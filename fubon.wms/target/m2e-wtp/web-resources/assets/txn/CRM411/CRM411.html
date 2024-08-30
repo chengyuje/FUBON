@@ -1,0 +1,168 @@
+<style>
+
+/* table size */
+.CRM411 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM411 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM411.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM411/CRM411.js"></script>
+<script type="text/javascript" src="assets/txn/CRM411/CRM411_INSERT.js"></script>
+<div class="CRM411" ng-controller="CRM411Controller" ng-cloak>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a14.gif" >議價授權設定</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<uib-tabset active="0" justified="true">
+					<uib-tab index="0" heading="一般客戶" select="init()">
+						<div id="tab1">
+							<h4 class="h4-title">查詢條件</h4>
+							<div class="search_table search_box2 scroll_y">
+								<table>
+									<tr>
+										<th style = "width:20%">產品類別：</th>
+										<td style = "width:80%">
+											<label><input type='checkbox' ng-model="inputVO.clickAll" ng-change="checkrow()" ng-click="toggleSelection()"/> 全選</label>
+											<label ng-repeat="req in mappingSet['SOT.PROD_TYPE']">
+												<input type="checkbox" name="selectedCodes" value="{{req.DATA}}" 
+													   ng-model='req.SELECTED'
+													   ng-click="toggleSelection()"
+													   ng-required="true"> {{req.LABEL}}
+												&nbsp;&nbsp;
+											</label>
+											&nbsp;&nbsp;
+											<label style="color: red" ng-show="ans.length <= 0">＊請選擇產品類別</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+							<div class="search_box_btn text-center">
+								<button type="button" class="btn btn-info" ng-click="query('0')" ng-disabled="ans.length <= 0">查詢</button>
+							</div>
+							<h4 class="h4-title">
+								查詢結果
+								<span><a href = "#" onclick="return false" ng-click="insert('0')"><i class="glyphicon glyphicon-plus"></i></a></span>
+							</h4>
+							<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="tablesaw table table-striped table-bordered text-center middle" ng-init="totals = {}">
+									<thead>
+										<tr>
+											<th rowspan="2">產品類別</th>
+											<th rowspan="2">屬級</th>
+											<th rowspan="2">職務別</th>
+											<th colspan="6">貢獻度</th>
+										</tr>
+										<tr>
+											<th>E</th>
+											<th>I</th>
+											<th>P</th>
+											<th>O</th>
+											<th>S</th>
+											<th>其他</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr  ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" class="repeat-row">
+											<td>{{row.PROD_TYPE | mapping:mappingSet['SOT.PROD_TYPE']:'F3'}}</td>
+											<td>{{row.LEVEL_NO}}</td>
+											<td>{{row.ROLE_LIST}}</td>
+											<td>{{row.E}}</td>
+											<td>{{row.I}}</td>
+											<td>{{row.P}}</td>
+											<td>{{row.O}}</td>
+											<td>{{row.S}}</td>
+											<td>{{row.OTH}}</td>
+										</tr>					
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</uib-tab>
+					<uib-tab index="1" heading="高端客戶" select="init()">
+						<div id="tab2">
+							<h4 class="h4-title">查詢條件</h4>
+							<div class="search_table search_box2 scroll_y">
+								<table>
+									<tr>
+										<th style = "width:20%">產品類別：</th>
+										<td style = "width:80%">
+											<label><input type='checkbox' ng-model="inputVO.clickAll" ng-change="checkrow()" ng-click="toggleSelection()"/> 全選</label>
+											<label ng-repeat="req in mappingSet['SOT.PROD_TYPE']">
+												<input type="checkbox" name="selectedCodes" value="{{req.DATA}}" 
+													   ng-model='req.SELECTED'
+													   ng-click="toggleSelection()"
+													   ng-required="true"> {{req.LABEL}}
+												&nbsp;&nbsp;
+											</label>
+											&nbsp;&nbsp;
+											<label style="color: red" ng-show="ans.length <= 0">＊請選擇產品類別</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+							<div class="search_box_btn text-center">
+								<button type="button" class="btn btn-info" ng-click="query('9')" ng-disabled="ans.length <= 0">查詢</button>
+							</div>
+							<h4 class="h4-title">
+								查詢結果
+								<span><a href = "#" onclick="return false" ng-click="insert('9')"><i class="glyphicon glyphicon-plus"></i></a></span>
+							</h4>
+							<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="tablesaw table table-striped table-bordered text-center middle" ng-init="totals = {}">
+									<thead>
+										<tr>
+											<th rowspan="2">產品類別</th>
+											<th rowspan="2">屬級</th>
+											<th rowspan="2">職務別</th>
+											<th colspan="6">貢獻度</th>
+										</tr>
+										<tr>
+											<th>E</th>
+											<th>I</th>
+											<th>P</th>
+											<th>O</th>
+											<th>S</th>
+											<th>其他</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr  ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" class="repeat-row">
+											<td>{{row.PROD_TYPE | mapping:mappingSet['SOT.PROD_TYPE']:'F3'}}</td>
+											<td>{{row.LEVEL_NO}}</td>
+											<td>{{row.ROLE_LIST}}</td>
+											<td>{{row.E}}</td>
+											<td>{{row.I}}</td>
+											<td>{{row.P}}</td>
+											<td>{{row.O}}</td>
+											<td>{{row.S}}</td>
+											<td>{{row.OTH}}</td>
+										</tr>					
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</uib-tab>
+				</uib-tabset>
+			</div>
+		</div>
+	</div>
+</div>

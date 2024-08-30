@@ -1,0 +1,81 @@
+<div ng-controller="CRM251_EDITController" ng-cloak>
+	<div class="modal-dialog CRM251_EDIT">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.GROUP_ID == null ? '新增' : '編輯'}}群組</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">客戶群組名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="group_name" name="group_name" ng-model="inputVO.group_name" e-length-limit="20" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.group_name.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入客戶群組名稱</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="!priID.startsWith('UHRM')">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">AO Code：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="ao_code" name="ao_code"
+									ng-datasource="AOCodes"
+									ng-model="inputVO.ao_code"
+									ng-validate="false" 
+									ng-disabled="ao_code.length == 1"
+	   								ng-readonly="ao_code.length == 1" 
+									ng-editable="false" 
+									ng-format="F1"
+									ng-required="true"
+									width="150px"
+									style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.ao_code.$error.required" ng-if="!priID.startsWith('UHRM')">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇AO Code</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="priID.startsWith('UHRM')">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">UHRM：</th>
+							<td class="col-md-7 tdpadding">
+			    				<e-combobox id="uEmpID" name="uEmpID"
+											ng-datasource="mappingSet['UHRM_LIST']"
+											ng-model="inputVO.uEmpID"
+											ng-validate="false" 
+											ng-disabled="priID == 'UHRM002'"
+											ng-readonly="priID == 'UHRM002'" 
+											ng-show="priID.startsWith('UHRM')"
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											width="200px"
+											style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.uEmpID.$error.required" ng-if="priID.startsWith('UHRM')">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇UHRM</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" ng-disabled = "inputVO.group_name == null || inputVO.ao_code == undefined ">確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

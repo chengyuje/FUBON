@@ -1,0 +1,157 @@
+<div class="panel_content">
+<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+	<e-jumping-once output="outputVO1" list="prdData" totalList="prdList"></e-jumping-once>
+	<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="4" e-list="prdData">
+		<thead>
+			<tr>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PROD_TYPE" e-query="inquire()">商品類別</e-sorter></th>
+				<th>憑證編號</th>
+				<th>產品代碼</th>
+				<th>產品名稱</th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="DATA_DATE" e-query="inquire()">贖回日期</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INV_CRCY_TYPE" e-query="inquire()">幣別</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INV_COST_ORGD" e-query="inquire()">投資成本(原幣)</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REF_AMT_ORGD" e-query="inquire()">贖回金額(原幣)</e-sorter></th>
+<!-- 				<th ng-if="inputVO.prdType=='03'">贖回前手息(原幣)</th> -->
+<!-- 				<th ng-if="inputVO.prdType=='03'">申購前手息(原幣)</th> -->
+				<th>原幣不含息報酬率(%)</th>
+				<th ng-if="inputVO.prdType=='03'">原幣含息報酬率(%)</th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INV_COST_TWD" e-query="inquire()">投資成本(折台幣)</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REF_AMT_TWD" e-query="inquire()">贖回金額(折台幣)</e-sorter></th>
+<!-- 				<th ng-if="inputVO.prdType=='03'">贖回前手息(折台幣)</th> -->
+<!-- 				<th ng-if="inputVO.prdType=='03'">申購前手息(折台幣)</th> -->
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REF_EXCH_RATE" e-query="inquire()">贖回匯率</e-sorter></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="repeat-row" ng-repeat="row in prdData track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+				<td ng-if="row.PROD_TYPE == 'PD07'">{{row.INV_TYPE == 'SN' ? '境外結構型商品(SN)' : '海外債'}}</td>
+				<td ng-if="row.PROD_TYPE != 'PD07'">{{row.PROD_TYPE | mapping:PRD_TYPE_SHOW:'F3'}}</td>
+				<td>{{row.CERT_NBR}}</td>
+				<td>{{row.PROD_ID}}</td>
+				<td ng-if="!row.REMARK || row.REMARK == ''">{{row.PROD_NAME}}</td>
+				<td ng-if="row.REMARK && row.REMARK != ''">{{row.PROD_NAME}}({{row.REMARK}})</td>
+				<td>{{toJsDate(row.DATA_DATE) | date:'yyyy/MM/dd'}}</td>
+				<td>{{row.INV_CRCY_TYPE}}</td>
+				<td style="text-align: right;">{{row.INV_COST_ORGD | number}}</td>
+				<td style="text-align: right;">{{row.REF_AMT_ORGD | number}}</td>
+<!-- 				<td style="text-align: right;" ng-if="inputVO.prdType=='03'">{{row.RDM_PRE_DIVID | number}}</td> -->
+<!-- 				<td style="text-align: right;" ng-if="inputVO.prdType=='03'">{{row.PUR_PRE_DIVID | number}}</td> -->
+				<!-- 原幣不含息報酬率 = (贖回金額原幣 – 投資成本(原幣) ) *100 / 投資成本 , 小數點2位 -->
+				<td style="text-align: right;">{{(row.REF_AMT_ORGD - row.INV_COST_ORGD) * 100 / row.INV_COST_ORGD  | number:2}}</td>
+				<!-- 海外債(到期): 原幣含息報酬率 = (還本原幣金額 + 累積配息金額 - 申購成交金額 -申購前手息) * 100 / 申購成交金額 , 小數點2位 -->
+				<td style="text-align: right;" ng-if="inputVO.prdType=='03' && row.PROD_TYPE == 'PD22'">{{(row.REF_AMT_ORGD + row.TXN_DIVID_ORGD - row.INV_COST_ORGD - row.PUR_PRE_DIVID) * 100 / row.INV_COST_ORGD | number:2}}</td>
+				<!-- 海外債(贖回): 原幣含息報酬率 = (還本原幣金額 + 贖回前手息 + 累積配息金額 - 申購成交金額 -申購前手息) * 100 / 申購成交金額 , 小數點2位 -->
+				<td style="text-align: right;" ng-if="inputVO.prdType=='03' && row.PROD_TYPE == 'PD23'">{{(row.REF_AMT_ORGD + row.RDM_PRE_DIVID + row.TXN_DIVID_ORGD - row.INV_COST_ORGD - row.PUR_PRE_DIVID) * 100 / row.INV_COST_ORGD | number:2}}</td>
+				<td style="text-align: right;">{{row.INV_COST_TWD | number:0}}</td>
+				<td style="text-align: right;">{{row.REF_AMT_TWD | number:0}}</td>
+<!-- 				<td style="text-align: right;" ng-if="inputVO.prdType=='03'">{{row.RDM_PRE_DIVID_TW | number}}</td> -->
+<!-- 				<td style="text-align: right;" ng-if="inputVO.prdType=='03'">{{row.PUR_PRE_DIVID_TW | number}}</td> -->
+				<td style="text-align: right;">{{row.REF_EXCH_RATE | number}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<br>
+<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+	<e-jumping-once output="outputVO2" list="curRows" totallist="curList"></e-jumping-once>
+	<table class="table td_center" e-list="curRows">
+		<thead>
+			<tr>
+				<th>幣別</th>
+				<th>投資成本(原幣)</th>
+				<th>贖回金額(原幣)</th>
+				<th>投資成本(台幣)</th>
+				<th>贖回金額(台幣)</th>
+				<th>原幣不含息報酬率(%)</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="repeat-row" ng-repeat="row in curRows track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+				<td>{{row.INV_CRCY_TYPE}}</td>
+				<td class="td_right">{{row.INV_COST_ORGD | number}}</td>
+				<td class="td_right">{{row.REF_AMT_ORGD | number}}</td>
+				<td class="td_right">{{row.INV_COST_TWD | number:0}}</td>
+				<td class="td_right">{{row.REF_AMT_TWD | number:0}}</td>
+				<td class="td_right">{{(row.REF_AMT_ORGD - row.INV_COST_ORGD) * 100 / row.INV_COST_ORGD  | number:2}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div>
+<table>
+	<tr>
+		<td>
+			<b>參考總損益(台幣)(不含息)：{{TOTAL_RTN_TWD | number:0}}</b><br/>
+			<b>折台幣總報酬率(%)(不含息)：{{((TOTAL_AMT_TWD - TOTAL_COST_TWD) * 100 / TOTAL_COST_TWD) | number:2}}</b>
+		</td>
+		<td ng-if="inputVO.prdType == '03'">
+			<b>參考總損益(台幣)(含息)：{{TOTAL_BOND_PL_TWD | number:0}}</b><br/>
+			<b>折台幣總報酬率(%)(含息)：{{(TOTAL_BOND_PL_TWD * 100 / TOTAL_BOND_COST_TWD) | number:2}}</b>
+		</td>
+	</tr>
+	<tr>
+</table>
+</div>
+
+<span ng-if="inputVO.prdType != '03'" class="with-errors">
+	註：1. 贖回內容不包含「轉出之基金」。
+	<br>
+	&emsp;&emsp;2. 贖回參考匯率為贖回當日之收盤買價。
+</span>
+<span ng-if="inputVO.prdType == '03'" class="with-errors">
+	註：1. 贖回參考匯率為贖回當日之收盤買價。
+	<br/>
+	&emsp;&emsp;2. 含息報酬率計算公式：
+	<br/>
+	&emsp;&emsp;&emsp;已到期：(到期原幣金額 + 累積配息金額 - 申購成交金額 - 申購前手息) / 申購成本
+	<br/>
+	&emsp;&emsp;&emsp;已贖回：(贖回成交金額 + 贖回前手息 + 累積配息金額 - 申購成交金額 - 申購前手息) / 申購成本
+</span>
+
+<h4 class="h4-title">累計已實現配息</h4>
+<div class="gv_tab_sc scroll_y" style="white-space: nowrap;"> 
+	<e-jumping-once output="outputVO3" list="divRows" totallist="divList"></e-jumping-once>
+	<table class="table td_center" e-list="divRows">
+		<thead>
+			<tr>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PROD_TYPE" e-query="inquire2()">商品類別</e-sorter></th>
+				<th>憑證編號</th>
+				<th>產品代碼</th>
+				<th>產品名稱</th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="VALU_CRCY_TYPE" e-query="inquire2()">幣別</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="TXN_DIVID_ORGD" e-query="inquire2()">累積配息(原幣)</e-sorter></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="repeat-row" ng-repeat="row in divRows" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+				<td ng-if="row.PROD_TYPE == 'PD07'">{{row.INV_TYPE == 'SN' ? '境外結構型商品(SN)' : '海外債'}}</td>
+				<td ng-if="row.PROD_TYPE != 'PD07'">{{row.PROD_TYPE | mapping:PRD_TYPE_SHOW:'F3'}}</td>
+				<td>{{row.CERT_NBR}}</td>
+				<td>{{row.PROD_ID}}</td>
+				<td>{{row.PROD_NAME}}</td>
+				<td>{{row.VALU_CRCY_TYPE}}</td>
+				<td class="td_right">{{row.TXN_DIVID_ORGD | number}}</td>
+			</tr>
+			<!-- 合計 -->
+			<tr>
+				<td colspan="5">配息總計(台幣)</td>
+				<td class="td_right">{{TOTAL_DIVID_TWD | number:0}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<span class="with-errors">
+	註：本系統僅提供2006/1/1起之贖回及累積配息資料。
+</span>
+<br>
+<span ng-show="inputVO.prdType != '03' ">
+	海外交易所買賣基金及國內指數股票型基金﹝ETF﹞之淨值為本行系統最近一日集中市場之市場收盤價，
+	投資損益、報酬率、參考餘額亦使用本行系統最近一日集中市場的市場收盤價格估算得之。
+	<br>
+</span>
+<span class="with-errors">
+	已上最新資訊僅至前一營業日終資料，僅供參考，勿做為對帳單之用！
+</span>
+</div>

@@ -1,0 +1,53 @@
+
+<script type="text/javascript" src="assets/txn/CRM826/CRM826.js"></script>
+<script type="text/javascript" src="assets/txn/CRM826/CRM826_DETAIL.js"></script>
+<div class="CRM826" ng-controller="CRM826Controller" ng-cloak>
+	<!-- <div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >黃金存摺</div>
+	</div>-->
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th>交易編號</th>
+						<th>商品名稱</th>
+						<th>交易金額</th>
+						<th>商品幣別</th>
+						<th>相對幣別</th>
+						<th>交易日</th>
+						<th>比價日</th>
+						<th>到期日</th>
+						<th>商品收益率(%)</th>
+						<th>幣別</th>
+						<th>收益金額</th>
+						<th>是否幣轉</th>
+						<th>到期幣別</th>
+						<th>到期返還金額</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;"><a href="#" onclick="return false" ng-click="detail(row)">{{row.PROD_ID}}</a></td>
+						<td style="text-align: left;">{{row.PRD_NAME}}</td>
+						<td style="text-align: right;">{{row.TXN_AMT|number:2}}</td>
+						<td style="text-align: left;">{{row.VALU_CRCY_TYPE|mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+						<td style="text-align: left;">{{row.MPNG_CRCY_TYPE|mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+						<td style="text-align: left;">{{toJsDate(row.TXN_DATE)|date:"yyyy/MM/dd"}}</td>
+						<td style="text-align: left;">{{toJsDate(row.EXPIRY_DATE)|date:"yyyy/MM/dd"}}</td>
+						<td style="text-align: left;">{{toJsDate(row.DUE_DATE)|date:"yyyy/MM/dd"}}</td>
+						<td style="text-align: right;">{{row.YIELD_RATE | number : 2}}</td>
+						<td style="text-align: left;">{{row.VALU_CRCY_TYPE}}</td>
+						<td style="text-align: right;">{{row.REF_PROFIT|number:2}}</td>
+						<td style="text-align: left;">{{row.CRCY_CHGE_STATUS | mapping:mappingSet['CRM.DCI_CRCY_CHGE_STATUS']:'F3'}}</td>
+						<td style="text-align: left;">{{row.CRCY_CHGE_STATUS ? (row.CRCY|mapping:mappingSet['FPS.CURRENCY']:'F3') : '' }}</td>
+						<td style="text-align: right;">{{row.CRCY_CHGE_STATUS ? (row.DEL_AMT|number:2) : ''}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

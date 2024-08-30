@@ -1,0 +1,94 @@
+<div ng-controller="FPSProdNANOController">
+	<!-- query -->
+	<div class="block query-box container" ng-class="{'no-area': arrowUp}">
+		<!-- fake title -->
+		<div class="content-wrapper"
+			style="background-color: #bfe2f7; margin-top: -1px;">
+			<div class="content-title font-bold">商品清單</div>
+			<div class="content-body">
+				<div class="toggle-wrapper btn-fps"
+					ng-class="{'btn-fps-disabled':isMore}"
+					ng-click="isMore?'':arrowUp=!arrowUp">
+					查詢條件 <img src="assets/images/ic-up.svg" class="icon"
+						ng-show="!arrowUp"> <img src="assets/images/ic-down.svg"
+						class="icon" ng-show="arrowUp">
+				</div>
+			</div>
+		</div>
+
+		<!-- fake body -->
+		<div class="content-wrapper product_query" ng-show="!arrowUp">
+			<table>
+				<tbody>
+					<tr>
+						<th>商品代碼：</th>
+						<td><input type="text" class="form-control"
+							style="text-transform: uppercase;" placeholder="請輸入..."
+							id="fund_id" name="prd_id" ng-model="inputVO.prd_id"
+							ng-blur="getName()" e-length-limit="16"></td>
+						<th>商品名稱：</th>
+						<td colspan="3"><input type="text" class="form-control"
+							style="text-transform: uppercase;" placeholder="請輸入..."
+							id="prd_name" name="prd_name" ng-model="inputVO.prd_name"
+							e-length-limit="255"></td>
+					</tr>
+					<tr>
+						<th>商品風險等級：</th>
+						<td><e-combobox id="risk_level"
+								ng-datasource="PROD_RISK_LEVEL" ng-model="inputVO.risk_level"
+								ng-validate="false" ng-readonly="false" ng-editable="false"
+								ng-format="F3" ng-required="false" width="150px"
+								style="line-height:20px;"/></td>
+						<th>計價幣別：</th>
+						<td><e-combobox id="currency" ng-datasource="CURRENCY"
+								ng-model="inputVO.currency" ng-validate="false"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								ng-required="false" width="150px" style="line-height:20px;" />
+						</td>						
+						<th>投資策略：</th>
+						<td><e-combobox id="inv_level" ng-datasource="PROD_INV_LEVEL"
+								ng-model="inputVO.inv_level" ng-validate="false"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								ng-required="false" width="150px" style="line-height:20px;" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="search_box_btn text-center">
+				<a type="button" class="btn-fps" ng-click="inquire()">查詢</a> <a
+					type="button" class="btn-fps" ng-click="init()">清除</a>
+			</div>
+		</div>
+	</div>
+	<!-- !query -->
+
+	<!-- result -->
+	<div>
+		<e-jumping-once ng-show="inputVO.type" output="outputVO" list="paramList" totallist="prodList"></e-jumping-once>
+	</div>
+	<table class="table">
+		<thead>
+			<tr>
+				<th rowspan="2" style="min-width: 2em;"></th>
+				<th rowspan="2">推薦</th>
+				<th>商品名稱</th>
+				<th>風險等級</th>
+				<th>投資策略</th>
+				<th>計價幣別</th>
+		</thead>
+		<tbody>
+			<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+				<td><input type="checkbox" ng-model="row.selected"
+					ng-change="selected(row)"></td>
+				<td>
+					<img src="assets/images/ic-crown.svg">
+				</td>
+				<td>{{row.PRD_NAME}}</td>
+				<td>{{row.RISKCATE_ID}}</td>
+				<td>{{row.INV_LEVEL| mapping:PROD_INV_LEVEL:'F3'}}</td>
+				<td>{{row.CURRENCY_STD_ID| mapping:CURRENCY:'F3'}}</td>
+			</tr>
+		</tbody>
+	</table>
+	<!-- !result -->
+</div>

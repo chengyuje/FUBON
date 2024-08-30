@@ -1,0 +1,77 @@
+<script type="text/javascript" src="assets/txn/INS140/INS140.js"></script>
+<script type="text/javascript" src="assets/txn/INS140/INS140_RELATION.js"></script>
+<div class="INS140" ng-controller="INS140Controller" ng-cloak>
+	<div class="panel panel-default">
+		<div class="search_table" style="margin: 10px;">
+			<table>
+				<tr>
+					<td colspan="2" width="30%"></td>
+					<td colspan="5" width="50%"><h3>§&nbsp;對象：</h3></td>
+					<td width="20%"></td>
+				</tr>
+				<tr>
+					<td colspan="2" width="30%"></td>
+					<td width="10%"><input type='radio' name="radio" ng-disabled="!hasPolicy&&!hasQuestionnaire" ng-model="inputVO.object" value="self"/>&nbsp;&nbsp;本人</td>
+					<td colspan="3"  width="30%"><input type='radio' name="radio" ng-disabled="!hasPolicy&&!hasQuestionnaire" ng-model="inputVO.object" value="relation"/>&nbsp;&nbsp;包含家庭關係戶&nbsp;&nbsp;<button class="btn btn-info" ng-click="goRelation(inputVO.custID)" ng-disabled="inputVO.lstFamilyTemp.length == 0 || inputVO.object == 'self'">家庭關係戶</button></td>
+					<td colspan="2" width="30%"></td>
+				</tr>
+				<tr>
+					<td colspan="8"></td>
+				</tr>
+				
+				<tr>
+					<td colspan="2" width="30%"></td>
+					<td colspan="2" width="20%"><h3>§&nbsp;保單健診報告書</h3></td>
+					<td colspan="3" width="30%"><h3>§&nbsp;家庭財務安全報告書</h3></td>
+					<td width="20%"></td>
+				</tr>
+				<tr>
+					<td colspan="2" width="30%"></td>
+					<td colspan="2" width="20%"><input type="checkbox" ng-disabled="!hasPolicy" ng-model="selectAllLift" ng-true-value="'Y'" ng-false-value="'N'" ng-click="selectAll('L' , selectAllLift)">&nbsp;&nbsp;列印所有表單</td>
+					<td colspan="2" width="20%"><input type="checkbox" ng-disabled="!hasQuestionnaire" ng-model="selectAllRight" ng-true-value="'Y'" ng-false-value="'N'" ng-click="selectAll('R' , selectAllRight)">&nbsp;&nbsp;列印所有表單</td>
+					<td width="10%"></td>
+					<td width="20%"></td>
+				</tr>
+				<tr>
+					<td colspan="2" width="30%"></td>
+					<td colspan="2" width="20%"><input type="checkbox" ng-disabled="!hasPolicy" ng-model="policyDetail" ng-true-value="'Y'" ng-false-value="'N'" ng-click="select('policyDetail', policyDetail)" >&nbsp;&nbsp;現有保單一覽表</td>
+					<td colspan="2" width="20%"><input type="checkbox" ng-disabled="!hasQuestionnaire" ng-model="familyFeeGap" ng-true-value="'Y'" ng-false-value="'N'" ng-click="select('familyFeeGap', familyFeeGap)" >&nbsp;&nbsp;應備費用計不足額表</td>
+					<td width="10%"></td>
+					<td width="20%"></td>
+				</tr>
+				<tr>
+					<td colspan="2" width="30%"></td>
+					<td colspan="2" width="20%"><input type="checkbox" ng-disabled="!hasPolicy" ng-model="viewStructure" ng-true-value="'Y'" ng-false-value="'N'" ng-click="select('viewStructure', viewStructure)">&nbsp;&nbsp;保障項目彙總表</td>
+ 					<td colspan="2" width="20%"><input type="checkbox" ng-disabled="!hasQuestionnaire" ng-model="familySave" ng-true-value="'Y'" ng-false-value="'N'" ng-click="select('familySave', familySave)">&nbsp;&nbsp;財務安全規劃基本資料 </td>
+					<td width="10%"></td>
+					<td width="20%"></td>
+				</tr>
+				<tr>
+					<td colspan="2" width="30%"></td>
+					<td colspan="2" width="20%"><input type="checkbox" ng-disabled="!hasPolicy" ng-model="indYearSum" ng-true-value="'Y'" ng-false-value="'N'" ng-click="select('indYearSum', indYearSum)">&nbsp;&nbsp;個人保險保障彙總表</td>
+					<td colspan="2" width="20%"></td>
+					<td width="10%"></td>
+					<td width="20%"></td>
+				</tr>
+				<tr>
+					<td colspan="2" width="30%"></td>
+					<td colspan="2" width="20%"><input type="checkbox" ng-disabled="!hasPolicy" ng-model="familyYear" ng-true-value="'Y'" ng-false-value="'N'" ng-click="select('familyYear', familyYear)">&nbsp;&nbsp;家庭保險保障彙總表</td>
+					<td colspan="2" width="20%"></td>
+					<td width="10%"></td>
+					<td width="20%"></td>
+				</tr>
+				<tr>
+					<td colspan="2" width="30%"></td>
+					<td colspan="2" width="20%"><input type="checkbox" ng-disabled="!hasPolicy" ng-model="viewSum" ng-true-value="'Y'" ng-false-value="'N'" ng-click="select('viewSum', viewSum)">&nbsp;&nbsp;保障項目明細表</td>
+					<td colspan="2" width="20%"></td>
+					<td width="10%"></td>
+					<td width="20%"></td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="printPolicyReport();" ng-disabled="!hasPolicy&&!hasQuestionnaire">列印</button>
+			<button type="button" class="btn btn-info" ng-click="init('N');" ng-disabled="!hasPolicy&&!hasQuestionnaire">清除</button>
+		</div>
+    </div>
+</div>

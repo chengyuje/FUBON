@@ -1,0 +1,45 @@
+<div class="block container">
+  <div print-wrapper>
+    <div class="title title-left subtitle prime"
+         style="height: 2.6em;
+                  position: relative;">
+      <b style="font-size: 1.1em;">基金+連結全委帳戶之投資型保險</b>
+    </div>
+  </div>
+
+  <table class="table"
+         print-wrapper>
+    <thead>
+      <tr>
+        <th style="width:50%;">商品</th>
+        <th>投入金額</th>
+        <th>約當台幣</th>
+        <th>比例</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in paramList track by $index"
+          ng-show="row.action!='delete'"
+          class="repeat-row"
+          print-cell>
+
+        <td class="text-left"
+            width="50%"
+            ng-bind="row.PRD_CNAME">
+        </td>
+        <!--投入金額 -->
+        <td style="text-align: right;"
+            ng-bind="row.PTYPE == 'MFD'? (row.TRUST_CURR + '    ' + (row.CHG_PERCENT | number:0)) : (row.CURRENCY_TYPE + '    ' + (row.CHG_PERCENT | number:0))">
+        </td>
+        <!--台幣市值 -->
+        <td style="text-align: right;"
+            ng-bind="row.NTD_PERCENT | number">
+        </td>
+        <!--配置比例(依市值)-->
+        <td>
+          <span ng-bind="row.INV_PERCENT"></span>%
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

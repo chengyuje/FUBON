@@ -1,0 +1,233 @@
+<style>
+
+input:required:invalid{
+ 	border-color: red;
+
+}
+table.INS130 tr td {
+	padding: 5px;
+}
+
+.table-border {
+	border-color: #ddf2f9;
+    border-top: #ddf2f9;
+    border-bottom: #ddf2f9;
+    border-left: #ddf2f9;
+    border-right: #ddf2f9;
+}
+
+.left-border-hidden{
+	border-left-style: hidden !important;
+}
+
+.right-border-hidden{
+	border-right-style: hidden !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/INS130/INS130.js"></script>
+<script type="text/javascript" src="assets/txn/INS430/INS431_CHILDREN.js"></script>
+<div class="INS130" ng-controller="INS130Controller" ng-cloak>
+	<div class="search_table">
+		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<h4 class="h4-title">被保人基本資料</h4>
+			<table class="gv_tab_sc">					
+				<tr class="text-center">
+					<th width="25%" colspan="4"><b>被保人ID：{{inputVO.custId}}</b></th>
+					<th width="30%" colspan="4"><b>姓名：{{inputVO.custName}}</b></th>
+					<th width="25%" colspan="4"><b>年齡：{{inputVO.age}}歲</b></th>
+					<th width="20%" colspan="4"><b>性別：{{inputVO.gender | mapping:mappingSet['CRM.CUST_GENDER']:F3}}</b></th>
+				</tr>
+				<tr class="text-center" ng-if="inputVO.hasRel">
+					<th colspan="4">
+						<b>配偶(家庭成員)姓名：{{inputVO.partnerName}}</b>
+					</th>
+					<th colspan="4">
+						<b>配偶(家庭成員)生日：{{inputVO.partnerBirthDate | date:"yyyy/MM/dd"}}</b>
+					</th>
+					<th colspan="4">
+						<b>配偶(家庭成員)性別：{{inputVO.partnerGender | mapping:mappingSet['CRM.CUST_GENDER']:F3}}</b>
+					</th>
+					<th colspan="4"></th>
+				</tr>	
+				<tr class="text-center" ng-if="!inputVO.hasRel">
+					<td colspan="2"><b>*配偶(家庭成員)</b><br><b>姓名：</b></td>
+					<td colspan="2"><input type="text" class="form-control" style="width:100px;text-align: left;" e-length-limit="100" id="parName" name="parName" ng-model="inputVO.partnerName" required></td>
+					<td colspan="2"><b>*配偶(家庭成員)</b><br><b>生日：</b></td>
+					<td colspan="2">
+						<div class="input-group datebox datewidth">
+							<input type="text" id="parBirth" name="parBirth"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.partnerBirthDate"
+									is-open="model.a"
+									ng-readonly="true"
+									width="100px"
+									required
+									 />
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+								<i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</div>
+					</td>
+					<td colspan="2"><b>*配偶(家庭成員)</b><br><b>性別：</b></td>
+					<td colspan="2">
+						<e-combobox 
+						id="parGender" name="parGender"
+						ng-paramtype="CRM.CUST_GENDER"
+						ng-model="inputVO.partnerGender"
+						ng-format="F3"
+						width="100px"
+						ng-required="true">
+					</td>
+					<td colspan="4">
+				</tr>														
+			</table>
+			<table  class="gv_tab_sc scroll_y">
+				<tr>
+					<th colspan="5"><h4 class="h4-title">應備費用</h4></th>
+					<th colspan="6"><h4 class="h4-title">已備費用</h4></th>
+				</tr>
+				<tr>
+					<td colspan="5"><h4>生活費用</h4></td>
+					<td colspan="6"><h4>年薪收入</h4></td>
+				</tr>
+				<tr>
+					<td colspan="3">1. 家庭生活基本開銷(月)</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="8" id="livingExp" name="livingExp" ng-model="inputVO.livingExp" required></td>
+					<td class="left-border-hidden">萬元</td>
+					
+					<td>被保險人年薪</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="8" id="income" name="income" ng-model="inputVO.income" required></td>
+					<td class="left-border-hidden">萬元</td>
+					<td>配偶年薪</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="8" id="couIncome" name="couIncome" ng-model="inputVO.couIncome" required></td>
+					<td class="left-border-hidden">萬元</td>
+				</tr>
+				<tr>
+					<td colspan="3">2. 家庭生活非必要開銷(月)</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="8" id="notlivingExp" name="notlivingExp" ng-model="inputVO.notlivingExp" required></td>
+					<td class="left-border-hidden">萬元</td>
+					
+					<td colspan="6"><h4>房租收入</h4></td>						
+				</tr>
+				<tr>
+					<td width="15%">3. 被保險人生活費用(月)</td>
+					<td colspan="2" class="left-border-hidden"><button type="button" class="btn btn-info" ng-click="btnHelper('A')" >小幫手</button></td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="8" id="custLivingFee" name="custLivingFee" ng-model="inputVO.custLivingFee" required></td>
+					<td class="left-border-hidden">萬元</td>
+					<td colspan="2">房屋租金(年)</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="8" id="rentIncome" name="rentIncome" ng-model="inputVO.rentIncome" required ></td>
+					<td colspan="3" class="left-border-hidden">萬元</td>
+				</tr>
+				<tr>
+					<td>4. 子女生活費用(月)</td>
+					<td colspan="2" class="left-border-hidden"><button type="button" class="btn btn-info" ng-click="btnHelper('B')" >小幫手</button></td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="8" id="childLivingFee" name="childLivingFee" ng-model="inputVO.childLivingFee" required></td>
+					<td class="left-border-hidden">萬元</td>
+					<td colspan="6"><h4>準現金資產</h4></td>	
+				</tr>
+				<tr>
+					<td colspan="5"><h4>房貸費用</h4></td>
+					
+					<td colspan="2">現金及活期存款</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="10" id="cashAmt" name="cashAmt" ng-model="inputVO.cashAmt" required></td>
+					<td colspan="3" class="left-border-hidden">萬元</td>
+				</tr>
+				<tr>
+					<td colspan="3">房貸攤還金額(月)</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="8" id="houDebtAmt" name="houDebtAmt" ng-model="inputVO.houDebtAmt" required></td>
+					<td class="left-border-hidden">萬元</td>
+					
+					<td colspan="6"><h4>動產投資</h4></td>	
+				</tr>
+				<tr>
+					<td colspan="3">尚須</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="2" id="houDebtY" name="houDebtY" ng-model="inputVO.houDebtY" required></td>
+					<td class="left-border-hidden">年還清</td>
+					
+					<td colspan="2">1.股票</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="10" id="stockAmt" name="stockAmt" ng-model="inputVO.stockAmt" required></td>
+					<td colspan="3" class="left-border-hidden">萬元</td>	
+				</tr>
+				<tr>
+					<td colspan="5"><h4>教育費用</h4></td>
+					
+					<td colspan="2">2.定存</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="10" id="ctAmt" name="ctAmt" ng-model="inputVO.ctAmt" required></td>
+					<td colspan="3" class="left-border-hidden">萬元</td>
+				</tr>
+				<tr>
+					<td>子女教育基金</td>
+					<td colspan="2" class="left-border-hidden">
+							<button type="button" class="btn btn-info" ng-click="btnEdu()" >教育基金試算</button>
+							<span> </span>
+							<button type="button" class="btn btn-info" ng-click="btnHelper('C')" >小幫手</button>
+					</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="8" id="eduAmt" name="eduAmt" ng-model="inputVO.eduAmt" disabled="true" required></td>
+					<td class="left-border-hidden">萬元</td>
+					
+					<td colspan="2">3.共同基金</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="10" id="fundAmt" name="fundAmt" ng-model="inputVO.fundAmt" required></td>
+					<td colspan="3" class="left-border-hidden">萬元</td>
+				</tr>
+				<tr>
+					<td colspan="5"><h4>其他費用</h4></td>
+					
+					<td colspan="2">4.連動債</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="10" id="snAmt" name="snAmt" ng-model="inputVO.snAmt" required></td>
+					<td colspan="3" class="left-border-hidden">萬元</td>
+				</tr>
+				<tr>
+					<td>1.車貸(月)</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="8" id="carDebtAmt" name="carDebtAmt" ng-model="inputVO.carDebtAmt" required></td>
+					<td class="left-border-hidden right-border-hidden">萬元  尚須</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="3" id="carDebtY" name="carDebtY" ng-model="inputVO.carDebtY" required></td>
+					<td class="left-border-hidden">年還清</td>
+					
+					<td colspan="2">5.投資型保險</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="10" id="investInsAmt" name="investInsAmt" ng-model="inputVO.investInsAmt" required></td>
+					<td colspan="3" class="left-border-hidden">萬元</td>
+				</tr>
+				<tr>
+					<td>2.信貸(月)</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="8" id="cardDebtAmt" name="cardDebtAmt" ng-model="inputVO.cardDebtAmt" required></td>
+					<td class="left-border-hidden right-border-hidden">萬元  尚須</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="3" id="cardDebtY" name="cardDebtY" ng-model="inputVO.cardDebtY" required></td>
+					<td class="left-border-hidden">年還清</td>
+					
+					<td colspan="6"><h4>不動產</h4></td>
+				</tr>
+				<tr>
+					<td>3.其他貸款(月)</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:100px;text-align: right;" e-length-limit="8" id="otherDebtAmt" name="otherDebtAmt" ng-model="inputVO.otherDebtAmt" required></td>
+					<td colspan="3" class="left-border-hidden">萬元</td>
+											
+					<td colspan="2">房地產投資</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="10" id="investImmoveAmt" name="investImmoveAmt" ng-model="inputVO.investImmoveAmt" required></td>
+					<td colspan="3" class="left-border-hidden">萬元</td>
+				</tr>
+				<tr>
+					<td colspan="5"><h4>遺產稅</h4></td>
+					<td colspan="6"><h4>其他資產</h4></td>
+				</tr>
+				<tr>
+					<td>遺產稅金額</td>
+					<td colspan="2" class="left-border-hidden"><a ng-href="{{mapping.links[0]}}" target="_blank" class="btn btn-info" style="text-decoration:none;" role="button" >遺產稅試算</a></td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="10" id="taxIn" name="taxIn" ng-model="inputVO.taxIn" required></td>
+					<td class="left-border-hidden">萬元</td>
+					
+					<td colspan="2">其他資產</td>
+					<td><input e-input-limit="NABS" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="10" id="trustAmt" name="trustAmt" ng-model="inputVO.trustAmt" required></td>
+					<td colspan="3" class="left-border-hidden">萬元</td>					
+				</tr>
+				
+			</table>
+		</form>
+	</div>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="saveData(true)" >儲存</button>
+		<button type="button" class="btn btn-info" ng-click="familyFinData()" >家庭財務安全試算</button>
+	</div>	
+</div>

@@ -1,0 +1,289 @@
+<style>
+/* open dialog */
+.ngdialog.CRM611_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM611_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM611_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM611_DETAIL table.little{
+	width: 60%;
+}
+.CRM611_DETAIL div.gv_tab_sc th{
+	white-space: normal;
+}
+/* change row */
+.CRM611_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM611_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.red{
+	color: red;
+}
+.table-bordered tr>th{
+	width: 12%;
+}
+.table-bordered tr>td{
+	width: 12%;
+}
+</style>
+
+<div class="CRM611_DETAIL" ng-controller="CRM611_DETAILController" ng-cloak>
+	<div>
+		<h4 class="h4-title">基本資料</h4>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="table-bordered">
+				<tr>
+					<th>英文姓名</th>
+					<td ng-if="isVehicle || isMobile">{{esbData2.ENG_NAME | eMasking:8}}</td>
+					<td ng-if="!(isVehicle || isMobile)">{{esbData2.ENG_NAME}}</td>
+					<th>出生;創立日期</th>
+					<td>{{esbData2.BDAY_D}}<text ng-if = "esbData2.RESP_BDAY">;{{esbData2.RESP_BDAY}}</text></td>
+					<th>年齡</th>
+					<td>{{esbData2.AGE}}</td>
+					<th>國籍</th>
+					<td>{{data.COUNTRY_NAME}}</td>
+				</tr>
+				<tr>
+					<th>性別</th>
+					<td>{{esbData2.SEX  | mapping:mappingSet['CRM.CUST_GENDER']:'F3'}}</td>
+					<th>學歷</th>
+					<td>{{esbData2.EDUCATION == '7' ? ' ' : esbData2.EDUCATION|mapping: mappingSet['KYC.EDUCATION']:'F3'}}</td>
+					<th>婚姻狀況</th>
+					<td>{{esbData2.MARRAGE |  mapping: mappingSet['KYC.MARRAGE']:'F3' }}</td>
+					<th>子女數</th>
+					<td>{{esbData2.CHILD_NO  |  mapping: mappingSet['KYC.CHILD_NO']:'F3'}}</td>
+				</tr>
+				<tr>
+					<th>職業別</th>
+					<td>{{esbData2.CAREER | mapping:mappingSet['KYC.CAREER']:'F3'}}</td>
+					<th>服務單位</th>
+					<td>{{esbData2.COMPANY}}</td>
+					<th>職稱</th>
+					<td>{{esbData2.TITLE}}</td>
+					<th>年收入</th>
+					<td>{{data.ANNUAL_INCOME_AMT}}</td>
+				</tr>
+				<tr>
+					<th>組織型態</th>
+					<td>{{esbData2.ORG_TYPE |mapping:mappingSet['CRM.CBS.ORG.TYPE']:'F3'}}</td>
+					<th>公司負責人ID</th>
+					<td>{{esbData2.RESP_ID}}</td>
+					<th>公司負責人姓名</th>
+					<td>{{esbData2.RESP_NAME}}</td>
+					<th></th>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+		<h4 class="h4-title">其他資料</h4>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="table-bordered">
+				<tr>
+					<th>OBU註記</th>
+					<td>{{esbData.obuFlag == 'Y' ? 'Y' : 'N'}}</td>
+					<th>客訴戶註記</th>
+					<td>{{dbData.COMPLAIN_YN == 'Y' ? 'Y' : 'N'}}</td>
+					<th>死亡戶註記</th>
+					<td>{{esbData.deathFlag == 'Y' ? 'Y' : 'N'}}</td>
+					<th>喜好的通知方式</th>
+					<td>
+						<e-combobox id="infrom_way" name="infrom_way"
+							ng-paramtype="CRM.PREF_INFORM_WAY"
+							ng-model="inputVO.infrom_way"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							width="120px"
+							style="line-height:20px;" />
+					</td>
+				</tr>
+				<tr>
+					<th>信託/衍商已簽署推介同意書</th>
+					<td>{{esbData.custProRemark | mapping:mappingSet['CRM.SIGN_AGMT']:'F3'}}/{{siPromData.isEffetive == 'Y' ? siPromData.status : 'N' | mapping:mappingSet['CRM.SI_SIGN_AGMT']:'F3'}}</td>
+					<th>信託/衍商推介同意</th>
+					<td>{{esbData.custTxFlag == 'Y' ? 'Y' : 'N'}}/{{siPromData.isEffetive == 'Y' ? 'Y' : 'N'}}</td>
+					<th>投資註記</th>
+					<td>{{esbData.custProFlag =='Y' ? '專業投資人' : '非專業投資人'}}</td>
+					<th>最後變更日期</th>
+					<td>{{dbData.LASTUPDATE}}</td>
+				</tr>
+				<tr>
+					<!-- mantis 3902 hide -->
+<!-- 					<th>對帳單別</th> -->
+<!-- 					<td>{{esbData.billType | mapping:mappingSet['CRM.BILLS_TYPE']:'F3'}}</td> -->
+					<th>證券註記</th>
+					<td>{{esbData.acc3Other == 'Y' ? 'Y' : 'N'}}</td>
+					<th>保險註記</th>
+					<td>{{esbData.acc2Other == 'Y' ? 'Y' : 'N'}}</td>
+					<th>投信註記</th>
+					<td>{{esbData.acc4Other == 'Y' ? 'Y' : 'N'}}</td>
+					<th>家庭會員註記</th>
+					<td>{{dbData.FAMILY_DEGREE | mapping:mappingSet['CRM.FAMILY_DEGREE']:'F3'}}</td>
+				</tr>
+				<tr>
+					<th>RS拒銷戶</th>
+					<td>{{esbData.rejectProdFlag == 'Y' ? 'Y' : 'N'}}</td>
+					<th>NS禁銷戶</th>
+					<td>{{esbData.noSale  == 'Y' ? 'Y' : 'N'}}</td>
+					<th>本行授信異常註記</th>
+					<td>{{dbData.CREDIT_ABNORMAL == 'Y' ? 'Y' : 'N'}}</td>
+					<th>潛力等級註記</th>
+					<td>{{dbData.POTENTIAL_LEVEL | mapping:mappingSet['CRM.POTENTIAL_LEVEL']:'F3'}}</td>
+				</tr>
+				<tr>
+					<th>目前FATCA身份</th>
+					<td>{{w8bList.IDF_N | mapping:mappingSet['SOT.FATCA_CHK_IDFN']:'F1'}}</td>
+					<th>辨識狀態</th>
+					<td>{{w8bList.IDF_S}}</td>
+					<th>前次辨識身份</th>
+					<td>{{w8bList.IDF_P == '0000' ? '' : w8bList.IDF_P}}</td>
+					<th>體驗權益等級</th>
+					<td>{{dbData.EXPERIENCE_LEVEL | mapping:mappingSet['CRM.EXPERIENCE_LEVEL']:'F3'}}</td>
+				</tr>
+				<tr>
+					<th>是否實動戶</th>
+					<td>{{dbData.IS_ACTUAL}}</td>
+					<th>W-8BEN(W-8BEN-E)/效期</th>
+					<td>{{w8BenData.w8BenEffYN == null || w8BenData.w8BenEffYN == '' ? 'N' : 'Y'}}{{w8BenData.w8benEndDate == null ? '' : '/'}}{{toJsDate(w8BenData.w8benEndDate) | date:"yyyy-MM-dd"}}</td>
+					<th></th>
+					<td></td>
+					<th></th>
+					<td></td>
+				</tr>
+			</table>
+			
+		</div>
+		<h4 class="h4-title">客戶同意共銷註記</h4>
+		<div class="gv_tab_sc scroll_y">
+			<table class="table-bordered">
+				<tr>
+					<th>共同行銷-基本資料<br>(姓名/地址)</th>
+					<td>{{esbData.infoFlag == 'Y' ? 'Y' : 'N'}}</td>
+					<th></th>
+					<td></td>
+					<th></th>
+					<td></td>
+					<th></th>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+		<h4 class="h4-title">共同行銷基本資料(其他)註記</h4>
+		<div class="gv_tab_sc scroll_y">
+			<table class="table-bordered">
+				<tr>
+					<th>富邦產物保險<br>股份有限公司</th>
+					<td>{{esbData.acc1Other == 'Y' ? 'Y' : 'N'}}</td>
+					<th>富邦人壽<br>股份有限公司</th>
+					<td>{{esbData.acc2Other == 'Y' ? 'Y' : 'N'}}</td>
+					<th>富邦綜合證券<br>股份有限公司</th>
+					<td>{{esbData.acc3Other == 'Y' ? 'Y' : 'N'}}</td>
+					<th>富邦投資信託<br>股份有限公司</th>
+					<td>{{esbData.acc4Other == 'Y' ? 'Y' : 'N'}}</td>
+				</tr>
+				<tr>
+					<th>富邦期貨<br>股份有限公司</th>
+					<td>{{esbData.acc6Other == 'Y' ? 'Y' : 'N'}}</td>
+					<th>富昇人身保險代理<br>股份有限公司</th>
+					<td>{{esbData.acc7Other == 'Y' ? 'Y' : 'N'}}</td>
+					<th>富昇財產保險代理<br>股份有限公司</th>
+					<td>{{esbData.acc8Other == 'Y' ? 'Y' : 'N'}}</td>
+					<th></th>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+		<h4 class="h4-title">共同行銷往來資料交易註記</h4>
+		<div class="gv_tab_sc scroll_y">
+			<table class="table-bordered">
+				<tr>
+					<th>富邦產物保險<br>股份有限公司</th>
+					<td>{{esbData.acc1Flag == 'Y' ? 'Y' : 'N'}}</td>
+					<th>富邦人壽<br>股份有限公司</th>
+					<td>{{esbData.acc2Flag == 'Y' ? 'Y' : 'N'}}</td>
+					<th>富邦綜合證券<br>股份有限公司</th>
+					<td>{{esbData.acc3Flag == 'Y' ? 'Y' : 'N'}}</td>
+					<th>富邦投資信託<br>股份有限公司</th>
+					<td>{{esbData.acc4Flag == 'Y' ? 'Y' : 'N'}}</td>
+				</tr>
+				<tr>
+					<th>富邦期貨<br>股份有限公司</th>
+					<td>{{esbData.acc6Flag == 'Y' ? 'Y' : 'N'}}</td>
+					<th>富昇人身保險代理<br>股份有限公司</th>
+					<td>{{esbData.acc7Flag == 'Y' ? 'Y' : 'N'}}</td>
+					<th>富昇財產保險代理<br>股份有限公司</th>
+					<td>{{esbData.acc8Flag == 'Y' ? 'Y' : 'N'}}</td>
+					<th></th>
+					<td></td>
+				</tr>	
+			</table>
+		</div>
+		<div style="border-top-style: solid; border-color: #3399cc; margin: 10px 0;"></div>
+		<div class="gv_tab_sc scroll_y">
+			<table class="table-bordered">
+				<tr>
+					<th>同意銀行DM</th>
+					<td>{{esbData.dmFlag == 'Y' ? 'Y' : 'N'}}</td>
+					<th>同意銀行EDM</th>
+					<td>{{esbData.edmFlag == 'Y' ? 'Y' : 'N'}}</td>
+					<th>同意銀行簡訊</th>
+					<td>{{esbData.smsFlag == 'Y' ? 'Y' : 'N'}}</td>
+					<th>同意銀行電銷</th>
+					<td>{{esbData.tmFlag == 'Y' ? 'Y' : 'N'}}</td>
+				</tr>
+				<tr>
+					<th>大型薪轉公司銷售提醒註記</th>
+					<td>{{dbData.BIG_CO_REFUSE_PROM_YN  == 'Y' ? 'Y' : 'N'}}</td>
+					<td colspan="6">(若為 Y，表示該公司不希望員工上班時遭打擾，理專宜利用非上班時間打客戶手機聯繫)</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="save()" function-type="maintenance">儲存</button>
+			<span class="bigspace"></span>
+<!-- 				<button type="button" class="btn btn-info" ng-click="cancel()">取消</button> -->
+		</div>
+	</div>
+</div>

@@ -1,0 +1,312 @@
+<style>
+/* open dialog */
+.ngdialog.PMS345 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS345 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS345 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS345 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS345.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS345_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS345/PMS345.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS345" ng-controller="PMS345Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr >
+							<th>*照會日期：</th>
+							<td colspan="3" ><div style="float: left  "
+									class="input-group datebox datewidth">
+									<input type="text" class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.sCreDate"
+										is-open="model.a" datepicker-options="bgn_sDateOptions"
+										ng-readonly="true" ng-change="limitDate();dateChange()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+
+								<div style="float: left">~</div>
+
+								<div style="float: left" class="input-group datebox datewidth">
+									<input type="text" class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.eCreDate"
+										is-open="model.b" datepicker-options="bgn_eDateOptions"
+										ng-readonly="true" ng-change="limitDate();" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div></td>
+							<th>照會截止日：</th>
+							<td colspan="3"><div style="float: left;"
+									class="input-group datebox datewidth">
+									<input type="text" class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.sCreDate2"
+										is-open="model.c" datepicker-options="bgn_sDateOptions2"
+										ng-readonly="true" ng-change="limitDate2()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open2($event,'c')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+								<div style="float: left;">~</div>
+								<div style="float: left;" class="input-group datebox datewidth">
+									<input type="text" class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.eCreDate2"
+										is-open="model.d" datepicker-options="bgn_eDateOptions2"
+										ng-readonly="true" ng-change="limitDate2();" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open2($event,'d')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div></td>
+
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td><e-combobox ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id" ng-validate="false"
+									ng-disabled="disableRegionCombo"
+							        ng-readonly="disableRegionCombo"  ng-editable="false" ng-format="F3"
+									ng-change="ChangeRegion();Region()" ng-required="false" width="150px"
+									height="30px" style="line-height:20px;" /></td>
+
+							<th>營運區：</th>
+							<td><e-combobox id="op_id" name="op_id"
+									ng-datasource="AREA_LIST" ng-model="inputVO.branch_area_id"
+									ng-validate="false"  ng-editable="false"
+									ng-model="inputVO.branch_area_id"  
+									ng-disabled="disableAreaCombo"
+							       ng-readonly="disableAreaCombo"
+									ng-change="ChangeArea();Area()" ng-format="F3" width="90px"
+									style="line-height:20px;" /></td>
+
+							<th>分行：</th>
+							<td><e-combobox ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr" ng-validate="false"
+									ng-disabled="disableBranchCombo"
+							        ng-readonly="disableBranchCombo"
+							        ng-editable="false" ng-format="F1"
+									ng-required="false" ng-change="ChangeBranch();Branch()" width="155px"
+									height="30px" style="line-height:20px;" /></td>
+							<th>理專：</th>
+							<td><e-combobox id="ao_code"
+									ng-datasource="AO_LIST" ng-model="inputVO.ao_code"
+									ng-validate="false"ng-disabled="disableAoCombo"
+							         ng-readonly="disableAoCombo" ng-editable="false"
+									ng-format="F1" ng-required="false" width="100px"
+									style="line-height:20px;" /></td>
+
+
+
+
+                           
+						</tr>
+
+						<tr>
+							<th>保單號碼：</th>
+							<td><input type="text" ng-model="inputVO.POLICY_NO" SIZE="10"  e-length-limit="10" ng-keyup="sizelimit1()"  />-<input SIZE="3" type="text" id="P1"   e-length-limit="2"  ng-model="inputVO.num" ng-keyup="sizelimit2()" />-<input type="text" SIZE="1"  id="P2"   e-length-limit="1"   ng-model="inputVO.ID_DUP" ng-keyup="sizelimit3()"  /></td>
+							<th>要保人ID：</th>
+							<td><input type="text" ng-model="inputVO.id" style="width: 100px; "/></td>
+							<th>照會類別:</th>
+							<td><e-combobox id="csvType" ng-paramtype="PMS.NOTE_TYPE"
+									ng-model="inputVO.clas"
+									ng-change="action(inputVO.RESIGN_DESTINATION)"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-format="F1" ng-required="false" width="155px" /></td>
+							<th>狀態：</th>
+							<td><e-combobox id="csvType" ng-paramtype="PMS.NOTE_STATUS"
+									ng-model="inputVO.type"
+									ng-change="action(inputVO.RESIGN_DESTINATION)"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-format="F1" ng-required="false" width="100px" /></td>
+
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()"
+					ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+				<e-jumping-once input="inputVO" output="outputVO" list="data" totallist="paramList" rowcountlimit="10"></e-jumping-once>
+		<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：每日</td>
+					</tr>
+					<tr>
+						<td>產出日：{{toJsDate(paramList[0].CDATE) | date:'yyyy/MM/dd'}}</td>
+					</tr>
+				</table>
+		</div>
+		<div class="gv_tab_sc scroll_y">
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="rstable tablesaw table-striped e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="8" e-list="data">
+					<thead>
+						<tr>
+							<TH>序號</TH>
+							<TH>業務處名稱</TH>
+							<TH>營運區</TH>
+							<TH>分行代碼</TH>
+							<TH>分行名稱</TH>
+							<TH>AO Code</TH>
+							<TH>招攬人ID</TH>
+							<TH>保單號碼</TH>
+							<TH>商品名稱</TH>
+							<TH>要保人ID</TH>
+							<TH>要保人姓名</TH>
+							<TH>照會類別</TH>
+							<TH>照會截止日</TH>
+							<TH>照會連結</TH>
+							<TH>照會內容</TH>
+							<TH>處理狀態</TH>
+							<TH>照會日期</TH>
+							<TH>照會案件編號</TH>
+							<TH>照會碼</TH>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+						ng-repeat="row in data   | limitTo:displayLimit track by $index"
+						ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                             
+							<td>{{row.NUM}}</td>
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							
+							<td>{{row.BRANCH_AREA_NAME}}</td>
+							<td>{{row.BRANCH_NBR}}</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td ng-if="row.EMP_NAME!=null">{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+							 <td ng-if="row.EMP_NAME==null">{{row.AO_CODE}}</td>
+							<td>{{row.ATTRACT_ID}}</td>
+							<!-- <td ng-if="row.aa>1" rowspan={{row.aa}}>{{row.POLICY_NO_2}}</td> -->
+							<td>{{row.POLICY_NO_2}}</td>
+							<td>{{row.PRD_NAME}}</td>
+							<td>{{row.PROPOSER_ID}}</td>
+							<td>{{row.PROPOSER_NAME}}</td>
+							<!-- <td ng-if="row.aa>1" rowspan={{row.aa}}>{{row.NOTE_TYPE |
+								mapping:mappingSet['PMS.NOTE_TYPE']:'F3' }}</td> -->
+							<td>{{row.NOTE_TYPE |
+								mapping:mappingSet['PMS.NOTE_TYPE']:'F3' }}</td>
+							
+							<!-- <td ng-if="row.aa>1" rowspan={{row.aa}}>{{toJsDate(row.REPLY_DATE) | date:'yyyy/MM/dd'}}</td> -->
+							
+							<td>{{toJsDate(row.REPLY_DATE) | date:'yyyy/MM/dd'}}</td>
+							<!-- 問題單號0002089 -->
+							<!-- <td ng-if="row.aa>1" rowspan={{row.aa}}><button type="button" class="btn btn-info" ng-click="doc(row.NOTE_URL) ">
+								<font color="white">下載</font>
+								</button></td> -->
+									
+							<td><button type="button" ng-disabled="row.FF == 1" class="btn btn-info" ng-click="doc(row.NOTE_URL) ">
+								<font color="white">下載</font>
+								</button></td>
+								
+							<td>{{row.SUMMARY}}</td>
+							
+							<td>{{row.STATUS |
+								mapping:mappingSet['PMS.NOTE_STATUS']:'F3' }}</td>
+							<td>{{toJsDate(row.NOTE_DATE) | date:'yyyy/MM/dd'}}</td>
+							<td>{{ row.CASE_NO }}</td>
+							<td>{{ row.NOTE_CODE }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

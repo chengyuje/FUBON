@@ -1,0 +1,246 @@
+<style>
+/* open dialog */
+.ngdialog.CMMGR011 {
+	
+}
+/* dialog panl */
+.modal-dialog.CMMGR011 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CMMGR011 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CMMGR011 table.little{
+	width: 60%;
+}
+.CMMGR011 div.gv_tab_sc th{
+	white-space: normal;
+}
+/* change row */
+.CMMGR011.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CMMGR011_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.selected-row {
+	background-color: deepskyblue !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CMMGR011/CMMGR011.js"></script>
+<script type="text/javascript" src="assets/txn/CMMGR011/CMMGR011_EDIT.js"></script>
+<div class="CMMGR011" ng-controller="CMMGR011_Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >功能權限管理</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<table>
+				<tr>
+					<!-- list -->
+					<td width="50%">
+						<h4>功能清單</h4>
+						<table ng-init="ragSelect='rdoFunc'">
+							<tr>
+								<th><input type="radio" ng-model="ragSelect" value="rdoFunc">&emsp;功能代號：</th>
+								<td><input style="text-transform: uppercase;" class="form-control" type="text" placeholder="請輸入..." id="txnCode" name="txnCode" ng-model="inputVO.txnCode" maxlength="255"></td>
+								<th>功能名稱：</th>
+								<td><input class="form-control" type="text" placeholder="請輸入..." id="txnName" name="txnName" ng-model="inputVO.txnName" maxlength="30"></td>
+							</tr>
+							<tr>
+								<th><input type="radio" ng-model="ragSelect" value="rdoGroup">&emsp;權限群組：</th>
+								<td colspan="3">
+									<e-combobox id="worksType"
+												ng-datasource="mappingSet['groupsDesc']"
+												ng-model="inputVO.priID"
+												ng-validate="false"
+												ng-readonly="false"
+												ng-editable="false"
+												ng-format="F3"
+												ng-required="false"
+												width="400px"
+												style="line-height:20px;"/>
+									<button type="button" class="btn btn-primary" ng-click="inquire()" function-type="query">查詢</button>
+								</td>
+							</tr>
+						</table>
+						<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList"></e-jumping>
+						<div class="gv_tab_sc scroll_y" style="min-height:370px;">
+							<table class="table-bordered">
+								<thead>
+									<tr>
+										<th width="20%">功能代號</th>
+										<th width="50%">功能名稱</th>
+										<th width="20%">最近更新日期</th>
+										<th width="10%">維護者</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-click="queryItemFunList(row.TXNCODE)" ng-class="{'selected-row': row.TXNCODE ==  inputVO2.txnCode}" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td><a href="/edit/{{row.TXNCODE}}" onclick="return false" ng-click="edit(row)">{{row.TXNCODE}}</a></td>
+										<td>{{row.TXNNAME}}</td>
+										<td>{{row.LASTUPDATE}}</td>
+										<td>{{row.MODIFIER}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<button type="button" class="btn btn-default" ng-click="add()" function-type="maintenance">新增</button>
+					</td>
+					<!-- other -->
+					<td width="50%">
+						<h4>群組清單</h4>
+						<e-jumping-once output="priVO" list="priSubList" totallist="priList"></e-jumping-once>
+						<div class="gv_tab_sc scroll_y" style="min-height:200px;">
+							<table class="table-bordered">
+								<thead>
+									<tr>
+										<th width="20%">
+											<label>
+												<input type='checkbox' ng-model='clickAll' ng-change='checkrow(clickAll,priSubList)' />&nbsp;&nbsp;本頁全選
+											</label>
+										</th>
+										<th width="20%">群組代號</th>
+										<th width="60%">群組名稱</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in priSubList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td><input type='checkbox' ng-model='row.SELECTED' /></td>
+										<td>{{row.PRIID}}</td>
+										<td>{{row.PRINAME}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="text-center">
+							<button type="button" class="btn btn-default" ng-click="btnAddFun()" ng-disabled="inputVO2.txnCode == ''">加入↓</button>
+							<button type="button" class="btn btn-default" ng-click="btnDelFun()" ng-disabled="inputVO2.txnCode == ''">移除↑</button>
+						</div>
+						<br>
+						<e-jumping-once output="funcVO" list="funcSubList" totallist="funcList"></e-jumping-once>
+						<div class="gv_tab_sc scroll_y" style="min-height:200px;">
+							<table class="table-bordered">
+								<thead>
+									<tr>
+										<th width="10%">
+											<label>
+												<input type='checkbox' ng-model='clickAll2' ng-change='checkrow(clickAll2,funcSubList)' />
+												<br>本頁<br>全選
+											</label>
+										</th>
+										<th>群組代號</th>
+										<th>群組名稱</th>
+										<th>
+											<label>
+												<input type='checkbox' ng-model='maintenanceAll' ng-disabled="!allowMaintenance" ng-change='clickrow("maintenance")' />
+												<br>維護
+											</label>
+										</th>
+										<th>
+											<label>
+												<input type='checkbox' ng-model='queryAll' ng-disabled="!allowQuery" ng-change='clickrow("query")' />
+												<br>查詢
+											</label>
+										</th>
+										<th>
+											<label>
+												<input type='checkbox' ng-model='exportsAll' ng-disabled="!allowExport" ng-change='clickrow("exports")' />
+												<br>匯出
+											</label>
+										</th>
+										<th>
+											<label>
+												<input type='checkbox' ng-model='printAll' ng-disabled="!allowPrint" ng-change='clickrow("print")' />
+												<br>列印
+											</label>
+										</th>
+										<th>
+											<label>
+												<input type='checkbox' ng-model='watermarkAll' ng-disabled="!allowWatermark" ng-change='clickrow("watermark")' />
+												<br>浮水印
+											</label>
+										</th>
+										<th>
+											<label>
+												<input type='checkbox' ng-model='securityAll' ng-disabled="!allowSecurity" ng-change='clickrow("security")' />
+												<br>鎖右鍵
+											</label>
+										</th>
+										<th>
+											<label>
+												<input type='checkbox' ng-model='confirmAll' ng-disabled="!allowConfirm" ng-change='clickrow("confirm")' />
+												<br>覆核
+											</label>
+										</th>
+										<th>
+											<label>
+												<input type='checkbox' ng-model='mobileAll' ng-disabled="!allowMobile" ng-change='clickrow("mobile")' />
+												<br>行動
+											</label>
+										</th>
+										<th>
+											<label>
+												<input type='checkbox' ng-model='screenAll' ng-disabled="!allowScreen" ng-change='clickrow("screen")' />
+												<br>鎖拍螢幕
+											</label>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in funcSubList track by $index">
+										<td><input type='checkbox' ng-model='row.SELECTED' /></td>
+										<td>{{row.priID}}</td>
+										<td>{{row.priName}}</td>
+										<td><input type='checkbox' ng-model='row.maintenance' ng-disabled="!row.allowMaintenance" /></td>
+										<td><input type='checkbox' ng-model='row.query' ng-disabled="!row.allowQuery" /></td>
+										<td><input type='checkbox' ng-model='row.exports' ng-disabled="!row.allowExport" /></td>
+										<td><input type='checkbox' ng-model='row.print' ng-disabled="!row.allowPrint" /></td>
+										<td><input type='checkbox' ng-model='row.watermark' ng-disabled="!row.allowWatermark" /></td>
+										<td><input type='checkbox' ng-model='row.security' ng-disabled="!row.allowSecurity" /></td>
+										<td><input type='checkbox' ng-model='row.confirm' ng-disabled="!row.allowConfirm" /></td>
+										<td><input type='checkbox' ng-model='row.mobile' ng-disabled="!row.allowMobile" /></td>
+										<td><input type='checkbox' ng-model='row.screen' ng-disabled="!row.allowScreen" /></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="search_box_btn text-center">
+							<button type="button" class="btn btn-primary" ng-click="save()" ng-disabled="inputVO2.txnCode == ''" function-type="maintenance">儲存</button>
+							<button type="button" class="btn btn-default" ng-click="queryItemFunList(inputVO2.txnCode)" ng-disabled="inputVO2.txnCode == ''">重置</button>
+						</div>
+					</td>
+				</tr>
+			</table>	
+		</div>
+	</div>
+</div>

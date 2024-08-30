@@ -1,0 +1,71 @@
+<style>
+
+</style>
+<div ng-controller="PRD251_EDITController" ng-cloak>
+	<div class="modal-dialog PRD251">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.PRD_ID == null ? '新增' : '編輯'}}限價控管</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">商品代碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_id" name="prd_id" class="form-control" style="width:90%;display:inline;" ng-model="inputVO.prd_id" ng-blur="checkID()" ng-disabled="row.PRD_ID != null" e-length-limit="16" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.prd_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入商品代碼</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="!canEdit">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">{{errMsg | i18n:[' ']}}</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">商品名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="bond_name" name="bond_name" class="form-control" style="width:90%;display:inline;" ng-model="inputVO.bond_name" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">客戶ID：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="cust_id" name="cust_id" class="form-control" style="width:90%;display:inline;" ng-model="inputVO.cust_id" ng-blur="checkID()" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.cust_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入客戶ID</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">限價價格：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="limit_price" name="limit_price" class="form-control" style="width:90%;display:inline;" ng-model="inputVO.limit_price" ng-blur="doFloat()" maxlength="6" e-input-limit="ND">%</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">通路服務費率：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="channel_fee" name="channel_fee" class="form-control" style="width:90%;display:inline;" ng-model="inputVO.channel_fee" ng-blur="doFloat()" maxlength="6" e-input-limit="ND">%</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

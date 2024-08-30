@@ -1,0 +1,241 @@
+<style>
+.bigspace {
+    margin-left: 50px !important;
+}
+
+.form-control-CRM239 {
+    padding: 4px 10px;
+    font-size: 16px;
+    color: #666666;
+    background-color: #f4f4f4;
+    border: 1px solid #999999;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-transition: none;
+    -o-transition: none;
+    transition: none;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM239/CRM239.js"></script>
+<script type="text/javascript" src="assets/txn/CRM230/CRM230.js"></script>
+<script type="text/javascript" src="assets/txn/CUS160/CUS160_ADD.js"></script>
+<script type="text/javascript" src="assets/txn/CRM230/CRM230_COMPANY.js"></script>
+<div class="CRM239" ng-controller="CRM239Controller" ng-cloak>
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+        </div>
+        <!--Content of the panel-->
+        <div class="panel_content">
+            <!-- include -->
+            <div ng-include="'assets/txn/CRM230/CRM230_COMMON.html'"></div>
+            <!-- include -->
+            <div class="search_table">
+                <hr>
+                <h4>保險商品</h4>
+                <table>
+                    <tr>
+                        <th>保險代碼：</th>
+                        <td >
+                            <input type="text" placeholder="請輸入..." id="prd_id" name="prd_id" ng-model="inputVO.prd_id" e-length-limit="50" style="text-transform:uppercase;">
+                        </td>
+                        <th>幣別：</th>
+                        <td>
+                            <e-combobox id="crcy_type" name="crcy_type" ng-paramtype="FPS.CURRENCY" ng-model="inputVO.crcy_type" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="true" width="200px" style="line-height:20px;" />
+                        </td>
+                        <th>保單進件來源：</th>
+                        <td >
+                            <e-combobox id="ins_source" 
+                            	name="ins_source" 
+                            	ng-paramtype="CRM.INS_AST_SOURCE" 
+                            	ng-model="inputVO.ins_source"
+                            	ng-validate="false" 
+                            	ng-readonly="false" 
+                            	ng-editable="false" 
+                            	ng-format="F3" 
+                            	ng-required="true" 
+                            	width="200px" 
+                            	style="line-height:20px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>保險名稱：</th>
+                        <td>
+                            <input type="text" placeholder="請輸入..." id="prod_name" name="prod_name" ng-model="inputVO.prod_name" e-length-limit="50">
+                        </td>
+                        <th>檔期：</th>
+                        <td>
+                            <input type="text" placeholder="請輸入..." id="term_cnt" name="term_cnt" ng-model="inputVO.term_cnt" e-length-limit="50">
+                        </td>
+                        <th>保險公司名稱：</th>
+                        <td>
+                            <e-combobox id="insCompany" name="insCompany" 
+										ng-datasource="insCompanyList"
+										ng-model="inputVO.ins_companyNum"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="200px"
+										style="line-height:20px;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>投資型連結標的代碼：</th>
+                        <td>
+                            <input type="text" style="text-transform:uppercase;" placeholder="請輸入..." id="inv_target_no" name="inv_target_no" ng-model="inputVO.inv_target_no" e-length-limit="50">
+                        </td>
+                        <th>生效日：</th>
+                        <td colspan="3">
+                            <div>
+                                <input type="text" id="policy_active_date_s" name="policy_active_date_s" class="form-control-CRM239" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.policy_active_date_s" is-open="model.e" datepicker-options="policy_sDateOptions" ng-readonly="true" ng-change="limitDate1()" size="13" />
+                                <!-- 製作日曆button -->
+                                <button type="button" class="btn btn-default" ng-click="open($event,'e')">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                                <label>&nbsp ~ &nbsp</label>
+                                <input type="text" id="policy_active_date_e" name="policy_active_date_e" class="form-control-CRM239" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.policy_active_date_e" is-open="model.f" datepicker-options="policy_eDateOptions" ng-readonly="true" ng-change="limitDate1()" size="13" />
+                                <!-- 製作日曆button -->
+                                <button type="button" class="btn btn-default" ng-click="open($event,'f')">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>險種類別：</th>
+                        <td>
+                            <e-combobox id="ins_type" name="ins_type" 
+										ng-paramtype="PRD.INS_TYPE"
+										ng-model="inputVO.ins_type"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="200px"
+										style="line-height:20px;"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="search_box_btn text-center">
+                <button type="button" class="btn btn-info" ng-click="inquireInit_common();inquire();" function-type="query">查詢</button>
+                <button type="button" class="btn btn-info" ng-click="clearAll();init();">清除</button>
+            </div>
+        </div>
+    </div>
+    <!-- 結果區 -->
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+        </div>
+        <!--Content of the panel-->
+        <div class="panel_content">
+            <!-- 分頁 -->
+            <uib-tabset active="0" justified="true">
+                <uib-tab index="0" heading="客戶資訊">
+                    <!-- 新增待辦 -->
+                    <div ng-include="'assets/txn/CRM230/CRM230_INVESTTAB.html'"></div>
+                    <!-- 客戶資訊 -->
+                    <div ng-include="'assets/txn/CRM230/CRM230_CUSTTAB.html'"></div>
+                </uib-tab>
+                <uib-tab index="1" heading="投資資訊">
+                    <e-jumping-once output="outputVO" list="resultListData" totallist="resultList"></e-jumping-once>
+                    <div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+                        <table class="e-table-freeze" e-height="400px" e-left="2" e-list="resultListData" e-mode="3" e-top="true">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="inquire()">客戶ID</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="APPL_NAME" e-query="inquire()">要保人姓名</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="POLICY_NBR, POLICY_SEQ, ID_DUP" e-query="inquire()">保單號碼</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="CONTRACT_STATUS" e-query="inquire()">保單狀態</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="INS_TYPE" e-query="inquire()">險種類別</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="POLICY_SIMP_NAME" e-query="inquire()">商品名稱</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="INS_COMP_NAME" e-query="inquire()">保險公司名稱</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="ACUM_PAID_POLICY_FEE" e-query="inquire()">累計已繳保費/投資金額</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="POLICY_ACTIVE_DATE" e-query="inquire()">保單生效日</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="AO_CODE" e-query="inquire()">銷售人員</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="SP_POLICY_NOTE" e-query="inquire()">註記文字</e-sorter>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="repeat-row" ng-repeat="row in resultListData | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                                    <td><a onclick="return false" ng-click="goCRM610(row)">{{row.CUST_ID}}</a></td>
+                                    <!-- 客戶ID -->
+                                    <td>{{row.APPL_NAME}}</td>
+                                    <!-- 要保人姓名 -->
+                                    <td>{{row.POLICY_NBR}}{{row.POLICY_SEQ == '0' ? '' : ('-' + row.POLICY_SEQ)}}{{(row.ID_DUP == null || row.ID_DUP == ' ') ? '' : ('-' + row.ID_DUP)}}</td>
+                                    <!-- 保單號碼 -->
+                                    <!-- 保單號碼組成=保單號碼-保單號碼序號-ID_DUP(若有值才會呈現，若無值則為空白) -->
+                                    <td>{{row.CONTRACT_STATUS | mapping:mappingSet['CRM.CRM239_CONTRACT_STATUS']:'F3'}}</td>
+                                    <!-- 保單狀態(契約狀態) -->
+                                    <td>{{row.INS_TYPE}}</td>
+                                    <!-- 險種類別 -->
+                                    <td>{{row.POLICY_SIMP_NAME}}</td>
+                                    <!-- 商品名稱 -->
+                                    <td>{{row.INS_COMP_NAME}}</td>
+                                    <!-- 保險公司名稱 -->
+                                    <td align="right">{{row.ACUM_INS_AMT_ORGD | number : 0}}</td>
+                                    <!-- 累計已繳保費/投資金額 -->
+                                    <td>{{toJsDate(row.POLICY_ACTIVE_DATE) | date:"yyyy-MM-dd" }}</td>
+                                    <!-- 保單生效日 -->
+                                    <td>{{row.AO_CODE == null ? '' : row.AO_CODE }}</td>
+                                    <!-- 銷售人員 -->
+                                    <td style="font-weight: bold; color: red">{{row.SP_POLICY_NOTE}}</td>
+                                    <!-- 註記文字 -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+                        <table align="left" style="width:30%">
+                            <thead>
+                                <h4>幣別合計</h4>
+                                <tr>
+                                    <th>幣別</th>
+                                    <th>累計已繳保費</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="repeat-row" ng-repeat="(key, data) in resultList | orderBy: 'CRCY_TYPE' | groupBy: 'CRCY_TYPE'">
+                                    <td>{{key | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+                                    <td align="right">{{getSum(data, 'ACUM_INS_AMT_ORGD') | number : 0}}</td>
+                                    <!-- 累計已繳保費 -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+            <!-- 分頁 -->
+        </div>
+    </div>
+    <!-- 結果區 -->
+</div>

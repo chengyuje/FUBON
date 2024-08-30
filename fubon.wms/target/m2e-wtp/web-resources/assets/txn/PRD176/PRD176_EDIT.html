@@ -1,0 +1,347 @@
+<style>
+    .modal-dialog.PRD176_EDIT {
+        position: relative;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 950px;
+        height: auto;
+    }
+
+    .modal-dialog.PRD176_EDIT .modal-body {
+        height: 75vh;
+    }
+
+</style>
+<div ng-controller="PRD176_EDITController" ng-cloak>
+    <div class="modal-dialog PRD176_EDIT">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+                <h4 id="myModalAlertLabel" class="modal-title" align="center">編輯保險公司</h4>
+            </div>
+            <div class="modal-body">
+                <form name="prd176EditForm" class="form-horizontal" data-toggle="validator" role="form"
+                      autocomplete="off" enter-as-tab>
+                    <table>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="cname">*保險公司中文名稱：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="cname"
+                                       name="cname" class="form-control"
+                                       ng-model="inputVO.cname"
+                                       e-length-limit="50"
+                                       required
+                                       readonly
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr ng-show="prd176EditForm.cname.$error.required">
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"></th>
+                            <td class="col-md-7 help-block with-errors">請輸入保險公司中文名稱</td>
+                            <td class="col-xs-1"></td>
+                        <tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="shortname">*保險公司簡稱：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="shortname" name="shortname" class="form-control"
+                                       ng-model="inputVO.shortname"
+                                       e-length-limit="50"
+                                       required
+                                       readonly
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr ng-show="prd176EditForm.shortname.$error.required">
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"></th>
+                            <td class="col-md-7 help-block with-errors">請輸入保險公司簡稱</td>
+                            <td class="col-xs-1"></td>
+                        <tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="ename">保險公司英文名稱：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="ename" name="ename" class="form-control"
+                                       ng-model="inputVO.ename"
+                                       e-length-limit="50"
+                                       required
+                                       readonly
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="zipcode">*保險總公司地址郵遞區碼：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="zipcode" name="zipcode" class="form-control"
+                                       ng-model="inputVO.zipcode"
+                                       e-length-limit="3"
+                                       required
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr ng-show="prd176EditForm.zipcode.$error.required">
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"></th>
+                            <td class="col-md-7 help-block with-errors">請輸入保險總公司地址郵遞區碼</td>
+                            <td class="col-xs-1"></td>
+                        <tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="address">*地址：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="address" name="address" class="form-control"
+                                       ng-model="inputVO.address"
+                                       e-length-limit="100"
+                                       required
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr ng-show="prd176EditForm.address.$error.required">
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"></th>
+                            <td class="col-md-7 help-block with-errors">請輸入地址</td>
+                            <td class="col-xs-1"></td>
+                        <tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="contactPersonName">*業務聯絡人姓名：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="contactPersonName" name="contactPersonName" class="form-control"
+                                       ng-model="inputVO.contactPersonName"
+                                       e-length-limit="20"
+                                       required
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr ng-show="prd176EditForm.contactPersonPhone.$error.required">
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"></th>
+                            <td class="col-md-7 help-block with-errors">請輸入業務聯絡人姓名</td>
+                            <td class="col-xs-1"></td>
+                        <tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="contactPersonPhone">*聯絡人電話：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="contactPersonPhone" name="contactPersonPhone"
+                                       class="form-control"
+                                       ng-model="inputVO.contactPersonPhone"
+                                       e-length-limit="20"
+                                       required
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr ng-show="prd176EditForm.contactPersonPhone.$error.required">
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"></th>
+                            <td class="col-md-7 help-block with-errors">請輸入聯絡人電話</td>
+                            <td class="col-xs-1"></td>
+                        <tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="idNum">*統一編號：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="idNum" name="idNum" class="form-control"
+                                       ng-model="inputVO.idNum"
+                                       e-length-limit="20"
+                                       required
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr ng-show="prd176EditForm.idNum.$error.required">
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"></th>
+                            <td class="col-md-7 help-block with-errors">請輸入統一編號</td>
+                            <td class="col-xs-1"></td>
+                        <tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="contactPersonEmail">*聯絡人e-mail：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="contactPersonEmail" name="contactPersonEmail"
+                                       class="form-control"
+                                       ng-model="inputVO.contactPersonEmail"
+                                       e-length-limit="50"
+                                       required
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr ng-show="prd176EditForm.contactPersonEmail.$error.required">
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"></th>
+                            <td class="col-md-7 help-block with-errors">請輸入聯絡人e-mail</td>
+                            <td class="col-xs-1"></td>
+                        <tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="admContactPersonName">行政聯絡人姓名：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="admContactPersonName" name="admContactPersonName"
+                                       class="form-control"
+                                       ng-model="inputVO.admContactPersonName"
+                                       e-length-limit="20"
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="admContactPersonPhone">行政聯絡人電話：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="admContactPersonPhone" name="admContactPersonPhone"
+                                       class="form-control"
+                                       ng-model="inputVO.admContactPersonPhone"
+                                       e-length-limit="20"
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="admContactPersonEmail">行政聯絡人e-mail：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="admContactPersonEmail" name="admContactPersonEmail"
+                                       class="form-control"
+                                       ng-model="inputVO.admContactPersonEmail"
+                                       e-length-limit="50"
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="indContactPersonName">理賠聯絡人姓名：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="indContactPersonName" name="indContactPersonName"
+                                       class="form-control"
+                                       ng-model="inputVO.indContactPersonName"
+                                       e-length-limit="20"
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="indContactPersonPhone">理賠聯絡人電話：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="indContactPersonPhone" name="indContactPersonPhone"
+                                       class="form-control"
+                                       ng-model="inputVO.indContactPersonPhone"
+                                       e-length-limit="20"
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="indContactPersonEmail">理賠聯絡人e-mail：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text" id="indContactPersonEmail" name="indContactPersonEmail"
+                                       class="form-control"
+                                       ng-model="inputVO.indContactPersonEmail"
+                                       e-length-limit="50"
+                                >
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="contractDate">*簽約日期：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <div class="input-group datebox datewidth">
+                                    <input type="text" id="contractDate" name="contractDate"
+                                           class="form-control"
+                                           uib-datepicker-popup="yyyy/MM/dd"
+                                           ng-model="inputVO.contractDate"
+                                           is-open="calendar.contractDate"
+                                           datepicker-options="contractDateObj.sDateOptions"
+                                           ng-readonly="true"
+                                           ng-required="true"
+                                    />
+                                    <!-- 製作日曆button -->
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default"
+                                                ng-click="openCalendar($event,'contractDate')">
+                                        <i class="glyphicon glyphicon-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr ng-show="prd176EditForm.contractDate.$error.required">
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"></th>
+                            <td class="col-md-7 help-block with-errors">請選擇簽約日期</td>
+                            <td class="col-xs-1"></td>
+                        <tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="contractDate">續約日期：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <div class="input-group datebox datewidth">
+                                    <input type="text" id="renewDate" name="renewDate"
+                                           class="form-control"
+                                           uib-datepicker-popup="yyyy/MM/dd"
+                                           ng-model="inputVO.renewDate"
+                                           is-open="calendar.renewDate"
+                                           datepicker-options="renewDateObj.sDateOptions"
+                                           ng-readonly="true"
+                                    />
+                                    <!-- 製作日曆button -->
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default"
+                                                ng-click="openCalendar($event, 'renewDate')">
+                                        <i class="glyphicon glyphicon-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3"><label for="contractDate">終止合約日期：</label></th>
+                            <td class="col-md-7 tdpadding">
+                                <div class="input-group datebox datewidth">
+                                    <input type="text" id="termDate" name="termDate"
+                                           class="form-control"
+                                           uib-datepicker-popup="yyyy/MM/dd"
+                                           ng-model="inputVO.termDate"
+                                           is-open="calendar.termDate"
+                                           datepicker-options="termDateObj.sDateOptions"
+                                           ng-readonly="true"
+                                    />
+                                    <!-- 製作日曆button -->
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default"
+                                                ng-click="openCalendar($event, 'termDate')">
+                                        <i class="glyphicon glyphicon-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+            <div class="search_box_btn text-center">
+                <button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance">確定</button>
+                <button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+            </div>
+        </div>
+    </div>
+</div>

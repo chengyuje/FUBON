@@ -1,0 +1,219 @@
+<style>
+/* open dialog */
+.ngdialog.CRM123 {}
+/* dialog panl */
+.modal-dialog.CRM123 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM123 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM123 table.little{
+	width: 30%;
+}
+/* change row */
+.CRM123.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM123_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.CRM123 .menu{
+	margin: 0;
+	padding-left: 10px;
+}
+.CRM123 .typeP a{
+	color: purple !important;
+}
+.CRM123 .typeD a{
+	color: red !important;
+}
+.CRM123 .bigspace{
+	margin-left: 50px !important;
+}
+.CRM123 .datewidth{
+	width:180px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM123/CRM123.js"></script>
+<div class="CRM123" ng-controller="CRM123Controller">
+	<table>
+		<tr>
+			<td width="25%">
+				<div class="btn-group">
+					<button class="btn btn-default" mwl-date-modifier date="viewDate" decrement="calendarView" ng-click="initdetail()">＜</button>
+					<button class="btn btn-default" mwl-date-modifier date="viewDate" set-to-today ng-click="initdetail()">今天</button>
+					<button class="btn btn-default" mwl-date-modifier date="viewDate" increment="calendarView" ng-click="initdetail()">＞</button>
+				</div>
+				<div class="btn-group">
+					<label class="btn btn-info" ng-click="changeView('year')">年曆</label>
+					<label class="btn btn-info" ng-click="changeView('month')">月曆</label>
+				</div>
+			</td>
+			<td width="50%">
+				<h2 class="text-center" ng-bind="inputVO.date  | date:'yyyy年MM月dd日EEEE'"></h2>
+			</td>
+			<td width="25%">
+			</td>
+		</tr>
+	</table>
+	<table>
+		<tr>
+			<td class="mwl-calendar-wrapper">				
+				<mwl-calendar
+					events="events"
+					view="calendarView"
+					view-title="calendarTitle"
+					view-date="viewDate"
+					on-view-change-click="false"
+					on-timespan-click="dateClicked(calendarDate)"
+					cell-is-open="false"
+					custom-template-urls="{calendarMonthCell: 'customMonthCell2.html'}" 
+					cell-auto-open-disabled="true"
+					>
+				</mwl-calendar>
+			</td>
+			<td class="mwl-calendar-neighbor">
+			    <table>
+			    	<!-- ******************************************募集****************************************** -->
+			    	<tr>
+			    	    <td>
+			    	    	<div class="my_tit"><i class="glyphicon glyphicon-piggy-bank"></i>募集
+			    	    		<span class="badge" ng-bind="(resultListInvest.length>0?resultListInvest.length:'0')"></span>
+			    	    	</div>
+			    	    </td>
+					</tr>
+					<tr>
+						<td>
+							<e-jumping-once output="outputVOInvest" input="inputVO" query=showInvest() list="Invest" totallist="resultListInvest"></e-jumping-once>
+							<table class="gv_tab_sc scroll_y text-center">
+								<thead>
+									<tr>
+										<th>商品類別</th>
+										<th>商品名稱</th>
+										<th>募集起日</th>
+										<th>募集迄日</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in Invest | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td>{{row.PTYPE | mapping:mappingSet['CAM.PRD_TYPE']:'F3'}}</td>
+										<td>{{row.PRD_NAME}}</td>
+										<td>{{toJsDate(row.BGN_DATE_OF_INVEST) | date:"yyyy-MM-dd"}}</td>
+										<td>{{toJsDate(row.END_DATE_OF_INVEST) | date:"yyyy-MM-dd"}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+					<!-- *************************************************************************************** -->
+					
+					<!-- ******************************************休市****************************************** -->
+					<tr>
+						<td>
+							<div class="my_tit"><i class="glyphicon glyphicon-piggy-bank"></i>休市
+								<span class="badge" ng-bind="(resultListRest.length > 0 ? resultListRest.length : '0')"></span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<e-jumping-once output="outputVORest" input="inputVO" query=showRest() list="Rest" totallist="resultListRest"></e-jumping-once>
+							<table class="gv_tab_sc scroll_y text-center" ng-init="totals = {}" >
+								<thead>
+									<tr>
+										<th>市場</th>
+										<th>商品類別</th>
+										<th>商品名稱</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in Rest | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td ng-bind="row.MKT_NAME"></td>
+										<td ng-bind="row.PTYPE | mapping:mappingSet['CAM.PRD_TYPE']:'F3'"></td>
+										<td ng-bind="row.PRD_NAME"></td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+					<!-- *************************************************************************************** -->
+					
+					<!-- ******************************************配息****************************************** -->
+					<tr>
+						<td>
+							<div class="my_tit"><i class="glyphicon glyphicon-piggy-bank"></i>配息
+								<span class="badge" ng-bind="(resultListDividend.length>0?resultListDividend.length:'0')"></span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<e-jumping-once output="outputVODividend" input="inputVO" query=showDividend() list="Dividend" totallist="resultListDividend"></e-jumping-once>
+							<table class="gv_tab_sc scroll_y text-center" ng-init="totals = {}">
+								<thead>
+									<tr>
+										<th>商品類別</th>
+										<th>商品代碼</th>
+										<th>配息率%</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in Dividend | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td ng-bind="row.PTYPE | mapping:mappingSet['CAM.PRD_TYPE']:'F3'"></td>
+										<td ng-bind="row.PRD_NAME"></td>
+										<td ng-bind="row.DIV_RATE"></td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+					<!-- *************************************************************************************** -->
+					
+					<!-- ******************************************到期****************************************** -->
+					<tr>
+						<td>
+							<div class="my_tit"><i class="glyphicon glyphicon-piggy-bank"></i>到期
+								<span class="badge" ng-bind="(resultListExpiry.length > 0 ? resultListExpiry.length : '0')"></span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<e-jumping-once output="outputVOExpiry" input="inputVO" query=showExpiry() list="Expiry" totallist="resultListExpiry"></e-jumping-once>
+							<table class="gv_tab_sc scroll_y text-center" ng-init="totals = {}" >
+								<thead>
+									<tr>
+										<th>商品類別</th>
+										<th>商品代碼</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in Expiry | limitTo:displayLimit track by $index" >
+										<td ng-bind="row.PTYPE | mapping:mappingSet['CAM.PRD_TYPE']:'F3'"></td>
+										<td ng-bind="row.PRD_NAME"></td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+					<!-- *************************************************************************************** -->
+				</table>	
+			</td>
+		</tr>
+	</table>
+</div>

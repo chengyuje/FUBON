@@ -1,0 +1,405 @@
+<style>
+/* open dialog */
+.ngdialog.PMS315 {
+
+}
+/* dialog panl */
+.modal-dialog.PMS315 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS315 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS315 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS315.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS315_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS315/PMS315.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS315" ng-controller="PMS315Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>報表月份：</th>
+							<td><e-combobox id="dataMonth" name="dataMonth"
+									ng-datasource="mappingSet['timeE']" ng-model="inputVO.sCreDate"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-change="dateChange()" ng-format="F3"
+									width="143px" style="line-height:20px;" /></td>
+									
+							<th>業務處：</th>
+							<td><e-combobox ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id" ng-validate="false"
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-format="F3" ng-change="ChangeRegion();Region()"
+									ng-required="false" width="165px" height="30px"
+									style="line-height:20px;" /></td>
+						</tr>
+						<tr>
+							<th>營運區：</th>
+							<td><e-combobox ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id" ng-validate="false"
+									ng-disabled="disableAreaCombo" ng-readonly="disableAreaCombo"
+									ng-editable="false" ng-change="ChangeArea();Area()"
+									ng-format="F3" ng-required="false" width="95px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>分行：</th>
+							<td><e-combobox ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr" ng-validate="false"
+									ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" ng-editable="false"
+									ng-format="F1" ng-required="false"
+									ng-change="ChangeBranch();Branch()" width="155px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>理專：</th>
+							<td><e-combobox id="ao_code" name="ao_code"
+									ng-datasource="AO_LIST" ng-model="inputVO.ao_code"
+									ng-validate="false" ng-disabled="disableAoCombo"
+									ng-readonly="disableAoCombo" ng-editable="false" ng-format="F1"
+									ng-required="false" ng-change="ChangeAo_code()" width="150px"
+									style="line-height:20px;" /></td>
+						</tr>
+						<tr>
+		    				<th>保單號碼+保單序號:</th>
+		    				<td>
+								<input type="text" maxlength="10" style="width: 100px;" ng-model="inputVO.POLICY_NO"> 
+								- 
+								<input type="text" maxlength="1" style="width: 30px;" e-input-limit="N" ng-model="inputVO.POLICY_SEQ"> 
+							</td>
+							<th>要保人ID:</th>
+		    				<td>
+		    					<input type="text" placeholder="請輸入..." ng-model="inputVO.CUST_ID" required="required" ng-disabled="read" style="text-transform: uppercase;">
+		    				</td>
+		    				<th>要保人姓名:</th>
+		    				<td>
+		    					<input type="text" placeholder="請輸入..." ng-model="inputVO.CUST_NAME" required="required" ng-disabled="read" style="text-transform: uppercase;">
+		    				</td>							
+							
+							
+		    			</tr>
+		    			<tr>
+			    			<th>應繳日期區間：</th>
+							<td colspan="3">							
+								<div class="input-group datebox datewidth" style="float:left">
+									<input type="text" 
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.PAID_DATES"
+									is-open="model.a"
+									datepicker-options="bgn_sDateOptionsPAID"								
+									ng-readonly="true"								
+									ng-change="limitDatePAID();"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>																					
+								<div style="float:left">&nbsp; ～ &nbsp;</div>	
+								<div class="input-group datebox datewidth" style="float:left">
+									<input type="text"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.PAID_DATEE"
+									is-open="model.b"
+									datepicker-options="bgn_eDateOptionsPAID"								
+									ng-readonly="true"								
+									ng-change="limitDatePAID();"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>								
+							</td>
+						</tr>
+						<tr>
+							<th>預計第一次扣款日區間：</th>
+							<td colspan="3">							
+								<div class="input-group datebox datewidth" style="float:left">
+									<input type="text"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.FST_ACT_DTS"
+									is-open="model.c"
+									datepicker-options="bgn_sDateOptionsFST"								
+									ng-readonly="true"								
+									ng-change="limitDateFST();"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>																					
+								<div style="float:left">&nbsp; ～ &nbsp;</div>	
+								<div class="input-group datebox datewidth" style="float:left">
+									<input type="text" 
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.FST_ACT_DTE"
+									is-open="model.d"
+									datepicker-options="bgn_eDateOptionsFST"								
+									ng-readonly="true"								
+									ng-change="limitDateFST();"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>								
+							</td>
+						</tr>
+		    			
+		    			<tr>
+		    				<th>繳別狀態：</th>
+							<td>
+								<e-combobox 
+									ng-datasource="mappingSet['MOP_T']" 
+									ng-model="inputVO.MOP_T"
+									ng-validate="false" 
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="false" 
+									width="200px"
+									style="line-height:20px;" />
+							</td>
+							<th>繳費狀態：</th>
+							<td>
+								<e-combobox 
+									ng-datasource="mappingSet['PAID_STAT']" 
+									ng-model="inputVO.PAID_STAT"
+									ng-validate="false" 
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="false" 
+									width="100px"
+									style="line-height:20px;" />
+							</td>
+		    			</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：每月</td>
+					</tr>
+					<tr>
+						<td style="color:red">(警語)</td>
+					</tr>
+					<tr>
+						<td style="color:red">1.本報表提供次月應繳之客戶繳費參考資訊，如有異動，以實際狀況為準。</td>
+					</tr>
+					<tr>
+						<td style="color:red">2.[險種]為主約險種。</td>
+					</tr>
+					<tr>
+						<td style="color:red">3.[下次扣款日]欄位僅供參考，如有特殊狀況(非營業日、投資型及利變型商品...)，請洽商品行銷部服務人員。</td>
+					</tr>
+					<tr>
+						<td style="color:red">4.【依據民國99年2月2日修訂之[信用卡業務機構管理辦法]第25條第2項規定，
+						信用卡發卡機構不得同意持卡人以信用卡作為繳付保險單借款本息之工具，乃改以郵撥單通知須繳納之保險單借款利息。】</td>
+					</tr>
+					<tr>
+						<td style="color:red">5.訪談內容可容納254字元。</td>
+					</tr>
+				</table>
+			</div>
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;overflow-y: hidden;">
+				<table class="rstable">
+					<thead>
+						<tr>
+							<th>序號</th>
+							<th>資料年月</th>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行代碼</th>
+							<th>分行名稱</th>
+							<th>AO_CODE</th>
+							<th>
+								<e-sorter
+										e-input="inputVO" 
+										e-mode="auto" 
+										e-col="CUST_ID"
+										e-query="inquire()">要保人ID
+								</e-sorter>
+							</th>
+							<th>要保人姓名</th>
+							<th>被保人姓名</th>
+							<th>保單號碼</th>
+							<th>保單序號</th>
+							<th>險種代碼</th>
+							<th>繳費方式</th>
+							<th>
+								<e-sorter
+									e-input="inputVO" 
+									e-mode="auto" 
+									e-col="PAID_DATE"
+									e-query="inquire()">應繳日期
+								</e-sorter>
+							</th>
+							<th>
+								<e-sorter
+									e-input="inputVO" 
+									e-mode="auto" 
+									e-col="FST_ACT_DT"
+									e-query="inquire()">預計第一次扣款日
+								</e-sorter>
+							</th>
+							<th>繳別</th>
+							<th>幣別</th>
+							<th>折扣後保費</th>
+							<th>
+								<e-sorter
+									e-input="inputVO" 
+									e-mode="auto" 
+									e-col="POLI_YEAR"
+									e-query="inquire()">保單年度
+								</e-sorter>
+							</th>
+							<th>保單期繳</th>
+							<th>密戶</th>
+							<th>種類</th>
+							<th>
+								<e-sorter
+									e-input="inputVO" 
+									e-mode="auto" 
+									e-col="PAID_STAT"
+									e-query="inquire()">繳費狀態
+								</e-sorter>
+							</th>
+							<th>實際繳費日</th>
+							<th>參考匯率</th>
+							<th>下次扣款日</th>
+							<th>備註</th>
+							<th>訪談內容</th>
+							<th>最後修改人</th>
+							<th>最後修改時間</th>							
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{outputVO.currentPageIndex*10+$index+1}}</td>
+							<td>{{row.YEARMON}}</td>
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							<td>{{row.BRANCH_AREA_NAME}}</td>
+							<td>{{row.BRANCH_NBR}}</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.AO_CODE}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.INS_NAME}}</td>
+							<td>{{row.POLICY_NO}}</td>
+							<td>{{row.POLICY_SEQ}}</td>
+							<td>{{row.ITEM4}}</td>
+							<td>{{row.PAY_KIND_T}}</td>
+							<td>{{toJsDate(row.PAID_DATE) | date:'yyyy-MM-dd '}}</td>
+							<td>{{toJsDate(row.FST_ACT_DT) | date:'yyyy-MM-dd '}}</td>
+							<td>{{row.MOP_T}}</td>
+							<td>{{row.CURRENCY}}</td>
+							<td>{{row.PAID_AMOUNT}}</td>
+							<td>{{row.POLI_YEAR}}</td>
+							<td>{{row.POLI_PERD}}</td>
+							<td>{{row.SECRT_YN}}</td>
+							<td>{{row.ATR_CODE}}</td>
+							<td>{{row.PAID_STAT}}</td>
+							<td>{{toJsDate(row.APAID_DATE) | date:'yyyy-MM-dd '}}</td>
+							<td>{{row.EXCHANGE_RATE}}</td>
+							<td>{{row.NEXT_DATE}}</td>
+							<td>{{row.REMARK}}</td>
+							<td><input type="text" class="DESCR254" ng-model="row.DESCR254" e-length-limit="254"></td>
+							<td>{{row.MODIFIER}}</td>
+							<td>{{row.LASTUPDATE}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<br>
+				<div align="center" ng-show="paramList.length > 0">
+					<button type="button" class="btn btn-info" ng-click="save()">儲存</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>
+	
+	

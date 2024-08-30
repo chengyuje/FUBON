@@ -1,0 +1,129 @@
+<!--
+   特殊 Style 定義
+-->
+<style>
+.paddingRight0{
+	padding-right: 0;
+}
+.paddingLeft0{
+	padding-left: 0;
+}
+.rowOdd{
+	background-color: white;
+}
+.rowEven{
+	background-color: lightgray;
+}
+.rowOdd:hover,.rowEven:hover{
+	background-color: lightskyblue !important;
+}
+.selected-row{
+	background-color: deepskyblue !important;
+}
+
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/CMMGR004/CMMGR004.js"></script>
+<script type="text/javascript" src="assets/txn/CMMGR004/CMMGR004_EDIT.js"></script>
+<div class="container" ng-controller="CMMGR004_Controller" ng-cloak>
+  <!-- left, vertical navbar & content -->
+  <div class="row"> 
+    <!-- left, vertical navbar --> 
+    <!-- content -->
+    <div class="col-md-12"> <!-- InstanceBeginEditable name="Content" -->
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="text-muted bootstrap-admin-box-title"><i class="glyphicon glyphicon-th-large"></i>排程設定</div>
+            </div>
+
+            <div class="bootstrap-admin-panel-content text-muted search_box">
+              <form>
+              	<table>
+                    <tr>
+                        <th>排程代號：</th>
+                        <td colspan="1"><input type="text" class="form-control" 
+							id="scheduleid" name="scheduleid"
+							ng-model="inputVO.scheduleid" 
+							placeholder="排程代號" maxlength="20"  autofocus>
+						</td>
+                        <th>排程名稱：</th>
+                        <td colspan="1"><input type="text" class="form-control" 
+							id="schedulename" name="schedulename"
+							ng-model="inputVO.schedulename" maxlength="10"
+							placeholder="排程名稱">
+						</td>
+                    </tr>
+                	<tr>
+                    	<th>排程說明：</th>
+                        <td colspan="3"><input type="text" class="form-control" 
+							id="description" name="description"
+							ng-model="inputVO.description" maxlength="33"
+							placeholder="排程說明">
+						</td>
+                     </tr>
+                </table> 
+                <div class="search_box_btn text-center">
+                  <button type="button"  class="btn btn-default" ng-click="inquireInit();inquire()" function-type="query" >查詢</button>
+                  <button type="button" class="btn btn-default" ng-click="init()" >清除</button>
+				  <a href="02排程設定.html" onclick="return false" ng-click="edit()" class="btn btn-primary" function-type="maintenance" >新增</a>  
+                </div>
+                
+              </form>
+            </div>
+
+                <div class="bootstrap-admin-panel-content" style="position:relative;">
+                    <div class="form-horizontal" style="margin-bottom: 15px; overflow: hidden;">
+                    	<div style="position:absolute; top:22px;">
+                        </div>
+                    </div>
+                <e-jumping
+		      		input="inputVO"
+		      		output="outputVO"
+		      		query="inquire()"
+		      		list="paramList"
+		      	></e-jumping>
+                		<table class="tablesaw table table-striped table-bordered" data-tablesaw-mode="swipe" data-tablesaw-sortable data-tablesaw-minimap >
+                  			<thead>
+                    			<tr>
+                     				<th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist">排程代號</th>
+                      				<th scope="col" data-tablesaw-sortable-col>排程名稱</th>
+                      				<th scope="col" data-tablesaw-sortable-col>排程說明</th>
+                      				<th scope="col" data-tablesaw-sortable-col>最後一次異動時間</th>
+                                    <th scope="col" data-tablesaw-sortable-col>是否已納入排程</th>
+                                    <th scope="col" data-tablesaw-sortable-col>啟用狀態</th>
+                                    <th scope="col" data-tablesaw-sortable-col>手動執行</th>
+                    			</tr>
+                  			</thead>
+                  			<tbody>
+                    			<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                      				<td><a href="/edit/{{row.SCHEDULEID}}" onclick="return false" ng-click="edit(row)">{{row.SCHEDULEID}}</a></td>
+                      				<td>{{row.SCHEDULENAME}}</td>
+                      				<td>{{row.DESCRIPTION}}</td>
+                      				<td>{{row.LASTTRY}}</td>
+                                    <td>{{row.ISSCHEDULED}}</td>
+                                    <td>{{row.ISUSE}}</td>
+                                    <td><button type="button" class="btn btn-default" function-type="maintenance" 
+                                          ng-click="execute(row)">手動執行</button></td>
+                    			</tr>
+                  			</tbody>
+                		</table>
+<!-- 		          		<e-paging outputVO="outputVO" -->
+<!-- 		          			inputVO="inputVO" -->
+<!-- 			           		callQuery="inquire()" -->
+<!-- 			           		displayLimit="displayLimit" -->
+<!-- 			           		dataList="paramList" -->
+<!-- 		           		></e-paging> -->
+                </div>
+
+
+          </div>
+        </div>
+      </div>
+                    <!-- InstanceEndEditable --> </div>
+  </div>
+</div>

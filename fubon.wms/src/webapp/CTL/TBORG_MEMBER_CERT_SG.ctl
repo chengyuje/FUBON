@@ -1,0 +1,53 @@
+--**************************************************************************
+--PROJECT_CODE> TBCAM
+--DATE>2016/07/05
+--AUTHOR> Grace Liu
+--PURPOSE>ST Load
+--**************************************************************************
+
+--**************************************************************************
+--TARGET>TBORG_MEMBER_CERT_SG
+--TRUNCATE_BEFORE_INSERT>Y
+--**************************************************************************
+--OPTIONS (ERRORS = 0)
+OPTIONS (direct=true)
+LOAD DATA
+TRUNCATE
+into table TBORG_MEMBER_CERT_SG
+--FIELDS TERMINATED BY X'09'
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+BU_ORG
+,BG_ORG
+,EMP_ID
+,EMP_NAME
+,CUST_ID
+,JOB_TITLE_NAME
+,JOB_RANK
+,JOINDTE
+,EDU_BG
+,BIRTHDATE
+,CUR_JOB_NAME
+,CERTIFICATE_TYPE
+,CERTIFICATE_NAME
+,CERTIFICATE_NO
+,CERTIFICATE_UNIT
+,CERTIFICATE_CODE
+,CERTIFICATE_GET_DATE
+,REG_TYPE
+,REGIST_TYPE
+,CERTIFICATE_EX_DATE
+,REG_DATE
+,UNREG_DATE
+,CANCEL_DATE
+,EXCHANGE_DATE
+,EFFDT
+,LEGAL_END_DATE
+,REG_STATUS
+,APPLY_DATE
+,INFORM_DATE 
+,VERSION "0"
+,CREATETIME SYSDATE
+,CREATOR constant "PABTH_BTORG003"
+)       

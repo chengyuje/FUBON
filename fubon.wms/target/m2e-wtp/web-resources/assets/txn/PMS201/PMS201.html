@@ -1,0 +1,479 @@
+<style>
+.box1 {
+	width: 100%;
+}
+h3 {
+	color: blue;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS201/PMS201.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS201/PMS201_CUST.js"></script>
+<div class="container-fluid" ng-controller="PMS201Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>						
+						<tr>
+							<th>*月週：</th>
+							<td>
+								<e-combobox ng-datasource="mappingSet['timeE']" 
+											ng-model="inputVO.eTime"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false" 
+											ng-format="F3" 
+											ng-required="true"
+											ng-change="dateChange()"  
+											width="200px" 
+											height="30px" 
+											style="line-height:20px;" />
+							</td>
+							<th>*分行別：</th>
+							<td>
+								<e-combobox ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.branch_nbr" 
+											ng-validate="false"
+											ng-disabled="disableBranchCombo"
+									        ng-readonly="disableBranchCombo" 
+									        ng-format="F1"
+											ng-required="true" 
+											ng-change="ChangeBranch();" 
+											width="200px"
+											height="30px" 
+											style="line-height:20px;" />
+							</td>
+							<th>*理專：</th>
+							<td>
+								<e-combobox id="ao_code"
+											name="ao_code" 
+											ng-datasource="AO_LIST"
+											ng-model="inputVO.ao_code" 
+											ng-validate="false"
+											ng-disabled="disableAoCombo" 
+											ng-readonly="disableAoCombo"
+											ng-editable="false" 
+											ng-format="F1" 
+											ng-required="true"
+											ng-change="ChangeAo_code();" 
+											width="180px"
+											style="line-height:20px;" />
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+			</div>
+		</div>
+	</div>
+
+	<div style="background-color: #d7edfa;">
+		<table id="rsTitle">
+			<tr>
+				<td width="40%">
+					<h4><font color="106987">&nbsp;個人月預估收益差異報表(週) (最後統計日期至：{{empDtl.length > 0 ? (toJsDate(empDtl[0].WEEK_END_DATE) > curDate ? curDate : toJsDate(empDtl[0].WEEK_END_DATE)) : curDate | date:'yyyy/MM/dd'}})</font></h4>
+				</td>
+				<td width="60%" align="right">
+					<table>
+						<tr class="thick">
+							<td>生產力目標&nbsp;&nbsp;</td>
+							<td><font color="red">{{ 0+PRODUCT_GOALS | number }}</font></td>
+							<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+							<td>預估達成率&nbsp;&nbsp;</td>
+							<td><font color="red">{{ 0+(EST_EARNINGS/PRODUCT_GOALS)*100 | number }}%</font></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br />
+	<div class="row">
+	
+	<!-- ***********=========================== A.收益達成目標_START ===========================*********** -->
+		<div class="col-md-5">
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_btn"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a03.gif">A.收益達成目標</div>
+			</div>
+			<div class="panel_content" style="height:1100px;">
+				<div class="gv_tab_sc">
+				
+					<!-- *********** 戰力&Coaching活動. *********** -->
+					<h3><i class="glyphicon glyphicon-list"></i>戰力&Coaching活動</h3>
+					<div class="search_box_btn text-left scroll_y">
+						<table ng-show="empDtl.length > 0">
+							<tr>
+								<th style="border-bottom-style: none;">員編</th>
+								<td style="border-bottom-style: none;">{{empDtl[0].EMP_ID}}</td>
+								<th style="border-bottom-style: none;">姓名</th>
+								<td style="border-bottom-style: none;">{{empDtl[0].EMP_NAME}}</td>																	
+							</tr>
+							<tr>
+								<th style="border-bottom-style: none;">職級</th>
+								<td style="border-bottom-style: none;">{{empDtl[0].AO_JOB_RANK}}</td>
+								<th style="border-bottom-style: none;">主管</th>
+								<td style="border-bottom-style: none;">{{empDtl[0].SALES_SUP_EMP_NAME}}</td>							
+							</tr>	
+						</table>						
+						<br />					
+						<table ng-show="empDtl.length > 0">
+							<tr>
+								<th style="border-bottom-style: none;vertical-align: middle;" width="40%">MTD實際達成率</th>
+								<td align="left" style="border-bottom-style: none;">{{0+empDtl[0].ACT_RATE}}%</td>
+							</tr>
+							<tr>
+								<th style="border-bottom-style: none;vertical-align: middle;">Coaching頻次</th>
+								<td style="border-bottom-style: none;">{{empDtl[0].COACHING_FREQ | mapping:mappingSet['PMS.COACHING_STATE']:'F3'}}</td>
+							</tr>
+							<tr>
+								<th style="border-bottom-style: none;vertical-align: middle;">Coaching重點</th>
+								<td style="border-bottom-style: none;white-space: pre">{{empDtl[0].COACHING_MAIN}}</td>
+							</tr>
+						</table>
+					</div>
+					
+					<!-- *********** 業績表現達成率. *********** -->
+					<h3><i class="glyphicon glyphicon-list"></i>業績表現達成率</h3>
+					<div class="search_box_btn text-left scroll_y">
+						<table class="tablesaw table table-striped table-bordered" ng-show="aGroupTitleList.length > 0">
+							<thead align="center">
+								<tr rowspan="2"></tr>
+								<tr>
+									<th></th>
+									<th class="repeat-row" ng-repeat="aGroup in aGroupTitleList track by $index">{{aGroup.YYYYMM | limitTo: 2 : 4}}&nbsp;月</th>
+								</tr>
+								<tr></tr>
+							</thead>
+							<tbody align="center">
+								<tr class="repeat-row" ng-repeat="row in resultBehaveRateList track by $index">
+									<td>{{row.COLUMN_NAME | mapping:mappingSet['PMS.PERFORMANCE_TITLE_NAME']:'F3'}}</td>
+									<td class="repeat-row" ng-repeat="aGroup in aGroupTitleList track by $index" align="right">
+									<per ng-if="row.COLUMN_NAME == 'M_FEE' || 
+												row.COLUMN_NAME == 'Y_FEE' || 
+												row.COLUMN_NAME == 'M_AVG' || 
+												row.COLUMN_NAME == 'Y_AVG'">{{row['MONTH_' + aGroup.YM_NUM]}}%</per>
+									<per ng-if="row.COLUMN_NAME != 'M_FEE' && 
+												row.COLUMN_NAME != 'Y_FEE' && 
+												row.COLUMN_NAME != 'M_AVG' && 
+												row.COLUMN_NAME != 'Y_AVG'">{{row['MONTH_' + aGroup.YM_NUM]}}</per>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<!-- *********** 理專行動計劃. *********** -->
+					<h3><i class="glyphicon glyphicon-list"></i>理專行動計劃</h3>
+					<div class="search_box_btn text-left scroll_y">
+						<textarea id="qstn_content" name="qstn_content" class="form-control" ng-model="inputVO.selfNote" style="width: 100%; height: 198px" e-length-limit="200" ng-show="empDtl.length > 0"></textarea>
+					</div>
+					<button type="button"class="btn btn-info" ng-click="save()" align="center" ng-show="empDtl.length > 0">儲存</button>
+				</div>
+			</div>
+		</div>
+		<!-- ***********===========================  A.收益達成目標_END  ===========================*********** -->
+		
+		<!-- ***********=========================== B.產品組合指標_START ===========================*********** -->
+		<div class="col-md-7">
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a02.gif">B.產品組合指標</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content" style="height:1100px;">
+				<div class="gv_tab_sc">
+				
+					<!-- *********** 產品組合指標. *********** -->
+					<h3><i class="glyphicon glyphicon-list"></i>產品組合指標</h3>
+					<div class="search_box_btn text-left scroll_y">
+						<table class="tablesaw table table-striped table-bordered rstable scroll_y" ng-show="bGroupTitleList.length > 0">
+							<thead>
+								<tr rowspan="2"></tr>
+								<tr>
+									<th>產品別</th>
+									<th>指標項目</th>
+									<th class="repeat-row" ng-repeat="bGroup in bGroupTitleList track by $index">{{bGroup.WEEK_START_DATE}}<br /> ∣ <br />{{bGroup.WEEK_END_DATE}}</th>
+									<th>上周{{AO_JOB_RANK}}<BR>均值</th>
+								</tr>
+								<tr></tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat-start="(prodType, dataA) in prodGroupIndexList | groupBy: 'PROD_TYPE' as resultA">
+									<th rowspan="{{dataA.length + 1}}" colspan="{{(prodType == '合計總收益' ? 2 : 1)}}" align="center" style="{{prodType == '合計總收益' ? 'background-color: #d7edfa;font-weight: bold' : ''}}">
+										{{prodType}}
+									</th>
+								</tr>
+								<tr ng-repeat-end ng-repeat="row in dataA">
+									<th ng-show="row.ITEM" align="center" style="{{row.ITEM == '小計' ? 'background-color: #d7edfa;font-weight: bold' : ''}}">
+										{{row.ITEM | mapping:mappingSet['PMS.PROD_ITEM']:'F3'}}
+									</th>
+									<td class="repeat-row" ng-repeat="bGroup in bGroupTitleList track by $index" align="right" style="{{row.ITEM == '小計' || row.PROD_TYPE == '合計總收益' ? 'background-color: #d7edfa;font-weight: bold' : ''}}">
+										{{row['WEEK_' + bGroup.WEEK_NUM] | number:0}}
+									</td>
+									<td align="right" style="{{row.ITEM == '小計' || row.PROD_TYPE == '合計總收益' ? 'background-color: #d7edfa;font-weight: bold' : ''}}">
+										{{row.ROI | number:0}}
+									</td>
+								</tr>
+								<tr ng-repeat-end ng-hide="true"></tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<!-- *********** 本月追蹤商品明細. *********** -->
+					<h3><i class="glyphicon glyphicon-list"></i>本月追蹤商品明細</h3>
+					<div class="search_box_btn text-left scroll_y">
+						<table class="tablesaw table table-striped table-bordered" ng-show="prodTrackDtlList.length > 0">
+							<thead>
+								<tr rowspan="2"></tr>
+								<tr>
+									<th>本月追蹤商品明細</th>
+									<th>銷售量</th>
+									<th>手續費收入</th>
+								</tr>
+								<tr></tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in prodTrackDtlList track by $index">
+									<td>{{row.MAIN_COM_NBR_NAME}}</td>
+									<td align="right">{{row.T_BAL | number:0}}</td>
+									<td align="right">{{row.T_FEE | number:0}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- ***********===========================  B.產品組合指標_END  ===========================*********** -->
+	
+	<!-- ***********=========================== C.客戶經營指標_START ===========================*********** -->
+	<div class="row">
+		<div class="col-md-5">
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a04.gif">C.客戶經營指標</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content" style="height:1270px;">
+				<div class="gv_tab_sc scroll_y">
+				
+					<!-- *********** 客戶經營指標總覽 *********** -->
+					<h3><i class="glyphicon glyphicon-list"></i>客戶經營指標總覽</h3>
+					<div class="search_box_btn text-left scroll_y">
+						<table class="tablesaw table table-striped table-bordered rstable" ng-show="cGroupTitle1List.length > 0">
+							<thead align="center">
+								<tr rowspan="2"></tr>
+								<tr>
+									<th>項目</th>
+									<th class="repeat-row" ng-repeat="cGroup1 in cGroupTitle1List track by $index">{{cGroup1.YYYYMM | limitTo: 2 : 4}}&nbsp;月</th>
+									<th>本月{{AO_JOB_RANK}}均值</th>
+								</tr>
+								<tr></tr>
+							</thead>
+							<tbody align="center">
+								<tr class="repeat-row" ng-repeat="row in prdctvt1List track by $index">
+									<th style="vertical-align:middle;">{{row.COLUMN_NAME | mapping:mappingSet['PMS.PRDCIVT1_TITLE_NAME']:'F3'}}</th>
+									<td class="repeat-row" ng-repeat="cGroup1 in cGroupTitle1List track by $index" align="center" style="vertical-align:middle;">
+										<div style="white-space: pre" ng-if="row.COLUMN_NAME == 'CNTCT'">{{row['MONTH_' + cGroup1.YM_NUM]}}</div>
+										<div ng-show="row.COLUMN_NAME != 'CNTCT'">{{row['MONTH_' + cGroup1.YM_NUM]}}</div>
+									</td>
+									<td style="vertical-align:middle;white-space: pre" align="center">{{row.AO_AVG}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<!-- *********** 產品滲透率 *********** -->
+					<h3><i class="glyphicon glyphicon-list"></i>產品滲透率</h3>
+					<div class="search_box_btn text-left scroll_y">
+						<table class="tablesaw table table-striped table-bordered rstable" ng-show="cGroupTitle2List.length > 0">
+							<thead align="center">
+								<tr rowspan="2"></tr>
+								<tr>
+									<th>項目</th>
+									<th class="repeat-row" ng-repeat="cGroup2 in cGroupTitle2List track by $index">{{cGroup2.PARAM_NAME}}</th>
+								</tr>
+								<tr></tr>
+							</thead>
+							<tbody align="center">
+								<tr class="repeat-row" ng-repeat="row in prdctvt2List track by $index">
+									<td style="white-space: nowrap">
+										{{row.PARAM_NAME}}<br />
+										<div ng-show="row.PARAM_CODE == 'AUM' && cGroupTitle2List.length == 7">(仟元)</div>
+										<div ng-show="row.PARAM_CODE == 'AUM' && cGroupTitle2List.length == 6">(百萬)</div>
+										<div ng-show="row.PARAM_CODE == 'RATE_CUST'">(客戶數)</div>
+									</td>
+									<td class="repeat-row" ng-repeat="cGroup2 in cGroupTitle2List track by $index" style="vertical-align:middle;" align="right">
+										<div style="white-space: pre" ng-if="row.PARAM_CODE == 'RATE_CUST'">{{row[cGroup2.PARAM_CODE]}}</div>
+										<div ng-show="row.PARAM_CODE == 'AUM' && cGroupTitle2List.length == 7">{{row[cGroup2.PARAM_CODE]/1000 | number:2}}</div>
+										<div ng-show="row.PARAM_CODE == 'AUM' && cGroupTitle2List.length == 6">{{row[cGroup2.PARAM_CODE] | number:2}}</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>						
+						<br />						
+						<table class="tablesaw table table-striped table-bordered rstable" ng-show="cGroupTitle3List.length > 0">
+							<thead align="center">
+								<tr rowspan="2"></tr>
+								<tr>
+									<th>項目</th>
+									<th class="repeat-row" ng-repeat="cGroup3 in cGroupTitle3List track by $index">{{cGroup3.PARAM_NAME}}</th>
+								</tr>
+								<tr></tr>
+							</thead>
+							<tbody align="center">
+								<tr class="repeat-row" ng-repeat="row in prdctvt2List track by $index">
+									<td style="white-space: nowrap">
+										{{row.PARAM_NAME}}<br />
+										<div ng-show="row.PARAM_CODE == 'AUM' && cGroupTitle3List.length == 7">(仟元)</div>
+										<div ng-show="row.PARAM_CODE == 'AUM' && cGroupTitle3List.length == 6">(百萬)</div>
+										<div ng-show="row.PARAM_CODE == 'RATE_CUST'">(客戶數)</div>
+									</td>
+									<td class="repeat-row" ng-repeat="cGroup3 in cGroupTitle3List track by $index" style="vertical-align:middle;" align="right">
+										<div style="white-space: pre" ng-if="row.PARAM_CODE == 'RATE_CUST'" ng-hide="cGroup3.PARAM_CODE == 'TTL'">{{row[cGroup3.PARAM_CODE]}}</div>
+										<div ng-show="row.PARAM_CODE == 'AUM' && cGroupTitle3List.length == 7">{{row[cGroup3.PARAM_CODE] | number:0}}</div>
+										<div ng-show="row.PARAM_CODE == 'AUM' && cGroupTitle3List.length == 6">{{row[cGroup3.PARAM_CODE] | number:2}}</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<!-- *********** 貢獻度客戶經營指標 *********** -->
+					<h3><i class="glyphicon glyphicon-list"></i>貢獻度客戶經營指標</h3>
+					<div class="search_box_btn text-left scroll_y">
+						<table class="tablesaw table table-striped table-bordered rstable" ng-show="cGroupTitle4List.length > 0">
+							<thead align="center">
+								<tr rowspan="2"></tr>
+								<tr>
+									<th>項目</th>
+									<th class="repeat-row" ng-repeat="cGroup4 in cGroupTitle4List track by $index">{{cGroup4.CON_NAME}}</th>
+									<th>合計</th>
+								</tr>
+								<tr></tr>
+							</thead>
+							<tbody align="center">
+								<tr class="repeat-row" ng-repeat="row in prdctvt3List track by $index">
+									<th>{{row.COLUMN_NAME | mapping:mappingSet['PMS.PRDCIVT3_TITLE_NAME']:'F3'}}</th>
+									<td class="repeat-row" ng-repeat="cGroup4 in cGroupTitle4List track by $index" style="vertical-align:middle;" align="right">
+										<div ng-show="row.COLUMN_NAME == 'NON_CNTCT_CNT' || row.COLUMN_NAME == 'UNSERVE_CNT'">
+											<a href="#" onclick="return false" ng-click="row.COLUMN_NAME == 'NON_CNTCT_CNT' ? getDtl(row, cGroup4.CON_TYPE) : getDtl(row, cGroup4.CON_TYPE)">{{row[cGroup4.CON_TYPE]}}</a>
+										</div>
+										<div ng-hide="row.COLUMN_NAME == 'NON_CNTCT_CNT' || row.COLUMN_NAME == 'UNSERVE_CNT'">{{row[cGroup4.CON_TYPE]}}</div>
+									</td>
+									<td align="right">
+										<div ng-show="row.COLUMN_NAME == 'NON_CNTCT_CNT' || row.COLUMN_NAME == 'UNSERVE_CNT'">
+											<a href="#" onclick="return false" ng-click="row.COLUMN_NAME == 'NON_CNTCT_CNT' ? getDtl(row, 'TOT') : getDtl(row, 'TOT')">{{row.TOT}}</a>
+										</div>
+										<div ng-hide="row.COLUMN_NAME == 'NON_CNTCT_CNT' || row.COLUMN_NAME == 'UNSERVE_CNT'">{{row.TOT}}</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- ***********===========================  C.客戶經營指標_END  ===========================*********** -->
+		
+		<!-- ***********=========================== D.活動量指標__START ===========================*********** -->
+		<div class="col-md-7">
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a05.gif">D.活動量指標</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content" style="height:1270px;">
+				<div class="gv_tab_sc scroll_y">
+				
+					<!-- *********** 活動量指標. *********** -->
+					<h3><i class="glyphicon glyphicon-list"></i>活動量指標</h3>
+					<div class="search_box_btn text-left scroll_y">
+						<table class="tablesaw table table-striped table-bordered rstable scroll_y" ng-show="bGroupTitleList.length > 0">
+							<thead>
+								<tr rowspan="2"></tr>
+								<tr>
+									<th></th>
+									<th colspan="4">{{dGroupTitleList[0].WEEK_START_DATE}}-{{dGroupTitleList[0].WEEK_END_DATE}}</th>
+									<th colspan="2">{{dGroupTitleList[1].WEEK_START_DATE}}-{{dGroupTitleList[1].WEEK_END_DATE}}</th>
+									<th colspan="2">{{dGroupTitleList[0].WEEK_START_DATE}}-{{dGroupTitleList[0].WEEK_END_DATE}}-{{AO_JOB_RANK}} 均值</th>
+								</tr>
+								<tr>
+									<th></th>
+									<th>客戶數</th>
+									<th>聯繫率</th>
+									<th>會面率</th>
+									<th>成交率</th>
+									<th>聯繫率</th>
+									<th>成交率</th>
+									<th>聯繫率</th>
+									<th>成交率</th>
+								</tr>
+								<tr></tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in actIndexList track by $index">
+									<th align="center"><b>{{row.VIP_NAME}}</b></th>
+									<td align="right">{{row.CUST_CNT}}</td>
+									<td align="right">{{row.A_RATE_F}}%</td>
+									<td align="right">{{row.M_RATE_F}}%</td>
+									<td align="right">{{row.C_RATE_F}}%</td>
+									<td align="right">{{row.A_RATE_B}}%</td>
+									<td align="right">{{row.C_RATE_B}}%</td>
+									<td align="right">{{row.A_RATE_AVG}}%</td>
+									<td align="right">{{row.C_RATE_AVG}}%</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<!-- *********** 成交客戶. *********** -->
+					<h3><i class="glyphicon glyphicon-list"></i>成交客戶</h3>
+					<div class="search_box_btn text-left scroll_y">
+						<table class="tablesaw table table-striped table-bordered rstable scroll_y" ng-show="transCustList.length > 0">
+							<thead>
+								<tr rowspan="2"></tr>
+								<tr>
+									<th></th>
+									<th colspan="2">{{transCustList[0].YYYYMM_F | limitTo: 2 : 4}}&nbsp;月</th>
+									<th colspan="2">{{transCustList[0].YYYYMM_B | limitTo: 2 : 4}}&nbsp;月</th>
+								</tr>
+								<tr></tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in transCustList track by $index">
+									<th align="center" width="10%">{{row.TOP}}</th>
+									<td align="left" width="22.5%" style="{{row.BACK_TOP != null ? 'background-color: #d7edfa;font-weight: bold' : ''}}">{{row.CUST_ID_F}}</td>
+									<td align="left" width="22.5%" style="{{row.BACK_TOP != null ? 'background-color: #d7edfa;font-weight: bold' : ''}}">{{row.CUST_NAME_F}}</td>
+									<td align="left" width="22.5%" style="{{row.FIRST_TOP != null ? 'background-color: #d7edfa;font-weight: bold' : ''}}">{{row.CUST_ID_B}}</td>
+									<td align="left" width="22.5%" style="{{row.FIRST_TOP != null ? 'background-color: #d7edfa;font-weight: bold' : ''}}">{{row.CUST_NAME_B}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		<!-- ***********=========================== D.活動量指標__END ===========================*********** -->
+				
+	</div>
+	<!-- InstanceEndEditable -->
+	<!-- ./content -->
+</div>

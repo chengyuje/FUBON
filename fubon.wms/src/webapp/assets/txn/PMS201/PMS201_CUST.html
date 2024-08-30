@@ -1,0 +1,52 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS201_CUST {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 500px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS201/PMS201_CUST.js"></script>
+<div>
+	<div ng-controller="PMS201_CUSTController" ng-cloak>
+		<div class="modal-dialog PMS201_CUST">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">
+						{{row.COLUMN_NAME | mapping:mappingSet['PMS.PRDCIVT3_TITLE_NAME']:'F3'}}-
+						{{vipType | mapping:mappingSet['CRM.CON_DEGREE']:'F3'}}
+					</h4>
+				</div>
+				<div class="modal-body">
+					<e-jumping-once output="paramListOutputVO" list="data" totallist="prdCtvtMngmDtl"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" >
+						<table>
+							<thead>
+								<tr>
+									<th>客戶ID</th>
+									<th>客戶姓名</th>
+									<th ng-hide="inputVO.targetType == '1'">次數</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td>{{row.CUST_ID}}</td>
+									<td>{{row.CUST_NAME}}</td>
+									<td ng-hide="inputVO.targetType == '1'">{{row.UNSERVE_CNT}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

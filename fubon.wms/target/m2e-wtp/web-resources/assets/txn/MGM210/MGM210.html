@@ -1,0 +1,105 @@
+<style>
+	.searchBox{
+		display : inline-block;
+	}
+</style>
+<script type="text/javascript" src="assets/txn/MGM210/MGM210.js"></script>
+<script type="text/javascript" src="assets/txn/MGM211/MGM211.js"></script>
+<script type="text/javascript" src="assets/txn/MGM212/MGM212.js"></script>
+<div ng-controller="MGM210Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<div class="panel_content">
+		<div style="text-align:center; padding:1em">
+		<div class="searchBox">活動代碼：
+			<e-combobox  
+              	id="actSEQ"
+               	ng-datasource="actList"
+                ng-model="inputVO.actSEQ" 
+                ng-validate="true"
+                ng-readonly="false" 
+                ng-editable="false" 
+                ng-format="F1"
+                ng-required="false" 
+				width="200px" 
+				style="line-height:20px"/>
+		</div>
+		<div class="searchBox" style="padding-left:3em">活動狀態：
+			<e-combobox 
+        		id="actStatus"
+              	ng-datasource="mappingSet['MGM.ACT_STATUS']" 
+                ng-model="inputVO.actStatus"
+                ng-validate="false"
+                ng-readonly="false"
+                ng-editable="false"
+                ng-format="F3"
+                ng-required="false"
+				width="200px"
+				style="line-height:20px" />
+		</div>
+		</div>
+		<div class="search_box_btn" style="text-align:center">
+			<button type="button" class="btn btn-info" ng-click="openMGM211(null)">新增</button>
+			<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+			<button type="button" class="btn btn-info" ng-disabled="inputVO.actSeq.length == 0" ng-click="delRow()">刪除</button>
+		</div>
+	</div>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>
+	<div class="panel_content">
+		<div class="searchBox" style="padding:1em">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		</div>
+		<div class="gv_tab_sc scroll_y">
+			<table class="tablesaw table table-striped table-bordered">
+			<thead>
+				<tr>
+					<th>選取</th>
+<!-- 				<th>活動類型</th> -->
+					<th>
+						<e-sorter e-input="inputVO" e-mode="auto" e-col="A.ACT_SEQ" e-query="query()">活動代碼</e-sorter>
+					</th>
+					<th>
+						<e-sorter e-input="inputVO" e-mode="auto" e-col="A.ACT_NAME" e-query="query()">活動名稱</e-sorter>
+					</th>
+					<th>
+						<e-sorter e-input="inputVO" e-mode="auto" e-col="A.EFF_DATE" e-query="query()">生效日期</e-sorter>
+					</th>
+					<th>
+						<e-sorter e-input="inputVO" e-mode="auto" e-col="A.DEADLINE" e-query="query()">截止日期</e-sorter>
+					</th>
+					<th>
+						<e-sorter e-input="inputVO" e-mode="auto" e-col="ACT_STATUS" e-query="query()">活動狀態</e-sorter>
+					</th>
+					<th>
+						<e-sorter e-input="inputVO" e-mode="auto" e-col="A.EMP_NAME" e-query="query()">建立人員</e-sorter>
+					</th>
+					<th>活動維護</th>
+					<th>
+						<e-sorter e-input="inputVO" e-mode="auto" e-col="A.POINT" e-query="query()">點數放行</e-sorter>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					<td><input type="checkbox" ng-init="row.DEL = false" ng-model="row.DEL" ng-click="addDeleteList()"/></td>
+<!-- 				<td>{{row.ACT_TYPE | mapping:mappingSet['MGM.ACT_TYPE']:'F3'}}</td> -->
+					<td>{{row.ACT_SEQ}}</td>
+					<td>{{row.ACT_NAME}}</td>
+					<td>{{toJsDate(row.EFF_DATE) | date:"yyyy/MM/dd"}}</td>
+					<td>{{toJsDate(row.DEADLINE) | date:"yyyy/MM/dd"}}</td>
+					<td>{{row.ACT_STATUS | mapping:mappingSet['MGM.ACT_STATUS']:'F3'}}</td>
+					<td>{{row.EMP_NAME}}</td>
+					<td style="text-align: center;"><a href="#" ng-click="openMGM211(row)">活動維護</a></td>
+					<td align="right"><a href="#" ng-click="openMGM212(row)">{{row.POINT | number:0}}點</a></td>
+<!-- 				<td align="right" ng-show="row.ACT_TYPE == 'V'"><a href="#">{{row.POINT | number:0}}</a></td> -->
+				</tr>
+			</tbody>
+			</table>
+		</div>
+	</div>
+</div>

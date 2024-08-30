@@ -1,0 +1,153 @@
+<style>
+.PMS350_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS350_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS350_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<div ng-controller="PMS350_DETAILController" ng-cloak>
+	<div class="modal-dialog PMS350_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{DataRow.RPT_NAME}}：{{DataRow.RPT_EXPLAIN}}</h4>
+			</div>
+			<div class="modal-body">
+				<marquee ng-show="MARQUEE_FLAG == 'Y' && MARQUEE_TXT && MARQUEE_TXT != ''" scrolldelay="70" scrollamount="2"  onMouseOver="stop();" onmouseout="start();">
+					<span><i class="glyphicon glyphicon-bullhorn"></i>{{MARQUEE_TXT}}</span>
+				</marquee>
+				<div class="search_table search_box3">
+					<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+						<table>
+							<tr ng-if="!memLoginFlag.startsWith('UHRM')">
+								<th>業務處：</th>
+								<td>
+									<e-combobox id="region_center_id" name="region_center_id"
+												ng-datasource="REGION_LIST" 
+												ng-model="inputVO.region_center_id"
+												ng-validate="false" 
+												ng-disabled="disableRegionCombo"
+												ng-readonly="disableRegionCombo" 
+												ng-editable="false"
+												ng-format="F3" 
+												ng-required="false" 
+												ng-change="ChangeRegion()"
+												width="200px" 
+												style="line-height:20px;" />
+								</td>
+								<th>營運區：</th>
+								<td>
+									<e-combobox id="branch_area_id" name="branch_area_id"
+												ng-datasource="AREA_LIST" 
+												ng-model="inputVO.branch_area_id"
+												ng-validate="false" 
+												ng-disabled="disableAreaCombo"
+												ng-readonly="disableAreaCombo" 
+												ng-editable="false"
+												ng-format="F3" 
+												ng-required="false" 
+												ng-change="ChangeArea()"
+												width="200px" 
+												style="line-height:20px;" />
+								</td>
+								<th>分行別：</th>
+								<td>
+									<e-combobox id="branch_nbr" name="branch_nbr"
+												ng-datasource="BRANCH_LIST" 
+												ng-model="inputVO.branch_nbr"
+												ng-validate="false" 
+												ng-disabled="disableBranchCombo"
+												ng-readonly="disableBranchCombo" 
+												ng-editable="false"
+												ng-format="F1" 
+												ng-required="false" 
+												ng-change="ChangeBranch()"
+												width="200px" 
+												style="line-height:20px;" />
+								</td>													    												
+							</tr>
+							<tr>			
+								<th>員工編號：</th>
+								<td>
+									<input type="text" class="form-control" placeholder="請輸入..." id="emp_id" name="emp_id" ng-model="inputVO.emp_id" e-length-limit="20" style="text-transform: uppercase; width:250px" ng-disabled="empIdDisabled">
+								</td>		
+								<th></th>
+								<td></td>
+								<th></th>
+								<td></td>								
+							</tr>					
+						</table>
+					</form>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="initQuery();">清除</button>				
+				    <button type="button" class="btn btn-info" 
+				    		ng-click="export()" 
+				    		ng-hide="hideExport"
+				    		ng-disabled="paramList.length < 1" 
+				    		function-type="export">匯出</button>
+				</div>
+				<h4 class="h4-title">查詢結果</h4>
+				<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="table td_center e-table-freeze" e-height="500px" e-mode="1" e-left="8" e-top="true" e-list="paramList">
+						<thead>
+							<tr>
+								<th>項次</th>
+								<th>資料年月</th>
+								<!-- <th>業務處</th> -->
+								<th>營運區</th>
+								<th>分行代號</th>
+								<th>分行名稱</th>
+								<th>員工編號</th>
+								<th>員工姓名</th>
+								<th>AO Code</th>
+								<th style="min-width:9em;white-space:normal;" class="repeat-row" ng-repeat="rw in colList track by $index">{{rw.COL_NAME}}</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							 	<td>{{row.ROW_SEQ}}</td>
+							 	<td>{{row.DATA_YEARMON}}</td>
+							 	<!-- <td>{{row.REGION_CENTER_NAME}}</td> -->
+							 	<td>{{row.BRANCH_AREA_NAME}}</td>
+							 	<td>{{row.BRANCH_NBR}}</td>
+							 	<td>{{row.BRANCH_NAME}}</td>
+							 	<td>{{row.EMP_ID}}</td>
+							 	<td>{{row.EMP_NAME}}</td>
+							 	<td>{{row.AO_CODE}}</td>
+								<td style="white-space:normal;" class="repeat-row" ng-repeat="value in getListByComma(row.COL) track by $index">{{value}}</td>
+							</tr>
+						</tbody>
+					</table>				
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

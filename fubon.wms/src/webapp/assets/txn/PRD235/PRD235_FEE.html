@@ -1,0 +1,78 @@
+<style>
+.modal-dialog.PRD235_FEE {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 700px;
+	height: 500px;
+}
+</style>
+<div ng-controller="PRD235_FEEController" ng-cloak>
+	<div class="modal-dialog PRD235_FEE"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">費用率與報酬率資料</h4>
+			</div>
+			<div class="modal-body">
+				<div><b>近五年費用率及報酬率資料：{{inputVO.year5}} ～ {{inputVO.year1}}</b></div>
+				<br/>
+				<table>
+					<tr>
+						<td>
+							<e-upload success="uploadFinshed(name,rname)"></e-upload>
+							<a onclick="return false" ng-click="downloadSimple()">(下載範例檔案)</a>
+						</td>
+						<td width="10%"></td>
+						<td style="vertical-align: top;">
+							<button type="button" class="btn btn-primary" ng-click="uploadFee()">上傳</button>
+							<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+						</td>
+					</tr>
+				</table>
+				<br/>
+				<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="min-height:250px;white-space: nowrap;">
+					<table class="table-bordered middle">
+							<thead>
+								<tr>
+									<th>商品代碼</th>
+									<th>商品名稱</th>
+									<th>近1年年度</th>
+									<th>近1年費用率%</th>
+									<th>近2年費用率%</th>
+									<th>近3年費用率%</th>
+									<th>近4年費用率%</th>
+									<th>近5年費用率%</th>
+									<th>近1年報酬率%</th>
+									<th>近2年報酬率%</th>
+									<th>近3年報酬率%</th>
+									<th>近4年報酬率%</th>
+									<th>近5年報酬率%</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td>{{row.PRD_ID}}</td>
+									<td>{{row.FUND_CNAME}}</td>
+									<td>{{row.FEE_YEAR}}</td>
+									<td>{{row.FEE_RATE_1}}</td>
+									<td>{{row.FEE_RATE_2}}</td>
+									<td>{{row.FEE_RATE_3}}</td>
+									<td>{{row.FEE_RATE_4}}</td>
+									<td>{{row.FEE_RATE_5}}</td>
+									<td>{{row.ROI_1}}</td>
+									<td>{{row.ROI_2}}</td>
+									<td>{{row.ROI_3}}</td>
+									<td>{{row.ROI_4}}</td>
+									<td>{{row.ROI_5}}</td>
+								</tr>
+							</tbody>
+						</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,228 @@
+<style>
+
+.row_inline{
+	display: inline;
+}
+.intd_width{
+	width: 50%;
+	vertical-align: top;
+}
+.div_scoll{
+	height: 300px;
+	overflow: scroll;	
+}
+</style>
+<script type="text/javascript" src="assets/txn/KYC311/KYC311.js"></script>
+<script type="text/javascript" src="assets/txn/KYC311/KycRemoveTheCase.js"></script>
+<div ng-controller="KYC311Controller" ng-cloak>
+	  <div class="tfb_content">
+      <div class="tfb_content_icon"></div>
+      <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a16.gif" >資料查詢 </div>
+    </div>	
+    <div class="panel_content">
+    	<div class="gv_tab_sc scroll_y">
+    		<table>
+    			<tr>
+    				<td class="intd_width">
+    					<div class="panel panel-default">
+    						<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">
+									一、個人 基本資料
+								</div>
+							</div>
+							<table>
+								<tr>
+									<td>
+										客戶姓名(Name)：{{inputVO.cust_name}}
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div style="margin-right: 75px;" class="row_inline">性別(Gender)：{{inputVO.GENDER}}</div>
+										<div style="margin-right: 75px;" class="row_inline">身分證字號(ID Number)：{{inputVO.CUST_ID}}</div><br>
+										<div style="margin-right: 50px;" class="row_inline">出生日期(Date of Birth)：{{birthday}}</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										教育程度(Education)：{{inputVO.EDUCATION | mapping:EDUCATIONList:F3}}
+									</td>
+								</tr>
+								<tr>
+									<td>
+										職業(Occupation)：{{inputVO.CAREER | mapping:CAREERList:F3}}
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div style="margin-right: 150px;" class="row_inline">婚姻(Marital Status)：{{inputVO.MARRAGE | mapping:MARRAGEList:F3}}</div><br/>
+										<div class="row_inline">子女人數(Children)：{{inputVO.CHILD_NO | mapping:CHILD_NOList:F3}}</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div>
+											連絡電話(日)(Contact Number(Day))：{{basic_information.DAY}}
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div>
+											連絡電話(夜)(Contact Number(Night))：{{basic_information.NIGHT}}
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div>
+											連絡電話(行動)(Contact Number(Mobile))：{{basic_information.TEL_NO}}
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div>
+											連絡電話(傳真)(Contact Number(Fax))：{{basic_information.FAX}}
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div>
+											通訊地址(Mailing Address)：{{basic_information.CUST_ADDR_1}}
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div>
+											電子郵件(E-mail Address)：{{basic_information.EMAIL_ADDR}}
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div>
+											領有全民健康保險重大傷病證明(With Proof of Major Illness and Injury of National Health Insurance)：{{basic_information.SICK_TYPE_data}}
+										</div>
+									</td>
+								</tr>
+							</table>
+    					</div>
+    					<div class="panel panel-default">
+    						<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">
+									二、財務背景、投資經驗、投資需求與風險偏好
+								</div>
+							</div>
+							<div class="div_scoll">
+							<table ng-repeat = "row in questionList track by $index" ng-class-old="'rowLdd'" ng-class-even="'rowEven'">
+								<tr>
+									<td>{{$index+1}}.{{row.QUESTION_DESC}}({{row.QUESTION_DESC_ENG}})</td>
+								</tr>
+								<tr ng-repeat="row1 in row.ANSWER_LIST track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td style="padding-left: 20px;" ng-show="row1.select==true?true:false">
+										<h4>{{row1.ANSWER_DESC}}({{row1.ANSWER_DESC_ENG}})</h4>
+									</td>
+								</tr>
+							</table>
+							</div>
+    					</div>
+    				</td>
+    				<td class="intd_width">
+    					<div class="panel panel-default">
+    						<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">
+									風險屬性評估問卷編號
+								</div>
+							</div>
+							<div style="margin: 20px 20px 20px 20px;">{{inputVO.SEQ}}</div>
+    					</div>
+    					<div class="panel panel-default">
+    						<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">
+									風險屬性計算結果
+								</div>
+							</div>
+							<div style="margin-left: 20px;"><h4>客戶風險屬性為{{basic_information.CUST_RISK_AFR}}等級({{basic_information.CUST_RISK_AFR|mapping:risk_LevelList:F3}})</h4></div>
+							<div style="margin-left: 20px;">{{basic_information.CUST_RISK_AFR|mapping:result_descList:F3}}</div>
+    					</div>
+    					<div ng-show="basic_information.CUST_RISK_AFR == 'C1'?false:true" class="panel panel-default">
+    						<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">
+									 客戶聲明
+								</div>
+							</div>
+							<div style="margin: 20px 20px 20px 20px;">
+								客戶欲調降風險屬性為
+								<e-combobox id="down_risk_level" name="down_risk_level"
+											ng-datasource = "RISK_LEVEL_List"
+											ng-model = "inputVO.down_risk_level"
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-disabled="true"
+											style="line-height:20px;" />
+							
+							
+							</div>						
+    					</div>
+    						<div class="panel panel-default">
+    						<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">
+									錄音編號
+								</div>
+							</div>
+							<div style="margin: 20px 20px 20px 20px;">
+								<div style=" display: inline;">
+									錄音編號: {{inputVO.REC_SEQ}}									
+								</div>
+								<br>
+								<div style="display: inline; color:red;">請注意：尚未主管覆核之問卷，如完成客服錄音後需查詢錄音編號，請重新登入「問卷執行」頁面查詢。</div>
+							</div>
+    					</div>
+    					<div style="min-height: 500px;" class="panel panel-default">
+    						<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">
+									主管覆核
+									
+								</div>
+							</div>
+							<div style="margin: 20px 20px 20px 20px;">
+								<div style="display: inline;">
+									<label><input type="radio" name="out_access_group" ng-model="inputVO.OUT_ACCESS" ng-value="1" required>
+									行內承作</label>
+								</div>
+								<div style="display: inline;">
+									<label><input type="radio" name="out_access_group" ng-model="inputVO.OUT_ACCESS" ng-value="2" required>
+									外訪承作</label>					
+								</div>
+							</div>
+							<div style="margin: 20px 20px 20px 20px;">
+								<div style=" display: inline;">
+									員編:
+									<input id="emp_id" name="emp_id" type="text" placeholder="請輸入..." 
+										   ng-disabled="inputVO.OUT_ACCESS==''" ng-model="inputVO.EMP_ID" width="30%">
+								</div>
+								<div style="display: inline;">
+									密碼:
+									<input id="emp_password" name="emp_password" type="password" placeholder="請輸入..." 
+									       ng-disabled="inputVO.OUT_ACCESS==''" ng-model="inputVO.EMP_PASSWORD" width="30%">
+								</div>
+							</div>
+    					</div>
+    				</td>
+    			</tr>
+    		</table>
+    	</div>
+    </div>
+    <div class="search_box_btn text-center">
+				<button ng-disabled="finishForPrint" ng-click="saveandPrintData()" class="btn btn-info">列印</button>
+				<button ng-disabled="finishForPrint" ng-click="saveandPrintData_ENG()" class="btn btn-info">列印(英文版)</button>
+				<button ng-disabled="finish" ng-click="deleteData()" class="btn btn-info">刪除</button>
+				<button ng-disabled="finish" ng-click="btnSubmit()" class="btn btn-info">完成</button>
+	</div>								
+</div>

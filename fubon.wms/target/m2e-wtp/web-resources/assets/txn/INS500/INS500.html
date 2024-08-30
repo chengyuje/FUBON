@@ -1,0 +1,207 @@
+<script type="text/javascript" src="assets/txn/INS500/INS500.js"></script>
+
+<div class="INS500" ng-controller="INS500Controller" ng-cloak>
+	
+	<!-- 查詢操作項 -->
+	<div class="search_table">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >客戶基本資料</div>
+		</div>
+		<div class="panel_content">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<td width="35%"></td>
+						<td width="10%" style="padding-top: 1%;">*客戶ID：</td>
+						<td><input type="text" class="form-control" 
+							style="width: 150px; text-align: left; text-transform: uppercase;"
+							maxlength="10" id="custId" name="custId" ng-model="inputVO.custId"
+							ng-required="true">
+						</td>
+<!-- 							ng-blur="getUserInfo('INSURED')" -->
+						<td width="10%" style="padding-top: 1%;">客戶姓名：</td>
+						<td><input type="text" class="form-control" disabled="true"
+							style="width: 150px; text-align: left; text-transform: uppercase;"
+							maxlength="10" id="custName" name="custId" ng-model="inputVO.custName"
+							>
+						</td>
+						<td width="35%"></td>
+					</tr>
+					<tr>
+						<td colspan="6" class="text-center">
+							<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+							<button type="button" class="btn btn-info" ng-click="clear()">清除</button>
+						</td>				
+					</tr>
+				</table>
+			</form>
+		</div>	
+	</div>	
+	
+	<!-- 列表呈現區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >商品組合規劃</div>
+		</div>
+		<div class="panel_content">
+			<!-- 既有儲蓄型商品 -->
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th colspan="8" class="text-center">既有儲蓄型商品</th>
+						</tr>
+						<tr>
+							<th>勾選</th>
+							<th>險種代碼</th>
+							<th>險種名稱</th>
+							<th>繳費年期</th>
+							<th>保險年度</th>
+							<th>保費</th>
+							<th>保額</th>
+							<th>當年度生存金</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row text-center" ng-repeat="row in inputVO.savingsList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>
+								<!-- 勾選 -->
+								<input type='checkbox' ng-model="row.checkData" ng-true-value="'Y'" ng-false-value="'N'"/>
+							</td>
+							<td ng-bind="row.prdId1" style="text-align: left;"><!-- 險種代碼 --></td>
+							<td ng-bind="row.prdName1" style="text-align: left;"><!-- 險種名稱 --></td>
+							<td ng-bind="row.insPrdAnnual1" style="text-align: left;"><!-- 繳費年期 --></td>
+							<td ng-bind="row.curPolicyYear1" style="text-align: left;"><!-- 保險年度 --></td>
+							<td ng-bind="row.returnFee1 | number" style="text-align: right;"><!-- 保費 --></td>
+							<td ng-bind="row.assureAmt1" style="text-align: right;"><!-- 保額 --></td>
+							<td ng-bind="row.aliveFee1 | number" style="text-align: right;"><!-- 當年度生存金 --></td>
+						</tr>
+					</tbody>
+				</table>
+				<p class="text-right">顯示數值為年度末的金額<p>
+			</div>
+			<br>
+			
+			<!-- 主推還本型商品 -->
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th colspan="10" class="text-center">主推還本型商品</th>
+						</tr>
+						<tr>
+							<th>勾選</th>
+							<th>險種代碼</th>
+							<th>商品名稱</th>
+							<th>繳費年期</th>
+							<th>保險年度</th>
+							<th>保額</th>
+							<th>單位</th>
+							<th>幣別</th>
+							<th>年繳表定保費(折台)</th>
+							<th>第一年度末生存金(折台)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row text-center" ng-repeat="row in inputVO.reimbursementList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>
+								<!-- 勾選 -->
+								<input type='checkbox' ng-model='row.checkData' ng-true-value="'Y'" ng-false-value="'N'" ng-change="checkReimbursementRow(row)"/>
+						    </td>
+							<td ng-bind="row.prdId2" style="text-align: left;"><!-- 險種代碼 --></td>
+							<td ng-bind="row.prdName2" style="text-align: left;"><!-- 商品名稱 --></td>
+							<td>
+								<!-- 繳費年期 -->
+								<e-combobox 
+								id="ANNUAL" name="ANNUAL"
+								ng-datasource="row.insPrdAnnual2"
+								ng-model="row.insPrdAnnualModel2"
+								ng-format="F2" ng-readonly="row.checkData !='Y'"
+								ng-change="getRefRate(row)">
+							</td>
+							<td ng-bind="row.curPolicyYear2" style="text-align: left;"><!-- 保險年度 --></td>
+							<td>
+								<!-- 保額 -->
+								<input e-input-limit="NC" type="text" class="form-control" style="width: 150px; text-align: right;height: 90%;"	ng-model="row.assureAmt2" ng-blur="getAssureAmt(row)" ng-disabled="row.checkData != 'Y'">
+							</td>
+							<td ng-bind="row.prdUnit2  | mapping:INS_UNIT:F3" style="text-align: left;"><!-- 單位 --></td>
+							<td ng-bind="row.currCD2" style="text-align: left;"><!-- 幣別 --></td>
+							<td ng-bind="row.policyFee2 | number" style="text-align: right;"><!-- 年繳表定保費 --></td>
+							<td ng-bind="row.aliveFee2 | number" style="text-align: right;"><!-- 第一年度生存金 --></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<br>
+			
+			<!-- 當年度可領回生存金共 -->
+			<div class="form-inline">
+				<button type="button" class="btn btn-info" ng-click="confirm()" >確認</button>
+				<label margin-right:10px">當年度可領回生存金共</label>
+				<input ng-model="inputVO.curAliveFee" e-input-limit="NN" type="text" class="form-control" style="width: 150px; text-align: right;" disabled >		
+				<label margin-left:10px">元</label>	
+			</div>
+			<br>
+			
+			<!-- 推薦保障型商品 -->
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th colspan="8" class="text-center">推薦保障型商品</th>
+						</tr>
+						<tr>
+							<th>勾選</th>
+							<th>險種代碼</th>
+							<th>險種名稱</th>
+							<th>繳費年期</th>
+							<th>保險年度</th>
+							<th>保費</th>
+							<th>保額</th>
+							<th>保障年期</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row text-center" ng-repeat="row in inputVO.protectionList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>
+								<!-- 勾選 -->
+								<input type='radio' name="radio" ng-model='row.checkData' ng-click="checkProtectionRow(row)"/>
+							</td>
+							<td ng-bind="row.prdId3" style="text-align: left;"><!-- 險種代碼 --></td>
+							<td ng-bind="row.prdName3" style="text-align: left;"><!-- 險種名稱 --></td>
+							<td>
+								<!-- 繳費年期 -->
+								<e-combobox 
+								id="ANNUAL" name="ANNUAL"
+								ng-datasource="row.insPrdAnnual3"
+								ng-model="row.insPrdAnnualModel3"
+								ng-format="F2" ng-readonly="row.isDisabled"
+								ng-change="getAssureAmtAndAnnual(row, 'change')">
+							</td>
+							<td ng-bind="row.curPolicyYear3" style="text-align: left;"><!-- 保險年度 --></td>
+							<td>
+								<!-- 保費 -->
+								<input e-input-limit="NC" type="text"  class="form-control" style="width: 150px; text-align: right;height: 90%;" ng-blur="getAssureAmtAndAnnual(row, 'blur')" ng-model="row.policyFee3" ng-disabled="row.isDisabled">
+								<input type="hidden" ng-model="row.policyFee3_tmp" > 
+							</td>
+							<td ng-bind="row.assureAmt3" style="text-align: right;"><!-- 保額 --></td>
+							<td ng-bind="row.guaranteeAnnual" style="text-align: right;"><!-- 保障年期 --></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<br>
+			
+			<!-- 操作按鈕 -->
+			<div style="float: left;">
+				<button type="button" class="btn btn-info" ng-click="print()" ng-disabled="isDisabledPrint">列印建議書</button>
+<!-- 		移除		<button type="button" class="btn btn-info" ng-click="save()" ng-disabled="inputVO.custId == undefined|| inputVO.custId == null">暫存</button> -->
+			</div>
+			<br>
+			<br>
+		</div>
+	</div>			
+</div>
+

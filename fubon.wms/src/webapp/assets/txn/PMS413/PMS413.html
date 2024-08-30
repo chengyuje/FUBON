@@ -1,0 +1,172 @@
+<style>
+
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS413/PMS413.js"></script>
+<script type="text/javascript" src="assets/txn/PMS413/PMS413_EDIT.js"></script>
+
+<div class="PMS413" ng-controller="PMS413Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<div class="search_table search_box3">
+				<table>
+					<tr>						
+						<th>*電腦類型：</th>
+						<td>
+							<e-combobox id="comType" name="comType" 
+										ng-datasource="mappingSet['comType']"
+										ng-model="inputVO.comType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"	
+										ng_required="true"						
+										ng-format="F3"
+										width="180px"
+										ng-change="inquireInit();comTypeChange();"
+										style="line-height:20px;" />														
+						</td>											    
+						<th>IP Address：</th>
+						<td><input type="text" class="form-control" onkeyup="value=value.replace(/[^\d^\.]/g,'') " ng-model="inputVO.ip"></td>																											
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>						
+							<e-combobox id="rc_id" name="rc_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.rc_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion(region)"
+										style="line-height:20px;" />
+						</td>						
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="op_id" name="op_id"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.op_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(region)"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>	
+						<th>分行：</th>
+						<td>		
+							<e-combobox id="br_id" name="br_id"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.br_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeBranch(region)"
+										style="line-height:20px;" />									 
+						</td>
+						<th ng-show="inputVO.comType!=1">員工：</th>
+						<!-- 2017/11/9 mantis:3938 直接輸入且不檢核 -->
+						<td ng-show="inputVO.comType!=1">
+							<input type="text" class="form-control" placeholder="請輸入..." id="emp_id" name="emp_id" ng-model="inputVO.emp_id" e-length-limit="11">
+<!-- 							<e-combobox id="emp_id" name="emp_id" -->
+<!-- 							ng-datasource="EMP_LIST" -->
+<!-- 							ng-model="inputVO.emp_id" -->
+<!-- 							ng-validate="false"  -->
+<!-- 							ng-disabled="EMP_LIST.length == 2" -->
+<!-- 							ng-readonly="EMP_LIST.length == 2"  -->
+<!-- 							ng-editable="false" -->
+<!-- 							ng-format="F1" -->
+<!-- 							ng-required="false" -->
+<!-- 							ng-change="ChangeEmp_id(region)" -->
+<!-- 							style="line-height:20px;" /> -->
+						</td>						
+					</tr>					
+				</table>
+			</div>
+			</form>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit();init()">清除</button>
+				<button type="button" class="btn btn-info" ng-show="CanEdit && ((member == false && inputVO.comType != 1) || (member == true && inputVO.comType == 1))" ng-click="btnNew(row)">新增</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" function-type="export">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+			<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>			
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th ng-show="CanEdit && ((member == false && inputVO.comType != 1) || (member == true && inputVO.comType == 1))">功能</th>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行</th>
+							<th ng-hide="inputVO.comType == '1'">員工</th>
+							<th>IP Address</th>
+							<th>建立人</th>
+							<th>建立日期</th>
+							<th>最後修改人</th>
+							<th>最後修改時間</th>														
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center" ng-show="CanEdit && ((member == false && inputVO.comType != 1) || (member == true && inputVO.comType == 1))">
+						 		<e-combobox id="cmbAction" name="cmbAction" 
+											ng-datasource="mappingSet['action']"
+											ng-model="row.action"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-change="execAct(row)"
+											ng-required="false"
+											ng-format="F3"
+											width="100px"
+											style="line-height:20px;" />
+						 	</td>
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							<td>{{row.OP_AREA_NAME}}</td>
+							<td>{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+							<td ng-hide="inputVO.comType == '1'">{{row.EMP_ID}}-{{row.EMP_NAME}}</td>
+							<td>{{row.IPADDRESS}}</td>
+							<td>{{row.CREATOR}}-{{row.EMP_NAME_C}}</td>
+							<td>{{row.CREATETIME}}</td>
+							<td>{{row.MODIFIER}}-{{row.EMP_NAME_M}}</td>
+							<td>{{row.LASTUPDATE}}</td>													 	
+						</tr>
+					</tbody>
+				</table>				
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

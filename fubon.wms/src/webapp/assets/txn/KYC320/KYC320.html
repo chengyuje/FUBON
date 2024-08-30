@@ -1,0 +1,308 @@
+<style>
+/* open dialog */
+.ngdialog.KYC320 {
+	
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+
+input:required:invalid {
+	border-color: red;
+}
+/* dialog panl */
+.modal-dialog.KYC320 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+/*
+.KYC320 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+*/
+.KYC320 table.little {
+	width: 89%;
+}
+/* change row */
+.KYC320.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+/* scroll && height */
+.scroll_KYC320_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+
+.disabled {
+  cursor: not-allowed;
+}
+</style>
+<script type="text/javascript" src="assets/txn/KYC320/KYC320.js"></script>
+<script type="text/javascript" src="assets/txn/KYC320/KYC320_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/KYC320/KYC320_REC.js"></script>
+<script type="text/javascript" src="assets/txn/KYC320/KYC320_COOLINGREC.js"></script>
+<script type="text/javascript" src="assets/txn/KYC320/KYC320_KYCebank.js"></script>
+
+<div class="KYC320" ng-controller="KYC320Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab style="width: 100%;">
+					<table>
+						<tr>
+							<th>
+								<font style="color: red">*</font>客戶ID/統編：
+							</th>
+							<td>
+								<input type="text" class="form-control" ng-model="inputVO.CUST_ID" ng-required="inputVO.sTime==undefined" style="text-transform: uppercase;" ng-blur="text_toUppercase(inputVO.CUST_ID,'CUST_ID')"/>
+							</td>
+							<th>承作通路：</th>
+							<td>
+								<e-combobox ng-datasource="mappingSet['trType']"
+											ng-model="inputVO.INV" 
+											ng-validate="false" 
+											ng-readonly="false"
+											ng-editable="false" 
+											ng-format="F3" 
+											ng-change="bran()"
+											width="200px" 
+											height="30px" 
+											style="line-height:20px;"
+											ng-required="false" />
+							</td>
+						</tr>
+						<tr>
+							<th>*評估日期(起)：</th>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" 
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd" 
+											ng-model="inputVO.sTime"
+											is-open="model.a" 
+											datepicker-options="bgn_sDateOptions"
+											alt-input-formats="altInputFormats" 
+											ng-readonly="true"
+											ng-change="limitDate()" 
+											ng-required="inputVO.CUST_ID ==''" />
+										<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+							<th>*評估日期(訖)：</th>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" 
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd" 
+											ng-model="inputVO.eTime"
+											is-open="model.a2" 
+											datepicker-options="bgn_sDateOptions"
+											alt-input-formats="altInputFormats" 
+											ng-readonly="true"
+											ng-change="limitDate()" 
+											ng-required="inputVO.CUST_ID ==''" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a2')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="print()" function-type="export">列印</button>
+				<button type="button" class="btn btn-info" ng-click="clear()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="queryKYC()" function-type="print">查詢網銀KYC</button>				
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once ng-show="inputVO" output="outputVO" totallist="printList" list="data"></e-jumping-once>
+			<div algin="left">
+				<table>
+					<tr>
+						<td ng-if="inputVO.CUST_ID!='' && inputVO.INV=='' && inputVO.sTime==undefined && !isClear" align="right">
+							客戶首筆KYC_承作日期{{toJsDate(printList[printList.length-1].CREATE_DATE) | date:'yyyy/MM/dd'}}，訖今共承作{{data[0].COUT}}筆
+							<label class="with-errors">筆數不包含編號開頭為JSKYCREC的資料</label>
+						</td>
+						<td align="left">{{curDate | date:'yyyy/MM/dd'}}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y"
+				style="height: 400px; white-space: nowrap;">
+				<div class="gv_tab_sc scroll_y"
+					style="height: 400px; white-space: nowrap;">
+					<table class="table-bordered rstable">
+						<thead>
+							<tr class="middle">
+								<th>客戶名稱</th>
+								<th>評估日期</th>
+								<th>風險屬性評估問卷編號</th>
+								<th>承作通路</th>
+								<th>風險屬性</th>
+								<th>距前次檢視天數</th>
+								<th>行內/外訪</th>
+								<th>錄音編號</th>
+								<th>列印中文KYC</th>
+								<th>列印英文KYC</th>
+								<th>備註</th>
+								<th>鍵機人員</th>
+								<th>冷靜期</th>
+								<th>冷靜期後C值</th>			
+								<th>冷靜期解除帶進線員編</th>
+								<th>冷靜期錄音編號</th>
+							</tr>
+
+						</thead>
+						<tbody>
+							<tr class="repeat-row" align="center" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center">{{row.CUST_NAME }}</td>
+								<td align="center">{{toJsDate(row.CREATE_DATE) | date:'yyyy/MM/dd HH:mm' }}</td>
+								<td align="center">{{row.SEQ }}</td>
+								<td align="center">
+									<d ng-if="row.INVEST_BRANCH_NBR != null && row.INVEST_BRANCH_NBR!='999'">
+										{{row.INVEST_BRANCH_NBR}}-{{row.INVEST_BRANCH_NAME}}
+									</d>
+									<d ng-if="row.INVEST_BRANCH_NBR != null && row.INVEST_BRANCH_NBR=='999'">
+										<span ng-bind="(row.EMP_ID || '網銀') | mapping : mappingSet['trType'] : 'F3'"></span>
+									</d>
+								</td>
+								<td align="center">{{row.CUST_RISK_AFR }}</td>
+								<td align="center">{{row.DIFF_DAYS }}</td>
+								<td align="center" ng-if="type=='0'">
+									<c ng-if="row.OUT_ACCESS=='2'"> <a href="" ng-click="detail(row)">外訪</a></c> 
+									<c ng-if="row.OUT_ACCESS=='1'"> <a href="" ng-click="detail(row)">行內</a></c>
+								</td>
+								<td align="center" ng-if="type=='1'">
+									<c ng-if="row.OUT_ACCESS=='2'">外訪</c> 
+									<c ng-if="row.OUT_ACCESS=='1'">行內</c>
+								</td>
+								<td align="center" ng-if="row.REC_SEQ">
+									<c>{{row.REC_SEQ }}</c>
+								</td>
+								<td align="center" ng-if="!row.REC_SEQ">
+									<d ng-if="type=='0'">
+										<c ng-if="row.INVEST_BRANCH_NBR != null && row.INVEST_BRANCH_NBR!='999'"><a href="" ng-click="to_REC(row)">無錄音編號</a></c>
+										<c ng-if="row.INVEST_BRANCH_NBR != null && row.INVEST_BRANCH_NBR=='999'">{{row.REC_SEQ }}</c>
+									</d>
+									<d ng-if="type!='0'">
+										<c ng-if="row.INVEST_BRANCH_NBR != null && row.INVEST_BRANCH_NBR!='999'">無錄音編號</c>
+										<c ng-if="row.INVEST_BRANCH_NBR != null && row.INVEST_BRANCH_NBR=='999'">{{row.REC_SEQ }}</c>
+									</d>
+								</td>
+								<td>
+									<div ng-show="row.KYC == 'Y'">
+										<button type="button" class="btn btn-default" function-type="print" ng-click="printKYC(row, 'N')">列印中文KYC</button>
+									</div>
+								</td>
+								<td>
+									<div ng-show="row.KYC_ENG == 'Y'">
+										<button type="button" class="btn btn-default" function-type="print" ng-click="printKYC(row, 'Y')">列印英文KYC</button>
+									</div>
+								</td>
+								<td align="center">{{row.REMARK }}</td>
+								<td align="center">{{row.RPT_CREATOR_EMPID}}</td>
+								<td align="center" ng-if="row.isUnnaturalPerson">
+									<a href="" ng-click="to_COOLING_REC(row)" ng-if="row.COOL_STATUS == 'C' && pri_type" >冷靜期中</a>
+									<c ng-if="row.COOL_STATUS == 'C' && !pri_type" >冷靜期中</c>
+									<c ng-if="row.COOL_STATUS == 'R' ">已解除</c>
+									<c ng-if="row.COOL_STATUS == 'N' ">已取消</c>
+								</td>
+								<td align="center" ng-if="row.isUnnaturalPerson">
+									<a href="" ng-click="to_COOLING_REC(row)" ng-if="row.COOL_STATUS == 'C' && pri_type" >{{row.COOL_RISK_AFR}}</a>
+									<c ng-if="row.COOL_STATUS == 'C' && !pri_type" >{{row.COOL_RISK_AFR}}</c>
+									<c ng-if="row.COOL_STATUS == 'R' "></c>
+									<c ng-if="row.COOL_STATUS == 'N' "></c>
+								</td>
+								<td align="center" ng-if="!row.isUnnaturalPerson">
+									<a href="" ng-click="to_COOLING_REC(row)" ng-if="row.COOL_STATUS == 'C' && pri_type && row.AGE < 65" >冷靜期中</a>
+									<c ng-if="row.COOL_STATUS == 'C' && (!pri_type || row.AGE >= 65)" >冷靜期中</c>
+									<c ng-if="row.COOL_STATUS == 'R' ">已解除</c>
+									<c ng-if="row.COOL_STATUS == 'N' ">已取消</c>
+								</td>
+								<td align="center"ng-if="!row.isUnnaturalPerson">
+									<a href="" ng-click="to_COOLING_REC(row)" ng-if="row.COOL_STATUS == 'C' && pri_type && row.AGE < 65" >{{row.COOL_RISK_AFR}}</a>
+									<c ng-if="row.COOL_STATUS == 'C' && (!pri_type || row.AGE >= 65)" >{{row.COOL_RISK_AFR}}</c>
+									<c ng-if="row.COOL_STATUS == 'R' "></c>
+									<c ng-if="row.COOL_STATUS == 'N' "></c>
+								</td>
+								<td align="center">{{row.INLINEEMPID == null ? '' : row.INLINEEMPID  + '-' + row.INLINEEMP_NAME }}</td>
+								<td align="center">{{row.COOL_REC_SEQ }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

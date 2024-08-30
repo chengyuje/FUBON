@@ -1,0 +1,145 @@
+<style>
+
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/SQM220/SQM220.js"></script>
+
+<div class="SQM220" ng-controller="SQM220Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>						
+						<th><font color="red">＊</font>計績年月：</th>
+							<td>		 
+								<e-combobox ng-datasource="ymList"
+											ng-model="inputVO.yearMon"
+											ng-validate="false"
+											ng-editable="false" ng-format="F3"
+											width="150px" height="30px"	
+											ng-required="true"								
+											style="line-height:20px;" /></td>
+							</td>
+						<th>分行別：</th>
+							<td>
+								<e-combobox
+								ng-datasource="BRANCH_LIST"
+								ng-model="inputVO.branchNbr"
+								ng-validate="false" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+							</td>	
+						<th>問卷別：</th>
+							<td>						 
+								<e-combobox ng-datasource="QTN_LIST"
+											ng-model="inputVO.qtnType"
+											ng-validate="false" 
+											ng-disabled="disableBranchCombo"
+											ng-readonly="disableBranchCombo" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											width="155px"
+											style="line-height:20px;" />						 				 
+							</td>
+					</tr>
+				</table>
+				</form>
+			</div>
+			<div class="search_box_btn">
+				<span style="color: red;">依問卷「整體滿意度」分類。</span>
+				<div style="text-align: center;">
+					<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+					<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">		    
+			<e-jumping-once output="outputVO"  list="data" totallist="paramList" query = "query()"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;overflow-y: hidden;">
+					<table class="rstable middle e-table-freeze" e-height="600px" e-list="paramList" e-mode="1" e-top="true" e-left="4">
+					<thead>
+						<tr>
+							<th>分行別</th>
+							<th>問卷別</th>
+							<th>非常滿意</th>
+							<th>滿意</th>
+							<th>普通</th>
+							<th>不滿意</th>
+							<th>非常不滿意</th>
+							<th>未聯繫</th>
+							<th>合計</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat-start="(a,dataA) in data | groupBy : 'BRANCH_NBR' as resultA">
+						 	<td rowspan = "{{ dataA.length +1 }}">{{a | mapping : BRANCH_LIST : 'F1'}}</td>
+						</tr>
+						<tr ng-repeat = "row in dataA">
+							<td style="text-align: center;">{{row.QTN_TYPE|mapping:QTN_LIST}}</td>
+							<td>
+								<input type="text" ng-model="row.VS_CNT" style="text-align: center;width:100%" min="0" max="9" step="1" ng-pattern="/^[0-9]+$/" >
+							</td>
+							<td>
+								<input type="text" ng-model="row.S_CNT" style="text-align: center;width:100%" min="0" max="9" step="1" ng-pattern="/^[0-9]+$/" >
+							</td>
+							<td>
+								<input type="text" ng-model="row.OS_CNT" style="text-align: center;width:100%" min="0" max="9" step="1" ng-pattern="/^[0-9]+$/" >
+							</td>
+							<td>
+								<input type="text" ng-model="row.NS_CNT" style="text-align: center;width:100%" min="0" max="9" step="1" ng-pattern="/^[0-9]+$/" >
+							</td>
+							<td>
+								<input type="text" ng-model="row.VD_CNT" style="text-align: center;width:100%" min="0" max="9" step="1" ng-pattern="/^[0-9]+$/" >
+							</td>
+							<td>
+								<input type="text" ng-model="row.NC_CNT" style="text-align: center;width:100%" min="0" max="9" step="1" ng-pattern="/^[0-9]+$/" >
+							</td>
+							<td style="text-align: center;" >
+								{{row.TOT_CNT||0|number:0}}
+							</td>
+						 </tr>
+						 <tr ng-repeat-end="">
+						 	<td colspan="2" align="center">{{a | mapping : BRANCH_LIST : 'F1'}} 合計</td>
+						 	<td align="center">{{resultSumList[a].VS_CNT}}</td>
+						 	<td align="center">{{resultSumList[a].S_CNT}}</td>
+						 	<td align="center">{{resultSumList[a].OS_CNT}}</td>
+						 	<td align="center">{{resultSumList[a].NS_CNT}}</td>
+						 	<td align="center">{{resultSumList[a].VD_CNT}}</td>
+						 	<td align="center">{{resultSumList[a].NC_CNT}}</td>
+						 	<td align="center">{{resultSumList[a].TOT_CNT}}</td>
+ 						 </tr>
+						 
+					</tbody>
+				</table>
+			</div>
+				<br>				
+					<div align="center" ng-show="paramList.length > 0"><button type="button" class="btn btn-info" ng-click="save()">儲存</button></div>				
+		</div>
+	</div>
+</div>

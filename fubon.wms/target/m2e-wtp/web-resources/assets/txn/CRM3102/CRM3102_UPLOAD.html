@@ -1,0 +1,158 @@
+<style>
+.modal-dialog.CRM3102_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+</style>
+<div ng-controller="CRM3102_UPLOADController" ng-cloak>
+	<div class="modal-dialog CRM3102_UPLOAD">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">輪調/加強管控專案資訊</h4>
+			</div>
+ 			<div class="modal-body">
+ 				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+ 					<table>
+ 						<tr>
+ 							<td class="col-xs-1"></td>
+							<th class="col-md-1 tdpadding">專案類型：</th>
+							<td class="col-md-9 tdpadding" colspan="5">
+								<input type="radio" name="PRJ_TYPE" ng-model="inputVO.PRJ_TYPE" ng-value="'1'" ng-disabled="inputVO.PRJ_ID != ''" required>
+								輪調專案&nbsp;&nbsp;
+								<input type="radio" name="PRJ_TYPE" ng-model="inputVO.PRJ_TYPE" ng-value="'2'" ng-disabled="inputVO.PRJ_ID != ''" required>
+								加強管控專案
+				       		</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="inputVO.PRJ_TYPE == '2'">
+ 							<td class="col-xs-1"></td>
+							<th class="col-md-1 tdpadding">加強管控類型：</th>
+							<td class="col-md-9 tdpadding" colspan="5">
+								<input type="radio" name="PRJ_SUB_TYPE" ng-model="inputVO.PRJ_SUB_TYPE" ng-value="'1'" ng-disabled="inputVO.PRJ_ID != ''" required>
+								一般理專&nbsp;&nbsp;
+								<input type="radio" name="PRJ_SUB_TYPE" ng-model="inputVO.PRJ_SUB_TYPE" ng-value="'2'" ng-disabled="inputVO.PRJ_ID != ''" required>
+								高端理專
+				       		</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+	 						<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">專案名稱：</th>
+ 							<td class="col-md-9 tdpadding" colspan="5"><input type="text" class="form-control" placeholder="請輸入..." id="PRJ_NAME" name="PRJ_NAME" ng-model="inputVO.PRJ_NAME" e-length-limit="100" required></td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">專案說明：</th>
+ 							<td class="col-md-9 tdpadding" colspan="5">
+ 								<textarea id="PRJ_NOTE" name="PRJ_NOTE" class="form-control" ng-model="inputVO.PRJ_NOTE" style="width: 100%; height: 100px" e-length-limit="500"></textarea>
+ 							</td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>	
+ 							<th class="col-md-1 tdpadding">專案起訖日：</th>
+ 							<td class="col-md-9 tdpadding" colspan="5">
+ 								<div class="input-group datebox datewidth">
+									<input type="text" id="sdate" name="sdate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sdate"
+										is-open="model.a"
+										datepicker-options="sDateOptions"
+										ng-readonly="true"								
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+		 							<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+ 								<div style="float: left !important;">～</div>
+ 								<div class="input-group datebox datewidth">
+									<input type="text" id="edate" name="edate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.edate"
+										is-open="model.b"
+										datepicker-options="eDateOptions"
+										ng-readonly="true"								
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+		 							<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+ 							</td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">專案執行日期：</th>
+ 							<td class="col-md-9 tdpadding" colspan="5">
+ 								<div class="input-group datebox datewidth">
+									<input type="text" id="exedate" name="exedate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.PRJ_EXE_DATE"
+										is-open="model.c"
+										datepicker-options="exeDateOptions"
+										ng-readonly="true"								
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+		 							<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+ 							</td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr ng-show="inputVO.PRJ_TYPE == '2'">
+ 							<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">對帳單基準日：</th>
+ 							<td class="col-md-9 tdpadding" colspan="5">
+ 								<div class="input-group datebox datewidth">
+									<input type="text" id="staDate" name="staDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.STATEMENT_DATE"
+										is-open="model.d"
+										datepicker-options="staDateOptions"
+										ng-readonly="true"								
+										ng-change="limitDate()"/>
+										<!-- 製作日曆button -->
+		 							<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+ 							</td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">選擇上傳名單檔案：</th>
+							<td class="col-md-7 tdpadding">
+								<e-upload success="uploadFinshed(name,rname)"></e-upload>
+								<a onclick='return false' ng-click="downloadSample()">(下載範例檔案)</a>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+ 					</table>
+ 				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="editPrj()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

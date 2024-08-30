@@ -1,0 +1,282 @@
+<style>
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD179/PRD179.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PRD179" ng-controller="PRD179Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>業務處：</th>
+							<td><e-combobox ng-datasource="REGION_LIST" ng-model="inputVO.region_center_id" ng-disabled="disableRegionCombo" ng-readonly="disableRegionCombo" ng-format="F3" ng-change="ChangeRegion()" width="200px" /></td>
+							<th>營運區：</th>
+							<td><e-combobox ng-datasource="AREA_LIST" ng-model="inputVO.branch_area_id" ng-disabled="disableAreaCombo" ng-readonly="disableAreaCombo" ng-format="F3" ng-change="ChangeArea()" width="200px" /></td>
+							<th>分行別：</th>
+							<td><e-combobox ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr" ng-disabled="disableBranchCombo" ng-readonly="disableBranchCombo" ng-format="F1" ng-change="ChangeBranch()" width="200px" /></td>
+						</tr>
+						<tr>
+							<th>理專：</th>
+							<td><e-combobox ng-datasource="AO_LIST" ng-model="inputVO.ao_code" ng-disabled="disableAoCombo" ng-readonly="disableAoCombo" ng-format="F1" ng-change="ChangeAo_code()" width="200px" /></td>
+							<th>*案件類型：</th>
+							<td><e-combobox id="CASETYPE" name="CASETYPE" ng-datasource="mappingSet['CASETYPE']" ng-model="inputVO.CASETYPE" ng-validate="false" ng-readonly="false" ng-editable="false" ng-require="true" ng-format="F3" width="150px" style="line-height:20px;" required /></td>
+						</tr>
+						<tr>
+							<th>受理編號：</th>
+							<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.ACCEPTID"/></td>
+							<th>保險產品類型：</th>
+							<td><e-combobox id="POLICY_TYPE_2" name="POLICY_TYPE_2" ng-datasource="mappingSet['POLICY_TYPE_2']" ng-model="inputVO.POLICY_TYPE_2" ng-validate="false" ng-readonly="false" ng-editable="false" ng-require="true" ng-format="F3" width="150px" style="line-height:20px;"/></td>
+							<th>保單號碼：</th>
+							<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.POLICY_NO" /></td>
+						</tr>
+						<tr>
+							<th>保單狀況：</th>
+							<td><e-combobox id="POLICYSTATUS" name="POLICYSTATUS" ng-datasource="mappingSet['POLICYSTATUS']" ng-model="inputVO.POLICYSTATUS" ng-validate="false" ng-readonly="false" ng-editable="false" ng-require="true" ng-format="F3" width="150px" style="line-height:20px;" /></td>
+							<th>*保險公司：</th>
+							<td><e-combobox id="CNAME" name="CNAME" ng-datasource="mappingSet['CNAME']" ng-model="inputVO.CNAME" ng-validate="false" ng-readonly="false" ng-editable="false" ng-require="true" ng-format="F3" width="150px" style="line-height:20px;" required /></td>
+							<th>招攬人ID：</th>
+							<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.SALES_ID" /></td>
+						</tr>
+						<tr>
+							<th>要保人ID：</th>
+							<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.PAYER_APPL_ID" /></td>
+							<th>產品代號：</th>
+							<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.PRODUCTID" /></td>
+							<th>專案代號：</th>
+							<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.PROJECTID" /></td>
+						</tr>
+						<tr>
+							<th>被保人ID：</th>
+							<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.INSURED_ID" /></td>
+							<th>*要保書填寫日：</th>
+							<td colspan="3">
+								<div class="input-group datebox datewidth" style="float: left">
+									<input type="text" id="sCreDate" name="sCreDate" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.SAPPLY_DATE" is-open="model.a" datepicker-options="bgn_sDateOptions" ng-readonly="true" ng-change="limitDate()" style="width: 150px;" required/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+
+								</div>
+								<div style="float: left">&nbsp; ～ &nbsp;</div>
+								<div style="float: left" class="input-group datebox datewidth">
+									<input type="text" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.EAPPLY_DATE" is-open="model.b" datepicker-options="bgn_eDateOptions" ng-readonly="true" ng-change="limitDate()" style="width: 150px;" required/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="downloadCSV()" function-type="export" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+
+	<h4 class="h4-title">查詢結果</h4>
+	<div style="float: left">
+		<e-jumping-once output="outputVO" list="data" totallist="paramList"></e-jumping-once>
+	</div>
+	<div style="clear: both;"></div>
+	<div class="gv_tab_sc" style="white-space: nowrap; min-height: 235px;">
+		<table class="e-table-freeze" e-mode="3" e-height="535px" e-top="true" e-left="4" e-list="roleList">
+			<thead>
+				<tr>
+					<th>分行</th>
+					<th>業務員姓名</th>
+					<th>業務員(招攬人)ID</th>
+					<th>推薦人員ID</th>
+					<th>建檔人員姓名</th>
+					<th>提醒日</th>
+					<th>提醒事項</th>
+					<th>要保人身分</th>
+					<th>要保人姓名</th>
+					<th>要保人生日</th>
+					<th>要保人家庭收入</th>
+					<th>要保人ID</th>
+					<th>要保人類別</th>
+					<th>要保人個人年收入</th>
+					<th>要保人戶籍地址</th>
+					<th>要保人聯絡地址</th>
+					<th>要保人手機</th>
+					<th>要保人電話</th>
+					<th>要保人E-MAIL</th>
+					<th>高齡錄音序號</th>
+					<th>要保人風險等級</th>
+					<th>報被保人姓名</th>
+					<th>被保人ID</th>
+					<th>被保人生日</th>
+					<th>被保人性別</th>
+					<th>被保人類別</th>
+					<th>被保人與要保人關係</th>
+					<th>被保人個人年收入</th>
+					<th>被保人家庭收入</th>
+					<th>被保人戶籍地址</th>
+					<th>被保人聯絡地址</th>
+					<th>被保人手機</th>
+					<th>被保人電話</th>
+					<th>被保人E-MAIL</th>
+					<th>輸入日</th>
+					<th>受理日</th>
+					<th>受理編號</th>
+					<th>要保書填寫日</th>
+					<th>商品幣別</th>
+					<th>匯率</th>
+					<th>繳別</th>
+					<th>原幣總保費</th>
+					<th>台幣總保費</th>
+					<th>專案代號</th>
+					<th>產品名稱</th>
+					<th>保障年期</th>
+					<th>產品年限</th>
+					<th>設定幣別</th>
+					<th>產品中分類</th>
+					<th>風險等級</th>
+					<th>保額(原幣)</th>
+					<th>目標保費(原幣)</th>
+					<th>首期繳費方式</th>
+					<th>續期保費</th>
+					<th>保費繳交與要保人關係</th>
+					<th>保費來源</th>
+					<th>投資標的</th>
+					<th>放行者</th>
+					<th>放行時間</th>
+					<th>平台</th>
+					<th>附加費用率</th>
+					<th>折扣率</th>
+					<th>年收入差異說明</th>
+					<th>受益人1</th>
+					<th>受益人1身份證字號</th>
+					<th>受益人1與要保人關係</th>
+					<th>受益人2</th>
+					<th>受益人2身份證字號</th>
+					<th>受益人2與要保人關係</th>
+					<th>受益人3</th>
+					<th>受益人3身份證字號</th>
+					<th>受益人3與要保人關係</th>
+					<th>受益人4</th>
+					<th>受益人4身份證字號</th>
+					<th>受益人4與要保人關係</th>
+					<th>狀態</th>
+					<th>保險公司</th>
+					<th>保單號碼</th>
+					<th>產品代號</th>
+					<th>保險產品類型</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in data track by $index">
+					<td align="center">{{row.BRANCH_NAME}}</td>
+					<td align="center">{{row.SALES_NAME}}</td>
+					<td align="center">{{row.SALES_ID}}</td>
+					<td align="center">{{row.RECOMMENDER_ID}}</td>
+					<td align="center">{{row.RECOMMENDER_NAME}}</td>
+					<td align="center">{{row.MEMODATE}}</td>
+					<td align="center">{{row.MEMOSTR}}</td>
+					<td align="center">{{row.PAYER_IC}}</td>
+					<td align="center">{{row.PAYER_APPL_NAME}}</td>
+					<td align="center">{{toJsDate(row.PAYER_BIRTH_DATE) | date:"yyyy-MM-dd"}}</td>
+					<td align="center">{{row.PAYER_FINCOME}}</td>
+					<td align="center">{{row.PAYER_APPL_ID}}</td>
+					<td align="center">{{row.PAYERTYPESERIALNUM | mapping:mappingSet['PRD.PAYER_TYPE']:'F3'}}</td>
+					<td align="center">{{row.PAYER_ANNUAL_INCOME_AMT}}</td>
+					<td align="center">{{row.PAYER_CEN_ADDRESS}}</td>
+					<td align="center">{{row.PAYER_COM_ADDRESS}}</td>
+					<td align="center">{{row.PAYER_MOBILE_NO}}</td>
+					<td align="center">{{row.PAYER_TEL_NO}}</td>
+					<td align="center">{{row.PAYER_EMAIL}}</td>
+					<td align="center">{{row.OLDAAG_INSURED}}</td>
+					<td align="center">{{row.PAYER_RISK}}</td>
+					<td align="center">{{row.INSURED_NAME}}</td>
+					<td align="center">{{row.INSURED_ID}}</td>
+					<td align="center">{{toJsDate(row.INSURE_BIRTH_DATE) | date:"yyyy-MM-dd"}}</td>
+					<td align="center">{{row.INSUTE_GENDER}}</td>
+					<td align="center">{{row.INSUREDTYPESERIALNUM | mapping:mappingSet['PRD.INSURED_TYPE']:'F3' }}</td>
+					<td align="center">{{row.INSUREDOCCUPATIONCLASS | mapping:mappingSet['PRD.OCCUPATION_CLASS']:'F3'}}</td>
+					<td align="center">{{row.INSURED_ANNUAL_INCOME_AMT}}</td>
+					<td align="center">{{row.INSURED_FINCOME}}</td>
+					<td align="center">{{row.INSURED_CEN_ADDRESS}}</td>
+					<td align="center">{{row.INSURED_COM_ADDRESS}}</td>
+					<td align="center">{{row.INSURED_MOBILE_NO}}</td>
+					<td align="center">{{row.INSURED_TEL_NO}}</td>
+					<td align="center">{{row.INSURED_EMAIL}}</td>
+					<td align="center">{{toJsDate(row.NEWADDDATE) | date:"yyyy-MM-dd"}}</td>
+					<td align="center">{{toJsDate(row.ACCEPTDATE) | date:"yyyy-MM-dd"}}</td>
+					<td align="center">{{row.ACCEPTID}}</td>
+					<td align="center">{{toJsDate(row.APPLY_DATE) | date:"yyyy-MM-dd"}}</td>
+					<td align="center">{{row.CURRENCY}}</td>
+					<td align="center">{{row.EXACT_MONEYRATE}}</td>
+					<td align="center">{{row.POLICYMODE}}</td>
+					<td align="center">{{row.DUEPREMIUM_ORI}}</td>
+					<td align="center">{{row.DUEPREMIUM}}</td>
+					<td align="center">{{row.PROJECTID}}</td>
+					<td align="center">{{row.PRODUCTNAME}}</td>
+					<td align="center">{{row.REM_YEAR}}</td>
+					<td align="center">{{row.PRODUCTPUD}}</td>
+					<td align="center">{{row.SETTING_CURRENCY}}</td>
+					<td align="center">{{row.POLICY_TYPE}}</td>
+					<td align="center">{{row.RISK_TYPE}}</td>
+					<td align="center">{{row.SA_UNIT}}</td>
+					<td align="center">{{row.PERM}}</td>
+					<td align="center">{{row.FIRST_PAY_WAY}}</td>
+					<td align="center">{{row.CONTINUE_PREMIUN}}</td>
+					<td align="center">{{row.PAYMETHOD_RELATION | mapping:mappingSet['PRD.PAYMETHOD_RELATION']:'F3'}}</td>
+					<td align="center">{{row.PREMIUN_SOURCE}}</td>
+					<td align="center">{{row.AAAAA}}</td>
+					<td align="center">{{row.FUSER}}</td>
+					<td align="center">{{toJsDate(row.FDATE) | date:"yyyy-MM-dd"}}</td>
+					<td align="center">{{row.PREMIUMTABLE}}</td>
+					<td align="center">{{row.ADFEERATE}}</td>
+					<td align="center">{{row.DISCOUNT}}</td>
+					<td align="center">{{row.INCOME_DIFFMEMO}}</td>
+					<td align="center">{{row.BENEFITNAME1}}</td>
+					<td align="center">{{row.BENEFITIDNO1}}</td>
+					<td align="center">{{row.BENEFITOCCUPATIONCLASS1 | mapping:mappingSet['PRD.OCCUPATION_CLASS']:'F3'}}</td>
+					<td align="center">{{row.BENEFITNAME2}}</td>
+					<td align="center">{{row.BENEFITIDNO2}}</td>
+					<td align="center">{{row.BENEFITOCCUPATIONCLASS2 | mapping:mappingSet['PRD.OCCUPATION_CLASS']:'F3'}}</td>
+					<td align="center">{{row.BENEFITNAME3}}</td>
+					<td align="center">{{row.BENEFITIDNO3}}</td>
+					<td align="center">{{row.BENEFITOCCUPATIONCLASS3 | mapping:mappingSet['PRD.OCCUPATION_CLASS']:'F3'}}</td>
+					<td align="center">{{row.BENEFITNAME4}}</td>
+					<td align="center">{{row.BENEFITIDNO4}}</td>
+					<td align="center">{{row.BENEFITOCCUPATIONCLASS4 | mapping:mappingSet['PRD.OCCUPATION_CLASS']:'F3'}}</td>
+					<td align="center">{{row.POLICYSTATUS}}</td>
+					<td align="center">{{row.CNAME}}</td>
+					<td align="center">{{row.POLICY_NO}}</td>
+					<td align="center">{{row.PRODUCTID}}</td>
+					<td align="center">{{row.POLICY_TYPE_2}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

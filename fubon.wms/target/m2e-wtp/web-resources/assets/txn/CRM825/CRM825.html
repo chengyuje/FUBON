@@ -1,0 +1,68 @@
+<script type="text/javascript" src="assets/txn/CRM825/CRM825.js"></script>
+<script type="text/javascript" src="assets/txn/CRM825/CRM825_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD140/PRD140_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD120/PRDDocument.js"></script>
+<div class="CRM825" ng-controller="CRM825Controller" ng-cloak>
+	<!-- <div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >境外結構型商品(SN)</div>
+	</div>-->
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th>(約當臺幣)</th>
+					<td colspan = "3"></td>
+				</tr>
+				<tr>
+					<th>庫存總金額：</th>
+					<td colspan = "3">{{SUMTrustVal | number :0}}</td>
+				</tr>
+				<tr>
+					<th>含息總報酬率：</th>
+					<td colspan = "3">{{Return | number :2}}{{ Return != null ? '%' : ''}}</td>
+				</tr>
+			</table>	
+		</div>
+	<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th>憑證編號</th>
+						<th>商品代號</th>
+						<th>商品名稱</th>
+						<th>商品幣別</th>
+						<th>庫存面額</th>
+						<th>交易日</th>
+						<th>發行日</th>
+						<th>最新配息日</th>
+						<th>最新配息率</th>
+						<th>累積配息率</th>
+						<th>最新報價</th>
+						<th>含息報酬率</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;"><a href="#" onclick="return false" ng-click="detail(row)">{{row.TrustNo}}</a></td>
+						<td style="text-align: left;">{{row.BondNo}}</td>
+						<td style="text-align: left;"><a href="#" onclick="return false" ng-click="goPrdDetail(row)">{{row.BondName}}</a></td>
+						<td style="text-align: center;">{{row.CurCode}}</td>
+						<td style="text-align: right;">{{row.TrustVal | number : 0}}</td>
+						<td style="text-align: center;">{{toJsDate(row.sninfoList.TRANS_DATE) | date:"yyyy-MM-dd"}}</td>
+						<td style="text-align: center;">{{toJsDate(row.sninfoList.DATE_OF_FLOTATION) | date:"yyyy-MM-dd"}}</td>
+						<td style="text-align: center;">{{toJsDate(row.NewInterestDate) | date:"yyyy-MM-dd"}}</td>
+						<td style="text-align: center;">{{(row.NewAccuInterest/row.TrustVal*100)| number:6}}%</td>
+						<td style="text-align: center;">{{(row.AccuInterest / row.TrustVal*100)| number:6}}%</td>
+						<td style="text-align: right;">{{row.RefPrice | number : 4}}</td>
+						<td style="text-align: right;">{{row.IRROR | number:4}}{{row.IRROR != null ? '%' : ''}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+				
+				

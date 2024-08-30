@@ -1,0 +1,167 @@
+<style>
+/* open dialog */
+.ngdialog.CAM210_5_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.CAM210_5_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+/* table size */
+.CAM210_5_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CAM210_5_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CAM210_5_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+.red {
+	color: red !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM210/CAM210_5.js"></script>
+<div ng-controller="CAM210_5_Controller" ng-cloak>
+	<div class="modal-dialog CAM210_5_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 class="modal-title" align="center">已過期活動一覽</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<div>
+						<table>
+							<tr>
+								<th>活動名稱</th>
+								<th>簡要說明</th>
+								<th>活動到期日</th>
+							</tr>
+							<tr>
+								<td align="center">{{row.CAMPAIGN_NAME}}</td>
+								<td>{{row.CAMPAIGN_DESC}}</td>
+<!-- 								<td style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"> -->
+<!-- 									<div uib-tooltip="{{row.CAMPAIGN_DESC}}" tooltip-placement="right-bottom"> -->
+<!-- 										{{row.CAMPAIGN_DESC.length > 4 ? (row.CAMPAIGN_DESC | limitTo:4) + "..." : row.CAMPAIGN_DESC}} -->
+<!-- 									</div> -->
+<!-- 								</td> -->
+								<td >{{row.END_DATE | limitTo: 10}}</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<uib-tabset active="tabIdx" justified="true">
+   					<uib-tab index="0" heading="營運區">
+						<e-jumping-once output="outputVO" list="data" totallist="expiredActivitiesOpAreaList"></e-jumping-once>
+						<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+							<table class="table-bordered">
+								<thead>
+									<tr>
+										<th>營運區</th>
+										<th>名單數</th>
+										<th>已結案數</th>
+										<th>未結案數</th>
+										<th>結案率</th>
+<!-- 										<th>投資申購量(百萬)</th> -->
+<!-- 										<th>保險申購量(百萬)</th> -->
+<!-- 										<th>信用卡核卡數</th> -->
+<!-- 										<th>房貸撥款量(百萬)</th> -->
+<!-- 										<th>信貸撥款量(百萬)</th> -->
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="dataRow in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td align="center">
+											<a ng-click="txtOP_5(dataRow)">{{dataRow.BRANCH_AREA_NAME}}</a>
+											<div style="display: none;">{{dataRow.BRANCH_AREA_ID}}</div>
+										</td>
+										<td align="right">{{dataRow.LEAD_COUNTS}}</td>
+										<td align="right">{{dataRow.LEAD_CLOSE}}</td>
+<!-- 										<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+										<td align="right">{{dataRow.LEAD_COUNTS - dataRow.LEAD_CLOSE}}</td>
+<!-- 										<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+										<td align="right">{{(dataRow.LEAD_CLOSE/dataRow.LEAD_COUNTS)*100 | number:0}}{{dataRow.LEAD_COUNTS != null && dataRow.LEAD_COUNTS != '' ? '%' : ''}}</td>
+<!-- 										<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+<!-- 										<td align="right">{{dataRow.INVS_BAL}}</td> -->
+<!-- 										<td align="right">{{dataRow.INSS_BAL}}</td> -->
+<!-- 										<td align="right">{{dataRow.CARD_SUM}}</td> -->
+<!-- 										<td align="right">{{dataRow.LOAN1_SUM}}</td> -->
+<!-- 										<td align="right">{{dataRow.LOAN2_SUM}}</td> -->
+									</tr>
+									<tr id='pageTr'>
+										<td align="center">小計</td>
+										<td align="right">{{data | sumOfValue:'LEAD_COUNTS'}}</td>
+										<td align="right">{{data | sumOfValue:'LEAD_CLOSE'}}</td>
+<!-- 										<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+										<td align="right">{{(data | sumOfValue:'LEAD_COUNTS')-(data | sumOfValue:'LEAD_CLOSE')}}</td>
+<!-- 										<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+										<td align="right">{{((data | sumOfValue:'LEAD_CLOSE')/(data | sumOfValue:'LEAD_COUNTS'))*100 | number:0}}%</td>
+<!-- 										<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+<!-- 										<td align="right">{{data | sumOfValue:'INVS_BAL'}}</td> -->
+<!-- 										<td align="right">{{data | sumOfValue:'INSS_BAL'}}</td> -->
+<!-- 										<td align="right">{{data | sumOfValue:'CCD_SUM'}}</td> -->
+<!-- 										<td align="right">{{(data | sumOfValue:'LOAN1_SUM')}}</td> -->
+<!-- 										<td align="right">{{(data | sumOfValue:'LOAN2_SUM')}}</td> -->
+									</tr>
+									<tr id='toralTr'>
+										<td align="center">合計</td>
+										<td align="right">{{totalLeadCounts}}</td>
+										<td align="right">{{totalOkLeadCounts}}</td>
+<!-- 										<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+										<td align="right">{{totalLeadCounts - totalOkLeadCounts}}</td>
+<!-- 										<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+										<td align="right">{{(totalOkLeadCounts/totalLeadCounts)*100 | number:0}}%</td>
+<!-- 										<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+<!-- 										<td align="right">{{totalInvsSum}}</td> -->
+<!-- 										<td align="right">{{totalInssSum}}</td> -->
+<!-- 										<td align="right">{{totalCcdSum}}</td> -->
+<!-- 										<td align="right">{{totalLoan1Sum}}</td> -->
+<!-- 										<td align="right">{{totalLoan2Sum}}</td> -->
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</uib-tab>
+					<uib-tab index="1" heading="分行" disable="disableBranchTab">
+						<div ng-include="'assets/txn/CAM210/CAM210_5_branch.html'"></div>
+					</uib-tab>
+   					<uib-tab index="2" heading="理專" disable="disableAoTab">
+   						<div ng-include="'assets/txn/CAM210/CAM210_5_ao.html'"></div>
+   					</uib-tab>
+				</uib-tabset>
+			</div>
+		</div>
+	</div>
+</div>

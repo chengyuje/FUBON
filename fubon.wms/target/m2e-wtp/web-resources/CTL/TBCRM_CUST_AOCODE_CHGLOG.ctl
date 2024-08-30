@@ -1,0 +1,48 @@
+--**************************************************************************
+--PROJECT_CODE> TBKYC
+--DATE>2022/04/12
+--AUTHOR> Sam Tu
+--PURPOSE>ST Load
+--**************************************************************************
+
+--**************************************************************************
+--TARGET>TBCRM_CUST_AOCODE_CHGLOG
+--TRUNCATE_BEFORE_INSERT>N
+--**************************************************************************
+--OPTIONS (ERRORS = 0)
+OPTIONS (direct=true,skip=0)
+LOAD DATA
+CHARACTERSET AL32UTF8
+APPEND
+--TRUNCATE
+into table	TBCRM_CUST_AOCODE_CHGLOG
+--FIELDS TERMINATED BY X'09'
+FIELDS TERMINATED BY '#!!#' --OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+SEQ
+,CUST_ID
+,ORG_AO_CODE
+,ORG_AO_BRH
+,ORG_AO_NAME
+,NEW_AO_CODE
+,NEW_AO_BRH
+,NEW_AO_NAME
+,REG_AOCODE_EMP_ID
+,REG_AOCODE_SUB_DATETIME "TO_DATE(:REG_AOCODE_SUB_DATETIME,'YYYYMMDD')"
+,APL_REASON
+,APL_OTH_REASON
+,LETGO_EMP_ID
+,LETGO_DATETIME "TO_DATE(:LETGO_DATETIME,'YYYY-MM-DD hh24:mi:ss')"
+,TRS_TXN_SOURCE
+,TRS_PRJ_NBR
+,RETURN_400_YN
+,VERSION
+,CREATETIME "TO_DATE(:CREATETIME,'YYYYMMDD')"
+,CREATOR
+,MODIFIER
+,LASTUPDATE "TO_DATE(:LASTUPDATE,'YYYYMMDD')"
+,CHG_DATE "TO_DATE(:CHG_DATE,'YYYYMMDD')"
+,APL_EMP_ID
+,IMP_FILE_NAME
+)

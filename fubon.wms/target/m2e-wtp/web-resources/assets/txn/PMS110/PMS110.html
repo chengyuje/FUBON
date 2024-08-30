@@ -1,0 +1,238 @@
+<script type="text/javascript" src="assets/txn/PMS110/PMS110.js"></script>
+<script type="text/javascript" src="assets/txn/PMS110/PMS110_INSERT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS110/PMS110_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS110/PMS110_ACTIVITY.js"></script>
+<script type="text/javascript" src="assets/txn/PMS110/PMS110_MEMO.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<style>
+    /* table size */
+    .PMS110 table {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+</style>
+<div class="PMS110" ng-controller="PMS110Controller">
+    <div class="tfb_content">
+        <div class="tfb_content_icon"></div>
+        <div class="tfb_content_tit">
+            <img src="assets/images/icon/tfb_icon_a15.gif">查詢條件與功能
+        </div>
+    </div>
+    <div class="panel_content">
+    	<div class="search_table search_box2 scroll_y">
+    		<form name="parameterTypeEditForm">
+	    		<table>
+	    			<tr>
+	    				<th style="width: 16.6%;"><font color="red">*</font>業務處：</th>
+	    				<td>
+	    					<e-combobox ng-datasource="REGION_LIST"
+	                                    ng-model="inputVO.region_center_id"
+	                                    ng-disabled="disableRegionCombo"
+	                                    ng-readonly="disableRegionCombo"
+	                                    ng-format="F3"
+	                                    ng-change="ChangeRegion()"
+	                                    width="200px" required/>
+	    				</td>
+	    				<th style="width: 16.6%;"><font color="red">*</font>營運區：</th>
+	    				<td>
+	    					<e-combobox ng-datasource="AREA_LIST"
+	                                    ng-model="inputVO.branch_area_id"
+	                                    ng-disabled="disableAreaCombo"
+	                                    ng-readonly="disableAreaCombo"
+	                                    ng-format="F3"
+	                                    ng-change="ChangeArea()"
+	                                    width="200px" required/>
+	    				</td>
+	    				<th style="width: 16.6%;"><font color="red">*</font>分行別：</th>
+	    				<td>
+	                        <e-combobox ng-datasource="BRANCH_LIST"
+	                                    ng-model="inputVO.branch_nbr"
+	                                    ng-disabled="disableBranchCombo"
+	                                    ng-readonly="disableBranchCombo"
+	                                    ng-format="F1"
+	                                    ng-change="ChangeBranch()"
+	                                    width="200px" required/>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<th style="width: 16.6%;"><font color="red">*</font>業務人員：</th>
+	    				<td>
+	                        <e-combobox ng-datasource="EMP_LIST"
+	                                    ng-model="inputVO.emp_id"
+	                                    ng-disabled="disableEmpCombo"
+	                                    ng-readonly="disableEmpCombo"
+	                                    ng-format="F1"
+	                                    ng-change="ChangeAo_code()"
+	                                    width="200px" required/>
+	    				</td>
+	    				<th style="width: 16.6%;"><font color="red">*</font>銷售計劃月份：</th>
+	    				<td>
+	                        <e-combobox ng-datasource="mappingSet['timeE']"
+	                                    ng-model="inputVO.planYearmon"
+	                                    ng-format="F3"
+	                                    ng-change="dateChange()"
+	                                    width="200px" required/>
+	    				</td>
+	    				<th style="width: 16.6%;">承作商品：</th>
+	    				<td>
+	                        <e-combobox ng-datasource="mappingSet['PMS.PIPELINE_PRD']"
+	                                    ng-model="inputVO.estPrd"
+	                                    ng-format="F3"
+	                                    width="200px"/>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<th style="width: 16.6%;">客戶來源：</th>
+	    				<td>
+	                        <e-combobox ng-datasource="mappingSet['PMS.CUST_SOURCE']"
+	                                    ng-model="inputVO.custSource"
+	                                    ng-format="F3"
+	                                    width="200px"/>
+	    				</td>
+	    				<th style="width: 16.6%;">案件狀態：</th>
+	    				<td>
+	                        <e-combobox ng-datasource="mappingSet['PMS.PIPELINE_STATUS']"
+	                                    ng-model="inputVO.planStatus"
+	                                    ng-format="F3"
+	                                    width="200px"/>
+	    				</td>
+	    				<th style="width: 16.6%;">撥款月份：</th>
+	    				<td>
+	                        <e-combobox ng-datasource="mappingSet['drawMonth']"
+	                                    ng-model="inputVO.drawMonth"
+	                                    ng-format="F3"
+	                                    width="200px"/>
+	    				</td>
+	    			</tr>
+	    		</table>
+	    	</form>
+    	</div>
+    	<div class="search_box_btn text-center">  
+     		<div align="center">
+			    <button ng-click="inquire()" class="btn btn-primary" function-type="query"><span class="glyphicon glyphicon-search"></span>查詢</button>
+			    <button ng-click="init();dateChange()" class="btn btn-info"><span class="glyphicon glyphicon-erase"></span>清除</button>
+			    <button ng-click="export()" class="btn btn-success" function-type="export" ng-disabled="pipelineList.length == 0"><span class="glyphicon glyphicon-save"></span>匯出</button>
+			    <button ng-click="insert()" class="btn btn-warning" function-type="maintenance"><span class="glyphicon glyphicon-plus"></span>我的銷售計畫</button>
+			</div>
+    	</div>
+    </div>
+    <div class="tfb_content">
+        <div class="tfb_content_icon"></div><div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+    </div>
+    <div class="panel_content">
+        <!-- Collection 統計區 -->
+        
+        <table class="table table-striped" ng-if="(inputVO.estPrd == undefined || inputVO.estPrd == null || inputVO.estPrd == '') || inputVO.estPrd == '1'">
+        	<thead>
+        		<tr>
+        			<th style="text-align: center;width:150px">房貸</th>
+        			<th class="repeat-row" ng-repeat="row in mappingSet['PMS.PIPELINE_PRD_ITEM_1']" style="text-align: center;">{{row.LABEL}}</th>
+					<th style="text-align: center;">總計</th>
+        		</tr>
+        	</thead>
+       		<tbody>
+        		<tr class="repeat-row" ng-repeat="row in pilelineSumList | filterBy: ['EST_PRD']:1">
+        			<td align="center" ng-bind="row.ITEM_NAME"></td>
+        			<td align="center" ng-bind="row.ITEM11"></td>
+        			<td align="center" ng-bind="row.ITEM12"></td>
+        			<td align="center" ng-bind="row.ITEM13"></td>
+        			<td align="center" ng-bind="row.ITEM11 + row.ITEM12 + row.ITEM13"></td>
+        		</tr>
+        	</tbody>
+        </table>
+        <table class="table table-striped" ng-if="(inputVO.estPrd == undefined || inputVO.estPrd == null || inputVO.estPrd == '') || inputVO.estPrd == '2'">
+        	<thead>
+        		<tr>
+        			<th style="text-align: center;width:150px">信貸</th>
+        			<th class="repeat-row" ng-repeat="row in mappingSet['PMS.PIPELINE_PRD_ITEM_2']" style="text-align: center;">{{row.LABEL}}</th>
+					<th style="text-align: center;">總計</th>
+        		</tr>
+        	</thead>
+       		<tbody>
+        		<tr class="repeat-row" ng-repeat="row in pilelineSumList | filterBy: ['EST_PRD']: 2">
+        			<td align="center" ng-bind="row.ITEM_NAME"></td>
+        			<td align="center" ng-bind="row.ITEM21"></td>
+        			<td align="center" ng-bind="row.ITEM22"></td>
+        			<td align="center" ng-bind="row.ITEM23"></td>
+        			<td align="center" ng-bind="row.ITEM24"></td>
+        			<td align="center" ng-bind="row.ITEM21 + row.ITEM22 + row.ITEM23 + row.ITEM24"></td>
+        		</tr>
+        	</tbody>
+        </table>
+       	<table class="table table-striped" ng-if="(inputVO.estPrd == undefined || inputVO.estPrd == null || inputVO.estPrd == '') || inputVO.estPrd == '3'">
+        	<thead>
+        		<tr>
+        			<th style="text-align: center;width:150px">留貸</th>
+        			<th class="repeat-row" ng-repeat="row in mappingSet['PMS.PIPELINE_PRD_ITEM_3']" style="text-align: center;">{{row.LABEL}}</th>
+					<th style="text-align: center;">總計</th>
+        		</tr>
+        	</thead>
+        	<tbody>
+        		<tr class="repeat-row" ng-repeat="row in pilelineSumList | filterBy: ['EST_PRD']: 3">
+        			<td align="center" ng-bind="row.ITEM_NAME"></td>
+        			<td align="center" ng-bind="row.ITEM31"></td>
+        			<td align="center" ng-bind="row.ITEM31"></td>
+        		</tr>
+        	</tbody>
+        </table>
+
+        <e-jumping-once output="outputVO" list="subData" totallist="pipelineList"></e-jumping-once>
+        
+        <div class="gv_tab_sc scroll_y">
+            <table class="table-striped e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+                <thead>
+	                <tr>
+	                	<th>功能</th>
+	                    <th>客戶來源</th>
+	                    <th>案件狀態</th>
+	                    <th>客戶ID</th>
+	                    <th>客戶姓名</th>
+	                    <th>面談日期</th>
+	                    <th>預計承作商品</th>
+	                    <th>預計承作金額</th>
+	                    <th>案件編號</th>
+	                    <th>實際承作商品類型</th>
+	                    <th ng-show="memLoginFlag=='ALL'">進件日期</th>
+	                    <th ng-show="memLoginFlag=='ALL'">核准日期</th>
+	                    <th ng-show="memLoginFlag=='ALL'">核准金額</th>
+	                    <th>對保日期</th>
+	                    <th>預計撥款日期</th>
+	                    <th ng-show="memLoginFlag=='ALL'">撥款日期</th>
+	                    <th ng-show="memLoginFlag=='ALL'">撥款金額</th>
+	                    <th>轉介單位</th>
+	                    <th>轉介人員</th>
+	                    <th>備註</th>
+	                </tr>
+                </thead>
+                <tbody>
+                	<!-- 20210702 雪慧: 在pipeline計劃查詢畫面中最下面進件日期丶核准日期丶核准金額丶撥款日期丶撥款金額先暫時隱藏，只開放總行可以查詢核對驗證資料使用 -->
+	                <tr class="repeat-row" ng-repeat="row in subData | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	                    <td align="center"><button ng-click="insert(row)" class="btn btn-warning" function-type="export"><span class="glyphicon glyphicon-pencil"></span>編輯</button></td>
+	                    <td align="center" ng-bind="row.CUST_SOURCE | mapping:mappingSet['PMS.CUST_SOURCE']:'F3'"></td>
+	                    <td align="center" ng-bind="row.PIPELINE_STATUS | mapping:mappingSet['PMS.PIPELINE_STATUS']:'F3'"></td>
+	                    <td align="center" ng-bind="row.CUST_ID"></td>
+	                    <td align="center" ng-bind="row.CUST_NAME"></td>
+	                    <td align="center" ng-bind="dateType(row.MEETING_DATE)"></td>
+	                    <td align="center" ng-bind="row.EST_PRD | mapping:mappingSet['PMS.PIPELINE_PRD']:'F3'"></td>
+	                    <td align="right"  ng-bind="row.EST_AMT | number:0"></td>
+	                    <td align="center" ng-bind="row.CASE_NUM"></td>
+	                    <td align="center" ng-bind="row.PIPELINE_PRD_ITEM | mapping:mappingSet['PMS.PIPELINE_PRD_ITEM']:'F3'"></td>
+	                    <td align="center" ng-show="memLoginFlag=='ALL'" ng-bind="dateType(row.RECEIVE_DATE)"></td>
+	                    <td align="center" ng-show="memLoginFlag=='ALL'" ng-bind="dateType(row.ALLOW_DATE)"></td>
+	                    <td align="right"  ng-show="memLoginFlag=='ALL'" ng-bind="row.ALLOW_AMT | number:0"></td>
+	                    <td align="center" ng-bind="dateType(row.CHK_LOAN_DATE)"></td>
+	                    <td align="center" ng-bind="dateType(row.EST_DRAW_DATE)"></td>
+	                    <td align="center" ng-show="memLoginFlag=='ALL'" ng-bind="dateType(row.APPROPRIATION_DATE)"></td>
+	                    <td align="right"  ng-show="memLoginFlag=='ALL'" ng-bind="row.APPROPRIATION_AMT"></td>
+	                    <td align="center" ng-bind="row.REF_UNIT"></td>
+	                    <td align="center" ng-bind="row.REF_EMP"></td>
+	                    <td align="center"><button ng-click="openMemo(row.MEMO)" class="btn btn-success" function-type="query"><span class="glyphicon glyphicon-search"></span>檢視</button></td>
+	                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

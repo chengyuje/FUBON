@@ -1,0 +1,107 @@
+<form name="form.ftp" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+    <div class="form-group" style="padding-top: 20px">
+        <label class="col-form-label col-sm-2" ng-bind="'傳檔 ID'"></label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" ng-model="ftpVO.tipFtpSettingId"
+                   placeholder="傳檔 ID 固定為 RPT.報表代號！" maxlength="20" readonly required/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'來源檔目錄'" for="tipSrcDirectory"></label>
+        <div class="col-sm-10">
+            <input id="tipSrcDirectory" type="text" class="form-control" ng-model="ftpVO.tipSrcDirectory" placeholder="請輸入..."
+                   ng-disabled="isCreateOrUpdate && !needFtp" ng-readonly="!isCreateOrUpdate"  maxlength="200" />
+        </div>
+    </div>
+
+    <div class="form-group has-feedback">
+        <label class="col-form-label col-sm-2" for="tipSrcFileName">
+            <span ng-bind="'來源檔檔名'"></span>
+            <i class="glyphicon glyphicon-info-sign" ng-click="openDateRuleUI()"></i>
+        </label>
+        <div class="col-sm-10">
+            <input id="tipSrcFileName" type="text" class="form-control" ng-model="ftpVO.tipSrcFileName" placeholder="可點選提示來了解日期命名規則！"
+                   ng-disabled="isCreateOrUpdate && !needFtp" ng-readonly="!isCreateOrUpdate" maxlength="100" required />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'目的檔目錄'" for="tipDesDirectory"></label>
+        <div class="col-sm-10">
+            <input id="tipDesDirectory" type="text" class="form-control" ng-model="ftpVO.tipDesDirectory" placeholder="請輸入..."
+                   ng-disabled="isCreateOrUpdate && !needFtp" ng-readonly="!isCreateOrUpdate" maxlength="200" required />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" for="tipDesFileName">
+            <span ng-bind="'目的檔檔名'"></span>
+            <i class="glyphicon glyphicon-info-sign" ng-click="openDateRuleUI()"></i>
+        </label>
+        <div class="col-sm-10">
+            <input id="tipDesFileName" type="text" class="form-control" ng-model="ftpVO.tipDesFileName" placeholder="可點選提示來了解日期命名規則！"
+                   ng-disabled="isCreateOrUpdate && !needFtp" ng-readonly="!isCreateOrUpdate" maxlength="100" required />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'FTP Server ID'"></label>
+        <div class="col-sm-10">
+            <e-combobox width="100%" ng-datasource="mappingSet['hostId']" ng-model="ftpVO.cmbHostId" ng-format="F2"
+                        ng-disabled="isCreateOrUpdate && !needFtp" ng-readonly="!isCreateOrUpdate" required />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'檢核檔名'" for="tipCheckFile"></label>
+        <div class="col-sm-10">
+            <input id="tipCheckFile" type="text" class="form-control" ng-model="ftpVO.tipCheckFile" placeholder="請輸入..."
+                   ng-disabled="isCreateOrUpdate && !needFtp" ng-readonly="!isCreateOrUpdate" maxlength="100"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'檢核檔重試次數'" for="tipRepeat"></label>
+        <div class="col-sm-10">
+            <input type="number" class="form-control" ng-model="ftpVO.tipRepeat" placeholder="單位：次（上限 9999 次）" min="0"
+                   step="1" max="9999" id="tipRepeat" ng-disabled="isCreateOrUpdate && !needFtp" ng-readonly="!isCreateOrUpdate" required />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'檢核檔重試間隔時間'" for="tipRepeatInterval"></label>
+        <div class="col-sm-10">
+            <input type="number" class="form-control" ng-model="ftpVO.tipRepeatInterval" placeholder="單位：分鐘（上限 9999 分鐘）"
+                   min="0" max="9999" id="tipRepeatInterval" ng-disabled="isCreateOrUpdate && !needFtp" ng-readonly="!isCreateOrUpdate" required />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'是否刪除遠端檔案'"></label>
+        <div class="col-sm-10">
+            <e-combobox ng-paramtype="COMMON.YES_NO" ng-model="ftpVO.srcDelete" ng-format="F1"
+                        ng-disabled="isCreateOrUpdate && !needFtp" ng-readonly="!isCreateOrUpdate" required />
+        </div>
+    </div>
+
+    <hr/>
+
+    <div ng-if="isCreateOrUpdate" class="text-center">
+        <button type="button" class="btn btn-success" ng-click="createOrUpdate()" data-toggle="tooltip" title="儲存設定～">
+            <span class="glyphicon glyphicon-floppy-disk"></span>
+            <span ng-bind="'儲存'"></span>
+        </button>
+        <button type="button" class="btn btn-default" ng-click="startFtp()" data-toggle="tooltip" title="需要 FTP～"
+                ng-show="!needFtp">
+            <span class="glyphicon glyphicon-open"></span>
+            <span ng-bind="'需要'"></span>
+        </button>
+        <button type="button" class="btn btn-default" ng-click="clearFtp()" data-toggle="tooltip" title="不需要 FTP～"
+                ng-show="needFtp">
+            <span class="glyphicon glyphicon-erase"></span>
+            <span ng-bind="'不需要'"></span>
+        </button>
+    </div>
+</form>
+

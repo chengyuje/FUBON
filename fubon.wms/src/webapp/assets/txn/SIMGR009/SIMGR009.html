@@ -1,0 +1,164 @@
+<style>
+.SIMGR009 .search_box th {
+	text-align:center;
+	padding:0px;
+}
+
+.SIMGR009 .search_box td{	
+	text-align:center;
+	padding: 5px;
+}
+.SIMGR009 .ngdialog {
+    margin-top:-150px;
+}
+.SIMGR009 .sortableTable tr{
+	cursor: move;
+}
+
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/SIMGR009/SIMGR009.js"></script>
+<script type="text/javascript" src="assets/txn/SIMGR009/SIMGR009_EDIT.js"></script>
+<div class="container SIMGR009">
+	<div ng-controller="SIMGR009Controller" ng-cloak >
+	  <!-- left, vertical navbar & content -->
+	  <div class="row"> 
+	    <!-- left, vertical navbar --> 
+	    <!-- content -->
+	    <div class="col-md-12"> <!-- InstanceBeginEditable name="Content" -->
+	      <div class="row">
+	        <div class="col-md-12">
+	          <div class="panel panel-default">
+	            <div class="panel-heading">
+	              <div class="text-muted bootstrap-admin-box-title"><i class="glyphicon glyphicon-th-large"></i>參數內容設定</div>
+	            </div>
+	
+	            <div class="bootstrap-admin-panel-content text-muted search_box">
+	              <form>
+	              	<table>
+		              	<tbody>
+		                    <tr>
+		                        <th><h4>參數清單</h4></th>
+								<th colspan="2"><h4>參數維護</h4></th>
+								<!-- <td></td> -->
+		                    </tr>
+		                	<tr>
+								<td>
+			                        <e-combobox id="ptypeBuss"
+										ng-paramtype="TBSYSPARAMTYPE.PTYPE_BUSS" 
+										ng-model="inputVO.cmbPtypeBuss"
+										ng-validate="true" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F1" 
+										ng-required="false" 
+										/>
+								</td>
+								<td style="width:55%">{{ptype_desc}}</td>
+		                    </tr>
+		                    <tr>
+		                        <td></td>
+								<td></td>
+		                     </tr>
+	
+							 <tr>  
+								<td>
+									<div class="slim-scroll" data-height="300">
+				                        <table >
+				                        	<tr class="repeat-row" ng-click="detail(row)" ng-repeat="row in paramList" ng-class="{'selected-row': row.PARAM_TYPE ==  inputVO.selectedParameter}" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+												<td>{{row.PTYPE_NAME}}</td>			
+											</tr>
+										</table>
+									</div>
+								</td>	
+								
+								<td>
+									<div class="slim-scroll" data-height="300" >
+				                        <table class="table table-striped table-bordered sortableTable" align=center>
+				                        	<thead>
+					                        	<tr>
+					                        		<th scope="col">狀態</th>
+					                   				<th scope="col">編碼</th> 
+					                   				<th scope="col">參數值</th>
+													<th scope="col">說明</th>	
+					                        	</tr>
+				                        	</thead>
+				                        	<tbody ui-sortable="sortableOptions" ng-model="adgParameter">
+					                        	<tr class="repeat-row" ng-click="show(row, $index)" ng-repeat="row in adgParameter" ng-class="{'selected-row': row.PARAM_CODE ==  currentDetailRow.PARAM_CODE}" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+													<td>{{row.PARAM_STATUS | mapping:paramStatusDesc}}</td>
+													<td>{{row.PARAM_CODE}}</td>
+													<td>{{row.PARAM_NAME_EDIT}}</td>
+													<td>{{row.PARAM_DESC}}</td>
+												</tr>
+				                        	</tbody>
+										</table>
+									</div>
+								</td>
+<!--  								<td> -->
+<!-- 								<table height=300px> -->
+<!-- 									<tr> -->
+<!-- 										<td>生效日期：</td> -->
+<!-- 										<td> -->
+<!-- 										<input class="form-control" type="text" ng-model="currentDetailRow.WORKS_DATE" ng-disabled="true"/><br> -->
+<!-- 										</td> -->
+<!-- 									</tr> -->
+<!-- 									<tr> -->
+<!-- 										<td>參數編碼:</td> -->
+<!-- 										<td> -->
+<!-- 										<input class="form-control" type="text" ng-model="currentDetailRow.PARAM_CODE" maxlength="10" ng-disabled="true"/><br> -->
+<!-- 										</td> -->
+<!-- 									</tr> -->
+<!-- 									<tr> -->
+<!-- 										<td>參數值:</td> -->
+<!-- 										<td><textarea class="form-control" ng-model="currentDetailRow.PARAM_NAME_EDIT" maxlength="30" ng-disabled="true"></textarea></td> -->
+<!-- 									</tr> -->
+<!-- 								</table> -->
+<!-- 								</td> -->
+		                     </tr>
+	
+							 <tr>
+								<td>
+		                        <e-combobox id="orderType" ng-disabled="eComboDisabled"
+									ng-paramtype="TBSYSPARAMTYPE.ORDER_TYPE"
+									ng-datasource="orderTypeDatasource" 
+									ng-model="inputVO.cmbOrderType"
+									ng-validate="true" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3" 
+									ng-required="false" 
+									ng-change = "inquireParamType()"
+									/>
+								</td>
+								<td>
+		                        <table>
+		                        	<tr>
+										<td>
+											<div class="ax_dynamic_panel" align="center">
+										      	<button href="/new" onclick="return false" ng-click="edit()" class="btn btn-info" ng-if="inputVO.selectedParameter" function-type="maintenance" >新增</button>
+												<button href="/edit/{{paramCode}}" onclick="return false" ng-click="edit(currentDetailRow)" class="btn btn-info" ng-if="currentDetailRow.PARAM_CODE" function-type="maintenance" >編輯</button>
+												<button href="/delete/{{paramCode}}" onclick="return false" ng-click="del()" class="btn btn-danger" ng-if="currentDetailRow.PARAM_CODE" function-type="maintenance" >刪除</button>
+										      	<!--  <span function-type="export" ><e-upload success="uploadFinshed(url)" text="匯入" ng-if="inputVO.selectedParameter" ></e-upload></span>-->
+										      	<button href="/reset/{{paramCode}}" onclick="return false" ng-click="reset()" class="btn btn-info" ng-if="inputVO.selectedParameter" function-type="maintenance" >清除</button>
+										      	<button href="/save/{{paramCode}}" onclick="return false" ng-click="save()" class="btn btn-info" ng-if="inputVO.selectedParameter" function-type="maintenance" >儲存</button>										      	
+										      	<button href="/export/{{paramCode}}" onclick="return false" ng-click="exportData()" class="btn btn-info" ng-if="adgParameter.length > 0" function-type="export" >匯出</button>
+								    		</div>
+										</td>
+									</tr>
+								</table>
+								</td>
+		                    </tr>  
+	                    </tbody>       
+	                </table>  
+	              </form>
+	            </div>
+	          </div>
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+</div>

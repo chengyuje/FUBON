@@ -1,0 +1,503 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.systex.jbranch.app.esoaf</groupId>
+	<artifactId>fubon.wms</artifactId>
+	<packaging>war</packaging>
+	<version>0.0.1</version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<tomcat.version>8.0.24</tomcat.version>
+		<java.version>1.7</java.version>
+		<server.scope>provided</server.scope>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+		<enable.was.restful.start></enable.was.restful.start>
+		<enable.was.restful.end></enable.was.restful.end>
+	</properties>
+	<dependencies>
+		<!-- JDK 7 所需 Driver 版本 -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.49</version>
+		</dependency>
+
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+    		<artifactId>jjwt-api</artifactId>
+    		<version>0.11.5</version>
+		</dependency>
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+    		<artifactId>jjwt-impl</artifactId>
+    		<version>0.11.5</version>
+<!--     		<scope>runtime</scope> -->
+		</dependency>
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+    		<artifactId>jjwt-jackson</artifactId>
+    		<version>0.11.5</version>
+<!--     		<scope>runtime</scope> -->
+		</dependency>
+		<dependency>
+		    <groupId>io.jsonwebtoken</groupId>
+		    <artifactId>jjwt-root</artifactId>
+		    <version>0.11.5</version>
+		    <type>pom</type>
+		</dependency>
+
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>2.9.8</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-annotations</artifactId>
+		    <version>2.9.8</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-core</artifactId>
+		    <version>2.9.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.systex.jbranch.app.fubon</groupId>
+			<artifactId>systex-app-fubon-table</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.systex.jbranch.app.esoaf</groupId>
+			<artifactId>systex-app-esoaf-combobox</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-asm</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-simgr009</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-cmmgr001</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-cmmgr002</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-cmmgr003</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-cmmgr004</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-cmmgr005</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-cmmgr006</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-cmmgr007</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- 為凱基專案修改，故不取自Maven -->
+		<!-- <dependency> <groupId>com.systex.jbranch.app.esoaf</groupId> <artifactId>systex-app-esoaf-cmmgr008</artifactId>
+			<version>1.0-SNAPSHOT</version> </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-cmmgr009</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-cmmgr010</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-cmmgr011</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- 為凱基專案修改，故不取自Maven -->
+		<!-- <dependency> <groupId>com.systex.jbranch.app.esoaf</groupId> <artifactId>systex-app-esoaf-cmmgr012</artifactId>
+			<version>1.0-SNAPSHOT</version> </dependency> -->
+		<!-- 為凱基專案修改，故不取自Maven -->
+		<!-- <dependency> <groupId>com.systex.jbranch.app.esoaf</groupId> <artifactId>systex-app-esoaf-cmmgr013</artifactId>
+			<version>1.0-SNAPSHOT</version> </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-cmmgr014</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-i18n</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.systex.jbranch.app.esoaf</groupId> -->
+		<!-- <artifactId>systex-app-esoaf-marquee</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> <groupId>com.systex.jbranch.app.esoaf</groupId> <artifactId>systex-app-esoaf-cmmgr020</artifactId>
+			<version>1.0-SNAPSHOT</version> </dependency> -->
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-core</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-logging-juli</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jasper</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jasper-el</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jsp-api</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-dbcp</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>webcab.lib.finance.portfolio</groupId>
+			<artifactId>PortfolioJ2SE</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<!-- <dependency> <groupId>tw.com.pmc.eis.ldap</groupId> <artifactId>kgi-ldap-utility</artifactId>
+			<version>1.0</version> </dependency> -->
+		<!-- db driver -->
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>sqljdbc4</artifactId>
+			<version>4.0</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.187</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>db2jcc4</groupId>
+			<artifactId>db2jcc4</artifactId>
+			<version>1.0</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>db2jcc_license_cu</groupId>
+			<artifactId>db2jcc_license_cu</artifactId>
+			<version>1.0</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+			<version>12.1.0.2.0</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml-schemas</artifactId>
+			<version>3.14</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.supercsv</groupId>
+			<artifactId>super-csv</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+		<!-- RESTful service -->
+		<!-- for local test, WAS does not use jersey -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.glassfish.jersey.containers</groupId> -->
+		<!-- <artifactId>jersey-container-servlet</artifactId> -->
+		<!-- <version>2.2</version> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>jsr311-api</artifactId>
+			<version>1.1.1</version>
+			<scope>${server.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-vfs2</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.54</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.lingala.zip4j/zip4j -->
+		<dependency>
+			<groupId>net.lingala.zip4j</groupId>
+			<artifactId>zip4j</artifactId>
+			<version>2.10.0</version>
+		</dependency>
+
+
+<!-- https://mvnrepository.com/artifact/javax/javaee-api -->
+<dependency>
+    <groupId>javax</groupId>
+    <artifactId>javaee-api</artifactId>
+    <version>7.0</version>
+    <scope>provided</scope>
+</dependency>
+<!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/sqljdbc4 -->
+<dependency>
+    <groupId>com.microsoft.sqlserver</groupId>
+    <artifactId>sqljdbc4</artifactId>
+    <version>4.0</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/commons-discovery/commons-discovery -->
+<dependency>
+    <groupId>commons-discovery</groupId>
+    <artifactId>commons-discovery</artifactId>
+    <version>0.5</version>
+</dependency>
+		<!-- axis start -->
+<!-- https://mvnrepository.com/artifact/org.apache.axis/axis -->
+<dependency>
+    <groupId>org.apache.axis</groupId>
+    <artifactId>axis</artifactId>
+    <version>1.4</version>
+</dependency>
+		<!--
+			因為 axis1.4 本身沒有做相關依賴的設置，所以必須將 axis-jaxrpc 目錄（相關依賴）
+			手動放置在本地 maven 庫裡 ../repository/org/apache/axis 。
+			批次主機因為直接以 Tomcat 作為 Server 環境，所以沒有 JAX-PRC？
+			IBM WebSphere 因為有相關實例，所以就算沒有該支 Jar 也不會錯？
+			Ref: https://www.ibm.com/support/knowledgecenter/en/SSAW57_8.5.5/com.ibm.websphere.nd.multiplatform.doc/ae/cwbs_jaxrpc.html
+		 -->
+
+		<dependency>
+			<groupId>org.apache.axis</groupId>
+			<artifactId>axis-jaxrpc</artifactId>
+			<version>1.4</version>
+		</dependency>
+
+		<!-- axis end -->
+
+<!--		&lt;!&ndash;		 https://mvnrepository.com/artifact/c3p0/c3p0&ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>c3p0</groupId>-->
+<!--			<artifactId>c3p0</artifactId>-->
+<!--			<version>0.9.1.2</version>-->
+<!--		</dependency>-->
+	</dependencies>
+	<profiles>
+		<profile>
+			<id>sit</id>
+			<properties>
+				<enable.was.restful.start>&lt;!--</enable.was.restful.start>
+				<enable.was.restful.end>--&gt;</enable.was.restful.end>
+			</properties>
+		</profile>
+	</profiles>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<archive>
+						<!-- <manifest> -->
+						<!-- <addClasspath>true</addClasspath> -->
+						<!-- </manifest> -->
+						<manifestEntries>
+							<Build-Time>${maven.build.timestamp}</Build-Time>
+							<Build-Host>${agent.name}</Build-Host>
+							<Build-User>${user.name}</Build-User>
+							<Build-Maven>Maven ${maven.version}</Build-Maven>
+							<Build-Java>${java.version}</Build-Java>
+							<Build-OS>${os.name}</Build-OS>
+							<Build-Label>${project.version}</Build-Label>
+							<Build-Path>${basedir}</Build-Path>
+						</manifestEntries>
+					</archive>
+					<warName>wms-${project.version}</warName>
+					<webResources>
+						<resource>
+							<filtering>true</filtering>
+							<directory>${basedir}/src/webapp/</directory>
+							<includes>
+								<include>**/web.xml</include>
+							</includes>
+						</resource>
+						<resource>
+							<filtering>false</filtering>
+							<directory>${basedir}/src/webapp/</directory>
+							<excludes>
+								<exclude>cache.manifest</exclude>
+							</excludes>
+						</resource>
+					</webResources>
+					<webXml>${basedir}/src/webapp/WEB-INF/web.xml</webXml>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<!-- <plugin> <groupId>com.systex.maven.plugin</groupId> <artifactId>diffpackage-maven-plugin</artifactId>
+				<version>1.0</version> <executions> <execution> <id>DiffPackage</id> <phase>package</phase>
+				<goals> <goal>DiffPackage</goal> </goals> <configuration> <target>target/${project.artifactId}-${project.version}</target>
+				</configuration> </execution> </executions> </plugin> -->
+			<!-- <plugin> -->
+			<!-- <groupId>com.systex.maven.plugin</groupId> -->
+			<!-- <artifactId>cachemanifest-maven-plugin</artifactId> -->
+			<!-- <version>0.3</version> -->
+			<!-- <configuration> -->
+			<!-- <inputDirectory>${basedir}/src/webapp/</inputDirectory> -->
+			<!-- <outputManifestFile>${project.build.directory}/${project.build.finalName}/cache.manifest</outputManifestFile> -->
+			<!-- <excludes> -->
+			<!-- <exclude>WEB-INF</exclude> -->
+			<!-- <exclude>cache.manifest</exclude> -->
+			<!-- </excludes> -->
+			<!-- <additionals> -->
+			<!-- </additionals> -->
+			<!-- <networkResources> -->
+			<!-- <networkResource>*</networkResource> -->
+			<!-- </networkResources> -->
+			<!-- </configuration> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <phase>prepare-package</phase> -->
+			<!-- <goals> -->
+			<!-- <goal>cacheManifest-generator</goal> -->
+			<!-- </goals> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.8</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.3</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.6</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.6</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	<repositories>
+		<repository>
+			<id>systex-jbranch</id>
+			<name>systex-jbranch</name>
+			<url>http://systex-jbranch/artifactory/jbranch-repos</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+</project>

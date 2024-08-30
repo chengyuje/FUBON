@@ -1,0 +1,42 @@
+--**************************************************************************
+--PROJECT_CODE> TBPMS
+--DATE> 2019/02/25
+--AUTHOR> Eli Huang
+--PURPOSE> ST Load
+--**************************************************************************
+
+--**************************************************************************
+--TARGET> TBPMS_BDS057_SG
+--TRUNCATE_BEFORE_INSERT> Y
+--**************************************************************************
+--OPTIONS (ERRORS = 0)
+OPTIONS (direct=true)
+LOAD DATA
+TRUNCATE
+into table	TBPMS_BDS057_SG
+--FIELDS TERMINATED BY WHITESPACE
+FIELDS TERMINATED BY ',' --OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+B7EF1 POSITION(1:12)
+,B7EF2 POSITION(13:19)
+,B7EF3 POSITION(20:27)
+,B7EF6 POSITION(28:35)
+,B7EF4 POSITION(36:54)
+,B7EF5 POSITION(55:73)
+,B7EF7 POSITION(74:81)
+,B7EF8 POSITION(82:89)
+,B7EF9 POSITION(90:97)
+,B7EFA POSITION(98:105)
+,B7EFB POSITION(106:113)
+,B7EFC POSITION(114:118)
+,B7EFD POSITION(119:137)
+,B7EFE POSITION(138:156)
+,B7EFF POSITION(157:164)
+,B7056 POSITION(165:214)
+,MTIME POSITION(215:220)
+,MDATE POSITION(221:228)
+,MUSER POSITION(229:238)
+,MPGM POSITION(239:248)
+)
+       

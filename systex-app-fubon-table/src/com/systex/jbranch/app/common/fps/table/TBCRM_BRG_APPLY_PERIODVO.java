@@ -1,0 +1,441 @@
+package com.systex.jbranch.app.common.fps.table;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import com.systex.jbranch.platform.common.dataaccess.vo.VOBase;;
+
+
+
+
+/** @Author : SystexDBTool CodeGenerator By LeoLin*/
+public class TBCRM_BRG_APPLY_PERIODVO extends VOBase {
+
+    /** identifier field */
+    private String APPLY_SEQ;
+
+    /** nullable persistent field */
+    private String TERMINATE_SEQ;
+
+    /** nullable persistent field */
+    private Timestamp APPLY_DATE;
+
+    /** nullable persistent field */
+    private String APPLY_TYPE;
+
+    /** nullable persistent field */
+    private String CUST_ID;
+
+    /** nullable persistent field */
+    private BigDecimal DMT_STOCK;
+
+    /** nullable persistent field */
+    private BigDecimal DMT_BOND;
+
+    /** nullable persistent field */
+    private BigDecimal DMT_BALANCED;
+
+    /** nullable persistent field */
+    private BigDecimal FRN_STOCK;
+
+    /** nullable persistent field */
+    private BigDecimal FRN_BOND;
+
+    /** nullable persistent field */
+    private BigDecimal FRN_BALANCED;
+
+    /** nullable persistent field */
+    private BigDecimal BUY_HK_MRK;
+
+    /** nullable persistent field */
+    private BigDecimal BUY_US_MRK;
+
+    /** nullable persistent field */
+    private BigDecimal SELL_HK_MRK;
+
+    /** nullable persistent field */
+    private BigDecimal SELL_US_MRK;
+
+    /** nullable persistent field */
+    private Timestamp BRG_BEGIN_DATE;
+
+    /** nullable persistent field */
+    private Timestamp BRG_END_DATE;
+
+    /** nullable persistent field */
+    private String BRG_REASON;
+
+    /** nullable persistent field */
+    private String MGR_EMP_ID_1;
+
+    /** nullable persistent field */
+    private String MGR_EMP_ID_2;
+
+    /** nullable persistent field */
+    private String MGR_EMP_ID_3;
+
+    /** nullable persistent field */
+    private String MGR_EMP_ID_4;
+
+    /** nullable persistent field */
+    private String HIGHEST_AUTH_LV;
+
+    /** nullable persistent field */
+    private String AUTH_STATUS;
+
+    /** nullable persistent field */
+    private String APPLY_STATUS;
+
+    /** nullable persistent field */
+    private String MPLUS_BATCH;
+
+    /** nullable persistent field */
+    private BigDecimal SELL_UK_MRK;
+
+    /** nullable persistent field */
+    private BigDecimal BUY_UK_MRK;
+    
+    private String APPLE_SETUP_TYPE;
+    
+    private String C_BRANCH_NBR;
+    
+    /** nullable persistent field */
+    private BigDecimal SELL_JP_MRK;
+
+    /** nullable persistent field */
+    private BigDecimal BUY_JP_MRK;
+
+    private String DYNAMIC_YN;
+    
+public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBCRM_BRG_APPLY_PERIOD";
+
+
+public String getTableuid () {
+    return TABLE_UID;
+}
+
+    /** full constructor */
+    public TBCRM_BRG_APPLY_PERIODVO(String APPLY_SEQ, String TERMINATE_SEQ, Timestamp APPLY_DATE, String APPLY_TYPE, String CUST_ID, BigDecimal DMT_STOCK, BigDecimal DMT_BOND, BigDecimal DMT_BALANCED, BigDecimal FRN_STOCK, BigDecimal FRN_BOND, BigDecimal FRN_BALANCED, BigDecimal BUY_HK_MRK, BigDecimal BUY_US_MRK, BigDecimal SELL_HK_MRK, BigDecimal SELL_US_MRK, Timestamp BRG_BEGIN_DATE, Timestamp BRG_END_DATE, String BRG_REASON, String MGR_EMP_ID_1, String MGR_EMP_ID_2, String MGR_EMP_ID_3, String MGR_EMP_ID_4, String HIGHEST_AUTH_LV, String AUTH_STATUS, String APPLY_STATUS, Timestamp createtime, String creator, String modifier, Timestamp lastupdate, String MPLUS_BATCH, BigDecimal SELL_UK_MRK, BigDecimal BUY_UK_MRK, Long version, String APPLE_SETUP_TYPE, String C_BRANCH_NBR, BigDecimal SELL_JP_MRK, BigDecimal BUY_JP_MRK) {
+        this.APPLY_SEQ = APPLY_SEQ;
+        this.TERMINATE_SEQ = TERMINATE_SEQ;
+        this.APPLY_DATE = APPLY_DATE;
+        this.APPLY_TYPE = APPLY_TYPE;
+        this.CUST_ID = CUST_ID;
+        this.DMT_STOCK = DMT_STOCK;
+        this.DMT_BOND = DMT_BOND;
+        this.DMT_BALANCED = DMT_BALANCED;
+        this.FRN_STOCK = FRN_STOCK;
+        this.FRN_BOND = FRN_BOND;
+        this.FRN_BALANCED = FRN_BALANCED;
+        this.BUY_HK_MRK = BUY_HK_MRK;
+        this.BUY_US_MRK = BUY_US_MRK;
+        this.SELL_HK_MRK = SELL_HK_MRK;
+        this.SELL_US_MRK = SELL_US_MRK;
+        this.BRG_BEGIN_DATE = BRG_BEGIN_DATE;
+        this.BRG_END_DATE = BRG_END_DATE;
+        this.BRG_REASON = BRG_REASON;
+        this.MGR_EMP_ID_1 = MGR_EMP_ID_1;
+        this.MGR_EMP_ID_2 = MGR_EMP_ID_2;
+        this.MGR_EMP_ID_3 = MGR_EMP_ID_3;
+        this.MGR_EMP_ID_4 = MGR_EMP_ID_4;
+        this.HIGHEST_AUTH_LV = HIGHEST_AUTH_LV;
+        this.AUTH_STATUS = AUTH_STATUS;
+        this.APPLY_STATUS = APPLY_STATUS;
+        this.createtime = createtime;
+        this.creator = creator;
+        this.modifier = modifier;
+        this.lastupdate = lastupdate;
+        this.MPLUS_BATCH = MPLUS_BATCH;
+        this.SELL_UK_MRK = SELL_UK_MRK;
+        this.BUY_UK_MRK = BUY_UK_MRK;
+        this.version = version;
+        this.APPLE_SETUP_TYPE = APPLE_SETUP_TYPE;
+        this.C_BRANCH_NBR = C_BRANCH_NBR;
+        this.SELL_JP_MRK = SELL_JP_MRK;
+        this.BUY_JP_MRK = BUY_JP_MRK;
+    }
+
+    public String getC_BRANCH_NBR() {
+		return C_BRANCH_NBR;
+	}
+
+	public void setC_BRANCH_NBR(String c_BRANCH_NBR) {
+		C_BRANCH_NBR = c_BRANCH_NBR;
+	}
+
+	public String getAPPLE_SETUP_TYPE() {
+		return APPLE_SETUP_TYPE;
+	}
+
+	public void setAPPLE_SETUP_TYPE(String aPPLE_SETUP_TYPE) {
+		APPLE_SETUP_TYPE = aPPLE_SETUP_TYPE;
+	}
+
+	/** default constructor */
+    public TBCRM_BRG_APPLY_PERIODVO() {
+    }
+
+    /** minimal constructor */
+    public TBCRM_BRG_APPLY_PERIODVO(String APPLY_SEQ) {
+        this.APPLY_SEQ = APPLY_SEQ;
+    }
+
+    public String getAPPLY_SEQ() {
+        return this.APPLY_SEQ;
+    }
+
+    public void setAPPLY_SEQ(String APPLY_SEQ) {
+        this.APPLY_SEQ = APPLY_SEQ;
+    }
+
+    public String getTERMINATE_SEQ() {
+        return this.TERMINATE_SEQ;
+    }
+
+    public void setTERMINATE_SEQ(String TERMINATE_SEQ) {
+        this.TERMINATE_SEQ = TERMINATE_SEQ;
+    }
+
+    public Timestamp getAPPLY_DATE() {
+        return this.APPLY_DATE;
+    }
+
+    public void setAPPLY_DATE(Timestamp APPLY_DATE) {
+        this.APPLY_DATE = APPLY_DATE;
+    }
+
+    public String getAPPLY_TYPE() {
+        return this.APPLY_TYPE;
+    }
+
+    public void setAPPLY_TYPE(String APPLY_TYPE) {
+        this.APPLY_TYPE = APPLY_TYPE;
+    }
+
+    public String getCUST_ID() {
+        return this.CUST_ID;
+    }
+
+    public void setCUST_ID(String CUST_ID) {
+        this.CUST_ID = CUST_ID;
+    }
+
+    public BigDecimal getDMT_STOCK() {
+        return this.DMT_STOCK;
+    }
+
+    public void setDMT_STOCK(BigDecimal DMT_STOCK) {
+        this.DMT_STOCK = DMT_STOCK;
+    }
+
+    public BigDecimal getDMT_BOND() {
+        return this.DMT_BOND;
+    }
+
+    public void setDMT_BOND(BigDecimal DMT_BOND) {
+        this.DMT_BOND = DMT_BOND;
+    }
+
+    public BigDecimal getDMT_BALANCED() {
+        return this.DMT_BALANCED;
+    }
+
+    public void setDMT_BALANCED(BigDecimal DMT_BALANCED) {
+        this.DMT_BALANCED = DMT_BALANCED;
+    }
+
+    public BigDecimal getFRN_STOCK() {
+        return this.FRN_STOCK;
+    }
+
+    public void setFRN_STOCK(BigDecimal FRN_STOCK) {
+        this.FRN_STOCK = FRN_STOCK;
+    }
+
+    public BigDecimal getFRN_BOND() {
+        return this.FRN_BOND;
+    }
+
+    public void setFRN_BOND(BigDecimal FRN_BOND) {
+        this.FRN_BOND = FRN_BOND;
+    }
+
+    public BigDecimal getFRN_BALANCED() {
+        return this.FRN_BALANCED;
+    }
+
+    public void setFRN_BALANCED(BigDecimal FRN_BALANCED) {
+        this.FRN_BALANCED = FRN_BALANCED;
+    }
+
+    public BigDecimal getBUY_HK_MRK() {
+        return this.BUY_HK_MRK;
+    }
+
+    public void setBUY_HK_MRK(BigDecimal BUY_HK_MRK) {
+        this.BUY_HK_MRK = BUY_HK_MRK;
+    }
+
+    public BigDecimal getBUY_US_MRK() {
+        return this.BUY_US_MRK;
+    }
+
+    public void setBUY_US_MRK(BigDecimal BUY_US_MRK) {
+        this.BUY_US_MRK = BUY_US_MRK;
+    }
+
+    public BigDecimal getSELL_HK_MRK() {
+        return this.SELL_HK_MRK;
+    }
+
+    public void setSELL_HK_MRK(BigDecimal SELL_HK_MRK) {
+        this.SELL_HK_MRK = SELL_HK_MRK;
+    }
+
+    public BigDecimal getSELL_US_MRK() {
+        return this.SELL_US_MRK;
+    }
+
+    public void setSELL_US_MRK(BigDecimal SELL_US_MRK) {
+        this.SELL_US_MRK = SELL_US_MRK;
+    }
+
+    public Timestamp getBRG_BEGIN_DATE() {
+        return this.BRG_BEGIN_DATE;
+    }
+
+    public void setBRG_BEGIN_DATE(Timestamp BRG_BEGIN_DATE) {
+        this.BRG_BEGIN_DATE = BRG_BEGIN_DATE;
+    }
+
+    public Timestamp getBRG_END_DATE() {
+        return this.BRG_END_DATE;
+    }
+
+    public void setBRG_END_DATE(Timestamp BRG_END_DATE) {
+        this.BRG_END_DATE = BRG_END_DATE;
+    }
+
+    public String getBRG_REASON() {
+        return this.BRG_REASON;
+    }
+
+    public void setBRG_REASON(String BRG_REASON) {
+        this.BRG_REASON = BRG_REASON;
+    }
+
+    public String getMGR_EMP_ID_1() {
+        return this.MGR_EMP_ID_1;
+    }
+
+    public void setMGR_EMP_ID_1(String MGR_EMP_ID_1) {
+        this.MGR_EMP_ID_1 = MGR_EMP_ID_1;
+    }
+
+    public String getMGR_EMP_ID_2() {
+        return this.MGR_EMP_ID_2;
+    }
+
+    public void setMGR_EMP_ID_2(String MGR_EMP_ID_2) {
+        this.MGR_EMP_ID_2 = MGR_EMP_ID_2;
+    }
+
+    public String getMGR_EMP_ID_3() {
+        return this.MGR_EMP_ID_3;
+    }
+
+    public void setMGR_EMP_ID_3(String MGR_EMP_ID_3) {
+        this.MGR_EMP_ID_3 = MGR_EMP_ID_3;
+    }
+
+    public String getMGR_EMP_ID_4() {
+        return this.MGR_EMP_ID_4;
+    }
+
+    public void setMGR_EMP_ID_4(String MGR_EMP_ID_4) {
+        this.MGR_EMP_ID_4 = MGR_EMP_ID_4;
+    }
+
+    public String getHIGHEST_AUTH_LV() {
+        return this.HIGHEST_AUTH_LV;
+    }
+
+    public void setHIGHEST_AUTH_LV(String HIGHEST_AUTH_LV) {
+        this.HIGHEST_AUTH_LV = HIGHEST_AUTH_LV;
+    }
+
+    public String getAUTH_STATUS() {
+        return this.AUTH_STATUS;
+    }
+
+    public void setAUTH_STATUS(String AUTH_STATUS) {
+        this.AUTH_STATUS = AUTH_STATUS;
+    }
+
+    public String getAPPLY_STATUS() {
+        return this.APPLY_STATUS;
+    }
+
+    public void setAPPLY_STATUS(String APPLY_STATUS) {
+        this.APPLY_STATUS = APPLY_STATUS;
+    }
+
+    public String getMPLUS_BATCH() {
+        return this.MPLUS_BATCH;
+    }
+
+    public void setMPLUS_BATCH(String MPLUS_BATCH) {
+        this.MPLUS_BATCH = MPLUS_BATCH;
+    }
+
+    public BigDecimal getSELL_UK_MRK() {
+        return this.SELL_UK_MRK;
+    }
+
+    public void setSELL_UK_MRK(BigDecimal SELL_UK_MRK) {
+        this.SELL_UK_MRK = SELL_UK_MRK;
+    }
+
+    public BigDecimal getBUY_UK_MRK() {
+        return this.BUY_UK_MRK;
+    }
+
+    public void setBUY_UK_MRK(BigDecimal BUY_UK_MRK) {
+        this.BUY_UK_MRK = BUY_UK_MRK;
+    }
+
+    public BigDecimal getSELL_JP_MRK() {
+		return SELL_JP_MRK;
+	}
+
+	public void setSELL_JP_MRK(BigDecimal sELL_JP_MRK) {
+		SELL_JP_MRK = sELL_JP_MRK;
+	}
+
+	public BigDecimal getBUY_JP_MRK() {
+		return BUY_JP_MRK;
+	}
+
+	public void setBUY_JP_MRK(BigDecimal bUY_JP_MRK) {
+		BUY_JP_MRK = bUY_JP_MRK;
+	}
+
+	public String getDYNAMIC_YN() {
+		return DYNAMIC_YN;
+	}
+
+	public void setDYNAMIC_YN(String dYNAMIC_YN) {
+		DYNAMIC_YN = dYNAMIC_YN;
+	}
+
+	public void checkDefaultValue() {
+    }
+
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("APPLY_SEQ", getAPPLY_SEQ())
+            .toString();
+    }
+
+}

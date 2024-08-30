@@ -1,0 +1,164 @@
+<style>
+td, th {
+    padding: 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG210/ORG210.js"></script>
+<script type="text/javascript" src="assets/txn/ORG210/ORG210ADD.js"></script>
+<script type="text/javascript" src="assets/lib/zTree/js/jquery.ztree.core-3.5.min.js"></script>
+<div ng-controller="ORG210Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >業務組織設定</div>
+	</div>
+	<div class="panel_content">
+		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab="">
+			<table style="width: 100%;">
+				<tr>
+					<!-- menu -->
+					<td rowspan="4" style="vertical-align: top; width: 30%;">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">組織樹狀圖</div>
+							</div>
+							<ul id="orgTree" class="ztree"></ul>
+						</div>
+					</td>
+					<td width="800px" style="vertical-align: top;">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">組織資訊</div>
+							</div>
+							<div class="bootstrap-admin-panel-content text-muted search_box">
+								<table width="100%">
+									<tr>
+										<th width="10%">代碼：</th>
+										<td width="90%"><input class="form-control" type="text" placeholder="請輸入..." id="tipOrgId" name="tipOrgId" ng-model="inputVO.DEPT_ID" e-length-limit="60" ng-readonly="true"></td>
+									</tr>
+									<tr>
+										<th>名稱：</th>
+										<td>
+											<input class="form-control" type="text" placeholder="請輸入..." id="tipOrgName" name="tipOrgName" ng-model="inputVO.DEPT_NAME" e-length-limit="60" ng-readonly="true" required>
+											<input class="form-control" type="hidden" placeholder="請輸入..." id="orgType" name="orgType" ng-model="inputVO.ORG_TYPE">
+										</td>
+									</tr>
+									<tr ng-show="parameterTypeEditForm.tipOrgName.$error.required">
+										<th></th>
+										<td class="with-errors">請點選左方組織</td>
+									</tr>
+									<tr ng-if="inputVO.PARENT_DEPT_ID != null && inputVO.PARENT_DEPT_ID != ''" ng-hide="true">
+										<th>父層級：</th>
+										<td>
+											<e-combobox id="PARENT_DEPT_ID" name="PARENT_DEPT_ID" ng-disabled="true"
+														ng-datasource="mappingSet['parentDeptLst']"
+														ng-model="inputVO.PARENT_DEPT_ID"
+									   					ng-validate="false" 
+									   					ng-readonly="true" 
+									   					ng-editable="false"
+									   					ng-format="F3"
+									   					ng-required="false"/>
+										</td>
+									</tr>
+									<tr ng-show="inputVO.ORG_TYPE == '40' || inputVO.ORG_TYPE =='50'">
+										<th ng-show="inputVO.ORG_TYPE == '50'">級別：</th>
+										<td ng-show="inputVO.ORG_TYPE == '50'">
+											<e-combobox id="DEPT_DEGREE" name="DEPT_DEGREE" ng-disabled="inputVO.ORG_TYPE != '50'"
+														ng-paramtype="ORG.BRANCH_DEGREE"
+														ng-model="inputVO.DEPT_DEGREE"
+									   					ng-validate="false" 
+									   					ng-readonly="false" 
+									   					ng-editable="false"
+									   					ng-format="F3"
+									   					ng-required="false"/>
+										</td>
+									</tr>
+									<tr ng-show="inputVO.ORG_TYPE == '40' || inputVO.ORG_TYPE =='50'">
+										<th>組別：</th>
+										<td>
+											<e-combobox id="DEPT_GROUP" name="DEPT_GROUP" ng-disabled="inputVO.ORG_TYPE != '40' && inputVO.ORG_TYPE != '50'"
+														ng-datasource="mappingSet['deptGroup']"
+														ng-model="inputVO.DEPT_GROUP"
+									   					ng-validate="false" 
+									   					ng-readonly="false" 
+									   					ng-editable="false"
+									   					ng-format="F3"
+									   					ng-required="false"/>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<button type="button" class="btn btn-info" ng-disabled="inputVO.DEPT_ID == undefined || inputVO.DEPT_ID == ''" style="margin-left: 10px;" ng-click="showORG210ADD()" function-type="maintenance">新增人員</button>
+						<button type="button" class="btn btn-info" ng-disabled="inputVO.DEPT_ID == undefined || inputVO.DEPT_ID == ''" ng-click="delDeptMember()" function-type="maintenance">刪除人員</button>
+						<button type="button" class="btn btn-info" ng-disabled="inputVO.DEPT_ID == undefined || inputVO.DEPT_ID == ''" ng-click="modDept()" function-type="maintenance">確認</button>
+						<button type="button" class="btn btn-info" ng-disabled="inputVO.DEPT_ID == undefined || inputVO.DEPT_ID == ''" ng-click="init()" >清除</button>
+						<button type="button" class="btn btn-default" ng-disabled="inputVO.DEPT_ID == undefined || inputVO.DEPT_ID == ''" ng-click="export()" function-type="export">下載人員職務/角色明細檔</button>
+						<button type="button" class="btn btn-default" ng-click="reBack()" ng-show="connector('get', 'ORG110_queryCondition') != undefined">上一頁</button>
+					</td>
+				</tr>
+				<tr function-type="maintenance">
+					<td>
+						<div class="panel panel-default" style="overflow: scroll;">
+							<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">組織人員
+<!-- 									<button type="button" class="btn btn-info" ng-disabled="inputVO.DEPT_ID == undefined || inputVO.DEPT_ID == ''" style="margin-left: 10px;" ng-click="showORG210ADD()" function-type="maintenance">新增人員</button> -->
+<!-- 									<button type="button" class="btn btn-info" ng-disabled="inputVO.DEPT_ID == undefined || inputVO.DEPT_ID == ''" ng-click="delDeptMember()" function-type="maintenance">刪除人員</button> -->
+<!-- 									<button type="button" class="btn btn-info" ng-disabled="inputVO.DEPT_ID == undefined || inputVO.DEPT_ID == ''" ng-click="modDept()" function-type="maintenance">確認</button> -->
+<!-- 									<button type="button" class="btn btn-info" ng-disabled="inputVO.DEPT_ID == undefined || inputVO.DEPT_ID == ''" ng-click="init()" >清除</button> -->
+<!-- 									<button type="button" class="btn btn-default" ng-disabled="inputVO.DEPT_ID == undefined || inputVO.DEPT_ID == ''" ng-click="export()" function-type="export">下載人員職務/角色明細檔</button> -->
+<!-- 									<button type="button" class="btn btn-default" ng-click="reBack()" ng-show="connector('get', 'ORG110_queryCondition') != undefined">上一頁</button> -->
+								</div>
+							</div>
+							<div class="gv_tab_sc">
+								<table class="tablesaw table table-striped table-bordered">
+									<thead>
+										<tr>
+											<th>刪除</th>
+											<th>職務</th>
+											<th ng-show="inputVO.ORG_TYPE == '50'">業務組別</th>
+											<th>員工代碼</th>
+											<th>AO Code</th>
+											<th>員工姓名</th>
+											<th>E-mail</th>
+											<th>角色清單</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" ng-repeat="row in deptEmpLst">
+											<td style="text-align: center;"><input type="checkbox" ng-init="row.DEL = false" ng-model="row.DEL" class="btn btn-info" ></td>
+											<td>{{row.JOB_TITLE_NAME}}</td>
+											<td ng-show="inputVO.ORG_TYPE == '50'">
+												<e-combobox id="" ng-disabled="inputVO.ORG_TYPE != '50'"
+															ng-paramtype="ORG.SALES_GROUP_TYPE"
+															ng-model="row.GROUP_TYPE"
+															ng-change=""
+										   					ng-validate="false" 
+										   					ng-readonly="false" 
+										   					ng-editable="false"
+										   					ng-format="F3"
+										   					ng-required="false"
+										   					width="80px" />
+											</td>
+											<td>{{row.EMP_ID}}</td>
+											<td>{{row.AO_CODE}}</td>
+											<td>{{row.EMP_NAME}}</td>
+											<td>{{row.EMP_EMAIL_ADDRESS}}</td>
+											<td align="left" style=" white-space: pre">{{row.ROLE_LIST}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td style="height: 100%;">&nbsp;</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+</div>

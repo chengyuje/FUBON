@@ -1,0 +1,206 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+
+
+</style>
+
+<!-- 再投資、有推介 -->
+<div class="print A4"
+     ng-controller="FPSPrintController">
+
+  <!-- header -->
+  <section>
+    <img ng-src="{{path.header}}"
+         class="wrapper"
+         print="header">
+  </section>
+
+  <!-- title -->
+  <section print
+           print-top-margin="-5"
+           style="margin-bottom:2em;"
+           class="wrapper">
+    <div ng-include="path.brief"></div>
+  </section>
+
+  <!-- image -->
+  <section>
+    <img ng-if="rptUrl"
+         data-ng-src="{{rptUrl}}"
+         alt="rptUrleName"
+         style="margin-bottom:5em;
+                width:100%;"
+         print="image"
+         print-page="next"
+         print-scale-direction="vertical">
+  </section>
+  <!-- cust -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">1</span>基本資料
+    </div>
+    <div class="block container"
+         style="border-radius: 1em;">
+      <div ng-include="path.custInfo"
+           ng-init="isPrint=true"></div>
+    </div>
+  </section>
+
+  <!-- FPS320 -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">2</span>您的需求
+    </div>
+    <div class="block container"
+         style="border-radius: 1em;padding:5px">
+      <div ng-include="path.requirement"
+           ng-init="isPrint=true"></div>
+    </div>
+    <ol class="ps-wrapper wrapper tiny-font">
+		<li class="ps" ng-bind="'單筆已投資金額為目前庫存部位的單筆投資金額加總；定期已投資金額為目前庫存部位的定期(不)定額投資金額加總。'"></li>
+		<li class="ps" ng-bind="'本規劃書所載(包含以下之內容)，資料來源皆為台北富邦商業銀行，資料基準日皆截至' + fpsPrevBusiDay + '為止本行可取得之最新資料；如需計算折合台幣金額時，折算台幣匯率係採本行前一營業日台幣對外幣之匯率；金額欄位數字皆四捨五入計算至整數位。'"></li>
+	</ol>
+  </section>
+
+  <!-- achieved state -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">3</span>理財目標達成狀態
+    </div>
+    <div class="wrapper"
+         ng-bind="hitRateGuyText[HIT_RATE_FLAG]"></div>
+    <div class="block container"
+         style="border-radius: 1em;padding:5px">
+      <div ng-include="path.achievedState"
+           ng-init="isPrint=true"></div>
+    </div>
+
+    <div ng-include="path.achievedState_ps"></div>
+  </section>
+
+  <section print
+           print-unique="true">
+    <div class="title-wrapper">
+      <span class="title-num">4</span>投資組合調整
+    </div>
+    <div ng-include="path.rebalanceChart"></div>
+    <ol class="ps-wrapper wrapper tiny-font">
+		<li class="ps" ng-bind="'上述投資組合股債配置及市場配置資訊僅包含基金商品，且股債配置中，屬於債的部位包含債券型基金、平衡型基金(投資債券占比較高者)及貨幣型基金；屬於股的部位包含股票型基金及平衡型基金(投資股票占比較高)，台北富邦商業銀行將不定期依標的投資比例變化，調整商品的股債分類。'"></li>
+	</ol>
+  </section>
+
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">5</span>調整前後商品明細
+    </div>
+    <div class="wrapper">根據前述配置規劃之投資組合標的如下：</div>
+    <div ng-include="path.rebalanceProduct"></div>
+    <ol class="ps-wrapper wrapper tiny-font">
+		<li class="ps" ng-bind="'調整前及調整後比例皆以約當台幣金額計算占比。'"></li>
+		<li class="ps" ng-bind="'「市值/保單價值」及「調整後金額」欄位依商品特定不同而有定義差異，基金為參考市值、連結全委帳戶之投資型保險為保單帳戶價值。'"></li>
+	</ol>
+  </section>
+
+  <!-- charts -->
+  <section ng-if="!showFPS323Error">
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">6</span>績效模擬
+      </div>
+      <div class="wrapper">根據前述規劃之商品標的組合，使用其歷史價格資料並透過財務理論模型模擬出在較佳情境、一般情境，和較差情境下投資到期時的預期金額。</div>
+    </div>
+    <div print
+         print-unique="true">
+      <div class="block container">
+        <div class="content-wrapper no-border">
+          <div ng-include="path.portRtnSim"></div>
+        </div>
+      </div>
+    </div>
+    <div ng-include="path.portRtnSim_ps"
+         ng-show="!calInvestmentText"
+         print></div>
+  </section>
+
+  <section ng-if="!showFPS330Error">
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num" ng-bind="7-showFPS323Error"></span>歷史績效表現
+      </div>
+    </div>
+    <!-- 看情況更改 -->
+    <div ng-include="path.historyPerformance"
+         print
+         print-unique="true"></div>
+    <div ng-include="path.historyPerformance_ps"
+         print></div>
+  </section>
+
+  <!-- productPerformance -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num" ng-bind="8-showFPS323Error-showFPS330Error"></span>基金商品績效
+    </div>
+    <div class="wrapper">商品明細中個別產品之近期績效如下：</div>
+
+    <div ng-include="path.productPerformance"></div>
+    <div ng-include="path.productPerformance_ps"></div>
+  </section>
+
+  <!-- transaction -->
+  <section print
+           ng-if="checkTransaction">
+    <div class="title-wrapper">
+      <span class="title-num"
+            ng-bind="9-showFPS323Error-showFPS330Error"></span>您的待執行交易
+    </div>
+    <div class="wrapper">依據前述商品明細，本次理財規劃待執行交易臚列如下。因投資市場瞬息萬變，提醒您留意執行時效。</div>
+    <div ng-include="path.transaction"></div>
+    <ol class="ps-wrapper wrapper tiny-font">
+		<li class="ps" ng-bind="'基金幣別為申購幣別、連結全委帳戶之投資型保險幣別為保單幣別；申購/贖回金額依商品特定不同而有定義差異，舉例而言，如為連結全委帳戶之投資型保險則表示為保費金額/解約金額，依此類推。'"></li>
+	</ol>
+  </section>
+
+  <section ng-if="hisList.length > 0"
+           print>
+    <div class="title-wrapper">
+      <span class="title-num"
+            ng-class="(10-!!showFPS323Error-showFPS330Error-!checkTransaction) > 9 ? ' two-digit' : ''"
+            ng-bind="10-!!showFPS323Error-showFPS330Error-!checkTransaction"></span>基金歷史交易明細
+    </div>
+    <div class="wrapper">您已贖回/到期之最近十筆商品明細：</div>
+    <div ng-include="path.historyTransaction"></div>
+    <ol class="ps-wrapper wrapper tiny-font">
+		<li class="ps" ng-bind="'基金幣別為申購幣別。'"></li>
+<!-- 		<li class="ps" ng-bind="'基金幣別為申購幣別，連結全委帳戶之投資型保險幣別為保單幣別。'"></li> -->
+	</ol>
+  </section>
+
+  <!-- 使用指南 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num"
+              ng-class="(11-!!showFPS323Error-showFPS330Error-!checkTransaction-!(hisList.length > 0)) > 9 ? ' two-digit' : ''"
+              ng-bind="11-!!showFPS323Error-showFPS330Error-!checkTransaction-!(hisList.length > 0)"></span>規劃書使用指南
+      </div>
+    </div>
+
+    <div ng-include="path.manual"
+         print></div>
+  </section>
+
+  <!-- 注意事項 -->
+  <section ng-if="checkTransaction">
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num"
+              ng-class="(12-!!showFPS323Error-showFPS330Error-!checkTransaction-!(hisList.length > 0)) > 9 ? ' two-digit' : ''"
+              ng-bind="12-!!showFPS323Error-showFPS330Error-!checkTransaction-!(hisList.length > 0)"></span>注意事項
+      </div>
+    </div>
+    <div ng-include="path.notice" print></div>
+  </section>
+  <div id="hiddendom"></div>
+</div>

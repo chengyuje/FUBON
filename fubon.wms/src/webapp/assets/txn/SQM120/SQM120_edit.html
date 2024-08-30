@@ -1,0 +1,247 @@
+<style>
+.modal-dialog.SQM120_edit{
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: 80vh;
+}
+.SQM120_edit table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.SQM120_edit.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SQM120_edit_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.SQM120_edit .no_happy {
+	background-color: 	#FFFF00;
+}
+.SQM120_edit .happy {
+	background-color:  #FFFFFF;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SQM120/SQM120_send.js"></script>
+<script type="text/javascript" src="assets/txn/SQM120/SQM120_returns.js"></script>
+
+<div class="SQM120" ng-controller="SQM120_editController" ng-cloak>
+	<div class="modal-dialog SQM120_edit" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<section print>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{inputVO.qtnType | mapping:QTN_LIST}}滿意度改善檢討報告</h4>
+				</section>
+			</div>
+			
+			<div class="modal-body">
+				<section print>
+					<table style="width:100%" >
+						<tr>
+							<th>分行別：{{inputVO.branch_nbr}}<ps ng-show="BRANCH_NAME">-</ps>{{BRANCH_NAME}}</th>
+							<th>交易日期：{{inputVO.trade_date}}</th>
+							<th>處/副主管批示結案日：{{inputVO.end_date}}</th>
+							<th>客戶ID：{{inputVO.cust_id}}</th>
+							<th>客戶姓名：{{inputVO.cust_name}}</th>
+							
+						</tr>
+					</table>
+					<p>
+					<table>
+						<tr>
+							<th>{{inputVO.qtnType | mapping:QTN_LIST}}問卷：</th>	
+						</tr>
+					</table>	
+					<table class="e-table-freeze table td_center" e-height="535px" e-mode="1" e-top="true" e-list="totalList"  style="width:100%;">
+						<thead>
+							<tr>
+								<td class="repeat-row" style="height:10%;width: 300px;background-color: #FFDDAA !important;color:#000000;border: 1px solid black !important;" ng-repeat="row in column track by $index" align="center" valign="middle" >
+									{{row.QST_DESC}}
+								</td>	
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="repeat-row" style="border: 1px solid black !important;" ng-class="{'no_happy': (row.ANSWER == '4' || row.ANSWER == '5' || row.ANSWER == '6'), 'happy': !(row.ANSWER == '4' || row.ANSWER == '5' || row.ANSWER == '6')}" ng-repeat="row in column track by $index" align='center' valign="middle" >
+									{{((inputVO.qtnType == 'WMS01' && row.QST_ORDER == 11) ||
+									   (inputVO.qtnType == 'WMS02' && row.QST_ORDER == 13) || 
+									   (inputVO.qtnType == 'WMS03' && row.QST_ORDER == 17) || 
+									   (inputVO.qtnType == 'WMS04' && row.QST_ORDER == 13)     ? row.ANSWER : '') | mapping:ANS_TYPE_PUSH:'F3'}}
+									{{((inputVO.qtnType == 'WMS01' && row.QST_ORDER != 11) || 
+									   (inputVO.qtnType == 'WMS02' && row.QST_ORDER != 13) ||
+									   (inputVO.qtnType == 'WMS03' && row.QST_ORDER != 17) ||
+									   (inputVO.qtnType == 'WMS04' && row.QST_ORDER != 13)    ? row.ANSWER : '') | mapping:ANS_TYPE:'F3'}}
+									{{(inputVO.qtnType == 'WMS05' ? row.ANSWER : '') | mapping:ANS_TYPE:'F3'}}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="modal-body">
+						<table style="width:100%">
+								<tr>
+									<th>客戶質化意見：</th>	
+								</tr>
+								<tr>
+									<td><textarea id="text" placeholder="請輸入..." name="text" class="form-control" ng-model="inputVO.resp_note" style="width: 100%; height: 100px" e-length-limit="2000" ng-disabled ='true' ></textarea></td>
+								</tr>					
+						</table>
+						<br>
+						<table style="width:100%">
+								<tr>
+									<th>分行說明/問題釐清：(剩餘字數:{{800 - inputVO.brh_desc.length}})<br>1.請務必聯絡客戶致意(註記聯絡時間)<br>2.請詳細說明客戶不滿意原因</th>	
+								</tr>
+								<tr>
+									<td><textarea id="brh_desc" placeholder="請輸入..." name="text" class="form-control" ng-model="inputVO.brh_desc" style="width: 100%; height: 100px" maxlength="800"></textarea></td>
+								</tr>	
+						</table>
+						<br>
+						<table style="width:50%;line-height:25px;"  ng-show="inputVO.qtnType == 'WMS03' || inputVO.qtnType == 'WMS04'">
+							<tr>
+							<th style="width:150px";>客戶來行等待時間：</th>
+							<td style="width:50px";><input id="waiting_time" type="text" ng-model="inputVO.waiting_time" style="width: 50px;"></td>
+							<th>mins</th>
+							<th style="width:120px";>交易作業時間：</th>
+						    <td style="width:50px";><input id="working_time" type="text" ng-model="inputVO.working_time" style="width: 50px;"/></td> 
+						    <th>mins</th>
+							</tr>
+						</table>
+						<table style="width:90%;line-height:25px;">
+								<tr>
+									<th ng_show ="inputVO.qtnType != 'WMS03' && inputVO.qtnType != 'WMS04'">專員姓名：{{inputVO.emp_name}} </th>
+									<th ng_show ="inputVO.qtnType == 'WMS03' || inputVO.qtnType == 'WMS04'">經辦姓名：{{inputVO.emp_name}} </th>
+									<th>員編：</th>
+								    <td><input type="text" id="emp_id" ng-model="inputVO.emp_id" style="width: 200px;" ng-blur="getJob_title_name(inputVO.emp_id)" /></td>
+								    <th >職級： {{inputVO.cur_job}}</th>
+								    <th style="width: 100px;">現職年資：</th>
+								    <td><input type="text" ng-model="inputVO.cur_job_y" style="width: 50px;"></td>
+								    <th>年</th>
+								    <td><input type="text" ng-model="inputVO.cur_job_m" style="width: 50px;"/></td>
+								    <th>月</th>  
+							    </tr>   
+							    <p> 
+							    <tr>
+									<th>主管姓名：{{inputVO.sup_emp_name}} </th>
+									<th>員編：</th>
+								    <td><input type="text" id="sup_emp_id" ng-model="inputVO.sup_emp_id" style="width: 200px;" ng-blur="getSup_Job_title_name(inputVO.sup_emp_id)"/></td>
+								    <th >職級： {{inputVO.sup_cur_job}}</th>
+							    </tr>  
+						</table>
+						<br>
+						<table style="width:100%">
+								<tr>
+									<th>改善計畫：站在客戶立場，以「多一度的服務」思維擬定改善計畫 (剩餘字數:{{500 - inputVO.improve_desc.length}})</th>	
+								</tr>
+								<tr>
+									<td><textarea id="improve_desc" placeholder="請輸入..." name="text" class="form-control" ng-model="inputVO.improve_desc" style="width: 100%; height: 100px" maxlength="500"></textarea></td>
+								</tr>		
+						</table>
+						<br>
+						<table style="width:100%">
+								<tr>
+									<th>區長簽核意見：(剩餘字數:{{200 - inputVO.op_sup_remark.length}})</th>	
+								</tr>
+								<tr>
+									<td><textarea id="op_sup_remark" placeholder="請輸入..." name="text" class="form-control" ng-model="inputVO.op_sup_remark" style="width: 100%; height: 100px" maxlength="200"></textarea></td>
+								</tr>		
+						</table>
+						<br>
+						<table style="width:100%">
+						<!--  
+								<tr>
+									<th>處副主管簽核意見：(剩餘字數:{{100 - inputVO.rc_vice_sup_remark.length}})</th>	
+								</tr>
+								<tr>
+									<td colspan="3"><textarea id="text" placeholder="請輸入..." name="text" class="form-control" ng-model="inputVO.rc_vice_sup_remark" style="width: 100%; height: 100px" maxlength="100"></textarea></td>
+								</tr>
+						-->		
+								<tr ng-show="inputVO.qtnType != 'WMS03' && inputVO.qtnType != 'WMS04' ">
+									<th style="width: 400px;">最後一次訪談紀錄建立時間：{{inputVO.last_visit_date}}</th>
+									<th>貢獻度等級：{{con_degree_desc}}</th> 
+									<th>應聯繫頻率：{{inputVO.frq_day}} <ps ng-show="inputVO.frq_day">天</ps></th> 
+								</tr>
+								<tr >	
+									<th colspan="3" >
+									處/副主管批示並填寫意見：&emsp;
+									<label><input type="radio" name="deduction_initial" ng-model="inputVO.deduction_initial" ng-value="'Y'" ng-disabled ='role_id != "A164"' >扣分</label>
+									&emsp;
+									<label><input type="radio" name="deduction_initial" ng-model="inputVO.deduction_initial" ng-value="'N'" ng-disabled ='role_id != "A164"' >不扣分</label>
+									</th>
+								</tr>
+						</table>
+						<br>
+						<table style="width:100%" >
+								<tr ng-if="job_tltle_name == '處副主管'">
+								<th ng-show="inputVO.rc_sup_remark != null" >處主管簽核意見：{{inputVO.rc_sup_remark}}</th> 	
+								</tr>
+								<tr ng-if="job_tltle_name == '處副主管'">
+								<th>處副主管簽核意見：(剩餘字數:{{200 - inputVO.rc_vice_sup_remark.length}})</th>
+								</tr>
+								<tr ng-if="job_tltle_name == '處副主管'">
+									<td><textarea id="text" placeholder="請輸入..." name="text" class="form-control" ng-model="inputVO.rc_vice_sup_remark" style="width: 100%; height: 100px" maxlength="200" ng-disabled ='role_id != "A164"' ></textarea></td>									
+								</tr>
+								<tr ng-if="job_tltle_name == '處主管'">
+									<th ng-show="inputVO.rc_vice_sup_remark != null">處副主管簽核意見：{{inputVO.rc_vice_sup_remark}}</th> 
+									<th ng-show="inputVO.rc_vice_sup_remark == null">處副主管無簽核意見</th>
+								</tr>
+								<tr ng-if="job_tltle_name == '處主管'">
+									<th>處主管簽核意見：(剩餘字數:{{200 - inputVO.rc_sup_remark.length}})</th>
+										
+								</tr>
+								<tr ng-if="job_tltle_name == '處主管'">
+									<td><textarea id="text" placeholder="請輸入..." name="text" class="form-control" ng-model="inputVO.rc_sup_remark" style="width: 100%; height: 100px" maxlength="200" ng-disabled ='role_id != "A164"' ></textarea></td>									
+								</tr>
+								<tr ng-if="job_tltle_name != '處主管' && job_tltle_name != '處副主管'">
+									<th>處/副主管簽核意見：</th>	
+								</tr>
+								<tr ng-if="job_tltle_name != '處主管' && job_tltle_name != '處副主管'">
+									<td><textarea id="text" placeholder="請輸入..." name="text" class="form-control" ng-model="merge_rc_sup_remark" style="width: 100%; height: 100px" maxlength="200" ng-disabled ='role_id != "A164"' ></textarea></td>									
+								</tr>				
+						</table>
+						<br>
+						<table style="width:100%">
+								<tr>
+									<th>總行簽核意見：(剩餘字數:{{200 - inputVO.headmgr_remark.length}})</th>	
+								</tr>
+								<tr>
+									<td><textarea id="text" placeholder="請輸入..." name="text" class="form-control" ng-model="inputVO.headmgr_remark" style="width: 100%; height: 100px" maxlength="200"></textarea></td>
+								</tr>		
+						</table>
+						
+						
+					</div>
+				</section>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="saveAndSend()" >儲存並送出</button>
+					<button type="button" class="btn btn-primary" ng-click="save('close')" ng-show="headmgr_flag">結案</button>
+					<button type="button" class="btn btn-primary" ng-click="save('save')" >儲存</button>
+					<button type="button" class="btn btn-primary" ng-click="returns('returns')" ng-show="inputVO.case_no != null && inputVO.creator != userID " >退件</button>
+					<button type="button" class="btn btn-primary" ng-click="returns('returnsToCreator')" ng-show="roleID =='A164' || headmgr_flag " >退件至建立人</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

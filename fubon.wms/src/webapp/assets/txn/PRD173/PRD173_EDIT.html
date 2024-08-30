@@ -1,0 +1,87 @@
+<<style>
+<!--
+input:required:invalid {
+     border-color: red;
+}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/PRD173/PRD173_EDIT.js"></script>
+<div ng-controller="PRD173_EDITController" ng-cloak>
+    <div class="modal-dialog" style="width: 1080px;">
+      <div class="modal-content">
+        <div class="modal-header"> 
+        	<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+          <h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">{{title}}</h4>
+        </div>
+        <div class="modal-body">
+        <form name="add_prod">
+ 			<div class="gv_tab_sc scroll_y">
+		        <table>
+		        <thead>
+		          <tr>
+		            <th>專案名稱</th>
+		            <th>商品檔期</th>
+		            <th>啟用日</th>
+		            <th>停用日</th>
+		          </tr>
+		        </thead>
+		        <tbody>
+		          <tr>
+		            <td>
+						<input id="prod_name" name="prod_name" type="text" placeholder="請輸入..." ng-model="inputVO.PROD_NAME" style="width: 150px;" ng-required="true">
+					</td>
+		            <td>
+						<input id="prod_period" name="prod_period" type="text" placeholder="請輸入..." ng-model="inputVO.PROD_PERIOD" ng-required="true">
+					</td>
+		            <td>
+			           	<div class="input-group datebox datewidth">
+							<input type="text" id="sDate" name="sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.EFFECT_DATE"
+									is-open="model.a"
+									datepicker-options="bgn_sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"
+									ng-required="true"/>
+									<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+		            </td>
+		            <td>
+						<div class="input-group datebox datewidth">
+							<input type="text" id="eDate" name="eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.EXPIRY_DATE"
+									is-open="model.b"
+									datepicker-options="bgn_eDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"
+									/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+					</td>
+		          </tr>
+		        </tbody>
+		        </table>
+		      </div>
+		      <div style="text-align: center;" class="modal-footer">
+			        <button ng-click="btnSubmit()" class="btn btn-info" data-dismiss="modal">確定</button> 
+			        <button type="button" ng-click="closeThisDialog('cancel')" class="btn btn-info"data-dismiss="modal">取消</button> 
+		      </div>
+		    </form>
+        </div>
+      </div>
+    </div>
+
+</div>

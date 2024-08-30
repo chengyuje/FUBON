@@ -1,0 +1,148 @@
+<style> 
+.datewidth{
+	width:120px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM710/CRM710.js"></script>
+<div class="CRM710" ng-controller="CRM710Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table style="width: 50%; margin-left: 30%; margin-right: auto;">
+					<tr>
+						<th>解說人員：</th>
+						<td style="width: 70%;"><input tySpe="text" class="form-control" placeholder="請輸入..." id="empID" name="empID" ng-model="inputVO.empID" e-length-limit="12" style="width: 30%;text-transform: uppercase;"></td>
+					</tr>
+					<tr>
+						<th>客戶ID：</th>
+						<td style="width: 70%;"><input tySpe="text" class="form-control" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" ng-blur="toUppercase_data(inputVO.custID, 'custid')" e-length-limit="12" style="width: 30%;text-transform: uppercase;"></td>
+					</tr>
+					<tr>
+						<th>客戶姓名：</th>
+						<td style="width: 70%;"><input tySpe="text" class="form-control" placeholder="請輸入..." id="custName" name="custName" ng-model="inputVO.custName" e-length-limit="12" style="width: 30%;text-transform: uppercase;"></td>
+					</tr>
+					<tr>
+						<th>資料月份：</th>
+						<td class="form-inline" colspan="1">
+		                	<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="importSDate" name="importSDate"
+										   	class="form-control"
+											uib-datepicker-popup="yyyyMM"
+											ng-model="inputVO.importSDate"
+											is-open="model.e"
+											datepicker-options="importStartDateOptions"
+									   		datepicker-mode="'month'"
+											ng-readonly="true"
+											ng-change="limitDate();dateChange()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="importEDate" name="importEDate"
+										   	class="form-control"
+											uib-datepicker-popup="yyyyMM"
+											ng-model="inputVO.importEDate"
+											is-open="model.f"
+											datepicker-options="importEndDateOptions"
+									   		datepicker-mode="'month'"
+											ng-readonly="true"
+											ng-change="limitDate()" 
+											ng-disabled="inputVO.importSDate == undefined" />
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'f')" ng-disabled="inputVO.importSDate == undefined" ng-readonly="inputVO.importSDate == undefined">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>商品種類：</th>
+						<td>
+							<e-combobox id="prodType" name="prodType" 
+										ng-paramtype="CRM.PROD_LIST"
+										ng-model="inputVO.prodType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="getTradeType()"
+										width="75%"
+										style="line-height:20px;"/>
+						</td>
+					</tr>
+					<tr>
+						<th>交易種類：</th>
+						<td>
+							<e-combobox id="tradeType" name="tradeType" 
+										ng-datasource="mappingSet['SOT.TRADE_TYPE_COMBOBOX']"
+										ng-model="inputVO.tradeType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="75%"
+										style="line-height:20px;"/>
+							<font color="red" ng-hide="inputVO.prodType != ''">請選擇商品種類</span>
+						</td>
+					</tr>
+					
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit();init();">清除</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping-once input="inputVO" output="outputVO" list="data" totallist="tradeList" rowcountlimit="10"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data">
+					<thead>
+						<tr>
+							<th>交易日期</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>歸屬行</th>
+							<th>目前AO CODE</th>
+							<th>交易類別</th>
+							<th>交易項目</th>
+							<th>商品代號</th>
+							<th>商品名稱</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" align="center" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.TRADE_DATE | date:"yyyy-MM-dd"}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+							<td>{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+							<td>{{row.PROD_TYPE | mapping:mappingSet['CRM.PROD_LIST']:'F3'}}</td>
+							<td ng-if="row.PROD_TYPE == '1'">{{row.TRADE_TYPE | mapping:mappingSet['SOT.TRADE_TYPE']:'F3'}}</td>
+							<td ng-if="row.PROD_TYPE == '7'">{{row.TRADE_TYPE | mapping:mappingSet['IOT.TRADE_TYPE']:'F3'}}</td>
+							<td ng-if="row.PROD_TYPE != '1' && row.PROD_TYPE != '7'">{{row.TRADE_TYPE | mapping:mappingSet['SOT.BUY_SELL']:'F3'}}</td>
+							<td align="left" style="white-space: pre">{{row.PROD_ID_LIST}}</td>
+							<td align="left" style="white-space: pre">{{row.PROD_NAME_LIST}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

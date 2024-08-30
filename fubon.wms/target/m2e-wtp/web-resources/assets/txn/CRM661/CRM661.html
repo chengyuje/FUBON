@@ -1,0 +1,156 @@
+<style>
+/* open dialog */
+.ngdialog.CRM661 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM661 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM661 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM661 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM661.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM661_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:188px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.red{
+	color: red;
+}
+.textarea-CRM661
+    {
+      width: 500px;
+      height: 158px;
+      vertical-align: middle;
+    }
+.tfb_content_tit-CRM661{height:52px ; color:#FFF ;font-size:17px ;font-weight:bold ;  min-width:410px ;width:410px ; background-color:#93c5e1 ;white-space: nowrap;}
+
+
+</style>
+<script type="text/javascript" src="assets/txn/CRM661/CRM661.js"></script>
+<script type="text/javascript" src="assets/txn/CRM661/CRM661_rel_add.js"></script>
+<script type="text/javascript" src="assets/txn/CRM661/CRM661_rel_set.js"></script>
+<script type="text/javascript" src="assets/txn/CRM661/CRM661_rel_rpy.js"></script>
+
+<div class="CRM661" ng-controller="CRM661Controller" ng-cloak>
+	<div class="gv_tab_sc scroll_y" style="min-height:300px;height:100%;white-space:nowrap;">
+		<table>
+			<thead>
+				<tr>
+					<th rowspan ="2" ng-show = "check_ao"></th>
+					<th rowspan ="2">客戶姓名</th>
+					<th rowspan ="2">身分證字號</th>
+					<th rowspan ="2">關係</th>
+					<th rowspan ="2">分行</th>
+					<th rowspan ="2">服務理專</th>
+					<th rowspan ="2">UHRM</th>
+<!-- 						<th rowspan ="2">歸戶服務(主戶)</th> -->
+					<th rowspan ="2">會員等級</th>
+					<th rowspan ="2">貢獻度等級</th>
+					<th rowspan ="2">家庭會員<br />(主戶)</th>
+					<th colspan ="5">一年內最近一次下單費率 %(僅呈現理專可申請不同等級折扣之產品項)</th>
+				</tr>
+				<tr>
+					<th>股票型<br />境外基金</th>
+					<th>債券型<br />境外基金</th>
+					<th>平衡型<br />境外基金</th>
+					<th>ETF</th>
+					<th>海外債</th>
+				</tr>
+			</thead>
+			<tbody> 
+				<tr class="repeat-row" ng-repeat="row in resultList_rel | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" >
+					<td align = "center" ng-show = "check_ao" style="height: 45px;">
+						<a class="btn btn-danger btn-circle" ng-click="rel_delete(row)" ng-show="row.CUST_ID != inputVO.cust_id" ng-if="row.SHOW_CODI == 'Y'">
+							<i class="glyphicon glyphicon-trash"></i>
+						</a>
+					</td>
+					<td>{{row.CUST_NAME}}{{row.REL_STATUS | mapping:mappingSet['STATUS']}}</td>
+					<td>
+						<span ng-show = "row.IN_COVERAGE == 'Y'"><a href="#" onclick="return false" ng-click="gohome(row.CUST_ID)">{{row.CUST_ID}}</a></span>
+						<span ng-show = "row.IN_COVERAGE != 'Y'">{{row.CUST_ID}}</span>
+					</td>
+					<td>{{row.REL_TYPE | mapping:mappingSet['CRM.REL_TYPE']:'F3'}}{{row.REL_TYPE_OTH != null ? '_' : ''}}{{row.REL_TYPE_OTH }}</td>
+					<td>{{row.BRANCH_NAME}}</td>
+					<td>{{row.AO_CODE}}{{row.EMP_NAME != null ? '_' : ''}}{{row.EMP_NAME}}</td>
+					<td>{{row.UEMP_ID}}{{row.UEMP_NAME != null ? '_' : ''}}{{row.UEMP_NAME}}</td>
+<!-- 						<td>{{row.JOIN_SRV_CUST_ID | mapping:mappingSet['JOIN_SRV_CUST_ID']:'F1'}}</td> -->
+					<td>
+						<span ng-show = "row.IN_COVERAGE == 'Y'">{{row.VIP_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</span>
+						<span ng-show = "row.IN_COVERAGE != 'Y'" style="color:#BFBFBF">非轄下不顯示</span>
+					</td>
+					<td>
+						<span ng-show = "row.IN_COVERAGE == 'Y'">{{row.CON_DEGREE | mapping:mappingSet['CRM.CON_DEGREE']:'F3'}}</span>
+						<span ng-show = "row.IN_COVERAGE != 'Y'" style="color:#BFBFBF">非轄下不顯示</span>
+					</td>
+					<td>{{row.PRV_MBR_MAST_YN}}</td>
+					<td style="text-align: right;">{{row.TXFEE_DSCNT_RATE_1 != null ? row.TXFEE_DSCNT_RATE_1  : 0}}</td>
+					<td style="text-align: right;">{{row.TXFEE_DSCNT_RATE_2 != null ? row.TXFEE_DSCNT_RATE_2  : 0}}</td>
+					<td style="text-align: right;">{{row.TXFEE_DSCNT_RATE_3 != null ? row.TXFEE_DSCNT_RATE_3  : 0}}</td>
+					<td style="text-align: right;">{{row.TXFEE_DSCNT_RATE_4 != null ? row.TXFEE_DSCNT_RATE_4  : 0}}</td>
+					<td style="text-align: right;">{{row.TXFEE_DSCNT_RATE_5 != null ? row.TXFEE_DSCNT_RATE_5  : 0}}</td>
+				</tr>
+				<tr ng-show = "check_ao">
+					<td align = "center"><a class="btn btn-success btn-circle" ng-click = "rel_add()"><i class="glyphicon glyphicon-plus"></i></a></td>
+					<td><input class="form-control" type="text" id="rel_cust_name" name="rel_cust_name" ng-model="inputVO.rel_cust_name" style="width:150px;display:inline;" e-length-limit="30" disabled></td>
+					<td><input class="form-control" type="text" id="rel_cust_id" name="rel_cust_id" ng-model="inputVO.rel_cust_id" style="width:150px;display:inline;" e-length-limit="30" disabled> <a class="btn btn-info btn-circle" ng-click = "open_rel(1)" style="display:inline;"><i class="glyphicon glyphicon-zoom-in"></i></a></td>
+					<td colspan = "12">
+						<e-combobox id="rel_type" 
+									ng-datasource="mappingSet['CRM.REL_TYPE_N00']"
+									ng-model="inputVO.rel_type"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									width="100px"
+									style="line-height:20px;display:inline;" />
+						<input class="form-control" type="text" id="rel_type_oth" name="rel_type_oth" placeholder = "請輸入關係" ng-show = "inputVO.rel_type == '99'" ng-model="inputVO.rel_type_oth" style="width:120px;display:inline;" e-length-limit="30" >
+					</td>
+
+				</tr>
+			</tbody>
+		</table>
+	</div>
+<!-- 			<button type="button" class="btn btn-primary" ng-click="open_set()" ng-show = "check_ao">歸戶服務</button> -->
+	<button type="button" class="btn btn-primary" ng-click="open_rpy()" ng-show = "check_rpy">待覆核清單</button>
+</div>

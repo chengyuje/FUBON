@@ -1,0 +1,105 @@
+<style>
+/* open dialog */
+.ngdialog.CAM140_QUS {
+	
+}
+/* dialog panl */
+.modal-dialog.CAM140_QUS {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+/* table size */
+.CAM140_QUS table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CAM140_QUS.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CAM140_QUS_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<div>
+	<div ng-controller="CAM140_QUSController" ng-cloak>
+		<div class="modal-dialog CAM140_QUS">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">編輯行銷問卷</h4>
+				</div>
+				<div class="modal-body">
+					<h4 class="h4-title form-inline">*問卷名稱：<input class="form-control" type="text" placeholder="請輸入..." id="examName" name="examName" ng-model="inputVO.examName" e-length-limit="100"></h4>
+					<div class="text-danger">＊選擇順序為題目順序。</div>
+					<e-jumping-once output="outputVO" list="data" totallist="questionList"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" >
+						<table>
+							<thead>
+								<tr>
+									<th style="width:10%">功能</th>
+									<th style="width:5%">題目<br />順序</th>
+									<th style="width:5%">題庫<br />題號</th>
+									<th style="width:25%">題目</th>
+									<th style="width:10%">問卷<br />類型</th>
+									<th style="width:20%">答案清單</th>
+									<th style="width:15%">是否有<br />其他項目</th>
+									<th style="width:15%">是否有<br />補充說明</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" align="center" ng-repeat="row in data | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td style="width:10%">
+										<div ng-repeat="value in inputVO.questionVersionList | filter:row.QUESTION_VERSION as results">
+											<a href="#" data-toggle="modal" class="btn btn-warning btn-circle" ng-click="addQuestion(row)"><i class="glyphicon glyphicon-trash"></i></a>
+										</div>
+										<div ng-if="results.length == 0">
+											<button type="button" class="btn btn-primary" onclick= "return false" ng-click="addQuestion(row)" ><i class="glyphicon glyphicon-plus"></i></button>
+										</div>
+									</td>
+									<td>
+										<div ng-repeat="value in inputVO.questionVersionList | filter:row.QUESTION_VERSION as results">
+										{{inputVO.questionVersionList.indexOf(value) + 1}}
+										</div>
+									</td>
+									<td style="width:5%">{{row.ROWNUM}}</td>
+									<td style="width:25%" align="left">{{row.QUESTION_DESC}}</td>
+									<td style="width:10%">{{row.QUESTION_TYPE | mapping:mappingSet['SYS.QUESTION_TYPE']:'F3'}}</td>
+									<td align="left" style="white-space: pre">{{row.ANSWER_DESC}}</td>
+									<td style="width:15%">{{row.ANS_OTHER_FLAG | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+									<td style="width:15%">{{row.ANS_MEMO_FLAG | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="save()" ng-disabled="inputVO.examName.length == 0 || inputVO.questionVersionList.length == 0">確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

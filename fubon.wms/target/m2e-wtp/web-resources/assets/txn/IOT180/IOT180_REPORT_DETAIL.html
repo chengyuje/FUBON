@@ -1,0 +1,113 @@
+<style>
+/* dialog panl */
+.modal-dialog.IOT180_REPORT_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+/* table size */
+._DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+._DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll__EDIT_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.titleTB th, td {
+	border-collapse: collapse;
+	padding: 3px;
+	text-align: center;	
+}
+.titleTB th {
+	background-color: lightgray
+}
+.numAlign{
+	text-align: right !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT180/IOT180_REPORT_DETAIL.js"></script>
+<div ng-controller="IOT180_REPORT_DETAILController" ng-cloak>
+	<div class="modal-dialog IOT180_REPORT_DETAIL"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">明細</h4>
+			</div>
+			<div class="modal-body">
+				<e-jumping-once output="outputVO" list="data" totallist="paramList"></e-jumping-once>				
+				<div class="gv_tab_sc scroll_y" style="height:350px;white-space: nowrap;">
+					<table class="e-table-freeze" e-mode="1" e-top="true" e-list="data">
+						<thead>
+							<tr>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="YEARMON" e-query="query()">資料年月</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_AREA_NAME" e-query="query()">營運區</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NBR" e-query="query()">分行代號</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NAME" e-query="query()">分行名稱</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="EMP_ID" e-query="query()">員工編號</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="EMP_NAME" e-query="query()">員工姓名</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_CODE" e-query="query()">AO Code</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="KEYIN_DATE" e-query="query()">鍵機日</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INS_ID" e-query="query()">保險文件編號</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="APPLY_DATE" e-query="query()">申請日</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">要保人ID</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_ID" e-query="query()">被保人ID</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PRD_NAME" e-query="query()">險種</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PMS_STATUS" e-query="query()">案件狀態</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="ANNU_ACT_FEE" e-query="query()">預估收益</e-sorter></th>
+							</tr>						
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 												 	
+							 	<td>{{row.YEARMON}}</td>
+							 	<td>{{row.BRANCH_AREA_NAME}}</td>
+							 	<td>{{row.BRANCH_NBR}}</td>
+							 	<td>{{row.BRANCH_NAME}}</td>
+							 	<td>{{row.EMP_ID}}</td>
+							 	<td>{{row.EMP_NAME}}</td>
+							 	<td>{{row.AO_CODE}}</td>
+							 	<td>{{toJsDate(row.KEYIN_DATE) | date:"yyyy-MM-dd"}}</td>
+							 	<td>{{row.INS_ID}}</td>
+							 	<td>{{toJsDate(row.APPLY_DATE) | date:"yyyy-MM-dd"}}</td>
+							 	<td>{{row.CUST_ID}}</td>
+							 	<td>{{row.INSURED_ID}}</td>
+							 	<td>{{row.PRD_NAME}}</td>
+							 	<td>{{row.PMS_STATUS |  mapping:mappingSet['status']:'F1'}}</td>
+							 	<td>{{row.ANNU_ACT_FEE}}</td>				 															
+							</tr>						
+						</tbody>
+					</table>				
+				</div>
+			</div>
+			<div align="center">
+			<e-paging outputVO="outputVO" inputVO="inputVO" callQuery="query()" displayLimit="displayLimit" dataList="paramList"></e-paging>
+			</div>
+			<div><p></p></div>
+		</div>
+	</div> 
+</div>

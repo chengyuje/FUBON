@@ -1,0 +1,80 @@
+<style>
+/* dialog panl */
+.modal-dialog.CAM140_RES {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+</style>
+<div>
+	<div ng-controller="CAM140_RESController" ng-cloak>
+		<div class="modal-dialog CAM140_RES">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeAfertCountRow()">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">名單回應選項維護</h4>
+				</div>
+				<div class="modal-body">
+					<table>
+						<thead>
+							<tr>
+								<th ng-show="data != 'updateImp'">功能</th>
+								<th>啟用</th>
+								<th>代碼</th>
+								<th>意義</th>
+								<th>回應選項名稱</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td width="14%" ng-show="data != 'updateImp'">
+									<button type="button" ng-if="row.editDis" ng-disabled="row.CAMPAIGN_ID == '0000000000' || row.CAMPAIGN_ID == '0000000001' || row.CAMPAIGN_ID == '0000000002' || row.CAMPAIGN_ID == '0000000003' || row.CAMPAIGN_ID == '0000000004' || row.CAMPAIGN_ID == '0000000006' || row.CAMPAIGN_ID == '0000000006'" class="btn btn-info" ng-click="edit(row)">編輯</button>
+									<button type="button" ng-if="row.editDis" ng-disabled="row.CAMPAIGN_ID == '0000000000' || row.CAMPAIGN_ID == '0000000001' || row.CAMPAIGN_ID == '0000000002' || row.CAMPAIGN_ID == '0000000003' || row.CAMPAIGN_ID == '0000000004' || row.CAMPAIGN_ID == '0000000006' || row.CAMPAIGN_ID == '0000000006' || row.delDis" class="btn btn-info" ng-click="del(row)">刪除</button>
+									<button type="button" ng-if="!row.editDis" class="btn btn-info" ng-click="confirm(row)">儲存</button>
+									<button type="button" ng-if="!row.editDis" class="btn btn-info" ng-click="cancel(row)">取消</button>
+								</td>
+								<td width="10%"><input type='checkbox' ng-disabled="row.editDis" ng-model='row.tempENABLE' ng-true-value="'Y'" ng-false-value="'N'" /></td>
+								<td width="10%"><input type="text" class="form-control" ng-disabled="true" id="LEAD_STATUS" name="LEAD_STATUS" ng-model="row.LEAD_STATUS"></td>
+								<td ng-show="row.LEAD_STATUS =='01' || row.LEAD_STATUS =='02'"></td>
+								<td width="30%" ng-hide="row.LEAD_STATUS =='01' || row.LEAD_STATUS =='02'">
+									<e-combobox id="RESPONSE_MEAN" name="RESPONSE_MEAN" ng-disabled="row.editDis"
+												ng-paramtype="CAM.RESPONSE_MEAN"
+												ng-model="row.tempMEAN"
+												ng-validate="false" 
+												ng-readonly="row.editDis" 
+												ng-editable="false"
+												ng-format="F3" 
+												ng-required="false" 
+												width="200px"
+												ng-if="responseCode == '0000000000' || responseCode == '0000000006'"
+												style="line-height:20px;" />
+									<e-combobox id="RESPONSE_MEAN" name="RESPONSE_MEAN" ng-disabled="row.editDis"
+												ng-paramtype="CAM.RESPONSE_MEAN_2"
+												ng-model="row.tempMEAN"
+												ng-validate="false" 
+												ng-readonly="row.editDis" 
+												ng-editable="false"
+												ng-format="F3" 
+												ng-required="false" 
+												width="200px"
+												ng-if="responseCode != '0000000000' && responseCode != '0000000006'"
+												style="line-height:20px;" />
+								</td>
+								<td width="36%">
+									<textarea ng-disabled="row.editDis" class="form-control" id="RESPONSE_NAME" name="RESPONSE_NAME" placeholder="請輸入..." ng-model="row.tempNAME" e-length-limit="100"></textarea>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="closeAfertCountRow()" >確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

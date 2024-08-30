@@ -1,0 +1,54 @@
+<script type="text/javascript" src="assets/txn/FPS231/FPS231.js"></script>
+<script type="text/javascript" src="assets/txn/FPS231/FPS231_CUR.js"></script>
+<style>
+/***for table 顏色***/
+.table-stripeds>tbody>tr:nth-child(old) {
+	background-color: #FFFFCC;
+}
+</style>
+<div class="FPS231" ng-controller="FPS231Controller" ng-cloak>
+	<!--Content of the panel-->
+	<div class="gv_tab_sc text-center">
+
+		<table class="tablesaw table table-stripeds table-bordered">
+			<div style="text-align: right;margin-bottom:10px;" ng-if="connector('get','FPS200')!='assets/txn/FPS240/FPS240.html'">
+
+				<button ng-click="curs()" class="btn btn-info">新增商品</button>
+
+				<button ng-click="returnCopy()" class="btn btn-info">匯入原始建議</button>
+				<button ng-click="save()" class="btn btn-info">儲存</button>
+
+			</div>
+			<thead>
+
+				<tr>
+					<th  ng-if="connector('get','FPS200')!='assets/txn/FPS240/FPS240.html'" >刪除</th>
+					<th>商品類別</th>
+					<th>代號<br/>商品</th>
+					<th>計價幣別<br/>保單幣別</th>
+					<th>原幣金額</th>
+					<th>約當台幣</th>
+					<th>比例</th>
+					<th>原幣最低申購金額</th>
+				</tr>
+
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in paramList track by $index">
+					<td  ng-if="connector('get','FPS200')!='assets/txn/FPS240/FPS240.html'"  ng-click="del()"><img src="assets/images/icon/u45.jpg"></td>
+					<td>{{row.PRD_TYPE}}</td>
+					<td align="left">{{row.PRD_NUM}}</td>
+					<td>{{row.CUR}}</td>
+					<td align="right"><input type="text"  style="text-align: right"  ng-model="row.ORG_AMT"
+							class="form-control"
+							ng-disabled="connector('get','FPS200')=='assets/txn/FPS240/FPS240.html'"
+							style="width: 200px; text-transform: uppercase;"></td>
+					<td align="right">{{row.U_AMT}}</td>
+					<td align="right">{{row.PER}}%</td>
+					<td align="right">{{row.AMT}}</td>
+					
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

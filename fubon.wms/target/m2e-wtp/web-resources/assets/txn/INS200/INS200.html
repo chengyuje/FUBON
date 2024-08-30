@@ -1,0 +1,79 @@
+<style>
+.INS200 table {
+	width: 70%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.INS200.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+input:required:invalid {
+ 	border-color: red;
+}
+.alignleft{
+	text-align: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/INS200/INS200.js"></script>
+<div class="INS200" ng-controller="INS200Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >保險規劃書</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table class="td_center">
+					<tr>
+						<td>*客戶ID:</td>
+						<td><input id="cust_id" name="cust_id" type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.CUST_ID" style="text-transform: uppercase;" ng-blur="custidToUppercase();" required></td>
+						<td colspan="4">
+							<button type="button" class="btn btn-info" ng-click="take_last_record()" ng-disabled="!inputVO.IS_CUST">最近一次紀錄查詢</button>
+							<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+							<button type="button" class="btn btn-info" ng-click="GoINS200Loader()">進行規劃</button>
+						</td>
+					</tr>
+					<tr>
+						<td>*客戶姓名:</td>
+						<td><input id="cust_name" name="cust_name" type="text" class="form-control"  placeholder="請輸入..." ng-model="inputVO.CUST_NAME" style="text-transform: uppercase;" ng-disabled="inputVO.IS_CUST" required></td>
+						<td>*客戶生日:</td>
+						<td>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="birthday" name="birthday"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.BIRTHDAY"
+									is-open="model.a"
+									datepicker-options="bgn_sDateOptions"
+									ng-disabled="inputVO.IS_CUST"
+									ng-change="count_age()"
+									ng-readonly="true" required />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="inputVO.IS_CUST">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</td>
+						<td>保險年齡:</td>
+						<td><input id="age" name="age" type="text" class="form-control alignRight" style="width: 50px;" ng-model="inputVO.AGE" ng-disabled="true"></td>
+					</tr>
+					<tr>
+						<td>保單規劃建議書名稱：</td>
+						<td>{{PLAN_NAME}}</td>
+						<td>規劃日期：</td>
+						<td>{{PLAN_DATE}}</td>
+						<td>建立人：</td>
+						<td>{{EMP_NAME}}</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+	</div>
+</div>

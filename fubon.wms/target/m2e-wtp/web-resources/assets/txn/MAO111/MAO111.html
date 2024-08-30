@@ -1,0 +1,393 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+
+/* check box css */
+input.faChkRnd, input.faChkSqr {
+  visibility: hidden;
+}
+input.faChkRnd:checked:after, input.faChkRnd:after,
+input.faChkSqr:checked:after, input.faChkSqr:after {
+  visibility: visible;
+  font-family: FontAwesome;
+  font-size:22px;height: 14px; width: 14px;
+  position: relative;
+  top: -3px;
+  left: 0px;
+  background-color:#FFF;
+  display: inline-block;
+}
+
+input.faChkRnd:checked:after {
+  content: '\f058';
+}
+
+input.faChkRnd:after {
+  content: '\f10c';
+}
+
+input.faChkSqr:checked:after {
+  content: '\f14a';
+}
+
+input.faChkSqr:after {
+  content: '\f096';
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MAO111/MAO111.js"></script>
+<script type="text/javascript" src="assets/txn/MAO111/MAO111_add.js"></script>
+<div class="MAO111" ng-controller="MAO111Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >申請查詢</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<div class="search_table search_box">
+				<table>
+					<tr>
+						<th><span style="color:red" ng-show = "inputVO.branchNbr == ''">*</span>分行別：</th>
+						<td>
+							<e-combobox id="branchNbr" name="branchNbr"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branchNbr"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1 || memLoginFlag.startsWith('UHRM')"
+										ng-readonly="AVAIL_BRANCH.length == 1 || memLoginFlag.startsWith('UHRM')" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeBranch(region)"
+										style="line-height:20px;" />
+						</td>
+						<th>申請人：</th>
+						<td>
+							<e-combobox id="ao_code" name="ao_code"
+								ng-datasource="AO_LIST"
+								ng-model="inputVO.ao_code"
+								ng-validate="false" 
+								ng-disabled="AO_LIST.length == 1 || memLoginFlag.startsWith('UHRM')"
+								ng-readonly="AO_LIST.length == 1 || memLoginFlag.startsWith('UHRM')" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="true"
+								ng-change="ChangeEmp_id(test)"
+								style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th><span style="color:red" ng-show = "inputVO.use_date == undefined">*</span>使用日期：</th>
+						<td>
+						<div class="input-group datebox datewidth">
+							<input type="text" id="use_date" name="use_date"
+								   class="form-control" 
+								   uib-datepicker-popup="yyyy/MM/dd"
+								   ng-model="inputVO.use_date" 
+								   is-open="model.a"
+								   ng-readonly="true"
+								   ng-disabled="memLoginFlag.startsWith('UHRM')"
+								   required />
+							<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="memLoginFlag.startsWith('UHRM')"><i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</div>
+						</td>
+						<th>使用地點 : </th>
+						<td>
+							<e-combobox id="dev_site_type"
+										ng-datasource="mappingSet['MAO.DEV_SITE_TYPE']" 
+										ng-model="inputVO.dev_site_type"
+			   							ng-validate="false" 
+			   							ng-disabled="memLoginFlag.startsWith('UHRM')"
+			   							ng-readonly="memLoginFlag.startsWith('UHRM')"
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							style="line-height:20px;" />
+						</td>
+					</tr>
+				</table>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="init2();inquireInit();inquire();" ng-disabled="parameterTypeEditForm.$invalid || memLoginFlag.startsWith('UHRM')" >查詢</button>
+					<button type="button" class="btn btn-info" ng-click="init2();init();">清除</button>
+				</div>
+			</div>
+		</form>	
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<table width="100%">
+				<tr>
+					<td><h4 class="h4-title">可申請時段</h4></td>
+				</tr>
+			</table>
+			<div class="gv_tab_sc scroll_y" style="height:185px;white-space: nowrap;">
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="resultList">
+					<thead>
+						<tr>
+							<th rowspan="2">載具名稱</th>
+							<th rowspan="2">保管人</th>
+							<th rowspan="2">使用地點</th>
+							<th colspan="11">使用時間</th>
+						</tr>
+							<th>08時</th>
+							<th>09時</th>
+							<th>10時</th>
+							<th>11時</th>
+							<th>12時</th>
+							<th>13時</th>
+							<th>14時</th>
+							<th>15時</th>
+							<th>16時</th>
+							<th>17時</th>
+							<th>18時~次日8時</th>
+						<tr>
+						
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.DEV_NBR}}</td>
+							<td align="center">{{row.DEV_TAKE_EMP_NAME}}</td>
+							<td align="center">{{row.DEV_SITE_TYPE | mapping:mappingSet['MAO.DEV_SITE_TYPE']:'F3'}}</td>
+<!-- 							<td align="center"> -->
+<!-- 								<input type="checkbox"  -->
+<!-- 									   class="faChkSqr"  -->
+<!-- 									   ng-init="initValue = row.APL1_YN == 'Y' ? true : false"  -->
+<!-- 									   ng-change="check(row, 1)"  -->
+<!-- 									   ng-model="row.APL1_YN"  -->
+<!-- 									   ng-true-value="'Y'"  -->
+<!-- 									   ng-false-value="'N'"  -->
+<!-- 									   ng-disabled="initValue || (row.APL1_YN == 'N' && dev_check) || row.APL1_YN == 'X'"> -->
+<!-- 								<span ng-show="initValue">&nbsp;&nbsp;已出租</span> -->
+<!-- 								<span ng-show="row.APL1_YN == 'X'">&nbsp;&nbsp;已過申請期間</span> -->
+<!-- 							</td> -->
+<!-- 							<td align="center"> -->
+<!-- 								<input type="checkbox"  -->
+<!-- 								 	   class="faChkSqr"  -->
+<!-- 								 	   ng-init="initValue2 = row.APL2_YN == 'Y' ? true : false"  -->
+<!-- 								 	   ng-change = "check(row, 2)"  -->
+<!-- 								 	   ng-model = "row.APL2_YN"  -->
+<!-- 								 	   ng-true-value="'Y'"  -->
+<!-- 								 	   ng-false-value="'N'"  -->
+<!-- 								 	   ng-disabled="initValue2 || (row.APL2_YN == 'N' && dev_check) || row.APL2_YN == 'X'"> -->
+<!-- 								 <span ng-show="initValue2">&nbsp;&nbsp;已出租</span> -->
+<!-- 								 <span ng-show="row.APL2_YN == 'X'">&nbsp;&nbsp;已過申請期間</span> -->
+<!-- 							</td> -->
+<!-- 							<td align="center"> -->
+<!-- 								<input type="checkbox"  -->
+<!-- 								       class="faChkSqr"  -->
+<!-- 								       ng-init="initValue3 = row.APL3_YN == 'Y' ? true : false"  -->
+<!-- 								       ng-change="check(row, 3)"  -->
+<!-- 								       ng-model="row.APL3_YN"  -->
+<!-- 								       ng-true-value="'Y'"  -->
+<!-- 								       ng-false-value="'N'"  -->
+<!-- 								       ng-disabled="initValue3 || (row.APL3_YN == 'N' && dev_check) || row.APL3_YN == 'X'"> -->
+<!-- 								<span ng-show="initValue3">&nbsp;&nbsp;已出租</span> -->
+<!-- 								<span ng-show="row.APL3_YN == 'X'">&nbsp;&nbsp;已過申請期間</span> -->
+<!-- 							</td> -->
+							<td align="center">
+								<input type="checkbox" 
+									   class="faChkSqr" 
+									   ng-init="initValue = row.TITLE_1 == 'Y' ? true : false" 
+									   ng-change="check(row, 1)" 
+									   ng-model="row.TITLE_1" 
+									   ng-true-value="'Y'" 
+									   ng-false-value="'N'" 
+									   ng-disabled="initValue || (dev_nbr != null && row.DEV_NBR != dev_nbr) || row.TITLE_1 == 'X'"
+									   ng-show="!((initValue && row.TITLE_2 == 'Y')||(row.TITLE_1 == 'X'))">
+								<span ng-show="initValue">&nbsp;&nbsp;已出租</span>
+								<span ng-show="row.TITLE_1 == 'X'">&nbsp;&nbsp;已過申請期間</span>
+							</td>
+							<td align="center">
+								<input type="checkbox" 
+								 	   class="faChkSqr" 
+								 	   ng-init="initValue2 = row.TITLE_2 == 'Y' ? true : false" 
+								 	   ng-change = "check(row, 2)" 
+								 	   ng-model = "row.TITLE_2" 
+								 	   ng-true-value="'Y'" 
+								 	   ng-false-value="'N'" 
+								 	   ng-disabled="initValue2 || (dev_nbr != null && row.DEV_NBR != dev_nbr) || row.TITLE_2 == 'X'"
+								 	   ng-show="!((initValue2 && row.TITLE_2 == 'Y')||(row.TITLE_2 == 'X'))">
+								 <span ng-show="initValue2">&nbsp;&nbsp;已出租</span>
+								 <span ng-show="row.TITLE_2 == 'X'">&nbsp;&nbsp;已過申請期間</span>
+							</td>
+							<td align="center">
+								<input type="checkbox" 
+								       class="faChkSqr" 
+								       ng-init="initValue3 = row.TITLE_3 == 'Y' ? true : false" 
+								       ng-change="check(row, 3)" 
+								       ng-model="row.TITLE_3" 
+								       ng-true-value="'Y'" 
+								       ng-false-value="'N'" 
+								       ng-disabled="initValue3 || (dev_nbr != null && row.DEV_NBR != dev_nbr) || row.TITLE_3 == 'X'"
+								       ng-show="!((initValue3 && row.TITLE_3 == 'Y')||(row.TITLE_3 == 'X'))">
+								<span ng-show="initValue3">&nbsp;&nbsp;已出租</span>
+								<span ng-show="row.TITLE_3 == 'X'">&nbsp;&nbsp;已過申請期間</span>
+							</td>
+							<td align="center">
+								<input type="checkbox" 
+								       class="faChkSqr" 
+								       ng-init="initValue4 = row.TITLE_4 == 'Y' ? true : false" 
+								       ng-change="check(row, 4)" 
+								       ng-model="row.TITLE_4" 
+								       ng-true-value="'Y'" 
+								       ng-false-value="'N'" 
+								       ng-disabled="initValue4 || (dev_nbr != null && row.DEV_NBR != dev_nbr) || row.TITLE_4 == 'X'"
+								       ng-show="!((initValue4 && row.TITLE_4 == 'Y')||(row.TITLE_4 == 'X'))">
+								<span ng-show="initValue4">&nbsp;&nbsp;已出租</span>
+								<span ng-show="row.TITLE_4 == 'X'">&nbsp;&nbsp;已過申請期間</span>
+							</td>
+							<td align="center">
+								<input type="checkbox" 
+								       class="faChkSqr" 
+								       ng-init="initValue5 = row.TITLE_5 == 'Y' ? true : false" 
+								       ng-change="check(row, 5)" 
+								       ng-model="row.TITLE_5" 
+								       ng-true-value="'Y'" 
+								       ng-false-value="'N'" 
+								       ng-disabled="initValue5 || (dev_nbr != null && row.DEV_NBR != dev_nbr) || row.TITLE_5 == 'X'"
+								       ng-show="!((initValue5 && row.TITLE_5 == 'Y')||(row.TITLE_5 == 'X'))">
+								<span ng-show="initValue5">&nbsp;&nbsp;已出租</span>
+								<span ng-show="row.TITLE_5 == 'X'">&nbsp;&nbsp;已過申請期間</span>
+							</td>
+							<td align="center">
+								<input type="checkbox" 
+								       class="faChkSqr" 
+								       ng-init="initValue6 = row.TITLE_6 == 'Y' ? true : false" 
+								       ng-change="check(row, 6)" 
+								       ng-model="row.TITLE_6" 
+								       ng-true-value="'Y'" 
+								       ng-false-value="'N'" 
+								       ng-disabled="initValue6 || (dev_nbr != null && row.DEV_NBR != dev_nbr) || row.TITLE_6 == 'X'"
+								       ng-show="!((initValue6 && row.TITLE_6 == 'Y')||(row.TITLE_6 == 'X'))">
+								<span ng-show="initValue6">&nbsp;&nbsp;已出租</span>
+								<span ng-show="row.TITLE_6 == 'X'">&nbsp;&nbsp;已過申請期間</span>
+							</td>
+							<td align="center">
+								<input type="checkbox" 
+								       class="faChkSqr" 
+								       ng-init="initValue7 = row.TITLE_7 == 'Y' ? true : false" 
+								       ng-change="check(row, 7)" 
+								       ng-model="row.TITLE_7" 
+								       ng-true-value="'Y'" 
+								       ng-false-value="'N'" 
+								       ng-disabled="initValue7 || (dev_nbr != null && row.DEV_NBR != dev_nbr) || row.TITLE_7 == 'X'"
+								       ng-show="!((initValue7 && row.TITLE_7 == 'Y')||(row.TITLE_7 == 'X'))">
+								<span ng-show="initValue7">&nbsp;&nbsp;已出租</span>
+								<span ng-show="row.TITLE_7 == 'X'">&nbsp;&nbsp;已過申請期間</span>
+							</td>
+							<td align="center">
+								<input type="checkbox" 
+								       class="faChkSqr" 
+								       ng-init="initValue8 = row.TITLE_8 == 'Y' ? true : false" 
+								       ng-change="check(row, 8)" 
+								       ng-model="row.TITLE_8" 
+								       ng-true-value="'Y'" 
+								       ng-false-value="'N'" 
+								       ng-disabled="initValue8 || (dev_nbr != null && row.DEV_NBR != dev_nbr) || row.TITLE_8 == 'X'"
+								       ng-show="!((initValue8 && row.TITLE_8 == 'Y')||(row.TITLE_8 == 'X'))">
+								<span ng-show="initValue8">&nbsp;&nbsp;已出租</span>
+								<span ng-show="row.TITLE_8 == 'X'">&nbsp;&nbsp;已過申請期間</span>
+							</td>
+							<td align="center">
+								<input type="checkbox" 
+								       class="faChkSqr" 
+								       ng-init="initValue9 = row.TITLE_9 == 'Y' ? true : false" 
+								       ng-change="check(row, 9)" 
+								       ng-model="row.TITLE_9" 
+								       ng-true-value="'Y'" 
+								       ng-false-value="'N'" 
+								       ng-disabled="initValue9 || (dev_nbr != null && row.DEV_NBR != dev_nbr) || row.TITLE_9 == 'X'"
+								       ng-show="!((initValue9 && row.TITLE_9 == 'Y')||(row.TITLE_9 == 'X'))">
+								<span ng-show="initValue9">&nbsp;&nbsp;已出租</span>
+								<span ng-show="row.TITLE_9 == 'X'">&nbsp;&nbsp;已過申請期間</span>
+							</td>
+							<td align="center">
+								<input type="checkbox" 
+								       class="faChkSqr" 
+								       ng-init="initValue10 = row.TITLE_10 == 'Y' ? true : false" 
+								       ng-change="check(row, 10)" 
+								       ng-model="row.TITLE_10" 
+								       ng-true-value="'Y'" 
+								       ng-false-value="'N'" 
+								       ng-disabled="initValue10 || (dev_nbr != null && row.DEV_NBR != dev_nbr) || row.TITLE_10 == 'X'"
+								       ng-show="!((initValue10 && row.TITLE_10 == 'Y')||(row.TITLE_10 == 'X'))">
+								<span ng-show="initValue10">&nbsp;&nbsp;已出租</span>
+								<span ng-show="row.TITLE_10 == 'X'">&nbsp;&nbsp;已過申請期間</span>
+							</td>
+							<td align="center">
+								<input type="checkbox" 
+								       class="faChkSqr" 
+								       ng-init="initValue11 = row.TITLE_11 == 'Y' ? true : false" 
+								       ng-change="check(row, 11)" 
+								       ng-model="row.TITLE_11" 
+								       ng-true-value="'Y'" 
+								       ng-false-value="'N'" 
+								       ng-disabled="initValue11 || (dev_nbr != null && row.DEV_NBR != dev_nbr) || row.TITLE_11 == 'X'"
+								       ng-show="!((initValue11 && row.TITLE_11 == 'Y')||(row.TITLE_11 == 'X'))">
+								<span ng-show="initValue11">&nbsp;&nbsp;已出租</span>
+								<span ng-show="row.TITLE_11 == 'X'">&nbsp;&nbsp;已過申請期間</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="search_table search_box">
+				<table>
+					<tr>
+						<td colspan="3"><h4 class="h4-title">申請客戶明細</h4></td>
+					</tr>
+					<tr>
+						<th width="40%">客戶ID：<input class="form-control" type="text" style="text-transform: uppercase;display:inline;width:250px;" placeholder="請輸入..." id="cust_id" name="cust_id" ng-model="inputVO.cust_id" e-length-limit="16" required ng-disabled="memLoginFlag.startsWith('UHRM')"></th>
+						<th width="40%">客戶姓名：<input class="form-control" type="text" style="display:inline;width:250px;" placeholder="請輸入..." id="cust_name" name="cust_name" ng-model="inputVO.cust_name" e-length-limit="100" required ng-disabled="memLoginFlag.startsWith('UHRM')"></th>
+						<td width="20%" align="right">
+							<button type="button" class="btn btn-info" ng-click="add_page()" ng-disabled="(inputVO.cust_id == '' || inputVO.cust_id == undefined)  && (inputVO.cust_name == '' || inputVO.cust_name == undefined) || memLoginFlag.startsWith('UHRM')">查詢客戶</button>
+							<button type="button" class="btn btn-info" ng-click="init2()">清除</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table  class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="relationshipList">
+					<thead>
+						<tr>
+							<th></th>
+							<th>客戶姓名</th>
+							<th>客戶ID</th>
+							<th>關係戶</th>
+							<th>分行</th>
+							<th>服務理專</th>
+							<th>歸戶服務(主戶)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in relationshipList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align = "center"><a class="btn btn-danger btn-circle" ng-click="deletelist(row)"><i class="glyphicon glyphicon-trash"></i></a></td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.REL_TYPE | mapping:mappingSet['CRM.REL_TYPE']:'F3'}}</td>
+							<td>{{row.BRA_NBR | mapping:mappingSet['branch_nbr_all']:'F3'}}</td>
+							<td>{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+							<td>{{row.JOIN_SRV_CUST_ID}}{{(row.JOIN_SRV_CUST_ID != '' && row.JOIN_SRV_CUST_ID != null  ? "-" : "")}}{{row.JOIN_SRV_CUST_NAME}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="application()" ng-disabled="dev_save_time.length == 0 || !canEdit">申請</button>
+			</div>
+		</div>
+	</div>
+</div>

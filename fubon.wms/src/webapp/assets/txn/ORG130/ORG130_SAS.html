@@ -1,0 +1,368 @@
+<style>
+/* dialog panl */
+.modal-dialog.ORG130_SAS {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: 100vh;
+}
+.red{
+	color: red;
+}
+.DFKai-sb *{
+	font-family: DFKai-sb,'標楷體';
+	font-size: 18px;
+	border: black,thin;
+}
+.inputTr {
+	font-family: DFKai-sb,'標楷體';
+	font-size: 18px;
+ 	height: 100%;
+   	border: black,thin;
+  	padding: 0px 0;
+   	margin:0px;
+}
+div * {
+	font-family: DFKai-sb,'標楷體';
+	font-size: 16px;
+}
+table * {
+	font-family: DFKai-sb,'標楷體';
+	font-size: 16px;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/ORG130/ORG130_SAS.js"></script>
+<script type="text/javascript" src="assets/script/html2Pdf.js"></script>
+<script type="text/javascript" src="assets/script/html2canvas.js"></script>
+<script type="text/javascript" src="assets/script/jspdf.js"></script>
+                
+<div ng-controller="ORG130_SASController"  class="DFKai-sb" ng-cloak lang="zh-TW"> S
+	<div class="modal-dialog ORG130_SAS"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">面談評估表</h4>
+			</div>
+			<div class="modal-body DFKai-sb" lang="zh-TW">
+	 			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+		 			<table width="100%" print>
+		 				<tr>
+		 					<td width="30%">
+		 						<img src="assets/images/fubonFinincial.png" width="230" height="31">
+		 					</td>
+		 					<td align="center">
+		 						<div style="vertical-align:middle;text-align:center;font-size: 20px" class="DFKai-sb">面&nbsp;談&nbsp;評&nbsp;估&nbsp;表</div>
+		 					</td>
+		 					<td align="right"width="30%">
+<!-- 		 						DN:T1-0606-6-06-C -->
+								DN:T1-0603-6-07-C
+		 					</td>
+		 				</tr>
+		 				<tr>
+		 					<td colspan='4' align="right" class="DFKai-sb">面談日期：{{inputVO.evDate.getYear()+1900}}年{{inputVO.evDate.getMonth()+1}}月{{inputVO.evDate.getDate()}}日</td>
+		 				</tr>
+					</table>
+				  	<table border="1" class="tablesaw table table-bordered" print>
+						<tr>
+							<th width="5%" style="vertical-align:middle;text-align:center;">姓名</th>
+							<td width="10%" style="vertical-align:middle;"><div style="vertical-align:middle;text-align:left;font-size: 20px" class="DFKai-sb" ng-bind="inputVO.emp_name"></div></td>
+							<th width="10%" style="vertical-align:middle;text-align:center;">應徵職務</th>
+							<td width="10%" style="vertical-align:middle;">
+								<font style="vertical-align:middle;text-align:left;font-size: 20px" class="DFKai-sb" ng-bind="inputVO.branch_nbr | mapping:BRANCH_LIST:'F3'"></font>
+								<font style="vertical-align:middle;text-align:left;font-size: 20px" class="DFKai-sb" ng-bind="inputVO.ao_job_rank | mapping:mappingSet['ORG.MEET_JOB']:'F3'"></font>
+							</td>
+							<th width="8%" style="vertical-align:middle;text-align:center;">推薦人</th>
+							<td width="10%" style="vertical-align:middle;"><div style="vertical-align:middle;text-align:left;font-size: 20px" class="DFKai-sb" ng-bind="inputVO.recommender_emp_name"></div></td>
+						</tr>
+					</table>
+				  	<table cellpadding="0" border="1" class="tablesaw table table-bordered DFKai-sb" print>
+						<tr>
+							<th style="vertical-align:middle;text-align:center;" colspan="6" class="DFKai-sb">評估項目【視職務選填】</th>
+							<th width="7.5%" style="vertical-align:middle;text-align:center;" class="DFKai-sb">極佳</th>
+							<th width="7.5%" style="vertical-align:middle;text-align:center;" class="DFKai-sb">佳</th>
+							<th width="7.5%" style="vertical-align:middle;text-align:center;" class="DFKai-sb">普通</th>
+							<th width="7.5%" style="vertical-align:middle;text-align:center;" class="DFKai-sb">待加強</th>
+						</tr>
+						<tr> 
+							<td rowspan='5' class="DFKai-sb" style="width: 10.5%;vertical-align:middle;text-align:center;"><label class="DFKai-sb">*核心價值<br />(必填)</label></td>
+							<tr align="center">
+								<th style="vertical-align:middle;width: 5.75%;" class="DFKai-sb">
+									誠信
+								</th>
+								<td style="vertical-align:middle;text-align:left;" colspan="4" class="DFKai-sb">不違法、不偏私，亦不過度承諾，凡是承諾，說到做到。<br>勇於承認錯誤及承擔責任。</td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.honest" value="1" ng-required="!inputVO.honest"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.honest" value="2" ng-required="!inputVO.honest"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.honest" value="3" ng-required="!inputVO.honest"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.honest" value="4" ng-required="!inputVO.honest"></td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle;width: 5.75%" class="DFKai-sb">
+									親切
+								</th>
+								<td style="vertical-align:middle;text-align:left;" colspan="4" class="DFKai-sb">耐心傾聽並確認客戶需求，主動尋求回饋，發掘服務機會。<br>以同理心處理客戶抱怨，並獲得正面回應</td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.kindly" value="1" ng-required="!inputVO.kindly"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.kindly" value="2" ng-required="!inputVO.kindly" ></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.kindly" value="3" ng-required="!inputVO.kindly" ></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.kindly" value="4" ng-required="!inputVO.kindly" ></td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle;width: 5.75%" class="DFKai-sb">
+									專業
+								</th>
+								<td style="vertical-align:middle;text-align:left;" colspan="4" class="DFKai-sb">熟悉金融商品內容/服務流程。<br>持續關注工作領域的發展趨勢，不斷提升與客戶需求相關的知識與技能。<br>樂於與團隊成員分享，相互支援補位，以團隊表現為榮。</td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.prof" value="1" ng-required="!inputVO.prof"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.prof" value="2" ng-required="!inputVO.prof"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.prof" value="3" ng-required="!inputVO.prof"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.prof" value="4" ng-required="!inputVO.prof"></td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle;width: 5.75%" class="DFKai-sb">
+									創新
+								</th>
+								<td style="vertical-align:middle;text-align:left;" colspan="4" class="DFKai-sb">尊重多元相法，鼓勵討論，接納異見。<br>即使面對挫折，在合理的風險範圍內，仍持續嘗試不同方案的可行性。</td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.innov" value="1" ng-required="!inputVO.innov"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.innov" value="2" ng-required="!inputVO.innov" ></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.innov" value="3" ng-required="!inputVO.innov" ></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.innov" value="4" ng-required="!inputVO.innov" ></td>
+							</tr>
+							<tr>
+								<th colspan="2" class="DFKai-sb" style="vertical-align:middle;text-align:center;">*溝通協調</th>
+								<td style="vertical-align:middle;text-align:left;" colspan="4" class="DFKai-sb">
+									表達能力-能清楚且正確用言語及文字來表達、陳述事件的來龍去脈。<br>
+									說服力-溝通時，皆能使對方認同你的論點，並支持你。<br>
+									衝突管理-針對衝突，能妥善做好自我調適，從容以對。<br>
+									談判力-能充分分析及瞭解對方底限，進而達成工作目的。
+								</td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.communication" value="1" ng-required="!inputVO.communication"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.communication" value="2" ng-required="!inputVO.communication"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.communication" value="3" ng-required="!inputVO.communication"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.communication" value="4" ng-required="!inputVO.communication"></td>
+							</tr>
+							<tr>
+								<th colspan="2" class="DFKai-sb" style="vertical-align:middle;text-align:center;">*分析決斷</th>
+								<td style="vertical-align:middle;text-align:left;" colspan="4" class="DFKai-sb">
+									資料收集能力-能完整收集所需及相關的資料，並歸類整理重點。<br>
+									理解力-對於各項問題，都能瞭解事情之癥結，切入重點。<br>
+									判斷力-能分辨事情之輕重緩急，判斷其優先處理順序。<br>
+									應變能力-面對問題時，能提出合理的建議，來預防風險的發生。<br>
+									決斷力-面對決擇時，能正確且快速地做出決定。
+								</td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.problem_solving_skill" value="1" ng-required="!inputVO.problem_solving_skill"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.problem_solving_skill" value="2" ng-required="!inputVO.problem_solving_skill"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.problem_solving_skill" value="3" ng-required="!inputVO.problem_solving_skill"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.problem_solving_skill" value="4" ng-required="!inputVO.problem_solving_skill"></td>
+							</tr>
+							<tr>
+								<th colspan="2" class="DFKai-sb" style="vertical-align:middle;text-align:center;">*組織能力</th>
+								<td style="vertical-align:middle;text-align:left;" colspan="4" class="DFKai-sb">
+									任務安排-能將個人的業務目標分解為數個簡單可執行的做法。<br>
+									時程安排-能井然有序地安排各項工作的時程，依優先順序調整工作的順序或流程，以提升效率及降低成本。
+								</td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.organize" value="1" ng-required="!inputVO.organize"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.organize" value="2" ng-required="!inputVO.organize"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.organize" value="3" ng-required="!inputVO.organize"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.organize" value="4" ng-required="!inputVO.organize"></td>
+							</tr>
+							<tr>
+								<th colspan="2" class="DFKai-sb" style="vertical-align:middle;text-align:center;">*自我要求</th>
+								<td style="vertical-align:middle;text-align:left;" colspan="4" class="DFKai-sb">
+									主動積極-自動自發地完成工作並積極尋求成長改善的機會。<br>
+									學習成長-能從工作中學習成長，並能自我鞭策。
+								</td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.selfImprove" value="1" ng-required="!inputVO.selfImprove"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.selfImprove" value="2" ng-required="!inputVO.selfImprove"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.selfImprove" value="3" ng-required="!inputVO.selfImprove"></td>
+								<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.selfImprove" value="4" ng-required="!inputVO.selfImprove"></td>
+							</tr>
+						</tr>
+						<tr>
+							<th class="inputTr" colspan="2" style="vertical-align:middle;text-align:center;font-size: 16px">更換工作的<br />原因</th>
+							<td colspan="8" style="vertical-align:middle;">
+								<input type="text" class="form-control DFKai-sb" ng-model="inputVO.resign_reason" e-length-limit="500" size="20" width="80px">
+							</td>
+						</tr>
+						
+						<tr>
+							<th class="inputTr" colspan="2" style="vertical-align:middle;text-align:center;width: 15%">對應徵工作的<br />期待與看法</th>
+							<td colspan="8" style="vertical-align:middle;">
+								<input class="form-control DFKai-sb" type="text" ng-model="inputVO.expectation" e-length-limit="500" size="20" width="80px">
+							</td>
+						</tr>
+						<tr>
+							<th class="inputTr" colspan="2" style="vertical-align:middle;text-align:center;font-size: 16px">債信情形</th>
+							<td colspan="8" style="vertical-align:middle;">
+								本公司應徵人員專用履歷表中，應徵者聲明「是否曾有銀行拒絕往來、存款不足或債信不良紀錄？」勾選為<br />
+								<input class="inputTr" type="radio" ng-model="inputVO.credit_status" value="N"><label class="DFKai-sb">否</label>；
+								<input class="inputTr" type="radio" ng-model="inputVO.credit_status" value="Y"><label class="DFKai-sb">是</label>，
+								請依應徵者說明內容敘述瞭解情形：
+								<input class="form-control inputTr" type="text" style="width: 40%;display: inline;" ng-model="inputVO.credit_dtl" e-input-limit="125">
+							</td>
+						</tr>
+						<tr>
+							<th colspan="2" style="vertical-align:middle;text-align:center;" colspan='2' class="DFKai-sb">可上班日期</th>
+							<td colspan="2" style="vertical-align:middle;">
+								<div style="float: left" class="input-group datebox datewidth">
+									<input type="text" id="recv_case_sdate" name="recv_case_sdate"
+										   class="form-control DFKai-sb"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.bookedOnboardDate"
+										   is-open="model.a"
+										   datepicker-options="recv_case_sDateOptions"/>
+	 								<span class="input-group-btn">
+										<button type="button" class="btn btn-default DFKai-sb" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+							</td>
+							<th class="inputTr" colspan="2" style="vertical-align:middle;text-align:center;">期望待遇：NT$</th>
+							<td colspan="4" style="vertical-align:middle;">
+								<input type="text" class="form-control DFKai-sb" ng-model="inputVO.expSalary" e-length-limit="50" size="20" width="20px"  e-input-limit="N" ng-blur="avoidNumberError(7)">
+							</td>
+						</tr>
+						</table>
+                        <table border="1" class="tablesaw table table-bordered" print>
+						<tr>
+							<th width=15% style="vertical-align:middle;text-align:center;"><label>*面談主管<br />評語<br /><span class="red" id="showSpan">(請輸入五個字以上，超出邊框之評語無法列印)</span></label></th>
+							<td style="vertical-align:middle;">
+							<textarea 
+	                   				  ng-model="inputVO.intv_sup_remark" 
+	                   				  e-length-limit="1500" 
+	                   				  ng-minlength="5"
+	                   				  style="width: 100%; height: 400px;font-size: 18px" 
+	                   				  class="form-control DFKai-sb"
+	                   				  ng-required="true"
+	                   				  >
+	                   		</textarea>
+							</td>
+						</tr>
+	                </table>
+				  	<table border="1" class="tablesaw table table-bordered DFKai-sb" print>
+						<tr class="inputTr" height="5">
+							<th class="inputTr" style="vertical-align:middle;text-align:center;border-collapse: collapse;width:20%">前職業績表現</th>
+							<th class="inputTr" style="vertical-align:middle;text-align:center;border-collapse: collapse;width:16.5%">每月業績目標</th>
+							<td class="inputTr" style="vertical-align:middle;width:200px">
+								<input class="form-control inputTr" type="text" height="5" style="width: 50%;display: inline;text-align:right;" ng-model="inputVO.preMonthGoal" e-input-limit="N" ng-blur="avoidNumberError(1)"><span>萬</span>
+							</td>
+							<th class="inputTr" style="vertical-align:middle;text-align:center;border-collapse: collapse;width:16.5%">6M平均實際達成</th>
+							<td class="inputTr" style="vertical-align:middle;width:200px">
+								<input class="form-control inputTr" type="text" style="width: 50%;display: inline;text-align:right;" ng-model="inputVO.pre6MAccomplish" e-input-limit="N" ng-blur="avoidNumberError(2)"><span>萬</span>
+							</td>
+						</tr>
+						<tr>
+							<th class="inputTr" style="vertical-align:middle;text-align:center;border-collapse: collapse">評估未來</th>
+							<th class="inputTr" style="vertical-align:middle;text-align:center;">6M平均手收能力</th>
+							<td class="inputTr" style="vertical-align:middle;">
+								<input class="form-control inputTr" type="text" style="width: 50%;display: inline;text-align:right;" ng-model="inputVO.exp6MAbility" e-input-limit="N" ng-blur="avoidNumberError(3)"><span>萬</span>
+							</td>
+							<th class="inputTr" style="vertical-align:middle;text-align:center;">1年平均手收能力</th>
+							<td class="inputTr" style="vertical-align:middle;">
+								<input class="form-control inputTr" type="text" style="width: 50%;display: inline;text-align:right;" ng-model="inputVO.exp1YAbility" e-input-limit="N" ng-blur="avoidNumberError(4)"><span>萬</span>
+							</td>
+						</tr>
+					</table>
+				  	<table border="1" class="tablesaw table table-bordered DFKai-sb" style="height: 5px" print>
+						<tr class="inputTr">
+							<th class="inputTr" style="vertical-align:middle;text-align:center;width: 12%;"><label class="inputTr">房貸每月<br />撥款金額</label></th>
+							<td style="vertical-align:middle;width: 20%;"><input class="form-control inputTr" type="text" style="width:79%;display: inline;text-align:right;" ng-model="inputVO.expPropertyLoan" e-input-limit="N" ng-blur="avoidNumberError(5)"><span>百萬</span></td>
+							<th class="inputTr" style="vertical-align:middle;text-align:center;width:12%;"><label class="inputTr">信貸每月<br />撥款金額</label></th>
+							<td style="vertical-align:middle;width: 20%;"><input class="form-control inputTr" type="text" style="width:79%;display: inline;text-align:right;" ng-model="inputVO.expCreditLoan" e-input-limit="N" ng-blur="avoidNumberError(6)"><span>百萬</span></td>
+							<th class="inputTr" style="vertical-align:middle;text-align:center;width: 16%;">建議職等/職稱</th>
+							<td style="vertical-align:middle;width: 20%;"><input class="form-control inputTr" type="text" style="" ng-model="inputVO.suggest_job"></td>
+						</tr>
+					</table>
+				  	<table border="1" class="tablesaw table table-bordered DFKai-sb" print>
+						<tr>
+							<th class="inputTr" rowspan="5" style="width: 12%;vertical-align:middle;text-align:center;">面談<br />結果</th>
+<!-- 							<tr class="inputTr" > -->
+<!-- 								<td colspan="9"> -->
+<!-- 									<input class="inputTr" type="radio" ng-model="inputVO.hire_status" value="0"><label class="DFKai-sb">合格，安排下階段面談</label> -->
+<!-- 								</td> -->
+<!-- 							</tr> -->
+							<tr class="inputTr" >
+								<td colspan="9">
+									<input class="inputTr" type="radio" ng-model="inputVO.hire_status" value="1"><label class="DFKai-sb">錄用</label>
+									<input class="inputTr" type="radio" ng-model="inputVO.hire_status" value="2"><label class="DFKai-sb">備取</label>
+									<input class="inputTr" type="radio" ng-model="inputVO.hire_status" value="3"><label class="DFKai-sb">不錄用</label>
+									<input class="inputTr" type="radio" ng-model="inputVO.hire_status" value="4"><label class="DFKai-sb">推介其他部門/職務：</label>
+	                                <input class="inputTr" type="text" ng-model="inputVO.hireStatusTransRemark" ng-hide="inputVO.hire_status!='4'">
+								</td>
+							</tr>
+							<tr class="inputTr" >
+					            <th	style="vertical-align:middle;text-align:center;width: 15%" rowspan="2">*績效評核類別：</th>
+								<td colspan="9">
+									<input class="inputTr" type="radio" ng-model="inputVO.prefType" value="1"><label>管理者-部級</label>
+									<input class="inputTr" type="radio" ng-model="inputVO.prefType" value="2"><label>管理者-科級</label>
+								</td>
+							</tr>
+							<tr class="inputTr" >
+								<td colspan="9">
+									<input class="inputTr" type="radio" ng-model="inputVO.prefType" value="3"><label>非管理者-業務職</label>
+									<input class="inputTr" type="radio" ng-model="inputVO.prefType" value="4"><label>非管理者-非業務職</label>
+								</td>
+							</tr>
+						</tr>
+					</table>
+				  	<table border="1" class="tablesaw table table-bordered DFKai-sb" style="font-size: 11px" print>
+						<tr>
+							<th style="vertical-align:middle;text-align:center;width: 12%;">類別</th>
+							<th style="vertical-align:middle;text-align:center;">第一階<br/>名稱</th>
+							<th style="vertical-align:middle;text-align:center;">第二階<br/>名稱</th>
+							<th style="vertical-align:middle;text-align:center;">第三階<br/>名稱</th>
+							<th style="vertical-align:middle;text-align:center;">第四階<br/>名稱</th>
+							<th style="vertical-align:middle;text-align:center;">第五階<br/>名稱</th>
+							<th style="vertical-align:middle;text-align:center;">第六階<br/>名稱</th>
+							<th style="vertical-align:middle;text-align:center;">第七階<br/>名稱</th>
+							<th style="vertical-align:middle;text-align:center;">第八階<br/>名稱</th>
+						</tr>
+						<tr>
+							<th class="inputTr" style="vertical-align:middle;text-align:center;">BU</th>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.buLayer1"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.buLayer2"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.buLayer3"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.buLayer4"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.buLayer5"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.buLayer6"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.buLayer7"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.buLayer8"></td>
+						</tr>
+						<tr>
+							<th class="inputTr" style="vertical-align:middle;text-align:center;">跨BU(註2)</th>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.crosBuLayer1"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.crosBuLayer2"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.crosBuLayer3"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.crosBuLayer4"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.crosBuLayer5"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.crosBuLayer6"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.crosBuLayer7"></td>
+							<td><input class="inputTr form-control" type="text" style="width:80px;font-size: 11;" ng-model="inputVO.crosBuLayer8"></td>
+						</tr>
+					</table>
+				  	<table border="0" class="table" print>
+						<tr>
+							<td class="DFKai-sb" style="display:table-row;border-top:0px">1.員工所屬BU(子公司)各階名稱，主管可至EIP金控首頁/員工查詢/子公司查詢樹狀圖之正確單位名稱。</td>
+							<td class="DFKai-sb" style="display:table-row;border-top:0px">2.若為金控轄下各處組織，請依實際組織於上方跨BU欄位填寫組織類別與各階名稱。</td>
+						</tr>
+					</table>
+				  	<table border="0" class="table" print>
+	                    <tr>
+	                    	<td style="border-top:0px" class="DFKai-sb" width="33%">敬呈：</td>
+	                        <td style="border-top:0px" class="DFKai-sb" width="33%">權責主管簽名：</td>
+	                        <td style="align-self: flex-end;border-top:0px" class="DFKai-sb" width="33%">面談主管簽名：</td>
+	                    </tr>
+	                </table>
+				</form>	
+				<div class="search_box_btn text-center" >
+				<button type="button" class="btn btn-info" ng-click="save(row);" function-type="maintenance">儲存</button>
+				<button type="button" class="btn btn-info" ng-click="go('generatePDF','download');">列印</button>
+				<button type="button" class="btn btn-info" ng-click="clear();">重填</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>
+						

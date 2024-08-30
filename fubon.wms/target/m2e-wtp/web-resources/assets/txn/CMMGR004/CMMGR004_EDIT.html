@@ -1,0 +1,227 @@
+<!--
+   特殊 Style 定義
+-->
+<style>
+.CMMGR004_EDIT .search_box TH+TD {
+	align: right;
+	line-height: 20px;
+	width: auto;
+}
+
+.CMMGR004_EDIT #paddingUp0 {
+	margin: 8px;
+	padding: 8px;
+}
+
+.modal-dialog.CMMGR004_EDIT {
+	margin-top: 50px;
+	width: 60vw;
+	max-height: 80vh;
+}
+
+.CMMGR004_EDIT #thright {
+	text-align: right;
+}
+
+.CMMGR004_EDIT #thcenter {
+	text-align: center;
+}
+
+.CMMGR004_EDIT.table {
+    border: 1px solid #2980B9;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<div ng-controller="CMMGR004_EditController" ng-cloak>
+	<div class="modal-dialog CMMGR004_EDIT">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<button class="close" aria-hidden="false"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title">排程設定</h4>
+			</div>
+			<div class="modal-body">
+				<table class="row">
+					<tr>
+						<th class="col-md-3" id='thright'>排程代號：</th>
+						<td class="col-md-3" id="paddingUp0"><input type="text" class="form-control" id="scheduleid"
+							name="scheduleid" ng-model="inputVO.scheduleid" placeholder="必填"
+							maxlength="20" required autofocus
+							ng-disabled="row.SCHEDULEID != undefined"></td>
+						<th class="col-md-3" id='thright'>排程名稱：</th>
+						<td class="col-md-3" id="paddingUp0"><input type="text" class="form-control" id="schedulename"
+							name="schedulename" ng-model="inputVO.schedulename"
+							maxlength="10" placeholder="排程名稱"></td>
+					</tr>
+<!-- 					<tr> -->
+<!-- 						<td class="col-xs-1"></td> -->
+<!-- 						<td id="paddingUp0" class="help-block with-errors" -->
+<!-- 							ng-show="parameterTypeEditForm.scheduleid.$error.required">請輸入排程代號</td> -->
+<!-- 					</tr> -->
+					<tr>
+						<th class="col-md-3" id='thright'>排程說明：</th>
+						<td class="col-md-9" id="paddingUp0" colspan="3"><input type="text" class="form-control"
+							id="description" name="description"
+							ng-model="inputVO.description" maxlength="33" placeholder="排程說明"></td>
+					</tr>
+					<tr>
+						<th class="col-md-3" id='thright'>執行週期：</th>
+						<td class="col-md-3" id="paddingUp0"><input type="text" class="form-control"
+							id="cronexpression" name="cronexpression"
+							ng-model="inputVO.cronexpression" maxlength="50" placeholder="必填"
+							required>
+<!-- 							<span id="paddingUp0" class="help-block">秒 分鐘 小時 日期 月份 星期 年(非必要)&emsp;例.0 0 1 * * ?</span> -->
+						</td>
+						<td class="col-md-6">
+							<span id="paddingUp0"  style="width:200%" class="help-block">
+								秒 分鐘 小時 日期 月份 星期 年(非必要)&emsp;例.0 0 1 * * ?
+							</span>
+						</td>
+					</tr>
+<!-- 					<tr>  -->
+<!-- 						<th class="col-md-3" id='thright'>套用行事曆：</th> -->
+<!-- 						<td class="col-md-3" id="paddingUp0" colspan="1"><e-combobox id="calendar" name="calendar" -->
+<!-- 								ng-disabled="eComboDisabled" ng-paramtype="COMMGR004.CALENDAR" -->
+<!-- 								ng-model="inputVO.calendar" ng-validate="true" -->
+<!-- 								ng-readonly="false" ng-editable="false" ng-format="F1" -->
+<!-- 								ng-required="false"  /></td> -->
+					</tr>
+					<tr>
+<!-- 						<td id="paddingUp0"></td> -->
+<!-- 						<td id="paddingUp0" class="help-block with-errors" -->
+<!-- 							ng-show="parameterTypeEditForm.cronexpression.$error.required">請輸入執行週期</td> -->
+					</tr>
+					<tr>
+						<th class="col-md-3" id='thright'>參數：</th>
+						<td class="col-md-9" id="paddingUp0" colspan="3"><input type="text" class="form-control"
+							id="scheduleparameter" name="scheduleparameter"
+							ng-model="inputVO.scheduleparameter" maxlength="150"
+							placeholder="參數"></td>
+					</tr>
+					<tr>
+						<th class="col-md-3" id='thright'>是否啟用：</th>
+						<td class="col-md-3" id="paddingUp0"><e-combobox id="isuse" name="isuse"
+								ng-disabled="eComboDisabled" ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.isuse" ng-validate="true" ng-readonly="false"
+								ng-editable="false" ng-format="F1" ng-required="true"
+								 /></td>
+						<th class="col-md-3" id='thright'>執行主機：</th>
+						<td class="col-md-3" id="paddingUp0"><e-combobox id="processor" name="processor"
+								ng-datasource="mappingSet['processor']"
+								ng-model="inputVO.processor" ng-validate="true"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								ng-required="true"  /></td>
+					</tr>
+<!-- 					<tr> -->
+<!-- 						<td id="paddingUp0" class="help-block with-errors" -->
+<!-- 							ng-show="parameterTypeEditForm.isuse.$error.required">請輸入是否啟用</td> -->
+<!-- 						<td></td> -->
+<!-- 						<td id="paddingUp0" class="help-block with-errors" -->
+<!-- 							ng-show="parameterTypeEditForm.processor.$error.required">請輸入執行主機</td> -->
+<!-- 					</tr> -->
+					<tr>
+						<th class="col-md-3" id='thright'>預計合理時間(分)：</th>
+						<td class="col-md-3" id="paddingUp0"><input type="number" class="form-control" step="1"
+							id="executetime" name="executetime"
+							ng-pattern="/^(6553[0-5]|655[0-2]\d|65[0-4]\d\d|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3})$/"
+							name="quantity" min="0" ng-model="inputVO.executetime"
+							placeholder="預計合理時間(分)" ></td>
+						<th class="col-md-3" id='thright'>起始JOB：</th>
+						<td class="col-md-3" id="paddingUp0"><input type="number" class="form-control" id="startjob"
+							name="startjob" pattern="[0-9]*" min="1"
+							ng-model="inputVO.startjob" placeholder="起始JOB"></td>
+					</tr>
+<!-- 					<tr> -->
+<!-- 						<td id="paddingUp0" class="help-block with-errors" -->
+<!-- 							ng-show="parameterTypeEditForm.executetime.$error.required">請輸入合理時間(分)</td> -->
+<!-- 					</tr> -->
+					<tr>
+						<th class="col-md-3" id='thright'>是否已列入排程：</th>
+						<td class="col-md-3" id="paddingUp0"><e-combobox id="isscheduled" name="isscheduled"
+								ng-disabled="eComboDisabled" ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.isscheduled" ng-validate="true" ng-readonly="false" 
+								ng-editable="false" ng-format="F1" ng-required="false" 
+								/></td>
+						<th class="col-md-3" id='thright'>最後一次異動時間：</th>
+						<td class="col-md-3" id="paddingUp0"><input type="text" class="form-control" id="lasttry"
+							name="lasttry" ng-model="inputVO.lasttry" placeholder="最後一次異動時間"
+							disabled></td>
+					</tr>
+				</table>
+				<div class="search_box_btn ">
+					<button type="button" class="btn btn-default" ng-click="execute()"
+						ng-if="isNotCreate" function-type="maintenance">手動執行</button>
+				</div>
+				<div class="row">
+					<div class="col-lg-12 col-md-12">
+						<div class="col-lg-12 col-md-12">
+							<p>
+								<a class="btn btn-primary" ng-click="save()" function-type="maintenance">儲存</a> 
+								<a class="btn btn-primary" ng-click="initOpti()">清除</a>
+								<a class="btn btn-primary" ng-click="del()" function-type="maintenance">刪除</a>
+								<a class="btn btn-primary" ng-click="closeThisDialog('cancel')">離開</a>
+							</p>
+						</div>
+						<div class="col-lg-4 col-md-4 col-xs-4">
+							
+							<input type="text" class="form-control" ng-model="searchText" placeholder="搜尋Job..." ng-change="searchJob()">
+							<select multiple="multiple" class="form-control" size="5"
+								ng-options="item as (item.JOBID || '' ) + ' ' + (item.JOBNAME || '') for item in displayList"
+								ng-model="totalJob"></select>
+
+						</div>
+						<div class="col-lg-1 col-md-1 col-xs-1">
+							<button type="btn-group-vertical" class="btn btn-default"
+								style="margin: 50px 0px 15px 0px;" ng-click="btnAddChange()">
+								<i class="glyphicon glyphicon-chevron-right"></i>
+							</button>
+							<button type="button" class="btn btn-default"
+								ng-click="btnDelChange()">
+								<i class="glyphicon glyphicon-chevron-left"></i>
+							</button>
+						</div>
+						<div class="col-lg-6 col-md-6 col-xs-6">
+							<div class="scroll">
+								<table class="tablesaw table table-striped table-bordered">
+									<thead>
+										<tr>
+											<th>序號</th>
+											<th>JOB代號</th>
+											<th>JOB名稱</th>
+											<th>執行條件</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" ng-click="show(row)"
+											ng-repeat="row in (lstChoiceJob | orderBy:JOBID:reverse)"
+											ng-class="{'selected-row': row.JOBID ==  currentDetailRow.JOBID}"
+											ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{$index + 1}}</td>
+											<td>{{row.JOBID}}</td>
+											<td>{{row.JOBNAME}}</td>
+											<td></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="col-lg-1 col-md-1 col-xs-1">
+							<button type="btn-group-vertical" class="btn btn-default"
+								style="margin: 50px 0px 15px 0px;" ng-click="moveCurrentRowUp()">
+								<i class="glyphicon glyphicon-chevron-up"></i>
+							</button>
+							<button type="button" class="btn btn-default"
+								ng-click="moveCurrentRowDown()">
+								<i class="glyphicon glyphicon-chevron-down"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

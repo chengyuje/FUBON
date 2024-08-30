@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.systex.jbranch.platform.common.platformdao.table">
+    <class table="TBSYSDMWORKSTATION" name="com.systex.jbranch.platform.common.platformdao.table.TbsysdmworkstationVO">
+        <id name="wsID" column="WSID" type="string"/>
+        <property name="signOnBranchID" column="SIGNONBRANCHID" type="string"/>
+        <property name="wsIP" column="WSIP" type="string"/>
+        <property name="developMode" column="DEVELOPMODE" type="string"/>
+        <property name="localMode" column="LOCALMODE" type="string"/>
+        <property name="signOnWsID" column="SIGNONWSID" type="string"/>
+        <property name="touchedTime" column="TOUCHEDTIME" type="long"/>
+        <property name="applicationID" column="APPLICATIONID" type="string"/>
+        <many-to-one name="branch"
+                     class="TbsysdmbranchVO"
+                     column="BRCHID"
+                     not-null="true"
+                     lazy="proxy"/>
+        <!--<many-to-one name="user"
+                     class="TbsysdmuserVO"
+                     column="UID"
+                     lazy="proxy"
+                     cascade="all"/>-->
+        <!--<many-to-one name="user" class="TbsysdmuserVO" column="UID" not-null="false" unique="true" cascade="save-update, delete"/>-->
+        <set name="user" cascade="all" inverse="true">
+            <key column="WSID" unique="true"/>
+            <one-to-many class="TbsysdmuserVO" not-found="ignore"/>
+        </set>
+        <!--<set name="sections" inverse="true" lazy="true" cascade="delete">
+            <key column="WSID"/>
+            <one-to-many class="TbsysdmsectionVO"/>
+        </set>-->
+    </class>
+</hibernate-mapping>

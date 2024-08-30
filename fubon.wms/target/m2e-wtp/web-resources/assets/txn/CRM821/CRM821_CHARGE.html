@@ -1,0 +1,97 @@
+<style>
+/* open dialog */
+.ngdialog.CRM821_CHARGE {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM821_CHARGE {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+
+.gv_tab_sc_crm821 th{
+	white-space: nowrap;
+	padding: 7px 10px;
+	text-align: center;
+	color: #666;
+	vertical-align: bottom;
+	background-color: #cccccc;
+	border: 1px solid #fff;
+}
+
+.gv_tab_sc_crm821 td , .tab_month td{
+	padding: 7px 10px;
+	color: #666;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #cccccc;
+}
+
+</style>
+<div class="CRM821_CHARGE" ng-controller="CRM821_CHARGEController" ng-cloak>
+	<div class="modal-dialog CRM821_CHARGE">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">基金</h4>
+			</div>
+			<div class="modal-body">
+				<h4 class="h4-title">扣款日期/金額</h4>
+				<div class="gv_tab_sc_crm821 scroll_y" style="min-height:235px;white-space: nowrap;">
+					<!-- 2017/7/25 add -->
+					<table class="table table-bordered">
+						<tr>
+							<th>幣別</th>
+							<th>當月扣款金額合計</th>
+							<th class="repeat-row" ng-repeat="row1 in MON_DATA track by $index">
+								{{parseFloat(row1)}}日
+							</th>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row2 in COUNT_DATA track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td class="td_center">{{row2.CURCODE}}</td>
+							<td class="td_center">{{row2.TOTAL | number :0}}</td>
+							<td class="td_center" ng-repeat="row3 in MON_DATA track by $index">
+								{{row2.MONOBJ[row3] | number :0}}
+							</td>
+						</tr>
+					</table>
+					<!-- 2017/7/25 add -->
+				</div>
+				<h4 class="h4-title">扣款基金明細</h4>
+				<e-jumping-once output="outputVO_CHARGE" list="data" totallist="resultList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+					<table class="table-bordered">
+						<tr>
+							<th>信託型態</th>
+							<th>憑證號碼</th>
+							<th>基金名稱</th>
+							<th>扣款成功次數</th>
+							<th>交易幣別</th>
+							<th>每次申購金額</th>
+							<th>每月扣款日期</th>
+							<th>每月申購金額</th>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td style="text-align: center;">{{row.AssetType | mapping:mappingSet['AssetType']:'F3'}}</td>
+							<td style="text-align: center;">{{row.EviNum}}</td>
+							<td style="text-align: center;">{{row.FundName}}</td>
+							<td style="text-align: center;">{{row.PayCount | number}}</td>
+							<td style="text-align: center;">{{row.CurCode}}</td>
+							<td style="text-align: right;">{{(row.AssetType == '0002' ? row.TransferAmt : row.TransferAmt_L) | number :2}}</td>
+							<td style="text-align: center;">{{row.all_day.toString()}}</td>
+							<td style="text-align: right;">{{(row.AssetType == '0002' ? row.TransferAmt * row.all_day.length : row.TransferAmt_L * row.all_day.length) | number : 0}}</td>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

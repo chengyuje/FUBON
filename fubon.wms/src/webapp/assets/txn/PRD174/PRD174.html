@@ -1,0 +1,91 @@
+<script type="text/javascript" src="assets/txn/PRD174/PRD174.js"></script>
+<script type="text/javascript" src="assets/txn/PRD174/PRD174_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PRD174/PRD174_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PRD174/PRD174_BLANK_RPT.js"></script>
+<div ng-controller="PRD174Controller" ng-cloak>
+    <!--Content of the panel-->
+      <div class="search_table">
+            <div style="text-align: center; padding: 10px 10px 10px 10px">題目類型
+            	<e-combobox id="q_type" name="q_type"
+								ng-paramtype="PRD.INS_ANCDOC_Q_TYPE"
+								ng-model="inputVO.Q_TYPE"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								style="line-height:20px;" />
+			</div>
+      </div>
+      <div class="search_box_btn text-center">
+		<button ng-click="queryData()" class="btn btn-info">查詢</button>
+		<button ng-click="btnClear()" class="btn btn-info">清除</button>
+		<button ng-click="addRow()" class="btn btn-info">新增</button>
+		<button ng-click="upload()" class="btn btn-info" function-type="export">整批上傳</button>
+		<button ng-click="printBlankRpt()" class="btn btn-info">列印空白表單</button>
+	</div>
+      <div class="text-right">
+     <!--    <e-jumping-once ng-show="inputVO"
+					output="outputVO"
+					list="data" 
+					totallist="ins_ancdoclist"
+					>
+		</e-jumping-once>--> 
+			<e-jumping-once output="outputVO" list="data" totallist="ins_ancdoclist"></e-jumping-once>
+      </div>
+      <div class="gv_tab_sc scroll_y" style="white-space: nowrap;min-height:235px;overflow-x: auto;">
+        <table >
+        <thead>
+          <tr>
+            <th>功能</th>
+            <th>題目代號</th>
+            <th>題目文字格式設定</th>
+            <th>題目文字</th>
+            <th>題目類型</th>
+            <th>啟用日</th>
+            <th>停用日</th>
+            <th>建立人員</th>
+            <th>建立時間</th>
+            <th>異動人員</th>
+            <th>異動時間</th>
+            <th>覆核人員</th>
+            <th>覆核時間</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+            <td>
+	            <e-combobox id="edit" name="edit"
+								ng-datasource="row.edit"
+								ng-model="row.editto"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="edit($index,row)"
+								ng-if="row.STATUS=='Y'?false:true"
+								width="80px"
+								style="line-height:20px;" />
+            </td>
+            <td>{{row.Q_ID}}</td>
+            <td>
+            	<input class="bLarger" type="checkbox" ng-model="row.TEXT_STYLE_B" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled=true>粗體
+            	<input class="bLarger" type="checkbox" ng-model="row.TEXT_STYLE_I" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled=true>斜體
+            	<input class="bLarger" type="checkbox" ng-model="row.TEXT_STYLE_U" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled=true>底線
+            	<input class="bLarger" type="checkbox" ng-model="row.TEXT_STYLE_A" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled=true>陰影
+            </td>
+            <td>{{row.Q_NAME}}</td>
+            <td>{{row.Q_TYPE|mapping:typelist:F3}}</td>
+            <td>{{row.EFFECT_DATE}}</td>
+            <td>{{row.EXPIRY_DATE}}</td>
+            <td>{{row.CREATOR}}</td>
+            <td><div style="width: 100px;">{{row.CREATETIME}}</div></td>
+            <td>{{row.MODIFIER}}</td>
+            <td><div style="width: 100px;">{{row.LASTUPDATE}}</div></td>
+            <td>{{row.APPROVER}}</td>
+            <td><div style="width: 100px;">{{row.APP_DATE}}</div></td>
+          </tr>
+        </tbody>
+        </table>
+</div>

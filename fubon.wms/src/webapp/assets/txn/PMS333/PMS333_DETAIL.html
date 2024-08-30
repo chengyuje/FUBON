@@ -1,0 +1,93 @@
+<style>
+/* open dialog */
+.ngdialog.PMS333_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS333_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* table size */
+.PMS333_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS333_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS333_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<div ng-controller="PMS333_DETAILController" ng-cloak>
+	<div class="modal-dialog PMS333_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">客戶明細資料</h4>
+			</div>
+			<div class="modal-body">
+				<h4 class="text-center">分行：{{row.BRANCH_NAME}}<span class="bigspace"></span></h4>
+				
+				
+				<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+					<table class="e-table-freeze" e-height="200px" e-mode="1" e-top="true" e-list="paramList">
+						<thead>
+							<tr>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>客群身分</th>
+								<th>貢獻度等級</th>
+								<th>上月底AUM</th>							
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="data in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								
+								<td>{{data.CUST_ID}}</td>								
+								<td>{{data.CUST_NAME }}</td>
+								<td>{{data.VIP_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>								
+								<td>{{data.CON_DEGREE}}</td>
+								<td align="right">{{data.AVG_AUM_AMT  | currency:''}}</td>
+						
+						</tbody>
+					</table>
+				</div>
+				<!-- <e-paging outputVO="outputVO"
+				inputVO="inputVO"
+				callQuery="inquire()"
+				displayLimit="displayLimit"
+				dataList="paramList">
+				</e-paging> -->
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確定</button>
+			</div>
+		</div>
+	</div>
+</div>

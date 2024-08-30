@@ -1,0 +1,139 @@
+<style>
+.search_box TH+TD {
+	line-height: 20px;
+	width: auto;
+}
+
+.ngdialog {
+	margin-top: -150px;
+}
+
+th {
+	width: 100px;
+}
+
+#th_width {
+	padding-left: 50px;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/CMMGR013/CMMGR013.js"></script>
+<div class="">
+	<div ng-controller="CMMGR013_Controller" ng-cloak>
+		<!-- left, vertical navbar & content -->
+		<!-- left, vertical navbar -->
+		<!-- content -->
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<div class="text-muted bootstrap-admin-box-title">
+					<i class="glyphicon glyphicon-th-large"></i>使用者角色權限查詢
+				</div>
+			</div>
+			<div class="bootstrap-admin-panel-content text-muted search_box">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table style="width: 30%;" align="center">
+						<tr>
+							<th>分行：</th>
+							<td required><e-combobox id="cmbBRCHID" name="cmbBRCHID"
+									ng-disabled="eComboDisabled"
+									ng-datasource="mappingSet['brchID']"
+									ng-model="inputVO.cmbBRCHID" ng-validate="true"
+									ng-readonly="false" ng-editable="false" ng-format="F1"></td>
+						</tr>
+						<tr>
+							<th><input type="radio" name="radio" id="radio" value="1"
+								ng-model="inputVO.radioChange" ng-change="userChange()">
+								員工編號:</th>
+							<td><input type="text" class="form-control" id="empID"
+								name="empID" ng-model="inputVO.empID" placeholder="員工編號"
+								maxlength="10" ng-disabled="inputVO.radioChange == '2'"
+								style="width: 235px"></td>
+						</tr>
+						<tr>
+
+							<th><input type="radio" name="radio" id="radio" value="2"
+								ng-model="inputVO.radioChange" ng-change="userChange()">
+								角色名稱:</th>
+							<td><e-combobox ng-pattern="false" id="cmbQueryMode"
+									name="cmbQueryMode" ng-disabled="inputVO.radioChange == '1'"
+									ng-datasource="RoleList" ng-model="inputVO.cmbRoleID"
+									ng-validate="true" ng-readonly="false" ng-editable="false"
+									ng-format="F3" ng-required="false" width="100%" /></td>
+							<th></th>
+						</tr>
+					</table>
+					<div class="search_box_btn text-center">
+						<button type="button" class="btn btn-info"
+							ng-click="inquireInit();inquire()">查詢</button>
+						<button type="button" class="btn btn-info" ng-click="exportData()"
+							ng-disabled="!paramList.length > 0">匯出</button>
+						<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+					</div>
+				</form>
+			</div>
+			<div class="bootstrap-admin-panel-content"
+				style="position: relative;">
+				<table class="tablesaw table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th scope="col" data-tablesaw-sortable-col
+								data-tablesaw-priority="persist">分行代號</th>
+							<th scope="col" data-tablesaw-sortable-col>員工編號</th>
+							<th scope="col" data-tablesaw-sortable-col>員工姓名</th>
+							<th scope="col" data-tablesaw-sortable-col>角色代號</th>
+							<th scope="col" data-tablesaw-sortable-col>角色名稱</th>
+							<th scope="col" data-tablesaw-sortable-col>群組代號</th>
+							<th scope="col" data-tablesaw-sortable-col>群組名稱</th>
+							<th scope="col" data-tablesaw-sortable-col>功能代碼</th>
+							<th scope="col" data-tablesaw-sortable-col>功能名稱</th>
+							<th scope="col" data-tablesaw-sortable-col>維護</th>
+							<th scope="col" data-tablesaw-sortable-col>查詢</th>
+							<th scope="col" data-tablesaw-sortable-col>列印</th>
+							<th scope="col" data-tablesaw-sortable-col>匯出</th>
+							<th scope="col" data-tablesaw-sortable-col>浮水印</th>
+							<th scope="col" data-tablesaw-sortable-col>鎖右鍵</th>
+							<th scope="col" data-tablesaw-sortable-col>覆核</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							ng-repeat="row in results = (paramList | orderBy:predicate:reverse) | limitTo:displayLimit"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.DEPT_ID}}</td>
+							<td>{{row.EMP_ID}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td>{{row.ROLE_ID}}</td>
+							<td>{{row.ROLE_NAME}}</td>
+							<td>{{row.PRI_ID}}</td>
+							<td>{{row.PRI_NAME}}</td>
+							<td>{{row.ITEM_ID}}</td>
+							<td>{{row.TXN_NAME}}</td>
+							<td>
+								<input type="checkbox" ng-model="row.maintenance"
+								ng-disabled="true"></td>
+							<td><input type="checkbox" ng-model="row.query"
+								ng-disabled="true"></td>
+							<td><input type="checkbox" ng-model="row.print"
+								ng-disabled="true"></td>
+							<td><input type="checkbox" ng-model="row.export"
+								ng-disabled="true"></td>
+							<td><input type="checkbox" ng-model="row.watermark"
+								ng-disabled="true"></td>
+							<td><input type="checkbox" ng-model="row.security"
+								ng-disabled="true"></td>
+							<td><input type="checkbox" ng-model="row.confirm"
+								ng-disabled="true"></td>
+						</tr>
+					</tbody>
+				</table>
+				<e-paging outputVO="outputVO" inputVO="inputVO"
+					callQuery="inquire()" displayLimit="displayLimit"
+					dataList="paramList" mode="2"> </e-paging>
+			</div>
+		</div>
+	</div>
+</div>

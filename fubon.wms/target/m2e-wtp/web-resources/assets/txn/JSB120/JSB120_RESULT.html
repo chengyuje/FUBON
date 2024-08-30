@@ -1,0 +1,55 @@
+<style>
+/* dialog panl */
+.modal-dialog.JSB120_RESULT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1100px;
+	height: 650px;
+}
+</style>
+<div ng-controller="JSB120_RESULTController" ng-cloak>
+	<div class="modal-dialog JSB120_RESULT">
+		<div class="modal-content" style="height:auto">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{inputVO.ins_com_id | mapping:mappingSet['JSB.INS_COM_NAME_02']:'F3'}}_上傳後結果檢視</h4>
+			</div>
+			<div class="modal-body" style="height:auto">
+				<table class="table table-striped table-bordered" align="center">
+					<thead>
+						<tr>
+							<th style="text-align:center">保險公司</th>
+							<th style="text-align:center">參考日期</th>
+							<th style="text-align:center">上傳日期</th>
+							<th style="text-align:center">轉入保單數</th>
+							<th style="text-align:center">錯誤保單數</th>
+							<th style="text-align:center">總計保單數</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList track by $index">
+							<td style="text-align:left;">{{inputVO.ins_com_id | mapping:mappingSet['JSB.INS_COM_NAME_02']:'F3'}}</td>
+							<td style="text-align:center;">{{toJsDate(row.DATA_DATE) | date:"yyyy/MM/dd"}}</td>
+							<td style="text-align:center;">{{toJsDate(row.TODAY) | date:"yyyy/MM/dd hh:mm:ss"}}</td>
+							<td style="text-align:right;">
+								<a href="#" ng-click="export('OK')">{{row.IMP_ROW_COUNT | number:0}}</a>
+							</td>
+							<td style="text-align:right;">
+								<a href="#" ng-click="export('FAIL')">{{row.FAIL_ROW_COUNT | number:0}}</a>
+							</td>
+							<td style="text-align:right;">{{row.TOTAL_COUNT | number:0}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<p style="color: red; font-weight: bold;">*錯誤保單數：上傳保單號碼為空白</p>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="goMerge()" function-type="maintenance">確定</button>
+					<button type="button" class="btn btn-default" ng-click="cancel()">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

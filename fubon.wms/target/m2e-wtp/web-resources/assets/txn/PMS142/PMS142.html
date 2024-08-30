@@ -1,0 +1,187 @@
+
+<script type="text/javascript" src="assets/txn/PMS142/PMS142.js"></script>
+<div class="PMS142" ng-controller="PMS142Controller" ng-cloak>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="tfb_content">
+        		<div class="tfb_content_icon"></div>
+        		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >個獎試算參數維護</div>
+      		</div>
+      		<!--Content of the panel-->
+			<div class="panel_content">
+				<uib-tabset active="0" justified="true">
+					<uib-tab index="0" heading="產品收益率" select="init();queryData('PROD_YIELD');">
+						<div id="tab1">
+							<div class="search_box_btn text-left">
+								<button type="button" class="btn btn-info" ng-click="getExample();" function-type="export">下載範例</button>
+								<span id="csvBox_PROD_YIELD" style="display: inline-block;vertical-align: middle;"  function-type="export">
+									<e-upload id="csvUpload_PROD_YIELD" success="updFile(name, rname)" text="上傳" accept=".csv"></e-upload>
+								</span>
+								<button type="button" class="btn btn-info" ng-click="export();" function-type="export" ng-disabled="paramList.length == 0">匯出</button>
+							</div>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				          		<table class="table-bordered">
+				          			<thead>
+										<tr>
+											<th>產品</th>
+											<th>收益率</th>
+										</tr>
+									</thead>
+									<tbody>
+					              		<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.PROD}}</td>
+											<td>{{row.YIELD | number:2}} %</td>
+										</tr>
+									</tbody>
+								</table>
+				        	</div>
+						</div>
+					</uib-tab> 
+					<uib-tab index="1" heading="基本門檻" select="init();queryData('BASIC_THRESHHOLD');">
+						<div id="tab2">
+							<div class="search_box_btn text-left">
+								<button type="button" class="btn btn-info" ng-click="getExample();" function-type="export">下載範例</button>
+								<span id="csvBox_BASIC_THRESHHOLD" style="display: inline-block;vertical-align: middle;"  function-type="export">
+									<e-upload id="csvUpload_BASIC_THRESHHOLD" success="updFile(name, rname)" text="上傳" accept=".csv"></e-upload>
+								</span>
+								<button type="button" class="btn btn-info" ng-click="export();" function-type="export" ng-disabled="paramList.length == 0">匯出</button>
+							</div>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				          		<table class="table-bordered">
+				          			<thead>
+										<tr>
+											<th>職稱</th>
+											<th>本薪倍數</th>
+										</tr>
+									</thead>
+									<tbody>
+					              		<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.JOB_TITLE_NAME}}</td>
+											<td>{{row.SALARY_MULTIPLE | number:2}}</td>
+										</tr>
+									</tbody>
+								</table>
+				        	</div>
+						</div>
+					</uib-tab>
+					<uib-tab index="2" heading="新任成數" select="init();queryData('NUM_NEW_APPOINTMENTS');">
+						<div id="tab3">
+							<div class="search_box_btn text-left">
+								<button type="button" class="btn btn-info" ng-click="getExample();" function-type="export">下載範例</button>
+								<span id="csvBox_NUM_NEW_APPOINTMENTS" style="display: inline-block;vertical-align: middle;"  function-type="export">
+									<e-upload id="csvUpload_NUM_NEW_APPOINTMENTS" success="updFile(name, rname)" text="上傳" accept=".csv"></e-upload>
+								</span>
+								<button type="button" class="btn btn-info" ng-click="export();" function-type="export" ng-disabled="paramList.length == 0">匯出</button>
+							</div>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				          		<table class="table-bordered">
+				          			<thead>
+										<tr>
+											<th>職稱</th>
+											<th>月數</th>
+											<th>新任成數</th>
+										</tr>
+									</thead>
+									<tbody>
+					              		<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.JOB_TITLE_NAME}}</td>
+											<td>{{row.MONTHS | number:0}}</td>
+											<td>{{row.NUM_APPONTMENTS | number:2}} %</td>
+										</tr>
+									</tbody>
+								</table>
+				        	</div>
+						</div>
+					</uib-tab>
+					<uib-tab index="3" heading="獎金率" select="init();queryData('BONUS_RATE');">
+						<div id="tab4">
+							<div class="search_box_btn text-left">
+								<button type="button" class="btn btn-info" ng-click="getExample();" function-type="export">下載範例</button>
+								<span id="csvBox_BONUS_RATE" style="display: inline-block;vertical-align: middle;"  function-type="export">
+									<e-upload id="csvUpload_BONUS_RATE" success="updFile(name, rname)" text="上傳" accept=".csv"></e-upload>
+								</span>
+								<button type="button" class="btn btn-info" ng-click="export();" function-type="export" ng-disabled="paramList.length == 0">匯出</button>
+							</div>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				          		<table class="table-bordered">
+				          			<thead>
+										<tr>
+											<th>收益絕對數(最小值)</th>
+											<th>收益絕對數(最大值)</th>
+											<th>職稱</th>
+											<th>獎金率</th>
+										</tr>
+									</thead>
+									<tbody>
+					              		<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.INCOME_MIN | number:0}}</td>
+											<td>{{row.INCOME_MAX | number:0}}</td>
+											<td>{{row.JOB_TITLE_NAME}}</td>
+											<td>{{row.BONUS_RATE | number:2}} %</td>
+										</tr>
+									</tbody>
+								</table>
+				        	</div>
+						</div>
+					</uib-tab>
+					<uib-tab index="4" heading="財務指標" select="init();queryData('FINANCIAL_INDICATOR');">
+						<div id="tab5">
+							<div class="search_box_btn text-left">
+								<button type="button" class="btn btn-info" ng-click="getExample();" function-type="export">下載範例</button>
+								<span id="csvBox_FINANCIAL_INDICATOR" style="display: inline-block;vertical-align: middle;"  function-type="export">
+									<e-upload id="csvUpload_FINANCIAL_INDICATOR" success="updFile(name, rname)" text="上傳" accept=".csv"></e-upload>
+								</span>
+								<button type="button" class="btn btn-info" ng-click="export();" function-type="export" ng-disabled="paramList.length == 0">匯出</button>
+							</div>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				          		<table class="table-bordered">
+				          			<thead>
+										<tr>
+											<th>財務指標</th>
+											<th>達成率上限</th>
+											<th>權重</th>
+										</tr>
+									</thead>
+									<tbody>
+					              		<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.INDICATOR_TYPE}}</td>
+											<td>{{row.TARGET_MAX | number:2}} %</td>
+											<td>{{row.WEIGHTS | number:2}} %</td>
+										</tr>
+									</tbody>
+								</table>
+				        	</div>
+						</div>
+					</uib-tab>
+					<uib-tab index="5" heading="行為指標" select="init();queryData('BEHAVIORAL_INDICATOR');">
+						<div id="tab6">
+							<div class="search_box_btn text-left">
+								<button type="button" class="btn btn-info" ng-click="getExample();" function-type="export">下載範例</button>
+								<span id="csvBox_BEHAVIORAL_INDICATOR" style="display: inline-block;vertical-align: middle;"  function-type="export">
+									<e-upload id="csvUpload_BEHAVIORAL_INDICATOR" success="updFile(name, rname)" text="上傳" accept=".csv"></e-upload>
+								</span>
+								<button type="button" class="btn btn-info" ng-click="export();" function-type="export" ng-disabled="paramList.length == 0">匯出</button>
+							</div>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				          		<table class="table-bordered">
+				          			<thead>
+										<tr>
+											<th>行為指標</th>
+											<th>扣減比例</th>
+										</tr>
+									</thead>
+									<tbody>
+					              		<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.INDICATOR_TYPE}}</td>
+											<td>{{row.DEDUCTION_RATIO | number:2}} %</td>
+										</tr>
+									</tbody>
+								</table>
+				        	</div>
+						</div>
+					</uib-tab>
+				</uib-tabset>
+			</div>
+		</div>        		
+	</div>
+</div>

@@ -1,0 +1,217 @@
+<style>
+/* open dialog */
+.ngdialog.PMS336 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS336 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS336 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PMS336 table.little{
+	width: 60%;
+}
+/* change row */
+.PMS336.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS336_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.red{
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS336/PMS336.js"></script>
+
+<div class="PMS336" ng-controller="PMS336Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th>*資料月份：</th>
+						<td><e-combobox id="sTime" 
+							ng-datasource="ymList"
+							ng-model="inputVO.sTime"
+		   					ng-validate="false" 
+		   					ng-readonly="false" 
+		   					ng-editable="false"
+		   					ng-format="F3"
+		   					ng-required="true"
+		   					ng-change="dateChange();getFAIA()" 
+		   					width="155px"
+		   					height="30px"
+		   					style="line-height:20px;" /></td>
+						
+						<th >營運區：</th>
+						<td ><e-combobox id="branch_area_id" name="branch_area_id"
+											ng-datasource="AREA_LIST"
+											ng-model="inputVO.branch_area_id"
+											ng-validate="false" 
+											ng-disabled="disableAreaCombo"
+											ng-readonly="disableAreaCombo" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="ChangeArea()"
+											width="155px"
+											style="line-height:20px;" /></td>
+				
+					</tr>
+					
+					<tr>
+					
+						<th>業務處：</th>
+						<td><e-combobox id="region_center_id" name="region_center_id"
+											ng-datasource="REGION_LIST"
+											ng-model="inputVO.region_center_id"
+											ng-validate="false" 
+											ng-disabled="disableRegionCombo"
+											ng-readonly="disableRegionCombo" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="ChangeRegion()"
+											width="155px"
+											style="line-height:20px;" /></td>
+						
+					
+						
+						<th>分行別：</th>
+						<td><e-combobox id="branch_nbr" name="branch_nbr"
+											ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.branch_nbr"
+											ng-validate="false" 
+											ng-disabled="disableBranchCombo"
+											ng-readonly="disableBranchCombo" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="false"
+											ng-change="ChangeBranch()"
+											width="155px"
+											style="line-height:20px;" /></td>	
+						<th>輔銷人員</th>
+							<td><e-combobox id="emp_id" name="emp_id"
+										ng-datasource="mappingSet['emp_id']" ng-model="inputVO.emp_id"
+										ng-validate="false" ng-readonly="false" ng-editable="false"
+										ng-format="F1" ng-required="false" width="150px"
+										style="line-height:20px;" /></td>
+						</tr>
+				</table>
+				</form>
+			</div>
+			　<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				
+			</div>
+		
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="query()"
+				list="paramList"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+				<table  class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+					<tr >
+							<th rowspan="2">項次</th>
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行別</th>
+							<th rowspan="2">輔銷人員</th>
+							<th rowspan="2">輔銷團隊代碼</th>
+							<th colspan="3" rowspan="1" style="color:#2E64FE">銷售目標達成</th>
+							<th colspan="3" rowspan="1" style="color:#2E64FE">掛Goal專員達成</th>							
+						</tr>
+						<tr>
+						<th>投資/保險目標</th>
+						<th>實際銷量</th>
+						<th>達成率</th>
+						<th>掛Goal<br>專員數</th>
+						<th>實際達Goal數</th>
+						<th>達成率</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{outputVO.currentPageIndex*10+$index+1}}</td>
+							<td align="center">{{row.REGION_CENTER_NAME}}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME}}</td>
+							<td align="center">{{row.BRANCH_NAME}}</td>
+							<td align="center">{{row.EMP_NAME}}</td>
+							<td align="center">{{row.SUPT_SALES_TEAM_ID}}</td>
+							<td align="right">{{row.INV_INS_GOAL | number:0}}</td>
+							<td align="right">{{row.TXN_AMT | number:0}}</td>
+							<td align="right">{{row.TXN_RATE | number:2}}%</td>
+							<td align="right">{{row.GOAL_AO_CNT | number:0}}</td>
+							<td align="right">{{row.ACH_GOAL_CNT | number:0}}</td>
+							<td align="right">{{row.ACH_GOAL_RATE | number:2}}%</td>				
+						</tr>
+						<tr ng-show="paramList != ''">
+							<td align="center" colspan="6">合計</td>
+							<td align="right">{{getSum(paramList,'INV_INS_GOAL') | number:0}}</td>
+							<td align="right">{{getSum(paramList,'TXN_AMT') | number:0}}</td>
+							<td align="right">{{(getSum(paramList,'TXN_AMT')/getSum(paramList,'INV_INS_GOAL'))*100 | number:'2'}}%</td>
+							<td align="right">{{getSum(paramList,'GOAL_AO_CNT') | number:0}}</td>
+							<td align="right">{{getSum(paramList,'ACH_GOAL_CNT') | number:0}}</td>
+							<td align="right">{{(getSum(paramList,'ACH_GOAL_CNT') / getSum(paramList,'GOAL_AO_CNT'))*100 | number:'2'}}%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		 </div>
+	</div>
+	<!-- 結果區 -->
+</div>

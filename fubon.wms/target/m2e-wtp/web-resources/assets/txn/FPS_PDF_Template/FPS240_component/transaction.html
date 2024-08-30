@@ -1,0 +1,55 @@
+<div class="block container"
+     style="border-color:#93c5e1; margin-top: 0px; margin-bottom: 0px;"
+     print-wrapper>
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="title subtitle"
+            style="width:7%;">類別</th>
+        <th class="title subtitle"
+            style="width:45%;">商品</th>
+        <th class="title subtitle"
+            style="width:10%;">投資方式</th>
+        <th class="title subtitle"
+            style="width:16%;">申購/贖回金額</th>
+        <th class="title subtitle"
+            style="width:12%;">約當台幣</th>
+        <th class="title subtitle"
+            style="width:10%;">交易指示</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in transactionList"
+          print-cell>
+        <td ng-bind="row.PTYPE|mapping: mapping.prodType">
+          <!-- 類別 -->
+        </td>
+        <td style="padding-left:12px;text-align:left;">
+          <div ng-if="row.PTYPE != 'NANO'" ng-bind="row.PRD_ID+' '+row.PRD_CNAME"></div>
+          <div ng-if="row.PTYPE == 'NANO'" ng-bind="row.PRD_CNAME"></div>
+          <!-- 代號商品 -->
+        </td>
+        <td>
+          <div ng-if="row.PTYPE!=='MFD'&&row.PTYPE!=='NANO'">--</div>
+          <div ng-if="row.PTYPE=='MFD'"
+               ng-bind="row.INV_TYPE|mapping: mapping.invType"></div>
+          <div ng-if="row.PTYPE=='NANO'"
+               ng-bind="row.INV_TYPE|mapping: mapping.NANOInvType"></div>
+          <!-- 投資方式 -->
+        </td>
+        <td class="text-right">
+          <span ng-bind="row.TRUST_CURR"></span>
+          <span ng-bind="row.TRANSACT_ORG_AMT|number"></span>
+          <!-- 調整後原幣金額 -->
+        </td>
+        <td ng-bind="row.TRANSACT_TWD_AMT|number"
+            class="text-right">
+          <!-- 約當台幣-->
+        </td>
+        <td ng-bind="row.TXN_TYPE|mapping: row.txnTypeList">
+          <!-- 交易指示 -->
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,235 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS331/PMS331.js"></script>
+
+<div class="PMS331" ng-controller="PMS331Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">				
+					<table>
+						<tr>
+							<th> 報表月份： </th>						
+							<td>							
+								<e-combobox id="dataMonth" name="dataMonth" 
+									ng-datasource="mappingSet['timeE']"
+									ng-model="inputVO.dataMonth"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"								
+									width="143px"
+									style="line-height:20px;" />														
+							</td>
+							<th> 分派狀況： </th>
+							<td>
+								<e-combobox id="assignType" name="assignType" 
+									ng-datasource="mappingSet['assignType']"
+									ng-model="inputVO.assignType"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"								
+									width="90px"
+									style="line-height:20px;" />
+							</td>
+								<th>報表名稱： </th>
+							<td>
+								<e-combobox id="assignType" name="assignType" 
+									ng-datasource="mappingSet['assignType']"
+									ng-model="inputVO.assignType"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"								
+									width="150px"
+									style="line-height:20px;" />
+							</td>
+						</tr>	
+						<tr>
+							<th>業務處：</th>
+							<td>						     
+								<e-combobox id="rc_id" name="rc_id" 
+							       ng-datasource="mappingSet['region']"
+							       ng-model="inputVO.rc_id"
+							       ng-validate="false" 
+							       ng-readonly="false" 
+							       ng-editable="false"
+							       ng-change="regionChange()"
+							       ng-format="F3"
+							       ng-required="false"
+							       width="143px"						         
+							       style="line-height:20px;" />
+							</td>
+							<th>營運區：</th>
+							<td>
+								<e-combobox id="op_id" name="op_id" 
+								ng-datasource="mappingSet['op']"
+								ng-model="inputVO.op_id"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-change="areaChange()"
+								ng-format="F3"
+								width="90px"
+								style="line-height:20px;" />
+							</td>
+							<th>分行：</th>
+							<td>						 
+								<e-combobox id="br_id" name="br_id" 
+								ng-datasource="mappingSet['branch']"
+								ng-model="inputVO.br_id"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-change="branchChange()"
+								ng-format="F3"
+								width="150px"
+								style="line-height:20px;" />						 
+							</td>				
+							<th>理專：</th>
+							<td>						
+								<e-combobox id="aoEmp" name="aoEmp" 
+								ng-datasource="mappingSet['aoemp']"
+								ng-model="inputVO.aoEmp"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F1"
+								width="110px"
+								style="line-height:20px;" />						 
+							</td>						
+						</tr>
+					</table>							
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>				
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO"
+				input="inputVO"
+				query="inquire()" list="paramList"></e-jumping>				
+			<div align="left">
+				<table>
+			    	<tr>
+			    		<td align="right">資料產生日期：</td>
+			    		<td align="left">{{curDate | date:'yyyy/MM/dd'}}</td>
+			    	</tr>
+			    	<tr>
+			    		<td align="right">報表說明：</td>
+			    		<td align="left">換手經營客戶報表</td>
+			    	</tr>
+		    	</table>
+			</div>
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>				 			
+			<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th></th>
+							<th>業務處</th>
+							<th>分行代碼</th>
+							<th>分行名稱</th>
+							<th>AO Code</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>理財會員等級</th>
+							<th>貢獻度註記</th>
+							<th>ID歸戶總餘額</th>
+							<th>投資AUM</th>
+							<th>保險AUM</th>
+							<th>檢視日期</th>
+							<th>近一年手收</th>
+							<th>未符合次數</th>
+							<th>前次AO Code</th>
+							<th>指派新AO Code</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">							
+							<td>{{ $index+1 }}</td>
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							<td>{{row.BRANCH_NBR}}</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.AO_CODE}}</td>							
+							<td>{{row.CUST_ID}}</td>												
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.VIP_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>					
+							<td>{{row.AUM_DEGREE}}</td>
+							<td align="right">{{row.AUM | currency:''}}</td>
+							<td align="right">{{row.INV_AUM | currency:''}}</td>
+							<td align="right">{{row.INS_AUM | currency:''}}</td>
+							<td>{{row.CHECK_DAY}}</td>
+							<td align="right">{{row.FEE | currency:''}}</td>
+							<td>{{row.CNT}}</td>
+							<td>{{row.P_AO_CODE}}</td>
+							<td ng-init="getAOEMP(row.BRANCH_NBR)">
+								<div ng-show="row.CNT == 1">
+									<e-combobox id="assignAO" name="assignAO" 
+									ng-datasource="mappingSet[row.BRANCH_NBR]"
+									ng-model="row.A_AO_CODE"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="true"
+									ng-disabled="row.T_FLAG == 'Y'"
+									width="120px"
+									style="line-height:20px;" />
+								</div>
+								<div ng-show="row.CNT == 2">
+									移轉客戶歸屬行
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+				</form>												
+				<div align="center" ng-show="paramList.length > 0">
+					<button type="button" class="btn btn-info" ng-click="save()">儲存</button>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button type="button" cass="btn btn-info" ng-click="confirm()" ng-show="confirmFlag">確定進行客戶AO CODE移轉</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,107 @@
+<style>
+.MGM112 .e_panel_table tr th {
+	background: #efefef;
+	color: black;
+	font-weight: bold;
+}
+
+.linkDisabled {
+	cursor: not-allowed;
+  	pointer-events: none;
+  	color: #cccccc;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MGM112/MGM112.js"></script>
+<div class="MGM112" ng-controller="MGM112Controller" ng-cloak>	
+	<div class="e_panel_table scroll_y" style="min-height: 450px">
+		</br>
+		<div class="ejborder">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>	
+		</div>					
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap; ">
+			<table>
+				<thead>
+					<tr>
+						<th>功能</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.SEQ" e-query="inquire()">案件序號</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.MGM_CUST_ID" e-query="inquire()">推薦人</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.MGM_SIGN_STATUS" e-query="inquire()">推薦簽署表狀態</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.BE_MGM_CUST_ID" e-query="inquire()">被推薦人</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.BE_MGM_SIGN_STATUS" e-query="inquire()">被推薦簽署表狀態</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.MGM_START_DATE" e-query="inquire()">推薦日</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.MGM_END_DATE" e-query="inquire()">追蹤期間</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="INS" e-query="inquire()">追蹤期間投保銷量</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="APPR_STATUS" e-query="inquire()">核點狀態</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="CUST.BRA_NBR" e-query="inquire()">分行</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="ORG.EMP_NAME" e-query="inquire()">鍵機人員</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.CREATETIME" e-query="inquire()">鍵機日</e-sorter>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data">
+						<td>
+							<a href="#" ng-click="edit(row)" ng-hide="row.MGM_SIGN_STATUS == '3' && row.BE_MGM_SIGN_STATUS == '3'">修改</a>
+							<a href="#" class="linkDisabled" ng-show="row.MGM_SIGN_STATUS == '3' && row.BE_MGM_SIGN_STATUS == '3'">修改</a>
+						</td>
+						<td>{{row.SEQ}}</td>
+						<td>{{row.MGM_CUST_ID}}</td>
+						<td>{{row.MGM_SIGN_STATUS | mapping:mappingSet['MGM.SIGN_STATUS']:'F3'}}</td>
+						<td>{{row.BE_MGM_CUST_ID}}</td>
+						<td>{{row.BE_MGM_SIGN_STATUS | mapping:mappingSet['MGM.SIGN_STATUS']:'F3'}}</td>
+						<td>{{toJsDate(row.MGM_START_DATE) | date:"yyyy/MM/dd"}}</td>
+						<td>{{toJsDate(row.MGM_START_DATE) | date:"yyyy/MM/dd"}}～{{toJsDate(row.MGM_END_DATE) | date:"yyyy/MM/dd"}}</td>
+						
+						<td align="right" ng-show="priID > '011' || 
+												   ( ao_code != '' && ( loginID == row.EMP_ID || loginID == row.BE_EMP_ID )) || 
+												   ( ao_code == '' && loginBranchID == row.BRA_NBR ) ">
+							{{row.INS | number:0}}
+						</td>
+						<td align="right" ng-hide="priID > '011' || 
+												   ( ao_code != '' && ( loginID == row.EMP_ID || loginID == row.BE_EMP_ID )) || 
+												   ( ao_code == '' && loginBranchID == row.BRA_NBR ) ">非轄下客戶無法顯示	
+						</td>
+						
+<!-- 					<td>{{row.APPR_STATUS | mapping:mappingSet['MGM.APPR_STATUS']:'F3'}}</td> -->
+						<td align="right">{{row.APPR_STATUS == 1111 ? '鍵機流程未完成' : 
+											row.APPR_STATUS == 2222 ? '銷量計算中' : 
+											row.APPR_STATUS == 4444 ? '未達門檻' : 
+											row.APPR_STATUS == 5555 ? '待審核給點' : (row.APPR_STATUS | number:0) + '點'}}</td>
+						<td>{{row.BRA_NBR}}</td>
+						<td>{{row.EMP_NAME}}</td>
+						<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd"}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<br/>
+ 		<span style="color: red; font-weight: bold;">&nbsp;&nbsp;
+ 			*追蹤期間投保銷量每月計算更新一次，若鍵機日已過該月計算日，則投保銷量將不會顯示，待下個月後計算後更新。
+ 		</span>
+<!--  		<span style="color: red; font-weight: bold;">&nbsp;&nbsp;*迄今累計投保銷量：(追蹤期間內)被推薦人從推薦日當日起算到查詢日前一天的新增投保銷量，該銷量最晚只計到追蹤迄日。</span> -->
+	</div>
+</div>

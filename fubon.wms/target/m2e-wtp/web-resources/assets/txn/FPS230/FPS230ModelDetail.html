@@ -1,0 +1,92 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .FPSModelDetail .modal-dialog {
+    min-width: 70vw;
+  }
+
+  .FPSModelDetail .modal-content {
+    height: auto;
+  }
+
+  .FPSModelDetail .item {
+    display: inline-block;
+    padding: 0 1em;
+  }
+
+  .FPSModelDetail .table {
+    border: 0.5px solid #e1e1e1;
+  }
+
+  .FPSModelDetail .text-left {
+    text-align: left;
+  }
+
+  .FPSModelDetail .text-right {
+    text-align: right;
+  }
+
+</style>
+<div ng-controller="FPSModelDetailController"
+     ng-cloak
+     class="FPS FPSModelDetail">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a href="#"
+           class="close"
+           data-dismiss="modal"
+           aria-hidden="true"
+           ng-click="closeThisDialog('cancel')">&times; </a>
+        <h4 id="myModalAlertLabel"
+            class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th rowspan="2"
+                  style="border-right: .5px solid #ddd;
+                         width:30%;">月份</th>
+              <th style="border-bottom: .5px solid #ddd;
+                         width:70%;">標的與佔比</th>
+
+            </tr>
+            <tr>
+              <th>總行推薦</th>
+            </tr>
+          </thead>
+          <tbody style="text-align:center;">
+            <tr ng-repeat="row in modelItems">
+              <td rowspan="{{modelLen}}"
+                  ng-bind="ym"
+                  ng-if="$index===0"
+                  style="border-right: 0.5px solid #e1e1e1;">
+              </td>
+              <td>
+                <div class="text-left item"
+                     style="width: 75%; display: inline; float: left;">
+                  <a ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+                     ng-click="go('detail', row.PTYPE, row)"
+                     ng-if="row.PTYPE!='ETF'"></a>
+                  <a ng-href="https://www.fubon.com/banking/personal/fund_trust/ETF_search/ETF_search.htm?show=m5&Pram=$ETFWEB$HTML$ET011001]DJHTM#ETFID}{{row.PRD_ID}}"
+                     target="_blank"
+                     ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+                     ng-if="row.PTYPE=='ETF'">
+                  </a>
+                  <span ng-bind="row.targetIDs"
+                        ng-if="row.PTYPE=='INS'"
+                        class="ps"></span>
+                </div>
+                <div ng-bind="row.INV_PERCENT+'%'"
+                     class="text-right item"
+                     style="width: 24%; display: inline; float: right;"></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</div>

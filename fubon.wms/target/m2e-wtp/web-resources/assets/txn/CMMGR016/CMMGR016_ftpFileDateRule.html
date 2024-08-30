@@ -1,0 +1,76 @@
+<style>
+    .modal-dialog CMMGR016DateRule {
+        position: relative;
+        top: 100px;
+        right: 0;
+        bottom: 0;
+        left: 0px;
+    }
+</style>
+<div ng-controller="CMMGR016_ftpFileDateRuleController" ng-cloak>
+    <div class="modal-dialog CMMGR016DateRule">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        ng-click="closeThisDialog('cancel')">&times;
+                </button>
+                <h4 id="myModalAlertLabel" class="modal-title" align="center"
+                    ng-bind="'檔名日期規則說明'"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <span class="input-group-addon" ng-bind="'Try It！'"></span>
+                    <input type="text" class="form-control" placeholder="try you want！" ng-model="testName">
+                    <div class="input-group-btn">
+                        <button class="btn btn-success" data-toggle="tooltip" title="點點看！" ng-click="getRealName()"
+                                ng-disabled="!testName">
+                            <span class="glyphicon glyphicon-play-circle"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <span class="input-group-addon" ng-bind="'Ans'"></span>
+                    <input type="text" ng-model="realName" class="form-control" placeholder="show here！" readonly>
+                </div>
+
+                <div class="input-group" ng-show="error">
+                    <span class="help-block with-errors" ng-bind="error"></span>
+                </div>
+
+                <h3>格式：{日期[,數字[單位]]}</h3>
+                <h4>日期</h4>
+                <p>可使用 SYSDATE（系統日）、BUSDATE（批次日）、或是 Pattern（預設為 yyyyMMdd）。系統日與批次日後面可再加上 Pattern 來格式化，可參照 Pattern 介紹。</p>
+                <div>
+                    <ul>
+                        <li>TEST{SYSDATE}、TEST{BUSDATE}、TEST{yyyyMMdd}、TEST{SYSDATEyyMMdd}</li>
+                    </ul>
+                </div>
+
+                <h4>Pattern</h4>
+                <div>
+                    <ul>
+                        <li>四碼西元年：{yyyy-MM-dd-HH} 、 {yyyy_MM_dd_HH} 、 {yyyyMMddHH}</li>
+                        <li>二碼西元年：{yy-MM-dd-HH} 、 {yy_MM_dd_HH} 、 {yyMMddHH}</li>
+                        <li>三碼民國年：{cyy-MM-dd-HH} 、 {cyy_MM_dd_HH} 、 {cyyMMddHH}</li>
+                        <p>備註：年(y)、月(M)、日(d)、時(H)皆可省略，連接符為-和_亦可省略</p>
+                    </ul>
+                </div>
+
+                <h4>數字與單位</h4>
+                <p>非必填，若有使用','隔開，中間不可以有任何空格，可為負數。數字默認單位為天。另外其他單位如 M（月）、H（時）、E（月底）</p>
+                <div>
+                    <ul>
+                        <li>以天為單位：TEST{SYSDATE,-2}、TEST{SYSDATE,2}</li>
+                        <li>以月為單位：TEST{SYSDATE,-1M}、TEST{SYSDATE,1M}</li>
+                        <li>以時為單位：TEST{SYSDATEyyyyMMddHH,-1H}、TEST{SYSDATEyyyyMMddHH,1H}</li>
+                        <li>特定月份月底：TEST{SYSDATE,-1E}、TEST{SYSDATE,1E}</li>
+                        <li>特定月份月初：TEST{SYSDATEyyyyMM}01、TEST{SYSDATEyyyyMM,1M}01</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

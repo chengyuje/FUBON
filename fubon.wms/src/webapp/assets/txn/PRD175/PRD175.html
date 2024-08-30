@@ -1,0 +1,97 @@
+<style>
+input:required:invalid{
+	border-color: red;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PRD175/PRD175.js"></script>
+
+<div ng-controller="PRD175Controller" ng-cloak>
+	<div class="search_table">
+		<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+				data-toggle="validator" role="form" autocomplete="off" enter-as-tab
+				style="width: 85vw;">
+				<table>
+					<tr>
+						<th>分行代碼：</th>
+						<td><input type="text" style="width: 150px"
+						ng-change="inpet()"
+							ng-model="inputVO.BRANCH_NBR" ng-required="check"/></td>
+
+						<th>員工姓名：</th>
+						<td><input type="text" style="width: 150px"
+						ng-change="inpet()"
+							ng-model="inputVO.EMP_NAME"  ng-required="check"/></td>
+						<th>員工編號：</th>
+						<td><input type="text" style="width: 150px"
+						ng-change="inpet()"
+							ng-model="inputVO.EMP_ID"   ng-required="check"/></td>
+						<th>教育訓練日：</th>
+						<td><div class="input-group datebox datewidth">
+								<input type="text" class="form-control" style="width: 150px"
+								ng-change="inpet()"
+									uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.REG_DATE"
+									is-open="model.a" datepicker-options="bgn_sDateOptions" 
+									 ng-required="check"
+									alt-input-formats="altInputFormats" ng-readonly="true"
+									ng-change="limitDate()" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div></td>
+
+					</tr>
+				</table>
+			</form>
+		</div>
+
+		<div class="search_box_btn text-center">
+		<div style="text-align:left;color: red;">註:請擇一輸入</div>
+			<button ng-click="queryData()" class="btn btn-info">查詢</button>
+			<button ng-click="btnClear()" class="btn btn-info">清除</button>
+
+
+
+
+		</div>
+		<e-jumping output="outputVO" input="inputVO" query="queryData()"
+			list="ins_ancdoclist"></e-jumping>
+		<div class="text-right"></div>
+		<div class="gv_tab_sc scroll_y"
+			style="white-space: nowrap; min-height:235px; overflow-x: auto;">
+			<table>
+			<thead>
+				<tr>
+					<th>分行代碼</th>
+					<th>員工姓名</th>
+					<th>身分證字號</th>
+					<th>員工編號</th>
+					<th>基金代號</th>
+					<th>教育訓練日</th>
+					<th>異動日</th>
+					<th>異動人員</th>
+
+
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in ins_ancdoclist" ng-class-odd="'rowOdd'"
+					ng-class-even="'rowEven'">
+					<TD>{{row.BRANCH_NBR }}</td>
+					<TD>{{row.EMP_NAME }}</td>
+					<TD>{{row.CUST_ID }}</td>
+					<TD>{{row.EMP_ID }}</td>
+					<TD>{{row.TRAGET_ID }}</td>
+					<TD>{{toJsDate(row.REG_DATE) | date:'yyyy-MM-dd' }}</td>
+					<TD>{{toJsDate(row.LASTUPDATE) | date:'yyyy-MM-dd' }}</td>
+					<TD>{{row.MODIFIER }}</td>
+
+				</tr>
+			</tbody>
+			</table>
+		</div>

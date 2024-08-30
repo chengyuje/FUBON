@@ -1,0 +1,2187 @@
+<style>
+.modal-dialog.MTC110_MAINTAIN{
+	width: 1187px;
+	height: auto;
+}
+
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+
+/* input:required:invalid{ */
+/*  	border-color: red; */
+/* } */
+	
+</style>
+<script type="text/javascript" src="assets/txn/MTC110/MTC110_MAINTAIN.js"></script>
+<div ng-controller="MTC110_MAINTAINController" ng-cloak>
+	<div class="modal-dialog MTC110_MAINTAIN" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="stopTimeout(); clickClose();">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">金錢信託契約</h4>
+			</div>
+		    <!--Content of the panel-->
+		    <div class="modal-body">
+		    	<div class="gv_tab_sc scroll_y">
+		    		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+		    		<table>
+						<tr>
+							<td>◎</td>
+							<td>委託人須為本行存款客戶。</td>
+		    			</tr>
+						<tr>
+							<td>◎</td>
+							<td>委託人領有身心障礙證明、受監護宣告或輔助 宣告，請簽署紙本「身心障礙安養版本」。</td>
+		    			</tr>
+						<tr>
+							<td>◎</td>
+							<td>外國人簽約需檢附居留證，有關證件之檢核方 式請依行內規範辦理。</td>
+		    			</tr>
+		    			<tr>
+							<td>◎</td>
+							<td>外幣信託契約暫不受理受益人、監察人之外幣跨行給付約定，如非本行客戶有外幣給付需求，請引導客戶加開本行外幣帳戶。</td>
+		    			</tr>
+		    		<table>
+						<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">信託種類、財產目錄</th>
+						</tr>
+						<tr>
+							<td>交付幣別<span style="color:red;">*</span></td>
+							<td>
+								<div style="margin-bottom: 1%; margin-left: 1%;">
+					    			<label><input type="radio" ng-model="inputVO.CON_CURR" value="T" ng-disabled="unchangeable || lock">台幣&nbsp;&nbsp;</label>
+					    			<label><input type="radio" ng-model="inputVO.CON_CURR" value="F" ng-disabled="unchangeable || lock">外幣&nbsp;&nbsp;</label>
+					    		</div>
+				    		</td>
+		    			</tr>
+		    			<!-- 台幣 -->
+		    			<tr ng-show="inputVO.CON_CURR == 'T'">
+		    				<td>交付金額<span style="color:red;">*</span></td>
+		    				<td>
+		    					新台幣
+		    					<input type="text" class="form-control" 
+		    						   style="width:150px; display:inline;" 
+		    						   id="AMT1" name="AMT1"
+		    						   e-input-limit="NC" 
+		    						   ng-disabled="lock"
+		    						   ng-blur="checkAmt(1)"
+		    						   ng-model="inputVO.AMT1">
+		    				</td>
+		    			</tr>
+		    			<!-- 外幣 -->
+		    			<tr ng-show="inputVO.CON_CURR == 'F'">
+		    				<td>交付金額<span style="color:red;">*</span></td>
+		    				<td>
+		    					<e-combobox id="CURR1" name="CURR1"
+									   ng-datasource="currList1"
+									   ng-model="inputVO.CURR1" 
+									   ng-format="F3"
+									   ng-required="false"
+									   ng-disabled="true"
+									   ng-readonly="true"
+									   ng-change="changeCurr(1)"
+									   width="150px"
+									   style="line-height:20px;"/>
+									
+		    					<input type="text" class="form-control" 
+		    						   style="width:150px; display:inline;" 
+		    						   id="AMT1" name="AMT1"
+		    						   e-input-limit="NC"
+		    						   ng-disabled="lock || inputVO.CURR1 == undefined || inputVO.CURR1 == ''"
+		    						   ng-blur="checkAmt(1)"
+		    						   ng-model="inputVO.AMT1">
+		    					</br>
+		    					
+		    					<e-combobox id="CURR2" name="CURR2"
+									   ng-datasource="currList2"
+									   ng-model="inputVO.CURR2" 
+									   ng-format="F3"
+									   ng-disabled="lock || inputVO.AMT1 == undefined || inputVO.AMT1 == ''"
+									   ng-readonly="lock || inputVO.AMT1 == undefined || inputVO.AMT1 == ''"
+									   ng-required="false"
+									   ng-change="changeCurr(2)"
+									   width="150px"
+									   style="line-height:20px;"/>
+									
+		    					<input type="text" class="form-control" 
+		    						   style="width:150px; display:inline;" 
+		    						   id="AMT2" name="AMT2"
+		    						   e-input-limit="NC"
+		    						   ng-disabled="lock || inputVO.CURR2 == undefined || inputVO.CURR2 == ''"
+		    						   ng-blur="checkAmt(2)"
+		    						   ng-model="inputVO.AMT2">
+		    					</br>
+		    					
+		    					<e-combobox id="CURR3" name="CURR3"
+									   ng-datasource="currList3"
+									   ng-model="inputVO.CURR3" 
+									   ng-format="F3"
+									   ng-disabled="lock || inputVO.AMT2 == undefined || inputVO.AMT2 == ''"
+									   ng-readonly="lock || inputVO.AMT2 == undefined || inputVO.AMT2 == ''"
+									   ng-required="false"
+									   ng-change="changeCurr(3)"
+									   width="150px"
+									   style="line-height:20px;"/>
+									
+		    					<input type="text" class="form-control" 
+		    						   style="width:150px; display:inline;" 
+		    						   id="AMT3" name="AMT3"
+		    						   e-input-limit="NC"
+		    						   ng-disabled="lock || inputVO.CURR3 == undefined || inputVO.CURR3 == ''"
+		    						   ng-blur="checkAmt(3)"
+		    						   ng-model="inputVO.AMT3">
+		    				</td>
+		    			</tr>
+					</table>
+					<table>
+						<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">信託報酬
+								<label style="color: red;">※欄位預設為標準收費，如有議價可進行調整，並請提供議價簽核表。</label>
+							</th>
+						</tr>
+						<tr>
+		    				<td>簽約費 {{inputVO.CON_CURR == 'T' ? "NTD" : "USD"}}<span style="color:red;">*</span></td>
+		    				<td>
+		    					<input type="text" class="form-control" 
+		    						   style="width:150px; display:inline;" 
+		    						   id="SIGNING_FEE" name="SIGNING_FEE"
+		    						   e-input-limit="NN" 
+		    						   ng-disabled="lock"
+		    						   ng-blur="checkFee(1)"
+		    						   ng-model="inputVO.SIGNING_FEE">
+		    				</td>
+		    				<td>修約費 {{inputVO.CON_CURR == 'T' ? "NTD" : "USD"}}<span style="color:red;">*</span></td>
+		    				<td>
+		    					<input type="text" class="form-control" 
+		    						   style="width:150px; display:inline;" 
+		    						   id="MODIFY_FEE" name="MODIFY_FEE"
+		    						   e-input-limit="NN"
+		    						   ng-disabled="lock"
+		    						   ng-blur="checkFee(2)"
+		    						   ng-model="inputVO.MODIFY_FEE">
+		    				</td>
+		    			</tr>
+					    <tr>
+		    				<td>管理費（年費率）<span style="color:red;">*</span></td>
+		    				<td>
+		    					<table>
+		    						<tr>
+		    							<td style="border: none !important;">{{inputVO.CON_CURR == 'T' ? "1,000 萬(含)以下" : "30 萬(含)以下"}}</td>
+		    							<td style="border: none !important;">
+		    								<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="MNG_FEE_RATE1" name="MNG_FEE_RATE1"
+					    						   e-input-limit="NUU" nuu1="3" nuu2="2"
+					    						   ng-disabled="lock"
+					    						   ng-model="inputVO.MNG_FEE_RATE1"
+					    						   ng-blur="checkRate()">%
+		    							</td>
+		    						</tr>
+		    						<tr>
+		    							<td style="border: none !important;">{{inputVO.CON_CURR == 'T' ? "超過 1,000 萬至 3,000 萬(含)" : "超過 30 萬至 100 萬(含)"}}</td>
+		    							<td style="border: none !important;">
+		    								<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="MNG_FEE_RATE2" name="MNG_FEE_RATE2"
+					    						   e-input-limit="NUU" nuu1="3" nuu2="2"
+					    						   ng-disabled="lock"
+					    						   ng-model="inputVO.MNG_FEE_RATE2"
+					    						   ng-blur="checkRate()">%
+		    							</td>
+		    						</tr>
+		    						<tr>
+		    							<td style="border: none !important;">{{inputVO.CON_CURR == 'T' ? "超過 3,000 萬以上" : "超過 100 萬以上"}}</td>
+		    							<td style="border: none !important;">
+		    								<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="MNG_FEE_RATE3" name="MNG_FEE_RATE3"
+					    						   e-input-limit="NUU" nuu1="3" nuu2="2"
+					    						   ng-disabled="lock"
+					    						   ng-model="inputVO.MNG_FEE_RATE3"
+					    						   ng-blur="checkRate()">%
+		    							</td>
+		    						</tr>
+		    					</table>
+		    				</td>
+		    				<td>最低管理費 {{inputVO.CON_CURR == 'T' ? "NTD" : "USD"}}<span style="color:red;">*</span></td>
+		    				<td>
+		    					<input type="text" class="form-control" 
+		    						   style="width:150px; display:inline;" 
+		    						   id="MNG_FEE_MIN" name="MNG_FEE_MIN"
+		    						   e-input-limit="NN" 
+		    						   ng-disabled="lock"
+		    						   ng-blur="checkFee(3)"
+		    						   ng-model="inputVO.MNG_FEE_MIN">
+		    				</td>
+		    			</tr>
+					</table>
+					<table>
+						<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">信託關係人基本資料</th>
+						</tr>
+						<tr>
+		    				<td>委託人即受益人ID：<span style="color:red;">*</span></td>
+		    				<td>
+		    					<input class="form-control" type="text" 
+		    						id="CUST_ID1" name="CUST_ID1" 
+		    						style="width:150px; text-transform: uppercase;"
+		    						ng-model="inputVO.custList1.CUST_ID"
+		    						ng-disabled="unchangeable_c || lock"
+		    						ng-blur="checkID(1)"/>
+		    				</td>
+		    				<td>監察人ID：</td>
+		    				<td>
+		    					<input class="form-control" type="text" 
+		    						id="CUST_ID2" name="CUST_ID2" 
+		    						style="width:150px; display:inline; margin-right: 10px; text-transform: uppercase;"
+		    						ng-model="inputVO.custList2.CUST_ID"
+		    						ng-blur="checkID(2)"
+		    						ng-disabled="inputVO.custList1.CUST_ID == undefined || inputVO.custList1.CUST_ID == '' || lock"/>
+		    					
+		    					<input class="form-control" type="text" 
+		    						id="CUST_ID3" name="CUST_ID3" 
+		    						style="width:150px; display:inline; text-transform: uppercase;"
+		    						ng-model="inputVO.custList3.CUST_ID"
+		    						ng-blur="checkID(3)"
+		    						ng-disabled="inputVO.custList2.CUST_ID == undefined || inputVO.custList2.CUST_ID == '' || lock"/>
+		    				</td>
+		    			</tr>
+						<tr>
+		    				<td>次順位監察人ID：</td>
+		    				<td>
+		    					<input class="form-control" type="text" 
+		    						id="CUST_ID4" name="CUST_ID4" 
+		    						style="width:150px; text-transform: uppercase;"
+		    						ng-model="inputVO.custList4.CUST_ID"
+		    						ng-blur="checkID(4)"
+		    						ng-disabled="inputVO.custList2.CUST_ID == undefined || inputVO.custList2.CUST_ID == '' || lock"/>
+		    				</td>
+		    				<td>第三順位監察人ID：</td>
+		    				<td>
+		    					<input class="form-control" type="text" 
+		    						id="CUST_ID5" name="CUST_ID5" 
+		    						style="width:150px; text-transform: uppercase;"
+		    						ng-model="inputVO.custList5.CUST_ID"
+		    						ng-blur="checkID(5)"
+		    						ng-disabled="inputVO.custList4.CUST_ID == undefined || inputVO.custList4.CUST_ID == '' || lock"/>
+		    				</td>
+		    			</tr>
+					</table>
+		    		<table ng-show="inputVO.custList1.CUST_ID != undefined && inputVO.custList1.CUST_ID != ''">
+		    			<tr>
+							<th colspan="6" style="text-align: left; background-color: #56c0f5 !important;" class="table_title">委託人</th>
+						</tr>
+		    			<tr>
+							<th colspan="6" style="text-align: left; background-color: #56c0f5 !important;" class="table_title">
+								◎委託人領有身心障礙證明、受監護宣告或輔助宣告，請簽署紙本 「身心障礙安養版本」。</br>
+								◎外國人簽約需檢附居留證，有關證件之檢核方式請依行內規範辦理。
+							</th>
+						</tr>
+		    			<tr>
+							<td>姓名：<span style="color:red;">*</span></td>
+							<td>
+								<input class="form-control" type="text" 
+		    						id="CUST_NAME1" name="CUST_NAME1" 
+		    						style="width:150px;"
+		    						ng-disabled="true"
+		    						ng-model="inputVO.custList1.CUST_NAME"/>
+							</td>
+							<td>生日：<span style="color:red;">*</span></td>
+							<td>
+								<input class="form-control" type="text" 
+		    						id="BIRTH_DATE" name="BIRTH_DATE" 
+		    						style="width:150px;"
+		    						ng-disabled="true"
+		    						ng-model="inputVO.BIRTH_DATE"/>
+								<!-- <div style="float: left" class="input-group datebox datewidth">
+									<input type="text" id="BIRTH_DATE" name="BIRTH_DATE"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.BIRTH_DATE"
+										   is-open="model.a"
+										   datepicker-options="Birth_DateOptions"
+										   ng-readonly="true"/>
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="true">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>																		
+										</span>
+								</div> -->	
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>聯絡方式：<span style="color:red;">*</span></br>(需擇一填入)</td>
+							<td colspan="3">TEL：
+								<input class="form-control" type="text" 
+		    						id="TEL1" name="TEL1" 
+		    						style="width:150px; display: inline;"
+		    						ng-disabled="lock"
+		    						e-input-limit="N"
+		    						ng-model="inputVO.custList1.TEL"/>
+		    					</br></br>
+								手機：
+								<input class="form-control" type="text" 
+		    						id="MOBILE_NO1" name="MOBILE_NO1" 
+		    						style="width:150px; display: inline;"
+		    						ng-disabled="lock"
+		    						e-input-limit="N"
+		    						ng-model="inputVO.custList1.MOBILE_NO"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>E-mail：</td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="EMAIL1" name="EMAIL1" 
+		    						style="width:350px;"
+		    						ng-disabled="true"
+		    						ng-model="inputVO.custList1.EMAIL"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>戶籍地址郵遞區號：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						   id="CEN_ZIP_CODE" name="CEN_ZIP_CODE" 
+		    						   e-input-limit="N" 
+		    						   style="width:100px;"
+		    						   ng-disabled="true"
+		    						   maxlength="5"
+		    						   ng-blur="checkZip(inputVO.custList1.CEN_ZIP_CODE, '1_1')"
+		    						   ng-model="inputVO.custList1.CEN_ZIP_CODE"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>戶籍地址：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="CEN_ADDRESS" name="CEN_ADDRESS" 
+		    						style="width:450px;"
+		    						ng-disabled="true"
+		    						ng-model="inputVO.custList1.CEN_ADDRESS"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>通訊地址郵遞區號：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="COM_ZIP_CODE1" name="COM_ZIP_CODE1" 
+		    						style="width:100px;"
+		    						ng-disabled="lock"
+		    						maxlength="5"
+		    						ng-blur="checkZip(inputVO.custList1.COM_ZIP_CODE, '1_2')"
+		    						ng-model="inputVO.custList1.COM_ZIP_CODE"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>通訊地址：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="COM_ADDRESS1" name="COM_ADDRESS1" 
+		    						style="width:450px;"
+		    						ng-disabled="lock"
+		    						ng-model="inputVO.custList1.COM_ADDRESS"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>約定給付帳號：<span style="color:red;">*</span></td>
+							<td colspan="3">
+		    					<input type="radio" 
+		    						   ng-model="inputVO.custList1.AGR_ACC_TYPE" 
+		    						   value="A" 
+		    						   ng-disabled="lock" 
+		    						   ng-click="clickFbnBank(1)"
+		    						   style="margin-right: 5px;">本行
+		    					<e-combobox id="AGR_ACC1" name="AGR_ACC1"
+											ng-datasource="accList1"
+											ng-model="inputVO.custList1.AGR_ACC" 
+											ng-change="getBraName(inputVO.custList1.AGR_ACC, 1)"
+											ng-format="F3"
+											ng-show="inputVO.custList1.AGR_ACC_TYPE == 'A'"
+											ng-disabled="inputVO.custList1.AGR_ACC_TYPE == 'B' || lock"
+											ng-readonly="inputVO.custList1.AGR_ACC_TYPE == 'B' || lock"
+											ng-required="false"
+											width="250px"
+											style="line-height:20px; margin-left:5px;"/>
+								<span ng-show="BRA_NAME1 != undefined">{{BRA_NAME1}}</span>
+								</br>
+		    					
+		    					<input type="radio" 
+		    						   ng-model="inputVO.custList1.AGR_ACC_TYPE" 
+		    						   value="B" 
+		    						   ng-disabled="lock" 
+		    						   ng-click="clickOtrBank(1)"
+		    						   style="margin-right: 5px;" 
+		    						   ng-show="inputVO.CON_CURR == 'T'"><span ng-show="inputVO.CON_CURR == 'T'">他行</span>
+								<span ng-show="inputVO.custList1.AGR_ACC_TYPE == 'B'">
+									<e-combobox id="OTR_BANK1" name="OTR_BANK1"
+											ng-datasource="otrBankList"
+											ng-model="inputVO.custList1.OTR_BANK" 
+											ng-click="memberOriBnk(1)"
+											ng-change="getOtrBranch(1, inputVO.custList1.OTR_BANK)"
+											ng-format="F1"
+											ng-disabled="lock"
+											ng-readonly="lock"
+											ng-required="false"
+											width="200px"
+											style="line-height:20px; margin-left:5px;"/>
+			    					<e-combobox id="OTR_BRANCH1" name="OTR_BRANCH1"
+											ng-datasource="otrBranchList1"
+											ng-model="inputVO.custList1.OTR_BRANCH" 
+											ng-format="F3"
+											ng-disabled="inputVO.custList1.OTR_BANK == undefined || inputVO.custList1.OTR_BANK == '' || lock"
+											ng-readonly="inputVO.custList1.OTR_BANK == undefined || inputVO.custList1.OTR_BANK == '' || lock"
+											ng-required="false"
+											width="150px"
+											style="line-height:20px; margin-left:5px;"/>
+			    					
+			    					帳號
+			    					<input type="text" class="form-control" 
+			    						   style="width:150px; display:inline;" 
+			    						   id="OTR_ACC1" name="OTR_ACC1"
+			    						   e-input-limit="N" 
+			    						   ng-disabled="inputVO.custList1.OTR_BRANCH == undefined || inputVO.custList1.OTR_BRANCH == '' || lock"
+			    						   ng-model="inputVO.custList1.OTR_ACC">	
+								</span>
+							</td>
+		    			</tr>
+		    			<tr>
+		    				<td>委託人是否具下列身份：</td>
+		    				<td colspan="3">
+		    					<input type='checkbox' 
+		    						   style="margin-right: 5px;"
+		    						   ng-disabled="lock"
+		    						   ng-model='inputVO.custList1.MINOR_YN' 
+		    						   ng-click="clickMinor()" 
+		    						   ng-true-value="'Y'" ng-false-value="'N'"/>未成年&nbsp;&nbsp;
+		    					<label style="color: red;" ng-show="inputVO.custList1.MINOR_YN == 'Y'">◎依戶口名簿/戶籍謄本登載有權監護之法定代理人/監護人。</label>
+		    					</br>
+		    					<table ng-show="inputVO.custList1.MINOR_YN == 'Y'">
+		    						<tr>
+		    							<td style="border: none !important; width: 150px;">法定代理人ID：</td>
+		    							<td style="border: none !important;">
+		    								<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline; text-transform: uppercase;" 
+					    						   id="LEG_AGENT_ID1" name="LEG_AGENT_ID1"
+					    						   ng-disabled="lock"
+					    						   ng-focus="focusLeg(inputVO.custList1.LEG_AGENT_ID1)"
+					    						   ng-blur="getLegInfo('1', inputVO.custList1.LEG_AGENT_ID1)"
+					    						   ng-model="inputVO.custList1.LEG_AGENT_ID1">
+		    							</td>
+		    							<td style="border: none !important; width: 150px;">法定代理人ID：</td>
+		    							<td style="border: none !important;">
+		    								<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline; text-transform: uppercase;" 
+					    						   id="LEG_AGENT_ID2" name="LEG_AGENT_ID2"
+					    						   ng-disabled="lock || inputVO.custList1.LEG_AGENT_ID1 == undefined || inputVO.custList1.LEG_AGENT_ID1 == ''"
+					    						   ng-focus="focusLeg(inputVO.custList1.LEG_AGENT_ID2)"
+					    						   ng-blur="getLegInfo('2', inputVO.custList1.LEG_AGENT_ID2)"
+					    						   ng-model="inputVO.custList1.LEG_AGENT_ID2">
+		    							</td>
+		    						</tr>
+		    						<tr>
+		    							<td style="border: none !important; width: 150px;">姓名：</td>
+		    							<td style="border: none !important;">
+		    								<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="LEG_AGENT_NAME1" name="LEG_AGENT_NAME1"
+					    						   ng-disabled="lock || inputVO.custList1.LEG_AGENT_ID1 == undefined || inputVO.custList1.LEG_AGENT_ID1 == ''"
+					    						   ng-model="inputVO.custList1.LEG_AGENT_NAME1"
+					    						   ng-blur="addLegName('1')">
+		    							</td>
+		    							<td style="border: none !important; width: 150px;">姓名：</td>
+		    							<td style="border: none !important;">
+		    								<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="LEG_AGENT_NAME2" name="LEG_AGENT_NAME2"
+					    						   ng-disabled="lock || inputVO.custList1.LEG_AGENT_ID2 == undefined || inputVO.custList1.LEG_AGENT_ID2 == ''"
+					    						   ng-model="inputVO.custList1.LEG_AGENT_NAME2"
+					    						   ng-blur="addLegName('2')">
+		    							</td>
+		    						</tr>
+		    						<tr>
+		    							<td style="border: none !important;">電話：</td>
+		    							<td style="border: none !important;">
+		    								<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="LEG_AGENT_TEL1" name="LEG_AGENT_TEL1"
+					    						   ng-disabled="lock || inputVO.custList1.LEG_AGENT_ID1 == undefined || inputVO.custList1.LEG_AGENT_ID1 == ''"
+					    						   ng-model="inputVO.custList1.LEG_AGENT_TEL1">
+		    							</td>
+		    							<td style="border: none !important;">電話：</td>
+		    							<td style="border: none !important;">
+		    								<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="LEG_AGENT_TEL2" name="LEG_AGENT_TEL2"
+					    						   ng-disabled="lock || inputVO.custList1.LEG_AGENT_ID2 == undefined || inputVO.custList1.LEG_AGENT_ID2 == ''"
+					    						   ng-model="inputVO.custList1.LEG_AGENT_TEL2">
+		    							</td>
+		    						</tr>
+		    						<tr>
+		    							<td style="border: none !important;">關係：</td>
+		    							<td style="border: none !important;">
+		    								<!-- <label ng-repeat="rel in LEG_AGENT_REL">
+				     							<input type="radio" 
+				     								   id="LEG_AGENT_REL1" name="LEG_AGENT_REL1" 
+				     								   ng-disabled="lock || inputVO.custList1.LEG_AGENT_ID1 == undefined || inputVO.custList1.LEG_AGENT_ID1 == ''"
+				     								   ng-model='inputVO.custList1.LEG_AGENT_REL1' 
+				     								   ng-click="clickRel(1)"
+				     								   ng-value="rel.DATA"> {{rel.LABEL}} &nbsp;&nbsp;
+											</label>
+											<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="LEG_AGENT_OTR1" name="LEG_AGENT_OTR1"
+					    						   ng-disabled="lock || inputVO.custList1.LEG_AGENT_REL1 != '3'"
+					    						   ng-model="inputVO.custList1.LEG_AGENT_OTR1"> -->
+					    						   
+		    								<e-combobox id="LEG_AGENT_REL1" name="LEG_AGENT_REL1"
+														ng-paramtype="MTC.LEG_AGENT_REL"
+														ng-disabled="lock || inputVO.custList1.LEG_AGENT_ID1 == undefined || inputVO.custList1.LEG_AGENT_ID1 == ''"
+														ng-readonly="lock || inputVO.custList1.LEG_AGENT_ID1 == undefined || inputVO.custList1.LEG_AGENT_ID1 == ''"
+														ng-model="inputVO.custList1.LEG_AGENT_REL1" 
+														ng-format="F3"
+														ng-required="false"
+														width="150px"
+														style="line-height:20px;"/>
+		    							</td>
+		    							<td style="border: none !important;">關係：</td>
+		    							<td style="border: none !important;">
+		    								<!-- <label ng-repeat="rel in LEG_AGENT_REL">
+				     							<input type="radio" 
+				     								   id="LEG_AGENT_REL2" name="LEG_AGENT_REL2" 
+				     								   ng-model='inputVO.custList1.LEG_AGENT_REL2' 
+				     								   ng-disabled="lock || inputVO.custList1.LEG_AGENT_ID2 == undefined || inputVO.custList1.LEG_AGENT_ID2 == ''"
+				     								   ng-click="clickRel(2)"
+				     								   ng-value="rel.DATA"> {{rel.LABEL}} &nbsp;&nbsp;
+											</label>
+											<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="LEG_AGENT_OTR2" name="LEG_AGENT_OTR2"
+					    						   ng-disabled="lock || inputVO.custList1.LEG_AGENT_REL2 != '3'"
+					    						   ng-model="inputVO.custList1.LEG_AGENT_OTR2"> -->
+					    						   
+		    								<e-combobox id="LEG_AGENT_REL2" name="LEG_AGENT_REL2"
+														ng-paramtype="MTC.LEG_AGENT_REL"
+														ng-disabled="lock || inputVO.custList1.LEG_AGENT_ID2 == undefined || inputVO.custList1.LEG_AGENT_ID2 == ''"
+														ng-readonly="lock || inputVO.custList1.LEG_AGENT_ID2 == undefined || inputVO.custList1.LEG_AGENT_ID2 == ''"
+														ng-model="inputVO.custList1.LEG_AGENT_REL2" 
+														ng-format="F3"
+														ng-required="false"
+														width="150px"
+														style="line-height:20px;"/>
+		    							</td>
+		    						</tr>
+		    					</table>
+		    				</td>
+		    			</tr>
+		    			<tr ng-show="inputVO.custList1.MINOR_YN == 'Y'">
+		    				<td>印鑑留存方式:</br>(二擇一)</td>
+   							<td colspan="3">
+   								<input type="radio" 
+     								   id="SEAL_RETENTION_MTD1" name="SEAL_RETENTION_MTD1" 
+     								   ng-disabled="lock"
+     								   ng-model='inputVO.custList1.SEAL_RETENTION_MTD' 
+     								   ng-click="clickSealMtd()"
+     								   ng-value="'1'">未滿 7 歲&nbsp;&nbsp;
+   								<input type="radio" 
+     								   id="SEAL_RETENTION_MTD2" name="SEAL_RETENTION_MTD2" 
+     								   ng-disabled="lock"
+     								   ng-model='inputVO.custList1.SEAL_RETENTION_MTD' 
+     								   ng-click="clickSealMtd()"
+     								   ng-value="'2'">滿 7 歲未滿 18 歲
+   							</td>
+		    			</tr>
+		    			<tr ng-show="inputVO.custList1.SEAL_RETENTION_MTD == '1'">
+		    				<td>未滿 7 歲</br>(二擇一)</td>
+   							<td colspan="3">
+   								<input type="radio" 
+     								   id="SEAL_UNDER7_1" name="SEAL_UNDER7_1" 
+     								   ng-disabled="lock || oneLegAge"
+     								   ng-model='inputVO.custList1.SEAL_UNDER7' 
+     								   ng-click="clickUnder7()"
+     								   ng-value="'1'">併留法代雙方&nbsp;&nbsp;
+   								<input type="radio" 
+     								   id="SEAL_UNDER7_2" name="SEAL_UNDER7_2" 
+     								   ng-disabled="lock || oneLegAge"
+     								   ng-model='inputVO.custList1.SEAL_UNDER7' 
+     								   ng-click=""
+     								   ng-value="'2'">僅併留
+     							<e-combobox id="SEAL_UNDER7_NAME" name="SEAL_UNDER7_NAME"
+											ng-datasource="legNameList"
+											ng-disabled="lock || oneLegAge || inputVO.custList1.SEAL_UNDER7 == undefined || inputVO.custList1.SEAL_UNDER7 != '2'"
+											ng-readonly="lock || oneLegAge || inputVO.custList1.SEAL_UNDER7 == undefined || inputVO.custList1.SEAL_UNDER7 != '2'"
+											ng-model="inputVO.custList1.SEAL_UNDER7_NAME" 
+											ng-format="F3"
+											ng-required="false"
+											width="150px"
+											style="line-height:20px;"/>印鑑 
+   							</td>
+		    			</tr>
+		    			<tr ng-show="inputVO.custList1.SEAL_RETENTION_MTD == '2'">
+		    				<td>滿 7 歲未滿 18 歲</br>(二擇一)</td>
+   							<td colspan="3">
+   								<input type="radio" 
+     								   id="SEAL_UNDER20_11" name="SEAL_UNDER20_11" 
+     								   ng-disabled="lock"
+     								   ng-model='inputVO.custList1.SEAL_UNDER20_1' 
+     								   ng-click="clickUnder20()"
+     								   ng-value="'1'">不併留法代雙方印鑑</br>
+   								<input type="radio" 
+     								   id="SEAL_UNDER20_12" name="SEAL_UNDER20_12" 
+     								   ng-disabled="lock"
+     								   ng-model='inputVO.custList1.SEAL_UNDER20_1' 
+     								   ng-click="clickUnder20()"
+     								   ng-value="'2'">併留印鑑(續填，二擇一)
+     							
+     							</br>&nbsp;&nbsp;&nbsp;&nbsp;
+     							<input type="radio" 
+     								   id="SEAL_UNDER20_21" name="SEAL_UNDER20_21" 
+     								   ng-disabled="lock || oneLegAge || inputVO.custList1.SEAL_UNDER20_1 != '2'"
+     								   ng-model='inputVO.custList1.SEAL_UNDER20_2' 
+     								   ng-click=""
+     								   ng-value="'1'">併留法代雙方&nbsp;&nbsp;
+   								<input type="radio" 
+     								   id="SEAL_UNDER20_22" name="SEAL_UNDER20_22" 
+     								   ng-disabled="lock || oneLegAge || inputVO.custList1.SEAL_UNDER20_1 != '2'"
+     								   ng-model='inputVO.custList1.SEAL_UNDER20_2' 
+     								   ng-click=""
+     								   ng-value="'2'">僅併留
+     							<e-combobox id="SEAL_UNDER20_NAME" name="SEAL_UNDER20_NAME"
+											ng-datasource="legNameList"
+											ng-disabled="lock || oneLegAge || inputVO.custList1.SEAL_UNDER20_2 == undefined || inputVO.custList1.SEAL_UNDER20_2 != '2'"
+											ng-readonly="lock || oneLegAge || inputVO.custList1.SEAL_UNDER20_2 == undefined || inputVO.custList1.SEAL_UNDER20_2 != '2'"
+											ng-model="inputVO.custList1.SEAL_UNDER20_NAME" 
+											ng-format="F3"
+											ng-required="false"
+											width="150px"
+											style="line-height:20px;"/>印鑑 
+   							</td>
+		    			</tr>
+		    		</table>
+		    		<table ng-show="inputVO.custList2.CUST_ID != undefined && inputVO.custList2.CUST_ID != ''">
+		    			<tr>
+							<th colspan="6" style="text-align: left; background-color: #56c0f5 !important;" class="table_title">監察人1</th>
+						</tr>
+						<tr>
+							<th colspan="6" style="text-align: left; background-color: #56c0f5 !important;" class="table_title">
+								◎提醒監察人不得為破產管理人、受監護人、受輔助人、未成年人、委託人</br>
+								◎外國人簽約需檢附居留證，有關證件之檢核方式請依行內規範辦理。
+							</th>
+						</tr>
+		    			<tr>
+							<td>姓名：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="CUST_NAME2" name="CUST_NAME2" 
+		    						style="width:150px;"
+		    						ng-disabled="lock || inputVO.custList2.CUST_YN == 'Y'"
+		    						ng-model="inputVO.custList2.CUST_NAME"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>聯絡方式：<span style="color:red;">*</span></br>(需擇一填入)</td>
+							<td colspan="3">TEL：
+								<input class="form-control" type="text" 
+		    						id="TEL2" name="TEL2" 
+		    						style="width:150px; display: inline;"
+		    						ng-disabled="lock"
+		    						e-input-limit="N"
+		    						ng-model="inputVO.custList2.TEL"/>
+		    					</br></br>
+								手機：
+								<input class="form-control" type="text" 
+		    						id="MOBILE_NO2" name="MOBILE_NO2" 
+		    						style="width:150px; display: inline;"
+		    						ng-disabled="lock"
+		    						e-input-limit="N"
+		    						ng-model="inputVO.custList2.MOBILE_NO"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>E-mail：</td>
+							<td>
+								<input class="form-control" type="text" 
+		    						id="EMAIL2" name="EMAIL2" 
+		    						style="width:450px;"
+		    						ng-disabled="lock || inputVO.custList2.CUST_YN == 'Y'"
+		    						ng-model="inputVO.custList2.EMAIL"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>通訊地址郵遞區號：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="COM_ZIP_CODE2" name="COM_ZIP_CODE2" 
+		    						style="width:100px;"
+		    						ng-disabled="lock"
+		    						maxlength="5"
+		    						ng-blur="checkZip(inputVO.custList2.COM_ZIP_CODE, '2')"
+		    						ng-model="inputVO.custList2.COM_ZIP_CODE"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>通訊地址：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="COM_ADDRESS2" name="COM_ADDRESS2" 
+		    						style="width:450px;"
+		    						ng-disabled="lock"
+		    						ng-model="inputVO.custList2.COM_ADDRESS"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>報酬及給付：</td>
+							<td colspan="3">
+								<label><input type="radio" ng-model="inputVO.custList2.PAY_YN" value="N" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayN(2)">無&nbsp;&nbsp;</label>
+					    		<label><input type="radio" ng-model="inputVO.custList2.PAY_YN" value="Y" ng-disabled="lock" style="margin-right: 5px;">有</label></br>
+					    		<table ng-show="inputVO.custList2.PAY_YN == 'Y'">
+					    			<tr>
+					    				<td>幣別：</td>
+					    				<td ng-show="inputVO.CON_CURR == 'T'">TWD</td>
+					    				<td ng-show="inputVO.CON_CURR == 'F'">USD</td>
+					    				<!-- <td ng-show="inputVO.CON_CURR == 'F'">
+					    					<e-combobox id="PAY_CURR2" name="PAY_CURR2"
+														ng-datasource="currList"
+														ng-disabled="lock"
+														ng-readonly="lock"
+														ng-model="inputVO.custList2.PAY_CURR" 
+														ng-format="F3"
+														ng-required="false"
+														ng-change="getAccByCurr(2)"
+														width="150px"
+														style="line-height:20px;"/>
+					    				</td> -->
+					    			</tr>
+					    			<tr>
+					    				<td>金額：</td>
+					    				<td>
+					    					<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="PAY_AMT2" name="PAY_AMT2"
+					    						   e-input-limit="NC" 
+					    						   ng-disabled="lock"
+					    						   ng-blur="checkPayAmt(2)"
+					    						   ng-model="inputVO.custList2.PAY_AMT">
+					    				</td>
+					    			</tr>
+					    			<tr>
+					    				<td>頻率：</td>
+					    				<td>
+					    					<label>報酬於下列約定月份之 15 日給付</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList2.PAY_FREQ" value="M" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(2)">每月</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList2.PAY_FREQ" value="S" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(2)">每季（1.4.7.10月當月）</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList2.PAY_FREQ" value="H" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(2)">每半年（1.7月當月）</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList2.PAY_FREQ" value="A" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(2)">每年
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="1" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>1			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="2" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>2			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="3" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>3			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="4" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>4			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="5" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>5			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="6" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>6			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="7" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>7			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="8" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>8			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="9" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>9			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="10" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>10			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="11" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>11		    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList2.PAY_FREQ_A" value="12" ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>12月		    						
+					    						
+										   <!-- <input type='checkbox' style="margin-right: 5px;" ng-model='A1_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>1
+					    						<input type='checkbox' style="margin-right: 5px;" ng-model='A2_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>2
+					    						<input type='checkbox' style="margin-right: 5px;" ng-model='A3_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>3
+					    						<input type='checkbox' style="margin-right: 5px;" ng-model='A4_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>4
+					    						<input type='checkbox' style="margin-right: 5px;" ng-model='A5_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>5
+					    						<input type='checkbox' style="margin-right: 5px;" ng-model='A6_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>6
+					    						<input type='checkbox' style="margin-right: 5px;" ng-model='A7_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>7
+					    						<input type='checkbox' style="margin-right: 5px;" ng-model='A8_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>8
+					    						<input type='checkbox' style="margin-right: 5px;" ng-model='A9_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>9
+					    						<input type='checkbox' style="margin-right: 5px;" ng-model='A10_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>10
+					    						<input type='checkbox' style="margin-right: 5px;" ng-model='A11_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>11
+					    						<input type='checkbox' style="margin-right: 5px;" ng-model='A12_2' ng-click='checkMon(2)' ng-disabled="inputVO.custList2.PAY_FREQ != 'A' || lock"/>12月 -->
+					    					</label></br>
+					    				</td>
+					    			</tr>
+					    			<tr>
+					    				<td>約定給付帳號：</td>
+					    				<td>
+					    					<input type="radio" 
+					    						   ng-model="inputVO.custList2.AGR_ACC_TYPE" 
+					    						   value="A" 
+					    						   ng-disabled="lock" 
+					    						   ng-click="clickFbnBank(2)"
+					    						   style="margin-right: 5px;">本行
+					    					<e-combobox id="AGR_ACC2" name="AGR_ACC2"
+														ng-datasource="accList2"
+														ng-model="inputVO.custList2.AGR_ACC" 
+														ng-change="getBraName(inputVO.custList2.AGR_ACC, 2)"
+														ng-format="F3"
+														ng-show="inputVO.custList2.AGR_ACC_TYPE == 'A'"
+														ng-disabled="inputVO.custList2.AGR_ACC_TYPE == 'B' || lock"
+														ng-readonly="inputVO.custList2.AGR_ACC_TYPE == 'B' || lock"
+														ng-required="false"
+														width="250px" 
+														style="line-height:20px; margin-left:5px;"/>
+											<span ng-show="BRA_NAME2 != undefined">{{BRA_NAME2}}</span>
+											</br>
+					    					<input type="radio" 
+					    						   ng-model="inputVO.custList2.AGR_ACC_TYPE" 
+					    						   value="B" 
+					    						   ng-disabled="lock" 
+					    						   ng-click="clickOtrBank(2)"
+					    						   style="margin-right: 5px;"
+					    						   ng-show="inputVO.CON_CURR == 'T'"><span ng-show="inputVO.CON_CURR == 'T'">他行</span>
+											<span ng-show="inputVO.custList2.AGR_ACC_TYPE == 'B'">
+												<!-- <input type="text" class="form-control" 
+						    						   style="width:150px; display:inline; margin-left: 5px;" 
+						    						   id="OTR_BANK2" name="OTR_BANK2"
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList2.OTR_BANK">銀行
+												
+												<input type="text" class="form-control" 
+						    						   style="width:150px; display:inline; margin-left: 10px" 
+						    						   id="OTR_BRANCH2" name="OTR_BRANCH2"
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList2.OTR_BRANCH">分行&nbsp;&nbsp; -->
+						    					<e-combobox id="OTR_BANK2" name="OTR_BANK2"
+														ng-datasource="otrBankList"
+														ng-model="inputVO.custList2.OTR_BANK" 
+														ng-click="memberOriBnk(2)"
+														ng-change="getOtrBranch(2, inputVO.custList2.OTR_BANK)"
+														ng-format="F1"
+														ng-disabled="lock"
+														ng-readonly="lock"
+														ng-required="false"
+														width="200px"
+														style="line-height:20px; margin-left:5px;"/>
+						    					<e-combobox id="OTR_BRANCH2" name="OTR_BRANCH2"
+														ng-datasource="otrBranchList2"
+														ng-model="inputVO.custList2.OTR_BRANCH" 
+														ng-format="F3"
+														ng-disabled="inputVO.custList2.OTR_BANK == undefined || inputVO.custList2.OTR_BANK == '' || lock"
+														ng-readonly="inputVO.custList2.OTR_BANK == undefined || inputVO.custList2.OTR_BANK == '' || lock"
+														ng-required="false"
+														width="150px"
+														style="line-height:20px; margin-left:5px;"/>
+						    					帳號
+						    					<input type="text" class="form-control" 
+						    						   style="width:150px; display:inline;" 
+						    						   id="OTR_ACC2" name="OTR_ACC2"
+						    						   e-input-limit="N" 
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList2.OTR_ACC">	
+											</span>
+					    				</td>
+					    			</tr>
+					    		</table>
+							</td>
+		    			</tr>
+		    			<tr>
+		    				<td>解任方式：<span style="color:red;">*</span></td>
+		    				<td colspan="3">
+		    					<label><input type="radio" ng-model="inputVO.custList2.DIS_TYPE" value="1" ng-disabled="lock" style="margin-right: 5px;">委託人得隨時解任</label></br>
+					    		<label><input type="radio" ng-model="inputVO.custList2.DIS_TYPE" value="2" ng-disabled="lock" style="margin-right: 5px;">需經原監察人同意</label>
+		    				</td>
+		    			</tr>
+		    		</table>
+		    		<table ng-show="inputVO.custList3.CUST_ID != undefined && inputVO.custList3.CUST_ID != ''">
+		    			<tr>
+							<th colspan="6" style="text-align: left; background-color: #56c0f5 !important;" class="table_title">監察人2</th>
+						</tr>
+						<tr>
+							<th colspan="6" style="text-align: left; background-color: #56c0f5 !important;" class="table_title">
+								◎提醒監察人不得為破產管理人、受監護人、受輔助人、未成年人、委託人</br>
+								◎外國人簽約需檢附居留證，有關證件之檢核方式請依行內規範辦理。
+							</th>
+						</tr>
+		    			<tr>
+							<td>姓名：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="CUST_NAME3" name="CUST_NAME3" 
+		    						style="width:150px;"
+		    						ng-disabled="lock || inputVO.custList3.CUST_YN == 'Y'"
+		    						ng-model="inputVO.custList3.CUST_NAME"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>聯絡方式：<span style="color:red;">*</span></br>(需擇一填入)</td>
+							<td colspan="3">TEL：
+								<input class="form-control" type="text" 
+		    						id="TEL3" name="TEL3" 
+		    						style="width:150px; display: inline;"
+		    						ng-disabled="lock"
+		    						e-input-limit="N"
+		    						ng-model="inputVO.custList3.TEL"/>
+		    					</br></br>
+								手機：
+								<input class="form-control" type="text" 
+		    						id="MOBILE_NO3" name="MOBILE_NO3" 
+		    						style="width:150px; display: inline;"
+		    						ng-disabled="lock"
+		    						e-input-limit="N"
+		    						ng-model="inputVO.custList3.MOBILE_NO"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>E-mail：</td>
+							<td>
+								<input class="form-control" type="text" 
+		    						id="EMAIL3" name="EMAIL3" 
+		    						style="width:450px;"
+		    						ng-disabled="lock || inputVO.custList3.CUST_YN == 'Y'"
+		    						ng-model="inputVO.custList3.EMAIL"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>通訊地址郵遞區號：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="COM_ZIP_CODE3" name="COM_ZIP_CODE3" 
+		    						style="width:100px;"
+		    						ng-disabled="lock"
+		    						maxlength="5"
+		    						ng-blur="checkZip(inputVO.custList3.COM_ZIP_CODE, '3')"
+		    						ng-model="inputVO.custList3.COM_ZIP_CODE"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>通訊地址：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="COM_ADDRESS3" name="COM_ADDRESS3" 
+		    						style="width:450px;"
+		    						ng-disabled="lock"
+		    						ng-model="inputVO.custList3.COM_ADDRESS"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>報酬及給付：</td>
+							<td colspan="3">
+								<label><input type="radio" ng-model="inputVO.custList3.PAY_YN" value="N" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayN(3)">無&nbsp;&nbsp;</label>
+					    		<label><input type="radio" ng-model="inputVO.custList3.PAY_YN" value="Y" ng-disabled="lock" style="margin-right: 5px;">有</label></br>
+					    		<table ng-show="inputVO.custList3.PAY_YN == 'Y'">
+					    			<tr>
+					    				<td>幣別：</td>
+					    				<td ng-show="inputVO.CON_CURR == 'T'">TWD</td>
+					    				<td ng-show="inputVO.CON_CURR == 'F'">USD</td>
+					    				<!-- <td ng-show="inputVO.CON_CURR == 'F'">
+					    					<e-combobox id="PAY_CURR3" name="PAY_CURR3"
+														ng-datasource="currList"
+														ng-disabled="lock"
+														ng-readonly="lock"
+														ng-model="inputVO.custList3.PAY_CURR" 
+														ng-format="F3"
+														ng-required="false"
+														ng-change="getAccByCurr(3)"
+														width="150px"
+														style="line-height:20px;"/>
+					    				</td> -->
+					    			</tr>
+					    			<tr>
+					    				<td>金額：</td>
+					    				<td>
+					    					<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="PAY_AMT3" name="PAY_AMT3"
+					    						   e-input-limit="NC" 
+					    						   ng-disabled="lock"
+					    						   ng-blur="checkPayAmt(3)"
+					    						   ng-model="inputVO.custList3.PAY_AMT">
+					    				</td>
+					    			</tr>
+					    			<tr>
+					    				<td>頻率：</td>
+					    				<td>
+					    					<label><input type="radio" ng-model="inputVO.custList3.PAY_FREQ" value="M" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(3)">每月</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList3.PAY_FREQ" value="S" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(3)">每季（1.4.7.10月當月）</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList3.PAY_FREQ" value="H" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(3)">每半年（1.7月當月）</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList3.PAY_FREQ" value="A" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(3)">每年
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="1" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>1			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="2" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>2			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="3" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>3			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="4" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>4			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="5" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>5			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="6" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>6			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="7" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>7			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="8" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>8			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="9" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>9			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="10" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>10			    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="11" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>11		    						
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList3.PAY_FREQ_A" value="12" ng-disabled="inputVO.custList3.PAY_FREQ != 'A' || lock"/>12月
+					    					</label></br>
+					    				</td>
+					    			</tr>
+					    			<tr>
+					    				<td>約定給付帳號：</td>
+					    				<td>
+					    					<input type="radio" 
+					    						   ng-model="inputVO.custList3.AGR_ACC_TYPE" 
+					    						   value="A" 
+					    						   ng-disabled="lock" 
+					    						   ng-click="clickFbnBank(3)"
+					    						   style="margin-right: 5px;">本行
+					    					<e-combobox id="AGR_ACC3" name="AGR_ACC3"
+														ng-datasource="accList3"
+														ng-model="inputVO.custList3.AGR_ACC"
+														ng-change="getBraName(inputVO.custList3.AGR_ACC, 3)" 
+														ng-format="F3"
+														ng-show="inputVO.custList3.AGR_ACC_TYPE == 'A'"
+														ng-disabled="inputVO.custList3.AGR_ACC_TYPE == 'B' || lock"
+														ng-readonly="inputVO.custList3.AGR_ACC_TYPE == 'B' || lock"
+														ng-required="false"
+														width="250px"
+														style="line-height:20px; margin-left:5px;"/>
+											<span ng-show="BRA_NAME3 != undefined">{{BRA_NAME3}}</span>
+											</br>
+											<input type="radio" 
+					    						   ng-model="inputVO.custList3.AGR_ACC_TYPE" 
+					    						   value="B" 
+					    						   ng-disabled="lock" 
+					    						   ng-click="clickOtrBank(3)"
+					    						   style="margin-right: 5px;"
+					    						   ng-show="inputVO.CON_CURR == 'T'"><span ng-show="inputVO.CON_CURR == 'T'">他行</span>
+											<span ng-show="inputVO.custList3.AGR_ACC_TYPE == 'B'">
+												
+												<!-- <input type="text" class="form-control" 
+						    						   style="width:150px; display:inline; margin-left: 5px;" 
+						    						   id="OTR_BANK3" name="OTR_BANK3"
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList3.OTR_BANK">銀行
+												
+												<input type="text" class="form-control" 
+						    						   style="width:150px; display:inline; margin-left: 10px" 
+						    						   id="OTR_BRANCH3" name="OTR_BRANCH3"
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList3.OTR_BRANCH">分行&nbsp;&nbsp; -->
+						    					
+						    					<e-combobox id="OTR_BANK3" name="OTR_BANK3"
+														ng-datasource="otrBankList"
+														ng-model="inputVO.custList3.OTR_BANK" 
+														ng-click="memberOriBnk(3)"
+														ng-change="getOtrBranch(3, inputVO.custList3.OTR_BANK)"
+														ng-format="F1"
+														ng-disabled="lock"
+														ng-readonly="lock"
+														ng-required="false"
+														width="200px"
+														style="line-height:20px; margin-left:5px;"/>
+						    					
+						    					<e-combobox id="OTR_BRANCH3" name="OTR_BRANCH3"
+														ng-datasource="otrBranchList3"
+														ng-model="inputVO.custList3.OTR_BRANCH" 
+														ng-format="F3"
+														ng-disabled="inputVO.custList3.OTR_BANK == undefined || inputVO.custList3.OTR_BANK == '' || lock"
+														ng-readonly="inputVO.custList3.OTR_BANK == undefined || inputVO.custList3.OTR_BANK == '' || lock"
+														ng-required="false"
+														width="150px"
+														style="line-height:20px; margin-left:5px;"/>	   
+						    					
+						    					帳號
+						    					<input type="text" class="form-control" 
+						    						   style="width:150px; display:inline;" 
+						    						   id="OTR_ACC3" name="OTR_ACC3"
+						    						   e-input-limit="N" 
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList3.OTR_ACC">	
+											</span>
+					    				</td>
+					    			</tr>
+					    		</table>
+							</td>
+		    			</tr>
+		    			
+		    			<!--<tr>
+		    				<td>解任方式：</td>
+		    				<td colspan="3">
+		    					<label><input type="radio" ng-model="inputVO.custList3.DIS_TYPE" value="1" ng-disabled="lock" style="margin-right: 5px;">委託人得隨時解任</label></br>
+					    		<label><input type="radio" ng-model="inputVO.custList3.DIS_TYPE" value="2" ng-disabled="lock" style="margin-right: 5px;">需經原監察人同意</label>
+		    				</td>
+		    			</tr>-->
+		    		</table>		    		
+		    		<table ng-show="inputVO.custList4.CUST_ID != undefined && inputVO.custList4.CUST_ID != ''">
+		    			<tr>
+							<th colspan="6" style="text-align: left; background-color: #56c0f5 !important;" class="table_title">次順位監察人</th>
+						</tr>
+						<tr>
+							<th colspan="6" style="text-align: left; background-color: #56c0f5 !important;" class="table_title">
+								◎提醒監察人不得為破產管理人、受監護人、受輔助人、未成年人、委託人</br>
+								◎外國人簽約需檢附居留證，有關證件之檢核方式請依行內規範辦理。
+							</th>
+						</tr>
+		    			<tr>
+							<td>姓名：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="CUST_NAME4" name="CUST_NAME4" 
+		    						style="width:150px;"
+		    						ng-disabled="lock || inputVO.custList4.CUST_YN == 'Y'"
+		    						ng-model="inputVO.custList4.CUST_NAME"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>聯絡方式：<span style="color:red;">*</span></br>(需擇一填入)</td>
+							<td colspan="3">TEL：
+								<input class="form-control" type="text" 
+		    						id="TEL4" name="TEL4" 
+		    						style="width:150px; display: inline;"
+		    						ng-disabled="lock"
+		    						e-input-limit="N"
+		    						ng-model="inputVO.custList4.TEL"/>
+		    					</br></br>
+								手機：
+								<input class="form-control" type="text" 
+		    						id="MOBILE_NO4" name="MOBILE_NO4" 
+		    						style="width:150px; display: inline;"
+		    						ng-disabled="lock"
+		    						e-input-limit="N"
+		    						ng-model="inputVO.custList4.MOBILE_NO"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>E-mail：</td>
+							<td>
+								<input class="form-control" type="text" 
+		    						id="EMAIL4" name="EMAIL4" 
+		    						style="width:450px;"
+		    						ng-disabled="lock || inputVO.custList4.CUST_YN == 'Y'"
+		    						ng-model="inputVO.custList4.EMAIL"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>通訊地址郵遞區號：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="COM_ZIP_CODE4" name="COM_ZIP_CODE4" 
+		    						style="width:100px;"
+		    						ng-disabled="lock"
+		    						maxlength="5"
+		    						ng-blur="checkZip(inputVO.custList4.COM_ZIP_CODE, '4')"
+		    						ng-model="inputVO.custList4.COM_ZIP_CODE"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>通訊地址：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="COM_ADDRESS4" name="COM_ADDRESS4" 
+		    						style="width:450px;"
+		    						ng-disabled="lock"
+		    						ng-model="inputVO.custList4.COM_ADDRESS"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>報酬及給付：</td>
+							<td colspan="3">
+								<label><input type="radio" ng-model="inputVO.custList4.PAY_YN" value="N" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayN(4)">無&nbsp;&nbsp;</label>
+					    		<label><input type="radio" ng-model="inputVO.custList4.PAY_YN" value="Y" ng-disabled="lock" style="margin-right: 5px;">有</label></br>
+					    		<table ng-show="inputVO.custList4.PAY_YN == 'Y'">
+					    			<tr>
+					    				<td>幣別：</td>
+					    				<td ng-show="inputVO.CON_CURR == 'T'">TWD</td>
+					    				<td ng-show="inputVO.CON_CURR == 'F'">USD</td>
+					    				<!-- <td ng-show="inputVO.CON_CURR == 'F'">
+					    					<e-combobox id="PAY_CURR4" name="PAY_CURR4"
+														ng-datasource="currList"
+														ng-disabled="lock"
+														ng-readonly="lock"
+														ng-model="inputVO.custList4.PAY_CURR" 
+														ng-format="F3"
+														ng-required="false"
+														ng-change="getAccByCurr(4)"
+														width="150px"
+														style="line-height:20px;"/>
+					    				</td> -->
+					    			</tr>
+					    			<tr>
+					    				<td>金額：</td>
+					    				<td>
+					    					<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="PAY_AMT4" name="PAY_AMT4"
+					    						   e-input-limit="NC" 
+					    						   ng-disabled="lock"
+					    						   ng-blur="checkPayAmt(4)"
+					    						   ng-model="inputVO.custList4.PAY_AMT">
+					    				</td>
+					    			</tr>
+					    			<tr>
+					    				<td>頻率：</td>
+					    				<td>
+					    					<label><input type="radio" ng-model="inputVO.custList4.PAY_FREQ" value="M" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(4)">每月</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList4.PAY_FREQ" value="S" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(4)">每季（1.4.7.10月當月）</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList4.PAY_FREQ" value="H" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(4)">每半年（1.7月當月）</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList4.PAY_FREQ" value="A" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(4)">每年
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="1" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>1
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="2" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>2
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="3" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>3
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="4" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>4
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="5" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>5
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="6" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>6
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="7" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>7
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="8" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>8
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="9" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>9
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="10" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>10
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="11" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>11
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList4.PAY_FREQ_A" value="12" ng-disabled="inputVO.custList4.PAY_FREQ != 'A' || lock"/>12月
+					    					</label></br>
+					    				</td>
+					    			</tr>
+					    			<tr ng-show="false">
+					    				<td>約定給付帳號：</td>
+					    				<td>
+					    					<input type="radio" 
+					    						   ng-model="inputVO.custList4.AGR_ACC_TYPE" 
+					    						   value="A" 
+					    						   ng-disabled="lock" 
+					    						   ng-click="clickFbnBank(4)"
+					    						   style="margin-right: 5px;">本行
+					    					<e-combobox id="AGR_ACC4" name="AGR_ACC4"
+														ng-datasource="accList4"
+														ng-model="inputVO.custList4.AGR_ACC" 
+														ng-change="getBraName(inputVO.custList4.AGR_ACC, 4)"
+														ng-format="F3"
+														ng-show="inputVO.custList4.AGR_ACC_TYPE == 'A'"
+														ng-disabled="inputVO.custList4.AGR_ACC_TYPE == 'B' || lock"
+														ng-readonly="inputVO.custList4.AGR_ACC_TYPE == 'B' || lock"
+														ng-required="false"
+														width="250px"
+														style="line-height:20px; margin-left:5px;"/>
+											<span ng-show="BRA_NAME4 != undefined">{{BRA_NAME4}}</span>
+											</br>
+											<input type="radio" 
+					    						   ng-model="inputVO.custList4.AGR_ACC_TYPE" 
+					    						   value="B" 
+					    						   ng-disabled="lock" 
+					    						   ng-click="clickOtrBank(4)"
+					    						   style="margin-right: 5px;"
+					    						   ng-show="inputVO.CON_CURR == 'T'"><span ng-show="inputVO.CON_CURR == 'T'">他行</span>
+											<span ng-show="inputVO.custList4.AGR_ACC_TYPE == 'B'">
+												
+												<!-- <input type="text" class="form-control" 
+						    						   style="width:150px; display:inline; margin-left: 5px;" 
+						    						   id="OTR_BANK4" name="OTR_BANK4"
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList4.OTR_BANK">銀行
+												
+												<input type="text" class="form-control" 
+						    						   style="width:150px; display:inline; margin-left: 10px" 
+						    						   id="OTR_BRANCH4" name="OTR_BRANCH4"
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList4.OTR_BRANCH">分行&nbsp;&nbsp; -->
+						    					
+						    					<e-combobox id="OTR_BANK4" name="OTR_BANK4"
+														ng-datasource="otrBankList"
+														ng-model="inputVO.custList4.OTR_BANK" 
+														ng-click="memberOriBnk(4)"
+														ng-change="getOtrBranch(4, inputVO.custList4.OTR_BANK)"
+														ng-format="F1"
+														ng-disabled="lock"
+														ng-readonly="lock"
+														ng-required="false"
+														width="200px"
+														style="line-height:20px; margin-left:5px;"/>
+						    					<e-combobox id="OTR_BRANCH4" name="OTR_BRANCH4"
+														ng-datasource="otrBranchList4"
+														ng-model="inputVO.custList4.OTR_BRANCH" 
+														ng-format="F3"
+														ng-disabled="inputVO.custList4.OTR_BANK == undefined || inputVO.custList4.OTR_BANK == '' || lock"
+														ng-readonly="inputVO.custList4.OTR_BANK == undefined || inputVO.custList4.OTR_BANK == '' || lock"
+														ng-required="false"
+														width="150px"
+														style="line-height:20px; margin-left:5px;"/>
+														
+						    					帳號
+						    					<input type="text" class="form-control" 
+						    						   style="width:150px; display:inline;"
+						    						   id="OTR_ACC4" name="OTR_ACC4"
+						    						   e-input-limit="N"  
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList4.OTR_ACC">	
+											</span>
+					    				</td>
+					    			</tr>
+					    		</table>
+							</td>
+		    			</tr>
+		    			<!--<tr>
+		    				<td>解任方式：</td>
+		    				<td colspan="3">
+		    					<label><input type="radio" ng-model="inputVO.custList4.DIS_TYPE" value="1" ng-disabled="lock" style="margin-right: 5px;">委託人得隨時解任</label></br>
+					    		<label><input type="radio" ng-model="inputVO.custList4.DIS_TYPE" value="2" ng-disabled="lock" style="margin-right: 5px;">需經原監察人同意</label>
+		    				</td>
+		    			</tr>-->
+		    		</table>		    		
+		    		<table ng-show="inputVO.custList5.CUST_ID != undefined && inputVO.custList5.CUST_ID != ''">
+		    			<tr>
+							<th colspan="6" style="text-align: left; background-color: #56c0f5 !important;" class="table_title">第三順位監察人</th>
+						</tr>
+						<tr>
+							<th colspan="6" style="text-align: left; background-color: #56c0f5 !important;" class="table_title">
+								◎提醒監察人不得為破產管理人、受監護人、受輔助人、未成年人、委託人</br>
+								◎外國人簽約需檢附居留證，有關證件之檢核方式請依行內規範辦理。
+							</th>
+						</tr>
+		    			<tr>
+							<td>姓名：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="CUST_NAME5" name="CUST_NAME5" 
+		    						style="width:150px;"
+		    						ng-disabled="lock || inputVO.custList5.CUST_YN == 'Y'"
+		    						ng-model="inputVO.custList5.CUST_NAME"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>聯絡方式：<span style="color:red;">*</span></br>(需擇一填入)</td>
+							<td colspan="3">TEL：
+								<input class="form-control" type="text" 
+		    						id="TEL5" name="TEL5" 
+		    						style="width:150px; display: inline;"
+		    						ng-disabled="lock"
+		    						e-input-limit="N"
+		    						ng-model="inputVO.custList5.TEL"/>
+		    					</br></br>
+								手機：
+								<input class="form-control" type="text" 
+		    						id="MOBILE_NO5" name="MOBILE_NO5" 
+		    						style="width:150px; display: inline;"
+		    						ng-disabled="lock"
+		    						e-input-limit="N"
+		    						ng-model="inputVO.custList5.MOBILE_NO"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>E-mail：</td>
+							<td>
+								<input class="form-control" type="text" 
+		    						id="EMAIL5" name="EMAIL5" 
+		    						style="width:450px;"
+		    						ng-disabled="lock || inputVO.custList5.CUST_YN == 'Y'"
+		    						ng-model="inputVO.custList5.EMAIL"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>通訊地址郵遞區號：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="COM_ZIP_CODE5" name="COM_ZIP_CODE5" 
+		    						style="width:100px;"
+		    						ng-disabled="lock"
+		    						maxlength="5"
+		    						ng-blur="checkZip(inputVO.custList5.COM_ZIP_CODE, '5')"
+		    						ng-model="inputVO.custList5.COM_ZIP_CODE"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>通訊地址：<span style="color:red;">*</span></td>
+							<td colspan="3">
+								<input class="form-control" type="text" 
+		    						id="COM_ADDRESS5" name="COM_ADDRESS5" 
+		    						style="width:450px;"
+		    						ng-disabled="lock"
+		    						ng-model="inputVO.custList5.COM_ADDRESS"/>
+							</td>
+		    			</tr>
+		    			<tr>
+							<td>報酬及給付：</td>
+							<td colspan="3">
+								<label><input type="radio" ng-model="inputVO.custList5.PAY_YN" value="N" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayN(5)">無&nbsp;&nbsp;</label>
+					    		<label><input type="radio" ng-model="inputVO.custList5.PAY_YN" value="Y" ng-disabled="lock" style="margin-right: 5px;">有</label></br>
+					    		<table ng-show="inputVO.custList5.PAY_YN == 'Y'">
+					    			<tr>
+					    				<td>幣別：</td>
+					    				<td ng-show="inputVO.CON_CURR == 'T'">TWD</td>
+					    				<td ng-show="inputVO.CON_CURR == 'F'">USD</td>
+					    				<!-- <td ng-show="inputVO.CON_CURR == 'F'">
+					    					<e-combobox id="PAY_CURR5" name="PAY_CURR5"
+														ng-datasource="currList"
+														ng-disabled="lock"
+														ng-readonly="lock"
+														ng-model="inputVO.custList5.PAY_CURR" 
+														ng-format="F3"
+														ng-required="false"
+														ng-change="getAccByCurr(5)"
+														width="150px"
+														style="line-height:20px;"/>
+					    				</td> -->
+					    			</tr>
+					    			<tr>
+					    				<td>金額：</td>
+					    				<td>
+					    					<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="PAY_AMT5" name="PAY_AMT5"
+					    						   e-input-limit="NC" 
+					    						   ng-disabled="lock"
+					    						   ng-blur="checkPayAmt(5)"
+					    						   ng-model="inputVO.custList5.PAY_AMT">
+					    				</td>
+					    			</tr>
+					    			<tr>
+					    				<td>頻率：</td>
+					    				<td>
+					    					<label><input type="radio" ng-model="inputVO.custList5.PAY_FREQ" value="M" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(5)">每月</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList5.PAY_FREQ" value="S" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(5)">每季（1.4.7.10月當月）</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList5.PAY_FREQ" value="H" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(5)">每半年（1.7月當月）</label></br>
+					    					<label><input type="radio" ng-model="inputVO.custList5.PAY_FREQ" value="A" ng-disabled="lock" style="margin-right: 5px;" ng-click="clickPayFreq(5)">每年
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="1" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>1
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="2" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>2
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="3" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>3
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="4" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>4
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="5" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>5
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="6" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>6
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="7" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>7
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="8" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>8
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="9" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>9
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="10" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>10
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="11" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>11
+					    						<input type='radio' style="margin-right: 5px;" ng-model="inputVO.custList5.PAY_FREQ_A" value="12" ng-disabled="inputVO.custList5.PAY_FREQ != 'A' || lock"/>12月
+					    					</label></br>
+					    				</td>
+					    			</tr>
+					    			<tr ng-show="false">
+					    				<td>約定給付帳號：</td>
+					    				<td>
+					    					<input type="radio" 
+					    						   ng-model="inputVO.custList5.AGR_ACC_TYPE" 
+					    						   value="A" 
+					    						   ng-disabled="lock" 
+					    						   ng-click="clickFbnBank(5)"
+					    						   style="margin-right: 5px;">本行
+					    					<e-combobox id="AGR_ACC5" name="AGR_ACC5"
+														ng-datasource="accList5"
+														ng-model="inputVO.custList5.AGR_ACC" 
+														ng-change="getBraName(inputVO.custList5.AGR_ACC, 5)"
+														ng-format="F3"
+														ng-show="inputVO.custList5.AGR_ACC_TYPE == 'A'"
+														ng-disabled="inputVO.custList5.AGR_ACC_TYPE == 'B' || lock"
+														ng-readonly="inputVO.custList5.AGR_ACC_TYPE == 'B' || lock"
+														ng-required="false"
+														width="250px"
+														style="line-height:20px; margin-left:5px;"/>
+											<span ng-show="BRA_NAME5 != undefined">{{BRA_NAME5}}</span>
+											</br>
+											<input type="radio" 
+					    						   ng-model="inputVO.custList5.AGR_ACC_TYPE" 
+					    						   value="B" 
+					    						   ng-disabled="lock" 
+					    						   ng-click="clickOtrBank(5)"
+					    						   style="margin-right: 5px;"
+					    						   ng-show="inputVO.CON_CURR == 'T'"><span ng-show="inputVO.CON_CURR == 'T'">他行</span>
+											<span ng-show="inputVO.custList5.AGR_ACC_TYPE == 'B'">
+												
+												<!-- <input type="text" class="form-control" 
+						    						   style="width:150px; display:inline; margin-left: 5px;" 
+						    						   id="OTR_BANK5" name="OTR_BANK5"
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList5.OTR_BANK">銀行
+												
+												<input type="text" class="form-control" 
+						    						   style="width:150px; display:inline; margin-left: 10px" 
+						    						   id="OTR_BRANCH5" name="OTR_BRANCH5"
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList5.OTR_BRANCH">分行&nbsp;&nbsp; -->
+						    					
+						    					<e-combobox id="OTR_BANK5" name="OTR_BANK5"
+														ng-datasource="otrBankList"
+														ng-model="inputVO.custList5.OTR_BANK" 
+														ng-click="memberOriBnk(5)"
+														ng-change="getOtrBranch(5, inputVO.custList5.OTR_BANK)"
+														ng-format="F1"
+														ng-disabled="lock"
+														ng-readonly="lock"
+														ng-required="false"
+														width="200px"
+														style="line-height:20px; margin-left:5px;"/>
+						    					<e-combobox id="OTR_BRANCH5" name="OTR_BRANCH5"
+														ng-datasource="otrBranchList5"
+														ng-model="inputVO.custList5.OTR_BRANCH" 
+														ng-format="F3"
+														ng-disabled="inputVO.custList5.OTR_BANK == undefined || inputVO.custList5.OTR_BANK == '' || lock"
+														ng-readonly="inputVO.custList5.OTR_BANK == undefined || inputVO.custList5.OTR_BANK == '' || lock"
+														ng-required="false"
+														width="150px"
+														style="line-height:20px; margin-left:5px;"/>
+						    					
+						    					帳號
+						    					<input type="text" class="form-control" 
+						    						   style="width:150px; display:inline;" 
+						    						   id="OTR_ACC5" name="OTR_ACC5"
+						    						   e-input-limit="N" 
+						    						   ng-disabled="lock"
+						    						   ng-model="inputVO.custList5.OTR_ACC">	
+											</span>
+					    				</td>
+					    			</tr>
+					    		</table>
+							</td>
+		    			</tr>
+		    			<!--tr>
+		    				<td>解任方式：</td>
+		    				<td colspan="3">
+		    					<label><input type="radio" ng-model="inputVO.custList5.DIS_TYPE" value="1" ng-disabled="lock" style="margin-right: 5px;">委託人得隨時解任</label></br>
+					    		<label><input type="radio" ng-model="inputVO.custList5.DIS_TYPE" value="2" ng-disabled="lock" style="margin-right: 5px;">需經原監察人同意</label>
+		    				</td>
+		    			</tr>-->
+		    		</table>
+		    		<table>
+		    			<tr>
+							<th colspan="6" style="text-align: left; class="table_title">信託終止、變更、運用決定權約定</th>
+						</tr>
+						<tr>
+							<td>終止條件<span style="color:red;">*</span></td>
+							<td>
+								<table>
+									<tr>
+										<td style="border: none !important;">1. 成立滿</td>
+										<td style="border: none !important;">
+											<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline; margin-right: 5px;" 
+					    						   id="END_YEARS" name="END_YEARS"
+					    						   e-input-limit="N" 
+					    						   ng-disabled="lock"
+					    						   ng-blur="checkEndYear()"
+					    						   ng-model="inputVO.END_YEARS">年
+										</td>
+									</tr>
+									<tr>
+										<td style="border: none !important;">2. 財產低於 {{inputVO.CON_CURR == 'T' ? "NTD" : "USD"}}</td>
+										<td style="border: none !important;">
+											<input type="text" class="form-control" 
+					    						   style="width:150px; display:inline;" 
+					    						   id="END_AMT_LIMIT" name="END_AMT_LIMIT"
+					    						   e-input-limit="NC" 
+					    						   ng-disabled="lock"
+					    						   ng-blur="checkEndAmtLimit()"
+					    						   ng-model="inputVO.END_AMT_LIMIT">
+										</td>
+									</tr>
+								</table>
+		    				</td>
+		    				<td>提前終止<span style="color:red;">*</span></td>
+							<td>
+								<table>
+									<tr>
+										<td style="border: none !important;">
+											<input type="radio" ng-model="inputVO.TERM_CON" value="A" ng-disabled="radioLock || lock" style="margin-right: 5px;">委託人
+										</td>
+									</tr>
+									<tr ng-hide="radioLock">
+										<td style="border: none !important;">
+											<input type="radio" ng-model="inputVO.TERM_CON" value="B" ng-disabled="radioLock || lock" style="margin-right: 5px;">委託人+全體監察人
+										</td>
+									</tr>
+								</table>
+		    				</td>
+						</tr>
+						<tr>
+							<td>變更契約<span style="color:red;">*</span></td>
+							<td>
+								<table>
+									<tr>
+										<td style="border: none !important;">
+											<input type="radio" ng-model="inputVO.MODI_CON" value="A" ng-disabled="radioLock || lock" style="margin-right: 5px;">委託人
+										</td>
+									</tr>
+									<tr ng-hide="radioLock">
+										<td style="border: none !important;">
+											<input type="radio" ng-model="inputVO.MODI_CON" value="B" ng-disabled="radioLock || lock" style="margin-right: 5px;">委託人+全體監察人
+										</td>
+									</tr>
+								</table>
+		    				</td>
+							<td>運用決定權<span style="color:red;">*</span></td>
+							<td>
+								<table>
+									<tr>
+										<td style="border: none !important;">
+											<input type="radio" ng-model="inputVO.DISC_CON" value="A" ng-disabled="radioLock || lock" style="margin-right: 5px;" ng-click="changeDisc()">委託人
+										</td>
+									</tr>
+									<tr ng-hide="radioLock">
+										<td style="border: none !important;">
+											<input type="radio" ng-model="inputVO.DISC_CON" value="B" ng-disabled="radioLock || lock" style="margin-right: 5px;" ng-click="changeDisc()">委託人+全體監察人
+										</td>
+									</tr>
+									<tr ng-hide="radioLock">
+										<td style="border: none !important;">
+											<input type="radio" ng-model="inputVO.DISC_CON" value="C" ng-disabled="radioLock || lock" style="margin-right: 5px;" ng-click="changeDisc()">委任監察人
+											<table ng-show="showApp_sup" style="margin-left: 10px;">
+												<tr>
+													<td style="border: none !important;">
+														<input type="radio" 
+															   ng-model="inputVO.APP_SUP" value="C1" 
+															   ng-disabled="radioLock || inputVO.DISC_CON != 'C' || lock" 
+															   ng-click="changeApp()"
+															   style="margin-right: 5px;">全體監察人
+													</td>
+												</tr>
+												<tr ng-hide="radioLock">
+													<td style="border: none !important;">
+														<input type="radio" 
+															   ng-model="inputVO.APP_SUP" value="C2" 
+															   ng-disabled="radioLock || inputVO.DISC_CON != 'C' || lock" 
+															   ng-click="changeApp()"
+															   style="margin-right: 5px;">推派
+															   
+														<e-combobox id="DISC_ID" name="DISC_ID"
+																	ng-datasource="discList"
+																	ng-model="inputVO.DISC_ID" 
+																	ng-format="F3"
+																	ng-required="false"
+																	ng-disabled="inputVO.APP_SUP != 'C2' || lock"
+																	ng-readonly="inputVO.APP_SUP != 'C2' || lock"
+																	width="150px"
+																	style="line-height:20px;"/>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+		    				</td>
+						</tr>
+					</table>
+					<table>
+		    			<tr>
+							<th colspan="6" style="text-align: left; class="table_title">信託財產給付約定事項</th>
+						</tr>
+						<tr>
+							<td>Q：請問客戶規劃資產給付方式?&nbsp;<span style="color:red;">*</span></br>(至少擇一，可複選)</td>
+							<td colspan="3">
+								<table>
+									<tr>
+										<td style="border: none !important;">
+											<input type='checkbox' style="margin-right: 5px;" ng-model='inputVO.PAY_TYPE1' ng-disabled="lock" ng-change="changePayType('1')"/>定期定額給付，按約定時間撥款									
+										</td>
+									</tr>
+									<tr>
+										<td style="border: none !important;">
+											<input type='checkbox' style="margin-right: 5px;" ng-model='inputVO.PAY_TYPE2' ng-disabled="lock" ng-change="changePayType('2')"/>有需要再提供指示書申請撥款
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr ng-show="inputVO.PAY_TYPE1 == true">
+							<td>■&nbsp;&nbsp;定期定額給付，按約定時間撥款</br>(可複選)</td>
+							<td colspan="3">
+								<table>
+									<tr>
+										<td style="border: none !important;">
+											<input type='checkbox' style="margin-right: 5px;" ng-model='inputVO.SIP_TYPE1' ng-disabled="lock" ng-change="changeSipType('1')"/>依受益人年紀進行給付
+										</td>
+									</tr>
+									<tr>
+										<td style="border: none !important;">
+											<input type='checkbox' style="margin-right: 5px;" ng-model='inputVO.SIP_TYPE2' ng-disabled="lock" ng-change="changeSipType('2')"/>依約定月份進行給付
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr ng-show="inputVO.PAY_TYPE2 == true">
+							<td>■&nbsp;&nbsp;有需要再提供指示書申請撥款</td>
+							<td colspan="3">
+								<table>
+<!-- 									<tr> -->
+<!-- 										<td style="border: none !important;">Q：有權申請人?（擇一）</td> -->
+<!-- 									</tr> -->
+<!-- 									<tr> -->
+<!-- 										<td style="border: none !important;"> -->
+<!-- 											<input type="radio" ng-model="inputVO.APL_CON" value="A" ng-disabled="radioLock || lock" style="margin-right: 5px; margin-left: 25px;">委託人 -->
+<!-- 										</td> -->
+<!-- 									</tr> -->
+<!-- 									<tr> -->
+<!-- 										<td style="border: none !important;"> -->
+<!-- 											<input type="radio" ng-model="inputVO.APL_CON" value="B" ng-disabled="radioLock || lock" style="margin-right: 5px; margin-left: 25px;">委託人+全體監察人 -->
+<!-- 										</td> -->
+<!-- 									</tr> -->
+									<tr>
+										<td style="border: none !important;">Q：申請時是否需提供佐證單據?（可複選）</td>
+									</tr>
+									<tr>
+										<td style="border: none !important;">
+											<input type='checkbox' 
+												   style="margin-right: 5px; margin-left: 25px;" 
+												   ng-model='inputVO.APL_DOC_N' 
+												   ng-change="changeAplDoc()"
+												   ng-disabled="lock"/>否
+										</td>
+									</tr>
+									<tr>
+										<td style="border: none !important;">
+											<input type='checkbox' 
+												   style="margin-right: 5px; margin-left: 25px;" 
+												   ng-model='inputVO.APL_DOC_Y' 
+												   ng-change="changeAplDoc()"
+												   ng-disabled="lock"/>是
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr ng-show="inputVO.SIP_TYPE1 == true || inputVO.SIP_TYPE2 == true">
+							<td>固定給付</td>
+							<td colspan="3">
+								<table ng-show="inputVO.SIP_TYPE1 == true">
+									<tr>
+										<td style="border: none !important;" colspan="4">依受益人年紀進行給付，每月 10 日給付</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td style="text-align: center;">給付期間</td>
+										<td style="text-align: center;">幣別</td>
+										<td style="text-align: center;">金額</td>
+									</tr>
+									<tr>
+										<td>
+											<input type='checkbox' 
+												   style="margin-right: 5px; margin-left: 25px;" 
+												   ng-model='inputVO.BEN_AGE_YN1'
+												   ng-click="clickAge(1)"
+												   ng-disabled="lock"/>
+										</td>
+										<td>滿
+											<input type="text" class="form-control" 
+					    						   style="width:50px; display:inline;" 
+					    						   id="BEN_AGE1" name="BEN_AGE1"
+					    						   e-input-limit="N" 
+					    						   ng-disabled="lock || inputVO.BEN_AGE_YN1 != true"
+					    						   ng-blur="checkBenAge(1)"
+					    						   ng-model="inputVO.BEN_AGE1">歲(含)前
+										</td>
+										<td ng-show="inputVO.CON_CURR == 'T'" style="text-align: center;">新台幣</td>
+										<td ng-show="inputVO.CON_CURR == 'F'" style="text-align: center;">
+											<e-combobox id="BEN_CURR1" name="BEN_CURR1"
+														ng-datasource="currList"
+														ng-disabled="lock || inputVO.BEN_AGE_YN1 != true"
+														ng-readonly="lock || inputVO.BEN_AGE_YN1 != true"
+														ng-model="inputVO.BEN_CURR1" 
+														ng-format="F3"
+														ng-required="false"
+														width="80px"
+														style="line-height:20px;"/>
+										</td>
+										<td style="text-align: center;">
+											<input type="text" class="form-control" 
+					    						   style="width:110px; display:inline;" 
+					    						   id="BEN_AMT1" name="BEN_AMT1"
+					    						   e-input-limit="NC" 
+					    						   ng-disabled="lock || inputVO.BEN_AGE_YN1 != true"
+					    						   ng-blur="checkGiveAmt(1, 1)"
+					    						   ng-model="inputVO.BEN_AMT1">
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<input type='checkbox' 
+												   style="margin-right: 5px; margin-left: 25px;" 
+												   ng-model='inputVO.BEN_AGE_YN2'
+												   ng-click="clickAge(2)"
+												   ng-disabled="lock"/>
+										</td>
+										<td>超過
+											<input type="text" class="form-control" 
+					    						   style="width:50px; display:inline;" 
+					    						   id="BEN_AGE2" name="BEN_AGE2"
+					    						   e-input-limit="N" 
+					    						   ng-disabled="lock || inputVO.BEN_AGE_YN2 != true"
+					    						   ng-blur="checkBenAge(2)"
+					    						   ng-model="inputVO.BEN_AGE2">歲，未滿
+					    					<input type="text" class="form-control" 
+					    						   style="width:50px; display:inline;" 
+					    						   id="BEN_AGE3" name="BEN_AGE3"
+					    						   e-input-limit="N" 
+					    						   ng-disabled="lock || inputVO.BEN_AGE_YN2 != true"
+					    						   ng-blur="checkBenAge(3)"
+					    						   ng-model="inputVO.BEN_AGE3">歲
+										</td>
+										<td ng-show="inputVO.CON_CURR == 'T'" style="text-align: center;">新台幣</td>
+										<td ng-show="inputVO.CON_CURR == 'F'" style="text-align: center;">
+											<e-combobox id="BEN_CURR2" name="BEN_CURR2"
+														ng-datasource="currList"
+														ng-disabled="lock || inputVO.BEN_AGE_YN2 != true"
+														ng-readonly="lock || inputVO.BEN_AGE_YN2 != true"
+														ng-model="inputVO.BEN_CURR2" 
+														ng-format="F3"
+														ng-required="false"
+														width="80px"
+														style="line-height:20px;"/>
+										</td>
+										<td style="text-align: center;">
+											<input type="text" class="form-control" 
+					    						   style="width:110px; display:inline;" 
+					    						   id="BEN_AMT2" name="BEN_AMT2"
+					    						   e-input-limit="NC" 
+					    						   ng-disabled="lock || inputVO.BEN_AGE_YN2 != true"
+					    						   ng-blur="checkGiveAmt(1, 2)"
+					    						   ng-model="inputVO.BEN_AMT2">
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<input type='checkbox' 
+												   style="margin-right: 5px; margin-left: 25px;" 
+												   ng-model='inputVO.BEN_AGE_YN3'
+												   ng-click="clickAge(3)"
+												   ng-disabled="lock"/>
+										</td>
+										<td>滿
+											<input type="text" class="form-control" 
+					    						   style="width:50px; display:inline;" 
+					    						   id="BEN_AGE4" name="BEN_AGE4"
+					    						   e-input-limit="N" 
+					    						   ng-disabled="lock || inputVO.BEN_AGE_YN3 != true"
+					    						   ng-blur="checkBenAge(4)"
+					    						   ng-model="inputVO.BEN_AGE4">歲(含)後
+										</td>
+										<td ng-show="inputVO.CON_CURR == 'T'" style="text-align: center;">新台幣</td>
+										<td ng-show="inputVO.CON_CURR == 'F'" style="text-align: center;">
+											<e-combobox id="BEN_CURR3" name="BEN_CURR3"
+														ng-datasource="currList"
+														ng-disabled="lock || inputVO.BEN_AGE_YN3 != true"
+														ng-readonly="lock || inputVO.BEN_AGE_YN3 != true"
+														ng-model="inputVO.BEN_CURR3" 
+														ng-format="F3"
+														ng-required="false"
+														width="80px"
+														style="line-height:20px;"/>
+										</td>
+										<td style="text-align: center;">
+											<input type="text" class="form-control" 
+					    						   style="width:110px; display:inline;" 
+					    						   id="BEN_AMT3" name="BEN_AMT3"
+					    						   e-input-limit="NC" 
+					    						   ng-disabled="lock || inputVO.BEN_AGE_YN3 != true"
+					    						   ng-blur="checkGiveAmt(1, 3)"
+					    						   ng-model="inputVO.BEN_AMT3">
+										</td>
+									</tr>
+								</table>
+								<table ng-show="inputVO.SIP_TYPE2 == true">
+									<tr>
+										<td style="border: none !important;" colspan="4">依約定月份 10 日進行給付</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td style="text-align: center;">給付期間</td>
+										<td style="text-align: center;">幣別</td>
+										<td style="text-align: center;">金額</td>
+									</tr>
+									<tr>
+										<td>
+											<!-- <input type="radio" ng-model="inputVO.AGR_MON_TYPE" value="M" ng-disabled="lock" ng-click="clickAgrMon('M')" style="margin-right: 5px; margin-left: 25px;"> -->
+											<input type='checkbox' ng-model='inputVO.AGR_MON_TYPE_M' ng-click="clickAgrMon('M')" ng-disabled="lock"/>
+										</td>
+										<td>每月</td>
+										<td ng-show="inputVO.CON_CURR == 'T'" style="text-align: center;">新台幣</td>
+										<td ng-show="inputVO.CON_CURR == 'F'" style="text-align: center;">
+											<e-combobox id="M_CURR" name="M_CURR"
+														ng-datasource="currList"
+														ng-disabled="inputVO.AGR_MON_TYPE_M != true || lock"
+														ng-readonly="inputVO.AGR_MON_TYPE_M != true || lock"
+														ng-model="inputVO.M_CURR" 
+														ng-format="F3"
+														ng-required="false"
+														width="80px"
+														style="line-height:20px;"/>
+										</td>
+										<td style="text-align: center;">
+											<input type="text" class="form-control" 
+					    						   style="width:110px; display:inline;" 
+					    						   id="M_AMT" name="M_AMT"
+					    						   e-input-limit="NC" 
+					    						   ng-disabled="inputVO.AGR_MON_TYPE_M != true || lock"
+					    						   ng-blur="checkGiveAmt(2, 'M')"
+					    						   ng-model="inputVO.M_AMT">
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<!-- <input type="radio" ng-model="inputVO.AGR_MON_TYPE" value="A" ng-disabled="lock" ng-click="clickAgrMon('A')" style="margin-right: 5px; margin-left: 25px;"> -->
+											<input type='checkbox' ng-model='inputVO.AGR_MON_TYPE_A' ng-click="clickAgrMon('A')" ng-disabled="lock"/>
+										</td>
+										<td>每年(最多可選擇 11 個月)</br>
+											<input type='checkbox' style="margin-right: 5px;" ng-model='A1_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>1
+				    						<input type='checkbox' style="margin-right: 5px;" ng-model='A2_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>2
+				    						<input type='checkbox' style="margin-right: 5px;" ng-model='A3_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>3
+				    						<input type='checkbox' style="margin-right: 5px;" ng-model='A4_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>4
+				    						<input type='checkbox' style="margin-right: 5px;" ng-model='A5_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>5
+				    						<input type='checkbox' style="margin-right: 5px;" ng-model='A6_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>6</br>
+				    						<input type='checkbox' style="margin-right: 5px;" ng-model='A7_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>7
+				    						<input type='checkbox' style="margin-right: 5px;" ng-model='A8_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>8
+				    						<input type='checkbox' style="margin-right: 5px;" ng-model='A9_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>9
+				    						<input type='checkbox' style="margin-right: 5px;" ng-model='A10_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>10
+				    						<input type='checkbox' style="margin-right: 5px;" ng-model='A11_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>11
+				    						<input type='checkbox' style="margin-right: 5px;" ng-model='A12_1' ng-click='checkMon(1)' ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"/>12月
+										</td>
+										<td ng-show="inputVO.CON_CURR == 'T'" style="text-align: center;">新台幣</td>
+										<td ng-show="inputVO.CON_CURR == 'F'" style="text-align: center;">
+											<e-combobox id="A_CURR" name="A_CURR"
+														ng-datasource="currList"
+														ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"
+														ng-readonly="inputVO.AGR_MON_TYPE_A != true || lock"
+														ng-model="inputVO.A_CURR" 
+														ng-format="F3"
+														ng-required="false"
+														width="80px"
+														style="line-height:20px;"/>
+										</td>
+										<td style="text-align: center;">
+											<input type="text" class="form-control" 
+					    						   style="width:110px; display:inline;" 
+					    						   id="A_AMT" name="A_AMT"
+					    						   e-input-limit="NC" 
+					    						   ng-disabled="inputVO.AGR_MON_TYPE_A != true || lock"
+					    						   ng-blur="checkGiveAmt(2, 'A')"
+					    						   ng-model="inputVO.A_AMT">
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr ng-show="inputVO.APL_DOC_N == true">
+							<td>
+								<input type='checkbox' style="margin-right: 5px; margin-left: 25px;" ng-model='inputVO.APL_DOC_N' ng-disabled="true"/>
+								不限用途、免附單據
+							</td>
+							<td>
+								<table>
+									<tr>
+										<td style="border: none !important;">Q：有權申請人?</td>
+									</tr>
+									<tr>
+										<td style="border: none !important;">
+											<input type="radio" ng-model="inputVO.UNLIMIT_DOC_TYPE" value="A" ng-disabled="radioLock || lock" style="margin-right: 5px; margin-left: 25px;">委託人
+										</td>
+									</tr>
+									<tr ng-hide="radioLock">
+										<td style="border: none !important;">
+											<input type="radio" ng-model="inputVO.UNLIMIT_DOC_TYPE" value="B" ng-disabled="radioLock || lock" style="margin-right: 5px; margin-left: 25px;">委託人+全體監察人
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr ng-show="inputVO.APL_DOC_Y == true">
+							<td rowspan="2">
+								<input type='checkbox' style="margin-right: 5px; margin-left: 25px;" ng-model='inputVO.APL_DOC_Y' ng-disabled="true"/>
+								限制用途、檢附單據
+							</td>
+							<td>
+								<table>
+									<tr>
+										<td style="border: none !important;">Q：有權申請人?</td>
+									</tr>
+									<tr>
+										<td style="border: none !important;">
+											<input type="radio" ng-model="inputVO.LIMIT_DOC_TYPE" value="A" ng-disabled="radioLock || lock" style="margin-right: 5px; margin-left: 25px;">委託人
+										</td>
+									</tr>
+									<tr ng-hide="radioLock">
+										<td style="border: none !important;">
+											<input type="radio" ng-model="inputVO.LIMIT_DOC_TYPE" value="B" ng-disabled="radioLock || lock" style="margin-right: 5px; margin-left: 25px;">委託人+全體監察人
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr ng-show="inputVO.APL_DOC_Y == true">
+							<td>
+								<table>
+									<tr>
+										<td style="border: none !important;">
+											<input type='checkbox' style="margin-right: 5px;" ng-disabled="lock" ng-model='inputVO.EDU_YN'/>
+											教育費(限入受益人帳戶)
+										</td>
+									</tr>
+									<tr>
+										<td style="border: none !important;">
+											<input type='checkbox' style="margin-right: 5px;" ng-disabled="lock" ng-model='inputVO.MED_YN' ng-click="clickMed()"/>
+											醫療費<span ng-show="radioLock">(限入受益人帳戶)</span>
+											<table ng-hide="radioLock">
+												<tr>
+													<td style="border: none !important;">
+														<input type='checkbox' style="margin-right: 5px; margin-left: 25px;" ng-model='inputVO.MED_PAY_FOR_A'  ng-disabled="inputVO.MED_YN != true || lock"/>
+														<!-- <input type="radio" ng-model="inputVO.MED_PAY_FOR" value="A" ng-disabled="inputVO.MED_YN != true || lock" style="margin-right: 5px; margin-left: 25px;"> -->
+														匯入受益人帳戶
+													</td>
+												</tr>
+												<tr>
+													<td style="border: none !important;">
+														<input type='checkbox' style="margin-right: 5px; margin-left: 25px;" ng-model='inputVO.MED_PAY_FOR_B'  ng-disabled="inputVO.MED_YN != true || lock"/>
+														<!-- <input type="radio" ng-model="inputVO.MED_PAY_FOR" value="B" ng-disabled="inputVO.MED_YN != true || lock" style="margin-right: 5px; margin-left: 25px;"> -->
+														匯入監察人帳戶
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td style="border: none !important;">
+											<input type='checkbox' style="margin-right: 5px;" ng-disabled="lock" ng-model='inputVO.NUR_YN' ng-click="clickNur()"/>
+											安養護機構及看護支出
+											<table>
+												<tr>
+													<td style="border: none !important;">
+														<input type='checkbox' style="margin-right: 5px; margin-left: 25px;" ng-model='inputVO.NUR_PAY_FOR_A'  ng-disabled="inputVO.NUR_YN != true || lock"/>
+														<!-- <input type="radio" ng-model="inputVO.NUR_PAY_FOR" value="A" ng-disabled="inputVO.NUR_YN != true || lock" style="margin-right: 5px; margin-left: 25px;"> -->
+														匯入受益人帳戶
+													</td>
+												</tr>
+												<tr>
+													<td style="border: none !important;">
+														<input type='checkbox' style="margin-right: 5px; margin-left: 25px;" ng-model='inputVO.NUR_PAY_FOR_B'  ng-disabled="inputVO.NUR_YN != true || lock"/>
+														<!-- <input type="radio" ng-model="inputVO.NUR_PAY_FOR" value="B" ng-disabled="inputVO.NUR_YN != true || lock" style="margin-right: 5px; margin-left: 25px;"> -->
+														匯入安養機構及個人看護
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td style="border: none !important;">
+											<input type='checkbox' style="margin-right: 5px;" ng-disabled="lock" ng-model='inputVO.OTR_YN' ng-change="changeOtrYN();"/>
+											其他(限入受益人帳戶)
+											<table ng-show="inputVO.OTR_YN == true" style="margin-left: 25px; margin-top: 10px; width: 90%">
+												<tr>
+													<td>結婚</td>
+													<td ng-show="inputVO.CON_CURR == 'T'" style="text-align: center;">新台幣</td>
+													<td ng-show="inputVO.CON_CURR == 'F'" style="text-align: center;">
+														<e-combobox id="MAR_CURR" name="MAR_CURR"
+																	ng-datasource="currList"
+																	ng-disabled="lock"
+																	ng-readonly="lock"
+																	ng-model="inputVO.MAR_CURR" 
+																	ng-format="F3"
+																	ng-required="false"
+																	width="80px"
+																	style="line-height:20px;"/>
+													</td>
+													<td style="text-align: center;">
+														<input type="text" class="form-control" 
+								    						   style="width:110px; display:inline;" 
+								    						   id="MAR_AMT" name="MAR_AMT"
+								    						   e-input-limit="NC" 
+								    						   ng-disabled="lock"
+								    						   placeholder="金額"
+								    						   ng-blur="checkGiveAmt(3, 'MAR')"
+								    						   ng-model="inputVO.MAR_AMT">
+													</td>
+												</tr>
+												<tr>
+													<td>生育</td>
+													<td ng-show="inputVO.CON_CURR == 'T'" style="text-align: center;">新台幣</td>
+													<td ng-show="inputVO.CON_CURR == 'F'" style="text-align: center;">
+														<e-combobox id="BIR_CURR" name="BIR_CURR"
+																	ng-datasource="currList"
+																	ng-disabled="lock"
+																	ng-readonly="lock"
+																	ng-model="inputVO.BIR_CURR" 
+																	ng-format="F3"
+																	ng-required="false"
+																	width="80px"
+																	style="line-height:20px;"/>
+													</td>
+													<td style="text-align: center;">
+														<input type="text" class="form-control" 
+								    						   style="width:110px; display:inline;" 
+								    						   id="BIR_AMT" name="BIR_AMT"
+								    						   e-input-limit="NC" 
+								    						   ng-disabled="lock"
+								    						   placeholder="金額"
+								    						   ng-blur="checkGiveAmt(3, 'BIR')"
+								    						   ng-model="inputVO.BIR_AMT">
+													</td>
+												</tr>
+												<tr>
+													<td>購屋</td>
+													<td ng-show="inputVO.CON_CURR == 'T'" style="text-align: center;">新台幣</td>
+													<td ng-show="inputVO.CON_CURR == 'F'" style="text-align: center;">
+														<e-combobox id="HOS_CURR" name="HOS_CURR"
+																	ng-datasource="currList"
+																	ng-disabled="lock"
+																	ng-readonly="lock"
+																	ng-model="inputVO.HOS_CURR" 
+																	ng-format="F3"
+																	ng-required="false"
+																	width="80px"
+																	style="line-height:20px;"/>
+													</td>
+													<td style="text-align: center;">
+														<input type="text" class="form-control" 
+								    						   style="width:110px; display:inline;" 
+								    						   id="HOS_AMT" name="HOS_AMT"
+								    						   e-input-limit="NC" 
+								    						   ng-disabled="lock"
+								    						   placeholder="金額"
+								    						   ng-blur="checkGiveAmt(3, 'HOS')"
+								    						   ng-model="inputVO.HOS_AMT">
+													</td>
+												</tr>
+												<tr>
+													<td>其他：
+														<input type="text" class="form-control" 
+								    						   style="width:180px; display:inline;" 
+								    						   id="OTR_ITEM" name="OTR_ITEM"
+								    						   ng-disabled="lock"
+								    						   maxlength="10"
+								    						   ng-model="inputVO.OTR_ITEM">
+								    					<br><span style="font-size:9px;">(如有其他給付項目需求，請先洽信託業務處確認。最多可登打10個中文字)</span>
+													</td>
+													<td ng-show="inputVO.CON_CURR == 'T'" style="text-align: center;">新台幣</td>
+													<td ng-show="inputVO.CON_CURR == 'F'" style="text-align: center;">
+														<e-combobox id="OTR_CURR" name="OTR_CURR"
+																	ng-datasource="currList"
+																	ng-disabled="lock"
+																	ng-readonly="lock"
+																	ng-model="inputVO.OTR_CURR" 
+																	ng-format="F3"
+																	ng-required="false"
+																	width="80px"
+																	style="line-height:20px;"/>
+													</td>
+													<td style="text-align: center;">
+														<input type="text" class="form-control" 
+								    						   style="width:110px; display:inline;" 
+								    						   id="OTR_AMT" name="OTR_AMT"
+								    						   e-input-limit="NC" 
+								    						   ng-disabled="lock"
+								    						   placeholder="金額"
+								    						   ng-blur="checkGiveAmt(3, 'OTR')"
+								    						   ng-model="inputVO.OTR_AMT">
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>	    		
+		    		</form>
+		    	</div>
+		    	</br>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-default" 
+						ng-click="save(false)" 
+						ng-show="type != 'read'">儲存</button>
+						
+					<button type="button" class="btn btn-primary" 
+						ng-click="save(true)" 
+						ng-show="type != 'read'">確認送出</button>
+						
+					<button type="button" class="btn btn-default" ng-click="clickClose()">關閉</button>
+				</div>
+		    </div>
+		</div>
+	</div>
+</div>

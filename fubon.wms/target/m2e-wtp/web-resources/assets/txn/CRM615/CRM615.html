@@ -1,0 +1,111 @@
+<style>
+/* open dialog */
+.ngdialog.CRM615 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM615 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM615 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM615 table.little{
+	width: 61%;
+}
+/* change row */
+.CRM615.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM615_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM615/CRM615.js"></script>
+<div class="CRM615" ng-controller="CRM615Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >貢獻度分析</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<h4 class="h4-title">貢獻度資訊</h4>
+		<div class="gv_tab_sc scroll_y">
+			<table class="gv_tab_sc">
+				<thead>
+					<tr>
+						<th width="14%">{{twoYAgo}}.01~12<br>前兩年</th>
+						<th width="14%">{{oneYAgo}}01~{{oneYAgo}}12<br>前一年</th>
+						<th width="14%">{{oneYAgo}}01~{{oneYAgo}}12<br>前一年貢獻度</th>
+						<th width="14%">{{DATA_PERIOD_NEWEST_YEAR}}<br>過去12個月</th>
+						<th width="14%">{{DATA_PERIOD_NEWEST_YEAR}}<br>過去12個月貢獻度</th>
+						<th width="14%">{{thisYTimeY}}.01~{{thisYTimeM}}<br>今年以來</th>
+						<th width="14%">{{DATA_PERIOD_NEWEST_YEAR}}<br>最近一年投保申請量<br>(不含DCI，保管箱優惠專用)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td style = "text-align :right">{{twoYAgoTEXT | number:2}}</td><!-- 前二年 -->
+						<td style = "text-align :right">{{prftLastYear | number:2}}</td><!-- 前一年 -->
+						<td style = "text-align :center;">{{prftLastCON}}</td><!-- 前一年貢獻度 -->
+						<td style = "text-align :right">{{prftNewestYear | number:2}}</td><!-- 過去12個月 -->
+						<td style = "text-align :center;">{{prftNewestCON}}</td><!-- 過去12個月貢獻度 -->
+						<td style = "text-align :right">{{oneYAgoTEXT  | number:2}}</td><!-- 今年以來 -->
+						<td style = "text-align :right">{{thisYInsure  | number:2}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<!-- 結果區 -->
+		<h4 class="h4-title">貢獻度明細表</h4>
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<span style="float: right;">單位：新台幣元</span>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;clear: both;">
+			<table>
+				<thead>
+					<tr>
+						<th>資料年月</th>
+						<th>投保貢獻</th>
+						<th>存款貢獻</th>
+						<th>合計貢獻</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data track by $index">
+						<td >{{row.DATE_TIME}}</td>
+						<td style = "text-align :right">{{row.INVAPRU | number:2}}</td>
+						<td style = "text-align :right">{{row.DEPAPRU | number:2}}</td>
+						<td style = "text-align :right">{{row.INVAPRU + row.DEPAPRU | number:2}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

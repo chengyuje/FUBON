@@ -1,0 +1,60 @@
+<style>
+	/* 奇偶數行用不同顏色作區隔 */
+	.myTable tr:nth-child(even) {background: #DDD}	/* 偶數行 */
+	.myTable tr:nth-child(odd) {background: #FFF}	/* 奇數行 */
+</style>
+<script type="text/javascript" src="assets/txn/SQM410/SQM410.js"></script>
+<div ng-controller="SQM410ListController" ng-cloak>
+	<div class="modal-body gv_tab_sc">
+		<h4 align="center">滿意度未處理清單</h4>
+		<table class="table-bordered td_center myTable">
+			<thead>
+				<tr>
+					<th>發生月份</th>
+					<th>營運區</th>
+					<th>分行別</th>	
+					<th>問卷別</th>
+					<th>件數</th>					
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in resultList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					<td>{{row.YEARMON}}</td>
+					<td>{{row.BRANCH_AREA_NAME}}</td>
+					<td>{{row.BRANCH_NBR}} - {{row.BRANCH_NAME}}</td>
+					<td>{{row.QTN_TYPE | mapping:QTN_LIST}}</td>
+					<td><a onclick="return false" ng-click="detail(row,'main')">{{row.CASE_COUNT}}</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>	
+	<div class="modal-body gv_tab_sc" ng-if="agentList != null && agentList.length > 0">
+		<h4 align="center">您代理的滿意度未處理清單</h4>
+		<table class="table-bordered td_center myTable">
+			<thead>
+				<tr>
+					<th>發生月份</th>
+					<th>營運區</th>
+					<th>分行別</th>	
+					<th>問卷別</th>
+					<th>件數</th>					
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in agentList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					<td>{{row.YEARMON}}</td>
+					<td>{{row.BRANCH_AREA_NAME}}</td>
+					<td>{{row.BRANCH_NBR}} - {{row.BRANCH_NAME}}</td>
+					<td>{{row.QTN_TYPE | mapping:QTN_LIST}}</td>
+					<td><a onclick="return false" ng-click="detail(row,'agent')">{{row.CASE_COUNT}}</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+					
+					
+					
+					
+					
+					

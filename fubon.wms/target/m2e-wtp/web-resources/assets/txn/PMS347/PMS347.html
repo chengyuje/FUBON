@@ -1,0 +1,199 @@
+<style>
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS347/PMS347.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS347" ng-controller="PMS347Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*資料統計日期：</th>
+							<td><div class="input-group datebox datewidth">
+									<input type="text" id="bgn_sDate" name="bgn_sDate"
+										class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sCreDate" is-open="model.a"
+										datepicker-options="bgn_sDateOptions"
+										alt-input-formats="altInputFormats" ng-readonly="true"
+										ng-required="true"
+										ng-change="limitDate();dateChange()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+							
+							
+							
+							
+							<th>業務處：</th>
+							<td><e-combobox ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id" ng-validate="false"
+									ng-disabled="disableRegionCombo"
+							        ng-readonly="disableRegionCombo" ng-editable="false" ng-format="F3"
+									ng-change="ChangeRegion()" ng-required="false" width="200px"
+									height="30px" style="line-height:20px;" />
+							</td>
+							<th>分行別：</th>
+							<td><e-combobox ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr" ng-validate="false"
+									ng-disabled="disableBranchCombo"
+							        ng-readonly="disableBranchCombo" ng-format="F1"
+									ng-required="false" ng-change="ChangeBranch()" width="200px"
+									height="30px" style="line-height:20px;" />
+							</td>
+							
+						</tr>
+						<tr>
+							<th></th>
+							<td></td>
+							<th>營運區：</th>
+							<td><e-combobox ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id" ng-validate="false" 
+									ng-disabled="disableAreaCombo"
+							        ng-readonly="disableAreaCombo"
+									ng-editable="false" ng-change="ChangeArea()" ng-format="F3"
+									ng-required="false" width="200px" height="30px"
+									style="line-height:20px;" />
+							</td>
+							<th>理專：</th>
+							<td><e-combobox id="ao_code"
+									ng-datasource="AO_LIST" ng-model="inputVO.ao_code"
+									ng-validate="false" ng-disabled="disableAoCombo"
+							        ng-readonly="disableAoCombo" 
+							        ng-change="ChangeAo_code()"
+							        ng-editable="false"
+									ng-format="F1" ng-required="false" width="200px"
+									style="line-height:20px;" />
+							</td>
+							
+							
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList"></e-jumping>
+			<div algin="left">
+			<table>
+					<tr>
+						<td>產出頻率：</td>
+						<td>每日</td>
+					</tr>
+					<tr>
+						<td>產出日：</td>
+						<td align="left">{{inputVO.sCreDate_OK | date:'yyyy/MM/dd'}}</td>
+					</tr>
+				</table>
+<!-- 				<table> -->
+<!-- 					<tr> -->
+<!-- 						<td align="right">資料產生日期：</td> -->
+<!-- 						<td align="left">{{inputVO.sCreDate_OK | date:'yyyy/MM/dd'}}</td> -->
+<!-- 					</tr> -->
+<!-- 					<tr> -->
+<!-- 						<td align="right">報表說明：</td> -->
+<!-- 						<td align="left">固定收益型商品提前解約損失日報表</td> -->
+<!-- 					</tr> -->
+<!-- 				</table> -->
+			</div>
+			<div class="gv_tab_sc scroll_y"	style="white-space: nowrap;">
+				<table class="e-table-freeze" e-height="400px" e-mode="1" e-top="true" e-left="7" e-list="paramList">
+					<thead>
+						<tr>
+							<th>序號</th>
+							<th>業務處</th>
+							<th>區名</th>
+							<th>分行代碼</th>
+							<th>分行名稱</th>
+							<th>AO Code</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>商品代號</th>
+							<th>產品名稱</th>
+							<th>交易編號</th>
+							<th>實際贖回金額(臺幣)</th>
+							<th>累計配息(臺幣)</th>
+							<th>贖回手續費(臺幣)</th>
+							<th>原始申購本金(臺幣)</th>
+							<th>申購手續費(臺幣)</th>
+							<th>提前解約損失(臺幣)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index"	ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.NUM}}</td>
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							<td>{{row.BRANCH_AREA_NAME}}</td>
+							<td>{{row.BRANCH_NBR}}</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.PRD_ID}}</td>
+							<td>{{row.PRD_NAME}}</td>
+							<td>{{row.TXN_NO}}</td>
+							<td align="right">{{row.S_TXN_AMT | currency:''}}</td>
+							<td align="right">{{row.INTEREST | currency:''}}</td>
+							<td align="right">{{row.S_TXN_FEE | currency:''}}</td>
+							<td align="right">{{row.B_TXN_AMT | currency:''}}</td>
+							<td align="right">{{row.B_TXN_FEE | currency:''}}</td>
+							<td align="right">{{row.S_TXN_LOSS | currency:''}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,222 @@
+<script type="text/javascript" src="assets/txn/SOT610/SOT610.js"></script>
+<div class="SOT610" ng-controller="SOT610Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table style="width: 50%; margin-left: 30%; margin-right: auto;">
+					<tr>
+						<th>客戶ID：</th>
+						<td style="width: 70%;"><input type="text" class="form-control" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" ng-blur="toUppercase_data(inputVO.custID,'custid')" e-length-limit="12" style="width: 30%;text-transform: uppercase;"></td>
+					</tr>
+					<tr>
+						<th>商品種類：</th>
+						<td>
+							<e-combobox id="prodType" name="prodType" 
+										ng-paramtype="SOT.PROD_TYPE"
+										ng-model="inputVO.prodType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="getTradeType()"
+										width="75%"
+										style="line-height:20px;"/>
+						</td>
+					</tr>
+					<tr>
+						<th>交易種類：</th>
+						<td>
+							<e-combobox id="tradeType" name="tradeType" 
+										ng-datasource="mappingSet['SOT.TRADE_TYPE_COMBOBOX']"
+										ng-model="inputVO.tradeType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="75%"
+										style="line-height:20px;"/>
+							<font color="red" ng-hide="inputVO.prodType != ''">請選擇商品種類</span>
+						</td>
+					</tr>
+					<tr>
+						<th>交易狀態：</th>
+						<td>
+							<e-combobox id="tradeStatus" name="tradeStatus" 
+										ng-paramtype="SOT.TRADE_STATUS"
+										ng-model="inputVO.tradeStatus"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="75%"
+										style="line-height:20px;"/>
+						</td>
+					</tr>
+					<tr>
+						<th>是否需要議價：</th>
+						<td>
+							<e-combobox id="isBaraginNeeded" name="isBaraginNeeded" 
+										ng-paramtype="COMMON.YES_NO"
+										ng-model="inputVO.isBaraginNeeded"
+										ng-validate="false" 
+										ng-readonly="YN_Baragin" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="getBargainFeeFlag()"
+										width="75%"
+										style="line-height:20px;"
+										ng-disabled="YN_Baragin"/>
+						</td>
+					</tr>
+					<tr>
+						<th>議價狀態</th>
+						<td>
+							<e-combobox id="bargainFeeFlag" name="bargainFeeFlag" 
+										ng-datasource="mappingSet['SOT.BARGAIN_FEE_FLAG_COMBOBOX']"
+										ng-model="inputVO.bargainFeeFlag"
+										ng-validate="false" 
+										ng-readonly="YN_Baragin" 
+										ng-editable="false"
+										ng-format="F3"
+										width="75%"
+										style="line-height:20px;"
+										ng-disabled="YN_Baragin"/>
+							<font color="red" ng-hide="inputVO.isBaraginNeeded != ''">請選擇是否需要議價</span>
+						</td>
+					</tr>
+					<tr>
+						<th>商品代號：</th>
+						<td><input type="text" class="form-control" placeholder="請輸入..." id="prodID" name="prodID" ng-model="inputVO.prodID" e-length-limit="12" ng-blur="toUppercase_data(inputVO.prodID,'prodid')" style="width: 30%;"></td>
+					</tr>
+					<tr>
+						<th>交易起迄日：</th>
+						<td class="form-inline">
+							<div class="form-group">
+										<div class="input-group datebox datewidth">
+											<input type="text" id="sDate" name="sDate"
+												   class="form-control"
+													uib-datepicker-popup="yyyy/MM/dd"
+													ng-model="inputVO.sDate"
+													is-open="model.a"
+													datepicker-options="startDateOptions"
+													alt-input-formats="altInputFormats"
+													ng-readonly="true"
+													ng-change="limitDate()"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+												<i class="glyphicon glyphicon-calendar"></i></button>
+											</span>
+										</div>
+									~
+									
+										<div class="input-group datebox datewidth">
+											<input type="text" id="sDate2" name="sDate2"
+												   class="form-control"
+													uib-datepicker-popup="yyyy/MM/dd"
+													ng-model="inputVO.eDate"
+													is-open="model.c"
+													datepicker-options="startDateOptions2"
+													alt-input-formats="altInputFormats"
+													ng-readonly="true"
+													ng-change="limitDate()"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+												<i class="glyphicon glyphicon-calendar"></i></button>
+											</span>
+										</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>信託交易類別：</th>
+						<td>
+							<e-combobox id="bargainFeeFlag" name="bargainFeeFlag" 
+										ng-datasource="mappingSet['SOT.TRUST_TRADE_TYPE']"
+										ng-model="inputVO.trustTradeType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="75%"
+										style="line-height:20px;"/>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit();init();">清除</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once input="inputVO" output="outputVO" list="data" totallist="tradeList" rowcountlimit="10"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data">
+					<thead>
+						<tr>
+							<th>信託交易類別</th>
+							<th>交易日期</th>
+							<th>客戶ID</th>
+							<th>商品種類</th>
+							<th>交易種類</th>
+							<th>商品代號</th>
+							<th>商品名稱</th>
+							<th>交易狀態</th>
+							<th>議價狀態</th>
+							<th>功能選項</th>
+							<th>申購批號</th>
+							<th>鍵機人員</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" align="center" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.TRUST_TRADE_TYPE | mapping:mappingSet['SOT.TRUST_TRADE_TYPE']:'F3'}}</td>
+							<td>{{row.TRADE_DATE | date:"yyyy-MM-dd"}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.PROD_TYPE | mapping:mappingSet['SOT.PROD_TYPE']:'F3'}}</td>
+							<td ng-if="row.PROD_TYPE == '1'">{{row.TRADE_TYPE | mapping:mappingSet['SOT.TRADE_TYPE']:'F3'}}</td>
+							<td ng-if="row.PROD_TYPE == '8'">{{row.TRADE_TYPE | mapping:mappingSet['SOT.TRADE_TYPE_DYNA']:'F3'}}</td>
+							<td ng-if="row.PROD_TYPE != '1' && row.PROD_TYPE != '8' ">{{row.TRADE_TYPE | mapping:mappingSet['SOT.BUY_SELL']:'F3'}}</td>
+							<td align="left" style="white-space: pre">{{row.PROD_ID_LIST}}</td>
+							<td align="left" style="white-space: pre">{{row.PROD_NAME_LIST}}</td>
+							<td>{{row.TRADE_STATUS | mapping:mappingSet['SOT.TRADE_STATUS']:'F3'}}</td>
+							<td>{{row.BARGAIN_FEE_FLAG | mapping:mappingSet['SOT.BARGAIN_FEE_FLAG']:'F3'}}</td>
+							<td>
+								<div ng-show="row.GO_PAGE != null">
+									<button type="button" class="btn btn-default" ng-click="goPage(row)" function-type="query">繼續交易</button>
+								</div>
+								<div ng-show="row.GO_WEBBANK != null">
+									<button type="button" class="btn btn-default" ng-click="goWebBank(row)" function-type="query">檢視明細</button>
+								</div>
+								<div ng-show="row.PRINT_REPORT != null && !(row.PROD_TYPE == '4' && row.TRADE_TYPE == '1')">
+									<button type="button" class="btn btn-default" ng-click="printReport(row)" function-type="query">補印表單</button>
+								</div>
+								<div ng-show="row.PRINT_REPORT != null && (row.PROD_TYPE == '4' && row.TRADE_TYPE == '1')">
+									<button type="button" class="btn btn-default" ng-click="goSOT411(row)" function-type="query">檢視明細</button>
+								</div>
+							</td>
+							<td align="left" style="white-space: pre">{{row.BATCH_SEQ_LIST}}</td>
+							<td>{{row.RPT_CREATOR_EMPID}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

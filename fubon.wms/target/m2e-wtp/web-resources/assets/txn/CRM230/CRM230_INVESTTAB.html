@@ -1,0 +1,84 @@
+<div class="search_table search_box3">
+<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+	<table>
+		<tr>
+     		<th>名單/待辦工作名稱：</th>
+     		<td>
+     			<input type="text" placeholder="請輸入..." id="campaign_name" name="campaign_name" ng-model="inputVO.campaign_name" e-length-limit="25" required>
+     		</td>
+     		<th ng-hide="ao_code.length != 0">指派至新理專：</th>
+     		<td ng-hide="ao_code.length != 0">
+     			<e-combobox id="campaign_ao_code" 
+				ng-datasource="mappingSet['NEW_AO_CODE']"
+				ng-model="inputVO.campaign_ao_code"
+   				ng-validate="false" 
+   				ng-readonly="ao_code.length == 1" 
+   				ng-disabled="ao_code.length == 1"
+   				ng-format="F1"
+   				width="150px"
+   				style="line-height:20px;" 
+   				required />
+     		</td>
+     		<th>到期日：</th>
+			<td>
+				<div class="input-group datebox datewidth">
+					<input type="text" id="campaign_date" name="campaign_date"
+						class="form-control" 
+						uib-datepicker-popup="yyyy/MM/dd"
+						ng-model="inputVO.campaign_date" 
+						is-open="model.g"
+						datepicker-options="campaign_dateOptions" 
+						ng-readonly="true"
+						required/>
+					<!-- 製作日曆button -->
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default" ng-click="open($event,'g')">
+							<i class="glyphicon glyphicon-calendar"></i>
+						</button>
+					</span>
+				</div>
+			</td>
+     	</tr>
+     	<tr>
+     		<th>名單內容：</th>
+     		<td colspan="4">
+     			<textarea id="campaign_desc" name="campaign_desc" ng-model="inputVO.campaign_desc" style="width: 100%; height: 100px" e-length-limit="1000" required></textarea>
+     		</td>
+     		<!-- 理專新增名單 -->
+     		<td ng-show="ao_code.length != 0">
+     			<button type="button" class="btn btn-info" ng-click="add_campaign()" ng-disabled="(inputVO.campaign_name == undefined || inputVO.campaign_name == null) &&
+     																							  inputVO.campaign_date == undefined &&
+     																							  (inputVO.campaign_desc == undefined || inputVO.campaign_desc == null)">
+     			新增名單</button>
+     			</br>
+     			<span style="color: red">名單將在每天中午及凌晨各更新一次，若您有新增名單，將在此二個時間過後才會更新，請留意！</span>
+     		</td>
+     		<!-- 非理專新增名單 -->
+     		<td ng-show="ao_code.length == 0">
+     			<button type="button" class="btn btn-info" ng-click="add_campaign()" ng-disabled="parameterTypeEditForm.$invalid">新增名單</button>
+     			</br>
+	     		<span style="color: red">名單將在每天中午及凌晨各更新一次，若您有新增名單，將在此二個時間過後才會更新，請留意！</span>
+     		</td>
+     	</tr>
+	</table>
+</form>
+</div>
+
+<!-- mantis:4496 請隱藏主管(業務主管、個金主管、作業主管、督導、處主管)以「分行客戶查詢」、「客戶篩選」時的「客戶群組」欄位 -->
+<!-- follow old 客戶篩選需可篩選空code客戶角色 -->
+<div class="search_box_btn" ng-if="!(pri == '006' || pri == '009' || pri == '010' || pri == '011' || pri == '012'
+ || pri == 'O001' || pri == '013' || pri == '045' || pri == '046' || pri == '055' || pri == '056')">
+	客戶群組：
+	<e-combobox id="group" 
+	ng-datasource="mappingSet['GroupList']"
+	ng-model="inputVO.group"
+	ng-validate="false" 
+	ng-readonly="false" 
+	ng-editable="false"
+	ng-format="F3"
+	ng-required="false"
+	width="150px"
+	style="line-height:20px;" />
+	<span class="bigspace"></span>
+	<button type="button" class="btn btn-info" ng-click="checkAdd()" ng-disabled = "inputVO.group ==''|| inputVO.group == undefined">勾選客戶加入群組</button>
+</div>

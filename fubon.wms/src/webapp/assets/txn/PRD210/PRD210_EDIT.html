@@ -1,0 +1,212 @@
+<style>
+
+</style>
+<div ng-controller="PRD210_EDITController" ng-cloak>
+	<div class="modal-dialog PRD210">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.PRD_ID == null ? '新增' : '編輯'}}保險</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*保險代碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_id" name="prd_id" class="form-control" ng-model="inputVO.prd_id" ng-blur="checkID()" ng-disabled="row.PRD_ID != null" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.prd_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入保險代碼</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="!canEdit">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">{{errMsg | i18n:[' ']}}</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">保險名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="ins_name" name="ins_name" class="form-control" ng-model="inputVO.ins_name" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">險種類別：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="ins_type" name="ins_type"
+								ng-paramtype="PRD.INS_TYPE"
+								ng-model="inputVO.ins_type"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.ins_type.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇險種類別</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">適合退休規劃：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="retired" name="retired"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.retired"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">適合子女教育規劃：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="education" name="education"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.education"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">適合特定目的規劃：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="purpose" name="purpose"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.purpose"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">適合壽險規劃：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="life" name="life"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.life"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">適合意外規劃：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="accident" name="accident"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.accident"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">適合醫療規劃：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="medical" name="medical"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.medical"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">適合重大疾病規劃：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="diseases" name="diseases"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.diseases"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">是否類全委：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="is_inv" name="is_inv"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.is_inv"
+								ng-validate="false"
+								ng-readonly="false"
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">最低申購金額：</th>
+							<td class="col-md-7 tdpadding"><input id="base_amt_of_purchase" name="base_amt_of_purchase" class="form-control" type="text" placeholder="請輸入..." ng-model="inputVO.base_amt_of_purchase" e-input-limit="NN"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,156 @@
+<style>
+/* open dialog */
+.ngdialog.PMS709 {
+	
+}
+/* dialog panl */
+#ejp>tbody {
+	width: 100% !important;
+}
+
+.modal-dialog.PMS709 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS709 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS709 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS709.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS709_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS709/PMS709.js"></script>
+<script type="text/javascript" src="assets/txn/PMS709/PMS709_ADDDATA.js"></script>
+<div class="PMS709" ng-controller="PMS709Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">FCH轉介客戶登錄
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table style="width:800px;margin-left: 0">
+						<tr>
+							<th><span style="color: red;">*</span>轉介年月：</th>
+							<td><e-combobox ng-datasource="mappingSet['timeE']" ng-model="inputVO.yearMon"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-format="F3" ng-required="true" width="100px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>客戶ID：</th>
+							<td><input type="text" placeholder="請輸入客戶ID..." ng-model="inputVO.cust_ID" e-length-limit="10"></td>
+							<td><button type="button" class="btn btn-info" ng-click="query()">查詢</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<!-- <button type="button" class="btn btn-info" ng-click="init()">清除</button> -->
+								<button type="button" class="btn btn-info" ng-click="adddata()">新增</button></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+		
+	<!-- 結果區 -->
+		<div>
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+				</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<e-jumping output="outputVO" input="inputVO" query="query()"
+					list="largeAgrList"></e-jumping>
+				<div class="gv_tab_sc scroll_y"
+					style="height: 335px; white-space: nowrap;">
+					<table class="table-bordered" width="100%">
+						<thead>
+							<tr>
+								<th rowspan="1">編輯</th>
+								<th rowspan="1">轉介年月</th>
+								<th rowspan="1">客戶ID</th>
+								<th rowspan="1">FCH AO_CODE</th>
+								<th rowspan="1">FCH專員姓名</th>
+								<th rowspan="1">客戶轉介後分行代碼</th>
+								<th rowspan="1">轉介後 AO_CODE</th>
+								<th rowspan="1">轉介後理專姓名</th>
+								<th rowspan="1">編輯人員</th>
+								<th rowspan="1">編輯時間</th>
+							</tr>
+						</thead>
+						
+						<tbody style="text-align: center;">
+							<tr class="repeat-row" ng-repeat="row in largeAgrList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td><button type="button" class="btn btn-info" ng-click="editdata(row)">編輯</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<button type="button" class="btn btn-info" ng-click="deletedata($index)">刪除</button>
+								</td>
+								<td>{{row.FCH_REF_YEARMON}}</td>
+								<td>{{row.CUST_ID}}</td>
+								<td>{{row.FCH_AO_CODE}}</td>
+								<td>{{row.FCH_EMP_NAME}}</td>
+								<td>{{row.REF_BRANCH_NO}}</td>
+								<td>{{row.REF_AO_CODE}}</td>
+								<td>{{row.REF_EMP_NAME}}</td>
+								<td>{{row.MODIFIER}}</td>
+								<td>{{row.LASTUPDATE}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	<!-- 結果區 -->
+	</div>
+</div>

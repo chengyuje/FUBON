@@ -1,0 +1,72 @@
+<style>
+.rstable tr th {
+	vertical-align:middle;
+}
+</style>
+
+<div class="search_table search_box3">
+	<h4 class="h4-title">基本資料</h4>
+	<div class="gv_tab_sc scroll_y" style="min-height:235px;">
+		<table class="table-bordered rstable">
+			<tr>
+				<th>基金名稱<br>(中英文)</th>
+				<td>{{fundInfo.FUND_CNAME}}{{fundInfo.FUND_ENAME ? ' (' + fundInfo.FUND_ENAME +')' : ''}}</td>
+				<th>是否優質</th>
+				<td style="vertical-align:middle;">{{fundInfo.MAIN_PRD == 'Y' || fundInfo.RAISE_FUND == 'Y' ? '是' : '否'}}</td>
+			</tr>
+			<tr>
+				<th>成立日期</th>
+				<td>{{toJsDate(fundInfo.LAUNCH_DATE) | date:'yyyy/MM/dd'}}</td>
+				<th>計價幣別</th>
+				<td>{{fundInfo.CURRENCY_STD_ID | mapping:CURRENCY:'F3'}}</td>
+			</tr>
+			<tr>
+				<th>基金規模</th>
+				<td>{{fundInfo.FUND_SIZE != '百萬(台幣百萬)' ? fundInfo.FUND_SIZE : ''}}</td>
+				<th>本行風險等級</th>
+				<td>{{fundInfo.RISKCATE_ID | mapping:PROD_RISK_LEVEL:'F3'}}</td>
+			</tr>
+			<tr>
+				<th ng-bind="fundInfo.IS_BACKEND === 'Y'? '遞延申購手續費最高費率%': '申請手續費 %'"></th>
+				<td style="vertical-align:middle;">{{fundInfo.FEE2}}</td>
+				<th>轉換手續費<br>(基金公司收取/本行收取)</th>
+				<td>基金公司規定內扣或外收{{fundInfo.FEE ? fundInfo.FEE : '--'}}％轉換費用；本行DBU客戶依信託憑證每筆收取轉換手續費新台幣500元；OBU客戶依信託憑證之信託幣別收取，各幣別金額如下，USD：20；EUR：15；AUD：20；CNY：150；JPY：2000；HKD：200；NZD：20；ZAR：150；SGD：20；CAD：20；GBP：10； CHF：20；SEK：200。</td>
+			</tr>
+			<tr>
+				<th>投資區域</th>
+				<td>{{fundInfo.INV_AREA | mapping:MKT_TIER2:'F3'}}</td>
+				<th>投資標的</th>
+				<td>{{fundInfo.INV_TARGET | mapping:MKT_TIER3:'F3'}}</td>
+			</tr>
+			<tr>
+				<th>單筆申購最低原幣金額</th>
+				<td>{{fundInfo.BASE_AMT_OF_PURCHASE | number:0}}</td>
+				<th>客群</th>
+				<td>{{fundInfo.CUSTOMER_LEVEL | mapping:PRD_FUND_CUSTOMER_LEVEL:'F3':'true'}}</td>
+			</tr>
+			<tr>
+				<th>主題標籤</th>
+				<td>
+				<aa ng-show = "fundInfo.SUBJECT1">{{fundInfo.SUBJECT1 | mapping:PRD_FUND_SUBJECT:'F3'}}</aa>
+				<aa ng-show = "fundInfo.SUBJECT2">、{{fundInfo.SUBJECT2 | mapping:PRD_FUND_SUBJECT:'F3'}}</aa>
+				<aa ng-show = "fundInfo.SUBJECT3">、{{fundInfo.SUBJECT3 | mapping:PRD_FUND_SUBJECT:'F3'}}</aa>
+				</td>
+				<th>專案名稱</th>
+				<td>{{fundInfo.PROJECT | mapping:PRD_FUND_PROJECT:'F3':'true'}}</td>
+			</tr>
+		</table>
+	</div>
+	<h4 class="h4-title">銷售限制</h4>
+	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+		<p ng-if="restriction.FUS40 == 'Y'"><b>未核備</b></p>
+		<p ng-if="restriction.IS_SALE != '1'"><b>停止申購、轉入</b></p>
+		<p ng-if="restriction.NO_E_PURCHASE == 'Y'"><b>不可電子申購</b></p>
+		<p ng-if="restriction.NO_E_OUT == 'Y'"><b>不可電子轉出</b></p>
+		<p ng-if="restriction.NO_E_IN == 'Y'"><b>不可電子轉入</b></p>
+		<p ng-if="restriction.NO_E_BUYBACK == 'Y'"><b>不可電子贖回</b></p>
+		<p ng-if="restriction.QUOTA_CONTROL == 'Y'"><b>額度控管</b></p>
+<!-- 		<p ng-if="restriction.OTHER_RESTRICTION == 'Y'"><b>其他銷售限制</b></p> -->
+	</div>
+	<h4 class="h4-title">文件下載</h4>
+	<a onclick="return false" ng-click="goDownload()">文件連結</a>
+</div>

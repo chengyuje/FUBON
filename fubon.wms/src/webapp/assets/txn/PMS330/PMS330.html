@@ -1,0 +1,372 @@
+
+<style>
+/* open dialog */
+.ngdialog.PMS330 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS330 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS330 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS330 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS330.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS330_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS330/PMS330.js"></script>
+<script type="text/javascript"
+	src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS330" ng-controller="PMS330Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+						<th>*比較日：</th>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="sCreDate" name="sCreDate"
+										class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="sCreDate" is-open="model.a"
+										datepicker-options="bgn_sDateOptions" ng-readonly="true"
+										ng-change="limitDate();dateChange()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+							
+							<th>業務處：</th>
+							<td><e-combobox id="region_center_id"
+									name="region_center_id" ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id" ng-validate="false"
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-format="F3" ng-required="true" ng-change="ChangeRegion()"
+									width="200px" style="line-height:20px;" /></td>
+
+							<th>分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr"
+									ng-validate="false" ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" ng-editable="false"
+									ng-format="F1" ng-required="true" ng-change="ChangeBranch()"
+									width="150px" style="line-height:20px;" />
+							</td>
+
+						</tr>
+						<tr>
+							<th></th>
+							<td></td>
+							<th>營運區：</th>
+							<td><e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST" ng-model="inputVO.branch_area_id"
+									ng-validate="false" ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" ng-editable="false"
+									ng-format="F3" ng-required="true" ng-change="ChangeArea()"
+									width="200px" style="line-height:20px;" />
+							</td>
+
+							<th>理專：</th>
+							<td><e-combobox id="ao_code" name="ao_code"
+									ng-datasource="AO_LIST" ng-model="inputVO.ao_code"
+									ng-validate="false" ng-disabled="disableAoCombo"
+									ng-readonly="disableAoCombo" ng-editable="false" ng-format="F1"
+									ng-required="true" ng-change="ChangeAo_code()" width="150px"
+									style="line-height:20px;" />
+							</td>
+							
+							<th></th>
+							<td></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="getBusiday()" ng-disabled="sCreDate == ''" >查詢</button>
+
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()"
+					ng-disabled="paramList2.length < 1">匯出</button>
+			</div>
+
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList2"></e-jumping>
+			<div align="left">
+				<table>
+					<tr>
+						<td>產出頻率：每日</td>
+					</tr>
+					<tr>
+						<td>產出日：　{{CREATE_DATE}}</td>	
+					</tr>
+		 		</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="table-bordered rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList2">
+					<thead>
+						<tr rowspan="2">
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行</th>
+							<th rowspan="2">AOCode</th>
+							<th rowspan="1" colspan="1">資料年月</th>
+							<th rowspan="1" colspan="5">{{inputVO.sCreDate |
+								date:'yyyy/MM/dd'}}(比較日)</th>
+							
+							<th rowspan="1" colspan="5">{{DATA_DATE}}(最近一日)</th>
+							<th rowspan="1" colspan="5">差異數</th>
+
+						</tr>
+
+						<tr>
+							<th>客戶分級</th>
+					   <!-- <th>私人</th>
+							<th>白金</th>
+							<th>個人</th>
+							<th>一般</th> -->
+							<th>恆富</th>
+							<th>智富</th>
+							<th>穩富</th>
+							<th>一般存戶-跨優</th>
+							<th>一般</th>
+							
+					   <!-- <th>私人</th>
+							<th>白金</th>
+							<th>個人</th>
+							<th>一般</th> -->
+							<th>恆富</th>
+							<th>智富</th>
+							<th>穩富</th>
+							<th>一般存戶-跨優</th>
+							<th>一般</th>
+							
+					   <!-- <th>私人</th>
+							<th>白金</th>
+							<th>個人</th>
+							<th>一般</th> -->
+							<th>恆富</th>
+							<th>智富</th>
+							<th>穩富</th>
+							<th>一般存戶-跨優</th>
+							<th>一般</th>
+						</tr>
+						<tr>
+						</tr>
+					</thead>
+					<tbody class="repeat-row"
+							ng-repeat="row in paramList2 | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<tr>
+							<td rowspan="6">{{row.REGION_CENTER_NAME}}</td>
+							<td rowspan="6">{{row.BRANCH_AREA_NAME}}</td>
+							<td rowspan="6">{{row.BRANCH_NAME}}</td>
+							<td rowspan="6">{{row.AO_CODE}} {{row.EMP_NAME}}</td>
+							<td align="center">E</td>
+							<td align="right">{{row.SE_PRI}}</td>
+							<td align="right">{{row.SE_PLAT}}</td>
+							<td align="right">{{row.SE_PERSON}}</td>
+							<td align="right">{{row.SE_PERSON_C}}</td>
+							<td align="right">{{row.SE_MASS}}</td>
+							
+							<td align="right">{{row.E_PRI}}</td>
+							<td align="right">{{row.E_PLAT}}</td>
+							<td align="right">{{row.E_PERSON}}</td>
+							<td align="right">{{row.E_PERSON_C}}</td>
+							<td align="right">{{row.E_MASS}}</td>
+							
+							<td align="right">{{row.ESS_EI}}</td>
+							<td align="right">{{row.ESS_ET}}</td>
+							<td align="right">{{row.ESS_EP}}</td>
+							<td align="right">{{row.ESS_EC}}</td>
+							<td align="right">{{row.ESS_EM}}</td>
+						</tr>
+						<tr>
+							<td align="center">I</td>
+							<td align="right">{{row.SI_PRI}}</td>
+							<td align="right">{{row.SI_PLAT}}</td>
+							<td align="right">{{row.SI_PERSON}}</td>
+							<td align="right">{{row.SI_PERSON_C}}</td>
+							<td align="right">{{row.SI_MASS}}</td>
+							
+							<td align="right">{{row.I_PRI}}</td>
+							<td align="right">{{row.I_PLAT}}</td>
+							<td align="right">{{row.I_PERSON}}</td>
+							<td align="right">{{row.I_PERSON_C}}</td>
+							<td align="right">{{row.I_MASS}}</td>
+							
+							<td align="right">{{row.ESS_II}}</td>
+							<td align="right">{{row.ESS_IT}}</td>
+							<td align="right">{{row.ESS_IP}}</td>
+							<td align="right">{{row.ESS_IC}}</td>
+							<td align="right">{{row.ESS_IM}}</td>
+						</tr>
+						<tr>
+							<td align="center">P</td>
+							<td align="right">{{row.SP_PRI}}</td>
+							<td align="right">{{row.SP_PLAT}}</td>
+							<td align="right">{{row.SP_PERSON}}</td>
+							<td align="right">{{row.SP_PERSON_C}}</td>
+							<td align="right">{{row.SP_MASS}}</td>
+							
+							<td align="right">{{row.P_PRI}}</td>
+							<td align="right">{{row.P_PLAT}}</td>
+							<td align="right">{{row.P_PERSON}}</td>
+							<td align="right">{{row.P_PERSON_C}}</td>
+							<td align="right">{{row.P_MASS}}</td>
+							
+							<td align="right">{{row.ESS_PI}}</td>
+							<td align="right">{{row.ESS_PT}}</td>
+							<td align="right">{{row.ESS_PP}}</td>
+							<td align="right">{{row.ESS_PC}}</td>
+							<td align="right">{{row.ESS_PM}}</td>
+						</tr>
+						<tr>
+							<td align="center">O</td>
+							<td align="right">{{row.SO_PRI}}</td>
+							<td align="right">{{row.SO_PLAT}}</td>
+							<td align="right">{{row.SO_PERSON}}</td>
+							<td align="right">{{row.SO_PERSON_C}}</td>
+							<td align="right">{{row.SO_MASS}}</td>
+							
+							<td align="right">{{row.O_PRI}}</td>
+							<td align="right">{{row.O_PLAT}}</td>
+							<td align="right">{{row.O_PERSON}}</td>
+							<td align="right">{{row.O_PERSON_C}}</td>
+							<td align="right">{{row.O_MASS}}</td>
+							
+							<td align="right">{{row.ESS_OI}}</td>
+							<td align="right">{{row.ESS_OT}}</td>
+							<td align="right">{{row.ESS_OP}}</td>
+							<td align="right">{{row.ESS_OC}}</td>
+							<td align="right">{{row.ESS_OM}}</td>
+						</tr>
+						<tr>
+							<td align="center">S</td>
+							<td align="right">{{row.SS_PRI}}</td>
+							<td align="right">{{row.SS_PLAT}}</td>
+							<td align="right">{{row.SS_PERSON}}</td>
+							<td align="right">{{row.SS_PERSON_C}}</td>
+							<td align="right">{{row.SS_MASS}}</td>
+							
+							<td align="right">{{row.S_PRI}}</td>
+							<td align="right">{{row.S_PLAT}}</td>
+							<td align="right">{{row.S_PERSON}}</td>
+							<td align="right">{{row.S_PERSON_C}}</td>
+							<td align="right">{{row.S_MASS}}</td>
+							
+							<td align="right">{{row.ESS_SI}}</td>
+							<td align="right">{{row.ESS_ST}}</td>
+							<td align="right">{{row.ESS_SP}}</td>
+							<td align="right">{{row.ESS_SC}}</td>
+							<td align="right">{{row.ESS_SM}}</td>
+						</tr>
+						<tr>
+							<td align="center">一般</td>
+							<td align="right">{{row.SZ_PRI}}</td>
+							<td align="right">{{row.SZ_PLAT}}</td>
+							<td align="right">{{row.SZ_PERSON}}</td>
+							<td align="right">{{row.SZ_PERSON_C}}</td>
+							<td align="right">{{row.SZ_MASS}}</td>
+							
+							<td align="right">{{row.Z_PRI}}</td>
+							<td align="right">{{row.Z_PLAT}}</td>
+							<td align="right">{{row.Z_PERSON}}</td>
+							<td align="right">{{row.Z_PERSON_C}}</td>
+							<td align="right">{{row.Z_MASS}}</td>
+							
+							<td align="right">{{row.ESS_ZI}}</td>
+							<td align="right">{{row.ESS_ZT}}</td>
+							<td align="right">{{row.ESS_ZP}}</td>
+							<td align="right">{{row.ESS_ZP}}</td>
+							<td align="right">{{row.ESS_ZC}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

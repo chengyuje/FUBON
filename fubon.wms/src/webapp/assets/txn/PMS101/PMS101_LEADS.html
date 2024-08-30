@@ -1,0 +1,117 @@
+<style>
+/* open dialog */
+.ngdialog.PMS101_LEADS {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS101_LEADS {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* scroll && height */
+.scroll_PMS101_LEADS_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+</style>
+<div ng-controller="PMS101_LEADSController" ng-cloak>
+	<div class="modal-dialog PMS101_LEADS">
+		<div class="modal-content">
+			<div style="text-align:center;vertical-align:middle" class="modal-header">
+				
+				<div style="float:left;width:30%">客戶ID:{{inputVO.CUST_ID |eMasking:1}}
+					&nbsp;&nbsp;&nbsp; 
+				</div>
+				<div style="float:left;width:30%">	
+					客戶姓名: {{inputVO.CUST_NAME}} &nbsp;&nbsp;&nbsp;
+					
+				</div>
+				<div style="float:left;width:30%">	
+				近期詳細到期商品
+				</div>
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				
+			</div>
+			<div class="modal-body">
+
+				<div class="gv_tab_sc scroll_y"
+					style="white-space: nowrap;">
+					<table class="table-bordered e-table-freeze" e-height="250px" e-mode="1" e-top="true">
+						<thead>
+							<tr>
+								<th>類別</th>
+								<th>商品類別</th>
+								<th>商品細項</th>
+								<th>
+									<e-sorter
+										e-input="inputVO" 
+										e-mode="auto" 
+										e-col="EXP_AMT"
+										e-query="inquireLeads()">到期金額									
+									</e-sorter>
+								</th>
+								<th>
+									<e-sorter
+										e-input="inputVO" 
+										e-mode="auto" 
+										e-col="EXP_DT"
+										e-query="inquireLeads()">到期日
+									</e-sorter>
+								</th>
+
+
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row"
+								ng-repeat="row in resultList | limitTo:displayLimit track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center">{{row.CF_TYPE |
+									mapping:mappingSet['CF_TYPE']:'F3' }}</td>
+								<td align="center">{{row.PRD_TYPE}}</td>
+								<td align="center">{{row.PRD_NAME}}</td>
+								<td align="right">{{row.EXP_AMT | currency:''}}</td>
+								<td align="center">{{row.EXP_DT}}</td>
+
+
+
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="gv_tab_sc scroll_y"></div>
+				<e-paging outputVO="outputVO" inputVO="inputVO"
+					callQuery="inquire()" displayLimit="displayLimit"
+					dataList="paramList"> </e-paging>
+			</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >關閉視窗</button>
+				</div>
+			
+		</div>
+	</div>
+</div>

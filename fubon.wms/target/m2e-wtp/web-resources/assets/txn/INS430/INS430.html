@@ -1,0 +1,86 @@
+<style>
+
+#header{
+/* 	background-color:#FFD4D4;  */
+	margin-left:30%;
+	height:130px;
+	text-align:center;
+	line-height:100%;
+	!important;
+}
+
+#sidebar_left{
+/*  background-color:#FFECC9; */
+	width:30%;
+	height:700px;
+	text-align:left;
+ 	line-height:100%; 
+	float:left;
+	padding: 10px;
+	!important;
+}
+
+#content{
+/* 	background-color:#F2FFF2;  */
+	margin-left:30%;
+	height:570px;
+	line-height:100%;
+	!important;
+}
+
+.square {
+ 	background:#93c5e1;
+	float: left;
+	width:120px;
+	height:120px;
+	margin:5px;
+	border: 1px solid #93c5e1;
+	border-radius: 10px;
+	line-height:120px;
+}
+.noUseShow {
+	opacity: 0.3;
+}
+.useShow {
+	opacity: 1.0;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/INS430/INS430.js"></script>
+<script type="text/javascript" src="assets/txn/INS430/INS431.js"></script>
+<div ng-controller="INS430Controller" ng-cloak>
+	<div class="search_box3" style="height:700px;">
+		
+		<!-- INS431/INS432 -->
+		<div id="sidebar_left" ng-include="insPlanURL"></div>
+		
+		<!-- 畫面上方方格內容 -->
+		<div id="header" >
+			<div class="square" ng-show="hisPlan == '退休規劃'">
+				<h3 style="color: yellow;" ng-bind="(inputVO.gender == '1' ? INS_AVERAGE_LIFE_EXPECTANCY[0].LABEL : INS_AVERAGE_LIFE_EXPECTANCY[1].LABEL) + '歲'"></h3>
+				<h3 style="color: white;">平均餘命</h3>
+			</div>
+			<div ng-class="{false: 'useShow', true: 'noUseShow'} [retiredYears]" class="square" ng-show="hisPlan == '退休規劃'">
+				<h3 style="color: yellow;" ng-show="pensionUseYears != ''">{{pensionUseYears}}年</h3>
+				<h3 style="color: white;">退休金</br>使用期間</h3>
+			</div>
+			<div ng-class="{false: 'useShow', true: 'noUseShow'} [retiredMoney]" class="square" ng-show="hisPlan == '退休規劃'">
+				<h3 style="color: yellow;" ng-show="monLivExp != ''">{{monLivExp | number}}元</h3>
+				<h3 style="color: white;">每月費用</h3>
+			</div>
+			<div ng-class="{false: 'useShow', true: 'noUseShow'} [year]" class="square" ng-show="hisPlan != '退休規劃'">
+				<h3 style="color: yellow;" ng-show="planYears != ''">{{planYears}}年</h3>
+				<h3 style="color: white;">目標年期</h3>
+			</div>
+			<div ng-class="{false: 'useShow', true: 'noUseShow'} [needMoney]" class="square" ng-show="hisPlan != '退休規劃'">
+				<h3 style="color: yellow;" ng-show="amount != ''">{{amount | number}}元</h3>
+				<h3 style="color: white;" ng-show="hisPlan == '子女教育'">子女教育<br />所需金額</h3>
+				<h3 style="color: white;" ng-show="hisPlan != '子女教育'">需求金額</h3>
+			</div>
+		</div>
+		
+		<!-- INS440/INS450 -->
+		<div id="content" ng-include="insAdvURL"></div>
+	</div>
+<!-- 	</div> -->
+</div>

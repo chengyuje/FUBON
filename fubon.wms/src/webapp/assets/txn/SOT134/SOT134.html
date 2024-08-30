@@ -1,0 +1,273 @@
+<style>
+/* open dialog */
+.ngdialog.SOT134 {
+	
+}
+/* dialog panl */
+.modal-dialog.SOT134 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.SOT134 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.SOT134 table.little{
+	width: 60%;
+}
+/* change row */
+.SOT134.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SOT134_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT131/SOT131.js"></script>
+<script type="text/javascript" src="assets/txn/SOT134/SOT134.js"></script>
+<div class="SOT134" ng-controller="SOT134Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >風險檢核控管</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<h4 class="h4-title">交易資料</h4>
+			<table>
+				<tr>
+					<!-- 交易資料 -->
+					<td width="60%">
+						<table>
+							<tr>
+								<th>受託人：</th>
+								<td>台北富邦銀行受託信託財產專戶</td>
+							</tr>
+							<tr ng-hide='true'>								
+								<th>來行人員：</th>
+								<th>
+									<label ng-repeat="row in mappingSet['SOT.CUST_TYPE'] | limitTo:displayLimit track by $index">
+										<!-- 代理人先disable -->
+										<input type="radio" name="custType" ng-model="inputVO.custType" ng-value="row.DATA" disabled> {{row.LABEL}}
+										<span class="bigspace"></span>
+									</label>
+								</th>
+							</tr>
+							<tr>
+								<th>客戶資訊：</th>
+								<td>
+									<table>
+										<tr>
+											<th colspan="2">
+												客戶ID：
+												<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" e-length-limit="200" disabled>
+											</th>
+											<th>{{inputVO.custName}}</th>
+											<th>KYC等級/效期：{{inputVO.kycLevel}}/{{toJsDate(inputVO.kycDueDate) | date:"yyyy-MM-dd"}}</th>
+										</tr>
+										<tr>
+											<th>客戶註記：{{inputVO.custRemarks | mapping:mappingSet['SOT.SPEC_CUSTOMER']:'F3'}}</th>
+											<th>OBU註記：{{inputVO.outFlag}}</th>
+											<th>同意投資商品諮詢服務：{{inputVO.custTxFlag}}</th>
+											<th>期間議價效期：{{toJsDate(inputVO.custFeePrdDueDate) | date:"yyyy-MM-dd"}}</th>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr ng-hide='true'>
+								<th>代理人：</th>
+								<td>
+									<input type="text" class="form-control" style="width:auto;display:inline;" id="proxyCustID" name="proxyCustID" ng-model="inputVO.proxyCustID" e-length-limit="200" disabled>
+									<span class="bigspace"></span>
+									{{inputVO.proxyCustName}}
+								</td>
+							</tr>
+						</table>
+						<h4 class="h4-title">交易明細</h4>
+						<table>
+							<tr>
+								<td>
+									<div class="repeat-row" ng-repeat="row in cartList track by $index">
+										<div style="border-width: 1px;border-style:solid;border-color: #E3E3E3;">
+											<div class="text-right tdpadding">
+												<button type="button" class="btn btn-info" ng-click="editCart($index)" ng-disabled="row.BARGAIN_STATUS == '1' || inputVO.tradeStatus == '3' || feeTypeDisabled" function-type="maintenance">修改</button>
+												<button type="button" class="btn btn-info" ng-click="delCarFromM(row)" ng-disabled="row.BARGAIN_STATUS == '1' || inputVO.tradeStatus == '3' || row.FEE_TYPE == 'A'" function-type="maintenance">移除</button>
+											</div>
+											<table>
+												<tr>
+													<th colspan="6">贖回商品資訊</th>
+												</tr>
+												<tr>
+													<th>投資標的：</th>
+													<td>{{row.RDM_PROD_ID}}</td>
+													<th>商品風險等級：</th>
+													<td>{{row.RDM_PROD_RISK_LV}}</td>
+													<th>信託型態：</th>
+													<td>{{row.RDM_TRADE_TYPE_D|mapping:mappingSet['SOT.ASSET_TRADE_SUB_TYPE']:'F3'}}</td>
+												</tr>
+												<tr>
+													<th>憑證編號：</th>
+													<td>{{row.RDM_CERTIFICATE_ID}}</td>
+													<th>贖回入帳號：</th>
+													<td>{{row.CREDIT_ACCT}}</td>
+													<th>憑證是否終止：</th>
+													<td>{{row.IS_END_CERTIFICATE}}</td>
+												</tr>
+												<tr>
+													<th>原單位數：</th>
+													<td>{{row.RDM_UNIT}}</td>
+													<th>贖回方式/贖回單位數：</th>
+													<td>{{row.REDEEM_TYPE|mapping:mappingSet['SOT.REDEEM_TYPE']:'F3'}}/{{row.UNIT_NUM}}</td>
+													<th>信託幣別/投資金額：</th>
+													<td>{{row.RDM_TRUST_CURR}}&nbsp;{{row.RDM_TRUST_AMT |number}}</td>
+												</tr>
+												<tr>
+<!-- 													<th>預估贖回手續費：</th> -->
+<!-- 													<td>{{row.RDM_FEE |number}}</td> -->
+<!-- 													<th>預估信託管理費：</th> -->
+<!-- 													<td>{{row.MGM_FEE |number}}</td> -->
+													<th>交易日期：</th>
+													<td>{{toJsDate(row.TRADE_DATE) | date:"yyyy/MM/dd"}}</td>
+												</tr>
+<!-- 												<tr> -->
+<!-- 													<th>解說專員：</th> -->
+<!-- 													<td>{{row.NARRATOR_ID}}/{{row.NARRATOR_NAME}}</td> -->
+<!-- 													<th></th> -->
+<!-- 													<td></td> -->
+<!-- 													<th></th> -->
+<!-- 													<td></td> -->
+<!-- 												</tr> -->
+												<tr ng-if="row.IS_RE_PURCHASE=='Y'">
+													<th colspan="6">再申購商品資訊</th>
+												</tr>
+												<tr  ng-if="row.IS_RE_PURCHASE=='Y'">
+													<th>投資標的：</th>
+													<td>{{row.PCH_PROD_ID}}</td>
+													<th>商品風險等級：</th>
+													<td>{{row.PCH_PROD_RISK_LV}}</td>
+													<th>信託型態：</th>
+													<td>單筆申購</td>
+												</tr>
+												<tr  ng-if="row.IS_RE_PURCHASE=='Y'">
+													<th>優惠後手續費率：</th>
+													<td>{{row.FEE_RATE}}%</td>
+													<th>扣款帳號/收益入帳帳號：</th>
+													<td>{{row.CREDIT_ACCT}}</td>
+													<th>信託帳號：</th>
+													<td>{{row.TRUST_ACCT}}</td>
+												</tr>
+												<tr  ng-if="row.IS_RE_PURCHASE=='Y'">
+													<th>滿足點/停損點：</th>
+													<td>{{row.TAKE_PROFIT_PERC!=0 || row.STOP_LOSS_PERC != 0 ?row.TAKE_PROFIT_PERC+'% / '+row.STOP_LOSS_PERC+'%':''}}</td>
+													<th>停損停利通知方式：</th>
+													<td>{{row.PL_NOTIFY_WAYS}}</td>
+													<th></th>
+													<td></td>
+												</tr>
+												<tr>
+													<th>解說專員：</th>
+													<td>{{row.NARRATOR_ID}}/{{row.NARRATOR_NAME}}</td>
+													<th></th>
+													<td></td>
+													<th></th>
+													<td></td>
+												</tr>
+											</table>
+										</div>
+										<p style="color:red;">批號：{{row.BATCH_SEQ}}</p>
+										<br>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</td>
+					<!-- 交易控管 -->
+					<td width="40%">
+<!-- 						<h4 ng-show="custDTL[0].BARGAIN_FEE_FLAG=='1'" class="h4-title"  uib-tooltip="查詢時間:{{applyBargainListTime}}" tooltip-placement="left-bottom"> -->
+<!-- 						手續費優惠申請 -->
+<!-- 						</h4> -->
+						<h4 ng-show="custDTL[0].BARGAIN_FEE_FLAG=='1'" class="h4-title">
+						手續費優惠申請
+						<button type="button" class="btn btn-info" ng-click="queryApplyBargainStatus()" function-type="maintenance">重新整理</button>
+						</h4>
+						<div ng-show="custDTL[0].BARGAIN_FEE_FLAG=='1'"   class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+							<table class="table-bordered">
+								<tr>
+									<th>商品代號</th>
+									<th>預定手續費率</th>
+									<th>目前進度</th>
+								</tr>
+								<tr ng-repeat="row in applyBargainList track by $index">
+<!-- 									<td  uib-tooltip="{{row.PROD_NAME}}" tooltip-placement="right-bottom">{{row.PCH_PROD_ID}}</td> -->
+									<td>{{row.PCH_PROD_ID}}</td>
+									<td>{{row.FEE_RATE}}% </td>
+									<td>{{row.BARGAIN_STATUS | mapping:mappingSet['SOT.BARGAIN_STATUS']:'F3'}}</td>
+								</tr>
+							</table>
+						</div>
+						<h4 class="h4-title">交易控管</h4>
+						<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+							<table class="table-bordered">
+								<tr>
+									<th>風控錄音檢核</th>
+									<th>錄音序號</th>
+									<th>傳送狀態</th>
+								</tr>
+								<tr>
+									<td>
+										<div ng-hide="isFirstTrade == '' || isRePurchase =='N'">{{isFirstTrade}}</div>
+										<div ng-hide="ageUnder70Flag == '' || isRePurchase =='N'">{{ageUnder70Flag}}</div>
+										<div ng-hide="eduJrFlag == '' || isRePurchase =='N'">{{eduJrFlag}}</div>
+										<div ng-hide="healthFlag == '' || isRePurchase =='N'">{{healthFlag}}</div>
+									</td>
+									<td>
+<!-- 										<input type="text" class="form-control" style="width:auto;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="recSEQ" name="recSEQ" ng-model="inputVO.recSEQ" ng-if="IS_REC_NEEDED == 'Y'" ng-blur="validateRecSeq()" e-length-limit="12"> -->
+										<input type="text" class="form-control" style="width:auto;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="recSEQ" name="recSEQ" ng-model="inputVO.recSEQ" ng-show="isRecNeeded" ng-blur="validateRecSeq()" e-length-limit="12">
+									</td>
+									<td><span ng-show="inputVO.tradeStatus == '3'">{{'ehl_02_SOT_002' | i18n}}</span></td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+<!-- 			<button type="button" class="btn btn-info" ng-click="goOP()" function-type="maintenance" ng-disabled="(inputVO.bargainFeeFlag == '1' || inputVO.tradeStatus == '3' || recSeqFlag == 'Y') || (isRecNeeded && !inputVO.recSEQ)">傳送OP交易及列印表單</button> -->
+			<button type="button" 
+					class="btn btn-info" 
+					ng-click="goOP()" 
+					function-type="maintenance" 
+					ng-disabled="goOPDisabled ||
+								 (inputVO.bargainFeeFlag == '1' || 
+								 inputVO.tradeStatus == '3') || 
+								 (isRecNeeded && !inputVO.recSEQ)">傳送OP交易及列印表單</button>
+			<button type="button" class="btn btn-info" ng-click="newTrade()" ng-disabled="inputVO.tradeStatus != '3'" function-type="maintenance">繼續交易</button>
+		</div>
+	</div>
+</div>

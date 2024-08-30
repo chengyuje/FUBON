@@ -1,0 +1,149 @@
+<style>
+/* dialog panl */
+.modal-dialog.INS910_AddData {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/INS910/INS910_AddData.js"></script>
+<div ng-controller="INS910_AddDataController" ng-cloak>
+	<div class="modal-dialog INS910_AddData">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{ROW_INSTYPE | mapping:PLAN_TYPE:'F3'}}</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr ng-if="ROW_INSTYPE == '4'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-2">*適合類型：</th>
+							<td class="col-md-8 tdpadding" colspan="3">
+								<e-combobox id="SUGGEST_TYPE" name="SUGGEST_TYPE"
+								ng-paramtype="INS.PARA_NO4_SUGGEST_TYPE"
+								ng-model="inputVO.SUGGEST_TYPE"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="true"
+			  					width="150px"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2">*險種代碼：</th>
+							<td class="col-md-3 tdpadding"><input type="text" id="PRD_ID" name="PRD_ID" class="form-control" style="text-transform: uppercase;" ng-model="inputVO.PRD_ID" ng-blur="queryPrd()" required></td>
+							<th class="col-md-2">幣別：</th>
+							<td class="col-md-3 tdpadding"><input type="text" id="CURR_CD" name="CURR_CD" class="form-control" ng-model="inputVO.CURR_CD" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2">*繳費年期：</th>
+							<td class="col-md-3 tdpadding">
+								<e-combobox id="INSPRD_ANNUAL" name="INSPRD_ANNUAL"
+								ng-datasource="ANNUALSET"
+								ng-model="inputVO.INSPRD_ANNUAL"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="true"
+			  					ng-change="findKEYNO()"
+			  					width="150px"
+			  					style="line-height:20px;" />
+							</td>
+							<th class="col-md-2">單位：</th>
+							<td class="col-md-3 tdpadding"><input type="text" id="UNIT_NAME" name="UNIT_NAME" class="form-control" ng-model="inputVO.UNIT_NAME" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2">險種名稱：</th>
+							<td colspan="3" class="col-md-8 tdpadding"><input type="text" id="INSPRD_NAME" name="INSPRD_NAME" class="form-control" ng-model="inputVO.INSPRD_NAME" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2">年齡下限：</th>
+							<td class="col-md-3 tdpadding"><input type="text" id="MIN_AGE" name="MIN_AGE" class="form-control" ng-model="inputVO.MIN_AGE" disabled></td>
+							<th class="col-md-2">年齡上限：</th>
+							<td class="col-md-3 tdpadding"><input type="text" id="MAX_AGE" name="MAX_AGE" class="form-control" ng-model="inputVO.MAX_AGE" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2">*保額下限：</th>
+							<td class="col-md-3 tdpadding"><input type="text" id="POLICY_AMT_MIN" name="POLICY_AMT_MIN" class="form-control" ng-model="inputVO.POLICY_AMT_MIN" e-input-limit="NUU" nuu1="7" nuu2="2" required></td>
+							<th class="col-md-2">*保額上限：</th>
+							<td class="col-md-3 tdpadding"><input type="text" id="POLICY_AMT_MAX" name="POLICY_AMT_MAX" class="form-control" ng-model="inputVO.POLICY_AMT_MAX" e-input-limit="NUU" nuu1="7" nuu2="2" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2">*保險累加級距：</th>
+							<td class="col-md-3 tdpadding"><input type="text" id="POLICY_AMT_DISTANCE" name="POLICY_AMT_DISTANCE" class="form-control" ng-model="inputVO.POLICY_AMT_DISTANCE" e-input-limit="NUU" nuu1="7" nuu2="2" required></td>
+							<th class="col-md-2">*保障比：</th>
+							<td class="col-md-3 tdpadding"><input type="text" id="CVRG_RATIO" name="CVRG_RATIO" class="form-control" ng-model="inputVO.CVRG_RATIO" e-input-limit="NUU" nuu1="2" nuu2="5" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="ROW_INSTYPE == '5'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-2">資產傳承：</th>
+							<td class="col-md-3 tdpadding"><input type="checkbox" ng-true-value="'Y'" ng-false-value="'N'" style="top: 0px;" id="ESTATE_PLAN" name="ESTATE_PLAN" class="form-control" ng-model="inputVO.ESTATE_PLAN"></td>
+						</tr>
+						<tr ng-if="ROW_INSTYPE == '9'">
+							<td class="col-xs-1"></td>
+							<th class="">滿期金計算類型：</th>
+							<td class="col-md-3 tdpadding">
+								<e-combobox id="EARNED_CAL_WAY" name="EARNED_CAL_WAY"
+								ng-datasource="EARNED_CAL_WAY"
+								ng-model="inputVO.EARNED_CAL_WAY"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					width="150px"
+			  					style="line-height:20px;" />
+							</td>
+							<th class="col-md-2">滿期金年度：</th>
+							<td class="col-md-3 tdpadding"><input type="text" id="EARNED_YEAR" name="EARNED_YEAR" class="form-control" ng-model="inputVO.EARNED_YEAR"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="ROW_INSTYPE == '9'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-2">滿期金比：</th>
+							<td class="col-md-3 tdpadding"><input type="text" id="EARNED_RATIO" name="EARNED_RATIO" class="form-control" ng-model="inputVO.EARNED_RATIO"></td>
+						</tr>
+					</table>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,89 @@
+<style>
+.modal-dialog.ORG200 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 500px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+td, th {
+    padding: 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG200/ORG200.js"></script>
+<script type="text/javascript" src="assets/txn/ORG200/ORG200ADD.js"></script>
+<script type="text/javascript" src="assets/lib/zTree/js/jquery.ztree.core-3.5.min.js"></script>
+<div ng-controller="ORG200Controller" ng-cloak>
+	<div class="tfb_content">
+   		<div class="tfb_content_icon"></div>
+   		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >組織類型設定</div>
+	</div>
+	<div class="panel_content">
+		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab="">
+			<table style="width: 100%;">
+				<tr>
+					<!-- menu -->
+					<td rowspan="3" style="vertical-align: top; width: 30%;">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">組織樹狀圖</div>
+							</div>
+							<ul id="orgTree" class="ztree"></ul>
+						</div>
+					</td>
+					<td width="800px" style="vertical-align: top;">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title">組織資訊</div>
+							</div>
+							<div class="bootstrap-admin-panel-content text-muted search_box">
+								
+								<table width="100%">
+									<tr>
+										<th width="10%">代碼：</th>
+										<td width="90%"><input class="form-control" type="text" placeholder="請輸入..." id="tipOrgId" name="tipOrgId" ng-model="inputVO.DEPT_ID" maxlength="5" ng-readonly="true"></td>
+									</tr>
+									<tr>
+										<th>名稱：</th>
+										<td>
+											<input class="form-control" type="text" placeholder="請輸入..." id="tipOrgName" name="tipOrgName" ng-model="inputVO.DEPT_NAME" maxlength="60" ng-readonly="inputVO.DEPT_NAME==''" required>
+										</td>
+									</tr>
+									<tr ng-show="parameterTypeEditForm.tipOrgName.$error.required">
+										<th></th>
+										<td class="with-errors">請點選左方組織</td>
+									</tr>
+									<tr ng-if="inputVO.PARENT_DEPT_ID != null && inputVO.PARENT_DEPT_ID != ''">
+										<th>父層級：</th>
+										<td>
+											<e-combobox id="orgParent" 
+														ng-disabled="eComboDisabled"
+														ng-datasource="mappingSet['parentDeptLst']"
+														ng-model="inputVO.PARENT_DEPT_ID"
+									   					ng-validate="false" 
+									   					ng-readonly="false" 
+									   					ng-editable="false"
+									   					ng-format="F1"
+									   					ng-required="false" />
+										</td>
+									</tr>
+								</table>
+								<div class="search_box_btn">
+									<button type="button" class="btn btn-info" ng-click="modDeptDetail()" ng-disabled="inputVO.DEPT_ID == '' || inputVO.DEPT_NAME == ''" function-type="maintenance">確認</button>
+									<button type="button" class="btn btn-info" ng-click="init()" >清除</button>
+									<button type="button" class="btn btn-info" ng-click="showORG200ADD()" function-type="maintenance">新增</button>
+									<button type="button" class="btn btn-info" ng-click="delDept()" >刪除</button>
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+</div>

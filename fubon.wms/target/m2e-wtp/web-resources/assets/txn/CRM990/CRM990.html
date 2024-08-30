@@ -1,0 +1,255 @@
+<style>
+
+.datewidth{
+	width:180px !important;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/CRM990/CRM990.js"></script>
+<script type="text/javascript" src="assets/txn/CRM990/CRM990_MAINTAIN.js"></script>
+<script type="text/javascript" src="assets/txn/CRM990/CRM990_FLOW.js"></script>
+<div class="CRM990" ng-controller="CRM990Controller" ng-cloak>
+	<!-- 查詢條件 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >客訴查詢條件</div>
+		</div>
+	
+	</div>
+
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th class="col-md-1">客戶統編：</th>
+					<td class="col-md-5">
+						<input type="text" id="cust_id" name="cust_id" 
+							placeholder="請輸入..."
+							ng-model="inputVO.cust_id" 
+							maxlength="15"
+							class="form-control" 
+							style="width:200px; text-transform: uppercase;">
+					</td>
+					<th class="col-md-1">客戶姓名：</th>
+					<td class="col-md-5">
+						<input type="text" id="cust_name" name="cust_name" 
+							placeholder="請輸入..."
+							ng-model="inputVO.cust_name" 
+							maxlength="15"
+							class="form-control" 
+							style="width:200px; text-transform: uppercase;">
+					</td>
+				</tr>
+				<tr>
+					<th class="col-md-1">分行別：</th>
+					<td class="col-md-5">
+						<e-combobox id="branch_nbr" name="branch_nbr" 
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr" 
+							ng-validate="false"
+							ng-readonly="BRANCH_LIST.length == 1" 
+							ng-disabled="BRANCH_LIST.length == 1"
+							ng-format="F1"
+							ng-required="false" 
+							style="line-height:20px;" />
+					</td>					
+					<th class="col-md-1">狀態:</th>
+					<td class="col-md-5">
+						<e-combobox id="handle_step" name="handle_step"
+							ng-paramtype="CRM.REV_STATUS"
+							ng-model="inputVO.handle_step"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3" 
+							ng-required="false" 
+							style="line-height:20px;" />
+					</td>
+				</tr>
+				<tr>
+					<th class="col-md-1">日期起迄:</th>
+					<td class="col-md-5">
+						<div style="float: left" class="input-group datebox datewidth">
+							<input type="text" id="s_createtime" name="s_createtime"
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd"
+								   ng-model="inputVO.s_createtime"
+								   is-open="model.a"
+								   datepicker-options="s_createtimeOptions"
+								   ng-readonly="true"								
+								   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+							</span>
+						</div>	
+						<div style="float: left">&nbsp;~&nbsp;</div>
+						<div style="float: left" class="input-group datebox datewidth">
+							<input type="text" id="e_createtime" name="e_createtime"
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd"
+								   ng-model="inputVO.e_createtime"
+								   is-open="model.b"
+								   datepicker-options="e_createtimeOptions"
+								   ng-readonly="true"								
+								   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+							</span>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="changeFlag();query()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="inquireInit()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="add()" function-type="maintenance" ng-hide='true'>新增</button>
+		</div>
+	</div>
+	
+	<!-- 查詢結果 -->
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>
+	<div class="panel_content">
+		<div class="text-center">
+			<button type="button" class="btn btn-info" ng-click="exportResult()">列印備查簿</button>
+			
+			<button type="button" class="btn btn-info" 
+				ng-click="release()" 
+				ng-show="role == '072' || role == '044' || role == '046'">放行</button>
+				
+		</div>
+		<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="e-table-freeze" e-height="580px" e-left="{{freezeControl}}" e-mode="1" e-top="true" e-list="paramList">
+				<thead>
+					<tr>
+						<th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist">功能</th>
+						
+						<th ng-show="role == '072' || role == '044' || role == '046'">
+							<label>
+								<input type="checkbox" ng-model="pageControlVO.pageChoice" ng-change="page()" /> 本頁全選
+							</label>
+							<br/>
+							<label>
+								<input type="checkbox" ng-model="pageControlVO.allChoice" ng-change="all()" /> 全選
+							</label>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NBR" e-query="query()">分行別</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="GRADE" e-query="query()">等級</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="query()">姓名</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">身份證字號</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="HAPPEN_DATE" e-query="query()">發生日期</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="PRO_EMP_ID" e-query="query()">狀態</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="COMPLAIN_PRODUCT" e-query="query()">客訴商品或項目</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="EMP_NAME" e-query="query()">服務或銷售人員</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="END_DATE" e-query="query()">結案日期</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="PROCESS_DAYS" e-query="query()">處理天數</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="CREATOR" e-query="query()">建立人</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="EDITOR_CONDITION1" e-query="query()">第一級</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="EDITOR_CONDITION2" e-query="query()">第二級</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="EDITOR_CONDITION3" e-query="query()">第三級</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="EDITOR_CONDITION4" e-query="query()">總行</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="EDITOR_CONDITION5" e-query="query()">總行</e-sorter>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center">
+							<button type="button" class="btn btn-default" 
+									ng-show="(row.PRO_EMP_ID == loginID || role == '071') && row.HANDLE_STEP != 'E'" 
+									ng-click="maintain(row, 'edit')">編輯</button>
+								
+							<button type="button" class="btn btn-default" 
+									ng-show="row.PRO_EMP_ID != loginID || role >= '071' || row.HANDLE_STEP == 'E'" 
+									ng-click="maintain(row, 'detail')">查詢</button>
+									
+							<button type="button" class="btn btn-default" ng-click="exportPdf(row)">列印</button>
+							
+							<button type="button" class="btn btn-default" ng-show="row.HANDLE_STEP == 'E' && role > '040'" ng-click="revive(row)">取消結案</button>
+						</td>
+						<td align="center" ng-show="role == '072' || role == '044' || role == '046'">
+							<label style="font-weight: initial; margin-bottom: 0px;">
+								<input type="checkbox" ng-model="row.SELECTED" ng-disabled="row.HANDLE_STEP == 'E' || row.HANDLE_STEP != 'A1'">勾選
+							</label>
+						</td>
+						<td align="left">{{row.BRANCH_NBR}}{{row.DEPT_NAME != undefined ? ("-" + row.DEPT_NAME) : "" }}</td>
+						<td align="center" ng-bind="row.GRADE | mapping : mappingSet['COMPLAIN_GRADE'] : 'F3'"></td>
+						<td align="center" ng-bind="row.CUST_NAME"></td>
+						<td align="center" ng-bind="row.CUST_ID"></td>
+						<td align="center" ng-bind="toJsDate(row.HAPPEN_DATE) | date:'yyyy/MM/dd'"></td>
+						<td align="center" ng-if="row.HANDLE_STEP == 'E'">
+							<button type="button" class="btn btn-success" ng-click="showComplainFlow(row)">結案</button>
+						</td>
+						<td align="center" ng-if="row.HANDLE_STEP !='E'">
+							<buttton type="button" class="btn btn-warning" ng-click="showComplainFlow(row)">目前處理人員 {{row.PRO_EMP_ID}}-{{row.PRO_EMP_NAME}}</buttton>
+						</td>
+						<td align="center" ng-bind="row.COMPLAIN_PRODUCT"></td>
+						<td align="center" ng-bind="row.EMP_NAME"></td>
+						<td align="center" ng-bind="toJsDate(row.END_DATE) | date:'yyyy/MM/dd'"></td>
+						<td align="center" ng-bind="row.PROCESS_DAYS"></td>
+						<td align="center">{{row.CREATOR}}<span ng-if="row.CREATOR">-</span>{{row.CREATOR_NAME}}</td>
+						<td align="center">{{row.EDITOR_CONDITION1}}<span ng-if="row.EDITOR_CONDITION1">-</span>{{row.EDIT1_NAME}}</td>
+						<td align="center">{{row.EDITOR_CONDITION2}}<span ng-if="row.EDITOR_CONDITION2">-</span>{{row.EDIT2_NAME}}</td>
+						<td align="center">{{row.EDITOR_CONDITION3}}<span ng-if="row.EDITOR_CONDITION3">-</span>{{row.EDIT3_NAME}}</td>
+						<td align="center">{{row.EDITOR_CONDITION4}}<span ng-if="row.EDITOR_CONDITION4">-</span>{{row.EDIT4_NAME}}</td>
+						<td align="center">{{row.EDITOR_CONDITION5}}<span ng-if="row.EDITOR_CONDITION5">-</span>{{row.EDIT5_NAME}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

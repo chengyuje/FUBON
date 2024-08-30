@@ -1,0 +1,294 @@
+<style>
+/* open dialog */
+.ngdialog.IOT370 {
+	
+}
+/* dialog panl */
+.modal-dialog.IOT370 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.IOT370 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.IOT370 table.little {
+	width: 60%;
+}
+/* change row */
+.IOT370.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_IOT370_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT370/IOT370.js"></script>
+
+
+<div class="IOT370" ng-controller="IOT370Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a16.gif">產險其他送件查詢
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>保險文件編號：</th>
+							<td><input type="text" ng-model="inputVO.INS_ID" style="text-transform: uppercase;" ng-blur="text_toUppercase(inputVO.INS_ID,'INS_ID')"/></td>
+
+							<th></th>
+							<td></td>
+
+							<th>保單號碼：</th>
+							<td><input type="text" ng-model="inputVO.POLICY_NO" style="text-transform: uppercase;" ng-blur="text_toUppercase(inputVO.POLICY_NO,'POLICY_NO')"/></td>
+
+
+
+
+						</tr>
+						<tr>
+							<th>鍵機日：</th>
+							<td><div class="input-group datebox datewidth">
+									<input type="text" class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.KEYIN_DATE_FROM" is-open="model.a"
+										datepicker-options="bgn_sDateOptions" ng-readonly="true"
+										ng-change="limitDate()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div></td>
+
+							<th>~</th>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.KEYIN_DATE_TO" is-open="model.b"
+										datepicker-options="bgn_eDateOptions" ng-readonly="true"
+										ng-change="limitDate();" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+							<th></th>
+							<td></td>
+
+
+
+
+						</tr>
+						<tr>
+							<th>分行代碼：</th>
+							<td><e-combobox ng-datasource="mappingSet['branch']"
+									ng-model="inputVO.BRANCH_NBR" ng-validate="false"
+									ng-readonly="false" ng-editable="false" ng-format="F3"
+									ng-required="false" ng-change="bran()" width="150px"
+									height="30px" style="line-height:20px;" ng-disabled="branch_lock" /></td>
+
+							<th></th>
+							<td></td>
+
+							<th></th>
+							<td></td>
+
+
+
+
+
+
+
+						</tr>
+						<tr>
+							<th>要保人ID：</th>
+							<td><input type="text" ng-model="inputVO.CUST_ID" style="text-transform: uppercase;" ng-blur="text_toUppercase(inputVO.CUST_ID,'CUST_ID')"/></td>
+							<th></th>
+							<td></td>
+							<th>被保人ID：</th>
+							<td><input type="text" ng-model="inputVO.INSURED_ID" style="text-transform: uppercase;" ng-blur="text_toUppercase(inputVO.INSURED_ID,'INSURED_ID')"></td>
+
+
+
+
+						</tr>
+
+						<tr>
+							<th>契約申請日：</th>
+							<td><div class="input-group datebox datewidth">
+									<input type="text" class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.APPLY_DATE_FROM" is-open="model.c"
+										datepicker-options="bgn_sDateOptions2" ng-readonly="true"
+										ng-change="limitDate2()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'c')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div></td>
+
+							<th>~</th>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.APPLY_DATE_TO" is-open="model.d"
+										datepicker-options="bgn_eDateOptions2" ng-readonly="true"
+										ng-change="limitDate2();" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'d')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+
+							<th>險種:</th>
+							<td><e-combobox id="csvType" ng-datasource="mappingSet['PPT_TYPE']"
+									ng-model="inputVO.PPT_TYPE"
+									ng-change="action(inputVO.RESIGN_DESTINATION)"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-format="F1" ng-required="false" width="150px" /></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="clear()">清除</button>
+<!-- 				<button type="button" class="btn btn-info" ng-click="export()" ng-disabled="paramList.length < 1">匯出</button> -->
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO"
+				totallist="paramList" list="data">
+			</e-jumping-once>
+			<div class="gv_tab_sc scroll_y"
+				style="height: 235px; white-space: nowrap;">
+				
+			<table>
+					<thead>
+						<tr>
+							<th>狀態</th>
+							<th>保險文件編號</th>
+							<th>保單號碼</th>
+							<th>分行代號</th>
+							<th>鍵機日</th>
+							<th>要保險人ID</th>
+							<th>要保險人姓名</th>
+							<th>未開戶註記</th>
+							<th>批改申請人</th>
+							<th>批改申請日</th>
+							<th>險種</th>
+							<th>送件批號</th>
+							<th>登錄人</th>
+							<th>登錄時間</th>
+							<th>行政助理1</th>
+							<th>行政助理1簽收時間</th>
+							<th>簽署人</th>
+							<th>簽署紀錄</th>
+							<th>行政助理2</th>
+							<th>行政助理2簽收時間</th>
+
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.STATUS | mapping:mappingSet['IOT.MAIN_STATUS']}}</td>
+							<td>{{row.INS_ID }}</td>
+							<td>{{row.POLICY_NO }}</td>
+							<td>{{row.BRANCH_NBR }}</td>
+							<td>{{toJsDate(row.KEYIN_DATE) | date:'yyyy/MM/dd'}}</td>
+							<td>{{row.CUST_ID }}</td>
+							<td>{{row.PROPOSER_NAME }}</td>
+							<td>{{row.UNOPEN_ACCT }}</td>
+							<td>{{row.RECRUIT_ID }}</td>
+							<td>{{toJsDate(row.APPLY_DATE) | date:'yyyy/MM/dd' }}</td>
+							<td>{{row.PPT_TYPE | mapping:mappingSet['PPT_TYPE']}}</td>
+							<td>{{row.OP_BATCH_NO }}</td>
+							<td>{{row.CREATOR }}</td>
+							<td>{{  toJsDate(row.CREATETIME) | date:'yyyy/MM/dd' }}</td>
+							<td>{{row.BEF_SIGN_OPRID }}</td>
+							<td>{{ toJsDate(row.BEF_SIGN_DATE) | date:'yyyy/MM/dd' }}</td>
+							<td>{{row.SIGN_OPRID }}</td>
+							<td>{{   toJsDate(row.SIGN_DATE) | date:'yyyy/MM/dd'}}</td>
+							<td>{{row.AFT_SIGN_OPRID }}</td>
+							<td>{{toJsDate(row.AFT_SIGN_DATE) | date:'yyyy/MM/dd' }}</td>
+
+						</tr>
+					</tbody>
+				</table></div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

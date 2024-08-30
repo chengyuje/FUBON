@@ -1,0 +1,174 @@
+<style>
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.rstable tbody tr td {
+	vertical-align:middle;
+	text-align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/REF130/REF130.js"></script>
+<div class="REF130" ng-controller="REF130Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr>
+						<th style="width: 16.6%;">業務處：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="regionID" name="regionID"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.regionID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width: 16.6%;">營運區：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="branchAreaID" name="branchAreaID"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branchAreaID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width: 16.6%;">分行：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="branchID" name="branchID"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branchID"
+									ng-validate="false" 
+									ng-disabled="AVAIL_BRANCH.length == 1"
+									ng-readonly="AVAIL_BRANCH.length == 1" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch(region)"
+									style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th style="width: 16.6%;">轉介人員編：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="salesPerson" name="salesPerson"
+										ng-datasource="EMP_LIST"
+										ng-model="inputVO.salesPerson"
+										ng-validate="false" 
+										ng-disabled="EMP_LIST.length == 2"
+										ng-readonly="EMP_LIST.length == 2" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeEmp_id(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width: 16.6%;"><font style="color: red;">＊</font>案件年月(YYYYMM)：</th>
+						<td style="width: 16.6%;"><input type="text" class="form-control" placeholder="請輸入..." id="txnDate" name="txnDate" ng-model="inputVO.txnDate" e-length-limit="6"></td>
+						<th style="width: 16.6%;"><font style="color: red;">＊</font>轉介商品：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="refProd" name="refProd" 
+										ng-datasource="mappingSet['REF_RPOD']"
+										ng-model="inputVO.refProd"
+										ng-validate="false" 
+										ng-readonly="disType" 
+										ng-disabled="disType"
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="refProdChange()"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()" function-type="query" ng-disabled="(inputVO.txnDate == undefined || inputVO.txnDate == '' || inputVO.txnDate == null) ||
+																												 (inputVO.refProd == undefined || inputVO.refProd == '' || inputVO.refProd == null)">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" function-type="export" ng-disabled="resultList.length == 0">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="500px" e-left="6" e-list="resultList" e-mode="1" e-top="false">
+					<thead>
+						<tr>
+							<th colspan="6">轉介基本資料</th>
+							<th colspan="6">轉介案件處理狀況</th>
+							<th colspan="8">轉介成效</th>
+						</tr>
+						<tr>
+							<th>轉介年月</th>
+							<th>分行名稱</th>
+							<th>轉介人身份</th>
+							<th>轉介人姓名</th>
+							<th>員編</th>
+							<th>轉介商品</th>
+							<th>每月轉介目標<br />參考件數</th>
+							<th>MTD<br />轉介件數</th>
+							<th>MTD<br />轉介件數達成率</th>
+							<th>MTD<br />已結案轉介件數</th>
+							<th>MTD<br />未結案轉介件數</th>
+							<th>MTD<br />處理中轉介件數</th>
+							<th ng-hide="inputVO.refProd == '5'">MTD<br />進件數</th>
+							<th ng-hide="inputVO.refProd == '5'">MTD<br />進件率</th>
+							<th>每月<br />轉介成功目標件數</th>
+							<th>MTD<br />轉介成功件數</th>
+							<th>MTD<br />轉介成功件數達成率</th>
+							<th>年度<br />轉介成功目標件數</th>
+							<th>YTD<br />轉介成功件數</th>
+							<th>YTD<br />轉介成功件數達成率</th>
+						</tr>
+					</thead>
+					<tbody ng-show="resultList.length > 0">
+						<tr class="repeat-row" align="center" ng-repeat="row in resultList">
+							<td>{{row.YYYYMM}}</td>
+							<td>{{row.REF_SRC}}</td>
+							<td>{{row.SALES_ROLE | mapping:mappingSet['CAM.REF_SALES_ROLE']:'F3'}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td>{{row.SALES_PERSON}}</td>
+							<td>{{row.REF_PROD | mapping:mappingSet['CAM.REF_PROD']:'F3'}}</td>
+							<td>{{row.REF_MONTH_AIMS_NUMBER}}</td>
+							<td>{{row.MTD_TOT}}</td>
+							<td>{{row.REF_MTD_NUMBER_RATE}}&nbsp;%</td>
+							<td>{{row.REF_MTD_CLOSE_NUMBER}}</td>
+							<td>{{row.REF_MTD_N_CLOSE_NUMBER}}</td>
+							<td>{{row.REF_MTD_PROCESSING_NUMBER}}</td>
+							<td ng-hide="inputVO.refProd == '5'">{{row.REF_MTD_INTO_NUMBER}}</td>
+							<td ng-hide="inputVO.refProd == '5'">{{row.REF_MTD_INTO_RATE}}&nbsp;%</td>
+							<td>{{row.REF_MONTH_SUCCESS_NUMBER}}</td>
+							<td>{{row.REF_MTD_SUCCESS_NUMBER}}</td>
+							<td>{{row.REF_MTD_SUCCESS_RATE}}&nbsp;%</td>
+							<td>{{row.REF_YEAR_SUCCESS_NUMBER}}</td>
+							<td>{{row.REF_YTD_SUCCESS_NUMBER}}</td>
+							<td>{{row.REF_YTD_SUCCESS_RATE}}&nbsp;%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

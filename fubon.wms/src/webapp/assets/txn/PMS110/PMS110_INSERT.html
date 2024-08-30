@@ -1,0 +1,336 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS110_INSERT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1300px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS110/PMS110_INSERT.js"></script>
+
+<div ng-controller="PMS110_INSERTController" ng-cloak>
+    <div class="modal-dialog PMS110_INSERT">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+                <h4 id="myModalAlertLabel" class="modal-title" ng-bind="(beforeAdd ? '新增': '編輯') + ' Pipeline 銷售計劃'"></h4>
+            </div>
+    		<div class="modal-body">
+                <form name="parameterTypeEditForm">
+					<table width="100%">
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>銷售計劃月份：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+                                <e-combobox id="planYearmon" name="planYearmon"
+                                			ng-datasource="mappingSet['timeE']"
+                                            ng-model="inputVO.planYearmon"
+                                            ng-change="loadAvailableActivities()"
+                                            ng-hide="!beforeAdd"
+                                            ng-format="F3"
+                                            width="160px"
+                                            required />
+                                {{(!beforeAdd) ? inputVO.planYearmon : ''}}
+		    				</td>
+		    				<th class="col-xs-1.5 tdpadding">面談日期：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+                                <div class="input-group datebox datewidth" style="float:left; width:200px">
+                                    <input type="text"
+                                           class="form-control"
+                                           uib-datepicker-popup="yyyy/MM/dd"
+                                           ng-model="inputVO.meetingDate"
+                                           is-open="model.a"
+                                           ng-readonly="true"/>
+                                    <!-- 製作日曆button -->
+                                    <span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+                                </div>
+		    				</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="parameterTypeEditForm.planYearmon.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"><font ng-show="parameterTypeEditForm.planYearmon.$error.required">請輸入銷售計劃月份</font></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>客戶ID：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<input 	id="custId" name= "custId"
+		    							class="form-control" 
+				    					type="text" 
+				    					placeholder="請輸入客戶 ID" 
+				    					ng-model="inputVO.custId" 
+				    					ng-hide="!beforeAdd && inputVO.custSource == 'L'" 
+				    					style="text-transform: uppercase;width:200px"/>
+				    			{{(!beforeAdd && inputVO.custSource == 'L') ? inputVO.custId : ''}}
+		    				</td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>客戶姓名：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<input 	id="custName" name="custName"
+		    							class="form-control" 
+				    					type="text" 
+				    					placeholder="請輸入客戶姓名" 
+				    					ng-model="inputVO.custName" 
+				    					ng-hide="!beforeAdd && inputVO.custSource == 'L'" 
+				    					ng-change="countLength(inputVO, 'custName', counter)" 
+                                        style="width:200px"/>
+				    			{{(!beforeAdd && inputVO.custSource == 'L') ? inputVO.custName : ''}}
+				    		</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="(inputVO.custId == '' || inputVO.custId == undefined) && (inputVO.custName == '' || inputVO.custName == undefined)">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"><font>請輸入客戶ID</font></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"><font>請輸入客戶姓名</font></td>
+							<td class="col-xs-1"></td>
+						</tr>
+	    				<tr ng-if="(!beforeAdd && inputVO.custSource == 'L')">
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">客戶連絡電話：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{(!beforeAdd && inputVO.custSource == 'L') ? row.LEAD_VAR_PHONE : ''}}</td>
+		    				<th class="col-xs-1.5 tdpadding">客戶方便連絡時間：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{(!beforeAdd && inputVO.custSource == 'L') ? row.LEAD_VAR_C_TIME : ''}}</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-if="(!beforeAdd && inputVO.custSource == 'L')">
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">客服或電銷轉介人員姓名：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{(!beforeAdd && inputVO.custSource == 'L') ? row.LEAD_VAR_RTN_E_NAME : ''}}</td>
+		    				<th class="col-xs-1.5 tdpadding">客服或電銷轉介人員員編：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{(!beforeAdd && inputVO.custSource == 'L') ? row.LEAD_VAR_RTN_E_ID : ''}}</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>預計承作商品：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<e-combobox id="estPrd" name="estPrd"
+		    								ng-datasource="mappingSet['PMS.PIPELINE_PRD']"
+                                            ng-model="inputVO.estPrd"
+                                            ng-hide="!beforeAdd && inputVO.custSource == 'L'" 
+                                            ng-format="F3"
+                                            width="160px"
+                                            required/>
+                                <font ng-show="!beforeAdd && inputVO.custSource == 'L'">{{inputVO.estPrd | mapping:mappingSet['PMS.PIPELINE_PRD']:'F3'}}</font>
+		    				</td>
+		    				<th class="col-xs-1.5 tdpadding">案件來源：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<e-combobox id="caseSource" name="caseSource"
+		    								ng-datasource="mappingSet['PMS.PIPELINE_SOURCE']"
+                                            ng-model="inputVO.caseSource"
+                                            ng-format="F3"
+                                            width="160px"/>
+		    				</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="parameterTypeEditForm.estPrd.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"><font ng-show="parameterTypeEditForm.estPrd.$error.required">請選擇預計承作商品</font></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>預計申請金額：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<input 	id="estAmt" name="estAmt"
+		    							type="text" 
+		    							class="form-control inputTr" 
+		    							ng-model="inputVO.estAmt" 
+		    							e-length-limit="18" 
+		    							ng-hide="!beforeAdd && inputVO.custSource == 'L'" 
+		    							placeholder="請輸入預計申請金額" 
+                                        style="width:200px"
+                                        required/>
+		    					<font ng-show="!beforeAdd && inputVO.custSource == 'L'">{{inputVO.estAmt | number:0}}</font>
+		    				</td>
+		    				<th class="col-xs-1.5 tdpadding">預計撥款日期：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<div class="input-group datebox datewidth" style="float:left; width:200px">
+                                    <input type="text"
+                                           class="form-control"
+                                           uib-datepicker-popup="yyyy/MM/dd"
+                                           ng-model="inputVO.estDrawDate"
+                                           is-open="model.b"
+                                           ng-readonly="true"
+                                           ng-required="false"/>
+                                    <!-- 製作日曆button -->
+                                    <span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+                                </div>
+		    				</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="parameterTypeEditForm.estAmt.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"><font ng-show="parameterTypeEditForm.estAmt.$error.required">請輸入預計申請金額</font></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">面談結果：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+                                <e-combobox ng-datasource="mappingSet['PMS.PIPELINE_VIEW_RESULT']"
+                                            ng-model="inputVO.meetingResult"
+                                            ng-format="F3"
+                                            width="160px"/>
+		    				</td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>分行別：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<e-combobox id="branch_nbr" name="branch_nbr"
+		    								ng-datasource="BRANCH_LIST"
+                                            ng-model="inputVO.branch_nbr"
+                                            ng-format="F1"
+                                            ng-hide="!beforeAdd" 
+                                            width="160px"
+                                            required/>
+		    					<font ng-show="!beforeAdd">{{inputVO.branch_nbr | mapping:BRANCH_LIST:'F1'}}</font>
+		    				</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="parameterTypeEditForm.branch_nbr.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"><font ng-show="parameterTypeEditForm.branch_nbr.$error.required">請選擇分行別</font></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">備註：</th>
+		    				<td class="col-xs-6.5 tdpadding" colspan="3">
+		    					<textarea placeholder="" ng-model="inputVO.memo" rows="3" class="form-control" ng-change="countLength(inputVO, 'memo', counter)" ></textarea>
+		    				</td>
+		    				<td class="col-xs-1"></td>
+						</tr>
+	    				<tr>
+	    					<td colspan="6"><hr /></td>
+	    				</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">案件進件編號：</th>
+		    				<td class="col-xs-2.5 tdpadding"><input class="form-control" type="text" ng-model="inputVO.case_num" placeholder="請輸入案件編號" ng-disabled="!(inputVO.meetingResult == '03A' || inputVO.meetingResult == '03B')" style="width:200px;text-transform: uppercase;"/></td>
+		    				<th class="col-xs-1.5 tdpadding"></th>
+		    				<td class="col-xs-2.5 tdpadding"></td>
+		    				<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">借款人身份證字號：</th>
+		    				<td class="col-xs-2.5 tdpadding"><input class="form-control" type="text" ng-model="inputVO.loanCustID" placeholder="請輸入借款人身份證字號" ng-disabled="!(inputVO.meetingResult == '03A' || inputVO.meetingResult == '03B')" style="width:200px"/></td>
+		    				<th class="col-xs-1.5 tdpadding">借款人姓名：</th>
+		    				<td class="col-xs-2.5 tdpadding"><input class="form-control" type="text" ng-model="inputVO.loanCustName" placeholder="請輸入借款人姓名" ng-disabled="!(inputVO.meetingResult == '03A' || inputVO.meetingResult == '03B')" style="width:200px"/></td>
+		    				<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">借款金額：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<input type="text" class="form-control inputTr" ng-model="inputVO.loanAmt" e-length-limit="50" size="20" style="display:inline;width: 120px;" e-input-limit="N" ng-disabled="!(inputVO.meetingResult == '03A' || inputVO.meetingResult == '03B')" placeholder="請輸入借款金額(單位：百萬元)">
+	                    		<div style="display:inline;font-size:13px;">單位：百萬元</div>
+		    				</td>
+		    				<th class="col-xs-1.5 tdpadding"></th>
+		    				<td class="col-xs-2.5 tdpadding"></td>
+		    				<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="inputVO.case_num != undefined && inputVO.case_num != '' && !beforeAdd">
+	    					<td colspan="6"><hr /></td>
+	    				</tr>
+						<tr ng-if="inputVO.case_num != undefined && inputVO.case_num != '' && !beforeAdd">
+							<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">案件狀態：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{inputVO.pipelineStatus | mapping:mappingSet['PMS.PIPELINE_STATUS']:'F3'}}</td>
+		    				<th class="col-xs-1.5 tdpadding">已核不撥原因：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+                                <e-combobox ng-datasource="mappingSet['PMS.PIPELINE_REFUSE']"
+                                            ng-model="inputVO.refuseReason"
+                                            ng-format="F3"
+                                            ng-disabled="!(inputVO.meetingResult == '03A' || inputVO.meetingResult == '03B')"
+                                            ng-readonly="!(inputVO.meetingResult == '03A' || inputVO.meetingResult == '03B')"
+                                            width="160px" />
+		    				</td>
+		    				<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="inputVO.case_num != undefined && inputVO.case_num != '' && !beforeAdd">
+							<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">承作商品類型：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{inputVO.estPrdItem | mapping:mappingSet['PMS.PIPELINE_PRD_ITEM']:'F3'}}</td>
+		    				<th class="col-xs-1.5 tdpadding">對保日期</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<div class="input-group datebox datewidth" style="float:left; width:200px">
+                                    <input type="text"
+                                           class="form-control"
+                                           uib-datepicker-popup="yyyy/MM/dd"
+                                           ng-model="inputVO.chkLoanDate"
+                                           is-open="model.c"
+                                           ng-readonly="true"
+                                           ng-required="false"/>
+                                    <!-- 製作日曆button -->
+                                    <span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+                                </div>
+		    				</td>
+		    				<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="inputVO.case_num != undefined && inputVO.case_num != '' && !beforeAdd">
+							<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">核准/婉拒日期：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{inputVO.adDate}}</td>
+		    				<th class="col-xs-1.5 tdpadding">核准/婉拒金額：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{inputVO.adAmt}}</td>
+		    				<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="inputVO.case_num != undefined && inputVO.case_num != '' && !beforeAdd">
+							<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">轉介人員姓名：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{inputVO.refEmp}}</td>
+		    				<th class="col-xs-1.5 tdpadding">轉介人員身份證字號：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{inputVO.refEmpCID}}</td>
+		    				<td class="col-xs-1"></td>
+						</tr>
+					</table>
+                </form>
+            </div>
+            <div class="search_box_btn text-center">
+                <button class="btn btn-primary" 
+                		ng-bind="'確定'" 
+                		ng-disabled="parameterTypeEditForm.planYearmon.$error.required ||
+									 parameterTypeEditForm.estPrd.$error.required ||
+									 parameterTypeEditForm.estAmt.$error.required ||
+									 parameterTypeEditForm.branch_nbr.$error.required"
+                		ng-click="save(beforeAdd)"></button>
+                <button class="btn btn-default" ng-bind="'取消'" ng-click="cancel()"></button>
+            </div>
+        </div>
+
+    </div>
+</div>

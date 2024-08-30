@@ -1,0 +1,215 @@
+<style>
+/* open dialog */
+.ngdialog.CRM131_USRPT {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM131_USRPT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM131_USRPT table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM131_USRPT table.little{
+	width: 60%;
+}
+/* change row */
+.CRM131_USRPT.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM131_USRPT_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:188px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.red{
+	color: red;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.form-control-CRM131_USRPT {
+    padding: 4px 10px;
+    font-size: 16px;
+    color: #666666;
+    background-color: #f4f4f4;
+    border: 1px solid #999999;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-transition: none;
+    -o-transition: none;
+    transition: none;
+	-webkit-border-radius: 0px;
+	-moz-border-radius:0px;
+	border-radius:0px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM131/CRM131_USRPT.js"></script>
+<script type="text/javascript" src="assets/txn/CAM190/CAM190_ROUTE.js"></script>
+<div class="CRM131_USRPT" ng-controller="CRM131_USRPTController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >請輸入查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box">
+				<table>
+     				<tr>
+     					<th>業務處：</th>
+     					<td>
+     						<e-combobox id="region_center_id" name="region_center_id"
+							ng-datasource="REGION_LIST"
+							ng-model="inputVO.region_center_id"
+							ng-validate="false" 
+							ng-disabled="AVAIL_REGION.length == 1"
+							ng-readonly="AVAIL_REGION.length == 1" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="ChangeRegion(regionOBJ)"
+							width="200px"
+							style="line-height:20px;" />
+     					</td>
+     					<th>營運區：</th>
+     					<td>
+     						<e-combobox id="branch_area_id" name="branch_area_id"
+							ng-datasource="AREA_LIST"
+							ng-model="inputVO.branch_area_id"
+							ng-validate="false" 
+							ng-disabled="AVAIL_AREA.length == 1"
+							ng-readonly="AVAIL_AREA.length == 1" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="ChangeArea(regionOBJ)"
+							width="150px"
+							style="line-height:20px;" />
+     					</td>
+     					<th>分行：</th>
+     					<td>
+     						<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-disabled="AVAIL_BRANCH.length == 1"
+							ng-readonly="AVAIL_BRANCH.length == 1" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeBranch(regionOBJ);getAolist();"
+							width="150px"
+							style="line-height:20px;" />
+     					</td>
+     				</tr>
+     				<tr>
+     					<th>理專：</th>
+	   					<td>
+     						<e-combobox id="ao_code" name="ao_code"
+							ng-datasource="AO_LIST"
+							ng-model="inputVO.ao_code"
+							ng-validate="false"
+							ng-disabled="AVAIL_AO_CODE.length == 1 || inputVO.branch_nbr ==''"
+							ng-readonly="AVAIL_AO_CODE.length == 1 || inputVO.branch_nbr ==''" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							width="200px"
+							style="line-height:20px;" />
+     					</td>
+     					<th></th>
+     					<td>
+     					</td>
+     				</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire();"
+					ng-disabled ="priList.indexOf(inputVO.pri_id) > -1 && !inputVO.branch_nbr">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportData();">匯出</button>
+				<br>
+				<label class="with-errors" ng-show="priList.indexOf(inputVO.pri_id) > -1 && !inputVO.branch_nbr"></label>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="resultCurrentList" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="min-height:400px;white-space: nowrap;">
+				<table class="table e-table-freeze" e-left="2" e-height="400px" e-list="resultList" e-mode="3" e-top="true">
+					<thead>
+						<tr>
+							<th>聯絡</th>
+							<th>分行別</th>
+							<th>理專</th>
+							<th>AOCODE</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="inquire()">客戶ID</e-sorter></th>
+							<th>客戶姓名</th>
+							<th>應聯繫頻率</th>
+							<th>最新訪談日期</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AUM_AMT" e-query="inquire()">歸戶總資產</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CON_DEGREE" e-query="inquire()">貢獻度</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="VIP_DEGREE" e-query="inquire()">理財會員等級</e-sorter></th>
+							<th>最後應聯繫日期</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultCurrentList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						    <td><button type="button" class="btn btn-info" ng-click="custConnectData(row, 'tab1')">聯絡</button></td>
+						    <td>{{row.BRA_NBR + '-' + row.BRANCH_NAME}}</td>
+							<td>{{row.EMP_ID + '-' + row.EMP_NAME}}</td>
+							<td class="td_right">{{row.AO_CODE}}</td>
+							<td class="td_right"><a href="#" onclick="return false" ng-click="custDTL(row)">{{row.CUST_ID}}</a></td>
+							<td class="td_right">{{row.CUST_NAME}}</td>
+							<td class="td_right">{{row.FRQ_DAY}}</td>
+							<td class="td_right">{{toJsDate(row.AO_INTERACT_LASTUPDATE)|date:"yyyy-MM-dd"}}</td>
+							<td class="td_right">{{row.AUM_AMT | number:0}}</td>
+							<td class="td_right">{{row.CON_DEGREE | mapping:CON_DEGREE:'F3'}}</td>
+							<td class="td_right">{{row.VIP_DEGREE == null ? 'M' : row.VIP_DEGREE | mapping:VIP_DEGREE:'F3'}}</td>
+							<td class="td_right">{{toJsDate(row.LAST_CONTACT_DATE)|date:"yyyy-MM-dd"}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

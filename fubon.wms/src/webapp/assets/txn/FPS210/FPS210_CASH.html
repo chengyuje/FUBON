@@ -1,0 +1,202 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .FPS200 .modal-dialog {
+    width: 50vw;
+    max-width: 500px;
+    height: 85%;
+  }
+
+  .FPS200.FPSCash .modal-body {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .FPS200.FPSCash th.sub {
+    text-indent: 2.5em;
+  }
+
+  .FPS200.FPSCash th {
+    text-indent: 1em;
+  }
+
+  .FPS200.FPSCash table {
+    margin: 0 auto;
+  }
+
+  .FPS200.FPSCash td {
+    text-align: right;
+    padding-right: 1em;
+  }
+
+  .FPS200.FPSCash td input {
+    margin: 0 0 0 auto;
+  }
+
+  .FPS200.FPSCash tr:not(:last-of-type) {
+    border-bottom: 1px solid #eee;
+  }
+
+</style>
+<script type="text/javascript"
+        src="assets/txn/FPS210/FPS210_CASH.js"></script>
+
+<div ng-controller="FPS210CashController"
+     class="FPS200 FPS FPSCash"
+     ng-cloak>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a href="#"
+           class="close"
+           data-dismiss="modal"
+           aria-hidden="true"
+           ng-click="closeThisDialog('cancel')">&times; </a>
+        <h4 id="myModalAlertLabel"
+            class="modal-title">預估現金部位需求</h4>
+      </div>
+      <div class="modal-body">
+        <table style="width:100%;">
+          <tr>
+            <th></th>
+            <td>單位:新台幣元</td>
+          </tr>
+          <tr>
+            <th>1.貸款支出</th>
+            <td>
+              <span>NT $ </span>
+              <span ng-bind="cashVO.AmtTotal_1|number"></span>
+            </td>
+          </tr>
+          <tr>
+            <th class="sub">*房貸（年）</th>
+            <td>
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control"
+                     style="width:150px;text-align: right;"
+                     ng-model="cashVO.houseLoan"
+                     ng-blur="compareLoan('houseLoan')?getAmtTotal('houseLoan'):''"
+                     ng-change="cashVO.houseLoan = cashVO.houseLoan.replace('-' , '');"
+                     required>
+            </td>
+          </tr>
+          <tr>
+            <th class="sub">*信貸（年）</th>
+            <td>
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control"
+                     style="width:150px;text-align: right;"
+                     ng-model="cashVO.creditLoan"
+                     ng-blur="compareLoan('creditLoan')?getAmtTotal('creditLoan'):''"
+                     ng-change="cashVO.creditLoan = cashVO.creditLoan.replace('-' , '');"
+                     required>
+            </td>
+          </tr>
+          <tr>
+            <th class="sub">*學貸（年）</th>
+            <td>
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control"
+                     style="width:150px;text-align: right;"
+                     ng-model="cashVO.stdLoan"
+                     ng-blur="compareLoan('stdLoan')?getAmtTotal('stdLoan'):''"
+                     ng-change="cashVO.stdLoan = cashVO.stdLoan.replace('-' , '');"
+                     required>
+            </td>
+          </tr>
+          <tr>
+            <th>2.其他支出</th>
+            <td>
+              <span>NT $ </span>
+              <span ng-bind="cashVO.AmtTotal_2|number"></span>
+            </td>
+          </tr>
+          <tr>
+            <th class="sub">*購屋頭期款</th>
+            <td>
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control"
+                     style="width:150px;text-align: right;"
+                     ng-model="cashVO.payForHouse"
+                     ng-blur="getAmtTotal('payForHouse');"
+                     ng-change="cashVO.payForHouse = cashVO.payForHouse.replace('-' , '');"
+                     required>
+            </td>
+          </tr>
+          <tr>
+            <th class="sub">*購車</th>
+            <td>
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control"
+                     style="width:150px;text-align: right;"
+                     ng-model="cashVO.payForCar"
+                     ng-blur="getAmtTotal('payForCar');"
+                     ng-change="cashVO.payForCar = cashVO.payForCar.replace('-' , '');"
+                     required>
+            </td>
+          </tr>
+          <tr>
+            <th class="sub">*留遊學（年）</th>
+            <td>
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control"
+                     style="width:150px;text-align: right;"
+                     ng-model="cashVO.study"
+                     ng-blur="getAmtTotal('study');"
+                     ng-change="cashVO.study = cashVO.study.replace('-' , '');"
+                     required>
+            </td>
+          </tr>
+          <tr>
+            <th class="sub">*旅遊（年）</th>
+            <td>
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control"
+                     style="width:150px;text-align: right;"
+                     ng-model="cashVO.travel"
+                     ng-blur="getAmtTotal('travel');"
+                     ng-change="cashVO.travel = cashVO.travel.replace('-' , '');"
+                     required>
+            </td>
+          </tr>
+          <tr>
+            <th class="sub">*其他（年）</th>
+            <td>
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control"
+                     style="width:150px;text-align: right;"
+                     ng-model="cashVO.other"
+                     ng-blur="getAmtTotal('other');"
+                     ng-change="cashVO.other = cashVO.other.replace('-' , '');"
+                     required>
+            </td>
+          </tr>
+          <!-- 						<tr style="background-color : #dc2e00"> -->
+          <tr style="background-color: #e5f3fc;">
+            <th>加總</th>
+            <td>
+              <span>NT $ </span>
+              <span ng-bind="cashVO.total|number"></span>
+            </td>
+          </tr>
+        </table>
+        <div class="search_box_btn text-center">
+          <a type="button"
+             class="btn-fps"
+             ng-click="clearAll()">全部清除</a>
+          <a type="button"
+             class="btn-fps"
+             ng-click="saveCash()">確定</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

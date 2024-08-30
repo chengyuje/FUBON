@@ -1,0 +1,161 @@
+<style>
+/* open dialog */
+.ngdialog.PMS204 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS204 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS204 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS204 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS204.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS204_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS204/PMS204.js"></script>
+<script type="text/javascript" src="assets/txn/PMS204/PMS204_INSERT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS204/PMS204_EDIT.js"></script>
+
+
+<div class="PMS204" ng-controller="PMS204Controller" ng-cloak>
+	<div>
+
+		<!--Content of the panel-->
+
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">主管評估頻率維護
+			</div>
+		</div>
+		<!--Content of the panel-->
+
+		<div class="panel_content">
+			<!-- <tr><th style="width: 200px; ">維護月份:</th>
+				<td><e-combobox ng-datasource="mappingSet['timeM']"
+					ng-model="inputVO.PLAN_YEARMON" ng-validate="false"
+					ng-readonly="false" ng-editable="false" ng-format="F3"
+					width="200px" height="30px" style="line-height:20px;"
+					ng-required="true" />
+				</td>
+				<button type="button" class="btn btn-info" ng-click="inquire2()" >查詢</button>
+			</tr> -->
+			<tr>
+				<th>
+					<td>
+						<button type="button" class="btn btn-info" ng-click="insert(inputVO)">新增評估頻率</button>
+					</td>
+				</th>
+			</tr>
+			<br><br>
+			<tr>
+				<th>
+					<td>
+						<e-jumping output="outputVO" input="inputVO" query="inquire()"
+							list="paramList"></e-jumping>
+					</td>
+				</th>
+			</tr>
+			<div class="gv_tab_sc scroll_y"
+				style=" white-space: nowrap;">
+				<table class="tablesaw table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th>修改</th>
+							<th>刪除</th>
+							<th>職級</th>
+							<th>MTD達成率</th>
+							<th>Coaching頻次</th>
+							<th>Coaching重點</th>
+							<th>維護日期</th>
+							<th>維護人員</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td style='text-align: center'>
+								<button type="button" class="btn btn-info" ng-click="edit(row)">修改</button>
+							</td>
+							<td style='text-align: center'>
+								<button type="button" class="btn btn-info" ng-click="del(row)">刪除</button>
+							</td>
+							<td style='text-align: center'>{{row.JOB_TITLE_ID |  mapping:mappingSet['PMS.AO_JOB_RANK'] :'FC3'}}</td>
+							<td>{{row.MTD_ACH_RATE_S}}%~{{row.MTD_ACH_RATE_E}}%</td>
+							<td>{{row.COACHING_FREQ |
+								mapping:mappingSet['PMS.COACHING_STATE']:'F1'}}</td>
+							<td>{{row.COACHING_POINT_A |
+								mapping:mappingSet['PMS.COACHING_POINT']:'F1'}}
+								{{row.COACHING_POINT_B |
+								mapping:mappingSet['PMS.COACHING_POINT']:'F1'}}
+								{{row.COACHING_POINT_C |
+								mapping:mappingSet['PMS.COACHING_POINT']:'F1'}}
+								{{row.COACHING_POINT_D |
+								mapping:mappingSet['PMS.COACHING_POINT']:'F1'}}</td>
+							<td>{{toJsDate(row.MAINTAIN_DATE) | date:'yyyy-MM-dd'}}</td>
+							<td>{{row.ID}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

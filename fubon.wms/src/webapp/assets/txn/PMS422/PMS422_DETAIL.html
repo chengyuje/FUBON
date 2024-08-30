@@ -1,0 +1,54 @@
+<style>
+	.PMS422 .modal-dialog {
+		position: relative;
+		top: 100px;
+		right: 0;
+		bottom: 0;
+		left: 0px;
+		width: 90%;
+		height: auto;
+	}
+</style>
+<div class="PMS422" ng-controller="PMS422_DetailController">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">分行人員與客戶資金往來異常報表明細</h4>
+			</div>
+			<div class="modal-body">
+				<e-jumping output="outputVO" input="inputVO" query="queryDetail()" list="details"></e-jumping>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="table-bordered">
+						<tr>
+							<th>序號</th>
+							<th>交易日期</th>
+							<th>行員姓名</th>
+							<th>行員帳號</th>
+							<th>客戶姓名</th>
+							<th>客戶帳號</th>
+							<th>原幣金額</th>
+							<th>交易金額(台幣)</th>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in details track by $index">
+							<td ng-bind="outputVO.currentPageIndex * 10 + $index + 1"></td>
+							<td ng-bind="row.TXN_DATE"></td>
+							<td ng-bind="row.EMP_NAME"></td>
+							<td ng-bind="row.EMP_ACCT"></td>
+							<td ng-bind="row.CUST_NAME"></td>
+							<td ng-bind="row.CUST_ACCT"></td>
+							<td ng-bind="row.AMT_ORGD | number: 0"></td>
+							<td ng-bind="row.AMT_NTD | number: 0"></td>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >
+						<span class="glyphicon glyphicon-remove"></span>
+						<span ng-bind="'關閉'"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

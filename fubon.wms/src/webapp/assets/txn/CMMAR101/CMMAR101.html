@@ -1,0 +1,173 @@
+<style>
+/* open dialog */
+.ngdialog.CMMAR101 {
+	
+}
+/* dialog panl */
+.modal-dialog.CMMAR101 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CMMAR101 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CMMAR101 table.little{
+	width: 60%;
+}
+/* change row */
+.CMMAR101.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CMMAR101_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CMMAR101/CMMAR101.js"></script>
+<script type="text/javascript" src="assets/txn/CMMAR101/CMMAR101_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/CMMAR101/CMMAR101_EMP.js"></script>
+<div ng-controller="CMMAR101Controller" ng-cloak>
+	<div class="CMMAR101 panel panel-default">
+		<div class="panel-heading">
+			<div class="text-muted bootstrap-admin-box-title"><i class="glyphicon glyphicon-th-large"></i>重要訊息維護</div>
+		</div>
+		<div class="bootstrap-admin-panel-content text-muted search_box">
+			<table class="little">
+				<tr>
+					<th>標題：</th>
+					<td class="tdpadding" colspan="3"><input class="form-control" type="text" placeholder="請輸入..." id="tipInfoTitle" name="tipInfoTitle" ng-model="inputVO.tipInfoTitle" e-length-limit="60"></td>
+				</tr>
+				<tr>
+					<th>發佈人員：</th>
+					<td class="tdpadding" colspan="3"><input class="form-control" type="text" placeholder="請輸入..." id="tipCreator" name="tipCreator" ng-model="inputVO.tipCreator" e-length-limit="255"></td>
+				</tr>
+				<tr>
+					<th>提醒起迄日：</th>
+					<td class="tdpadding">
+						<div class="input-group datebox datewidth">
+							<input type="text" id="sDate" name="sDate"
+							class="form-control"
+							datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.sDate"
+							is-open="opened1"
+							min-date="minDate" max-date="startMaxDate"
+							date-disabled="disabled(date, mode)"
+							ng-readonly="true"
+							ng-disabled="disStartDt"
+							ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default"
+								ng-click="open($event,1)"
+								ng-disabled="disStartDt">
+								<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+					</td>
+					<th class="alignleft">～</th>
+					<td class="tdpadding">
+						<div class="input-group datebox datewidth">
+							<input type="text" id="eDate" name="eDate"
+							class="form-control"
+							datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.eDate"
+							is-open="opened2"
+							min-date="endMinDate" max-date="maxDate"
+							date-disabled="disabled(date, mode)"
+							ng-readonly="true"
+							ng-disabled="disStartDt"
+							ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default"
+								ng-click="open($event,2)"
+								ng-disabled="disStartDt">
+								<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+					</td>
+				</tr>
+			</table>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query" >查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()" >清除</button>
+				<button type="button" class="btn btn-info" ng-click="edit()" function-type="maintenance" >新增</button>
+			</div>
+		</div>
+		<div class="bootstrap-admin-panel-content text-muted search_box">
+			<table class="tablesaw table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>動作</th>
+						<th>標題</th>
+						<th>內容</th>
+						<th>文件</th>
+						<th>起始日</th>
+						<th>到期日</th>
+						<th>發佈單位</th>
+						<th>發佈人員</th>
+						<th>通知人員</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>
+							<e-combobox id="cmbAction" name="cmbAction" ng-if="row.actionIF"
+							ng-datasource="row.set"
+							ng-model="row.cmbAction"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="action(row)"
+							width="100px"
+							style="line-height:20px;" />
+						</td>
+						<td>{{row.INFO_TITLE}}</td>
+						<td>{{row.INFO_DESC}}</td>
+						<td><a onclick="return false" ng-click="downloadByteFile(row)">{{row.ATTACH_NAME}}</a></td>
+						<td>{{toJsDate(row.INFO_SDATE) | date:'yyyy/MM/dd'}}</td>
+						<td>{{toJsDate(row.INFO_EDATE) | date:'yyyy/MM/dd'}}</td>
+						<td>{{row.TERRITORY_ID}}-{{row.DESCR}}</td>
+						<td>{{row.EMP_NAME}}</td>
+						<td ng-if="row.INFOEmp == '明細'"><a onclick="return false" ng-click="empDetail(row)">{{row.INFOEmp}}</a></td>
+						<td ng-if="row.INFOEmp != '明細'">{{row.INFOEmp}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<e-paging outputVO="outputVO"
+				inputVO="inputVO"
+				callQuery="inquire()"
+				displayLimit="displayLimit"
+				dataList="paramList">
+			</e-paging>
+		</div>
+	</div>
+</div>

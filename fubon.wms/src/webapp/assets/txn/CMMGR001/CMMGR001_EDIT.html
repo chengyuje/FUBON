@@ -1,0 +1,122 @@
+<!--
+   特殊 Style 定義
+-->
+<style>
+.ngdialog.ngdialog-theme-default.custom-width .ngdialog-content {
+	width:600px;
+	padding: 0%;
+}
+table{
+	width:100%;
+	margin-left:auto; 
+	margin-right:auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<div class="modal-dialog">
+	<div class="modal-content" ng-controller="CMMGR001_EditController" ng-cloak>
+		<div class="modal-header">
+			<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.ROLEID == null ? '新增' : '編輯'}}角色</h4>
+			<div class="dialog-error-message" align="center">{{errorMessage}}</div>
+		</div>
+		<div class="modal-body">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-3">角色代碼：</th>
+						<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="roleID" name="roleID" ng-model="inputVO.roleID" maxlength="20" required autofocus ng-disabled="row.ROLEID != undefined"></td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.roleID.$error.required">
+						<td class="col-xs-1"></td>
+						<th class="col-md-3"></th>
+						<td class="col-md-7 help-block with-errors">請輸入角色代碼</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-3">角色名稱：</th>
+						<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="roleName" name="roleName" ng-model="inputVO.roleName" maxlength="50" required ng-disabled="row.ROLEID != undefined"></td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.roleName.$error.required">
+						<td class="col-xs-1"></td>
+						<th class="col-md-3"></th>
+						<td class="col-md-7 help-block with-errors">請輸入功能名稱</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-3">型態：</th>
+						<td class="col-md-7 tdpadding">
+							<e-combobox id="extend3" name="extend3" ng-disabled="eComboDisabled" 
+								ng-paramtype="TBSYSSECUROLE.EXTEND3"
+								ng-model="inputVO.extend3"
+		    					ng-validate="true" 
+		    					ng-readonly="false" 
+		    					ng-editable="false"
+		    					ng-format="F3" 
+		    					ng-required="true"
+		    					width="291px"
+		    					style="line-height:20px;" />
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.extend3.$error.required">
+						<td class="col-xs-1"></td>
+						<th class="col-md-3"></th>
+						<td class="col-md-7 help-block with-errors">請選擇型態</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-3">檢核等級：</th>
+						<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="approvalLevel" name="approvalLevel" ng-model="inputVO.approvalLevel" maxlength="50" required></td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.approvalLevel.$error.required">
+						<td class="col-xs-1"></td>
+						<th class="col-md-3"></th>
+						<td class="col-md-7 help-block with-errors">請輸入檢核等級</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-3">首頁：</th>
+						<td class="col-md-7 tdpadding">
+							<e-combobox id="mainPage" name="mainPage" ng-disabled="eComboDisabled" 
+								ng-paramtype="cmmgr001.mainPage"
+								ng-model="inputVO.mainPage"
+		    					ng-validate="true" 
+		    					ng-readonly="false" 
+		    					ng-editable="false"
+		    					ng-format="F3" 
+		    					ng-required="true"
+		    					width="291px"
+		    					style="line-height:20px;" />
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.mainPage.$error.required">
+						<td class="col-xs-1"></td>
+						<th class="col-md-3"></th>
+						<td class="col-md-7 help-block with-errors">請選擇首頁</td>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+			<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			<span function-type="maintenance" ><button type="button" class="btn btn-danger" ng-click="del()" confirm="確定要刪除?" confirm-settings="{size: 'sm'}" ng-if="isUpdate">刪除</button></span>
+		</div>
+	</div>
+</div>

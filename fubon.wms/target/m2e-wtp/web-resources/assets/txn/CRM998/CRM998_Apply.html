@@ -1,0 +1,119 @@
+
+<script type="text/javascript" src="assets/txn/CRM998/CRM998_Apply.js"></script>
+
+<div ng-controller="CRM998_ApplyController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">客群身分例外開放申請
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<div style="margin-left:40px">
+					<div class="form-group row">
+						<label class="col-md-1 col-form-label" for="custId">客戶ID</label>
+						<div class="col-md-2">
+							<input id="custId" class="form-control" type="text" placeholder="請輸入..." 
+								   ng-model="inputVO.custId" e-length-limit="20" ng-change="inputVO.custId = inputVO.custId.toUpperCase()" />
+						</div>	
+						<div class="col-md-1">
+							<button type="button" class="btn btn-info" ng-click="inquiredata();">查詢</button>
+						</div>	
+					</div>
+					
+					<div ng-show="datashow"><hr/></div>
+					
+					<!-- 客戶資料 -->
+					<div ng-show="datashow">
+						<div class="form-group row">
+							<div class="col-md-1 col-form-label">客戶姓名：</div>
+							<label class="col-md-2 col-form-label">{{custData.CUST_NAME}}</label>
+							
+							<div class="col-md-1 col-form-label">客戶等級：</div>
+							<label class="col-md-2 col-form-label">{{custData.ORG_DEGREE | mapping:VIP_DEGREE:'F3'}}</label>
+							
+							<div class="col-md-1 col-form-label">客戶資產：</div>
+							<label class="col-md-2 col-form-label">{{custData.AUM_AMT | currency:''}}</label>	
+						</div>
+						
+						<div class="form-group row">
+							<div class="col-md-1 col-form-label">分行代碼：</div>
+							<label class="col-md-2 col-form-label">{{custData.BRA_NBR}}</label>
+							
+							<div class="col-md-1 col-form-label">理專員編：</div>
+							<label class="col-md-2 col-form-label">{{custData.EMP_ID}}</label>
+							
+							<div class="col-md-1 col-form-label">理專姓名：</div>
+							<label class="col-md-2 col-form-label">{{custData.EMP_NAME}}</label>
+							
+							<div class="col-md-1 col-form-label">AO CODE：</div>
+							<label class="col-md-2 col-form-label">{{custData.AO_CODE}}</label>		
+						</div>
+					</div>
+					
+					<div ng-show="datashow"><hr/></div>
+					
+					<!--例外升等新增-->
+					<div ng-show="datashow">
+						<div class="form-group row">
+							<label class="col-md-1 col-form-label">申請人員編</label>	
+							<div class="col-md-2">
+								<input class="form-control" type="text" placeholder="請輸入..." ng-model="inputVO.appl_emp_id"
+									   ng-change="getEMPName()" e-length-limit="6" style="width: 200px;" e-input-limit="N"/>
+								<label>{{inputVO.appl_emp_name}}</label>
+							</div>	
+							
+							<label class="col-md-1 col-form-label">新等級</label>
+							<div class="col-md-2">
+								<e-combobox ng-paramtype="CRM.VIP_DEGREE" ng-model="inputVO.new_degree" 
+											ng-validate="false" ng-editable="false" ng-format="F3" 
+											ng-required="false" width="180px" style="line-height:20px;"/>
+							</div>
+							
+							
+							<div class="col-md-4">
+								<button type="button" class="btn btn-info" ng-click="addVIPDegreeImprove();"
+										ng-disabled="addFlag()">新增</button>
+								<button type="button" class="btn btn-info" ng-click="addApplydata()" ng-disabled="!applydata.length">確定送出</button>
+								<br> 
+								<label ng-bind="getHit()"></label>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<hr/>
+			
+				<div class="gv_tab_sc scroll_y" style="min-height: 235px; white-space: nowrap;">
+					<table class="tablesaw table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>客戶資產</th>
+								<th>原等級</th>
+								<th>新等級</th>
+								<th>申請人ID</th>
+								<th>申請人姓名</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in applydata track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center">{{row.CUST_ID}}</td>
+								<td align="center">{{row.CUST_NAME}}</td>
+								<td align="center">{{row.AUM_AMT | currency:''}}</td>
+								<td align="center">{{row.ORG_DEGREE | mapping:VIP_DEGREE:'F3'}}</td>
+								<td align="center">{{row.NEW_DEGREE | mapping:VIP_DEGREE:'F3'}}</td>
+								<td align="center">{{row.APPL_EMP_ID}}</td>
+								<td align="center">{{row.APPL_EMP_NAME}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

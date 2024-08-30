@@ -1,0 +1,79 @@
+<style>
+.modal-dialog.PRD110_OVSPRI {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: 550px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD110/PRD110_OVSPRI.js"></script>
+<div ng-controller="PRD110_OVSPRIController" ng-cloak>
+	<div class="modal-dialog PRD110_OVSPRI"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">境外私募基金</h4>
+			</div>
+			<div class="modal-body">
+				<div class="search_table search_box3">
+					<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+						<table>
+							<tr>
+								<th>基金代碼：</th>
+								<td><input type="text" class="form-control" placeholder="請輸入..." id="fund_id" name="fund_id" ng-model="inputVO.PRD_ID" ng-blur="getName()" e-length-limit="16"></td>
+								<th>基金名稱：</th>
+								<td><input type="text" class="form-control" placeholder="請輸入..." id="fund_name" name="fund_name" ng-model="inputVO.FUND_NAME" e-length-limit="255"></td>
+							</tr>
+						</table>
+					</form>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-mousedown="inquireInit();inquire()" function-type="query">查詢</button>
+					<button type="button" class="btn btn-info" ng-mousedown="init();inquireInit()">清除</button>
+				</div>
+				
+				<!-- 結果區 -->
+				<e-jumping-once output="outputVO" list="paramList" totallist="totalList"></e-jumping-once>
+				<div class="gv_tab_sc" style="min-height:235px;white-space: nowrap;">
+					<table class="table-bordered td_center e-table-freeze" e-height="550px" e-mode="1" e-top="true" e-list="paramList">
+						<thead>
+							<tr>
+								<th>基金代碼</th>
+								<th>基金名稱</th>
+								<th>商品風險等級</th>
+								<th>計價幣別</th>
+								<th>申購/贖回</th>
+								<th>年份</th>
+								<th>次別</th>
+								<th>開放起日</th>
+								<th>開放訖日</th>
+								<th>申請截止日</th>
+								<th>交易日</th>
+								<th>原幣<br/>最低申購金額</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row.PRD_ID}}</td>
+								<td>{{row.PRD_NAME}}</td>
+								<td>{{row.RISKCATE_ID | mapping:PROD_RISK_LEVEL:'F3'}}</td>
+								<td>{{row.CURRENCY_STD_ID | mapping:CURRENCY:'F3'}}</td>
+								<td align="center">{{row.TRADE_TYPE | mapping: mappingSet['OVSPRI_PRD_CATEGORY']}}</td>
+								<td>{{row.PRD_YEAR}}</td>
+								<td>{{row.PRD_CATEGORY}}</td>
+								<td>{{toJsDate(row.START_DATE) | date:'yyyy-MM-dd'}}</td>
+								<td>{{toJsDate(row.END_DATE) | date:'yyyy-MM-dd'}}</td>
+								<td>{{toJsDate(row.DEADLINE_DATE) | date:'yyyy-MM-dd'}}</td>
+								<td>{{toJsDate(row.TRADE_DATE) | date:'yyyy-MM-dd'}}</td>
+								<td align="right">{{row.MIN_PURCHASE_AMT | number: 0}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

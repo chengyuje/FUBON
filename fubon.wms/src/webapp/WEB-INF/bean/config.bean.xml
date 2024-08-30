@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean id="config.dataSource" class="org.springframework.aop.framework.ProxyFactoryBean" lazy-init="true">
+        <property name="target" ref="abdbdayDataSource"/>
+    </bean>
+
+    <bean id="config.priorityComparator" class="com.systex.jbranch.platform.configuration.DBConfigPriorityComparator"
+          lazy-init="true">
+        <constructor-arg ref="config.dataSource"/>
+        <constructor-arg value="TBSYS_CONFIGTYPE"/>
+        <constructor-arg value="TYPE"/>
+        <constructor-arg value="PRIORITY"/>
+    </bean>
+
+    <bean id="config.configBrowser" class="com.systex.jbranch.platform.configuration.DBConfigBrowser" lazy-init="true">
+        <property name="dataSource" ref="config.dataSource"/>
+        <property name="tableName" value="TBSYS_CONFIG"/>
+        <property name="defaultType" value="DEFAULT"/>
+        <property name="defaultName" value="DEFAULT"/>
+        <property name="typeColumn" value="TYPE"/>
+        <property name="nameColumn" value="NAME"/>
+        <property name="keyColumn" value="KEY"/>
+        <property name="valueColumn" value="VALUE"/>
+        <property name="priorityComparator" ref="config.priorityComparator"/>
+    </bean>
+</beans>

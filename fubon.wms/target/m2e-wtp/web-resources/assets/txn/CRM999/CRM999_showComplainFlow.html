@@ -1,0 +1,54 @@
+<style>
+.modal-dialog.CRM999_show {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM999/CRM999_showComplainFlow.js"></script>
+<div ng-controller="CRM999showController" ng-cloak>
+	<div class="modal-dialog CRM999_show">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">客訴流程紀錄</h4>
+			</div>
+			<div class="modal-body">
+				<e-jumping input="inputVO" output="outputVO" query="query()"
+					list="paramList"></e-jumping>
+				<div class="gv_tab_sc scroll_y"
+					style="min-height: 235px; white-space: nowrap;">
+					<table class="tablesaw table table-striped table-bordered"
+						data-tablesaw-mode="swipe" data-tablesaw-sortable
+						data-tablesaw-minimap>
+						<thead>
+							<tr>
+								<th>處理人員</th>
+								<th>下一處理人員</th>
+								<th>處理狀態</th>
+								<th>送出案件時間</th>
+								<th>退件原因</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row"
+								ng-repeat="row in paramList track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center" ng-bind="row.EMP_FROM + '-' + row.EMP_FROM_NAME"></td>
+								<td align="center" ng-bind="row.EMP_TO + '-' + row.EMP_TO_NAME"></td>
+								<td align="center" ng-bind="row.STATUS | mapping:COMPLAIN_FLOWDTL_STATUS:'F3'"></td>
+								<td align="center" ng-bind="row.DATE_FROM"></td>
+								<td align="left" ng-bind="row.REASON"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

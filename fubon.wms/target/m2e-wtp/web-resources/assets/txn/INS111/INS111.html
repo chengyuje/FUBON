@@ -1,0 +1,306 @@
+<style>
+<!--
+table .small_font{
+	font-size: small;
+	font-weight: bold;
+}
+div .small_font{
+	font-size: small;
+	font-weight: bold;
+}
+input{
+	font-size: small;
+	font-weight: normal;
+}
+
+.show_is_wl {
+	float: right;
+    margin-right: 60px;
+    margin-top: 5px;
+}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/INS111/INS111.js"></script>
+<script type="text/javascript" src="assets/txn/INS111/INS111_RIDER.js"></script><!-- Juan看這邊 -->
+<script type="text/javascript" src="assets/txn/INS112/INS112.js"></script>
+<div ng-controller="INS111Controller" ng-cloak>
+    	<div class="modal-dialog" style="width: 60%;">
+    		<div class="modal-content">
+    			<div class="modal-header">
+    				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+    				<h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">行外保單{{type == 'new' ? '新增' : '修改'}}</h4>
+    			</div>
+    			<div class="modal-body">
+	    			<form name="parameterTypeEditForm">
+			    		<div class="gv_tab_sc scroll_y">
+			    			<table style="margin-top: 1%;" class="small_font">
+		    					<tr>
+		    						<td>*被保險人ID:</td>
+				    				<td>
+				    					<input ng-required="true" ng-blur="getInfo('INSURED')" id="insured_id" name="insured_id" type="text" placeholder="請輸入..." ng-model="inputVO.INSURED_ID" style="text-transform: uppercase;">
+				    				</td>
+				    				<td>*生日：</td>
+				    				<td>
+				    					<div class="input-group datebox datewidth">
+											<input type="text" id="insured_birthday" name="insured_birthday"
+													class="form-control"
+													uib-datepicker-popup="yyyy/MM/dd"
+													ng-model="inputVO.INSURED_BIRTHDAY"
+													is-open="model.a"
+													ng-required="true"
+													ng-readonly="true"
+													disabled="true"
+														/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'a')" disabled="true">
+													<i class="glyphicon glyphicon-calendar"></i>
+												</button>
+											</span>
+										</div>
+				    				</td>
+		    					</tr>
+		    					<tr>
+		    						<td>*被保險人姓名:</td>
+				    				<td colspan="3">
+				    					<input ng-required="true" id="insured_name" name="insured_name" type="text" placeholder="請輸入..." ng-model="inputVO.INSURED_NAME" style="text-transform: uppercase;" disabled="true">
+				    				</td>
+		    					</tr>
+								<tr>
+									<td>*保單號碼：</td>
+									<td colspan="3">
+										<e-combobox id="policy_nbr" name="policy_nbr" ng-disabled="FORMList.length == 1"
+											ng-datasource="FORMList" 
+											ng-model="inputVO.POLICY_NBR" 
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-required="true"
+											ng-format="F3"/>
+										<!-- <input id="policy_nbr" name="policy_nbr" type="text" placeholder="請輸入..." ng-model="inputVO.POLICY_NBR" required="required"> -->
+									</td>
+								</tr>
+								<tr>
+									<td>*保險公司：</td>
+									<td colspan="3">
+										<e-combobox id="com_id" name="com_id" ng-disabled="COMList.length == 1 || type == 'update'" 
+											ng-datasource="COMList" 
+											ng-model="inputVO.COM_ID" 
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="change_COM_ID()"/>
+									</td>
+									<!-- <td>*保單狀態：</td>
+									<td></td> -->
+								</tr>
+								<tr>
+									<td>*商品名稱：</td>
+									<td colspan="3">
+										<input ng-required="true" id="prd_name" name="prd_name" type="text" placeholder="請輸入..." ng-model="inputVO.PRD_NAME" ng-blur="checkPRD_NAME()" style="text-transform: uppercase;width: 80%;">
+									</td>
+								</tr>
+								<tr>
+									<td>*險種代碼：</td>
+									<td colspan="3">
+										<input ng-required="true" id="prd_id" name="prd_id" type="text" placeholder="請輸入..." ng-model="inputVO.PRD_ID" ng-blur="checkPRD_NAME()" style="text-transform: uppercase;">
+										<button type="button" class="btn btn-info" ng-click="getProduc('Y')">查詢</button>
+										<label class="show_is_wl" ng-show="IS_WL == 'Y'">終身({{WL_TERM}})</label>
+									</td>
+								</tr>
+								<tr>
+									<td>*主/附約：</td>
+									<td>
+										<e-combobox id="is_main" name="is_main" ng-disabled="INS.IS_MAIN.length == 1"
+											ng-paramtype="INS.IS_MAIN"
+											ng-model="inputVO.IS_MAIN"
+											ng-validate="false"
+											ng-readonly="true" 
+											ng-editable="true"
+											ng-format="F3"
+											ng-required="true"
+									 />
+									</td>
+									<!-- *保障年期： -->
+									<td ng-show="labelTITLE_A!==''">{{labelTITLE_A ?labelTITLE_A + '：' : labelTITLE_A}}</td>
+									<td ng-show="labelTITLE_A!==''">  
+										<e-combobox id="coveryear_sel" name="coveryear_sel" ng-disabled="COVERYEAR_SELList.length == 1" ng-required="COVERYEAR_SELList.length > 1"
+											ng-datasource="COVERYEAR_SELList" 
+											ng-model="inputVO.COVERYEAR_SEL" 
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-disabled="show_COVERYEAR_SEL"/>
+									</td>
+								</tr>
+								<tr>
+									<td>*保單生效日：</td>
+									<td>
+										<div class="input-group datebox datewidth">
+											<input type="text" id="effected_date" name="effected_date"
+													class="form-control"
+													ng-required="true"
+													uib-datepicker-popup="yyyy/MM/dd"
+													ng-model="inputVO.EFFECTED_DATE"
+													is-open="model.b"
+													datepicker-options="bgn_sDateOptions"
+													ng-readonly="true"
+														/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+													<i class="glyphicon glyphicon-calendar"></i>
+												</button>
+											</span>
+										</div>
+									</td>
+									<!-- *繳費年期： -->
+									<td ng-show="labelTITLE_Y!==''">{{labelTITLE_Y ?labelTITLE_Y + '：' : labelTITLE_Y}}</td>
+									<td ng-show="labelTITLE_Y!==''">
+										<e-combobox id="paymentyear_sel" name="paymentyear_sel" ng-disabled="PAYMENTYEAR_SELList.length == 1" ng-required="PAYMENTYEAR_SELList.length > 1"
+											ng-datasource="PAYMENTYEAR_SELList" 
+											ng-model="inputVO.PAYMENTYEAR_SEL" 
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-disabled="show_PAYMENTYEAR_SEL"/>
+									</td>
+								</tr>
+								<tr>
+									<td>*幣別：</td>
+									<td>
+										<e-combobox id="curr_cd" name="curr_cd" ng-disabled="CURR_CDList.length == 1"
+											ng-datasource="CURR_CDList" 
+											ng-model="inputVO.CURR_CD" 
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-required="true"
+											ng-format="F3"/>
+									</td>
+									<!-- *種類： -->
+									<td ng-show="labelTITLE_K!==''">{{labelTITLE_K ?labelTITLE_K + '：' : labelTITLE_K}}</td>
+									<td ng-show="labelTITLE_K!==''" >
+										<e-combobox id="kind_sel" name="kind_sel" ng-disabled="KIND_SELList.length == 1" ng-required="KIND_SELList.length > 1"
+											ng-datasource="KIND_SELList" 
+											ng-model="inputVO.KIND_SEL" 
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-disabled="show_KIND_SEL"/>
+									</td>
+								</tr>
+								<tr>
+									<td>*保額：</td>
+									<td>
+										<div ng-if="QUANTITY_STYLEList.length>0">
+										<e-combobox id="upqty_sel" name="upqty_sel" ng-disabled="QUANTITY_STYLEList.length == 1"
+											ng-datasource="QUANTITY_STYLEList" 
+											ng-model="inputVO.UPQTY_SEL" 
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-required="true"
+											ng-format="F3"/>
+											{{COVERCACULUNITDESC}}	
+										</div>
+										<div ng-if="QUANTITY_STYLE!=null">
+											<input ng-required="true" id="upqty_sel" name="upqty_sel" type="text" placeholder="請輸入..." ng-model="inputVO.UPQTY_SEL" ng-blur="checkUpqty_sel()" style="width: 150px;" e-length-limit="30">
+											({{QUANTITY_STYLE}})
+											{{COVERCACULUNITDESC}}
+										</div>
+										<div ng-if="QUANTITY_STYLEList.length==0 && QUANTITY_STYLE==null">
+											<input ng-required="true" e-input-limit="NC" id="insuredamt" name="insuredamt" type="text" placeholder="請輸入..." ng-model="inputVO.INSUREDAMT" style="text-align: right; width: 150px;" maxlength="18">
+											{{COVERCACULUNITDESC}}
+										</div>
+									</td>
+									<!-- *保險對象： -->
+									<td ng-show="labelTITLE_O!==''">{{labelTITLE_O ?labelTITLE_O + '：' : labelTITLE_O}}</td>
+									<td ng-show="labelTITLE_O!==''">
+										<e-combobox id="insured_object" name="insured_object" ng-disabled="INSURED_OBJECTList.length == 1" ng-required="INSURED_OBJECTList.length > 1"
+											ng-datasource="INSURED_OBJECTList" 
+											ng-model="inputVO.INSURED_OBJECT" 
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-disabled="show_INSURED_OBJECT"/>
+									</td>
+								</tr>
+								<tr>
+									<td>*繳別：</td>
+									<td colspan="3">
+										<e-combobox id="pay_type" name="pay_type" ng-disabled="INS.PAY_TYPE.length == 1"
+											ng-paramtype="INS.PAY_TYPE"
+											ng-model="inputVO.PAY_TYPE"
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+									 />
+									</td>
+								</tr>
+								<tr>
+									<td>
+										*保費(原幣)：
+<!-- 										<button type="button" class="btn btn-info" ng-click="calCalculationPolicy()">試算</button> -->
+									</td>
+									<td colspan="3">
+										<input id="insyearfee" name="insyearfee" type="text" placeholder="請輸入..." e-length-limit="18" ng-model="inputVO.INSYEARFEE" e-input-limit="N" ng-blur="change_number_ins(inputVO.INSYEARFEE)">
+									元</td>
+								</tr>
+								<tr>
+									<td>*要保人是否為身故受益人：</td>
+									<td colspan="3">
+										<e-combobox id="beneficiary_yn" name="beneficiary_yn"
+											ng-paramtype="COMMON.YES_NO"
+											ng-model="inputVO.BENEFICIARY_YN"
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+									 />
+									</td>
+								</tr>
+								<tr>
+									<td colspan="4"><button type="button" class="btn btn-info" ng-click = "Add_IS_MAIN_N()">增加附約</button>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="4">
+										<table>
+											<tr>
+												<th>被保險人ID</th>
+												<th>被保險人姓名</th>
+												<th>險種代碼</th>
+												<th>附約商品名稱</th>
+											</tr>
+											<tr ng-click="Modify_IS_MAIN_N(row)" ng-repeat="row in inputVO.IS_MAIN_NList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" style="display: bl">
+												<td><a href="#">{{row.INSURED_ID}}</a></td>
+												<td><a href="#">{{row.INSURED_NAME}}</a></td>
+												<td><a href="#">{{row.PRD_ID}}</a></td>
+												<td><a href="#">{{row.PRD_NAME}}</a></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+							</table>
+							<div style="padding-top: 2%;">
+								<button class="btn btn-info" ng-click="Save()">儲存</button>
+								<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">取消</button>
+							</div>
+			    		</div>
+					</form>
+    			</div>
+    		</div>
+    		
+    </div>	
+
+</div>

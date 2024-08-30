@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-lazy="false" package="com.systex.jbranch.platform.common.platformdao.table">
+    <class table="TBSYSPROJECT" name="com.systex.jbranch.platform.common.platformdao.table.TbsysprojectVO" optimistic-lock="version">
+        <id column="PROJECT_ID" name="projectId" type="java.lang.String" length="20">
+            <generator class="assigned"/>
+        </id>
+        <version column="VERSION" generated="never" name="version" type="long"/>
+        <property name="projectName" column="PORJECT_NAME" type="java.lang.String" length="40"/>
+        <property name="description" column="DESCRIPTION" type="java.lang.String" length="60"/>
+        <set name="users" lazy="true" table="TBSYSPROJECTUSER">
+            <key/>
+            <many-to-many class="com.systex.jbranch.platform.common.platformdao.table.TbsysuserVO" column="TELLERID"/>
+        </set>
+        <set name="orgs" lazy="true" table="TBSYSPROJECTORG">
+            <key/>
+            <many-to-many class="com.systex.jbranch.platform.common.platformdao.table.TbsysorgVO" column="DIV_NO"/>
+        </set>
+        <property column="CREATOR" generated="never" lazy="false" length="20"
+                  name="creator" type="java.lang.String"/>
+        <property column="CREATETIME" generated="never" lazy="false"
+                  length="23" name="createtime" type="java.sql.Timestamp"/>
+        <property column="LASTUPDATE" generated="never" lazy="false"
+                  length="23" name="lastupdate" type="java.sql.Timestamp"/>
+        <property column="MODIFIER" generated="never" lazy="false" length="20"
+                  name="modifier" type="java.lang.String"/>
+        <!-- Associations -->
+    </class>
+</hibernate-mapping>

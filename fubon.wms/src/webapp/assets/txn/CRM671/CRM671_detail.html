@@ -1,0 +1,293 @@
+<style>
+/* open dialog */
+.ngdialog.CRM671_detail {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM671_detail {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM671_detail table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM671_detail table.little{
+	width: 60%;
+}
+/* change row */
+.CRM671_detail.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM671_detail_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM671/CRM671_detail.js"></script>
+<script type="text/javascript" src="assets/txn/CUS160/CUS160.js"></script>
+<script type="text/javascript" src="assets/txn/CRM671/CRM671_add.js"></script>
+<div class="CRM671_detail" ng-controller="CRM671_detailController" ng-cloak>
+	<div>
+		<!--Content of the panel-->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >交辦事項</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<!-- 查詢結果 -->
+			<table>
+				<tr>
+					<td width = "85%"><e-jumping output="outputVO3" input="inputVO" query="inquire2()" list="resultList3"></e-jumping></td>
+					
+					<td width = "15%">
+						<button type="button" class="btn btn-info" ng-hide="resultList3.length == 0" ng-click="save()">儲存</button>
+						<button type="button" class="btn btn-info" ng-show="resultList3.length == 0" ng-click="toCUS160()">新增</button>
+						<a href="#" ng-hide="resultList3.length == 0" ng-click="toCUS160()">更多>></a>
+					</td>
+				</tr>
+			</table>
+			<div class="gv_tab_sc scroll_y middle" style="height:235px;white-space: nowrap;">
+				<table class = "table-bordered text-center middle">
+					<thead>
+						<tr>
+							<th width="30%">項目</th>
+							<th width="35%">到期日</th>
+							<th width="35%">狀態</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList3 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.TASK_MEMO}}</td>
+							<td>{{toJsDate(row.TASK_DATE) | date:"yyyy-MM-dd"}}</td>
+							<td><e-combobox id="TASK_STATUS" name="TASK_STATUS" 
+										ng-datasource="mappingSet['CAM.TASK_STATUS']"
+										ng-model="row.TASK_STATUS"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="getList(row.SEQ_NO,row.TASK_STATUS)"
+										style="line-height:20px;" 
+										required/></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	
+	<div ng-show = "pri_id != '004' && pri_id != '014' && pri_id != '015' && pri_id != '023' && pri_id != '024' && pri_id != '004AO'">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >理專訪談紀錄</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<!-- 查詢結果 -->
+		<button type="button" class="btn btn-info" ng-click="add()" function-type="maintenance" ng-if="!pri_id.startsWith('UHRM')">新增訪談紀錄</button>
+		<hr>
+			<e-jumping-once output="FC_outputVO" list="data" totallist="FCResult"></e-jumping-once>
+			<div class="gv_tab_sc" style="min-height:235px;">
+				<table class="table table-bordered e-table-freeze" e-height="400px" e-mode="1" e-top="true" e-list="data">
+					<thead>
+						<tr>
+							<th width="5%" ng-if="pri == 'A1'" function-type="maintenance">刪除</th>
+							<th width="10%">溝通管道</th>
+							<th width="20%">通知客戶內容</th>
+							<th width="25%">客戶回應內容</th>
+							<th width="15%">聯繫日期</th>
+							<th width="10%">最後修改人</th>
+							<th width="15%">最後修改時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td class="td_center" ng-if="pri == 'A1'" function-type="maintenance"><input type='checkbox' ng-model='row.CHECK_AO' ng-change='delrow_ao(row)' ng-true-value="'Y'" ng-false-value="'N'"/></td>
+							<td class="td_center">{{row.CMU_TYPE | mapping: mappingSet['CAM.VST_REC_CMU_TYPE'] :'F3'}}</td>
+							<td>{{row.VISIT_MEMO}}</td>
+							<td>{{row.VISIT_CREPLY}}</td>
+							<td>{{row.VISIT_DT}}</td>
+							<td class="td_center">{{row.MODIFIER}}-{{row.EMP_NAME}}</td>
+							<td class="td_center">{{row.LASTUPDATE}}</td>
+						</tr>
+						<tr ng-if = "pri == 'A1' && FCResult.length > 0" function-type="maintenance">
+							<td>
+								<button href="#" data-toggle="modal" class="btn btn-danger btn-circle" ng-click="delData(row,'1')">
+									<i class="glyphicon glyphicon-trash"></i>
+								</button>
+							</td>
+						</tr>						
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	
+	<div ng-show = "pri_id != '004' && pri_id != '014' && pri_id != '015' && pri_id != '023' && pri_id != '024' && pri_id != '004AO'">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >UHRM訪談紀錄</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<!-- 查詢結果 -->
+		<button type="button" class="btn btn-info" ng-click="add()" function-type="maintenance" ng-if="pri_id.startsWith('UHRM')">新增訪談紀錄</button>
+		<hr>
+			<e-jumping-once output="UHRM_outputVO" list="dataUHRM" totallist="UHRMResult"></e-jumping-once>
+			<div class="gv_tab_sc" style="min-height:235px;">
+				<table class="table table-bordered e-table-freeze" e-height="400px" e-mode="1" e-top="true" e-list="data">
+					<thead>
+						<tr>
+							<th width="5%" ng-if="pri_id.startsWith('UHRM')" function-type="maintenance">刪除</th>
+							<th width="10%">溝通管道</th>
+							<th width="20%">通知客戶內容</th>
+							<th width="25%">客戶回應內容</th>
+							<th width="15%">聯繫日期</th>
+							<th width="10%">最後修改人</th>
+							<th width="15%">最後修改時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in dataUHRM | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td class="td_center" ng-if="pri_id.startsWith('UHRM')" function-type="maintenance"><input type='checkbox' ng-model='row.CHECK_UHRM' ng-change='delrow_uhrm(row)' ng-true-value="'Y'" ng-false-value="'N'"/></td>
+							<td class="td_center">{{row.CMU_TYPE | mapping: mappingSet['CAM.VST_REC_CMU_TYPE'] :'F3'}}</td>
+							<td>{{row.VISIT_MEMO}}</td>
+							<td>{{row.VISIT_CREPLY}}</td>
+							<td>{{row.VISIT_DT}}</td>
+							<td class="td_center">{{row.MODIFIER}}-{{row.EMP_NAME}}</td>
+							<td class="td_center">{{row.LASTUPDATE}}</td>
+						</tr>
+						<tr ng-if = "pri == 'U1' && UHRMResult.length > 0" function-type="maintenance">
+							<td>
+								<button href="#" data-toggle="modal" class="btn btn-danger btn-circle" ng-click="delData(row, '4')">
+									<i class="glyphicon glyphicon-trash"></i>
+								</button>
+							</td>
+						</tr>						
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	
+	<div ng-show = "(pri_id == '004' || pri_id == '004AO') || ( pri_id != '014' && pri_id != '015' && pri_id != '023' && pri_id != '024')">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >消金人員訪談紀錄</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<!-- 查詢結果 -->
+		<button type="button" ng-if="(pri_id == '004' || pri_id == '004AO')" class="btn btn-info" ng-click="add()" function-type="maintenance">新增訪談紀錄</button>
+		<hr>
+			<e-jumping-once output="PS_outputVO" list="data1" totallist="PSResult"></e-jumping-once>
+			<div class="gv_tab_sc" style="min-height:235px;">
+				<table class="e-table-freeze" e-height="400px" e-mode="1" e-top="true" e-list="data1">
+					<thead>
+						<tr>
+							<th width="5%" ng-if="pri == 'A1'" function-type="maintenance">刪除</th>
+							<th width="10%">溝通管道</th>
+							<th width="20%">通知客戶內容</th>
+							<th width="25%">客戶回應內容</th>
+							<th width="15%">聯繫日期</th>
+							<th width="10%">最後修改人</th>
+							<th width="15%">最後修改時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data1 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td class="td_center" ng-if="pri == 'A1'" function-type="maintenance"><input type='checkbox' ng-model='row.CHECK_PS' ng-change='delrow_ps(row)' ng-true-value="'Y'" ng-false-value="'N'"/></td>
+							<td class="td_center">{{row.CMU_TYPE  | mapping: mappingSet['CAM.VST_REC_CMU_TYPE'] :'F3'}}</td>
+							<td>{{row.VISIT_MEMO}}</td>
+							<td>{{row.VISIT_CREPLY}}</td>
+							<td>{{row.VISIT_DT}}</td>
+							<td class="td_center">{{row.MODIFIER}}-{{row.EMP_NAME}}</td>
+							<td class="td_center">{{row.LASTUPDATE}}</td>
+						</tr>
+						<tr ng-if = "pri == 'A1' && PSResult.length > 0" function-type="maintenance">
+							<td>
+								<button href="#" data-toggle="modal" class="btn btn-danger btn-circle" ng-click="delData(row,'2')">
+									<i class="glyphicon glyphicon-trash"></i>
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	
+	<div ng-show = "pri_id != '004' && pri_id != '004AO'">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >輔銷人員訪談紀錄</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<!-- 查詢結果 -->
+			<button type="button" class="btn btn-info" ng-click="add()" ng-show = "pri_id == '014' || pri_id == '023'" function-type="maintenance">新增訪談紀錄</button>
+			<hr>
+			<e-jumping-once output="FA_outputVO" list="data2" totallist="FAResult"></e-jumping-once>
+			<div class="gv_tab_sc" style="min-height:235px;">
+				<table class="table table-bordered e-table-freeze" e-height="400px" e-mode="1" e-top="true" e-list="data2">
+					<thead>
+						<tr>
+							<th width="5%" ng-if="pri_id == '015' || pri_id == '024'" function-type="maintenance">刪除</th>
+							<th width="10%">溝通管道</th>
+							<th width="20%">通知客戶內容</th>
+							<th width="25%">客戶回應內容</th>
+							<th width="15%">聯繫日期</th>
+							<th width="10%">最後修改人</th>
+							<th width="15%">最後修改時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data2 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td class="td_center" ng-if="pri_id == '015' || pri_id == '024'" function-type="maintenance"><input type='checkbox' ng-model='row.CHECK_FI' ng-change='delrow_fi(row)' ng-true-value="'Y'" ng-false-value="'N'"/></td>
+							<td class="td_center">{{row.CMU_TYPE | mapping: mappingSet['CAM.VST_REC_CMU_TYPE'] :'F3'}}</td>
+							<td>{{row.VISIT_MEMO}}</td>
+							<td>{{row.VISIT_CREPLY}}</td>
+							<td>{{row.VISIT_DT}}</td>
+							<td class="td_center">{{row.MODIFIER}}-{{row.EMP_NAME}}</td>
+							<td class="td_center">{{row.LASTUPDATE}}</td>
+						</tr>
+						<tr ng-if = "(pri_id == '015' && FAResult.length > 0) || (pri_id == '024' && FAResult.length > 0)" function-type="maintenance">
+							<td>
+								<button href="#" data-toggle="modal" class="btn btn-danger btn-circle" ng-click="delData(row,'3')">
+									<i class="glyphicon glyphicon-trash"></i>
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+</div>

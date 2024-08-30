@@ -1,0 +1,152 @@
+<style>
+/* open dialog */
+.ngdialog.CRM121_INSERT {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM121_INSERT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+/* table size */
+.CRM121_INSERT table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM121_INSERT.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM121_INSERT_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+
+.datewidth{
+	width:180px !important;
+}
+</style>
+
+<!-- <script type="text/javascript" src="assets/txn/CRM121/CRM121_INSERT.js"></script> -->
+<!-- <script type="text/javascript" src="assets/txn/PMS109/PMS109.js"></script> -->
+<!-- <script type="text/javascript" src="assets/txn/PMS109/PPAP.js"></script> -->
+
+<div ng-controller="CRM121_INSERTController" ng-cloak>
+	<div class="modal-dialog CRM121_INSERT"> 
+		<div class="modal-content" ng-show ="true">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">新增</h4>
+			</div>
+			<div class="modal-body" ng-show= "true">
+	 			<table>
+	 				<tr>
+	 					<th>新增項目：</th>	<!-- 理專新增-待辦事項 CUS160、A/M/C PMS109 -->
+	 					<td>
+	 						<e-combobox id="act" name="act" 
+	 		       				ng-datasource="mappingSet['set']"
+								ng-model="act"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+						</td>
+						<th ng-show = "act=='A'">客戶ID :</th>
+						<td ng-show = "act=='A'">
+							<input type="text" class="form-control" placeholder="請輸入..." 
+								id="CUST_ID" name="CUST_ID" 
+								ng-model="inputVO.CUST_ID" style="text-transform:uppercase;">
+						</td>
+	 				</tr>
+	 			</table>
+	 		</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="action();closeThisDialog('cancel');" 
+				        ng-disabled="(act == 'A' && inputVO.CUST_ID=='')|| act == ''|| act == undefined ">確認</button>
+	 			<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+		</div>
+		<!-- 輔消新增備忘錄 -->
+		<div class="modal-content" ng-show ="false">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">新增備忘錄</h4>
+			</div>
+	 		<div class="modal-body" >
+		 		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				  	<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 tdpadding">提醒日期：</th>
+							<td class="col-md-7 tdpadding" colspan = "2">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="sdate" name="sdate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.TASK_DATE"
+									is-open="model.b"
+									datepicker-options="DateOptions"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+	 								<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>	
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 tdpadding">提醒時間：</th>
+							<td class="col-md-3 tdpadding"><input type="time"  ng-model="inputVO.TASK_STIME"  placeholder="HH:mm:ss" min="08:00:00" max="17:00:00" required /></td>
+							<td class="col-md-1 tdpadding">~</td>
+							<td class="col-md-3 tdpadding"><input type="time"  ng-model="inputVO.TASK_ETIME"  placeholder="HH:mm:ss" min="08:00:00" max="17:00:00" required /></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 tdpadding">名稱：</th>
+							<td class="col-md-7 tdpadding" colspan = "2"><input type="text" class="form-control" ng-model="inputVO.TASK_TITLE" e-length-limit="10" size="10" style="width:150px ;"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 tdpadding">內容：</th>
+							<td class="col-md-7 tdpadding" colspan = "2"><textarea placeholder="請輸入..." ng-model="inputVO.TASK_MEMO" e-length-limit="500"></textarea></td>
+							<td class="col-xs-1"></td>
+						</tr>	
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="add();closeThisDialog('cancel');">確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+		</div>
+	</div>
+</div>
+					
+					
+					
+					
+					
+					
+					
+					

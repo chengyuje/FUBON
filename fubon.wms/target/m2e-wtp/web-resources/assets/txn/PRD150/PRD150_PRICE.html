@@ -1,0 +1,162 @@
+<div class="search_table">
+	<h4 class="h4-title">查詢條件</h4>
+	<table>
+		<tr>
+			<th>報價查詢起訖日期</th>
+			<td>
+				<div class="form-group">
+					<div class="input-group datebox datewidth">
+						<input type="text" id="sDate" name="sDate"
+						class="form-control"
+						uib-datepicker-popup="yyyy/MM/dd"
+						ng-model="PriceVO.sDate"
+						is-open="model.a"
+						datepicker-options="sDateOptions"
+						ng-readonly="true"
+						ng-change="limitDate()"/>
+						<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+							<i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+					<div style="float: left !important;">～</div>
+					<div class="input-group datebox datewidth">
+						<input type="text" id="eDate" name="eDate"
+						class="form-control"
+						uib-datepicker-popup="yyyy/MM/dd"
+						ng-model="PriceVO.eDate"
+						is-open="model.b"
+						datepicker-options="eDateOptions"
+						ng-readonly="true"
+						ng-change="limitDate()"/>
+						<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+							<i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+				</div>
+			</td>
+			<th>報價查詢期間</th>
+			<td>
+				<e-combobox id="stime" 
+				ng-datasource="mappingSet['Time']"
+				ng-model="PriceVO.stime"
+				ng-validate="false"
+				ng-readonly="false" 
+				ng-editable="false"
+				ng-format="F3"
+				ng-change="setDate()"
+				ng-required="false"
+				width="100px"
+				style="line-height:20px;" />
+			</td>
+		</tr>
+	</table>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="getPrice()" function-type="query">查詢</button>
+	</div>
+	<table>
+		<tr>
+			<th width="70%">
+				<nvd3 options="options" data="data"></nvd3>
+			</th>
+			<th width="30%">
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="table table-bordered e-table-freeze" e-top="true" e-mode="1" e-height="450px" e-list="history">
+						<thead>
+							<tr>
+								<th width="70%">日期</th>
+								<th width="30%">參考贖回報價%</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in history track by $index" >
+					     		<td align="center">{{row.date | date:'yyyy-MM-dd'}}</th>
+					     		<td align="right">{{row.value}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</th>
+		</tr>
+	</table>
+	<h4 class="h4-title">最新實際贖回成交價格紀錄</h4>
+	<table>
+		<tr>
+			<th>報價查詢起訖日期</th>
+			<td>
+				<div class="form-group">
+					<div class="input-group datebox datewidth">
+						<input type="text" id="s2Date" name="s2Date"
+						class="form-control"
+						uib-datepicker-popup="yyyy/MM/dd"
+						ng-model="PriceVO.s2Date"
+						is-open="model.c"
+						datepicker-options="s2DateOptions"
+						ng-readonly="true"
+						ng-change="limitDate2()"/>
+						<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+							<i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+					<div style="float: left !important;">～</div>
+					<div class="input-group datebox datewidth">
+						<input type="text" id="e2Date" name="e2Date"
+						class="form-control"
+						uib-datepicker-popup="yyyy/MM/dd"
+						ng-model="PriceVO.e2Date"
+						is-open="model.d"
+						datepicker-options="e2DateOptions"
+						ng-readonly="true"
+						ng-change="limitDate2()"/>
+						<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+							<i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+				</div>
+			</td>
+			<th>報價查詢期間</th>
+			<td>
+				<e-combobox id="s2time" 
+				ng-datasource="mappingSet['Time']"
+				ng-model="PriceVO.s2time"
+				ng-validate="false"
+				ng-readonly="false" 
+				ng-editable="false"
+				ng-format="F3"
+				ng-change="setDate2()"
+				ng-required="false"
+				width="100px"
+				style="line-height:20px;" />
+			</td>
+		</tr>
+	</table>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="getPrice2()" function-type="query">查詢</button>
+	</div>
+	<e-jumping-once output="history2VO" list="history2par" totallist="history2"></e-jumping-once>
+	<div class="gv_tab_sc" style="white-space: nowrap;">
+		<table class="table-bordered">
+			<thead>
+				<tr>
+					<th width="50%">成交日期</th>
+					<th width="50%">成交單價</th>
+					<!-- <th width="33%">成交面額</th> -->
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in history2par track by $index">
+					<td align="center">{{toJsDate(row.A01002) | date:"yyyy-MM-dd"}}</td>
+		     		<td align="center">{{(row.A01004 / 1000000) | number:6}}</td>
+		     		<!-- <td>{{row.ACT_STS == 'S4' ? row.CONT_AMT : ''}}</td> -->
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

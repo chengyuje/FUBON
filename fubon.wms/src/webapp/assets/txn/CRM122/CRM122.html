@@ -1,0 +1,153 @@
+<style>
+/* open dialog */
+.ngdialog.CRM122 {
+	
+}
+/* table size */
+.CRM122 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM122 table.little{
+	width: 30%;
+}
+/* change row */
+.CRM122.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.CRM122 .datewidth{
+	width:180px !important;
+}
+.CRM122 .form-control-datePopup {
+ 	opacity: 0;
+    width: 0;
+    float: right;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM121/CRM121_INSERT.js"></script>
+<script type="text/javascript" src="assets/txn/CRM121/CRM121_MODIFY.js"></script>
+<script type="text/javascript" src="assets/txn/CRM122/CRM122.js"></script>
+<script type="text/javascript" src="assets/txn/CRM122/CRM122_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/CUS160/CUS160_ADD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PMS109.js"></script>
+<script type="text/javascript" src="assets/txn/PMS103/PMS103.js"></script>
+<div class="CRM122" ng-controller="CRM122Controller">
+	<div>
+		<table>
+			<tr>
+				<td width="25%">
+					<div class="btn-group">
+						<button class="btn btn-default" mwl-date-modifier date="viewDate" decrement="calendarView" ng-click="init()">＜</button>
+						<button class="btn btn-default" mwl-date-modifier date="viewDate" set-to-today ng-click="init()">今天</button>
+						<button class="btn btn-default" mwl-date-modifier date="viewDate" increment="calendarView" ng-click="init()">＞</button>
+					</div>
+				</td>
+				<td width="50%">
+					<h2 class="text-center" ng-bind="viewDate  | date:'yyyy年MM月dd日EEEE'"></h2>
+				</td>
+				<td width="25%">
+					<div>
+						理專：<e-combobox id="emp" name="emp" 
+							ng-datasource="mappingSet['emp']"
+							ng-model="inputVO.AO_CODE"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-required="true"
+							ng-format="F3"
+							ng-change="AO_change();"
+							width = "150px"
+							style="line-height:20px;"/>
+					</div>
+					<div>
+						<button type="button" class="btn btn-info" ng-click="insert()" ng-disabled = "inputVO.EMP_ID == ''">新增</button> 
+						<button type="button" class="btn btn-info" ng-click= "modify(row,updateType)" ng-disabled ="ans.length>1 || ans1.length>1  || (ans.length == 0 && ans1.length == 0) " >編輯</button>
+								<input type="text" id="TASK_DATE" name="TASK_DATE" class="form-control form-control-datePopup" 
+							   	uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.TASK_DATE"
+								is-open="model.p"
+								datepicker-options="startDateOptions"
+								alt-input-formats="altInputFormats"
+								ng-readonly="false"
+								ng-change="dateDate(inputVO.TASK_DATE)"
+								required />
+						<button type="button" class="btn btn-info" ng-click="open($event,'p')" 
+						 		ng-disabled ="ans.length>1 || ans1.length>1  || ans.length == 0 && ans1.length == 0 ">
+								<i class="glyphicon glyphicon-calendar"></i>變換日期</button>
+						<button type="button" class="btn btn-info" ng-click = "deleTodo()" ng-disabled = "ans.length == 0 && ans1.length ==0">刪除</button>
+					</div>
+				</td>
+			</tr>
+		</table>	
+		<table>
+			<tr>
+				<td class="mwl-calendar-wrapper">
+					<mwl-calendar
+						events="events"
+						view="calendarView"
+						view-title="calendarTitle"
+						view-date="viewDate"
+						on-view-change-click="false"
+						on-timespan-click="dateClicked(calendarDate)"
+						cell-is-open="false"
+						cell-modifier="groupEvents(calendarCell)"
+						custom-template-urls="{calendarMonthCell: 'customMonthCell2.html'}"
+						cell-auto-open-disabled="true">
+					</mwl-calendar>
+					<!-- 20170113	主要讓標題能顯示出點選得日期  - Stella -->
+					<mwl-calendar
+						ng-show="false"
+						events="events1"
+						view="calendarView1"
+						view-title="calendarTitle"
+						view-date="viewDate1"
+						day-view-start="08:00"
+  						day-view-end="17:00">
+					</mwl-calendar>
+				<!-- 20170113	主要讓標題能顯示出點選得日期  - Stella  END -->
+				</td>
+				<!-- 理專行事曆 -->
+				<td class="mwl-calendar-neighbor">
+					<div class="scroll_y">
+						<div class="my_tit">
+							<h3>
+								<img src="assets/images/icon/my_tit_a01.gif" width="37" height="37">待辦事項 <span class="badge" ng-bind="MyTodoLst.length"></span>
+							</h3>
+						</div>
+						<div class="scroll_y" style="height: 170px">
+							<ul ng-repeat= "row1 in MyTodoLst| filter:{EMP_ID: inputVO.EMP_ID}">
+								<li class="checkbox" > 
+									<label>
+										<input type="checkbox"  ng-model='row1.SELECTED' ng-click= "toggleSelection(row1.SEQ_NO)" > 
+										<div style = "margin: 7px 0 0;">
+											<b>理專人員：</b>{{row1.AO_CODE}}-{{row1.EMP_NAME}}&nbsp;<b>客戶：</b>{{row1.CUST_ID}}-{{row1.CUST_NAME}}&nbsp;&nbsp;{{row1.TITLE}}&nbsp;({{row1.STATUS | mapping:mappingSet['CAM.TASK_STATUS']:'F3'}})
+										</div>
+									</label>
+								</li>
+							</ul>
+						</div>
+ 						<div class="my_tit" ng-show="amc"> 
+ 							<h3> 
+ 								<img src="assets/images/icon/my_tit_a02.gif" width="37" height="37">預計約訪事項<span class="badge" ng-bind="MyAUMLst.length"></span> 
+ 							</h3> 
+ 						</div> 
+ 						<div class="scroll_y" style="height: 170px"> 
+ 							<ul ng-repeat="row in MyAUMLst| filter:{EMP_ID: inputVO.EMP_ID}" ng-show="amc"> 
+ 								<li class="checkbox"> 
+ 									<label style="cursor:default"> 
+ 										<div style = "margin: 7px 0 0;"> 
+ 											<b>理專人員：</b>{{row.AO_CODE}}-{{row.EMP_NAME}}&nbsp;<b>客戶：</b>{{row.CUST_ID}}-{{row.CUST_NAME}}&nbsp;&nbsp;<a href="" ng-click="opendtl(row)">{{row.EST_PRD | mapping:mappingSet['PMS.SALE_PLAN_PRD_TYPE']:'F3'}}</a>&nbsp;({{row.STATUS  | mapping:mappingSet['CAM.CAL_SALES_TASK_AMC_DESC']:'F3'}}) 
+ 										</div> 
+ 									</label> 
+ 								</li> 
+ 							</ul> 
+ 						</div> 
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>

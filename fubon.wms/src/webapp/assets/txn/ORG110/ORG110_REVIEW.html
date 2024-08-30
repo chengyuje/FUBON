@@ -1,0 +1,61 @@
+<style>
+/* dialog panl */
+.modal-dialog.ORG110_REVIEW {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 950px;
+	height: auto;
+}
+</style>
+<div>
+	<div ng-controller="ORG110_REVIEWController" ng-cloak>
+		<div class="modal-dialog ORG110_REVIEW">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">{{inputVO.EMP_ID}} 人員資料異動歷程</h4>
+				</div>
+				<div class="modal-body">
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table style="text-align:center;">
+							<thead>
+								<tr>
+									<th>員工編號</th>
+									<th>員工姓名</th>
+									<th>員工手機號碼</th>
+									<th>員工部門分機號碼</th>
+									<th>員工照片</th>
+									<th>覆核狀態</th>
+									<th>異動人員</th>
+									<th>異動時間</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in reviewList track by $index">
+									<td>{{row.EMP_ID}}</td>
+									<td>{{row.EMP_NAME}}</td>
+									<td>{{row.EMP_CELL_NUM}}</td>
+									<td>{{row.EMP_DEPT_EXT}}</td>
+									<td class="text-center" ng-if="row.EMP_PHOTO != undefined">
+										<a href="" ng-click="getProfilePicture(row)" ng-if="row.pictureSrc=='' || row.pictureSrc==undefined">Y</a>
+										<img ng-click="row.pictureSrc = ''" ng-if="row.pictureSrc != '' && row.pictureSrc != undefined" ng-src="{{row.pictureSrc}}" style="max-height: 208px; max-width: 168px"/>
+									</td>
+									<td class="text-center" ng-if="row.EMP_PHOTO == undefined">N</td>
+									<td style="width:11%">{{(row.REVIEW_STATUS | mapping:mappingSet['COMMON.REVIEW_STATUS']:'F3')}}</td>
+									<td style="width:10%">{{row.CREATOR}}</td>
+									<td style="width:15%">{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" function-type="maintenance">確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

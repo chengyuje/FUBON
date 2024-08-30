@@ -1,0 +1,165 @@
+<style>
+<!--
+input.bLarger{width: 20px; height: 20px;}
+-->
+</style>
+
+<script type="text/javascript" src="assets/txn/IOT330/IOT330.js"></script>
+
+<div ng-controller="IOT330Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a16.gif">產險送件打包
+		</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<table>
+				<tr>
+					<th>*保險送件類型</th>
+					<td colspan="5"><e-combobox id="reg_type" name="reg_type"
+							ng-datasource="mappingSet['IOT.PACK_REG_TYP']"
+							ng-model="inputVO.REG_TYPE" ng-validate="false"
+							ng-readonly="false" ng-editable="false" ng-format="F3"
+							width="250px" style="line-height:20px;" /></td>
+				</tr>
+				<tr>
+					<th>*鍵機日</th>
+					<td colspan="2" class="form-inline">
+						<div class="form-group">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="keyin_date_f" name="keyin_date_f"
+									class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.KEYIN_DATE_F" is-open="model.a"
+									datepicker-options="bgn_sDateOptions" ng-readonly="true"
+									ng-change="limitDate()" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+							～
+							<div class="input-group datebox datewidth">
+								<input type="text" id="keyin_date_t" name="keyin_date_t"
+									class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.KEYIN_DATE_T" is-open="model.b"
+									datepicker-options="bgn_eDateOptions" ng-readonly="true"
+									ng-change="limitDate()" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</td>
+					<th colspan="3"><input class="uniform_on" type='checkbox'
+						id="included" name="included" ng-model='inputVO.INCLUDED'
+						ng-true-value="'Y'" ng-false-value="'N'" /> 查詢所有尚未送件(含退件)</th>
+				</tr>
+				<tr>
+					<th>被保人ID</th>
+					<td><input id="insured_id" name="insured_id" type="text"
+						ng-model="inputVO.INSURED_ID" style="text-transform: uppercase;" ng-blur="text_toUppercase(inputVO.INSURED_ID,'INSURED_ID')"></td>
+						
+					<th style="width: 70px">要保人ID</th>
+					<td><input id="cust_id" name="cust_id" type="text"
+						ng-model="inputVO.CUST_ID" style="text-transform: uppercase;" ng-blur="text_toUppercase(inputVO.CUST_ID,'CUST_ID')"></td>
+						
+					<th>保單號碼</th>
+					<td><input id="policy_no1" name="policy_no1" type="text"
+						style="width: 200px; text-transform: uppercase;" ng-model="inputVO.POLICY_NO" ng-blur="text_toUppercase(inputVO.POLICY_NO,'POLICY_NO')">
+				</tr>
+				<tr>
+					<th>保險文件編號</th>
+					<td><input id="ins_id" name="ins_id" type="text"
+						ng-model="inputVO.INS_ID" style="text-transform: uppercase;" ng-blur="text_toUppercase(inputVO.INS_ID,'INS_ID')"></td>
+					<th>招攬(送件)人員員編</th>
+					<td><input ng-blur="getInfo('RECRUIT')" type="text"
+						ng-model="inputVO.OP_BATCH_OPRID" style="text-transform: uppercase;"></td>
+					<th>送件人員姓名</th>
+					<td>{{inputVO.OP_BATCH_OPRNAME}}</td>
+				</tr>
+			</table>
+		</div>
+		<div
+			style="color: red; font-size: small; text-shadow: black; padding-left: 1%;">註:*為必輸欄位</div>
+		<div class="search_box_btn text-center">
+			<button ng-click="queryData()" class="btn btn-info">查詢</button>
+			<button ng-click="btnClear()" class="btn btn-info">清除</button>
+		</div>
+		<div class="text-right">
+
+
+			<e-jumping-once ng-show="inputVO" output="outputVO"
+				totallist="IOT_MAINList" list="data" rowcountlimit="300">
+			</e-jumping-once>
+		</div>
+		<div class="gv_tab_sc scroll_y">
+			<table>
+			<thead>
+				<tr>
+					<th>
+						<input class="uniform_on bLarger" type='checkbox' id="select_all" ng-model="inputVO.select_all" ng-true-value="'Y'" ng-false-value="'N'" ng-change = "select_all()">
+						勾選
+					</th>
+					<th>功能</th>
+					<th>狀態</th>
+					<th>退件原因</th>
+					<th>保險文件編號</th>
+					<th>文件申請日期</th>
+
+					<th>被保險人姓名</th>
+					<th>要保險人姓名</th>
+					<th ng-show="showINSPRD_ID">險種</th>
+					<th>保險文件</th>
+
+
+					<th>分行送件批號</th>
+
+				</tr>
+				</thead>
+				<tbody>
+				<tr class="repeat-row"
+					ng-repeat="row in IOT_MAINList track by $index"
+					ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+
+
+					<td><input class="uniform_on bLarger" type='checkbox'
+						ng-model='row.CHECK' ng-true-value="'Y'" ng-false-value="'N'"
+						ng-change="select_false(row.CHECK)" /></td>
+					<td><e-combobox ng-datasource="row.edit" ng-model="row.editto"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="false" ng-change="edit(row)"
+							width="100px" style="line-height:20px;" /></td>
+
+					<td>{{row.STATUS | mapping:mappingSet['IOT.MAIN_STATUS']}}</td>
+					<td>{{row.REJ_REASON}}</td>
+					<td>{{row.INS_ID }}</td>
+					<td>{{toJsDate(row.APPLY_DATE) | date:'yyyy-MM-dd' }}</td>
+					<td>{{row.PROPOSER_NAME }}</td>
+					<td>{{row.INSURED_NAME }}</td>
+					<td>{{row.PPT_TYPE | mapping:mappingSet['IOT.PPT_TYPE']}}</td>
+					<td>
+						<span ng-repeat="row1 in row.outList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<div>{{row1.DOC_NAME}}</div>
+						</span>
+					</td>
+					<td>{{row.OP_BATCH_NO }}</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button ng-click="Pack()" class="btn btn-info">打包</button>
+			<button ng-click="unPack()" class="btn btn-info">取消打包</button>
+		</div>
+	</div>
+</div>

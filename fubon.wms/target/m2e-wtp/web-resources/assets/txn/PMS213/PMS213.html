@@ -1,0 +1,241 @@
+<style>
+/* open dialog */
+.ngdialog.PMS213 {
+	
+}
+/* dialog panl */
+#ejp>tbody {
+	width: 100% !important;
+}
+
+.modal-dialog.PMS213 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS213 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS213 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS213.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS213_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+<!-- 新增共用controller -->
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS213/PMS213_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS213/PMS213.js"></script>
+
+<div class="PMS213" ng-controller="PMS213Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">資料查詢
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>
+						<th style="text-align:left;"><font color="red">*</font>計績年月:</th>
+						<td>
+							<e-combobox ng-datasource="mappingSet['timeE']"
+								ng-model="inputVO.yearMon" ng-validate="false" ng-readonly="false"
+								ng-editable="false" ng-format="F3" ng-required="false"
+								ng-change="dateChange()" 
+								width="150px" height="30px" style="line-height:20px;" />
+						</td>
+						
+						<th style="text-align:left;">AOCODE:</th>
+						<td>
+							<input type="text" ng-model="inputVO.AOCODE" style="width: 180px; "/>
+						</td>
+						<th style="text-align:left;">軌跡類型:</th>
+						<td style="width:10%">
+							<e-combobox ng-paramtype="PMS.CNR_ADJ_TYPE"
+								ng-model="inputVO.adjType" ng-validate="false" ng-readonly="false"
+								ng-editable="false" ng-format="F3" ng-required="false"
+								width="200px" height="30px" style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						
+						<th style="text-align:left;">客戶ID:</th>
+						<td>
+							<input type="text"  ng-model="inputVO.custId" style="width: 180px; "/>
+						</td>
+						<th style="text-align:left;">產品代號:</th>
+						<td>
+							<input type="text" ng-model="inputVO.prodCode" style="width: 180px; "/>
+						</td>
+						<th style="text-align:left;">調整類別:</th>
+						<td style="width:10%">
+							<e-combobox ng-paramtype="PMS.CNR_SYS_ADJ_DESC" 
+								ng-model="inputVO.adjDesc" ng-validate="false" ng-readonly="false"
+								ng-editable="false" ng-format="F3" ng-required="false"
+								width="200px" height="30px" style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th style="text-align:left;">分行:</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+								ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr"
+								ng-validate="false" ng-disabled="disableBranchCombo"
+								ng-readonly="disableBranchCombo" ng-editable="false"
+								ng-format="F1" ng-required="false" ng-change="ChangeBranch()"
+								width="150px" style="line-height:20px;" />
+						</td>
+						<th style="text-align:left;">專員:</th>
+						<td>		
+							<e-combobox id="emp_id" name="emp_id"
+										ng-datasource="EMP_LIST"
+										ng-model="inputVO.emp_id"
+										ng-validate="false" 
+										ng-disabled="disableEmpCombo"
+										ng-readonly="disableEmpCombo" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										width="150px"
+										ng-change="ChangeAo_code()"
+										style="line-height:20px;" />
+						</td>	
+						<th style="text-align:left;">產品類別:</th>
+						<td style="width:10%">
+						
+							<e-combobox ng-datasource="mappingSet['adjProd']"
+								ng-model="inputVO.PRODTYPE" ng-validate="false" ng-readonly="false"
+								ng-editable="false" ng-format="F3" ng-required="false"
+								width="200px" height="30px" style="line-height:20px;" />
+						</td>					
+					</tr>
+				</table>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+					<button type="button" class="btn btn-info" ng-click="upload(inputVO.yearMon)">整批上傳新件</button>
+					<button type="button" class="btn btn-info" ng-click="download(inputVO.yearMon)">異常數據下載</button>
+					<button type="button" class="btn btn-info" ng-click="exportRPT()" >匯出</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content" ng-show = "true">
+			<e-jumping output="outputVO" input="inputVO" query="query()"
+				list="outputLargeAgrList"></e-jumping>
+			<div class="gv_tab_sc scroll_y"	style="white-space: nowrap;">
+				<table id="showTab" class="table-bordered">
+				<thead>
+					<tr>
+						<th>計績年月</th>
+						<th>交易日期</th>
+						<th>客戶ID</th>
+						<th>客戶姓名</th>
+						<th>AOCODE</th>
+						<th>交易理專</th>
+						<th>產品代號</th>
+						<th>產品類別</th>
+						<th>商品名稱</th>
+						<th>產品銷量<br/>/調整數</th>  <!--產品收益/調整數 2017/6/19 前-->
+						<th>手續費<br/>/調整數</th>
+						<th>產品實際收益<br/>/調整數</th>
+						<th>產品CNR收益<br/>/調整數</th>
+						<th>調整</th>
+						<th>軌跡類型</th>
+						<th>人工調整說明<br/>/系統調整類別</th>
+						<th>編輯</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="x in outputLargeAgrList">
+						<td style="text-align:center;color:blue">{{x.YEARMON}}</td>
+						<td style="text-align:center;color:blue">{{x.TRANDATE}}</td>
+						<td style="text-align:center;color:blue">{{x.CUSTID}}</td>
+						<td style="text-align:center;color:blue">{{x.CUSTNAME}}</td>
+						<td style="text-align:center;color:blue">{{x.AOCODE}}</td>
+						<td style="text-align:center;color:blue">{{x.TRANAOCODE}}</td>
+						<td style="text-align:center;color:blue">{{x.PRODCODE}}</td>
+						<td style="text-align:center;color:blue">{{x.PRODTYPE}}</td>
+						<td style="text-align:center;color:blue">{{x.PRODNAME}}</td>
+						<td style="text-align:right;color:blue">{{x.PRODBEN}}</td>
+						<td style="text-align:right;color:blue">{{x.TXN_FEE}}</td>
+						<td style="text-align:right;color:blue">{{x.PRODREALBEN}}</td>
+						<td style="text-align:right;color:blue">{{x.PRODCNRBEN}}</td>
+						<td style="text-align:center;color:blue">{{x.ADJ}}</td>
+						<td style="text-align:center;color:blue">{{x.ADJ_TYPE | mapping:mappingSet['adjType']:'F3'}}</td>
+						<td style="text-align:center;color:blue">{{x.ADJ_DESC | mapping:mappingSet['adjDesc']:'F3'}}</td> <!-- 2017/06/15 修改增加MAPPING 調整類別 -->
+						<td style="text-align:center;color:blue" ng-if="x.ADJ_TYPE=='0'">
+							<button class="btn btn-info" ng-click="add($event,$index);" style="text-align:center;" >新增</button>
+						</td>
+						<td style="text-align:center;color:blue" ng-if="x.ADJ_TYPE=='1'||x.ADJ_TYPE=='3'">
+							<button class="btn btn-info" ng-click="save($event,$index);" style="text-align:center;" >編輯</button>
+							<button class="btn btn-info" ng-click="del($event,$index);" style="text-align:center;" >刪除</button>
+						</td>
+						<td style="text-align:center;color:blue" ng-if="x.ADJ_TYPE=='2'">-</td>
+					</tr>
+				</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

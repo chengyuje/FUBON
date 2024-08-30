@@ -1,0 +1,82 @@
+<
+<style>
+<!--
+input:required:invalid {
+	border-color: red;
+}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/PRD172/PRD172_EDIT.js"></script>
+<div ng-controller="PRD172_EDITController" ng-cloak>
+	<div class="modal-dialog" style="width: 1080px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog(inputVO.REG_TYPE,'cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title"
+					style="text-align: center;">{{title}}</h4>
+			</div>
+			<div class="modal-body">
+					<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab
+					style="width: 100%;">
+					<div class="gv_tab_sc scroll_y">
+						<table>
+						<thead>
+							<tr>
+								<th>*登錄種類</th>
+								<TH><span ng-show="OTH_TYPEController()">*</span>文件登錄文件種類</TH>
+								<TH>*文件名稱</TH>
+								<TH>*顯示順序</TH>
+								<TH>*文件種類</TH>
+								<TH>*文件重要性</TH>
+								<TH>*需簽署</TH>
+
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><e-combobox ng-datasource="REG_TYPEList" ng-model="inputVO.REG_TYPE"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-format="F3" ng-required="false" style="line-height:20px;" />
+								</td>
+								<td><e-combobox ng-paramtype="IOT.OTH_TYPE" ng-change="REG_TYPEController()"
+										ng-model="inputVO.OTH_TYPE" ng-validate="false" ng-disabled="chk_REG()"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										width="130px" ng-required="OTH_TYPEController()" style="line-height:20px;"
+										required ></td>
+								<td><input type="text" placeholder="請輸入文件名稱..."
+									ng-model="inputVO.DOC_NAME" style="width: 100px" required></td>
+								<td><input type="number" placeholder="請輸入顯示順序..."
+									style="width: 100px" ng-model="inputVO.DOC_SEQ" required></td>
+								<td><e-combobox ng-paramtype="PRD.DOC_TYPE"
+										ng-model="inputVO.DOC_TYPE" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										ng-required="true" width="100px" style="line-height:20px;" required/></td>
+								<td><e-combobox ng-paramtype="IOT.DOC_CHK_LEVEL"
+										ng-model="inputVO.DOC_LEVEL" ng-validate="false"
+										ng-readonly="SIGN_INC" ng-editable="false" ng-format="F3"
+										ng-required="true" width="100px" style="line-height:20px;" required/>
+								</td>
+								<td><e-combobox ng-paramtype="COMMON.YES_NO"
+										ng-model="inputVO.SIGN_INC" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										ng-required="true" width="100px" style="line-height:20px;" required/>
+								</td>
+							</tr>
+						</tbody>
+						</table>
+					</div>
+					<div style="text-align: center;" class="modal-footer">
+						<button ng-click="btnSubmit()" class="btn btn-info"
+							data-dismiss="modal">確定</button>
+						<button type="button" ng-click="closeThisDialog(inputVO.REG_TYPE,'cancel')" class="btn btn-info"
+							data-dismiss="modal">取消</button>
+					</div>
+				</form>
+			</div>
+
+		</div>
+	</div>
+
+</div>

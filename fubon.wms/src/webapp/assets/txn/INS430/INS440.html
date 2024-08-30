@@ -1,0 +1,94 @@
+<style>
+.retire_tit{
+/*  text-align: center; */
+ 	padding-left: 20px;
+ 	line-height: 50px;
+}
+.noUseShow {
+	opacity: 0.3;
+}
+.useShow {
+	opacity: 1.0;
+}
+</style>
+<script type="text/javascript" src="assets/txn/INS430/INS430.js"></script>
+<script type="text/javascript" src="assets/txn/INS430/INS440.js"></script>
+<script type="text/javascript" src="assets/txn/INS430/INS441.js"></script>
+<script type="text/javascript" src="assets/txn/INS430/INS442.js"></script>
+<div class="INS440" ng-controller="INS440Controller" ng-cloak>
+	<div ng-class="{false: 'useShow', true: 'noUseShow'} [retiredNeedMoney]">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit retire_tit">計算退休金所需資金</div>
+		</div>
+	<!--Content of the panel-->
+		<div class="panel_content" style="height:520px;">
+			<div class="gv_tab_sc scroll_y" style="height:100%;white-space: nowrap;">
+				<span style="float: right;">單位：新台幣元</span><br><br>
+				<table>
+					<thead>
+						<tr>
+						    <th>給付類型</th>
+						    <th>每月給付</th>
+						    <th>一次給付</th>
+						    <th>試算</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>社會保險</td>
+							<td><input style="text-align: right;" class="form-control" type="text" e-input-limit="NN" ng-model="inputVO.laborINSAMT1"  placeholder="0" ng-change="sumMonth()" ng-disabled="changeSug"></td>
+							<td><input style="text-align: right;" class="form-control" type="text" e-input-limit="NN" ng-model="inputVO.laborINSAMT2" placeholder="0" ng-change="sumOneTime()" ng-disabled="changeSug"></td>
+							<td>
+	                            <a class="btn btn-info" 
+		                            ng-href="{{changeSug ? '' : mapping.links[0]}}"
+		                            target="_blank">勞保</a>
+								<a class="btn btn-info"
+	                                ng-href="{{changeSug ? '' : mapping.links[1]}}"
+	                                target="_blank">國民年金</a>
+								<a class="btn btn-info"
+                                    ng-href="{{changeSug ? '' : mapping.links[2]}}"
+                                    target="_blank">公保</a>
+							</td>										
+						</tr>
+						<tr>
+							<td>退休制度</td>
+							<td><input style="text-align: right;" class="form-control" type="text" e-input-limit="NN" ng-model="inputVO.person1" placeholder="0" ng-change="sumMonth()" ng-disabled="changeSug"></td>
+							<td><input style="text-align: right;" class="form-control" type="text" e-input-limit="NN" ng-model="inputVO.person2" placeholder="0" ng-change="sumOneTime()" ng-disabled="changeSug"></td>
+							<td>
+								<a class="btn btn-info"
+	                               ng-href="{{changeSug ? '' : mapping.links[3]}}"
+	                               target="_blank">勞工退休金</a>
+								<a class="btn btn-info"
+                                   ng-href="{{changeSug ? '' : mapping.links[4]}}"
+                                   target="_blank">公職退休金</a>
+							</td>										
+						</tr>
+						<tr>
+							<td>商業保險</td>
+							<td><input style="text-align: right;" class="form-control" type="text" e-input-limit="NN" ng-model="inputVO.othINSAMT1" ng-blur="totallyMonth()" ng-disabled="changeSug"></td>
+							<td><input style="text-align: right;" class="form-control" type="text" e-input-limit="NN" ng-model="inputVO.othINSAMT2" ng-blur="totalOnce()" ng-disabled="changeSug"></td>
+							<td><button type="button" class="btn btn-info" ng-click="!changeSug && busIns()" >試算</button></td>										
+						</tr>
+						<tr>
+							<td>其他</td>
+							<td><input style="text-align: right;" class="form-control" type="text" e-input-limit="NN" ng-model="inputVO.onceTotal" ng-blur="totallyMonth()" ng-disabled="changeSug"></td>
+							<td><input style="text-align: right;" class="form-control" type="text" e-input-limit="NN" ng-model="inputVO.othAMT2" ng-blur="totalOnce()" ng-disabled="changeSug"></td>
+							<td><button type="button" class="btn btn-info" ng-click="!changeSug && otherPay()">試算</button></td>										
+						</tr>
+						<tr>
+							<td>合計</td>
+							<td>{{totalMonth | number}}</td>
+							<td>{{totalOneTime | number}}</td>
+							<td></td>										
+						</tr>
+						
+					</tbody>
+				</table>
+				<br>
+				<button style="float: right;" type="button" class="btn btn-default" ng-click="next() && !changeSug" ng-disabled="changeSug">下一步</button>
+			</div>
+		</div>
+	</div>
+</div>
+

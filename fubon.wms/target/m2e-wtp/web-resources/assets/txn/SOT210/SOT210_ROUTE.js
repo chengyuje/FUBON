@@ -1,0 +1,10 @@
+
+'use strict';
+eSoafApp.controller('SOT210_ROUTEController', 
+    function($rootScope, $scope, $controller, socketService, ngDialog, projInfoService, $confirm) {
+        $controller('BaseController', {$scope: $scope});
+        $scope.controllerName = "SOT210_ROUTEController";
+       
+     
+    }
+);

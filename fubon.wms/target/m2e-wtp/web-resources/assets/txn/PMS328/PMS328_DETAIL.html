@@ -1,0 +1,92 @@
+<style>
+/* open dialog */
+.ngdialog.PMS328_DETAIL {
+	
+}
+
+/* dialog panl */
+.modal-dialog.PMS328_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 80%;
+	height: 100% !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+text {
+	font: 12px sans-serif;
+}
+
+svg {
+	display: block;
+}
+
+html, body, svg, .modal-content, .ngdialog-content, div.ng-scope {
+	margin: 0px !important;
+	padding: 0px !important;
+	height: 100% !important;
+	width: 100% !important;
+}
+</style>
+
+
+<div ng-controller="PMS328_DETAILController" ng-cloak>
+
+	<div class="modal-content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th>業務處：</th>
+					<td><e-combobox 
+							ng-datasource="mappingSet['region']" ng-model="inputVO.region"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-change="genArea()" ng-required="false"
+							width="300px" height="30px" style="line-height:20px;" /></td>
+
+					<th>分行別：</th>
+					<td><e-combobox 
+							ng-datasource="mappingSet['branch']" ng-model="inputVO.branch"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="false" ng-change="bran()"
+							width="300px" height="30px" style="line-height:20px;" /></td>
+					<th>分析類別：</th>
+					<td><e-combobox  ng-datasource="mappingSet['type']"
+							ng-model="inputVO.type" ng-validate="false" ng-readonly="false"
+							ng-editable="false" ng-format="F3" ng-required="false"
+							ng-change="types()" width="300px" height="30px"
+							style="line-height:20px;" /></td>
+
+
+
+				</tr>
+				<tr>
+					<th>營運區：</th>
+					<td><e-combobox  ng-datasource="mappingSet['op']"
+							ng-model="inputVO.op" ng-validate="false" ng-readonly="false"
+							ng-editable="false" ng-change="genBranch()" ng-format="F1"
+							ng-required="false" width="300px" height="30px"
+							style="line-height:20px;" /></td>
+
+					<th>理專：</th>
+					<td><e-combobox 
+							ng-datasource="mappingSet['aocodes']" ng-model="inputVO.aocode"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="false" width="300px"
+							style="line-height:20px;" /></td>
+						<th align="center" style="color: #FA00F7;">請按此按鈕離開</th>
+					<td><button type="button" class="btn btn-info"
+					ng-click="closeThisDialog('cancel')">關閉趨勢圖</button></td>
+
+				</tr>
+			</table>
+		</div>
+		<nvd3 options="options" data="data"> </nvd3>
+	</div>
+
+</div>

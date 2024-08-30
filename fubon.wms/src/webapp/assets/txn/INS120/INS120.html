@@ -1,0 +1,133 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/INS120/INS120.js"></script>
+<div class="INS120" ng-controller="INS120Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table >					
+					<tr>
+						<th style="width:10%"></th>
+						<th style="width:10%">分行：</th>
+						<td style="width:20%">
+							<e-combobox id="branchId" name="branchId"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branchId"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="reFindAo()"
+										style="line-height:20px;" />
+						</td>
+						<th style="width:10%">理專：</th>
+						<td style="width:40%">
+							<e-combobox id="aoCode" name="aoCode"
+										ng-datasource="AO_LIST"
+										ng-model="inputVO.aoCode"
+										ng-validate="false"
+										ng-disabled="inputVO.branchId == '' || AVAIL_AO_CODE.length == 1"
+										ng-readonly="inputVO.branchId == ''"
+										ng-editable="false"
+										ng-format="F1"
+										width="150px"
+										style="line-height:20px;" />
+						</td>						
+					</tr>
+					<tr>
+						<th style="width:10%"></th>
+						<th style="width:10%">客戶ID：</th>
+						<td style="width:20%"><input class="form-control" type="text" style="width:50%;text-align: left;" maxlength="16" id="custId" name="custId" ng-model="inputVO.custId" ng-blur="getcustName()"></td>
+						<th style="width:10%">客戶姓名：</th>
+						<th>{{inputVO.custName}}</th>
+					</tr>
+					<tr>
+						<th style="width:10%"></th>
+						<th style="width:10%">健診同意書上傳日期：</th>
+						<td style="width:20%">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="agreeSdate" name="agreeSdate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.agreeSdate"
+									   is-open="model.a"
+									   datepicker-options="bgn_sDateOptions"
+									   ng-readonly="true"
+									   ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+						</td>
+						<th style="width:10%">～</th>
+						<td>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="agreeEdate" name="agreeEdate"
+									   class="form-control" 
+									   uib-datepicker-popup="yyyy/MM/dd" 
+									   ng-model="inputVO.agreeEdate" 
+									   is-open="model.b" 
+									   datepicker-options="bgn_eDateOptions" 
+									   ng-readonly="true" 
+									   ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+						</td>
+					</tr>					
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="queryData();" >查詢</button>
+				<button type="button" class="btn btn-info" ng-click="initial();" >清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportCSV();" ng-disabled="!csvBtn" >匯出</button>
+			</div>
+		</div>
+		<div class="tfb_content">
+      		<div class="tfb_content_icon"></div>
+      		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+   		</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="table table-striped text-center middle e-table-freeze" e-height="500px" e-mode="1" e-top="true" ng-init="totals = {}">
+					<thead>
+						<tr>
+							<th style="width: 200px;">保單健診同意書</th>
+							<th>被保人ID</th>
+							<th>被保人姓名</th>
+							<th>上傳日期</th>
+							<th>建立人</th>							
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td><a onclick="return false" ng-click="print(row)">列印</a></td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME?row.CUST_NAME:row.INS_CUS_NAME}}</td>
+							<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+							<td>{{row.CREATOR}}</td>							
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

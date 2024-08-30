@@ -1,0 +1,126 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+
+</style>
+<script type="text/javascript" src="assets/txn/FPS200/FPS200_HISTORY.js"></script>
+<script type="text/javascript" src="assets/txn/FPS200/FPS200_PRINT.js"></script>
+
+<div ng-controller="FPS200HistoryController" ng-cloak>
+	<div class="panel panel-default">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content" style="overflow:auto;">
+			<div class="search_table search_box3">
+				<table>
+					<tr>
+						<th>狀態：</th>
+						<td>
+							<e-combobox ng-datasource="planStatusList"
+										ng-model="inputVO.planStatus"
+										ng-validate="true" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3" 
+										ng-required="false"/>
+						</td>
+						<th>建立日期：</th>
+						<td>
+							<div class="input-group" style="width:235px">
+								<input type="text" class="form-control"
+									datepicker-popup="yyyy/MM/dd" 
+									ng-model="inputVO.planStartDate"
+									is-open="opened1" 
+									ng-required="false" 
+									ng-readonly="true"
+									ng-change="limitDate()"
+									max-date="startMaxDate"
+									/> 
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,1)">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</td>
+						<th style="text-align: center">~</th>
+						<td>
+							<div class="input-group" style="width:235px">
+								<input type="text" class="form-control"
+									datepicker-popup="yyyy/MM/dd" 
+									ng-model="inputVO.planEndDate"
+									is-open="opened2" 
+									ng-required="false" 
+									ng-readonly="true"
+									ng-change="limitDate()"
+									min-date="endMinDate"
+									/> 
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,2)">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</td>
+						<td><button type="button" class="btn-fps" ng-click="query()" function-type="query">查詢</button></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td>
+							<input type="checkbox" ng-model="inputVO.isInvalid">已失效
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping input="inputVO" output="outputVO" query="query()" list="planList" ></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="min-height:235px; white-space: nowrap;">
+				<table class="table-bordered">
+					<thead>
+						<tr>
+							<th>編號</th>
+							<th>狀態</th>
+							<th>目的</th>
+							<th>分行</th>
+							<th>理專</th>
+							<th>前次修改日期</th>
+							<th>建立日期</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="row in planList">
+							<td>{{row.SEQ_NO}}</td>
+							<td>{{row.PLAN_STATUS | mapping : planStatusList : F3}}</td>
+							<td ng-if="row.PLAN_STATUS == '1' || row.PLAN_STATUS == '3'">
+								<a ng-click="toPLAN(row)">{{row.PALN_TYPE | mapping : planTypeList : F3}}</a>
+							</td>
+							<td ng-if="row.PLAN_STATUS == '2' || row.PLAN_STATUS == '4'">
+								{{row.PALN_TYPE | mapping : planTypeList : F3}}
+							</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td>{{row.LASTUPDATE}}</td>
+							<td>{{row.PLAN_DATE}}</td>
+							<td>
+								<button ng-if="row.PLAN_STATUS == '2'" type="button" class="btn-fps" ng-click="openPrint(row)" function-type="print">補印意向書</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

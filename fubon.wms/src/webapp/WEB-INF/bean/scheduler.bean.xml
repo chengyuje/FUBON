@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--******************** Scheduler ********************-->
+    <bean id="dataaccessjob"
+          class="com.systex.jbranch.platform.common.scheduler.DataAccessScheduleJob" scope="prototype"/>
+
+    <bean id="scheduleaudit"
+          class="com.systex.jbranch.platform.common.scheduler.AuditLogProxy" scope="prototype"/>
+
+    <bean id="jdbcjob"
+          class="com.systex.jbranch.platform.common.scheduler.JDBCScheduleJob" scope="prototype"/>
+
+    <bean id="scheduleManagement" class="com.systex.jbranch.platform.common.scheduler.ScheduleManagement"
+          p:workDayUtils-ref="workDayUtils"
+          p:dataAccessManager-ref="dataAccessManager"/>
+
+    <bean id="propertyUtil" class="com.systex.jbranch.platform.common.scheduler.PropertyUtil"
+          p:root="#{dataManager.root}"
+          p:cronExpression="0/30 * * * * ?"
+          p:standALone="false"
+          p:startSchedule="#{scheduleStart.getValue()}"/>
+</beans>

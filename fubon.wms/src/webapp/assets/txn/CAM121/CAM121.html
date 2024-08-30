@@ -1,0 +1,174 @@
+<style>
+/* open dialog */
+.ngdialog.CAM121 {
+	
+}
+/* dialog panl */
+.modal-dialog.CAM121 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CAM121 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CAM121 table.little{
+	width: 60%;
+}
+/* change row */
+.CAM121.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CAM121_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.red{
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM121/CAM121.js"></script>
+<script type="text/javascript" src="assets/txn/CAM121/CAM121_MAINTAIN.js"></script>
+<div class="CAM121" ng-controller="CAM121Controller" ng-cloak>		
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;">問卷題目：</th>
+					<td style="width: 5%;">
+						<input type="text" class="form-control" placeholder="請輸入..." id="questionDesc" name="questionDesc" ng-model="inputVO.questionDesc" e-length-limit="200">
+					</td>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;">建立日期：</th>
+					<td style="width: 10%;">
+						<div class="input-group datebox datewidth" style="float: left !important;">
+							<input type="text" id="sDate" name="sDate" class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.sDate"
+								   is-open="model.a" datepicker-options="startDateOptions"
+								   alt-input-formats="altInputFormats" ng-readonly="true"
+								   ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+						<div style="float: left !important;">～</div>
+						<div class="input-group datebox datewidth" style="float: left !important;">
+							<input type="text" id="eDate" name="eDate" class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.eDate"
+								   is-open="model.b" datepicker-options="endDateOptions"
+								   alt-input-formats="altInputFormats" ng-readonly="true"
+								   ng-change="limitDate()"/>
+							 <!-- 製作日曆button -->
+							 <span class="input-group-btn">
+								 <button type="button" class="btn btn-default" ng-click="open($event,'b')">
+								 	<i class="glyphicon glyphicon-calendar"></i>
+								 </button>
+							</span>
+						</div>
+					</td>
+				</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="edit()" function-type="maintenance">新增</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="questionList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y">
+				<table>
+					<thead>
+						<tr>
+							<th style="width:15%">功能</th>
+							<th style="width:5%">題庫<br/> 編號</th>
+							<th style="width:20%">題目</th>
+							<th>問卷類型</th>
+							<th style="width:20%">答案清單</th>
+							<th>是否有其他項目</th>
+							<th>是否有補充說明</th>
+							<th style="width:10%">建立人</th>
+							<th style="width:10%">建立日期</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" align="center" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td style="width:15%">
+								<div class="text-danger" ng-show="row.STATUS == 'Y'">使用中</div>
+								<e-combobox ng-datasource="row.set"
+											ng-model="row.cmbAction"
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="action(row)"
+											ng-hide="row.STATUS == 'Y'"
+											width="100px"
+											style="line-height:20px;" />
+							</td>
+							<td style="width:5%">{{row.ROWNUM}}</td>
+							<td style="width:20%" align="left">{{row.QUESTION_DESC}}</td>
+							<td>{{row.QUESTION_TYPE | mapping:mappingSet['SYS.QUESTION_TYPE']:'F3'}}</td>
+							<td align="left" style="white-space: pre">{{row.ANSWER_DESC}}</td>
+							<td>{{row.ANS_OTHER_FLAG | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.ANS_MEMO_FLAG | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td style="width:10%">{{row.CREATOR}}</td>
+							<td style="width:10%">{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd"}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

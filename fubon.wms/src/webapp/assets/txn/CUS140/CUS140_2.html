@@ -1,0 +1,247 @@
+<style>
+.modal-dialog.CUS140_2 {
+	width: 1000px;
+	height: auto;
+}
+
+.datewidth2 {
+	margin: auto;
+	width:180px !important;
+}
+</style>
+<div ng-controller="CUS140_2Controller" ng-cloak>
+	<div class="modal-dialog CUS140_2" resizable="false">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">回報結果</h4>
+			</div>
+			<div class="modal-body">
+				<h4 class="h4-title">計畫內容</h4>
+				<table style="word-break: break-word;">
+					<tr>
+						<th class="col-md-2">回報計畫名稱：</th>
+						<td class="col-md-2 tdpadding">{{row.IVG_PLAN_NAME}}</td>
+						<th class="col-md-2">回報計畫說明：</th>
+						<td class="col-md-2 tdpadding">{{row.IVG_PLAN_DESC}}</td>
+						<th class="col-md-2">計畫狀態：</th>
+						<td class="col-md-2 tdpadding">{{row.IVG_PLAN_TYPE | mapping:IVG_PLAN_TYPE:'F3'}}</td>
+					</tr>
+					<tr>
+						<th class="col-md-2">開始日期</th>
+						<td class="col-md-2 tdpadding">{{toJsDate(row.IVG_START_DATE) | date:'yyyy-MM-dd'}}</td>
+						<th class="col-md-2">截止日期</th>
+						<td class="col-md-2 tdpadding">{{toJsDate(row.IVG_END_DATE) | date:'yyyy-MM-dd'}}</td>
+						<th class="col-md-2">附加檔案：</th>
+						<td class="col-md-2 tdpadding"><a onclick="return false" ng-click="download()">{{row.DOC_NAME}}</a></td>
+					</tr>
+					<tr>
+						<th class="col-md-2">回報類型:</th>
+						<td class="col-md-2 tdpadding">{{row.IVG_TYPE | mapping:IVG_TYPE:'F3'}}</td>
+						<th class="col-md-2">計劃建立人：</th>
+						<td class="col-md-2 tdpadding">{{row.MODIFIER}}-{{row.MODIFIER_NAME}}</td>
+						<th class="col-md-2"></th>
+						<td class="col-md-2 tdpadding"></td>
+					</tr>
+				</table>
+				<div class="gv_tab_sc scroll_y" style="overflow: auto;">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<div>
+						<table class="td_center" style="word-break: break-word;">
+							<thead>
+								<!-- 單筆 -->
+								<tr ng-if="row.IVG_TYPE == '1'">
+									<th ng-repeat="row2 in detailParamList[0]">{{row2.FIELD_LABEL}}</th>
+								</tr>
+								<!-- 多筆 -->
+								<tr ng-if="row.IVG_TYPE == '2'">
+									<th style="width:7%"></th>
+									<th ng-repeat="row2 in detailParamList[0]">{{row2.FIELD_LABEL}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- 單筆 -->
+								<tr ng-if="row.IVG_TYPE == '1'" ng-repeat="rowList in detailParamList track by $index" class="repeat-row" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td ng-repeat="row2 in rowList track by $index">
+				                        <div ng-if="row2.DISPLAYONLY != 'H'" ng-switch="row2.FIELD_TYPE">
+				                            <!-- 1:文字 -->
+				                            <span ng-switch-when="1">
+				                            	<label ng-if="row2.DISPLAYONLY" style="min-width: 100px;">{{row2.FIELD_VALUE}}</label>
+				                            	<textarea ng-if="!row2.DISPLAYONLY" id="{{row2.IVG_FIELD_SEQ}}" name="{{row2.IVG_FIELD_SEQ}}" class="form-control" ng-model="row2.FIELD_VALUE" style="min-width: 100px;" e-length-limit="255" ng-required="rowList.length == 1"></textarea>
+				                                <span ng-show="parameterTypeEditForm[{{row2.IVG_FIELD_SEQ}}].$error.required" class="with-errors">請輸入文字</span>
+				                            </span>
+				                            <!-- 2:整數 -->
+				                            <span ng-switch-when="2">
+				                            	<label ng-if="row2.DISPLAYONLY" style="min-width: 100px;">{{row2.FIELD_VALUE}}</label>
+				                            	<textarea ng-if="!row2.DISPLAYONLY" id="{{row2.IVG_FIELD_SEQ}}" name="{{row2.IVG_FIELD_SEQ}}" class="form-control" ng-model="row2.FIELD_VALUE" style="min-width: 100px;" e-input-limit="N" e-length-limit="255"  ng-required="rowList.length == 1"></textarea>
+				                            	<span ng-show="parameterTypeEditForm[{{row2.IVG_FIELD_SEQ}}].$error.required" class="with-errors">請輸入整數</span>
+				                            </span>
+				                            <!-- 3:含小數點數字 -->
+				                            <span ng-switch-when="3">
+				                            	<label ng-if="row2.DISPLAYONLY" style="min-width: 100px;">{{row2.FIELD_VALUE}}</label>
+				                            	<textarea ng-if="!row2.DISPLAYONLY" id="{{row2.IVG_FIELD_SEQ}}" name="{{row2.IVG_FIELD_SEQ}}" class="form-control" ng-model="row2.FIELD_VALUE" style="min-width: 100px;" e-input-limit="ND" e-length-limit="255"  ng-required="rowList.length == 1"></textarea>
+				                            	<span ng-show="parameterTypeEditForm[{{row2.IVG_FIELD_SEQ}}].$error.required" class="with-errors">請輸入數字</span>
+				                            </span>
+				                            <!-- 4:日期 -->
+				                            <span ng-switch-when="4">
+				                            	<div class="input-group datebox datewidth2">
+				                                	<input type="text" id="{{row2.IVG_FIELD_SEQ}}" name="{{row2.IVG_FIELD_SEQ}}"
+				                                	ng-disabled="row2.DISPLAYONLY"
+				                                	class="form-control"
+													uib-datepicker-popup="yyyy/MM/dd"
+													ng-model="row2.FIELD_VALUE"
+													is-open="model[row2.IVG_FIELD_SEQ]"
+													ng-readonly="true"  ng-required="rowList.length == 1" />
+													<!-- 製作日曆button -->
+				                                    <span class="input-group-btn">
+				                                        <button type="button" class="btn btn-default" ng-disabled="row2.DISPLAYONLY" ng-click="open($event,row2.IVG_FIELD_SEQ)">
+				                                            <i class="glyphicon glyphicon-calendar"></i>
+				                                        </button>
+				                                    </span>
+				                                </div>
+				                                <span ng-show="parameterTypeEditForm[{{row2.IVG_FIELD_SEQ}}].$error.required" class="with-errors">請選擇日期</span>
+				                            </span>
+				                            <!-- 5:下拉選單 -->
+				                            <span ng-switch-when="5">
+				                                <e-combobox id="{{row2.IVG_FIELD_SEQ}}" name="{{row2.IVG_FIELD_SEQ}}"
+	                                            ng-datasource="row2.DropDown"
+	                                            ng-model="row2.FIELD_VALUE"
+	                                            ng-validate="true"
+	                                            ng-disabled="row2.DISPLAYONLY"
+	                                            ng-readonly="row2.DISPLAYONLY"
+	                                            ng-editable="false"
+	                                            ng-format="F3"
+	                                            ng-required="rowList.length == 1" />
+	                                            <div ng-show="parameterTypeEditForm[{{row2.IVG_FIELD_SEQ}}].$error.required" class="with-errors">請選擇下拉</div>
+				                            </span>
+				                        </div>
+									</td>
+								</tr>
+
+								<!-- 多筆 -->
+								<tr ng-if="row.IVG_TYPE == '2' && !noDataflag" ng-repeat="rowList in detailParamList track by $index" class="repeat-row" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td style="width:7%" align="center">
+										<a href="#" data-toggle="modal" class="btn btn-danger btn-circle" ng-click="delField(rowList)">刪除</i></a>
+										<a href="#" data-toggle="modal" class="btn btn-warning btn-circle" style="margin-top: 5px;" 
+										   ng-click="modify(rowList)" 
+										   ng-show="rowList.showSave == undefined || 
+										   			rowList.showSave == false">修改</i></a>
+										<a href="#" data-toggle="modal" class="btn btn-primary btn-circle" style="margin-top: 5px;" 
+										   ng-click="save(rowList)"
+										   ng-show="rowList.showSave == true">儲存</i></a>
+									</td>
+									<td ng-repeat="row2 in rowList track by $index">
+				                        <div ng-switch="row2.FIELD_TYPE">
+				                            <!-- 1:文字 -->
+				                            <span ng-switch-when="1">
+				                            	<textarea id="{{row2.IVG_FIELD_SEQ}}" name="{{row2.IVG_FIELD_SEQ}}" class="form-control" 
+				                            			  ng-model="row2.FIELD_VALUE" style="min-width: 100px;" maxlength="200" ng-disabled="rowList.showSave != true"></textarea>
+				                            </span>
+				                            <!-- 2:整數 -->
+				                            <span ng-switch-when="2">
+				                            	<textarea id="{{row2.IVG_FIELD_SEQ}}" name="{{row2.IVG_FIELD_SEQ}}" class="form-control" ng-model="row2.FIELD_VALUE" style="min-width: 100px;" e-length-limit="255" ng-disabled="rowList.showSave != true"></textarea>
+				                            </span>
+				                            <!-- 3:含小數點數字 -->
+				                            <span ng-switch-when="3">
+				                            	<textarea id="{{row2.IVG_FIELD_SEQ}}" name="{{row2.IVG_FIELD_SEQ}}" class="form-control" ng-model="row2.FIELD_VALUE" style="min-width: 100px;" e-length-limit="255" ng-disabled="rowList.showSave != true"></textarea>
+				                            </span>
+				                            <!-- 4:日期 -->
+				                            <span ng-switch-when="4">
+				                            	<div class="input-group datebox datewidth2">
+				                                	<input type="text" id="{{row2.IVG_FIELD_SEQ}}" name="{{row2.IVG_FIELD_SEQ}}"
+				                                	class="form-control"
+													uib-datepicker-popup="yyyy/MM/dd"
+													ng-model="row2.FIELD_VALUE"
+													is-open="model[row2.IVG_FIELD_SEQ]"
+													ng-readonly="true" readonly/>
+													<!-- 製作日曆button -->
+				                                    <span class="input-group-btn">
+				                                        <button type="button" class="btn btn-default" ng-click="open($event,row2.IVG_FIELD_SEQ)" ng-disabled="rowList.showSave != true">
+				                                            <i class="glyphicon glyphicon-calendar"></i>
+				                                        </button>
+				                                    </span>
+				                                </div>
+				                            </span>
+				                            <!-- 5:下拉選單 -->
+				                            <span ng-switch-when="5">
+				                                <e-combobox id="{{row2.IVG_FIELD_SEQ}}" name="{{row2.IVG_FIELD_SEQ}}"
+	                                            ng-datasource="row2.DropDown"
+	                                            ng-model="row2.FIELD_VALUE"
+	                                            ng-validate="false"
+	                                            ng-disabled="rowList.showSave != true"
+	                                            ng-readonly="rowList.showSave != true"
+	                                            ng-format="F3" />
+	                                         </span>
+				                        </div>
+									</td>
+								</tr>
+								
+								<!-- 多筆_新增 -->
+								<tr ng-if="row.IVG_TYPE == '2'" ng-repeat="newrowList in newResult track by $index" style="background-color:#FAFAFA;">
+									<td style="width:7%" align="center">
+										<button type="button" class="btn btn-primary" onclick= "return false" ng-click="btnAdd(newrowList)" function-type="maintenance">儲存</i></button>
+									</td>
+									<td ng-repeat="newRow in newrowList track by $index">
+				                        <div ng-switch="newRow.FIELD_TYPE">
+				                            <!-- 1:文字 -->
+				                            <span ng-switch-when="1">
+				                            	<textarea id="{{newRow.IVG_FIELD_SEQ}}" name="{{newRow.IVG_FIELD_SEQ}}" class="form-control" ng-model="newRow.FIELD_VALUE" style="min-width: 100px;" e-length-limit="255" required></textarea>
+				                                <span ng-show="parameterTypeEditForm[{{newRow.IVG_FIELD_SEQ}}].$error.required" class="with-errors">請輸入文字</span>
+				                            </span>
+				                            <!-- 2:整數 -->
+				                            <span ng-switch-when="2">
+				                            	<textarea id="{{newRow.IVG_FIELD_SEQ}}" name="{{newRow.IVG_FIELD_SEQ}}" class="form-control" ng-model="newRow.FIELD_VALUE" style="min-width: 100px;" e-input-limit="N" e-length-limit="255" required></textarea>
+				                                <span ng-show="parameterTypeEditForm[{{newRow.IVG_FIELD_SEQ}}].$error.required" class="with-errors">請輸入整數</span>
+				                            </span>
+				                            <!-- 3:含小數點數字 -->
+				                            <span ng-switch-when="3">
+				                            	<textarea id="{{newRow.IVG_FIELD_SEQ}}" name="{{newRow.IVG_FIELD_SEQ}}" class="form-control" ng-model="newRow.FIELD_VALUE" style="min-width: 100px;" e-input-limit="ND" e-length-limit="255" required></textarea>
+				                                <span ng-show="parameterTypeEditForm[{{newRow.IVG_FIELD_SEQ}}].$error.required" class="with-errors">請輸入數字</span>
+				                            </span>
+				                            <!-- 4:日期 -->
+				                            <span ng-switch-when="4">
+				                            	<div class="input-group datebox datewidth2">
+				                                	<input type="text" id="{{newRow.IVG_FIELD_SEQ}}" name="{{newRow.IVG_FIELD_SEQ}}"
+				                                	class="form-control"
+													uib-datepicker-popup="yyyy/MM/dd"
+													ng-model="newRow.FIELD_VALUE"
+													is-open="model[newRow.IVG_FIELD_SEQ]"
+													ng-readonly="true" required/>
+													<!-- 製作日曆button -->
+				                                    <span class="input-group-btn">
+				                                        <button type="button" class="btn btn-default" ng-click="open($event,newRow.IVG_FIELD_SEQ)">
+				                                            <i class="glyphicon glyphicon-calendar"></i>
+				                                        </button>
+				                                    </span>
+				                                </div>
+				                                <span ng-show="parameterTypeEditForm[{{newRow.IVG_FIELD_SEQ}}].$error.required" class="with-errors">請選擇日期</span>
+				                            </span>
+				                            <!-- 5:下拉選單 -->
+				                            <span ng-switch-when="5">
+				                                <e-combobox id="{{newRow.IVG_FIELD_SEQ}}" name="{{newRow.IVG_FIELD_SEQ}}"
+	                                            ng-datasource="newRow.DropDown"
+	                                            ng-model="newRow.FIELD_VALUE"
+	                                            ng-validate="true"
+	                                            ng-readonly="false"
+	                                            ng-editable="false"
+	                                            ng-format="F3"
+	                                            ng-required="true" />
+	                                            <div ng-show="parameterTypeEditForm[{{newRow.IVG_FIELD_SEQ}}].$error.required" class="with-errors">請選擇下拉</div>
+				                            </span>
+				                        </div>
+									</td>	
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</form>
+				</div>
+				<div class="search_box_btn text-center">
+					<button ng-if="row.IVG_TYPE == '1'" type="button" class="btn btn-primary" ng-click="btnSave(detailParamList)" function-type="maintenance" >確定</button>
+					<button ng-if="row.IVG_TYPE == '1'" type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+					<button ng-if="row.IVG_TYPE == '2'" type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >關閉視窗</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

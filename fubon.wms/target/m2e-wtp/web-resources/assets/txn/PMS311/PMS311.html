@@ -1,0 +1,413 @@
+<style>
+   .datewidth {
+   width: 180px !important;
+   }
+   .middle th {
+   vertical-align: middle;
+   }
+</style>
+<script type="text/javascript" src="assets/txn/PMS311/PMS311.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS311" ng-controller="PMS311Controller" ng-cloak>
+   <div>
+      <div class="tfb_content">
+         <div class="tfb_content_icon"></div>
+         <div class="tfb_content_tit">
+            <img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+         </div>
+      </div>
+      <!--Content of the panel-->
+      <div class="panel_content">
+         <div class="search_table search_box3">
+            <form name="parameterTypeEditForm" class="form-horizontal"
+               data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+               <table>
+                  <tr>
+                     <th><font color="red">＊</font>資料日期：</th>
+                     <td>							
+						<e-combobox id="sCreDate" name="sCreDate" 
+							ng-datasource="mappingSet['timeW']"
+							ng-model="inputVO.sCreDate"
+							ng-validate="false" 
+							ng-readonly="false"		
+							ng-required="false"	
+							ng-editable="false"
+							ng-change="limitDate();dateChange()"
+							ng-format="F3"
+							width="150px"
+							style="line-height:20px;" ng-show="inputVO.rptType!=undefined"/>
+					</td>
+                     <th>業務處：</th>
+                     <td>
+                        <e-combobox id="region_center_id" name="region_center_id"
+                           ng-datasource="REGION_LIST"
+                           ng-model="inputVO.region_center_id"
+                           ng-validate="false" 
+                           ng-disabled="disableRegionCombo"
+                           ng-readonly="disableRegionCombo" 
+                           ng-editable="false"
+                           ng-format="F3"
+                           ng-required="false"
+                           ng-change="ChangeRegion()"
+                           width="200px"
+                           style="line-height:20px;" />
+                     </td>
+                     <th>分行別：</th>
+                     <td>
+                        <e-combobox id="branch_nbr" name="branch_nbr"
+                           ng-datasource="BRANCH_LIST"
+                           ng-model="inputVO.branch_nbr"
+                           ng-validate="false" 
+                           ng-disabled="disableBranchCombo"
+                           ng-readonly="disableBranchCombo" 
+                           ng-editable="false"
+                           ng-format="F1"
+                           ng-required="false"
+                           ng-change="ChangeBranch()"
+                           width="150px"
+                           style="line-height:20px;" />
+                     </td>
+                  </tr>
+                  <tr>
+                     <th><font color="red">＊</font>報表類型：</th>
+                     <td>
+                        <e-combobox id="rptType" name="rptType"
+                           ng-datasource="mappingSet['rptType']"
+                           ng-model="inputVO.rptType" ng-validate="false"
+                           ng-readonly="false" ng-editable="false" ng-required="true"
+                           ng-format="F3" width="150px" style="line-height:20px;"
+                           ng-change="rptTypeChange();init1()" />
+                     </td>
+                     <th>營運區：</th>
+                     <td>
+                        <e-combobox id="branch_area_id" name="branch_area_id"
+                           ng-datasource="AREA_LIST"
+                           ng-model="inputVO.branch_area_id"
+                           ng-validate="false" 
+                           ng-disabled="disableAreaCombo"
+                           ng-readonly="disableAreaCombo" 
+                           ng-editable="false"
+                           ng-format="F3"
+                           ng-required="false"
+                           ng-change="ChangeArea()"
+                           width="200px"
+                           style="line-height:20px;" />
+                     </td>
+                     <th>專員：</th>
+                     <td>
+                        <e-combobox id="emp_id" name="emp_id"
+                           ng-datasource="EMP_LIST"
+                           ng-model="inputVO.emp_id"
+                           ng-validate="false"
+                           ng-disabled="disableAoCombo"
+                           ng-readonly="disableAoCombo" 
+                           ng-editable="false"
+                           ng-format="F1"
+                           ng-required="false"
+                           ng-change="ChangeAo_code()"
+                           width="150px"
+                           style="line-height:20px;" />
+                     </td>
+                  </tr>
+               </table>
+            </form>
+         </div>
+         <div class="search_box_btn text-center">
+            <button type="button" class="btn btn-info"
+               ng-click="inquireInit();query()">查詢</button>
+            <button type="button" class="btn btn-info" ng-click="inquireInit();init()">清除</button>
+            <button type="button" class="btn btn-info" ng-click="exportRPT()"
+               ng-disabled="paramList.length < 1">匯出</button>
+         </div>
+      </div>
+   </div>
+   <!-- 結果區 -->
+   <div>
+      <div class="tfb_content">
+         <div class="tfb_content_icon"></div>
+         <table>
+            <tr>
+               <td>
+                  <div class="tfb_content_tit">
+                     <img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+                  </div>
+               </td>
+               <td width="80%">
+                  <div align="right">
+                     <font ng-show="inputVO.rptType=='mortRPT'" color="106987" style="font-weight: bold">單位：百萬元&nbsp;&nbsp;</font>
+                     <font ng-show="inputVO.rptType=='credRPT'" color="106987" style="font-weight: bold">信貸單位：百萬元/好運貸單位:元&nbsp;&nbsp;</font>
+                  </div>
+               </td>
+            </tr>
+         </table>
+      </div>
+      <!--Content of the panel-->
+      <div class="panel_content">
+         <!-- 			<e-jumping output="outputVO" -->
+         <!-- 				input="inputVO" -->
+         <!-- 				query="query()" list="paramList"></e-jumping>    			 -->
+         <div algin="left">
+            <table>
+               <tr>
+                  <td>產出頻率：</td>
+                  <td>每週</td>
+               </tr>
+               <tr>
+                  <td>產出日：</td>
+                  <td ng-if="paramList.length>0">{{toJsDate(paramList[0].CREATETIME)  | date:'yyyy/MM/dd' }}</td>
+               </tr>
+            </table>
+         </div>
+         <e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>
+         <div class="gv_tab_sc scroll_y">
+            <table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="6" e-list="paramList">
+               <thead>
+                  <tr class="middle">
+                     <th rowspan="3">業務處</th>
+                     <th rowspan="3">營運區</th>
+                     <th rowspan="3">分行代號</th>
+                     <th rowspan="3">分行名稱</th>
+                     <th rowspan="3">消金專員姓名</th>
+                     <th rowspan="3">員編</th>
+                     <th colspan="10" ng-show="inputVO.rptType == 'mortRPT'">分期型_購屋</th>
+                     <th colspan="10" ng-show="inputVO.rptType == 'credRPT'">一般信貸</th>
+                     <th colspan="10" ng-show="inputVO.rptType == 'mortRPT'">分期型_非購屋</th>
+                     <th colspan="10" ng-show="inputVO.rptType == 'credRPT'">職團信貸</th>
+                     <th colspan="10" ng-show="inputVO.rptType == 'mortRPT'">循環型房貸</th>
+                     <th colspan="10" ng-show="inputVO.rptType == 'credRPT'">卡友信貸</th>
+                     <th colspan="10" ng-show="inputVO.rptType == 'mortRPT'">房貸合計</th>
+                     <th colspan="6" ng-show="inputVO.rptType == 'credRPT'">認股信貸</th>
+                     <th colspan="11" ng-show="inputVO.rptType == 'credRPT'">信貸合計(不含認股信貸)</th>
+                     <th colspan="9" ng-show="inputVO.rptType == 'credRPT'">好運貸</th>
+                  </tr>
+                  <tr>
+                     <!-- 分期型_購屋 / 一般信貸 -->
+                     <th rowspan="2" style="vertical-align: middle">月目標(MTD)</th>
+                     <th colspan="3">當週</th>
+                     <th colspan="3">MTD</th>
+                     <th colspan="3">YTD</th>
+                     <!-- 分期型_非購屋 / 職團信貸 -->
+                     <th rowspan="2" style="vertical-align: middle">月目標(MTD)</th>
+                     <th colspan="3">當週</th>
+                     <th colspan="3">MTD</th>
+                     <th colspan="3">YTD</th>
+                     <!-- 循環型房貸 / 卡友信貸 -->
+                     <th rowspan="2" style="vertical-align: middle">月目標(MTD)</th>
+                     <th colspan="3">當週</th>
+                     <th colspan="3">MTD</th>
+                     <th colspan="3">YTD</th>
+                     <!-- 房貸合計   -->
+                     <th rowspan="2" ng-show="inputVO.rptType == 'mortRPT'"
+                        style="vertical-align: middle">月目標(MTD)</th>
+                     <!-- 房貸合計 / 認股信貸 -->
+                     <th colspan="2" ng-show="inputVO.rptType == 'credRPT'">當週</th>
+                     <th colspan="2" ng-show="inputVO.rptType == 'credRPT'">MTD</th>
+                     <th colspan="2" ng-show="inputVO.rptType == 'credRPT'">YTD</th>
+                     <!-- 信貸合計(不含認股信貸) -->
+                     <th rowspan="2" ng-show="inputVO.rptType == 'credRPT'"
+                        style="vertical-align: middle">月目標(MTD)</th>
+                     <th colspan="3">當週</th>
+                     <th colspan="3">MTD</th>
+                     <th colspan="4">YTD</th>
+                     <!-- 好運貸 -->
+                     <th rowspan="2" ng-show="inputVO.rptType == 'credRPT'"
+                        style="vertical-align: middle">月目標(MTD)</th>
+                     <th colspan="2" ng-show="inputVO.rptType == 'credRPT'">當週</th>
+                     <th colspan="2" ng-show="inputVO.rptType == 'credRPT'">MTD</th>
+                     <th colspan="4" ng-show="inputVO.rptType == 'credRPT'">YTD</th>
+                  </tr>
+                  <tr>
+                     <!-- 當週 -->
+                     <th>進件金額</th>
+                     <th>撥款金額</th>
+                     <th>達成率</th>
+                     <!-- MTD -->
+                     <th>進件金額</th>
+                     <th>撥款金額</th>
+                     <th>達成率</th>
+                     <!-- YTD -->
+                     <th>撥款金額</th>
+                     <th>目標</th>
+                     <th>達成率</th>
+                     <!-- 當週 -->
+                     <th>進件金額</th>
+                     <th>撥款金額</th>
+                     <th>達成率</th>
+                     <!-- MTD -->
+                     <th>進件金額</th>
+                     <th>撥款金額</th>
+                     <th>達成率</th>
+                     <!-- YTD -->
+                     <th>撥款金額</th>
+                     <th>目標</th>
+                     <th>達成率</th>
+                     <!-- 當週 -->
+                     <th>進件金額</th>
+                     <th>撥款金額</th>
+                     <th>達成率</th>
+                     <!-- MTD -->
+                     <th>進件金額</th>
+                     <th>撥款金額</th>
+                     <th>達成率</th>
+                     <!-- YTD -->
+                     <th>撥款金額</th>
+                     <th>目標</th>
+                     <th>達成率</th>
+                     <!-- 認股信貸 -->
+                     <th ng-show="inputVO.rptType == 'credRPT'">進件金額</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">撥款金額</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">進件金額</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">撥款金額</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">撥款金額</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">目標</th>
+                     <!-- 信貸合計(不含認股信貸) -->
+                     <!-- 當週 -->
+                     <th>進件金額</th>
+                     <th>撥款金額</th>
+                     <th>達成率</th>
+                     <!-- MTD -->
+                     <th>進件金額</th>
+                     <th>撥款金額</th>
+                     <th>達成率</th>
+                     <!-- YTD -->
+                     <th>撥款金額</th>
+                     <th>目標</th>
+                     <th>達成率</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">排名</th>
+                     <!-- 好運貸 -->
+                     <th ng-show="inputVO.rptType == 'credRPT'">核實保費</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">達成率</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">核實保費</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">達成率</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">核實保費</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">目標</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">達成率</th>
+                     <th ng-show="inputVO.rptType == 'credRPT'">排名</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  <tr ng-repeat="row in paramList track by $index">
+                     <td align="center">{{row.REGION_CENTER_NAME}}</td>
+                     <td align="center">{{row.BRANCH_AREA_NAME}}</td>
+                     <td align="center">{{row.BRANCH_NBR}}</td>
+                     <td align="center">{{row.BRANCH_NAME}}</td>
+                     <td align="center">{{row.EMP_NAME}}</td>
+                     <td align="center">{{row.EMP_ID}}</td>
+                     <!-- 房貸 -->
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_HB_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_HB_IN_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_HB_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_HB_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_HB_MTD_IN_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_HB_MTD_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_HB_MTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_HB_YTD_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_HB_YTD_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_HB_YTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_NHB_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_NHB_IN_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_NHB_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_NHB_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_NHB_MTD_INT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_NHB_MTD_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_NHB_MTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_NHB_YTD_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_NHB_YTD_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.S_NHB_YTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.C_NHB_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.C_NHB_IN_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.C_NHB_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.C_NHB_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.C_NHB_MTD_IN_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.C_NHB_MTD_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.C_NHB_MTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.C_NHB_YTD_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.C_NHB_YTD_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.C_NHB_YTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.MRTG_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.MRTG_IN_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.MRTG_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.MRTG_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.MRTG_MTD_IN_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.MRTG_MTD_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.MRTG_MTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.MRTG_YTD_OUT_AMT  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.MRTG_YTD_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'mortRPT'" align="right">{{row.MRTG_YTD_RATE  | currency:''}}%</td>
+                     <!-- 							<td ng-show="inputVO.rptType == 'mortRPT'">{{row.MRTG_YTD_RANK}}</td> -->
+                     <!-- 信貸 -->
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.NC_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.NC_W_IA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.NC_W_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.NC_W_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.NC_MTD_IA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.NC_MTD_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.NC_MTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.NC_YTD_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.NC_YTD_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.NC_YTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.GC_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.GC_W_IA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.GC_W_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.GC_W_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.GC_MTD_IA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.GC_MTD_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.GC_MTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.GC_YTD_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.GC_YTD_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.GC_YTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CC_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CC_W_IA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CC_W_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CC_W_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CC_MTD_IA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CC_MTD_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CC_MTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CC_YTD_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CC_YTD_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CC_YTD_RATE  | currency:''}}%</td>
+                     <!-- 認股信貸 -->
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.C_W_IA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.C_W_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.C_MTD_IA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.C_MTD_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.C_YTD_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.C_YTD_TAR  | currency:''}}</td>
+                     <!-- 信貸合計 -->
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CT_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CT_W_IA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CT_W_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CT_W_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CT_MTD_IA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CT_MTD_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CT_MTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CT_YTD_OA  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CT_YTD_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CT_YTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.CT_YTD_RANK }}</td>
+                     <!-- 好運貸  -->
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.E_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.E_W_AF  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.E_W_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.E_MTD_AF  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.E_MTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.E_YTD_AF  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.E_YTD_TAR  | currency:''}}</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.E_YTD_RATE  | currency:''}}%</td>
+                     <td ng-show="inputVO.rptType == 'credRPT'" align="right">{{row.E_YTD_RANK }}</td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <div algin="left">
+            <table>
+               <tr>
+                  <td align="right">說明：</td>
+                  <td align="left"></td>
+               </tr>
+            </table>
+         </div>
+      </div>
+   </div>
+   <!-- 結果區 -->
+</div>

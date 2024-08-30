@@ -1,0 +1,100 @@
+<script type="text/javascript" src="assets/txn/INS100/INS100.js"></script>
+<script type="text/javascript" src="assets/txn/INS100/INS100_POLICY.js"></script>
+<script type="text/javascript" src="assets/txn/INS100/INS100_UPLOAD.js"></script>
+
+<div class="INS100" ng-controller="INS100Controller" ng-cloak>
+	
+	<div class="search_table">
+		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<table>
+				<tr>
+					<td colspan="4"><h4 class="h4-title">客戶資料查詢</h4></td>					
+				</tr>
+				<tr>
+					<td width="30%"></td>
+					<td width="10%" style="padding-top: 1%;">*身分證字號：</td>
+					<td width="10%"><input type="text" class="form-control"
+						style="width: 150px; text-align: left; text-transform: uppercase;"
+						maxlength="10" id="custId" name="custId" ng-model="inputVO.custId"
+						required>
+					</td>
+					<td><button type="button" class="btn btn-info" ng-click="query()">查詢</button></td>	
+				</tr>
+			</table>			
+		</form>	
+	</div>	
+	<div>
+		<e-jumping-once output="outputVO" list="data" totallist="inputVO.resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="table table-striped text-center middle">
+				<thead>
+					<tr>
+						<th>選取</th>
+						<th>來源</th>
+						<th>姓名</th>
+						<th>身分證字號</th>
+						<th>生日</th>
+						<th>保險年齡</th>
+						<th>性別</th>
+						<th>保單健診同意書歷史</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-if="none_data">
+						<td><input type="radio" name="radio" value="0" ng-model="inputVO.click"></td>
+						<td>本人</td>
+						<td>
+							<input id="cust_name" name="cust_name" type="text" placeholder="請輸入..." ng-model="inputVO.cust_name" style="text-transform: uppercase;" ng-blur="check_input_data()">
+						</td>
+						<td>
+							{{inputVO.add_custId}}
+						</td>
+						<td>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="birth_date" name="birth_date"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.birth_date"
+									is-open="model.a"
+									ng-readonly="true"
+									ng-change="getAge()"
+								/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</td>
+						<td>{{inputVO.age}}</td>
+						<td>{{inputVO.gender | mapping : mappingSet['CRM.CUST_GENDER'] :'F3'}}</td>
+						<td><span style="margin-right: 1%;">未上傳</td>							
+					</tr>
+					<tr class="repeat-row" ng-repeat="row in inputVO.resultList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td><input type="radio" name="radio" value={{$index+1}} ng-model="inputVO.click" ng-blur = "radio_choic(row)"></td>
+						<td>{{row.SOURCE}}</td>
+						<td>{{row.CUST_NAME}}</td>
+						<td>{{row.CUST_ID}}</td>
+						<td>{{toJsDate(row.BIRTH_DATE) | date:"yyyy/MM/dd"}}</td>
+						<td>{{row.INSURED_AGE}}</td>
+						<td>{{row.GENDER | mapping : mappingSet['CRM.CUST_GENDER'] :'F3'}}</td>
+						<td>
+							<a ng-if="row.REPORT_DATE != null" ng-click="Date_toINS120(row)">{{toJsDate(row.REPORT_DATE) | date:"yyyy/MM/dd"}}</a>
+							<span ng-if="row.REPORT_DATE == null">未上傳</span>
+						</td>							
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="ins100Policy()" ng-disabled="disabled_button">保單健診同意書</button>
+<!-- 		<button type="button" class="btn btn-info" ng-click="ins100R1()" ng-disabled="disabled_button">下載[保單健診同意書]</button> -->
+		<button type="button" class="btn btn-info" ng-click="ins100Upload()" ng-disabled="disabled_button">上傳[保單健診同意書]</button>
+		<button type="button" class="btn btn-info" ng-click="ins100R2()" ng-disabled="disabled_button">下載[保單返還簽收單]</button>
+		<button type="button" class="btn btn-info" ng-click="ins100R3()" ng-disabled="disabled_button">下載[家庭財務安全問卷]</button>
+		<button type="button" class="btn btn-info" ng-click="step2()" ng-disabled="disabled_button">進行健診</button>
+	</div>			
+</div>
+

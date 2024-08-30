@@ -1,0 +1,64 @@
+<script type="text/javascript" src="assets/txn/CRM828/CRM828.js"></script>
+<div class="CRM828" ng-controller="CRM828Controller" ng-cloak>
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th>(約當臺幣)</th>
+					<td></td>
+					<th></th>
+					<td></td>
+				</tr>
+				<tr>
+					<th>參考總市值：</th>
+					<td>{{SUMP_VALUE | number : 0}}</td>
+					<th>總庫存數量(公克)：</th>
+					<td>{{SUMBAL | number : 0}}</td>
+				</tr>
+				<tr>
+					<th>參考總報酬率：</th>
+					<td>{{Return | number :2}}{{ Return != null ? '%' : ''}}</td>
+					<th>參考總損益金額：</th>
+					<td>{{SUMYIELD_AMT | number : 0}}</td>
+				</tr>
+			</table>
+		</div>
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th>帳號</th>
+						<th>庫存數量(公克)</th>
+						<th>幣別</th>
+						<th>參考牌價</th>
+						<th>平均參考買入成本</th>
+						<th>參考市值</th>
+						<th>參考投資金額</th>
+						<th>參考損益金額</th>
+						<th>參考總報酬率</th>
+						<th>定期定額狀態</th>
+						<th>每月投資日期</th>
+						<th>每次投資金額</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;">{{row.ACNO}}</td>
+						<td style="text-align: right;">{{row.BAL | number : 2}}</td>
+						<td style="text-align: left;">{{row.CUR}}</td>
+						<td style="text-align: right;">{{row.BRD_PRICE | number : 0}}</td>
+						<td style="text-align: right;">{{row.AVG_COST | number : 0}}</td>
+						<td style="text-align: right;">{{row.P_VALUE | number : 0}}</td>
+						<td style="text-align: right;">{{row.INV_AMT | number : 0}}</td>
+						<td style="text-align: right;">{{(row.YIELD_S == '-' ? '-' : '')}}{{row.YIELD_AMT | number : 0}}</td>
+						<td style="text-align: right;">{{(row.YIELD_S == '-' ? '-' : '')}}{{row.YIELD ? (row.YIELD | number : 2) + '%' : ''}}</td>
+						<td style="text-align: left;">{{row.M_STS}}</td>
+						<td style="text-align: left;">{{row.M_DATE}}</td>
+						<td style="text-align: right;">{{row.M_AMT | number : 0}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

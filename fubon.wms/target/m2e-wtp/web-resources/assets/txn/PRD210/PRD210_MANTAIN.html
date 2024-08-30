@@ -1,0 +1,87 @@
+<style>
+.modal-dialog {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 500px;
+	height: auto;
+}
+</style>
+<div ng-controller="PRD210_MANTAINController" ng-cloak>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.PRD_ID == null ? '新增' : '編輯'}}投資型保險標的-股債配置</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*標的代碼：</th>
+							<td class="col-md-7 tdpadding">
+								<input type="text" 
+									id="target_id" name="target_id" 
+									class="form-control" 
+									placeholder="請輸入..."
+									ng-model="inputVO.target_id" 
+									ng-blur="checkTragetID()" 
+									ng-disabled="row.TARGET_ID != null" required>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.target_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入標的代碼</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="!canEdit">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">{{errMsg | i18n:[' ']}}</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">標的名稱：</th>
+							<td class="col-md-7 tdpadding">{{inputVO.linked_name}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*股債類型：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="stock_bond_type" name="stock_bond_type"
+								ng-paramtype="FPS.STOCK_BOND_TYPE"
+								ng-model="inputVO.stock_bond_type"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.stock_bond_type.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇股債類型</td>
+							<td class="col-xs-1"></td>
+						<tr>
+					</table>
+				</form>
+				<br>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

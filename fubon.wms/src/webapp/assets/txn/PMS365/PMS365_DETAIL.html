@@ -1,0 +1,150 @@
+<style>
+.modal-dialog.PMS365_DETAIL{
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: auto;
+}
+.PMS365_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS365_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS365_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+
+</style>
+
+<div class="PMS365" ng-controller="PMS365_DETAILController" ng-cloak>
+	<div class="modal-dialog PMS365_DETAIL">  
+		<div class="modal-content">	
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">AUM異動月報_{{yyyymm}}_{{aoCode == '000' ? 'MASS' : aoCode}}{{aoCode == '000' ? '' : (aoType | mapping:mappingSet['AO_TYPE']:'F3')}}_明細</h4>
+			</div>
+			<div class="modal-body">
+				<div>
+					說明：AUM差異明細僅提供異動10萬以上客戶明細
+				</div>	
+				<div ng-if="aumType == 'AO'">
+					<e-jumping-once output="outputVO" list="data" totallist="dtlList"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table class="tablesaw table table-striped table-bordered">
+							<thead>
+								<tr>
+									<th rowspan="2" width="170px" ng-if="aoCode != '000'" >AO CODE</th>
+									<th rowspan="2" width="170px">客戶ID</th>
+									<th rowspan="2" width="170px">客戶姓名</th>
+									<th rowspan="2" width="170px">法金註記</th>
+									
+									<th colspan="3">存款AUM(萬)</th>
+									<th colspan="3">投資AUM(萬)</th>
+									<th colspan="3">保險AUM(萬)</th>						
+								</tr>
+								<tr>
+									<th width="125px">本月</th>
+									<th width="125px">上月</th>
+									<th width="125px">差異</th>
+									
+									<th width="125px">本月</th>
+									<th width="125px">上月</th>
+									<th width="125px">差異</th>
+									
+									<th width="125px">本月</th>
+									<th width="125px">上月</th>
+									<th width="125px">差異</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td class='text-center' ng-if="aoCode != '000'">{{aoCode}}{{aoType | mapping:mappingSet['AO_TYPE']:'F3'}}</td>
+									<td class='text-center'>{{row.CUST_ID}}</td>
+									<td class='text-center'>{{row.CUST_NAME}}</td>
+									<td class='text-center'>{{row.CUST_07}}</td>
+									
+									<td class='text-right'>{{0 + row.AUM_SAV_T_M | currency:'':0}}</td>
+									<td class='text-right'>{{0 + row.AUM_SAV_L_M | currency:'':0}}</td>
+									<td class='text-right'>{{0 + row.AUM_SAV_DIFF | currency:'':0}}</td>
+									
+									<td class='text-right'>{{0 + row.AUM_INV_T_M | currency:'':0}}</td>
+									<td class='text-right'>{{0 + row.AUM_INV_L_M | currency:'':0}}</td>
+									<td class='text-right'>{{0 + row.AUM_INV_DIFF | currency:'':0}}</td>
+									
+									<td class='text-right'>{{0 + row.AUM_INS_T_M | currency:'':0}}</td>
+									<td class='text-right'>{{0 + row.AUM_INS_L_M | currency:'':0}}</td>
+									<td class='text-right'>{{0 + row.AUM_INS_DIFF | currency:'':0}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="search_box_btn text-center">
+						<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確認</button>
+					</div>
+				</div>
+				<div ng-if="aumType != 'AO'">
+					<e-jumping-once output="outputVO" list="data" totallist="dtlList"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table class="tablesaw table table-striped table-bordered">
+							<thead>
+								<tr>
+									<th rowspan="2" width="170px" ng-if="aoCode != '000'" >AO CODE</th>
+									<th rowspan="2" width="170px">客戶ID</th>
+									<th rowspan="2" width="170px">客戶姓名</th>
+									<th rowspan="2" width="170px">法金註記</th>
+									
+									<th colspan="3">{{aumType | mapping:mappingSet['AUM_TYPE']:'F3'}}</th>
+								</tr>
+								<tr>
+									<th width="125px">本月</th>
+									<th width="125px">上月</th>
+									<th width="125px">差異</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td class='text-center' ng-if="aoCode != '000'">{{aoCode}}{{aoType | mapping:mappingSet['AO_TYPE']:'F3'}}</td>
+									<td class='text-center'>{{row.CUST_ID}}</td>
+									<td class='text-center'>{{row.CUST_NAME}}</td>
+									<td class='text-center'>{{row.CUST_07}}</td>
+									
+									<td class='text-right'>{{0 + row.AUM_T_M | currency:'':0}}</td>
+									<td class='text-right'>{{0 + row.AUM_L_M | currency:'':0}}</td>
+									<td class='text-right'>{{0 + row.AUM_DIFF | currency:'':0}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="search_box_btn text-center">
+						<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確認</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,32 @@
+<style>
+.modal-dialog.PRDDocument_url {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+</style>
+<div ng-controller="PRDDocument_urlController" ng-cloak>
+	<div class="modal-dialog PRDDocument_url">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{isPDF ? "PDF" : "網址"}}</h4>
+			</div>
+			<div class="modal-body">
+				<div ng-if="!isPDF">
+					<iframe width="100%" height="100%" ng-src="{{url | trustAsResourceUrl}}"></iframe>
+				</div>
+				<div ng-if="isPDF" style="overflow:auto;-webkit-overflow-scrolling:touch;">
+					<ng-pdf template-url="assets/txn/PRD120/PRD_PDF.html"></ng-pdf>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

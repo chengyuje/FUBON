@@ -1,0 +1,260 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS109 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1200px;
+	height: auto;
+}
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+.datewidth {
+	width: 180px !important;
+}
+
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS109/PMS109.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PPAP.js"></script>
+<script type="text/javascript" src="assets/txn/CRM210/CRM210.js"></script>
+<script type="text/javascript" src="assets/txn/PMS104/PMS104_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PMS109_COMFIRM.js"></script>
+
+<div ng-controller="PMS109Controller" ng-cloak>
+	<div class="modal-dialog PMS109">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">銷售計劃內容</h4>
+			</div>
+			<div class="modal-body">
+                <form name="parameterTypeEditForm">
+					<table width="100%">
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>銷售計劃月份：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+                                <e-combobox ng-datasource="ymList"
+											ng-model="inputVO.PLAN_YEARMON" 
+											ng-validate="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-show="mode == 'add'"
+											width="200px" 
+											height="30px" 
+											ng-class="requiecontrol"
+											style="line-height:20px;"
+											ng-required="true" />
+								<span ng-show="mode == 'upd'">{{inputVO.PLAN_YEARMON}}</span>
+		    				</td>
+		    				<th class="col-xs-1.5 tdpadding">個金RM：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{inputVO.AO_CODE}}-{{cust_aoName}}</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="inputVO.PLAN_YEARMON == null || inputVO.PLAN_YEARMON == '' || inputVO.PLAN_YEARMON == undefined">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors">
+								<span class="error" ng-show="inputVO.PLAN_YEARMON == null || inputVO.PLAN_YEARMON == '' || inputVO.PLAN_YEARMON == undefined"> 
+									<font style="color: red">請選擇銷售計劃月份</font>
+								</span>
+							</td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">身分證字號：</th>
+		    				<td class="col-xs-2.5 tdpadding"><a ng-click="goCRM610(inputVO)">{{inputVO.CUST_ID}}</a></td>
+		    				<th class="col-xs-1.5 tdpadding">姓名：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{inputVO.CUST_NAME}}</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>預計承作商品：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<e-combobox ng-paramtype="PMS.SALE_PLAN_PTYPE"
+											ng-model="inputVO.EST_PRD" 
+											ng-validate="false"
+											ng-editable="false" 
+											ng-format="F3"
+											ng-required="true" 
+											ng-show="mode == 'add'"
+											width="200px" 
+											height="30px"
+											ng-change="getRate('EST_PRD')"
+											style="line-height:20px;" />
+								<span ng-show="mode == 'upd'">{{inputVO.EST_PRD | mapping:mappingSet['PMS.SALE_PLAN_PTYPE']:'F3'}}</span>
+							</td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>預計承作金額：</th>
+		    				<td class="col-xs-2.5 tdpadding form-inline">
+		    					<input 	type="text" 
+										class="form-control" 
+										style="width: 150px" 
+										ng-model="inputVO.EST_AMT" 
+										e-length-limit="200" 
+										placeholder="" 
+										e-input-limit="N" 
+										ng-change="getRate('EST_AMT')"
+										ng-required="true" /> &nbsp;&nbsp;元
+		    				</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="(inputVO.EST_PRD == null || inputVO.EST_PRD == '' || inputVO.EST_PRD == undefined) || (inputVO.EST_AMT <= 0 || inputVO.EST_AMT == '' || inputVO.EST_AMT == undefined)">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors">
+								<span class="error" ng-show="inputVO.EST_PRD == null || inputVO.EST_PRD == '' || inputVO.EST_PRD == undefined"> 
+									<font style="color: red">請選擇預計承作商品</font>
+								</span>
+							</td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors">
+								<span class="error" ng-show="inputVO.EST_AMT <= 0 || inputVO.EST_AMT == '' || inputVO.EST_AMT == undefined"> 
+									<font style="color: red">不可小於或等於0</font>
+								</span>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>預估收益率：</th>
+		    				<td class="col-xs-2.5 tdpadding form-inline">
+		    					<input 	type="text" 
+										class="form-control" 
+										style="width: 150px" 
+										ng-model="inputVO.EST_EARNINGS_RATE" 
+										e-length-limit="3" 
+										placeholder="" 
+										e-input-limit="NC" 
+										ng-disabled="inputVO.EST_PRD == null || inputVO.EST_PRD == '' || inputVO.EST_PRD == undefined"
+										ng-change="getRate('EST_EARNINGS_RATE')"
+										ng-required="true" /> &nbsp;&nbsp;%
+								<br>
+								
+							</td>
+		    				<th class="col-xs-1.5 tdpadding">預估收益：</th>
+		    				<td class="col-xs-2.5 tdpadding ">{{inputVO.EST_EARNINGS | number:0}}&nbsp;元</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="(inputVO.EST_PRD != null && inputVO.EST_PRD != '' && inputVO.EST_PRD != undefined) && (inputVO.EST_EARNINGS_RATE <= 0 || inputVO.EST_EARNINGS_RATE == '' || inputVO.EST_EARNINGS_RATE == undefined)">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors">
+								<span class="error" ng-show="(inputVO.EST_PRD != null && inputVO.EST_PRD != '' && inputVO.EST_PRD != undefined) && (inputVO.EST_EARNINGS_RATE <= 0 || inputVO.EST_EARNINGS_RATE == '' || inputVO.EST_EARNINGS_RATE == undefined)"> 
+									<font style="color: red">不可小於或等於0</font>
+								</span>
+							</td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">預計約訪日期(A)：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<div class="input-group datebox datewidths" style="float:left; width:200px">
+									<input 	type="text" id="bgn_aDate" name="bgn_aDate"
+											class="form-control" 
+											uib-datepicker-popup="yyyy/MM/dd" 
+											ng-readonly="true"
+											ng-model="inputVO.ACTION_DATE" 
+											is-open="model.a"
+											datepicker-options="endmop_A"
+											alt-input-formats="altInputFormats" 
+											show-button-bar="true"							
+											ng-required="false" />										
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+		    				<th class="col-xs-1.5 tdpadding"></th>
+		    				<td class="col-xs-2.5 tdpadding"></td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">預計見面日期(M)：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<div class="input-group datebox datewidths" style="float:left; width:200px">
+									<input 	type="text" name="bgn_mDate" name="bgn_mDate"
+											class="form-control" 
+											uib-datepicker-popup="yyyy/MM/dd" 
+											ng-readonly="true"
+											ng-model="inputVO.MEETING_DATE"
+											is-open="model.m" 
+											datepicker-options="endmop_M"
+											alt-input-formats="altInputFormats"
+											show-button-bar="true"
+											ng-required="false"  />
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'m')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+		    				<th class="col-xs-1.5 tdpadding"></th>
+		    				<td class="col-xs-2.5 tdpadding"></td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>預計成交日期(C)：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<div class="input-group datebox datewidths" style="float:left; width:200px">
+									<input 	type="text" id="bgn_cDate" name="bgn_cDate"
+											class="form-control" 
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.CLOSE_DATE" 
+											is-open="model.c"
+											ng-readonly="true"
+											datepicker-options="endcop_C"
+											alt-input-formats="altInputFormats" 
+											show-button-bar="true"
+											ng-required="true"  />
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>								
+								</div>
+							</td>
+		    				<th class="col-xs-1.5 tdpadding"></th>
+		    				<td class="col-xs-2.5 tdpadding"></td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="(inputVO.CLOSE_DATE == null || inputVO.CLOSE_DATE == '' || inputVO.CLOSE_DATE == undefined)">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors">
+								<span class="error" ng-show="(inputVO.CLOSE_DATE == null || inputVO.CLOSE_DATE == '' || inputVO.CLOSE_DATE == undefined)"> 
+									<font style="color: red">請選擇預計成交日期(C)</font>
+								</span>
+							</td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+	    			</table>
+	    		</form>
+	    	</div>
+	    	<div class="search_box_btn text-center">  
+	     		<div align="center">
+				    <button ng-click="action('A')" class="btn btn-primary" ng-if="mode == 'add'">儲存</button>
+				    <button ng-click="action('M')" class="btn btn-primary" ng-if="mode == 'upd'">更新</button>
+				    <button ng-click="action('C')" class="btn btn-default">取消</button>
+				</div>
+	    	</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,362 @@
+<style>
+.datewidth{
+	width:242px !important;
+}
+</style>
+<div class="search_table search_box3">
+	<h4>客戶基本資料查詢</h4>
+	<table>
+     	<tr>
+     		<th>歸屬行：</th>
+     		<td>
+     			<e-combobox id="belong_bra_nbr"
+							ng-datasource="mappingSet['branchsDesc']"
+							ng-model="inputVO.belong_bra_nbr"
+			   				ng-validate="false" 
+			   				ng-readonly="belong_bra_nbr != ''" 
+			   				ng-disabled="belong_bra_nbr != ''"
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>國籍：</th>
+     		<td>
+     			<e-combobox id="country_nbr"
+			     			ng-paramtype="CRM.COUNTRY_MAP"
+							ng-model="inputVO.country_nbr"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>性別：</th>
+     		<td>
+     			<e-combobox id="gender" 
+							ng-paramtype="CRM.CUST_GENDER"
+							ng-model="inputVO.gender"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     	</tr>
+     	<tr>
+     		<th>出生年起日：</th>
+			<td>
+				<div class="input-group datebox datewidth">
+					<input 	type="text" id="birth_sDate" name="birth_sDate"
+							class="form-control" 
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.birth_sDate" 
+							is-open="model.a"
+							datepicker-options="birth_sDateOptions" 
+							ng-readonly="true"
+							ng-change="limitDatebirth()" />
+					<!-- 製作日曆button -->
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+							<i class="glyphicon glyphicon-calendar"></i>
+						</button>
+					</span>
+				</div>
+			</td>
+			<th>出生年迄日：</th>
+			<td>
+				<div class="input-group datebox datewidth">
+					<input 	type="text" id="birth_eDate" name="birth_eDate"
+							class="form-control" 
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.birth_eDate" 
+							is-open="model.b"
+							datepicker-options="birth_eDateOptions" 
+							ng-readonly="true"
+							ng-change="limitDatebirth()" />
+					<!-- 製作日曆button -->
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+							<i class="glyphicon glyphicon-calendar"></i>
+						</button>
+					</span>
+				</div>
+			</td>
+     		<th>客戶別：</th>
+     		<td>
+     			<e-combobox id="cust_type" 
+							ng-paramtype="KYC.QUEST_TYPE"
+							ng-model="inputVO.cust_type"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     	</tr>
+     	<tr>
+     		<th>婚姻狀況：</th>
+     		<td>
+     			<e-combobox id="marriage" 
+							ng-datasource="mappingSet['MARRIAGE_STAT']"
+							ng-model="inputVO.marriage"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>學歷：</th>
+     		<td>
+     			<e-combobox id="education" 
+							ng-paramtype="CRM.EDUCATION_STAT"
+							ng-model="inputVO.education"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>子女數：</th>
+     		<td>
+     			<e-combobox id="child" 
+							ng-datasource="mappingSet['CHILD_NUM']"
+							ng-model="inputVO.child"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     	</tr>
+     	<tr>
+     		<th>理財會員等級：</th>
+     		<td>
+     			<e-combobox id="vip_degree" 
+							ng-paramtype="CRM.VIP_DEGREE"
+							ng-model="inputVO.vip_degree"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>{{pri.startsWith('UHRM') ? 'UHRM：' : 'AO Code：'}}</th>
+     		<td>
+     			<!-- #0662: WMS-CR-20210624-01_配合DiamondTeam專案調整系統模組功能_組織+客管 -->
+     			<e-combobox id="ao_code" 
+							ng-datasource="mappingSet['AO_CODE']"
+							ng-model="inputVO.ao_code"
+			   				ng-validate="false" 
+			   				ng-readonly="ao_code.length == 1" 
+			   				ng-disabled="ao_code.length == 1"
+			   				ng-hide="pri.startsWith('UHRM')"
+			   				ng-editable="false"
+			   				ng-format="F1"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+   				<e-combobox id="uEmpID" name="uEmpID"
+							ng-datasource="mappingSet['UHRM_LIST']"
+							ng-model="inputVO.uEmpID"
+							ng-validate="false" 
+							ng-disabled="mappingSet['UHRM_LIST'].length == 2"
+							ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
+							ng-show="pri.startsWith('UHRM')"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							width="200px"
+							style="line-height:20px;" />
+     		</td>
+     		<th>客戶風險屬性：</th>
+     		<td>
+     			<e-combobox id="cust_risk_atr" 
+							ng-paramtype="FPS.CUST_RISK_ATTR"
+							ng-model="inputVO.cust_risk_atr"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     	</tr>
+     	<tr>
+     		<th>薪轉公司：</th>
+     		<td>
+     			<input 	type="text" class="form-control"
+     					placeholder="請點選放大鏡..." 
+	     				id="sal_company" name="sal_company" 
+	     				ng-model="inputVO.sal_company" 
+	     				e-length-limit="300"
+	     				ng-disabled="true"
+	     				style="width:160px;display: inline-block">
+     			<input type="image" src="assets/images/magnifier.jpg" alt="薪轉公司查詢" name="query_company" id="query_company" ng-click="query_company(row)" style="vertical-align:middle"/>	
+     		</td>
+     		<th>法金戶：</th>
+     		<td>
+     			<e-combobox id="co_acct" 
+							ng-paramtype="CRM.CRM210_CO_ACCT_YN"
+							ng-model="inputVO.co_acct"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>客訴戶：</th>
+     		<td>
+     			<e-combobox id="complain" 
+			     			ng-paramtype="CRM.CRM230_YN"
+							ng-model="inputVO.complain"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     	</tr>
+     	<tr>
+     		<th>使用網路銀行：</th>
+     		<td>
+     			<e-combobox id="ebank" 
+							ng-paramtype="CRM.CRM230_OPEN_STAT"
+							ng-model="inputVO.ebank"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>使用語音：</th>
+     		<td>
+     			<e-combobox id="voice" 
+							ng-paramtype="CRM.CRM230_OPEN_STAT"
+							ng-model="inputVO.voice"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>使用行動銀行：</th>
+     		<td>
+     			<e-combobox id="app" 
+							ng-paramtype="CRM.CRM230_OPEN_STAT"
+							ng-model="inputVO.app"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+     	</tr>
+     	<tr>
+     		<th>專業投資人：</th>
+     		<td>
+     			<input class="uniform_on" type='checkbox' id="investor" name="investor" ng-model='inputVO.investor' ng-true-value="'Y'" ng-false-value="'N'" />
+     		</td>
+     		<th>可推介：</th>
+     		<td>
+     			<input class="uniform_on" type='checkbox' id="rec" name="rec" ng-model='inputVO.rec' ng-true-value="'Y'" ng-false-value="'N'" />
+     		</td>
+     		<th>薪轉戶：</th>
+     		<td>
+     			<e-combobox id="sal_acc_yn" 
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.sal_acc_yn"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+     		</td>
+		</tr>
+		<tr>
+            <th width="10%">是否持有有效信用卡：</th>
+            <td>
+                <e-combobox id="hold_card_flg" 
+			                ng-paramtype="CRM.CRM230_YN" 
+			                ng-model="inputVO.hold_card_flg" 
+			                ng-validate="false" 
+			                ng-readonly="false" 
+			                ng-editable="false" 
+			                ng-format="F3" 
+			                ng-required="false" 
+			                ng-change="checkCardFlg()" 
+			                width="200px" 
+			                style="line-height:20px;" />
+            </td>
+            <th width="10%">W-8BEN(W-8BEN-E)：</th>
+            <td width="40%">
+				<e-combobox id="cust_w8ben" 
+							ng-paramtype="CRM.W8BEN_TYPE"
+							ng-model="inputVO.cust_w8ben"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							width="225px"
+							style="line-height:20px;" />
+			</td>
+        </tr>
+        <tr ng-show="inputVO.hold_card_flg == 'Y'">
+            <th>持有正/附卡：</th>
+            <td colspan="3">
+                <e-combobox id="ms_type" 
+			                ng-paramtype="CAM.CARD_TYPE" 
+			                ng-model="inputVO.ms_type" 
+			                ng-validate="false" 
+			                ng-readonly="false" 
+			                ng-editable="false" 
+			                ng-format="F3" 
+			                ng-required="false" 
+			                width="200px" 
+		                	style="line-height:20px;" /> (選附卡意指只擁有附卡，無任何一張正卡)
+            </td>
+        </tr>
+        <tr ng-show="inputVO.hold_card_flg == 'N'">
+            <th>未持有正/附卡：</th>
+            <td>
+                <e-combobox id="opp_ms_type" 
+			                ng-paramtype="CAM.CARD_TYPE" 
+			                ng-model="inputVO.opp_ms_type" 
+			                ng-validate="false" 
+			                ng-format="F3" 
+			                ng-required="false" 
+			                width="200px" 
+			                style="line-height:20px;" />
+            </td>
+        </tr>
+	</table>
+</div>

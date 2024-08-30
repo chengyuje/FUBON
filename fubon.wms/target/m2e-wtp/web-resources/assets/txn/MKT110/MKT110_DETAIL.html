@@ -1,0 +1,122 @@
+<style>
+.modal-dialog.MKT110 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD120/PRDDocument_url.js"></script>
+<div ng-controller="MKT110_DETAILController" ng-cloak>
+	<div class="modal-dialog MKT110">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">詳細內容資訊</h4>
+			</div>
+			<div class="modal-body">
+				<div class="e_panel_table">
+					<table class="table td_center" style="margin-bottom: 0px;">
+						<thead>
+							<tr>
+								<th width="33%">公佈欄類別</th>
+								<th width="33%">適用人員</th>
+								<th width="33%">產品類別</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>{{bType | mapping:BULLETIN_TYPE:'F3'}}</td>
+								<td>{{chkCode}}</td>
+								<td>{{pType | mapping:PRD_TYPE:'F3'}}</td>
+							</tr>
+						</tbody>
+					</table>
+					<table class="table td_center">
+						<thead>
+							<tr>
+								<th colspan="4">佈告主旨</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="4" style="text-align: initial;">{{subject}}</td>
+							</tr>
+						</tbody>
+						<thead>
+							<tr>
+								<th colspan="4">佈告內容</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="4" style="text-align: initial;">
+									<div id="contentHtml"></div>
+								</td>
+							</tr>
+						</tbody>
+						<thead>
+							<tr>
+								<th width="25%">活動起日</th>
+								<th width="25%">活動迄日</th>
+								<th width="25%">佈告單位</th>
+								<th width="25%">聯絡窗口</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>{{sDate | date:"yyyy-MM-dd"}}</td>
+								<td>{{eDate | date:"yyyy-MM-dd"}}</td>
+								<td>{{orgn ? orgn : '總行人員'}}</td>
+								<td>{{contact}}</td>
+							</tr>
+						</tbody>
+						<thead>
+							<tr>
+								<th colspan="2">檔案</th>
+								<th colspan="2">網址</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="2">
+									<div class="scroll_y" style="height:100px;">
+										<p style="word-break: break-all;" ng-repeat="row in fileName track by $index">
+											<a ng-if="!(IsMobile && row.PDFNAME == 'PDF')" onclick="return false" ng-click="downloadByteFile(row)">{{row.DOC_NAME}}</a>
+											<a ng-if="IsMobile && row.PDFNAME == 'PDF'" onclick="return false" ng-click="showPDF(row)">{{row.DOC_NAME}}</a>
+										</p>
+									</div>
+								</td>
+								<td colspan="2">
+									<div class="scroll_y" style="height:100px;">
+										<p style="word-break: break-all;" ng-repeat="row in web track by $index">
+											<a ng-href="{{row.DOC_NAME}}" target="_blank">{{row.DOC_NAME}}</a>
+										</p>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+						<thead>
+							<tr>
+								<th colspan="4">圖片</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td style="text-align: center;" colspan="4">
+									<img ng-src="{{pictureSrc}}" style="max-width:100%; height:auto" />
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button"  class="btn btn-info" ng-click="closeThisDialog('cancel')" >確認</button>
+				</div>			
+			</div>
+		</div>
+	</div>
+</div>

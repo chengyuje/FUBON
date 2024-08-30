@@ -1,0 +1,403 @@
+<style>
+  /* .red_dot {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    border-radius: 100%;
+    background: radial-gradient(farthest-corner at 5px 5px, #FFE4E4, rgba(241, 111, 92, 1), #999);
+  }
+
+  .yellow_dot {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    border-radius: 100%;
+    background: radial-gradient(farthest-corner at 5px 5px, rgba(248, 248, 248, 0.95), rgb(241, 239, 92), #999);
+  }
+
+  .green_dot {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    border-radius: 100%;
+    background: radial-gradient(farthest-corner at 5px 5px, rgba(248, 248, 248, 0.95), rgb(82, 239, 57), #999);
+  } */
+
+  .FPS410 .template-wrapper {
+    margin: .7em auto;
+  }
+
+  .FPS410 .deletePic {
+    color: #2a8960;
+    font-size: 25px;
+  }
+
+  .FPS410 p {
+    text-indent: 2em;
+  }
+
+  .FPS410 .rstable thead tr th {
+    vertical-align: middle;
+    text-align: center;
+    padding: 7px 10px;
+    color: #000000;
+    background-color: #efefef;
+    border: 1px solid #28a4c9;
+  }
+
+  .FPS410 .rstable tbody tr td {
+    vertical-align: middle;
+    text-align: center;
+    padding: 7px 10px;
+    border: 1px solid #28a4c9;
+  }
+
+  .FPS410 .clear::after {
+    display: block;
+    content: '';
+    clear: both;
+  }
+
+  .FPS410 .chart-wrapper .title {
+    text-align: left;
+  }
+
+  .FPS410 .container .title {
+    text-align: left;
+  }
+
+  .FPS410 .text-right {
+    text-align: right;
+  }
+
+</style>
+
+<script type="text/javascript"
+        src="assets/txn/FPS410/FPS410.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS410/FPS410PrintPreview.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS410/FPS410_print.js"></script>
+
+<!-- details -->
+<script type="text/javascript"
+        src="assets/txn/PRD160/PRD160_DETAIL.js"></script>
+<script type="text/javascript"
+        src="assets/txn/PRD110/PRD110_DETAIL.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS/FPS_SOT.js"></script>
+
+<div ng-controller="FPS410Controller"
+     ng-clock>
+  <!-- content -->
+  <div class="FPS410 FPS">
+    <div>
+      <!-- templates -->
+      <div class="template-wrapper"
+           ng-include="'assets/txn/FPS300/FPS320.template.html'">
+      </div>
+      <div class="template-wrapper"
+           ng-include="'assets/txn/FPS400/FPS400_status.template.html'">
+      </div>
+      <!-- Main -->
+      <!-- chart -->
+      <section class="block container">
+        <div class="title title-left">投資組合部位</div>
+        <div style="display:flex;
+                    justify-content: space-around;
+                    margin: 0 auto;">
+          <div class="block clear-space">
+            <div class="title subtitle title-left">股債配置</div>
+            <div class="content-wrapper no-border chart-wrapper">
+              <div class="chart-content">
+                <div id="stockChart"
+                     class="chart"></div>
+              </div>
+            </div>
+            <div class="no-border">
+              <table style="width:100%;
+                              table-layout:fixed;">
+                <tbody class="content-wrapper"
+                       style="text-align:center">
+                  <tr ng-repeat="row in chartTables.stockChart">
+                    <td style="text-align:right;">
+                      <div class="color-block"
+                           ng-style="{'background-color': row.color}"></div>
+                    </td>
+                    <td ng-bind="row.label"
+                        style="text-align:left;"></td>
+                    <td ng-bind="row.value+' %'"
+                        style="text-align:left;"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="block clear-space">
+            <div class="title subtitle title-left">市場配置</div>
+            <div class="content-wrapper no-border chart-wrapper">
+              <div class="chart-content">
+                <div id="classChart"
+                     class="chart"></div>
+              </div>
+            </div>
+            <div class="no-border">
+              <table style="width:100%;
+                              table-layout:fixed;">
+                <tbody class="content-wrapper"
+                       style="text-align:center">
+                  <tr ng-repeat="row in chartTables.classChart">
+                    <td style="text-align:right;">
+                      <div class="color-block"
+                           ng-style="{'background-color': row.color}"></div>
+                    </td>
+                    <td ng-bind="row.label"
+                        style="text-align:left;"></td>
+                    <td ng-bind="row.value+' %'"
+                        style="text-align:left;"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <table class="table table-striped">
+          <thead>
+            <tr rowspan="2">
+              <th rowspan="2">類別</th>
+              <th rowspan="2"
+                  style="width:250px">商品</th>
+              <th rowspan="2">風險等級</th>
+              <th rowspan="2">計價幣別</th>
+              <th rowspan="2">申購幣別</th>
+              <th rowspan="2">投資方式</th>
+              <th rowspan="2">市值<br/>保單價值</th>
+              <th rowspan="2">約當台幣</th>
+              <th rowspan="2">比例</th>
+              <th colspan="2">含息報酬率</th>
+            </tr>
+            <tr>
+              <th>原幣</th>
+              <th>折台幣</th>
+            </tr>
+          </thead>
+          <tbody align="center">
+            <tr ng-repeat="row in paramList"
+                class="repeat-row"
+                ng-class-odd="'rowOdd'"
+                ng-class-even="'rowEven'">
+              <td ng-bind="row.PTYPE|mapping: mapping.pType"></td>
+              <!-- 類別 -->
+              <td class="text-left">
+                <!-- 代號商品 -->
+                <a ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+                   ng-click="go('detail', row.PTYPE, row)"></a>
+              </td>
+              <td>
+                <!--  風險等級 -->
+                <span ng-if="row.PTYPE!='INS'">{{row.RISK_TYPE}}</span>
+                <span ng-if="row.PTYPE=='INS'">--</span>
+              </td>
+
+              <td ng-bind="row.CURRENCY_TYPE">
+                <!-- 計價幣別 -->
+              </td>
+
+              <td ng-bind="row.TRUST_CURR">
+                <!-- 申購幣別 -->
+              </td>
+              <td>
+                <!-- 投資方式 -->
+                <div ng-if="row.TxnType=='N1' && row.PTYPE!='INS'">
+                  <span>單筆</span>
+                </div>
+                <div ng-if="row.TxnType=='N2' && row.PTYPE!='INS'">
+                  <span>定額</span>
+                </div>
+                <div ng-if="row.PTYPE=='INS'">
+                  <span>--</span>
+                </div>
+              </td>
+              <td class="text-right">
+                <!-- 原幣金額 -->
+                <span ng-bind="(row.CURRENCY_TYPE==='TWD'?row.STORE_NTD:row.STORE_RAW)|number"></span>
+              </td>
+              <td class="text-right">
+                <span ng-bind="row.NTD_PERCENT|number"></span>
+                <!-- 約當台幣 -->
+              </td>
+              <td>
+                <!-- 比例 -->
+                <span ng-bind="row.INV_PERCENT"></span>%
+              </td>
+              <!-- 含息報酬率 原幣 -->
+              <td>
+                <span ng-if="row.PTYPE!='INS'"
+                      ng-bind="(row.RTN_RATE_WD  | number : 2) + '%'"></span>
+                <div ng-if="row.PTYPE=='INS'">
+                  <span>--</span>
+                </div>
+              </td>
+              <!-- 含息報酬率 折台幣 -->
+              <td>
+                <span ng-if="row.PTYPE!='INS'"
+                      ng-bind="(row.RTN_RATE_WD_TWD  | number : 2) + '%'"></span>
+                <div ng-if="row.PTYPE=='INS'">
+                  <span>--</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="clear" style="text-align: left;">
+        <div class="content-title" style="display:inline-block;width: 75%;">
+          <!-- <div class="ps" style="color:#ff5d5d;font-weight: bold;">＊color:#ff5d5d;font-weight: bold;</div>
+          <div>＊折算台幣匯率採前一個營業日之匯率；且上述理財規劃金額皆僅計算至整數位</div>
+          <div>＊投資型保險僅包含類全委投資型保險並列入平衡型部位；股債配置不包含貨幣型基金部位</div> -->          
+          <table style="padding: 0em; padding-left: 2%;padding-right: 1%;border-bottom: 0; width: 100%;"  >
+          	<tr style="padding: 0;">
+          		<td style="padding: 0;width: 2.5%; float: left; text-align: right;color:#ff5d5d;">*</td>
+          		<td style="padding: 0;width: 97%; float: left; color:#ff5d5d;font-weight: bold;">提醒您，理財規劃金額為客戶前日資產部位，非當日即時資料，可能出現差異，請特別留意。</td>
+          	</tr>
+          	<tr style="padding: 0;">
+          		<td style="padding: 0;width: 2.5%; float: left; text-align: right;">*</td>
+          		<td style="padding: 0;width: 97%; float: left;">上述投資組合股債配置及市場配置資訊僅包含基金商品，且股債配置中，屬於債的部位包含債券型基金、平衡型基金(投資債券占比較高者)及貨幣型基金；屬於股的部位包含股票型基金及平衡型基金(投資股票占比較高)，本行將不定期依標的投資比例變化，調整商品的股債分類。</td>
+          	</tr>
+          	<tr style="padding: 0;">
+          		<td style="padding: 0;width: 2.5%; float: left; text-align: right;">*</td>
+          		<td style="padding: 0;width: 97%; float: left;">資料基準日皆截至2019/02/15為止本行可取得之最新資料；如需計算折合台幣匯率時，折台匯率係採本行前一營業日台幣對外幣之匯率，金額欄位數字皆四捨五入計算至整數位。</td>
+          	</tr>
+          	<tr style="padding: 0;">
+          		<td style="padding: 0;width: 2.5%; float: left; text-align: right;">*</td>
+          		<td style="padding: 0;width: 97%; float: left;">單筆已投資金額為目前庫存部位的單筆投資金額加總；定期已投資金額為目前庫存部位的定期(不)定額投資金額加總。</td>
+          	</tr>
+          	<tr style="padding: 0;">
+          		<td style="padding: 0;width: 2.5%; float: left; text-align: right;">*</td>
+          		<td style="padding: 0;width: 97%; float: left;">目前進度狀態說明：(1)符合進度：達成率 ≥ 100%     (2)微幅落後：90% &lt;= 達成率 &lt; 100%    (3)落後：達成率 &lt; 90% 。</td>
+          	</tr>
+          	<tr style="padding: 0;">
+          		<td style="padding: 0;width: 2.5%; float: left; text-align: right;">*</td>
+          		<td style="padding: 0;width: 97%; float: left;">達成率=市值(含息)/應達目標；含息報酬率=(市值(含息)-投入金額)/投入金額；市值同時包含基金參考市值與全委帳戶之投資型保險保單帳戶價值，且此數值僅供參考。</td>
+          	</tr>
+          	<tr style="padding: 0;">
+          		<td style="padding: 0;width: 2.5%; float: left; text-align: right;">*</td>
+          		<td style="padding: 0;width: 97%; float: left;">目標理財之標的包含基金及連結全委帳戶之投資型保險</td>
+          	</tr>
+          </table>
+        </div>
+        <div class="content-body" style="margin-right: 15px; float: right; margin-top: 1em;">
+          <!-- <a class=" btn-fps"
+             ng-click="fps300.chgTab('ReturnFPS400')">上一步</a> -->
+          <a class=" btn-fps"
+             ng-click="kycDisable?'':go('print')"
+             ng-class="{'btn-fps-disabled':kycDisable}">產出績效追蹤報告書</a>
+          <a class=" btn-fps"
+             ng-click="kycDisable?'':fps300.chgTab('FPS411')"
+             ng-class="{'btn-fps-disabled':kycDisable}">下一步</a>
+        </div>
+      </section>
+
+      <!-- 歷史交易明細 -->
+      <section class="block container">
+        <div class="title title-left">基金歷史交易明細</div>
+        <div class="content-wrapper no-border">
+          <table style="margin: 0 auto;">
+            <tr>
+              <th>贖回起訖日</th>
+              <td>
+                <div class="input-group datebox datewidth">
+                  <input type="text"
+                         class="form-control"
+                         uib-datepicker-popup="yyyy/MM/dd"
+                         ng-model="inputVO.SD"
+                         is-open="openSD"
+                         ng-readonly="true"
+                         ng-required="false"
+                         datepicker-options="sDateOptions"
+                         ng-change="limitDate()" />
+                  <!-- 製作日曆button -->
+                  <span class="input-group-btn">
+                    <button type="button"
+                            class="btn btn-default"
+                            ng-click="open($event,'openSD')">
+                      <i class="glyphicon glyphicon-calendar"></i>
+                    </button>
+                  </span>
+                </div>
+              </td>
+              <th style="text-align:center;">～</th>
+              <td>
+                <div class="input-group datebox datewidth">
+                  <input type="text"
+                         class="form-control"
+                         uib-datepicker-popup="yyyy/MM/dd"
+                         ng-model="inputVO.ED"
+                         is-open="openED"
+                         ng-readonly="true"
+                         datepicker-options="eDateOptions"
+                         ng-change="limitDate()" />
+                  <!-- 製作日曆button -->
+                  <span class="input-group-btn">
+                    <button type="button"
+                            class="btn btn-default"
+                            ng-click="open($event,'openED')">
+                      <i class="glyphicon glyphicon-calendar"></i>
+                    </button>
+                  </span>
+                </div>
+              </td>
+              <td>&nbsp;&nbsp;
+                <a class="btn-fps"
+                   ng-click="inquireHis()">查詢</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div ng-show="!transDetailList"></div>
+        <table class="table table-striped">
+          <thead class="padding-thead">
+            <th>贖回日期</th>
+            <th>商品</th>
+            <th>申購幣別</th>
+            <th>投入金額</th>
+            <th>贖回金額</th>
+            <th>配息金額</th>
+            <th>含息報酬率</th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="row in transDetailList">
+              <td ng-bind="row.DATA_DATE"></td>
+              <td>
+                <a ng-bind="row.PROD_ID+' '+row.PROD_NAME"
+                   ng-click="go('detail', 'MFD', row)"></a>
+              </td>
+              <td ng-bind="row.VALU_CRCY_TYPE"></td>
+              <td style="text-align: right;"
+                  ng-bind="(row.VALU_CRCY_TYPE==='TWD'?row.INV_COST_TWD:row.INV_COST_ORGD) | number : 0"></td>
+              <td style="text-align: right;"
+                  ng-bind="(row.VALU_CRCY_TYPE==='TWD'?row.REF_AMT_TWD:row.REF_AMT_ORGD) | number : 0"></td>
+              <td style="text-align: right;"
+                  ng-bind="(row.VALU_CRCY_TYPE==='TWD'?row.TXN_DIVID_TWD:row.TXN_DIVID_ORGD) | number : 0"></td>
+              <td ng-bind="(row.VALU_CRCY_TYPE==='TWD'?row.RATIO_TWD:row.RATIO_ORGD | number : 2) + '%'"></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <!-- 
+      <section class="clear" style="text-align: left;">
+        <div class="content-title" style="display:inline-block;width: 75%;">
+        <table style="padding: 0em; padding-left: 2%;padding-right: 1%;border-bottom: 0; width: 100%;"  >
+          	<tr style="padding: 0;">
+          		<td style="padding: 0;width: 2.5%; float: left; text-align: right;">*</td>
+          		<td style="padding: 0;width: 97%; float: left;">基金幣別為申購幣別，連結全委帳戶之投資型保險幣別為保單幣別。</td>
+          	</tr>
+        </table>
+        </div>
+      </section>
+ 		-->
+    </div>
+  </div>
+</div>

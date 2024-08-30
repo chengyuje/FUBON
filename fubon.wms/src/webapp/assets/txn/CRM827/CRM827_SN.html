@@ -1,0 +1,64 @@
+<style>
+    /* open dialog */
+    .ngdialog.CRM827_SN {
+
+    }
+</style>
+<script type="text/javascript" src="assets/txn/CRM825/CRM825.js"></script>
+<script type="text/javascript" src="assets/txn/PRD140/PRD140_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/CRM827/CRM827_SN.js"></script>
+
+<div class="CRM827_SN" ng-controller="CRM827_SNController" ng-cloak>
+    <h4 class="h4-title">境外結構型商品</h4>
+    <div class="search_table search_box3">
+        <table>
+            <tr>
+                <th>(約當臺幣)</th>
+                <td colspan = "3"></td>
+            </tr>
+            <tr>
+                <th>庫存總金額：</th>
+                <td colspan = "3">{{SUMTrustVal | currency:''}}</td>
+            </tr>
+            <tr>
+                <th>含息總報酬率：</th>
+                <td colspan = "3">{{ReturnRate | number :2}}%</td>
+            </tr>
+        </table>	
+    </div>
+    <e-jumping-once output="outputVO" list="data" totallist="SNList"></e-jumping-once>
+    <div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+        <table class="modal-body table-bordered">
+            <tr>
+                <th>憑證編號</th>
+                <th>商品代號</th>
+                <th>商品名稱</th>
+                <th>商品幣別</th>
+                <th>庫存面額</th>
+                <th>交易日</th>
+                <th>發行日</th>
+                <th>最新配息日</th>
+                <th>最新配息率</th>
+                <th>累積現金配息</th>
+                <th>累積配息率</th>
+                <th>最新報價</th>
+                <th>含息報酬率</th>
+            </tr>
+            <tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                <td style="text-align: left;">{{row.CERT_NO}}</td>
+                <td style="text-align: left;">{{row.PROD_ID}}</td>
+                <td style="text-align: left;"><a href="#" onclick="return false" ng-click="goPrdDetail(row)">{{row.PROD_NAME}}</a></td>
+                <td style="text-align: center;">{{row.CUR_TYPE}}</td>
+                <td style="text-align: right;">{{row.DENOM | currency:''}}</td>
+                <td style="text-align: center;">{{toJsDate(row.TRAN_DATE) | date:"yyyy-MM-dd"}}</td>
+                <td style="text-align: center;">{{toJsDate(row.ISSUE_DATE) | date:"yyyy-MM-dd"}}</td>
+                <td style="text-align: center;">{{toJsDate(row.LATEST_INT_DATE) | date:"yyyy-MM-dd"}}</td>
+                <td style="text-align: center;">{{row.LATEST_INT_RATE}}{{row.LATEST_INT_RATE != null && row.LATEST_INT_RATE != undefined && row.LATEST_INT_RATE != '' ? '%' : ''}}</td>
+                <td style="text-align: center;">{{row.ACC_CASH_DIV | currency:''}}</td>
+                <td style="text-align: center;">{{row.ACC_INT_RATE}}{{row.ACC_INT_RATE != null && row.ACC_INT_RATE != undefined && row.ACC_INT_RATE != '' ? '%' : ''}}</td>
+                <td style="text-align: right;">{{row.LATEST_PRICE | currency:''}}</td>
+                <td style="text-align: right;">{{row.RATE_OF_RETURN}}{{row.RATE_OF_RETURN != null && row.RATE_OF_RETURN != undefined && row.RATE_OF_RETURN != '' ? '%' : ''}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

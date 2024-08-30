@@ -1,0 +1,90 @@
+<style>
+/* open dialog */
+.ngdialog.CRM826_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM826_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+
+</style>
+<div class="CRM826_DETAIL" ng-controller="CRM826_DETAILController" ng-cloak>
+	<div class="modal-dialog CRM826_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">明細畫面</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc scroll_y">
+					<table class="table-bordered">
+						<tr>
+							<th width="20%">交易編號</th>
+							<td width="30%" style="text-align: right;">{{row.PROD_ID}}</td>
+							<th width="20%">交易日期</th>
+							<td width="30%" style="text-align: right;">{{toJsDate(row.TXN_DATE)|date:"yyyy-MM-dd"}}</td>
+						</tr>
+						<tr>
+							<th>商品幣別</th>
+							<td style="text-align: right;">{{row.VALU_CRCY_TYPE}}</td>
+							<th>交易金額</th>
+							<td style="text-align: right;">{{row.TXN_AMT|number:2}}</td>
+						</tr>
+						<tr>
+							<th>相對貨幣</th>
+							<td style="text-align: right;">{{row.MPNG_CRCY_TYPE}}</td>
+							<th>起息日期</th>
+							<td style="text-align: right;">{{toJsDate(row.PAY_DATE)|date:"yyyy-MM-dd"}}</td>
+						</tr>
+						<tr>
+							<th>扣款帳號</th>
+							<td style="text-align: right;">{{row.DED_ACC_NBR}}</td>
+							<th>即期匯率</th>
+							<td style="text-align: right;">{{row.SPOT_RATE|number:4}}</td>
+						</tr>
+						<tr>
+							<th>組合式商品帳號</th>
+							<td style="text-align: right;">{{row.ACC_NBR}}</td>
+							<th>履約價</th>
+							<td style="text-align: right;">{{row.STRIKE|number:4}}</td>
+						</tr>
+						<tr>
+							<th>產品收益率%</th>
+							<td style="text-align: right;">{{row.YIELD_RATE|number:4}}</td>
+							<th>比價日期</th>
+							<td style="text-align: right;">{{toJsDate(row.EXPIRY_DATE)|date:"yyyy-MM-dd"}}</td>
+						</tr>
+						<tr>
+							<th>是否幣轉</th>
+							<td style="text-align: right;">{{row.CRCY_CHGE_STATUS | mapping:mappingSet['CRM.DCI_CRCY_CHGE_STATUS']:'F3'}}</td>
+							<th>比價時點匯率</th>
+							<td style="text-align: right;">{{row.EXPIRY_DATE_SPOT_RATE |number:4}}</td>
+						</tr>
+						<tr>
+							<th>觸發匯率</th>
+							<td style="text-align: right;">{{row.STRIKE2}}</td>
+							<th>到期日期</th>
+							<td style="text-align: right;">{{toJsDate(row.DUE_DATE)|date:"yyyy-MM-dd"}}</td>
+						</tr>
+						<tr>
+							<th></th>
+							<td></td>
+							<th>狀態</th>
+							<td style="text-align: right;">{{row.TRADE_STATUS | mapping:mappingSet['CRM.DCI_TRADE_STATUS']:'F3'}}</td>
+						</tr>						
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

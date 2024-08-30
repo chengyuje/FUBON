@@ -1,0 +1,63 @@
+<script type="text/javascript" src="assets/txn/CRM512/CRM512.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512_BOSS.js"></script>
+<div class="panel_content">		    
+	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+        <table class="table-bordered">
+            <thead>
+            	<tr>
+                	<th>類別</th>
+                	<th>項目</th>
+                	<th>選項</th>
+                	<th ng-show="inputVO.fromPRD != 'Y'">異動單位</th>
+                	<th ng-show="inputVO.fromPRD != 'Y'">異動員編/姓名</th>
+                	<th ng-show="inputVO.fromPRD != 'Y'">異動日期</th>
+                	<th ng-show="inputVO.fromPRD != 'Y'">異動歷程</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in qusBankListAfter" class="repeat-row" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					<td align="center">{{row.QUESTION_CLASS_NAME}}</td>
+					<td align="center">
+						{{row.QUESTION_NAME_NAME != null ? row.QUESTION_NAME_NAME : 'ー'}}
+						<div><font color="red" function-type="maintenance">{{row.REQUIRED_YN == 'Y' ? '(必填)' : ''}}</font></div>
+					</td>
+					<td>
+						<div ng-if="row.QUESTION_DESCR">{{row.QUESTION_DESCR}}</div>
+						<div ng-repeat="answer in row.answer">
+							<input type="checkbox" 
+								   ng-click="answer.ANSWER_NGCHECK == 'N' ? answer.ANSWER_NGCHECK = 'Y' : answer.ANSWER_NGCHECK = 'N';checkOption()"
+								   ng-if="row.QUESTION_TYPE == 'M'"
+								   ng-checked="answer.ANSWER_NGCHECK == 'Y'"
+								   ng-disabled="row.ansDisabled || answer.ansDisabled"/>
+							<input type="radio" 
+								   ng-click="answer.ANSWER_NGCHECK == 'N' ? answer.ANSWER_NGCHECK = 'Y' : answer.ANSWER_NGCHECK = 'N';checkOption()"
+								   ng-if="row.QUESTION_TYPE == 'S'"
+								   ng-checked="answer.ANSWER_NGCHECK == 'Y'"
+								   ng-disabled="row.ansDisabled || row.QUESTION_CLASS == '99'"/>
+							<input type="text" class="form-control"
+							       ng-model="answer.ANSWER_REMARK"
+								   ng-if="row.QUESTION_TYPE == 'T'"
+								   ng-value="answer.ANSWER_REMARK"
+								   e-length-limit="150"
+								   ng-disabled="row.ansDisabled"/>
+							{{(row.QUESTION_TYPE == 'M' || row.QUESTION_TYPE == 'S') ? answer.ANSWER_DESC : ''}}
+						</div>
+						<div ng-if="row.QUESTION_REMARK"><b>{{row.QUESTION_REMARK}}</b></div>
+					</td>
+					<td align="center" ng-show="inputVO.fromPRD != 'Y'">{{row.CHG_DEPT_NAME}}</td>
+					<td align="center" ng-show="inputVO.fromPRD != 'Y'">{{row.CHG_CREATOR_NAME}}</td>
+					<td align="center" ng-show="inputVO.fromPRD != 'Y'">{{row.CHG_CREATOR_TIME}}</td>
+					<td align="center" ng-show="inputVO.fromPRD != 'Y'"><button type="button" class="btn btn-default" ng-click="getHistory(row)">異動歷程</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <div align="center" ng-show="inputVO.fromPRD != 'Y' && qusBankListAfter.length > 0">
+        	<button type="button" class="btn btn-success" ng-click="save(false)" function-type="maintenance"><span class="glyphicon glyphicon-floppy-disk"></span>儲存</button>
+        </div>
+        <div align="center" ng-show="inputVO.fromPRD == 'Y'">
+       		<button type="button" class="btn btn-success" ng-click="save(false)" ng-disabled="inputVO.isAnsChanged" function-type="maintenance"><span class="glyphicon glyphicon-floppy-disk"></span>客戶狀態符合前次觀察</button>
+        	<button type="button" class="btn btn-success" ng-click="save(true)" ng-disabled="!inputVO.isAnsChanged" function-type="maintenance"><span class="glyphicon glyphicon-floppy-disk"></span>客戶狀態已有變化</button>
+        </div>
+	</div>
+</div>

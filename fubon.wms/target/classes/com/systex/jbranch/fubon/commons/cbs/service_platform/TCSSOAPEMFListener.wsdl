@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Created by TIBCO WSDL-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://fubon.org/OperationImpl/ListenerServices/SOAP/Listener" xmlns:ns0="http://fubon.com.tw/XSD/TCSSoapService" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="Untitled" targetNamespace="http://fubon.org/OperationImpl/ListenerServices/SOAP/Listener">
+    <wsdl:types>
+        <xs:schema xmlns="http://fubon.com.tw/XSD/TCSSoapService" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://fubon.com.tw/XSD/TCSSoapService" elementFormDefault="qualified" attributeFormDefault="unqualified">
+            <xs:element name="SoapService">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="ServiceHeader">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="HSYDAY" type="xs:string"/>
+                                    <xs:element name="HSYTIME" type="xs:string"/>
+                                    <xs:element name="UserName" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="Password" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="SPName" type="xs:string"/>
+                                    <xs:element name="TxID" type="xs:string"/>
+                                    <xs:element name="HWSID" type="xs:string"/>
+                                    <xs:element name="HSTANO" type="xs:string"/>
+                                    <xs:element name="OSERNO" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="HTLID" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="HFMTID" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="HRETRN" type="xs:string"/>
+                                    <xs:element name="Encoding" type="xs:string"/>
+                                    <xs:element name="ResponseCode" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="UUID" type="xs:string"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="ServiceBody">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="TxnString" type="xs:string"/>
+                                    <xs:element name="DataType" type="xs:string"/>
+                                    <xs:element name="ShouldRender" type="xs:boolean" minOccurs="0"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="ServiceError" minOccurs="0">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="ErrorCode" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="ErrorCategory" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="Timestamp" type="xs:dateTime" minOccurs="0"/>
+                                    <xs:element name="ErrorFrom" type="xs:string" minOccurs="0"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:service name="TCSSOAPEMFListener">
+        <wsdl:port name="SOAPListener" binding="tns:SOAPListenerBinding">
+            <soap:address location="http://localhost:9214/ListenerServices/SOAP/Listener/TCSSOAPEMFListener"/>
+        </wsdl:port>
+    </wsdl:service>
+    <wsdl:portType name="ReceiverSoap">
+        <wsdl:operation name="Operation">
+            <wsdl:input message="tns:RequestMessage"/>
+            <wsdl:output message="tns:ResponseMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="SOAPListenerBinding" type="tns:ReceiverSoap">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="Operation">
+            <soap:operation style="document" soapAction="/ListenerServices/SOAP/Listener"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:message name="RequestMessage">
+        <wsdl:part name="parameters" element="ns0:SoapService"/>
+    </wsdl:message>
+    <wsdl:message name="ResponseMessage">
+        <wsdl:part name="parameters" element="ns0:SoapService"/>
+    </wsdl:message>
+</wsdl:definitions>

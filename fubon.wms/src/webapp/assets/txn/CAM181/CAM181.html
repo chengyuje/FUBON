@@ -1,0 +1,277 @@
+<style>
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.CAM181ToolTip .tooltip-inner {
+	max-width: 350px !important;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/CAM180/CAM180.js"></script>
+<script type="text/javascript" src="assets/txn/CAM181/CAM181.js"></script>
+<div class="CAM181" ng-controller="CAM181Controller" ng-cloak>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="tfb_content">
+        		<div class="tfb_content_icon"></div>
+        		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >名單訪談紀錄下載</div>
+      		</div>
+			<div class="panel_content">
+				<h4 class="h4-title">查詢條件</h4>
+	       		<div class="search_table search_box2 scroll_y">
+					<form name="parameterTypeEditForm" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+						<table>
+							<tr>
+								<th>名單執行理專：</th>
+								<td>
+									<e-combobox id="pCode" name="pCode"
+												ng-datasource="mappingSet['UHRM_LIST']"
+												ng-model="inputVO.pCode"
+												ng-validate="false" 
+												ng-disabled="mappingSet['UHRM_LIST'].length == 2 && priID != 'UHRM012'"
+												ng-readonly="mappingSet['UHRM_LIST'].length == 2 && priID != 'UHRM012'" 
+												ng-editable="false"
+												ng-format="F1"
+												style="line-height:20px;" />
+								</td>
+								<th></th>
+								<td></td>
+							</tr>
+							<tr>
+								<th>客戶ID：</th>
+								<td><input type="text" class="form-control" placeholder="請輸入..." id="id" name="id" style="text-transform: uppercase;" ng-model="inputVO.id" e-length-limit="25"></td>
+								<th>名單名稱：</th>
+								<td><input type="text" class="form-control" placeholder="請輸入..." id="name" name="name" ng-model="inputVO.name" e-length-limit="25"></td>
+							</tr>
+							<tr>
+								<th>*名單來源：</th>
+								<td>
+									<e-combobox id="from" name="from" 
+									ng-paramtype="CAM.CAM_CATEGORY"
+									ng-model="inputVO.from"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									style="line-height:20px;" />
+								</td>
+								<th>名單維護者：</th>
+								<td><input type="text" class="form-control" placeholder="請輸入..." id="modifier" name="modifier" ng-model="inputVO.modifier" e-length-limit="25"></td>
+							</tr>
+							<tr ng-show="parameterTypeEditForm.from.$error.required">
+								<th></th>
+								<td class="with-errors">請選擇名單來源</td>
+								<th></th>
+								<td></td>
+							</tr>
+							<tr>
+								<th>*名單建立日期：</th>
+								<td>
+									<div class="form-group">
+										<div class="input-group datebox datewidth">
+											<input type="text" id="sDate" name="sDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.sDate"
+											is-open="model.a"
+											datepicker-options="sDateOptions"
+											ng-readonly="true"
+											show-button-bar="true"
+											ng-change="limitDate()"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+												<i class="glyphicon glyphicon-calendar"></i></button>
+											</span>
+										</div>
+										<div style="float: left !important;">～</div>
+										<div class="input-group datebox datewidth">
+											<input type="text" id="eDate" name="eDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.eDate"
+											is-open="model.b"
+											datepicker-options="eDateOptions"
+											ng-readonly="true"
+											show-button-bar="true"
+											ng-change="limitDate()"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+												<i class="glyphicon glyphicon-calendar"></i></button>
+											</span>
+										</div>
+									</div>
+								</td>
+								<th>*名單維護日期：</th>
+								<td>
+									<div class="form-group">
+										<div class="input-group datebox datewidth">
+											<input type="text" id="sEDate" name="sEDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.sEDate"
+											is-open="model.c"
+											datepicker-options="sEDateOptions"
+											ng-readonly="true"
+											show-button-bar="true"
+											ng-change="limitEDate()"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+												<i class="glyphicon glyphicon-calendar"></i></button>
+											</span>
+										</div>
+										<div style="float: left !important;">～</div>
+										<div class="input-group datebox datewidth">
+											<input type="text" id="eEDate" name="eEDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.eEDate"
+											is-open="model.d"
+											datepicker-options="eEDateOptions"
+											ng-readonly="true"
+											show-button-bar="true"
+											ng-change="limitEDate()"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+												<i class="glyphicon glyphicon-calendar"></i></button>
+											</span>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr ng-show="date">
+								<th></th>
+								<td class="with-errors" colspan="3">請至少選擇一日期</td>
+							</tr>
+							<tr>
+								<th class="with-errors" style="white-space: pre-line;" colspan="4">
+									提示：
+									1.提供最近一年的交易明細查詢，若您欲查詢超過一年之交易明細，煩請分次查詢，例如：欲查詢{{nowDate.getFullYear()}}年1月1日起之資料，迄日最多可輸入{{nowDate.getFullYear()}}年12月31日，其後資料請分次查詢。
+									2.星號(*)欄位必須輸入
+									3.「名單建立日期」與「名單維護日期」需擇一輸入
+								</th>
+							</tr>
+						</table>
+					</form>
+	       		</div>
+	       		<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire(tabType)" function-type="query" ng-show="tabType==0">查詢(五年內)</button>
+					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire(tabType)" function-type="query" ng-show="tabType==1">查詢(五年前)</button>
+					<button type="button" class="btn btn-info" ng-click="download()" function-type="export" ng-disabled="totalList.length == 0">下載</button>
+					<button type="button" class="btn btn-info" ng-click="init();inquireInit();">清除</button>
+				</div>
+				<uib-tabset active="0" justified="true">
+					<uib-tab index="0" heading="近五年訪談記錄區" select="init();inquireInit();setTabType(0);">
+						<div id="tab1">
+			        		<h4 class="h4-title">查詢結果</h4>
+				          	<e-jumping-once output="outputVO" list="paramList" totallist="totalList"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="table table-bordered td_center">
+									<thead>
+										<tr>
+											<th>歸屬行</th>
+											<th>客戶統一編號</th>
+											<th>客戶姓名</th>
+											<th>客戶AOCode</th>
+											<th>目前UHRM</th>
+											<th>名單狀態</th>
+											<th>名單名稱</th>
+											<th>聯繫方式</th>
+											<th>通知客戶內容</th>
+											<th>客戶回應內容</th>
+											<th>聯繫日期</th>
+											<th>名單維護者</th>
+											<th>名單維護時間</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.DEPT_NAME}}</td>
+											<td>{{row.CUST_ID}}</td>
+											<td>{{row.CUST_NAME}}</td>
+											<td>{{row.CAO_CODE}}</td>
+											<td>{{row.CU_EMP_ID}}</td>
+											<td>{{row.RESPONSE_NAME}}</td>
+											<td>{{row.LEAD_NAME}}</td>
+											<td>{{row.CMU_TYPE | mapping:mappingSet['CAM.VST_REC_CMU_TYPE']:'F3'}}</td>
+											<td>
+												<div uib-tooltip="{{row.VISIT_MEMO}}" tooltip-placement="auto right" tooltip-append-to-body="true" tooltip-class="CAM180ToolTip">
+													{{row.VISIT_MEMO.length > 40 ? (row.VISIT_MEMO | limitTo: 40) + "..." : row.VISIT_MEMO}}
+												</div>
+											</td>
+											<td>
+												<div uib-tooltip="{{row.VISIT_CREPLY}}" tooltip-placement="auto right" tooltip-append-to-body="true" tooltip-class="CAM180ToolTip">
+													{{row.VISIT_CREPLY.length > 40 ? (row.VISIT_CREPLY | limitTo: 40) + "..." : row.VISIT_CREPLY}}
+												</div>
+											</td>
+											<td>{{toJsDate(row.VISIT_DT) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+											<td>{{row.MODIFIER}}</td>
+											<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</uib-tab> 
+					<uib-tab index="1" heading="歷史訪談記錄查詢區" select="init();inquireInit();setTabType(1);">
+						<div id="tab2">
+			       		 	<h4 class="h4-title">查詢結果</h4>
+				          	<e-jumping-once output="outputVO" list="paramList" totallist="totalList"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="table table-bordered td_center">
+									<thead>
+										<tr>
+											<th>歸屬行</th>
+											<th>客戶統一編號</th>
+											<th>客戶姓名</th>
+											<th>客戶AOCode</th>
+											<th>目前UHRM</th>
+											<th>名單狀態</th>
+											<th>名單名稱</th>
+											<th>聯繫方式</th>
+											<th>通知客戶內容</th>
+											<th>客戶回應內容</th>
+											<th>聯繫日期</th>
+											<th>名單維護者</th>
+											<th>名單維護時間</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.DEPT_NAME}}</td>
+											<td>{{row.CUST_ID}}</td>
+											<td>{{row.CUST_NAME}}</td>
+											<td>{{row.CAO_CODE}}</td>
+											<td>{{row.CU_EMP_ID}}</td>
+											<td>{{row.RESPONSE_NAME}}</td>
+											<td>{{row.LEAD_NAME}}</td>
+											<td>{{row.CMU_TYPE | mapping:mappingSet['CAM.VST_REC_CMU_TYPE']:'F3'}}</td>
+											<td>
+												<div uib-tooltip="{{row.VISIT_MEMO}}" tooltip-placement="auto right" tooltip-append-to-body="true" tooltip-class="CAM180ToolTip">
+													{{row.VISIT_MEMO.length > 40 ? (row.VISIT_MEMO | limitTo: 40) + "..." : row.VISIT_MEMO}}
+												</div>
+											</td>
+											<td>
+												<div uib-tooltip="{{row.VISIT_CREPLY}}" tooltip-placement="auto right" tooltip-append-to-body="true" tooltip-class="CAM180ToolTip">
+													{{row.VISIT_CREPLY.length > 40 ? (row.VISIT_CREPLY | limitTo: 40) + "..." : row.VISIT_CREPLY}}
+												</div>
+											</td>
+											<td>{{toJsDate(row.VISIT_DT) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+											<td>{{row.MODIFIER}}</td>
+											<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</uib-tab>
+				</uib-tabset>
+			</div>
+		</div>        		
+	</div>
+</div>

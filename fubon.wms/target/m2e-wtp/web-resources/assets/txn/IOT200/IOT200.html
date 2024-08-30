@@ -1,0 +1,234 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT200/IOT200.js"></script>
+<script type="text/javascript" src="assets/txn/IOT200/IOT200_EXPORT.js"></script>
+<div class="IOT200" ng-controller="IOT200Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon" style="left:400px"></div>
+			<div class="tfb_content_tit" style="width:400px"><img src="assets/images/icon/tfb_icon_a15.gif" >電子要保書公會通報送件查詢</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">區別：</th>
+						<td ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="areaID" name="areaID"
+										ng-datasource="mappingSet['op']"
+										ng-model="inputVO.areaID"
+										ng-validate="false"
+										ng-disabled="area_list.length == 1"
+										ng-readonly="area_list.length == 1"
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="areaChange()"
+										style="line-height:20px;" />
+						</td>
+						<th ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">業務處：</th>
+						<td ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-paramtype="PMS.UHRM_RC"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeRegion()"
+										style="line-height:20px;" />
+						</td>			
+						<th><span ng-if="inputVO.caseID == '' && inputVO.custID == '' && inputVO.insuredID == '' && inputVO.insPrdID == ''">*</span>申請日期查詢：</th>
+						<td colspan="3">
+							<div class="input-group datebox datewidth" style="float:left">
+								<input 	type="text" id="sApplyDate" name="sApplyDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sApplyDate"
+										is-open="model.a"
+										datepicker-options="bgn_sDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate();dateChange();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+							<div style="float:left">&nbsp; ～ &nbsp;</div>
+							<div class="input-group datebox datewidth" style="float:left">
+								<input 	type="text" id="eApplyDate" name="eApplyDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.eApplyDate"
+										is-open="model.b"
+										datepicker-options="bgn_eDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate();dateChange();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">分行：</th>
+						<td ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="branchID" name="branchID"
+										ng-datasource="mappingSet['branch']"
+										ng-model="inputVO.branchID"
+										ng-validate="false"
+										ng-disabled="bra_list.length == 1"
+										ng-readonly="bra_list.length == 1"
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
+						<th ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">業務中心：</th>
+						<td ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-paramtype="PMS.UHRM_OP"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeArea()"
+										style="line-height:20px;" />
+						</td>
+						<th><span ng-show="inputVO.sApplyDate == undefined && inputVO.eApplyDate == undefined"></span>要保人ID：</th>
+						<td>
+							<input type="text" class="form-control" ng-model="inputVO.custID" style="text-transform: uppercase;width:180px;" ng-blur="text_toUppercase(inputVO.custID,'custID')">
+						</td>
+					</tr>
+					<tr>
+						<th><span ng-show="inputVO.sApplyDate == undefined && inputVO.eApplyDate == undefined">*</span>案件編號：</th>
+						<td>
+							<input type="text" class="form-control" ng-model="inputVO.caseID" style="text-transform: uppercase;width:180px;" ng-blur="text_toUppercase(inputVO.caseID,'caseID')">
+						</td>
+						<th><span ng-show="inputVO.sApplyDate == undefined && inputVO.eApplyDate == undefined">*</span>被保人ID：</th>
+						<td>
+							<input type="text" class="form-control" ng-model="inputVO.insuredID" style="text-transform: uppercase;width:180px;" ng-blur="text_toUppercase(inputVO.insuredID,'insuredID')">
+						</td>
+					</tr>
+					<tr>
+						<th>案件狀態：</th>
+						<td>
+							<e-combobox id="status" name="status"
+										ng-datasource="mappingSet['IOT.MAPP_STATUS']"
+										ng-model="inputVO.status"
+										ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F3"
+										width="150px"
+										style="line-height:20px;" />
+						</td>
+						<th><span ng-show="inputVO.sApplyDate == undefined && inputVO.eApplyDate == undefined">*</span>險種代碼：</th>
+						<td>
+							<input type="text" class="form-control" ng-model="inputVO.insPrdID" style="text-transform: uppercase;width:180px;" ng-blur="text_toUppercase(inputVO.insPrdID,'insPrdID')">
+						</td>
+					</tr>
+				</table>
+				</form>
+			</div>
+			<!-- 改自CRM3101， -->
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="queryData()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="uploadFile()" function-type="maintenance">選擇上傳檔案</button>
+				<button type="button" class="btn btn-info" ng-click="downloadExm()" function-type="export">下載範例</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+				<table class="table-bordered middle">
+					<thead>
+						<tr>
+							<th>案件來源</th>
+							<th>建檔日期</th>
+							<th>申請日期</th>
+							<th>案件編號</th>
+							<th>保險文件編號</th>
+							<th>案件狀態</th>
+							<th>要保人ID</th>
+							<th>要保人姓名</th>
+							<th>被保人ID</th>
+							<th>被保人姓名</th>
+							<th>幣別</th>
+							<th>主約險種代碼</th>
+							<th>繳別</th>
+							<th>保費</th>
+							<th>業務員姓名</th>
+							<th>分行代碼</th>
+							<th>傳送完成日期時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.CASE_SOU}}</td>
+							<td>{{toJsDate(row.KEYIN_DATE) | date:'yyyy-MM-dd'}}</td>
+							<td>{{toJsDate(row.APPLY_DATE) | date:'yyyy-MM-dd'}}</td>
+							<td>{{row.CASE_ID}}</td>
+							<td>{{row.INS_ID}}</td>
+							<td>{{row.FINAL_STATUS | mapping:mappingSet['IOT.MAPP_STATUS']:'F3'}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.PROPOSER_NAME}}</td>
+							<td>{{row.INSURED_ID}}</td>
+							<td>{{row.INSURED_NAME}}</td>
+							<td>{{row.CURR_CD}}</td>
+							<td>{{row.INSPRD_ID}}</td>
+							<td>{{row.PAY_TYPE}}</td>
+							<td>{{row.REAL_PREMIUM}}</td>
+							<td>{{row.SALES_NAME}}</td>
+							<td>{{row.BRANCH_NBR}}</td>
+							<td>{{toJsDate(row.SEND_DATETIME) | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

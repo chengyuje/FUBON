@@ -1,0 +1,647 @@
+<style>
+.modal-dialog.CRM990_MAINTAIN{
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 90%;
+	height: 720px;
+}
+
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+
+/* input:required:invalid{ */
+/*  	border-color: red; */
+/* } */
+	
+</style>
+<script type="text/javascript" src="assets/txn/CRM990/CRM990_MAINTAIN.js"></script>
+<script type="text/javascript" src="assets/txn/CRM990/CRM990_NEXT.js"></script>
+<script type="text/javascript" src="assets/txn/CRM990/CRM990_REJECT.js"></script>
+<div ng-controller="CRM990_MAINTAINController" ng-cloak>
+	<div class="modal-dialog CRM990_MAINTAIN" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="stopTimeout(); closeThisDialog('cancel');">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">客訴管理</h4>
+			</div>
+		    <!--Content of the panel-->
+		    <div class="modal-body">
+		    	<div class="gv_tab_sc scroll_y">
+		    		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+
+		    		<div style="margin-bottom: 1%; margin-left: 1%;">
+		    			案件分流<span style="color:red;">*</span>&nbsp;&nbsp;&nbsp;&nbsp;
+		    			<label><input type="radio" ng-model="inputVO.case_type" value="FM" ng-disabled="lock">理財客訴&nbsp;&nbsp;</label>
+		    			<label><input type="radio" ng-model="inputVO.case_type" value="OP" ng-disabled="lock">作業客訴&nbsp;&nbsp;</label>
+		    			<label><input type="radio" ng-model="inputVO.case_type" value="CF" ng-disabled="lock">授信客訴&nbsp;&nbsp;</label>
+		    			<label><input type="radio" ng-model="inputVO.case_type" value="OTH" ng-disabled="lock">其他客訴</label>
+		    		</div>
+		    		<div>
+						<div class="col-md-1">專員員編</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" 
+								id="emp_id" name="emp_id" 
+								ng-model="inputVO.emp_id"
+								ng-disabled="lock"
+								ng-blur="getEmpInfoById()" 
+								maxlength="6" size="10" />
+						</div>
+						<div class="col-md-1">專員姓名</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" 
+								id="emp_name" name="emp_name" 
+								ng-model="inputVO.emp_name"
+								ng-disabled="lock"
+								maxlength="20" size="10" />
+						</div>						
+		    		</div>
+		    		</br></br>
+		    		<div>
+						<div class="col-md-1">AO Code</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" 
+								id="ao_code" name="ao_code"
+								ng-model="inputVO.ao_code" 
+								ng-disabled="lock"
+								ng-blur="getEmpInfoByAo()"
+								maxlength="3" size="10" />
+						</div>
+						<div class="col-md-1">是否在職</div>
+						<div class="col-md-3 tdpadding">
+							<e-combobox id="service_yn" name="service_yn"
+									ng-paramtype="COMMONS.ISUSE"
+									ng-model="inputVO.service_yn"
+									ng-readonly="lock"
+									ng-disabled="lock"
+									ng-format="F3"
+									style="line-height:20px;" />	
+						</div>						
+		    		</div>
+		    		</br></br>
+		    		<table>
+						<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">一、客戶基本資料</th>
+						</tr>
+						<tr>
+		    				<td>客戶統編</td>
+		    				<td>
+		    					<input class="form-control" type="text" 
+		    						id="cust_id" name="cust_id"
+									ng-model="inputVO.cust_id"
+									ng-focus="tagCustID()"
+									ng-blur="getCustData(); getHisComInfo();"
+									ng-disabled="lock"
+									style="text-transform:uppercase;"
+									maxlength="10"
+									size="10"/>
+		    				</td>
+		    				<td>客戶姓名<span style="color:red;">*</span></td>
+		    				<td>
+								<input class="form-control" type="text" 
+									id="cust_name"name="cust_name" 
+									ng-model="inputVO.cust_name"
+									ng-disabled="lock"
+									ng-required="true"
+									maxlength="10" />
+							</td>
+		    			</tr>
+		    			<tr>
+		    				<td>    					
+		    					<span>出生年月日(西元)</span>
+		    				</td>
+		    				<td>
+		    					<div class="input-group datebox datewidth">
+									<input type="text" id="birthday" name="birthday"
+										class="form-control" 
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.birthdate" 
+										ng-readonly="true"
+										is-open="model.c"
+										datepicker-options="birthdayOptions"  />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'c')" 
+											ng-disabled="lock">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+		    				</td>
+		    				<td>
+		    					<span>職業別</span>
+		    				</td>
+		    				<td>
+		    					<input class="form-control" type="text" 
+									id="occup"name="occup" 
+									ng-model="inputVO.occup"
+									ng-disabled="lock"
+									maxlength="10" />
+									
+								<!-- <e-combobox id="occup" name="occup"
+									ng-paramtype="KYC.CAREER"
+									ng-model="inputVO.occup" 
+									ng-validate="false" 
+									ng-disabled="lock"
+									ng-readonly="lock"
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="false" 
+									style="line-height:20px;" /> -->
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>    					
+		    					<span>聯絡電話</span>
+		    				</td>
+		    				<td>
+								<input class="form-control" type="text" 
+									id="phone" name="phone"
+									ng-model="inputVO.phone"
+									ng-disabled="lock"
+									e-input-limit="N" 
+									maxlength="20" size="10" />
+		    				</td>
+		    				<td>
+		    					<span>學歷</span>
+		    				</td>
+		    				<td>
+		    					<e-combobox id="education" name="education"
+									ng-paramtype="CRM.EDUCATION_STAT"
+									ng-model="inputVO.education" 
+									ng-validate="false" 
+									ng-disabled="lock"
+									ng-readonly="lock" 
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="false" 
+									style="line-height:20px;" />
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>    					
+		    					<span>開戶日期</span>
+		    				</td>
+		    				<td>
+		    					<div class="input-group datebox datewidth">
+									<input type="text" class="form-control"
+										id="open_acc_date" name="open_acc_date"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.open_acc_date" 
+										ng-readonly="true" 
+										is-open="model.d"
+										datepicker-options="open_acc_dateOptions"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'d')" 
+											ng-disabled="lock">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+		    				</td>
+		    				<td>
+		    					<span>總往來資產AUM</span>
+		    				</td>
+		    				<td>
+		    					<input class="form-control" type="text" 
+		    						id="total_asset" name="total_asset" 
+		    						ng-model="inputVO.total_asset"
+		    						ng-disabled="lock"
+									e-input-limit="NC"
+									maxlength="15" size="10" />
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>    					
+		    					<span>是否寄送對帳單</span>
+		    				</td>
+		    				<td ng-show="inputVO.check_sheet == undefined || 
+		    							 (inputVO.check_sheet != '1' && inputVO.check_sheet != '2' && 
+		    							  inputVO.check_sheet != '3' && inputVO.check_sheet != '4')">
+		    					<e-combobox id="check_sheet" name="check_sheet"
+									ng-paramtype="CRM.BILLS_TYPE"
+									ng-model="inputVO.check_sheet" 
+									ng-validate="false" 
+									ng-disabled="lock"
+									ng-readonly="lock" 
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="false" 
+									style="line-height:20px;" />
+		    				</td>
+		    				<!-- For 舊資料使用 -->
+		    				<td ng-show="inputVO.check_sheet == '1' || inputVO.check_sheet == '2' || 
+		    							 inputVO.check_sheet == '3' || inputVO.check_sheet == '4'">
+		    					<e-combobox id="check_sheet" name="check_sheet"
+									ng-paramtype="CRM.CHECK_SHEET"
+									ng-model="inputVO.check_sheet" 
+									ng-validate="false" 
+									ng-disabled="lock"
+									ng-readonly="lock" 
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="false" 
+									style="line-height:20px;" />
+		    				</td>
+		    				<td>
+		    					<span></span>
+		    				</td>
+		    				<td></td>
+		    			</tr>
+					</table>
+					<table>
+						<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">二、客訴資訊</th>
+						</tr>
+						<tr>
+		    				<td>分行別<span style="color:red;">*</span></td>
+		    				<td>
+		    					<e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="AVAIL_BRANCH.length == 1 || lock"
+									ng-readonly="AVAIL_BRANCH.length == 1 || lock" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="true"
+									ng-change="changeBranch()"
+									style="line-height:20px;" />
+		    				</td>
+		    				<td ng-show="priID >= 041">發生日期<span style="color:red;">*</span></td>
+		    				<td ng-show="priID >= 041">
+		    					<div class="input-group datebox datewidth">
+									<input type="text" class="form-control" 
+										id="happen_date" name="happen_date"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.happen_date" 
+										ng-readonly="true"
+										ng-change="getMaxEndDate()"
+										is-open="model.a"
+										datepicker-options="happen_dateOptions"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'a')" 
+											ng-disabled="act == 'detail'"> 
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+		    				</td>
+		    				<td ng-show="inputVO.grade == '1' || inputVO.grade == '2' || 
+		    					(inputVO.grade == '3' && priID >= 041) || 
+		    					(is806 == true && inputVO.grade != undefined && inputVO.grade != '')">結案日期</td>
+		    					
+		    				<td ng-show="inputVO.grade == '1' || inputVO.grade == '2' || 
+		    					(inputVO.grade == '3' && priID >= '041') || 
+		    					(is806 == true && inputVO.grade != undefined && inputVO.grade != '')">
+		    					
+								<div class="col-md-3 tdpadding">
+									<div class="input-group datebox datewidth">
+										<input type="text" class="form-control" 
+											id="end_date" name="end_date"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.end_date" 
+											ng-readonly="true"
+											is-open="model.b"
+											datepicker-options="end_dateOptions"/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default"
+												ng-click="open($event,'b')"
+												ng-disabled="act == 'detail'">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+											
+										</span>
+									</div>
+								</div>
+		    				</td>
+		    			</tr>
+					    <tr>
+		    				<td>等級<span style="color:red;">*</span></td>
+		    				<td>
+								<e-combobox id="grade" name="grade"
+									ng-paramtype="CRM.COMPLAIN_GRADE"
+									ng-model="inputVO.grade" 
+									ng-validate="false" 
+									ng-readonly="lock || gradeCtrl"
+									ng-disabled="lock || gradeCtrl"
+									ng-format="F3" 
+									ng-required="true" 
+									ng-change="changeGrade()"
+									style="line-height:20px;" />		    					
+		    				</td>
+		    				<td>客訴來源<span style="color:red;">*</span></td>
+		    				<td>
+		    					<e-combobox id="complain_source" name="complain_source"
+		    					    ng-datasource="mappingSet['COMPLAIN_SOURCE']"
+									ng-model="inputVO.complain_source" 
+									ng-validate="false" 
+									ng-change="ctrlGrade()"
+									ng-readonly="lock"
+									ng-disabled="lock"
+									ng-format="F3"
+									ng-required="false" 
+									style="line-height:20px;" />
+		    				</td>
+		    				<td>客訴類型<span style="color:red;">*</span></td>
+		    				<td>
+		    					<e-combobox id="complain_type" name="complain_type"
+									ng-paramtype="CRM.COMPLAIN_TYPE"
+									ng-model="inputVO.complain_type" 
+									ng-change="ctrlGrade()"
+									ng-validate="false"
+									ng-readonly="lock"
+									ng-disabled="lock"
+									ng-format="F3"
+									ng-required="false" 
+									style="line-height:20px;" />
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>客訴摘要<span style="color:red;">*</span></span></td>
+		    				<td colspan="3">
+		    					<textarea name="complain_summary" id="complain_summary"
+									placeholder="請輸入..." 
+									class="form-control" maxlength="150" rows="5"
+									ng-model="inputVO.complain_summary"
+									ng-disabled="lock"
+									ng-change="checkLenght('complain_summary', 'summary_lenght', '150');"
+									ng-required="true">
+								</textarea>
+								<div style="float: left !important" ng-bind="'剩餘字數:' + summary_lenght"></div>
+<!-- 								</br> -->
+<!-- 								<div class="col-md-3 tdpadding" ng-if="complainSourceFlag"> -->
+<!-- 									<input class="form-control" type="text"  -->
+<!-- 										id="otherSource" name="otherSource"  -->
+<!-- 										ng-model="inputVO.otherSource"  -->
+<!-- 										placeholder="其他客訴來源..."  -->
+<!-- 										maxlength="10" size="10" /> -->
+<!-- 								</div> -->
+		    				</td>
+		    			</tr>
+					    <tr>
+		    				<td>客訴商品<span style="color:red;">*</span></td>
+		    				<td>
+								<input class="form-control" type="text" 
+									id="complain_product" name="complain_product" 
+									ng-model="inputVO.complain_product"
+									ng-disabled="lock"
+									maxlength="33" size="15" />   					
+		    				</td>
+		    				<td>客訴商品幣別</td>
+		    				<td>
+		    					<input class="form-control" type="text"
+									id="complain_product_currency" name="complain_product_currency"
+									ng-model="inputVO.complain_product_currency"
+									ng-disabled="lock"
+									maxlength="10" size="10" />
+		    				</td>
+		    				<td>客訴商品金額</td>
+		    				<td>
+		    					<input class="form-control" type="text"
+									id="complain_product_amoun" name="complain_product_amoun"
+									ng-model="inputVO.complain_product_amoun"
+									ng-disabled="lock"
+									e-input-limit="NC" 
+									maxlength="20" size="10" />
+		    				</td>
+		    			</tr>
+					    <tr>
+		    				<td>申購日期</td>
+		    				<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" class="form-control" 
+										id="buy_date" name="buy_date"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.buy_date" 
+										ng-readonly="true" 
+										is-open="model.e"
+										datepicker-options="buy_dateOptions"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'e')" 
+											ng-disabled="lock">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>  					
+		    				</td>
+		    				<td>上傳招攬/事件報告書</td>
+		    				<td>
+								<div>
+									<e-upload id="upload_file" 
+										success="uploadReport(name,rname)" 
+										text="上傳"
+										accept=".pdf"
+										ng-disabled="act == 'detail'"></e-upload>
+								</div>
+								<div style="padding-top: 10px;" ng-show="reportName != ''">
+									<a href="#" ng-click="reportView()">{{reportName}}</a>&nbsp;
+									<!-- 刪除 -->
+									<a href="#" data-toggle="modal" class="btn btn-warning btn-circle" ng-click="deleteReport()">
+		              					<i class="glyphicon glyphicon-trash"></i>
+		              				</a>
+								</div>
+							</td>
+		    			</tr>
+					</table>
+					<table>
+						<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">三、往來商品項目</th>
+						</tr>
+						<tr>
+		    				<td>銀行往來商品項目</td>
+		    				<td>
+		    					<input class="form-control" type="text" 
+		    						id="buy_product_type" name="buy_product_type" 
+		    						ng-model="inputVO.buy_product_type"
+		    						ng-disabled="lock"
+									maxlength="16" size="15" />
+		    				</td>
+		    				<td>加附投資明細損益表 *.xls</td>
+		    				<td>
+								<div>
+									<e-upload id="upload_file" success="uploadFinshed(name,rname)" text="上傳" accept=".xls" ng-disabled="lock"></e-upload>
+								</div>
+								<div ng-if="inputVO.upload_file">
+									<button type="button" class="btn btn-default" ng-click="downloadFile()">下載檔案</button>
+								</div>
+							</td>
+		    			</tr>
+					</table>
+		    		<table>
+		    			<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">四、問題實況<span style="color:red;">*</span></th>
+						</tr>
+		    			<tr>
+							<td>
+								<textarea class="form-control" rows="5" maxlength="800"
+									name="problem_describe" id="problem_describe"
+									placeholder="請輸入..." 
+									ng-model="inputVO.problem_describe"
+									ng-disabled="lock"
+									ng-change="checkLenght('problem_describe', 'problem_lenght', '800');"
+									ng-required>
+	                    		</textarea>
+								<div style="float: left !important" ng-bind="'剩餘字數:' + problem_lenght"></div>
+							</td>
+		    			</tr>
+		    		</table>
+		    		<table>
+		    			<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">五、客戶訴求<span style="color:red;">*</span></th>
+						</tr>
+		    			<tr>
+							<td>
+								<textarea class="form-control" rows="5" maxlength="500"
+									id="cust_describe" name="cust_describe"
+									placeholder="請輸入..." 
+									ng-model="inputVO.cust_describe"
+									ng-disabled="lock"
+									ng-change="checkLenght('cust_describe', 'cust_describe_lenght', '500');"
+									ng-required>
+	                    		</textarea>
+								<div style="float: left !important" ng-bind="'剩餘字數:' + cust_describe_lenght"></div>
+							</td>
+		    			</tr>
+		    		</table>
+		    		<table ng-show="priID >= '041' || (is806 == false && inputVO.grade != undefined) || 
+		    						(is806 == true && inputVO.grade != undefined && 
+		    						 inputVO.branch_nbr != undefined && inputVO.branch_nbr != '')">
+		    			<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">六、第一級處理情形</th>
+						</tr>
+		    			<tr>
+							<td>
+								<textarea class="form-control" rows="5" maxlength="800"
+									id="handle_condition1" name="handle_condition1"
+									placeholder="請輸入..." 
+									ng-model="inputVO.handle_condition1"
+									ng-change="checkLenght('handle_condition1', 'condition1_lenght', '800');"
+									ng-disabled="lockCondition"
+									ng-blur="syncHandler(1, inputVO.handle_condition1)"
+									ng-required>
+	                    		</textarea>
+								<div style="float: left !important" ng-bind="'剩餘字數:' + condition1_lenght"></div>
+							</td>
+		    			</tr>
+		    		</table>
+		    		<table ng-show="priID >= '041' || (is806 == false && inputVO.grade != undefined && inputVO.grade != '1') ||
+		    						(is806 == true && inputVO.grade != undefined && inputVO.grade != '1' && 
+		    						 inputVO.branch_nbr != undefined && inputVO.branch_nbr != '')">
+		    			<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">七、第二級處理情形</th>
+						</tr>
+		    			<tr>
+							<td>
+							<textarea class="form-control" rows="5" maxlength="500"
+								name="handle_condition2" id="handle_condition2"
+								placeholder="請輸入..." 
+								ng-model="inputVO.handle_condition2"
+								ng-change="checkLenght('handle_condition2', 'condition2_lenght', '500');"
+								ng-disabled="lockCondition"
+								ng-blur="syncHandler(2, inputVO.handle_condition2)"
+								ng-required>
+                    		</textarea>
+							<div style="float: left !important" ng-bind="'剩餘字數:' + condition2_lenght"></div>
+							</td>
+		    			</tr>
+		    		</table>
+		    		<table ng-show="priID >= '041' || (is806 == false && inputVO.grade != undefined && inputVO.grade == '3') ||
+		    						(is806 == true && inputVO.grade != undefined && inputVO.grade == '3' && 
+		    						 inputVO.branch_nbr != undefined && inputVO.branch_nbr != '')">
+		    			<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">八、第三級處理情形</th>
+						</tr>
+		    			<tr>
+							<td>
+								<textarea class="form-control" rows="5" maxlength="500"
+									name="handle_condition3" id="handle_condition3"
+									placeholder="請輸入..." 
+									ng-model="inputVO.handle_condition3"
+									ng-change="checkLenght('handle_condition3', 'condition3_lenght', '500');"
+									ng-disabled="lockCondition"
+									ng-blur="syncHandler(3, inputVO.handle_condition3)"
+									ng-required>
+                    			</textarea>
+								<div style="float: left !important" ng-bind="'剩餘字數:' + condition3_lenght"></div>
+							</td>
+		    			</tr>
+		    		</table>
+		    		<table ng-show="priID >= '041' || (inputVO.grade != undefined && inputVO.grade == '3' && is806 == false)">
+		    			<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">九、總行處理情形</th>
+						</tr>
+		    			<tr>
+							<td>
+								<textarea class="form-control" rows="5" maxlength="1000"
+									name="handle_condition4" id="handle_condition4"
+									placeholder="請輸入..."
+									ng-model="inputVO.handle_condition4"
+									ng-change="checkLenght('handle_condition4', 'condition4_lenght', '1000');"
+									ng-disabled="lockCondition || priID < '041'"
+									ng-blur="syncHandler(4, inputVO.handle_condition4)"
+									ng-required>
+                    			</textarea>
+								<div style="float: left !important" ng-bind="'剩餘字數:' + condition4_lenght"></div>
+							</td>
+		    			</tr>
+		    			<tr ng-show="priID >= '041'">
+							<td>
+								是否符合公平待客原則？<span style="color:red;">*</span>&nbsp;&nbsp;
+								<label><input type="radio" ng-model="inputVO.treat_cust_fairly" value="Y" ng-disabled="lockCondition">是&nbsp;&nbsp;</label>
+			    				<label><input type="radio" ng-model="inputVO.treat_cust_fairly" value="N" ng-disabled="lockCondition">否</label>
+							</td>
+						</tr>
+		    		</table>    			    		
+		    		</form>
+		    	</div>
+		    	</br>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" 
+						ng-click="nextStep()" 
+						ng-show="act != 'detail' && !hideSaveAndSend">儲存並送出</button>
+						
+					<button type="button" class="btn btn-default" 
+						ng-click="save()" 
+						ng-show="act != 'detail' && !hideSave">儲存</button>
+						
+					<button type="button" class="btn btn-default" ng-click="stopTimeout(); closeThisDialog('cancel');" ng-show="act != 'detail'">取消</button>
+					
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" ng-show="act == 'detail'">關閉</button>
+						
+					<button type="button" class="btn btn-default" 
+						ng-click="backStep('one')" 
+						ng-hide="back_control || inputVO.grade == '1'">退回上一級</button>
+						
+					<button type="button" class="btn btn-default" 
+						ng-click="backStep('first')" 
+						ng-hide="back_control">退回第一級</button>
+						
+					<button type="button" class="btn btn-default" 
+						ng-click="deleteCase()" 
+						ng-show="role > '040'">刪除</button>
+					
+	<!-- 			<button type="button" class="btn btn-default" ng-click="tackBack()" ng-hide="tackBack_control">抽回</button> 2018.04.13與佩芬討論移除此功能。-->
+				</div>
+		    </div>
+		</div>
+	</div>
+</div>

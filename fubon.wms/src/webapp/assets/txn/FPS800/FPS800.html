@@ -1,0 +1,69 @@
+<style>
+  .FPS800 {
+    color: #666;
+  }
+
+  .FPS800 .ps {
+    float: right;
+    margin-bottom: 5px;
+  }
+
+</style>
+
+<!--
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript"
+        src="assets/txn/FPS810/FPS810.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS813/FPS813.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS814/FPS814.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS815/FPS815.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS816/FPS816.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS817/FPS817.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS818/FPS818.js"></script>
+
+<div class="FPS800">
+  <div ng-controller="FPS800Controller"
+       ng-cloak>
+    <uib-tabset active="tabSelected"
+                Justified="true">
+      <uib-tab index="0"
+               heading="理財規劃"
+               ng-if="roleType!='3'"
+               ng-click="tab('0')">
+      </uib-tab>
+      <uib-tab index="1"
+               heading="特定目的理財規劃"
+               ng-if="roleType=='3'"
+               ng-click="tab('1')">
+      </uib-tab>
+      <uib-tab index="2"
+               heading="非特定目的理財規劃"
+               ng-if="roleType=='3'"
+               ng-click="tab('2')">
+      </uib-tab>
+      <uib-tab index="3"
+               heading="進階查詢"
+               ng-click="tab('3')">
+      </uib-tab>
+    </uib-tabset>
+
+    <!-- content -->
+    <div ng-if="tabSelected===3&&roleType!=3"
+         style="padding: 1em 0;">
+      <button class="btn btn-info"
+              ng-click="tab('4')">理財規劃金額/手續費依商品查詢</button>
+      <button class="btn btn-info"
+              ng-click="tab('5')">目標理財規劃績效查詢</button>
+    </div>
+    <div ng-include="fps800Path"></div>
+
+  </div>
+</div>

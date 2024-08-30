@@ -1,0 +1,138 @@
+package com.systex.jbranch.app.common.fps.table;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import com.systex.jbranch.platform.common.dataaccess.vo.VOBase;;
+
+
+
+
+/** @Author : SystexDBTool CodeGenerator By LeoLin*/
+public class TBCRM_CUST_ASSET_PRINT_HISVO extends VOBase {
+
+    /** identifier field */
+    private com.systex.jbranch.app.common.fps.table.TBCRM_CUST_ASSET_PRINT_HISPK comp_id;
+
+    /** nullable persistent field */
+    private Timestamp APPLY_DATE;
+
+    /** nullable persistent field */
+    private String EMP_ID;
+
+    /** nullable persistent field */
+    private String EMP_NAME;
+
+    /** nullable persistent field */
+    private BigDecimal PRINT_COUNT;
+    
+    /** nullable persistent field */
+    private String EMP_BRA_NBR;
+
+public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBCRM_CUST_ASSET_PRINT_HIS";
+
+
+public String getTableuid () {
+    return TABLE_UID;
+}
+
+    /** full constructor */
+    public TBCRM_CUST_ASSET_PRINT_HISVO(com.systex.jbranch.app.common.fps.table.TBCRM_CUST_ASSET_PRINT_HISPK comp_id, Timestamp APPLY_DATE, String EMP_ID, String EMP_NAME, Timestamp createtime, String creator, String modifier, Timestamp lastupdate, Long version,BigDecimal PRINT_COUNT) {
+        this.comp_id = comp_id;
+        this.APPLY_DATE = APPLY_DATE;
+        this.EMP_ID = EMP_ID;
+        this.EMP_NAME = EMP_NAME;
+        this.createtime = createtime;
+        this.creator = creator;
+        this.modifier = modifier;
+        this.lastupdate = lastupdate;
+        this.version = version;
+        this.PRINT_COUNT = PRINT_COUNT;
+    }
+
+    /** default constructor */
+    public TBCRM_CUST_ASSET_PRINT_HISVO() {
+    }
+
+    /** minimal constructor */
+    public TBCRM_CUST_ASSET_PRINT_HISVO(com.systex.jbranch.app.common.fps.table.TBCRM_CUST_ASSET_PRINT_HISPK comp_id) {
+        this.comp_id = comp_id;
+    }
+
+    public com.systex.jbranch.app.common.fps.table.TBCRM_CUST_ASSET_PRINT_HISPK getcomp_id() {
+        return this.comp_id;
+    }
+
+    public void setcomp_id(com.systex.jbranch.app.common.fps.table.TBCRM_CUST_ASSET_PRINT_HISPK comp_id) {
+        this.comp_id = comp_id;
+    }
+
+    public Timestamp getAPPLY_DATE() {
+        return this.APPLY_DATE;
+    }
+
+    public void setAPPLY_DATE(Timestamp APPLY_DATE) {
+        this.APPLY_DATE = APPLY_DATE;
+    }
+
+    public String getEMP_ID() {
+        return this.EMP_ID;
+    }
+
+    public void setEMP_ID(String EMP_ID) {
+        this.EMP_ID = EMP_ID;
+    }
+
+    public String getEMP_NAME() {
+        return this.EMP_NAME;
+    }
+
+    public void setEMP_NAME(String EMP_NAME) {
+        this.EMP_NAME = EMP_NAME;
+    }
+
+    public void checkDefaultValue() {
+    }
+
+
+    public BigDecimal getPRINT_COUNT() {
+		return PRINT_COUNT;
+	}
+
+	public void setPRINT_COUNT(BigDecimal PRINT_COUNT) {
+		this.PRINT_COUNT = PRINT_COUNT;
+	}
+	
+    public String getEMP_BRA_NBR() {
+		return EMP_BRA_NBR;
+	}
+
+	public void setEMP_BRA_NBR(String eMP_BRA_NBR) {
+		EMP_BRA_NBR = eMP_BRA_NBR;
+	}
+
+	public String toString() {
+        return new ToStringBuilder(this)
+            .append("comp_id", getcomp_id())
+            .toString();
+    }
+
+    public boolean equals(Object other) {
+        if ( (this == other ) ) return true;
+        if ( !(other instanceof TBCRM_CUST_ASSET_PRINT_HISVO) ) return false;
+        TBCRM_CUST_ASSET_PRINT_HISVO castOther = (TBCRM_CUST_ASSET_PRINT_HISVO) other;
+        return new EqualsBuilder()
+            .append(this.getcomp_id(), castOther.getcomp_id())
+            .isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(getcomp_id())
+            .toHashCode();
+    }
+
+}

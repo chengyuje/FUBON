@@ -1,0 +1,197 @@
+<script type="text/javascript" src="assets/txn/REF150/REF150.js"></script>
+<div class="REF150" ng-controller="REF150Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr>
+						<th style="width: 16.6%;">業務處：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="regionID" name="regionID"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.regionID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width: 16.6%;">營運區：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="branchAreaID" name="branchAreaID"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branchAreaID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width: 16.6%;">分行：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="branchID" name="branchID"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branchID"
+									ng-validate="false" 
+									ng-disabled="AVAIL_BRANCH.length == 1"
+									ng-readonly="AVAIL_BRANCH.length == 1" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch(region)"
+									style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th style="width: 16.6%;"></th>
+						<td style="width: 16.6%;">
+						</td>
+						<th style="width: 16.6%;"><font style="color: red;">＊</font>案件年月(YYYYMM)：</th>
+						<td style="width: 16.6%;"><input type="text" class="form-control" placeholder="請輸入..." id="txnDate" name="txnDate" ng-model="inputVO.txnDate" e-length-limit="6"></td>
+						<th style="width: 16.6%;"><font style="color: red;">＊</font>轉介商品：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="refProd" name="refProd" 
+										ng-datasource="mappingSet['REF_RPOD']"
+										ng-model="inputVO.refProd"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="refProdChange()"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()" function-type="query" ng-disabled="(inputVO.txnDate == undefined || inputVO.txnDate == '' || inputVO.txnDate == null) ||
+																												 (inputVO.refProd == undefined || inputVO.refProd == '' || inputVO.refProd == null)">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" function-type="export" ng-disabled="resultList.length == 0">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="e-table-freeze" e-height="500px" e-left="4" e-list="resultList" e-mode="1" e-top="true" e-list="resultList" ng-show="inputVO.refProd == '5'">
+					<thead>
+						<tr>
+							<th colspan="4">轉介基本資料</th>
+							<th colspan="12">投保商品</th>
+						</tr>
+						<tr>
+							<th>轉介年月</th>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行名稱</th>
+							<th>每月<br />轉介目標參考件數</th>
+							<th>MTD<br />轉介件數</th>
+							<th>MTD<br />轉介件數達成率</th>
+							<th>每月<br />轉介成功目標件數</th>
+							<th>MTD<br />轉介成功件數</th>
+							<th>MTD<br />轉介成功件數達成率</th>
+							<th>年度<br />轉介目標參考件數</th>
+							<th>YTD<br />轉介件數</th>
+							<th>YTD<br />轉介件數達成率</th>
+							<th>年度<br />轉介成功目標件數</th>
+							<th>YTD<br />轉介成功件數</th>
+							<th>YTD<br />轉介成功件數達成率</th>
+						</tr>
+					</thead>
+					<tbody ng-show="resultList.length > 0">
+						<tr class="repeat-row" align="center" ng-repeat="row in resultList">
+							<td><div ng-if="row.BRANCH_AREA_NAME == null && row.BRANCH_NAME == null">{{row.TXN_DATE}}</div></td>
+							<td><div ng-if="row.BRANCH_AREA_NAME == null && row.BRANCH_NAME == null">{{row.CENTER_NAME}}</div></td>
+							<td><div ng-if="row.BRANCH_NAME == null">{{row.BRANCH_AREA_NAME}}</div></td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.REF_M_INV_AIMS_NUMBER}}</td>
+							<td>{{row.MTD_INV_TOT}}</td>
+							<td>{{row.REF_M_INV_RATE1}}&nbsp;%</td>
+							<td>{{row.REF_M_INV_SUCCESS_NUMBER}}</td>
+							<td>{{row.REF_MTD_INV_SUCCESS_NUMBER}}</td>
+							<td>{{row.REF_M_INV_RATE2}}&nbsp;%</td>
+							<td>{{row.REF_Y_INV_AIMS_NUMBER}}</td>
+							<td>{{row.YTD_INV_TOT}}</td>
+							<td>{{row.REF_Y_LOAN_RATE1}}&nbsp;%</td>
+							<td>{{row.REF_Y_INV_SUCCESS_NUMBER}}</td>
+							<td>{{row.REF_YTD_INV_SUCCESS_NUMBER}}</td>
+							<td>{{row.REF_Y_INV_RATE2}}&nbsp;%</td>
+						</tr>
+					</tbody>
+				</table>
+				<table class="e-table-freeze" e-height="500px" e-left="4" e-list="resultList" e-mode="1" e-top="true" ng-show="inputVO.refProd != '5'">
+					<thead>
+						<tr>
+							<th colspan="4">轉介基本資料</th>
+							<th colspan="15">貸款類商品</th>
+						</tr>
+						<tr>
+							<th>轉介年月</th>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行名稱</th>
+							<th>轉介商品</th>
+							<th>每月<br />轉介目標參考件數</th>
+							<th>MTD<br />轉介件數</th>
+							<th>MTD<br />轉介件數達成率</th>
+							<th>MTD<br />進件數</th>
+							<th>每月<br />轉介成功目標件數</th>
+							<th>MTD<br />轉介成功件數</th>
+							<th>MTD<br />轉介成功件數達成率</th>
+							<th>年度<br />轉介目標參考件數</th>
+							<th>YTD<br />轉介件數</th>
+							<th>YTD<br />轉介件數達成率</th>
+							<th>YTD<br />進件數</th>
+							<th>年度<br />轉介成功目標件數</th>
+							<th>YTD<br />轉介成功件數</th>
+							<th>YTD<br />轉介成功件數達成率</th>
+						</tr>
+					</thead>
+					<tbody ng-show="resultList.length > 0">
+						<tr class="repeat-row" align="center" ng-repeat="row in resultList track by $index">
+							<td><div ng-if="row.BRANCH_AREA_NAME == null && row.BRANCH_NAME == null">{{row.TXN_DATE}}</div></td>
+							<td><div ng-if="row.BRANCH_AREA_NAME == null && row.BRANCH_NAME == null">{{row.CENTER_NAME}}</div></td>
+							<td><div ng-if="row.BRANCH_NAME == null">{{row.BRANCH_AREA_NAME}}</div></td>
+							<td><div ng-if="resultList[$index-1].BRANCH_NAME != row.BRANCH_NAME">{{row.BRANCH_NAME}}</div></td>
+							<td>{{row.REF_PROD | mapping:mappingSet['CAM.REF_PROD']:'F3'}}</td>
+							<td>{{row.REF_M_LOAN_AIMS_NUMBER}}</td>
+							<td>{{row.MTD_LOAN_TOT}}</td>
+							<td>{{row.REF_M_LOAN_RATE1}}&nbsp;%</td>
+							<td>{{row.MTD_LOAN_INTO_PIECES_NUMBER}}</td>
+							<td>{{row.REF_M_LOAN_SUCCESS_NUMBER}}</td>
+							<td>{{row.MTD_LOAN_SUCCESS_NUMBER}}</td>
+							<td>{{row.REF_M_LOAN_RATE2}}&nbsp;%</td>
+							<td>{{row.REF_Y_LOAN_AIMS_NUMBER}}</td>
+							<td>{{row.YTD_LOAN_TOT}}</td>
+							<td>{{row.REF_Y_LOAN_RATE1}}&nbsp;%</td>
+							<td>{{row.YTD_LOAN_INTO_TOT}}</td>
+							<td>{{row.REF_Y_LOAN_SUCCESS_NUMBER}}</td>
+							<td>{{row.REF_YTD_LOAN_SUCCESS_NUMBER}}</td>
+							<td>{{row.REF_Y_LOAN_RATE2}}&nbsp;%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

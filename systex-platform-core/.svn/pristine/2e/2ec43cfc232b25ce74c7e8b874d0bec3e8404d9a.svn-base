@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-lazy="false" package="com.systex.jbranch.platform.common.platformdao.table">
+    <!--
+        Created by the Middlegen Hibernate plugin 2.2
+
+        http://boss.bekk.no/boss/middlegen/
+        http://www.hibernate.org/
+    -->
+    <class lazy="false"
+           name="com.systex.jbranch.platform.common.platformdao.table.TbsyssecuassVO" table="TBSYSSECUASS" optimistic-lock="version">
+        <id column="ASSIGNMENTID" length="20" name="assignmentId" type="java.lang.String">
+            <generator class="assigned"/>
+        </id>
+        <version column="version" generated="never" name="version" type="long"/>
+        <many-to-one name="assigner" column="ASSIGNERID"
+                     not-null="true" lazy="false" fetch="join" outer-join="true"
+                     class="com.systex.jbranch.platform.common.platformdao.table.TbsysuserVO"/>
+        <many-to-one name="assignerRole" column="ASSIGNERROLEID"
+                     not-null="true" lazy="false" fetch="join" outer-join="true"
+                     class="com.systex.jbranch.platform.common.platformdao.table.TBSYSSECUROLEVO"/>
+        <many-to-one name="receiver" column="RECEIVERID"
+                     not-null="true" lazy="false" fetch="join" outer-join="true"
+                     class="com.systex.jbranch.platform.common.platformdao.table.TbsysuserVO"/>
+        <property column="STARTDATE" generated="never" lazy="false" length="23" name="startDate" not-null="false" type="java.sql.Timestamp"/>
+        <property column="ENDDATE" generated="never" lazy="false" length="23" name="endDate" not-null="false" type="java.sql.Timestamp"/>
+        <property column="STATUS" generated="never" lazy="false" length="1" name="status" not-null="true" type="java.lang.String"/>
+        <property column="CREATOR" generated="never" lazy="false" length="20" name="creator" type="java.lang.String"/>
+        <property column="CREATETIME" generated="never" lazy="false" length="23" name="createtime" type="java.sql.Timestamp"/>
+        <property column="LASTUPDATE" generated="never" lazy="false" length="23" name="lastupdate" type="java.sql.Timestamp"/>
+        <property column="MODIFIER" generated="never" lazy="false" length="20" name="modifier" type="java.lang.String"/>
+        <!-- Associations -->
+    </class>
+</hibernate-mapping>

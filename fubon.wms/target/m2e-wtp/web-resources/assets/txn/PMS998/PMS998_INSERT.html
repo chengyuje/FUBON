@@ -1,0 +1,171 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS998_INSERT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<div>
+	<div ng-controller="PMS998_INSERTController" ng-cloak>
+		<div class="modal-dialog PMS998_INSERT"> 
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">新增白名單</h4>
+				</div>
+	 			<div class="modal-body">
+			  		<table width="100%">
+			  			<tr ng-hide="hideFlag == 'Y'">
+							<td class="col-xs-2"></td>
+							<th class="col-md-2 tdpadding">業務處：</th>
+							<td class="col-md-4 tdpadding">
+								<e-combobox id="regionCenterID" name="regionCenterID"
+											ng-datasource="REGION_LIST"
+											ng-model="inputVO.regionCenterID"
+											ng-validate="false" 
+											ng-disabled="AVAIL_REGION.length == 1"
+											ng-readonly="AVAIL_REGION.length == 1" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="ChangeRegion(region)"
+											style="line-height:20px;" />
+							</td>
+							<td class="col-xs-2"></td>
+						</tr>
+						<tr ng-hide="hideFlag == 'Y'">
+							<td class="col-xs-2"></td>
+							<th class="col-md-2 tdpadding">營運區：</th>
+							<td class="col-md-4 tdpadding">
+								<e-combobox id="branchAreaID" name="branchAreaID"
+											ng-datasource="AREA_LIST"
+											ng-model="inputVO.branchAreaID"
+											ng-validate="false" 
+											ng-disabled="AVAIL_AREA.length == 1"
+											ng-readonly="AVAIL_AREA.length == 1" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="ChangeArea(region)"
+											style="line-height:20px;" />
+							</td>
+							<td class="col-xs-2"></td>
+						</tr>
+						<tr ng-hide="hideFlag == 'Y'">
+							<td class="col-xs-2"></td>
+							<th class="col-md-2 tdpadding"><font color="red">*</font>&nbsp;分行：</th>
+							<td class="col-md-4 tdpadding">
+								<e-combobox id="branchNbr" name="branchNbr"
+											ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.branchNbr"
+											ng-validate="false" 
+											ng-disabled="AVAIL_BRANCH.length == 1"
+											ng-readonly="AVAIL_BRANCH.length == 1" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="false"
+											ng-change="ChangeBranch(region)"
+											style="line-height:20px;" />
+							</td>
+							<td class="col-xs-2"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-2"></td>
+							<th class="col-md-2 tdpadding" ng-if="hideFlag != 'Y'"><font color="red">*</font>&nbsp;行員員編：</th>
+							<td class="col-md-4 tdpadding" ng-if="hideFlag != 'Y'">
+								<e-combobox id="empID" name="empID"
+											ng-datasource="EMP_LIST"
+											ng-model="inputVO.empID"
+											ng-validate="false" 
+											ng-disabled="EMP_LIST.length == 2"
+											ng-readonly="EMP_LIST.length == 2" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											style="line-height:20px;" />
+							</td>
+					    	<th class="col-md-2 tdpadding" ng-if="hideFlag == 'Y'">員工姓名：</th>
+							<td class="col-md-2 tdpadding" ng-if="hideFlag == 'Y'">
+			    				<e-combobox id="uEmpID" name="uEmpID"
+											ng-datasource="mappingSet['UHRM_LIST']"
+											ng-model="inputVO.empID"
+											ng-validate="false" 
+											ng-disabled="mappingSet['UHRM_LIST'].length == 2"
+											ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											style="line-height:20px;" />				 
+							</td>
+							
+							<td class="col-xs-2"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-2"></td>
+							<th class="col-md-2 tdpadding"><font color="red">*</font>&nbsp;客戶ID：</th>
+							<td class="col-md-4 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." ng-model="inputVO.custID" style="width:265px;" ng-change="toUppercase_data(inputVO.custID, 'custid')" ng-blur="getCustName()"></td>
+							<td class="col-xs-2"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-2"></td>
+							<th class="col-md-2 tdpadding">客戶姓名：</th>
+							<td class="col-md-4 tdpadding">{{inputVO.custName}}</td>
+							<td class="col-xs-2"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-2"></td>
+							<th class="col-md-2 tdpadding"><font color="red">*</font>&nbsp;與行員關係：</th>
+							<td class="col-md-4 tdpadding">
+								<e-combobox id="c2eRelation" name="c2eRelation" 
+											ng-paramtype="PMS.C2E_RELATION"
+											ng-model="inputVO.c2eRelation"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											style="line-height:20px;"/>
+							</td>
+							<td class="col-xs-2"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-2"></td>
+							<th class="col-md-2 tdpadding"><font color="red">*</font>&nbsp;確認佐證：</th>
+							<td class="col-md-4 tdpadding">
+								<e-combobox id="prove" name="prove" 
+											ng-paramtype="PMS.PROVE"
+											ng-model="inputVO.prove"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											style="line-height:20px;"/>
+								<br>
+							</td>
+							<td class="col-xs-2"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-2"></td>
+							<th class="col-md-2 tdpadding"></th>
+							<td class="col-md-4 tdpadding">
+								<input type="text" class="form-control" style="width: 265px;display:inline;" e-length-limit="200" ng-model="inputVO.note" placeholder="請補充確認佐證..." ng-if="inputVO.prove == '03'"/>
+							</td>
+							<td class="col-xs-2"></td>
+						</tr>	
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="add()" ng-disabled="">送出覆核</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+				</div>
+			</div>	
+		</div>
+	</div>
+</div>

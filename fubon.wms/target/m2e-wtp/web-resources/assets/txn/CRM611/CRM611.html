@@ -1,0 +1,87 @@
+<script type="text/javascript" src="assets/txn/CRM611/CRM611.js"></script>
+<script type="text/javascript" src="assets/txn/CRM611/CRM611_DETAIL.js"></script>
+<div class="CRM611" ng-controller="CRM611Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_btn" style="left:222px;">
+			<a onclick="return false" ng-click="jump()" class="btn btn-primary">
+			    <i class="glyphicon glyphicon-play"></i> 詳細資料</a>
+		</div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a06.gif">客戶基本資料
+		</div>
+	</div>
+	<!-- #1476: 請協助調整消金PS客戶首頁權限 -->
+	<div class="panel_content">
+		<div class="e_panel_table scroll_y" style="min-height: 450px">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>姓名</th>
+						<td ng-if="IsMobile">{{custName | eMasking:8}}</td>
+						<td ng-if="!IsMobile">{{custName}}</td>
+						<th>UHRM</th>
+						<td ng-if="IsMobile">{{data.UEMP_NAME ? (data.UEMP_NAME | eMasking:7) : ''}}</td>
+						<td ng-if="!IsMobile">{{data.UEMP_NAME ? (data.UEMP_NAME) : ''}}</td>
+					</tr>
+					<tr>
+						<th>身分證字號</th>
+						<td ng-if="IsMobile">{{data.CUST_ID | eMasking:1}}</td>
+						<td ng-if="!IsMobile">{{data.CUST_ID}}</td>
+						<th>理專/AO CODE</th>
+						<td ng-if="IsMobile">{{data.EMP_NAME ? (data.EMP_NAME | eMasking:7) + '/'+ data.AO_CODE : ''}}{{data.C_TYPE_NAME != '' ? data.C_TYPE_NAME : ''}}</td>
+						<td ng-if="!IsMobile">{{data.EMP_NAME == null ? '' : (data.EMP_NAME + '/'+ data.AO_CODE)}}{{data.C_TYPE_NAME != '' ? data.C_TYPE_NAME : ''}}</td>
+					</tr>
+					<tr>
+						<th>生日</th>
+						<td>{{toJsDate(data.BIRTH_DATE) | date: "yyyy/MM/dd"}}</td>
+						<th>歸屬行</th>
+						<!-- 有code時是顯示理專的分行 -->
+						<td ng-show="data.AO_CODE != null">{{data.AO_BRA_NBR == null ? (data.BRA_NBR == null ? '' : (data.BRA_NBR + '-'+ data.BRANCH_NAME)) : (data.AO_BRA_NBR + '-'+ data.AO_BRANCH_NAME)}}</td>
+						<!-- 沒code時要顯示客戶的歸屬行 -->
+						<td ng-show="data.AO_CODE == null">{{data.BRA_NBR == null ? '' : (data.BRA_NBR + '-'+ data.BRANCH_NAME)}}</td>
+					</tr>
+					<tr>
+						<th>性別</th>
+						<td>{{data.GENDER | mapping:mappingSet['CRM.CUST_GENDER']:'F3'}}</td>
+						<th>薪轉戶/公司</th>
+						<td>{{data.SAL_COMPANY == null ? 'N' : 'Y/'+data.SAL_COMPANY}}</td>
+					</tr>
+					<tr>
+						<th>理財會員等級</th>
+						<td>{{data.VIP_DEGREE == null ? 'M' : data.VIP_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+						<th>法金戶/RM</th>
+						<td>{{data.CO_ACCT_YN == 'Y' ? 'Y' : 'N'}} {{data.CO_RM == null ? '' : ('/' + data.CO_RM) }}</td>
+					</tr>
+					<tr>
+						<th>貢獻度等級</th>
+						<td>{{data.CON_DEGREE}}</td>
+						<th>客戶註記</th>
+						<td><font style="color:red">{{cust_note}}</font></td>
+					</tr>
+					<tr>
+						<th>KYC等級/效期</th>
+						<td>{{data.CUST_RISK_AFR}}{{data.KYC_EXPIRY_DATE == null ? '' : '/'}}{{toJsDate(data.KYC_EXPIRY_DATE) | date:"yyyy/MM/dd"}}</td>
+						<th>信託/衍商推介同意</th>
+						<td>{{esbData.custTxFlag == 'Y' ? 'Y' : 'N'}}/{{siPromData.isEffetive == 'Y' ? 'Y' : 'N'}}</td>
+					</tr>
+					<tr>
+						<th>專業投資人/效期</th>
+						<td>{{esbData.custProFlag}}{{esbData.custProDate == null ? '' : '/'}}{{toJsDate(esbData.custProDate) | date:"yyyy/MM/dd"}}</td>
+						<th>共同行銷/銀行電銷</th>
+						<td>
+							{{esbData.infoFlag == null ? '' : esbData.infoFlag == 'Y' ? 'Y' : 'N'}}
+							{{esbData.tmFlag == null ? '': esbData.tmFlag == 'Y' ? '/Y' : '/N'}}
+						</td>
+					</tr>
+					<tr>
+						<th>W-8BEN(W-8BEN-E)/效期</th>
+						<td>{{w8BenData.w8BenEffYN == null || w8BenData.w8BenEffYN == '' ? 'N' : 'Y'}}{{w8BenData.w8benEndDate == null ? '' : '/'}}{{toJsDate(w8BenData.w8benEndDate) | date:"yyyy-MM-dd"}}</td>
+						<th>高資產客戶/效期</th>
+						<td>{{hnwcData.validHnwcYN == 'Y' ? 'Y' : 'N'}}{{hnwcData.dueDate == null ? '' : '/'}}{{toJsDate(hnwcData.dueDate) | date:"yyyy/MM/dd"}}</td>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>

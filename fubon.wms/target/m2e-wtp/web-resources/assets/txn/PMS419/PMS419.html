@@ -1,0 +1,320 @@
+<style>
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+
+.pointer {
+	cursor: pointer;
+}
+.gv_tab_sc td, .tab_month td{
+	padding: 7px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS419/PMS419.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS419" ng-controller="PMS419Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						  <th>業務處：</th>
+					      <td><e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id"
+									    ng-validate="false" 
+									    ng-disabled="disableRegionCombo"
+										ng-readonly="disableRegionCombo"  
+									    ng-editable="false"
+										ng-format="F3"
+									    ng-required="false"
+										ng-change="ChangeRegion()"
+										width="150px"
+										style="line-height:20px;" /></td>
+					      <th>營運區：</th>
+					     <td><e-combobox id="branch_area_id" name="branch_area_id"
+								   ng-datasource="AREA_LIST"
+								   ng-model="inputVO.branch_area_id"
+								   ng-validate="false" 
+								   ng-disabled="disableAreaCombo"
+								   ng-readonly="disableAreaCombo"
+								   ng-editable="false"
+								   ng-format="F3"
+								   ng-required="false"
+								   ng-change="ChangeArea()"
+								   width="150px"
+								   style="line-height:20px;" /></td>
+					      <th>分行別：</th>
+					      <td><e-combobox id="branch_nbr" name="branch_nbr"
+					              ng-datasource="BRANCH_LIST"
+					              ng-model="inputVO.branch_nbr"
+								  ng-validate="false" 
+								  ng-disabled="disableBranchCombo"
+							      ng-readonly="disableBranchCombo" 
+								  ng-editable="false"
+								  ng-format="F1"
+								  ng-required="false"
+								  ng-change="ChangeBranch()"
+								  width="150px"
+								  style="line-height:20px;" /></td>
+					     <th> 理專：</th>
+						<td><e-combobox id="emp_id" name="emp_id"
+							    ng-datasource="EMP_LIST"
+							    ng-model="inputVO.emp_id"
+								ng-validate="false"
+								ng-disabled="disableEmpCombo"
+								ng-readonly="disableEmpCombo" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="false"
+								ng-change="ChangeEmp_code()"
+								width="150px"
+								style="line-height:20px;" /></td>
+						</tr>	
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit();init()">清除</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="paramList1" totallist="totalData1"></e-jumping-once>
+			<div algin="left">
+				<table>
+					<tr>
+			    		<td style="font-weight:bold">單筆申購</td>
+			    	</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList1">
+					<thead>
+						<tr>
+							<th rowspan="2">交易日期</th>							
+							<th rowspan="2">客戶ID</th>							
+							<th rowspan="2">客戶姓名</th>
+							<th rowspan="2">理專ID</th>
+							<th rowspan="2">理專姓名</th>
+							<th rowspan="2">信託憑證號碼</th>
+							<th rowspan="2">基金名稱</th>
+							<th colspan="2">信託金額</th>
+							<th rowspan="2">手續費</th>
+							<th rowspan="2">信託帳號</th>
+							<th rowspan="2">通路</th>
+
+						</tr>					
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList1 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						 	<td align="center">{{row.TRADE_DATE }}</td>
+						 	<td align="left"><a onclick="return false" ng-click="custDTL(row)">{{row.PERSON_ID }}</td>
+						 	<td align="left">{{row.CUST_NAME }}</td>
+						 	<td align="left">{{row.EMP_ID}}</td>
+						 	<td align="left">{{row.EMP_NAME}}</td>
+						 	<td align="center">{{row.CERTIFICATE_NUM }}</td>
+						 	<td align="left">{{row.PRD_ID}} {{row.FUND_NAME }}</td>
+						 	<td align="center">{{row.CURRENCY }}</td>
+						 	<td align="center">{{row.TRUST_AMT_L }}</td>
+						 	<td align="center">{{row.TRUST_FEE_L }}</td>
+						 	<td align="center">{{row.ACCT_NO }}</td>
+						 	<td align="center">{{row.INS_TYPE|  mapping:mappingSet['CRM.TR_TYPE']:'F3'  }}</td>
+						 	
+						</tr>
+					</tbody>
+				</table>
+				<br>								
+			</div>
+			<!--定期定額申購(訂約)  -->
+			<e-jumping-once output="outputVO2" list="paramList2" totallist="totalData2"></e-jumping-once>
+			<div algin="left">
+				<table>
+					<tr>
+			    		<td style="font-weight:bold">定期定額申購(訂約)</td>
+			    	</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList2">
+					<thead>
+						<tr>
+							<th rowspan="2">交易日期</th>	
+							<th rowspan="2">客戶ID</th>							
+							<th rowspan="2">客戶姓名</th>
+							<th rowspan="2">理專ID</th>
+							<th rowspan="2">理專姓名</th>
+							<th rowspan="2">信託憑證號碼</th>
+							<th rowspan="2">基金名稱</th>
+							<th colspan="2">信託金額</th>
+							<th rowspan="2">手續費</th>
+							<th rowspan="2">每月扣款日</th>
+							<th rowspan="2">信託帳號</th>
+							<th rowspan="2">通路</th>
+
+						</tr>					
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList2 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						 	<td align="center">{{row.TRADE_DATE }}</td>
+						 	<td align="left"><a onclick="return false" ng-click="custDTL(row)">{{row.PERSON_ID }}</td>
+						 	<td align="left">{{row.CUST_NAME }}</td>
+						 	<td align="left">{{row.EMP_ID}}</td>
+						 	<td align="left">{{row.EMP_NAME}}</td>
+						 	<td align="center">{{row.CERTIFICATE_NUM }}</td>
+						 	<td align="left">{{row.PRD_ID}} {{row.FUND_NAME }}</td>
+						 	<td align="center">{{row.CURRENCY }}</td>
+						 	<td align="center">{{row.TRUST_AMT_M == 0 ? row.TRUST_AMT_L : "低: " + row.TRUST_AMT_L + " 中: " + row.TRUST_AMT_M + " 高: " + row.TRUST_AMT_H}} </td>
+						 	<td align="center">{{row.TRUST_FEE_M == 0 ? row.TRUST_FEE_L : "低: " + row.TRUST_FEE_L + " 中: " + row.TRUST_FEE_M + " 高: " + row.TRUST_FEE_H}}</td>
+						 	<td align="center">{{row.DATE_1}}{{row.DATE_2 == "00" ? "" : ", " + row.DATE_2}}{{row.DATE_3 == "00" ? "" : ", " + row.DATE_3}}
+						 					   {{row.DATE_4 == "00" ? "" : ", " + row.DATE_4}}{{row.DATE_5 == "00" ? "" : ", " + row.DATE_5}}{{row.DATE_6 == "00" ? "" : ", " + row.DATE_6}}</td>
+						 	<td align="center">{{row.ACCT_NO }}</td>
+						 	<td align="center">{{row.INS_TYPE|  mapping:mappingSet['CRM.TR_TYPE']:'F3'  }}</td>
+						 	
+						</tr>
+					</tbody>
+				</table>								
+			</div>
+			<br>
+			
+			<!--贖回  -->
+			<e-jumping-once output="outputVO4" list="paramList4" totallist="totalData4"></e-jumping-once>
+			<div algin="left">
+				<table>
+					<tr>
+			    		<td style="font-weight:bold">贖回</td>
+			    	</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList4">
+					<thead>
+						<tr>
+							<th rowspan="2">交易日期</th>
+							<th rowspan="2">客戶ID</th>							
+							<th rowspan="2">客戶姓名</th>
+							<th rowspan="2">理專ID</th>
+							<th rowspan="2">理專姓名</th>
+							<th rowspan="2">信託憑證號碼</th>
+							<th rowspan="2">基金名稱</th>
+							<th rowspan="2">贖回單位數</th>
+							<th rowspan="2">信託帳號</th>
+							<th rowspan="2">通路</th>
+
+						</tr>					
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList4 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						 	<td align="center">{{row.TRADE_DATE }}</td>
+						 	<td align="left"><a onclick="return false" ng-click="custDTL(row)">{{row.PERSON_ID }}</td>
+						 	<td align="left">{{row.CUST_NAME }}</td>
+						 	<td align="left">{{row.EMP_ID}}</td>
+						 	<td align="left">{{row.EMP_NAME}}</td>
+						 	<td align="center">{{row.CERTIFICATE_NUM }}</td>
+						 	<td align="left">{{row.PRD_ID}} {{row.FUND_NAME }}</td>
+						 	<td align="center">{{row.QTY}}</td>
+						 	<td align="center">{{row.ACCT_NO }}</td>
+						 	<td align="center">{{row.INS_TYPE|  mapping:mappingSet['CRM.TR_TYPE']:'F3' }}</td>
+						 	
+						</tr>
+					</tbody>
+				</table>								
+			</div>
+			<br>
+			
+			<!--轉換  -->
+			<e-jumping-once output="outputVO3" list="paramList3" totallist="totalData3"></e-jumping-once>
+			<div algin="left">
+				<table>
+					<tr>
+			    		<td style="font-weight:bold">轉換</td>
+			    	</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList3">
+					<thead>
+						<tr>
+							<th rowspan="2">交易日期</th>		
+							<th rowspan="2">客戶ID</th>							
+							<th rowspan="2">客戶姓名</th>
+							<th rowspan="2">理專ID</th>
+							<th rowspan="2">理專姓名</th>
+							<th rowspan="2">信託憑證號碼</th>
+							<th rowspan="2">基金名稱</th>
+							<th rowspan="2">轉入基金名稱</th>
+							<th rowspan="2">轉換單位數</th>
+							<th rowspan="2">實扣手續費</th>
+							<th rowspan="2">信託帳號</th>
+							<th rowspan="2">通路</th>
+
+						</tr>					
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList3 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						 	<td align="center">{{row.TRADE_DATE }}</td>
+						 	<td align="left"><a onclick="return false" ng-click="custDTL(row)">{{row.PERSON_ID }}</td>
+						 	<td align="left">{{row.CUST_NAME }}</td>
+						 	<td align="left">{{row.EMP_ID}}</td>
+						 	<td align="left">{{row.EMP_NAME}}</td>
+						 	<td align="center">{{row.CERTIFICATE_NUM }}</td>
+						 	<td align="left">{{row.PRD_ID}} {{row.FUND_NAME }}</td>
+						 	<td align="left">{{row.PRD_ID_2}} {{row.FUND_NAME1}}</td>
+						 	<td align="center">{{row.QTY}}</td>
+						 	<td align="center">{{row.TRUST_FEE_L}}</td>
+						 	<td align="center">{{row.ACCT_NO}}</td>
+						 	<td align="center">{{row.INS_TYPE|  mapping:mappingSet['CRM.TR_TYPE']:'F3' }}</td>
+						 	
+						</tr>
+					</tbody>
+				</table>								
+			</div>
+			<br>	
+			
+		</div>
+	</div>
+	
+	<!-- 結果區 -->
+</div>

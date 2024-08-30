@@ -1,0 +1,58 @@
+--**************************************************************************
+--PROJECT_CODE> TBIOT
+--DATE>2016/10/04
+--AUTHOR> Grace Liu
+--PURPOSE>ST Load
+--**************************************************************************
+
+--**************************************************************************
+--TARGET>TBIOT_PPT_FUGGX88_SG
+--TRUNCATE_BEFORE_INSERT>Y
+--**************************************************************************
+--OPTIONS (ERRORS = 0)
+OPTIONS (direct=true)
+LOAD DATA
+TRUNCATE
+into table	TBIOT_PPT_FUGGX88_SG
+--FIELDS TERMINATED BY X'09'
+FIELDS TERMINATED BY ',' --OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+D_TYPE
+,BRANCH_NBR
+,INSURED_NAME "TRIM(:INSURED_NAME)"
+,INSURED_ID
+,INSURED_TEL 
+,PROPOSER_NAME "TRIM(:PROPOSER_NAME)" 
+,CUST_ID
+,PROPOSER_TEL
+,PROPOSER_POST
+,PROPOSER_ADD
+,TARGET_POS
+,TARGET_ADD
+,DATE_F
+,DATE_T
+,BUILD_YEAR
+,BUILD_MAT
+,BUILD_LEVEL
+,BUILD_SIZE
+,BUILD_FLOOR
+,PREMIUM_F_AMT
+,PREMIUM_E_AMT
+,PREMIUM_O_AMT
+,PREMIUM_F
+,PREMIUM_E
+,PREMIUM_O
+,PREMIUM_H
+,REMARK
+,REAL_PREMIUM
+,PROG_NUM
+,RECRUIT_ID
+,INS_NO_F
+,INS_NO_E
+,SEQ
+,LOCATE
+,VERSION "0"
+,CREATETIME sysdate
+,CREATOR constant "TBIOT_PPT_FUGGX88_SG"
+)

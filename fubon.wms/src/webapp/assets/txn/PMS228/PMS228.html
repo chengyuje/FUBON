@@ -1,0 +1,156 @@
+<style>
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS228/PMS228.js"></script>
+<script type="text/javascript" src="assets/txn/PMS228/PMS228_UPLOAD.js"></script>
+<script type="text/javascript"
+	src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS228" ng-controller="PMS228Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+				data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<div class="search_table search_box3">
+					<table>
+						<tr>
+							<th><font color=red> ＊ </font>查詢年月：</th>
+							<!-- <td><input type="text" 
+									size="8" 
+									e-input-limit="N"
+									e-length-limit="6" 
+									ng-model="inputVO.reportDate"								
+									ng-pattern="/^([0-9]){6}/" 
+									required>
+								<input type="hidden" autofocus /> <font color=blue>
+									YYYYMM </font></td> -->
+							<td><e-combobox ng-datasource="mappingSet['timeE']"
+									ng-model="inputVO.reportDate" 
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="true" 
+									width="90px" 
+									height="30px"
+									style="line-height:20px;" 
+									ng-change="dateChange()" /></td>
+									<!-- 	ng-blur="querySeen()"  -->
+							
+							<td align="right"><button type="button" class="btn btn-info"
+					ng-click="queryDatas()">查詢</button></td>
+							<!--ng-click="exportRPT(inputVO.tgtType)" ng-disabled="paramList.length < 1"  -->
+							<td >
+									<button type="button" class="btn btn-info"
+										ng-click="exportRPT()"
+										ng-disabled="paramList.length < 1">匯出
+									</button>&nbsp;
+							<button type="button" class="btn btn-info"
+										ng-click="upload()"
+										>上傳日目標</button>  
+							</td>
+							</tr>
+					</table>
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif"> {{(inputVO.reportDate).substr(0,4)}}/{{(inputVO.reportDate).substr(4,5)}} &nbsp;消金生產力目標
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="queryDatas()"
+				list="paramList"></e-jumping>
+				
+				
+			<div class="gv_tab_sc scroll_y">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-left="6" e-top="true">
+					<thead>
+						<tr>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分行&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+							<th>銷售人員</th>
+							<th>到職日</th>
+							<th>職稱</th>
+							<th>房貸-購屋<br>(單位:百萬元)</th>
+							<th>房貸-非購屋<br>(單位:百萬元)</th>
+							<th>房貸-分期型<br>(單位:百萬元)</th>
+							<th>房貸-循環型<br>(單位:百萬元)</th>
+							<th>信貸-一般<br>(單位:百萬元)</th>
+							<th>信貸-職團<br>(單位:百萬元)</th>
+							<th>信貸-卡友<br>(單位:百萬元)</th>
+							<th>維護日期</th>
+							<th>維護人員</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center" >{{row.REGION_CENTER_NAME}}</td>
+							<td align="center" >{{row.BRANCH_AREA_NAME}}</td>
+							<td align="center" >{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+							<td align="center" >{{row.AO_CODE}}<br>-{{row.EMP_NAME}}</td>
+							<td align="right">{{toJsDate(row.FIRST_DATE) | date:'yyyy/MM/dd'}}</td>
+							<td align="right">{{row.JOB_TITLE}}</td>
+							<td align="right">{{row.HB_AMT/1000000 | currency:'':3}}</td>
+							<td align="right">{{row.NHB_AMT/1000000 | currency:'':3}}</td>
+							<td align="right">{{row.S_HB_AMT/1000000 | currency:'':3}}</td>
+							<td align="right">{{row.C_HB_AMT/1000000 | currency:'':3}}</td>
+							<!-- 商品目標_主商品代號 -->
+							<td align="right">{{row.NC_AMT/1000000 | currency:'':3}}</td>
+							<!-- 商品目標_主商品名稱 -->
+							<td align="right">{{row.GC_AMT/1000000 | currency:'':3}}</td>
+							<td align="right">{{row.CC_AMT/1000000	| currency:'':3}}</td>
+							<td align="center">{{toJsDate(row.MAINTAIN_DATE) | date:'yyyy/MM/dd'}}</td>
+							<td align="center">{{row.MAINTAIN_NAME}}</td>
+							
+						
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

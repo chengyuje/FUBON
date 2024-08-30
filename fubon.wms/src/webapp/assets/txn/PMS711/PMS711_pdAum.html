@@ -1,0 +1,58 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS711_pdAum {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 650px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.table-border tr input {
+	width:100px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS711/PMS711_pdAum.js"></script>
+<div ng-controller="PMS711_pdAumController" ng-cloak>
+	<div class="modal-dialog PMS711_pdAum">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{subName}}</h4>
+			</div>
+				<!--Content of the panel-->
+			<div class="panel_content">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						<table class="table-bordered table-border">
+							<tr>
+								<th rowspan="2">理專職級</th>
+								<th >存投保AUM(不含台定)</th>
+							</tr>
+							<tr>
+								<th ng-show="personType == '1'">增量日目標(單位：元)</th>
+								<th ng-show="personType == '2'">增量月目標(單位：元)</th> 
+							</tr>
+							<tr ng-repeat="row in showList">
+								<td style="color:blue; text-align:center">{{row.PD_TYPE}}</td>
+								<td align="center" ng-show="personType == '1'">
+									<input type="text" style="text-align:right"  ng-model="row.D_GOAL" e-input-limit='N' e-length-limit="22" />
+								</td>
+								<td align="center" ng-show="personType == '2'">
+									<input type="text" style="text-align:right"  ng-model="row.M_GOAL" e-input-limit='N' e-length-limit="22" />
+								</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click=update()>儲存</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div>

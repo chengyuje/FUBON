@@ -1,0 +1,104 @@
+<style>
+/* open dialog */
+.ngdialog.CRM661_rel_rpy {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM661_rel_rpy {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM661_rel_rpy table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM661_rel_rpy table.little{
+	width: 61%;
+}
+/* change row */
+.CRM661_rel_rpy.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM661_rel_rpy_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+
+.nv-label text{
+    font-size:14.5px;
+}
+
+</style>
+<!-- 結果區 -->
+<script type="text/javascript" src="assets/txn/CRM661/CRM661_rel_rpy.js"></script>
+
+<div class="CRM661_rel_rpy" ng-controller="CRM661_rel_rpyController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >待覆核申請清單</div>
+		</div>
+		<div class="panel_content">
+			<div class="gv_tab_sc scroll_y" style="height:300px;white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>同意</th>
+							<th>退回</th>
+							<th>#</th>
+							<th>主戶</th>
+							<th>主戶ID</th>
+							<th>關係戶</th>
+							<th>關係戶ID</th>
+							<th>關係</th>
+							<th>關係戶歸屬行</th>
+							<th>關係戶理專</th>
+							<th>主戶理專</th>
+							<th>申請動作</th>
+						</tr>
+					</thead>
+								
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList_rel_rpy | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align = "center"><a class="btn btn-success btn-circle" ng-click="rel_rpy(row, 'Y')"><i class="glyphicon glyphicon-ok"></i></a></td>
+							<td align = "center"><a class="btn btn-danger btn-circle" ng-click="rel_rpy(row, 'N')"><i class="glyphicon glyphicon-remove"></i></a></td>
+							<td>{{$index + 1}}</td>
+							<td>{{row.CUST_NAME_M}}</td>
+							<td>{{row.CUST_ID_M}}</td>
+							<td>{{row.CUST_NAME_S}}</td>
+							<td>{{row.CUST_ID_S}}</td>
+							<td>{{row.REL_TYPE | mapping:mappingSet['CRM.REL_TYPE']:'F3'}}</td>
+							<td>{{row.BRANCH_NAME_S}}</td>
+							<td>{{row.EMP_ID_S}}_{{row.EMP_NAME_S}}</td>
+							<td>{{row.EMP_ID_M}}_{{row.EMP_NAME_M}}</td>
+							<td>{{row.REL_STATUS | mapping:mappingSet['REL_STATUS']:'F3'}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,43 @@
+<style>
+
+</style>
+<div ng-controller="CUS111Controller" ng-cloak>
+	<div class="modal-dialog CUS111">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">附件</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc">
+					<table class="table">
+						<thead>
+							<tr>
+							  <th></th>	
+							  <th>檔案名稱</th>
+		                      <th>分類</th>
+		                      <th>產品分類</th>
+		                      <th>上傳日期</th>						  
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in dataList track by $index">
+								<td class="td_center">
+									<input type="checkbox" ng-model="row.getData"/>
+								</td>
+								<td class="td_center">{{row.FILENAME}}</td>
+								<td class="td_center">{{row.CATEGORY_BY_CONTENT | mapping:CATEGORY_CONTENT:'F3'}}</td>
+								<td class="td_center">{{row.CATEGORY_BY_PRODUCT | mapping:CATEGORY_PRODUCT:'F3'}}</td>
+								<td class="td_center">{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd"}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="btnContent()">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,146 @@
+<script type="text/javascript" src="assets/txn/CMMGR016/CMMGR016.js"></script>
+<script type="text/javascript" src="assets/txn/CMMGR016/CMMGR016_detail.js"></script>
+<script type="text/javascript" src="assets/txn/CMMGR016/CMMGR016_ftpFileDateRule.js"></script>
+<script type="text/javascript" src="assets/txn/COMMON/CommonUtil.js"></script>
+
+<style>
+    .CMMGR016 .center {
+        text-align: center;
+    }
+
+    .CMMGR016 .pad {
+        padding: 10px 0px 10px 0px;
+    }
+
+</style>
+
+<div class="CMMGR016" ng-controller="CMMGR016_Controller">
+    <div class="tfb_content">
+        <div class="tfb_content_icon"></div>
+        <div class="tfb_content_tit">
+            <img src="assets/images/icon/tfb_icon_a15.gif"><span ng-bind="'報表內容設定'"></span>
+        </div>
+    </div>
+    <div class="panel_content">
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon" ng-bind="'報表代號'"></span>
+                    <input class="form-control" type="text" placeholder="請輸入報表代號～"
+                           ng-model="inputVO.code" e-length-limit="100" autofocus/>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon" ng-bind="'報表名稱'"></span>
+                    <input class="form-control" type="text" placeholder="請輸入報表名稱～"
+                           ng-model="inputVO.name" e-length-limit="100"/>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon" ng-bind="'報表種類'"></span>
+                    <e-combobox style="line-height:20px;" ng-datasource="mappingSet['type']" ng-model="inputVO.type"
+                                ng-format="F3" width="140px" required/>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <label ng-bind="'過濾器'"></label>&emsp;&emsp;
+            <label title="篩選驗證檔">
+                <span class="glyphicon glyphicon-file"></span>
+                <span ng-bind="'驗證檔'"></span>
+                <input type="checkbox" ng-model="inputVO.check" ng-true-value="'Y'" ng-false-value="''"/>
+            </label>&emsp;
+            <label title="篩選 FTP">
+                <span class="glyphicon glyphicon-upload"></span>
+                <span ng-bind="'FTP'"></span>
+                <input type="checkbox" ng-model="inputVO.ftp" ng-true-value="'Y'" ng-false-value="''"/>
+            </label>&emsp;
+            <label title="篩選 MAIL">
+                <span class="glyphicon glyphicon-envelope"></span>
+                <span ng-bind="'MAIL'"></span>
+                <input type="checkbox" ng-model="inputVO.mail" ng-true-value="'Y'" ng-false-value="''"/>
+            </label>&emsp;
+            <label title="篩選 JOB">
+                <span class="glyphicon glyphicon-tasks"></span>
+                <span ng-bind="'JOB'"></span>
+                <input type="checkbox" ng-model="inputVO.job" ng-true-value="'Y'" ng-false-value="''"/>
+            </label>
+        </div>
+
+        <div class="row">
+            <div class="center pad">
+                <button type="button" class="btn btn-primary" ng-click="inquire()" function-type="query"
+                        data-toggle="tooltip" title="查詢有哪些報表設定～">
+                    <span class="glyphicon glyphicon-search"></span>
+                    <span ng-bind="'查詢'"></span>
+                </button>
+                <button type="button" class="btn btn-info" ng-click="clear()" data-toggle="tooltip"
+                        title="清除輸入條件與結果">
+                    <span class="glyphicon glyphicon-erase"></span>
+                    <span ng-bind="'清除'"></span>
+                </button>
+                <button type="button" class="btn btn-warning" ng-click="cruAction('C', null)"
+                        function-type="maintenance" data-toggle="tooltip" title="有新的報表要增加嗎？">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span ng-bind="'新增'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tfb_content">
+        <div class="tfb_content_icon"></div>
+        <div class="tfb_content_tit">
+            <img src="assets/images/icon/tfb_icon_a15.gif"><span ng-bind="'查詢結果'"></span>
+        </div>
+    </div>
+    <div class="panel_content">
+        <e-jumping-once output="outputVO" list="data" totallist="result"></e-jumping-once>
+        <div class="gv_tab_sc scroll_y" style="min-height: 235px; white-space: nowrap;">
+            <table class="tablesaw table table-striped table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th rowspan="2" width="140px" ng-bind="'功能'"></th>
+                    <th rowspan="2" ng-bind="'代號（名稱）'"></th>
+                    <th rowspan="2" ng-bind="'說明'"></th>
+                    <th rowspan="2" width="140px" ng-bind="'報表種類'"></th>
+                    <th rowspan="2" width="140px" ng-bind="'檔案編碼'"></th>
+                    <th colspan="4" ng-bind="'資訊'"></th>
+                </tr>
+                <tr>
+                    <th data-toggle="tooltip" title="驗證檔"><span class="glyphicon glyphicon-file"></span></th>
+                    <th data-toggle="tooltip" title="FTP"><span class="glyphicon glyphicon-upload"></span></th>
+                    <th data-toggle="tooltip" title="MAIL">
+                        <sapn class="glyphicon glyphicon-envelope"></sapn>
+                    </th>
+                    <th data-toggle="tooltip" title="JOB"><span class="glyphicon glyphicon-tasks"></span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="repeat-row"
+                    ng-repeat="row in data track by $index | limitTo:displayLimit"
+                    ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                    <td>
+                        <e-combobox width="100px" ng-datasource="mappingSet['func']" ng-model="row.func"
+                                    ng-format="F3" ng-change="exec(row)"/>
+                    </td>
+                    <td align="center"
+                        ng-bind="row.RPT_CODE + '（' + (row.RPT_CODE == row.RPT_NAME? '同代號': row.RPT_NAME) + '）'"></td>
+                    <td align="center" ng-bind="row.RPT_DESC"></td>
+                    <td align="center" ng-bind="row.RPT_TYPE | mapping:mappingSet['type']:'F3'"></td>
+                    <td align="center" ng-bind="row.FILE_CODING | mapping:mappingSet['coding']:'F3'"></td>
+                    <td align="center"><span ng-class="row.CHK_FILE_NAME? 'glyphicon glyphicon-ok': ''"></span></td>
+                    <td align="center"><span ng-class="row.FTPSETTINGID? 'glyphicon glyphicon-ok': ''"></span></td>
+                    <td align="center"><span ng-class="row.PARAM_TYPE? 'glyphicon glyphicon-ok': ''"></span></td>
+                    <td align="center"><span ng-class="row.JOBID? 'glyphicon glyphicon-ok': ''"></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

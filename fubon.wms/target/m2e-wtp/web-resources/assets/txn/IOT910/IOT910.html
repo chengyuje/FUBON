@@ -1,0 +1,75 @@
+<script type="text/javascript" src="assets/txn/IOT910/IOT910.js"></script>
+<div ng-controller="IOT910Controller" ng-cloak>
+    <div class="modal-dialog" style="width: 1080px;">
+      <div class="modal-content">
+        <div class="modal-header"> 
+        	<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+          <h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">險種查詢</h4>
+        </div>
+        <div class="modal-body" ng-if="inputVO.FB_COM_YN == 'Y'">
+        	<div class="gv_tab_sc scroll_y">
+				<table>
+					<tr>
+						<th>險種代碼</th>
+						<th>險種名稱</th>
+						<th>產品類型</th>
+						<th>繳費年期</th>
+						<th>主/附約別</th>
+						<th>繳別</th>
+						<th>幣別</th>
+						<th>保費類型</th>
+						<th>特殊條件</th>
+						<th>保險公司</th>
+					</tr>
+					<tr ng-repeat="row in INSPRDList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td><a ng-click="returnINSPRDData(row)">{{row.INSPRD_ID}}</a></td>
+						<td>{{row.INSPRD_NAME}}</td>
+						<td>{{row.INSPRD_TYPE | mapping:insprd_typelist:F3}}</td>
+						<td>{{row.INSPRD_ANNUAL}}</td>
+						<td>{{row.MAIN_RIDER | mapping:main_riderlList:F3}}</td>
+						<td>{{row.PAY_TYPE | mapping:pay_typeList:F3}}</td>
+						<td>{{row.CURR_CD}}</td>
+						<td>{{row.FEE_STATE | mapping:class_List:F3}}</td>
+						<td>{{row.SPECIAL_CONDITION}}</td>
+						<td>{{row.INS_COM_NAME}}</td>
+					</tr>
+				</table>
+	 		</div>
+        </div>
+        
+        <div class="modal-body" ng-if="inputVO.FB_COM_YN == 'N'">
+        	<div class="gv_tab_sc scroll_y">
+				<table>
+					<tr>
+						<th>保險公司</th>
+						<th>英文代號</th>
+						<th>保險產品</th>
+						<th>保險產品簡稱</th>
+						<th>主附約別</th>
+						<th>產品上架日</th>
+						<th>開始銷售日</th>
+						<th>停止銷售日</th>
+						<th>產品大分類</th>
+						<th>平台</th>
+						<th>商品幣別</th>
+					</tr>
+					<tr ng-repeat="row in INSPRDList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{row.INS_COM_NAME}}</td>
+						<td><a ng-click="returnINSPRDData(row)">{{row.INSPRD_ID}}</a></td>
+						<td>{{row.INSPRD_NAME}}</td>
+						<td>{{row.INSPRD_NAME_SHORT}}</td>
+						<td>{{row.MAIN_RIDER | mapping:main_riderlList:F3}}</td>
+						<td>{{toJsDate(row.PRODUCTON_DT) | date:"yyyy-MM-dd"}}</td>
+						<td>{{toJsDate(row.PRODUCTVALIDFROM) | date:"yyyy-MM-dd"}}</td>
+						<td>{{toJsDate(row.PRODUCTVALIDTHRU) | date:"yyyy-MM-dd"}}</td>
+						<td>{{row.PRODUCTTYPE1}}</td>
+						<td>{{row.PREMIUMTABLE}}</td>
+						<td>{{row.CURR_CD}}</td>
+					</tr>
+				</table>
+	 		</div>
+        </div>
+      </div>
+    </div>
+
+</div>

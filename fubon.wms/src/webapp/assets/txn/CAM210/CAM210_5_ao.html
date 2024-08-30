@@ -1,0 +1,94 @@
+<style>
+/* table size */
+.CAM210_AO table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.CAM210_AO table.little {
+	width: 89%;
+}
+/* change row */
+.CAM210_AO.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CAM210_AO_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM210/CAM210_5_ao.js"></script>
+<div ng-controller="CAM210_5_ao_Controller" ng-cloak>
+	<div class="CAM210_AO">
+		<e-jumping-once output="aoOutputVO" list="aoData" totallist="expiredActivitiesAoAreaList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th>分行</th>
+						<th>姓名</th>
+						<th>身分別</th>
+						<th>客戶ID</th>
+						<th>客戶姓名</th>
+						<th>結案狀態</th>
+<!-- 						<th>投資申購量(百萬)</th> -->
+<!-- 						<th>保險申購量(百萬)</th> -->
+<!-- 						<th>信用卡核卡數</th> -->
+<!-- 						<th>房貸撥款量(百萬)</th> -->
+<!-- 						<th>信貸撥款量(百萬)</th> -->
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="dataRow in aoData track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center">{{dataRow.BRANCH_NAME}}</td>
+						<td align="center">{{dataRow.EMP_NAME}}</td>
+						<td align="center">{{dataRow.JOB_TITLE_NAME}}</td>
+						<td align="center"><a href="#" onclick="return false" ng-click="custDTL(dataRow)">{{dataRow.CUST_ID}}</a></td>
+						<td align="center">{{dataRow.CUST_NAME}}</td>
+						<td align="center">{{dataRow.RESPONSE_NAME}}</td>
+<!-- 						<td align="center" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+<!-- 						<td align="right">{{dataRow.INVS_BAL}}</td> -->
+<!-- 						<td align="right">{{dataRow.INSS_BAL}}</td> -->
+<!-- 						<td align="right">{{dataRow.CCD_SUM}}</td> -->
+<!-- 						<td align="right">{{dataRow.LOAN1_SUM}}</td> -->
+<!-- 						<td align="right">{{dataRow.LOAN2_SUM}}</td> -->
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

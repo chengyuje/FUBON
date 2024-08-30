@@ -1,0 +1,64 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS711 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS711/PMS711_creditNewGoalSetTS.js"></script>
+<div ng-controller="PMS711_creditNewGoalSetTSController" ng-cloak>
+	<div class="modal-dialog PMS711">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請上傳T/S(信貸)</h4>
+			</div>
+			<!--Content of the panel-->
+			<form style="margin-bottom: 10px;" name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<div class="search_table">
+				<table style="margin-top: 16px;">
+					<tr>
+						<th>&nbsp;&nbsp;&nbsp;上傳檔案 (.xls)</th>
+						<td><e-upload success="uploadFinshed(name,rname)" accept=".xls"></e-upload></td>
+						<td><button type="button" class="btn btn-info" ng-click="importfile()" ng-disabled="!checkName()">上傳資料</button></td>
+						<td><button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">取消</button></td>
+					</tr>
+				</table>
+			</div>
+			</form>
+			<div class="search_box_btn">
+				<e-jumping output="outputVO" input="inputVO" query="queryCreditNewGoalTS()"
+					list="showList"></e-jumping>
+				<form style="margin-bottom: 10px;" name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<div class="show_table gv_tab_sc scroll_y">
+					<table style="margin-top: 16px;" class="table-bordered">
+						<thead>
+							<tr>
+								<th>營運區代碼</th>
+								<th>營運區名稱</th>
+								<th>信貸T/S(單位：百萬)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row"
+								ng-repeat="row in showList | limitTo:displayLimit track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center">{{row.BRANCH_AREA_ID }}</td>
+								<td align="center">{{row.BRANCH_AREA_NAME }}</td>
+								<td align="center">{{row.TS }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

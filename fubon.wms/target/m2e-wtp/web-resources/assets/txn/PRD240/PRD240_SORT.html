@@ -1,0 +1,88 @@
+<style>
+/* change row */
+.PRD240_SORT.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD120/PRD120.js"></script>
+<script type="text/javascript" src="assets/txn/PRD240/PRD240_SORT.js"></script>
+<div class="PRD240_SORT" ng-controller="PRD240_SORTController" ng-cloak>
+	<br>
+	<div class="gv_tab_sc">
+		<table class="td_center">
+			<thead>
+				<tr>
+					<td colspan="5" style="background-color: white;border: none !important;">目前生效日期：{{currentDate}}</td>
+					<td colspan="4" style="background-color: white;border: none !important;">
+						<div style="float: left !important;margin-top: 3px;">
+							預計生效日期：&emsp;
+						</div>
+						<div class="input-group datebox datewidth">
+							<input type="text" id="date" name="date"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.date"
+								is-open="model.a"
+								datepicker-options="dateOptions"
+								ng-readonly="true"
+								ng-change="init()" />
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+								<i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="5" style="background-color: white;border: none !important;"></td>
+					<td colspan="4" style="background-color: white;border: none !important;">
+						有異動日期：{{changeDate}}
+					</td>
+				</tr>
+				<tr>
+					<th width="5%">優質商品排序</th>
+					<th width="10%">ETF代碼</th>
+					<th width="20%">ETF名稱</th>
+					<th width="10%">商品風險等級</th>
+					<th width="5%" style="background-color: white;border: none !important;"></th>
+					<th width="15%">ETF代碼</th>
+					<th width="20%">ETF名稱</th>
+					<th width="10%">商品風險等級</th>
+					<th width="5%">搜尋代碼</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in listBase track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					<td>{{row.rank}}</td>
+					<td>{{row.old_prd_id}}</td>
+					<td>{{row.old_etf_name}}</td>
+					<td>{{row.old_risk_id}}</td>
+					<td style="border: none !important;"></td>
+					<td><input type="text" id="prd_id" name="prd_id" class="form-control" ng-model="row.prd_id" e-length-limit="10" ng-blur="checkID(row)"></td>
+					<td ng-if="row.canEdit">{{row.etf_name}}</td>
+					<td ng-if="!row.canEdit" class="with-errors">無此商品代碼</td>
+					<td>{{row.risk_id}}</td>
+					<td><button type="button" class="btn btn-info" ng-click="goPRD120_ETF(row)" function-type="query">搜尋</button></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="save()" function-type="maintenance">儲存</button>
+		<button type="button" class="btn btn-info" ng-click="init()" function-type="maintenance">重新查詢</button>
+		<button type="button" class="btn btn-info" ng-click="clear()" function-type="maintenance">清除日期</button>
+	</div>
+</div>

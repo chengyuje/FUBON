@@ -1,0 +1,97 @@
+<style>
+
+</style>
+<div ng-controller="KYC310_REASONController" ng-cloak>
+	<div class="modal-dialog KYC310">
+		<div class="modal-content">
+			<div class="modal-header esoaf-confirm">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">提醒視窗</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc scroll_y" ng-if="data.index == 1" >
+					<table>
+						<tr>
+							<th>年齡18歲(含)以上客戶，學歷國中(含)以下欲變更為高中職(含)以上</th>
+						</tr>
+						<tr>
+							<td>
+								<div>原因：</div>
+									<div ng-repeat="row in data.options track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										{{$index+1}}
+										<label><input ng-disabled="noupdatedata" type="radio" name="edu_choose" ng-model="inputVO.edu_choose" ng-value="row.DATA" required>
+										{{row.LABEL}}
+										</label>
+									</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="gv_tab_sc scroll_y" ng-if="data.index == 3">
+					<table>
+						<tr>
+							<th>有重大傷病證明變更為無的原因</th>
+						</tr>
+						<tr>
+							<td>
+								<div>原因：</div>
+									<div ng-repeat="row in data.options track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										{{$index+1}}
+										<label><input ng-disabled="noupdatedata" type="radio" name="health_change" ng-model="inputVO.health_change" ng-value="row.DATA" required>
+										{{row.LABEL}}
+										</label>
+									</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="gv_tab_sc scroll_y" ng-if="data.index == 5">
+					「客戶已填過「衍生性金融商品客戶適性評估問卷」，請檢視客戶投資經驗填答內容與本次填答是否一致。」
+				</div>
+				<div class="gv_tab_sc scroll_y" ng-if="data.index == 7">
+					<table>
+						<tr>
+							<th>經比對，客戶留存電子郵件與本行其他客戶有重覆情形，請與客戶確認原因</th>
+						</tr>
+						<tr>
+							<td>
+								<div style="display: inline;">
+									重覆電子郵件客戶姓名: 
+									<div ng-repeat="row in data.sameEmailData track by $index"">
+										<label>
+                                           {{row.name}}  ID: {{row.id}} <br>
+										</label>
+									</div> 
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<div>原因：<br></div>
+									<div ng-repeat="row in data.options track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										{{$index+1}}
+										<label style="font-size:14px"><input ng-disabled="noupdatedata" type="radio" name="sameEmail_choose" ng-model="inputVO.sameEmail_choose" ng-value="row.DATA" required>
+										{{row.LABEL}}
+										</label>
+									</div>
+							</td>
+						</tr>
+						<tr>
+							<td ng-show="inputVO.sameEmail_choose == 5">
+								<div style="display: inline;">
+									理由：
+									<input id="sameEmail_reason" name="sameEmail_reason" type="text" ng-model="inputVO.sameEmail_reason" placeholder="請輸入..." e-length-limit="50" required>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div style="text-align: right;">
+<!-- 					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >確定</button> -->
+					<button type="button" class="btn btn-info" ng-click="confirm()" >確定</button>
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

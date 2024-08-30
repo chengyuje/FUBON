@@ -1,0 +1,278 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/REF120/REF120.js"></script>
+<div class="REF120" ng-controller="REF120Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr>
+						<th style="width: 16.6%;">案件編號：</th>
+						<td style="width: 16.6%;"><input type="text" class="form-control" placeholder="請輸入..." id="seq" name="seq" ng-model="inputVO.seq" e-length-limit="13"></td>
+						<th style="width: 16.6%;"><font style="color: red;">＊</font>轉介日期：</th>
+						<td colspan="3">
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="sDate" name="sDate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.sDate"
+									   is-open="model.a"
+									   datepicker-options="startDateOptions"
+									   alt-input-formats="altInputFormats"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>	
+							<div style="float: left">&nbsp;~&nbsp;</div>
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="eDate" name="eDate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.eDate"
+									   is-open="model.b"
+									   datepicker-options="endDateOptions"
+									   alt-input-formats="altInputFormats"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th style="width: 16.6%;">業務處：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="regionID" name="regionID"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.regionID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width: 16.6%;">營運區：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="branchAreaID" name="branchAreaID"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branchAreaID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width: 16.6%;">分行：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="branchID" name="branchID"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branchID"
+									ng-validate="false" 
+									ng-disabled="AVAIL_BRANCH.length == 1"
+									ng-readonly="AVAIL_BRANCH.length == 1" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch(region)"
+									style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th style="width: 16.6%;">轉介人員編：</th>
+						<td style="width: 16.6%;"><input type="text" class="form-control" placeholder="請輸入..." id="salesPerson" name="salesPerson" ng-model="inputVO.salesPerson" e-length-limit="11"></td>
+						<th style="width: 16.6%;">轉介人姓名：</th>
+						<td style="width: 16.6%;"><input type="text" class="form-control" placeholder="請輸入..." id="salesName" name="salesName" ng-model="inputVO.salesName" e-length-limit="180"></td>
+						<th style="width: 16.6%;">轉介人職務別：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="salesRole" name="salesRole" 
+										ng-paramtype="CAM.REF_SALES_ROLE"
+										ng-model="inputVO.salesRole"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+					<tr>
+						<th style="width: 16.6%;">受轉介人員編：</th>
+						<td style="width: 16.6%;"><input type="text" class="form-control" placeholder="請輸入..." id="userID" name="userID" ng-model="inputVO.userID" e-length-limit="11"></td>
+						<th style="width: 16.6%;">受轉介人姓名：</th>
+						<td style="width: 16.6%;"><input type="text" class="form-control" placeholder="請輸入..." id="userName" name="userName" ng-model="inputVO.userName" e-length-limit="180"></td>
+						<th style="width: 16.6%;">受轉介人職務別：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="userRole" name="userRole" 
+										ng-paramtype="CAM.REF_USER_ROLE"
+										ng-model="inputVO.userRole"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+					</tr>
+						<th style="width: 16.6%;">客戶ID：</th>
+						<td style="width: 16.6%;"><input type="text" class="form-control" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" e-length-limit="10"></td>
+						<th style="width: 16.6%;">客戶姓名：</th>
+						<td style="width: 16.6%;"><input type="text" class="form-control" placeholder="請輸入..." id="custName" name="custName" ng-model="inputVO.custName" e-length-limit="18"></td>
+						<th style="width: 16.6%;">轉介商品：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="refProd" name="refProd" 
+										ng-paramtype="CAM.REF_PROD"
+										ng-model="inputVO.refProd"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="checkContRslt()"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th style="width: 16.6%;">投保商品案件<br />進度查詢：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="refInsContRslt" name="refInsContRslt" 
+										ng-paramtype="CAM.REF_INS_CONT_RSLT"
+										ng-model="inputVO.refInsContRslt"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="checkProd('ins')"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+						<th style="width: 16.6%;">貸款類商品案件<br />進度查詢：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="refLoanContRslt" name="refLoanContRslt" 
+										ng-paramtype="CAM.REF_LOAN_CONT_RSLT"
+										ng-model="inputVO.refLoanContRslt"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="checkProd('loan')"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query"　ng-disabled="(inputVO.sDate == undefined || inputVO.sDate　== '' || inputVO.sDate == null) ||
+																												 				　(inputVO.eDate == undefined || inputVO.eDate == '' || inputVO.eDate == null)">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" function-type="export" ng-disabled="salerecList.length == 0">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="salerecList"></e-jumping-once>
+<!-- 			<e-jumping output="outputVO" input="inputVO" query="inquire()" list="salerecList"></e-jumping> -->
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>功能</th>
+							<th>是否已處理</th>
+							<th>案件編號</th>
+							<th>日期</th>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行</th>
+							<th>轉介人員編</th>
+							<th>轉介人姓名</th>
+							<th>轉介人職務別</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>轉介商品</th>
+							<th>受轉介人員編</th>
+							<th>受轉介人姓名</th>
+							<th>受轉介人職務別</th>
+							<th>聯絡狀態</th>
+							<th>洽談內容</th>
+							<th>已核不撥原因</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" align="center" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>
+								<e-combobox id="cmbAction" name="cmbAction"
+											ng-datasource="row.set"
+											ng-model="row.cmbAction"
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="action(row)"
+											ng-if="row.set.length > 0"
+											width="100px"
+											style="line-height:20px;" />
+											{{row.cmbAction}}
+							</td>
+							<td>{{row.CONT_RSLT != null && row.CONT_RSLT != 'A01' ? '✔' : ''}}</td>
+							<td>
+								{{row.SEQ}}
+								<div style="display:inline;" ng-if="row.REF_CON_ID != null"><br />(舊){{row.REF_CON_ID}}</div>
+							</td>
+							<td>{{toJsDate(row.TXN_DATE) | date:"yyyy-MM-dd"}}</td>
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							<td>{{row.BRANCH_AREA}}</td>
+							<td>{{row.BRANCH}}</td>
+							<td>{{row.SALES_PERSON}}</td>
+							<td>{{row.SALES_NAME}}</td>
+							<td>{{row.SALES_ROLE | mapping:mappingSet['CAM.REF_SALES_ROLE']:'F3'}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.REF_PROD | mapping:mappingSet['CAM.REF_PROD']:'F3'}}</td>
+							<td>{{row.USERID}}</td>
+							<td>{{row.USERNAME}}</td>
+							<td>{{row.USERROLE | mapping:mappingSet['CAM.REF_USER_ROLE']:'F3'}}</td>
+							<td>
+								<div ng-if="row.REF_PROD == '5'">{{row.CONT_RSLT | mapping:mappingSet['CAM.REF_INS_CONT_RSLT']:'F3'}}</div>
+								<div ng-if="row.REF_PROD != '5'">{{row.CONT_RSLT | mapping:mappingSet['CAM.REF_LOAN_CONT_RSLT']:'F3'}}</div>
+							</td>
+							<td>
+								<div uib-tooltip="{{row.COMMENTS}}" tooltip-placement="right-bottom">
+									{{row.COMMENTS.length > 10 ? (row.COMMENTS | limitTo: 10) + "..." : row.COMMENTS}}
+								</div>
+							</td>
+							<td>{{row.NON_GRANT_REASON | mapping:mappingSet['CAM.REF_NON_GRANT_REASON']:'F3'}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

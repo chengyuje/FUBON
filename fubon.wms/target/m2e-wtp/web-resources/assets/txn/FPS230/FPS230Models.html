@@ -1,0 +1,223 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .FPSModels .modal-body {
+    padding: 0;
+  }
+
+  .FPSModels .modal-dialog {
+    width: 90vw;
+  }
+  
+nav.ios li {
+	margin-left: -5px;
+	display: inline-block;
+	width: 150px;
+	padding: .1em 1em;
+	border: 0.7px solid #29819d;
+	background-color: #fff;
+	color: #29819d;
+	cursor: pointer;
+}
+
+</style>
+<!-- WV USE -->
+<script type="text/javascript" src="assets/txn/FPS230/FPS230Models.js"></script>
+<!-- WV USE -->
+<script type="text/javascript" src="assets/txn/FPS230/FPS230ModelDetail.js"></script>
+<script type="text/javascript" src="assets/txn/PRD110/PRD110_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD130/PRD130_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD140/PRD140_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD150/PRD150_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD160/PRD160_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd.js"></script>
+
+<div ng-controller="FPS230ModelsController"
+     ng-cloak
+     class="FPS FPSModels">
+
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a href="#"
+           class="close"
+           data-dismiss="modal"
+           aria-hidden="true"
+           ng-click="closeThisDialog('cancel')">&times; </a>
+        <h4 id="myModalAlertLabel"
+            class="modal-title"
+            ng-bind="type + (title||'投資組合配置')"></h4>
+      </div>
+      <div class="modal-body">
+        <section class="block banner container no-area"
+                 style="text-align: left;
+                        background-color: #bfe2f7;
+                        border-color: #bfe2f7;
+                        margin-bottom:0;">
+          <div class="content-wrapper"
+               style="height:36px;
+                      line-height:1em;">
+            <div class="content-title"
+                 style="font-size:1.2em;
+                        font-weight: 600;
+                        width:49%;">您預設優先顯示的
+              <span ng-bind="riskType"></span>投資組合為:
+              <span ng-bind="preferTitle"></span>
+            </div>
+          </div>
+        </section>
+        <div ios-nav
+             title-map="titleMap"
+             path="path"
+             value="model"
+             style="margin-top:.5em;
+                    font-size: 1.3em;"></div>
+
+        <section class="block container">
+          <div class="title title-left">
+            特色
+          </div>
+          <div class="content-wrapper">
+            <p ng-bind="featureDescription[0].FEATURE_DESC"></p>
+          </div>
+        </section>
+
+        <section class="block container">
+          <div class="title title-left">
+            標的
+          </div>
+          <div class="content-wrapper"
+               style="padding:0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th style="padding:1.2em 0;"
+                      ng-if="!returnAll"></th>
+                  <th>類別</th>
+                  <th>商品</th>
+                  <th>風險等級</th>
+                  <th>
+                  	<div>計價幣別</div>
+                	<div ng-show="data.sppType === 'SPP'">保單幣別</div>
+                  </th>
+                  <th>短期展望</th>
+                  <th ng-if="!hasIns">投入金額</th>
+                  <th ng-if="!hasIns">約當台幣</th>
+                  <th>建議比例</th>
+                </tr>
+              </thead>
+              <tbody style="text-align:center;">
+                <tr ng-repeat="row in recommendList" ng-show= "stockBondType === 'ALL' || row.STOCK_BOND_TYPE == stockBondType">
+                  <td ng-if="!returnAll">
+                    <input type="checkbox"
+                           ng-model="row.selected">
+                  </td>
+                  <td ng-bind="row.PTYPE|mapping: prodTypeMap">
+                    <!-- 類別 -->
+                  </td>
+                  <td style="padding-left:12px;
+                             text-align:left;">
+                    <a ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+                       ng-click="go('detail', row.PTYPE, row)"
+                       ng-if="row.PTYPE!='ETF'"></a>
+                    <a ng-href="https://www.fubon.com/banking/personal/fund_trust/ETF_search/ETF_search.htm?show=m5&Pram=$ETFWEB$HTML$ET011001]DJHTM#ETFID}{{row.PRD_ID}}"
+                       target="_blank"
+                       ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+                       ng-if="row.PTYPE=='ETF'">
+                    </a>
+                    <span ng-bind="row.targetIDs"
+                          ng-if="row.PTYPE=='INS'"
+                          class="ps"></span>
+                    <!-- 代號商品 -->
+                  </td>
+                  <td ng-bind="row.RISK_TYPE||'--'">
+                    <!-- 風險等級 -->
+                  </td>
+                  <td ng-bind="row.CURRENCY_TYPE">
+                    <!-- 計價幣別 -->
+                  </td>
+                  <td>
+                    <!-- 投資展望 -->
+                    <img ng-src="{{mapping.trendPath[row.CIS_3M]}}"
+                         alt="{{row.CIS_3M}}">
+                    <span ng-if="!row.CIS_3M">--</span>
+                    <div>
+                      <a class="more"
+                         ng-click="go('product',null,row)">more</a>
+                    </div>
+                  </td>
+                  <td ng-bind="(sppType === 'SPP' && row.PURCHASE_ORG_AMT == 0) ? '--' : (row.PURCHASE_ORG_AMT|number)" ng-if="!hasIns">
+                    <!-- 約當原幣 -->
+                  </td>
+                  <td ng-bind="(sppType === 'SPP' && row.PURCHASE_ORG_AMT == 0) ? '--' : (row.PURCHASE_TWD_AMT|number)" ng-if="!hasIns">
+                    <!-- 約當台幣 -->
+                  </td>
+                  <td>
+                    <!-- 比例 -->
+                    <span ng-bind="row.INV_PERCENT"></span>%
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="block container">
+          <div class="title title-left">
+            基金 歷史績效
+            <a style="float:right;
+                      margin-right:.5em"
+               ng-click="arrowUp=!arrowUp">
+              <img ng-src="{{arrowPath[arrowUp?'down':'up']}}"
+                   class="icon">
+            </a>
+          </div>
+          <div class="content-wrapper"
+               ng-show="arrowUp"
+               style="padding:0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th rowspan="2"
+                      style="border-right: .5px solid #ddd;">投資組合持有期間</th>
+                  <th colspan="2"
+                      style="border-bottom: .5px solid #ddd;">總行推薦</th>
+                </tr>
+                <tr>
+                  <th style="border-right: .5px solid #ddd;width:25%;">累積報酬率%</th>
+                  <th style="width:25%;">年化波動率%</th>
+                </tr>
+              </thead>
+              <tbody style="text-align:center;">
+                <tr ng-repeat="model in modelList">
+                  <td>
+                    <a ng-bind="model.DATA_YEARMONTH+'~至今'"
+                       ng-click="go('model','model',model)"></a>
+                  </td>
+                  <td ng-bind="model.RETURN_ANN+'%'"></td>
+                  <td ng-bind="model.VOLATILITY+'%'"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="clear"
+                 ng-if="sppType==='INV'"
+                 style="text-align: left;">
+          <div class="ps-wrapper">
+            <div class="ps">
+              ＊提供近一年每月推薦的投資組合標的與比例，在假設投資組合持有至今都不調整標的與比例情況下，計算累積報酬率及年化波動率。
+            </div>
+          </div>
+        </section>
+
+        <div class="padding text-center"
+             style="margin-bottom:1em;">
+          <a class="btn-fps"
+             ng-click="back2Main(returnAll)">加入規劃</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

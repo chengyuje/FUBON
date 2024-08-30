@@ -1,0 +1,197 @@
+<style>
+
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/SQM210/SQM210.js"></script>
+
+<div class="SQM210" ng-controller="SQM210Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>						
+						<th><font color=red>＊</font>計績年月：</th>
+							<td>						 
+								<e-combobox ng-datasource="ymList"
+											ng-model="inputVO.yearMon"
+											ng-validate="false"
+											ng-editable="false" ng-format="F3"
+											width="150px" height="30px"	
+											ng-required="true"								
+											style="line-height:20px;" /></td>					 
+							</td>
+						<th>分行別：</th>
+							<td>
+								<e-combobox
+								ng-datasource="BRANCH_LIST"
+								ng-model="inputVO.branchNbr"
+								ng-validate="false" 
+								ng-disabled="disableBranchCombo"
+								ng-readonly="disableBranchCombo" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+							</td>	
+						<th>滿意度：</th>
+							<td>						 
+								<e-combobox ng-datasource="ANS_TYPE"
+											ng-model="inputVO.satisfactionO"
+											ng-validate="false" 
+											ng-disabled="disableBranchCombo"
+											ng-readonly="disableBranchCombo" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="false"
+											width="155px"
+											style="line-height:20px;" />						 
+							</td>
+					</tr>
+					<tr>
+						<th>問卷別：</th>
+							<td>						 
+								<e-combobox ng-datasource="QTN_LIST"
+											ng-model="inputVO.qtnType"
+											ng-validate="false" 
+											ng-disabled="disableBranchCombo"
+											ng-readonly="disableBranchCombo" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											width="155px"
+											style="line-height:20px;" />						 
+							</td>
+						<th>職務別：</th>
+						<td>
+							<e-combobox ng-datasource="ROLE_ID_SHOW"
+										ng-model="inputVO.jobTitleName"
+					   					ng-validate="false" 
+					   					ng-readonly="false" 
+					   					ng-editable="false"
+					   					ng-format="F3"
+					   					ng-required="false"
+			   							style="line-height:20px;" />
+					   	</td>
+
+						<th>員編：</th>
+							<td><input type="text"  ng-model="inputVO.empId" style="width: 100px; "/></td>				 
+					</tr>
+														
+				</table>
+				</form>
+			</div>
+			<div class="search_box_btn">
+				<span style="color: red;">依問卷「整體滿意度」分類。</span>
+				<div style="text-align: center;">
+					<button type="button" class="btn btn-info" ng-click="inquiry()">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+					<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+			<e-jumping-once output="outputVO"  list="data" totallist="paramList" query = "query()"></e-jumping-once>
+			<!-- <e-jumping-once output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping-once> -->
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;overflow-y: hidden;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="4" e-list="paramList">
+					<thead>
+						<tr>
+							<th>計績年月</th>
+							<th>問卷別</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NBR" e-query="inquiry()">分行別</e-sorter>
+							</th>
+							<th>姓名</th>
+							<th>員編</th>
+							<th>職務</th>
+							<th>滿意度</th>
+							<th>回覆值</th>
+							<th>客戶ID</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="SEND_DATE" e-query="inquiry()">接收日期</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="RESP_DATE" e-query="inquiry()">回覆日期</e-sorter>
+							</th>
+							<th>手機號碼</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DEDUCTION_FINAL" e-query="inquiry()">扣分</e-sorter>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td style="text-align:center;">{{row.YEARMON}}</td>
+						 	<td style="text-align:center;">{{row.QTN_TYPE | mapping:QTN_LIST}}</td>
+							<td style="text-align:center;">{{row.BRANCH_NBR}}</td>
+							<td style="text-align:center;"> 
+								{{row.EMP_NAME}}
+							</td>
+							<td style="text-align:center;">
+								{{row.EMP_ID}}
+							</td>
+							<td style="text-align:center;">
+								{{row.CUR_JOB}}
+							</td>
+							<td style="text-align:center;">
+								{{row.SATISFACTION_O | mapping:ANS_TYPE}}
+							</td>
+<!--  						
+							<td style="text-align:center;">
+								<e-combobox ng-datasource="ANS_TYPE"
+											ng-model="row.SATISFACTION_O"
+											ng-editable="true"
+											ng-format="F3"
+											ng-required="true"
+											width="155px"
+											style="line-height:20px;" ng-disabled ="true"/>		
+							</td>
+-->								
+							<td style="text-align:center;">
+								<input type="text" style="text-align:center;" ng-model="row.RESP_NO"
+								       ng-required = "true" ng-blur="change_final(row)" >
+							</td>
+							<td style="text-align:center;">{{row.CUST_ID}}</td>
+							<td style="text-align:center;">{{row.SEND_DATE}}</td>
+							<td style="text-align:center;">{{row.RESP_DATE}}</td>
+							<td style="text-align:center;">{{row.MOBILE_NO}}</td>
+							<td style="text-align:center;">
+							{{row.DEDUCTION_FINAL}}
+<!-- 
+								<input type="text" style="text-align:center;" ng-model="row.DEDUCTION_FINAL"
+								       ng-required = "true">
+ -->							
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<br>
+				<div align="center" ng-show="paramList.length > 0"><button type="button" class="btn btn-info" ng-click="save()">儲存</button></div>				
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,128 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS210 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 90%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setSpMar.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_UPLOAD.js"></script>
+<div ng-controller="PMS210_setSpMarController" ng-cloak>
+	<div class="modal-dialog PMS210">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+<!-- 				<div class="tfb_content_icon"></div> -->
+<!-- 				<div class="tfb_content_tit"> -->
+<!-- 					<img src="assets/images/icon/tfb_icon_a15.gif">請上傳非財務扣分明細 -->
+<!-- 				</div> -->
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請上傳非財務扣分明細</h4>
+
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<e-jumping output="outputVO" input="inputVO" query="select()"
+					list="spMarList"></e-jumping>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						<table class="table-bordered">
+							<tr>
+								<th >成績年月</th>
+								<th >分行代碼</th>
+								<th >分行名稱</th>
+								<th >缺失內容</th>
+								<th >人員類別</th>
+								<th >理專姓名</th>
+								<th >員工編號</th>
+								<th >客戶紛爭%</th>
+								<th >法令遵循/其他內外部規範%</th>
+								<th >稽核缺失%</th>
+								<th >證照取得%</th>
+								<th >認識客戶作業落實(KYC)%</th>
+								<th >滿意度%</th>
+								<th >非常態交易%</th>
+								<th >獨立重大缺失扣減獎金%</th>
+								<th >發生/釐清月份</th>
+								<th >發生/釐清往前追溯月數</th>
+								<th >角色別</th>
+								<th >理專群組</th>
+							</tr>
+							<tr ng-repeat="y in spMarList">
+								<td style="color:blue; text-align:center" >
+									{{y.YEARMON}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.BRANCH_NBR}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.BRANCH_NAME}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.MISS_CONT}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.PERSONNEL_CATEGORY}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.EMP_NAME}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.EMP_ID}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.CUST_DIS}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.REG_COM_EXT_SPEC}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.AUD_MISS}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.OBT_LICEN}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.KYC}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.SATISFACTION}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.UN_TRANS}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.LACK_IND_RATE}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.HA_MONTH}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.PERIOD_TIME}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.CUST_TYPE}}
+								</td>
+								<td style="color:blue; text-align:center" >
+									{{y.EMP_GROUPS}}
+								</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="upload(resultList.YEARMON)">上傳資料</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div>
+</div>

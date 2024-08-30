@@ -1,0 +1,54 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS711 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 50%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS711/PMS711.js"></script>
+<script type="text/javascript" src="assets/txn/PMS711/PMS711_pro21.js"></script>
+<div ng-controller="PMS711_pro21Controller" ng-cloak>
+	<div class="modal-dialog PMS711">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{subName}}</h4>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						商、新金轉換比例 &nbsp;<input type="text" size="2" style="text-align:right;width:100px" ng-model="showList[0].TAKING_COUNT"/>&nbsp; : 
+						&nbsp;<input type="text" size="2" style="text-align:right;width:100px" ng-model="showList[0].NEW_COUNT"/>
+						<br/><br/>
+						<table class="table-bordered">
+							<tr>
+								<th>主管類別</th>
+								<th ng-if="subId=='21'">商金戶數目標</th>
+								<th ng-if="subId=='26'">新金戶數目標</th>
+							</tr>
+							<tr ng-repeat="y in showList">
+								<td align="center" style="color:blue;"> {{y.CHAR_TYPE}}</td>
+								<td ng-if="subId=='21'" align="center"> <input type="text" style="text-align:right;width:100px" ng-model="y.TAKING_PROP" size="10"/> </td>
+								<td ng-if="subId=='26'" align="center"> <input type="text" style="text-align:right;width:100px" ng-model="y.NEW_PROP" size="10"/> </td>
+							</tr>
+							
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()">儲存</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div>
+</div>

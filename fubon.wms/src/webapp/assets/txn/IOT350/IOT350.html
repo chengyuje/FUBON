@@ -1,0 +1,170 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+
+/* check box css */
+input.faChkRnd, input.faChkSqr {
+  visibility: hidden;
+}
+input.faChkRnd:checked:after, input.faChkRnd:after,
+input.faChkSqr:checked:after, input.faChkSqr:after {
+  visibility: visible;
+  font-family: FontAwesome;
+  font-size:25px;height: 17px; width: 17px;
+  position: relative;
+  top: -3px;
+  left: 0px;
+  background-color:#FFF;
+  display: inline-block;
+}
+
+input.faChkRnd:checked:after {
+  content: '\f058';
+}
+
+input.faChkRnd:after {
+  content: '\f10c';
+}
+
+input.faChkSqr:checked:after {
+  content: '\f14a';
+}
+
+input.faChkSqr:after {
+  content: '\f096';
+}
+/* check box css */
+
+</style>
+<div class="IOT350" ng-controller="IOT350Controller" ng-cloak>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a15.gif">產險集作大保單送件查詢
+				</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<div class="search_table search_box3">
+					<table>
+						<tr>
+							<th>保險文件編號：</th>
+							<td><input type="text" placeholder="請輸入..." id="insId"
+								name="insId" ng-model="inputVO.insId" e-length-limit="12">
+							</td>
+							<th>要保險人 ID：</th>
+							<td><input type="text" placeholder="請輸入..." id="custId"
+								name="custId" ng-model="inputVO.custId" e-length-limit="12" style="text-transform: uppercase;">
+							</td>
+							<th>被保險人 ID:</th>
+							<td><input type="text" placeholder="請輸入..." id="insuredId"
+								name="insuredId" ng-model="inputVO.insuredId" e-length-limit="12" style="text-transform: uppercase;">
+							</td>
+						</tr>
+						<tr>						
+						<th>申請日期：</th>
+						<td colspan="5">							
+							<div class="input-group datebox datewidth" style="float:left">
+								<input type="text" id="applyDateFrom" name="applyDateFrom"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.applyDateFrom"
+								is-open="model.a"
+								datepicker-options="sDateOptions"								
+								ng-readonly="true"								
+								ng-change="limitDate();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>																					
+							<div style="float:left">&nbsp; ～ &nbsp;</div>	
+							<div class="input-group datebox datewidth" style="float:left">
+								<input type="text" id="applyDateTo" name="applyDateTo"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.applyDateTo"
+								is-open="model.b"
+								datepicker-options="eDateOptions"								
+								ng-readonly="true"								
+								ng-change="limitDate();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>								
+						</td>											    											
+					</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info"
+						ng-click="queryData()">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="clear()">清除</button>
+				</div>
+			</div>
+			<!-- 結果區 -->
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a15.gif">集作大保單送件查詢結果
+				</div>
+			</div>
+			<div class="panel_content">
+				<div class="tab-pane fade in active">
+					<e-jumping-once ng-show="inputVO"
+						output="outputVO"
+						totallist="paramList"
+						list="data"
+						>
+					</e-jumping-once>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th>匯入狀態</th>
+									<th>保險文件編號</th>
+									<th>作業中心代號</th>
+									<th>要保險人ID</th>
+									<th>要保險人姓名</th>
+									<th>被保險人ID</th>
+									<th>被保險人姓名</th>
+									<th>申請日期</th>
+									<th>招攬人員編</th>
+									<th>總保費</th>
+									<th>險種</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row"
+									ng-repeat="row in data track by $index | limitTo:displayLimit"
+									ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td align="center">{{row.IMPORT_STATUS}}</td>
+									<td align="center">{{row.INS_ID}}</td>
+									<td align="center">{{row.BRANCH_NBR}}</td>
+									<td align="center">{{row.CUST_ID}}</td>
+									<td align="center">{{row.PROPOSER_NAME}}</td>
+									<td align="center">{{row.INSURED_ID}}</td>
+									<td align="center">{{row.INSURED_NAME}}</td>
+									<td align="center">{{toJsDate(row.APPLY_DATE)|date:'yyyy-MM-dd'}}</td>
+									<td align="center">{{row.RECRUIT_ID}}</td>
+									<td align="center">{{row.REAL_PREMIUM|number}}</td>
+									<td align="center">{{row.PPT_TYPE}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,393 @@
+<style>
+/* open dialog */
+.ngdialog.PMS217 {
+}
+/* dialog panl */
+#ejp>tbody {
+	width: 100% !important;
+}
+.modal-dialog.PMS217 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS217 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PMS217 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS217.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS217_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+.alignleft {
+	text-align: left !important;
+}
+.bigspace {
+	margin-left: 50px !important;
+}
+.datewidth {
+	width: 180px !important;
+}
+.search-table-outter {
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.red {
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS217/PMS217.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS217" ng-controller="PMS217Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">資料查詢
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*報表年月：</th>
+							<td><e-combobox id="sTime"
+									ng-datasource="mappingSet['timeE']" ng-model="inputVO.sTime"
+									ng-change="rptVersionChange();dateChange();select()" ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-format="F3" ng-required="true" width="200px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>*報表版本：</th>
+							<td>						
+								<e-combobox id="rptVersion" name="rptVersion" ng-datasource="mappingSet['rversion']"
+								ng-model="inputVO.rptVersion" ng-validate="false" ng-readonly="false" 
+								ng-editable="false" ng-format="F3" 
+								ng-required="true" width="200px" height="30px" style="line-height:20px;" />						 
+							</td>
+							<th>業務處：</th>
+							<td><e-combobox id="region_center_id" name="region_center_id" ng-model="inputVO.region_center_id" 
+									ng-datasource="REGION_LIST" ng-validate="false" ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-format="F3"  ng-change="ChangeRegion()"
+									width="200px" height="30px" style="line-height:20px;" /></td>
+						</tr>
+						<tr>
+							<th>&nbsp;營運區：</th>
+							<td><e-combobox id="branch_area_id" name="branch_area_id" ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id" ng-validate="false" ng-readonly="disableAreaCombo"
+									ng-disabled="disableAreaCombo" ng-editable="false" ng-change="ChangeArea()" ng-format="F3"
+									width="200px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>&nbsp;分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr"
+									ng-validate="false" ng-editable="false"
+									ng-format="F1" ng-change="ChangeBranch()"
+									ng-readonly="disableBranchCombo" 
+									ng-disabled="disableBranchCombo"
+									width="200px" height="30px" style="line-height:20px;" /></td>
+							<th>理專：</th>
+							<td><e-combobox id="ao_code" name="ao_code"
+									ng-datasource="AO_LIST" ng-model="inputVO.ao_code"
+									ng-validate="false" ng-disabled="disableAoCombo"
+									ng-readonly="disableAoCombo"  ng-change="ChangeAo_code()"
+									ng-editable="false" ng-format="F1" width="200px"
+									style="line-height:20px;" /></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();inquireInit()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" ng-disabled="largeAgrList.length < 1">匯出</button>
+			</div>
+		</div>
+	<!-- 結果區 -->
+		<div>
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+				</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<e-jumping output="outputVO" input="inputVO" query="query()"
+					list="largeAgrList"></e-jumping>
+				<div class="gv_tab_sc scroll_y"
+					style="height: 235px; white-space: nowrap;">
+					<table class="  table-bordered">
+						<thead ng-if="role == 1">
+							<tr>
+								<th rowspan="2">資料年月</th>
+								<th rowspan="2">業務處</th>
+								<th rowspan="2">營運區</th>
+								<th rowspan="2">分行代碼</th>
+								<th rowspan="2">分行別</th>
+								<th rowspan="2">員工編號</th>
+								<th rowspan="2">專員姓名</th>
+								<th rowspan="2">AO_CODE</th>
+								<th rowspan="2">理專職級</th>
+								<th rowspan="1" colspan="20">計績收益(加碼後)</th>
+								<th rowspan="2">實際收益</th>
+								<th rowspan="2">承作量</th>
+								<th rowspan="2">收益目標</th>
+								<th rowspan="2">理財收益目標</th>
+								<th rowspan="2">加碼後計績收益達成率</th>
+								<th rowspan="2">理財收益達GOAL獎金(1)</th>
+								<th rowspan="1" colspan="4">新戶數</th>
+								<th rowspan="2">新戶開發獎金(2)</th>
+								<th rowspan="2">轉介計績收益</th>
+								<th rowspan="2">轉介獎金(3)<br>[轉介計績收益* 4%]</th>
+								<th rowspan="2">績效獎勵金<br>(4)=(1)+(2)+(3)</th>
+								<th rowspan="2">財務指標扣減金額</th>
+								<th rowspan="2">非財務指標扣減金額</th>
+								<th rowspan="2">獨立列示重大缺失扣減金額</th>
+								<th rowspan="2">新戶轉介扣減金額</th>
+								<th rowspan="2">上期遞延扣減金額</th>
+								<th rowspan="2">實際扣減金額<br>(本月+上期遞延)</th>
+								<th rowspan="2">業務獎勵金100%</th>
+								<th rowspan="2">業務獎勵金80%</th>
+								<th rowspan="2">業務獎勵金20%</th>
+								<th rowspan="2">獎金率</th>
+								<th rowspan="2">業務獎勵金應調整數</th>
+								<th rowspan="2">業務獎勵金實發</th>
+								<th rowspan="2">名次(依據業務獎勵金實發)</th>
+								<th rowspan="2">達100%門檻人數</th>
+								<th rowspan="2">業務獎勵金調整說明</th>
+							</tr>
+							<tr>
+								<th rowspan="1">存匯類商品</th>
+								<th rowspan="1">國內基金-單筆</th>
+								<th rowspan="1">國內基金-小額</th>
+								<th rowspan="1">國內基金-短Trade(減項)</th>
+								<th rowspan="1">國外基金-單筆(含轉換)</th>
+								<th rowspan="1">國外基金-小額</th>
+								<th rowspan="1">國外基金-短Trade(減項)</th>
+								<th rowspan="1">基金管理費</th>
+								<th rowspan="1">DCI</th>
+								<th rowspan="1">SI</th>
+								<th rowspan="1">ETF</th>
+								<th rowspan="1">海外股票</th>
+								<th rowspan="1">海外債券</th>
+								<th rowspan="1">SN</th>
+								<th rowspan="1">保險-躉繳</th>
+								<th rowspan="1">保險-分期繳首年</th>
+								<th rowspan="1">保險-分期繳續年</th>
+								<th rowspan="1">信託商品</th>
+								<th rowspan="1">黃金存摺</th>
+								<th rowspan="1">加總</th>
+								<th rowspan="1"><show ng-show="newCustRateList[0].AUM_INC_START && newCustRateList[0].AUM_INC_END && newCustRateList[0].BONUS">{{(0+newCustRateList[0].AUM_INC_START)/10000  | number : 0}}萬~{{(0+newCustRateList[0].AUM_INC_END)/10000  | number : 0}}萬含投保<br>(每戶{{(0+newCustRateList[0].BONUS)}}元)</show></th>
+								<th rowspan="1"><show ng-show="newCustRateList[1].AUM_INC_START && newCustRateList[1].AUM_INC_END && newCustRateList[1].BONUS">{{(0+newCustRateList[1].AUM_INC_START)/10000  | number : 0}}萬~{{(0+newCustRateList[1].AUM_INC_END)/10000  | number : 0}}萬含投保<br>(每戶{{(0+newCustRateList[1].BONUS)}}元)</show></th>
+								<th rowspan="1"><show ng-show="newCustRateList[2].AUM_INC_START && newCustRateList[2].AUM_INC_END && newCustRateList[2].BONUS">{{(0+newCustRateList[2].AUM_INC_START)/10000  | number : 0}}萬~{{(0+newCustRateList[2].AUM_INC_END)/10000  | number : 0}}萬含投保<br>(每戶{{(0+newCustRateList[2].BONUS)}}元)</show></th>
+								<th rowspan="1"><show ng-show="newCustRateList[3].AUM_INC_START && newCustRateList[3].AUM_INC_END && newCustRateList[3].BONUS">{{(0+newCustRateList[3].AUM_INC_START)/10000  | number : 0}}萬以上含投保<br>(每戶{{(0+newCustRateList[3].BONUS)}}元)</show></th>
+							</tr>
+						</thead>
+						<thead ng-if="role != 1">
+							<tr>
+								<th rowspan="2">資料年月</th>
+								<th rowspan="2">業務處</th>
+								<th rowspan="2">營運區</th>
+								<th rowspan="2">分行代碼</th>
+								<th rowspan="2">分行別</th>
+								<th rowspan="2">員工編號</th>
+								<th rowspan="2">專員姓名</th>
+								<th rowspan="2">AO_CODE</th>
+								<th rowspan="2">理專職級</th>
+								<th rowspan="1" colspan="20">計績收益(加碼後)</th>
+								<th rowspan="2">加碼後計績收益達成率</th>
+								<th rowspan="2">理財收益達GOAL獎金(1)</th>
+								<th rowspan="1" colspan="4">新戶數</th>
+								<th rowspan="2">新戶開發獎金(2)</th>
+								<th rowspan="2">轉介計績收益</th>
+								<th rowspan="2">轉介獎金(3)<br>[轉介計績收益* 4%]</th>
+								<th rowspan="2">績效獎勵金<br>(4)=(1)+(2)+(3)</th>
+								<th rowspan="2">財務指標扣減金額</th>
+								<th rowspan="2">非財務指標扣減金額</th>
+								<th rowspan="2">獨立列示重大缺失扣減金額</th>
+								<th rowspan="2">新戶轉介扣減金額</th>
+								<th rowspan="2">上期遞延扣減金額</th>
+								<th rowspan="2">實際扣減金額<br>(本月+上期遞延)</th>
+								<th rowspan="2">業務獎勵金100%</th>
+								<th rowspan="2">業務獎勵金80%</th>
+								<th rowspan="2">業務獎勵金應調整數</th>
+								<th rowspan="2">業務獎勵金實發</th>
+								<th rowspan="2">業務獎勵金調整說明</th>
+							</tr>
+							<tr>
+								<th rowspan="1">存匯類商品</th>
+								<th rowspan="1">國內基金-單筆</th>
+								<th rowspan="1">國內基金-小額</th>
+								<th rowspan="1">國內基金-短Trade(減項)</th>
+								<th rowspan="1">國外基金-單筆(含轉換)</th>
+								<th rowspan="1">國外基金-小額</th>
+								<th rowspan="1">國外基金-短Trade(減項)</th>
+								<th rowspan="1">基金管理費</th>
+								<th rowspan="1">DCI</th>
+								<th rowspan="1">SI</th>
+								<th rowspan="1">ETF</th>
+								<th rowspan="1">海外股票</th>
+								<th rowspan="1">海外債券</th>
+								<th rowspan="1">SN</th>
+								<th rowspan="1">保險-躉繳</th>
+								<th rowspan="1">保險-分期繳首年</th>
+								<th rowspan="1">保險-分期繳續年</th>
+								<th rowspan="1">信託商品</th>
+								<th rowspan="1">黃金存摺</th>
+								<th rowspan="1">加總</th>
+								<th rowspan="1"><show ng-show="newCustRateList[0].AUM_INC_START && newCustRateList[0].AUM_INC_END && newCustRateList[0].BONUS">{{(0+newCustRateList[0].AUM_INC_START)/10000  | number : 0}}萬~{{(0+newCustRateList[0].AUM_INC_END)/10000  | number : 0}}萬含投保<br>(每戶{{(0+newCustRateList[0].BONUS)}}元)</show></th>
+								<th rowspan="1"><show ng-show="newCustRateList[1].AUM_INC_START && newCustRateList[1].AUM_INC_END && newCustRateList[1].BONUS">{{(0+newCustRateList[1].AUM_INC_START)/10000  | number : 0}}萬~{{(0+newCustRateList[1].AUM_INC_END)/10000  | number : 0}}萬含投保<br>(每戶{{(0+newCustRateList[1].BONUS)}}元)</show></th>
+								<th rowspan="1"><show ng-show="newCustRateList[2].AUM_INC_START && newCustRateList[2].AUM_INC_END && newCustRateList[2].BONUS">{{(0+newCustRateList[2].AUM_INC_START)/10000  | number : 0}}萬~{{(0+newCustRateList[2].AUM_INC_END)/10000  | number : 0}}萬含投保<br>(每戶{{(0+newCustRateList[2].BONUS)}}元)</show></th>
+								<th rowspan="1"><show ng-show="newCustRateList[3].AUM_INC_START && newCustRateList[3].AUM_INC_END && newCustRateList[3].BONUS">{{(0+newCustRateList[3].AUM_INC_START)/10000  | number : 0}}萬以上含投保<br>(每戶{{(0+newCustRateList[3].BONUS)}}元)</show></th>
+							</tr>
+						</thead>
+						
+						<tbody ng-if="role == 1">
+							<tr class="repeat-row" ng-repeat="row in largeAgrList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center">{{row.YEARMON}}</td>
+								<td align="center">{{row.REGION_CENTER_NAME}}</td>
+								<td align="center">{{row.BRANCH_AREA_NAME}}</td>
+								<td align="center">{{row.BRANCH_NBR}}</td>
+								<td align="center">{{row.BRANCH_NAME}}</td>
+								<td align="center">{{row.EMP_ID}}</td>
+								<td align="center">{{row.EMP_NAME}}</td>
+								<td align="center">{{row.AO_CODE}}</td>
+								<td align="center">{{row.JOB_TITLE_ID}}</td>
+								<td align="right">{{row.FC_DEPOSIT}}</td>
+								<td align="right">{{row.FC_LFUND_SIN}}</td>
+								<td align="right">{{row.FC_LFUND_SMA}}</td>
+								<td align="right">{{row.FC_LFUND_STR}}</td>
+								<td align="right">{{row.FC_OLUND_SIN}}</td>
+								<td align="right">{{row.FC_OLUND_SMA}}</td>
+								<td align="right">{{row.FC_OLUND_STR}}</td>
+								<td align="right">{{row.FC_FUND_MNG_FEE}}</td>
+								<td align="right">{{row.FC_DCI}}</td>
+								<td align="right">{{row.FC_SI}}</td>
+								<td align="right">{{row.FC_ETF}}</td>
+								<td align="right">{{row.FC_TPCC}}</td>
+								<td align="right">{{row.FC_OSEA}}</td>
+								<td align="right">{{row.FC_SN}}</td>
+								<td align="right">{{row.FC_INS_SG}}</td>
+								<td align="right">{{row.FC_INS_SQ_FIR}}</td>
+								<td align="right">{{row.FC_INS_SQ_CON}}</td>
+								<td align="right">{{row.FC_TRUST_FEE}}</td>
+								<td align="right">{{row.FC_GOLD}}</td>
+								<td align="right">{{row.COMBINED}}</td>
+								<td align="right">{{row.REAL_INCOME}}</td>
+								<td align="right">{{row.NOTIONAL_AMT}}</td>
+								<td align="right">{{row.EARN_GOAL}}</td>
+								<td align="right">{{row.XPAD_EARN_GOAL}}</td>
+								<td align="right">{{row.INCOME_OW_RATE}}</td>
+								<td align="right">{{row.XPAD_INCOME_GOAL}}</td>
+								<td align="right">{{row.INS_LEVEL1}}</td>
+								<td align="right">{{row.INS_LEVEL2}}</td>
+								<td align="right">{{row.INS_LEVEL3}}</td>
+								<td align="right">{{row.INS_LEVEL4}}</td>
+								<td align="right">{{row.NEW_CUST_DEV_BONUS}}</td>
+								<td align="right">{{row.REFER_PERFOR_GAIN}}</td>
+								<td align="right">{{row.REFER_BONUS}}</td>
+								<td align="right">{{row.PERFOR_BONUS}}</td>
+								<td align="right">{{row.FIN_DEDUC_AMT}}</td>
+								<td align="right">{{row.UN_FIN_DEDUCAMT}}</td>
+								<td align="right">{{row.LACK_IND_AMT}}</td>
+								<td align="right">{{row.NEW_REF_DEDUCT_AMT}}</td>
+								<td align="right">{{row.PREVIOUS_DEDUC_AMT}}</td>
+								<td align="right">{{row.REAL_DEDUC_AMT}}</td>
+								<td align="right">{{row.FC_BONUS_CNR100}}</td>
+								<td align="right">{{row.FC_BONUS_CNR80}}</td>
+								<td align="right">{{row.FC_BONUS_CNR20}}</td>
+								<td align="right">{{row.FC_BONUS_CNR}}</td>
+								<td align="right">{{row.FC_BONUS_CNRADJ}}</td>
+								<td align="right">{{row.FC_BONUS_CNR_REAL}}</td>
+								<td align="right">{{row.RANKING}}</td>
+								<td align="right">{{row.THRESHOLD_NUM_100}}</td>
+								<td align="left">{{row.FC_BONUS_CNRADJ_NOTE}}</td>
+							</tr>
+						</tbody>
+						<tbody ng-if="role != 1">
+							<tr class="repeat-row" ng-repeat="row in largeAgrList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center">{{row.YEARMON}}</td>
+								<td align="center">{{row.REGION_CENTER_NAME}}</td>
+								<td align="center">{{row.BRANCH_AREA_NAME}}</td>
+								<td align="center">{{row.BRANCH_NBR}}</td>
+								<td align="center">{{row.BRANCH_NAME}}</td>
+								<td align="center">{{row.EMP_ID}}</td>
+								<td align="center">{{row.EMP_NAME}}</td>
+								<td align="center">{{row.AO_CODE}}</td>
+								<td align="center">{{row.JOB_TITLE_ID}}</td>
+								<td align="right">{{row.FC_DEPOSIT}}</td>
+								<td align="right">{{row.FC_LFUND_SIN}}</td>
+								<td align="right">{{row.FC_LFUND_SMA}}</td>
+								<td align="right">{{row.FC_LFUND_STR}}</td>
+								<td align="right">{{row.FC_OLUND_SIN}}</td>
+								<td align="right">{{row.FC_OLUND_SMA}}</td>
+								<td align="right">{{row.FC_OLUND_STR}}</td>
+								<td align="right">{{row.FC_FUND_MNG_FEE}}</td>
+								<td align="right">{{row.FC_DCI}}</td>
+								<td align="right">{{row.FC_SI}}</td>
+								<td align="right">{{row.FC_ETF}}</td>
+								<td align="right">{{row.FC_TPCC}}</td>
+								<td align="right">{{row.FC_OSEA}}</td>
+								<td align="right">{{row.FC_SN}}</td>
+								<td align="right">{{row.FC_INS_SG}}</td>
+								<td align="right">{{row.FC_INS_SQ_FIR}}</td>
+								<td align="right">{{row.FC_INS_SQ_CON}}</td>
+								<td align="right">{{row.FC_TRUST_FEE}}</td>
+								<td align="right">{{row.FC_GOLD}}</td>
+								<td align="right">{{row.COMBINED}}</td>
+								<td align="right">{{row.INCOME_OW_RATE}}</td>
+								<td align="right">{{row.XPAD_INCOME_GOAL}}</td>
+								<td align="right">{{row.INS_LEVEL1}}</td>
+								<td align="right">{{row.INS_LEVEL2}}</td>
+								<td align="right">{{row.INS_LEVEL3}}</td>
+								<td align="right">{{row.INS_LEVEL4}}</td>
+								<td align="right">{{row.NEW_CUST_DEV_BONUS}}</td>
+								<td align="right">{{row.REFER_PERFOR_GAIN}}</td>
+								<td align="right">{{row.REFER_BONUS}}</td>
+								<td align="right">{{row.PERFOR_BONUS}}</td>
+								<td align="right">{{row.FIN_DEDUC_AMT}}</td>
+								<td align="right">{{row.UN_FIN_DEDUCAMT}}</td>
+								<td align="right">{{row.LACK_IND_AMT}}</td>
+								<td align="right">{{row.NEW_REF_DEDUCT_AMT}}</td>
+								<td align="right">{{row.PREVIOUS_DEDUC_AMT}}</td>
+								<td align="right">{{row.REAL_DEDUC_AMT}}</td>
+								<td align="right">{{row.FC_BONUS_CNR100}}</td>
+								<td align="right">{{row.FC_BONUS_CNR80}}</td>
+								<td align="right">{{row.FC_BONUS_CNRADJ}}</td>
+								<td align="right">{{row.FC_BONUS_CNR_REAL}}</td>
+								<td align="left">{{row.FC_BONUS_CNRADJ_NOTE}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	<!-- 結果區 -->
+	</div>
+</div>

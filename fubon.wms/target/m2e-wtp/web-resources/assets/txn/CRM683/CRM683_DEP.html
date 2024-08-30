@@ -1,0 +1,95 @@
+<style>
+    /* open dialog */
+    .ngdialog.CRM683_DEP {
+
+    }
+
+</style>
+<script type="text/javascript" src="assets/txn/CRM683/CRM683.js"></script>
+<script type="text/javascript" src="assets/txn/CRM683/CRM683_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/CRM683/CRM683_DEP.js"></script>
+
+<div class="CRM683_DEP" ng-controller="CRM683_DEPController" ng-cloak>
+    <h4 class="h4-title">台外幣活存</h4>
+    <e-jumping-once output="outputVO1" list="data1" totallist="cdList"></e-jumping-once>
+    <div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+        <table class="modal-body table-bordered">
+            <tr>
+                <th>帳號</th>
+                <th>幣別</th>
+                <th>帳戶餘額</th>
+                <th>契約編號</th>
+            </tr>
+            <tr class="repeat-row" ng-repeat="row in data1 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" > 
+                <td align="center">{{row.ACNO}}</td>
+                <td align="center">{{row.CUR}}</td>
+                <td align="center">{{row.VALUE | currency:''}}</td>
+                <td align="center">{{inputVO.contract_no}}</td>
+            </tr>
+        </table>
+    </div>
+    <h4 class="h4-title">台幣定存</h4>
+    <e-jumping-once output="outputVO2" list="data2" totallist="tdList"></e-jumping-once>
+    <div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+        <table class="modal-body table-bordered">
+            <tr>
+            	<th>幣別</th>
+                <th>存款期間</th>
+                <th>定存帳號</th>
+                <th>存單帳號</th>
+                <th>機動/固定</th>
+                <th>利率</th>
+                <th>存單金額</th>
+                <th>本利轉入帳號</th>
+                <th>到期續存方式</th>
+                <th>利息領取方式</th>
+                <th>契約編號</th>                
+            </tr>
+            <tr class="repeat-row" ng-repeat="row in data2 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'"  >
+                <td align="center">{{row.CUR}}</td>
+                <td align="center">{{toJsDate(row.VALUE_DATE)|date:'yyyy-MM-dd'}} ~ {{toJsDate(row.DUE_DATE) |date:'yyyy-MM-dd'}}</td>
+                <td align="center">{{row.ACNO}}</td>
+                <td align="center"></td>
+                <td align="center">{{row.INT_TYPE      | mapping:mappingSet['CRM.INT_RATE_TYPE']:'F3'}}</td>
+                <td align="center">{{row.INT_RATE}}%</td>
+                <td align="center">{{row.CD_AMT | currency:''}}</td>
+                <td align="center">{{row.INT_ACNO}}</td>
+                <td align="center">{{row.RENEW_TYPE    | mapping:mappingSet['CRM.MON_TRUST_RENEW_WAY']:'F3'}}</td>
+                <td align="center">{{row.INT_DRAW_TYPE | mapping:mappingSet['CRM.MON_TRUST_INT_WAY']:'F3'}}</td>
+                <td align="center">{{inputVO.contract_no}}</td>
+             </tr>
+        </table>
+    </div>
+    <h4 class="h4-title">外幣定存</h4>
+    <e-jumping-once output="outputVO3" list="data3" totallist="ftdList"></e-jumping-once>
+    <div class=" gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+        <table class="modal-body table-bordered">
+            <tr>
+                <th>幣別</th>
+                <th>起息日期~到期日期</th>
+                <th>定存帳號</th>
+                <th>存單帳號</th>
+                <th>機動/固定</th>
+                <th>利率</th>
+                <th>存單金額</th>
+                <th>本利轉入帳號</th>
+                <th>到期續存方式</th>
+                <th>利息領取方式</th>
+                <th>契約編號</th>
+            </tr>
+            <tr class="repeat-row" ng-repeat="row in data3 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'"  >
+                <td align="center">{{row.CUR}}</td>
+                <td align="center">{{toJsDate(row.VALUE_DATE)|date:'yyyy-MM-dd'}} ~ {{toJsDate(row.DUE_DATE) |date:'yyyy-MM-dd'}}</td>
+                <td align="center">{{row.ACC_NBR}}</td>
+                <td align="center">{{row.CD_NBR}}</td>
+                <td align="center">{{row.INT_TYPE      | mapping:mappingSet['CRM.INT_RATE_TYPE']:'F3'}}</td>
+                <td align="center">{{row.INT_RATE}}%</td>
+                <td align="center">{{row.CD_AMT | currency:''}}</td>
+                <td align="center">{{row.INT_ACNO}}</td>
+                <td align="center">{{row.RENEW_TYPE    | mapping:mappingSet['CRM.MON_TRUST_RENEW_WAY']:'F3'}}</td>
+                <td align="center">{{row.INT_DRAW_TYPE | mapping:mappingSet['CRM.MON_TRUST_INT_WAY']:'F3'}}</td>
+                <td align="center">{{inputVO.contract_no}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

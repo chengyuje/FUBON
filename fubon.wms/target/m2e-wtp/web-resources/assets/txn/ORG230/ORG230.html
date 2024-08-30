@@ -1,0 +1,120 @@
+<style>
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.rstable tbody tr td {
+	text-align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG230/ORG230.js"></script>
+<div ng-controller="ORG230Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3 scroll_y">
+			<table>
+				<tr>
+					<th width="16.6%">業務處：</th>
+					<td width="16.6%">
+						<e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id"
+									ng-validate="false" 
+									ng-disabled="AVAIL_REGION.length == 1"
+									ng-readonly="AVAIL_REGION.length == 1" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeRegion(region)"
+									style="line-height:20px;" />
+				   	</td>
+					<th width="16.6%">營運區：</th>
+					<td width="16.6%">
+						<e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="AVAIL_AREA.length == 1"
+									ng-readonly="AVAIL_AREA.length == 1" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeArea(region)"
+									style="line-height:20px;" />
+				   	</td>
+					<th width="16.6%">分行：</th>
+					<td width="16.6%">
+						<e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="AVAIL_BRANCH.length == 1"
+									ng-readonly="AVAIL_BRANCH.length == 1" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch(region)"
+									style="line-height:20px;" />
+			   		</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="getBranchMbrQuotaLst()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()" >清除</button>
+			<button type="button" class="btn btn-info" ng-click="getSampleLst()">下載範例</button>
+			<span id="csvBox" style="display: inline-block;vertical-align: middle;"><e-upload id="csvUpload" success="uploadBranchMbrQuotaLst(name,rname)" text="上傳" accept=".csv"></e-upload></span>
+		</div>
+	</div>
+	<div class="tfb_content">
+     		<div class="tfb_content_icon"></div>
+     		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+  		</div>
+	<div class="panel_content">
+		<e-jumping output="outputVO" input="inputVO" query="getBranchMbrQuotaLst()" list="branchMbrQuotaLst"></e-jumping>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="rstable">
+				<thead>
+					<tr>
+						<th>刪除</th>
+						<th>業務處</th>
+						<th>營運區</th>
+						<th>分行</th>
+						<th>FC1</br>員額數</th>
+						<th>FC2</br>員額數</th>
+						<th>FC3</br>員額數</th>
+						<th>FC4</br>員額數</th>
+						<th>FC5</br>員額數</th>
+						<th>FCH</br>員額數</th>
+						<th>作業人員</br>員額數</th>
+						<th>作業主管</br>員額數</th>
+						<th>消金PS</br>員額數</th>
+						<th>最後修改人</th>
+						<th>最後修改時間</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in branchMbrQuotaLst track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td class='text-center'><button type="button" class="btn btn-info" ng-click="delBranchMbrQuota(row)" >刪除</button></td>
+						<td class='text-center'>{{row.REGION_CENTER_NAME}}</td>
+						<td class='text-center'>{{row.BRANCH_AREA_NAME}}</td>
+						<td class='text-center'>{{row.BRANCH_NAME}}</td>
+						<td class='text-center'>{{row.FC1_CNT}}</td>
+						<td class='text-center'>{{row.FC2_CNT}}</td>
+						<td class='text-center'>{{row.FC3_CNT}}</td>
+						<td class='text-center'>{{row.FC4_CNT}}</td>
+						<td class='text-center'>{{row.FC5_CNT}}</td>
+						<td class='text-center'>{{row.FCH_CNT}}</td>
+						<td class='text-center'>{{row.OP_CNT}}</td>
+						<td class='text-center'>{{row.OPH_CNT}}</td>
+						<td class='text-center'>{{row.PS_CNT}}</td>
+						<td class='text-center'>{{row.MODIFIER}}</td>
+						<td class='text-center'>{{row.LASTUPDATE}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,298 @@
+<style>
+.rstable tr th {
+	vertical-align:middle;
+}
+.rstable tr td {
+	vertical-align:middle;
+	height: 50px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT210/SOT210.js"></script>
+<script type="text/javascript" src="assets/txn/SOT210/SOT210_ROUTE.js"></script>
+<script type="text/javascript" src="assets/txn/SOT210/SOT210_AVAIL_BALANCE.js"></script>
+<script type="text/javascript" src="assets/txn/PRD120/PRD120.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100_BOSS.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512_DETAILS.js"></script>
+
+<div class="SOT210" ng-controller="SOT210Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >商品資料輸入及適配</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<h4 class="h4-title">交易資料輸入</h4>
+				<table class="rstable">
+					<tr ng-hide='true'>
+						<th width="15%">來行人員：</th>
+						<td colspan="6">
+							<div ng-repeat="row in mappingSet['SOT.CUST_TYPE']" style="display:inline;">
+								<input type="radio" name="custType" ng-model="inputVO.custType" ng-value="row.DATA" ng-hide="row.DATA == 'AGENT'"><span ng-hide="row.DATA == 'AGENT'">&nbsp;{{row.LABEL}}&nbsp;&nbsp;</span></input>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th style="vertical-align:middle" rowspan="3">客戶資訊：</th>
+					</tr>
+					<tr>
+						<td width="20%">客戶ID *：<input type="text" class="form-control" style="width:auto;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" ng-disabled="cartList.length > 0" ng-blur="validateSeniorCust();" e-length-limit="16" required></td>
+						<td width="10%">{{inputVO.custName}}</td>
+						<td>KYC等級/效期：</td>
+						<td width="10%">{{inputVO.kycLV}}/{{inputVO.kycDueDate | date:"yyyy-MM-dd"}}</td>
+						<td>客戶註記：</td>
+						<td width="10%">{{inputVO.custRemarks | mapping:mappingSet['SOT.SPEC_CUSTOMER']:'F3'}}</td>
+					</tr>
+					<tr>
+						<td>專業投資人/有效截止日期：</td>
+						<td width="10%">{{inputVO.profInvestorYN}}/{{inputVO.piDueDate | date:"yyyy-MM-dd"}}</td>
+						<td>同意投資商品諮詢服務：</td>
+						<td width="10%">{{inputVO.isAgreeProdAdv}}</td>
+						<td>期間議價效期：</td>
+						<td width="10%">{{inputVO.bargainDueDate | date:"yyyy-MM-dd"}}</td>
+					</tr>
+					<!-- <tr>
+						<th>代理人：</th>
+						<td><input type="text" class="form-control" style="width:auto;display:inline;" id="proxyCustID" name="proxyCustID" ng-model="inputVO.proxyCustID" e-length-limit="11" disabled></td>
+						<td colspan="5"></td>
+					</tr> -->
+				</table>
+				<div style="margin-bottom: 10px;">
+					<button type="button" class="btn btn-info" ng-click="goPRD120_ETF()" function-type="query" ng-disabled="!inputVO.custID || inputVO.custID == ''">ETF搜尋</button>
+					<button type="button" class="btn btn-info" ng-click="goPRD120_STOCK()" function-type="query" ng-disabled="!inputVO.custID || inputVO.custID == ''">股票搜尋</button>
+				</div>
+				<table class="rstable">
+					<tr>
+						<th width="15%">選擇標的：</th>
+						<td width="25%">商品代號 *：<input type="text" class="form-control" style="width:auto;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="prodID" name="prodID" ng-model="inputVO.prodID" ng-blur="getProdDTL()" e-length-limit="16" ng-disabled="!inputVO.custID || inputVO.custID == ''" required></td>
+						<td colspan="2">{{inputVO.prodName}}</td>
+						<td width="10%">計價幣別：</td>
+						<td width="10%">{{inputVO.prodCurr}}</td>
+						<td width="10%">產品風險等級：</td>
+						<td width="10%">{{inputVO.prodRiskLV}}</td>
+					</tr>
+					<tr>
+						<th>交易指示到期日：</th>
+						<td>
+							<div ng-repeat="row in dueDate" style="display:inline;">
+								<input ng-disabled="showDueDate[$index]" type="radio" id="dueDate" name="dueDate" ng-model="inputVO.dueDate" ng-value="row.DATA" ng-click="checkDueDate()">&nbsp;{{toJsDate(row.LABEL) | date:"yyyy-MM-dd"}}&nbsp;&nbsp;
+							</div>
+						</td>
+						<td>最低申購金額：</td>
+						<td width="10%">{{inputVO.prodMinBuyAmt | number}}</td>
+						<td width="10%">最低買進單位：</td>
+						<td width="10%">{{inputVO.prodMinBuyUnit}}&nbsp;股</td>
+						<td width="10%">最低累進單位：</td>
+						<td width="10%">{{inputVO.prodMinGrdUnit}}&nbsp;股</td>						
+					</tr>					
+					<tr>
+						<th>買進價格指示：</th>
+						<td colspan="7">
+							<div style="margin-bottom: 5px;">
+								<input ng-disabled="showentrustType[2]" type="radio" name="entrustType" ng-model="inputVO.entrustType" value="3" ng-click="checkUnitNum();checkShowDueDate()">
+								&nbsp;限價&nbsp;
+								<input type="text" class="form-control" 
+									style="width:100px; display:inline;" 
+									id="entrustAmt1" name="entrustAmt1" 
+									e-input-limit="NUU" nuu1="10" nuu2="2" 
+									ng-model="inputVO.entrustAmt1" 
+									ng-disabled="inputVO.entrustType != '3'" 
+									ng-blur="checkUnitNum()">&nbsp;元
+								&nbsp;&nbsp;{{inputVO.closingPriceDate | date:"yyyy-MM-dd"}}
+								&nbsp;&nbsp;收盤價：{{inputVO.closingPrice | number : 4}}元
+							</div>
+							<div style="margin-bottom: 5px;">
+								<input ng-disabled="showentrustType[3]" type="radio" name="entrustType" ng-model="inputVO.entrustType" value="4" ng-click="checkUnitNum();checkShowDueDate()">
+								&nbsp;限價&nbsp;
+								比{{inputVO.closingPrice | number}}元低&nbsp;
+								<input type="text" class="form-control" 
+									id="entrustDiscount" name="entrustDiscount" 
+									style="width:100px; display:inline;" 
+									e-input-limit="NUU" nuu1="10" nuu2="2"
+									ng-maxlength="6" 
+									ng-model="inputVO.entrustDiscount" 
+									ng-disabled="inputVO.entrustType != '4'" 
+									ng-blur="checkUnitNum()">
+									&nbsp;%&nbsp;=&nbsp;{{inputVO.entrustAmt2}}元以下買進
+							</div>
+							<div>
+								<input ng-disabled="showentrustType[0]" type="radio" name="entrustType" ng-model="inputVO.entrustType" value="1" ng-click="checkUnitNum();checkShowDueDate()">&nbsp;市價
+							</div>
+							<a 	ng-href="{{quote}}{{quoteProd}}" 
+								ng-hide="inputVO.countryCode == 'GBR'"
+								class="btn btn-info" 
+								style="text-decoration:none;" 
+								role="button" 
+								target="_blank">查詢報價</a><!-- ng-disabled="!quoteProd || quoteProd==''" -->
+						</td>
+					</tr>
+					<tr>
+						<th>買進股數 *：</th>
+						<td  colspan="7">
+							<input type="number" class="form-control" 
+								style="width:100px;
+								display:inline;" 
+								placeholder="請輸入..." 
+								id="unitNum" name="unitNum" 
+								ng-model="inputVO.unitNum" 
+								ng-disabled="inputVO.prodID == ''" 
+								ng-blur="checkUnitNum()" 
+								required>&nbsp;股</td>
+					</tr>
+					<tr>
+						<th>委託價金：</th>
+						<td colspan="7">
+							{{inputVO.priceTemp | number}}
+						</td>
+					</tr>					
+					<tr>
+						<th>表定手續費率：</th>
+						<td colspan="7">
+							{{inputVO.defaultFeeRate}}&nbsp;%
+						</td>
+					</tr>
+					<tr>
+						<th>手續費優惠方式：</th>
+						<td colspan="7">
+							依&nbsp;
+							<e-combobox id="feeRateType" name="feeRateType" 
+										ng-datasource="mappingSet['FEE_RATE_TYPE']"
+										ng-model="feeRateType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="getFeeType()"
+										style="line-height:20px;"/>
+							&nbsp;手續費率&nbsp;
+							<input type="number" class="form-control" style="width:100px;display:inline;" id="feeRate" name="feeRate" ng-model="inputVO.feeRate" ng-maxlength="20" ng-disabled="feeRateType != 'A'" ng-blur="getFee('rate')">&nbsp;%
+							&nbsp;手續費金額&nbsp;
+							<input type="number" class="form-control" style="width:100px;display:inline;" id="feePrice" name="feePrice" ng-model="inputVO.fee" ng-maxlength="20" ng-disabled="true">&nbsp;
+							&nbsp;折數&nbsp;
+							<input type="number" class="form-control" style="width:100px;display:inline;" id="feeDiscount" name="feeDiscount" ng-model="inputVO.feeDiscount" ng-maxlength="20" ng-disabled="feeRateType != 'A'" ng-blur="getFee('feeDiscount')">&nbsp;折	
+							<span ng-if="inputVO.feeRateType =='A'">
+	    				    	</br>
+	    						議價原因：<input  type="text"  class="form-control" style="width:1000px;display:inline;" placeholder="請輸入..." id="brgReason" name="brgReason" ng-model="inputVO.brgReason" e-length-limit="200">
+	    					</span>
+						</td>
+					</tr>
+					<tr>
+						<th>扣款帳號：</th>
+						<td colspan="7">
+							<e-combobox id="debitAcct" name="debitAcct" 
+										ng-datasource="mappingSet['SOT.DEBIT_ACCT_LIST#DSIPLAY']"
+										ng-model="inputVO.debitAcct"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-disabled="cmbDebitAcct"
+										ng-format="F3"
+										ng-change="changeAcct('debit')"
+										style="line-height:20px;"/>可投資餘額 &nbsp; <a ng-href="#" style="text-decoration:none;" ng-click="getAvailBalance()">{{showCurrency}} &nbsp; {{showAvbBalance | number}} </a>
+						</td>
+					</tr>
+					<tr>
+						<th>信託帳號：</th>
+						<td colspan="7">
+							<e-combobox id="trustAcct" name="trustAcct" 
+										ng-datasource="mappingSet['SOT.TRUST_ACCT_LIST']"
+										ng-model="inputVO.trustAcct"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="checkTrustAcct();getBestFeeRate()"
+										style="line-height:20px;"/>
+						</td>
+					</tr>
+					<tr>
+						<th>收益入帳帳號：</th>
+						<td colspan="7">
+							<e-combobox id="creditAcct" name="creditAcct" 
+										ng-datasource="mappingSet['SOT.CREDIT_ACCT_LIST#DSIPLAY']"
+										ng-model="inputVO.creditAcct"
+										ng-validate="false" 
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-disabled="cmbCreditAcct"
+										ng-format="F3"										
+										style="line-height:20px;"/>
+						</td>
+					</tr>
+					<tr>
+						<th>停損停利設定：</th>
+						<td colspan="7">
+							滿足點：
+							<input type="number" class="form-control" style="width:auto;display:inline;" id="takeProfitPerc" name="takeProfitPerc" ng-model="inputVO.takeProfitPerc" ng-maxlength="6">&nbsp;%&nbsp;&nbsp;
+							停損點：
+							<input type="number" class="form-control" style="width:auto;display:inline;" id="stopLossPerc" name="stopLossPerc" ng-model="inputVO.stopLossPerc" ng-maxlength="6">&nbsp;%&nbsp;&nbsp;
+						</td>
+					</tr>
+					<tr>
+						<th>停損停利通知方式：</th>
+						<td colspan="7" ng-show="!urlDisable">
+							網銀訊息通知，Email：{{inputVO.plMsg}}&nbsp;&nbsp;
+							<a ng-href="{{eBankPredocURL}}" class="btn btn-info" style="text-decoration:none;" role="button" target="_blank">網行銀服務申請書</a>
+							<a ng-href="{{chgPrtdocURL}}" class="btn btn-info" style="text-decoration:none;" role="button" target="_blank">變更申請書列印</a>
+						</td>
+						<!-- for webView should be disabled -->
+						<td colspan="7" ng-show="urlDisable">
+							網銀訊息通知，Email：{{inputVO.plNotifWays}}
+							<button type="button" class="btn btn-info" ng-disabled="urlDisable">網行銀服務申請書</button>
+							<button type="button" class="btn btn-info" ng-disabled="urlDisable">變更申請書列印</button>
+						</td>
+					</tr>
+					<tr>
+						<th>解說專員：</th>
+						<td colspan="7"><input type="text" class="form-control" style="width:auto;display:inline;" id="narratorID" name="narratorID" ng-model="inputVO.narratorID" e-length-limit="11" ng-blur="getSOTEmpInfo()" ng-disabled="narratorDisabled">&nbsp;&nbsp;{{inputVO.narratorName}}</td>
+					</tr> 
+				</table>
+				<div style="margin-bottom: 10px;">
+					<button type="button" class="btn btn-info" ng-click="addCar()">加入購物車</button>
+					&nbsp;<span class="with-errors">數存戶不適用臨櫃「套表」交易</span>
+				</div>
+				<div class="gv_tab_sc scroll_y" style="min-height:235px; white-space: nowrap;">
+					<table class="table-bordered">
+						<thead>
+							<tr>
+								<th>功能</th>
+								<th>商品資訊</th>
+								<th>商品名稱</th>
+								<th>計價幣別</th>
+								<th>買進股數</th>
+								<th>買進價格指示</th>
+								<th>手續費率</th>
+								<th>預估手續費</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" align="center" ng-repeat="row in cartList">
+								<td>
+									<button type="button" class="btn btn-info" ng-click="delCar(row)" ng-show="row.BARGAIN_STATUS != '1'">移除</button>
+									<div ng-show="row.BARGAIN_STATUS == '1'">{{row.BARGAIN_STATUS | mapping:mappingSet['SOT.BARGAIN_STATUS']:'F3'}}</div>
+								</td>
+								<td>{{row.TRADE_MARKET}}</td>
+								<td>
+									<div style="display:inline;" ng-show="row.BARGAIN_STATUS == '1'">{{row.PROD_ID}}&nbsp;{{row.PROD_NAME}}</div>
+									<div style="display:inline;" ng-show="row.BARGAIN_STATUS != '1'"><a ng-href="#" style="text-decoration:none;" ng-click="refresh(row)">{{row.PROD_ID}}&nbsp;{{row.PROD_NAME}}</a></div>
+								</td>
+								<td>{{row.PROD_CURR}}</td>
+								<td>{{row.UNIT_NUM}}</td>
+								<td>{{row.ENTRUST_TYPE | mapping:mappingSet['SOT.ENTRUST_TYPE']:'F3'}}&nbsp;{{row.ENTRUST_AMT | number}}</td>
+								<td>{{row.FEE_RATE}}</td>
+								<td>{{row.FEE | number}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</form>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="clearTradeSEQ();init()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="next()" ng-disabled="cartList.length == 0" function-type="maintenance">下一步</button>
+		</div>
+	</div>
+</div>

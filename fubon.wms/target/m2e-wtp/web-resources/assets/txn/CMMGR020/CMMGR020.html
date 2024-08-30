@@ -1,0 +1,193 @@
+<style>
+    /* table size */
+    .CMMGR020 table {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* change row */
+    .CMMGR020.table > tbody > tr > td {
+        table-layout: fixed;
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+
+    /* 此為顯示 Menu Tree Style 階層縮排 */
+    .menu {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    /* Menu Tree Zone Style */
+    .zoneTree {
+        height: 75vmin;
+        width: inherit;
+
+        overflow: scroll;
+    }
+</style>
+<script src="assets/js/directives/dynamic.js"></script>
+<script src="assets/js/services/menuService.js"></script>
+<script type="text/javascript" src="assets/txn/CMMGR020/CMMGR020.js"></script>
+<div class="CMMGR020" ng-controller="CMMGR020_Controller" ng-cloak>
+    <div class="search_table">
+        <!-- MENU TREE ZONE-->
+        <div class="col-md-3">
+            <div class="zone">
+                <h3 ng-bind="'MENU TREE'"></h3>
+                <div class="input-group">
+                    <input class="form-control" type="text" placeholder="輸入Menu Id 來查詢 Menu"
+                           ng-model="inputVO.menuId"/>
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" ng-click="loadMenu()" data-toggle="tooltip" title="查詢目錄">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <div class="zoneTree">
+                    <dynamic template="{{treeMenuHtmlTemplate}}"></dynamic>
+                </div>
+            </div>
+        </div>
+        <!-- MENU DETAIL ZONE-->
+        <div class="col-md-3">
+            <div class="zone">
+                <h3 ng-bind="detail.displayName"></h3>
+
+                <div class="input-group" function-type="maintenance">
+                    <button ng-disabled="detail.isEdit || !(detail.curr.MENU_TYPE != 'P')" class="btn btn-warning"
+                            ng-click="detail.isEdit = !detail.isEdit" data-toggle="tooltip" title="編輯目錄">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                    <button ng-disabled="!detail.isEdit" class="btn btn-success" ng-click="saveMenu()"
+                            data-toggle="tooltip" title="儲存變更">
+                        <span class="glyphicon glyphicon-floppy-disk"></span>
+                    </button>
+                    <button ng-disabled="!detail.isEdit" class="btn btn-primary" ng-click="addMenu()"
+                            data-toggle="tooltip" title="新增子目錄">
+                        <span class="glyphicon glyphicon-folder-close"></span>
+                        <span ng-class="getMenuAddBtnClass()"></span>
+                    </button>
+
+                    <button ng-disabled="!(detail.isEdit && detail.curr.MENU_ID != 'ROOT')" class="btn btn-danger"
+                            ng-click="delMenu()" data-toggle="tooltip" title="刪除目錄">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
+                </div>
+
+                <hr/>
+
+                <div class="input-group">
+                    <span class="input-group-addon"><span
+                            ng-bind="detail.curr.MENU_TYPE != 'P'? '目錄名': '功能名'"></span></span>
+                    <input ng-disabled="!(detail.isEdit && detail.curr.MENU_ID != 'ROOT')" type="text"
+                           class="form-control" placeholder="目錄名稱"
+                           ng-model="detail.curr.MENU_NAME">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">父目錄</span>
+                    <input ng-disabled="!(detail.isEdit && detail.curr.MENU_ID != 'ROOT')" type="text"
+                           class="form-control" placeholder="父目錄名稱"
+                           ng-model="detail.curr.PREV_MENU">
+                </div>
+                <div class="input-group" ng-hide="!(detail.isEdit && detail.curr.MENU_ID != 'ROOT')">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-list"></span></span>
+                    <e-combobox style="line-height: inherit;"
+                                ng-datasource="detail.prevList" ng-model="detail.curr.PREV_MENU"
+                                ng-validate="false" ng-readonly="false" ng-editable="false"
+                                ng-format="F3"/>
+                </div>
+
+                <table class="table table-hover">
+                    <tbody ng-if="!detail.isEdit">
+                    <tr ng-repeat="sub in detail.curr.SUBITEM track by $index" ng-class="tableTrClassSelector(sub)">
+                        <td><span ng-class="getMenuIcon(sub.MENU_TYPE)"></span></td>
+                        <td ng-bind="sub.MENU_ID + '-' + sub.MENU_NAME"></td>
+                    </tr>
+                    </tbody>
+
+                    <tbody ng-if="detail.isEdit" ui-sortable="sortableOptions" ng-model="detail.curr.SUBITEM">
+                    <tr ng-repeat="sub in detail.curr.SUBITEM track by $index" ng-class="tableTrClassSelector(sub)">
+                        <td><span ng-class="getMenuIcon(sub.MENU_TYPE)"></span></td>
+                        <td><span ng-bind="sub.MENU_ID + '-' + sub.MENU_NAME"></span>
+                            <button style="float: right" ng-if="sub.MENU_TYPE == 'P' || sub.IS_NEW_MENU"
+                                    class="btn btn-danger" ng-click="delFile(sub)" data-toggle="tooltip" title="將此項從目錄中移除"><span
+                                    class="glyphicon glyphicon-trash"></span></button>
+                        </td>
+                    </tr>
+                    <tr ng-show="detail.addMenuZone.show">
+                        <td><span ng-class="getMenuIcon('F')"></span></td>
+                        <td>
+                            <div class="input-group-sm">
+                                <input id="newMenuIdInput" type="text" class="form-control" placeholder="目錄編號(可不填)"
+                                       e-length-limit="30" ng-model="detail.addMenuZone.newMenuId"/>
+                                <input id="newMenuNameInput" type="text" class="form-control" placeholder="目錄名稱(必填)"
+                                       e-length-limit="80" ng-model="detail.addMenuZone.newMenuName"/>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- TRADE ZONE-->
+        <div class="col-md-6">
+            <div class="zone">
+                <h3>功能一覽</h3>
+                <div class="input-group">
+                    <input class="form-control" type="text" placeholder="請輸入功能代碼或名稱" ng-model="inputVO.item"
+                           e-length-limit="100"/>
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" ng-click="inquireInit();getItem();" data-toggle="tooltip"
+                                title="查詢功能">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <e-jumping-once output="outputVO" list="paramList" totallist="itemList"></e-jumping-once>
+                <div class="gv_tab_sc scroll_y" style="min-height:235px;">
+                    <table class="table-bordered">
+                        <thead>
+                        <tr>
+                            <th class="col-md-1">
+                                <button ng-disabled="!detail.isEdit" class="btn btn-primary" ng-click="addItem()"
+                                        data-toggle="tooltip" title="添加本頁功能">
+                                    <span class="glyphicon glyphicon-file"></span><span
+                                        class="glyphicon glyphicon-plus-sign"></span>
+                                </button>
+                            <th class="col-md-3" ng-bind="'功能代號'"></th>
+                            <th class="col-md-4" ng-bind="'功能名稱'"></th>
+                            <th class="col-md-2" ng-bind="'最近更新日期'"></th>
+                            <th class="col-md-2" ng-bind="'維護者'"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'"
+                            ng-class-even="'rowEven'">
+                            <td>
+                                <button ng-disabled="!(detail.isEdit && row.canSelected)" class="btn btn-info"
+                                        ng-click="addItem(row)" data-toggle="tooltip" title="添加此功能">
+                                    <span class="glyphicon glyphicon-file"></span><span
+                                        class="glyphicon glyphicon-plus-sign"></span>
+                                </button>
+                            </td>
+                            <td ng-bind="row.TXNCODE"></td>
+                            <td ng-bind="row.TXNNAME"></td>
+                            <td><span ng-bind="row.LASTUPDATE"></span><br/><span ng-bind="row.LASTTIME"></span></td>
+                            <td><span ng-bind="row.MODIFIER"></span><br/><span ng-bind="row.MODIFIER_NAME || ''"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

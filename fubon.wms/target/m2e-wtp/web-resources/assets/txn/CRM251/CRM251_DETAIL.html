@@ -1,0 +1,66 @@
+<style>
+
+</style>
+<div ng-controller="CRM251_DETAILController" ng-cloak>
+	<div class="modal-dialog CRM251_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">明細內容</h4>
+			</div>
+			<div class="modal-body">
+				<h4 class="text-center">理專姓名：{{EMPID}}<span class="bigspace"></span>群組名稱：{{row.GROUP_NAME}}</h4>
+				<button type="button" class="btn btn-info" ng-click="del()" function-type="maintenance">勾選客戶從群組中刪除</button>
+				<button type="button" class="btn btn-info" ng-click="email()" function-type="maintenance">勾選客戶發送EMail</button>
+				<br>
+				<br>
+				<e-jumping-once output="outputVO" list="paramList" totallist="totalList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>
+									<label>
+										<input type='checkbox' ng-model='clickAll' ng-change='checkrow()' /> 全選
+									</label>
+								</th>
+								<th>客戶身分證字號</th>
+								<th>客戶姓名</th>
+								<th ng-if="priID.startsWith('UHRM')">計績/維護</th>
+								<th>理財會員等級</th>
+								<th>貢獻度等級</th>
+								<th>性別</th>
+								<th>生日</th>
+								<th>電話</th>
+								<th>EMail</th>
+								<th>資產總餘額</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="data in paramList track by $index">
+								<td>
+									<label>
+										<input type='checkbox' ng-model='data.CHECK' /> 勾選
+									</label>
+								</td>
+								<td><a onclick="return false" ng-click="detail(data)">{{data.CUST_ID}}</a></td>
+								<td>{{data.CUST_NAME}}</td>
+								<td ng-if="priID.startsWith('UHRM')">{{data.UEMP_AO_TYPE}}</td>
+								<td>{{data.VIP_DEGREE | mapping:VIP_DEGREE:'F3' | limitTo: 2}}</td>
+								<td>{{data.CON_DEGREE | mapping:CON_DEGREE:'F3'}}</td>
+								<td>{{data.GENDER | mapping:CUST_GENDER:'F3'}}</td>
+								<td>{{toJsDate(data.BIRTH_DATE)|date:"yyyy/MM/dd"}}</td>
+								<td>{{data.MOBILE_NO}}</td>
+								<td>{{data.EMAIL}}</td>
+								<td class="td_right">{{data.AUM_AMT  | currency:'':0}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

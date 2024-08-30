@@ -1,0 +1,90 @@
+<style>
+/* dialog panl */
+.modal-dialog.PRD234 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+.modal-dialog.PRD234_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 300px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+ 	<script type="text/javascript" src="assets/txn/PRD234/PRD234.js"></script>
+ 	<script type="text/javascript" src="assets/txn/PRD234/PRD234_EDIT.js"></script>	
+	<script type="text/javascript" src="assets/txn/PRD234/PRD234_UPLOAD.js"></script>
+<div ng-controller="PRD234Controller" ng-cloak>
+	<div class="search_table search_box3">
+		<table>
+			<tr>
+				<th>基金代碼：</th>
+				<td><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="prdId" name="prdId" ng-model="inputVO.prdId" e-length-limit="4"></td>
+				<td>
+					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">查詢</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6">
+					<div style="float: left">
+						<button type="button" class="btn btn-info" ng-click="upload()" >新增</button>
+					</div>
+					<div style="float: right">
+						
+					</div>
+					<div style="clear: both;"></div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!-- 結果區 -->
+	<h4 class="h4-title">查詢結果</h4>
+	<span>共&nbsp;{{paramList.length}}&nbsp;筆資料</span>
+	<div class="gv_tab_sc" style="white-space: nowrap;min-height:235px;overflow-x: auto;">
+		<table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+			<thead>
+				<tr>
+					<th function-type="maintenance">功能</th>
+					<th>基金代碼</th>
+					<th>基金名稱</th>
+					<th>費用結構說明書</th>
+					<th>上傳日期</th>
+					<th>上傳人員</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in paramList track by $index">
+					<td function-type="maintenance">
+						<e-combobox id="cmbAction" name="cmbAction"
+						ng-datasource="row.set"
+						ng-model="row.cmbAction"
+						ng-validate="false"
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						ng-change="action(row)"
+						width="100px"
+						style="line-height:20px;" />
+					</td>
+					<td text-align="center">{{row.PRD_ID}}</td>
+					<td text-align="center">{{row.FUND_CNAME}}</td>
+					<td text-align="center"><a onclick="return false" ng-click="download(row)">{{row.PRD_ID}}.pdf</td>
+					<td text-align="center">{{row.LASTUPDATE = null ? row.CREATETIME : row.LASTUPDATE}}</td>
+					<td text-align="center">{{row.MODIFIER = null ? row.CREATOR : row.MODIFIER}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

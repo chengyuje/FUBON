@@ -1,0 +1,62 @@
+<script type="text/javascript" src="assets/txn/CRM82A/CRM82A.js"></script>
+<script type="text/javascript" src="assets/txn/PRD131/PRD131_DETAIL.js"></script>
+<div class="CRM828" ng-controller="CRM82AController" ng-cloak>
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th colspan="2">(約當臺幣)&nbsp;&nbsp;&nbsp;含息報酬率公式 = [(參考贖回報價% X 庫存面額 ＋ 累計現金配息＋ 應收前手息 － 已付前手息) － 投資成本] ／ 投資成本</th>
+				</tr>
+				<tr>
+					<th>投資成本(折台幣)總計：</th>
+					<td>{{totalInvestmentTwd | number :0}}</td>
+				</tr>
+				<tr>
+					<th>含息總報酬率<span style="color: red;">(預估)</span>：</th>
+					<td>{{totalROI | number :2}}{{ totalROI != null ? '%' : ''}}</td>
+				</tr>
+			</table>
+		</div>
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="rstable e-table-freeze" e-left="3" e-height="500px" e-mode="1" e-top="true" e-list="data">
+				<thead>
+					<tr>
+						<th>憑證編號</th>
+						<th>產品代碼</th>
+						<th>產品名稱</th>
+						<th>計價幣別</th>
+						<th>投資成本(原幣)</th>
+						<th>庫存面額(原幣)</th>						
+						<th>參考贖回報價</th>
+						<th>參考市值</th>
+						<th>應收前手息</th>
+						<th>累計現金配息</th>
+						<th>已付前手息</th>
+						<th>含息報酬率</th>
+						<th>是否RS</th>
+						<th>是否質借</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;">金市</td>
+						<td style="text-align: left;">{{row.M_SE_CODE}}</td>
+						<td style="text-align: left;"><a href="#" onclick="return false" ng-click="goPrdDetail(row, 'BOND')">{{row.M_ISSUER_NM}}</a></td>						
+						<td style="text-align: left;">{{row.M_TP_NOMCUR}}</td>
+						<td style="text-align: right;">{{row.INVEST_COST_AMT | number : 2}}</td>
+						<td style="text-align: right;">{{row.M_TP_NOMINAL | number : 2}}</td>						
+						<td style="text-align: right;">{{row.QUTOATION | number : 2}}</td>
+						<td style="text-align: right;">{{row.MARKET_VALUE_AMT | number : 2}}</td>
+						<td style="text-align: right;">{{row.ACCRUED_AMT_RCV | number : 2}}</td>
+						<td style="text-align: right;">{{row.ACCUMULATED_INTEREST | number : 2}}</td>
+						<td style="text-align: right;">{{row.ACCRUED_AMT_PAY | number : 2}}</td>
+						<td style="text-align: right;">{{row.ROI_WITH_INT | number : 2}}%</td>
+						<td style="text-align: center;">{{row.IS_RS_DIS}}</a></td>
+						<td style="text-align: center;">{{row.COLL_SETTINT_FLAG}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

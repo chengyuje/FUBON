@@ -1,0 +1,122 @@
+<style>
+/* dialog panl */
+.modal-dialog.INS431_CHILDREN {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1200px;
+	height: auto;
+}
+.modal-dialog.INS431_CHILDREN {
+	width: 80%;
+	height: 80%;
+}
+.alignleft{
+	text-align: left !important;
+}
+.alignright{
+	text-align: right !important;
+}
+input:required:invalid{
+ 	border-color: red;
+}
+.INS431_CHILDREN tr td {
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/INS430/INS431_CHILDREN.js"></script>
+<div ng-controller="INS431_CHILDRENController" ng-cloak>
+	<div class="modal-dialog INS431_CHILDREN">
+		<div class="modal-content">	
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="" class="modal-title" align="left">計算教育費用所需資金</h4>
+			</div>
+			<div class="modal-body">
+		        <form>
+					<table class="INS431_CHILDREN">
+						<tr>
+							<td>客戶ID：</td>
+							<td ng-bind="inputVO.custID"></td>
+							<td>客戶姓名：</td>
+							<td  colspan="3" ng-bind="custData.CUST_NAME?custData.CUST_NAME:inputVO.custName"></td>
+						</tr>
+						<tr>
+							<td>子女姓名：</td>
+							<td><input type="text" class="form-control" style="text-align: left;" maxlength="30" id="childName" name="childName"ng-model="temp.childName"></td>
+							<td style="width: 15%;">子女生日：</td>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" 
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd" 
+										   ng-model="temp.childBirth"
+										   is-open="model.a" 
+										   datepicker-options="bgn_sDateOptions"
+										   ng-readonly="true"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span> 
+								</div>
+							</td>
+							<td style="width: 15%;">學齡結束年紀：</td>
+							<td><input type="text" e-input-limit="NN" class="form-control" style="text-align: right;" e-length-limit="2" id="endEduAge" name="endEduAge" ng-model="temp.eduEnd"></td>
+						</tr>
+						<tr>
+							<td style="width: 15%;">教育所需金額：</td>
+							<td><input type="text" e-input-limit="NN" class="form-control" style="text-align: right;" e-length-limit="8" id="eduAmt" name="eduAmt" ng-model="temp.eduCost"></td>
+							<td>元</td>
+							<td colspan="3"><button class="btn btn-info" ng-click="add()">新增資料</button></td>
+						</tr>
+					</table>
+				</form>
+				<div class="gv_tab_sc scroll_y" style="margin: 10px;">
+					<table class="td_center">
+						<thead>
+							<tr>
+								<th>刪除</th>
+								<th>子女姓名</th>
+								<th>子女出生日期</th>
+								<th>子女起算年齡</th>
+								<th>起算日期</th>
+								<th>學齡結束年紀</th>
+								<th>教育所需金額</th>
+								<th>參考資訊</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in tempList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td><button type="button" class="btn btn-info" ng-click="del(row, $index)"><span class="glyphicon">&#xe014;</span></button></td>
+								<td style="text-align: left"><a onclick="return false" ng-click="updateData(row)" ng-bind="row.CHILD_NAME"></a></td>
+								
+								<td ng-bind="row.CHILD_BIRTH.getFullYear()+'/'+(row.CHILD_BIRTH.getMonth()+1)+'/'+row.CHILD_BIRTH.getDate()"></td>
+								<td ng-bind="row.CHILD_AGE"></td>
+								<td ng-bind="row.LASTUPDATE"></td>
+								<td ng-bind="row.EDU_END"></td>
+								<td><input type="text" class="text-right" e-input-limit="NN" ng-model="row.EDU_COST" ng-blur="onBlurEduCost()"></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="modal-footer" style="text-align: center;">
+			        <table>
+				        <tr>
+				        	<th width="20%">子女教育所需資金：共</th>
+				        	<td width="10%"><input e-input-limit="NC" type="text" class="form-control" style="width:120px;text-align: right;" e-length-limit="10" id="eduAmtTotalShow" name="eduAmtTotalShow" ng-model="eduAmtTotalShow" ng-readonly="true"></td>
+					    	<td width="10%">元</td>
+					    	<td width="60%"><input type="hidden" class="form-control" id="eduAmtTotal" name="eduAmtTotal" ng-model="eduAmtTotal"></td>				    	
+				        </tr>
+				    </table>
+				    <button type="button" class="btn btn-info" ng-click="backToINS430()">需求試算</button>
+		        </div>
+			</div>
+		</div>
+	</div>
+</div>

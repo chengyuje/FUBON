@@ -1,0 +1,103 @@
+<style>
+
+</style>
+<div ng-controller="PRD233_UPLOAD1Controller" ng-cloak>
+	<div class="modal-dialog PRD233_UPLOAD">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">上傳CSV</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+					<table>
+						<thead>
+							<tr>
+								<th>基金代碼</th>
+								<th>基金名稱</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in inputVO.idList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row.PRD_ID}}</td>
+								<td>{{row.FUND_CNAME_A}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>文件名稱：</th>
+							<td class="tdpadding"><input type="text" id="doc_name" name="doc_name" class="form-control" ng-model="inputVO.doc_name" e-length-limit="1000"></td>
+						</tr>
+						<tr>
+							<th>
+								<label><input type="radio" name="group" ng-model="inputVO.type" ng-value="1" ng-change="ClearUpload()" required> 檔案上傳：</label>
+							</th>
+							<td class="tdpadding">
+								<e-upload success="uploadFinshed(name,rname)" model="inputVO.realfileName"></e-upload>
+							</td>
+						</tr>
+						<tr>
+							<th>
+								<label><input type="radio" name="group" ng-model="inputVO.type" ng-value="2" ng-change="ClearUpload()" required> URL網址：</label>
+							</th>
+							<td class="tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="web" name="web" ng-model="inputVO.web" e-length-limit="500"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.group.$error.required || (inputVO.type == 1 && !inputVO.realfileName) || (inputVO.type == 2 && !inputVO.web)">
+							<th></th>
+							<td class="help-block with-errors">請上傳檔案或輸入URL</td>
+						<tr>
+						<tr>
+							<th>起迄日：</th>
+							<td class="tdpadding">
+								<div class="form-group">
+									<div class="input-group datebox datewidth">
+										<input type="text" id="doc_sDate" name="doc_sDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.doc_sDate"
+										is-open="model.a"
+										datepicker-options="doc_sDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+									<div style="float: left !important;">～</div>
+									<div class="input-group datebox datewidth">
+										<input type="text" id="doc_eDate" name="doc_eDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.doc_eDate"
+										is-open="model.b"
+										datepicker-options="doc_eDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.doc_sDate.$error.required || parameterTypeEditForm.doc_eDate.$error.required">
+							<th></th>
+							<td class="help-block with-errors">請選擇起迄日</td>
+						<tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

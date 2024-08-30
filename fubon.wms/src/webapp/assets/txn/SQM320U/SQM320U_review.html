@@ -1,0 +1,274 @@
+<style>
+.modal-dialog.SQM320U_review {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: 80vh;
+}
+.SQM320U_review table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.SQM320U_review.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SQM320U_review_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<div ng-controller="SQM320U_reviewController" ng-cloak>
+	<div class="modal-dialog SQM320U_review">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">訪查作業</h4>
+			</div>
+			<div class="modal-body">
+					<div>
+						<label>客戶基本資料</label>
+					</div>
+					<table>
+						<tr>
+							<th>客戶姓名：&nbsp; {{CUST_NAME}}</th>
+							<th>身分證字號：&nbsp;<a href="#" onclick="return false" ng-click="custDTL(row)">{{CUST_ID}}</a></th>
+							<th>性別：&nbsp; {{GENDER}}</th>
+							<th>生日：&nbsp; {{BIRTH_DATE}}</th>
+							<th>秘密戶：&nbsp; {{SECRET_YN}}</th>
+							<!-- <th>上月平均AUM：&nbsp; {{AVG_AUM_AMT}}</th> -->
+						</tr>
+						<tr>
+							<th>客戶行動電話：&nbsp; {{MOBILE_NO}}</th>
+							<th>客戶市話：&nbsp; {{TEL_NO}}<ps ng-show =EXT_NO>-{{EXT_NO}}</ps></th>
+							<th>專員別：&nbsp; {{ROLE_NAME}}</th>
+				     		<th>RM_CODE：&nbsp; {{CUST_AO_CODE}}</th>
+				     		<th>UHRM姓名：&nbsp; {{EMP_NAME}}</th>
+						</tr>
+						<tr>
+							<th>專業投資人：&nbsp; {{PROF_INVESTOR_YN}}</th>
+				     		<th>符合推介：&nbsp; {{REC_YN}}</th>
+				     		<th>共同行銷：&nbsp; {{COMM_RS_YN}}</th>
+				     		<th>特定客戶：&nbsp; {{SP_CUST_YN}}</th>
+				     		<th>客訴戶：&nbsp; {{COMPLAIN_YN}}</th>
+						</tr>
+						<tr>
+				     		<th>自取對帳單客戶者：&nbsp; {{EBILL_PICK_YN}}</th>
+				     		<th>E級客戶：&nbsp; {{CUST_E_NOREC_FLAG}}</th>
+				     		<th>季底庫存資產減損客戶：&nbsp; {{AST_LOSS_NOREC_FLAG}}</th>
+				     		<th></th>
+				     		<th></th>
+						</tr>
+					</table>
+					<br>
+
+				<e-jumping-once output="outputVO" list="paramList" totallist="totalData"></e-jumping-once>
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="table-bordered rstable middle" e-height="535px" e-mode="1" e-top="true" e-list="paramList">
+						<thead>
+							<tr>
+								<th>訪談紀錄內容查核<br>(註: 無訪談紀錄者請選<font color="YELLOW">不符合</font>並於查核意見敘明，<br>例如<font color="YELLOW">E級/季底庫存資產減損/自取對帳單客戶</font>)</th>
+								<th>1.確認客戶清楚投資損益<br>狀況及理財往來情形</th>
+								<th>2.個金RM未以不當話術銷售商品<br>或招攬業務，亦無銷售非屬本行核准<br>之金融商品</th>
+								<th>3.個金RM無自行製作<br>並提供對帳單</th>
+								<th>4.「自取對帳單客戶名單」<br>確認目前資產是否符合<br>（註:非自取者請勾選符合）</th>
+								<th>5.符合電話行銷規範<br>(註: 非本行主動電話行銷或面訪者不需勾選)</th>
+								<th>查核日期</th>
+								<th>查核方式<br>（註:如為其他請於查核意見敘明）</th>
+								<th>電訪錄音序號</th>
+<!-- 								<th>上傳Email訪查紀錄</th> -->
+								<th>查核意見</th>
+								<th>名單類型</th>
+								<th>名單來源</th>
+								<th>名單名稱</th>
+								<th>當時服務專員</th>
+								<th>溝通管道</th>
+								<th>聯繫日期</th>
+								<th>訪談內容</th>
+								<th>客戶回應內容</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList track by $index" align="center" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>
+									<e-combobox id="meet_rule" name="meet_rule"
+												ng-datasource="MEET_RULE_LIST"
+												ng-model="row.MEET_RULE"
+												ng-validate="false"
+												ng-readonly="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+												ng-editable="false"
+												ng-require="true"
+												ng-format="F3" width="150px"
+												style="line-height:20px;"
+												ng-disabled="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+												ng-change="onlyOne(row.MEET_RULE);autoAuditRemark(row);" />
+								</td>
+								<td>
+									<e-combobox id="meet_rule_cust1" name="meet_rule_cust1"
+												ng-datasource="MEET_RULE_LIST"
+												ng-model="row.MEET_RULE_CUST1"
+												ng-validate="false"
+												ng-readonly="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+												ng-editable="false"
+												ng-require="true"
+												ng-format="F3" width="150px"
+												style="line-height:20px;"
+												ng-disabled="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+												ng-change="autoAuditRemark(row);"/>
+								</td>
+								<td>
+									<e-combobox id="meet_rule_cust2" name="meet_rule_cust2"
+												ng-datasource="MEET_RULE_LIST"
+												ng-model="row.MEET_RULE_CUST2"
+												ng-validate="false"
+												ng-readonly="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+												ng-editable="false"
+												ng-require="true"
+												ng-format="F3" width="150px"
+												style="line-height:20px;"
+												ng-disabled="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+												ng-change="autoAuditRemark(row);"/>
+								</td>
+								<td>
+									<e-combobox id="meet_rule_cust3" name="meet_rule_cust3"
+												ng-datasource="MEET_RULE_LIST"
+												ng-model="row.MEET_RULE_CUST3"
+												ng-validate="false"
+												ng-readonly="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+												ng-editable="false"
+												ng-require="true"
+												ng-format="F3" width="150px"
+												style="line-height:20px;"
+												ng-disabled="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+												ng-change="autoAuditRemark(row);"/>
+								</td>
+								<td>
+									<e-combobox id="meet_rule_cust4" name="meet_rule_cust4"
+												ng-datasource="MEET_RULE_LIST"
+												ng-model="row.MEET_RULE_CUST4"
+												ng-validate="false"
+												ng-readonly="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+												ng-editable="false"
+												ng-require="true"
+												ng-format="F3" width="150px"
+												style="line-height:20px;"
+												ng-disabled="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+												ng-change="autoAuditRemark(row);"/>
+								</td>
+								<td>
+									<e-combobox id="meet_tm_rule" name="choice"
+												ng-datasource="MEET_RULE_LIST"
+												ng-model="row.MEET_TM_RULE"
+												ng-validate="false"
+												ng-readonly="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE' || row.CMU_TYPE != 'P'"
+												ng-editable="false"
+												ng-require="true"
+												ng-format="F3" width="150px"
+												style="line-height:20px;"
+												ng-disabled="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE' || row.CMU_TYPE != 'P'"
+												ng-change="checkKYC(row);autoAuditRemark(row);"/>
+								</td>
+								<td>
+									<div class="input-group datebox datewidth">
+										<input type="text" id="meetDate" name="meetDate"
+											   class="form-control"
+											   uib-datepicker-popup="yyyy/MM/dd"
+											   ng-model="row.MEET_DATE"
+											   is-open="model[$index]"
+											   ng-readonly="true"
+											   ng-disabled="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+											   style="width:150px;"
+											   ng-change="autoAuditRemark(row);"/>
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event, $index)" ng-disabled="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+										</span>
+									</div>
+								</td>
+								<td>
+									<e-combobox id="meet_type" name="meet_type"
+												ng-datasource="MEET_TYPE"
+												ng-model="row.MEET_TYPE"
+												ng-validate="false"
+												ng-readonly="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"
+												ng-editable="false"
+												ng-require="true"
+												ng-format="F3" width="150px"
+												style="line-height:20px;"
+												ng-change="autoAuditRemark(row); "
+												ng-disabled="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"/>
+								</td>
+								<td>
+									<input 	type="text" 
+											class="form-control" 
+											style="width: 150px" 
+											ng-model="row.RECORD_SEQ"  
+											e-length-limit="12" 
+											e-input-limit="ND"
+											placeholder="請輸入電訪錄音序號..." 
+									  	  	ng-disabled="(TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE') || row.MEET_TYPE != 'P'"
+									  	  	ng-change="autoAuditRemark(row);"/>
+								</td>
+<!-- 								<td> -->
+<!-- 									<button type="button" class="btn btn-success" ng-click="uploadFinshed(null, null, null, 'DOWNLOAD', row)" ng-show="row.FILE_FLAG == 'Y'"><span class="glyphicon glyphicon-save"></span>下載</button> -->
+<!-- 									<button type="button" class="btn btn-danger" ng-click="uploadFinshed(null, null, null, 'DEL', row)" ng-show="row.FILE_FLAG == 'Y'"><span class="glyphicon glyphicon-trash"></span>刪除</button> -->
+<!-- 									<span id="fileBox" style="display: inline-block;vertical-align: middle;" function-type="export" ng-show="row.FILE_FLAG == 'N'"> -->
+<!-- 										<e-upload id="uploadFile" success="uploadFinshed(name, rname, size, 'A', row)" text="上傳" ng-disabled="(TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE') || row.MEET_TYPE != 'E'"></e-upload> -->
+<!-- 									</span> -->
+<!-- 								</td> -->
+								<td style="width: 150px;">
+									<textarea 	id="text" name="text"
+												placeholder="請輸入..." 
+												class="form-control" 
+												ng-model="row.AUDIT_REMARK"
+												style="width: 170px; height: 30px" 
+												e-length-limit="2000"
+												ng-disabled="TYPE == 'search'  || (meet_rule_disabled && (row.MEET_RULE == null || row.MEET_RULE == '')) || row.CHK_DISABLE == 'CLOSE'"  >
+									</textarea>
+								</td>
+								<td>{{row.LEAD_TYPE | mapping:LEAD_TYPE}}</td>
+								<td>{{row.LEAD_SOURCE_ID |mapping:LEAD_SOURCE}}</td>
+								<td>{{row.CAMPAIGN_NAME}}</td>
+								<td>{{row.VISITOR}} - {{row.EMP_NAME}}</td>
+								<td>{{row.CMU_TYPE | mapping:VST_REC_CMU_TYPE}}</td>
+								<td>{{row.CONTACT_DATE}}</td>
+								<td>{{row.VISIT_MEMO}}</td>
+								<td>{{row.VISIT_CREPLY}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-show ='TYPE == "audited" && REVIEW_DATE == null' ng-click="save('save')" >儲存</button>
+					<!-- 單號 : 5478 -->
+					<!-- 可覆核的條件 -->
+					<button type="button" class="btn btn-primary"
+							ng-show ='REVIEW_DATE == null && AUDITOR != loginID && row.REVIEWER_FLAG == "N" && isSupervisor == true'
+							ng-click="review()" >覆核</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

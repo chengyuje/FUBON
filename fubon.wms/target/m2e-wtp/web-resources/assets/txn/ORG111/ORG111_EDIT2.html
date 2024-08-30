@@ -1,0 +1,90 @@
+<style>
+/* dialog panl */
+.modal-dialog.ORG111_EDIT2 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 650px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<div>
+	<div ng-controller="ORG111_EDIT2Controller" ng-cloak>
+		<div class="modal-dialog ORG111_EDIT2">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">角色列表</h4>
+				</div>
+				<div class="modal-body">
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">員工編號：</th>
+							<td class="col-md-7 tdpadding" colspan="3">{{row.EMP_ID}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">員工姓名：</th>
+							<td class="col-md-7 tdpadding" colspan="3">{{row.EMP_NAME}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">是否為主要角色：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox ng-paramtype="COMMON.YES_NO"
+											ng-model="inputVO.isPrimaryRole" 
+											ng-validate="false"
+											ng-readonly="row.IS_PRIMARY_ROLE == 'Y'" 
+											ng-editable="false" 
+											ng-format="F3"
+											ng-required="row.IS_PRIMARY_ROLE != 'Y'" 
+											ng-disabled="row.IS_PRIMARY_ROLE == 'Y'" 
+											style="line-height:20px;"/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.isPrimaryRole != 'Y' && inputVO.isPrimaryRole != 'N'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors" colspan="3">請選擇是否為主要角色</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">角色：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox ng-datasource="mappingSet['ro']"
+											ng-model="inputVO.ROLE_ID" 
+											ng-validate="true"
+											ng-readonly="false" 
+											ng-editable="false" 
+											ng-format="F3"
+											ng-required="true" 
+											style="line-height:20px;"/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.ROLE_ID == ''">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors" colspan="3">請選擇角色</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" ng-disabled="inputVO.ROLE_ID == '' || inputVO.isPrimaryRole == ''">新增</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

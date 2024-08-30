@@ -1,0 +1,452 @@
+<style>
+<!-- input.bLarger {
+    width: 20px;
+    height: 20px;
+}
+
+-->.search_table th {
+    vertical-align: middle;
+}
+
+.search_table td {
+    vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT150/IOT150.js"></script>
+<script type="text/javascript" src="assets/txn/IOT150/IOT150_INSSIGRPT.js"></script>
+<script type="text/javascript" src="assets/txn/IOT160/IOT160.js"></script>
+<script type="text/javascript" src="assets/txn/IOT930/IOT930.js"></script>
+<script type="text/javascript" src="assets/txn/IOT940/IOT940.js"></script>
+
+<script type="text/javascript" src="assets/txn/COMMON/CommonUtil.js"></script>
+<script type="text/javascript" src="assets/txn/IOT150/IOT150_notFbGenPrint.js"></script>
+<script type="text/javascript" src="assets/txn/IOT150/IOT150_notFbSigReview.js"></script>
+<script type="text/javascript" src="assets/txn/IOT150/IOT150_notFbReviewForm.js"></script>
+
+<div ng-controller="IOT150Controller" ng-cloak>
+    <div class="tfb_content">
+        <div class="tfb_content_icon"></div>
+        <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a16.gif">壽險契約送件點收 </div>
+    </div>
+    <!--Content of the panel-->
+    <div class="panel_content">
+        <div class="search_table">
+            <table style="width: 80%;margin-left: auto;margin-right: auto;">
+                <tr>
+                    <td style="width: 10%;">
+                        <button ng-click="setBatch()" class="btn btn-info">設定批次</button>
+                    </td>
+                </tr>
+                <tr>
+                    <th>*保險送件類型</th>
+                    <td>
+                        <e-combobox id="reg_type" name="reg_type" ng-paramtype="IOT.PACK_REG_TYPE" ng-model="inputVO.REG_TYPE" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" width="80%" style="line-height:20px;" ng-change="showSearchCondition()" />
+                    </td>
+                    <th>分行代號</th>
+                    <td colspan="3">
+                        <input id="branch_nbr" name="branch_nbr" type="text" placeholder="請輸入..." ng-model="inputVO.BRANCH_NBR">
+                    </td>
+                </tr>
+                <tr>
+                    <th style="width: 10%;">*分行送件批號</th>
+                    <td style="width: 18%;">
+                        <input id="op_batch_no" name="op_batch_no" type="text" placeholder="請輸入..." ng-model="inputVO.OP_BATCH_NO" ng-required="true" style="text-transform: uppercase;" ng-blur="touppcase_OP_BATCH_NO(inputVO.OP_BATCH_NO)">
+                    </td>
+                    <th style="width: 5%;">狀態</th>
+                    <td colspan="2" style="width: 30%;">
+                        <e-combobox id="status" name="status" ng-paramtype="IOT.MAIN_STATUS" ng-model="inputVO.STATUS" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" style="line-height:20px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>保險文件編號</th>
+                    <td>
+                        <input id="ins_id" name="ins_id" type="text" placeholder="請輸入..." ng-model="inputVO.INS_ID">
+                    </td>
+                    <th ng-show="othertext==true?false:true">要保人ID</th>
+                    <th ng-show="othertext">立約人ID</th>
+                    <td colspan="3">
+                        <input id="cust_id" name="cust_id" type="text" placeholder="請輸入..." ng-model="inputVO.CUST_ID">
+                    </td>
+                </tr>
+                <tr>
+                	 <th>設定批次員編</th>
+                    <td>
+                        <input id="batchEmpId" name=""batchEmpId"" type="text" placeholder="請輸入..." ng-model="inputVO.BATCH_SETUP_EMPID">
+                    </td>
+                    <th>*設定批次日期</th>
+                    <td colspan="2" class="form-inline">
+                        <div class="form-group">
+                            <div class="input-group datebox datewidth">
+                                <input type="text" id="batchSetupDate" name="batchSetupDate" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.BATCH_SETUP_DATE" is-open="model.h" ng-readonly="true" />
+                                <!-- 製作日曆button -->
+                                <span class="input-group-btn">
+					              <button type="button" class="btn btn-default" ng-click="open($event,'h')">
+					                <i class="glyphicon glyphicon-calendar"></i>
+					              </button>
+					            </span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-show="exchangeShow">
+                    <th>分行逾天未送件</th>
+                    <td>
+                        <input id="b_over_days" name="b_over_days" type="text" ng-model="inputVO.B_OVER_DAYS" placeholder="請輸入..." e-input-limit="N">
+                    </td>
+                    <th>行政服務科逾天未送件</th>
+                    <td colspan="3">
+                        <input id="h_over_days" name="h_over_days" type="text" ng-model="inputVO.H_OVER_DAYS" placeholder="請輸入..." e-input-limit="N">
+                    </td>
+                </tr>
+                <tr ng-show="newShow">
+                    <th ng-show="othertext==true?false:true"><span ng-if="hasRegType">*</span>要保書填寫申請日</th>
+                    <th ng-show="othertext"><span ng-if="hasRegType">*</span>約定書申請日</th>
+                    <td colspan="5" class="form-inline">
+                        <div class="form-group">
+                            <div class="input-group datebox datewidth">
+                                <input type="text" id="apply_date_f" name="apply_date_f" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.APPLY_DATE_F" is-open="model.c" datepicker-options="bgn_applysDateOptions" ng-readonly="true" ng-change="applylimitDate()" />
+                                <!-- 製作日曆button -->
+                                <span class="input-group-btn">
+              <button type="button" class="btn btn-default" ng-click="open($event,'c')">
+                <i class="glyphicon glyphicon-calendar"></i>
+              </button>
+            </span>
+                            </div>
+                            ～
+                            <div class="input-group datebox datewidth">
+                                <input type="text" id="apply_date_t" name="apply_date_t" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.APPLY_DATE_T" is-open="model.d" datepicker-options="bgn_applyeDateOptions" ng-readonly="true" ng-change="applylimitDate()" />
+                                <!-- 製作日曆button -->
+                                <span class="input-group-btn">
+              <button type="button" class="btn btn-default" ng-click="open($event,'d')">
+                <i class="glyphicon glyphicon-calendar"></i>
+              </button>
+            </span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-show="otherShow">
+                    <th>保單號碼</th>
+                    <td colspan="5">
+                        <input id="policy_no1" name="policy_no1" type="text" style="width: 50px;" ng-model="inputVO.POLICY_NO1"> -
+                        <input id="policy_no2" name="policy_no2" type="text" style="width: 50px;" ng-model="inputVO.POLICY_NO2"> -
+                        <input id="policy_no3" name="policy_no3" type="text" style="width: 50px;" ng-model="inputVO.POLICY_NO3">
+                    </td>
+                </tr>
+                <tr ng-show="exchangeShow">
+                    <th>適用專案</th>
+                    <td>
+                        <input id="prod_name" name="prod_name" type="text" placeholder="請輸入..." ng-model="inputVO.PROD_NAME">
+                    </td>
+                    <th colspan="4">
+                        <input class="uniform_on" type='checkbox' id="prod_all" name="prod_all" ng-model="inputVO.PROD_ALL" ng-true-value="'Y'" ng-false-value="'N'" /> 所有專案
+                    </th>
+                </tr>
+                <tr>
+                    <th>點收經辦員編(簽署前)</th>
+                    <td>
+                        <input id="bef_sign_oprid" name="bef_sign_oprid" type="text" placeholder="請輸入..." ng-model="inputVO.BEF_SIGN_OPRID">
+                    </td>
+                    <th>*點收日期(簽署前)</th>
+                    <td colspan="2" class="form-inline">
+                        <div class="form-group">
+                            <div class="input-group datebox datewidth">
+                                <input type="text" id="bef_sign_date" name="bef_sign_date" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.BEF_SIGN_DATE" is-open="model.e" ng-readonly="true" />
+                                <!-- 製作日曆button -->
+                                <span class="input-group-btn">
+              <button type="button" class="btn btn-default" ng-click="open($event,'e')">
+                <i class="glyphicon glyphicon-calendar"></i>
+              </button>
+            </span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>簽署人員編</th>
+                    <td>
+                        <input id="sign_oprid" name="sign_oprid" type="text" placeholder="請輸入..." ng-model="inputVO.SIGN_OPRID">
+                    </td>
+                    <th>簽署日期</th>
+                    <td colspan="2" class="form-inline">
+                        <div class="form-group">
+                            <div class="input-group datebox datewidth">
+                                <input type="text" id="sign_date" name="sign_date" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.SIGN_DATE" is-open="model.f" ng-readonly="true" />
+                                <!-- 製作日曆button -->
+                                <span class="input-group-btn">
+              <button type="button" class="btn btn-default" ng-click="open($event,'f')">
+                <i class="glyphicon glyphicon-calendar"></i>
+              </button>
+            </span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>點收經辦員編(簽署後)</th>
+                    <td>
+                        <input id="aft_sign_oprid" name="aft_sign_oprid" type="text" placeholder="請輸入..." ng-model="inputVO.AFT_SIGN_OPRID">
+                    </td>
+                    <th>點收日期(簽署後)</th>
+                    <td colspan="2" class="form-inline">
+                        <div class="form-group">
+                            <div class="input-group datebox datewidth">
+                                <input type="text" id="aft_sign_date" name="aft_sign_date" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.AFT_SIGN_DATE" is-open="model.g" ng-readonly="true" />
+                                <!-- 製作日曆button -->
+                                <span class="input-group-btn">
+              <button type="button" class="btn btn-default" ng-click="open($event,'g')">
+                <i class="glyphicon glyphicon-calendar"></i>
+              </button>
+            </span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span ng-if="hasRegType">*</span>鍵機日</th>
+                    <td colspan="5" class="form-inline">
+                        <div class="form-group">
+                            <div class="input-group datebox datewidth">
+                                <input type="text" id="keyin_date_f" name="keyin_date_f" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.KEYIN_DATE_F" is-open="model.a" datepicker-options="bgn_sDateOptions" ng-readonly="true" ng-change="limitDate()" />
+                                <!-- 製作日曆button -->
+                                <span class="input-group-btn">
+              <button type="button" class="btn btn-default" ng-click="open($event,'a')">
+                <i class="glyphicon glyphicon-calendar"></i>
+              </button>
+            </span>
+                            </div>
+                            ～
+                            <div class="input-group datebox datewidth">
+                                <input type="text" id="keyin_date_t" name="keyin_date_t" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.KEYIN_DATE_T" is-open="model.b" datepicker-options="bgn_eDateOptions" ng-readonly="true" ng-change="limitDate()" />
+                                <!-- 製作日曆button -->
+                                <span class="input-group-btn">
+              <button type="button" class="btn btn-default" ng-click="open($event,'b')">
+                <i class="glyphicon glyphicon-calendar"></i>
+              </button>
+            </span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div style="color: red;font-size: small;text-shadow: black;padding-left: 1%;">註:*為必輸欄位<span ng-if="hasRegType">{{hasRegType_text}}</span></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="search_box_btn text-center">
+            <button ng-click="queryData()" class="btn btn-info">查詢</button>
+            <button ng-click="btnClear()" class="btn btn-info">清除</button>
+            <button ng-click="export()" class="btn btn-info">匯出</button>
+            <button ng-click="insSigRpt()" class="btn btn-info">人壽待簽署管理報表</button>
+            <button function-type="query" ng-click="notFbGenPrint()" class="btn btn-info">非富壽_送件明細表產生暨補印</button>
+            <button function-type="query" ng-click="notFbSigReview()" class="btn btn-info">非富壽_送件明細表保險公司簽收回覆</button>
+            <button ng-click="exportRecordYN()" class="btn btn-info">保險資金電訪報表</button>
+        </div>
+        <div class="text-right">
+            <e-jumping-once ng-show="inputVO" output="outputVO" totallist="IOT_MAINList" list="data" rowcountlimit="300">
+            </e-jumping-once>
+        </div>
+        <div class="gv_tab_sc scroll_y">
+            <table ng-show="othertable==false?true:false" style="width: 420%;" class="e-table-freeze" e-height="500px" e-mode="3" e-top="true" e-left="4" e-list="data">
+                <thead>
+                    <tr>
+						<th ng-show="signViewFileShow">簽署/檢視文件 </th>
+                        <th>
+                            <input class="uniform_on bLarger" type='checkbox' id="selectPass_all" name="selectPass_all" ng-model="inputVO.selectPass_all" ng-true-value="'Y'" ng-false-value="'N'" ng-change="selectall()"" ng-disabled="inputVO.selectNoPass_all == 'Y'?true:false" />通過
+                        </th>
+                        <th>
+                            <input class="uniform_on bLarger" type='checkbox' id="selectNoPass_all" name="selectNoPass_all" ng-model="inputVO.selectNoPass_all" ng-true-value="'Y'" ng-false-value="'N'" ng-change="selectall()" ng-disabled="inputVO.selectPass_all == 'Y'?true:false" /> 不通過
+                        </th>
+                        <th><div style="width: 100px;">狀態</div></th>
+                        <th>保險文件編號</th>
+                        <th>高齡客戶投保關懷說明</th>
+                        <th>被保人ID</th>
+                        <th>被保險人姓名</th>
+                        <th ng-show="otherDataShow">文件種類</th>
+                        <th>主約險種</th>
+                        <th ng-show="newDataShow">實收保費(原幣)</th>
+                        <th><div style="width: 200px;">保險相關文件</div></th>
+                        <th ng-show="newDataShow">躉繳/分期繳</th>
+                        <th ng-show="showReasonList">不通過原因</th>
+                        <th ng-show="showReasonList">補充說明</th>
+                        <th>退件原因</th>
+                        <th ng-show="newDataShow">幣別</th>
+                        <th>備註(傳給人壽)</th>
+                        <th>要保人ID</th>
+                        <th>要保人姓名</th>
+                        <th ng-show="otherDataShow">保單號碼</th>
+                        <th>送達方式</th>
+                        <th>批次</th>
+                        <th>送達日</th>
+                        <th>電子送件時間</th>
+                        <th>人壽點收人</th>
+                        <th>人壽回饋說明</th>
+                        <th>人壽簽收時間</th>
+                        <th>分行送件批號</th>
+                        <th>行助員編(批次設定)</th>
+                        <th>行助簽收日(批次設定)</th>
+                        <th>行助員編(簽署前)</th>
+                        <th>行助簽收日(簽署前)</th>
+                        <th>總行送件批號</th>
+                        <th>簽署人員編</th>
+                        <th>簽署日期</th>
+                        <th>簽署人批號</th>
+                        <th>行助員編(簽署後)</th>
+                        <th>行助簽收日(簽署後)</th>
+                        <th>分行留存文件</th>
+                        <th>人壽系統簽署人員編</th>
+                        <th>人壽系統簽署日期</th>
+                        <th>人壽系統簽署結果</th>
+                        <th>保單進件來源</th>
+                        <th>保險公司</th>
+                        <th>契撤案件</th>
+                        <th>保險資金電訪<br/>欄位註記</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                        <td ng-show="signViewFileShow">
+                        	<button ng-show="row.isOpBatchNonewEtopShow && (row.STATUS == 40 || row.STATUS == 62)" ng-click="signView('sign')" class="btn btn-info">
+                        		簽署
+                        	</button>
+                        	<button ng-show="row.isOpBatchS && (row.STATUS == 60 || row.STATUS == 70 || row.STATUS == 80)" ng-click="signINSView()" class="btn btn-info">
+                        		簽署(人壽)
+                        	</button>
+                        	<button ng-show="((row.isOpBatchNonewEtopShow && (row.STATUS != 40 && row.STATUS != 62)) || row.isOpBatchS)" ng-click="pdfFile(row.INS_ID)" class="btn btn-info">
+                        		檢視文件
+                        	</button>
+                        	<button ng-show="row.MAPPVIDEO_YN == 'Y'" ng-click="openMAPPVideo(row)" class="btn btn-info">
+                        		視訊簽單影像
+                        	</button>
+                        	<button ng-show="row.MAPPVIDEO_YN == 'Y'" ng-click="openMAPPVideoDialog(row)" class="btn btn-info">
+                        		影像品質檢核項目
+                        	</button>
+                        </td>
+                        <td>
+                            <input class="uniform_on bLarger" type='checkbox' id="pass" name="pass" ng-disabled="row.nopass == 'Y'?true:false" ng-model="row.pass" ng-true-value="'Y'" ng-false-value="'N'" ng-change="chkXsetStatus(row,'PASS')" />
+                        </td>
+                        <td>
+                            <input class="uniform_on bLarger" type='checkbox' id="nopass" name="nopass" ng-disabled="row.pass == 'Y'?true:false" ng-model="row.nopass" ng-true-value="'Y'" ng-false-value="'N'" ng-change="chkXsetStatus(row,'REJECT')" />
+                        </td>
+                        <td>{{row.STATUS | mapping:mappingSet['IOT.MAIN_STATUS']:F3}}</td>
+                        <td>{{row.INS_ID}}</td>
+                        <td>{{row.SENIOR_AUTH_REMARKS}}</td>
+                        <td>{{row.INSURED_ID}}</td>
+                        <td>{{row.INSURED_NAME}}</td>
+                        <td ng-show="otherDataShow">{{row.OTH_TYPE | mapping:mappingSet['IOT.OTH_TYPE']:F3}}</td>
+                        <td>{{row.INSPRD_ID}}</td>
+                        <td ng-show="newDataShow" style="text-align: right;">{{row.REAL_PREMIUM | number}}</td>
+                        <td>
+                            <span ng-repeat="row1 in row.outList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                				<div>{{row1.DOC_NAME}}</div>
+             				 </span>
+                        </td>
+                        <td ng-show="newDataShow">{{row.PAY_TYPE | mapping:mappingSet['IOT.PAY_TYPE']:F3}}</td>
+                        <td style="width: 1%;" ng-show="showReasonList">
+                            <e-combobox id="nopassreason" name="nopassreason" ng-paramtype="IOT.REJ_REASON" ng-model="row.nopassreason" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" style="line-height:20px;" ng-disabled="row.nopass == 'Y'?false:true" />
+                        </td>
+                        <td ng-show="showReasonList">
+                            <input id="rej_reason_oth" name="rej_reason_oth" type="text" placeholder="請輸入..." ng-model="row.REJ_REASON_OTH" ng-disabled="row.nopass == 'Y' && row.nopassreason == '10'?false:true">
+                        </td>
+                        <td>{{row.REJ_REASON_SHOW}}</td>
+                        <td ng-show="newDataShow">{{row.CURR_CD}}</td>
+                        <td>
+                            <input id="REMARK_BANK" name="REMARK_BANK" type="text" placeholder="請輸入..." ng-model="row.REMARK_BANK">
+                        </td>
+                        <td>{{row.CUST_ID}}</td>
+                        <td>{{row.PROPOSER_NAME}}</td>
+                        <td ng-show="otherDataShow">
+                            <div style="width: 200px;">{{row.POLICY_NO}}</div>
+                        </td>
+                        <td>{{row.SUBMIT_WAY | mapping:mappingSet['IOT.SUBMIT_WAY']:F3}}</td>
+                        <td>{{row.BATCH_SEQ | mapping:mappingSet['IOT.BATCH_SEQ']:F3}}</td>
+                        <td>{{row.SUBMIT_DATE}}</td>
+                        <td>{{row.INS_SUBMIT_DATE}}</td>
+                        <td>{{row.INS_RCV_OPRID}}</td>
+                        <td>{{row.REMARK_INS}}</td>
+                        <td>{{row.INS_RCV_DATE}}</td>
+                        <td>{{row.OP_BATCH_NO}}</td>
+                        <td>{{row.BATCH_SETUP_EMPID}}</td>
+                        <td>{{row.BATCH_SETUP_DATE}}</td>
+                        <td>{{row.BEF_SIGN_OPRID}}</td>
+                        <td>{{row.BEF_SIGN_DATE}}</td>
+                        <td>{{row.BEF_SIGN_NO}}</td>
+                        <td>{{row.SIGN_OPRID}}</td>
+                        <td>{{row.SIGN_DATE}}</td>
+                        <td>{{row.SIGN_NO}}</td>
+                        <td>{{row.AFT_SIGN_OPRID}}</td>
+                        <td>{{row.AFT_SIGN_DATE}}</td>
+                        <td>
+                            <span ng-repeat="row2 in row.inList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+               				 <div>{{row2.DOC_NAME}}</div>
+              				</span>
+                        </td>
+                        <td>{{row.INS_SIGN_OPRID}}</td>
+                        <td>{{row.INS_SIGN_DATE}}</td>
+                        <td>{{row.INS_SIGN_YN}}</td>
+                        <td>{{row.INS_SOURCE}}</td>
+                        <td>{{row.INS_COM_NAME}}</td>
+                        <td>{{row.CANCEL_CONTRACT_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+                        <td>{{row.RECORD_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table ng-show="othertable">
+                <thead>
+                    <tr>
+                        <th>設定狀態</th>
+                        <th>補充說明</th>
+                        <th>備註</th>
+                        <th>狀態</th>
+                        <th>保險文件編號</th>
+                        <th>立約人ID</th>
+                        <th>立約人姓名</th>
+                        <th>適用專案</th>
+                        <th>保險相關文件</th>
+                        <th>分行送件批號</th>
+                        <th>簽收時間</th>
+                        <th>簽收人</th>
+                        <th>分行留存文件</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                        <td>
+                            <e-combobox id="nopassreason" name="nopassreason" ng-datasource="row.SET_STATUS" ng-model="row.SELECT_SET_STATUS" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" width="100px" />
+                        </td>
+                        <td>
+                            <input id="rej_reason_oth" name="rej_reason_oth" type="text" placeholder="請輸入..." ng-model="row.REJ_REASON_OTH" ng-disabled="row.SELECT_SET_STATUS == '45'?false:true">
+                        </td>
+                        <td>
+                            <input id="REMARK_BANK" name="REMARK_BANK" type="text" placeholder="請輸入..." ng-model="row.REMARK_BANK">
+                        </td>
+                        <td>{{row.STATUS | mapping:mappingSet['IOT.REG4_STATUS']:F3}}</td>
+                        <td>{{row.INS_ID}}</td>
+                        <td>{{row.CUST_ID}}</td>
+                        <td>{{row.PROPOSER_NAME}}</td>
+                        <td>{{row.PROD_NAME}}{{row.PROD_PERIOD}}</td>
+                        <td>
+                            <span ng-repeat="row1 in row.outList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                <div>{{row1.DOC_NAME}}</div>
+              </span>
+                        </td>
+                        <td>{{row.OP_BATCH_NO}}</td>
+                        <td>{{row.AFT_SIGN_DATE}}</td>
+                        <td>{{row.AFT_SIGN_OPRID}}</td>
+                        <td>
+                            <span ng-repeat="row2 in row.inList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                <div>{{row2.DOC_NAME}}</div>
+              </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="search_box_btn text-center">
+            <button ng-click="submit()" class="btn btn-info">儲存</button>
+            <button ng-disabled="print" ng-click="Report()" class="btn btn-info">補印送人壽寄件明細表</button>
+        </div>
+    </div>
+</div>

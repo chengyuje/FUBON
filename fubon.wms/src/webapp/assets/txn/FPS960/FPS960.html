@@ -1,0 +1,205 @@
+<style>
+.modal-dialog.FPS960 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1100px;
+	height: auto;
+}
+/* table size */
+.FPS960 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.FPS960 table.little{
+	width: 60%;
+}
+/* change row */
+.FPS960.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_FPS960_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/FPS960/FPS960.js"></script>
+<script type="text/javascript" src="assets/txn/FPS960/FPS960_SET.js"></script>
+<div class="FPS960" ng-controller="FPS960Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >理規使用者權限設定</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<h4 class="h4-title" ng-if="!CanConfirm">可使用理財規劃系統的人員</h4>
+		<div class="search_table">
+			<table ng-if="CanConfirm" style="width:auto">
+				<tr>
+					<th width="5%">資料年月：</th>
+					<td>
+						<div class="input-group datebox datewidth">
+							<input type="text" id="date" name="date"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM"
+								ng-model="inputVO.date"
+								datepicker-options="{minMode: 'month'}"
+								datepicker-mode="'month'"
+								is-open="model.a"
+								ng-readonly="true" />
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+								<i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</div>
+					</td>
+					<th></th>
+					<td></td>
+				</tr>
+			</table>
+			<table ng-if="!CanConfirm">
+				<tr>
+					<th colspan="2">
+						<div style="float: left !important;margin-top: 3px;">
+							<b>資料年月：{{inputVO.date | date:"yyyy/MM"}}&emsp;&emsp;&emsp;
+							生效日：</b>
+						</div>
+						<div class="input-group datebox datewidth">
+							<input type="text" id="date" name="date"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.date"
+								is-open="model.a"
+								datepicker-options="dateOptions"
+								ng-readonly="true" />
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+								<i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</div>
+					</th>
+				</tr>
+				<tr>
+					<th width="10%">
+						<label>
+							<input type="radio" ng-model="inputVO.setType" ng-value="2" ng-change="typeChange()">
+							自訂人員：
+						</label>
+					</th>
+					<td width="90%">
+						<button type="button" class="btn btn-primary" ng-disabled="inputVO.setType !='2'" ng-click="setReport()">設定對象</button>
+						&emsp;
+						<span class="repeat-row" ng-repeat="data in inputVO.chkRole track by $index">
+							{{$last ? data.ROLE_NAME : data.ROLE_NAME + ", "}}
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<th>
+						<label>
+							<input type="radio" ng-model="inputVO.setType" ng-value="1" ng-change="typeChange()">
+							依上傳名單：
+						</label>
+					</th>
+					<td>
+						<div>
+							<e-upload ng-disabled="inputVO.setType !='1'" success="uploadFinshed(name,rname)" model="inputVO.realfileName"></e-upload>
+							<a onclick="return false" ng-click="downloadSimple()">(下載範例檔案)</a>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="goAdd()" function-type="maintenance">新增草稿</button>
+			<button type="button" class="btn btn-info" ng-click="init();inquireInit();inquire()" function-type="maintenance">　清除　</button>
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="confirm">　查詢　</button>
+			<button type="button" class="btn btn-info" ng-click="init();inquireInit();" function-type="confirm">　清除　</button>
+			<button type="button" class="btn btn-info" ng-click="review('W')" function-type="confirm">　核可　</button>
+			<button type="button" class="btn btn-info" ng-click="review('R')" function-type="confirm">　退回　</button>
+			<button type="button" class="btn btn-info" ng-click="review('F')" function-type="confirm">　失效　</button>
+		</div>
+		<!-- 結果區 -->
+		<e-jumping-once output="outputVO" list="dataList" totallist="totalList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:335px;white-space: nowrap;">
+			<table class="table table-bordered td_center">
+				<thead>
+					<tr>
+						<th function-type="confirm" width="10%">
+							<label style="font-weight: initial;margin-bottom: 0px;">
+								<input type='checkbox' ng-model='obj.clickList' ng-change='checklist()' /> 本頁全選
+							</label>
+						</th>
+						<th function-type="maintenance" width="10%">功能</th>
+						<th width="5%">資料年月</th>
+						<th width="10%"><e-sorter e-input="inputVO" e-mode="auto" e-col="AUTH_TYPE" e-query="inquire()">適用人員型態</e-sorter></th>
+						<th width="40%">人員檔案</th>
+						<th width="5%"><e-sorter e-input="inputVO" e-mode="auto" e-col="EFFECT_START_DATE" e-query="inquire()">生效日</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="STATUS" e-query="inquire()">狀態</e-sorter></th>
+						<th>建立人員</th>
+						<th>最後修改人</th>
+						<th>最後修改時間</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in dataList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td function-type="confirm">
+							<label style="font-weight: initial;margin-bottom: 0px;" ng-if="row.STATUS == 'P' || row.STATUS == 'W'">
+								<input type='checkbox' ng-model='row.SELECTED'>
+							</label>
+						</td>
+						<td function-type="maintenance">
+							<e-combobox id="cmbAction" name="cmbAction" ng-if="row.STATUS == 'S' || row.STATUS == 'R'"
+							ng-datasource="row.set"
+							ng-model="row.cmbAction"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="action(row)"
+							width="100px"
+							style="line-height:20px;" />
+						</td>
+						<td>{{toJsDate(row.EFFECT_START_DATE) | date:"yyyy/MM"}}</td>
+						<td>{{row.AUTH_TYPE == '1' ? '依上傳名單' : '自訂人員'}}</td>
+						<td ng-if="row.AUTH_TYPE == '1'"><button type="button" class="btn btn-info" ng-click="download(row)">下載檔案</button></td>
+						<td ng-if="row.AUTH_TYPE == '2'" style="white-space:normal;">{{row.ROLE_NAME}}</td>
+						<td>{{toJsDate(row.EFFECT_START_DATE) | date:"yyyy/MM/dd"}}</td>
+						<td>{{row.STATUS | mapping:PARAM_STATUS:'F3'}}</td>
+						<td>{{row.ADDNAME}}<br>{{row.CREATOR}}</td>
+						<td>{{row.MODNAME}}<br>{{row.MODIFIER}}</td>
+						<td>
+							{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd"}}
+							<br>
+							{{toJsDate(row.LASTUPDATE) | date:"HH:mm:ss"}}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<span class="with-errors">*判斷主管覆核的先後順序，最後覆核的資料視為生效</span>
+	</div>
+</div>

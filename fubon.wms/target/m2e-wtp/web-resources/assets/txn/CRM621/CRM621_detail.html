@@ -1,0 +1,229 @@
+<style>
+/* open dialog */
+.ngdialog.CRM621_detail {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM621_detail {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM621_detail table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM621_detail table.little{
+	width: 60%;
+}
+/* change row */
+.CRM621_detail.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM621_detail_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:188px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+}
+.red{
+	color: red;
+}
+.form-control-CRM621_detail {
+    padding: 4px 10px;
+    font-size: 16px;
+    color: #666666;
+    background-color: #f4f4f4;
+    border: 1px solid #999999;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-transition: none;
+    -o-transition: none;
+    transition: none;
+	-webkit-border-radius: 0px;
+	-moz-border-radius:0px;
+	border-radius:0px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM621/CRM621_detail.js"></script>
+<div class="CRM621_detail" ng-controller="CRM621_detailController" ng-cloak>
+		<!--Content of the panel-->
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >特殊聯絡方式</div>
+			</div>
+			<div class="panel_content">
+				<div>
+					<table>
+						<tr>
+							<td valign="top" style = "border: 0px solid rgba(255, 255, 255, 0)!important;">
+								新增輸入:
+							</td>
+							<td valign="top" style = "border: 0px solid rgba(255, 255, 255, 0)!important;width: 50%;">
+								<textarea rows="1" cols="50" id="content" ng-model="inputVO.content"style="width: 100%;"maxlength="250;"></textarea>
+<!-- 								<input type="text" id="content" name="content" ng-model="inputVO.content" style="width: 100%;"maxlength="250;word-wrap:break-word;"> -->
+								<p ng-show="inputVO.content.length == '250'" style="color:red">輸入內容最250字</p>
+							</td>
+							<td valign="top" style = "border: 0px solid rgba(255, 255, 255, 0)!important; text-align: right">
+								有效期間:
+								<e-combobox id="valid_type" 
+											ng-datasource="mappingSet['VALID_TYPE']"
+											ng-model="inputVO.valid_type"
+											ng-change = "check()"
+				   							ng-validate="false" 
+				   							ng-readonly="false" 
+				   							ng-editable="false"
+				   							ng-format="F3"
+				   							ng-required="false"
+				   							width="120px"
+				   							style="line-height:20px;" />
+							</td>
+							<td valign="top" style = "border: 0px solid rgba(255, 255, 255, 0)!important;">
+								<button type="button" class="btn btn-info" ng-click="add()" 
+								ng-disabled = "(inputVO.content == '' || inputVO.content == null || inputVO.content == undefined)
+								|| (inputVO.valid_type != 'F' && inputVO.valid_type != 'D' && inputVO.valid_type != 'B') ">新增</button>
+							</td>						
+						</tr>
+						<tr ng-show = "inputVO.valid_type == 'B' || inputVO.valid_type == 'D'">
+							<td style = "border: 0px solid rgba(255, 255, 255, 0)!important;"  colspan = "3">
+								日期:
+								<input ng-if = "inputVO.valid_type == 'B'" type="text" id="valid_bgn_Date" name="valid_bgn_Date"
+										class="form-control-CRM621_detail" 
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.valid_bgn_Date" 
+										is-open="model.a"
+										datepicker-options="valid_bgn_DateOptions" 
+										ng-readonly="true"
+										ng-change="limitDate()" 
+										size = "13"/>
+								<!-- 製作日曆button -->
+								<button ng-if = "inputVO.valid_type == 'B'" type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+								<label ng-if = "inputVO.valid_type == 'B'">&nbsp ~ &nbsp</label>					
+								<input type="text" id="valid_end_Date" name="valid_end_Date"
+										class="form-control-CRM621_detail" 
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.valid_end_Date" 
+										is-open="model.b"
+										datepicker-options="valid_end_DateOptions" 
+										ng-readonly="true"
+										ng-change="limitDate()" 
+										size = "13"/>
+								<!-- 製作日曆button -->
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</td>						
+						</tr>
+					</table>
+				</div>
+				<e-jumping-once output="outputVO_A" list="data_A" totallist="resultList_A"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="height:235px;">
+				<table>
+					<thead>
+						<tr>
+							<th style="width :10%;text-align: center;">功能</th>
+							<th style="width :30%;text-align: center;">內容</th>
+							<th style="width :15%;text-align: center;">有效期間</th>
+							<th style="width :15%;text-align: center;">有效迄日</th>
+							<th style="width :15%;text-align: center;">建立人員</th>
+							<th style="width :15%;text-align: center;">建立日期時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data_A track by $index " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td style="width :10%;text-align: left;"><button type="button" class="btn btn-info" ng-click="delete(row)" >刪除</button></td>
+							<td style="width :30%;text-align: left;"> {{row.CONTENT}}</td>
+							<td style="width :15%;text-align: left;">{{row.VALID_TYPE | mapping:mappingSet['VALID_TYPE']:'F3'}}</td>
+							<td style="width :15%;text-align: left;">{{toJsDate(row.VALID_BGN_DATE) | date: "yyyy-MM-dd"}}{{row.VALID_BGN_DATE != null ? '~' : ''}}{{toJsDate(row.VALID_END_DATE) | date: "yyyy-MM-dd"}}</td>
+							<td style="width :15%;text-align: left;"> {{row.CREATOR}}</td>
+							<td style="width :15%;text-align: left;">{{toJsDate(row.CREATETIME) | date: "yyyy-MM-dd"}}</td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+			</div>
+			
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >通訊地址</div>
+			</div>
+			<div class="panel_content">
+				<e-jumping-once ng-show="outputVO_B" output="outputVO_B" totallist="resultList_B" list="data_B" rowcountlimit="5"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="height:235px;">
+				<table>
+					<thead>
+						<tr>
+							<th style="width :8%;">郵遞區號</th>
+							<th style="width :12%;">地址類別</th>
+							<th style="width :80%;">理財郵件地址</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data_B | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.ZIP_COD}}</td>
+							<td>{{row.MEMO}}</td>
+							<td>{{row.DATA}}</td>
+						</tr>
+					</tbody>
+					
+				</table>
+				</div>
+			</div>
+			
+			<div>
+				<div ng-include="'assets/txn/CRM621/CRM621_phone.html'"></div>
+				<div class="col-md-6">
+					<div class="tfb_content">
+						<div class="tfb_content_icon"></div>
+						<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >通訊電子郵件</div>
+					</div>
+					<div class="panel_content">
+						<e-jumping-once output="outputVO_D" totallist="resultList_D" list="data_D" rowcountlimit="5"></e-jumping-once>
+						<div class="gv_tab_sc scroll_y" style="height:235px;">
+							<table>
+								<thead>
+									<tr>
+										<th>E-MAIL地址</th>
+									</tr>
+								<thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in data_D | limitTo:displayLimit track by $index"
+										ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td ng-bind="row.mail"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+	</div>
+</div>

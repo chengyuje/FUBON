@@ -1,0 +1,83 @@
+<style>
+  .modal-dialog {
+    width: 50vw;
+    max-width: 450px !important;
+  }
+
+  .modal-content {
+    height: auto;
+    max-height: 100%;
+    overflow: auto;
+  }
+
+  .FPS350Detail table {
+    text-align: center;
+  }
+
+  .modal-title {
+    text-align: left;
+  }
+
+  .FPS350Detail.FPS table.table thead tr th {
+    background-color: #53b0c9;
+    color: #fff;
+  }
+
+  .FPS350Detail.FPS table.table tbody tr:nth-child(odd) {
+    background-color: #dbeef4;
+  }
+
+  .FPS350Detail.FPS table.table tbody tr:nth-child(even) {
+    background-color: #b7dee8;
+  }
+
+</style>
+
+<div ng-controller="FPS350DetailController"
+     ng-cloak
+     class="FPS350Detail FPS">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a href="#"
+           class="close"
+           data-dismiss="modal"
+           aria-hidden="true"
+           ng-click="closeThisDialog('cancel')">&times; </a>
+        <h4 id="myModalAlertLabel"
+            class="modal-title">轉寄規劃書</h4>
+      </div>
+      <div class="modal-body">
+        <div class="bootstrap-admin-panel-content">
+          <div style="height: 35px;">
+            <e-jumping-once output="outputVO"
+                            list="data"
+                            totallist="paramList"></e-jumping-once>
+          </div>
+          <table class="table table-striped table-bordered">
+            <thead>
+              <th>產出規劃書日期</th>
+              <th>轉寄</th>
+              <th>列印</th>
+            </thead>
+            <tbody>
+              <tr ng-repeat="row in data">
+                <td ng-bind="row.buildTime"></td>
+                <td>
+                  <i class="fa fa-envelope-o clickable"
+                     ng-class="{'important blue':row.IS_EMAIL>0}"
+                     ng-click="go('resend',row.SEQ_NO)"></i>
+                </td>
+                <td>
+                  <i class="fa fa-download clickable"
+                     ng-class="{'important blue':row.IS_PRINT>0}"
+                     ng-click="go('download',row.SEQ_NO)"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

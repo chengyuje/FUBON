@@ -1,0 +1,251 @@
+<style> 
+    .PMS401 .datewidth {
+        width: 180px !important;
+    }
+
+    .PMS401 .rstable thead tr th {
+        vertical-align: middle;
+    }
+
+    .PMS401 .noticed {
+        color: #FF0000;
+    }
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS400/PMS400.js"></script>
+<script type="text/javascript" src="assets/txn/PMS401/PMS401.js"></script>
+<script type="text/javascript" src="assets/txn/PMS401/PMS401_detail.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS401" ng-controller="PMS401Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr>						
+						<th>資料統計日期：</th>
+						<td colspan="7">							
+							<div class="input-group datebox datewidth" style="float:left">
+								<input 	type="text" id="sCreDate" name="sCreDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sCreDate"
+										is-open="model.a"
+										datepicker-options="bgn_sDateOptions"								
+										ng-readonly="true"								
+										ng-change="limitDate();dateChange();"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')"><i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>																					
+							<div style="float:left">&nbsp; ～ &nbsp;</div>	
+							<div class="input-group datebox datewidth" style="float:left">
+								<input	type="text" id="eCreDate" name="eCreDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.eCreDate"
+										is-open="model.b"
+										datepicker-options="bgn_eDateOptions"								
+										ng-readonly="true"								
+										ng-change="limitDate();dateChange();"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')"><i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>								
+						</td>											    											
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="disableRegionCombo"
+										ng-readonly="disableRegionCombo" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeRegion()"
+										width="200px"
+										style="line-height:20px;" />
+						</td>						
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="disableAreaCombo"
+										ng-readonly="disableAreaCombo" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeArea()"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+						<th>分行：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_nbr"
+										ng-validate="false" 
+										ng-disabled="disableBranchCombo"
+										ng-readonly="disableBranchCombo" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeBranch()"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+						<th></th>
+						<td></td>
+					</tr>
+					<tr>
+						<th>行員員編：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." id="empID" name="empID" ng-model="inputVO.empID" style="width: 235px" e-length-limit="60"></td>
+						<th>已回覆/未回覆：</th>
+						<td>
+							<e-combobox id="noteStatus" name="noteStatus"
+										ng-paramtype="PMS.NOTE_STATUS"
+										ng-model="inputVO.noteStatus"
+										ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F3"
+										width="200px"
+										style="line-height:20px;"/>
+						</td>
+						<th></th>
+						<td></td>
+						<th></th>
+						<td></td>
+					</tr>					
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="inquireInit();query()"><span class="glyphicon glyphicon-search"></span>查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();limitDate()"><span class="glyphicon glyphicon-erase"></span>清除</button>
+				<button type="button" class="btn btn-success" ng-click="exportRPT()"><span class="glyphicon glyphicon-save"></span>匯出</button>
+				
+				<button type="button" class="btn btn-primary" ng-click="oldRPT('400')" ng-show="false" ><span class="glyphicon glyphicon-search"></span>舊報表查詢(~2018/04/30)</button>
+				<button type="button" class="btn btn-primary" ng-click="oldRPT('399')" ><span class="glyphicon glyphicon-search"></span>舊報表查詢(2018/05/01~2024/08/26)</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">		    
+			<e-jumping-once output="outputVO" list="paramList" totallist="totalData"></e-jumping-once>
+			<div algin="left">
+				<table>
+			    	<tr>
+			    		<td>產出頻率：</td>
+			    		<td>每日</td>
+			    	</tr>
+			    	<tr>
+			    		<td>產出日：</td>
+			    		<td>{{ rptDate }}</td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="rstable tablesaw table-striped e-table-freeze" e-mode="1" e-top="true" e-left="7" e-list="paramList">
+					<thead>
+						<tr>
+							<th>查詢明細<br>功能</th>
+							<th>私銀註記</th>
+							<th>資料日期</th>
+							<th>交易日期</th>
+							<th>所屬分行</th>
+							<th>員編</th>
+							<th>行員姓名</th>
+							<th>合計金額</th>
+							<th>查證方式</th>
+							<th>電訪錄音編號</th>
+							<th>資金來源或帳戶關係</th>
+							<th>具體原因或用途</th>
+							<th>初判異常<br>轉法遵部調查</th>
+							<th>首次建立日期</th>
+							<th>最新異動人員</th>
+							<th>最新異動日期</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td style="vertical-align:middle;" align="center">
+						 		<input type="checkbox" ng-show="false" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'">
+						 		<button type="button" class="btn btn-warning btn-circle" ng-click="openDetail(row, 'dtl')">
+									<i class="glyphicon glyphicon-list-alt" title="明細"></i>
+								</button>
+						 	</td>
+						 	<td style="vertical-align:middle;" align="center">{{row.RM_FLAG}}</td>
+						 	<td style="vertical-align:middle;" align="center">{{row.CREATETIME}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.TX_DATE}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.BRANCH_NBR}}<ps ng-show="row.BRANCH_NAME">-</ps>{{row.BRANCH_NAME}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.EMP_ID}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.EMP_NAME}}</td>
+							<td align="right">{{row.TX_AMT | currency:'':0}}</td>							
+							<td style="text-align:left;">
+		                    	<e-combobox id="checkType" name="checkType"
+											ng-datasource="mappingSet['PMS.CHECK_TYPE']"
+											ng-model="row.NOTE_TYPE"
+											ng-validate="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-change="updateFlag(row)"
+											ng-readonly="!chkMaintenance"
+											ng-disabled="!chkMaintenance"
+											style="line-height:20px;display:inline;" />
+		                    	<input type="text" class="form-control" style="width: 300px;display:inline;" ng-blur="updateFlag(row)" ng-model="row.NOTE" e-length-limit="200" placeholder="請補充查證方式..." ng-disabled="!chkMaintenance" ng-if="row.NOTE_TYPE == 'O'"/>
+		                    </td>						
+		                    <td>
+								<input 	type="text" class="form-control" style="width: 150px;display:inline;" 
+										e-length-limit="12" 
+										e-input-limit="ND"
+										ng-model="row.RECORD_SEQ" 
+										placeholder="請輸入電訪錄音編號..." 
+										ng-if="row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A'" 
+										ng-disabled="!chkMaintenance || row.RECORD_YN == 'N'"
+										ng-blur="updateFlag(row)"/>
+							</td>	
+		                    <td><input type="text" class="form-control" style="width: 300px;display:inline;" ng-disabled="!chkMaintenance" ng-change="updateFlag(row)" ng-model="row.NOTE2"></td>
+							<td><input type="text" class="form-control" style="width: 300px;display:inline;" ng-disabled="!chkMaintenance" ng-change="updateFlag(row)" ng-model="row.NOTE3"></td>
+							<td align="center">								
+								<label>是<input type="radio" value="Y" ng-change="updateFlag(row)" ng-disabled="!chkMaintenance" ng-model="row.HR_ATTR" ></label>&emsp;						
+								<label>否<input type="radio" value="N" ng-change="updateFlag(row)" ng-disabled="!chkMaintenance" ng-model="row.HR_ATTR" ></label>
+							</td>
+							<td style="vertical-align:middle;" align="center">{{row.FIRSTUPDATE}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.MODIFIER}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.LASTUPDATE}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div>
+				<table>
+					<tr>
+						<td>說明：</td>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+			<br>
+			<div align="center" ng-show="paramList.length > 0 && chkMaintenance">
+				<button type="button" class="btn btn-success" ng-click="save()">
+					<span class="glyphicon glyphicon-floppy-disk"></span>儲存
+				</button>
+			</div>
+			<div>提醒:如關係為親友務必說明是<span class="noticed">親或友</span>，如資金往來為<span class="noticed">借貸</span>請<span class="noticed">詳加查核及敘明</span>。</div>
+		</div>
+	</div>
+</div>

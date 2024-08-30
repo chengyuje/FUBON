@@ -1,0 +1,103 @@
+<style>
+/* open dialog */
+.dialog.CRM831_money {
+
+}
+/* dialog panl */
+.modal-dialog-CRM831_money {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+    width: 1200px;
+    margin: 30px auto;
+}
+/* table size */
+.CRM831_money table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM831_money.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM831_money_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<div class="CRM831_money" ng-controller="CRM831_moneyController" ng-cloak>
+	<div class="modal-dialog-CRM831_money" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header" style ="padding-left: 85px;"><!-- 多了一口X會使標題不置中，加空格處理 -->
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 class="modal-title" align="center">繳費資訊</h4>
+			</div>
+			<div class="modal-body">
+				<div class="tfb_content">
+					<div class="tfb_content_icon"></div>
+					<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >保單繳費資訊</div>
+				</div>
+				<div class="panel_content">
+					<e-jumping output="outputVO"
+								input="inputVO"
+								query="inquire3()" list="resultList2"></e-jumping>
+					<div class="gv_tab_sc scroll_y" style="height:300px;white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th>保單號碼</th>
+									<th>保單幣別</th>
+									<th>應繳保費</th>
+	<!-- 								<th>應繳日期</th> -->
+									<th>入帳日期</th>
+									<th>繳費年期</th>
+									<th>繳費期數</th>
+									<th>繳別</th>
+									<th>繳費方式</th>
+									<th>扣款帳號</th>
+								</tr>
+							</thead>
+									
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in resultList2 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td align="center">{{inputVO.policy_nbr_str}}</td>
+									<td align="center">{{row.POLICY_CUR}}</td>
+									<td style="text-align: right;">{{row.ACCU_CUR_PREM|number}}</td>
+	<!-- 								<td>{{toJsDate(row.APPL_DATE)|date:"yyyy-MM-dd"}}</td> -->
+									<td align="center">{{toJsDate(row.RECORDED_DATE)|date:"yyyy-MM-dd"}}</td>
+									<td align="center">{{row.PAY_YEAR}}</td>
+									<td align="center">{{row.PAY_TIME}}</td>
+									<td align="center">{{row.PAY_TYPE | mapping:payTypeList:'F3'}}</td>
+									<td align="center">{{row.PAY_WAY | mapping:paywayList:'F3'}}</td>
+									<td align="center">{{row.CREDIT_CARD_NUM}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,192 @@
+<style> 
+/* open dialog */
+.ngdialog.SOT420 {
+	
+}
+/* dialog panl */
+.modal-dialog.SOT420 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.SOT420 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.SOT420 table.little{
+	width: 60%;
+}
+/* change row */
+.SOT420.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SOT420_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT420/SOT420.js"></script>
+<div class="SOT420" ng-controller="SOT420Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >SI庫存查詢及贖回</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<h4 class="h4-title">SI庫存查詢及贖回</h4>
+				<table>
+					<tr>
+						<th class="col-md-4"></th>
+						<th class="col-md-4">
+							<table>
+								<th class="col-md-1">*客戶ID：　　　</th>
+								<th class="col-md-3"><input type="text" class="form-control" style="width:100%;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="custId" name="custId" ng-model="inputVO.custId" ng-disabled="cartList.length > 0" ng-blur="getSOTCustInfo()" e-length-limit="200" required></th>
+							</table>
+						</th>
+						<th class="col-md-4"></th>
+					</tr>
+					<tr>
+						<th class="col-md-4"></th>
+						<th class="col-md-4">
+							<table>
+								<th class="col-md-1">商品代號：　　</th>
+								<th class="col-md-3"><input type="text" class="form-control" style="width:100%;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="prodID" name="prodId" ng-model="inputVO.prodId" ng-disabled="cartList.length > 0" ng-blur="getSOTCustInfo()" e-length-limit="200"></th>
+							</table>
+						</th><th class="col-md-4"></th>
+					</tr>
+					<tr>
+						<th class="col-md-4"></th>
+						<th class="col-md-4">
+							<table>
+								<th class="col-md-1">商品名稱：　　</th>
+								<th class="col-md-3"><input type="text" class="form-control" style="width:100%;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="prodName" name="prodName" ng-model="inputVO.prodName" ng-disabled="cartList.length > 0" ng-blur="getSOTCustInfo()" e-length-limit="200"></th>
+							</table>
+						</th>
+						<th class="col-md-4"></th>
+					</tr>
+					<tr>
+						<th class="col-md-4"></th>
+						<th>
+							<table>
+								<td class="col-md-1"  style="width:198px; !important;">申購起訖日期：</td>
+								<td class="col-md-2">
+									<table>
+										<td class="col-md-1">
+											<div class="input-group datebox datewidth">
+												<input type="text" 
+													   class="form-control"
+													   uib-datepicker-popup="yyyy/MM/dd" 
+													   ng-model="inputVO.startDate"
+													   is-open="model.a" 
+													   datepicker-options="bgn_sDateOptions"
+													   ng-readonly="true" 
+													   ng-change="limitDate()" />
+												<!-- 製作日曆button -->
+												<span class="input-group-btn">
+													<button type="button" class="btn btn-default"
+														ng-click="open($event,'a')">
+														<i class="glyphicon glyphicon-calendar"></i>
+													</button>
+												</span> 
+											</div>~
+										</td>
+										<td class="col-md-1">
+											<div class="input-group datebox datewidth">
+												<input type="text" 
+													   class="form-control"
+													   uib-datepicker-popup="yyyy/MM/dd"
+													   ng-model="inputVO.endDate"
+													   is-open="model.b"
+													   datepicker-options="bgn_eDateOptions"								
+													   ng-readonly="true"								
+													   ng-change="limitDate();"/>
+												<!-- 製作日曆button -->
+												<span class="input-group-btn">
+													<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+														<i class="glyphicon glyphicon-calendar"></i>
+													</button>																		
+												</span>
+											</div>
+										</td>
+									</table>
+								</td>
+							</table>
+						</th><th class="col-md-4"></th>
+					</tr>
+				</table>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				</div>
+				<h4 class="h4-title">申購境外組合式商品紀錄查詢列表</h4>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="text-center middle e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="custAssetSIList">
+						<thead>
+							<tr>
+							    <th>申購日期</th>
+								<th>客戶</th>
+								<th>收件編號</th>
+								<th>商品代號</th>
+								<th>商品名稱</th>
+								
+								<th>商品幣別</th>
+								<th>庫存面額</th>
+								<th>最新報價日</th> 
+								<th>最新參考報價</th> 
+								<th>狀態</th> 
+								<th>功能選項</th>
+							</tr>			
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in custAssetSIList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{toJsDate(row.INVEND) | date:"yyyy-MM-dd"}}</td>
+								<td>{{custId}}</td>
+								<td>{{row.IVRNO}}</td>
+								<td>{{row.SDPRD}}</td>								
+								<td>{{row.PRDCNM}}</td>
+								
+								<td>{{row.IVCUCY}}</td>
+								<td>{{row.IVAMT2 | currency:"$":0}}</td>
+								<td>{{toJsDate(row.SDAMT3DATE) | date:"yyyy-MM-dd"}}</td>
+								<td>{{row.SDAMT3}}%</td>
+								<td ng-if="row.TYPE == '1'">委託中</td> 
+								<td ng-if="row.TYPE != '1'">持有中</td> 
+								<td>
+									<div style="display:inline;" ng-if="row.TYPE != '1'">
+										<button type="button" class="btn btn-info" ng-click="next(row)">贖回</button>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+			</div>
+			</form>
+		</div>
+		
+	</div>
+</div>

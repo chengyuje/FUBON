@@ -1,0 +1,385 @@
+<style>
+/* open dialog */
+.ngdialog.CRM814 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM814 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM814 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM814 table.little{
+	width: 61%;
+}
+/* change row */
+.CRM814.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM814_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+
+.nv-label text{
+    font-size:14.5px;
+}
+
+.form-control-CRM814 {
+    padding: 4px 10px;
+    font-size: 16px;
+    color: #666666;
+    background-color: #f4f4f4;
+    border: 1px solid #999999;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-transition: none;
+    -o-transition: none;
+    transition: none;
+	-webkit-border-radius: 0px;
+	-moz-border-radius:0px;
+	border-radius:0px;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+
+
+</style>
+<!-- 結果區 -->
+<script type="text/javascript" src="assets/txn/CRM814/CRM814.js"></script>
+
+<div class="CRM814" ng-controller="CRM814Controller" ng-cloak>
+<div class="search_table search_box">
+<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+	<table class="table-bordered ">
+		<tr>
+			<th>帳號:</th>
+			<td colspan="2">
+				<e-combobox id="account" name="account"
+					ng-datasource="mappingSet['account']"
+					ng-model="inputVO.account"
+	   				ng-validate="false" 
+	   				ng-readonly="false" 
+	   				ng-editable="false"
+	   				ng-format="F1"
+	   				width="360px"
+	   				style="line-height:20px;" 
+	   				required />
+			</td>	
+				
+		</tr>		
+		
+		<tr>
+			<th rowspan ="2">查詢期間:</th>
+			<th>快速查詢:</th>
+			<td>
+				<table>
+					<tr>
+						<td width = "10%"><input type="radio" name="group" ng-model="inputVO.time" ng-value="1" ng-click="getDate_Day(0)">當天</td>
+						<td width = "10%"><input type="radio" name="group" ng-model="inputVO.time" ng-value="2" ng-click="getDate_Day(3)"> 三天內</td>
+						<td width = "10%"><input type="radio" name="group" ng-model="inputVO.time" ng-value="3" ng-click="getDate_Day(7)"> 近一周</td>
+						<td width = "10%"><input type="radio" name="group" ng-model="inputVO.time" ng-value="4" ng-click="getDate_Day(14)"> 近二周</td>
+						<td width = "10%"><input type="radio" name="group" ng-model="inputVO.time" ng-value="5" ng-click="getDate_Day(21)"> 近三周</td>
+						<td width = "40%"></td>
+					</tr>
+					<tr>
+						<td><input type="radio" name="group" ng-model="inputVO.time" ng-value="6" ng-click="getDate_Month(1)"> 近一個月</td>
+						<td><input type="radio" name="group" ng-model="inputVO.time" ng-value="7" ng-click="getDate_Month(2)"> 近二個月</td>
+						<td><input type="radio" name="group" ng-model="inputVO.time" ng-value="8" ng-click="getDate_Month(3)"> 近三個月</td>
+						<td><input type="radio" name="group" ng-model="inputVO.time" ng-value="9" ng-click="getDate_Month(6)"> 近六個月</td>
+						<td colspan = "2"><input type="radio" name="group" ng-model="inputVO.time" ng-value="10" ng-click="getDate_Month(0)"> 六個月前至近一年內</td>
+					</tr>
+					<tr>
+						<td><button type="button" class="btn btn-info" ng-click="getDate('thisMonth')">{{date1 | date:'yyyy/MM'}}</button></td>
+						<td><button type="button" class="btn btn-info" ng-click="getDate('lastMonth')">{{date2 | date:'yyyy/MM'}}</button></td>
+						<td><button type="button" class="btn btn-info" ng-click="getDate('lastMonths')">{{date3 | date:'yyyy/MM'}}</button></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		
+		<tr>	
+			
+			<th>自訂查詢:</th>
+			<td>
+				<div>
+					<div class="input-group datebox datewidth" style="float:left">
+						<input type="text" id="sCreDate" name="sCreDate"
+							class="form-control"
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.sCreDate"
+							is-open="model.a"
+							datepicker-options="bgn_sDateOptions"								
+							ng-readonly="true"								
+							ng-change="limitDate();dateChange();"
+							required/>
+							<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+								<i class="glyphicon glyphicon-calendar"></i>
+							</button>																		
+						</span>
+					</div>																					
+					<div style="float:left">&nbsp; ～ &nbsp;</div>	
+						<div class="input-group datebox datewidth" style="float:left">
+							<input type="text" id="eCreDate" name="eCreDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.eCreDate"
+								is-open="model.b"
+								datepicker-options="bgn_eDateOptions"								
+								ng-readonly="true"								
+								ng-change="limitDate();dateChange();"
+								required/>
+								<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>																		
+							</span>
+						</div>	
+					<label>&nbsp; &nbsp;&nbsp;</label>
+					<button type="button" class="btn btn-info" ng-click="inquire()" ng-disabled="parameterTypeEditForm.$invalid" >開始查詢</button>
+					<button type="button" class="btn btn-info" ng-click="cancel()">清除</button>
+				</div>
+			</td>						
+		</tr>
+	</table>
+</form>	
+	</div>
+	<div>
+		<uib-tabset active="0" justified="true">
+			<uib-tab index="0" heading="臺幣活期存款">
+			
+				<e-jumping-once output="tsListOutputVO" list="tsParamList" totallist="tsList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th>帳務日期</th>
+									<th>交易時間</th>
+									<th>摘要</th>
+									<th>支出金額</th>
+									<th>存入金額</th>
+									<th>即時餘額</th>
+									<th>代辦行</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in tsParamList | limitTo:displayLimit track by $index" >
+									<td align = "center">{{row.ACT_DATE}}</td>
+									<td align = "center">{{row.TX_DATE}}</td>
+									<td align = "center">{{row.MEMO}}</td>
+ 									<td ng-show ="row.TRUST_NO == 'C'" align = "right">{{row.DR_TXT}}</td>
+									<td ng-show ="row.TRUST_NO == 'C'" align = "right">{{row.CR_TXT | number:2}}</td>
+									<td ng-show ="row.TRUST_NO == 'D'" align = "right">{{row.DR_TXT | eMakePositive | number:2 }}</td>
+									<td ng-show ="row.TRUST_NO == 'D'" align = "right">{{row.CR_TXT}}</td>
+									<td align = "right">{{row.PB_BAL | number:2}}</td>
+									<td align = "center">{{row.RMK}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>			
+			</uib-tab> 
+			
+			<uib-tab index="1" heading="臺幣定期存款">
+				
+				<e-jumping-once output="tcdListOutputVO" list="tcdParamList" totallist="tcdList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th>交易時間</th>
+									<th>存息</th>
+									<th>起息日</th>
+									<th>到期日</th>
+									<th>利率別</th>
+									<th>利率</th>
+									<th>定存金額</th>
+									<th>到期續存方式</th>
+									<th>代辦行</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in tcdParamList | limitTo:displayLimit track by $index" >
+									<td align = "center">{{row.TX_DATE}}</td>
+									<td align = "center">{{row.DPR_PRD}}</td>
+									<td align = "center">{{row.BK_DATE}}</td>
+									<td align = "center">{{row.DUE_DATE}}</td>
+									<td align = "center">{{row.INT_TYPE}}</td>
+									<td align = "right">{{row.INT_RATE}}</td>
+									<td align = "right">{{row.AMT1 | number:2}}</td>
+									<td align = "center">{{row.END_AGR}}</td>
+									<td align = "center">{{row.RMK}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>	
+			</uib-tab>
+			
+			<uib-tab index="2" heading="外幣活期存款">
+				
+				<e-jumping-once output="fsListOutputVO" list="fsParamList" totallist="fsList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th>帳務日期</th>
+									<th>交易時間</th>
+									<th>摘要</th>
+									<th>幣別</th>
+									<th>支出金額</th>
+									<th>存入金額</th>
+									<th>即時餘額</th>
+									<th>代辦行</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in fsParamList | limitTo:displayLimit track by $index" >
+									<td align = "center">{{row.ACT_DATE}}</td>
+									<td align = "center">{{row.TX_DATE}}</td>
+									<td align = "center">{{row.MEMO}}</td>
+									<td align = "center">{{row.CUR}}</td>
+									<td ng-show ="row.TRUST_NO == 'C'" align = "right">{{row.DR_TXT}}</td>
+									<td ng-show ="row.TRUST_NO == 'C'" align = "right">{{row.CR_TXT | number:2}}</td>
+									<td ng-show ="row.TRUST_NO == 'D'" align = "right">{{row.DR_TXT | eMakePositive | number:2 }}</td>
+									<td ng-show ="row.TRUST_NO == 'D'" align = "right">{{row.CR_TXT}}</td>
+									<td align = "right">{{row.PB_BAL | number:2}}</td>
+									<td align = "center">{{row.RMK}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>	
+			</uib-tab> 
+			
+			<uib-tab index="3" heading="外幣定期存款">
+					
+				<e-jumping-once output="fcdListOutputVO" list="fcdParamList" totallist="fcdList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th>交易時間</th>
+									<th>存單號碼</th>
+									<th>存息</th>
+									<th>起息日</th>
+									<th>到期日</th>
+									<th>利率別</th>
+									<th>利率</th>
+							        <th>幣別</th> 
+									<th>定存金額</th>
+									<th>到期續存方式</th>
+									<th>代辦行</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in fcdParamList | limitTo:displayLimit track by $index" >
+									<td align = "center">{{row.TX_DATE}}</td>
+									<td align = "center">{{row.ACNO}}</td>
+									<td align = "center">{{row.DPR_PRD}}</td>
+									<td align = "center">{{row.BK_DATE}}</td>
+									<td align = "center">{{row.DUE_DATE}}</td>
+									<td align = "center">{{row.INT_TYPE}}</td>
+									<td align = "right">{{row.INT_RATE}}</td>
+								    <td align = "right">{{row.CUR}}</td>
+									<td align = "right">{{row.AMT1 | number:2}}</td>
+									<td align = "center">{{row.END_AGR}}</td>
+									<td align = "center">{{row.RMK}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>	
+			</uib-tab>
+			
+			<uib-tab index="4" heading="基金">
+				
+				<e-jumping-once output="nfListOutputVO" list="nfParamList" totallist="nfList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th>帳務日期</th>
+									<th>交易時間</th>
+									<th>摘要</th>
+									<th>支出單位數</th>
+									<th>存入單位數</th>
+									<th>庫存</th>
+									<th>代辦行</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in nfParamList | limitTo:displayLimit track by $index" >
+									<td align = "center">{{row.ACT_DATE}}</td>
+									<td align = "center">{{row.TX_DATE}}</td>
+									<td align = "center">{{row.MEMO}}</td>
+									<td align = "right">{{row.DR_TXT | eMakePositive | number:2 }}</td>
+									<td align = "right">{{row.CR_TXT | number:2}}</td>
+									<td align = "right">{{row.PB_BAL | number:2}}</td>
+									<td align = "center">{{row.RMK}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>	
+			</uib-tab> 
+			
+			<uib-tab index="5" heading="黃金存摺">
+								
+				<e-jumping-once output="gdListOutputVO" list="gdParamList" totallist="gdList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th>帳務日期</th>
+									<th>交易時間</th>
+									<th>摘要</th>
+									<th>支出克數</th>
+									<th>存入克數</th>
+									<th>庫存</th>
+									<th>代辦行</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in gdParamList | limitTo:displayLimit track by $index" >
+									<td align = "center">{{row.ACT_DATE}}</td>
+									<td align = "center">{{row.TX_DATE}}</td>
+									<td align = "center">{{row.MEMO}}</td>
+									<td align = "right">{{row.DR_TXT | number:2}}</td>
+									<td align = "right">{{row.CR_TXT | number:2}}</td>
+									<td align = "right">{{row.PB_BAL | number:2}}</td>
+									<td align = "center">{{row.RMK}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>	
+
+			</uib-tab> 
+	</uib-tabset>
+	</div>
+</div>

@@ -1,0 +1,118 @@
+<!--
+   特殊 Style 定義
+-->
+<style>
+
+.SIMGR009 table{
+	width:100%;
+	margin-left:auto; 
+	margin-right:auto;
+}
+.SIMGR009 .tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+
+.modal-dialog.SIMGR009 {
+	position: relative;
+}
+
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<div class="modal-dialog SIMGR009">
+	<div class="modal-content" ng-controller="SIMGR009EditController" ng-cloak>
+		<div class="modal-header">
+		<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+			<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.PARAM_TYPE == null ? '新增' : '編輯'}}參數</h4>
+			<div class="dialog-error-message" align="center">{{errorMessage}}</div>
+		</div>
+		<div class="modal-body">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-3">參數種類：</th>
+						<td class="col-md-7 tdpadding">
+							{{row.PARAM_TYPE}}
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-3">參數編碼：</th>
+						<td class="col-md-7 tdpadding">
+							<input type="text" class="form-control" 
+								id="ptypeName" name="PARAM_CODE"
+								ng-model="row.PARAM_CODE" 
+								placeholder="參數編碼" autofocus required ng-disabled="isUpdate" maxlength="40">
+							</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.PARAM_CODE.$error.required">
+						<td class="col-xs-1"></td>
+						<th class="col-md-3"></th>
+						<td class="col-md-7 help-block with-errors" >
+						請輸入參數編碼
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.PARAM_CODE.$error.exist">
+						<td class="col-xs-1"></td>
+						<th class="col-md-3"></th>
+						<td class="col-md-7 help-block with-errors">
+						已存在的參數編碼
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-3">參數值：</th>
+						<td class="col-md-7 tdpadding">
+							<textarea class="form-control" 
+								id="ptypeDesc" name="PARAM_NAME_EDIT"
+								ng-model="row.PARAM_NAME_EDIT"
+								rows="1"
+								cols="10"
+								placeholder="參數值" maxlength="1500" required>
+							</textarea></td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.PARAM_NAME_EDIT.$error.required">
+						<td class="col-xs-1"></td>
+						<th class="col-md-3"></th>
+						<td class="col-md-7 help-block with-errors" >
+						請輸入參數值
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-3">參數說明：</th>
+						<td class="col-md-7 tdpadding">
+							<input type="text" class="form-control" 
+								id="roleMaintain" name="PARAM_DESC"
+								ng-model="row.PARAM_DESC" 
+								placeholder="參數說明" maxlength="100">
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.PARAM_DESC.$error.required">
+						<td class="col-xs-1"></td>
+						<th class="col-md-3"></th>
+						<td class="col-md-7 help-block with-errors" >
+						請輸入參數內容
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+			</form>
+			<div style="margin-top: 50px" class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

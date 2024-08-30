@@ -1,0 +1,170 @@
+<script type="text/javascript" src="assets/txn/PMS503/PMS503.js"></script>
+<div ng-controller="PMS503Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+	  		<div class="tfb_content_icon"></div>
+	  		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*資料月份：</th>
+							<td colspan="7">
+								<e-combobox id="dataMonth" name="dataMonth" 
+											ng-datasource="mappingSet['timeE']"
+											ng-model="inputVO.sCreDate"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-required="true"
+											ng-change="dateChange()"
+											ng-format="F3"
+											style="line-height:20px;" />	
+							</td>
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td>
+								<e-combobox id="region_center_id" name="region_center_id"
+											ng-datasource="REGION_LIST"
+											ng-model="inputVO.region_center_id"
+											ng-validate="false" 
+											ng-disabled="AVAIL_REGION.length == 1"
+											ng-readonly="AVAIL_REGION.length == 1" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeRegion(test)"
+											style="line-height:20px;" />
+							</td>						
+							<th>營運區：</th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+											ng-datasource="AREA_LIST"
+											ng-model="inputVO.branch_area_id"
+											ng-validate="false" 
+											ng-disabled="AVAIL_AREA.length == 1"
+											ng-readonly="AVAIL_AREA.length == 1" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeArea(test)"
+											style="line-height:20px;" />
+							</td>
+							<th>分行：</th>
+							<td>
+								<e-combobox id="branch_nbr" name="branch_nbr"
+											ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.branch_nbr"
+											ng-validate="false" 
+											ng-disabled="AVAIL_BRANCH.length == 1"
+											ng-readonly="AVAIL_BRANCH.length == 1" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											ng-change="ChangeBranch(test)"
+											style="line-height:20px;" />
+							</td>
+						</tr>					
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="queryInit();query();" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();limitDate();dateChange()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="getExample();" function-type="export">下載範例</button>
+				<span id="csvBox" style="display: inline-block;vertical-align: middle;"  function-type="export">
+					<e-upload id="csvUpload" success="updFile(name, rname);" text="上傳" accept=".csv"></e-upload>
+				</span>
+				<button type="button" class="btn btn-info" ng-click="export()" ng-disabled="paramList.length == 0" function-type="export">匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" query="query()" list="data" totallist="paramList"></e-jumping-once>
+	    	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="table-bordered">
+					<thead>
+						<tr>
+							<th rowspan="3">年月</th>
+							<th rowspan="3">業務處</th>
+							<th rowspan="3">營運區</th>
+							<th rowspan="3">分行</th>
+							<th rowspan="3">投保銷量</th>
+							
+							<th rowspan="3">投資銷量</th>
+							<th colspan="10">基金</th>
+							
+							<th rowspan="3">海外股票/ETF</th>
+							<th rowspan="3">海外債<br>(含自營)</th>
+							<th rowspan="3">SI/SN/DCI</th>
+							<th rowspan="3">信託</th>
+							<th rowspan="3">其他<br>(奈米投/黃金存摺)</th>
+							
+							<th rowspan="3">投險銷量</th>
+							<th colspan="3">保險</th>
+						</tr>
+						<tr>
+							<th colspan="2">股票型</th>
+							<th colspan="2">平衡型</th>
+							<th colspan="2">債券型</th>
+							<th colspan="2">貨幣型</th>
+							<th rowspan="2">單筆</th>
+							<th rowspan="2">定期定額</th>
+							
+							<th rowspan="2">投資型</th>
+							<th rowspan="2">躉繳</th>
+							<th rowspan="2">分期型</th>
+						</tr>
+						<tr>
+							<th>單筆</th>
+							<th>定期定額</th>
+							<th>單筆</th>
+							<th>定期定額</th>
+							<th>單筆</th>
+							<th>定期定額</th>
+							<th>單筆</th>
+							<th>定期定額</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" align="center" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.YYYYMM}}</td>
+							<td colspan="{{(row.BRANCH_AREA_NAME == null && row.BRANCH_NAME == null) || row.REGION_CENTER_NAME == '全行' ? 3 : 0}}">{{row.REGION_CENTER_NAME}}</td>
+							<td ng-show="row.BRANCH_AREA_NAME != null"colspan="{{row.BRANCH_NAME == null ? 2 : 0}}">{{row.BRANCH_AREA_NAME}}</td>
+							<td ng-show="row.BRANCH_NAME != null">{{row.BRANCH_NAME}}</td>
+							<td>{{row.TOTAL_INV_INS | number:0}}</td>
+							<td>{{row.TOTAL_INV | number:0}}</td>
+							<td>{{row.FUND_S_S | number:0}}</td>
+							<td>{{row.FUND_S_RQ | number:0}}</td>
+							<td>{{row.FUND_BA_S | number:0}}</td>
+							<td>{{row.FUND_BA_RQ | number:0}}</td>
+							<td>{{row.FUND_BN_S | number:0}}</td>
+							<td>{{row.FUND_BN_RQ | number:0}}</td>
+							<td>{{row.FUND_CR_S | number:0}}</td>
+							<td>{{row.FUND_CR_RQ | number:0}}</td>
+							<td>{{row.FUND_S | number:0}}</td>
+							<td>{{row.FUND_RQ | number:0}}</td>
+							<td>{{row.STOCK_ETF | number:0}}</td>
+							<td>{{row.BOND | number:0}}</td>
+							<td>{{row.SI_SN_DCI | number:0}}</td>
+							<td>{{row.TRUST | number:0}}</td>
+							<td>{{row.OTHER | number:0}}</td>
+							<td>{{row.TOTAL_INS | number:0}}</td>
+							<td>{{row.INS_INV | number:0}}</td>
+							<td>{{row.INS_SP | number:0}}</td>
+							<td>{{row.INS_STAG | number:0}}</td>
+						</tr>
+					</tbody>
+				</table>
+	    	</div>
+		</div>
+	</div>
+</div>

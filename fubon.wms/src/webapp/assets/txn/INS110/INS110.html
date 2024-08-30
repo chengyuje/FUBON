@@ -1,0 +1,89 @@
+<style>
+<!--
+span .topline{
+	margin: 3%;
+}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/INS110/INS110.js"></script>
+<script type="text/javascript" src="assets/txn/INS111/INS111.js"></script>
+
+<div ng-controller="INS110Controller" ng-cloak>
+    <form>
+    	<div style="text-align: center;margin-top: 1%;">
+    		<span class="topline">被保險人:</span>
+    		<span class="topline" style="color: red;">{{inputVO.INSURED_NAME}}</span>
+    		<span class="topline">
+    			<button type="button" ng-click="Print_LastTime()" class="btn btn-info">前次健診紀錄</button>
+    		</span>
+    		<span class="topline">保單健診同意書:</span>
+    		<span class="topline" style="color: red;">{{CONSENT | mapping:mappingSet['INS.CONSENT']:'F3'}}</span>
+    		<span class="topline">
+    			<button type="button" class="btn btn-info" ng-click="To_INS111('new',null)">新增行外保單</button>
+    		</span>
+	    	<span class="topline">年繳化應繳保費(台幣):</span>
+	    	<span class="topline" style="color: red;">{{inputVO.TOTAL_INS_YEAR_FEE | number}}</span>
+	    	<span class="topline">元</span>
+	    </div>
+	    <div class="gv_tab_sc scroll_y" style="margin: 1%;">
+		    <table>
+		    	<tr>
+		    		<th colspan="2">操作</th>
+		    		<th nowrap="nowrap">保單號碼</th>
+		    		<th>保險公司</th>
+		    		<th>商品名稱</th>
+		    		<th>險種代碼</th>
+		    		<th>繳費年期</th>
+		    		<th>主/附約</th>
+		    		<th>繳別</th>
+		    		<th>單位/計畫</th>
+		    		<th>保額</th>
+		    		<th>單位</th>
+		    		<th>幣別</th>
+		    		<th>保費(原幣)</th>
+		    		<th>保費(折台)*</th>
+		    		<th>保單生效日</th>
+		    		<th>保單狀態</th>
+		    		<th>資料來源</th>
+		    	</tr>
+		    	<tr ng-repeat="row in queryData" ng-class-odd="'rowOdd'"
+						ng-class-even="'rowEven'">
+		    		<td>
+		    			<button type="button" class="btn btn-info" ng-if="row.INOUT == '2'" ng-click="To_INS111('update',row)">修改</button>
+		    		</td>
+		    		<td>
+		    			<button type="button" class="btn btn-info" ng-if="row.INOUT == '2'" ng-click="DeleteINS111Data(row)">刪除</button>
+		    		</td>
+		    		<td nowrap="nowrap">{{row.POLICY_NBR}}</td>
+		    		<td align="center">{{row.COM_NAME=='209' ? '富邦人壽':row.COM_NAME}}</td>
+		    		<td align="left">{{row.PRD_NAME}}</td>
+		    		<td align="center">{{row.PRD_ID}}</td>
+		    		<td align="center">{{row.PAYMENTYEAR_SEL_NAME}}</td>
+		    		<td align="center">{{row.IS_MAIN | mapping:mappingSet['INS.IS_MAIN']:'F3'}}</td>
+		    		<td align="center">{{row.PAY_TYPE | mapping:mappingSet['INS.PAY_TYPE']:'F3'}}</td>
+		    		<td align="center">{{row.UPQTY_SEL}}</td>
+		    		<td align="right">{{row.INSUREDAMT | number:0}}</td>
+		    		<td align="center">{{row.COVERCACULUNITDESC}}</td>
+		    		<td align="center">{{row.CURR_CD}}</td>
+		    		<td align="right">{{row.INSYEARFEE | number:0}}</td>
+		    		<td align="right">{{row.LOCAL_INSYEARFEE | number:0}}</td>
+		    		<td align="center">{{toJsDate(row.EFFECTED_DATE) | date:"yyyy/MM/dd"}}</td>
+		    		<td align="center">{{(row.STATUS | mapping:mappingSet['CRM.CRM239_CONTRACT_STATUS']:'F3').trim()}}</td>
+		    		<td align="center">{{row.INOUT | mapping:mappingSet['INS.FROM']:'F3'}}</td>
+		    	</tr>
+		    </table>
+		<div> 
+	    	<p>註：試算匯率以當日均匯【(買匯+賣匯)/2】計算。</p>
+	    </div>
+	    </div>
+
+	    <div style="margin-top: 1%;text-align: right;">
+	    	<span>
+	    		<button type="button" class="btn btn-info" ng-click="return_INS100()">回保單健診入口</button>
+	    		<button type="button" class="btn btn-info" ng-click="To_INS140()">列印報告書</button>
+	    		<button type="button" class="btn btn-info" ng-click="To_INS130()">進行家庭財務安全規劃</button>
+	    		<button type="button" class="btn btn-info" ng-click="To_INS200()">進行保險規劃</button>
+	    	</span>
+	    </div>
+	</form>
+</div>

@@ -1,0 +1,176 @@
+<style>
+/* open dialog */
+.ngdialog.CRM351 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM351 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM351 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM351 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM351.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM351_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.datewidth{
+	width:188px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM351/CRM351.js"></script>
+<div class="CRM351" ng-controller="CRM351Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >客戶移轉交接資訊</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table search_box2">
+			<table>
+				<tr>
+   					<th>分行：</th>
+     				<td>
+     					<e-combobox id="bra_nbr"
+						ng-datasource="BRANCH_LIST"
+						ng-model="inputVO.bra_nbr"
+		   				ng-validate="false" 
+						ng-disabled="bra_list.length == 1"
+						ng-readonly="bra_list.length == 1"
+						ng-editable="false"
+						ng-format="F1"
+						ng-change="getAolist()"
+						style="line-height:20px;" />
+   					</td>
+   					<th>理專：</th>
+   					<td>
+   						<e-combobox id="ao_code" 
+						ng-datasource="AO_LIST"
+						ng-model="inputVO.ao_code"
+						ng-validate="false" 
+						ng-disabled="ao_code.length == 1"
+						ng-readonly="ao_code.length == 1" 
+						ng-editable="true"
+						ng-format="F1"
+						style="line-height:20px;" />
+   					</td>
+   				</tr>
+				<tr>
+   					<th>客戶ID：</th>
+   					<td><input type="text" class="form-control" placeholder="請輸入..." id="cust_id" name="cust_id" ng-model="inputVO.cust_id" style="width:260px;text-transform:uppercase;" e-length-limit="20"></td>
+   					<th>等級：</th>
+   					<td>
+   						<e-combobox id="con_degree"
+   						ng-paramtype="CRM.CON_DEGREE"
+						ng-model="inputVO.con_degree"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="150px"
+						style="line-height:20px;" />
+   					</td>
+   				</tr>
+   				<tr>
+   					<th>客戶姓名：</th>
+   					<td><input type="text" class="form-control" placeholder="請輸入..." id="cust_name" name="cust_name" ng-model="inputVO.cust_name" style="width:260px;" e-length-limit="15"></td>
+   					<th>客群身分：</th>
+   					<td>
+   						<e-combobox id="vip_degree" 
+						ng-paramtype="CRM.VIP_DEGREE"
+						ng-model="inputVO.vip_degree"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="150px"
+						style="line-height:20px;" />
+   					</td>
+   				</tr>			
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire();">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init();inquireInit()">清除</button>
+		</div>
+		<!-- 結果區 -->
+		<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th>
+							<label>
+								<input type='checkbox' ng-model='clickAll' ng-change='checkrow()' /> 全選
+							</label>
+						</th>
+						<th>檢視資料</th>
+						<th>分行</th>
+						<th>理專</th>
+						<th>客戶ID</th>
+						<th>客戶姓名</th>
+						<th>等級</th>
+						<th>客群身分</th>
+						<th>需聯絡本人</th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="OTH_CONTACT_INFO" e-query="inquire()">其他聯絡資訊</th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_HO_NOTE" e-query="inquire()">客戶交接註記</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>
+							<label>
+								<input type='checkbox' ng-model='row.SELECTED' /> 選擇
+							</label>
+						</td>
+						<td><button type="button" class="btn btn-info" ng-click="detail(row)">資料</button></td>
+						<td>{{row.RESIGN_BRA_NBR}}-{{row.RESIGN_BRANCH_NAME}}</td>
+						<td>{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+						<td>{{row.CUST_ID}}</td>
+						<td>{{row.CUST_NAME}}</td>
+						<td>{{row.CON_DEGREE | mapping:CON_DEGREE:'F3'}}</td>
+						<td>{{row.VIP_DEGREE | mapping:VIP_DEGREE:'F3'}}</td>
+						<td>
+							<label>
+								<input type='checkbox' ng-disabled="!row.SELECTED" id="contact_cust_yn" name="contact_cust_yn" ng-model='row.CONTACT_CUST_YN' ng-true-value="'Y'" ng-false-value="'N'"/>
+  							</label>
+						</td>
+						<td><input type="text" ng-disabled="!row.SELECTED" placeholder="請輸入..." id="oth_contact_info" name="oth_contact_info" ng-model="row.OTH_CONTACT_INFO" e-length-limit="40"></td>
+						<td><input type="text" ng-disabled="!row.SELECTED" placeholder="請輸入..." id="cust_ho_note" name="cust_ho_note" ng-model="row.CUST_HO_NOTE" e-length-limit="40"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="save()" >儲存</button>
+			<button type="button" class="btn btn-info" ng-if="priList.indexOf(inputVO.pri_id) > -1" ng-click="preReview(1)">同意部分放行</button>
+			<button type="button" class="btn btn-info" ng-if="priList.indexOf(inputVO.pri_id) > -1" ng-click="preReview(2)">同意全部放行</button>
+			<button type="button" class="btn btn-info" ng-if="priList.indexOf(inputVO.pri_id) > -1" ng-click="preReview(3)">不同意放行</button>
+		</div>
+	</div>
+</div>

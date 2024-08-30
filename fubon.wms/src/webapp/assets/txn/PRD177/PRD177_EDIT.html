@@ -1,0 +1,509 @@
+<style>
+    .modal-dialog.PRD177_EDIT {
+        position: relative;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        min-width: 95vw;
+        height: auto;
+    }
+
+    .modal-dialog.PRD177_EDIT .modal-body {
+        max-height: 75vh;
+    }
+
+    .modal-dialog.PRD177_EDIT .currency {
+        width: 600px;
+    }
+
+    .modal-dialog.PRD177_EDIT .optionLabel {
+        float: left;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        margin-right: 20px;
+    }
+
+    .modal-dialog.PRD177_EDIT .vertical-options {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-dialog.PRD177_EDIT .options {
+        margin-right: 20px;
+    }
+
+    .modal-dialog.PRD177_EDIT .warning {
+        text-align: center;
+        color: red;
+    }
+
+    .modal-dialog.PRD177_EDIT .bound {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(300px, 1fr));
+        grid-gap: 10px 100px;
+        vertical-align: middle;
+        padding-top: 30px;
+    }
+
+    .modal-dialog.PRD177_EDIT .bound-item {
+        display: flex;
+        align-items: center;
+        column-gap: 5px;
+    }
+
+    .modal-dialog.PRD177_EDIT .bound-label {
+        margin-top: -25px;
+    }
+
+    .modal-dialog.PRD177_EDIT .bound-date {
+        width: 50px;
+    }
+
+    .modal-dialog.PRD177_EDIT .bound-element {
+        vertical-align: middle;
+    }
+</style>
+<div ng-controller="PRD177_EDITController" ng-cloak>
+    <form name="prd177EditForm" class="form-horizontal" data-toggle="validator" role="form"
+          autocomplete="off" enter-as-tab>
+        <div class="modal-dialog PRD177_EDIT">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+                    <h4 id="myModalAlertLabel" class="modal-title" align="center" ng-bind="dialogTitle"></h4>
+                </div>
+                <div class="modal-body">
+                    <fieldset ng-hide="readOnly">
+                        <table>
+                            <tr>
+                                <td class="col-md-3">
+                                    <label for="insuranceCoSerialNum">*保險公司：</label>
+                                    <e-combobox id="insuranceCoSerialNum" name="insuranceCoSerialNum"
+                                                ng-datasource="mappingSet['COMPANY']"
+                                                ng-model="inputVO.insuranceCoSerialNum"
+                                                ng-validate="false"
+                                                ng-readonly="false"
+                                                ng-editable="false"
+                                                ng-format="F3"
+                                                width="360px"
+                                                style="line-height:20px;"
+                                                ng-required="true"
+                                    />
+                                </td>
+                                <td class="col-md-3">
+                                    <label for="productId">*英文代碼(唯讀)：</label>
+                                    <input type="text" id="productId" name="productId" class="form-control"
+                                           ng-model="inputVO.productId"
+                                           e-length-limit="20"
+                                           readonly
+                                           required
+                                    >
+                                </td>
+                                <td class="col-md-3">
+                                    <label for="mof">*核准文號：</label>
+                                    <input type="text" id="mof" name="mof" class="form-control"
+                                           ng-model="inputVO.mof"
+                                           e-length-limit="100"
+                                           required
+                                    >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="col-md-3">
+                                    <label for="productName">*保險產品：</label>
+                                    <input type="text" id="productName" name="productName" class="form-control"
+                                           ng-model="inputVO.productName"
+                                           e-length-limit="50"
+                                           required
+                                    >
+                                </td>
+                                <td class="col-md-3">
+                                    <label for="mainstayProduct">*主推商品：</label>
+                                    <e-combobox id="mainstayProduct" name="mainstayProduct"
+                                                ng-datasource="mappingSet['MAINSTAY_PRODUCT']"
+                                                ng-model="inputVO.mainstayProduct"
+                                                ng-validate="false"
+                                                ng-readonly="false"
+                                                ng-editable="false"
+                                                ng-format="F3"
+                                                width="100px"
+                                                style="line-height:20px;"
+                                                ng-required="true"
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="col-md-3">
+                                    <label for="productShortName">*保險產品簡稱：</label>
+                                    <input type="text" id="productShortName" name="productShortName"
+                                           class="form-control"
+                                           ng-model="inputVO.productShortName"
+                                           e-length-limit="50"
+                                           required
+                                    >
+                                </td>
+                                <td class="col-md-3">
+                                    <label for="contractId">*主附約別：</label>
+                                    <e-combobox id="contractId" name="contractId"
+                                                ng-datasource="mappingSet['CONTRACT_ID']"
+                                                ng-model="inputVO.contractId"
+                                                ng-validate="false"
+                                                ng-readonly="false"
+                                                ng-editable="false"
+                                                ng-format="F3"
+                                                width="100px"
+                                                style="line-height:20px;"
+                                                ng-required="true"
+                                    />
+                                    <label for="addSubFlag" style="word-wrap:break-word">
+                                        <input id="addSubFlag"
+                                               type="checkbox"
+                                               ng-model="inputVO.addSubFlag"
+                                               ng-true-value="'Y'"
+                                               ng-false-value="'N'"/>
+                                        可附加附約
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-3">
+                                    <label for="productOnDt">*產品上架日：</label>
+                                    <div class="input-group datebox datewidth">
+                                        <input type="text" id="productOnDt" name="productOnDt"
+                                               class="form-control"
+                                               uib-datepicker-popup="yyyy/MM/dd"
+                                               ng-model="inputVO.productOnDt"
+                                               is-open="calendar.productOnDt"
+                                               datepicker-options="productOnDt.sDateOptions"
+                                               ng-readonly="true"
+                                               ng-required="true"
+                                        />
+                                        <!-- 製作日曆button -->
+                                        <span class="input-group-btn">
+                                        <button type="button"
+                                                class="btn btn-default"
+                                                ng-click="openCalendar($event,'productOnDt')">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                        </button>
+                                    </span>
+                                    </div>
+                                </td>
+                                <td class="col-md-3">
+                                    <label for="productValidFrom">*開始銷售日：</label>
+                                    <div class="input-group datebox datewidth">
+                                        <input type="text" id="productValidFrom" name="productValidFrom"
+                                               class="form-control"
+                                               uib-datepicker-popup="yyyy/MM/dd"
+                                               ng-model="inputVO.productValidFrom"
+                                               is-open="calendar.productValidFrom"
+                                               datepicker-options="productValidFrom.sDateOptions"
+                                               ng-readonly="true"
+                                               ng-required="true"
+                                        />
+                                        <!-- 製作日曆button -->
+                                        <span class="input-group-btn">
+                                        <button type="button"
+                                                class="btn btn-default"
+                                                ng-click="openCalendar($event,'productValidFrom')">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                        </button>
+                                    </span>
+                                    </div>
+                                </td>
+                                <td class="col-md-3">
+                                    <label for="productValidThru">停止銷售日：</label>
+                                    <div class="input-group datebox datewidth">
+                                        <input type="text" id="productValidThru" name="productValidThru"
+                                               class="form-control"
+                                               uib-datepicker-popup="yyyy/MM/dd"
+                                               ng-model="inputVO.productValidThru"
+                                               is-open="calendar.productValidThru"
+                                               datepicker-options="productValidThru.sDateOptions"
+                                               ng-readonly="true"
+                                        />
+                                        <!-- 製作日曆button -->
+                                        <span class="input-group-btn">
+                                        <button type="button"
+                                                class="btn btn-default"
+                                                ng-click="openCalendar($event,'productValidThru')">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                        </button>
+                                    </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-3">
+                                    <label>*保費必輸檢核：</label>
+                                    <label for="comm1Flag" style="word-wrap:break-word" class="options">
+                                        <input id="comm1Flag"
+                                               type="checkbox"
+                                               ng-model="inputVO.comm1Flag"
+                                               ng-true-value="'Y'"
+                                               ng-false-value="'N'"
+                                        />
+                                        目標保費
+                                    </label>
+                                    <label for="comm2Flag" style="word-wrap:break-word" class="options">
+                                        <input id="comm2Flag"
+                                               type="checkbox"
+                                               ng-model="inputVO.comm2Flag"
+                                               ng-true-value="'Y'"
+                                               ng-false-value="'N'"/>
+                                        超額保費
+                                    </label>
+                                </td>
+                                <td class="col-md-3">
+                                    <label for="productType1">*產品大分類：</label>
+                                    <e-combobox id="productType1" name="productType1"
+                                                ng-datasource="mappingSet['PRODUCT_TYPE1']"
+                                                ng-model="inputVO.productType1"
+                                                ng-validate="false"
+                                                ng-readonly="false"
+                                                ng-editable="false"
+                                                ng-format="F3"
+                                                width="100px"
+                                                style="line-height:20px;"
+                                                ng-required="true"
+                                    />
+                                </td>
+                                <td class="col-md-3">
+                                    <label for="productCategory">*產品中分類：</label>
+                                    <e-combobox id="productCategory" name="productCategory"
+                                                ng-datasource="mappingSet['PRODUCT_CATEGORY']"
+                                                ng-model="inputVO.productCategory"
+                                                ng-validate="false"
+                                                ng-readonly="false"
+                                                ng-editable="false"
+                                                ng-format="F3"
+                                                width="100px"
+                                                style="line-height:20px;"
+                                                ng-required="true"
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-3">
+                                    <label for="sumAssumedType">*保額型態：</label>
+                                    <e-combobox id="sumAssumedType" name="sumAssumedType"
+                                                ng-datasource="mappingSet['SUM_ASSUMED_TYPE']"
+                                                ng-model="inputVO.sumAssumedType"
+                                                ng-validate="false"
+                                                ng-readonly="false"
+                                                ng-editable="false"
+                                                ng-format="F3"
+                                                width="100px"
+                                                style="line-height:20px;"
+                                                ng-required="true"
+                                    />
+                                </td>
+                                <td class="col-md-3">
+                                    <label>*平台：</label>
+                                    <label ng-repeat="row in options['PREMIUM_TABLE'] track by $index"
+                                           for="{{row.label}}" style="word-wrap:break-word"
+                                           class="options">
+                                        <input id="{{row.label}}"
+                                               type="checkbox"
+                                               ng-model="row.checked"
+                                               ng-true-value="true"
+                                               ng-false-value="false"/>
+                                        {{ row.label }}
+                                    </label>
+                                </td>
+                                <td class="col-md-3">
+                                    <label for="productCategory">*年化佣金註記：</label>
+                                    <e-combobox id="contractBonus" name="contractBonus"
+                                                ng-datasource="mappingSet['CONTRACT_BONUS']"
+                                                ng-model="inputVO.contractBonus"
+                                                ng-validate="false"
+                                                ng-readonly="false"
+                                                ng-editable="false"
+                                                ng-format="F3"
+                                                width="100px"
+                                                style="line-height:20px;"
+                                                ng-required="true"
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="col-md-3">
+                                    <div class="optionLabel"><label>*幣別：</label></div>
+                                    <div class="currency">
+                                        <label ng-repeat="row in options['CURRENCY'] track by $index"
+                                               for="{{row.label}}" style="word-wrap:break-word"
+                                               class="options">
+                                            <input id="{{row.label}}"
+                                                   type="checkbox"
+                                                   ng-model="row.checked"
+                                                   ng-true-value="true"
+                                                   ng-false-value="false"/>
+                                            {{ row.label }}
+                                        </label>
+                                    </div>
+                                </td>
+                                <td class="col-md-3">
+                                    <label class="optionLabel">*案件來源：</label>
+                                    <div class="vertical-options">
+                                        <label ng-repeat="row in options['CHANNEL'] track by $index"
+                                               for="{{row.label}}" style="word-wrap:break-word"
+                                               class="options">
+                                            <input id="{{row.label}}"
+                                                   type="checkbox"
+                                                   ng-model="row.checked"
+                                                   ng-true-value="true"
+                                                   ng-false-value="false"/>
+                                            {{ row.label }}
+                                        </label>
+                                    </div>
+                                    <e-combobox id="policyType" name="policyType"
+                                                ng-datasource="mappingSet['POLICY_TYPE']"
+                                                ng-model="inputVO.policyType"
+                                                ng-validate="false"
+                                                ng-readonly="false"
+                                                ng-editable="false"
+                                                ng-format="F3"
+                                                width="100px"
+                                                style="line-height:20px;"
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-3">
+                                    <label>*產品風險：</label>
+                                    <e-combobox id="productRisk" name="productRisk"
+                                                ng-datasource="mappingSet['PRODUCT_RISK']"
+                                                ng-model="inputVO.productRisk"
+                                                ng-validate="false"
+                                                ng-readonly="false"
+                                                ng-editable="false"
+                                                ng-format="F3"
+                                                width="100px"
+                                                style="line-height:20px;"
+                                                ng-required="true"
+                                    />
+                                </td>
+                                <td class="col-md-3">
+                                    <label>*風險等級：</label>
+                                    <e-combobox id="riskRate" name="riskRate"
+                                                ng-datasource="mappingSet['RISK_RATE']"
+                                                ng-model="inputVO.riskRate"
+                                                ng-validate="false"
+                                                ng-readonly="false"
+                                                ng-editable="false"
+                                                ng-format="F3"
+                                                width="100px"
+                                                style="line-height:20px;"
+                                                ng-required="true"
+                                    />
+                                </td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                    <fieldset ng-disabled="readOnly">
+                        <div class="warning" ng-hide="readOnly">**以下所有佣金率單位請正常輸入小數點位數**</div>
+                        <div class="gv_tab_sc scroll_y" style="min-height: 235px; white-space: nowrap;">
+                            <table class="tablesaw table table-striped table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>案件來源</th>
+                                    <th>目標佣金率</th>
+                                    <th>超額佣金率</th>
+                                    <th>浮動佣金率</th>
+                                    <th>續期佣金率(區間年)</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="bound-element">一般</td>
+                                    <td class="bound-element">
+                                        <input type="text" id="commRate" name="commRate" class="form-control"
+                                               ng-model="inputVO.commRate"
+                                        >
+                                    </td>
+                                    <td class="bound-element">
+                                        <input type="text" id="commRateA" name="commRateA" class="form-control"
+                                               ng-model="inputVO.commRateA"
+                                        >
+                                    </td>
+                                    <td class="bound-element">
+                                        <input type="text" id="commRateC" name="commRateC" class="form-control"
+                                               ng-model="inputVO.commRateC"
+                                        >
+                                    </td>
+                                    <td class="bound">
+                                        <div class="bound-item" ng-repeat="row in bound.channel1 track by $index">
+                                            <div ng-bind="row.CD_NM"></div>
+                                            <input type="text" class="form-control bound-date"
+                                                   ng-model="row.ADD_1_START_MONTH" ng-blur="boundBlur(row)"/>
+                                            <div>~</div>
+                                            <input type="text" class="form-control bound-date"
+                                                   ng-model="row.ADD_1_END_MONTH" ng-blur="boundBlur(row)"/>
+                                            <div>年</div>
+                                            <div>
+                                                <div ng-show="$index < 2" class="bound-label">目標</div>
+                                                <input type="text" class="form-control"
+                                                       ng-model="row.ADD_1_COMMISSIONRATE" ng-blur="boundBlur(row)"/>
+                                            </div>
+                                            <div>
+                                                <div ng-show="$index < 2" class="bound-label">超額</div>
+                                                <input type="text" class="form-control"
+                                                       ng-model="row.ADD_1_COMMRATEA" ng-blur="boundBlur(row)"/>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bound-element">小花平台</td>
+                                    <td class="bound-element">
+                                        <input type="text" id="commRate2" name="commRate2" class="form-control"
+                                               ng-model="inputVO.commRate2"
+                                        >
+                                    </td>
+                                    <td class="bound-element">
+                                        <input type="text" id="commRateA2" name="commRateA2" class="form-control"
+                                               ng-model="inputVO.commRateA2"
+                                        >
+                                    </td>
+                                    <td class="bound-element">
+                                        <input type="text" id="commRateC2" name="commRateC2" class="form-control"
+                                               ng-model="inputVO.commRateC2"
+                                        >
+                                    </td>
+                                    <td class="bound">
+                                        <div class="bound-item" ng-repeat="row in bound.channel2 track by $index">
+                                            <div ng-bind="row.CD_NM"></div>
+                                            <input type="text" class="form-control bound-date"
+                                                   ng-model="row.ADD_1_START_MONTH" ng-blur="boundBlur(row)"/>
+                                            <div>~</div>
+                                            <input type="text" class="form-control bound-date"
+                                                   ng-model="row.ADD_1_END_MONTH" ng-blur="boundBlur(row)"/>
+                                            <div>年</div>
+                                            <div>
+                                                <div ng-show="$index < 2" class="bound-label">目標</div>
+                                                <input type="text" class="form-control"
+                                                       ng-model="row.ADD_1_COMMISSIONRATE" ng-blur="boundBlur(row)"/>
+                                            </div>
+                                            <div>
+                                                <div ng-show="$index < 2" class="bound-label">超額</div>
+                                                <input type="text" class="form-control"
+                                                       ng-model="row.ADD_1_COMMRATEA" ng-blur="boundBlur(row)"/>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="search_box_btn text-center" ng-hide="readOnly">
+                    <button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance">確定
+                    </button>
+                    <button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,73 @@
+<style>
+.modal-dialog.CRM999_back {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM999/CRM999_backComplainFlow.js"></script>
+<div ng-controller="CRM999backController" ng-cloak>
+	<div class="modal-dialog CRM999_back">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">退件處理流程</h4>
+			</div>
+			<div class="modal-body">
+		   		<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<div class="row">
+						<div class="col-md-2">案件分流</div>
+						<div class="col-md-2">
+							<label><input type="radio"
+								ng-model="inputVO.flowType" ng-value="1" ng-disabled="true">理財客訴</label>
+						</div>
+						<div class="col-md-2">
+							<label><input type="radio"
+								ng-model="inputVO.flowType" ng-value="2" ng-disabled="true">作業客訴</label>
+						</div>
+						<div class="col-md-2">
+							<label><input type="radio"
+								ng-model="inputVO.flowType" ng-value="3" ng-disabled="true">消金客訴</label>
+						</div>
+						<div class="col-md-2">
+							<label><input type="radio"
+								ng-model="inputVO.flowType" ng-value="4" ng-disabled="true">FCH客訴</label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-2">上一流程</div>
+						<div class="col-md-8">{{inputVO.lastOrg}}<span ng-if="inputVO.lastOrg">-</span>{{inputVO.lastName}}</div>
+					</div>
+					<div class="row">
+						<div class="col-md-2">目前流程</div>
+						<div class="col-md-8">{{inputVO.org}}<span ng-if="inputVO.org">-</span>{{inputVO.name}}({{inputVO.emp}})</div>
+					</div>
+					<div class="row">
+						<div class="col-md-2">退件原因</div>
+						<div class="col-md-10">
+							<textarea name="backReason" id="backReason"
+								placeholder="請輸入..." ng-model="inputVO.backReason"
+								rows="5" class="form-control" maxlength="60" size="50"
+								ng-change="checkLenght('backReason', 'lenght1', '60');"
+								ng-required>
+                    			</textarea>
+							<div style="float: left !important" ng-bind="'剩餘字數:' + lenght1">
+							</div>
+						</div>
+					</div>
+					
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="backSubmit()">確認</button>
+					<button type="button" class="btn btn-default"
+						ng-click="closeThisDialog('cancel')">返回</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,109 @@
+<style>
+/* open dialog */
+.ngdialog.PMS354_INS_EDIT {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS354_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: auto;
+	height: auto;
+}
+/* table size */
+.PMS354_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+
+/* scroll && height */
+.scroll_PMS354_EDIT_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.titleTB th, td {
+	border-collapse: collapse;
+	padding: 3px;
+	text-align: center;	
+}
+.titleTB th {
+	background-color: lightgray
+}
+.numAlign{
+	text-align: right !important;
+}
+</style>
+<div ng-controller="PMS354_BRDETAILController" ng-cloak>	
+	<div class="modal-dialog PMS354_DETAIL"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">查詢結果</h4>
+			</div>
+			<div class="modal-body">
+				<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>			
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="table-bordered rstable">
+					<thead>						
+						<tr>
+							<th>AO CODE</th>
+							<th>理專員編</th>
+							<th>理專姓名</th>
+							<th class="repeat-row" ng-repeat="col in colList track by $index">{{col}}&nbsp;銷量</th>
+							<th>折台幣銷量合計</th>
+							<!-- <th class="repeat-row" ng-repeat-start="col2 in colList2 track by $index">{{col2.TARGET}}</th>
+							<th class="repeat-row" ng-repeat-end>{{col2.TARGET}}達成率</th>	 -->														
+						</tr>																			
+					</thead>
+					<tbody>
+						<tr ng-repeat-start="(a, dataA) in paramList | orderBy: 'REGION_CENTER_NAME' | groupBy: 'REGION_CENTER_NAME' as resultA">
+						</tr>
+						<tr ng-repeat-start="(b, dataB) in dataA | orderBy: 'BRANCH_AREA_NAME' | groupBy: 'BRANCH_AREA_NAME' as resultB">	
+						</tr>
+						<tr ng-repeat-start="dataC in dataB | orderBy: 'BRANCH_NBR' | groupBy: 'BRANCH_NBR' as resultC">	
+						</tr>
+						<tr ng-repeat-end ng-repeat="row in dataC">
+							<td>{{row.AO_CODE}}</td>
+							<td>{{row.EMP_ID}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td align="right" style="text-align: right" class="repeat-row" ng-repeat="prd in getListByComma(row.ORG_PRD) track by $index">{{prd | number:0}}</td>
+							<td align="right" style="text-align: right">{{getListByComma(row.PRD) | sum | number:0}}</td>
+							<!-- <td align="right" class="repeat-row" ng-repeat-start="tar in getListByComma(row.TARGET_LIST) track by $index">{{tar | number:0}}</td>
+							<td align="right" class="repeat-row" ng-repeat-end>{{tar == 0 ? 0 : (getListByComma(row.PRD) | sum ) / tar * 100 | number:0}}%</td>	 -->						
+						</tr>
+						 <tr ng-repeat-end ng-repeat = "row in paramList2 | limitTo : 1">
+							<td colspan="3" align="center">{{row.BRANCH_NAME}} 合計 </td>
+							<td align="right"  style="text-align: right" class="repeat-row" ng-repeat="prd in getSumya(paramList2, 'ORG_PRD') track by $index">{{prd | number:0}}</td>
+							<td align="right"  style="text-align: right">{{getSum(dataB,'PRD') |number:0}}</td>
+					
+						</tr> 
+						<tr ng-repeat-end>
+						</tr>
+						<tr ng-repeat-end>
+				      	</tr>
+					</tbody>
+				</table>								
+			</div>
+
+			</div>
+	</div> 
+</div>
+</div>

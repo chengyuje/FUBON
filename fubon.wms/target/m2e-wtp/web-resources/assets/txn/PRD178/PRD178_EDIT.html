@@ -1,0 +1,115 @@
+<style>
+</style>
+<div ng-controller="PRD178_EDITController" ng-cloak>
+	<div class="modal-dialog PRD230_Fund">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">編輯</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th class="col-md-3">保險公司：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="CNAME" name="CNAME" class="form-control" ng-model="inputVO.CNAME" disabled></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">專案代碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="PROJECTID" name="PROJECTID" class="form-control" ng-model="inputVO.PROJECTID" disabled></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">專案名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="PROJECTNAME" name="PROJECTNAME" class="form-control" ng-model="inputVO.PROJECTNAME" ng-change="changeUpdateFlag(1)"></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">通路型態：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="DEPARTMENTTYPE" name="DEPARTMENTTYPE" class="form-control" ng-model="inputVO.DEPARTMENTTYPE" ng-change="changeUpdateFlag(1)"></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">專案大分類：</th>
+							<td class="col-md-7 tdpadding"><e-combobox id="PROJECTTYPE2" name="PROJECTTYPE2" ng-datasource="mappingSet['PROJECT_TYPE2']" ng-model="inputVO.PROJECTTYPE2" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="150px" style="line-height:20px;" ng-change="changeUpdateFlag(1)" /></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">專案中分類：</th>
+							<td class="col-md-7 tdpadding"><e-combobox id="PROJECTTYPE" name="PROJECTTYPE" ng-datasource="mappingSet['PROJECT_TYPE']" ng-model="inputVO.PROJECTTYPE" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="150px" style="line-height:20px;" ng-change="changeUpdateFlag(1)" /></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">專案小分類：</th>
+							<td class="col-md-7 tdpadding"><e-combobox id="PROJECTTYPE1" name="PROJECTTYPE1" ng-datasource="mappingSet['PROJECT_TYPE1']" ng-model="inputVO.PROJECTTYPE1" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="150px" style="line-height:20px;" ng-change="changeUpdateFlag(1)" /></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">保費固定：</th>
+							<td class="col-md-7 tdpadding"><e-combobox id="PERMER" name="PERMER" ng-datasource="mappingSet['YESNO']" ng-model="inputVO.PERMER" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="150px" style="line-height:20px;" ng-change="changeUpdateFlag(1)" /></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">開始銷售日：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth" style="float: left">
+									<input type="text" id="sCreDate" name="sCreDate" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.VALIDFROM" is-open="model.a" datepicker-options="bgn_sDateOptions" ng-readonly="true" ng-required="true" ng-change="limitDate();changeUpdateFlag(1)" style="width: 150px;" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th class="col-md-3">停止銷售日：</th>
+							<td class="col-md-7 tdpadding">
+								<div style="float: left" class="input-group datebox datewidth">
+									<input type="text" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.VALIDTHRU" is-open="model.b" datepicker-options="bgn_eDateOptions" ng-required="true" ng-readonly="true" ng-change="limitDate();changeUpdateFlag(1)" style="width: 150px;" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th class="col-md-3">保險公司產品名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="INSCOPRODUCTNAME" name="INSCOPRODUCTNAME" class="form-control" ng-model="inputVO.INSCOPRODUCTNAME" ng-change="changeUpdateFlag(1)"></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">保險公司產品代號：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="INSCOPRODUCTID" name="INSCOPRODUCTID" class="form-control" ng-model="inputVO.INSCOPRODUCTID" ng-change="changeUpdateFlag(1)"></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">備註：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="MEMO" name="MEMO" class="form-control" ng-model="inputVO.MEMO" ng-change="changeUpdateFlag(1)"></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">產品代號：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="MPRODUCTID" name="MPRODUCTID" class="form-control" ng-model="inputVO.MPRODUCTID" disabled></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">產品名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="MPRODUCTNAME" name="MPRODUCTNAME" class="form-control" ng-model="inputVO.MPRODUCTNAME" disabled></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">繳費/保障方式：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="PAYANDPROTECT" name="PAYANDPROTECT" class="form-control" ng-model="inputVO.PAYANDPROTECT" disabled></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">單位數：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="COVERAGEDUEPREMIUM" name="COVERAGEDUEPREMIUM" class="form-control" ng-model="inputVO.COVERAGEDUEPREMIUM" ng-change="changeUpdateFlag(2)"></td>
+						</tr>
+						<tr>
+							<th class="col-md-3">保費：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="CONTCOVERAGEDUEPREMIUM" name="CONTCOVERAGEDUEPREMIUM" class="form-control" ng-model="inputVO.CONTCOVERAGEDUEPREMIUM" ng-change="changeUpdateFlag(2)"></td>
+						</tr>
+					</table>
+					<div class="search_box_btn text-center">
+						<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance">修改</button>
+						<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+					</div>
+				</form>
+			</div>
+
+		</div>
+	</div>
+</div>

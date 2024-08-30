@@ -1,0 +1,360 @@
+<style>
+.datewidth {
+	width: 180px !important;
+}
+
+.middle tbody tr td {
+	vertical-align: middle;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS301/PMS301.js"></script>
+<script type="text/javascript" src="assets/txn/PMS301/PMS301_detail.js"></script>
+<script type="text/javascript"
+	src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS301" ng-controller="PMS301Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<!--	<tr>
+							<th>*資料統計日期：</th>
+							<td><div class="input-group datebox datewidth">
+									<input type="text" id="sCreDate" name="sCreDate"
+										class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sCreDate" is-open="model.a"
+										datepicker-options="bgn_sDateOptions" ng-readonly="true"
+										ng-change="limitDate();dateChange()" />
+									<!-- 製作日曆button --PMS> 
+					<!--			<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div></td>
+						</tr>-->
+						<tr>
+							<th><font color="red">＊</font>查詢類別：</th>
+							<td><e-combobox id="srchType" name="srchType"
+									ng-datasource="mappingSet['srchType']"
+									ng-model="inputVO.srchType" ng-validate="false"
+									ng-readonly="false" ng-editable="false" ng-format="F3"
+									ng-required="true" width="100px" style="line-height:20px;" /></td>
+							<th>業務處</th>
+							<td><e-combobox id="rc_id" name="rc_id"
+									ng-datasource="REGION_LIST" ng-model="inputVO.region_center_id"
+									ng-validate="false" ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-change="ChangeRegion()" ng-format="F3" ng-required="false"
+									width="150px" style="line-height:20px;" /></td>
+							<th>營運區</th>
+							<td><e-combobox id="op_id" name="op_id"
+									ng-datasource="AREA_LIST" ng-model="inputVO.branch_area_id"
+									ng-validate="false" ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" ng-editable="false"
+									ng-change="ChangeArea()" ng-format="F3" width="150px"
+									style="line-height:20px;" /></td>
+							<th>分行</th>
+							<td><e-combobox id="br_id" name="br_id"
+									ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr"
+									ng-validate="false" ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" ng-editable="false"
+									ng-change="ChangeBranch()" ng-format="F1" width="150px"
+									style="line-height:20px;" /></td>
+						</tr>
+						<tr  ng-show="inputVO.srchType=='MTD'" >
+							<th><font color="red">＊</font>資料月份：</th>
+								<td><e-combobox id="eTime"
+										ng-datasource="ymList" ng-model="inputVO.tx_ym"
+									 	ng-validate="false" ng-readonly="false" ng-editable="false"
+										ng-format="F3" ng-required="inputVO.srchType=='MTD'" width="200px" height="30px"
+										style="line-height:20px;" />
+							</td>
+						</tr>	
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="inquireInit();inquire()">查詢</button>
+				<button type="button" class="btn btn-info"
+					ng-click="inquireInit();init()">清除</button>
+				<button ng-disabled="csvList.length==0" type="button"
+					class="btn btn-info" ng-click="exportRPT()" function-type="export">匯出</button>
+			</div>
+		</div>
+
+		<div>
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+				</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<e-jumping-once output="outputVO" list="paramList"
+					totallist="resultList"></e-jumping-once>
+				<div align="left">
+					<table>
+						<tr>
+							<td align="right">產出頻率：</td>
+							<td align="left">每日</td>
+						</tr>
+						<tr>
+							<td align="left">產出日：</td>
+							<td align="left">{{TIME}}</td>
+
+						</tr>
+					</table>
+				</div>
+				<div class="gv_tab_sc scroll_y text-center"
+					style="min-height: 235px; white-space: nowrap;">
+					<table class="rstable middle e-table-freeze" e-height="500px"
+						e-mode="1" e-top="true" e-list="resultList">
+						<thead>
+							<tr>
+								<th rowspan="2">業務處</th>
+								<th rowspan="2">營運區</th>
+								<th rowspan="2">分行</th>
+								<th rowspan="2">組別</th>
+								<!-- <th colspan="13">上一營業日戰報</th> -->
+								<th ng-if="inputVO.srchType !='MTD' && inputVO.srchType !='HIS_MON'"colspan="6">當日投保日收即時資料</th>
+								<th ng-if="inputVO.srchType =='MTD' || inputVO.srchType =='HIS_MON'" colspan="6">MTD日收即時資料</th>
+							</tr>
+							<tr>
+								<!--上一營業日戰報  -->
+								<!-- <th>投資<br>實績<br>(A)
+								</th>
+								<th>投資<br>日目標<br>(B)
+								</th>
+								<th>投資<br>實際已達成率<br>(C=A/B)
+								</th>
+								<th>投資<br>應達成率<br>(MTD)
+								</th>
+								<th>投資<br>實際達成率
+								</th>
+								<th>保險<br>實績
+								</th>
+								<th>保險<br>日目標
+								</th>
+								<th>保險<br>實際已達成率
+								</th>
+								<th>保險<br>應達成
+								</th>
+								<th>合計<br>實績
+								</th>
+								<th>合計<br>日目標
+								</th>
+								<th>合計<br>實際達成率
+								</th>
+								<th>合計<br>應達成
+								</th> -->
+								<!-- 當日日終即時資料 -->
+								<th>投資<br>實績
+								</th>
+								<th>投資<br>實際達成率
+								</th>
+								<th>保險<br>實績
+								</th>
+								<th>保險<br>實際達成率
+								</th>
+								<th>合計<br>實績
+								</th>
+								<th>合計<br>實際達成率
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								ng-repeat-start=" (a,dataA) in paramList | groupBy: 'REGION_CENTER_NAME' as resultA">
+								<td rowspan="{{ dataA.length + numGroups(resultB)*2+1}}">{{a}}</td>
+							</tr>
+							<tr
+								ng-repeat-start=" (b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+								<td rowspan="{{dataB.length+1}}">{{b}}</td>
+							</tr>
+
+							<tr class="repeat-row" ng-repeat=" row in dataB"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td ng-if="row.BRANCH_NAME !=null"><a
+									ng-click="bn(row.BRANCH_NBR,row)">{{row.BRANCH_NBR}}<shows
+											ng-show="row.BRANCH_NAME">-</shows>{{row.BRANCH_NAME}}
+								</a></td>
+								<td ng-if="row.BRANCH_NAME ==null"><a
+									ng-click="bn(row.BRANCH_NBR,row)">{{row.BRANCH_NBR}}</a></td>
+								<td>{{row.BRANCH_GROUP}}</a></td>
+								<!--上一營業日戰報  -->
+								<!-- <td align="right">{{row["投資實際達成(A)"] || 0 | number:0}}</td>
+								<td align="right">{{row["投資日目標"] || 0 |  number:0}}</td>
+								<td align="right">{{row["投資實際達成率"] || 0 |  number:2}}%</td>
+								<td align="right">{{row["投資應達成率"] || 0 |  number:2}}%</td>
+								<td align="right">{{row["投資總達成率"]*100 ||0 |  number:2}}%</td>
+								<td align="right">{{row["保險實際達成(A)"] || 0 |  number:0}}</td>
+								<td align="right">{{row["保險日目標"] || 0 |  number:0}}</td>
+								<td align="right">{{row["保險實際達成率"] || 0 |  number:2}}%</td>
+								<td align="right">{{row["保險應達成率"] || 0 |  number:2}}%</td>
+								<td align="right">{{row["投資實際達成(A)"] + row["保險實際達成(A)"] || 0 |  number:0}}</td>
+								<td align="right">{{row["合計日目標"] || 0 |  number:0}}</td>
+								<td align="right">{{row["合計實際達成率"] || 0 |  number:2}}%</td>
+								<td align="right">{{row["合計應達成率"] || 0 |  number:2}}%</td> -->
+								<!-- 當日日終即時資料 -->
+								<td align="right">{{row["INV_FEE"] || 0 | number:0}}</td>
+								<td align="right">{{row["INV_DAY_RATE"] || 0 | number:2}}%</td>
+								<td align="right">{{row["INS_FEE"] || 0 | number:0}}</td>
+								<td align="right">{{row["INS_DAY_RATE"] || 0 | number:2}}%</td>
+								<td align="right">{{row["TOT_FEE"] || 0 | number:0}}</td>
+								<td align="right">{{row["TOT_DAY_RATE"] || 0 | number:2}}%</td>
+							</tr>
+							<tr ng-repeat-end="">
+								<td colspan="3" align="center">{{b}} 合計</td>
+								<!--上一營業日戰報  -->
+								<!--<td align="right">{{0+getSum(dataB, '投資實際達成(A)') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataB, '投資日目標') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataB, '投資實際達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataB, '投資應達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataB, '投資總達成率')*100||0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataB, '保險實際達成(A)') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataB, '保險日目標') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataB, '保險實際達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataB, '保險應達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataB, '投資實際達成(A)') + getSum(dataB, '保險實際達成(A)') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataB, '合計日目標') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataB, '合計實際達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataB, '合計應達成率') || 0 |  number:2}}%</td>-->
+								<!-- 當日日終即時資料 -->
+								<!--  <td align="right">{{0+getSum(dataB, '當日投資實際達成(A)') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataB, 'INV_DAY_RATE') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataB, 'INS_FEE') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataB, 'INS_DAY_RATE') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataB, '當日投資實際達成(A)') + getSum(dataB, 'INS_FEE') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataB, 'INV_DAY_RATE') + getSum(dataB, 'INS_DAY_RATE') || 0 | number:2}}%</td>-->
+								<!-- 當日日終即時資料  改為全行合計-->
+								<td align="right">{{0+sumColnum(b, 'INV_FEE') || 0 |
+									number:0}}</td>
+								<td align="right">{{0+sumColnum(b, 'INV_DAY_RATE') || 0 |
+									number:2}}%</td>
+								<td align="right">{{0+sumColnum(b, 'INS_FEE') || 0 |
+									number:0}}</td>
+								<td align="right">{{0+sumColnum(b, 'INS_DAY_RATE') || 0 |
+									number:2}}%</td>
+								<td align="right">{{0+sumColnum(b, 'TOT_FEE') || 0 |
+									number:0}}</td>
+								<td align="right">{{0+sumColnum(b, 'TOT_DAY_RATE') || 0 |
+									number:2}}%</td>
+							</tr>
+							<tr ng-repeat-end="">
+								<td colspan="4" align="center">{{a}} 合計</td>
+								<!-- <td align="right">{{0+getSum(dataA, '投資實際達成(A)') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '投資日目標') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '投資實際達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '投資應達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '投資總達成率')*100||0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '保險實際達成(A)') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '保險日目標') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '保險實際達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '保險應達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '投資實際達成(A)') + getSum(dataA, '保險實際達成(A)') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '合計日目標') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '合計實際達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '合計應達成率') || 0 |  number:2}}%</td> -->
+								<!-- 當日日終即時資料 -->
+								<!-- <td align="right">{{0+getSum(dataA, 'INV_FEE') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'INV_DAY_RATE') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, 'INS_FEE') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'INS_DAY_RATE') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '當日投資實際達成(A)') + getSum(dataA, 'INS_FEE') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'INV_DAY_RATE') + getSum(dataA, 'INS_DAY_RATE') || 0 |  number:2}}%</td> -->
+								<!-- 當日日終即時資料  改為全行合計-->
+								<td align="right">{{0+sumColnum(a, 'INV_FEE') || 0 |
+									number:0}}</td>
+								<td align="right">{{0+sumColnum(a, 'INV_DAY_RATE') || 0 |
+									number:2}}%</td>
+								<td align="right">{{0+sumColnum(a, 'INS_FEE') || 0 |
+									number:0}}</td>
+								<td align="right">{{0+sumColnum(a, 'INS_DAY_RATE') || 0 |
+									number:2}}%</td>
+								<td align="right">{{0+sumColnum(a, 'TOT_FEE') || 0 |
+									number:0}}</td>
+								<td align="right">{{0+sumColnum(a, 'TOT_DAY_RATE') || 0 |
+									number:2}}%</td>
+							</tr>
+							<!-- 全行總計 -->
+							<tr ng-if="resultList.length>0">
+								<td colspan="4" align="center">全行總計</td>
+								<!-- <td align="right">{{0+getSum(dataA, '投資實際達成(A)') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '投資日目標') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '投資實際達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '投資應達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '投資總達成率')*100||0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '保險實際達成(A)') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '保險日目標') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '保險實際達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '保險應達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '投資實際達成(A)') + getSum(dataA, '保險實際達成(A)') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '合計日目標') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, '合計實際達成率') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '合計應達成率') || 0 |  number:2}}%</td> -->
+								<!-- 當日日終即時資料 -->
+								<!-- <td align="right">{{0+getSum(dataA, '當日投資實際達成(A)') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'INV_DAY_RATE') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, 'INS_FEE') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'INS_DAY_RATE') || 0 |  number:2}}%</td>
+								<td align="right">{{0+getSum(dataA, '當日投資實際達成(A)') + getSum(dataA, 'INS_FEE') || 0 |  number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'INV_DAY_RATE') + getSum(dataA, 'INS_DAY_RATE') || 0 |  number:2}}%</td> -->
+								<!-- 當日日終即時資料  改為全行合計-->
+								<td align="right">{{0+sumColnum('ALL', 'INV_FEE') || 0 |
+									number:0}}</td>
+								<td align="right">{{0+sumColnum('ALL', 'INV_DAY_RATE') || 0
+									| number:2}}%</td>
+								<td align="right">{{0+sumColnum('ALL', 'INS_FEE') || 0 |
+									number:0}}</td>
+								<td align="right">{{0+sumColnum('ALL', 'INS_DAY_RATE') || 0
+									| number:2}}%</td>
+								<td align="right">{{0+sumColnum('ALL', 'TOT_FEE') || 0 |
+									number:0}}</td>
+								<td align="right">{{0+sumColnum('ALL', 'TOT_DAY_RATE') || 0
+									| number:2}}%</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div algin="left">
+					<table>
+                        <!-- 單號 : 5679 -->
+						<tr>
+							<td>說明：單位為元，每次更新時間為9:30、13:30、16:30、18:00</td>
+							<td></td>
+						</tr>
+
+						<tr>
+							<td>※投資收益含基金小額，海外債.海外ETF/海外股票之收益為鍵機資料，最後計績仍以商品分配／交割月為計績時點。</td>
+							<td></td>
+						</tr>
+
+						<tr>
+							<td>※保險收益未以85折計算。</td>
+							<td></td>
+						</tr>
+
+					</table>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>

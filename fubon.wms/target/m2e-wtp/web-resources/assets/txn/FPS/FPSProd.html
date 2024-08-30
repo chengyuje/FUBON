@@ -1,0 +1,106 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .FPS200PRD .modal-title {
+    text-align: center;
+  }
+
+  .modal-body {
+    padding: 0;
+  }
+
+  .modal-dialog {
+    width: 90vw;
+  }
+
+  .FPS200PRD h5 {
+    margin: 0;
+  }
+
+</style>
+<!-- prod -->
+<link rel="stylesheet" href="assets/txn/FPS/FPS.css">
+<script type="text/javascript" src="assets/txn/FPS/FPSProd.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_SavingIns.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_Currency.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_MFD.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_ETF.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_InvestIns.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_Bond.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_SI.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_SN.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_NANO.js"></script>
+<script type="text/javascript" src="assets/txn/PRD110/PRD110_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD130/PRD130_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD140/PRD140_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD150/PRD150_DETAIL.js"></script>
+<!-- prod -->
+<div ng-controller="FPS200PrdController"
+     ng-cloak
+     class="FPS200PRD FPS">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a href="#"
+           class="close"
+           data-dismiss="modal"
+           aria-hidden="true"
+           ng-click="closeThisDialog('cancel')">&times; </a>
+        <h4 id="myModalAlertLabel"
+            class="modal-title">新增商品</h4>
+      </div>
+      <div class="modal-body">
+        <div class="product-menu FPS"
+             style="text-align:left;">
+          <!-- left items -->
+          <aside>
+            <h4>選購商品</h4>
+            <div class="item-wrapper text-center"
+                 ng-repeat="item in itemList">
+              <h5 class="title title-left"
+                  ng-bind="item.title"></h5>
+              <div class="item"
+                   ng-repeat="row in item.list">
+                <a ng-click="deleteRow(item,$index)"
+                   class="icon fly-trashcan">
+                  <img src="assets/images/ic-delete.svg">
+                </a>
+                <div ng-bind="row.name"
+                     style="margin-left:2em;"></div>
+              </div>
+            </div>
+
+            <div style="text-align:center;
+                        margin-top:2em;">
+              <a class="btn-fps"
+                 ng-class="{'btn-fps-disabled':isMore}"
+                 ng-click="isMore?'':back2Main()">
+                加入規劃
+              </a>
+            </div>
+
+          </aside>
+
+          <!-- right selection -->
+          <section>
+            <div ios-nav
+                 title-map="titleMap"
+                 path="path"
+                 value="query"
+                 disabled="isMore"
+                 style="margin-top:.5em;"></div>
+
+            <!-- container -->
+            <div class="padding text-center">
+              <div ng-include="path"></div>
+              <!-- <a class="btn-fps"
+                 ng-class="{'btn-fps-disabled':isMore}"
+                 ng-click="isMore?'':addCart()">選購</a> -->
+            </div>
+            <!-- !container -->
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

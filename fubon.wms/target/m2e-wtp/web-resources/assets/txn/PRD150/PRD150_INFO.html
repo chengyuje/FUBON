@@ -1,0 +1,84 @@
+<div class="search_table search_box3">
+	<h4 class="h4-title">基本資料</h4>
+	<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+		<table class="table-bordered">
+			<tr>
+				<th>計價幣別</th>
+				<td>{{siInfo.CURRENCY_STD_ID | mapping:BOND_CURRENCY:'F1'}}</td>
+				<th>交易日</th>
+				<td>{{toJsDate(siInfo.TRANS_DATE) | date:'yyyy-MM-dd'}}</td>
+			</tr>
+			<tr>
+				<th>起息日</th>
+				<td>{{toJsDate(siInfo.VALUE_DATE) | date:'yyyy-MM-dd'}}</td>
+				<th>到期日</th>
+				<td>{{toJsDate(siInfo.DATE_OF_MATURITY) | date:'yyyy-MM-dd'}}</td>
+			</tr>
+			<tr>
+				<th>開始受理贖回日</th>
+				<td>{{toJsDate(siInfo.START_DATE_OF_BUYBACK) | date:'yyyy-MM-dd'}}</td>
+				<th></th>
+				<td></td>
+			</tr>
+			<tr>
+				<th>到期保本率</th>
+				<td>{{siInfo.RATE_GUARANTEEPAY ? siInfo.RATE_GUARANTEEPAY + ' %' : '0 %'}}</td>
+				<th>產品風險等級</th>
+				<td>{{siInfo.RISKCATE_ID | mapping:PROD_RISK_LEVEL:'F3'}}</td>
+			</tr>
+			<tr>
+				<th>最低申購面額</th>
+				<td>{{siInfo.BASE_AMT_OF_PURCHASE | currency:'':0}}</td>
+				<th>累進申購面額</th>
+				<td>{{siInfo.UNIT_AMT_OF_PURCHASE ? siInfo.UNIT_AMT_OF_PURCHASE == 0 ? '' : siInfo.UNIT_AMT_OF_PURCHASE : '' | currency:'':0}}</td>
+			</tr>
+			<tr>
+				<th>配息頻率(次/年)</th>
+				<td>{{siInfo.FREQUENCY_OF_INTEST_PAY}}</td>
+				<th>到期年限</th>
+				<td>{{siInfo.YEAR_OF_MATURITY}}</td>
+			</tr>
+			<tr>
+				<th>固定配息率</th>
+				<td>{{siInfo.FIXED_DIVIDEND_RATE ? siInfo.FIXED_DIVIDEND_RATE + ' %' : ''}}</td>
+				<th>固定配息期間</th>
+				<td>{{siInfo.FIXED_RATE_DURATION}}</td>
+			</tr>
+			<tr>
+				<th>浮動配息率</th>
+				<td>{{siInfo.FLOATING_DIVIDEND_RATE ? siInfo.FLOATING_DIVIDEND_RATE + ' %' : ''}}</td>
+				<th>幣轉</th>
+				<td>{{siInfo.CURRENCY_EXCHANGE}}</td>
+			</tr>
+			<tr ng-repeat="row in invest track by $index" ng-if="$index % 2 == 0">
+				<th>連結標的{{TwNum[$index]}}</th>
+				<td>{{invest[$index]}}</td>
+				<th>連結標的{{TwNum[$index + 1]}}</th>
+				<td>{{invest[$index + 1]}}</td>
+			</tr>
+			<tr>
+				<th>專員收益率</th>
+				<td>{{siInfo.RATE_OF_RETURN ? (siInfo.RATE_OF_RETURN * 100) + ' %' : ''}}</td>
+				<th>專案名稱</th>
+				<td>{{siInfo.PROJECT | mapping:SI_PROJECT:'F3':'true'}}</td>
+			</tr>
+			<tr>
+				<th>客群名稱</th>
+				<td>{{siInfo.CUSTOMER_LEVEL | mapping:SI_CUSTOMER_LEVEL:'F3':'true'}}</td>
+				<th>剩餘年期</th>
+				<td>{{siInfo.SURPLUS}}</td>
+			</tr>
+		</table>
+	</div>
+	<h4 class="h4-title">銷售限制</h4>
+	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+		<p ng-if="restriction.IS_SALE != 'Y'"><b>不可銷售</b></p>
+<!-- 		<p ng-if="restriction.W8BEN_MARK == 'Y'"><b>需W8-BEN</b></p> -->
+<!-- 		<p ng-if="restriction.RISK_CHECKLIST == 'Y'"><b>需填寫風險檢核表</b></p> -->
+		<p ng-if="restriction.PI_BUY == 'Y'"><b>限專投申購</b></p>
+		<p ng-if="restriction.OBU_BUY == 'Y'"><b>限OBU申購</b></p>
+		<p ng-if="restriction.HNWC_BUY == 'Y'"><b>限高資產客戶申購</b></p>
+	</div>
+	<h4 class="h4-title">文件下載</h4>
+	<a onclick="return false" ng-click="goDownload()">文件連結</a>
+</div>

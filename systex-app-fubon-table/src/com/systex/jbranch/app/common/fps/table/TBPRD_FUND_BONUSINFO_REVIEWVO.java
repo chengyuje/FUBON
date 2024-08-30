@@ -1,0 +1,362 @@
+package com.systex.jbranch.app.common.fps.table;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import com.systex.jbranch.platform.common.dataaccess.vo.VOBase;;
+
+
+
+
+/** @Author : SystexDBTool CodeGenerator By LeoLin*/
+public class TBPRD_FUND_BONUSINFO_REVIEWVO extends VOBase {
+
+    /** identifier field */
+    private BigDecimal SEQ;
+
+    /** nullable persistent field */
+    private String PRD_ID;
+
+    /** nullable persistent field */
+    private String LIPPER_ID;
+
+    /** nullable persistent field */
+    private String TIER_LEVEL;
+
+    /** nullable persistent field */
+    private String RRNOTES;
+
+    /** nullable persistent field */
+    private String FEE;
+
+    /** nullable persistent field */
+    private String FEE1;
+
+    /** nullable persistent field */
+    private String FEE2;
+
+    /** nullable persistent field */
+    private String FEE3;
+
+    /** nullable persistent field */
+    private String M_FEE;
+
+    /** nullable persistent field */
+    private String M_FEE_RATE;
+
+    /** nullable persistent field */
+    private String REWARD;
+
+    /** nullable persistent field */
+    private String REWARD_DF;
+
+    /** nullable persistent field */
+    private String TRAIN;
+
+    /** nullable persistent field */
+    private String OTHER_REWARD;
+
+    /** nullable persistent field */
+    private String ACT_TYPE;
+
+    /** nullable persistent field */
+    private String REVIEW_STATUS;
+
+    /** nullable persistent field */
+    private String OTHER_REWARD_INV;
+    
+    /** nullable persistent field */
+    private String OTHER_REWARD_AGN;
+    
+    /** nullable persistent field */
+    private String OTHER_REWARD_FRN;
+
+    /** nullable persistent field */
+    private String IPO_START;
+
+    /** nullable persistent field */
+    private String IPO_END;
+
+    /** nullable persistent field */
+    private String TB1_FEE;
+
+    /** nullable persistent field */
+    private String OTHER_DISTRIBUTION;
+    
+    /** nullable persistent field */
+    private String IPO_RAISE_START;
+
+    /** nullable persistent field */
+    private String IPO_RAISE_END;
+
+public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBPRD_FUND_BONUSINFO_REVIEW";
+
+
+public String getTableuid () {
+    return TABLE_UID;
+}
+
+    /** full constructor */
+    public TBPRD_FUND_BONUSINFO_REVIEWVO(BigDecimal SEQ, String PRD_ID, String LIPPER_ID, String TIER_LEVEL, String RRNOTES, String FEE, String FEE1, String FEE2, String FEE3, String M_FEE, String M_FEE_RATE, String REWARD, String REWARD_DF, String TRAIN, String OTHER_REWARD, String ACT_TYPE, String REVIEW_STATUS, Timestamp createtime, String creator, String modifier, Timestamp lastupdate, Long version, String OTHER_REWARD_INV, String OTHER_REWARD_AGN, String OTHER_REWARD_FRN, String IPO_START, String IPO_END, String TB1_FEE, String OTHER_DISTRIBUTION, String IPO_RAISE_START, String IPO_RAISE_END) {
+        this.SEQ = SEQ;
+        this.PRD_ID = PRD_ID;
+        this.LIPPER_ID = LIPPER_ID;
+        this.TIER_LEVEL = TIER_LEVEL;
+        this.RRNOTES = RRNOTES;
+        this.FEE = FEE;
+        this.FEE1 = FEE1;
+        this.FEE2 = FEE2;
+        this.FEE3 = FEE3;
+        this.M_FEE = M_FEE;
+        this.M_FEE_RATE = M_FEE_RATE;
+        this.REWARD = REWARD;
+        this.REWARD_DF = REWARD_DF;
+        this.TRAIN = TRAIN;
+        this.OTHER_REWARD = OTHER_REWARD;
+        this.ACT_TYPE = ACT_TYPE;
+        this.REVIEW_STATUS = REVIEW_STATUS;
+        this.createtime = createtime;
+        this.creator = creator;
+        this.modifier = modifier;
+        this.lastupdate = lastupdate;
+        this.version = version;
+        this.OTHER_REWARD_INV = OTHER_REWARD_INV;
+        this.OTHER_REWARD_AGN = OTHER_REWARD_AGN;
+        this.OTHER_REWARD_FRN = OTHER_REWARD_FRN;
+        this.IPO_START = IPO_START;
+        this.IPO_END = IPO_END;
+        this.TB1_FEE = TB1_FEE;
+        this.OTHER_DISTRIBUTION = OTHER_DISTRIBUTION;
+        this.IPO_RAISE_START = IPO_RAISE_START;
+        this.IPO_RAISE_END = IPO_RAISE_END;
+    }
+
+    /** default constructor */
+    public TBPRD_FUND_BONUSINFO_REVIEWVO() {
+    }
+
+    /** minimal constructor */
+    public TBPRD_FUND_BONUSINFO_REVIEWVO(BigDecimal SEQ) {
+        this.SEQ = SEQ;
+    }
+
+    public BigDecimal getSEQ() {
+        return this.SEQ;
+    }
+
+    public void setSEQ(BigDecimal SEQ) {
+        this.SEQ = SEQ;
+    }
+
+    public String getPRD_ID() {
+        return this.PRD_ID;
+    }
+
+    public void setPRD_ID(String PRD_ID) {
+        this.PRD_ID = PRD_ID;
+    }
+
+    public String getLIPPER_ID() {
+        return this.LIPPER_ID;
+    }
+
+    public void setLIPPER_ID(String LIPPER_ID) {
+        this.LIPPER_ID = LIPPER_ID;
+    }
+
+    public String getTIER_LEVEL() {
+        return this.TIER_LEVEL;
+    }
+
+    public void setTIER_LEVEL(String TIER_LEVEL) {
+        this.TIER_LEVEL = TIER_LEVEL;
+    }
+
+    public String getRRNOTES() {
+        return this.RRNOTES;
+    }
+
+    public void setRRNOTES(String RRNOTES) {
+        this.RRNOTES = RRNOTES;
+    }
+
+    public String getFEE() {
+        return this.FEE;
+    }
+
+    public void setFEE(String FEE) {
+        this.FEE = FEE;
+    }
+
+    public String getFEE1() {
+        return this.FEE1;
+    }
+
+    public void setFEE1(String FEE1) {
+        this.FEE1 = FEE1;
+    }
+
+    public String getFEE2() {
+        return this.FEE2;
+    }
+
+    public void setFEE2(String FEE2) {
+        this.FEE2 = FEE2;
+    }
+
+    public String getFEE3() {
+        return this.FEE3;
+    }
+
+    public void setFEE3(String FEE3) {
+        this.FEE3 = FEE3;
+    }
+
+    public String getM_FEE() {
+        return this.M_FEE;
+    }
+
+    public void setM_FEE(String M_FEE) {
+        this.M_FEE = M_FEE;
+    }
+
+    public String getM_FEE_RATE() {
+        return this.M_FEE_RATE;
+    }
+
+    public void setM_FEE_RATE(String M_FEE_RATE) {
+        this.M_FEE_RATE = M_FEE_RATE;
+    }
+
+    public String getREWARD() {
+        return this.REWARD;
+    }
+
+    public void setREWARD(String REWARD) {
+        this.REWARD = REWARD;
+    }
+
+    public String getREWARD_DF() {
+        return this.REWARD_DF;
+    }
+
+    public void setREWARD_DF(String REWARD_DF) {
+        this.REWARD_DF = REWARD_DF;
+    }
+
+    public String getTRAIN() {
+        return this.TRAIN;
+    }
+
+    public void setTRAIN(String TRAIN) {
+        this.TRAIN = TRAIN;
+    }
+
+    public String getOTHER_REWARD() {
+        return this.OTHER_REWARD;
+    }
+
+    public void setOTHER_REWARD(String OTHER_REWARD) {
+        this.OTHER_REWARD = OTHER_REWARD;
+    }
+
+    public String getACT_TYPE() {
+        return this.ACT_TYPE;
+    }
+
+    public void setACT_TYPE(String ACT_TYPE) {
+        this.ACT_TYPE = ACT_TYPE;
+    }
+
+    public String getREVIEW_STATUS() {
+        return this.REVIEW_STATUS;
+    }
+
+    public void setREVIEW_STATUS(String REVIEW_STATUS) {
+        this.REVIEW_STATUS = REVIEW_STATUS;
+    }
+
+    public void checkDefaultValue() {
+    }
+
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("SEQ", getSEQ())
+            .toString();
+    }
+
+    public String getOTHER_REWARD_INV() {
+		return OTHER_REWARD_INV;
+	}
+
+	public void setOTHER_REWARD_INV(String oTHER_REWARD_INV) {
+		OTHER_REWARD_INV = oTHER_REWARD_INV;
+	}
+
+	public String getOTHER_REWARD_AGN() {
+		return OTHER_REWARD_AGN;
+	}
+
+	public void setOTHER_REWARD_AGN(String oTHER_REWARD_AGN) {
+		OTHER_REWARD_AGN = oTHER_REWARD_AGN;
+	}
+
+	public String getOTHER_REWARD_FRN() {
+		return OTHER_REWARD_FRN;
+	}
+
+	public void setOTHER_REWARD_FRN(String oTHER_REWARD_FRN) {
+		OTHER_REWARD_FRN = oTHER_REWARD_FRN;
+	}
+
+    public String getIPO_START() {
+        return IPO_START;
+    }
+
+    public void setIPO_START(String IPO_START) {
+        this.IPO_START = IPO_START;
+    }
+
+    public String getIPO_END() {
+        return IPO_END;
+    }
+
+    public void setIPO_END(String IPO_END) {
+        this.IPO_END = IPO_END;
+    }
+
+    public String getTB1_FEE() {
+        return TB1_FEE;
+    }
+
+    public void setTB1_FEE(String TB1_FEE) {
+        this.TB1_FEE = TB1_FEE;
+    }
+
+    public String getOTHER_DISTRIBUTION() {
+        return OTHER_DISTRIBUTION;
+    }
+
+    public void setOTHER_DISTRIBUTION(String OTHER_DISTRIBUTION) {
+        this.OTHER_DISTRIBUTION = OTHER_DISTRIBUTION;
+    }
+
+	public String getIPO_RAISE_START() {
+		return IPO_RAISE_START;
+	}
+
+	public void setIPO_RAISE_START(String iPO_RAISE_START) {
+		IPO_RAISE_START = iPO_RAISE_START;
+	}
+
+	public String getIPO_RAISE_END() {
+		return IPO_RAISE_END;
+	}
+
+	public void setIPO_RAISE_END(String iPO_RAISE_END) {
+		IPO_RAISE_END = iPO_RAISE_END;
+	}
+    
+}

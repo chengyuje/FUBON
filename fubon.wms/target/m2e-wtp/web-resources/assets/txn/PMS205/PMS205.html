@@ -1,0 +1,246 @@
+<style>
+/* open dialog */
+.ngdialog.PMS205 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS205 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS205 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS205 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS205.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS205_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS205/PMS205.js"></script>
+<script type="text/javascript" src="assets/txn/PMS205/PMS205_QUERY.js"></script>
+
+<div class="PMS205" ng-controller="PMS205Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box2">
+				<table>
+					<tr>
+<!-- 						<th>月份：</th> -->
+						<td>
+							<div style="float:left">
+								日期：
+							</div>
+							<div style="float:left">&nbsp;&nbsp;&nbsp;</div>
+							<div style="float:left">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="sCreDate" name="sCreDate"
+										class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.eTime" is-open="model.a"
+										ng-required="true"
+										style="width: 200px" datepicker-options="bgn_sDateOptions"
+										ng-readonly="true" ng-change="limitDate();dateChange()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>						
+							</div>
+							<div style="float:left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+							<div style="float:left">
+								<button type="button" class="btn btn-info"
+									ng-click="inquireInit();inquire()">查詢</button>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<div class="panel_content">
+			<!--Content of the panel-->
+			<div>
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<th>商品種類：</th>
+					<td><input type="radio" id="camId" name="camId" value="1" ng-model="inputVO.checkgi"/>基金</td>
+					 <td><input type="radio" id="camId2" name="camId2" value="2" ng-model="inputVO.checkgi"/>保險</td>
+					<br><br>
+					
+					<td>
+							<div style="float:left">
+								專案起日：
+							</div>
+					<div style="float:left">&nbsp;&nbsp;&nbsp;</div>
+							<div style="float:left">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="sCreDate" name="sCreDate"
+										class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.eTimes" is-open="model.b"
+										ng-required="false"
+										style="width: 145px" datepicker-options="bgn_sDateOptions"
+										ng-readonly="true" ng-change="limitDate();dateChange()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>						
+							</div>
+					</td>
+					<div style="float:left">&nbsp;&nbsp;&nbsp;</div>
+					<td>
+							<div style="float:left">
+								專案迄日：
+							</div>
+					<div style="float:left">&nbsp;&nbsp;&nbsp;</div>
+							<div style="float:left">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="sCreDate" name="sCreDate"
+										class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sTimes" is-open="model.c"
+										ng-required="false"
+										style="width: 145px" datepicker-options="bgn_sDateOptions"
+										ng-readonly="true" ng-change="limitDate();dateChange()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'c')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>						
+							</div>
+					</td>
+					
+					<br><br>
+					
+					<th>主商品代號：</th>
+					<td><input type="text" placeholder="請輸入..." id="camId"
+						name="camId" ng-model="inputVO.MAIN_COM_NBR" e-length-limit="39"
+						ng-disabled="inputVO.eTime==''" />
+						<input type="image" src="assets/images/magnifier.jpg" ng-click="qu(inputVO.MAIN_COM_NBR,inputVO.checkgi)"
+						ng-disabled="inputVO.eTime==''" />
+						
+						</td>
+					<th>相關商品代號：</th>
+					<td><input type="text" placeholder="請輸入..." id="camName"
+						name="camName" ng-model="inputVO.REL_COM_NBR" e-length-limit="150"
+						ng-regire="" ng-disabled="inputVO.eTime==''" /></td>
+					<button type="button" class="btn btn-info" ng-click="edit()"
+						ng-disabled="inputVO.eTime==''">加入</button>
+					<br>
+					<th></th>
+					<td></td>
+					<th></th>
+					<td>(請輸入相關商品代號,以逗點隔開,例如:0101,0102................)</td>
+
+				</form>
+			</div>
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList"></e-jumping>
+			<div class="gv_tab_sc scroll_y"
+				style="height: auto; white-space: nowrap;">
+				<table class="tablesaw table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th>刪除</th>
+							<th>專案起日</th>
+							<th>專案迄日</th>
+							<th>商品種類</th>
+							<th>主商品代號</th>
+							<th>商品名稱</th>
+							<th>相關商品代號</th>
+
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td style='text-align: center'>
+								<button type="button" class="btn btn-info" ng-click="del(row)">刪除</button>
+							</td>
+							<td>{{row.EDATE}}</td>
+							<td>{{row.SDATE}}</td>
+							<td>{{row.PRD_ID | mapping:resulttest:'F3'}}</td>
+							<td style='text-align: center'>{{row.MAIN_COM_NBR}}</td>
+							<td>{{row.MAIN_COM_NBR_NAME}}</td>
+							<td>{{row.REL_COM_NBR}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

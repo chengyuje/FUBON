@@ -1,0 +1,340 @@
+<style>
+/* open dialog */
+.ngdialog.CRM681 {
+
+}
+/* dialog panl */
+.modal-dialog.CRM681 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM681 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM681 table.little{
+	width: 61%;
+}
+/* change row */
+.CRM681.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM681_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.nv-label text{
+    font-size:14.5px;
+}
+.CRM681 .bubble
+{
+	position: relative;
+	width: 250px;
+	height: 120px;
+	padding: 10px;
+	background: #FDE7EF;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
+.CRM681 .bubble:after
+{
+	content: '';
+	position: absolute;
+	border-style: solid;
+	border-width: 15px 15px 15px 0;
+	border-color: transparent #FDE7EF;
+	display: block;
+	width: 0;
+	z-index: 1;
+	margin-top: -15px;
+	left: -15px;
+	top: 50%;
+}
+</style>
+<!-- 結果區 -->
+<script type="text/javascript" src="assets/txn/CRM681/CRM681.js"></script>
+<script type="text/javascript" src="assets/txn/CRM610/CRM610.js"></script>
+<script type="text/javascript" src="assets/txn/CRM840/CRM840.js"></script>
+<script type="text/javascript" src="assets/txn/CRM682/CRM682.js"></script>
+<div class="CRM681" ng-controller="CRM681Controller" ng-cloak>
+	<div>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >資產負債總覽</div>
+	</div>
+		<div class="panel_content">
+			<div class="search_table scroll_y" style="position: relative;min-height:450px;height:100%">
+				<table id="CRM681HOVERTABLE">
+					<tr>
+						<td width="48%">
+							<table>
+								<tr>
+									<td>
+										<h4 style="display: inline;">資產總計：</h4>
+										<span style="color:#8BC5C9;">{{deposit + investment + gd_amt + insurance | number:0}}</span>
+										<h5 style="color: #3399cc; font-weight: bold; margin-top: 3px; margin-bottom: 3px;">(約當台幣)</h5>
+									</td>
+								</tr>
+<!-- 							<tr> -->
+<!-- 								<td> -->
+<!-- 									<span style="color:#8BC5C9;">{{deposit+investment+insurance|number:2}}</span> -->
+<!-- 								</td> -->
+<!-- 							</tr> -->
+								<tr>
+									<td>
+										<div class="gv_tab_sc">
+										<table style="border-collapse: separate;">
+											<thead>
+												<tr>
+													<th style="background-color:#BDE5FF; color: black;">資產類型</th>
+													<th style="background-color:#BDE5FF; color: black; width: 55%;">金額(台幣)</th>
+												</tr>
+											</thead>
+
+											<tbody>
+												<tr>
+													<td ng-hide = "login.startsWith('004') || login == '01A'"><a href="#" onclick="return false" ng-click="getCustHomeInclude('CRM810')">存款</a></td>
+													<td ng-show = "login.startsWith('004') || login == '01A'">存款</td>
+													<td  style="text-align: right;">{{deposit | number:0}}</td>
+<!-- 													<td  style="text-align: right;">287,573,209,407.00</td> {{deposit | currency:'$'}} -->
+
+												</tr>
+												<tr>
+													<td ng-hide = "login.startsWith('004') || login == '01A'"><a href="#" onclick="return false" ng-click="getCustHomeInclude('CRM820')">投資</a></td>
+													<td ng-show = "login.startsWith('004') || login == '01A'">投資</td>
+													<td  style="text-align: right;">{{investment | number:0}}</td>
+<!-- 													<td  style="text-align: right;">3,020,923,532.75</td> {{deposit | currency:'$'}} -->
+
+												</tr>
+												<tr>
+													<td ng-hide = "login.startsWith('004') || login == '01A'"><a href="#" onclick="return false" ng-click="getCustHomeInclude('CRM830')">保險</a></td>
+													<td ng-show = "login.startsWith('004') || login == '01A'">保險</td>
+<!-- 												<td  style="text-align: right;">{{insurance | number:0}}</td> {{insurance | currency:'$'}} -->
+													<td  style="text-align: right;">{{insurance | number : 0}}</td> <!-- {{deposit | currency:'$'}} -->
+												</tr>
+											</tbody>
+										</table>
+										</div>
+<!-- 									<div class="search_box_btn text-center"> -->
+<!-- 										<button type="button" class="btn btn-info" ng-click="xxx()">檢視與配置</button> -->
+<!-- 										<button type="button" class="btn btn-info" ng-click="xxx()">投資績效分析</button> -->
+<!-- 									</div> -->
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div class="gv_tab_sc">
+										<table style="border-collapse: separate;">
+											<tbody>
+												<tr>
+													<td ng-hide = "login.startsWith('004') || login == '01A'"><a href="#" onclick="return false" ng-click="goCRM683()">有價證券信託</a></td>
+													<td ng-show = "login.startsWith('004') || login == '01A'">有價證券信託</td>
+													<td  style="text-align: right; width: 55%;">{{crm683 | number : 0}}</td> 
+												</tr>
+												<tr>
+													<td ng-hide = "login.startsWith('004') || login == '01A'">
+														<a href="#" onclick="return false" ng-click="getCustHomeInclude('CRM870')" ng-show="secCustCrossSelling == 'Y'">證券往來</a>
+														<span ng-show="secCustCrossSelling == 'N'">證券往來</span>
+													</td>
+													<td ng-show = "login.startsWith('004') || login == '01A'">證券往來</td>
+													<td style="text-align: right; width: 55%;">{{sec | number : 0}}</td> 
+												</tr>
+											</tbody>
+										</table>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<h4 style="display: inline;">資產總計</h4>
+										<h5 style="display: inline; color:#3399cc; font-weight: bold; margin-top: 3px; margin-bottom: 3px;">(含有價證券、證券往來)</h5> 
+										<h4 style="display: inline;">：</h4>
+										
+										<span style="display: inline; color:#8BC5C9;">{{deposit + investment + gd_amt + insurance + crm683 + sec | number:0}}</span>
+										
+										<h5 style="color: #3399cc; font-weight: bold; margin-top: 3px; margin-bottom: 3px;">(約當台幣)</h5>
+									</td>
+								</tr>
+							</table>
+							<!-- 財神爺 -->
+ 							<!--<table id="CRM681FORTUNA">
+ 								<tr ng-if="FORTUNA.length > 0">
+ 									<td width="30%" style="vertical-align:middle">
+ 										<img src="assets/images/money_SVG/money_thumbup.svg" />
+ 									</td>
+ 									<td width="70%" class="bubble">
+ 										<ul class="ps-wrapper wrapper tiny-font" style="padding-left: 20px;">
+ 											<li class="ps" ng-repeat="row in FORTUNA track by $index" ng-switch="row.TYPE" ng-if="$index <= 1">
+ 												<p ng-switch-when="BOTH_SPEC">
+ 													客戶有待執行交易，目標理財規劃<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '1')">GO</a>
+ 													，全資產規劃<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '2')">GO</a>
+ 												</p>
+ 												<p ng-switch-when="SPEC">
+ 													客戶有待執行交易<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '1')">GO</a>
+ 												</p>
+ 												<p ng-switch-when="NON_SPEC">
+ 													客戶有待執行交易<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '2')">GO</a>
+ 												</p>
+ 												<p ng-switch-when="MONEY_BIG">
+ 													客戶帳上約有{{row.MONEY}}萬可規劃資金，請協助客戶進行理財規劃唷！ <a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row)">GO</a>
+ 												</p>
+ 												<p ng-switch-when="MONEY_LOW">
+ 													財神到, 快速進入理財規劃！<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row)">GO</a>
+ 												</p>
+ 												<p ng-switch-when="SPP_GO">
+ 													快速進行目標理財規劃之績效追蹤或調整。 <a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row)">GO</a>
+ 												</p>
+ 												<p ng-switch-when="PORT_GO">
+ 													快速進行目標理財規劃之績效追蹤或調整。 <a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row)">GO</a>
+ 												</p>
+ 												<p ng-switch-when="STATUS_GO">
+ 													{{row.TEXT}} <a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '3')">投資GO</a>，<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '4')">保險GO</a>
+ 												</p>
+ 											</li>
+ 										</ul>
+ 										<span style="padding-left: 20px;" ng-if="FORTUNA.length > 2">...</span>
+ 									</td>
+ 								</tr>
+ 							</table>-->
+						</td>
+
+						<td width="48%">
+							<table>
+								<tr>
+									<td>
+										<h4 style="display: inline;">負債總計：</h4>
+										<span style="color:#8BC5C9;">{{FuAll | number:0}}</span>
+										<span style="right: 5px;position: absolute;font-weight: bold;"><a href="#" onclick="return false" ng-click="loanIncrementInfo()">可增貸資訊</a></span>
+										<br>
+										<h5 style="color: #3399cc; font-weight: bold; margin-top: 3px; margin-bottom: 3px;">(約當台幣)</h5>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div class="gv_tab_sc">
+										<table style="border-collapse: separate;">
+											<thead>
+												<tr>
+													<th style="background-color:#FDE7EF; color: black;">負債類型</th>
+													<th style="background-color:#FDE7EF; color: black;">金額(台幣)</th>
+												</tr>
+											</thead>
+
+											<tbody>
+												<tr>
+													<td><a href="#" onclick="return false" ng-click="getCustHomeInclude1(0)">分期型房貸</a></td>
+													<td style="text-align: right;">{{Fu1 | number:0}}</td>
+												</tr>
+												<tr>
+													<td><a href="#" onclick="return false" ng-click="getCustHomeInclude1(2)">信用貸款</a></td>
+													<td style="text-align: right;">{{Fu3| number:0}}</td>
+												</tr>
+												<tr>
+													<td><a href="#" onclick="return false" ng-click="getCustHomeInclude1(1)">循環型貸款</a></td>
+													<td style="text-align: right;">{{Fu2| number:0}}</td>
+												</tr>
+												<tr>
+													<td><a href="#" onclick="return false" ng-click="getCustHomeInclude1(3)">就學貸款</a></td>
+													<td style="text-align: right;">{{Fu4| number:0}}</td>
+												</tr>
+												<tr>
+													<td><a href="#" onclick="return false" ng-click="getCustHomeInclude1(4)">留學貸款</a></td>
+													<td style="text-align: right;">{{Fu5| number:0}}</td>
+												</tr>
+												<tr>
+													<td><a href="#" onclick="return false" ng-click="getCustHomeInclude1(6)">存單質借</a></td>
+													<td style="text-align: right;">{{Fu6| number:0}}</td>
+												</tr>
+												<tr ng-show="Fu7 > 0">
+													<td>個人週轉金貸款</td>
+													<td style="text-align: right;">{{Fu7| number:0}}</td>
+												</tr>
+												<tr ng-show="Fu8 > 0">
+													<td>企業貸款</td>
+													<td style="text-align: right;">{{Fu8| number:0}}</td>
+												</tr>
+												<tr>
+													<td><a href="#" onclick="return false" ng-click="getCustHomeInclude1(5)">信用卡本期帳單剩餘應繳金額</a></td>
+													<td style="text-align: right;">{{dataList1 | number:0}}</td>
+												</tr>
+												<!--  
+												<tr>
+													<td>信用卡未出帳單消費金額</td>
+													<td style="text-align: right;">{{dataList2 | number:0}}</td>
+												</tr>-->
+											</tbody>
+										</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<!-- 財神爺 -->
+				<!-- <table id="CRM681HIDDENFORTUNA" style="position: absolute;min-height:400px;top: 20px;">
+					<tr>
+						<td width="20%" style="vertical-align:middle">
+							<img src="assets/images/money_SVG/money_thumbup.svg" />
+						</td>
+						<td width="80%" class="bubble">
+							<ul class="ps-wrapper wrapper tiny-font" style="font-size:20px;">
+								<li class="ps" ng-repeat="row in FORTUNA track by $index" ng-switch="row.TYPE">
+									<p ng-switch-when="BOTH_SPEC">
+										客戶有待執行交易，目標理財規劃<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '1')">GO</a>
+										，全資產規劃<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '2')">GO</a>
+									</p>
+									<p ng-switch-when="SPEC">
+										客戶有待執行交易<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '1')">GO</a>
+									</p>
+									<p ng-switch-when="NON_SPEC">
+										客戶有待執行交易<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '2')">GO</a>
+									</p>
+									<p ng-switch-when="MONEY_BIG">
+										客戶帳上約有{{row.MONEY}}萬可規劃資金，請協助客戶進行理財規劃唷！<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row)">GO</a>
+									</p>
+									<p ng-switch-when="MONEY_LOW">
+										財神到, 快速進入理財規劃！<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row)">GO</a>
+									</p>
+									<p ng-switch-when="SPP_GO">
+										快速進行目標理財規劃之績效追蹤或調整。<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row)">GO</a>
+									</p>
+									<p ng-switch-when="PORT_GO">
+										快速進行目標理財規劃之績效追蹤或調整。<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row)">GO</a>
+									</p>
+									<p ng-switch-when="STATUS_GO">
+										{{row.TEXT}}<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '3')">投資GO</a>，<a style="cursor:pointer;white-space: nowrap;" onclick="return false" ng-click="FORTUNA_GO(row, '4')">保險GO</a>
+									</p>
+								</li>
+							</ul>
+						</td>
+					</tr>
+				</table>-->
+			</div>
+		</div>
+	</div>
+</div>

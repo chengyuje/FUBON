@@ -1,0 +1,94 @@
+<style>
+/* dialog panl */
+.modal-dialog.MGM410_EDIT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 90%;
+	height: 550px;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MGM410/MGM410_EDIT.js"></script>
+<div ng-controller="MGM410_EDITController" ng-cloak>
+	<div class="modal-dialog MGM410_EDIT" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">整批放行</h4>
+			</div>
+			<div class="modal-body">
+				<div>
+					<table width="100%">
+	                    <tr>
+	                        <td width="40%" align="right"><span style="color: red">*</span>申請狀態：</td>
+	                        <td width="60%" align="left">
+	                            <e-combobox id="delivery_status" name="delivery_status" 
+	                            	ng-datasource="mappingSet['MGM.DELIVERY_STATUS']"
+	                            	ng-model="inputVO.delivery_status" 
+	                            	ng-validate="false" 
+	                            	ng-readonly="false" 
+	                            	ng-editable="false" 
+	                            	ng-format="F3" 
+	                            	ng-required="true" 
+	                            	width="100%" height="30px" 
+	                            	style="line-height:20px;" />
+	                        </td>
+	                    </tr>	                	
+	                </table>
+				</div>
+				<div class="searchBox" style="padding:1em">
+					<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+				</div>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="tablesaw table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th style="text-align: left !important;">
+									<label>
+										<input type="checkbox" ng-model="pageControlVO.pageChoice" ng-change="page()" /> 本頁全選
+									</label>
+									<br/>
+									<label>
+										<input type="checkbox" ng-model="pageControlVO.allChoice" ng-change="all()" /> 全選
+									</label>
+								</th>
+								<th>申請書序號</th>
+								<th>分行</th>
+								<th>兌換人員</th>
+								<th>客戶姓名</th>
+								<th>當次兌換點數</th>
+								<th>贈品性質</th>
+								<th>贈品內容</th>
+								<th>兌換數量</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td style="text-align: center;">
+									<input type="checkbox" ng-model="row.SELECTED" ng-disabled="row.RELEASE_YN == 'Y'">勾選
+								</td>
+								<td ng-bind="row.APPLY_SEQ"></td>
+								<td>{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+								<td ng-bind="row.EMP_NAME"></td>
+								<td ng-bind="row.CUST_NAME"></td>
+								<td style="text-align: right;" ng-bind="row.APPLY_POINTS | number : 0">點</td>
+								<td ng-bind="row.GIFT_KIND | mapping : mappingSet['MGM.GIFT_KIND'] : 'F3'"></td>
+								<td ng-bind="row.GIFT_NAME"></td>
+								<td style="text-align: right;" ng-bind="row.APPLY_NUMBER | number : 0"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+	                <button type="button" class="btn btn-info" 
+	                	ng-click="save()" 
+	                	ng-disabled="inputVO.delivery_status == undefined || inputVO.delivery_status == ''"
+	                	function-type="maintenance">確認後儲存</button>
+	            </div>
+			</div>
+		</div>
+	</div>
+</div>

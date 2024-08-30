@@ -1,0 +1,439 @@
+<style>
+
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS423/PMS423.js"></script>
+<script type="text/javascript" src="assets/txn/PMS423/PMS423_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS423" ng-controller="PMS423Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>						
+						<th><font color=red>＊</font>資料月份：</th>
+						<td>							
+							<e-combobox id="data_date" name="data_date"
+										 ng-datasource="mappingSet['PMS.DATA_DATE']"
+										 ng-model="inputVO.data_date"
+										 ng-validate="false"
+										 ng-readonly="false"
+										 ng-editable="false"
+										 ng-format="F3"
+										 ng-required="false"
+										 ng-change="dateChange()" 
+										 width="180px"
+										 style="line-height:20px;"/>	
+						</td>
+						<th><font color=red>＊</font>報表類型：</th>
+						<td colspan="3">							
+							<e-combobox id="report_type" name="report_type"
+										 ng-datasource="mappingSet['PMS.REPORT_TYPE']"
+										 ng-model="inputVO.report_type"
+										 ng-validate="false"
+										 ng-readonly="false"
+										 ng-editable="false"
+										 ng-format="F3"
+										 ng-change="inquireInit(true)"
+										 ng-required="false"
+										 width="300px"
+										 style="line-height:20px;"/>
+						</td>	
+					</tr>
+                    <tr>
+                    	<th>業務處：</th>
+	     				<td>
+	     					<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1"
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion(test)"
+				   						width="180px"
+				   						style="line-height:20px;" />
+	     				</td>
+	     				<th>營運區：</th>
+	   					<td>
+	   						<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="AREA_LIST.length == 1"
+										ng-readonly="AREA_LIST.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(test)"
+										width="150px"
+										style="line-height:20px;" />
+	   					</td>
+	     				<th>分行：</th>
+	     				<td>
+	     					<e-combobox id="branch_nbr" name="branch_nbr"
+				     					ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_nbr"
+										ng-validate="false" 
+										ng-disabled="BRANCH_LIST.length == 1"
+										ng-readonly="BRANCH_LIST.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeBranch(test)"
+				   						width="150px"
+				   						style="line-height:20px;" />
+	     				</td>
+                    	<th>員編：</th>
+					  	<td>
+					  		<e-combobox id="emp_id" name="emp_id"
+										ng-datasource="EMP_LIST"
+										ng-model="inputVO.emp_id"
+										ng-validate="false"
+										ng-readonly="disableEmpCombo" 
+										ng-readonly="disableEmpCombo" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-disabled="disableEmpCombo"
+										ng-change="ChangeAo_code()"
+										width="150px"
+										style="line-height:20px;" />
+					  	</td>	
+					</tr>					
+				</table>
+				</form>			
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" ng-show="inputVO.report_type == '1'">匯出</button>
+				<button type="button" class="btn btn-info" ng-click="upload()">增量目標數上傳</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+		<e-jumping-once  output="outputVO" list="data" totallist="resultList"></e-jumping-once> 
+			<div class="gv_tab_sc scroll_y">
+				<span>說明：本月最新日期為 {{current_snap_date}}</span>
+				<!-- 各項目標數(統計計績Code) -->
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data" style="white-space:nowrap" ng-show="showFlag=='1'">
+					<thead>
+						<tr>
+							<th colspan="2"></th>
+							<th colspan="3">增量目標數</th>
+							<th colspan="4">當月合計</th>
+							<th colspan="4">較上月差異</th>
+						</tr>
+						<tr>
+							<th>分行別</th>
+							<th>理專</th>
+							<th>存款不含<br>台定增量<br>目標</th>
+							<th>投保不含<br>黃金存摺<br>增量目標</th>
+							<th>EIP客戶<br>增量目標</th>
+							<th>當月存款<br>不含台定<br>AUM</th>
+							<th>當月投保<br>不含黃金<br>存摺AUM</th>
+							<th>當月EIP<br>客戶數</th>
+							<th>當月LUM<br>(房貸放款<br>餘額)</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_SAVING" e-query="query()">較上月底<br>增減存款<br>不含台定<br>AUM</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_INVINS" e-query="query()">較上月底<br>增減投保<br>不含黃金<br>存摺AUM</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_EIPCNT" e-query="query()">較上月底<br>增減EIP<br>客戶數</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_LUM" e-query="query()">較上月底<br>增減LUM<br>(房貸放款<br>餘額)</e-sorter>
+							</th>							
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td align="center">{{row.BRANCH_NBR}}</td>
+						 	<td align="center">{{row.EMP_ID}}-{{row.AO_CODE}}{{row.AO_TYPE}}-{{row.EMP_NAME}}</td>
+						 	<td align="center">{{row.WK_GOAL_DEP}}</td>
+						 	<td align="center">{{row.WK_GOAL_INV}}</td>
+						 	<td align="center">{{row.WK_GOAL_EIP}}</td>
+						 	<td align="center">{{row.MON_SAVING}}</td>
+						 	<td align="center">{{row.MON_INVINS}}</td>
+						 	<td align="center">{{row.MON_EIPCNT}}</td>
+						 	<td align="center">{{row.MON_LUM}}</td>
+						 	<td align="center" ng-show="row.EMP_ID != '000000'"><a href="#" onclick="return false" ng-click="goAnotherRpt('2', row);">{{row.DIFF_SAVING}}</a></td>
+						 	<td align="center" ng-show="row.EMP_ID != '000000'"><a href="#" onclick="return false" ng-click="goAnotherRpt('3', row);">{{row.DIFF_INVINS}}</a></td>
+						 	<td align="center" ng-show="row.EMP_ID != '000000'"><a href="#" onclick="return false" ng-click="goAnotherRpt('4', row);">{{row.DIFF_EIPCNT}}</a></td>
+						 	<td align="center" ng-show="row.EMP_ID != '000000'"><a href="#" onclick="return false" ng-click="goAnotherRpt('5', row);">{{row.DIFF_LUM}}</a></td>
+						 	<!-- 理專ID遇到 000000，較上月差異的4個欄位移除超連結，只顯示數字。 -->
+						 	<td align="center" ng-show="row.EMP_ID == '000000'">{{row.DIFF_SAVING}}</td>
+						 	<td align="center" ng-show="row.EMP_ID == '000000'">{{row.DIFF_INVINS}}</td>
+						 	<td align="center" ng-show="row.EMP_ID == '000000'">{{row.DIFF_EIPCNT}}</td>
+						 	<td align="center" ng-show="row.EMP_ID == '000000'">{{row.DIFF_LUM}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<!-- 存款不含台定AUM增減明細 -->
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data" style="white-space:nowrap" ng-show="showFlag=='2'">
+					<thead>
+						<tr>
+							<th colspan="5"></th>
+							<th colspan="4">本月</th>
+							<th colspan="4">上月</th>
+							<th colspan="3">差異</th>
+						</tr>
+						<tr>
+							<th>分行別</th>
+							<th>理專</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>存款不含<br>台定AUM<br>較上月底增減</th>														
+							<th>AO Code</th>														
+							<th>台活</th>														
+							<th>外活</th>														
+							<th>外定</th>														
+							<th>AO Code</th>														
+							<th>台活</th>														
+							<th>外活</th>														
+							<th>外定</th>																												
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_DEP_T_AUM" e-query="query()">台活</e-sorter>
+							</th>														
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_DEP_F_AUM" e-query="query()">外活</e-sorter>
+							</th>														
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_CT_F_AUM" e-query="query()">外定</e-sorter>
+							</th>																											
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td align="center">{{row.BRANCH_NBR}}</td>
+						 	<td align="center">{{row.EMP_ID}}-{{row.EMP_NAME}}</td>
+						 	<td align="center">{{row.CUST_ID}}</td>
+						 	<td align="center">{{row.CUST_NAME}}</td>
+						 	<td align="center">{{row.DIFF_SAVING}}</td>
+						 	<td align="center">{{row.CUR_AO_CODE}}</td>
+						 	<td align="center">{{row.CUR_DEP_T_AUM}}</td>
+						 	<td align="center">{{row.CUR_DEP_F_AUM}}</td>
+						 	<td align="center">{{row.CUR_CT_F_AUM}}</td>
+						 	<td align="center">{{row.LAT_AO_CODE}}</td>
+						 	<td align="center">{{row.LAT_DEP_T_AUM}}</td>
+						 	<td align="center">{{row.LAT_DEP_F_AUM}}</td>
+						 	<td align="center">{{row.LAT_CT_F_AUM}}</td>
+						 	<td align="center">{{row.DIFF_DEP_T_AUM}}</td>
+						 	<td align="center">{{row.DIFF_DEP_F_AUM}}</td>
+						 	<td align="center">{{row.DIFF_CT_F_AUM}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<!-- 投保不含黃金存摺AUM增減明細 -->
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data" style="white-space:nowrap" ng-show="showFlag=='3'">
+					<thead>
+						<tr>
+							<th colspan="5"></th>
+							<th colspan="11">本月</th>
+							<th colspan="11">上月</th>
+							<th colspan="11">差異</th>
+						</tr>
+						<tr>
+							<th>分行別</th>
+							<th>理專</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>投保AUM<br>不含黃金存摺<br>較上月增減</th>														
+							<th>AO Code</th>														
+							<th>基金</th>														
+							<th>ETF</th>														
+							<th>海外股票</th>														
+							<th>SI</th>														
+							<th>DCI</th>														
+							<th>SN</th>														
+							<th>RP</th>														
+							<th>海外債</th>														
+							<th>金錢信託</th>														
+							<th>保險</th>														
+							<th>AO Code</th>														
+							<th>基金</th>														
+							<th>ETF</th>														
+							<th>海外股票</th>														
+							<th>SI</th>														
+							<th>DCI</th>														
+							<th>SN</th>														
+							<th>RP</th>														
+							<th>海外債</th>														
+							<th>金錢信託</th>														
+							<th>保險</th>																											
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_INV_FUND_AUM" e-query="query()">基金</e-sorter>
+							</th>														
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_INV_ETF_AUM" e-query="query()">ETF</e-sorter>
+							</th>														
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_INV_OVST_AUM" e-query="query()">海外股票</e-sorter>
+							</th>														
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_INV_SI_AUM" e-query="query()">SI</e-sorter>
+							</th>														
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_INV_DCI_AUM" e-query="query()">DCI</e-sorter>
+							</th>														
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_INV_SN_AUM" e-query="query()">SN</e-sorter>
+							</th>														
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_INV_RP_AUM" e-query="query()">RP</e-sorter>
+							</th>														
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_INV_OVBN_AUM" e-query="query()">海外債</e-sorter>
+							</th>														
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_INV_TRUST_AUM" e-query="query()">金錢信託</e-sorter>
+							</th>														
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_INS_AUM" e-query="query()">保險</e-sorter>
+							</th>																																						
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td align="center">{{row.BRANCH_NBR}}</td>
+						 	<td align="center">{{row.EMP_ID}}-{{row.EMP_NAME}}</td>
+						 	<td align="center">{{row.CUST_ID}}</td>
+						 	<td align="center">{{row.CUST_NAME}}</td>
+						 	<td align="center">{{row.DIFF_INVINS}}</td>
+						 	<td align="center">{{row.CUR_AO_CODE}}</td>
+						 	<td align="center">{{row.CUR_INV_FUND_AUM}}</td>
+						 	<td align="center">{{row.CUR_INV_ETF_AUM}}</td>
+						 	<td align="center">{{row.CUR_INV_OVST_AUM}}</td>
+						 	<td align="center">{{row.CUR_INV_SI_AUM}}</td>
+						 	<td align="center">{{row.CUR_INV_DCI_AUM}}</td>
+						 	<td align="center">{{row.CUR_INV_SN_AUM}}</td>
+						 	<td align="center">{{row.CUR_INV_RP_AUM}}</td>
+						 	<td align="center">{{row.CUR_INV_OVBN_AUM}}</td>
+						 	<td align="center">{{row.CUR_INV_TRUST_AUM}}</td>
+						 	<td align="center">{{row.CUR_INS_AUM}}</td>
+						 	<td align="center">{{row.LAT_AO_CODE}}</td>
+						 	<td align="center">{{row.LAT_INV_FUND_AUM}}</td>
+						 	<td align="center">{{row.LAT_INV_ETF_AUM}}</td>
+						 	<td align="center">{{row.LAT_INV_OVST_AUM}}</td>
+						 	<td align="center">{{row.LAT_INV_SI_AUM}}</td>
+						 	<td align="center">{{row.LAT_INV_DCI_AUM}}</td>
+						 	<td align="center">{{row.LAT_INV_SN_AUM}}</td>
+						 	<td align="center">{{row.LAT_INV_RP_AUM}}</td>
+						 	<td align="center">{{row.LAT_INV_OVBN_AUM}}</td>
+						 	<td align="center">{{row.LAT_INV_TRUST_AUM}}</td>
+						 	<td align="center">{{row.LAT_INS_AUM}}</td>
+						 	<td align="center">{{row.DIFF_INV_FUND_AUM}}</td>
+						 	<td align="center">{{row.DIFF_INV_ETF_AUM}}</td>
+						 	<td align="center">{{row.DIFF_INV_OVST_AUM}}</td>
+						 	<td align="center">{{row.DIFF_INV_SI_AUM}}</td>
+						 	<td align="center">{{row.DIFF_INV_DCI_AUM}}</td>
+						 	<td align="center">{{row.DIFF_INV_SN_AUM}}</td>
+						 	<td align="center">{{row.DIFF_INV_RP_AUM}}</td>
+						 	<td align="center">{{row.DIFF_INV_OVBN_AUM}}</td>
+						 	<td align="center">{{row.DIFF_INV_TRUST_AUM}}</td>
+						 	<td align="center">{{row.DIFF_INS_AUM}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<!-- EIP客戶增減明細 -->
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data" style="white-space:nowrap" ng-show="showFlag=='4'">
+					<thead>
+						<tr>
+							<th colspan="4"></th>
+							<th colspan="2">本月</th>
+							<th colspan="2">上月</th>
+							<th rowspan="2">
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_CON_DEGREE" e-query="query()">差異</e-sorter>
+							</th>
+						</tr>
+						<tr>
+							<th>分行別</th>
+							<th>理專</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>												
+							<th>AO Code</th>														
+							<th>貢獻度</th>														
+							<th>AO Code</th>														
+							<th>貢獻度</th>																											
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td align="center">{{row.BRANCH_NBR}}</td>
+						 	<td align="center">{{row.EMP_ID}}-{{row.EMP_NAME}}</td>
+						 	<td align="center">{{row.CUST_ID}}</td>
+						 	<td align="center">{{row.CUST_NAME}}</td>
+						 	<td align="center">{{row.CUR_AO_CODE}}</td>
+						 	<td align="center">{{row.CUR_CON_DEGREE}}</td>
+						 	<td align="center">{{row.LAT_AO_CODE}}</td>
+						 	<td align="center">{{row.LAT_CON_DEGREE}}</td>
+						 	<td align="center">{{row.DIFF_CON_DEGREE}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<!-- LUM房貸增減明細 -->
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data" style="white-space:nowrap" ng-show="showFlag=='5'">
+					<thead>
+						<tr>
+							<th colspan="4"></th>
+							<th colspan="2">本月</th>
+							<th colspan="2">上月</th>
+							<th rowspan="2">
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DIFF_LUM" e-query="query()">LUM增減</e-sorter>
+							</th>
+						</tr>
+						<tr>
+							<th>分行別</th>
+							<th>理專</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>												
+							<th>AO Code</th>														
+							<th>LUM餘額</th>														
+							<th>AO Code</th>														
+							<th>LUM餘額</th>																										
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td align="center">{{row.BRANCH_NBR}}</td>
+						 	<td align="center">{{row.EMP_ID}}-{{row.EMP_NAME}}</td>
+						 	<td align="center">{{row.CUST_ID}}</td>
+						 	<td align="center">{{row.CUST_NAME}}</td>
+						 	<td align="center">{{row.CUR_AO_CODE}}</td>
+						 	<td align="center">{{row.CUR_LUM}}</td>
+						 	<td align="center">{{row.LAT_AO_CODE}}</td>
+						 	<td align="center">{{row.LAT_LUM}}</td>
+						 	<td align="center">{{row.DIFF_LUM}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<span style="color:red;">報表較上月差異欄位計算邏輯係提供本月與上月底差異比較，未包含調整基期，僅供參考</span>
+			</div>
+		</div>
+	</div>
+</div>

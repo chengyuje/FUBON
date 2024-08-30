@@ -1,0 +1,113 @@
+<style>
+.bigspace {
+    margin-left: 20px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/MGM310/MGM310.js"></script>
+<script type="text/javascript" src="assets/txn/MGM310/MGM310_GIFT.js"></script>
+<div ng-controller="MGM310Controller" ng-cloak>
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+        </div>
+        <!--Content of the panel-->
+        <div class="panel_content">
+            <div class="search_table">
+                <table>
+                    <tr>
+                        <th width="10%">贈品代碼：</th>
+                        <td width="40%">
+                            <e-combobox id="gift_seq" name="gift_seq" 
+                            	ng-datasource="mappingSet['GIFT_SEQ']"
+                            	ng-model="inputVO.gift_seq" 
+                            	ng-validate="false" 
+                            	ng-readonly="false" 
+                            	ng-editable="false" 
+                            	ng-format="F1" 
+                            	ng-required="true" 
+                            	ng-change="checkActType()" 
+                            	width="100%" height="30px" 
+                            	style="line-height:20px;" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="search_box_btn text-center">
+            	<button type="button" class="btn btn-info" ng-click="addGift()">新增</button>
+                <button type="button" class="btn btn-info" ng-click="inquire()" function-type="query">查詢</button>
+            </div>
+        </div>
+    </div>
+    <!-- 結果區 -->
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+        </div>
+        <!--Content of the panel-->
+        <div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>功能</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="GIFT.GIFT_SEQ" e-query="inquire()">贈品代碼</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="GIFT.GIFT_NAME" e-query="inquire()">贈品名稱</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="GIFT.GIFT_KIND" e-query="inquire()">贈品性質</e-sorter>
+							</th>
+<!-- 						<th>領用方式</th> -->
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="GIFT.GIFT_COSTS" e-query="inquire()">贈品成本</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="GIFT.GIFT_AMOUNT" e-query="inquire()">總數量</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="GIFT.GIFT_TAKEN" e-query="inquire()">已領用數量</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="GIFT_REMAINING" e-query="inquire()">剩餘數量</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="ORG.EMP_NAME" e-query="inquire()">修改人員</e-sorter>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>
+								<e-combobox id="fn" name="fn" 
+									ng-datasource="row.fn"
+									ng-model="row.edit"
+									ng-validate="false" 
+									ng-readonly="false"
+									ng-editable="false" 
+									ng-format="F3" 
+									ng-required="false"
+									ng-change="edit(row)" 
+									width="100px" style="line-height:20px;" />
+							</td>
+							<td>{{row.GIFT_SEQ}}</td>
+							<td>{{row.GIFT_NAME}}</td>
+							<td>{{row.GIFT_KIND | mapping:mappingSet['MGM.GIFT_KIND']:'F3'}}</td>
+<!-- 						<td>{{row.GIFT_GET_WAY | mapping:mappingSet['MGM.GIFT_GET_WAY']:'F3'}}</td> -->
+							<td align = "right">{{row.GIFT_COSTS}}</td>
+							<td align = "right">{{row.GIFT_AMOUNT}}</td>
+							<td align = "right">{{row.GIFT_TAKEN}}</td>
+							<td align = "right">{{row.GIFT_REMAINING}}</td>
+							<td>{{row.EMP_NAME}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>	
+        </div>
+    </div>
+    
+</div>

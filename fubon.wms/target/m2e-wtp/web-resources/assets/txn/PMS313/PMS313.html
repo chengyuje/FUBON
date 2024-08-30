@@ -1,0 +1,713 @@
+<style>
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.middle th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS313/PMS313.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS313" ng-controller="PMS313Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th><font color="red">＊</font> 報表月份：</th>
+							<td><e-combobox id="dataMonth" name="dataMonth" 
+									ng-datasource="mappingSet['timeE']"
+									ng-model="inputVO.sCreDate"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-change="limitDate();dateChange()"
+									ng-format="F3"
+									ng-required="true" width="170px" style="line-height:20px;" />
+							</td>
+							<th><font color="red">＊</font> 報表類型：</th>
+							<td><e-combobox id="sType" name="sType"
+									ng-datasource="mappingSet['sType']" ng-model="inputVO.sType"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-format="F3" ng-required="true" width="170px"
+									style="line-height:20px;" /></td>
+							<th><font color="red">＊</font>統計類型：</th>
+							<td><e-combobox id="pType" name="pType"
+									ng-datasource="mappingSet['pType']" ng-model="inputVO.pType"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-format="F3" ng-required="true" width="170px"
+									style="line-height:20px;" /></td>
+						</tr>
+						<tr>
+							<th>　&nbsp;業務處：</th>
+							<td><e-combobox  
+									ng-datasource="REGION_LIST" ng-model="inputVO.region_center_id"
+									ng-validate="false" ng-disabled="disableRegionCombo"
+							        ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-format="F3" ng-change="ChangeRegion();Region()" ng-required="false"
+									width="170px" height="30px" style="line-height:20px;" /></td>
+							<th>　&nbsp;營運區：</th>
+							<td><e-combobox   
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id" ng-validate="false" 
+									ng-disabled="disableAreaCombo"
+							        ng-readonly="disableAreaCombo"
+									ng-editable="false" ng-change="ChangeArea();Area()" ng-format="F3"
+									ng-required="false" width="170px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>　分行：</th>
+							<td><e-combobox  
+									ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr"
+									ng-validate="false" ng-disabled="disableBranchCombo"
+							        ng-readonly="disableBranchCombo" ng-editable="false"
+									ng-format="F1" ng-required="false" ng-change="ChangeBranch();Branch()"
+									width="170px" height="30px" style="line-height:20px;" /></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()"
+					ng-disabled="paramList.length < 1">匯出</button>
+
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<table>
+				<tr>
+					<td><div class="tfb_content_tit">
+							<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+						</div></td>
+					<td width="80%"><div align="right">
+							<font color="106987" style="font-weight: bold">單位：百萬元&nbsp;&nbsp;</font>
+						</div></td>
+				</tr>
+			</table>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<!-- 
+	    <e-jumping-once output="outputVO" list="paramList" totallist="totalData"></e-jumping-once>
+		 -->
+			<!-- 
+			<e-jumping output="outputVO"
+				input="inputVO"
+				query="query()" list="paramList"></e-jumping>
+		  -->
+			<div algin="left">
+				<div algin="left">
+					<table>
+						<tr>
+							<td>產出頻率：</td>
+							<td>每日</td>
+						</tr>
+						<tr>
+							<td>產出日：</td>
+							<td>{{toJsDate(paramList[0].CREATETIME) | date:'yyyy/MM/dd'}}</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="gv_tab_sc scroll_y">
+				<!-- 房信貸分行業績戰報 -->
+				<table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="5" e-list="paramList" ng-hide="sType != 'RPT01'">
+					<thead>
+						<tr class="middle">
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行別</th>
+							<th rowspan="2">組別</th>
+							<th rowspan="3">分行名稱</th>
+							<th colspan="4">分期型房貸_購屋</th>
+							<th colspan="4">分期型房貸_非購屋</th>
+							<th colspan="4">分期型房貸合計</th>
+							<th colspan="4">循環型房貸</th>
+							<th colspan="4">房貸合計</th>
+							<th rowspan="2">房貸<br>分行分組排名
+							</th>
+							<th colspan="4">信貸_一般</th>
+							<th colspan="4">信貸_職團</th>
+							<th colspan="4">信貸_卡友</th>
+							<th colspan="2">認股信貸</th>
+							<th colspan="4">信貸(不含認股信貸)合計</th>
+							<th rowspan="2">信貸<br>分行分組排名
+							</th>
+						</tr>
+						<tr>
+							<!-- 分期型房貸_購屋 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 分期型房貸_非購屋 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 分期型房貸合計 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 循環型房貸 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 房貸合計 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 信貸_一般 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 信貸_職團 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 信貸_卡友 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 認股信貸 -->
+							<th>件數</th>
+							<th>金額</th>
+							<!-- 信貸(不含認股信貸)合計 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							ng-repeat-start=" (a,dataA) in paramList | groupBy: 'REGION_CENTER_NAME' as resultA">
+							<td rowspan="{{ dataA.length + numGroups(resultB)*2 + 1}}">{{a}}</td>
+						</tr>
+						<tr
+							ng-repeat-start=" (b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+							<td rowspan="{{dataB.length + 1}}">{{b}}</td>
+						</tr>
+						<tr ng-repeat=" c in dataB">
+							<td>{{c.BRANCH_NBR}}</td>
+							<td>{{c.BRANCH_CLS}}</td>
+							<td>{{c.BRANCH_NAME}}</td>
+							<td align="right">{{c.S_MRTG_HB_CNT |number:''}}</td>
+							<td align="right">{{c.S_MRTG_HB_AMT | number:2}}</td>
+							<td align="right">{{c.S_MRTG_HB_TAR | number:2}}</td>
+							<td align="right">{{c.S_MRTG_HB_RATE | number:2}}%</td>
+							<td align="right">{{c.S_MRTG_NHB_CNT |number:''}}</td>
+							<td align="right">{{c.S_MRTG_NHB_AMT | number:2}}</td>
+							<td align="right">{{c.S_MRTG_NHB_TAR | number:2}}</td>
+							<td align="right">{{c.S_MRTG_NHB_RATE | number:2}}%</td>
+							<td align="right">{{c.S_MRTG_T_HB_CNT |number:''}}</td>
+							<td align="right">{{c.S_MRTG_T_HB_AMT | number:2}}</td>
+							<td align="right">{{c.S_MRTG_T_HB_TAR | number:2}}</td>
+							<td align="right">{{c.S_MRTG_T_HB_RATE | number:2}}%</td>
+							<td align="right">{{c.R_MRTG_CNT |number:''}}</td>
+							<td align="right">{{c.R_MRTG_AMT | number:2}}</td>
+							<td align="right">{{c.R_MRTG_TAR | number:2}}</td>
+							<td align="right">{{c.R_MRTG_RATE | number:2}}%</td>
+							<td align="right">{{c.MRTG_T_CNT |number:''}}</td>
+							<td align="right">{{c.MRTG_T_AMT | number:2}}</td>
+							<td align="right">{{c.MRTG_T_TAR | number:2}}</td>
+							<td align="right">{{c.MRTG_T_RATE | number:2}}%</td>
+							<td align="right">{{c.MRANK}}</td>
+							<td align="right">{{c.CREDIT_N_CNT |number:''}}</td>
+							<td align="right">{{c.CREDIT_N_AMT | number:2}}</td>
+							<td align="right">{{c.CREDIT_N_TAR | number:2}}</td>
+							<td align="right">{{c.CREDIT_N_RATE | number:2}}%</td>
+							<td align="right">{{c.CREDIT_G_CNT |number:''}}</td>
+							<td align="right">{{c.CREDIT_G_AMT | number:2}}</td>
+							<td align="right">{{c.CREDIT_G_TAR | number:2}}</td>
+							<td align="right">{{c.CREDIT_G_RATE | number:2}}%</td>
+							<td align="right">{{c.CREDIT_C_CNT |number:''}}</td>
+							<td align="right">{{c.CREDIT_C_AMT | number:2}}</td>
+							<td align="right">{{c.CREDIT_C_TAR | number:2}}</td>
+							<td align="right">{{c.CREDIT_C_RATE | number:2}}%</td>
+							<td align="right">{{c.W_CREDIT_CNT | number:2}}</td>
+							<td align="right">{{c.W_CREDIT_AMT | number:2}}</td>
+							<td align="right">{{c.CREDIT_T_CNT |number:''}}</td>
+							<td align="right">{{c.CREDIT_T_AMT | number:2}}</td>
+							<td align="right">{{c.CREDIT_T_TAR | number:2}}</td>
+							<td align="right">{{c.CREDIT_T_RATE | number:2}}%</td>
+							<td align="right">{{c.CRANK}}</td>
+						</tr>
+						<tr ng-repeat-end>
+							<td colspan="4" align="center" >{{b}} 合計</td>
+							<td align="right">{{getSum(dataB, 'S_MRTG_HB_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataB, 'S_MRTG_HB_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataB, 'S_MRTG_HB_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataB, 'S_MRTG_HB_AMT','S_MRTG_HB_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataB, 'S_MRTG_NHB_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataB, 'S_MRTG_NHB_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataB, 'S_MRTG_NHB_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataB, 'S_MRTG_NHB_AMT','S_MRTG_NHB_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataB, 'S_MRTG_T_HB_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataB, 'S_MRTG_T_HB_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataB, 'S_MRTG_T_HB_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataB, 'S_MRTG_T_HB_AMT','S_MRTG_T_HB_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataB, 'R_MRTG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataB, 'R_MRTG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataB, 'R_MRTG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataB, 'R_MRTG_AMT','R_MRTG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataB, 'MRTG_T_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataB, 'MRTG_T_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataB, 'MRTG_T_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataB, 'MRTG_T_AMT','MRTG_T_TAR')| number:2}}%</td>
+							<td align="right"></td>
+							<td align="right">{{getSum(dataB, 'CREDIT_N_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataB, 'CREDIT_N_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataB, 'CREDIT_N_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataB, 'CREDIT_N_AMT','CREDIT_N_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataB, 'CREDIT_G_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataB, 'CREDIT_G_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataB, 'CREDIT_G_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataB, 'CREDIT_G_AMT','CREDIT_G_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataB, 'CREDIT_C_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataB, 'CREDIT_C_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataB, 'CREDIT_C_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataB, 'CREDIT_C_AMT','CREDIT_C_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataB, 'W_CREDIT_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataB, 'W_CREDIT_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataB, 'CREDIT_T_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataB, 'CREDIT_T_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataB, 'CREDIT_T_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataB, 'CREDIT_T_AMT','CREDIT_T_TAR')| number:2}}%</td></td>
+							<td align="right"></td>
+						</tr>
+						<tr ng-repeat-end>
+							<td colspan="5" align="center">{{a}} 合計</td>
+							<td align="right">{{getSum(dataA, 'S_MRTG_HB_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'S_MRTG_HB_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'S_MRTG_HB_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'S_MRTG_HB_AMT','S_MRTG_HB_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'S_MRTG_NHB_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'S_MRTG_NHB_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'S_MRTG_NHB_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'S_MRTG_NHB_AMT','S_MRTG_NHB_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'S_MRTG_T_HB_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'S_MRTG_T_HB_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'S_MRTG_T_HB_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'S_MRTG_T_HB_AMT','S_MRTG_T_HB_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'R_MRTG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'R_MRTG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'R_MRTG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'R_MRTG_AMT','R_MRTG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'MRTG_T_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'MRTG_T_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'MRTG_T_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'MRTG_T_AMT','MRTG_T_TAR')| number:2}}%</td>
+							<td align="right"></td>
+							<td align="right">{{getSum(dataA, 'CREDIT_N_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'CREDIT_N_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'CREDIT_N_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'CREDIT_N_AMT','CREDIT_N_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'CREDIT_G_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'CREDIT_G_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'CREDIT_G_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'CREDIT_G_AMT','CREDIT_G_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'CREDIT_C_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'CREDIT_C_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'CREDIT_C_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'CREDIT_C_AMT','CREDIT_C_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'W_CREDIT_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'W_CREDIT_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'CREDIT_T_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'CREDIT_T_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'CREDIT_T_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'CREDIT_T_AMT','CREDIT_T_TAR')| number:2}}%</td>
+							<td align="right"></td>
+						</tr>
+						<tr ng-show="paramList.length > 0">
+							<td colspan="5" align="center">總計</td>
+							<td align="right">{{getSum(paramList, 'S_MRTG_HB_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'S_MRTG_HB_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'S_MRTG_HB_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'S_MRTG_HB_AMT','S_MRTG_HB_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'S_MRTG_NHB_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'S_MRTG_NHB_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'S_MRTG_NHB_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'S_MRTG_NHB_AMT','S_MRTG_NHB_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'S_MRTG_T_HB_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'S_MRTG_T_HB_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'S_MRTG_T_HB_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'S_MRTG_T_HB_AMT','S_MRTG_T_HB_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'R_MRTG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'R_MRTG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'R_MRTG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'R_MRTG_AMT','R_MRTG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'MRTG_T_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'MRTG_T_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'MRTG_T_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'MRTG_T_AMT','MRTG_T_TAR')| number:2}}%</td>
+							<td align="right"></td>
+							<td align="right">{{getSum(paramList, 'CREDIT_N_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'CREDIT_N_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'CREDIT_N_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'CREDIT_N_AMT','CREDIT_N_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'CREDIT_G_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'CREDIT_G_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'CREDIT_G_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'CREDIT_G_AMT','CREDIT_G_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'CREDIT_C_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'CREDIT_C_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'CREDIT_C_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'CREDIT_C_AMT','CREDIT_C_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'W_CREDIT_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'W_CREDIT_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'CREDIT_T_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'CREDIT_T_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'CREDIT_T_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'CREDIT_T_AMT','CREDIT_T_TAR')| number:2}}%</td>
+							<td align="right"></td>
+						</tr>
+
+					</tbody>
+				</table>
+				<!-- 好運貸業績戰報 -->
+				<table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="5" e-list="paramList" ng-hide="sType != 'RPT02'">
+					<thead>
+						<tr class="middle">
+							<th rowspan="3">業務處</th>
+							<th rowspan="3">營運區</th>
+							<th rowspan="3">分行別</th>
+							<th rowspan="3">組別</th>
+							<th rowspan="3">分行名稱</th>
+							<th colspan="5">MTD</th>
+							<th rowspan="3">MTD分行<br>分組排名
+							</th>
+							<th colspan="5">YTD</th>
+							<th rowspan="3">YTD分行<br>分組排名
+							</th>
+						</tr>
+						<tr>
+							<!-- MTD -->
+							<th rowspan="2">房貸中長期<br>撥款達成率(MTD)
+							</th>
+							<th colspan="4">好運貸</th>
+							<!-- YTD -->
+							<th rowspan="2">房貸分期型<br>撥款達成率(YTM)
+							</th>
+							<th colspan="4">好運貸</th>
+						</tr>
+						<tr>
+							<th>件數</th>
+							<th>保費</th>
+							<th>目標</th>
+							<th>MTD達成率</th>
+							<th>件數</th>
+							<th>保費</th>
+							<th>目標</th>
+							<th>YTD達成率</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							ng-repeat-start=" (a,dataA) in paramList | groupBy: 'REGION_CENTER_NAME' as resultA">
+							<td rowspan="{{ dataA.length + numGroups(resultB)*2 + 1}}">{{a}}</td>
+						</tr>
+						<tr
+							ng-repeat-start=" (b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+							<td rowspan="{{dataB.length + 1}}">{{b}}</td>
+						</tr>
+						<tr ng-repeat=" c in dataB">
+							<td>{{c.BRANCH_NBR}}</td>
+							<td>{{c.BRANCH_CLS}}</td>
+							<td>{{c.BRANCH_NAME}}</td>
+							<td align="right">{{c.MRTG_RATE_MTD}}%</td>
+							<td align="right">{{c.MTD_CNT|number:''}}</td>
+							<td align="right">{{c.MTD_FEE}}</td>
+							<td align="right">{{c.MTD_TAR}}</td>
+							<td align="right">{{c.MTD_RATE}}%</td>
+							<td align="right">{{c.MTD_RANK}}</td>
+							<td align="right">{{c.MRTG_RATE_YTM}}%</td>
+							<td align="right">{{c.YTD_CNT|number:''}}</td>
+							<td align="right">{{c.YTD_FEE}}</td>
+							<td align="right">{{c.YTD_TAR}}</td>
+							<td align="right">{{c.YTD_RATE}}%</td>
+							<td align="right">{{c.YTD_RANK}}</td>
+						</tr>
+						<tr ng-repeat-end>
+						</tr>
+						<tr ng-repeat-end>
+							<td colspan="5" align="center">{{a}} 合計</td>
+							<td align="right"></td>
+							<td align="right">{{getSum(dataA, 'MTD_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'MTD_FEE')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'MTD_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'MTD_FEE','MTD_TAR')| number:2}}%</td>
+							<td align="right"></td>
+							<td align="right">{{getSum(dataA, 'MRTG_RATE_YTM')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'YTD_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'YTD_FEE')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'YTD_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'YTD_FEE','YTD_TAR')| number:2}}%</td>
+							<td align="right"></td>
+						</tr>
+						<tr ng-show="paramList.length > 0">
+							<td colspan="5" align="center">總計</td>
+							<td align="right"></td>
+							<td align="right">{{getSum(paramList, 'MTD_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'MTD_FEE')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'MTD_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'MTD_FEE','MTD_TAR')| number:2}}%</td>
+							<td align="right"></td>
+							<td align="right">{{getSum(paramList, 'MRTG_RATE_YTM')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'YTD_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'YTD_FEE')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'YTD_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'YTD_FEE','YTD_TAR')| number:2}}%</td>
+							<td align="right"></td>
+						</tr>
+					</tbody>
+				</table>
+				<!-- 房貸法金+個金報表 -->
+				<table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="5" e-list="paramList" ng-hide="sType != 'RPT03'">
+					<thead>
+						<tr class="middle">
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行別</th>
+							<th rowspan="2">組別</th>
+							<th rowspan="3">分行名稱</th>
+							<th colspan="4">購屋_個金</th>
+							<th colspan="4">購屋_法金</th>
+							<th colspan="4">購屋合計</th>
+							<th colspan="4">非購屋_個金</th>
+							<th colspan="4">非購屋_法金</th>
+							<th colspan="4">非購屋合計</th>
+							<th colspan="4">額度式_個金</th>
+							<th colspan="2">額度式_法金</th>
+							<th colspan="4">額度式合計</th>
+						</tr>
+						<tr>
+							<!-- 購屋_個金 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 購屋_法金 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 購屋合計 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 非購屋_個金 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 非購屋_法金 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 非購屋_合計 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 額度式_個金 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<!-- 額度式_法金 -->
+							<th>件數</th>
+							<th>金額</th>
+							<!-- 額度式合計 -->
+							<th>件數</th>
+							<th>金額</th>
+							<th>目標</th>
+							<th>達成率</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							ng-repeat-start=" (a,dataA) in paramList | groupBy: 'REGION_CENTER_NAME' as resultA">
+							<td rowspan="{{ dataA.length + numGroups(resultB)*2 + 1}}">{{a}}</td>
+						</tr>
+						<tr
+							ng-repeat-start=" (b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+							<td rowspan="{{dataB.length + 1}}">{{b}}</td>
+						</tr>
+						<tr ng-repeat=" c in dataB">
+							<td>{{c.BRANCH_NBR}}</td>
+							<td>{{c.BRANCH_CLS}}</td>
+							<td>{{c.BRANCH_NAME}}</td>
+							<td align="right">{{c.HB_PG_CNT|number:''}}</td>
+							<td align="right">{{c.HB_PG_AMT}}</td>
+							<td align="right">{{c.HB_PG_TAR}}</td>
+							<td align="right">{{c.HB_PG_RATE}}%</td>
+							<td align="right">{{c.HB_FG_CNT|number:''}}</td>
+							<td align="right">{{c.HB_FG_AMT}}</td>
+							<td align="right">{{c.HB_FG_TAR}}</td>
+							<td align="right">{{c.HB_FG_RATE}}%</td>
+							<td align="right">{{c.HB_TT_CNT|number:''}}</td>
+							<td align="right">{{c.HB_TT_AMT}}</td>
+							<td align="right">{{c.HB_TT_TAR}}</td>
+							<td align="right">{{c.HB_TT_RATE}}%</td>
+							<td align="right">{{c.NHB_PG_CNT|number:''}}</td>
+							<td align="right">{{c.NHB_PG_AMT}}</td>
+							<td align="right">{{c.NHB_PG_TAR}}</td>
+							<td align="right">{{c.NHB_PG_RATE}}%</td>
+							<td align="right">{{c.NHB_FG_CNT|number:''}}</td>
+							<td align="right">{{c.NHB_FG_AMT}}</td>
+							<td align="right">{{c.NHB_FG_TAR}}</td>
+							<td align="right">{{c.NHB_FG_RATE}}%</td>
+							<td align="right">{{c.NHB_TT_CNT|number:''}}</td>
+							<td align="right">{{c.NHB_TT_AMT}}</td>
+							<td align="right">{{c.NHB_TT_TAR}}</td>
+							<td align="right">{{c.NHB_TT_RATE}}%</td>
+							<td align="right">{{c.F_PG_CNT|number:''}}</td>
+							<td align="right">{{c.F_PG_AMT}}</td>
+							<td align="right">{{c.F_PG_TAR}}</td>
+							<td align="right">{{c.F_PG_RATE}}%</td>
+							<td align="right">{{c.F_FG_CNT|number:''}}</td>
+							<td align="right">{{c.F_FG_AMT}}</td>
+							<td align="right">{{c.F_TT_CNT|number:''}}</td>
+							<td align="right">{{c.F_TT_AMT}}</td>
+							<td align="right">{{c.F_TT_TAR}}</td>
+							<td align="right">{{c.F_TT_RATE}}%</td>
+						</tr>
+						<tr ng-repeat-end>
+						</tr>
+						<tr ng-repeat-end>
+							<td colspan="5" align="center">{{a}} 合計</td>
+							<td align="right">{{getSum(dataA, 'HB_PG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'HB_PG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'HB_PG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'HB_PG_AMT','HB_PG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'HB_FG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'HB_FG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'HB_FG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'HB_FG_AMT','HB_FG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'HB_TT_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'HB_TT_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'HB_TT_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'HB_TT_AMT','HB_TT_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'NHB_PG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'NHB_PG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'NHB_PG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'NHB_PG_AMT','NHB_PG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'NHB_FG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'NHB_FG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'NHB_FG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'NHB_FG_AMT','NHB_FG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'NHB_TT_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'NHB_TT_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'NHB_TT_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'NHB_TT_AMT','NHB_TT_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'F_PG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'F_PG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'F_PG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'F_PG_AMT','F_PG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(dataA, 'F_FG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'F_FG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'F_TT_CNT')|number:''}}</td>
+							<td align="right">{{getSum(dataA, 'F_TT_AMT')| number:2}}</td>
+							<td align="right">{{getSum(dataA, 'F_TT_TAR')| number:2}}</td>
+							<td align="right">{{getAve(dataA, 'F_TT_AMT','F_TT_TAR')| number:2}}%</td>
+						</tr>
+						<tr ng-show="paramList.length > 0">
+							<td colspan="5" align="center">總計</td>
+							<td align="right">{{getSum(paramList, 'HB_PG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'HB_PG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'HB_PG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'HB_PG_AMT','HB_PG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'HB_FG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'HB_FG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'HB_FG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'HB_FG_AMT','HB_FG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'HB_TT_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'HB_TT_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'HB_TT_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'HB_TT_AMT','HB_TT_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'NHB_PG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'NHB_PG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'NHB_PG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'NHB_PG_AMT','NHB_PG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'NHB_FG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'NHB_FG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'NHB_FG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'NHB_FG_AMT','NHB_FG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'NHB_TT_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'NHB_TT_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'NHB_TT_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'NHB_TT_AMT','NHB_TT_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'F_PG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'F_PG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'F_PG_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'F_PG_AMT','F_PG_TAR')| number:2}}%</td>
+							<td align="right">{{getSum(paramList, 'F_FG_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'F_FG_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'F_TT_CNT')|number:''}}</td>
+							<td align="right">{{getSum(paramList, 'F_TT_AMT')| number:2}}</td>
+							<td align="right">{{getSum(paramList, 'F_TT_TAR')| number:2}}</td>
+							<td align="right">{{getAve(paramList, 'F_TT_AMT','F_TT_TAR')| number:2}}%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div algin="left">
+				<table>
+
+					<tr>
+						<td align="right">說明：</td>
+						<td align="left"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

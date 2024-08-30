@@ -1,0 +1,200 @@
+<style>
+/* open dialog */
+.ngdialog.CRM800 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM800 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM800 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM800 table.little{
+	width: 61%;
+}
+/* change row */
+.CRM800.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM800_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+
+.nv-label text{
+    font-size:14.5px;
+}
+
+</style>
+<!-- 結果區 -->
+<script type="text/javascript" src="assets/txn/CRM800/CRM800.js"></script>
+
+<div class="CRM800" ng-controller="CRM800Controller" ng-cloak>
+	<div>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >資產負債總覽</div>
+	</div>
+		<div class="panel_content">
+			<div class="search_table search_box2">
+				<table>
+					<tr>
+						<td width="48%" ng-hide = "login == '004' || login == '01A'">
+							<table>
+								<tr>
+									<td width="48%" align="center">
+										<!-- 繪圖 -->
+			       						<nvd3 options="options" data="data"></nvd3>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<h4>資產總計(約當台幣): {{deposit+investment+insurance| number : 0}}</h4> <!-- {{deposit+investment+insurance | currency:'$'}} -->
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div class="gv_tab_sc">
+										<table>
+											<thead>
+												<tr>
+													<th>資產類型</th>
+													<th>金額(台幣)</th>
+												</tr>
+											</thead>
+								
+											<tbody>
+												<tr>	
+													<td ng-hide = "login.startsWith('004') || login == '01A'"><a href="#" onclick="return false" ng-click="getCustHomeInclude('CRM810')">存款</a></td>
+													<td ng-show = "login.startsWith('004') || login == '01A'">存款</td>
+													<td  style="text-align: right;">{{deposit | number : 0}}</td> <!-- {{deposit | currency:'$'}} -->
+												</tr>
+												<tr>	
+													<td ng-hide = "login.startsWith('004') || login == '01A'"><a href="#" onclick="return false" ng-click="getCustHomeInclude('CRM820')">投資</a></td>
+													<td ng-show = "login.startsWith('004') || login == '01A'">投資</td>
+													<td  style="text-align: right;">{{investment | number : 0}}</td> <!-- {{investment | currency:'$'}} -->
+												</tr>
+												<tr>	
+													<td ng-hide = "login.startsWith('004') || login == '01A'"><a href="#" onclick="return false" ng-click="getCustHomeInclude('CRM830')">保險</a></td>
+													<td ng-show = "login.startsWith('004') || login == '01A'">保險</td>
+													<td  style="text-align: right;">{{insurance | number : 0}}</td> <!-- {{insurance | currency:'$'}} -->
+												</tr>
+											</tbody>
+										</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</td>
+						
+						<td width="48%">
+							<table>
+								<tr>
+									<td width="48%" align="center">
+										<!-- 繪圖 -->
+			       						<nvd3 options="options2" data="data2"></nvd3>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<h4>負債總計(約當台幣): {{FuAll| number : 0}}</h4>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div class="gv_tab_sc">
+										<table>
+											<thead>
+												<tr>
+													<th>負債類型</th>
+													<th>金額(台幣)</th>
+												</tr>
+											</thead>
+								
+											<tbody>
+												<tr>	
+													<td ng-if="Fu1 == 0">分期型房貸</td>	
+													<td ng-if="Fu1 > 0"><a href="#" onclick="return false" ng-click="getCustHomeInclude1(0)">分期型房貸</a></td>
+													<td style="text-align: right;">{{Fu1 | number : 2}}</td>										
+												</tr>
+												<tr>	
+													<td ng-if="Fu3 == 0">信用貸款</td>
+													<td ng-if="Fu3 > 0"><a href="#" onclick="return false" ng-click="getCustHomeInclude1(2)">信用貸款</a></td>
+													<td style="text-align: right;">{{Fu3 | number : 2}}</td>
+												</tr>
+												<tr>	
+													<td ng-if="Fu2 == 0">循環型貸款</td>
+													<td ng-if="Fu2 > 0"><a href="#" onclick="return false" ng-click="getCustHomeInclude1(1)">循環型貸款</a></td>
+													<td style="text-align: right;">{{Fu2 | number : 2}}</td>
+												</tr>
+												<tr>	
+													<td ng-if="Fu4 == 0">就學貸款</td>
+													<td ng-if="Fu4 > 0"><a href="#" onclick="return false" ng-click="getCustHomeInclude1(3)">就學貸款</a></td>
+													<td style="text-align: right;">{{Fu4 | number : 2}}</td>
+												</tr>
+												<tr>	
+													<td ng-if="Fu5 == 0">留學貸款</td>
+													<td ng-if="Fu5 > 0"><a href="#" onclick="return false" ng-click="getCustHomeInclude1(4)">留學貸款</a></td>
+													<td style="text-align: right;">{{Fu5 | number : 2}}</td>
+												</tr>
+												<tr>	
+													<td ng-if="Fu6 == 0">存單質借</td>
+													<td ng-if="Fu6 > 0"><a href="#" onclick="return false" ng-click="getCustHomeInclude1(6)">存單質借</a></td>
+													<td style="text-align: right;">{{Fu6 | number : 2}}</td>
+												</tr>				
+												<tr ng-if="Fu7 !='0'">	
+													<td>個人週轉金貸款</td>
+													<td style="text-align: right;">{{Fu7 | number : 2}}</td>
+												</tr>
+												<tr ng-if="Fu8 !='0'">	
+													<td>企業貸款</td>
+													<td style="text-align: right;">{{Fu8 | number : 2}}</td>
+												</tr>
+												<tr>	
+													<td><a href="" onclick="return false" ng-click="getCustHomeInclude1(5)">信用卡本期帳單剩餘應繳金額</a></td>
+													<td style="text-align: right;">{{dataList1 | number : 2}}</td>
+												</tr>
+												<!-- 
+												<tr>	
+													<td>信用卡未出帳單消費金額</td>
+													<td style="text-align: right;">{{dataList2 | number : 2}}</td>
+												</tr> -->
+											</tbody>
+										</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

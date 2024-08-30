@@ -1,0 +1,109 @@
+<style>
+.modal-dialog.CRM311_custEdit {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM311/CRM311_custEdit.js"></script>
+<div ng-controller="CRM311custEditController" ng-cloak>
+	<div class="modal-dialog CRM311_custEdit">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請輸入最適客戶數設定</h4>
+			</div>
+			<div class="modal-body">
+				<table>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-4">理專職級</th>
+						<td class="col-md-6 tdpadding">
+							<e-combobox id="aoJob" 
+							ng-datasource="AO_JOB_RANK"
+							ng-model="inputVO.cust_ao_job_rank"
+		   					ng-validate="true" 
+		   					ng-readonly="true" 
+		   					ng-editable="true"
+		   					ng-format="F3"
+		   					ng-required="false"
+		   					ng-disabled = "inputVO.ao_ao_job_rank != null || inputVO.ao_ao_job_rank != ''"
+		   					style="line-height:20px;" />
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-4">經營等級</th>
+						<td class="col-md-6 tdpadding">
+							<e-combobox id="checked" 
+							ng-paramtype="CRM.VIP_DEGREE" 
+							ng-model="inputVO.vip_degree"
+		   					ng-validate="true" 
+		   					ng-readonly="true" 
+		   					ng-editable="true"
+		   					ng-format="F3"
+		   					ng-required="false"
+		   					ng-disabled = "inputVO.ao_ao_job_rank != null || inputVO.ao_ao_job_rank != ''"
+		   					style="line-height:20px;" />
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-4">等級客戶數上限</th>
+						<td class="col-md-6 tdpadding">
+							<input class="form-control" 
+		   					type="text" 
+		   					id="txnCode" name="txnCode" 
+		   					ng-model="inputVO.cust_no_limit_up" 
+		   					e-input-limit="N" maxLength="5"/>
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-4">客戶數彈性(%)</th>
+						<td class="col-md-6 tdpadding">
+							<input class="form-control" 
+		   					type="text" 
+		   					id="txnCode" name="txnCode" 
+		   					ng-model="inputVO.cust_no_flex_prcnt" 
+		   					e-input-limit="N" maxLength="3"/>
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-4"></th>
+						<td class="col-md-6 tdpadding">
+							<p>(總客戶數已達上限，但日餘額尚未達上限時，彈性增加客戶數%設定)</p>
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-4">總客戶數上限(人)</th>
+						<td class="col-md-6 tdpadding">
+							<input class="form-control" 
+		   					type="text" 
+		   					id="txnCode" name="txnCode"  
+		   					ng-model="inputVO.ttl_cust_no_limit_up" 
+		   					ng-readonly="true"
+		   					maxlength="100"/>
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+				<div class="search_box_btn text-center">
+		   			<button type="button" class="btn btn-primary" ng-click="custmodify()">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+		   		</div>
+			</div>
+		</div>
+	</div>
+</div>

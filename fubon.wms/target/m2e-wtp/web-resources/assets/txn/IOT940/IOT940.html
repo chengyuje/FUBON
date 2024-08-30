@@ -1,0 +1,84 @@
+<style>
+.modal-dialog.IOT940 {
+	width: 1000px; 
+}
+.table_title{
+	font-size: medium;
+	font-style: normal;
+	
+}
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+table{
+	font-size: small;
+	font-weight: bold;
+}
+div{
+	font-size: small;
+	font-weight: bold;
+}
+input:required:invalid{
+ 	border-color: red;
+
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT940/IOT940.js"></script>
+<div ng-controller="IOT940Controller" ng-cloak>
+	<div class="modal-dialog IOT940">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">視訊投保錄音錄影作業檢核表</h4>
+			</div>
+			<div class="modal-body" style="overflow: scroll;">
+				<div>
+					<span>要保人ID：{{inputVO.CUST_ID}}</span><br/>
+					<span>要保書編號：{{inputVO.INS_ID}}</span><br/><br/>
+					<span>■ 執行視訊投保錄影查檢時，請依下表確實逐項核對錄影內容是否完成包含下列要件</span>
+				</div>
+				<div class="gv_tab_sc">
+		 			<table style="text-align:center;">
+						<tr style="background-color:#eeeeee;">
+							<td style="width:200px;">核對項目：</td>
+							<td style="width:80px;" ng-repeat="colStep in CHK_STEP_LIST track by $index">{{colStep.LABEL}}</td>
+						</tr>
+						<tr ng-repeat="rowCode in CHK_CODE_LIST track by $index" style="align:center;">
+							<td style="text-align:left;">{{rowCode.LABEL}}</td>
+							<td ng-repeat="ans in CHK_ANS_LIST track by $index" ng-if="rowCode.DATA == (ans.DATA.length<3 ? ans.DATA.substring(1,2) : ans.DATA.substring(1,3))">
+								<input ng-if="rowCode.DATA != '97' && rowCode.DATA != '98' && rowCode.DATA != '99'"
+										class="bLarger" type="radio" name={{ans.DATA}} ng-model="inputVO.CHK_YN_LIST[ans.DATA].DATA" value="Y" 
+										ng-disabled="ans.DATA.substring(0,1) != inputVO.CHKLIST_TYPE">
+										<span ng-if="rowCode.DATA != '97' && rowCode.DATA != '98' && rowCode.DATA != '99'">通過&nbsp;&nbsp;</span>
+								<input ng-if="rowCode.DATA != '97' && rowCode.DATA != '98' && rowCode.DATA != '99'"
+										class="bLarger" type="radio" name={{ans.DATA}} ng-model="inputVO.CHK_YN_LIST[ans.DATA].DATA" value="N" 
+										ng-disabled="ans.DATA.substring(0,1) != inputVO.CHKLIST_TYPE">
+										<span ng-if="rowCode.DATA != '97' && rowCode.DATA != '98' && rowCode.DATA != '99'">不通過</span>
+								<textarea ng-if="rowCode.DATA == '97'"
+										class="bLarger" type="text" name={{ans.DATA}} ng-model="inputVO.CHK_YN_LIST[ans.DATA].DATA" 
+										ng-disabled="ans.DATA.substring(0,1) != inputVO.CHKLIST_TYPE" style="width:90%;height: 50px" maxlength="100"></textarea>
+								<input ng-if="rowCode.DATA == '98'"
+										class="bLarger" type="text" name={{ans.DATA}} ng-model="inputVO.CHK_YN_LIST[ans.DATA].DATA" 
+										ng-disabled="true" style="text-align:center; width:90%;">
+								<input ng-if="rowCode.DATA == '99'"
+										class="bLarger" type="text" name={{ans.DATA}} ng-model="inputVO.CHK_YN_LIST[ans.DATA].DATA" 
+										ng-disabled="true" style="text-align:center; width:90%;">
+							</td>
+						</tr>
+					</table>
+								
+		 		</div>
+		 		<div class="modal-footer" style="text-align:center;">
+		 			<button ng-click="save()" class="btn btn-info"data-dismiss="modal" ng-disabled="inputVO.CHKLIST_TYPE != '1' && inputVO.CHKLIST_TYPE != '2' && inputVO.CHKLIST_TYPE != '3'">儲存</button> 
+			        <button ng-click="closeThisDialog('cancel')" class="btn btn-info"data-dismiss="modal">關閉</button> 
+		        </div>
+			</div>
+		</div>
+	</div>
+</div>

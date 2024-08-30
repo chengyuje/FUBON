@@ -1,0 +1,90 @@
+
+<!-- 結果區 -->
+<script type="text/javascript" src="assets/txn/CRM830/CRM830.js"></script>
+
+<div class="CRM830" ng-controller="CRM830Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >保險分佈</div>
+		</div>
+		<div class="panel_content">
+			<div>
+				<table width="100%">
+					<!-- 總計 -->
+					<tr>
+						<td></td>
+						<td>
+							<div class="gv_tab_sc scroll_y" style="height:80px;white-space: nowrap;">
+							<table>
+								<tr>
+									<td width="30%"><a href="#" onclick="return false" ng-click="detail('all', 'all')">保險總計(約當台幣):</a></td>
+									<td width="70%" align="right">{{ getTotal()|number:0}}</td>
+								</tr>
+							</table>
+							</div>
+						</td>
+					</tr>
+					<!-- 北富銀 -->
+					<tr>
+						<td width="55%">
+							<!-- 繪圖 -->
+        					<nvd3 options="options" data="data"></nvd3>
+						</td>
+						
+						<td width="45%">
+						<div class="gv_tab_sc scroll_y" style="height:300px;white-space: nowrap;">
+							<table>
+								<thead>
+									<tr><th colspan="2">富壽</th></tr>
+									<tr>
+										<th>保險類型</th>
+										<th>累積實繳保費(約當台幣)</th>
+									</tr>
+								</thead>
+								
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in resultList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">	
+										<td ><a href="#" onclick="return false" ng-click="detail(row, '1')">{{row.INS_TYPE | mapping:insTypeList:'F3'}}</a></td>
+										<td align="right">{{row.TOTAL_INS_AMT_TWD|number:0}}</td>
+									</tr>
+
+								</tbody>
+							</table>
+						</div>
+						</td>
+					</tr>
+					<!-- 日盛保代 -->
+					<tr>
+						<td width="55%">
+							<!-- 繪圖 -->
+        					<nvd3 options="optionsJSB" data="dataJSB"></nvd3>
+						</td>
+						
+						<td width="45%">
+							<div class="gv_tab_sc scroll_y" style="height:300px;white-space: nowrap;">
+								<table>
+									<thead>
+										<tr><th colspan="2">非富壽</th></tr>
+										<tr>
+											<th>保險類型</th>
+											<th>累積實繳保費(約當台幣)</th>
+										</tr>
+									</thead>
+									
+									<tbody>
+										<tr class="repeat-row" ng-repeat="row in resultListJSB | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">	
+											<td ><a href="#" onclick="return false" ng-click="detail(row, '2')">{{row.INS_TYPE | mapping:insTypeList:'F3'}}</a></td>
+											<td align="right">{{row.TOTAL_INS_AMT_TWD|number:0}}</td>
+										</tr>
+	
+									</tbody>
+								</table>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

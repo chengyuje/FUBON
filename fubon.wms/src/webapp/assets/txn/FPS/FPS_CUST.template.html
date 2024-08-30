@@ -1,0 +1,103 @@
+<style>
+  .table.FPS200Cust tbody tr td {
+    padding: .5em 1em .5em 0;
+    word-wrap: break-word;
+  }
+
+  .table.FPS200Cust tbody tr th {
+    padding: .5em 0 .5em 1em;
+    width: 20%;
+  }
+
+  .table.FPS200Cust tbody tr td {
+    text-align: right;
+  }
+
+  .FPS200Cust td:not(:last-of-type) {
+    border-right: .5px solid #e1e1e1;
+  }
+
+</style>
+
+<div>
+  <!-- banner -->
+  <table class="table FPS200Cust"
+         style="table-layout: fixed;margin: 0;"
+         ng-if="!isPrint">
+    <tr>
+      <th style="width:35%">客戶姓名</th>
+      <td style="width:60%" ng-bind="custInfo.CUST_NAME"></td>
+      <th style="width:35%">年齡</th>
+      <td style="width:60%" ng-bind="custInfo.AGE"></td>
+      <th style="width:35%">KYC等級/效期</th>
+      <td style="width:60%">
+        <span ng-bind="custInfo.KYC_LEVEL"></span>
+        <span ng-show="custInfo.KYC_DUE_DATE">/</span>
+        <span ng-bind="toJsDate(custInfo.KYC_DUE_DATE) | date:'yyyy.MM.dd'"></span>
+      </td>
+    </tr>
+    <tr>
+      <th style="width:35%">OBU註記</th>
+      <td style="width:60%">
+        <span ng-bind="custInfo.OBU_FLAG"></span>
+      </td>
+      <th style="width:35%">專業投資人/效期</th>
+      <td style="width:60%">
+        <span ng-if="custInfo.CUST_PRO_FLAG && custInfo.CUST_PRO_FLAG != 'N'">Y</span>
+        <span ng-if="custInfo.CUST_PRO_FLAG == 'N'">N</span>
+        <span ng-show="custInfo.CUST_PRO_DATE">/</span>
+        <span ng-bind="toJsDate(custInfo.CUST_PRO_DATE) | date:'yyyy.MM.dd'"></span>
+      </td>
+      <th style="width:35%">薪資戶</th>
+      <td style="width:60%" ng-bind="custInfo.SAL_COMPANY">
+        <!-- <flags ng-if="custInfo.SAL_COMPANY == 'Y'">是</flags>
+        <flags ng-if="custInfo.SAL_COMPANY == 'N'">否</flags> -->
+      </td>
+    </tr>
+    <tr>
+      <th style="width:35%">信託推介同意</th>
+      <td style="width:60%" ng-bind="custInfo.SIGN_AGMT_YN"></td>
+      <th style="width:35%">E-mail</th>
+      <td style="width:60%" ng-bind="custInfo.EMAIL"></td>
+      <th></th>
+      <td></td>
+    </tr>
+    <tr ng-if="false">
+      <!-- 資料預計8/1上線，未上線前先隱藏 -->
+      <th>衍商推介同意</th>
+      <td>SOW</td>
+      <th></th>
+      <td></td>
+      <th></th>
+      <td></td>
+    </tr>
+  </table>
+  <!-- print -->
+  <table class="table FPS200Cust"
+         style="table-layout: fixed;margin: 0;"
+         ng-if="isPrint">
+    <tr>
+      <th width="15%">客戶姓名</th>
+      <td width="35%"
+          ng-bind="custInfo.maskedCUST_NAME||custInfo.CUST_NAME"></td>
+      <th width="15%">E-mail</th>
+      <td width="35%"
+          ng-bind="custInfo.maskedEMAIL||custInfo.EMAIL"></td>
+    </tr>
+    <tr>
+      <th width="15%">KYC等級/效期</th>
+      <td width="35%">
+        <span ng-bind="custInfo.KYC_LEVEL"></span>
+        <span ng-show="custInfo.KYC_DUE_DATE">/</span>
+        <span ng-bind="toJsDate(custInfo.KYC_DUE_DATE) | date:'yyyy.MM.dd'"></span>
+      </td>
+      <th width="15%">專業投資人/效期</th>
+      <td width="35%">
+        <span ng-if="custInfo.CUST_PRO_FLAG && custInfo.CUST_PRO_FLAG != 'N'">Y</span>
+        <span ng-if="custInfo.CUST_PRO_FLAG == 'N'">N</span>
+        <span ng-show="custInfo.CUST_PRO_DATE">/</span>
+        <span ng-bind="toJsDate(custInfo.CUST_PRO_DATE) | date:'yyyy.MM.dd'"></span>
+      </td>
+    </tr>
+  </table>
+</div>

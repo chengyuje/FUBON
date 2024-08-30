@@ -1,0 +1,71 @@
+<style>
+.modal-dialog.CRM3101_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 500px;
+	height: auto;
+}
+</style>
+<div ng-controller="CRM3101_UPLOADController" ng-cloak>
+	<div class="modal-dialog CRM3101_UPLOAD">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請上傳分流名單檔案</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">名單名稱：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="list_name" name="list_name" ng-model="inputVO.list_name" e-length-limit="15" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.list_name.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入名單名稱</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">選擇上傳名單檔案：</th>
+							<td class="col-md-7 tdpadding">
+								<e-upload success="uploadFinshed(name,rname)"></e-upload>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="!inputVO.realfileName">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請上傳名單檔案</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">選擇上傳分行檔案：</th>
+							<td class="col-md-7 tdpadding">
+								<e-upload success="uploadFinshed2(name,rname)"></e-upload>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="!inputVO.realfileName2">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請上傳分行檔案</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

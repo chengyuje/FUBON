@@ -1,0 +1,1032 @@
+<style>
+.table_title{
+	font-size: medium;
+	font-style: normal;
+
+}
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+table{
+	font-size: small;
+	font-weight: bold;
+}
+div{
+	font-size: small;
+	font-weight: bold;
+}
+input:required:invalid{
+ 	border-color: red;
+
+}
+.ins_icon{
+width:20px;
+height:20px;
+background-image: url("assets/images/magnifier.jpg");
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT110/IOT110.js"></script>
+<script type="text/javascript" src="assets/txn/IOT110/AllItems.js"></script>
+<script type="text/javascript" src="assets/txn/IOT110/ServiceNetwork.js"></script>
+<script type="text/javascript" src="assets/txn/IOT110/InsAdministratForm.js"></script>
+<script type="text/javascript" src="assets/txn/IOT160/IOT160.js"></script>
+<script type="text/javascript" src="assets/txn/IOT400/IOT400.js"></script>
+<script type="text/javascript" src="assets/txn/IOT910/IOT910.js"></script>
+<script type="text/javascript" src="assets/txn/IOT930/IOT930.js"></script>
+<script type="text/javascript" src="assets/txn/IOT940/IOT940.js"></script>
+<script type="text/javascript" src="assets/txn/IOT950/IOT950.js"></script>
+<script type="text/javascript" src="assets/txn/IOT960/IOT960.js"></script>
+<div ng-controller="IOT110Controller" ng-cloak>
+    <div class="tfb_content">
+      <div class="tfb_content_icon"></div>
+      <div class="tfb_content_tit">
+      	<img src="assets/images/icon/tfb_icon_a15.gif">要保人保險購買檢核
+      </div>
+    </div>
+    <!--Content of the panel-->
+    <div class="panel_content">
+    	<div ng-hide="hideTable=='true'" class="gv_tab_sc scroll_y">
+    		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+    		<div>
+    			常用連結:
+	    		<a ng-href="http://eip2.fubon.com/sites/ttw/WMG/DocLib10/Forms/AllItems.aspx" target="_blank">保險商品完整包</a>&nbsp;
+	    		<a ng-href="https://agent.fubonlife.com.tw" target="_blank">保經代服務網</a>&nbsp;
+	    		<a ng-href="http://eip2.fubon.com/sites/ttw/WMG/DocLib14/Forms/AllItems.aspx" target="_blank">保險行政表單</a>
+	    		<a ng-href="doc/IOT/IOT_DOC_001.pdf" target="_blank">新契約親晤親簽暫行措施同意聲明書(客戶)</a>
+	    		<a ng-href="doc/IOT/IOT_DOC_002.pdf" target="_blank">保費資金來源話術</a>
+    		</div>
+    		<br>
+    		<div style="margin-top: 1%;margin-bottom: 1%; display: inline; width:300px;">
+    			*保險交易項目:
+    			<e-combobox id="regType"
+					ng-paramtype="IOT.TRADE_TYPE" ng-model="inputVO.REG_TYPE"
+					ng-validate="false" ng-format="F3" ng-required="true" width="180px" ng-readonly="noUpdate || viewOnly"/>
+					(<a style="color: red;">*為必要輸入欄位</a>)
+    		</div>
+    		<div style="display: inline;margin-left: 5%;">
+	    		適合度檢核編號:
+		    	<input id="prematchSeq" name="prematchSeq" type="text" ng-model="inputVO.PREMATCH_SEQ" ng-disabled="true">
+	    	</div>
+	    	<div style="display: inline;margin-left: 5%;" ng-show="inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE=='1' && brhmgrAuthing">
+	    		<button type="button" ng-click="Doc_print('Y')" class="btn btn-info">檢視行動投保要保書</button>
+	    	</div>
+	    	<div style="display: inline;margin-left: 5%;" ng-show="inputVO.MAPPVIDEO_YN == 'Y'">
+	    		<button type="button" class="btn btn-info" ng-click="openMappVideoList()">視訊簽單影像</button>
+	    	</div>
+	    	<div style="display: inline;" ng-show="inputVO.MAPPVIDEO_YN == 'Y'">
+	    		<button type="button" class="btn btn-info" ng-click="openMappVideoChkItems()">影像品質檢核項目</button>
+	    	</div>
+	    	<div>&nbsp;</div>
+    		<div style="margin-top: 1%;margin-bottom: 1%; display: inline; padding-right:100px;" ng-show="inputVO.REG_TYPE=='1'">
+	    		*要保書類型:&nbsp;&nbsp;&nbsp;
+		    	<e-combobox id="reg_type" name="reg_type"
+		          	ng-paramtype="IOT.OTH_TYPE_110"
+		           	ng-model="inputVO.OTH_TYPE"
+		           	ng-validate="false"
+					ng-format="F3"
+					ng-required="true"
+					width="80%"
+					ng-change="chgOthType();"
+					style="line-height:20px;"
+					ng-readonly="noUpdate || viewOnly" />
+	    	</div>
+	    	<div style="display: inline;margin-left: 5%;" ng-show="inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE=='1'">
+	    		*案件編號:&nbsp;
+		    	<input ng-blur="getCaseIDInfo(); getMAPPVideoChkType();" id="case_id" name="case_id" type="text" placeholder="請輸入..." 
+		    			ng-model="inputVO.CASE_ID" required="requiredCASEID" ng-disabled="viewOnly || noUpdate || caseIdDisabled || inputVO.DATA_SHR_YN == 'Y'">
+		    	<span>(App請輸入同意書右下角J開頭編碼，套表列印請輸入要保書右下角J開頭編碼)</span>
+	    	</div>
+	    	<div>&nbsp;</div>
+	    	<div style="margin-top: 1%;margin-bottom: 1%; display: inline; padding-right:100px;" ng-if="inputVO.REG_TYPE=='2' || inputVO.REG_TYPE=='3'" >
+	    		*進件來源:&nbsp;&nbsp;&nbsp;
+    			<input type="radio" name="fbComYn" ng-model="inputVO.FB_COM_YN" value="Y" ng-change="fnComYnChange();" ng-disabled="noUpdate || viewOnly">&nbsp;富壽&nbsp;&nbsp;
+    			<input type="radio" name="fbComYn" ng-model="inputVO.FB_COM_YN" value="N" ng-change="fnComYnChange();" ng-disabled="noUpdate || viewOnly">&nbsp;非富壽
+    		</div>
+    		<div style="display: inline;margin-left: 5%;" ng-if="inputVO.REG_TYPE=='2' || inputVO.REG_TYPE=='3'" >
+    			*保險公司：&nbsp;&nbsp;&nbsp;
+                <e-combobox id="insuranceCoSerialNum" name="insuranceCoSerialNum"
+                                            ng-datasource="mappingSet['COMPANY']"
+                                            ng-model="inputVO.COMPANY_NUM"
+                                            ng-validate="false"
+                                            ng-readonly="false"
+                                            ng-editable="false"
+                                            ng-disabled="noUpdate || viewOnly"
+                                            ng-format="F3"
+                                            width="360px"
+                                            style="line-height:20px;"
+                                            ng-change="companyChange()"
+                                            required
+                                />
+            </div>
+	    	<div>&nbsp;</div>
+			<table ng-show="(inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE != '') || inputVO.REG_TYPE=='2'">
+				<tr>
+					<th colspan="6" style="text-align: left;" class="table_title" ng-show="inputVO.REG_TYPE=='1'">一、要/被保人/繳款人基本資訊</th>
+					<th colspan="6" style="text-align: left;" class="table_title" ng-show="inputVO.REG_TYPE=='2'">一、要/被保人基本資訊</th>
+					<th colspan="6" style="text-align: left;" class="table_title" ng-show="inputVO.REG_TYPE=='3'">一、要/被保人/保單基本資訊</th>
+				</tr>
+				<tr ng-show="inputVO.REG_TYPE=='2'">
+    				<td>*保單號碼:</td>
+    				<td colspan = "5">
+    					<span>
+    						<input ng-blur="POLICY_NO_Query()" id="policy_no1" name="policy_no1" type="text" maxlength="20" style="width:20%; text-transform: uppercase;" ng-model="inputVO.POLICY_NO1" ng-required="false" ng-disabled="viewOnly" ng-required="true">
+			    			-
+			    			<input ng-blur="POLICY_NO_Query()" id="policy_no2" name="policy_no2" type="text" maxlength="2" style="width: 5%;" ng-model="inputVO.POLICY_NO2" e-input-limit="N" ng-required="false" ng-disabled="viewOnly">
+			    			-
+			    			<input ng-blur="POLICY_NO_Query()" id="policy_no3" name="policy_no3" type="text" maxlength="2" style="width: 5%; text-transform: uppercase;" ng-model="inputVO.POLICY_NO3" ng-required="false" ng-disabled="viewOnly">
+    					</span>
+    				</td>
+    			</tr>
+				<tr>
+    				<td>*要保人ID:</td>
+    				<td>
+    					<input type="text" id="custId" name="custId" ng-blur="getInfo('CUST')" ng-model="inputVO.CUST_ID" ng-required="true" style="text-transform: uppercase;"
+    						ng-disabled="noUpdate || viewOnly">
+    				</td>
+    				<td>*要保人姓名:</td>
+    				<td>
+    					<input type="text" id="proposerName" name="proposerName" ng-model="inputVO.PROPOSER_NAME" style="text-transform: uppercase;" ng-required="true" ng-disabled="viewOnly">
+    				</td>
+    				<td>*要保人生日:</td>
+    				<td>
+    					<div class="input-group datebox datewidth" style="width: 60%;">
+							<input type="text" id="proposerBirth" name="proposerBirth"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.PROPOSER_BIRTH"
+								is-open="model.a" ng-blur="checkyear()"
+								alt-input-formats="altInputFormats"
+								ng-readonly="true"
+								ng-required="true"
+								ng-disabled="viewOnly"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="viewOnly">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+						</div>
+    				</td>
+    			</tr>
+    			<tr ng-show="inputVO.REG_TYPE=='2'">
+					<td style="width: 10%;">要保人戶況檢核:</td>
+    				<td>{{inputVO.PROPOSER_CM_FLAG | mapping:mappingSet['IOT.CM_FLAG']:F3}}</td>
+    				<td style="width: 10%;">KYC等級/效期:</td>
+    				<td colspan="3">{{inputVO.CUST_RISK}}/{{inputVO.CUST_RISK_DUE | date:"yyyy-MM-dd"}}</td>
+    			</tr>
+			    <tr>
+    				<td>法定代理人ID:</td>
+    				<td>
+    					<input type="text" id="repID" name="repID" ng-blur="getInfo('REPRESET')" ng-model="inputVO.REPRESET_ID" style="text-transform: uppercase;" ng-required="checkseveryear" ng-disabled="viewOnly">
+    				</td>
+    				<td>法定代理人姓名:</td>
+    				<td>
+    					<input type="text" id="represetName" name="represetName" ng-model="inputVO.REPRESET_NAME" style="text-transform: uppercase;" ng-required="checkseveryear" ng-disabled="viewOnly">
+    				</td>
+    				<td>與要保人關係:</td>
+    				<td>
+    					<e-combobox id="rltBtProRep" width="100px"
+									ng-model="inputVO.RLT_BT_PROREP" ng-validate="false"
+						   			ng-readonly="false" ng-editable="false"
+						   			ng-format="F3" ng-required="checkseveryear"
+						   			ng-paramtype="IOT.RELATED_WITH_PROPOSER"
+						   			ng-disabled="viewOnly" />
+    				</td>
+    			</tr>
+				<tr>
+    				<td colspan="1">
+    					<input type="checkbox" ng-model="chkSameCustId" ng-change="toSameCustId()" ng-disabled="viewOnly">與要保人相同
+    				</td>
+    				<td colspan="5"></td>
+    			</tr>
+    			<tr>
+    				<td><span ng-show="inputVO.REG_TYPE=='1'">*</span>被保人ID:</td>
+    				<td>
+    					<input type="text" id="insuredId" name="insuredId" ng-blur="getInfo('INSURED')" ng-model="inputVO.INSURED_ID" style="text-transform: uppercase;" 
+    						ng-required="inputVO.REG_TYPE=='1'" ng-disabled="viewOnly || chkSameCustId || (noUpdate && inputVO.CALLOUT_YN == 'Y')">
+    				</td>
+    				<td><span ng-show="inputVO.REG_TYPE==1">*</span>被保人姓名:</td>
+    				<td>
+    					<input type="text" id="insuredName" name="insuredName" ng-model="inputVO.INSURED_NAME" style="text-transform: uppercase;" ng-required="inputVO.REG_TYPE=='1'" ng-disabled="viewOnly || chkSameCustId">
+    				</td>
+    				<td>*被保人生日:</td>
+    				<td>
+    					<div class="input-group datebox datewidth" style="width: 60%;">
+							<input type="text" id="insuredBirth" name="insuredBirth"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.INSURED_BIRTH"
+								is-open="model.d"
+								alt-input-formats="altInputFormats"
+								ng-readonly="true"
+								ng-required="true"
+								ng-disabled="viewOnly"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'d')" ng-disabled="viewOnly">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+						</div>
+    				</td>
+    			</tr>
+    			<tr ng-show="inputVO.REG_TYPE=='1'">
+    				<td>*繳款人與要保人關係:</td>
+    				<td colspan="5">
+    					<e-combobox id="rltBtProPay" width="150px"
+									ng-model="inputVO.RLT_BT_PROPAY" ng-validate="false"
+						   			ng-readonly="false" ng-editable="false"
+						   			ng-format="F3" ng-required="checkseveryear"
+						   			ng-paramtype="IOT.PAYER_REL_PROPOSER"
+						   			ng-disabled="viewOnly"
+						   			ng-change = "chgRltBtPropay()" />
+    				</td>
+    			</tr>
+    			<tr ng-show="inputVO.REG_TYPE=='1'">
+    				<td>*繳款人ID:</td>
+    				<td>
+    					<input type="text" id="payerId" name="payerId" ng-blur="getInfo('PAYER')" ng-model="inputVO.PAYER_ID" ng-required="true" 
+    						style="text-transform: uppercase;" ng-disabled="viewOnly || (noUpdate && inputVO.CALLOUT_YN == 'Y')">
+    				</td>
+    				<td>*繳款人姓名:</td>
+    				<td>
+    					<input type="text" id="payerName" name="payerName" ng-model="inputVO.PAYER_NAME" style="text-transform: uppercase;" ng-required="true" ng-disabled="viewOnly">
+    				</td>
+    				<td>*繳款人生日:</td>
+    				<td>
+    					<div class="input-group datebox datewidth" style="width: 60%;">
+							<input type="text" id="payerBirth" name="payerBirth"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.PAYER_BIRTH"
+								is-open="model.e"
+								alt-input-formats="altInputFormats"
+								ng-readonly="true"
+								ng-required="true"
+								ng-disabled="viewOnly"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'e')" ng-disabled="viewOnly">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+						</div>
+    				</td>
+    			</tr>
+			</table>
+			<table ng-show="(inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE != '') || inputVO.REG_TYPE=='2'">
+				<tr>
+					<th colspan="6" style="text-align: left;" class="table_title">二、商品資訊</th>
+				</tr>
+				<tr>
+    				<td>*險種代號:</td>
+    				<td>
+    					<input id="insprd_id" name="insprd_id" type="text" placeholder="請輸入..." ng-model="inputVO.INSPRD_ID" required="required" ng-disabled="noUpdate || viewOnly" style="text-transform: uppercase;" ng-blur="checkCNCTData()">
+		    			<button type="button" class="ins_icon" ng-click="Ins_query()" ng-disabled="noUpdate || viewOnly"></button>
+    				</td>
+    				<td>險種名稱:</td>
+    				<td>{{inputVO.INSPRD_NAME}}</td>
+    				<td ng-show="inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE != ''">
+    					<span>*躉繳/分期繳:</span>
+    				</td>
+    				<td ng-show="inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE != ''">
+		    			<e-combobox id="pay_type" name="pay_type"
+		                ng-paramtype="IOT.PAY_TYPE"
+		                ng-model="inputVO.PAY_TYPE"
+		                ng-validate="false"
+						ng-readonly="false"
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="true"
+						width="30%"
+						ng-change = "linkmop2()"
+						ng-disabled="INSPRD_Lock || viewOnly" />
+		    		</td>
+    			</tr>
+    			<tr ng-show="inputVO.REG_TYPE=='2'">
+    				<td>投資型屬性問卷分數:</td>
+		    		<td colspan="3">
+		    			<input id="inv_score" name="inv_score" type="text" placeholder="請輸入..." ng-model="inputVO.INV_SCORE" e-input-limit="NC" maxlength="2" ng-disabled="viewOnly">
+		    		</td>
+    			</tr>
+    			<tr ng-show="inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE != ''">
+    				<td>
+    					<span>*繳費年期:</span>
+    				</td>
+    				<td>
+    					{{inputVO.INSPRD_ANNUAL}}
+    				</td>
+    				<td>*實收保費(原幣):</td>
+		    		<td>
+		    			<input id="real_premium" name="real_premium" type="text" placeholder="請輸入..." ng-model="inputVO.REAL_PREMIUM" e-input-limit="NC" maxlength="11" required="required" ng-disabled="viewOnly || (noUpdate && inputVO.CALLOUT_YN == 'Y')">
+		    		</td>
+		    		<td>基本保費(原幣):</td>
+		    		<td>
+		    			<input id="real_premium" name="real_premium" type="text" placeholder="請輸入..." ng-model="inputVO.BASE_PREMIUM" e-input-limit="NC" maxlength="11" ng-disabled="viewOnly || (noUpdate && inputVO.CALLOUT_YN == 'Y')">
+		    		</td>
+    			</tr>
+    			<tr ng-show="inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE != ''">
+    				<td>*分期繳別:</td>
+    				<td>
+		    			<e-combobox id="mop2" name="mop2"
+		                ng-paramtype="IOT.MOP2"
+		                ng-model="inputVO.MOP2"
+		                ng-validate="false"
+						ng-readonly="false"
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="true"
+						width="30%"
+						ng-disabled="mop2lock || viewOnly || (noUpdate && inputVO.CALLOUT_YN == 'Y')"/>
+		    		</td>
+    				<td colspan="2">
+    					<span style="padding-right: 1%;">實際收益率 (臺幣 / 非年化):</span>{{inputVO.PRD_RATE}}
+    				</td>
+    				<td colspan="2">
+    					<span style="padding-right: 1%;">CNR收益率 (臺幣 / 非年化):</span>{{inputVO.CNR_RATE}}
+    				</td>
+    			</tr>
+    			<tr ng-show="inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE != ''">
+    				<td colspan="2">
+    					<span style="padding-right: 1%;">參考匯率:</span>{{inputVO.EXCH_RATE}}
+    				</td>
+    				<td colspan="2"><span style="padding-right: 1%;">非常態交易參考匯率:</span>{{inputVO.AB_EXCH_RATE}}</td>
+    				<td colspan="2">
+    					<span style="padding-right: 1%;">幣別:</span>{{inputVO.CURR_CD}}
+    				</td>
+    			</tr>
+    			<tr ng-show="inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE != ''">
+		    		<td>*業報書投保前三個月內有辦理解約:</td>
+		    		<td>
+		    			<e-combobox id="contractEndYN" name="contractEndYN"
+							ng-paramtype="COMMON.YES_NO_12"
+							ng-model="inputVO.CONTRACT_END_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="noUpdate && inputVO.CALLOUT_YN == 'Y'"/>
+		    		</td>
+		    		<td>*業報書投保前三個月內有辦理貸款或保險單借款:</td>
+		    		<td>
+		    			<e-combobox id="sInfitemLoanYN" name="sInfitemLoanYN"
+							ng-paramtype="COMMON.YES_NO_12"
+							ng-model="inputVO.S_INFITEM_LOAN_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="noUpdate && inputVO.CALLOUT_YN == 'Y'"/>
+		    		</td>
+		    		<td>*業報書保費來源為解約:</td>
+    				<td>
+		    			<e-combobox id="loanSource2YN" name="loanSource2YN"
+									ng-paramtype="COMMON.YES_NO"
+									ng-model="inputVO.LOAN_SOURCE2_YN"
+									ng-validate="false"
+									ng-readonly="false"
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									width="30%"
+									style="line-height:20px;"
+									ng-disabled="viewOnly || (noUpdate && inputVO.CALLOUT_YN == 'Y')" />
+		    		</td>
+				</tr>
+				<tr ng-show="inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE != ''">
+					<td>*要保書申請日:</td>
+		    		<td>
+		    			<div class="input-group datebox datewidth" style="width: 90%;">
+							<input type="text" id="applyDate" name="applyDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.APPLY_DATE"
+									is-open="model.b"
+									datepicker-options="bgn_sDateOptions"
+									ng-readonly="true"
+									ng-blur="applyDateChg()"
+									ng-required="true"
+									ng-disabled="noUpdate || viewOnly" />
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open_apply_date($event,'b')" ng-disabled="noUpdate || viewOnly">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+		    		</td>
+		    		<td>投資型屬性問卷分數:</td>
+		    		<td>
+		    			<input id="inv_score" name="inv_score" type="text" placeholder="請輸入..." ng-model="inputVO.INV_SCORE" e-input-limit="NC" maxlength="2" ng-disabled="viewOnly || (noUpdate && inputVO.CALLOUT_YN == 'Y')">
+		    		</td>
+		    		<td>*業報書保費來源為貸款/保單借款:</td>
+    				<td>
+		    			<e-combobox id="loanSourceYN" name="loanSourceYN"
+									ng-paramtype="COMMON.YES_NO"
+									ng-model="inputVO.LOAN_SOURCE_YN"
+									ng-validate="false"
+									ng-readonly="false"
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									width="30%"
+									style="line-height:20px;"
+									ng-disabled="viewOnly || (noUpdate && inputVO.CALLOUT_YN == 'Y')"
+									 />
+		    		</td>
+				</tr>
+				<tr>
+					<td colspan="6">
+						<button type="button" class="btn btn-info" ng-click="openFundLinkDialog()"
+							ng-disabled="inputVO.INSPRD_NAME == '' || inputVO.PRODUCT_TYPE == '1' || inputVO.PREMATCH_SEQ == ''">基金適配作業</button>
+					</td>
+				</tr>
+<!-- 				<tr> -->
+<!-- 					<td colspan="6"> -->
+<!-- 						<button type="button" class="btn btn-info" ng-click="openHNWCFundLinkDialog()">高資產投組適配</button> -->
+<!-- 					</td> -->
+<!-- 				</tr> -->
+			</table>
+			<table ng-show="inputVO.REG_TYPE=='1' && inputVO.OTH_TYPE != ''">
+				<tr>
+					<th colspan="8" style="text-align: left;" class="table_title">三、檢核資訊
+					<input type="checkbox" ng-model="chkCopyInsId" ng-change="copyInsIdData()" ng-disabled="viewOnly">請輸入欲複製說明的適合度檢核編號
+					<input ng-blur="copyInsIdData();" id="copyInsId" name="copyInsId" type="text" placeholder="請輸入..." ng-model="copyInsId" ng-disabled="viewOnly" maxlength="10">
+					</th>
+				</tr>
+				<tr>
+    				<td colspan="2">檢核試算日:{{ inputVO.MATCH_DATE | date:'yyyy-MM-dd'}}</td>
+    				<td colspan="2"></td>
+<!--     				<td colspan="2" ng-model="input.sysdate"></td> -->
+    				<td>*招攬人員編:</td>
+    				<td colspan="3">
+    					<input type="text" id="recruitId" name="recruitId" ng-blur="getInfo('RECRUIT')" ng-model="inputVO.RECRUIT_ID" ng-required="true" ng-disabled="!isHeadMgr">
+    				</td>
+    			</tr>
+				<tr>
+					<td style="width: 10%;">要保人戶況檢核:</td>
+    				<td>{{inputVO.PROPOSER_CM_FLAG | mapping:mappingSet['IOT.CM_FLAG']:F3}}</td>
+    				<td style="width: 10%;">KYC等級/效期:</td>
+    				<td>{{inputVO.CUST_RISK}}/{{inputVO.CUST_RISK_DUE | date:"yyyy-MM-dd"}}</td>
+    				<td style="width: 10%;">契撤案件:</td>
+    				<td colspan="3">
+    					<input type="checkbox" ng-model="inputVO.CANCEL_CONTRACT_YN" ng-false-value="'N'" ng-true-value="'Y'" ng-disabled="viewOnly">
+    				</td>
+    			</tr>
+    			<tr>
+					<td style="width: 10%;">要保人舊保單提領保額/保價日:</td>
+    				<td>{{inputVO.C_PREM_DATE | date:'yyyy-MM-dd'}}</td>
+    				<td style="width: 10%;">行內貸款申請日:</td>
+    				<td>{{inputVO.C_LOAN_APPLY_DATE | date:'yyyy-MM-dd'}}</td>
+    				<td style="width: 10%;">*要保人工作內容:</td>
+    				<td colspan="3"><input type="text" id="proposerWork" style="width: 100%; " maxlength="16" ng-model="inputVO.PROPOSER_WORK" ng-disabled="viewOnly || (noUpdate && inputVO.CALLOUT_YN == 'Y')" ng-required="true"></td>
+    			</tr>
+    			<tr>
+					<td style="width: 10%;">AML風險等級:</td>
+    				<td>{{inputVO.AML}}</td>
+    				<td style="width: 10%;">Pre-check結果:</td>
+    				<td colspan="5">{{inputVO.PRECHECK}}</td>
+    			</tr>
+    			<tr>
+					<td style="width: 10%;">*業報年收入(工作+其他):</td>
+    				<td><input type="text" id="proposerIncome1" style="width: 130px; " maxlength="18" e-input-limit="NUU" nuu1="14" nuu2="4" ng-model="inputVO.PROPOSER_INCOME1" ng-required="true" ng-disabled="viewOnly || (noUpdate && inputVO.CALLOUT_YN == 'Y')"> (萬元)</td>
+    				<td style="width: 10%;">行內KYC收入:</td>
+    				<td><input type="text" id="cKycIncome" style="width: 150px; " ng-model="inputVO.C_KYC_INCOME" ng-disabled="true"></td>
+    				<td style="width: 10%;">授信收入:</td>
+    				<td>{{inputVO.PROPOSER_INCOME3 | number:0}}</td>
+    				<td style="width: 10%;">最近撥貸日:</td>
+    				<td>{{inputVO.C_LOAN_CHK2_DATE | date:'yyyy-MM-dd'}}</td>
+    			</tr>
+    			<tr>
+					<td style="width: 10%;">保單借款檢核:<br>(透過本行送件)</td>
+    				<td>
+		    			<e-combobox id="cloanChk1YN" name="cloanChk1YN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.C_LOAN_CHK1_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+    				<td style="width: 10%;">行內貸款檢核:</td>
+    				<td >
+		    			<e-combobox id="cloanChk2YN" name="cloanChk2YN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.C_LOAN_CHK2_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+		    		<td style="width: 10%;">行內保單解約檢核:</td>
+    				<td >
+		    			<e-combobox id="cloanChk3YN" name="cloanChk3YN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.C_LOAN_CHK3_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+    				<td style="width: 10%;">定存不打折檢核:</td>
+    				<td >
+		    			<e-combobox id="ccdChkYN" name="ccdChkYN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.C_CD_CHK_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+    			</tr>
+    			<tr>
+					<td style="width: 10%;">行內負債(不含信用卡):</td>
+    				<td >{{inputVO.CUST_DEBIT | number:4}} (萬元)</td>
+    				<td style="width: 10%;">定存單解約/到期日:</td>
+    				<td>{{ inputVO.C_CD_DUE_DATE | date:'yyyy-MM-dd'}}</td>
+    				<td colspan="2"></td>
+				</tr>
+
+    			<tr>
+					<td style="width: 10%;">被保人戶況檢核:</td>
+    				<td >{{inputVO.INSURED_CM_FLAG | mapping:mappingSet['IOT.CM_FLAG']:F3}}</td>
+    				<td style="width: 10%;">行內貸款申請日:</td>
+    				<td>{{ inputVO.I_LOAN_APPLY_DATE | date:'yyyy-MM-dd'}}</td>
+    				<td style="width: 10%;">*被保人工作內容:</td>
+    				<td colspan="3"><input type="text" id="insuredWork" style="width: 100%; " maxlength="16" ng-model="inputVO.INSURED_WORK" ng-disabled="viewOnly || (noUpdate && inputVO.CALLOUT_YN == 'Y')" ng-required="true"></td>
+				</tr>
+				<tr>
+					<td style="width: 10%;">*業報年收入(工作+其他):</td>
+    				<td><input type="text" id="insuredIncome1" style="width: 130px; " maxlength="18" e-input-limit="NUU" nuu1="14" nuu2="4" ng-model="inputVO.INSURED_INCOME1" ng-required="true" ng-disabled="viewOnly || (noUpdate && inputVO.CALLOUT_YN == 'Y')"> (萬元)</td>
+    				<td style="width: 10%;">行內KYC收入:</td>
+    				<td><input type="text" id="iKycIncome" style="width: 150px; " ng-model="inputVO.I_KYC_INCOME" ng-disabled="true"></td>
+    				<td style="width: 10%;">授信收入:</td>
+    				<td>{{inputVO.INSURED_INCOME3 | number:0}}</td>
+    				<td style="width: 10%;">最近撥貸日:</td>
+    				<td>{{inputVO.I_LOAN_CHK2_DATE | date:'yyyy-MM-dd'}}</td>
+    			</tr>
+    			<tr>
+					<td style="width: 10%;">保單借款檢核:<br>(透過本行送件)</td>
+    				<td>
+		    			<e-combobox id="iloanChk1YN" name="iloanChk1YN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.I_LOAN_CHK1_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+    				<td style="width: 10%;">行內貸款檢核:</td>
+    				<td >
+		    			<e-combobox id="iloanChk2YN" name="iloanChk2YN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.I_LOAN_CHK2_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+		    		<td style="width: 10%;">行內保單解約檢核:</td>
+    				<td >
+		    			<e-combobox id="iloanChk3YN" name="iloanChk3YN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.I_LOAN_CHK3_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+    				<td style="width: 10%;">定存不打折檢核:</td>
+    				<td >
+		    			<e-combobox id="icdChkYN" name="icdChkYN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.I_CD_CHK_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+    			</tr>
+    			<tr>
+					<td style="width: 10%;">行內負債(不含信用卡):</td>
+    				<td >{{inputVO.INSURED_DEBIT | number:4}} (萬元)</td>
+    				<td style="width: 10%;">定存單解約/到期日:</td>
+    				<td>{{ inputVO.I_CD_DUE_DATE | date:'yyyy-MM-dd'}}</td>
+    				<td colspan="2"></td>
+				</tr>
+
+				<tr>
+					<td style="width: 10%;">繳款人戶況檢核:</td>
+    				<td >{{inputVO.PAYER_CM_FLAG | mapping:mappingSet['IOT.CM_FLAG']:F3}}</td>
+    				<td style="width: 10%;">行內貸款申請日:</td>
+    				<td >{{ inputVO.P_LOAN_APPLY_DATE | date:'yyyy-MM-dd'}}</td>
+    				<td style="width: 10%;">定存單解約/到期日:</td>
+    				<td>{{ inputVO.P_CD_DUE_DATE | date:'yyyy-MM-dd'}}</td>
+    				<td colspan="2"></td>
+				</tr>
+				<tr>
+					<td style="width: 10%;">保單借款檢核:<br>(透過本行送件)</td>
+    				<td>
+		    			<e-combobox id="loanChk1YN" name="loanChk1YN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.LOAN_CHK1_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+    				<td style="width: 10%;">行內貸款檢核:</td>
+    				<td >
+		    			<e-combobox id="loanChk2YN" name="loanChk2YN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.LOAN_CHK2_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+		    		<td style="width: 10%;">行內保單解約檢核:</td>
+    				<td >
+		    			<e-combobox id="loanChk3YN" name="loanChk3YN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.LOAN_CHK3_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+    				<td style="width: 10%;">定存不打折檢核:</td>
+    				<td >
+		    			<e-combobox id="cdChkYN" name="cdChkYN"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.CD_CHK_YN"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="30%"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+    			</tr>
+
+    			<tr ng-show="false">
+    				<td style="width: 10%;">年收入與行內徵審記錄不一致說明</td>
+    				<td colspan="7" width="82%"><textarea type="text" id="incomeRemark" style="width: 100%; " maxlength="300" ng-model="inputVO.INCOME_REMARK" ng-disabled="viewOnly"></textarea></td>
+    			</tr>
+
+    			<tr>
+    				<td style="width: 10%;">客戶保費來源/投資屬性說明</td>
+    				<td colspan="7" width="82%"><textarea type="text" id="loanSourceRemark" style="width: 100%; " maxlength="100" ng-model="inputVO.LOAN_SOURCE_REMARK" ng-disabled="viewOnly"></textarea></td>
+    			</tr>
+    			<tr>
+    				<td style="width: 10%;">要保人高齡銷售過程錄音序號</td>
+    				<td><input type="text" id="cSaleSeniorTransseq" maxlength="12" ng-model="inputVO.C_SALE_SENIOR_TRANSSEQ" ng-disabled="viewOnly"></td>
+    				<td style="width: 10%;">被保人高齡銷售過程錄音序號</td>
+    				<td><input type="text" id="iSaleSeniorTransseq" maxlength="12" ng-model="inputVO.I_SALE_SENIOR_TRANSSEQ" ng-disabled="viewOnly"></td>
+    				<td style="width: 10%;">繳款人高齡銷售過程錄音序號</td>
+    				<td><input type="text" id="pSaleSeniorTransseq" maxlength="12" ng-model="inputVO.P_SALE_SENIOR_TRANSSEQ" ng-disabled="viewOnly"></td>
+    				<td style="width: 10%;">高齡銷售過程錄音覆核選項:</td>
+    				<td>
+		    			<e-combobox id="seniorAuthOpt" name="seniorAuthOpt"
+							ng-paramtype="IOT.SENIOR_AUTH_OPT"
+							ng-model="inputVO.SENIOR_AUTH_OPT"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change="validateSeniorAuthOPT();"
+							width="150px"
+							style="line-height:20px;"
+							ng-disabled="!brhmgrAuthing"/>
+		    		</td>
+    			</tr>
+    			<tr>
+		    		<td style="width: 10%;">請檢核招攬人員針對高齡客戶是否有維護行內高齡客戶資訊觀察表:</td>
+    				<td>
+		    			<e-combobox id="seniorAuthOpt2" name="seniorAuthOpt2"
+							ng-paramtype="IOT.SENIOR_AUTH_OPT2"
+							ng-model="inputVO.SENIOR_AUTH_OPT2"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="150px"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+		    		<td style="width: 10%;">請檢核客戶資訊觀察表高齡客戶能力表現問項為8.無上述情形且金融認知問項為4.無上述情形之選項:</td>
+    				<td>
+		    			<e-combobox id="seniorAuthOpt3" name="seniorAuthOpt3"
+							ng-paramtype="IOT.SENIOR_AUTH_OPT3"
+							ng-model="inputVO.SENIOR_AUTH_OPT3"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="300px"
+							style="line-height:20px;"
+							ng-disabled="true"/>
+		    		</td>
+		    		<td style="width: 10%;">業務人員報告書附表_高齡客戶投保評估量表，評估結果及適合投保評估理由勾選項目為:</td>
+    				<td colspan="3">
+		    			<e-combobox id="seniorAuthOpt4" name="seniorAuthOpt4"
+							ng-paramtype="IOT.SENIOR_AUTH_OPT4"
+							ng-model="inputVO.SENIOR_AUTH_OPT4"
+							ng-validate="false"
+							ng-readonly="false"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change=""
+							width="250px"
+							style="line-height:20px;"
+							ng-disabled="!brhmgrAuthing"/>
+		    		</td>
+    			</tr>
+				<tr>
+    				<td style="width: 10%;">高齡客戶投保關懷說明</td>
+    				<td colspan="5" width="82%"><textarea type="text" id="seniorAuthRemarks" style="width: 100%; " maxlength="100" 
+    					ng-model="inputVO.SENIOR_AUTH_REMARKS" ng-disabled="!brhmgrAuthing || inputVO.SENIOR_AUTH_OPT3 == '2' || inputVO.SENIOR_AUTH_OPT3 == '1'"></textarea></td>
+    				<td style="width: 10%;">關懷主管員編</td>
+    				<td><input type="text" id="seniorAuthId" name="seniorAuthId" ng-model="inputVO.SENIOR_AUTH_ID" ng-disabled="!brhmgrAuthing || inputVO.SENIOR_AUTH_OPT3 == '2'" maxlength="10"></td>
+    			</tr>
+    			
+    			<tr>
+    				<td >
+    					<button type="button" class="btn btn-info" ng-click="checkFit('1')" ng-disabled="(inputVO.STATUS!='' && inputVO.STATUS!='1' && inputVO.STATUS!='4') || privilegeGroup!='FC'">適合度檢核</button>
+    				</td>
+    				<td >
+    					<button type="button" class="btn btn-info" ng-click="checkFit('2')" ng-disabled="inputVO.STATUS!='1' || privilegeGroup!='FC'">送出覆核</button>
+    				</td>
+    				<td>
+    					<button type="button" class="btn btn-info" ng-click="checkFit('3')" ng-disabled="!brhmgrAuthing">核可</button>
+    				</td>
+    				<td>
+    					<button type="button" class="btn btn-info" ng-click="checkFit('4')" ng-disabled="!(brhmgrAuthing || brhmgrAllowDeny)">退回</button>
+    				</td>
+    				<td colspan="3" ng-show="!fromIOT111">
+    					<button type="button" class="btn btn-info" ng-disabled="privilegeGroup!='FC'" ng-click="init();">新增下一筆</button>
+    				</td>
+    				<td colspan="3" ng-show="fromIOT111">
+    					<button type="button" class="btn btn-info" ng-click="back_page_btn();">回上一頁</button>
+    				</td>
+    				<td colspan="2">
+    					<button type="button" class="btn btn-info" ng-click="openCallReport();" 
+    						ng-disabled="inputVO.STATUS == '' || inputVO.REG_TYPE != '1' || inputVO.NEED_PREMIUM_TRANSSEQ_YN == 'N'">電訪預約/取消</button>
+    				</td>
+    			</tr>
+			</table>
+
+			<table ng-show="inputVO.REG_TYPE=='2'">
+				<tr>
+					<th colspan="6" style="text-align: left;" class="table_title">三、檢核資訊</th>
+				</tr>
+				<tr>
+    				<td colspan="2">檢核試算日:{{ date | date:'yyyy-MM-dd'}}</td>
+    				<td colspan="2"></td>
+<!--     				<td colspan="2" ng-model="input.sysdate"></td> -->
+    				<td colspan="2">招攬人員編:{{inputVO.RECRUIT_ID}}</td>
+    			</tr>
+				<tr>
+					<td style="width: 18%;">要保人戶況檢核:</td>
+    				<td>{{inputVO.PROPOSER_CM_FLAG | mapping:mappingSet['IOT.CM_FLAG']:F3}}</td>
+					<td style="width: 13%;">被保人戶況檢核:</td>
+    				<td>{{inputVO.INSURED_CM_FLAG | mapping:mappingSet['IOT.CM_FLAG']:F3}}</td>
+					<td style="width: 13%;">法代戶況檢核:</td>
+    				<td>{{inputVO.REPRESET_CM_FLAG | mapping:mappingSet['IOT.CM_FLAG']:F3}}</td>
+				</tr>
+				<tr>
+    				<td colspan="3">
+    					<button type="button" class="btn btn-info" ng-click="checkFit('1')" ng-disabled="inputVO.STATUS!='' || privilegeGroup!='FC'">適合度檢核</button>
+    				</td>
+    				<td colspan="3" ng-show="!fromIOT111">
+    					<button type="button" class="btn btn-info" ng-disabled="privilegeGroup!='FC'" ng-click="init();">新增下一筆</button>
+    				</td>
+    				<td colspan="2" ng-show="fromIOT111">
+    					<button type="button" class="btn btn-info" ng-click="back_page_btn();">回上一頁</button>
+    				</td>
+    			</tr>
+			</table>
+
+			<!-- 新增契約變更_要保人變更 -->
+			<table ng-show="inputVO.REG_TYPE=='3'">
+				<tr>
+					<th colspan="6" style="text-align: left;" class="table_title">一、要/被保人/保單基本資訊</th>
+				</tr>
+				<tr>
+    				<td>*保單號碼:</td>
+    				<td colspan = "3">
+    					<span>
+    						<input ng-blur="POLICY_NO_Query()" id="policy_no1" name="policy_no1" type="text" maxlength="20" style="width:20%; text-transform: uppercase;" ng-model="inputVO.POLICY_NO1" ng-required="false" ng-disabled="viewOnly" ng-required="true">
+			    			-
+			    			<input ng-blur="POLICY_NO_Query()" id="policy_no2" name="policy_no2" type="text" maxlength="2" style="width: 5%;" ng-model="inputVO.POLICY_NO2" e-input-limit="N" ng-required="false" ng-disabled="viewOnly">
+			    			-
+			    			<input ng-blur="POLICY_NO_Query()" id="policy_no3" name="policy_no3" type="text" maxlength="2" style="width: 5%; text-transform: uppercase;" ng-model="inputVO.POLICY_NO3" ng-required="false" ng-disabled="viewOnly">
+    					</span>
+    				</td>
+    				<td>被保人ID:</td>
+    				<td>
+    					<input type="text" id="insuredId" name="insuredId" ng-blur="getInfo('INSURED');" ng-model="inputVO.INSURED_ID" style="text-transform: uppercase;" ng-required="inputVO.REG_TYPE=='1'" ng-disabled="viewOnly">
+    				</td>
+    			</tr>
+    			<tr>
+    				<td colspan="1">
+    					<input type="checkbox" ng-model="chkSameInsuredId" ng-change="toSameInsuredId()" ng-disabled="viewOnly">同被保人
+    				</td>
+    				<td colspan="5"></td>
+    			</tr>
+				<tr>
+    				<td>*變更後要保人ID:</td>
+    				<td>
+    					<input type="text" id="chgCustId" name="chgCustId" ng-blur="getInfo('CHG_CUST')" ng-model="inputVO.CHG_CUST_ID" ng-required="true" style="text-transform: uppercase;" ng-disabled="viewOnly || chkSameInsuredId">
+    				</td>
+    				<td>*變更後要保人姓名:</td>
+    				<td>
+    					<input type="text" id="chgProposerName" name="chgProposerName" ng-model="inputVO.CHG_PROPOSER_NAME" style="text-transform: uppercase;" ng-required="true" ng-disabled="viewOnly || chkSameInsuredId">
+    				</td>
+    				<td>*變更後要保人生日:</td>
+    				<td>
+    					<div class="input-group datebox datewidth"  style="width: 60%;">
+							<input type="text" id="chgProposerBirth" name="CHG_PROPOSER_BIRTH"
+								class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.CHG_PROPOSER_BIRTH"
+								is-open="model.c" ng-blur="checkyear()"
+								alt-input-formats="altInputFormats" ng-readonly="true"
+								ng-required="true"
+								ng-disabled="viewOnly"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,'c')" ng-disabled="viewOnly || chkSameInsuredId">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+						</div>
+    				</td>
+    			</tr>
+			    <tr>
+					<td style="width: 18%;">AML風險等級:</td>
+    				<td>{{inputVO.AML}}</td>
+    				<td style="width: 18%;">Pre-check結果:</td>
+    				<td>{{inputVO.PRECHECK}}</td>
+    				<td style="width: 18%;">保險公司:</td>
+    				<td>{{inputVO.INS_COM_NAME}}</td>
+    			</tr>
+    			<tr>
+    				<td >
+    					<button type="button" class="btn btn-info" ng-click="checkFit('1')" ng-disabled="(inputVO.STATUS!='' && inputVO.STATUS!='1' && inputVO.STATUS!='4') || privilegeGroup!='FC'">適合度檢核</button>
+    				</td>
+    				<td >
+    					<button type="button" class="btn btn-info" ng-click="checkFit('2')" ng-disabled="inputVO.STATUS!='1' || privilegeGroup!='FC' || regType3AuthDisabled">送出覆核</button>
+    				</td>
+    				<td colspan="2">
+    					<button type="button" class="btn btn-info" ng-click="checkFit('3')" ng-disabled="!brhmgrAuthing">核可</button>
+    					&nbsp;&nbsp;&nbsp;
+    					<button type="button" class="btn btn-info" ng-click="checkFit('4')" ng-disabled="!(brhmgrAuthing || brhmgrAllowDeny)">退回</button>
+    				</td>
+    				<td colspan="2" ng-show="!fromIOT111">
+    					<button type="button" class="btn btn-info" ng-disabled="privilegeGroup!='FC'" ng-click="init();">新增下一筆</button>
+    				</td>
+    				<td colspan="2" ng-show="fromIOT111">
+    					<button type="button" class="btn btn-info" ng-click="back_page_btn();">回上一頁</button>
+    				</td>
+    			</tr>
+			</table>
+
+    		<table ng-show="inputVO.REG_TYPE != '3' && !viewOnly && inputVO.REG_TYPE != ''">
+    			<tr>
+					<th colspan="6" style="text-align: left;" class="table_title">四、列印報表</th>
+				</tr>
+				<tr ng-show="inputVO.REG_TYPE == '1' && inputVO.STATUS=='1' && savePass">
+    				<td colspan = "6">
+    					<button type="button" class="btn btn-info" ng-click="printCheckList()">客戶保險購買檢核表</button>
+    				</td>
+    			</tr>
+    			<tr ng-show="inputVO.REG_TYPE == '1' && inputVO.STATUS=='1' && savePass">
+    				<td colspan = "6">
+    					<button type="button" class="btn btn-info" ng-click="printInsVitIntDecBook()">保險重要權益宣告書列印</button>
+    				</td>
+    			</tr>
+    			<tr ng-show="(inputVO.REG_TYPE == '1' || inputVO.REG_TYPE == '2') && Investment==true && inputVO.STATUS=='1' && savePass">
+    				<td colspan = "6">
+    					<button type="button" class="btn btn-info" ng-click="printInvOriAdaFunList()">投資型商品基金適配表列印</button>
+    				</td>
+    			</tr>
+    			<tr ng-show="(inputVO.REG_TYPE == '1' || inputVO.REG_TYPE == '2') && (checkCost || validSeniorRec) && inputVO.STATUS=='1' && savePass" >
+    				<td colspan = "6">
+    					<button type="button" class="btn btn-info" ng-click="printUnuTraRecTeleIntList()">非常態交易錄音電訪單列印</button>
+    				</td>
+    			</tr>
+    			<!-- 依下述條件產生【保費來源確認及高齡客戶關懷錄音電訪單】 -->
+    			<!-- 契撤案件不須檢核 -->
+    			<!-- 定存打折檢核為Y且主約險種定義需檢核保費來源(險種代號不存在不需要錄音的參數表) -->
+    			<!-- 保費支付來源為貸款且保單貸款檢核Y且主約險種定義需檢核保費來源(險種代號不存在不需要錄音的參數表) -->
+    			<!-- 保費支付來源為貸款且行內貸款檢核Y且主約險種定義需檢核保費來源(險種代號不存在不需要錄音的參數表) -->
+    			<!-- 貸款申請日於要報書申請日93天內需檢核保費來源(險種代號不存在不需要錄音的參數表) -->
+    			<!-- 業保書投保前三個月內有辦理解約或業報書投保前三個月有辦理貸款(險種代號不存在不需要錄音的參數表) -->
+    			<!-- 要保人或被保人或繳款人保險年齡達65歲且所購買商品代號不存在於不需要錄音的參數表 -->
+    			<tr ng-show="savePass && inputVO.REG_TYPE == '1' && inputVO.STATUS=='1' && inputVO.CANCEL_CONTRACT_YN != 'Y'
+    						&& ((inputVO.LOAN_SOURCE_YN == 'Y' && !isInNoChkLoan)
+    							|| (inputVO.LOAN_SOURCE2_YN == 'Y' && !isInNoChkLoan)
+    							|| ((inputVO.LOAN_CHK1_YN == 'Y' || inputVO.LOAN_CHK2_YN == 'Y' || inputVO.LOAN_CHK3_YN == 'Y' || inputVO.CD_CHK_YN == 'Y'
+    								|| inputVO.C_LOAN_CHK1_YN == 'Y' || inputVO.C_LOAN_CHK2_YN == 'Y' || inputVO.C_LOAN_CHK3_YN == 'Y' || inputVO.C_CD_CHK_YN == 'Y'
+    								|| inputVO.I_LOAN_CHK1_YN == 'Y' || inputVO.I_LOAN_CHK2_YN == 'Y' || inputVO.I_LOAN_CHK3_YN == 'Y' || inputVO.I_CD_CHK_YN == 'Y'
+    								|| inputVO.C_LOAN_APPLY_YN == 'Y' || inputVO.I_LOAN_APPLY_YN == 'Y' || inputVO.P_LOAN_APPLY_YN == 'Y'
+    								|| inputVO.CONTRACT_END_YN == '1' || inputVO.S_INFITEM_LOAN_YN == '1' || inputVO.isOver65) && !isInNoChkLoan))">
+    				<td colspan = "6">
+    					<button type="button" class="btn btn-info" ng-click="printSourceRecList()">保費來源確認及高齡客戶關懷錄音電訪單</button>
+    				</td>
+    			</tr>
+    		</table>
+
+    		<table ng-show="inputVO.REG_TYPE == '3' && (inputVO.STATUS == '1' || chgCustPrintCheck) && savePass">
+    			<tr>
+					<th colspan="6" style="text-align: left;" class="table_title">四、列印報表</th>
+				</tr>
+    			<tr>
+    				<td colspan = "6">
+    					<button type="button" class="btn btn-info" ng-click="printChgCustCheckList()">客戶保險購買檢核表</button>
+    				</td>
+    			</tr>
+    		</table>
+    		</form>
+    	</div>
+    </div>
+</div>

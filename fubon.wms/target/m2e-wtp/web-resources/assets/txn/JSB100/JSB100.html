@@ -1,0 +1,143 @@
+<script type="text/javascript" src="assets/txn/JSB100/JSB100.js"></script>
+<script type="text/javascript" src="assets/txn/JSB100/JSB100_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/JSB100/JSB100_LOG.js"></script>
+<div ng-controller="JSB100Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">日盛保代保單單筆資料修改—保險行政</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+     				<tr>
+     					<th>*要保人ID：</th>
+     					<td>
+     						<input type="text" class="form-control" placeholder="請輸入..." id="cust_id" name="cust_id" ng-model="inputVO.cust_id" style="width:150px; text-transform: uppercase;" e-length-limit="12" required>
+     					</td>
+     					<th>*被保人ID：</th>
+     					<td>
+     						<input type="text" class="form-control" placeholder="請輸入..." id="ins_id" name="ins_id" ng-model="inputVO.ins_id" style="width:150px; text-transform: uppercase;" e-length-limit="12" required>
+     					</td>
+     					<th>處理序號：</th>
+     					<td>
+     						<input type="text" class="form-control" placeholder="請輸入..." id="seq" name="seq" ng-model="inputVO.seq" style="width:150px;">
+     					</td>
+  			  		</tr>
+     				<tr>
+     					<th>*保單號碼：</th>
+     					<td>
+     						<input type="text" class="form-control" placeholder="請輸入..." id="policy_nbr" name="policy_nbr" ng-model="inputVO.policy_nbr" style="width:150px; text-transform: uppercase;" required>
+     					</td>
+     					<th>*受理編號：</th>
+     					<td>
+     						<input type="text" class="form-control" placeholder="請輸入..." id="acceptid" name="acceptid" ng-model="inputVO.acceptid" style="width:150px;" required>
+     					</td>
+     					<th>編輯狀態：</th>
+     					<td>
+     						<e-combobox id="update_status"
+										ng-datasource="mappingSet['JSB.UPDATE_STATUS']"
+										ng-model="inputVO.update_status"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="180px"
+			   							style="line-height:20px;" />
+     					</td>
+  			  		</tr>
+  			  		<tr>
+						<th>*修改日期：</th>
+						<td colspan="3">
+     						<div style="float: left; width: 160px;" class="input-group datebox datewidth">
+								<input type="text" id="user_update_date_s" name="user_update_date_s"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.user_update_date_s"
+									   datepicker-options="sDateOptions"
+									   is-open="model.a"
+									   ng-readonly="true"
+									   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>																		
+								</span>
+							</div>
+							<div style="float: left">&nbsp;～&nbsp;</div>
+     						<div style="float: left; width: 160px;" class="input-group datebox datewidth">
+								<input type="text" id="user_update_date_e" name="user_update_date_e"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.user_update_date_e"
+									   datepicker-options="eDateOptions"
+									   is-open="model.b"
+									   ng-readonly="true"
+									   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>																		
+								</span>
+							</div>
+     					</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()" function-type="query">查詢</button>
+			</div>
+		</div>
+		
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>選擇</th>
+							<th>受理編號</th>
+							<th>保單號碼</th>
+							<th>險種名稱</th>
+							<th>要保人ID</th>
+							<th>要保險人姓名</th>
+							<th>被保人ID</th>
+							<th>被保險人姓名</th>
+							<th>保險公司</th>
+							<th>異動LOG</th>
+							<th>狀態</th>
+							<th>處理序號</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>
+								<a href="#" ng-click="showDTL(row)">
+								{{row.UPDATE_STATUS == 'P' ? '待覆核' : ((row.UPDATE_STATUS == 'E' || row.UPDATE_STATUS == 'R') ? '繼續編輯' : '修改')}}
+								</a>
+							</td>
+							<td>{{row.ACCEPTID}}</td>
+							<td>{{row.POLICY_NBR}}</td>
+							<td>{{row.POLICY_FULL_NAME}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.APPL_NAME}}</td>
+							<td>{{row.INS_ID}}</td>
+							<td>{{row.INS_NAME}}</td>
+							<td>{{row.INS_COMP_NAME}}</td>
+							<td>
+								<a href="#" ng-click="showLOG(row)">檢視</a>
+							</td>
+							<td>{{row.CONTRACT_STATUS | mapping:mappingSet['CRM.CONTRACT_ST']:'F3'}}</td>
+							<td>{{row.SEQ}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>	
+		</div>
+	</div>
+</div>

@@ -1,0 +1,94 @@
+
+<style>
+  /* open dialog basic*/
+  .SOT701 table {
+  	width: 70%;
+  	margin: 10px auto;
+  }
+  
+  .SOT701 th{
+  	padding-top: 10px 0;
+  	padding-left: 20px;
+  }
+  
+  .SOT701 .modWatcheral-dialog{
+  	width: auto;
+  	font-size: 16px;
+  }
+  
+  .SOT701 h4{
+  	font-size: 18px;
+  }	
+  /* open dialog basic */
+  
+  .SOT701 .form-group div{
+  	padding: 0 0 5px 0;
+  	width: 60%;
+  }
+  
+  .SOT701 div.file {
+  	text-align: center;
+  }
+  
+</style>
+<script type="text/javascript" src="assets/txn/SOT701/SOT701.js"></script>
+<div ng-controller="SOT701Controller" ng-cloak="ng-cloak" class="SOT701">
+  <div class="tfb_content">
+    <div class="tfb_content_icon"></div>
+    <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"/>查詢收發電文</div>
+  </div>
+  <!-- Content of the panel-->
+  <div class="panel_content">
+    <div class="search_table search_box">
+      <table>
+        <tr>
+          <th>交易序號:</th>
+          <td> 
+            <input id="sno" type="text" placeholder="請輸入..." name="sno" ng-model="inputVO.sno" e-length-limit="12"/>
+          </td>
+          <th>執行日期:</th>
+          <td>
+            <div class="form-group first-half">
+              <div class="input-group datebox datewidth">
+                <input id="esbDate" type="text" name="esbDate" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.esbDate" is-open="model.a" datepicker-options="esbDateOptions" ng-readonly="true" ng-change="esbDate()" class="form-control"/><span class="input-group-btn">
+                  <button type="button" ng-click="open($event,'a')" class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button></span>
+              </div>
+              <div style="float: left !important;"> </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div class="search_box_btn text-center">
+        <button type="button" ng-click="inquireInit();query();" class="btn btn-info">查詢</button>
+        <button type="button" ng-click="init()" class="btn btn-info">清除</button>
+      </div>
+    </div>
+    <e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>
+    <div style="height: 235px; white-space: nowrap;" class="gv_tab_sc scroll_y">
+      <table class="table-bordered">
+        <thead>
+          <tr>
+            <th>交易序號</th>
+            <th>電文編號</th>
+            <th>執行日期</th>
+            <th>使用者</th>
+            <th>上行內容</th>
+            <th>下行內容</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" class="repeat-row">
+            <td>{{row.ESB_SNO}}</td>
+            <td>{{row.ESB_HTXTID}}</td>
+            <td>{{toJsDate(row.CREATETIME)|date:'yyyy-MM-dd HH:mm:ss'}}</td>
+            <td>{{row.CREATOR}}</td>
+            <td><a>
+                <div ng-click="download(row, 'S')" class="file"><img src="assets/images/icon/u1208.png"/></div></a></td>
+            <td><a>
+                <div ng-click="download(row, 'R')" class="file"><img src="assets/images/icon/u1208.png"/></div></a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

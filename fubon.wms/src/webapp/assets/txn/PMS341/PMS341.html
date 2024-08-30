@@ -1,0 +1,223 @@
+<style>
+/* open dialog */
+.ngdialog.PMS341 {
+}
+/* dialog panl */
+.modal-dialog.PMS341 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS341 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PMS341 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS341.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS341_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+.alignleft {
+	text-align: left !important;
+}
+.bigspace {
+	margin-left: 50px !important;
+}
+.datewidth {
+	width: 240px !important;
+}
+.search-table-outter {
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.clas tr th {
+	vertical-align: middle;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+.rstable thead tr th {
+ vertical-align:middle;
+}
+.table_data {
+	margin: 0 10px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS341/PMS341.js"></script>
+<script type="text/javascript" src="assets/txn/PMS341/PMS341_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS341" ng-controller="PMS341Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+						<th>*資料年月： </th>						
+						<td><e-combobox id="eTime"
+									ng-datasource="mappingSet['timeE']" ng-model="inputVO.sTime"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-change="dateChange()"
+									ng-format="F3" ng-required="true" width="180px" height="30px"
+									style="line-height:20px;" /></td>
+						<th>業務處：</th>
+						<td><e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id"
+									ng-validate="false" 
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeRegion()"
+									width="200px"
+									style="line-height:20px;" />
+						</td>
+						<th>營運區：</th>
+						<td><e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeArea()"
+									width="200px"
+									style="line-height:20px;" />
+						</td>
+						</tr>
+						<tr>
+							<th>&nbsp;分行：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch()"
+									width="180px"
+									style="line-height:20px;" />
+							</td>
+							<th>身份類別：</th>
+							<td><e-combobox id="eTime"
+									ng-datasource="mappingSet['idCat']" ng-model="inputVO.idCat"
+									ng-validate="false"  ng-editable="false"
+									ng-format="F3" ng-required="false" width="200px"
+									ng-disabled="psflag"
+									ng-readonly="psflag" 
+									style="line-height:20px;" /></td>
+							<th>員工編號：</th>
+							<td>						
+								<e-combobox id="emp_id" name="emp_id"
+									ng-datasource="EMP_LIST"
+									ng-model="inputVO.emp_id"
+									ng-validate="false"
+									ng-disabled="disableEmpCombo"
+									ng-readonly="disableEmpCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeAo_code()"
+									width="200px"
+									style="line-height:20px;" />
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+				<button type="button" class="btn btn-info" ng-click="upload(inputVO.sTime)" function-type="maintenance">上傳</button>
+				<button type="button" class="btn btn-info" ng-click="downLoad()" function-type="maintenance">下載範例</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList"></e-jumping>
+			<div>
+				<table>
+			    	<tr>
+			    		<td align="left">資料產生日期：{{curDate | date:'yyyy/MM/dd'}}&nbsp;&nbsp;&nbsp;&nbsp;合計：{{bonusNum}}</td>
+			    	</tr>
+			    	<tr>
+			    		<td align="left">&nbsp;&nbsp;&nbsp;&nbsp;報表說明：房貸火地險佣金明細</td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y" style="min-height: 235px; white-space: nowrap;">
+				<table class="  table-bordered rstable middle">
+					<thead>
+						<tr>
+							<th>身份類別</th>
+							<th>姓名</th>
+							<th>員編</th>
+							<th>營運區</th>
+							<!-- <th>合計</th> -->
+							<th>個人獎金(四捨五入)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="left">{{row.ID_CAT}}-{{row.PARAM_NAME}}</td>
+							<td align="left">{{row.EMP_NAME }}</td>
+							<td align="left">{{row.EMP_ID }}</td>
+							<td align="left">{{row.BRANCH_AREA_NAME }}</td>
+							<!-- <td align="right">{{row.TOTAL | number:2}}</td> -->
+							<td align="right">{{row.BONUS | number:2}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

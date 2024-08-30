@@ -1,0 +1,422 @@
+<style>
+/* open dialog */
+.ngdialog.CRM391 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM391 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM391 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM391 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM391.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM391_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM391/CRM391.js"></script>
+<div class="CRM391" ng-controller="CRM391Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th>客戶ID：</th>
+						<td><input type="text" class="form-control" placeholder="請輸入..." id="cust_id" name="cust_id" ng-model="inputVO.cust_id" style="width:260px;text-transform:uppercase;" e-length-limit="15"></td>
+						<th>理專送出時間：</th>
+						<td>
+							<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="apl_sDate" name="apl_sDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.apl_sDate"
+											is-open="model.a"
+											datepicker-options="apl_sDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="apl_eDate" name="apl_eDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.apl_eDate"
+											is-open="model.b"
+											datepicker-options="apl_eDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>分派狀態：</th>
+						<td>
+							<e-combobox id="process" name="process"
+										ng-datasource="mappingSet['process']"
+										ng-model="inputVO.process"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										style="line-height:20px;" />
+						</td>
+						<th>分行主管送出時間：</th>
+						<td>
+							<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="apl_mgr_sDate" name="apl_mgr_sDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.apl_mgr_sDate"
+											is-open="model.c"
+											datepicker-options="apl_mgr_sDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate2()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="apl_mgr_eDate" name="apl_mgr_eDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.apl_mgr_eDate"
+											is-open="model.d"
+											datepicker-options="apl_mgr_eDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate2()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>調整前歸屬行：</th>
+						<td>
+							<e-combobox id="org_ao_brh" name="org_ao_brh" 
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.org_ao_brh"
+										ng-validate="false" 
+										ng-disabled="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="!inputVO.cust_id && !inputVO.new_ao_brh"
+										ng-change="getAolist()"
+										style="line-height:20px;" />
+						</td>
+						<th>督導主管覆核時間：</th>
+						<td>
+							<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="op_mgr_sDate" name="op_mgr_sDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.op_mgr_sDate"
+											is-open="model.e"
+											datepicker-options="op_mgr_sDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate3()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="op_mgr_eDate" name="op_mgr_eDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.op_mgr_eDate"
+											is-open="model.f"
+											datepicker-options="op_mgr_eDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate3()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'f')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">調整前AO Code：</th>
+						<td ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="org_ao_code" name="org_ao_code"
+										ng-datasource="ORG_AO_CODE"
+										ng-model="inputVO.org_ao_code"
+										ng-validate="false" 
+										ng-editable="true"
+										ng-format="F1"
+										style="line-height:20px;" />
+						</td>
+						<th ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">調整前UHRM：</th>
+     					<td ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+	     					<e-combobox id="org_uEmpID" name="org_uEmpID"
+										ng-datasource="mappingSet['UHRM_LIST']"
+										ng-model="inputVO.org_uEmpID"
+										ng-validate="false" 
+										ng-disabled="mappingSet['UHRM_LIST'].length == 2"
+										ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										style="line-height:20px;" />				
+						<th>處主管覆核時間：</th>
+						<td>
+							<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="dc_mgr_sDate" name="dc_mgr_sDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.dc_mgr_sDate"
+											is-open="model.g"
+											datepicker-options="dc_mgr_sDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate4()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'g')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="dc_mgr_eDate" name="dc_mgr_eDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.dc_mgr_eDate"
+											is-open="model.h"
+											datepicker-options="dc_mgr_eDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate4()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'h')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>調整後歸屬行：</th>
+						<td>
+							<e-combobox id="new_ao_brh" name="new_ao_brh" 
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.new_ao_brh"
+										ng-validate="false" 
+										ng-disabled="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="!inputVO.cust_id && !inputVO.org_ao_brh"
+										ng-change="getAolist2()"
+										style="line-height:20px;" />
+						</td>
+						<th>總行覆核時間：</th>
+						<td>
+							<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="hq_mgr_sDate" name="hq_mgr_sDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.hq_mgr_sDate"
+											is-open="model.i"
+											datepicker-options="hq_mgr_sDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate5()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'i')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="hq_mgr_eDate" name="hq_mgr_eDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.hq_mgr_eDate"
+											is-open="model.j"
+											datepicker-options="hq_mgr_eDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate5()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'j')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">調整後AO Code：</th>
+						<td ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="new_ao_code" name="new_ao_code"
+										ng-datasource="NEW_AO_CODE"
+										ng-model="inputVO.new_ao_code"
+										ng-validate="false" 
+										ng-editable="true"
+										ng-format="F1"
+										style="line-height:20px;" />
+						</td>
+						<th ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">調整後UHRM：</th>
+						<td ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+	     					<e-combobox id="new_uEmpID" name="new_uEmpID"
+										ng-datasource="mappingSet['UHRM_LIST']"
+										ng-model="inputVO.new_uEmpID"
+										ng-validate="false" 
+										ng-disabled="mappingSet['UHRM_LIST'].length == 2"
+										ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										style="line-height:20px;" />	
+						<th>調整類別</th>
+						<td>
+							<e-combobox id="trs_type"
+										ng-datasource="TRS_TYPE"
+										ng-model="inputVO.trs_type"
+										ng-validate="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.org_ao_brh.$error.required || parameterTypeEditForm.new_ao_brh.$error.required">
+						<td colspan="4" class="with-errors">請選擇其一「客戶ID」或「調整前歸屬行」或「調整後歸屬行」</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+		</div>
+		<!-- 結果區 -->
+		<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList"></e-jumping>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table e-table-freeze" e-left="5" e-height="500px" e-list="paramList" e-mode="3" e-top="true">
+				<thead>
+					<tr>
+						<th>客戶ID</th>
+						<th>調整前歸屬行</th>
+						<th>調整前理專</th>
+						<th>調整後歸屬行</th>
+						<th>調整後理專</th>
+						<th>建議人</th>
+						<th>建議人角色</th>
+						<th>理專送出時間</th>
+						<th>分行主管送出時間</th>
+						<th>送出人</th>
+						<th>督導主管覆核時間</th>
+						<th>覆核人</th>
+						<th>處主管覆核時間</th>
+						<th>覆核人</th>
+						<th>總行執行時間</th>
+						<th>執行人</th>
+						<th>預約生效日</th>
+						<th>AO異動原因</th>
+						<th>照會結果</th>
+						<th>同意書</th>
+						<th>調整類別</th>
+						<th>狀態</th>
+						<th>派送進度</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList| limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{row.CUST_ID}}</td>
+						<td>{{row.ORG_AO_BRH}}-{{row.BRANCH_NAME}}</td>
+						<td>{{row.ORG_AO_NAME}}</td>
+						<td>{{row.NEW_AO_BRH}}-{{row.NEW_BRANCH_NAME}}</td>
+						<td>{{row.NEW_AO_NAME}}</td>
+						<td>{{row.NAPL_EMP_ID}}</td>
+						<td>{{row.ROLE_NAME}}</td>
+						<td ng-if="row.TRS_TYPE != 'A'">{{toJsDate(row.APL_DATETIME) | date:"yyyy/MM/dd HH:mm:ss"}}</td> <!-- 非理專十戒換手經營 -->
+						<td ng-if="row.TRS_TYPE == 'A'"></td> <!-- 理專十戒換手經營不須顯示理專送出時間 -->
+						<td>{{toJsDate(row.APL_BRH_MGR_RPL_DATETIME) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+						<td>{{row.NAPL_BRH_MGR}}</td>
+						<td>{{toJsDate(row.OP_MGR_RPL_DATETIME) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+						<td>{{row.NOP_MGR}}</td>
+						<td>{{toJsDate(row.DC_MGR_RPL_DATETIME) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+						<td>{{row.NDC_MGR}}</td>
+						<td>{{toJsDate(row.HQ_MGR_RPL_DATETIME) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+						<td>{{row.NHQ_MGR}}</td>
+						<td>{{toJsDate(row.ACT_DATE) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+						<td>{{row.APL_REASON | mapping:TRS_APL_REASON:'F3'}}</td>
+						<td>{{row.CALL_REVIEW_STATUS | mapping:TRS_CALL_REVIEW_TYPE:'F3'}}</td>
+						<td><button ng-if="row.AGMT_FILE" type="button" class="btn btn-info" ng-click="download(row)">同意書下載</button></td>
+						<td>{{row.TRS_TYPE | mapping:TRS_TYPE:'F3'}}</td>
+						<td>{{row.PROCESS}}</td>
+						<td>{{row.PROCESS_STATUS | mapping:TRS_PROCESS_STATUS:'F3'}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

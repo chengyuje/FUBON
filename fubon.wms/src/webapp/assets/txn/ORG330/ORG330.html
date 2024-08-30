@@ -1,0 +1,100 @@
+<style>
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.rstable tbody tr td {
+	text-align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG330/ORG330.js"></script>
+<script type="text/javascript" src="assets/txn/ORG330/ORG330AGENT.js"></script>
+<script type="text/javascript" src="assets/txn/ORG330/ORG330_REVIEW.js"></script>
+<div ng-controller="ORG330Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3 scroll_y">
+			<table>
+				<tr>
+					<th style="width: 16.6%">角色代碼：</th>
+					<td style="width: 16.6%"><input class="form-control" type="text" placeholder="請輸入..." id="" name="" ng-model="inputVO.ROLE_ID" maxlength="4" ng-blur="checkDP()" ng-readonly="btnAction != 'n'"></td>
+					<th style="width: 16.6%">角色名稱：</th>
+					<td style="width: 16.6%"><input class="form-control" type="text" placeholder="請輸入..." id="" name="" ng-model="inputVO.ROLE_NAME" maxlength="60"></td>
+					<th style="width: 16.6%">人資職稱：<br/>(限分行單位)</th>
+					<td style="width: 16.6%"><input class="form-control" type="text" placeholder="請輸入..." id="" name="" ng-model="inputVO.JOB_TITLE_NAME" maxlength="90"></td>
+				</tr>
+				<tr>
+					<th style="width: 16.6%">是否為AO：</th>
+					<td style="width: 16.6%"><input style="width: 20px; height: 20px;" type="checkbox" id="" name="" ng-true-value="'Y'" ng-false-value="'N'" ng-model="inputVO.IS_AO"></td>
+					<th style="width: 16.6%">轄下範圍：</th>
+					<td style="width: 16.6%">
+						<e-combobox id="" name="" 
+									ng-paramtype="ORG.SYS_ROLE"
+									ng-model="inputVO.SYS_ROLE"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									width="300px"
+									style="line-height:20px;" 
+									required/>
+					</td>
+					<th style="width: 16.6%">可代理該角色：</th>
+					<td style="width: 16.6%">
+						<button type="button" class="btn btn-info" ng-click="showORG330AGENT(null)" ng-disabled="inputVO.ROLE_ID.length == 0 || inputVO.ROLE_NAME.length == 0" function-type="maintenance">選擇</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="addOrModRole()" ng-disabled="inputVO.ROLE_ID == '' || inputVO.ROLE_NAME == '' || inputVO.SYS_ROLE == ''" function-type="maintenance">{{btnAction == 'm' ? '修改' : '新增'}}</button>
+			<button type="button" class="btn btn-info" ng-click="init()" >取消</button>
+		</div>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="rstable">
+				<thead>
+					<tr>
+						<th style="width: 15%;">動作</th>
+						<th style="width: 15%;">角色代碼</th>
+						<th>角色名稱</th>
+						<th>人資職稱<br/>(限分行單位)</th>
+						<th style="width: 5%;">可代理角色</th>
+						<th style="width: 5%;">是否為AO</th>
+						<th style="width: 15%;">轄下範圍</th>
+						<!-- <th style="width: 15%;">異動註記</th> -->
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in roleLst" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>
+							<div ng-show="row.REVIEW_STATUS == 'W' && row.SEQNO != 0">
+								<button type="button" class="btn btn-primary" ng-click="review(row, 'Y')" function-type="confirm">核可</button>
+								<button type="button" class="btn btn-warning" ng-click="review(row, 'N')" function-type="confirm">退回</button>
+								<button type="button" class="btn btn-default" ng-click="doAction(row, 'h')">異動歷程</button>
+							</div>
+							<div ng-show="row.SEQNO == 0">
+								{{(row.REVIEW_STATUS | mapping:mappingSet['COMMON.REVIEW_STATUS']:'F3')}}
+							</div>
+							<div ng-show="row.REVIEW_STATUS == 'Y'">
+								<button type="button" class="btn btn-default" ng-click="doAction(row, 'm')" ng-disabled="btnAction == 'm'" ng-hide="inputVO.ROLE_ID != row.ROLE_ID && btnAction == 'm'" function-type="maintenance">修改</button>
+								<button type="button" class="btn btn-default" ng-click="doAction(row, 'd')" ng-disabled="btnAction == 'm'" ng-hide="inputVO.ROLE_ID != row.ROLE_ID && btnAction == 'm'" function-type="maintenance">刪除</button>
+								<button type="button" class="btn btn-default" ng-click="doAction(row, 'h')" ng-disabled="btnAction == 'm'" ng-hide="inputVO.ROLE_ID != row.ROLE_ID && btnAction == 'm'">異動歷程</button>
+							</div>
+						</td>
+						<td>{{row.ROLE_ID}}</td>
+						<td>{{row.ROLE_NAME}}</td>
+						<td>{{row.JOB_TITLE_NAME}}</td>
+						<td class="text-center">
+							<button type="button" class="btn btn-default" ng-click="showORG330AGENT(row)" ng-disabled="btnAction == 'm'">檢視</button>
+						</td>
+						<td style="width: 80px;">{{(row.IS_AO | mapping:mappingSet['COMMON.YES_NO']:'F3') || '否'}}</td>
+						<td>{{(row.SYS_ROLE | mapping:mappingSet['ORG.SYS_ROLE']:'F3')}}</td>
+						<!-- <td>{{(row.ACT_TYPE | mapping:mappingSet['COMMON.ACT_TYPE']:'F3')}}</td> -->
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

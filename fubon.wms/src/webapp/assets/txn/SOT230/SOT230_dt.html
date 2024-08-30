@@ -1,0 +1,102 @@
+<style>
+</style>
+
+<div ng-controller="SOT230_DtController" ng-cloak>
+	<div class="modal-dialog SOT230">
+		<div class="modal-content">
+			<div class="modal-header">
+
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">
+					<div ng-if="row.entrustType == 'B'">買進即時成交交易資訊</div>
+					<div ng-if="row.entrustType == 'S'">賣出即時成交交易資訊</div>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<h4 class="h4-title">{{row.insuranceNo}} {{row.productName}}</h4>
+					<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="table-bordered">
+						
+						<TR>
+							<TH>委託結果</TH>
+							<TD>{{row.result |
+								mapping:mappingSet['CRM.CRM822_BUY_RESULT']:'F3'}}</TD>
+							<TH>商品幣別</TH>
+								<TD>{{row.entrustCur |
+									mapping:mappingSet['FPS.CURRENCY']:'F3'}}</TD>
+							<TH>委託股數</TH>
+							<TD>{{row.entrustAmt | number}}</TD>
+						</TR>
+						<TR>
+							<TH>委託日期</TH>
+							<TD>{{toJsDate(row.entrustDate) | date:"yyyy-MM-dd" }}</TD>
+							<TH>信託種類</TH>
+							<TD>{{row.trustType | mapping:mappingSet['CRM.ETF_TRUST_CURR_TYPE']:'F3'}}</TD>
+							<TH>委託價格</TH>
+							<TD>{{row.entrustPrice | number:6}}</TD>
+						</TR>
+						<TR>
+							<TH>成交日期</TH>
+							<TD>{{toJsDate(row.tradeDate) | date:"yyyy-MM-dd" }}</TD>
+							<TH>信託帳號</TH>
+							<TD>{{row.trustAcct}}</TD>
+							<TH>成交股數A</TH>
+							<TD>{{row.tradeAmt | number}}</TD>
+						</TR>
+						<TR>
+							<TH>交易指示到期日</TH>
+							<TD>{{toJsDate(row.tradeDateEnd)|date:"yyyy-MM-dd"}}</TD>
+							<TH>交易幣別</TH>
+							<TD>{{row.entrustCur | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</TD>
+							<TH>成交報價B</TH>
+							<TD>{{row.tradePrice | number:6}}</TD>
+						</TR>
+						<TR>
+							<TH>商品類型</TH>
+							<TD>{{row.prodcutType | mapping:mappingSet['CAM.PRD_TYPE']:'F3'}}</TD>
+							<TH>委託通路</TH>
+							<TD>{{row.channelType | mapping:mappingSet['SOT.ETF_CHANNEL_TYPE']:'F3'}}</TD>
+							<TH>成交金額A*B</TH>
+							<TD>{{row.tradeAmt * row.tradePrice | number:2 }}</TD>
+						</TR>
+						<TR>
+							<TH>預估手續費</TH>
+							<TD ng-if="row.entrustType == 'B'">{{row.tradeCostFee | number}}</TD>
+							<TD ng-if="row.entrustType == 'S'">{{row.tradeSellFee | number}}</TD>
+							<TH>預估其他費用</TH>
+							<TD ng-if="row.entrustType == 'B'">{{row.tradeCostOtFee | number}}</TD>
+							<TD ng-if="row.entrustType == 'S'">{{row.tradeSellOtFee | number}}</TD>
+							<TH>預估信管費</TH>
+							<TD>{{row.tradeTrustFee | number}}</TD>
+						</TR>
+						<TR>
+							<TH>交易市場(交易所)</TH>
+							<TD>{{row.trxMarket}}</TD>
+							<TH>入扣帳帳號</TH>
+							<TD ng-if="row.entrustType == 'B'">{{row.tradeCostAcct}}</TD>
+							<TD ng-if="row.entrustType == 'S'">{{row.tradeSellAcct}}</TD>
+						</TR>
+					</table>
+					</div>
+					<table>
+						<TR>
+							<TD>注意事項</TD>
+						</TR>
+						<TR>
+							<td>1.「成交金額 A*B」不含交易手續費及其他費用。</td>
+						</TR>
+						<TR>
+							<TD>2.預估手續費、預估其他費用及預估信管費為系統估算，非實際費用，相關實際費用扣除須等本行帳務結算後可至歷史交易明細查詢</TD>
+						</TR>
+
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="closeThisDialog('cancel')">確定</button>
+			</div>
+		</div>
+	</div>
+</div>

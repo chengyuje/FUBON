@@ -1,0 +1,123 @@
+
+<script type="text/javascript" src="assets/txn/CMMGR023/CMMGR023.js"></script>
+<div class="CMMGR023" ng-controller="CMMGR023_Controller">
+
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif" /><span ng-bind="'即時排程get檔案監控'"></span>
+		</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		最新監控時間: {{monitorTime}}
+
+		<!-- 結果區 -->
+		<e-jumping-once output="outputVO" list="data" totallist="paramList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height: 235px; white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th>排程ID</th>
+						<th>JOBID</th>
+						<th>FTP傳輸ID</th>
+						<th>FTP來源</th>
+						<th>下載路徑</th>
+						<th>下載檔名</th>
+						<th>排程預計執行時間</th>
+						<th>Get檔案是否存在</th>						
+						<th>FTP連線結果</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{row.SCHEDULEID}}</td>
+						<td>{{row.JOBID}}</td>
+						<td>{{row.FTPGETCODE}}</td>
+						<td>{{row.HOSTID}}</td>
+						<td>{{row.SRCDIRECTORY}}</td>
+						<td>{{row.SRCFILENAME}}</td>
+						<td>{{row.SCHDMONITORTIME}}</td>
+						<td>{{row.FILECHECK}}</td>
+						<td>{{row.FTPCONNECTRESULT}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif" /><span ng-bind="'歷史排程get檔案監控'"></span>
+		</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-1">查詢日期*:</div>
+				<div class="col-sm-3">
+					<input type="text" id="startDate" name="startDate" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.searchDate" is-open="model.a" datepicker-options="startDateOptions" ng-readonly="true" ng-change="chooseDate()" />
+				</div>
+				<!-- 製作日曆button -->
+				<div class="col-sm-1">
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+							<i class="glyphicon glyphicon-calendar"></i>
+						</button>
+					</span>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-1">排程ID:</div>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" id="SCHDID" name="SCHDID" ng-model="inputVO.SCHDID">
+				</div>
+				<div class="col-sm-1">JOBID:</div>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" id="JOBID" name="JOBID" ng-model="inputVO.JOBID">
+				</div>
+			</div>
+		</div>
+
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-primary" ng-click="inquire();init()" ng-disabled="!isDateChoose">查詢</button>
+			<span class="" ng-show="!isDateChoose" >請選擇日期!</span>
+		</div>
+		<!-- 結果區 -->
+		<e-jumping-once output="outputVO2" list="data2" totallist="paramList2"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height: 235px; white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+					    <th>最後監控時間</th>
+						<th>排程ID</th>
+						<th>JOBID</th>
+						<th>FTP傳輸ID</th>
+						<th>FTP來源</th>
+						<th>下載路徑</th>
+						<th>下載檔名</th>
+						<th>排程預計執行時間</th>
+						<th>Get檔案是否存在</th>	
+						<th>FTP連線結果</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data2 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					    <td>{{row.MONITORTIME}}</td>
+						<td>{{row.SCHEDULEID}}</td>
+						<td>{{row.JOBID}}</td>
+						<td>{{row.FTPGETCODE}}</td>
+						<td>{{row.HOSTID}}</td>
+						<td>{{row.SRCDIRECTORY}}</td>
+						<td>{{row.SRCFILENAME}}</td>
+						<td>{{row.SCHDMONITORTIME}}</td>
+						<td>{{row.FILECHECK}}</td>
+						<td>{{row.FTPCONNECTRESULT}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>

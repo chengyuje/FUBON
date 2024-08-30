@@ -1,0 +1,127 @@
+<style>
+	.datewidth{
+		width:200px !important;
+		float: left !important;
+	}
+	.search_box3 th {
+	    width: 3% !important;
+	}
+	.boxwidth{
+		padding: 17px 20px 20px 0
+	}
+</style>
+<script type="text/javascript" src="assets/txn/INS410/INS410.js"></script>
+<div ng-controller="INS410Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit" style="text-align:left"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content" style="overflow:auto;">
+		<div class="search_table search_box3">
+			<table>
+                <tr>
+                    <th>期間：</th>
+					<td>
+						<div class="form-group">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="plan_sDate" name="plan_sDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.plan_sDate"
+								is-open="model.a"
+								ng-readonly="true"
+								datepicker-options="startDateOptions"
+								ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+							<div style="float: left !important";class = "boxwidth">~</div>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="plan_eDate" name="plan_eDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.plan_eDate"
+								is-open="model.b"
+								ng-readonly="true"
+								datepicker-options="endDateOptions"
+								ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</div>
+					</td>
+                </tr>
+                <tr>
+                	<th>狀態：</th>
+                    <td style="text-align:left">
+                        <e-combobox 
+                        	id="cust_03"
+                        	ng-datasource="mapping.insStatus"
+                            ng-model="inputVO.plan_status"
+                            ng-validate="false"
+                            ng-readonly="false"
+                            ng-editable="false"
+                            ng-format="F3"
+                            ng-required="false"
+							width="200px"
+							style="line-height:20px" />
+                    </td>
+                </tr>
+			</table>
+		</div>
+		
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="queryHisPlan()">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+		</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit" style="text-align:left"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<div style="margin-bottom:20px">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		</div>
+			<div class="gv_tab_sc scroll_y">
+				<table class="tablesaw table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th>編號</th>
+							<th>狀態</th>
+							<th>需求目的</th>
+							<th>名稱</th>
+							<th>分行/理專</th>
+							<th>前次修改日期</th>
+							<th>建立時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index">
+<!-- 							<td>{{row.SPP_ID}}</td> -->
+	                        <td ng-bind="$index+1" style="text-align:center"></td>
+							<td>{{row.STATUS | mapping: mapping.insStatus }}</td>
+							<td>{{row.SPP_TYPE | mapping: mapping.insType}}</td>
+							<td><a href="#" ng-click="openFile(row)" >{{row.SPP_NAME}}</a></td>
+							<td>{{row.BRANCH_NAME}}/{{row.EMP_NAME}}</td>
+							<td>{{row.LASTUPDATE}}</td>
+							<td>{{row.CREATETIME}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

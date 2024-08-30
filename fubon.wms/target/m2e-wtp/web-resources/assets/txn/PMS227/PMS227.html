@@ -1,0 +1,249 @@
+<style>
+/* open dialog */
+.ngdialog.PMS227 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS227 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS227 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS227 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS227.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS227_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.clas tr th {
+	vertical-align: middle;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+.rstable thead tr th {
+ vertical-align:middle;
+}
+.search_table input {
+	width:216px;
+	height: 30px;
+	line-height: 20px;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<script type="text/javascript" src="assets/txn/PMS227/PMS227.js"></script>
+<script type="text/javascript" src="assets/txn/PMS227/PMS227_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS227/PMS227_CUST.js"></script>
+<script type="text/javascript" src="assets/txn/PMS227/PMS227_ACTUAL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS227/PMS227_CUST_UPLOAD.js"></script>
+
+<div class="PMS227" ng-controller="PMS227Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">請輸入查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*計績月份：</th>
+							<td>
+								<e-combobox id="dataMonth" name="dataMonth" 
+											ng-datasource="mappingSet['timeE']" 
+											ng-model="inputVO.sCreDate"
+											ng-change="dateChange()"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-disabled="disableCreDateCombo"
+											ng-format="F3" 
+											ng-required="true" 
+											width="180px" 
+											height="30px"
+											style="line-height:20px;" />
+							</td>
+							<th>業務處：</th>
+							<td>
+								<e-combobox id="region_center_id" name="region_center_id"
+											ng-datasource="REGION_LIST"
+											ng-model="inputVO.region_center_id"
+										    ng-validate="false" 
+										    ng-disabled="disableRegionCombo"
+											ng-readonly="disableRegionCombo"  
+										    ng-editable="false"
+											ng-format="F3"
+										    ng-required="false"
+											ng-change="ChangeRegion()"
+											width="180px"
+											style="line-height:20px;" /></td>
+							<th>營運區：</th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+										    ng-datasource="AREA_LIST"
+										    ng-model="inputVO.branch_area_id"
+										    ng-validate="false" 
+										    ng-disabled="disableAreaCombo"
+										    ng-readonly="disableAreaCombo"
+										    ng-editable="false"
+										    ng-format="F3"
+										    ng-required="false"
+										    ng-change="ChangeArea()"
+										    width="180px"
+										    style="line-height:20px;" />
+							</td>
+						</tr>
+						<tr>
+							<th>&nbsp;分行別：</th>
+							<td>
+								<e-combobox id="branch_nbr" name="branch_nbr"
+								            ng-datasource="BRANCH_LIST"
+								            ng-model="inputVO.branch_nbr"
+											ng-validate="false" 
+											ng-disabled="disableBranchCombo"
+										    ng-readonly="disableBranchCombo" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="false"
+											ng-change="ChangeBranch()"
+											width="180px"
+											style="line-height:20px;" /></td>
+							<th>轉介人員編：</th>
+							<td><input type="text" class="form-control" ng-model="inputVO.REF_ID" e-length-limit="16"></td>
+							<th>計績專員員編：</th>
+							<td><input type="text" class="form-control" ng-model="inputVO.TP_ID" e-length-limit="16"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();inquireInit()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="upload(inputVO.sCreDate)" function-type="maintenance">整批上傳調整</button>
+<!-- 				<button type="button" class="btn btn-info" ng-click="uploadCust(inputVO.sCreDate)" function-type="maintenance">有投保客戶上傳</button> -->
+				<button type="button" class="btn btn-info" ng-click="upActualCust(inputVO.sCreDate)" function-type="maintenance">上傳實動戶註記</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="height: 235px; white-space: nowrap;">
+				<table class="table-bordered rstable middle">
+					<thead>
+						<tr>
+							<th>轉介年月</th>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行代碼</th>
+							<th>分行</th>
+							<th>轉介案件編號</th>
+							<th>轉介日期</th>
+							<th>轉介人身份</th>
+							<th>轉介人員編</th>
+							<th>轉介人姓名</th>
+							<th>轉介商品</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>受轉介人員編</th>
+							<th>受轉介人姓名</th>
+							<th>計績理專員編</th>
+							<th>計績AO_CODE</th>
+							<th>計績年月</th>
+							<th>首日成交投資收益</th>
+							<th>首日成交保險收益</th>
+							<th>客戶當月是否有RM CODE</th>
+							<th>是否符合領獎資格</th>
+							<th>轉介獎金</th>
+							<th>資料來源</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.REF_YM }}</td>
+							<td align="center">{{row.REGION_CENTER_NAME }}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME }}</td>
+							<td align="center">{{row.BRANCH_NBR }}</td>
+							<td align="center">{{row.BRANCH_NAME }}</td>
+							<td align="center">{{row.CASE_SEQ }}</td>
+							<td align="center">{{row.REF_DATE }}</td>
+							<td align="center">{{row.REF_SR_NAME }}</td>
+							<td align="center">{{row.REF_ID }}</td>
+							<td align="center">{{row.REF_NAME }}</td>
+							<td align="center">{{row.REF_PROD_NAME }}</td>
+							<td align="center">{{row.CUST_ID }}</td>
+							<td align="center">{{row.CUST_NAME }}</td>
+							<td align="center">{{row.USER_ID }}</td>
+							<td align="center">{{row.USER_NAME }}</td>
+							<td align="center">{{row.TP_ID }}</td>
+							<td align="center">{{row.TP_AO_CODE }}</td>
+							<td align="center">{{row.TP_YM }}</td>
+							<td align="right">{{row.INV_FEE }}</td>
+							<td align="right">{{row.INS_FEE }}</td>
+							<td align="center">{{row.IS_RM_CODE }}</td>
+							<td align="center">{{row.IS_BONUS }}</td>
+							<td align="right">{{row.REF_BONUS }}</td>
+							<td ng-if="row.ADJ_TYPE == '1'" align="center">上傳資料</td>
+							<td ng-if="row.ADJ_TYPE == '0'" align="center">系統資料</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

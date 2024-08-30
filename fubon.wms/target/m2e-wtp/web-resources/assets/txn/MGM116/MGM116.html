@@ -1,0 +1,79 @@
+<style>
+.MGM116 .e_panel_table tr th {
+	background: #efefef;
+	color: black;
+	font-weight: bold;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MGM116/MGM116.js"></script>
+<div class="MGM116" ng-controller="MGM116Controller" ng-cloak>	
+	<div class="e_panel_table scroll_y" style="min-height: 450px">
+		<br/>
+<!-- 		<button type="button" class="btn btn-info" ng-click="getReceipt()">列印客戶簽收單</button> -->
+<!-- 		<span style="color: red; font-weight: bold;">*若客戶兌換的贈品領用方式為"分行親領"，請務必列印簽收單交客戶簽署，以確保雙方權益。</span> -->
+<!-- 		<br/><br/> -->
+		<div class="ejborder">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>	
+		</div>					
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap; ">
+			
+			<table>
+				<thead>
+					<tr>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="APP.CUST_ID" e-query="inquire()">推薦人ID</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="CUST.CUST_NAME" e-query="inquire()">推薦人姓名</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="APP.APPLY_SEQ" e-query="inquire()">申請書序號</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="APP.APPLY_POINTS" e-query="inquire()">當次兌換點數</e-sorter>
+						</th>
+<!-- 					<th ng-show="inputVO.act_type == 'V'">當次兌換金額</th> -->
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="GIFT.GIFT_KIND" e-query="inquire()">贈品性質</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="GIFT.GIFT_NAME" e-query="inquire()">贈品內容</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="APP.APPLY_NUMBER" e-query="inquire()">贈品數量</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="ORG.BRANCH_NBR" e-query="inquire()">分行</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="ORG.EMP_NAME" e-query="inquire()">兌換理專姓名</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="APP.ORDER_DATE" e-query="inquire()">贈品結算<br/>下單日期</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="APP.DELIVERY_STATUS" e-query="inquire()">贈品出貨狀態</e-sorter>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data">
+						<td>{{row.CUST_ID}}</td>
+						<td>{{row.CUST_NAME}}</td>
+						<td>{{row.APPLY_SEQ}}</td>
+						<td align="right">{{row.APPLY_POINTS | number:0}}</td>
+<!-- 					<td align="right" ng-show="inputVO.act_type == 'V'">{{row.APPLY_REWARD | number:0}}</td> -->
+						<td>{{row.GIFT_KIND | mapping:mappingSet['MGM.GIFT_KIND']:'F3'}}</td>
+						<td>{{row.GIFT_NAME}}</td>
+						<td align="right">{{row.APPLY_NUMBER | number:0}}</td>
+						<td>{{row.BRANCH_NBR}}</td>
+						<td>{{row.EMP_NAME}}</td>
+						<td>{{toJsDate(row.ORDER_DATE) | date:"yyyy/MM/dd"}}</td>
+						<td>{{row.DELIVERY_STATUS | mapping:mappingSet['MGM.DELIVERY_STATUS']:'F3'}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

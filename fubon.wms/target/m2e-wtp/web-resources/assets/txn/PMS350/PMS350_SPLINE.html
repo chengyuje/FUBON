@@ -1,0 +1,211 @@
+<style>
+/* dialog panl */
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.modal-dialog.PMS350_SPLINE {
+ 	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: auto;
+	height: auto;
+}
+/* table size */
+.PMS350_SPLINE table {
+	width: 60%;
+	align-content: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS350_SPLINE.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/PMS350/PMS350_SPLINE.js"></script>
+<div ng-controller="PMS350_SPLINEController" ng-cloak>
+	<div class="modal-dialog PMS350_SPLINE"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">智能報表產生器</h4>
+			</div>
+			<div class="tfb_content" style="margin-top: 10px">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit" style="font-size:22px;"><img src="assets/images/icon/tfb_icon_a15.gif">{{title}}</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content" ng-show="showStep3 || pms900">
+				<div class="search_table search_box">
+					<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+						<table style="width: 100% !important">
+							<tr>
+								<th>*資料統計日期：</th>
+								<td colspan="7">
+									<div class="form-group">
+										<div class="input-group datebox datewidth">
+											<input type="text" id="sDate" name="sDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.sDate"
+											is-open="model.a"
+											datepicker-options="sDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate()"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+												<i class="glyphicon glyphicon-calendar"></i></button>
+											</span>
+										</div>
+										<div style="float: left !important;">～</div>
+										<div class="input-group datebox datewidth">
+											<input type="text" id="eDate" name="eDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.eDate"
+											is-open="model.b"
+											datepicker-options="eDateOptions"
+											ng-readonly="true"
+											ng-change="limitDate()"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+												<i class="glyphicon glyphicon-calendar"></i></button>
+											</span>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<th>業務處：</th>
+								<td>
+									<e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id"
+									ng-validate="false" 
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-change="ChangeRegion()"
+									width="150px"
+									style="line-height:20px;" />
+								</td>						
+								<th>營運區：</th>
+								<td>
+									<e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-change="ChangeArea()"
+									width="150px"
+									style="line-height:20px;" />
+								</td>
+								<th>分行：</th>
+								<td>
+									<e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-change="ChangeBranch()"
+									width="150px"
+									style="line-height:20px;" />
+								</td>
+							</tr>					
+							<tr>				
+								<th>理專職等：</th>
+							  	<td>
+							  		<e-combobox id="col_seq" name="col_seq"
+										ng-datasource="AO_LEVEL"
+										ng-model="inputVO.fc"
+										ng-validate="false"
+										ng-editable="false"
+										ng-format="F3"
+										width="150px"
+										style="line-height:20px;" />
+							  	</td>	
+								<th>資料：</th>
+							  	<td>
+							  		<e-combobox id="col_seq" name="col_seq"
+										ng-datasource="COL_SEQ_LIST"
+										ng-model="inputVO.col_seq"
+										ng-validate="false"
+										ng-editable="false"
+										ng-format="F3"
+										width="150px"
+										style="line-height:20px;" />
+							  	</td>	
+							  	<th>圖形設定：</th>
+								<td>
+									<e-combobox id="setupCategory" name="setupCategory"
+									ng-datasource="SETUP_CAT"
+									ng-model="inputVO.setupCategory"
+									ng-validate="false" 
+									ng-editable="false"
+									ng-format="F3"
+									width="200px"
+									style="line-height:20px;" />
+								</td>	
+							</tr>					
+						</table>
+					</form>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="getCharData()">查詢</button>
+				</div>
+			</div>
+			
+			<div class="tfb_content" ng-show="showStep3 || pms900">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<e-jumping-once output="outputVO" list="paramList" totallist="resultList" ng-show="showStep1"></e-jumping-once>
+				<e-jumping-once output="outputVO2" list="paramList2" totallist="resultList2" ng-show="showStep2"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table ng-show="showStep1">
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							 	<td>
+							 		<input type="checkbox" ng-model="row.SELECTED">
+							 	</td>
+								<td>{{row.RPT_NAME}}--{{row.RPT_EXPLAIN}}</td>
+							</tr>
+						</tbody>
+					</table>
+					<table ng-show="showStep2">
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList2 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							 	<td>
+							 		<input type="checkbox" ng-model="row.SELECTED">
+							 	</td>
+								<td>{{row.COL_NAME}}</td>		
+							</tr>
+						</tbody>
+					</table>
+					<div id="chartContainer" style="height: 370px; width: 100%;" ng-show="showStep3 || pms900"></div>
+				</div>
+			</div>	
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="back()" ng-hide="showStep1 || pms900">上一步</button>
+				<button type="button" class="btn btn-info" ng-click="next()" ng-hide="showStep3">下一步</button>
+			</div>
+		</div>
+	</div> 
+</div>

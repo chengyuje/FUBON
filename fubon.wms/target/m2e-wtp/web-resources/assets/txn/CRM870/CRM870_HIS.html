@@ -1,0 +1,632 @@
+<style>
+.modal-dialog.CRM870_HIS {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1500px;
+	height: 900px;
+}
+/* table size */
+.CRM870_HIS table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM870_HIS.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM870_HIS_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.red{
+	color: red !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/CRM870/CRM870_HIS.js"></script>
+<script type="text/javascript" src="assets/txn/PRD312/PRD312_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD313/PRD313_DETAIL.js"></script>
+<div class="CRM870_HIS" ng-controller="CRM870_HISController" ng-cloak>
+	<div class="modal-dialog CRM870_HIS">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">證券往來({{custVO.CUST_ID}}<span style="font-weight: normal;">{{custVO.CUST_NAME}}</span>)</h4>
+			</div>
+			<div class="modal-body">
+				<div class="search_table search_box3">
+					<h4 class="h4-title">查詢條件</h4>
+					<table>
+		           		<tr>
+		           			<th style="width:5%"><input type="radio" ng-model="inputVO.RPT_TYPE" value="DT_SEARCH"><label>依日期查詢(成交/現金入帳)</label></th>
+		           			<td ng-if="inputVO.RPT_TYPE == 'DT_SEARCH'">
+								<div class="form-group">
+									<div class="input-group datebox datewidth">
+										<input 	type="text" id="startDate" name="startDate"
+												class="form-control"
+												uib-datepicker-popup="yyyy/MM/dd"
+												ng-model="inputVO.startDate"
+												is-open="model.a"
+												datepicker-options="startDateOptions"
+												ng-readonly="true"
+												ng-change="limitDate()" />
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+									<div style="float: left !important;">～</div>
+									<div class="input-group datebox datewidth">
+										<input 	type="text" id="endDate" name="endDate"
+												class="form-control"
+												uib-datepicker-popup="yyyy/MM/dd"
+												ng-model="inputVO.endDate"
+												is-open="model.b"
+												datepicker-options="endDateOptions"
+												ng-readonly="true"
+												ng-change="limitDate()" />
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+								</div>
+							</td>
+			             	<td ng-if="inputVO.RPT_TYPE != 'DT_SEARCH'"></td>
+						</tr>
+						<tr>
+							<th style="width:5%"><input type="radio" ng-model="inputVO.RPT_TYPE" value="PRD_SEARCH"><label>依產品代碼查詢</label></th>
+							<td ng-if="inputVO.RPT_TYPE == 'PRD_SEARCH'"><input class="form-control" type="text" placeholder="請輸入..." ng-model="inputVO.prdID" ></td>
+							<td ng-if="inputVO.RPT_TYPE != 'PRD_SEARCH'"></td>
+						</tr>
+		       		</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="getTXNList(tabSheet);getDIVList(tabSheet);">查詢</button>
+				</div>
+				<uib-tabset active="tabSheet" justified="true"> 
+					<uib-tab index="1" heading="複委託全部" ng-click="getTXNList(1);getDIVList(1);">
+						<h4 class="h4-title">往來記錄</h4>
+						<div class="gv_tab_sc scroll_y">
+							<e-jumping-once output="outputVO_t_all" list="txnData_all" totallist="txnList_all"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="e-table-freeze table td_center" e-mode="1" e-top="true" e-list="txnData_all">
+									<thead>
+										<tr>
+											<th>證券帳號</th>
+											<th>產品種類</th>
+											<th>委託書編號</th>
+											<th>成交日期</th>
+											<th>交割日期</th>
+											<th>交易類別</th>
+											<th>產品代碼</th>
+											<th>產品名稱</th>
+											<th>商品幣別</th>
+											<th>單位數/面額</th>
+											<th>成交價格</th>
+											<th>交易金額</th>
+											<th>債券前手息</th>
+											<th>交割金額</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in txnData_all">
+											<td>{{row.ACCT_NBR}}</td>
+											<td>{{row.PRODUCT_CODE_DESC}}</td>
+											<td>{{row.WARRANT_NBR}}{{row.WARRANT_SEQ_NBR}}</td>
+											<td>{{toJsDate(row.TXN_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{toJsDate(row.SETTLE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.TRADING_TYPE_CODE_DESC}}</td>
+											<td>
+												<span ng-if="row.PRODUCT_CODE_DESC == '複委託結構'"><a onclick="return false" ng-click="detail(4, row)">{{row.PROD_ID}}</a></span>
+												<span ng-if="row.PRODUCT_CODE_DESC == '境內結構型商品'"><a onclick="return false" ng-click="detail(5, row)">{{row.PROD_ID}}</a></span>
+												<span ng-if="row.PRODUCT_CODE_DESC == '複委託股票' || row.PRODUCT_CODE_DESC == '複委託債券'">{{row.PROD_ID}}</span>
+											</td>
+											<td>{{row.PROD_NAME}}</td>
+											<td>{{row.CURRENCY}}</td>
+											<td>{{row.QTY | number:2}}</td>
+											<td>{{row.UNIT_PRICE | number:4}}</td>
+											<td>{{row.TXN_AMT_FC | number:2}}</td>
+											<td>{{row.BOND_PRE_INTEREST | number:2}}</td>
+											<td>{{row.SETTLE_AMT_FC | number:2}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<h4 class="h4-title">配股/配息</h4>
+						<div class="gv_tab_sc scroll_y">
+							<e-jumping-once output="outputVO_d_all" list="divData_all" totallist="divList_all"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="e-table-freeze table td_center" e-mode="1" e-top="true" e-list="divData_all">
+									<thead>
+										<tr>
+											<th>證券帳號</th>
+											<th>產品種類</th>
+											<th>基準日</th>
+											<th>產品代碼</th>
+											<th>產品名稱</th>
+											<th>交易類別</th>
+											<th>基準日單位數</th>
+											<th>商品幣別</th>
+											<th>配息金額</th>
+											<th>稅金</th>
+											<th>配股數</th>
+											<th>應收付金額</th>
+											<th>現金入帳日</th>
+											<th>入金帳號</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in divData_all">
+											<td>{{row.ACCT_NBR}}</td>
+											<td>{{row.PRODUCT_CODE_DESC}}</td>
+											<td>{{toJsDate(row.ALLOCATE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>
+												<span ng-if="row.PRODUCT_CODE_DESC == '複委託結構'"><a onclick="return false" ng-click="detail(4, row)">{{row.PROD_ID}}</a></span>
+												<span ng-if="row.PRODUCT_CODE_DESC == '境內結構型商品'"><a onclick="return false" ng-click="detail(5, row)">{{row.PROD_ID}}</a></span>
+												<span ng-if="row.PRODUCT_CODE_DESC == '複委託股票' || row.PRODUCT_CODE_DESC == '複委託債券'">{{row.PROD_ID}}</span>
+											</td>
+											<td>{{row.PROD_NAME}}</td>
+											<td>{{row.TYPE_CODE_DESC}}</td>
+											<td>{{row.QTY | number:2}}</td>
+											<td>{{row.STOCK_CURRENCY}}</td>
+											<td>{{row.DIVIDEND_AMT | number:2}}</td>
+											<td>{{row.TAX_AMT | number:2}}</td>
+											<td>{{(row.PAID_ALLOTMENT_QTY + row.FREE_ALLOTMENT_QTY) | number:0}}</td>
+											<td>{{row.NET_AMT | number:2}}</td>
+											<td>{{toJsDate(row.CASH_POSTING_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.TO_BANK_ACCT_NBR}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</uib-tab> 
+					<uib-tab index="2" heading="海外股票" ng-click="getTXNList(2);getDIVList(2);">
+						<h4 class="h4-title">往來記錄</h4>
+						<div class="gv_tab_sc scroll_y">
+							<e-jumping-once output="outputVO_t_stock" list="txnData_stock" totallist="txnList_stock"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="e-table-freeze table td_center" e-mode="1" e-top="true" e-list="txnData_stock">
+									<thead>
+										<tr>
+											<th>證券帳號</th>
+											<th>產品種類</th>
+											<th>委託書編號</th>
+											<th>成交日期</th>
+											<th>交割日期</th>
+											<th>交易類別</th>
+											<th>產品代碼</th>
+											<th>產品名稱</th>
+											<th>商品幣別</th>
+											<th>單位數/面額</th>
+											<th>客戶成交價</th>
+											<th>交易金額</th>
+											<th>交割金額</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in txnData_stock">
+											<td>{{row.ACCT_NBR}}</td>
+											<td>{{row.PRODUCT_CODE_DESC}}</td>
+											<td>{{row.WARRANT_NBR}}{{row.WARRANT_SEQ_NBR}}</td>
+											<td>{{toJsDate(row.TXN_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{toJsDate(row.SETTLE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.TRADING_TYPE_CODE_DESC}}</td>
+											<td>{{row.PROD_ID}}</td>
+											<td>{{row.PROD_NAME}}</td>
+											<td>{{row.CURRENCY}}</td>
+											<td>{{row.QTY | number:0}}</td>
+											<td>{{row.UNIT_PRICE | number:4}}</td>
+											<td>{{row.TXN_AMT_FC | number:2}}</td>
+											<td>{{row.SETTLE_AMT_FC | number:2}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<h4 class="h4-title">配股/配息</h4>
+						<div class="gv_tab_sc scroll_y">
+							<e-jumping-once output="outputVO_d_stock" list="divData_stock" totallist="divList_stock"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="e-table-freeze table td_center" e-mode="1" e-top="true" e-list="divData_stock">
+									<thead>
+										<tr>
+											<th>證券帳號</th>
+											<th>產品種類</th>
+											<th>基準日</th>
+											<th>產品代碼</th>
+											<th>產品名稱</th>
+											<th>交易類別</th>
+											<th>基準日單位數</th>
+											<th>商品幣別</th>
+											<th>現金股利</th>
+											<th>稅金</th>
+											<th>發行費</th>
+											<th>應收付金額</th>
+											<th>現金入帳日</th>
+											<th>入金帳號</th>
+											<th>配股股數</th>
+											<th>股票入帳日</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in divData_stock">
+											<td>{{row.ACCT_NBR}}</td>
+											<td>{{row.PRODUCT_CODE_DESC}}</td>
+											<td>{{toJsDate(row.ALLOCATE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.PROD_ID}}</td>
+											<td>{{row.PROD_NAME}}</td>
+											<td>{{row.TYPE_CODE_DESC}}</td>
+											<td>{{row.QTY | number:0}}</td>
+											<td>{{row.STOCK_CURRENCY}}</td>
+											<td>{{row.DIVIDEND_AMT | number:2}}</td>
+											<td>{{row.TAX_AMT | number:2}}</td>
+											<td>{{row.ISSUE_FEE | number:2}}</td>
+											<td>{{row.NET_AMT | number:2}}</td>
+											<td>{{toJsDate(row.CASH_POSTING_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.TO_BANK_ACCT_NBR}}</td>
+											<td>{{(row.PAID_ALLOTMENT_QTY + row.FREE_ALLOTMENT_QTY) | number:0}}</td>
+											<td>{{toJsDate(row.STOCK_POSTING_DATE) | date:'yyyy-MM-dd'}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</uib-tab> 
+					<uib-tab index="3" heading="海外債券" ng-click="getTXNList(3);getDIVList(3);">
+						<h4 class="h4-title">往來記錄</h4>
+						<div class="gv_tab_sc scroll_y">
+							<e-jumping-once output="outputVO_t_bond" list="txnData_bond" totallist="txnList_bond"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="e-table-freeze table td_center" e-mode="1" e-top="true" e-list="txnData_bond">
+									<thead>
+										<tr>
+											<th>證券帳號</th>
+											<th>產品種類</th>
+											<th>委託書編號</th>
+											<th>成交日期</th>
+											<th>交割日期</th>
+											<th>交易類別</th>
+											<th>產品代碼</th>
+											<th>產品名稱</th>
+											<th>商品幣別</th>
+											<th>單位數/面額</th>
+											<th>客戶成交價</th>
+											<th>前手息</th>
+											<th>交割金額</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in txnData_bond">
+											<td>{{row.ACCT_NBR}}</td>
+											<td>{{row.PRODUCT_CODE_DESC}}</td>
+											<td>{{row.WARRANT_NBR}}{{row.WARRANT_SEQ_NBR}}</td>
+											<td>{{toJsDate(row.TXN_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{toJsDate(row.SETTLE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.TRADING_TYPE_CODE_DESC}}</td>
+											<td>{{row.PROD_ID}}</td>
+											<td>{{row.PROD_NAME}}</td>
+											<td>{{row.CURRENCY}}</td>
+											<td>{{row.QTY | number:2}}</td>
+											<td>{{row.UNIT_PRICE | number:4}}</td>
+											<td>{{row.BOND_PRE_INTEREST | number:2}}</td>
+											<td>{{row.SETTLE_AMT_FC | number:2}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<h4 class="h4-title">配股/配息</h4>
+						<div class="gv_tab_sc scroll_y">
+							<e-jumping-once output="outputVO_d_bond" list="divData_bond" totallist="divList_bond"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="e-table-freeze table td_center" e-mode="1" e-top="true" e-list="divData_bond">
+									<thead>
+										<tr>
+											<th>證券帳號</th>
+											<th>產品種類</th>
+											<th>基準日</th>
+											<th>產品代碼</th>
+											<th>產品名稱</th>
+											<th>交易類別</th>
+											<th>基準日單位數</th>
+											<th>商品幣別</th>
+											<th>配息金額</th>
+											<th>應收付金額</th>
+											<th>現金入帳日</th>
+											<th>入金帳號</th>
+											<th>債券累計配息<br />次數</th>
+											<th>債券累計配息<br />金額</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in divData_bond">
+											<td>{{row.ACCT_NBR}}</td>
+											<td>{{row.PRODUCT_CODE_DESC}}</td>
+											<td>{{toJsDate(row.ALLOCATE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.PROD_ID}}</td>
+											<td>{{row.PROD_NAME}}</td>
+											<td>{{row.TYPE_CODE_DESC}}</td>
+											<td>{{row.QTY | number:2}}</td>
+											<td>{{row.STOCK_CURRENCY}}</td>
+											<td>{{row.DIVIDEND_AMT | number:2}}</td>
+											<td>{{row.NET_AMT | number:2}}</td>
+											<td>{{toJsDate(row.CASH_POSTING_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.TO_BANK_ACCT_NBR}}</td>
+											<td>{{row.BOND_DIVIDEND_ACCU_CNT | number:0}}</td>
+											<td>{{row.BOND_DIVIDEND_ACCU_AMT | number:2}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</uib-tab> 
+					<uib-tab index="4" heading="境外結構型商品" ng-click="getTXNList(4);getDIVList(4);">
+						<h4 class="h4-title">往來記錄</h4>
+						<div class="gv_tab_sc scroll_y">
+							<e-jumping-once output="outputVO_t_sn" list="txnData_sn" totallist="txnList_sn"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="e-table-freeze table td_center" e-mode="1" e-top="true" e-list="txnData_sn">
+									<thead>
+										<tr>
+											<th>證券帳號</th>
+											<th>產品種類</th>
+											<th>委託書編號</th>
+											<th>成交日期</th>
+											<th>交割日期</th>
+											<th>交易類別</th>
+											<th>產品代碼</th>
+											<th>產品名稱</th>
+											<th>商品幣別</th>
+											<th>單位數/面額</th>
+											<th>客戶成交價</th>
+											<th>前手息</th>
+											<th>交割金額</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in txnData_sn">
+											<td>{{row.ACCT_NBR}}</td>
+											<td>{{row.PRODUCT_CODE_DESC}}</td>
+											<td>{{row.WARRANT_NBR}}{{row.WARRANT_SEQ_NBR}}</td>
+											<td>{{toJsDate(row.TXN_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{toJsDate(row.SETTLE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.TRADING_TYPE_CODE_DESC}}</td>
+											<td><a onclick="return false" ng-click="detail(4, row)">{{row.PROD_ID}}</a></td>
+											<td>{{row.PROD_NAME}}</td>
+											<td>{{row.CURRENCY}}</td>
+											<td>{{row.QTY | number:2}}</td>
+											<td>{{row.UNIT_PRICE | number:4}}</td>
+											<td>{{row.TXN_AMT_FC | number:2}}</td>
+											<td>{{row.SETTLE_AMT_FC | number:2}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<h4 class="h4-title">配股/配息</h4>
+						<div class="gv_tab_sc scroll_y">
+							<e-jumping-once output="outputVO_d_sn" list="divData_sn" totallist="divList_sn"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="e-table-freeze table td_center" e-mode="1" e-top="true" e-list="divData_sn">
+									<thead>
+										<tr>
+											<th>證券帳號</th>
+											<th>產品種類</th>
+											<th>基準日</th>
+											<th>產品代碼</th>
+											<th>產品名稱</th>
+											<th>交易類別</th>
+											<th>面額</th>
+											<th>商品幣別</th>
+											<th>配息金額</th>
+											<th>配息率</th>
+											<th>應收付金額</th>
+											<th>現金入帳日</th>
+											<th>入金帳號</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in divData_sn">
+											<td>{{row.ACCT_NBR}}</td>
+											<td>{{row.PRODUCT_CODE_DESC}}</td>
+											<td>{{toJsDate(row.ALLOCATE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td><a onclick="return false" ng-click="detail(4, row)">{{row.PROD_ID}}</a></td>
+											<td>{{row.PROD_NAME}}</td>
+											<td>{{row.TYPE_CODE_DESC}}</td>
+											<td>{{row.QTY | number:2}}</td>
+											<td>{{row.STOCK_CURRENCY}}</td>
+											<td>{{row.DIVIDEND_AMT | number:2}}</td>
+											<td>{{row.DIVIDEND_RATE | number:4}} %</td>
+											<td>{{row.NET_AMT | number:2}}</td>
+											<td>{{toJsDate(row.CASH_POSTING_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.TO_BANK_ACCT_NBR}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</uib-tab> 
+					<uib-tab index="5" heading="境內結構型商品" ng-click="getTXNList(5);getDIVList(5);">
+						<h4 class="h4-title">成交明細</h4>
+						<div class="gv_tab_sc scroll_y">
+							<e-jumping-once output="outputVO_t_dsn" list="txnData_dsn" totallist="txnList_dsn"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="e-table-freeze table td_center"  e-mode="1" e-top="true" e-list="txnData_dsn">
+									<thead>
+										<tr>
+											<th>資料日期</th>
+											<th>境內衍商帳號</th>
+											<th>成交單序號</th>
+											<th>產品代碼</th>
+											<th>產品名稱</th>
+											<th>成交日</th>
+											<th>交割日</th>
+											<th>到期日</th>
+											<th>到期交割日</th>
+											<th>成交價</th>
+											<th>交易別</th>
+											<th>契約名目本金</th>
+											<th>應收金額</th>
+											<th>代扣繳稅額</th>
+											<th>交割金額</th>
+											<th>約當股數</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in txnData_dsn">
+											<td>{{toJsDate(row.SNAP_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.ACCT_NBR}}</td>
+											<td>{{row.TXN_WARRANT_NBR}}</td>
+											<td><a onclick="return false" ng-click="detail(5, row)">{{row.STOCK_CODE}}</a></td>
+											<td>{{row.STOCK_NAME}}</td>
+											<td>{{toJsDate(row.TXN_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{toJsDate(row.SETTLE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{toJsDate(row.MATURITY_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{toJsDate(row.SETTLE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.UNIT_PRICE | number:4}}%</td>
+											<td>{{row.TXN_TYPE_DESC}}</td>
+											<td>{{row.FACE_VALUE | number:2}}</td>
+											<td>{{row.RECEIVABLES_AMT | number:2}}</td>
+											<td>{{row.WITHHOLDING_TAX | number:2}}</td>
+											<td>{{row.SETTLE_AMT | number:2}}</td>
+											<td>{{row.NBR_OF_SHARES | number:0}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<h4 class="h4-title">到期交割明細</h4>
+						<div class="gv_tab_sc scroll_y">
+							<e-jumping-once output="outputVO_t_dsn_e" list="txnData_dsn_e" totallist="txnList_dsn_e"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="e-table-freeze table td_center" e-mode="1" e-top="true" e-list="txnList_dsn_e">
+									<thead>
+										<tr>
+											<th>境內衍商帳號</th>
+											<th>成交單序號<br>新作交易序號</th>
+											<th>產品代碼</th>
+											<th>產品名稱</th>
+											<th>到期種類</th>
+											<th>到期日</th>
+											<th>到期交割日</th>
+											<th>契約名目本金</th>
+											<th>到期結算價格</th>
+											<th>到期結算金額</th>
+											<th>損益金額</th>
+											<th>代扣繳稅額</th>
+											<th>稅後應收付金額</th>
+											<th>補扣稅款日</th>
+											<th>交割種類</th>
+											<th>實物交割<br>股票代碼</th>
+											<th>實物交割股票名稱</th>
+											<th>標的覆約價</th>
+											<th>實物交割股數</th>
+											<th>實物結算價</th>
+											<th>實際撥券日</th>
+											<th>券商名稱</th>
+											<th>集保帳號</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in txnData_dsn_e">
+											<td style="vertical-align:middle;">{{row.ACCT_NBR}}</td>
+											<td style="vertical-align:middle;">{{row.TXN_WARRANT_NBR}}<br>{{row.EXTRACT_WARRANT_NBR}}</td>
+											<td style="vertical-align:middle;"><a onclick="return false" ng-click="detail(5, row)">{{row.STOCK_CODE}}</a></td>
+											<td style="vertical-align:middle;">{{row.STOCK_NAME}}</td>
+											<td style="vertical-align:middle;">{{row.EXTRACT_TYPE_DESC}}</td>
+											<td style="vertical-align:middle;">{{toJsDate(row.MATURITY_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td style="vertical-align:middle;">{{toJsDate(row.SETTLE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td style="vertical-align:middle;">{{row.FACE_VALUE | number:2}}</td>
+											<td style="vertical-align:middle;">{{row.UNIT_PRICE | number:4}} %</td>
+											<td style="vertical-align:middle;">{{row.RECEIVABLES_AMT | number:2}}</td>
+											<td style="vertical-align:middle;">{{row.BENEFIT_AMT | number:2}}</td>
+											<td style="vertical-align:middle;">{{row.WITHHOLDING_TAX | number:2}}</td>
+											<td style="vertical-align:middle;">{{row.SETTLE_AMT | number:2}}</td>
+											<td style="vertical-align:middle;">{{toJsDate(row.PAY_OVERDUE_TAX_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td style="vertical-align:middle;">{{row.SETTLE_TYPE_DESC}}</td>
+											<td style="vertical-align:middle;">{{row.SETTLE_STOCK_CODE}}</td>
+											<td style="vertical-align:middle;">{{row.SETTLE_STOCK_NAME}}</td>
+											<td style="vertical-align:middle;">{{row.STRIKE_PRICE | number:2}}</td>
+											<td style="vertical-align:middle;">{{row.SETTLE_NBR_OF_SHARES | number:0}}</td>
+											<td style="vertical-align:middle;">{{row.CLOSING_PRICE | number:2}}</td>
+											<td style="vertical-align:middle;">{{toJsDate(row.SBL_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td style="vertical-align:middle;">{{row.BROKER_NAME}}</td>
+											<td style="vertical-align:middle;">{{row.TDC_ACCT_NBR}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<h4 class="h4-title">配股/配息</h4>
+						<div class="gv_tab_sc scroll_y">
+							<e-jumping-once output="outputVO_d_dsn" list="divData_dsn" totallist="divList_dsn"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table class="e-table-freeze table td_center" e-mode="1" e-top="true" e-list="divList_dsn">
+									<thead>
+										<tr>
+											<th>境內衍商帳號</th>
+											<th>產品代碼</th>
+											<th>產品名稱</th>
+											<th>期別</th>
+											<th>庫存名目本金</th>
+											<th>約定利率(%)</th>
+											<th>配息評價日</th>
+											<th>配息入帳日</th>
+											<th>幣別</th>
+											<th>配息金額</th>
+											<th>入帳帳號</th>
+											<th>狀態註記</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in divData_dsn">
+											<td>{{row.ACCT_NBR}}</td>
+											<td><a onclick="return false" ng-click="detail(5, row)">{{row.STOCK_CODE}}</a></td>
+											<td>{{row.STOCK_NAME}}</td>
+											<td>{{row.SEQ_NO}}</td>
+											<td>{{row.FACE_VALUE | number:2}}</td>
+											<td>{{row.CONTRACT_RATE * 100 | number:2}}</td>
+											<td>{{toJsDate(row.EVALUATE_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{toJsDate(row.DIVIDEND_DATE) | date:'yyyy-MM-dd'}}</td>
+											<td>{{row.CURRENCY}}</td>
+											<td>{{row.DIVIDEND_AMT | number:2}}</td>
+											<td>{{row.BANK_ACCT_NBR}}</td>
+											<td>{{row.STATUS_DESC}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</uib-tab> 
+				</uib-tabset>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,284 @@
+<style>
+/* open dialog */
+.ngdialog.MKT111 {
+	
+}
+/* dialog panl */
+.modal-dialog.MKT111 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.MKT111 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.MKT111.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_MKT111_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.text-angular-width{
+	width:500px;
+	border-style: solid;
+    border-width: 1px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/MKT111/MKT111.js"></script>
+<div ng-controller="MKT111Controller" ng-cloak>
+	<div class="modal-dialog MKT111">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.SEQ == null ? '新增' : '編輯'}}佈告欄</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table style="table-layout: fixed;">
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">公佈欄類別：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="bType" name="bType" 
+								ng-paramtype="CAM.BULLETIN_TYPE"
+								ng-model="inputVO.bType"
+								ng-validate="false" 
+								ng-readonly="false"
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								ng-change="check_mkt_code()"
+								width="250px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.bType.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇公佈欄類別</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">產品類別：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="pType" name="pType" 
+								ng-paramtype="CAM.PRD_TYPE"
+								ng-model="inputVO.pType"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="250px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.pType.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇產品類別</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">主旨：</th>
+							<td class="col-md-7 tdpadding">
+								<textarea id="subject" name="subject" class="form-control" ng-model="inputVO.subject" style="width: 100%; height: 100px" e-length-limit="500" required></textarea>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.subject.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入主旨</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">活動起迄日：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="form-group">
+									<div class="input-group datebox datewidth">
+										<input type="text" id="sDate" name="sDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sDate"
+										is-open="model.a"
+										datepicker-options="sDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+									<div style="float: left !important;">～</div>
+									<div class="input-group datebox datewidth">
+										<input type="text" id="eDate" name="eDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.eDate"
+										is-open="model.b"
+										datepicker-options="eDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.sDate.$error.required || parameterTypeEditForm.eDate.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇活動起迄日</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">佈告單位：</th>
+							<td class="col-md-7 tdpadding">{{inputVO.orgn ? inputVO.orgn : '總行人員'}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">聯絡窗口：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="contact" name="contact" ng-model="inputVO.contact" e-length-limit="50"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">適用人員：</th>
+							<td class="col-md-7 tdpadding">
+								<label ng-show="inputVO.bType != '06'">
+									<input type='checkbox' ng-model='clickAll' ng-change='checkrow()'> 全部
+									&nbsp;&nbsp;
+								</label>
+								<label ng-repeat="fccode in CHANNEL_CODE">
+									<input type="checkbox" name="selectedCodes[]" value="{{fccode.DATA}}" ng-checked="chkCode.indexOf(fccode.DATA) > -1" ng-click="toggleSelection(fccode.DATA)"> {{fccode.LABEL}}
+									&nbsp;&nbsp;
+								</label>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="chkCode.length == 0">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇適用人員</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">佈告內容：</th>
+							<td class="col-md-7 tdpadding">
+								<text-angular ng-model="inputVO.content" ta-text-editor-class="text-angular-width"></text-angular>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="!inputVO.content || inputVO.content.trim().length == 0">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入佈告內容</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">上傳圖片檔案：</th>
+							<td class="col-md-7 tdpadding">
+								<table>
+									<tr>
+										<td>
+											<e-upload success="uploadFinshed(name,rname)" model="inputVO.realpictureName"></e-upload>
+											<table ng-if="inputVO.exipicture">
+												<tr>
+													<td>{{inputVO.realpictureName}}</td>
+													<td><button type="button" class="btn btn-info" ng-click="removePicture()" >X</button></td>
+												<tr>
+											</table>
+										</td>
+										<td ng-if="isUpdate && pictureSrc"><img ng-src="{{pictureSrc}}" height="100" width="100" /></td>
+									</tr>
+								</table>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">上傳附件：</th>
+							<td class="col-md-7 tdpadding">
+								<table>
+									<tr>
+										<td width="20%">上傳檔案</td>
+										<td width="80%" class="tdpadding">
+											<e-upload success="uploadFinshed2(name,rname)"></e-upload>
+											<table>
+												<tr class="repeat-row" ng-repeat="row in inputVO.realfileName track by $index">
+													<td><span style="word-break: break-all;">{{row.DOC_NAME}}</span></td>
+													<td><button type="button" class="btn btn-info" ng-click="removeUpload([inputVO.fileName,inputVO.realfileName],$index)" >X</button></td>
+												<tr>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td width="20%">網址</td>
+										<td width="80%" class="tdpadding">
+											<table>
+												<tr>
+													<td><input class="form-control" type="text" placeholder="請輸入..." id="webtext" name="webtext" ng-model="inputVO.webtext" ng-enter="addWeb(inputVO.webtext)" e-length-limit="4000"></td>
+													<td><button type="button" class="btn btn-info" ng-click="addWeb(inputVO.webtext)" >┼</button></td>
+												</tr>
+												<tr class="repeat-row" ng-repeat="row in inputVO.web track by $index">
+													<td><span style="word-break: break-all;">{{row.DOC_NAME}}</span></td>
+													<td><button type="button" class="btn btn-info" ng-click="removeUpload([inputVO.web],$index)" >X</button></td>
+												<tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="addData()" >儲存</button>
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

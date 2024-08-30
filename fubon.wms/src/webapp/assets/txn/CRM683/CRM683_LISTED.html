@@ -1,0 +1,84 @@
+<style>
+    /* open dialog */
+    .ngdialog.CRM827_FUND {
+
+    }
+
+</style>
+<script type="text/javascript" src="assets/txn/CRM683/CRM683.js"></script>
+<script type="text/javascript" src="assets/txn/CRM683/CRM683_LISTED.js"></script>
+<div class="CRM683_LISTED" ng-controller="CRM683_LISTEDController" ng-cloak>
+    <h4 class="h4-title">上市櫃股票</h4>
+<!--    <div class="search_table search_box3">
+        <table>
+            <tr>
+                <th>(約當臺幣)</th>
+                <td></td>
+                <th></th>
+                <td></td>
+            </tr>
+            <tr>
+                <th>參考總市值：</th>
+                <td>{{SUMCurBal | number :0}}</td>
+                <th>股票：</th>
+                <td>{{FundType_1 | number :0}}</td>
+            </tr>
+            <tr>
+                <th>參考總投資金額：</th>
+                <td>{{SUMCurAmt | number :0}}</td>
+                <th>債券：</th>
+                <td>{{FundType_4 | number :0}}</td>
+            </tr>
+            <tr>
+                <th>參考總損益金額：</th>
+                <td>{{SUMProfitAndLoss | number :0}}</td>
+                <th>平衡：</th>
+                <td>{{FundType_5 | number :0}}</td>
+            </tr>
+            <tr>
+                <th>參考總報酬率(不含配息)：</th>
+                <td>{{Return | number :2}} {{Return != null && Return != undefined && Return != '' ? '%' : ''}}</td>
+                <th>貨幣：</th>
+                <td>{{FundType_3 | number :0}}</td>
+            </tr>
+            <tr>
+				<th>參考總報酬率(含配息)：</th>
+				<td>{{Return_int | number :2}} {{Return_int != null && Return_int != undefined && Return_int != '' ? '%' : ''}}</td>
+			</tr>
+        </table>
+    </div> --> 
+    <!--<div class="search_box_btn text-center">
+<button type="button" class="btn btn-info" ng-click="goCharge()" function-type="query">約定扣款查詢</button>
+<button type="button" class="btn btn-info" ng-click="goCoupon()" function-type="query">配息/配權查詢</button>
+</div>
+--><!-- 結果區 -->
+    <e-jumping-once output="outputVO" list="data" totallist="stockList"></e-jumping-once>
+    <div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+        <table class="modal-body table-bordered">
+            <tr>
+            	<th>證券代號</th>
+            	<th>名稱</th>
+                <th>契約幣別</th>
+                <th>成本金額</th>
+                <th>無償配股股數</th>
+                <th>有償配股股數</th>
+                <th>庫存股數</th>
+                <th>參考收盤價日</th>
+                <th>參考收盤價</th>
+                <th>參考市值<br>(證券計價幣別)</th>
+            </tr>
+            <tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                <td style="text-align: left;">{{row.STOCK_ID}}</td> 
+                <td style="text-align: left;">{{row.STOCK_NAME}}</td>
+                <td style="text-align: left;">{{row.CURRENCY}}</td>
+                <td style="text-align: left;">{{row.INV_AMT | currency:''}}</td>
+                <td style="text-align: right;">{{row.STOCK_NO1 | currency:''}}</td>
+                <td style="text-align: right;">{{row.STOCK_NO2 | currency:''}}</td>
+                <td style="text-align: right;">{{row.STOCK_TOTAL_NO | currency:''}}</td>
+                <td style="text-align: left;">{{toJsDate(row.REF_VAL_DATE) | date:'yyyy/MM/dd'}}</td>
+                <td style="text-align: right;">{{row.REF_VAL | currency:''}}</td>
+                <td style="text-align: right;">{{row.REF_MARKET_VAL | currency:''}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

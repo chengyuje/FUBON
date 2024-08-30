@@ -1,0 +1,125 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS413_EDIT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+
+<div ng-controller="PMS413_EDITController" ng-cloak>
+	<div class="modal-dialog PMS413_EDIT"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row == null ? '新增' : '修改'}}{{Ctp}}電腦</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding">*電腦類型：</th>
+							<td class="col-md-3 tdpadding">
+								<e-combobox id="comType" name="comType" 
+											ng-datasource="mappingSet['comType']"
+											ng-model="inputVO.comType"
+											ng-validate="false" 
+											ng-readonly="cmbLock == 'true'" 
+											ng-required="true"
+											ng-editable="false"
+											ng-change="comTypeChange();"
+											ng-disabled="cmbLock == 'true'"
+											ng-format="F3"
+											width="180px"
+											style="line-height:20px;" />
+							</td>
+							<th class="col-md-2 tdpadding">*IP Address：</th>
+							<td class="col-md-3 tdpadding"><input type="text" class="form-control" onkeyup="value=value.replace(/[^\d^\.]/g,'') " placeholder="請輸入IP Address..." ng-model="inputVO.ip" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding">*業務處：</th>
+							<td class="col-md-3 tdpadding">
+								<e-combobox id="rc_id" name="rc_id"
+											ng-datasource="REGION_LIST"
+											ng-model="inputVO.rc_id"
+											ng-validate="false" 
+											ng-disabled="AVAIL_REGION.length == 1"
+											ng-readonly="AVAIL_REGION.length == 1" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeRegion(region)"
+											style="line-height:20px;" />
+							</td>
+							<th class="col-md-2 tdpadding">*營運區：</th>
+							<td class="col-md-3 tdpadding">
+								<e-combobox id="op_id" name="op_id"
+											ng-datasource="AREA_LIST"
+											ng-model="inputVO.op_id"
+											ng-validate="false" 
+											ng-disabled="AVAIL_AREA.length == 1"
+											ng-readonly="AVAIL_AREA.length == 1" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeArea(region)"
+											style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding">*分行：</th>
+							<td class="col-md-3 tdpadding">
+								<e-combobox id="br_id" name="br_id"
+											ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.br_id"
+											ng-validate="false" 
+											ng-disabled="AVAIL_BRANCH.length == 1"
+											ng-readonly="AVAIL_BRANCH.length == 1" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											ng-change="ChangeBranch(region)"
+											style="line-height:20px;" />	
+							</td>
+							<th class="col-md-2 tdpadding" ng-show="inputVO.comType == '2'">員工編號：</th>
+							<td class="col-md-3 tdpadding" ng-show="inputVO.comType == '2'">
+								<!-- 2017/11/9 mantis:3938 直接輸入且不檢核 -->
+								<input type="text" class="form-control" placeholder="請輸入..." id="emp_id" name="emp_id" ng-model="inputVO.emp_id" ng-blur="getEmpName()" e-length-limit="11">
+								<span ng-class="{'with-errors': !inputVO.emp_name}">{{inputVO.emp_name ? inputVO.emp_name : '客戶主檔無此客戶'}}</span>
+<!-- 								<e-combobox id="emp_id" name="emp_id" -->
+<!-- 								ng-datasource="EMP_LIST" -->
+<!-- 								ng-model="inputVO.emp_id" -->
+<!-- 								ng-validate="false"  -->
+<!-- 								ng-disabled="EMP_LIST.length == 2" -->
+<!-- 								ng-readonly="EMP_LIST.length == 2"  -->
+<!-- 								ng-editable="false" -->
+<!-- 								ng-format="F1" -->
+<!-- 								ng-required="false" -->
+<!-- 								ng-change="ChangeEmp_id(region)" -->
+<!-- 								style="line-height:20px;" /> -->
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-mousedown="save()">確定</button>
+				<button type="button" class="btn btn-default" ng-mousedown="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div> 
+</div>

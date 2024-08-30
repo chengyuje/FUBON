@@ -1,0 +1,204 @@
+<style>
+.rstable tr th {
+	vertical-align:middle;
+}
+.rstable tr td {
+	vertical-align:middle;
+	height: 50px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT140/SOT140.js"></script>
+<script type="text/javascript" src="assets/txn/PRD110/PRD110.js"></script>
+<script type="text/javascript" src="assets/txn/SOT140/SOT140_ROUTE.js"></script>
+<script type="text/javascript" src="assets/txn/SOT132/SOT132.js"></script>
+<script type="text/javascript" src="assets/txn/SOT712/FitnessMessageDialog.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100_BOSS.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512_DETAILS.js"></script>
+
+<div class="SOT140" ng-controller="SOT140Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >商品資料輸入及適配</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<h4 class="h4-title">交易資料輸入</h4>
+				<table class="rstable">
+					<tr ng-hide='true'>
+						<th width="15%">來行人員：</th>
+						<td colspan="6">
+							<div ng-repeat="row in mappingSet['SOT.CUST_TYPE']" style="display:inline;">
+								<input type="radio" name="custType" ng-model="inputVO.custType" ng-value="row.DATA" ng-hide="row.DATA == 'AGENT'"><span ng-hide="row.DATA == 'AGENT'">&nbsp;{{row.LABEL}}&nbsp;&nbsp;</span></input>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th style="vertical-align:middle" rowspan="3">客戶資訊：</th>
+					</tr>
+					<tr>
+						<td width="20%">*客戶ID：<input type="text" class="form-control" style="width:auto;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" ng-disabled="cartList.length > 0" ng-blur="validateSeniorCust();" e-length-limit="16" required></td>						
+						<td width="30%">{{inputVO.custName}}</td>
+						<td>KYC等級/效期：{{inputVO.kycLV}}/{{inputVO.kycDueDate | date:"yyyy-MM-dd"}}</td>
+						
+					</tr>
+					<tr>
+						<td>客戶註記：{{inputVO.custRemarks | mapping:mappingSet['SOT.SPEC_CUSTOMER']:'F3'}}</td>
+						<td>OBU註記：{{inputVO.isOBU}}</td>
+						<td>同意投資商品諮詢服務：{{inputVO.isAgreeProdAdv}}</td>					
+					</tr>
+					<!-- <tr>
+						<th>代理人：</th>
+						<td><input type="text" class="form-control" style="width:auto;display:inline;" id="proxyCustID" name="proxyCustID" ng-model="inputVO.proxyCustID" e-length-limit="11" disabled></td>
+						<td colspan="5"></td>
+					</tr> -->
+				</table>
+				<div style="margin-bottom: 10px;">
+						<button type="button" class="btn btn-info" ng-click="goSOT132()">選擇庫存</button>
+				</div>
+				<table class="rstable">
+					<tr>
+						<th width="15%">轉出標的：</th>
+						<td colspan="2" width="20%">{{inputVO.outProdID}}  {{inputVO.outProdName}}</td>
+						<td width="10%">計價幣別：{{inputVO.outProdCurr}}</td>						
+						<td width="15%">產品風險等級：{{inputVO.outProdRiskLV}}</td>
+						<td width="15%">信託金額：{{inputVO.outTrustCurr}} {{inputVO.outTrustAmt|number:filterNumber}}</td>						
+						<td width="25%"></td>
+					</tr>
+					<tr>
+						<th>信託型態：</th>
+						<td>{{inputVO.outTradeTypeD | mapping:mappingSet['SOT_AssetType']:'F3'}}</td>
+					</tr>
+					<tr>
+						<th>憑證編號：</th>
+						<td>{{inputVO.outCertificateID}}</td>
+					</tr>
+					<tr>
+						<th>信託業務別：</th>
+						<td>{{inputVO.outTrustCurrType | mapping:mappingSet['SOT.TRUST_CURR_TYPE']:'F3'}}</td>
+					</tr> 
+					<tr>
+						<th>原單位數：</th>
+						<td>{{inputVO.outUnit | number:4}}</td>
+					</tr>
+					<tr>
+						<th width="15%">轉出方式：</th>
+						<td colspan="6">
+							<div ng-repeat="row in mappingSet['SOT.TRANSFER_TYPE']" style="display:inline;">
+								<input type="radio" name="transferType" ng-model="inputVO.transferType" ng-value="row.DATA" ng-click="changeTransferType()" ng-hide="row.DATA == 'AGENT'" ><span ng-hide="row.DATA == 'AGENT'">&nbsp;{{row.LABEL}}&nbsp;&nbsp;</span></input>
+							</div>
+						</td>
+					</tr>
+				</table>
+				<div style="margin-bottom: 10px;">
+						<button type="button" class="btn btn-info" ng-click="goPRD110series()">搜尋可轉換標的</button>
+				</div>
+				<table class="rstable">
+					<tr ng-repeat="inProd in inProdList">
+						<th width="15%">轉入標的：</th>
+						<td ng-if="$index=='0'" width="20%">*基金代號：<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="inProdID1" name="inProdID1" ng-model="inProd.inProdID1" ng-blur="checkFundStatus($index,'N');compareCDSCMonth()" e-length-limit="16" ></td>
+						<td ng-if="$index!='0'" width="20%">基金代號：<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="inProdID1" name="inProdID1" ng-model="inProd.inProdID1" ng-blur="checkFundStatus($index,'N')" e-length-limit="16" ></td>
+						<td width="20%">基金名稱：{{inProd.inProdName1}}<!-- <input type="text" class="form-control" style="width:auto;display:inline;" id="inProdName1" name="inProdName1" ng-model="inputVO.inProdName1" e-length-limit="11"> --></td>
+						<td>計價幣別：{{inProd.inProdCurr1}}</td>
+						<td>產品風險等級：{{inProd.inProdRiskLV1}}</td>
+					</tr>
+					<tr ng-repeat="inProd in inProdList">
+						<th>轉入金額/單位數：</th>
+						<td>{{inProd.inProdID1_show}} {{inProd.inProdName1}}</td>
+						<td ng-if="$index=='0'">*單位數：<input type="text" class="form-control" e-input-limit="NC"  style="width:auto;display:inline;" id="inUnit1" name="inUnit1" ng-blur="queryUnitAndPresentVal(true,$index)" ng-disabled="inputVO.transferType=='1'" ng-model="inProd.inUnit1" e-length-limit="20" ></td>
+						<td ng-if="$index!='0'">單位數：<input type="text" class="form-control" e-input-limit="NC"  style="width:auto;display:inline;" id="inUnit1" name="inUnit1" ng-blur="queryUnitAndPresentVal(true,$index)" ng-disabled="inputVO.transferType=='1'" ng-model="inProd.inUnit1" e-length-limit="20" ></td>
+						<td>參考現值：<input type="text" class="form-control"   style="width:auto;display:inline;" id="inPresentVal1" e-input-limit="NC" e-input-limit="NUU" nuu2="in" name="inPresentVal1" e-input-limit="NC" ng-disabled="true" ng-blur="queryUnitAndPresentVal(false,$index)" ng-model="inProd.inPresentVal1" e-length-limit="20" ></td>
+					</tr>
+					<tr>
+						<th>手續費扣款帳號：</th>
+						<td colspan="6">
+							<e-combobox id="feeDebitAcct" name="feeDebitAcct" 
+										ng-datasource="mappingSet['feeDebitAcct']"
+										ng-model="inputVO.feeDebitAcct"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="changeAcct('feeDebitAcct')"
+										style="line-height:20px;"/>
+						</td>
+					</tr>
+					<tr>
+						<th>*取得公開說明書方式：</th>
+						<td colspan="7">
+							<e-combobox id="creditAcct" name="prospectusType" 
+										ng-datasource="mappingSet['SOT.PROSPECTUS_TYPE']"
+										ng-model="inputVO.prospectusType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-required="true"
+										ng-format="F3"
+										width="200px"
+										style="line-height:20px;" required/> 
+<!-- 							<span ng-show="parameterTypeEditForm.prospectusType.$error.required" class="with-errors" colspan="4">請輸入公開說明書</span> -->
+						</td>
+					</tr> 
+					<tr>
+						<th>*交易日期：</th>
+						<th>
+							<label ng-repeat="row in mappingSet['SOT.TRADE_DATE_TYPE'] | limitTo:displayLimit track by $index">
+								<input type="radio" name="tradeDateType" id="tradeDateType{{row.DATA}}" ng-model="inputVO.tradeDateType" ng-value="row.DATA" ng-click="getReserveTradeDate();checkTradeDateType();" required> &nbsp;{{row.LABEL}}&nbsp;&nbsp;
+								<span class="bigspace"></span>
+							</label> 
+							({{reserveTradeDay}}天內的營業日 {{toJsDate(tradeDate) | date:"yyyy-MM-dd"}})
+						</th>
+					</tr>
+					<tr>
+						<th>*解說專員：</th>
+						<td>
+							<input type="text" class="form-control" style="width:auto;display:inline;" id="narratorID" name="narratorID" ng-model="inputVO.narratorID" ng-blur="getTellerName()"  ng-disabled="narrDis" e-length-limit="200" required>
+							<span class="bigspace"></span>
+							{{inputVO.narratorName}}
+						</td>
+					</tr>
+				</table>
+				<div style="margin-bottom: 10px;">
+						<button type="button" class="btn btn-info" ng-click="addCar()">加入購物車</button>
+						&nbsp;<span class="with-errors">數存戶不適用臨櫃「套表」交易</span>
+				</div>
+		</div>
+		<br>
+		<br>
+		<!-- 購物車 -->
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th></th>
+						<th>轉出標的名稱</th>
+						<th>預估轉出單位數</th>	
+						<th>轉入標的名稱</th>	
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="rows in carList track by $index" >
+						<td><button type="button" class="btn btn-primary" ng-click="delCar(rows)"  ng-hide="row.BARGAIN_STATUS != null">移除</button></td>
+						<td><a onclick="return false" ng-click="edit(rows)">{{rows.OUT_PROD_NAME}}</a></td>
+						<td>
+							<SPAN>{{rows.IN_UNIT_1 |number:4}}</SPAN><br/>
+							<SPAN>{{rows.IN_UNIT_2 |number:4}}</SPAN><br/>
+							<SPAN>{{rows.IN_UNIT_3 |number:4}}</SPAN>
+						</td>
+						<td><SPAN>{{rows.IN_PROD_NAME_1}}</SPAN><br/>
+							<SPAN>{{rows.IN_PROD_NAME_2}}</SPAN><br/>
+							<SPAN>{{rows.IN_PROD_NAME_3}}</SPAN>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="clearTradeSEQ();init()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="next()" ng-disabled="carList.length == 0" function-type="maintenance">下一步</button>
+		</div>
+	</div>
+</div>

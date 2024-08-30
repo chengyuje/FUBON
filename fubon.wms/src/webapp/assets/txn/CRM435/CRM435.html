@@ -1,0 +1,117 @@
+<style>
+
+
+</style>
+<script type="text/javascript" src="assets/txn/CRM435/CRM435.js"></script>
+
+<div class="CRM435" ng-controller="CRM435Controller" ng-cloak>
+	<!-- 結果區 -->
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">議價授權簽核紀錄庫
+		</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="bootstrap-admin-panel-content text-muted search_box">	
+			<div class="row">
+				<label class="col-sm-offset-1 col-sm-5 control-label">議價編號：
+					<input type="text" id="apply_seq" class="col-sm-4 form-control"
+					name="apply_seq" ng-model="inputVO.apply_seq" maxlength="19"
+					e-input-limit="NABS" placeholder="請輸入議價編號...">
+				</label> <label class="col-sm-5 control-label">簽核者員工編號 <input
+					type="text" id="auth_emp_id" class="col-sm-4 form-control"
+					name="auth_emp_id" ng-model="inputVO.auth_emp_id" maxlength="6"
+					e-input-limit="N" placeholder="請輸入欲查詢員編..."></label>
+			</div>
+		</div>
+		<br/>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="print()">報表</button>
+			<button type="button" class="btn btn-info" ng-click="inquireInit(); init();">清除</button>
+			<button type="button" class="btn btn-warning">
+				<span class="glyphicon glyphicon-upload"></span> 上傳檔案
+			</button>
+			<button type="button" class="btn btn-warning">
+				<span class="glyphicon glyphicon-envelope"></span> envelope
+			</button>
+			
+			<button type="button" class="btn btn-warning">
+				<span class="glyphicon glyphicon-pencil"></span> pencil
+			</button>
+			
+			<button type="button" class="btn btn-warning">
+				<span class="glyphicon glyphicon-search"></span>search
+			</button>
+			<button type="button" class="btn btn-warning">
+				<span class="glyphicon glyphicon-user"></span> user
+			</button>
+			<button type="button" class="btn btn-warning">
+				<span class="glyphicon glyphicon-film"></span> film
+			</button>
+<!-- 			glyphicon-ok -->
+<button type="button" class="btn btn-warning">
+				<span class="glyphicon glyphicon-refresh"></span> test
+			</button>
+		</div>
+
+	</div>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+		</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y"
+			style="min-height: 235px; white-space: nowrap;">
+			<table class="tablesaw table table-striped table-bordered"
+				data-tablesaw-mode="swipe" data-tablesaw-sortable
+				data-tablesaw-minimap>
+				<thead>
+					<tr>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter
+								e-input="inputVO" e-mode="auto" e-col="APPLY_CAT" e-query="inquire()">議價類型</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter
+								e-input="inputVO" e-mode="auto" e-col="APPLY_SEQ" e-query="inquire()">議價編號</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter
+								e-input="inputVO" e-mode="auto" e-col="AUTH_TYPE" e-query="inquire()">記錄型態</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter
+								e-input="inputVO" e-mode="auto" e-col="AUTH_LV" e-query="inquire()">覆核層級</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter
+								e-input="inputVO" e-mode="auto" e-col="AUTH_EMP_ID" e-query="inquire()">簽核者員工</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter
+								e-input="inputVO" e-mode="auto" e-col="AUTH_DATE" e-query="inquire()">簽核時間</e-sorter></th>
+						<th>簽核意見</th>
+						<th>終止原因</th>
+						<th>建立者</th>
+						<th>建立日期</th>
+						<th>修改者</th>
+						<th>最後修改日期</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList track by $index"
+						ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center">{{row.APPLY_CAT | mapping:mappingSet['APPLY_CAT']:'F3'}}</td>
+						<td align="center">{{row.APPLY_SEQ}}</td>
+						<td align="center">{{row.AUTH_TYPE | mapping:mappingSet['AUTH_TYPE']:'F3'}}</td>
+						<td align="center">{{row.AUTH_LV | mapping:mappingSet['AUTH_LV']:'F3'}}</td>
+						<td align="center">{{row.AUTH_EMP_ID}}<span ng-if="row.AUTH_EMP_ID">-</span>{{row.AUTH_EMP_NAME}}</td>
+						<td align="center">{{row.AUTH_DATE}}</td>
+						<td align="center">{{row.COMMENTS}}</td>
+						<td align="center">{{row.TERMINATE_REASON}}</td>
+						<td align="center">{{row.CREATOR}}<span ng-if="row.CREATOR">-</span>{{row.CREATOR_NAME}}</td>
+						<td align="center">{{row.CREATETIME}}</td>
+						<td align="center">{{row.MODIFIER}}<span ng-if="row.MODIFIER">-</span>{{row.MODIFIER_NAME}}</td>
+						<td align="center">{{row.LASTUPDATE}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,94 @@
+<style>
+.modal-dialog.PRD281_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+.table_title{
+	font-size: medium;
+	font-style: normal;
+	
+}
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+</style>
+<div ng-controller="PRD281_UPLOADController" ng-cloak>
+	<div class="modal-dialog PRD281_UPLOAD">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">SI_FCI文件上傳</h4>
+			</div>
+ 			<div class="modal-body">
+ 				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+ 					<table>
+ 						<tr>
+	 						<th>文件種類：</th>
+ 							<td style="padding: 5px 5px 5px 5px">
+ 								<e-combobox id="DOC_TYPE" 
+ 									ng-paramtype="PRD.FCI_DOC_TYPE"
+									ng-model="inputVO.DOC_TYPE" 
+									ng-format="F3"
+									width="180px" 
+									ng-change="docTypeChanged();" required/>
+ 							</td>
+ 							<td width="2%"></td>
+ 							<th>幣別：</th>
+ 							<td style="padding: 5px 5px 5px 5px">
+ 								<e-combobox id="CURR_ID" 
+ 									ng-paramtype="PRD.FCI_CURRENCY"
+									ng-model="inputVO.CURR_ID" 
+									ng-validate="false" 
+									ng-disabled="inputVO.currDisalbed"
+									ng-readonly="inputVO.currDisalbed" 
+									ng-editable="false"
+									ng-format="F1"
+									width="180px"/>
+ 							</td>
+ 						</tr>
+ 						<tr>
+ 							<th>選擇上傳檔案：</th>
+							<td style="padding: 5px 5px 5px 5px">
+ 								<e-upload success="uploadFinshed(name,rname)" model="inputVO.realfileName"></e-upload>
+ 							</td>
+ 							<td width="2%"></td>
+							<th><button type="button" class="btn btn-info" ng-click="saveFile()">上傳</button></th>
+ 							<td style="padding: 5px 5px 5px 5px"></td>
+						</tr>
+ 					</table>
+ 				</form>
+ 				
+ 				<div class="search_box_btn text-center"></div>
+				<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+					<table class="table-bordered middle">
+						<thead>
+							<tr>
+								<th>文件種類</th>
+								<th>幣別</th>
+								<th>檢視上傳檔案</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in resultList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row.DOC_TYPE | mapping: FCI_DOC_TYPE : 'F3'}}</td>
+								<td>{{row.CURR_ID | mapping: FCI_CURRENCY : 'F1'}}</td>
+								<td align="center"><button type="button" class="btn btn-info" ng-click="viewFile(row)">檢視</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,546 @@
+<style>
+  .FPS411 .deletePic {
+    color: #2a8960;
+    font-size: 25px;
+  }
+
+  .FPS411 p {
+    text-indent: 2em;
+  }
+
+  .FPS411 .rstable thead tr th {
+    vertical-align: middle;
+    text-align: center;
+    padding: 7px 10px;
+    color: #000000;
+    background-color: #efefef;
+    border: 1px solid #28a4c9;
+  }
+
+  .FPS411 .rstable tbody tr td {
+    vertical-align: middle;
+    text-align: center;
+    padding: 7px 10px;
+    border: 1px solid #28a4c9;
+  }
+
+  .FPS411 .template-wrapper {
+    margin: .7em auto;
+  }
+
+  .FPS411 .chartTable {
+    display: inline-block;
+    width: 49%;
+    height: 300px;
+    position: relative;
+  }
+
+  .FPS411 .chartTable table {
+    width: 100%;
+    table-layout: fixed;
+    transform: translateY(-50%);
+    top: 50%;
+    position: absolute;
+  }
+
+  .FPS411 .chart-wrapper {
+    width: 50%;
+    display: inline-block;
+  }
+
+  .FPS .title.subtitle.prime {
+    background-color: #89d4d7;
+    font-size: 1.1em;
+  }
+
+  .FPS411 .more {
+    font-size: .7em;
+    color: #28a4c9;
+  }
+
+  .FPS table.stock tbody tr th,
+  .FPS table.stock tbody tr td {
+    padding: 10px 0;
+  }
+
+  .FPS table.stock tbody tr td:last-of-type {
+    padding: 10px;
+  }
+
+  .FPS411 .inputText input {
+    margin-right: 0;
+    margin-left: auto;
+  }
+
+</style>
+<script type="text/javascript"
+        src="assets/txn/FPS411/FPS411.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS320/FPS320.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS324/FPS324_STOCK.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS324/FPS324_PRD.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS321/FPS321.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS324/FPS324_SUG.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS324/FPS324_SWITCHPRD.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS322/FPS322.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS323/FPS323.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS325/FPS325.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS/FPSProd.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS/FPSProd_MFD.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS/FPSProd_InvestIns.js"></script>
+
+<!-- models -->
+<script type="text/javascript"
+        src="assets/txn/FPS230/FPS230Models.js"></script>
+
+<div ng-controller="FPS411Controller"
+     ng-clock>
+  <!-- content -->
+  <div class="FPS411 FPS">
+    <div>
+      <!-- templates -->
+      <a class="template-wrapper"
+         ng-click="openFps320()"
+         ng-include="'assets/txn/FPS300/FPS320.template.html'">
+      </a>
+      <div class="template-wrapper"
+           ng-include="'assets/txn/FPS400/FPS400_status.template.html'">
+      </div>
+
+      <!-- chart -->
+      <section class="block container">
+        <div class="title title-left">投資組合部位</div>
+        <div style="display:flex;
+                    justify-content: space-around;
+                    margin: 0 auto;">
+          <div class="block clear-space">
+            <!-- 調整前投資組合 左 -->
+            <div class="title subtitle prime title-left">【 調整前投資組合 】</div>
+
+            <div class="title subtitle title-left">股債配置</div>
+            <div class="no-border chart-wrapper">
+              <div class="chart-content">
+                <div id="b_stockChart"
+                     class="chart"></div>
+              </div>
+            </div>
+            <div class="no-border chartTable">
+              <table>
+                <tbody class="content-wrapper"
+                       style="text-align:center">
+                  <tr ng-repeat="row in chartTables.b_stockChart">
+                    <td style="text-align:right;">
+                      <div class="color-block"
+                           ng-style="{'background-color': row.color}"></div>
+                    </td>
+                    <td ng-bind="row.label"
+                        style="text-align:left;"></td>
+                    <td ng-bind="row.value+' %'"
+                        style="text-align:left;"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="title subtitle title-left">市場配置</div>
+            <div class="no-border chart-wrapper">
+              <div class="chart-content">
+                <div id="b_classChart"
+                     class="chart"></div>
+              </div>
+            </div>
+            <div class="no-border chartTable">
+              <table>
+                <tbody class="content-wrapper"
+                       style="text-align:center">
+                  <tr ng-repeat="row in chartTables.b_classChart">
+                    <td style="text-align:right;">
+                      <div class="color-block"
+                           ng-style="{'background-color': row.color}"></div>
+                    </td>
+                    <td ng-bind="row.label"
+                        style="text-align:left;"></td>
+                    <td ng-bind="row.value+' %'"
+                        style="text-align:left;"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 調整後投資組合 右 -->
+          <div class="block clear-space">
+            <div class="title subtitle prime title-left">【 調整後投資組合 】</div>
+            <div class="title subtitle title-left">股債配置</div>
+            <div class="no-border chart-wrapper">
+              <div class="chart-content">
+                <div id="a_stockChart"
+                     class="chart"></div>
+              </div>
+            </div>
+            <div class="no-border chartTable">
+              <table>
+                <tbody class="content-wrapper"
+                       style="text-align:center">
+                  <tr ng-repeat="row in chartTables.a_stockChart">
+                    <td style="text-align:right;">
+                      <div class="color-block"
+                           ng-style="{'background-color': row.color}"></div>
+                    </td>
+                    <td ng-bind="row.label"
+                        style="text-align:left;"></td>
+                    <td ng-bind="row.value+' %'"
+                        style="text-align:left;"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="title subtitle title-left">市場配置</div>
+            <div class="no-border chart-wrapper">
+              <div class="chart-content">
+                <div id="a_classChart"
+                     class="chart"></div>
+              </div>
+            </div>
+            <div class="no-border chartTable">
+              <table>
+                <tbody class="content-wrapper"
+                       style="text-align:center">
+                  <tr ng-repeat="row in chartTables.a_classChart">
+                    <td style="text-align:right;">
+                      <div class="color-block"
+                           ng-style="{'background-color': row.color}"></div>
+                    </td>
+                    <td ng-bind="row.label"
+                        style="text-align:left;"></td>
+                    <td ng-bind="row.value+' %'"
+                        style="text-align:left;"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- btns -->
+        <div class="content-wrapper"
+             style="height: 50px;
+	                padding: 1.3em;
+	                border-bottom: 0;
+	                top:10px;
+	                ">
+          <div class="content-title">
+          </div>
+          <div class="content-body">
+          	<a type="button"
+               class="btn-fps"
+               ng-click="go('models')"
+               style="right: 250px;
+	                position: absolute;
+	                top: 0;">
+              投資組合配置
+            </a>
+            <a type="button"
+               class="btn-fps"
+               ng-click="go('stock')"
+               style="right: 140px;
+	                position: absolute;
+	                top: 0;">
+              新增商品
+            </a>
+            
+            <!-- <a type="button"
+               class="btn-fps"
+               ng-click="openFps325()"
+               style="right: 140px;
+	                position: absolute;
+	                top: 0;">
+              最佳配置試算
+            </a> -->
+            <a class="toggle-wrapper btn-fps"
+               ng-click="arrowUp=!arrowUp"
+               style="right: 3px;
+	                position: absolute;
+	                top: 0;
+	                margin: -3px auto;">
+              市場概況
+              <img ng-src="{{arrowPath[arrowUp?'down':'up']}}"
+                   class="icon">
+            </a>
+          </div>
+        </div>
+
+        <section class="block banner-content container"
+                 ng-show="!arrowUp">
+          <div class="content-wrapper no-border">
+            <p ng-bind="marketOverview"></p>
+          </div>
+        </section>
+
+        <!-- stocks -->
+        <table class="stock table table-striped">
+          <thead>
+            <tr>
+              <th> </th>
+              <th>類別</th>
+              <th>推薦</th>
+              <th style="width:160px">商品</th>
+              <th>風險<br/>等級</th>
+              <th>
+                <div>計價幣別</div>
+                <div>保單幣別</div>
+              </th>
+              <th>申購幣別</th>
+              <th>投資方式</th>
+              <th>短期<br/>展望</th>
+              <th>
+                <div>市值/保單價值</div>
+                <div>約當台幣</div>
+              </th>
+              <th>
+                <div>調整後金額</div>
+                <div>約當台幣</div>
+              </th>
+              <th>&nbsp;&nbsp;比例</th>
+              <th>交易指示</th>
+              <th>
+                <div>申購門檻</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody align="center">
+            <tr ng-repeat="row in mixedParamList"
+                ng-show="row.action!='delete'"
+                class="repeat-row"
+                ng-class-odd="'rowOdd'"
+                ng-class-even="'rowEven'">
+              <!-- 刪除 -->
+              <td>
+                <a ng-if="row.ORDER_STATUS != 'Y'">
+                  <img src="assets/images/ic-delete.svg"
+                       ng-click="deleteRow($index)">
+                </a>
+                <a ng-show="row.ORDER_STATUS == 'Y'">
+                  <span class="glyphicon glyphicon-info-sign"
+                        aria-hidden="true"
+                        uib-tooltip="{{row.tooltipInfo}}"
+                        tooltip-placement="auto right"
+                        tooltip-append-to-body="true"
+                        tooltip-class="FPSTooltip"></span>
+                </a>
+              </td>
+              <!-- 類別 -->
+              <td ng-bind="row.PTYPE|mapping: mapping.pType"></td>
+              <!-- 推薦 -->
+              <td>
+                <img src="assets/images/ic-crown.svg"
+                     ng-if="row.MAIN_PRD == 'Y'">
+              </td>
+              <td class="text-left">
+                <!-- 代號商品 -->
+                <a ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+                   ng-click="go('detail', row.PTYPE, row)"></a>
+                <span ng-bind="row.TARGETS"
+                      ng-if="row.PTYPE=='INS'"></span>
+              </td>
+              <!-- 風險等級 -->
+              <td>
+                <span ng-if="row.PTYPE!='INS'">{{row.RISK_TYPE}}</span>
+                <span ng-if="row.PTYPE=='INS'">--</span>
+              </td>
+              <!-- 計價幣別 -->
+              <td ng-bind="row.CURRENCY_TYPE"></td>
+              <!-- 申購幣別 -->
+              <td>
+                <span ng-bind="row.CmbCur|mapping: mapping.cmbCur"
+                      ng-if="row.isStock"></span>
+                <e-combobox ng-datasource="mapping.cmbCur"
+                            ng-model="row.CmbCur"
+                            ng-validate="true"
+                            ng-readonly="row.CURRENCY_TYPE == 'TWD' || row.PTYPE == 'INS'"
+                            ng-disabled="row.CURRENCY_TYPE == 'TWD' || row.PTYPE == 'INS'"
+                            ng-editable="false"
+                            ng-required="true"
+                            ng-change="chgCur(row)"
+                            ng-format="F3"
+                            width="60"
+                            ng-if="!row.isStock" />
+              </td>
+              <!-- 投資方式 -->
+              <td>
+                <div ng-if="row.ORDER_STATUS != 'Y'">
+                  <e-combobox ng-datasource="mapping.invType"
+                              ng-model="row.INV_TYPE"
+                              ng-validate="true"
+                              ng-readonly="false"
+                              ng-editable="false"
+                              ng-format="F3"
+                              ng-change="changeInvType(row)"
+                              ng-required="true"
+                              width="60"
+                              ng-if="row.PTYPE != 'INS'" />
+                  <span ng-if="row.PTYPE == 'INS'">--</span>
+                </div>
+                <div ng-if="row.ORDER_STATUS == 'Y'">
+                  <span ng-bind="row.PTYPE=='INS' ? '--' : (row.INV_TYPE|mapping: mapping.invType)"></span>
+                </div>
+              </td>
+              <!-- 投資展望 -->
+              <td style="text-align:center;">
+                <span ng-if="row.PTYPE=='INS'">--</span>
+                <!-- 投資展望 -->
+                <div ng-if="row.PTYPE!='INS'">
+                  <img ng-src="{{mapping.trendPath[row.CIS_3M]}}"
+                       alt="{{row.CIS_3M}}">
+                  <div>
+                    <a class="more"
+                       ng-if="row.PTYPE=='MFD'"
+                       ng-click="go('product',null,row)">more</a>
+                    <span ng-if="row.PTYPE!='MFD'">--</span>
+                  </div>
+                </div>
+              </td>
+              <!-- 原幣庫存金額 約當台幣-->
+              <td class="text-right">
+                <div ng-show="!row.STORE_NTD">--</div>
+                <!-- 原幣庫存金額 -->
+                <div ng-show="row.STORE_RAW">
+                  <span ng-bind="row.STORE_RAW|number"></span>
+                </div>
+                <!-- 約當台幣 -->
+                <div ng-show="row.STORE_NTD">
+                  <span ng-bind="row.STORE_NTD|number :0"></span>
+                </div>
+              </td>
+              <!--調整後原幣金額 約當台幣 -->
+              <td class="text-right">
+                <!-- 調整後原幣金額  -->
+                <div class="inputText"
+                     ng-class="{'has-error':row.lowerEdge}">
+                  <input type="text"
+                         e-input-limit="NC"
+                         class="form-control text-right"
+                         style="width:130px"
+                         ng-model="row.CHG_PERCENT"
+                         ng-blur="checkValue(row); chgStore(row)"
+                         ng-change="row.CHG_PERCENT = row.CHG_PERCENT.replace('-' , '');">
+                </div>
+                <!-- 約當台幣 -->
+                <div>
+                  <span ng-bind="row.NTD_PERCENT|number :0"></span>
+                </div>
+              </td>
+              <!-- 比例 -->
+              <td>&nbsp;&nbsp;
+                <span ng-bind="row.INV_PERCENT"></span>%
+              </td>
+              <!-- 交易指示 -->
+              <td>
+                <!-- 交易指示 -->
+                <e-combobox ng-datasource="row.txnTypeList"
+                			ng-hide="row.txnTypeListLength <= 1 && row.TxnType == ''"
+                            ng-model="row.TxnType"
+                            ng-validate="true"
+                            ng-editable="false"
+                            ng-format="F3"
+                            ng-required="true"
+                            width="75"
+                            ng-readonly="row.txnTypeListLength <= 1"
+                            ng-disabled="row.txnTypeListLength <= 1"
+                            ng-change="row.txnTypeListLength>1&&chgTxnType(row)" />
+                <span ng-show="row.txnTypeListLength <= 1 && row.TxnType == ''">--</span>
+              </td>
+              <!-- 原幣申購門檻 (庫存不顯示) -->
+              <td class="text-right">
+                <div ng-bind="row.LowMoney && row.ORDER_STATUS != 'Y' ? (row.LowMoney | number) : '--'"></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <div class="content-wrapper"
+           style="padding: 0em;
+           		  padding-left: 2%;
+           		  padding-right: 1%;
+                  border-bottom: 0;
+                  ">
+        <div class="content-title">
+          <!--  <div class="ps" style="color:#ff5d5d;font-weight: bold;">＊提醒您，理財規劃金額為客戶前日資產部位，非當日即時資料，可能出現差異，請特別留意。</div>
+          <div>＊折算台幣匯率採前一個營業日之匯率；且上述理財規劃金額皆僅計算至整數位</div>
+          <div>＊投資型保險僅包含類全委投資型保險並列入平衡型部位；股債配置不包含貨幣型基金部位</div>-->
+        </div> 
+        <div class="content-body">
+          <a class="btn-fps"
+             ng-click="fps300.chgTab('ReturnFPS410')">上一步</a>
+          <a class="btn-fps"
+             ng-click="save()">儲存</a>
+          <a class=" btn-fps"
+             ng-click="go('nextFPS412')">下一步</a>
+        </div>
+      </div>
+      <section class="block container">
+        <div class="content-wrapper"
+             style="background-color: #bfe2f7;">
+          <div class="content-title"
+               style="padding-left: 0.5em; font-size: 1.3em; font-weight:bold;">績效模擬</div>
+          <div class="content-body">單位:新台幣元</div>
+        </div>
+        <!--         <div ng-show="calInvestmentText" style="text-align: center;"><span ng-bind="calInvestmentText"></span></div> -->
+        <!--         <div ng-show="!calInvestmentText"> -->
+        <div ng-show="showFPS323Error ? showFPS323Error : !calInvestmentText"
+             class="content-wrapper no-border">
+          <div ng-include="'assets/txn/FPS323/FPS323.html'"></div>
+        </div>
+        <div class="content-title" style="color:#E46C0A;font-weight: bold; float: left; text-align: left;padding: 4px;margin: 2px;">
+          <div>重要說明︰以上僅為歷史資料模擬投資組合之結果，不代表本投資組合之實際報酬及未來績效之保證，在特殊情況下，預期金額有可能比較差情境之數字更低，不同時間進行模擬操作，其結果亦可能不同。</div>
+        </div>
+      </section>
+      <section class="container"
+               style="padding: 0px;margin: 0px;width: 100%;">
+        <div ng-show="!calInvestmentText"
+             style="text-align: left;">
+          <div style="width: 2%; float: left; text-align: right;">*</div>
+          <div style="width: 97%; float: left;">本績效模擬乃是根據投資組合模組所產出之過去三年以上、至多十年的歷史年化報酬率與年化波動率(標準差)為基準(數據來源由嘉實資訊提供)，並假設投組價格未來變動符合幾何布朗運動(Geometric Browning Motion)走勢，且投組報酬率分配呈現常態分配。以投入金額、投組報酬率、投組標準差、投資期間、標準常態分配累積機率值等變數進行統計運算，推估投資組合價格變化的可能結果。惟本模擬之結果僅供參考，不代表其未來績效保證，未來實際狀況有可能與模擬數值出現大幅落差。</div>
+          <div style="width: 2%; float: left; text-align: right;">*</div>
+          <div style="width: 97%; float: left;">依規劃投入金額且假設中途未提前終止投資。</div>
+          <div style="width: 2%; float: left; text-align: right;">*</div>
+          <div style="width: 97%; float: left;">較佳情境下的預期金額指的是模擬投入金額至到期時，當較佳情境(5.0%機率)發生時的可能大於或等於此價值、一般情境下的預期金額指的是模擬投入金額至到期的平均可能價值；較差情境下的預期金額指的是模擬投入金額至到期時，當較差情境(5.0%機率)發生時的可能小於或等於此價值。</div>
+        </div>
+      </section>
+      <section class="block container">
+        <div class="title title-left">歷史績效表現</div>
+        <div ng-show="showFPS330Error ? showFPS330Error : !calModelPorfolioText"
+             class="content-wrapper no-border">
+          <div ng-include="'assets/txn/FPS330/FPS330.html'"></div>
+        </div>
+      </section>
+      <section class="container"
+               style="padding: 0px;margin: 0px;width: 100%;">
+        <div ng-show="!calModelPorfolioText"
+             style="text-align: left;">
+          <div style="width: 2%; float: left; text-align: right;">*</div>
+          <div style="width: 97%; float: left;">本歷史績效表現乃是根據投資商品原幣金額採加權方式計算之。</div>
+          <div style="width: 2%; float: left; text-align: right;">*</div>
+          <div style="width: 97%; float: left;">依投資組合商品最大共同資料區間(需完整年度)提供投資組合年度歷史績效表現，如最大共同資料區間超過10年，則計算近10年的資料。</div>
+          <div style="width: 2%; float: left; text-align: right;">*</div>
+          <div style="width: 97%; float: left;">數字僅供參考，投資人因不同時間進場，將有不同之投資績效，過去之績效亦不代表未來績效之保證。</div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>

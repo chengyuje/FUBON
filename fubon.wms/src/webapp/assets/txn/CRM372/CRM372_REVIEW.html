@@ -1,0 +1,111 @@
+<style>
+/* open dialog */
+.ngdialog.CRM372 {
+	
+}
+/* dialog panl */
+.modal-dialog {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: 650px;
+}
+/* table size */
+.CRM372 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM372 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM372.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM372_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<div ng-controller="CRM372_REVIEWController" ng-cloak>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">業務處長回報</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<div class="bootstrap-admin-panel-content">
+				        <e-jumping-once output="outputVO" list="data" totallist="inputVO.csvDataList"></e-jumping-once>
+<!-- 						<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList"></e-jumping> -->
+				      
+				      <table class="table table-striped"
+				             style="text-align:center;">
+				        <thead>			
+				          <th style="text-align: center;">類別</th>	          
+				          <th style="text-align: center;">業務處</th>
+				          <th style="text-align: center;">營運區</th>
+				          <th style="text-align: center;">分行名稱</th>
+				          <th style="text-align: center;">理專姓名</th>
+				          <th style="text-align: center;">回報結果</th>
+				          <th style="text-align: center;">狀態</th>
+				        </thead>
+				        <tbody>
+				          <tr class="repeat-row" ng-repeat="row in data" ng-init="outerIndex=$index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+				          	<td ng-bind="row.CHG_TYPE2 | mapping:chgTypeList2:'F3'"></td>
+				            <td ng-bind="row.REGION_CENTER_NAME"></td>
+				            <td ng-bind="row.BRANCH_AREA_NAME"></td>
+				            <td ng-bind="row.BRANCH_NAME"></td>
+				            <td ng-bind="row.EMP_NAME"></td>
+				            <td>
+					            <e-combobox id="CHG_TYPE" name="CHG_TYPE"
+								ng-datasource="chgTypeList"
+								ng-model="row.CHG_TYPE"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-show="row.CHG_TYPE2 == 'M'"
+								width="75px"
+								style="line-height:20px;" 
+								 />
+<!-- 				            	<span ng-repeat="list in chgTypeList">  -->
+<!-- 				            		<input type="radio" id="radio{{outerIndex}}" name="enabled{{outerIndex}}" ng-model="row.CHG_TYPE" ng-value="list.DATA" > {{list.LABEL}} -->
+<!-- 			            		</span> -->
+				            </td>
+				           <td ng-bind="row.STATUS | mapping:reviewStatusList:'F3'"></td>
+				          </tr>
+				        </tbody>
+				      </table>
+				    </div>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="confirm()" function-type="maintenance">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

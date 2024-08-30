@@ -1,0 +1,142 @@
+<style>
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS306/PMS306TIME.js"></script>
+
+<div class="PMS306TIME" ng-controller="PMS306TIMEController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">人壽點收時間查詢
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+				data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<div class="search_table search_box3">
+					<table>
+						<tr>
+								<div style="float: left">&nbsp查詢年月：</div>						 						 
+								<div style="float: left">
+								<e-combobox id="dataMonth" name="dataMonth" 
+									ng-datasource="mappingSet['timeA']"
+									ng-model="inputVO.YEARS"
+									ng-validate="false" 
+									ng-required="true"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									width="150px"
+									style="line-height:20px;" />														
+								</div>
+								
+								
+								
+								<div style="float: left">
+									&nbsp
+									<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+								</div>
+
+
+								<div style="float: left">
+									&nbsp
+									<button type="button" class="btn btn-info" ng-click="save()"
+										ng-disabled="paramList.length == 0">儲存</button>
+								</div></td>
+
+
+						</tr>
+					</table>
+				</div>
+			</form>
+
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif"> 人壽點收時間維護
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<!-- <e-jumping output="outputVO" list="paramList" input="inputVO"
+				query="inquire()"></e-jumping> -->
+			<div algin="left">
+				
+			</div>
+
+			<div class="gv_tab_sc scroll_y"
+				style="height: 235px; white-space: nowrap;">
+				<table table
+					class="tablesaw table table-striped table-bordered rstable">
+					<thead>
+						<tr>
+
+
+							<th>保險年月</th>
+							<th>計畫起日(yyyy/MM/dd hh:mm:ss)</th>
+							<th>計畫訖日(yyyy/MM/dd hh:mm:ss)</th>
+							<th>人壽點數時間(yyyy/MM/dd hh:mm:ss)</th>
+
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td><input type="text" ng-model="row.YEARMON" /></td>
+							<td><input type="text" ng-model="row.INS_PROFIT_S" /></td>
+							<td><input type="text" ng-model="row.INS_PROFIT_E" /></td>
+							<td><input type="text" ng-model="row.ACCEPT_TIME" /></td>
+
+						</tr>
+
+
+					</tbody>
+				</table>
+			</div>
+			<div algin="left">
+				<table>
+
+					<tr>
+						<td align="right">說明：</td>
+						<td align="left"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

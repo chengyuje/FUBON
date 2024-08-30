@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TransformData isReSend="Y">
+	<Tita>
+		<Header extends="TITA_BASIC">
+			<Field name='BXFG' desc='轉換標記' type='X' maxLen='1' padChar=' ' align='R' defaultValue='~' />
+			<Field name='BAPTYPE' desc='業務大類' type='X' maxLen='1' padChar=' ' align='R' defaultValue='A' />
+			<Field name='BTXNO' desc='交易代號' type='9' maxLen='2' padChar='0' align='L' defaultValue='00' />
+			<Field name='BSTXNO' desc='次交易代號' type='9' maxLen='2' padChar='0' align='L' defaultValue='00' />
+			<Field name='BPTYPE' desc='處理型態' type='9' maxLen='1' padChar='0' align='L' defaultValue='6' />
+			<Field name='BDSCPT' desc='摘要' type='X' maxLen='5' padChar=' ' align='R' defaultValue='I10' />
+		</Header>
+		<Body>
+			<Field name='PBRNO' desc='分行別' type='9' maxLen='3' padChar='0' align='L' defaultValue='' />
+			<Field name='DEPART' desc='部別' type='9' maxLen='2' padChar='0' align='L' defaultValue='' />
+			<Field name='SUBNO' desc='科目代號' type='X' maxLen='4' padChar=' ' align='R' defaultValue='' />
+			<Field name='PSRNO' desc='子目代號' type='X' maxLen='2' padChar=' ' align='R' defaultValue='' />
+			<Field name='DETCHK' desc='細目-檢碼' type='X' maxLen='3' padChar=' ' align='R' defaultValue='' />
+			<Field name='PBRNO' desc='分行別' type='9' maxLen='3' padChar='0' align='L' defaultValue='' />
+			<Field name='DEPART' desc='部別' type='9' maxLen='2' padChar='0' align='L' defaultValue='' />
+			<Field name='CENNO' desc='中心編號' type='9' maxLen='18' padChar='0' align='L' defaultValue='' />
+			<Field name='PAPNO' desc='科目代號' type='X' maxLen='9' padChar=' ' align='R' defaultValue='' />
+			<Field name='STADATE' desc='查詢起日' type='9' maxLen='8' padChar='0' align='L' defaultValue='' />
+			<Field name='ENDATE' desc='查詢迄日' type='9' maxLen='8' padChar='0' align='L' defaultValue='' />
+			<Field name='IFRSFLAG' desc='僅顯示IFRS明細帳' type='9' maxLen='1' padChar='0' align='L' defaultValue='' />
+		</Body>
+	</Tita>
+	<Tota>
+		<Header extends="TOTA_BASIC" />
+		<Body>
+			<Iterator count='$MAX' name='occurs1'>
+				<Field name='PBRNO' desc='分行別' type='9' maxLen='3' padChar='0' align='L' defaultValue='' />
+				<Field name='DEPART' desc='部別' type='9' maxLen='2' padChar='0' align='L' defaultValue='' />
+				<Field name='PAPNO' desc='科目代號' type='X' maxLen='9' padChar=' ' align='R' defaultValue='' />
+				<Field name='BTXDAY' desc='帳務日' type='9' maxLen='8' padChar='0' align='L' defaultValue='' />
+				<Field name='CENNO' desc='中心編號' type='9' maxLen='18' padChar='0' align='L' defaultValue='' />
+				<Field name='BCRDB' desc='借貸別' type='9' maxLen='1' padChar='0' align='L' defaultValue='' />
+				<Field name='BTAMT' desc='金額' type='9' maxLen='12.2' padChar='0' align='L' defaultValue='' />
+				<Field name='SUMARY' desc='傳票摘要' type='X' maxLen='42' padChar=' ' align='R' defaultValue='' />
+				<Field name='HMDNO' desc='戶名代號' type='9' maxLen='3' padChar='0' align='L' defaultValue='' />
+			</Iterator>
+		</Body>
+	</Tota>
+	<ReSend>
+		<Condition key="Header/BMSGEND" value="2"/>
+		<ReSendFields>$ALL</ReSendFields>
+	</ReSend>
+</TransformData>

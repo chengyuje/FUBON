@@ -1,0 +1,145 @@
+<script type="text/javascript" src="assets/txn/PQC200/PQC200.js"></script>
+<script type="text/javascript" src="assets/txn/PQC200U/PQC200U.js"></script>
+
+<div class="PQC200U" ng-controller="PQC200UController" ng-cloak>		
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-paramtype="PMS.UHRM_RC"
+										ng-model="inputVO.uhrmRC"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion()"
+										style="line-height:20px;" />
+						</td>						
+						<th>業務中心：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-paramtype="PMS.UHRM_OP"
+										ng-model="inputVO.uhrmOP"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea()"
+										style="line-height:20px;" />
+						</td>
+				   		<th>行員編號：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." ng-model="inputVO.u_emp_Id"></td>
+					</tr>
+					<tr>
+						<th>產品種類：</th>
+						<td>
+							<e-combobox ng-paramtype="PQC.PRD_TYPE"
+										ng-model="inputVO.prdType" 
+										ng-validate="false"
+										ng-editable="false" 
+										ng-format="F3"
+										ng-required="true" 
+										ng-change="getActivePrd()"
+										style="line-height:20px;" />
+						<th>產品：</th>
+						<td>
+							<e-combobox ng-datasource="mappingSet['ACTIVE_PRD_LIST']"
+										ng-model="inputVO.prdID" 
+										ng-validate="false"
+										ng-editable="false" 
+										ng-format="F3"
+										ng-required="true" 
+										ng-disabled="inputVO.prdType == '' || inputVO.prdType == undefined || inputVO.prdType == null"
+										ng-readonly="inputVO.prdType == '' || inputVO.prdType == undefined || inputVO.prdType == null"
+										style="line-height:20px;" />
+						</td>
+						<th>回報狀態：</th>
+						<td>
+							<e-combobox ng-paramtype="PQC.REPORT_TYPE"
+										ng-model="inputVO.reportType" 
+										ng-validate="false"
+										ng-editable="false" 
+										ng-format="F3"
+										ng-required="true" 
+										style="line-height:20px;" />
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="doAction(null, 'R')" function-type="export">匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行代碼</th>
+							<th>分行名稱</th>
+							<th>行員ID</th>
+							<th>行員姓名</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>產品種類</th>
+							<th>產品代號</th>
+							<th>產品名稱</th>
+							<th>幣別</th>
+							<th>已成功申請額度</th>
+							<th>取號號碼</th>
+							<th>建立人</th>
+							<th>建立時間</th>
+							<th>修改人</th>
+							<th>最新修改時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td>{{row.REGION_CENTER_NAME}}</td>
+							<td>{{row.BRANCH_AREA_NAME}}</td>
+							<td>{{row.BRANCH_NBR}}</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.APPLY_EMP_ID}}</td>
+							<td>{{row.APPLY_EMP_NAME}}</td>
+							<td>{{row.APPLY_CUST_ID}}</td>
+							<td>{{row.APPLY_CUST_NAME}}</td>
+							<td>{{row.APPLY_PRD_TYPE}}</td>
+							<td>{{row.APPLY_PRD_ID}}</td>
+							<td>{{row.PRD_NAME}}</td>
+							<td>{{row.CURRENCY}}</td>
+							<td>{{row.APPLY_QUOTA  | number}}</td>
+							<td>{{row.APPLY_SEQ}}</td>
+							<td>{{row.CREATOR}}-{{row.CREATE_EMP_NAME}}</td>
+							<td>{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+							<td>{{row.MODIFIER}}-{{row.MODIFY_EMP_NAME}}</td>
+							<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,100 @@
+<style>
+/* open dialog */
+.ngdialog.PMS324_showData {
+}
+/* dialog panl */
+.modal-dialog.PMS324_showData {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 700px;
+}
+/* table size */
+.PMS324_showData table {
+    /* width: 100%; */
+	margin-left: 15px;
+	margin-right: 15px;
+}
+/* change row */
+.PMS324_showData.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS324_showData_dialog {
+	overflow: scroll;
+	width: 500px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search_box1_IMPORTFILE th {	width: 10%;	}
+.search_box1_IMPORTFILE td {	width: 20%;	}
+.glyphicon-remove-sign_IMPORTFILE:before {
+  content: "\e083";
+  position: absolute;
+  right: 5px;
+}
+.show_table th,.show_table td{
+	border:1px solid #ccc;
+	padding: 10px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS324/PMS324_showData.js"></script>
+<div class="PMS324_showData" ng-controller="PMS324_showDataController" ng-cloak>
+	<div class="modal-dialog PMS324_showData" style="margin-top: 120px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">考績晉級參數</h4>
+			</div>
+			<e-jumping output="outputVO" input="inputVO" query="init()"
+				list="datList"></e-jumping>
+			<form style="margin-bottom: 10px;" name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<div class="show_table">
+				<table style="margin: 16px auto;">
+					<thead>
+						<tr>
+							<th>考核期間(起)</th>
+							<th>考核期間(迄)</th>
+							<th>員工編號</th>
+							<th>房貨轉介件數</th>
+							<th>信用卡卡數</th>
+							<th>去年考績甲以上(含)</th>
+							<th>勞動契約</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in datList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td style="text-align: center">{{row.START_MONTH }}</td>
+							<td style="text-align: center">{{row.END_MONTH }}</td>
+							<td style="text-align: center">{{row.EMP_ID }}</td>
+							<td style="text-align: right">{{row.LOAN_REF_CONT }}</td>
+							<td style="text-align: right">{{row.EISS_CNT }}</td>
+							<td style="text-align: center">{{row.RESULT_FIRST_OVER }}</td>
+							<td style="text-align: center">{{row.WORK_AGREEMENT }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			</form>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,178 @@
+<style>
+.modal-dialog.SQM140_import {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: auto;
+}
+.SQM140_import table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.SQM140_import.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SQM140_import_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<div ng-controller="SQM140_importController" ng-cloak>
+	<div class="modal-dialog SQM140_import">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">滿意度問卷匯入</h4>
+			</div>
+			<div class="modal-body">
+				<table>
+					<tr>
+						<th>交易日起訖：</th>
+						<td colspan="7">							
+							<div class="input-group datebox datewidth" style="float:left">
+								<input type="text" id="sCreDate" name="sCreDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.sCreDate"
+								is-open="model.a"
+								datepicker-options="bgn_sDateOptions"								
+								ng-readonly="true"								
+								ng-change="limitDate();dateChange();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>																					
+							<div style="float:left">&nbsp; ～ &nbsp;</div>	
+							<div class="input-group datebox datewidth" style="float:left">
+								<input type="text" id="eCreDate" name="eCreDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.eCreDate"
+								is-open="model.b"
+								datepicker-options="bgn_eDateOptions"								
+								ng-readonly="true"								
+								ng-change="limitDate();dateChange();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>								
+						</td>
+						
+						<th>分行別：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="true"
+							ng-change="ChangeBranch()"
+							width="150px"
+							style="line-height:20px;" />
+						</td>	
+						
+						<th>問卷別：</th>
+						<td>
+							<e-combobox id="qtn_type" name="qtn_type"
+							ng-datasource="QTN_LIST"
+							ng-model="inputVO.qtn_type"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F3"
+							width="150px"
+							style="line-height:20px;" />
+						</td>
+						
+							<th>員編：</th>
+						<td><input type="text" ng-model="inputVO.emp_id" style="width: 100px; "/></td>
+						
+						<th>客戶ID：</th>
+						<td><input type="text" ng-model="inputVO.cust_id" style="width: 100px; "/></td>
+				</tr>	
+				<tr>		
+						<th>已匯入：</th>
+			     		<td>
+			     			<input class="uniform_on" type='checkbox' id="import_check" name="investor" ng-model='inputVO.import_check' ng-true-value="'Y'" ng-false-value="'N'" />
+			     		</td>
+				</tr>
+				</table>
+				<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				</div>
+				
+				<e-jumping-once output="outputVO" list="paramList" totallist="totalData"></e-jumping-once>
+				
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="e-table-freeze table td_center" e-height="535px" e-mode="1" e-top="true" e-list="paramList">
+						<thead>
+							<tr>
+								<th>
+								<input class="uniform_on bLarger" type='checkbox' id="select_all" ng-model="inputVO.select_all" ng-true-value="'Y'" ng-false-value="'N'" ng-change = "select_all()">
+								全選
+								</th>
+								<th>業務處</th>
+								<th>營業區</th>
+								<th>分行別</th>
+								<th>員編</th>
+								<th>AO_CODE</th>
+								<th>客戶姓名</th>
+								<th>客戶ID</th>
+								<th>交易日期</th>
+								<th>回覆日期</th>
+								<th>問卷類別</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td><input class="uniform_on bLarger" type='checkbox' id="choice"
+								name="choice" ng-model='row.choice' ng-true-value="'Y'"
+								ng-false-value="'N'" ng-change="select_false(row.choice)"/></td>
+								<td>{{row.REGION_CENTER_NAME}}</td>
+								<td>{{row.BRANCH_AREA_NAME}}</td>
+								<td>{{row.BRANCH_NBR}}<ps ng-show="row.BRANCH_NAME">-</ps>{{row.BRANCH_NAME}}</td>
+								<td>{{row.EMP_ID}}<ps ng-show="row.EMP_NAME">-</ps>{{row.EMP_NAME}}</td>
+								<td>{{row.AO_CODE}}</td>
+								<td>{{row.CUST_NAME}}</td>
+								<td>{{row.CUST_ID}}</td>
+								<td>{{row.TRADE_DATE}}</td>
+								<td>{{row.RESP_DATE}}</td>
+								<td>{{row.QTN_TYPE | mapping:QTN_LIST}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="import()" >匯入</button>
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

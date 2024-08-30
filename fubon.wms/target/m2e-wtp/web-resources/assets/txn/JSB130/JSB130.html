@@ -1,0 +1,131 @@
+<script type="text/javascript" src="assets/txn/JSB130/JSB130.js"></script>
+<script type="text/javascript" src="assets/txn/JSB130/JSB130_RESULT.js"></script>
+<div ng-controller="JSB130Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">日盛保單對帳單上傳</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table style="width: 80%;">
+     				<tr>
+     					<th></th>
+     					<td></td>
+     					<th>*保險公司：</th>
+     					<td>
+     						<e-combobox id="ins_com_id"
+										ng-paramtype="JSB.INS_COM_NAME_03"
+										ng-model="inputVO.ins_com_id"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="true"
+			   							width="180px"
+			   							style="line-height:20px;" />
+     					</td>
+     					<th></th>
+     					<td></td>
+  			  		</tr>
+     				<tr>
+     					<th></th>
+     					<td></td>
+     					<th>*對帳單年月：</th>
+     					<td>
+     						<e-combobox id="data_month"
+										ng-datasource="mappingSet['YEARMONTH']" 
+										ng-model="inputVO.data_month"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="true"
+			   							width="180px"
+			   							style="line-height:20px;" />
+     					</td>
+     					<th></th>
+     					<td></td>
+  			  		</tr>
+     				<tr>
+     					<th></th>
+     					<td></td>
+     					<th>*參考日期：</th>
+     					<td>
+     						<div style="float: left; width: 220px;" class="input-group datebox datewidth">
+								<input type="text" id="data_date" name="data_date"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.data_date"
+									   datepicker-options="data_dateOptions"
+									   is-open="model.a"
+									   ng-readonly="true" required/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>																		
+								</span>
+							</div>
+     					</td>
+     					<th></th>
+     					<td></td>
+  			  		</tr>
+  			  		<tr>
+  			  			<th></th>
+     					<td></td>
+  			  			<th>*資料檔案</th>
+                        <td>
+                       		<span id="csvBox" style="display: inline-block;vertical-align: middle;">
+	                       		<e-upload id='csvUpload' success='uploadFinshed(name,rname)' model='inputVO.realfileName' width='180px' required></e-upload>
+                        	</span>
+                        </td>
+                        <th></th>
+     					<td></td>
+  			  		</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="upload()" function-type="query">上傳</button>
+			</div>
+		</div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">上傳對帳單檔資料清單</div>
+		</div>
+		<div class="panel_content">
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;" ng-show="resultList.length > 0">
+				<div class="text-left" style="margin-bottom: 10px;">
+					<button type="button" class="btn btn-info" ng-click="export('ALL')">已上傳彙整檔案資料匯出</button>
+					<button type="button" class="btn btn-info" ng-click="exportUpdate('ALL')">更新庫存資料匯出</button>
+				</div>
+				<table>
+					<thead>
+						<tr>
+							<th>保險公司</th>
+							<th>對帳單年月</th>
+							<th>參考日期</th>
+							<th>上傳日期</th>
+							<th>上傳筆數/清單</th>
+							<th>更新庫存檔案結果</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.INS_COM_ID | mapping:mappingSet['JSB.INS_COM_NAME_03']:'F3'}}</td>
+							<td>{{row.DATA_MONTH}}</td>
+							<td style="text-align:center;">{{toJsDate(row.DATA_DATE) | date:"yyyy/MM/dd"}}</td>
+							<td style="text-align:center;">{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd hh:mm:ss"}}</td>
+							<td style="text-align:right;" ng-show="row.IMP_ROW_COUNT == 0">{{row.IMP_ROW_COUNT}}</td>
+							<td style="text-align:right;" ng-show="row.IMP_ROW_COUNT > 0">
+								<a href="#" ng-click="export(row)">{{row.IMP_ROW_COUNT | number:0}}</a>
+							</td>
+							<td style="text-align:right;" ng-show="row.UPDATE_ROW_COUNT == 0">{{row.UPDATE_ROW_COUNT}}</td>
+							<td style="text-align:right;" ng-show="row.UPDATE_ROW_COUNT > 0">
+								<a href="#" ng-click="exportUpdate(row)">{{row.UPDATE_ROW_COUNT | number:0}}</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

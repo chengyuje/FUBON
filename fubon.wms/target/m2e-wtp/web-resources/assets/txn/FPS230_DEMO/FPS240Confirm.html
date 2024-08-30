@@ -1,0 +1,72 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .modal-body {
+    padding: 0;
+  }
+
+  .modal-dialog {
+    width: 300px;
+    height: 250px;
+  }
+
+  .FPS .radio input[type=radio] {
+    margin-left: -25px;
+    margin-top: 0px;
+  }
+
+</style>
+<div ng-controller="FPS240ConfirmController"
+     ng-cloak
+     class="FPS">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a href="#"
+           class="close"
+           data-dismiss="modal"
+           aria-hidden="true"
+           ng-click="closeThisDialog('cancel')">&times; </a>
+        <h4 id="myModalAlertLabel"
+            class="modal-title">執行動作</h4>
+      </div>
+      <div class="modal-body">
+        <div style="display:inline-block;
+                    margin:1em auto;
+                    text-align:left">
+          <label class="radio">
+            <input type="radio"
+                   name="action"
+                   ng-model="inputVO.action"
+                   ng-required="true"
+                   value="1">客戶有下單意願
+          </label>
+          <label class="radio">
+            <input type="radio"
+                   name="action"
+                   ng-model="inputVO.action"
+                   ng-required="true"
+                   ng-if="data!='PRINT_THINK'"
+                   value="0">暫存，客戶需考慮
+          </label>
+          <label class="radio"
+                 ng-show="!isThink">
+            <input type="radio"
+                   name="action"
+                   ng-model="inputVO.action"
+                   ng-required="true"
+                   value="-1">結束，客戶拒絕
+          </label>
+        </div>
+
+        <div class="padding text-center">
+          <a class="btn-fps"
+             ng-click="ok()">確認</a>
+          <a class="btn-fps"
+             ng-click="closeThisDialog('cancel')">取消</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+<script type="text/javascript" src="assets/txn/CAM120/CAM120.js"></script>
+<div class="CAM120" ng-controller="CAM120Controller" ng-cloak>
+	<!--Content of the panel-->
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>
+						<td style="width: 4%;"></td>
+						<th style="width: 1%;">行銷活動代碼：</th>
+						<td style="width: 10%;"><input class="form-control" placeholder="請輸入..." id="campId" name="campId" ng-model="inputVO.campId" e-length-limit="15"></td>
+						<td style="width: 4%;"></td>
+						<th style="width: 1%;">行銷活動名稱：</th>
+						<td style="width: 10%;"><input class="form-control" placeholder="請輸入..." id="campName" name="campName" ng-model="inputVO.campName" e-length-limit="150"></td>
+						<td style="width: 5%;"></td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init();inquire();">清除</button>
+			<button type="button" class="btn btn-info" ng-click="edit()" function-type="maintenance">新增</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList" e-connect="GridTab1"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>功能</th>
+							<th>名單參數代碼</th>
+							<th><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="CAMPAIGN_ID" e-query="inquire()">行銷活動代碼</e-sorter></th>
+							<th>行銷活動名稱</th>
+							<th>簡要說明</th>
+							<th>名單來源</th>
+							<th><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="CAMPAIGN_ID" e-query="inquire()">名單類型</e-sorter></th>
+							<th>附帶資料蒐集</th>
+							<th>話術</th>
+							<th>使用部隊</th>
+<!-- 							<th>第二使用通路</th> -->
+							<th>最後修改人</th>
+							<th>最後修改時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>
+								<e-combobox 
+								ng-datasource="row.set"
+								ng-model="row.cmbAction"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="action(row)"
+								width="100px"
+								style="line-height:20px;" />
+							</td>
+							<td>{{row.SFA_PARA_ID}}</td>
+							<td>{{row.CAMPAIGN_ID}}</td>
+							<td>{{row.CAMPAIGN_NAME}}</td>
+							<td>{{row.CAMPAIGN_DESC}}</td>
+							<td>{{row.LEAD_SOURCE_ID | mapping:LEAD_SOURCE:'F3'}}</td>
+							<td>{{row.LEAD_TYPE | mapping:LEAD_TYPE:'F3'}}</td>
+							<td>{{row.LEAD_PARA1 | mapping:LEAD_PARA1:'F3'}}</td>
+							<td>{{row.SALES_PITCH}}</td>
+							<td>{{row.FIRST_CHANNEL | mapping:CHANNEL_CODE:'F3'}}</td>
+<!-- 							<td>{{row.SECOND_CHANNEL | mapping:CHANNEL_CODE:'F3'}}</td> -->
+							<td>{{row.MODIFIER}}</td>
+							<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

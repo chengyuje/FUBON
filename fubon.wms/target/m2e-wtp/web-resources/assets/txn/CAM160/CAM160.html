@@ -1,0 +1,402 @@
+<style>
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM160/CAM160.js"></script>
+<script type="text/javascript" src="assets/txn/CAM160/CAM160_DEL.js"></script>
+<script type="text/javascript" src="assets/txn/CAM160/CAM160_LEADS.js"></script>
+<div class="CAM160" ng-controller="CAM160Controller" ng-cloak>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="tfb_content">
+        		<div class="tfb_content_icon"></div>
+        		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >活動名單移除及修改</div>
+      		</div>
+      		<!--Content of the panel-->
+			<div class="panel_content">
+				<uib-tabset active="0" justified="true">
+					<uib-tab index="0" heading="活動名單移除及修改" select="init()">
+						<div id="tab1">
+							<h4 class="h4-title">查詢條件</h4>
+			        		<div class="search_table search_box2 scroll_y">
+			          			<table>
+						            <tr>
+						              	<th>匯入日期：</th>
+						                <td class="form-inline">
+						                	<div class="form-group">
+												<div class="input-group datebox datewidth">
+													<input type="text" id="importSDate" name="importSDate"
+														   class="form-control"
+															uib-datepicker-popup="yyyy/MM/dd"
+															ng-model="inputVO.importSDate"
+															is-open="model.e"
+															datepicker-options="importStartDateOptions"
+															alt-input-formats="altInputFormats"
+															ng-readonly="true"
+															ng-change="limitDate()"/>
+													<!-- 製作日曆button -->
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+												<div style="float: left !important;">～</div>
+												<div class="input-group datebox datewidth">
+												<input 	type="text" id="importEDate" name="importEDate"
+													   	class="form-control"
+														uib-datepicker-popup="yyyy/MM/dd"
+														ng-model="inputVO.importEDate"
+														is-open="model.f"
+														datepicker-options="importEndDateOptions"
+														alt-input-formats="altInputFormats"
+														ng-readonly="true"
+														ng-change="limitDate()" 
+														ng-disabled="inputVO.importSDate == undefined" />
+												<!-- 製作日曆button -->
+												<span class="input-group-btn">
+													<button type="button" class="btn btn-default" ng-click="open($event,'f')" ng-disabled="inputVO.importSDate == undefined" ng-readonly="inputVO.importSDate == undefined">
+													<i class="glyphicon glyphicon-calendar"></i></button>
+												</span>
+											</div>
+										</div>
+											
+										</td>
+									</tr>
+									<tr>
+										<th>行銷活動代碼：</th>
+										<td><input type="text" class="form-control" placeholder="請輸入..." id="campID" name="campID" ng-model="inputVO.campID" e-length-limit="15"></td>
+										<th>行銷活動名稱：</th>
+										<td><input type="text" class="form-control" placeholder="請輸入..." id="campName" name="campName" ng-model="inputVO.campName" e-length-limit="150"></td>
+									</tr>
+									<tr>
+										<th>活動起始日：</th>
+										<td>
+											<div class="form-group">
+												<div class="input-group datebox datewidth">
+													<input 	type="text" id="sDate" name="sDate"
+															class="form-control"
+															uib-datepicker-popup="yyyy/MM/dd"
+															ng-model="inputVO.sDate"
+															is-open="model.a"
+															datepicker-options="startDateOptions"
+															alt-input-formats="altInputFormats"
+															ng-readonly="true"
+															ng-change="limitDate2()"/>
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+												<div style="float: left !important;">～</div>
+												<div class="input-group datebox datewidth">
+													<input 	type="text" id="sDate2" name=sDate2
+															class="form-control"
+															uib-datepicker-popup="yyyy/MM/dd"
+															ng-model="inputVO.sDate2"
+															is-open="model.b"
+															datepicker-options="startDateOptions2"
+															alt-input-formats="altInputFormats"
+															ng-readonly="true"
+															ng-change="limitDate2()"
+															ng-disabled="inputVO.sDate == undefined"/>
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-disabled="inputVO.sDate == undefined" ng-readonly="inputVO.sDate == undefined" ng-click="open($event,'b')">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+											</div>
+										</td>
+										<th>活動終止日：</th>
+										<td>
+											<div class="form-group">
+												<div class="input-group datebox datewidth">
+													<input 	type="text" id="eDate" name="eDate"
+															class="form-control"
+															uib-datepicker-popup="yyyy/MM/dd"
+															ng-model="inputVO.eDate"
+															is-open="model.c"
+															datepicker-options="endDateOptions"
+															alt-input-formats="altInputFormats"
+															ng-readonly="true"
+															ng-change="limitDate2()"/>
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+												<div style="float: left !important;">～</div>
+												<div class="input-group datebox datewidth">
+													<input 	type="text" id="eDate2" name="eDate2"
+															class="form-control"
+															uib-datepicker-popup="yyyy/MM/dd"
+															ng-model="inputVO.eDate2"
+															is-open="model.d"
+															datepicker-options="endDateOptions2"
+															alt-input-formats="altInputFormats"
+															ng-readonly="true"
+															ng-change="limitDate2()"
+															ng-disabled="inputVO.eDate == undefined"/>
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'d')" ng-disabled="inputVO.eDate == undefined" ng-readonly="inputVO.eDate == undefined">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+											</div>
+										</td>
+									</tr>
+				          		</table>
+			        		</div>
+			        		<div class="search_box_btn text-center">
+								<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+								<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+							</div>
+			        		<h4 class="h4-title">查詢結果</h4>
+							<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList" e-connect="GridTab1"></e-jumping>
+				        	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				          		<table class="table-bordered">
+				          			<thead>
+					            		<tr>
+					              			<th>功能</th>
+					              			<th><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="CREATETIME" e-query="inquire()">匯入日期時間</e-sorter></th>
+					              			<th><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="CAMPAIGN_ID" e-query="inquire()">行銷活動代碼</e-sorter>行銷活動名稱</th>
+					              			<th>簡要說明</th>
+					              			<th><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="START_DATE" e-query="inquire()">&nbsp;&nbsp;&nbsp;活動起始日&nbsp;&nbsp;&nbsp;</e-sorter></th>
+					              			<th><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="END_DATE" e-query="inquire()">&nbsp;&nbsp;&nbsp;活動終止日&nbsp;&nbsp;&nbsp;</e-sorter></th>
+					              			<th>實際匯入總數</th>
+					              			<th>目前可移除名單</th>
+					              			<th>目前已執行名單</th>
+					              			<th>已移除名單數</th>
+					              			<th>移除/修改狀態</th>
+					              			<th>放行人員編</th>
+					              			<th>放行時間</th>
+					              		</tr>
+				              		</thead>
+				              		<tbody>
+					              		<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>
+												<e-combobox id="cmbAction" name="cmbAction"
+												ng-datasource="row.set"
+												ng-model="row.cmbAction"
+												ng-validate="false"
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-format="F3"
+												ng-required="false"
+												ng-change="action(row)"
+												width="100px"
+												style="line-height:20px;" />
+											</td>
+											<td>{{row.CREATETIME | limitTo: 10}}<br>{{row.CREATETIME | limitTo: 8 : 11}}</td>
+											<td>{{row.CAMPAIGN_ID}}<br>{{row.CAMPAIGN_NAME}}</td>
+											<td>
+												<div uib-tooltip="{{row.CAMPAIGN_DESC}}" tooltip-placement="right-bottom">
+													{{row.CAMPAIGN_DESC.length > 4 ? (row.CAMPAIGN_DESC | limitTo: 4) + "..." : row.CAMPAIGN_DESC}}
+												</div>
+											</td>
+											<td>{{toJsDate(row.START_DATE) | date:"yyyy-MM-dd"}}</td>
+											<td>{{toJsDate(row.END_DATE) | date:"yyyy-MM-dd"}}</td>
+											<td align="right">{{row.IM_TOTAL_CNT}}</td>
+											<td align="right">{{row.REMOVEABLE}}</td>
+											<td align="right">{{row.PROCESSED}}</td>
+											<td align="right">{{row.RV_LE_CNT}}</td>
+											<td>{{row.RE_STATUS | mapping:mappingSet['CAM.RE_STATUS']:'F3'}}</td>
+											<td>{{row.REL_EMP_ID}}-{{row.EMP_NAME}}</td>
+											<td>{{row.REL_DATETIME | limitTo: 10}}<br>{{row.REL_DATETIME | limitTo: 8 : 11}}</td>
+										</tr>
+									</tbody>
+				         		</table>
+				        	</div>
+						</div>
+					</uib-tab> 
+					<uib-tab index="1" heading="名單移除及修改歷史紀錄" select="init_his()">
+						<div id="tab2">
+			       		 	<h4 class="h4-title">查詢條件</h4>
+			        		<div class="search_table search_box2">
+					          	<table>
+					            	<tr>
+					              		<th>行銷活動代碼：</th>
+										<td><input type="text" class="form-control" placeholder="請輸入..." id="his_campID" name="his_campID" ng-model="inputVO.his_campID" e-length-limit="15"></td>
+					              		<th>移除/修改日期：</th>
+					              		<td class="form-inline">
+					              			<div class="form-group">
+												<div class="input-group datebox datewidth">
+													<input 	type="text" id="his_delSDate" name="his_delSDate"
+														   	class="form-control"
+															uib-datepicker-popup="yyyy/MM/dd"
+															ng-model="inputVO.his_delSDate"
+															is-open="model.i"
+															datepicker-options="his_delStartDateOptions"
+															alt-input-formats="altInputFormats"
+															ng-readonly="true"
+															ng-change="limitDate_hisDel()"/>
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'i')">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+												<div style="float: left !important;">～</div>
+												<div class="input-group datebox datewidth">
+													<input 	type="text" id="his_delEDate" name="his_delEDate"
+														   	class="form-control"
+															uib-datepicker-popup="yyyy/MM/dd"
+															ng-model="inputVO.his_delEDate"
+															is-open="model.j"
+															datepicker-options="his_delEndDateOptions"
+															alt-input-formats="altInputFormats"
+															ng-readonly="true"
+															ng-change="limitDate_hisDel()"
+															ng-disabled="inputVO.his_delSDate == undefined"/>
+													<!-- 製作日曆button -->
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'j')" ng-disabled="inputVO.his_delSDate == undefined" ng-readonly="inputVO.his_delSDate == undefined">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+											</div>
+					              		</td>
+					           		</tr>
+									<tr>
+										<th>行銷活動名稱：</th>
+										<td><input type="text" class="form-control" placeholder="請輸入..." id="his_campName" name="his_campName" ng-model="inputVO.his_campName" e-length-limit="150"></td>
+										<th>移除/修改人員員編：</th>
+										<td><input type="text" class="form-control" placeholder="請輸入..." id="his_modifier" name="his_modifier" ng-model="inputVO.his_modifier" e-length-limit="150"></td>
+									</tr>
+									<tr>
+										<th>活動起始日：</th>
+										<td>
+											<div class="form-group">
+												<div class="input-group datebox datewidth">
+													<input 	type="text" id="his_sDate" name="his_sDate"
+														   	class="form-control"
+															uib-datepicker-popup="yyyy/MM/dd"
+															ng-model="inputVO.his_sDate"
+															is-open="model.g"
+															datepicker-options="hisStartDateOptions"
+															alt-input-formats="altInputFormats"
+															ng-readonly="true"
+															ng-change="limitDate_his()"/>
+													<!-- 製作日曆button -->
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'g')">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+												<div style="float: left !important;">～</div>
+												<div class="input-group datebox datewidth">
+													<input type="text" id="his_sDate2" name="his_sDate2"
+														   class="form-control"
+														   uib-datepicker-popup="yyyy/MM/dd"
+														   ng-model="inputVO.his_sDate2"
+														   is-open="model.h"
+														   datepicker-options="hisStartDate2Options"
+														   alt-input-formats="altInputFormats"
+														   ng-readonly="true"
+														   ng-change="limitDate_his()" 
+														   ng-disabled="inputVO.his_sDate == undefined"/>
+													<!-- 製作日曆button -->
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'h')" ng-disabled="inputVO.his_sDate == undefined" ng-readonly="inputVO.his_sDate == undefined">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+											</div>
+										</td>
+										<th>活動終止日：</th>
+										<td>
+											<div class="form-group">
+												<div class="input-group datebox datewidth">
+													<input 	type="text" id="his_eDate" name="his_eDate"
+														  	class="form-control"
+															uib-datepicker-popup="yyyy/MM/dd"
+															ng-model="inputVO.his_eDate"
+															is-open="model.k"
+															datepicker-options="hisEndDateOptions"
+															alt-input-formats="altInputFormats"
+															ng-readonly="true"
+															ng-change="limitDate_his()"/>
+													<!-- 製作日曆button -->
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'k')">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+												<div style="float: left !important;">～</div>
+												<div class="input-group datebox datewidth">
+													<input type="text" id="his_eDate2" name="his_eDate2"
+														   class="form-control"
+														   uib-datepicker-popup="yyyy/MM/dd"
+														   ng-model="inputVO.his_eDate2"
+														   is-open="model.l"
+														   datepicker-options="hisEndDate2Options"
+														   alt-input-formats="altInputFormats"
+														   ng-readonly="true"
+														   ng-change="limitDate_his()"
+														   ng-disabled="inputVO.his_eDate == undefined"/>
+													<!-- 製作日曆button -->
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'l')" ng-disabled="inputVO.his_eDate == undefined" ng-readonly="inputVO.his_eDate == undefined">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+											</div>
+										</td>
+									</tr>
+					          	</table>
+			        		</div>
+							<div class="search_box_btn text-center">
+								<button type="button" class="btn btn-info" ng-click="inquireInit_his();inquire_his()" function-type="query">查詢</button>
+								<button type="button" class="btn btn-info" ng-click="init_his()">清除</button>
+							</div>        
+				       		<h4 class="h4-title">查詢結果</h4>
+				       		<e-jumping output="hisOutputVO" input="inputVO" query="inquire_his()" list="hisList" e-connect="GridTab2"></e-jumping>
+				        	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				          		<table>
+				          			<thead>
+										<tr>
+											<th>未移除明細</th>
+											<th>移除/修改人員</th>
+											<th><e-sorter e-connect="GridTab2" e-input="inputVO" e-col="LASTUPDATE" e-query="inquire_his()">最近移除修改日期</e-sorter></th>
+											<th><e-sorter e-connect="GridTab2" e-input="inputVO" e-col="CREATETIME" e-query="inquire_his()">匯入日期時間</e-sorter></th>
+											<th><e-sorter e-connect="GridTab2" e-input="inputVO" e-col="CAMPAIGN_ID" e-query="inquire_his()">行銷活動代碼</e-sorter>行銷活動名稱</th>
+											<th>簡要說明</th>
+											<th><e-sorter e-connect="GridTab2" e-input="inputVO" e-col="RE_STATUS" e-query="inquire_his()">移除/修改狀態</e-sorter></th>
+											<th>移除/修改原因</th>
+											<th><e-sorter e-connect="GridTab2" e-input="inputVO" e-col="START_DATE" e-query="inquire_his()">活動起始日</e-sorter></th>
+											<th><e-sorter e-connect="GridTab2" e-input="inputVO" e-col="END_DATE" e-query="inquire_his()">活動終止日</e-sorter></th>
+											<th>實際匯入總數</th>
+											<th>移除時完成移除數</th>
+											<th>移除時未移除數</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" align="center" ng-repeat="row in hisList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td><a href="#myModal1" data-toggle="modal" class="btn btn-info btn-circle" ng-click="hisAction(row)" ng-hide="row.ALIVE_CNT == 0"><i class="glyphicon glyphicon-search"></i></a></td>
+											<td>{{row.MODIFIER}}-{{row.EMP_NAME}}</td>
+											<td>{{row.LASTUPDATE | limitTo: 10}}<br>{{row.LASTUPDATE | limitTo: 8 : 11}}</td>
+											<td>{{row.CREATETIME | limitTo: 10}}<br>{{row.CREATETIME | limitTo: 8 : 11}}</td>
+											<td>{{row.CAMPAIGN_ID}}<br>{{row.CAMPAIGN_NAME}}</td>
+											<td>
+												<div uib-tooltip="{{row.CAMPAIGN_DESC}}" tooltip-placement="right-bottom">
+													{{row.CAMPAIGN_DESC.length > 4 ? (row.CAMPAIGN_DESC | limitTo: 4) + "..." : row.CAMPAIGN_DESC}}
+												</div>
+											</td>
+											<td>{{row.RE_STATUS | mapping:mappingSet['CAM.RE_STATUS']:'F3'}}</td>
+											<td>{{row.RV_REASON}}</td>
+											<td>{{toJsDate(row.START_DATE) | date:"yyyy-MM-dd"}}</td>
+											<td>{{toJsDate(row.END_DATE) | date:"yyyy-MM-dd"}}</td>
+											<td align="right">{{row.IM_TOTAL_CNT}}</td>
+											<td align="right">{{row.RV_LE_CNT}}</td>
+											<td align="right">{{row.ALIVE_CNT}}</td>
+										</tr>
+									</tbody>
+								</table>
+				        	</div>
+						</div>
+					</uib-tab>
+				</uib-tabset>
+			</div>
+		</div>        		
+	</div>
+</div>

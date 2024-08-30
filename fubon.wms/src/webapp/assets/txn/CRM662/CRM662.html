@@ -1,0 +1,234 @@
+<style>
+/* open dialog */
+.ngdialog.CRM662 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM662 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM662 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM662 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM662.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM662_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:188px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.red{
+	color: red;
+}
+.textarea-CRM662
+    {
+      width: 500px;
+      height: 158px;
+      vertical-align: middle;
+    }
+.tfb_content_tit-CRM662{height:52px ; color:#FFF ;font-size:17px ;font-weight:bold ;  min-width:410px ;width:410px ; background-color:#93c5e1 ;white-space: nowrap;}
+
+
+</style>
+
+<script type="text/javascript" src="assets/txn/CRM662/CRM662.js"></script>
+<script type="text/javascript" src="assets/txn/CRM662/CRM662_prv_add.js"></script>
+<script type="text/javascript" src="assets/txn/CRM662/CRM662_prv_rpy.js"></script>
+
+<div class="CRM662" ng-controller="CRM662Controller" ng-cloak>
+	<div class="gv_tab_sc scroll_y" style="height:300px;white-space: nowrap;">
+		<table>
+			<thead>
+				<tr>
+					<th ng-show = "check_ao"></th>
+					<th>功能</th>
+					<th>成員客戶姓名</th>
+					<th>成員客戶ID</th>
+					<th>關係</th>
+					<th>理專姓名</th>
+					<th>AO_Code</th>
+					<th>UHRM姓名</th>
+					<th>UHRM</th>
+					<th>出生/創立日期</th>
+					<th>近12周最低資產總額</th>
+					<th>理財會員等級</th>
+					<th>生效日期</th>
+					<th>申請日</th>
+					<th>建立人</th>
+					<th>簽核主管</th>
+					<th>主管簽核時間</th>
+					<th>簽核督導</th>
+					<th>督導簽核時間</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in resultList_prv track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" >
+					<td align = "center">
+						<span ng-show = "row.CUST_ID == row.CUST_ID_M"></span>
+					</td>
+					<!-- 刪除 -->
+					<td align = "center" ng-show = "check_ao" style="height: 45px;">
+						<button class="btn btn-danger btn-circle" ng-click="prv_delete(row)" 
+						ng-show = "row.CUST_ID != inputVO.cust_id && VA_type =='2'" 
+						ng-disabled = "row.PRV_STATUS == 'PAN' || row.PRV_STATUS == 'PAN2' ||  row.PRV_STATUS == 'PAD' || resultList_prv[0].PRV_STATUS == 'PAO'">
+							<i class="glyphicon glyphicon-trash"></i>
+						</button>
+					</td>				
+					<td>
+						{{row.CUST_NAME}} 
+						<span ng-show = "resultList_prv[0].PRV_STATUS == 'PAO'">(排序待覆核)</span>
+						<span ng-show = "row.PRV_STATUS == 'PAN' || row.PRV_STATUS == 'PAN2' ">(申請待覆核)</span>
+						<span ng-show = "row.PRV_STATUS == 'PAD'">(刪除待覆核)</span>
+					</td>
+					<td>
+						<span ng-show = "row.EMP_ID == custVO.AO_ID"><a href="#" onclick="return false" ng-click="gohome(row.CUST_ID)">{{row.CUST_ID}}</a></span>
+						<span ng-show = "row.EMP_ID != custVO.AO_ID">{{row.CUST_ID}}</span>
+					</td>
+					<td>{{row.REL_TYPE | mapping:mappingSet['CRM.REL_TYPE']:'F3'}}</td>
+					<td>{{row.EMP_NAME}}</td>					
+					<td>{{row.AO_CODE}}</td>	
+					<td>{{row.UEMP_NAME}}</td>			
+					<td>{{row.UEMP_ID}}</td>
+					<td>{{toJsDate(row.BIRTH_DATE) | date:"yyyy/MM/dd"}}</td>
+					<td style="text-align: right;">{{row.AUM_AMT | currency:'$' : 0}}</td>
+					<td>{{row.VIP_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+					<td><span ng-show = "row.PRV_MBR_MAST_YN != 'Y' || row.PRV_STATUS == 'PSN'">{{toJsDate(row.ACT_DATE) | date:"yyyy/MM/dd"}}</span></td>
+					<td><span ng-show = "row.PRV_MBR_MAST_YN != 'Y' || row.PRV_STATUS == 'PSN'">{{toJsDate(row.APL_DATE) | date:"yyyy/MM/dd"}}</span></td>
+					<td><span ng-show = "row.PRV_MBR_MAST_YN != 'Y' || row.PRV_STATUS == 'PSN'">{{row.CREATOR}}</span></td>
+					<td><span ng-show = "row.PRV_MBR_MAST_YN != 'Y' || row.PRV_STATUS == 'PSN'">{{row.BRA_MGR_EMP_ID}}</span></td>
+					<td><span ng-show = "row.PRV_MBR_MAST_YN != 'Y' || row.PRV_STATUS == 'PSN'">{{row.BRA_MGR_RPL_DATE}}</span></td>
+					<td><span ng-show = "row.PRV_MBR_MAST_YN != 'Y' || row.PRV_STATUS == 'PSN'">{{row.OP_MGR_EMP_ID}}</span></td>
+					<td><span ng-show = "row.PRV_MBR_MAST_YN != 'Y' || row.PRV_STATUS == 'PSN'">{{row.OP_MGR_RPL_DATE}}</span></td>
+				</tr>
+
+				<tr class="repeat-row" ng-repeat="rowData in addList_prv track by $index" ng-show = "check_ao && VA_type =='2'">
+					<td align = "center">
+						<span ng-show = "rowData.CUST_ID == rowData.CUST_ID_M"></span>
+					</td>
+					<td align = "center">
+						<button class="btn btn-success btn-circle" ng-click = "add_row(rowData, $index)" ng-disabled = "resultList_prv[0].PRV_STATUS == 'PAO'" ng-hide = "rowData.type">
+							<i class="glyphicon glyphicon-plus"></i>
+						</button>
+					</td>
+					<td>
+						<input class="form-control" type="text" id="prv_cust_name" name="prv_cust_name" ng-model="rowData.prv_cust_name" style="width:150px" e-length-limit="30" disabled>
+					</td>
+					<td>
+						<input class="form-control" type="text" id="prv_cust_id" name="prv_cust_id" ng-model="rowData.prv_cust_id" style="width:150px;display:inline;" e-length-limit="30" disabled> 
+						<button class="btn btn-info btn-circle" ng-click = "open_prv(1, rowData, $index)" ng-disabled = "resultList_prv[0].PRV_STATUS == 'PAO'" style="display:inline;">
+							<i class="glyphicon glyphicon-zoom-in"></i>
+						</button>
+					</td>
+					<td>
+						<span ng-show = "rowData.rel_status">
+							<e-combobox id="rel_type" 
+										ng-datasource="mappingSet['CRM.REL_TYPE_N00']"
+										ng-model="rowData.rel_type"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										width="200px"
+										style="line-height:20px;" />
+						</span>
+						<span ng-hide = "rowData.rel_status">{{rowData.rel_type | mapping:mappingSet['CRM.REL_TYPE']:'F3'}}</span>
+					</td>
+					<td></td>
+					<td></td>					
+					<td></td>	
+					<td></td>
+					<td></td>				 
+					<td style="text-align: right;">{{rowData.prv_cust_aum | currency:'$' : 0}}</td>
+					<td>{{rowData.vip_degree | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>總合</td>
+					<td ng-show = "check_ao"></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+ 					<td></td>
+ 					<td></td>
+ 					<td></td>
+					<td style="text-align: right;">{{inputVO.aum_total | currency:'$' : 0}}</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<button type="button" class="btn btn-primary" ng-show="check_rpy"  ng-click= "open_prv_rpy()">覆核</button>
+<!-- 	<button type="button" class="btn btn-primary" ng-show="check_rpy && PRV_STATUS == 'PAN2'"  ng-click= "open_prv_rpy()">督導覆核</button> -->
+	<button class="btn btn-success btn-circle" ng-click = "prv_add()" ng-show = "check_ao && row.CUST_ID != inputVO.cust_id && VA_type =='2'">儲存</button>	
+	<hr>
+	
+	<div>
+		<table>
+			<tr>
+				<th width="180px">家庭會員最低資產總額</th>
+				<td>
+					<input class="form-control" style="text-align: right;width:150px;" type="text" id="aum_total" name="aum_total" ng-model="inputVO.aum_total" e-input-limit="NUU" nuu1="16" nuu2="0" e-length-limit="30" disabled>
+				</td>
+			</tr>
+			<tr>
+				<th>條件不符原因</th>
+				<td colspan = "3">	
+					<input class="form-control" type="text" id="reject_reason" name="reject_reason" ng-model="inputVO.reject_reason" style="width:400px" e-length-limit="100" disabled>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>

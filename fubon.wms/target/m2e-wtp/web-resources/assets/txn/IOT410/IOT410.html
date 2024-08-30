@@ -1,0 +1,200 @@
+<style>
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT410/IOT410.js"></script>
+<div ng-controller="IOT410Controller" ng-cloak>
+    <div class="modal-dialog" style="width: 80%;">
+      <div class="modal-content">
+        <div class="modal-header"> 
+        	<button type="button" class="close" ng-click="closeThisDialog('cancel');">&times;</button>
+          <h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">電訪紀錄登打/查詢_{{inputVO.PREMATCH_SEQ}}</h4>
+        </div>
+        <div class="modal-body">
+        	<div class="gv_tab_sc scroll_y">
+        		<div style="margin-bottom: 5px;" ng-show="showWarningMsg">
+					<samp style="color: red; font-weight: bold;">請留意！同案件編號電訪記錄有「電訪疑義」或「取消投保」之記錄！</samp>
+				</div>
+        		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+        		<table>
+					<tr>
+	    				<td colspan="6">電訪狀態：
+	    					<span ng-show="fromIOT111">{{inputVO.STATUS | mapping:mappingSet['CALLOUT_STATUS']:F3}}</span>
+	    					<e-combobox id="status" name="status"
+										ng-datasource="mappingSet['IOT.CALLOUT_STATUS']"
+										ng-model="inputVO.STATUS"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3" 
+										ng-required="false"
+										ng-hide="fromIOT111"
+										width="150px"
+										style="line-height:20px;"/>
+	    				</td>
+	    			</tr>
+	    			<tr>
+						<th colspan="6" style="text-align: left;" class="table_title">錄音序號</th>
+					</tr>
+	    			<tr>
+	    				<td style="width: 16.5%">要保人錄音序號</td>
+	    				<td style="width: 16.5%" ng-show="fromIOT111">{{inputVO.C_PREMIUM_TRANSSEQ}}</td>
+	    				<td style="width: 16.5%" ng-hide="fromIOT111">
+	    					<input type="text" id="c_premium_transseq" name="c_premium_transseq" 
+								placeholder="請輸入..."
+								ng-model="inputVO.C_PREMIUM_TRANSSEQ" 
+								ng-disabled="cFlag"
+								ng-blur="keySEQ('C')"
+								e-input-limit="N"
+								maxlength="12"
+								class="form-control">
+	    				</td>
+	    				<td style="width: 16.5%">被保人錄音序號</td>
+	    				<td style="width: 16.5%" ng-show="fromIOT111">{{inputVO.I_PREMIUM_TRANSSEQ}}</td>
+	    				<td style="width: 16.5%" ng-hide="fromIOT111">
+	    					<input type="text" id="i_premium_transseq" name="i_premium_transseq" 
+								placeholder="請輸入..."
+								ng-model="inputVO.I_PREMIUM_TRANSSEQ" 
+								ng-disabled="iFlag"
+								ng-blur="keySEQ('I')"
+								e-input-limit="N"
+								maxlength="12"
+								class="form-control">
+	    				</td>
+	    				<td style="width: 16.5%">繳款人錄音序號</td>
+	    				<td style="width: 16.5%" ng-show="fromIOT111">{{inputVO.P_PREMIUM_TRANSSEQ}}</td>
+	    				<td style="width: 16.5%" ng-hide="fromIOT111">
+	    					<input type="text" id="p_premium_transseq" name="p_premium_transseq" 
+								placeholder="請輸入..."
+								ng-model="inputVO.P_PREMIUM_TRANSSEQ" 
+								ng-disabled="pFlag"
+								e-input-limit="N"
+								maxlength="12"
+								class="form-control">
+	    				</td>
+	    			</tr>
+	    			<tr>
+						<th colspan="6" style="text-align: left;" class="table_title">電訪作業紀錄</th>
+					</tr>
+	    			<tr>
+	    				<td>總撥打次數</td>
+	    				<td ng-show="fromIOT111">{{inputVO.TOT_CALL_CNT | number:0}}</td>
+	    				<td ng-hide="fromIOT111">
+	    					<input type="text" id="tot_call_cnt" name="tot_call_cnt" 
+								placeholder="請輸入..."
+								ng-model="inputVO.TOT_CALL_CNT" 
+								e-input-limit="NN"
+								class="form-control">
+	    				</td>
+	    				<td>今日撥打次數</td>
+	    				<td ng-show="fromIOT111">{{inputVO.TODAY_CALL_CNT | number:0}}</td>
+	    				<td ng-hide="fromIOT111">
+	    					<input type="text" id="today_call_cnt" name="today_call_cnt" 
+								placeholder="請輸入..."
+								ng-model="inputVO.TODAY_CALL_CNT" 
+								e-input-limit="NN"
+								class="form-control">
+	    				</td>
+	    				<td>失敗次數</td>
+	    				<td ng-show="fromIOT111">{{inputVO.FAIL_CALL_CNT | number:0}}</td>
+	    				<td ng-hide="fromIOT111">
+	    					<input type="text" id="fail_call_cnt" name="fail_call_cnt" 
+								placeholder="請輸入..."
+								ng-model="inputVO.FAIL_CALL_CNT" 
+								e-input-limit="NN"
+								class="form-control">
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>未成功原因</td>
+	    				<td colspan="5" ng-show="fromIOT111">{{inputVO.FAIL_REASON | mapping:mappingSet['CALLOUT.FAIL_REASON']:F3}}</td>
+	    				<td colspan="5" ng-hide="fromIOT111">
+	    					<e-combobox id="fail_reason" name="fail_reason"
+										ng-paramtype="CALLOUT.FAIL_REASON"
+										ng-model="inputVO.FAIL_REASON"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3" 
+										ng-required="false"
+										width="280px"
+										style="line-height:20px;"/>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>失敗異常分類1</td>
+	    				<td colspan="5" ng-show="fromIOT111">{{inputVO.FAIL_TYPE1 | mapping:mappingSet['CALLOUT.FAIL_TYPE']:F3}}</td>
+	    				<td colspan="5" ng-hide="fromIOT111">
+	    					<e-combobox id="fail_type1" name="fail_type1"
+										ng-paramtype="CALLOUT.FAIL_TYPE"
+										ng-model="inputVO.FAIL_TYPE1"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3" 
+										ng-required="false"
+										width="280px"
+										style="line-height:20px;"/>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>失敗異常分類2</td>
+	    				<td colspan="5" ng-show="fromIOT111">{{inputVO.FAIL_TYPE2 | mapping:mappingSet['CALLOUT.FAIL_TYPE']:F3}}</td>
+	    				<td colspan="5" ng-hide="fromIOT111">
+	    					<e-combobox id="fail_type2" name="fail_type2"
+										ng-paramtype="CALLOUT.FAIL_TYPE"
+										ng-model="inputVO.FAIL_TYPE2"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3" 
+										ng-required="false"
+										width="280px"
+										style="line-height:20px;"/>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td colspan="6">備註(蓋掉異常分類別，請把前次失敗原因打進備註)
+	    					<textarea type="text" id="incomeRemark" style="width: 100%; height: 80px;" maxlength="300" ng-model="inputVO.CALL_MEMO" ng-disabled="fromIOT111"></textarea>
+	    				</td>
+	    			</tr>
+	    			<tr ng-show="rejectList.length > 0">
+	    				<td>退回原因</td>
+	    				<td colspan="5">
+	    					<table>
+								<thead>
+									<tr>
+										<th style="width: 16.5%">退回日期</th>
+										<th>退回原因</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in rejectList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td>{{row.REJECT_DATE}}</td>						
+										<td>{{row.REJECT_REASON}}</td>						
+									</tr>
+								</tbody>
+							</table>
+	    				</td>
+	    			</tr>
+	    			
+				</table>
+				<div class="search_box_btn text-center" ng-show="fromIOT111">
+					<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="closeThisDialog('cancel')">關閉視窗</button>
+				</div>
+				<div class="search_box_btn text-center" ng-hide="fromIOT111">
+					<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="save()">完成</button>
+					<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="closeThisDialog('cancel')">關閉視窗</button>
+				</div>
+        	</div>
+        </div>
+      </div>
+    </div>
+</div>

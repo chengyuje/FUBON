@@ -1,0 +1,228 @@
+<script type="text/javascript" src="assets/txn/PMS108/PMS108.js"></script>
+<style>
+/* open dialog */
+.ngdialog.PMS108 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS108 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* table size */
+.PMS108  table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS108 .table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+</style>
+<!--  popup2 -->
+<div ng-controller="PMS108Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">潛力金流客戶參數設定
+		</div>
+	</div>
+	<div class="panel_content">
+
+		<div class="modal-body">
+			<div class="tab-content" >
+				<uib-tabset active="activeJustified" Justified="true">
+				<uib-tab id="01" index="0" heading="基金">
+				<div class="search_table search_box2" style="height: 290px">
+					<table>
+						<tr>
+							<th></th>
+							<td class="form-inline"></td>
+						</tr>
+						<tr>
+							<th></th>
+							<td class="form-inline"></td>
+						</tr>
+						<tr>
+							<th>基金(By憑證含息報酬)</th>
+							<td class="form-inline"><input class="form-control"
+								type="text" ng-model="inputVO.ROI1" size="10"  ng-keyup="inputVO.ROI1=check(inputVO.ROI1)" onkeyup="value=value.replace(/[^\d\.]/g,'')  ">%</td>
+						</tr>
+						<tr>
+							<th>(基金)台幣庫存金額>=</th>
+							<td class="form-inline"><input type="text"
+								class="form-control" ng-model="inputVO.AMT_TWD1" e-input-limit="NC"  >
+								元</td>
+						</tr>
+					</table>
+				</div>
+				</uib-tab> <uib-tab id="02" index="1" heading="ETF/海外股票">
+				<div class="search_table search_box2" style="height: 290px">
+					<table>
+						<tr>
+							<th></th>
+							<td class="form-inline"></td>
+						</tr>
+						<tr>
+							<th></th>
+							<td class="form-inline"></td>
+						</tr>
+
+						<tr>
+							<th>ETF(By信託帳號+單一商品報酬)</th>
+							<td class="form-inline"><input class="form-control"
+								type="text" ng-model="inputVO.ROI2" size="10"   ng-keyup="inputVO.ROI2=check(inputVO.ROI2)">%</td>
+						</tr>
+						<tr>
+							<th>(ETF)台幣庫存金額>=</th>
+							<td class="form-inline"><input type="text"
+								class="form-control" ng-model="inputVO.AMT_TWD2" size="10"   e-input-limit="NC">
+								元</td>
+						</tr>
+					</table>
+				</div>
+				</uib-tab> <uib-tab id="03" index="2" heading="SI/SN">
+				<div class="search_table search_box2" style="height: 290px">
+					<table>
+						<tr>
+							<th></th>
+							<td class="form-inline"></td>
+						</tr>
+						<tr>
+							<th></th>
+							<td class="form-inline"></td>
+						</tr>
+						<tr>
+							<th>SI、SN(By交易憑證含息報酬)</th>
+							<td class="form-inline"><input class="form-control"
+								type="text" ng-model="inputVO.ROI3" size="10"  ng-keyup="inputVO.ROI3=check(inputVO.ROI3)">%</td>
+						</tr>
+						<tr>
+							<th>(SI、SN)台幣庫存金額>=</th>
+							<td class="form-inline"><input type="text"
+								class="form-control" ng-model="inputVO.AMT_TWD3" size="10"  e-input-limit="NC">
+								元</td>
+						</tr>
+					</table>
+				</div>
+				</uib-tab> <uib-tab id="04" index="3" heading="海外債">
+				<div class="search_table search_box2" style="height: 290px">
+					<table>
+						<tr>
+							<th></th>
+							<td class="form-inline"></td>
+						</tr>
+						<tr>
+							<th></th>
+							<td class="form-inline"></td>
+						</tr>
+						<tr>
+							<th>海外債(By交易憑證含息報酬)</th>
+							<td class="form-inline"><input class="form-control"
+								type="text" ng-model="inputVO.ROI4" size="10" ng-keyup="inputVO.ROI4=check(inputVO.ROI4)">%</td>
+						</tr>
+						<tr>
+							<th>(海外債)台幣庫存金額>=</th>
+							<td class="form-inline"><input type="text"
+								class="form-control" ng-model="inputVO.AMT_TWD4" size="10" e-input-limit="NC">
+								元</td>
+						</tr>
+					</table>
+				</div>
+				</uib-tab> <uib-tab id="05" index="4" heading="保險">
+				<div class="search_table search_box2">
+						<form name="parameterTypeEditForm" class="form-horizontal"
+							data-toggle="validator" role="form" autocomplete="off"
+							enter-as-tab>
+							<table>
+								<tr>
+									<th></th>
+									<td class="form-inline"></td>
+								</tr>
+								<tr>
+									<th></th>
+									<td class="form-inline"></td>
+								</tr>
+								<tr>
+									<th>險種代號</th>
+									<td class="form-inline"><input type="text" ng-model="inputVO.INS"
+										class="form-control" size="20" ng-required="true"></td>
+								</tr>
+								<tr>
+									<th>解約費用收取年期</th>
+									<td class="form-inline"><input type="text" ng-model="inputVO.YEAR" 
+										class="form-control" size="20" ng-required="true" onkeyup="value=value.replace(/[^\d]/g,'')  "> 
+										<a href="#"class="btn btn-primary" ng-click="check(inputVO.YEAR);saveins()">加入</a></td>
+								</tr>
+								<tr>
+									<th></th>
+									<td class="form-inline"></td>
+							</table>
+						</form>
+					</div>
+
+
+				<!-- 共O頁/共O筆資料 -->
+				<div class="text-right">
+					<e-jumping output="outputVO" input="inputVO" query="inquire()"
+						list="paramList"></e-jumping>
+				</div>
+				<div class="gv_tab_sc scroll_y">
+					<table>
+						<tr align="center">
+							<th>刪除</th>
+							<th>險種代號</th>
+							<th>險種名稱</th>
+							<th>解約費用收取年期</th>
+						</tr>
+						<tr class="repeat-row"
+							ng-repeat="row in insList track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" align="center">
+
+							<td><a href="#" class="btn btn-danger btn-circle"
+								ng-click="delins(row)"><i class="glyphicon glyphicon-trash"></i></a></td>
+							<td>{{row.INS_NBR}}</td>
+							<td>{{row.INS_NAME}}</td>
+							<td>{{row.TER_FEE_YEAR}}</td>
+						</tr>
+					</table>
+				</div>
+
+				</uib-tab>
+			</div>
+			<div class="modal-footer">
+				<p class="text-danger">註:系統將依照上述參數設定，每日產生潛力金流客戶明細</p>
+				<a href="#" class="btn btn-primary" data-dismiss="modal"
+					ng-click="save()">確定</a> <a href="#" class="btn btn-default"
+					data-dismiss="modal" ng-click="cancel()">取消</a>
+			</div>
+			</uib-tabset>
+		</div>
+
+	</div>
+
+</div>

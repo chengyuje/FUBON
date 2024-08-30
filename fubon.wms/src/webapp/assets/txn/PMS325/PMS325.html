@@ -1,0 +1,284 @@
+<style>
+/* open dialog */
+.ngdialog.PMS325 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS325 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS325 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PMS325 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS325.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS325_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+.alignleft {
+	text-align: left !important;
+}
+.bigspace {
+	margin-left: 50px !important;
+}
+.datewidth {
+	width: 180px !important;
+}
+.search-table-outter {
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.clas tr th {
+	vertical-align: middle;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+.rstable thead tr th {
+ vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS325/PMS325.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS325" ng-controller="PMS325Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">請輸入查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*考核區間：</th>
+							<td><e-combobox id="eTime"
+									ng-datasource="mappingSet['timeE']" ng-model="s1Time"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-change="dateChange()"
+									ng-format="F3" ng-required="true" width="200px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>業務處：</th>
+							<td><e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id"
+									ng-validate="false" 
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeRegion()"
+									width="200px"
+									style="line-height:20px;" />
+							</td>
+							<th>營運區：</th>
+							<td><e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeArea()"
+									width="200px"
+									style="line-height:20px;" />
+							</td>
+						</tr>
+						<tr>
+							<th>計算區間：</th>
+							<td><e-combobox id="eTime"
+									ng-datasource="mappingSet['timeEx']" ng-model="s2Time"
+									ng-validate="false" ng-change="dateChange1()"
+									ng-readonly="false" ng-editable="false"
+									ng-format="F3" ng-required="false" width="200px" height="30px"
+									style="line-height:20px;" />
+							</td>
+							<th>分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch()"
+									width="200px"
+									style="line-height:20px;" />
+							</td>
+							<th>理專：</th>
+							<td><e-combobox id="emp_id" 
+							        name="emp_id"
+									ng-datasource="EMP_LIST" 
+									ng-model="inputVO.emp_id"
+									ng-validate="false" 
+									ng-readonly="disableEmpCombo" 
+									ng-change="ChangeAo_code()"
+									ng-editable="false" 
+									ng-format="F1" 
+									ng-required="false" 
+									width="200px"
+									ng-disabled="disableEmpCombo"
+									style="line-height:20px;" />
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();inquireInit()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList"></e-jumping>
+			<div class="gv_tab_sc scroll_y"
+				style="height: 235px; white-space: nowrap;">
+				<table class="  table-bordered rstable middle">
+				<thead ng-if="role == 1">
+						<tr>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行代號</th>
+							<th>分行名稱</th>
+							<th>AO CODE</th>
+							<th>姓名</th>
+							<th>員工編號</th>
+							<th>職級</th>
+							<th>職等</th>
+							<th>職稱</th>
+							<th>任該職務掛GOAL日</th>
+							<th>掛GOAL年資</th>
+							<th>勞動契約</th>
+							<th>應達生產力目標<br>第一次手收平均值</th>
+							<th>應達生產力目標<br>第一次生產力目標</th>
+							<th>應達生產力目標<br>第一次達成率</th>
+							<th>應達生產力目標<br>第二次手收平均值</th>
+							<th>應達生產力目標<br>第二次生產力目標</th>
+							<th>應達生產力目標<br>第二次達成率</th>
+							<th>兩次平均實際收益</th>
+							<th>是否降級</th>
+							<th>降級後職級</th>
+							<th>降級後職等</th>
+							<th>降級後職稱</th>
+							<th>調整金額</th>
+						</tr>
+					</thead>
+					<thead ng-if="role != 1">
+						<tr>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行代號</th>
+							<th>分行名稱</th>
+							<th>AO CODE</th>
+							<th>姓名</th>
+							<th>員工編號</th>
+							<th>職級</th>
+							<th>職等</th>
+							<th>職稱</th>
+							<th>平均實際收益</th>
+							<th>應達生產力目標<br>第一次達成率(註)</th>
+							<th>應達生產力目標<br>第二次達成率</th>
+						</tr>
+					</thead>
+					<tbody ng-if="role == 1">
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.REGION_CENTER_NAME }}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME }}</td>
+							<td align="center">{{row.BRANCH_NBR }}</td>
+							<td align="center">{{row.BRANCH_NAME }}</td>
+							<td align="center">{{row.AO_CODE }}</td>
+							<td align="center">{{row.EMP_NAME }}</td>
+							<td align="center">{{row.EMP_ID }}</td>
+							<td align="center">{{row.JOB_TITLE_ID }}</td>
+							<td align="center">{{row.JOB_LEVEL_NAME }}</td>
+							<td align="center">{{row.JOB_POSITION_NAME }}</td>
+							<td align="center">{{row.GOAL_DAY }}</td>
+							<td align="center">{{row.GOAL_SENIORITY }}</td>
+							<td align="center">{{row.WORK_AGREEMENT }}</td>
+							<td align="right">{{row.STAT_AVG1}}</td>
+							<td align="right">{{row.STAT_PROD_GOAL1}}</td>
+							<td align="center">{{row.STAT_GOAL1}}</td>
+							<td align="right">{{row.STAT_AVG2}}</td>
+							<td align="right">{{row.STAT_PROD_GOAL2}}</td>
+							<td align="right">{{row.STAT_GOAL2 | number:2}}</td>
+							<td align="right">{{row.AVG_REAL_INCOME}}</td>
+							<td align="center">{{row.WHET_DEG }}</td>
+							<td align="center">{{row.DEG_AFT_RANK }}</td>
+							<td align="center">{{row.DEG_AFT_GRA }}</td>
+							<td align="center">{{row.DEG_AFT_NAME }}</td>
+							<td align="right">{{row.ADJUST_SUM}}</td>
+						</tr>
+					</tbody>
+					<tbody ng-if="role != 1">
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.REGION_CENTER_NAME }}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME }}</td>
+							<td align="center">{{row.BRANCH_NBR }}</td>
+							<td align="center">{{row.BRANCH_NAME }}</td>
+							<td align="center">{{row.AO_CODE }}</td>
+							<td align="center">{{row.EMP_NAME }}</td>
+							<td align="center">{{row.EMP_ID }}</td>
+							<td align="center">{{row.JOB_TITLE_ID }}</td>
+							<td align="center">{{row.JOB_LEVEL_NAME }}</td>
+							<td align="center">{{row.JOB_POSITION_NAME }}</td>
+							<td align="right">{{row.AVG_REAL_INCOME }}</td>
+							<td align="right">{{row.STAT_GOAL1 }}</td>
+							<td align="right">{{row.STAT_GOAL2 }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

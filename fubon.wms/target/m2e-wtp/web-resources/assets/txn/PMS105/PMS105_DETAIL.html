@@ -1,0 +1,105 @@
+<style>
+/* open dialog */
+.ngdialog.PMS105_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS105_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+/* table size */
+.PMS105_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS105_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS105_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+</style>
+<div ng-controller="PMS105_DETAILController" ng-cloak>
+	<div class="modal-dialog PMS105_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">金流客戶明細</h4>
+			</div>
+			<div class="modal-body">
+			
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList"></e-jumping>
+				<div class="gv_tab_sc scroll_y"
+					style="white-space: nowrap;">
+			
+					<table>
+						<thead>
+							<tr>
+								<th>項次</th>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>台外幣存金額</th>
+								<th>債券及組合式商品金額</th>
+								<th>當月新增保險金流</th>
+								<th>利變保險累積金流</th>
+								<th>基金與其他</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row"
+								ng-repeat="data in paramList | limitTo:displayLimit track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center">{{data.NUM}}</td>
+								<td align="center">{{data.CUST_ID  |eMasking:1}}</td>
+								<td align="center">{{data.CUST_NAME}}</td>
+								<td align="right">{{data.DEPOSIT_AMT | currency :'':0}}</td>
+								<td align="right">{{data.BOND_AMT | currency :'':0}}</td>
+								<td align="right">{{data.NEW_INS_CF | currency :'':0}}</td>
+								<td align="right">{{data.INTEREST_INS_CF | currency :'':0}}</td>
+								<td align="right">{{data.OTHER | currency :'':0}}</td>
+
+
+
+								<!-- 								<td class="text-center"><a onclick="return false" ng-click="detail(row)"><span class="glyphicon glyphicon-zoom-in"></span></a></td> -->
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >確定</button>
+			</div>
+		</div>
+	</div>
+</div>

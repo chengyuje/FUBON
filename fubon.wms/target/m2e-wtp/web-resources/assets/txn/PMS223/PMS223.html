@@ -1,0 +1,173 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS223/PMS223.js"></script>
+<div  class="type_PMS"><div  class="glyphicon glyphicon-chevron-right e_padding_2">{{connector('get','PMS_TITLE')}}</div></div>
+<div class="PMS223" ng-controller="PMS223Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th> 月份： </th>						
+						<td>							
+							<e-combobox id="dataMonth" name="dataMonth" 
+								ng-datasource="mappingSet['timeE']"
+								ng-model="inputVO.dataMonth"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"								
+								width="150px"
+								style="line-height:20px;" />														
+						</td>
+						<th> 分行別： </th>
+						<td>						 
+							<e-combobox id="br_id" name="br_id" 
+							ng-datasource="mappingSet['branch']"
+							ng-model="inputVO.br_id"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-change="branchChange()"
+							ng-format="F3"
+							width="150px"
+							style="line-height:20px;" />						 
+						</td>						
+					</tr>
+					<tr>
+						<th> 營運區： </th>
+						<td>
+							<e-combobox id="op_id" name="op_id" 
+							ng-datasource="mappingSet['op']"
+							ng-model="inputVO.op_id"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-change="genBranch()"
+							ng-format="F3"
+							width="150px"
+							style="line-height:20px;" />
+						</td>												 					
+						<th> 理專： </th>
+						<td>
+							<e-combobox id="emp_id" name="emp_id" 
+							ng-datasource="mappingSet['aoemp']"
+							ng-model="inputVO.emp_id"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false"							
+							ng-format="F3"
+							width="120px"
+							style="line-height:20px;" />
+						</td>												
+					</tr>					
+				</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+			<e-jumping output="outputVO"
+				input="inputVO"
+				query="query()" list="paramList"></e-jumping>
+			<div algin="left">
+				<table>
+			    	<tr>
+			    		<td align="right">資料產生日期：</td>
+			    		<td align="left">{{curDate | date:'yyyy/MM/dd'}}</td>
+			    	</tr>
+			    	<tr>
+			    		<td align="right">報表說明：</td>
+			    		<td align="left">保險負項明細報表</td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+				<table class="rstable">
+					<thead>
+						<tr>
+							<th>項次</th>							
+							<th>營運區</th>							
+							<th>分行別</th>
+							<th>專員員工代碼</th>
+							<th>專員姓名</th>
+							<th>成績年月</th>
+							<th>保單號碼</th>
+							<th>保單序號</th>
+							<th>要保人姓名</th>
+							<th>險種代號</th>
+							<th>險種說明</th>
+							<th>契約狀態</th>
+							<th>保費</th>
+							<th>加碼FINAL</th>
+							<th>計績收益</th>
+							<th>正項計績月份</th>
+						</tr>							
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						 	<td>{{$index + 1}}</td>						 								
+							<td>{{row.BRANCH_AREA_NAME}}</td>														
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.EMP_ID}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td>{{row.ACH_YR_MN}}</td>
+							<td>{{row.POLICY_NO}}</td>
+							<td>{{row.POLICY_SEQ}}</td>
+							<td>{{row.APPL_NAME}}</td>
+							<td>{{row.INS_TYPE_CODE}}</td>
+							<td>{{row.INS_TYPE_NOTE}}</td>
+							<td>{{row.CNCT_STATE}}</td>
+							<td>{{row.PREM}}</td>
+							<td>{{row.RAISE_FINAL}}</td>
+							<td>{{row.ACH_PRFT}}</td>	
+							<td>{{row.PLUS_ACH_YR_MN}}</td>							
+						</tr>
+					</tbody>
+				</table>				
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,184 @@
+<style>
+/* open dialog */
+.ngdialog.CRM613 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM613 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM613 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM613 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM613.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM613_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:188px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.red{
+	color: red;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/CRM613/CRM613.js"></script>
+<div class="CRM613" ng-controller="CRM613Controller" ng-cloak>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >AO Code變更紀錄</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="paramList" totallist="resultList" rowCountLimit="5"></e-jumping-once>
+			
+			<div class="gv_tab_sc" style="min-height:235px;white-space: nowrap;">
+				<table class="table-bordered td_center e-table-freeze" e-height="550px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>原AOCODE</th>
+							<th>員工姓名</th>
+							<th>新AO CODE</th>
+							<th>員工姓名</th>
+							<th>登Code人員</th>
+							<th>登Code送出時間</th>
+							<th>放行人員</th>
+							<th>放行時間</th>
+							
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.ROWNUM}}</td>
+							<td>{{row.ORG_AO_CODE}}</td>
+							<td>{{row.ORG_AO_NAME}}</td>
+							<td>{{row.NEW_AO_CODE}}</td>
+							<td>{{row.NEW_AO_NAME}}</td>
+							<td>{{row.REG_AOCODE_EMP_ID}}-{{row.REG_AOCODE_EMP_NAME}}</td>
+							<td>{{row.REG_AOCODE_SUB_DATETIME}}</td>
+							<td>{{row.LETGO_EMP_ID}}-{{row.LETGO_EMP_NAME}}</td>
+							<td>{{row.LETGO_DATETIME}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >UHRM異動記錄</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO3" list="uhrmChgLogData" totallist="uhrmChgLogList"  rowCountLimit="5"></e-jumping-once>
+			
+			<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>原UHRM</th>
+							<th>員工姓名</th>
+							<th>新UHRM</th>
+							<th>員工姓名</th>
+							<th>上傳人員</th>
+							<th>上傳時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in uhrmChgLogData | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.ROWNUM}}</td>
+							<td>{{row.OLD_UEMP_ID}}</td>
+							<td>{{row.OLD_UEMP_NAME}}</td>
+							<td>{{row.NEW_UEMP_ID}}</td>
+							<td>{{row.NEW_UEMP_NAME}}</td>
+							<td>{{row.REG_EMP_ID}}-{{row.REG_EMP_NAME}}</td>
+							<td>{{row.REG_SUB_DATETIME}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >會員等級變更紀錄</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping output="outputVO2" input="inputVO" query="inquire2()" list="resultList2"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>異動項目</th>
+							<th>原身分/原狀態</th>
+							<th>原身分名稱</th>
+							<th>新值</th>
+							<th>新身分名稱</th>
+							<th>升等體驗註記</th>
+							<th>截止日期</th>
+							<th>異動/申請人</th>
+							<th>異動/申請日期</th>
+							<th>生效/覆核人</th>
+							<th>覆核日期</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList2 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.ROWNUM}}</td>
+							<td>{{row.CHG_TYPE |  mapping:mappingSet['CRM.VIP_CHG_TYPE']:'F3'}}</td>
+							<td>{{row.ORG_DEGREE}}</td>
+							<td>{{row.ORG_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+							<td>{{row.NEW_DEGREE}}</td>
+							<td>{{row.NEW_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+							<td>{{row.UPGRADE_EXP_NOTE}}</td>
+							<td>{{row.DUE_DATE}}</td>
+							<td>{{row.APPL_EMP_ID}}-{{row.APPL_EMP_NAME}}</td>
+							<td>{{row.APPL_DATE}}</td>
+							<td>{{row.REVIEW_EMP_ID}}-{{row.REVIEW_EMP_NAME}}</td> 
+							<td>{{row.REVIEW_DATE}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

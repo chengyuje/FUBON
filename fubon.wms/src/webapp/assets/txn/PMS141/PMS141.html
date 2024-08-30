@@ -1,0 +1,772 @@
+<style>
+.search_box th+td {
+  	width: auto;
+ 	line-height: 15px;
+}
+.star_ul {
+    list-style: none;
+    padding-left: 1.2em;
+    text-indent: -1.2em;
+}
+.star_ul Li:before {
+    content: "＊";
+    display: block;
+    float: left;
+    width: 1.2em;
+}
+.border-style {
+	border: .5px solid #ddd;
+}
+.thStyle {
+ 	background-color: #f1f1f1; 
+ 	width:200px; 
+ 	text-align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS141/PMS141.js"></script>
+<link rel="stylesheet" type="text/css" href="assets/txn/FPS/FPS.css">
+
+<div class="PMS141" ng-controller="PMS141Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >個獎試算</div>
+	</div>
+	<div class="panel_content PMS141 FPS" style="padding:0;">
+   		<div style="display:flex; width: 99.5%; justify-content: space-around; margin: 0 auto;">
+    		<section class="block">
+    	    	<div class="title title-left">當月收入試算</div>
+       		 	<div class="content-wrapper">
+          			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+		          		<table class="table-bordered">
+		          			<thead>
+			            		<tr>
+			              			<th>產品別</th>
+									<th>銷量(台幣/元)</th>
+									<th>推估收益(台幣/元)</th>
+			              		</tr>
+		              		</thead>
+		              		<tbody>
+			              		<tr class="repeat-row" align="center" >
+									<td>
+										<e-combobox id="prod0" name="prod0"
+													ng-datasource="mappingSet['PROD_YIELD_0']"
+													ng-model="inputVO.prod[0]"
+													ng-validate="false"
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-change="calculate_P(0);checkColumn('SALES', 0);"
+													style="line-height:20px;" />
+									</td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[0]" 
+												ng-blur="calculate_P(0);checkColumn('SALES', 0);changePROD_YIELD_List(0)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[0] == undefined || inputVO.prod[0] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(0);checkColumn('SALES', 0)" >
+									</td>
+									<td>{{inputVO.income[0] | number:0}}</td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td>
+										<e-combobox id="prod1" name="prod1"
+													ng-datasource="mappingSet['PROD_YIELD_1']"
+													ng-model="inputVO.prod[1]"
+													ng-validate="false"
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-readonly="inputVO.income[0] == undefined || inputVO.income[0] == ''" 
+													ng-disabled="inputVO.income[0] == undefined || inputVO.income[0] == ''"
+													ng-change="calculate_P(1);checkColumn('SALES', 1)"
+													style="line-height:20px;" />
+									</td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[1]" 
+												ng-blur="calculate_P(1);checkColumn('SALES', 1);changePROD_YIELD_List(1)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[1] == undefined || inputVO.prod[1] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(1);checkColumn('SALES', 1)" >
+									</td>
+									<td>{{inputVO.income[1] | number:0}}</td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td>
+										<e-combobox id="prod2" name="prod2"
+													ng-datasource="mappingSet['PROD_YIELD_2']"
+													ng-model="inputVO.prod[2]"
+													ng-validate="false"
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-readonly="inputVO.income[1] == undefined || inputVO.income[1] == ''" 
+													ng-disabled="inputVO.income[1] == undefined || inputVO.income[1] == ''"
+													ng-change="calculate_P(2);checkColumn('SALES', 2)"
+													style="line-height:20px;" />
+									</td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[2]" 
+												ng-blur="calculate_P(2);checkColumn('SALES', 2);changePROD_YIELD_List(2)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[2] == undefined || inputVO.prod[2] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(2);checkColumn('SALES', 2)" >
+									</td>
+									<td>{{inputVO.income[2] | number:0}}</td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td>
+										<e-combobox id="prod3" name="prod3"
+													ng-datasource="mappingSet['PROD_YIELD_3']"
+													ng-model="inputVO.prod[3]"
+													ng-validate="false"
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-readonly="inputVO.income[2] == undefined || inputVO.income[2] == ''" 
+													ng-disabled="inputVO.income[2] == undefined || inputVO.income[2] == ''"
+													ng-change="calculate_P(3);checkColumn('SALES', 3)"
+													style="line-height:20px;" />
+									</td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[3]" 
+												ng-blur="calculate_P(3);checkColumn('SALES', 3);changePROD_YIELD_List(3)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[3] == undefined || inputVO.prod[3] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(3);checkColumn('SALES', 3)" >
+									</td>
+									<td>{{inputVO.income[3] | number:0}}</td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td>
+										<e-combobox id="prod4" name="prod4"
+													ng-datasource="mappingSet['PROD_YIELD_4']"
+													ng-model="inputVO.prod[4]"
+													ng-validate="false"
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-readonly="inputVO.income[3] == undefined || inputVO.income[3] == ''" 
+													ng-disabled="inputVO.income[3] == undefined || inputVO.income[3] == ''"
+													ng-change="calculate_P(4);checkColumn('SALES', 4)"
+													style="line-height:20px;" />
+									</td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[4]" 
+												ng-blur="calculate_P(4);checkColumn('SALES', 4);changePROD_YIELD_List(4)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[4] == undefined || inputVO.prod[4] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(4);checkColumn('SALES', 4)" >
+									</td>
+									<td>{{inputVO.income[4] | number:0}}</td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td>
+										<e-combobox id="prod5" name="prod5"
+													ng-datasource="mappingSet['PROD_YIELD_5']"
+													ng-model="inputVO.prod[5]"
+													ng-validate="false"
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-readonly="inputVO.income[4] == undefined || inputVO.income[4] == ''" 
+													ng-disabled="inputVO.income[4] == undefined || inputVO.income[4] == ''"
+													ng-change="calculate_P(5);checkColumn('SALES', 5)"
+													style="line-height:20px;" />
+									</td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[5]" 
+												ng-blur="calculate_P(5);checkColumn('SALES', 5);changePROD_YIELD_List(5)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[5] == undefined || inputVO.prod[5] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(5);checkColumn('SALES', 5)" >
+									</td>
+									<td>{{inputVO.income[5] | number:0}}</td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td>
+										<e-combobox id="prod6" name="prod6"
+													ng-datasource="mappingSet['PROD_YIELD_6']"
+													ng-model="inputVO.prod[6]"
+													ng-validate="false"
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-readonly="inputVO.income[5] == undefined || inputVO.income[5] == ''" 
+													ng-disabled="inputVO.income[5] == undefined || inputVO.income[5] == ''"
+													ng-change="calculate_P(6);checkColumn('SALES', 6)"
+													style="line-height:20px;" />
+									</td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[6]" 
+												ng-blur="calculate_P(6);checkColumn('SALES', 6);changePROD_YIELD_List(6)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[6] == undefined || inputVO.prod[6] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(6);checkColumn('SALES', 6)" >
+									</td>
+									<td>{{inputVO.income[6] | number:0}}</td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td>
+										<e-combobox id="prod7" name="prod7"
+													ng-datasource="mappingSet['PROD_YIELD_7']"
+													ng-model="inputVO.prod[7]"
+													ng-validate="false"
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-readonly="inputVO.income[6] == undefined || inputVO.income[6] == ''" 
+													ng-disabled="inputVO.income[6] == undefined || inputVO.income[6] == ''"
+													ng-change="calculate_P(7);checkColumn('SALES', 7)"
+													style="line-height:20px;" />
+									</td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[7]" 
+												ng-blur="calculate_P(7);checkColumn('SALES', 7);changePROD_YIELD_List(7)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[7] == undefined || inputVO.prod[7] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(7);checkColumn('SALES', 7)" >
+									</td>
+									<td>{{inputVO.income[7] | number:0}}</td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td>
+										<e-combobox id="prod8" name="prod8"
+													ng-datasource="mappingSet['PROD_YIELD_8']"
+													ng-model="inputVO.prod[8]"
+													ng-validate="false"
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-readonly="inputVO.income[7] == undefined || inputVO.income[7] == ''" 
+													ng-disabled="inputVO.income[7] == undefined || inputVO.income[7] == ''"
+													ng-change="calculate_P(8);checkColumn('SALES', 8)"
+													style="line-height:20px;" />
+									</td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[8]" 
+												ng-blur="calculate_P(8);checkColumn('SALES', 8);changePROD_YIELD_List(8)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[8] == undefined || inputVO.prod[8] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(8);checkColumn('SALES', 8)" >
+									</td>
+									<td>{{inputVO.income[8] | number:0}}</td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td>
+										<e-combobox id="prod9" name="prod9"
+													ng-datasource="mappingSet['PROD_YIELD_9']"
+													ng-model="inputVO.prod[9]"
+													ng-validate="false"
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-readonly="inputVO.income[8] == undefined || inputVO.income[8] == ''" 
+													ng-disabled="inputVO.income[8] == undefined || inputVO.income[8] == ''"
+													ng-change="calculate_P(9);checkColumn('SALES', 9)"
+													style="line-height:20px;" />
+									</td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[9]" 
+												ng-blur="calculate_P(9);checkColumn('SALES', 9);changePROD_YIELD_List(9)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[9] == undefined || inputVO.prod[9] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(9);checkColumn('SALES', 9)" >
+									</td>
+									<td>{{inputVO.income[9] | number:0}}</td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td><input type="text" class="form-control" ng-model="inputVO.prod[10]" style="width:270px; text-align: left; display:inline-block;" ></td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[10]" 
+												ng-blur="calculate_P(10);checkColumn('SALES', 10)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[10] == undefined || inputVO.prod[10] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(10);checkColumn('SALES', 10)" >
+									</td>									
+									<td><input type="text" class="form-control" ng-model="inputVO.income[10]" ng-blur="toNumber(10)" e-input-limit="N" ng-disabled="inputVO.sales[10] == undefined || inputVO.sales[10] == ''" style="width:150px; text-align: left; display:inline-block;" ></td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td><input type="text" class="form-control" ng-model="inputVO.prod[11]" ng-disabled="inputVO.income[10] == undefined || inputVO.income[10] == ''" style="width:270px; text-align: left; display:inline-block;" ></td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[11]" 
+												ng-blur="calculate_P(11);checkColumn('SALES', 11)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[11] == undefined || inputVO.prod[11] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(11);checkColumn('SALES', 11)" >
+									</td>									
+									<td><input type="text" class="form-control" ng-model="inputVO.income[11]" ng-blur="toNumber(11)" e-input-limit="N" ng-disabled="inputVO.sales[11] == undefined || inputVO.sales[11] == ''" style="width:150px; text-align: left; display:inline-block;" ></td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td><input type="text" class="form-control" ng-model="inputVO.prod[12]" ng-disabled="inputVO.income[11] == undefined || inputVO.income[11] == ''" style="width:270px; text-align: left; display:inline-block;" ></td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[12]" 
+												ng-blur="calculate_P(12);checkColumn('SALES', 12)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[12] == undefined || inputVO.prod[12] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(12);checkColumn('SALES', 12)" >
+									</td>									
+									<td><input type="text" class="form-control" ng-model="inputVO.income[12]" ng-blur="toNumber(12)" e-input-limit="N" ng-disabled="inputVO.sales[12] == undefined || inputVO.sales[12] == ''" style="width:150px; text-align: left; display:inline-block;" ></td>
+								</tr>
+								<tr class="repeat-row" align="center" >
+									<td><input type="text" class="form-control" ng-model="inputVO.prod[13]" ng-disabled="inputVO.income[12] == undefined || inputVO.income[12] == ''" style="width:270px; text-align: left; display:inline-block;" ></td>
+									<td>
+										<input 	type="text" 
+												class="form-control" 
+												ng-model="inputVO.sales[13]" 
+												ng-blur="calculate_P(13);checkColumn('SALES', 13)" 
+												e-input-limit="N" 
+												ng-disabled="inputVO.prod[13] == undefined || inputVO.prod[13] == ''" 
+												style="width:150px; text-align: left; display:inline-block;"
+												ng-change="calculate_P(13);checkColumn('SALES', 13)" >
+									</td>									
+									<td><input type="text" class="form-control" ng-model="inputVO.income[13]" ng-blur="toNumber(13)" e-input-limit="N" ng-disabled="inputVO.sales[13] == undefined || inputVO.sales[13] == ''" style="width:150px; text-align: left; display:inline-block;" ></td>
+								</tr>
+							</tbody>
+		         		</table>
+		        	</div>
+        		</div>
+     		</section>
+    
+			<section class="block">
+       			<div class="title title-left">個人獎金模擬試算</div>
+		        <div class="content-wrapper">
+		          	<h4 class="h4-title">基本資訊</h4>
+		          	<table class="table table-bordered">
+						<tbody>
+							<tr>
+								<th class="thStyle">月份</th>
+								<td>
+									<e-combobox id="busiDays" name="busiDays" 
+												ng-datasource="BUSI_DAYS_List"
+												ng-model="inputVO.busiDays"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-format="F3"
+												style="line-height:20px;" />	
+								</td>
+							</tr>
+			          		<tr>
+			          			<th class="thStyle">職級</th>
+			          			<td>
+			          				<e-combobox id="rmType" name="rmType" 
+												ng-paramtype="PMS.JOB_TITLE_NAME"
+												ng-model="inputVO.rmType"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-format="F3"
+												style="line-height:20px;"/>
+			          			</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">是否已過試用期</th>
+			          			<td>
+				          			<e-combobox id="isProbation" name="isProbation" 
+												ng-paramtype="COMMON.YES_NO"
+												ng-model="inputVO.isProbation"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-format="F3"
+												style="line-height:20px;"/>
+			          			</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">是否為新任RM</th>
+			          			<td>
+			          				<e-combobox id="isNewRM" name="isNewRM" 
+												ng-paramtype="COMMON.YES_NO"
+												ng-model="inputVO.isNewRM"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-format="F3"
+												style="line-height:20px;"/>
+			          			</td>
+			          		</tr>
+			          		<tr ng-show="inputVO.isNewRM == 'Y'">
+			          			<th class="thStyle">新任月數</th>
+			          			<td>
+			          				<e-combobox id="newMonth" name="newMonth" 
+												ng-paramtype="PMS.NUM_NEW_APPOINTMENTS"
+												ng-model="inputVO.newMonth"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-format="F3"
+												style="line-height:20px;"/>
+			          			</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">當月連續休假(特殊假別)天數</th>
+								<td><input type="text" class="form-control" ng-model="inputVO.vacationDays" e-input-limit="NC" style="width:100px; text-align: left; display:inline-block;"></td>
+			          		</tr>
+			          	</tbody>
+		          	</table>
+		          	<h4 class="h4-title">個人淨貢獻</h4>
+		          	<table class="table table-bordered">
+						<tbody>
+							<tr>
+								<th class="thStyle">當月預估收益</th>
+								<td>{{inputVO.allIncome = (inputVO.income[0] + inputVO.income[1] + inputVO.income[2] + inputVO.income[3] + inputVO.income[4] + inputVO.income[5] + inputVO.income[6] + inputVO.income[7] + inputVO.income[8] + inputVO.income[9] + inputVO.income[10] + inputVO.income[11] + inputVO.income[12] + inputVO.income[13]) | number:0}}</td>
+							</tr>
+			          		<tr>
+			          			<th class="thStyle">當月本薪</th>
+			          			<td>
+			          				<input 	type="text" 
+			          						class="form-control" 
+			          						ng-model="inputVO.monthlySalary" 
+			          						e-input-limit="N" 
+			          						style="width:100px; text-align: left; display:inline-block;"
+			          						ng-blur="checkColumn('MONTHLY_SALARY', 0)" 
+			          						ng-change="checkColumn('MONTHLY_SALARY', 0)">
+			          			</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">前月門檻差額</th>
+			          			<td>
+			          				<input 	type="text" 
+			          						class="form-control" 
+			          						ng-model="inputVO.thresholdDifference" 
+			          						e-input-limit="N" 
+			          						style="width:100px; text-align: left; display:inline-block;"
+			          						ng-blur="checkColumn('THRESHOLD_DIFFERENCE', 0)" 
+			          						ng-change="checkColumn('THRESHOLD_DIFFERENCE', 0)">
+			          			</td>
+			          		</tr>
+			          	</tbody>
+					</table>
+					<h4 class="h4-title">財務指標考核(預估達成率)</h4>
+		          	<table class="table table-bordered">
+						<tbody>
+							<tr>
+								<th class="thStyle">存款AuM</th>
+								<td>
+									<input 	type="text" 
+											class="form-control" 
+											ng-model="inputVO.depositAUM" 
+											e-input-limit="N" 
+											style="width:100px; text-align: left; display:inline-block;"
+											ng-blur="checkColumn('FINANCIAL_INDICATOR', '存款AuM')" 
+			          						ng-change="checkColumn('FINANCIAL_INDICATOR', '存款AuM')"> %
+								</td>
+							</tr>
+			          		<tr>
+			          			<th class="thStyle">投資及保險AuM</th>
+			          			<td>
+			          				<input 	type="text" 
+			          						class="form-control" 
+			          						ng-model="inputVO.INV_INS_AUM" 
+			          						e-input-limit="N" 
+			          						style="width:100px; text-align: left; display:inline-block;"
+			          						ng-blur="checkColumn('FINANCIAL_INDICATOR', '投資及保險AuM')" 
+			          						ng-change="checkColumn('FINANCIAL_INDICATOR', '投資及保險AuM')"> %
+			          			</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">商品活躍度</th>
+			          			<td>
+			          				<input 	type="text" 
+			          						class="form-control" 
+			          						ng-model="inputVO.prodActivity" 
+			          						e-input-limit="N" 
+			          						style="width:100px; text-align: left; display:inline-block;"
+			          						ng-blur="checkColumn('FINANCIAL_INDICATOR', '商品活躍度')" 
+			          						ng-change="checkColumn('FINANCIAL_INDICATOR', '商品活躍度')"> %
+			          			</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">投保商品配置</th>
+			          			<td>
+			          				<input type="text" 
+			          						class="form-control" 
+			          						ng-model="inputVO.INS_prodConfiguration" 
+			          						e-input-limit="N" 
+			          						style="width:100px; text-align: left; display:inline-block;"
+			          						ng-blur="checkColumn('FINANCIAL_INDICATOR', '投保商品配置')" 
+			          						ng-change="checkColumn('FINANCIAL_INDICATOR', '投保商品配置')"> %
+			          			</td>
+			          		</tr>
+			          	</tbody>
+					</table>
+					<h4 class="h4-title">違規</h4>
+		          	<table class="table table-bordered">
+						<tbody>
+							<tr>
+								<th class="thStyle">是否違規</th>
+								<td>
+									<e-combobox id="isViolation" name="isViolation" 
+												ng-paramtype="COMMON.YES_NO"
+												ng-model="inputVO.isViolation"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-format="F3"
+												style="line-height:20px;"/>
+								</td>
+							</tr>
+			          		<tr ng-show="inputVO.isViolation == 'Y'">
+			          			<th class="thStyle">違規態樣</th>
+			          			<td>
+			          				<e-combobox id="violationType" name="violationType" 
+												ng-paramtype="PMS.VIOLATION_TYPE"
+												ng-model="inputVO.violationType"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-format="F3"
+												style="line-height:20px;"/>
+			          			</td>
+			          		</tr>
+			          	</tbody>
+					</table>
+					<h4 class="h4-title">客訴</h4>
+		          	<table class="table table-bordered">
+						<tbody>
+							<tr>
+								<th class="thStyle">是否有客訴</th>
+								<td>
+									<e-combobox id="isCustComplaint" name="isCustComplaint" 
+												ng-paramtype="COMMON.YES_NO"
+												ng-model="inputVO.isCustComplaint"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-format="F3"
+												style="line-height:20px;"/>
+								</td>
+							</tr>
+			          		<tr ng-show="inputVO.isCustComplaint == 'Y'">
+			          			<th class="thStyle">是否可歸責</th>
+			          			<td>
+									<e-combobox id="isImputation" name="isImputation" 
+												ng-paramtype="COMMON.YES_NO"
+												ng-model="inputVO.isImputation"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-format="F3"
+												style="line-height:20px;"/>
+			          			</td>
+			          		</tr>
+			          		<tr ng-show="inputVO.isCustComplaint == 'Y' && inputVO.isImputation == 'Y'">
+			          			<th class="thStyle">客訴類型</th>
+			          			<td>
+			          				<e-combobox id="custComplaintType" name="custComplaintType" 
+												ng-paramtype="PMS.CUST_COMPLAINT_TYPE"
+												ng-model="inputVO.custComplaintType"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-format="F3"
+												style="line-height:20px;"/>
+			          			</td>
+			          		</tr>
+			          	</tbody>
+					</table>
+					<h4 class="h4-title">其它</h4>
+		          	<table class="table table-bordered">
+						<tbody>
+							<tr>
+								<th class="thStyle">前六個月平均月獎金</th>
+								<td>
+									<input 	type="text" 
+											class="form-control" 
+											ng-model="inputVO.avgBonus" 
+											e-input-limit="N" 
+											style="width:100px; 
+											text-align: left; display:inline-block;"
+											ng-blur="checkColumn('AVG_BONUS', 0)" 
+			          						ng-change="checkColumn('AVG_BONUS', 0)">
+								</td>
+							</tr>
+			          	</tbody>
+					</table>
+					<h4 class="h4-title" ng-if="false">驗算區(不顯示)</h4>
+		          	<table class="table table-bordered" ng-if="false"> <!-- 基本門檻 & 獎金率 -->
+						<tbody>
+							<tr>
+			          			<th class="thStyle">本薪倍數</th>
+			          			<td>{{inputVO.salaryMultiple}}</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">新任成數</th>
+			          			<td>{{inputVO.num_new_appointment}} %</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">休假折數</th>
+			          			<td>{{inputVO.vacationFold}} %</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">基本門檻</th>
+			          			<td>{{inputVO.basicThreshold}}</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">獎金率</th>
+			          			<td>{{POR}} %</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">獎成率成數</th>
+			          			<td>{{inputVO.bonusRateFold}} %</td>
+			          		</tr>
+			          	</tbody>
+					</table>
+					<table class="table table-bordered" ng-if="false"> <!-- 財務指標得分 -->
+						<tbody>
+			          		<tr>
+			          			<th class="thStyle"></th>
+			          			<th class="thStyle">達成率</th>
+			          			<th class="thStyle">得分%</th>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">存款AuM</th>
+			          			<td>{{inputVO.depositAUM_fillRate}} %</td>
+			          			<td>{{inputVO.depositAUM_score}} %</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">投資及保險AuM</th>
+			          			<td>{{inputVO.INV_INS_AUM_fillRate}} %</td>
+			          			<td>{{inputVO.INV_INS_AUM_score}} %</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle" colspan="3">得分上限</th>
+			          		</tr>
+			          		<tr>
+			          			<td colspan="3">{{inputVO.aumUpperLimit}} %</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">商品活躍度</th>
+			          			<td>{{inputVO.prodActivity_fillRate}} %</td>
+			          			<td>{{inputVO.prodActivity_score}} %</td>
+			          		</tr>
+			          		<tr>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">投保商品配置</th>
+			          			<td>{{inputVO.INS_prodConfiguration_fillRate}} %</td>
+			          			<td>{{inputVO.INS_prodConfiguration_score}} %</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle" colspan="3">得分上限</th>
+			          			
+			          		</tr>
+			          		<tr>
+			          			<td colspan="3">{{inputVO.prodUpperLimit}} %</td>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle" colspan="3">財務指標得分</th>
+			          		</tr>
+			          		<tr>
+			          			<td colspan="3">{{inputVO.upperLimit}} %</td>
+			          		</tr>
+			          	</tbody>
+					</table>
+					<table class="table table-bordered" ng-if="false"> <!-- 行為指標 -->
+						<tbody>
+			          		<tr>
+			          			<th class="thStyle">行為指標-違規</th>
+			          			<td>{{inputVO.violationRate}} %</th>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">行為指標-客戶(不滿意)</th>
+			          			<td>{{inputVO.dissatisfiedRate}} %</th>
+			          		</tr>
+			          		<tr>
+			          			<th class="thStyle">行為指標-客戶(可歸責)</th>
+			          			<td>{{inputVO.custComplaintRate}} %</th>
+			          		</tr>
+			          	</tbody>
+					</table>
+		        </div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="calculate();">計算</button>
+				</div>
+    		</section>
+   		</div>
+
+		<div style="display:flex; width: 99.5%; justify-content: space-around; margin: 0 auto;">
+			<section class="block container" style="text-align: left;">
+	     		<div class="title title-left">試算結果</div>
+	     		<div class="content-wrapper">
+		          	<table class="table table-bordered">
+						<tbody>
+							<tr>
+								<th class="thStyle">收入</th>
+								<td>{{inputVO.allIncome | number:0}}</td>
+							</tr>
+							<tr>
+								<th class="thStyle">領獎門檻</th>
+								<td>{{inputVO.basicThreshold | number:0}}</td>
+							</tr>
+							<tr>
+								<th class="thStyle">獎金率</th>
+								<td>{{inputVO.bonusRate | number:2}} %</td>
+							</tr>
+							<tr>
+								<th class="thStyle">財務指標考核(得分)</th>
+								<td>{{inputVO.upperLimit | number:0}} %</td>
+							</tr>
+							<tr>
+								<th class="thStyle">行為指標考核(扣減金額)</th>
+								<td>{{inputVO.deductionAmt | number:0}}</td>
+							</tr>
+							<tr>
+								<th class="thStyle">當月個人獎金</th>
+								<td>{{inputVO.personalBonus | number:0}}</td>
+							</tr>
+							<tr>
+								<th class="thStyle">當月生產力倍數</th>
+								<td>{{inputVO.productivityMultiplier | number:2}}</td>
+							</tr>
+						</tbody>
+					</table>
+					<div>
+						<font color="red">※ 附註說明 ※</font><br>
+						此試算結果係根據一定假設的情況下產出，僅供參考，未來實際可領取之獎金仍將依您的實際表現計算，故無法以此試算結果作為保證之要求，且因涉及個人薪獎，此試算相關內容嚴禁拍攝、列印或轉貼告知他人。
+					</div>
+					
+				</div>
+	   		</section>
+		</div>      
+	</div>
+</div>

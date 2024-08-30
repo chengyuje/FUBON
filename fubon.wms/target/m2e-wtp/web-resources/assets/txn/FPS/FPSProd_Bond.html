@@ -1,0 +1,235 @@
+<div ng-controller="FPSProdBNDController">
+  <!-- query -->
+  <div class="block query-box container"
+       ng-class="{'no-area': arrowUp}">
+    <!-- fake title -->
+    <div class="content-wrapper"
+         style="background-color:#bfe2f7;margin-top:-1px;">
+      <div class="content-title font-bold">商品清單</div>
+      <div class="content-body">
+        <div class="toggle-wrapper btn-fps"
+             ng-click="arrowUp=!arrowUp">
+          查詢條件
+          <img ng-src="{{arrowPath[arrowUp?'down':'up']}}"
+               class="icon">
+        </div>
+      </div>
+    </div>
+    <!-- fake body -->
+    <div class="content-wrapper product_query"
+         ng-show="!arrowUp">
+      <table>
+        <tbody>
+          <tr>
+            <th>海外債代號：</th>
+            <td>
+              <!-- ng-blur="getName()" -->
+              <input type="text"
+                     class="form-control"
+                     style="text-transform: uppercase;"
+                     placeholder="請輸入..."
+                     ng-model="inputVO.bondID"
+                     ng-change="inputVO.bondID = inputVO.bondID.toUpperCase()"
+                     e-length-limit="16">
+            </td>
+            <th>海外債名稱：</th>
+            <td>
+              <input type="text"
+                     class="form-control"
+                     style="text-transform: uppercase;"
+                     placeholder="請輸入..."
+                     ng-model="inputVO.bondName"
+                     e-length-limit="255">
+            </td>
+          </tr>
+          <tr>
+            <th>債券類型：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.BOND_TYPE"
+                          ng-model="inputVO.bondCate"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+            <th>計價幣別：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.BOND_CURRENCY"
+                          ng-model="inputVO.currency"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+          </tr>
+          <tr>
+            <th>票面利率：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.FACE_VALUE"
+                          ng-model="inputVO.faceVal"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+            <th>剩餘年期：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.DATE_OF_MATURITY"
+                          ng-model="inputVO.maturity"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+          </tr>
+          <tr>
+<!--             <th>YTM：</th> -->
+<!--             <td> -->
+<!--               <e-combobox ng-paramtype="PRD.BOND_YTM" -->
+<!--                           ng-model="inputVO.YTM" -->
+<!--                           ng-validate="false" -->
+<!--                           ng-readonly="false" -->
+<!--                           ng-editable="false" -->
+<!--                           ng-format="F3" -->
+<!--                           ng-required="false" -->
+<!--                           width="180" /> -->
+<!--             </td> -->
+            <th>標普信評：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.CREDIT_RATING_SP"
+                          ng-model="inputVO.ratingSP"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+<!--           </tr> -->
+<!--           <tr> -->
+            <th>商品風險等級：</th>
+            <td>
+              <e-combobox ng-paramtype="FPS.PROD_RISK_LEVEL"
+                          ng-model="inputVO.riskLev"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+          </tr>
+          <tr>
+            <th>專案名稱：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.BOND_PROJECT"
+                          ng-model="inputVO.bondProject"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180"
+                          multiple="true"
+                          separator=";"
+                          label-separator="；"/>
+            </td>
+            <th>客群名稱：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.BOND_CUSTOMER_LEVEL"
+                          ng-model="inputVO.bondCustLevel"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180"
+                          multiple="true"
+                          separator=";"
+                          label-separator="；"/>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="search_box_btn text-center">
+        <a class="btn-fps"
+           ng-click="inquire()">查詢</a>
+        <a class="btn-fps"
+           ng-click="init()">清除</a>
+      </div>
+    </div>
+  </div>
+  <!-- !query -->
+  <!-- result -->
+  <div>
+    <e-jumping-once output="outputVO"
+                    list="paramList"
+                    totallist="prodList"></e-jumping-once>
+  </div>
+  <table class="table thickerHead">
+    <thead>
+      <tr>
+        <th style="min-width:2em;"></th>
+        <th>推薦</th>
+        <th style="width:330px">商品</th>
+        <th>計價幣別</th>
+        <th>風險等級</th>
+        <th>剩餘年期</th>
+        <th>標普信評</th>
+<!--         <th>YTM</th> -->
+        <th>類型</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in paramList"
+          ng-show="row.action!='delete'"
+          class="repeat-row"
+          ng-class-odd="'rowOdd'"
+          ng-class-even="'rowEven'">
+        <td>
+          <input type="checkbox"
+                 ng-model="row.selected"
+                 ng-change="selected(row)">
+        </td>
+        <td>
+          <!-- 推薦 -->
+          <img src="assets/images/ic-crown.svg"
+               ng-if="row.PRD_RANK==='Y'">
+        </td>
+        <td style="text-align:left;">
+          <a ng-bind="row.PRD_ID+' '+row.BOND_CNAME"
+             ng-click="go('detail', row)"></a>
+          <!-- 代號商品 -->
+        </td>
+        <td ng-bind="row.CURRENCY_STD_ID">
+          <!-- 計價幣別 -->
+        </td>
+        <td ng-bind="row.RISKCATE_ID">
+          <!-- 風險等級 -->
+        </td>
+        <td ng-bind="row.DATE_OF_MATURITY">
+          <!-- 剩餘年期 -->
+        </td>
+        <td ng-bind="row.BOND_CREDIT_RATING_SP">
+          <!-- 標普信評-->
+
+        </td>
+<!--         <td ng-bind="row.YTM"> -->
+<!--           YTM -->
+<!--         </td> -->
+        <td ng-bind="row.BOND_CATE_ID|mapping: bondCate">
+          <!-- 類型 -->
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <!-- !result -->
+</div>

@@ -1,0 +1,136 @@
+<style>
+.modal-dialog.PRD281_EDIT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+.table_title{
+	font-size: medium;
+	font-style: normal;
+	
+}
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+</style>
+<div ng-controller="PRD281_EDITController" ng-cloak>
+	<div class="modal-dialog PRD281_EDIT">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">SI_FCI商品資訊</h4>
+			</div>
+ 			<div class="modal-body">
+ 				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+ 					<table>
+ 						<tr>
+	 						<th>幣別：</th>
+ 							<td style="padding: 5px 5px 5px 5px">
+ 								<e-combobox id="CURR_ID" 
+ 									ng-paramtype="PRD.FCI_CURRENCY"
+									ng-model="inputVO.CURR_ID" 
+									ng-validate="false" 
+									ng-format="F1"
+									ng-change="currIdChange();"
+									width="180px" required/>
+ 							</td>
+ 							<td width="2%"></td>
+ 							<th>風險等級：</th>
+ 							<td style="padding: 5px 5px 5px 5px">
+ 								<e-combobox id="RISKCATE_ID" 
+ 									ng-paramtype="FPS.PROD_RISK_LEVEL"
+									ng-model="inputVO.RISKCATE_ID" 
+									ng-validate="false" 
+									ng-format="F3"
+									width="180px" required/>
+ 							</td>
+ 						</tr>
+ 						<tr>
+ 							<th>參考報價參數Y%：</th>
+							<td style="padding: 5px 5px 5px 5px">
+ 								<input type="text" width="200px" placeholder="請輸入..." id="REF_PRICE_Y" name="REF_PRICE_Y" 
+ 								ng-model="inputVO.REF_PRICE_Y" e-length-limit="6" required e-input-limit="NUU" nuu1="3" nuu2="2">
+ 							</td>
+ 							<td width="2%"></td>
+							<th>min UF(X%)：</th>
+ 							<td style="padding: 5px 5px 5px 5px">
+ 								<input type="text" width="200px" placeholder="請輸入..." id="MIN_UF" name="MIN_UF" 
+ 								ng-model="inputVO.MIN_UF" e-length-limit="6" required e-input-limit="NUU" nuu1="3" nuu2="2">
+ 							</td>
+						</tr>
+ 						<tr>
+ 							<th>最低承作金額：</th>
+							<td style="padding: 5px 5px 5px 5px" >
+ 								<input type="text" width="200px" placeholder="請輸入..." id="BASE_AMT" name="BASE_AMT" 
+ 								ng-model="inputVO.BASE_AMT" e-length-limit="14" required e-input-limit="N" >
+ 							</td>
+ 							<td width="2%"></td>
+							<th>累加金額：</th>
+ 							<td style="padding: 5px 5px 5px 5px" >
+ 								<input type="text" width="200px" placeholder="請輸入..." id="UNIT_AMT" name="UNIT_AMT" 
+ 								ng-model="inputVO.UNIT_AMT" e-length-limit="14" required e-input-limit="N" >
+ 							</td>
+ 						</tr>
+ 						<tr>
+ 							<th>交易員charge(%)：</th>
+							<td style="padding: 5px 5px 5px 5px">
+ 								<input type="text" width="200px" placeholder="請輸入..." id="TRADER_CHARGE" name="TRADER_CHARGE" 
+ 								ng-model="inputVO.TRADER_CHARGE" e-length-limit="17" required e-input-limit="NUU" nuu1="3" nuu2="2">
+ 							</td>
+ 							<td width="2%"></td>
+							<th>履約價：</th>
+ 							<td style="padding: 5px 5px 5px 5px">
+ 								<input type="text" width="200px" placeholder="請輸入..." id="STRIKE_PRICE" name="STRIKE_PRICE" 
+ 								ng-model="inputVO.STRIKE_PRICE" e-length-limit="17" required e-input-limit="NUU" nuu1="14" nuu2="4">
+ 							</td>
+ 						</tr>
+ 						<tr>
+ 							<th>連結標的：</th>
+							<td style="padding: 5px 5px 5px 5px">
+							<e-combobox id="TARGET_CURR_ID" name="TARGET_CURR_ID"
+										ng-datasource="mappingSet['TARGET_CURR_ID']"
+										ng-model="inputVO.TARGET_CURR_ID"
+									   	ng-validate="false" 
+									   	ng-format="F3"
+									   	width="180px" required/>
+ 							</td>
+ 							<td width="2%"></td>
+							<th>生效日：</th>
+ 							<td style="padding: 5px 5px 5px 5px">
+ 								<div class="input-group datebox datewidth">
+									<input type="text" id="EFFECTIVE_DATE" name="EFFECTIVE_DATE"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.EFFECTIVE_DATE"
+										is-open="model.a"
+										datepicker-options="dateOptions"
+										ng-readonly="true"								
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+		 							<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+ 							</td>
+ 						</tr>
+ 					</table>
+ 				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="save()">確定</button>
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

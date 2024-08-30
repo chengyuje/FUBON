@@ -1,0 +1,208 @@
+<style>
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+
+/* check box css */
+input.faChkRnd, input.faChkSqr {
+  visibility: hidden;
+}
+input.faChkRnd:checked:after, input.faChkRnd:after,
+input.faChkSqr:checked:after, input.faChkSqr:after {
+  visibility: visible;
+  font-family: FontAwesome;
+  font-size:25px;height: 17px; width: 17px;
+  position: relative;
+  top: -3px;
+  left: 0px;
+  background-color:#FFF;
+  display: inline-block;
+}
+
+input.faChkRnd:checked:after {
+  content: '\f058';
+}
+
+input.faChkRnd:after {
+  content: '\f10c';
+}
+
+input.faChkSqr:checked:after {
+  content: '\f14a';
+}
+
+input.faChkSqr:after {
+  content: '\f096';
+}
+.PMS355 .noticed {
+    color: #FF0000;
+}
+/* check box css */
+
+
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS355/PMS355.js"></script>
+<script type="text/javascript" src="assets/txn/PMS355/PMS355_INS.js"></script>
+<script type="text/javascript" src="assets/txn/PMS355/PMS355_INS_UPD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS355" ng-controller="PMS355Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*資料月份：</th>
+							<td colspan="7">
+								<e-combobox id="dataMonth" name="dataMonth" 
+											ng-datasource="mappingSet['timeE']"
+											ng-model="inputVO.sCreDate"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-required="true"
+											ng-change="dateChange()"
+											ng-format="F3"
+											style="line-height:20px;" />	
+							</td>
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td>
+								<e-combobox id="region_center_id" name="region_center_id"
+											ng-datasource="REGION_LIST"
+											ng-model="inputVO.region_center_id"
+											ng-validate="false" 
+											ng-disabled="AVAIL_REGION.length == 1"
+											ng-readonly="AVAIL_REGION.length == 1" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeRegion(test)"
+											style="line-height:20px;" />
+							</td>						
+							<th>營運區：</th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+											ng-datasource="AREA_LIST"
+											ng-model="inputVO.branch_area_id"
+											ng-validate="false" 
+											ng-disabled="AVAIL_AREA.length == 1"
+											ng-readonly="AVAIL_AREA.length == 1" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeArea(test)"
+											style="line-height:20px;" />
+							</td>
+							<th>分行：</th>
+							<td>
+								<e-combobox id="branch_nbr" name="branch_nbr"
+											ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.branch_nbr"
+											ng-validate="false" 
+											ng-disabled="AVAIL_BRANCH.length == 1"
+											ng-readonly="AVAIL_BRANCH.length == 1" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											ng-change="ChangeBranch(test)"
+											style="line-height:20px;" />
+							</td>
+						</tr>					
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="queryInit();query();" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();limitDate();dateChange()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="resultList.length < 1" function-type="export">匯出</button>
+				<button type="button" class="btn btn-info" ng-click="updINSCust(inputVO.sCreDate)" function-type="maintenance">上傳保險活躍客戶</button>
+			</div>
+		</div>
+	</div>
+	
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">		    
+			<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-left="7" e-height="700px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th rowspan="2">資料年月</th>
+							<th rowspan="2">分行</th>
+							<th rowspan="2">專員員編</th>
+							<th rowspan="2">AO Code</th>
+							<th rowspan="2">總客戶數</th>
+							<th rowspan="2">總目標數</th>
+							<th rowspan="2">活躍度</th>
+							
+							<th colspan="9">各商品持有客戶數</th>
+							<th colspan="5">客戶類型</th>
+						</tr>
+						<tr>
+							<th>(1)&nbsp;存款</th>
+							<th>(2)&nbsp;保險</th>
+							<th>(3)&nbsp;基金</th>
+							<th>(4)&nbsp;ETF/海外股票</th>
+							<th>(5)&nbsp;DCI/SI/SN/海外債/金市債</th>
+							<th>(6)&nbsp;奈米投</th>
+							<th>(7)&nbsp;金錢信託(含有價證券信託)</th>
+							<th>(8)&nbsp;信用卡</th>
+							<th>(9)&nbsp;房貸/信貸</th>
+							
+							<th>age>=70</th>
+							<th>特定客戶</th>
+							<th>age<20</th>
+							<th>法人戶/OBU</th>
+							<th>一般戶</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td style="vertical-align:middle;" align="center">{{row.YYYYMM}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.AO_EMP_ID}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.CUST_AO}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.TOTAL_CUST | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.TOTAL_PRD_TARGET | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.ACTITITY_RATIO | number : 2}}%</td>
+							
+							<td style="vertical-align:middle;" align="right">{{row.ACT_PRD1 | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.ACT_PRD2 | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.ACT_PRD3 | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.ACT_PRD4 | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.ACT_PRD5 | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.ACT_PRD6 | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.ACT_PRD7 | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.ACT_PRD8 | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.ACT_PRD9 | number}}</td>
+							
+							<td style="vertical-align:middle;" align="right">{{row.USER_OLD | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.USER_SPEC | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.USER_YOUNG | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.USER_COMPANY + row.USER_OBU | number}}</td>
+							<td style="vertical-align:middle;" align="right">{{row.USER_N_SPEC | number}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

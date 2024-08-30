@@ -1,0 +1,68 @@
+<style>
+<!--
+.search_table_spacing{
+	width: 20%;
+}
+input.bLarger{width: 20px; height: 20px;}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/KYC610/KYC610.js"></script>
+
+<div ng-controller="KYC610Controller" ng-cloak>
+    <div class="tfb_content">
+      <div class="tfb_content_icon"></div>
+      <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a16.gif" >資料查詢 </div>
+    </div>
+    <div class="panel_content">
+    <!--Content of the panel-->
+      <div class="search_table">
+      <table>
+      <tr>
+      	<th><label style="color: red;">*</label>客戶ID(被授權人ID)：</th>
+      	<td>
+      		<input id="title_cust_id" name="title_cust_id" type="text" placeholder="請輸入..." ng-blur="getCustName(inputVO.CUST_ID,'CUST_NAME')" ng-model="inputVO.CUST_ID" width="30%" style="text-transform: uppercase;">
+      	</td>
+      	<th>客戶姓名：</th>
+      	<td>
+      		<input id="commentary_staff" name="commentary_staff" type="text" placeholder="請輸入..." ng-model="inputVO.CUST_NAME" width="30%">
+      	</td>
+      </tr>
+      <tr ng-if="inputVO.QUEST_TYPE=='1'">
+     	<td colspan="3">
+     		<label style="color: red;">(如為法人之授權辦理交易人員請加註法人名稱及統一編號)</label>
+     	</td>
+      <tr>
+      <tr ng-if="inputVO.QUEST_TYPE=='04'">
+      	<th>統一編號：</th>
+      	<td>
+      		<input type="text" placeholder="請輸入..." ng-model="inputVO.COMP_NBR" ng-blur="getCustName(inputVO.COMP_NBR,'COMP_NAME')" width="30%">
+      	</td>
+      	<th>公司名稱：</th>
+      	<td>
+      		<input type="text" placeholder="請輸入..." ng-model="inputVO.COMP_NAME" width="30%">
+      	</td>
+      </tr>
+      <tr>
+      	<th><label style="color: red;">*</label>問卷種類：</th>
+      	<td>
+	            <e-combobox id="edit" name="edit"
+								ng-datasource="QUEST_TYPE"
+								ng-model="inputVO.QUEST_TYPE"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="300px"
+								style="line-height:20px;"
+								 />
+      	</td>
+      </tr>
+      </table>
+      </div>
+    </div>
+	<div class="search_box_btn text-center">
+		<button ng-click="printQst()" class="btn btn-info">列印問卷題目/答案</button>
+		<button ng-click="Initial()" class="btn btn-info">清除</button>
+	</div>
+</div>

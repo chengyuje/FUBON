@@ -1,0 +1,244 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th,.colwidth>tbody>tr>td,.colwidth>thead>tr>td {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+.middle tbody tr th {
+	vertical-align: middle;
+}
+.rstable tbody tr th {
+	text-align: center;
+}
+.rstable tbody tr td {
+	text-align: center;
+}
+.rstable thead tr th {
+ vertical-align:middle;
+}
+.pointer {
+	cursor: pointer;
+}
+.rstable td, .rstable th {
+	border: 1px solid #ddd;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS338/PMS338.js"></script>
+<script type="text/javascript" src="assets/txn/PMS338/PMS338_DETAIL.js"></script>
+<div class="PMS338" ng-controller="PMS338Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table style="width: 12%;margin-left: 20px;">
+					<tr class="mon">
+						<th>*資料年份： </th>						
+						<td><e-combobox id="eTime"
+								ng-datasource="mappingSet['timeE']" ng-model="inputVO.sTime"
+								ng-change="limitDate()" ng-validate="false" ng-readonly="false" ng-editable="false"
+								ng-format="F3" ng-required="true" width="150px" height="30px"
+								style="line-height:20px;" /></td>
+					</tr>
+				</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="inquire();inquireInit()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+			<!-- <e-jumping output="outputVO"
+				input="inputVO"
+				query="query()" list="paramList"></e-jumping> -->
+			<div algin="left">
+				<table>
+			    	<tr>
+			    		<td align="right">資料產生日期：</td>
+			    		<td align="left">{{curDate | date:'yyyy/MM/dd'}}</td>
+			    	</tr>
+			    	<tr>
+			    		<td align="right">報表說明：</td>
+			    		<td align="left">房貸壽險佣金報表</td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;" ng-show="paramList.length == null || paramList.length == 0">
+				<table class="rstable">
+					<thead>
+						<tr>
+							<th>年月</th>
+							<th>{{curDate | date:'yyyy'}}/01</th>							
+							<th>{{curDate | date:'yyyy'}}/02</th>
+							<th>{{curDate | date:'yyyy'}}/03</th>
+							<th>{{curDate | date:'yyyy'}}/04</th>
+							<th>{{curDate | date:'yyyy'}}/05</th>
+							<th>{{curDate | date:'yyyy'}}/06</th>							
+							<th>{{curDate | date:'yyyy'}}/07</th>
+							<th>{{curDate | date:'yyyy'}}/08</th>
+							<th>{{curDate | date:'yyyy'}}/09</th>
+							<th>{{curDate | date:'yyyy'}}/10</th>
+							<th>{{curDate | date:'yyyy'}}/11</th>							
+							<th>{{curDate | date:'yyyy'}}/12</th>
+							<th>{{curDate | date:'yyyy'}}合計</th>
+						</tr>
+					</thead>
+				</table>		
+			</div>
+			<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;" ng-show="paramList.length > 0">
+				<table class="rstable">
+					<thead>
+						<tr>
+							<td rowspan="{{l}}">BAS</td>
+											
+							<th>{{yearNow}}/01</th>							
+							<th>{{yearNow}}/02</th>
+							<th>{{yearNow}}/03</th>
+							<th>{{yearNow}}/04</th>
+							<th>{{yearNow}}/05</th>
+							<th>{{yearNow}}/06</th>							
+							<th>{{yearNow}}/07</th>
+							<th>{{yearNow}}/08</th>
+							<th>{{yearNow}}/09</th>
+							<th>{{yearNow}}/10</th>
+							<th>{{yearNow}}/11</th>							
+							<th>{{yearNow}}/12</th>
+							<th>{{yearNow}}合計</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" ng-if="row.LOAN_TYPE == '1'" >
+							<td>房貸壽險</td>	
+							<td ng-if="row.MONTH01==0">{{row.MONTH01 | number :0 }}</td>						
+							<td ng-if="row.MONTH01!=0"><button class="btn btn-info" ng-click="upload(01,1)">{{row.MONTH01 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH02==0">{{row.MONTH02 | number :0 }}</td>	
+							<td ng-if="row.MONTH02!=0"><button class="btn btn-info" ng-click="upload(02,1)">{{row.MONTH02 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH03==0">{{row.MONTH03 | number :0 }}</td>	
+							<td ng-if="row.MONTH03!=0"><button class="btn btn-info" ng-click="upload(03,1)">{{row.MONTH03 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH04==0">{{row.MONTH04 | number :0 }}</td>	
+							<td ng-if="row.MONTH04!=0"><button class="btn btn-info" ng-click="upload(04,1)">{{row.MONTH04 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH05==0">{{row.MONTH05 | number :0 }}</td>								
+							<td ng-if="row.MONTH05!=0"><button class="btn btn-info" ng-click="upload(05,1)">{{row.MONTH05 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH06==0">{{row.MONTH06 | number :0 }}</td>	
+							<td ng-if="row.MONTH06!=0"><button class="btn btn-info" ng-click="upload(06,1)">{{row.MONTH06 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH07==0">{{row.MONTH07 | number :0 }}</td>	
+							<td ng-if="row.MONTH07!=0"><button class="btn btn-info" ng-click="upload(07,1)">{{row.MONTH07 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH08==0">{{row.MONTH08 | number :0 }}</td>	
+							<td ng-if="row.MONTH08!=0"><button class="btn btn-info" ng-click="upload(08,1)">{{row.MONTH08 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH09==0">{{row.MONTH09 | number :0 }}</td>	
+							<td ng-if="row.MONTH09!=0"><button class="btn btn-info" ng-click="upload(09,1)">{{row.MONTH09 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH10==0">{{row.MONTH10 | number :0 }}</td>								
+							<td ng-if="row.MONTH10!=0"><button class="btn btn-info" ng-click="upload(10,1)">{{row.MONTH10 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH11==0">{{row.MONTH11 | number :0 }}</td>	
+							<td ng-if="row.MONTH11!=0"><button class="btn btn-info" ng-click="upload(11,1)">{{row.MONTH11 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH12==0">{{row.MONTH12 | number :0 }}</td>								
+							<td ng-if="row.MONTH12!=0"><button class="btn btn-info" ng-click="upload(12,1)">{{row.MONTH12 | number :0 }}</button></td>				
+							<td>{{row.MONTH00 | number :0 }}</td>				
+						</tr>		
+						<tr ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" ng-if="row.LOAN_TYPE == '2'">
+							<td>非房貸壽險</td>
+							<td ng-if="row.MONTH01==0">{{row.MONTH01 | number :0 }}</td>						
+							<td ng-if="row.MONTH01!=0"><button class="btn btn-info" ng-click="upload(01,2)">{{row.MONTH01 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH02==0">{{row.MONTH02 | number :0 }}</td>	
+							<td ng-if="row.MONTH02!=0"><button class="btn btn-info" ng-click="upload(02,2)">{{row.MONTH02 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH03==0">{{row.MONTH03 | number :0 }}</td>	
+							<td ng-if="row.MONTH03!=0"><button class="btn btn-info" ng-click="upload(03,2)">{{row.MONTH03 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH04==0">{{row.MONTH04 | number :0 }}</td>	
+							<td ng-if="row.MONTH04!=0"><button class="btn btn-info" ng-click="upload(04,2)">{{row.MONTH04 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH05==0">{{row.MONTH05 | number :0 }}</td>								
+							<td ng-if="row.MONTH05!=0"><button class="btn btn-info" ng-click="upload(05,2)">{{row.MONTH05 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH06==0">{{row.MONTH06 | number :0 }}</td>	
+							<td ng-if="row.MONTH06!=0"><button class="btn btn-info" ng-click="upload(06,2)">{{row.MONTH06 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH07==0">{{row.MONTH07 | number :0 }}</td>	
+							<td ng-if="row.MONTH07!=0"><button class="btn btn-info" ng-click="upload(07,2)">{{row.MONTH07 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH08==0">{{row.MONTH08 | number :0 }}</td>	
+							<td ng-if="row.MONTH08!=0"><button class="btn btn-info" ng-click="upload(08,2)">{{row.MONTH08 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH09==0">{{row.MONTH09 | number :0 }}</td>	
+							<td ng-if="row.MONTH09!=0"><button class="btn btn-info" ng-click="upload(09,2)">{{row.MONTH09 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH10==0">{{row.MONTH10 | number :0 }}</td>								
+							<td ng-if="row.MONTH10!=0"><button class="btn btn-info" ng-click="upload(10,2)">{{row.MONTH10 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH11==0">{{row.MONTH11 | number :0 }}</td>	
+							<td ng-if="row.MONTH11!=0"><button class="btn btn-info" ng-click="upload(11,2)">{{row.MONTH11 | number :0 }}</button></td>
+							
+							<td ng-if="row.MONTH12==0">{{row.MONTH12 | number :0 }}</td>								
+							<td ng-if="row.MONTH12!=0"><button class="btn btn-info" ng-click="upload(12,2)">{{row.MONTH12 | number :0 }}</button></td>					
+							<td>{{row.MONTH00 | number :0 }}</td>				
+						</tr>	
+						<tr ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" ng-if="row.LOAN_TYPE == '3'">
+							<th>單位:元</th>
+							<th>{{row.MONTH01 | number :0 }}</th>
+							<th>{{row.MONTH02 | number :0 }}</th>
+							<th>{{row.MONTH03 | number :0 }}</th>
+							<th>{{row.MONTH04 | number :0 }}</th>							
+							<th>{{row.MONTH05 | number :0 }}</th>
+							<th>{{row.MONTH06 | number :0 }}</th>
+							<th>{{row.MONTH07 | number :0 }}</th>
+							<th>{{row.MONTH08 | number :0 }}</th>
+							<th>{{row.MONTH09 | number :0 }}</th>							
+							<th>{{row.MONTH10 | number :0 }}</th>
+							<th>{{row.MONTH11 | number :0 }}</th>							
+							<th>{{row.MONTH12 | number :0 }}</th>				
+							<th>{{row.MONTH00 | number :0 }}</th>		
+						</tr>	
+					</tbody>
+				</table>		
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

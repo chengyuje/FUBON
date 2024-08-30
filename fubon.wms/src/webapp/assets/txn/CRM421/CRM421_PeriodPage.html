@@ -1,0 +1,265 @@
+<style>
+/* dialog panl */
+.modal-dialog.CRM421_PeriodPage {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1250px;
+	height: auto;
+}
+.datewidth{
+	width:180px !important;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+	
+}
+.rstable tr th {
+    color: #999999;
+    font-weight: normal;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM421/CRM421_PeriodPage.js"></script>
+<script type="text/javascript" src="assets/txn/CRM421/CRM421_FamilyPeriod.js"></script>
+<div ng-controller="CRM421_PeriodPageController" ng-cloak>
+	<div class="modal-dialog CRM421_PeriodPage">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">議價折扣申請</h4>
+			</div>
+			
+			<div class="modal-body">
+				<table width="100%" class="rstable">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 tdpadding">授權類型：</th>
+						<td class="col-md-2 tdpadding">期間議價</td>
+						<th class="col-md-1.5 tdpadding">客戶ID：</th>
+						<td class="col-md-2 tdpadding">{{cust_id}}</td>
+						<th class="col-md-1.5 tdpadding">客戶姓名：</th>
+						<td class="col-md-2 tdpadding">{{cust_name}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 tdpadding">貢獻度等級：</th>
+						<td class="col-md-2 tdpadding">{{con_degree | mapping:mappingSet['CRM.CON_DEGREE']:'F3'}}</td>
+						<th class="col-md-1.5 tdpadding">理財會員等級：</th>
+						<td class="col-md-2 tdpadding">{{vip_degree | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+						<th class="col-md-1.5 tdpadding">客戶前日AUM：</th>
+						<td class="col-md-2 tdpadding">{{cust_aum | currency:"$":0}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 tdpadding">近一年手收：</th>
+						<td class="col-md-2 tdpadding">{{y_profee | currency:"$":0}}</td>
+						<td class="col-xs-1">
+							<button type="button" class="btn btn-info" ng-click="goFamily()" ng-disabled="hasPrv != true">此客戶為家庭戶成員</button>
+						</td>
+					</tr>
+				</table>
+				<hr>
+				<table width="100%" class="rstable">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-5 tdpadding" colspan="2">*申請基金適用折數</th>
+						<th class="col-md-5 tdpadding" colspan="2">*申請海外ETF/股票適用折數</th>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<td class="col-md-2.5 tdpadding">
+							國內股票型
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="dmt_stock" name="dmt_stock" ng-model="inputVO.dmt_stock" ng-blur="getHighest_auth_lv('NF')">
+							折
+						</td>
+						<td class="col-md-2.5 tdpadding">
+							國外股票型
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="frn_stock" name="frn_stock" ng-model="inputVO.frn_stock" ng-blur="getHighest_auth_lv('NF')">
+							折
+						</td>
+						<td class="col-md-2.5 tdpadding">
+							買入香港交易所
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="buy_hk_mrk" name="buy_hk_mrk" ng-model="inputVO.buy_hk_mrk" ng-blur="getHighest_auth_lv('ETF')">
+							折
+						</td>
+						<td class="col-md-2.5 tdpadding">
+							賣出香港交易所
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="sell_hk_mrk" name="sell_hk_mrk" ng-model="inputVO.sell_hk_mrk" ng-blur="getHighest_auth_lv('ETF')">
+							折
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<td class="col-md-2.5 tdpadding">
+							國內債券型
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="dmt_bond" name="dmt_bond" ng-model="inputVO.dmt_bond" ng-blur="getHighest_auth_lv('NF')">
+							折
+						</td>
+						<td class="col-md-2.5 tdpadding">
+							國外債券型
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="frn_bond" name="frn_bond" ng-model="inputVO.frn_bond" ng-blur="getHighest_auth_lv('NF')">
+							折
+						</td>
+						<td class="col-md-2.5 tdpadding">
+							買入美國交易所
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="buy_us_mrk" name="buy_us_mrk" ng-model="inputVO.buy_us_mrk" ng-blur="getHighest_auth_lv('ETF')">
+							折
+						</td>
+						<td class="col-md-2.5 tdpadding">
+							賣出美國交易所
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="sell_us_mrk" name="sell_us_mrk" ng-model="inputVO.sell_us_mrk" ng-blur="getHighest_auth_lv('ETF')">
+							折
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<td class="col-md-2.5 tdpadding">
+							國內平衡型
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="dmt_balanced" name="dmt_balanced" ng-model="inputVO.dmt_balanced" ng-blur="getHighest_auth_lv('NF')">
+							折
+						</td>
+						<td class="col-md-2.5 tdpadding">
+							國外平衡型
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="frn_balanced" name="frn_balanced" ng-model="inputVO.frn_balanced" ng-blur="getHighest_auth_lv('NF')">
+							折
+						</td>
+						<td class="col-md-2.5 tdpadding">
+							買入英國交易所
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="buy_uk_mrk" name="buy_uk_mrk" ng-model="inputVO.buy_uk_mrk" ng-blur="getHighest_auth_lv('ETF')">
+							折						
+						</td>
+						<td class="col-md-2.5 tdpadding">
+							賣出英國交易所
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="sell_uk_mrk" name="sell_uk_mrk" ng-model="inputVO.sell_uk_mrk" ng-blur="getHighest_auth_lv('ETF')">
+							折						
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<td class="col-md-2.5 tdpadding">&nbsp;</td>
+						<td class="col-md-2.5 tdpadding">&nbsp;</td>
+						<td class="col-md-2.5 tdpadding">
+							買入日本交易所
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="buy_uk_mrk" name="buy_jp_mrk" ng-model="inputVO.buy_jp_mrk" ng-blur="getHighest_auth_lv('ETF')">
+							折						
+						</td>
+						<td class="col-md-2.5 tdpadding">
+							賣出日本交易所
+							<input type="text" class="form-control" style="width:100px;display:inline;" e-input-limit="NUU" nuu1="3" nuu2="2" id="sell_uk_mrk" name="sell_jp_mrk" ng-model="inputVO.sell_jp_mrk" ng-blur="getHighest_auth_lv('ETF')">
+							折						
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-5 tdpadding" colspan="2">最高授權層級：</th>
+						<th class="col-md-5 tdpadding" colspan="2">最高授權層級：</th>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<td class="col-md-5 tdpadding" colspan="2">{{highest_auth_lv_name_1}}</td>
+						<td class="col-md-5 tdpadding" colspan="2">{{highest_auth_lv_name_2}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+				<table width="100%" class="rstable">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 tdpadding">*適用優惠期間：</th>
+						<td class="col-md-4.5 tdpadding">
+					     	<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="brg_sdate" name="brg_sdate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.brg_sdate"
+									   is-open="model.a"
+									   datepicker-options="brg_sdateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>	
+							<div style="float: left">&nbsp;~&nbsp;</div>
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="brg_edate" name="brg_edate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.brg_edate"
+									   is-open="model.b"
+									   datepicker-options="brg_edateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+						</td>
+						<th class="col-md-4 tdpadding" rowspan="3">
+							註1：同一張議價單若其中含有不同之折數，必須取得議價單中折數最低之簽核主管同意及簽章。<br />
+							註2：原手續費與折數之計算係以最新公告之「國內外基金手續費一覽表」為基準。<br />
+							註3：依優惠起日最多可申請6個月。
+						</th>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 tdpadding">議價原因：
+							</br><span style="font-size: small;">(限輸入50字)</span>
+						</th>
+						<td class="col-md-4.5 tdpadding" >
+					     	<input type="text" class="form-control" style="width:100%; display:inline;" 
+					     		placeholder="請輸入..." id="brg_reason" name="brg_reason" 
+					     		ng-model="inputVO.brg_reason" 
+					     		maxlength="50">
+						</td>
+					    
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 tdpadding"></th>
+						<td class="col-md-4.5 tdpadding"></td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+				</table>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="applyPeriod()" ng-disabled="((inputVO.dmt_stock == '' || inputVO.dmt_stock == undefined) &&
+																									 (inputVO.frn_stock == '' || inputVO.frn_stock == undefined) &&
+																									 (inputVO.dmt_bond == '' || inputVO.dmt_bond == undefined) &&
+																								     (inputVO.frn_bond == '' || inputVO.frn_bond == undefined) &&
+																								     (inputVO.dmt_balanced == '' || inputVO.dmt_balanced == undefined) &&
+																								     (inputVO.frn_balanced == '' || inputVO.frn_balanced == undefined)) &&
+																								     
+																								     ((inputVO.buy_hk_mrk == '' || inputVO.buy_hk_mrk == undefined) &&
+																									 (inputVO.sell_hk_mrk == '' || inputVO.sell_hk_mrk == undefined) && 
+																									 (inputVO.buy_us_mrk == '' || inputVO.buy_us_mrk == undefined) && 
+																									 (inputVO.sell_us_mrk == '' || inputVO.sell_us_mrk == undefined) &&
+																									 (inputVO.buy_uk_mrk == '' || inputVO.buy_uk_mrk == undefined)
+																									 (inputVO.seLL_uk_mrk == '' || inputVO.sell_uk_mrk == undefined)
+																									 (inputVO.buy_jp_mrk == '' || inputVO.buy_jp_mrk == undefined)
+																									 (inputVO.seLL_jp_mrk == '' || inputVO.sell_jp_mrk == undefined)) || 
+																									 
+																									 (inputVO.brg_sdate == undefined || inputVO.brg_edate == undefined) ||
+																									 
+																									 ((highest_auth_lv_1 == '' || highest_auth_lv_1 == undefined) && 
+																									 (highest_auth_lv_2 == '' || highest_auth_lv_2 == undefined)) ||
+																									 actionFlag == true">送出審核</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,184 @@
+<style>
+/* dialog panl */
+.modal-dialog.MGM212 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 90%;
+	height: 720px;
+}
+
+.linkDisabled {
+	cursor: not-allowed;
+  	pointer-events: none;
+  	color: #cccccc;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MGM212/MGM212.js"></script>
+<script type="text/javascript" src="assets/txn/MGM212/MGM212_MODIFY.js"></script>
+<div ng-controller="MGM212Controller" ng-cloak>
+	<div class="modal-dialog MGM212" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">點數放行</h4>
+			</div>
+			<div class="modal-body">
+				<div class="tfb_content">
+					<div class="tfb_content_icon"></div>
+					<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+				</div>
+				<div class="panel_content">
+					<div class="search_table">
+		                <table>
+		                    <tr>
+		                        <th width="10%">推薦人ID：</th>
+		                        <td width="40%">
+		                            <input type="text" class="form-control" placeholder="請輸入..." 
+					     				id="mgm_cust_id" name="mgm_cust_id" 
+					     				ng-model="inputVO.mgm_cust_id" 
+					     				e-length-limit="300"
+					     				style="width:200px ">
+		                        </td>
+		                        <th width="10%">案件序號：</th>
+		                        <td width="40%" colspan="2">
+		                            <input type="text" class="form-control" placeholder="請輸入..." 
+					     				id="seq" name="seq" 
+					     				ng-model="inputVO.seq"
+					     				e-length-limit="300"
+					     				style="width:200px ">
+		                        </td>
+		                        <th>點數類型：</th>
+			     				<td>
+			     					<e-combobox id="points_type" name="points_type"
+										ng-datasource="mappingSet['MGM.POINTS_TYPE']"
+										ng-model="inputVO.points_type"
+										ng-validate="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+				   						width="200px"
+				   						style="line-height:20px;" />
+			     				</td>
+		                    </tr>
+		                    <tr>
+			     				<th>狀態：</th>
+			   					<td>
+			   						<e-combobox id="release_status" name="release_status"
+										ng-datasource="mappingSet['MGM.RELEASE_STATUS']"
+										ng-model="inputVO.release_status"
+										ng-validate="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										width="200px"
+										style="line-height:20px;" />
+			   					</td>
+			     				<th>分行：</th>
+			     				<td>
+			     					<e-combobox id="branch_nbr" name="branch_nbr"
+				     					ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_nbr"
+										ng-validate="false"
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+				   						width="200px"
+				   						style="line-height:20px;" />
+			     				</td>
+		                    </tr>
+		                </table>
+		            </div>
+		            <div class="search_box_btn text-center">
+		                <button type="button" class="btn btn-info" ng-click="inquire()" function-type="query">查詢</button>
+		                <button type="button" class="btn btn-info" ng-click="download()" ng-disabled="resultList.length == 0">下載</button>
+		                <button type="button" class="btn btn-info" ng-click="release()">給點</button>
+		            </div>
+				</div>
+				<div class="tfb_content">
+					<div class="tfb_content_icon"></div>
+					<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+				</div>
+				<div class="panel_content">
+					<div class="searchBox" style="padding:1em">
+						<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+					</div>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table class="tablesaw table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th style="text-align: left !important;">
+									<label>
+										<input type="checkbox" ng-model="pageControlVO.pageChoice" ng-change="page()" /> 本頁全選
+									</label>
+									<br/>
+									<label>
+										<input type="checkbox" ng-model="pageControlVO.allChoice" ng-change="all()" /> 全選
+									</label>
+								</th>
+								<th>點數修改</th>
+								<th>案件序號</th>
+								<th>推薦人ID</th>
+								<th>推薦人姓名</th>
+								<th>被推薦人ID</th>
+								<th>被推薦人姓名</th>
+								<th>點數類型</th>
+								<th>點數</th>
+								<th>投保銷量</th>
+								<th>分行</th>
+								<th>主管覆核日期</th>
+								<th>追蹤期間</th>
+								<th>狀態</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td style="text-align: center;">
+									<input type="checkbox" ng-model="row.SELECTED" ng-disabled="row.RELEASE_YN == 'Y'">勾選
+								</td>
+								<td>
+									<a href="#"
+									   ng-show="row.RELEASE_YN != 'Y' && 
+												row.POINTS_MODIFY_DATE == null && 
+												row.POINTS_TYPE == '1'" 
+									   ng-click="modifyPoints(row.SEQ)">修改</a>
+									   
+									<a href="#" class="linkDisabled"
+									   ng-show="row.RELEASE_YN == 'Y' || 
+												row.POINTS_MODIFY_DATE != null || 
+												row.POINTS_TYPE != '1'" 
+									   ng-click="modifyPoints(row.SEQ)">修改</a>
+									   
+									<a href="#" data-toggle="modal" class="btn btn-warning btn-circle" 
+										ng-click="eviView(row)" 
+										ng-show="row.EVIDENCE_NAME != null && row.EVIDENCE_NAME != undefined">
+		              					<i class="glyphicon glyphicon-file"></i>
+		              				</a>
+								</td>
+								<td ng-bind="row.SEQ"></td>
+								<td ng-bind="row.MGM_CUST_ID"></td>
+								<td ng-bind="row.CUST_NAME"></td>
+								<td ng-bind="row.BE_MGM_CUST_ID == null ? '－' : row.BE_MGM_CUST_ID"></td>
+								<td ng-bind="row.BE_MGM_CUST_NAME == null ? '－' : row.BE_MGM_CUST_NAME"></td>
+								<td ng-bind="row.POINTS_TYPE | mapping : mappingSet['MGM.POINTS_TYPE'] : 'F3'"></td>
+								<td align="right" ng-bind="row.APPR_POINTS == null ? '未達門檻' : row.APPR_POINTS"></td>
+								<td align="right" ng-bind="row.INS_SELL_VOL == null ? '－' : (row.INS_SELL_VOL | number : 0)"></td>
+								<td ng-bind="row.BRA_NBR | mapping : BRANCH_LIST : 'F1'"></td>
+								<td ng-bind="row.ALL_REVIEW_DATE == null ? '－' : (toJsDate(row.ALL_REVIEW_DATE) | date:'yyyy/MM/dd')"></td>
+								<td>
+									{{toJsDate(row.MGM_START_DATE) | date:"yyyy/MM/dd"}}
+									{{row.MGM_END_DATE == null ? '－' : '～' + (toJsDate(row.MGM_END_DATE) | date:"yyyy/MM/dd")}}
+								</td>
+								<td ng-bind="(row.RELEASE_YN == null ? 'N' : row.RELEASE_YN) | mapping : mappingSet['MGM.RELEASE_STATUS'] : 'F3'"></td>
+							</tr>
+						</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,108 @@
+<style>
+    /** 檔案名稱 **/
+    .INS970 .hyper {
+        cursor: pointer;
+    }
+
+</style>
+
+<script type="text/javascript" src="assets/txn/INS970/INS970.js"></script>
+<div class="INS970" ng-controller="INS970_Controller" ng-cloak>
+    <div class="tfb_content">
+        <div class="tfb_content_icon"></div>
+        <div class="tfb_content_tit">
+            <img src="assets/images/icon/tfb_icon_a15.gif">M+視訊錄影檔案
+        </div>
+    </div>
+    <div class="panel_content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="input-group">
+                    <span class="input-group-addon" ng-bind="'網址（URL）'"></span>
+
+                    <input class="form-control" type="text" placeholder="輸入網址" ng-model="inputVO.url"
+                           ng-keyup="urlKeyUp($event)" readonly />
+                    <span class="input-group-btn">
+                        <button class="btn btn-info" ng-click="goBack()" data-toggle="tooltip" title="上一層">
+                            <span class="glyphicon glyphicon-arrow-left"></span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="gv_tab_sc">
+                    <table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true"
+                           e-list="target.list">
+                        <thead>
+                        <tr>
+                            <th>
+                                <e-sorter e-input="forSorter" e-col="" e-query="order('N')">檔案名稱</e-sorter>
+                            </th>
+                            <th>
+                                <e-sorter e-input="forSorter" e-col="" e-query="order('S')">檔案大小</e-sorter>
+                            </th>
+                            <th>
+                                <e-sorter e-input="forSorter" e-col="" e-query="order('T')">最後修改時間</e-sorter>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="repeat-row" ng-repeat="eachFile in target.list track by $index">
+                            <td ng-dblclick="entry(eachFile)">
+                                <span ng-class="'glyphicon glyphicon-' + (eachFile.IS_DIR? 'folder-close': 'file')"></span>
+                                <!-- 資料夾則顯示 -->
+                                <a ng-show="eachFile.IS_DIR" class="hyper" onclick="return false" ng-bind="eachFile.FILE_NAME"></a>
+                                <!-- 檔案則顯示 -->
+                                <a ng-show="!eachFile.IS_DIR" class="hyper" onclick="return false" ng-bind="eachFile.FILE_NAME"
+                                   ng-mouseenter="pop(eachFile)" ng-mouseover="fade(eachFile)"
+                                   popover-is-open="eachFile.show" uib-popover-template="funcTemplate"
+                                   popover-title="{{'功能指令'}}" popover-placement="right">
+
+                                    <script type="text/ng-template" id="funcTemplate.html">
+                                        <button class="btn btn-primary" data-toggle="tooltip" title="下載檔案到我的電腦"
+                                                ng-click="download(eachFile)">
+                                            <span class="glyphicon glyphicon-download"></span> 下載
+                                        </button>
+<!--                                        <button class="btn btn-danger" data-toggle="tooltip" title="刪除檔案"-->
+<!--                                                ng-click="delFile(eachFile)">-->
+<!--                                            <span class="glyphicon glyphicon-trash"></span></button>-->
+                                    </script>
+                                </a>
+                            </td>
+                            <td align="center" ng-bind="(eachFile.FILE_SIZE || '-') | number:0"></td>
+                            <td align="center" ng-bind="eachFile.LAST_MODIFIED"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="gv_tab_sc">
+                    <table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true"
+                           e-list="missionQueue">
+                        <thead>
+                        <tr>
+                            <th ng-bind="'任務編號'"></th>
+                            <th ng-bind="'任務佇列'"></th>
+                            <th ng-bind="'狀態'"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="repeat-row" ng-repeat="mission in missionQueue track by $index">
+                            <td align="center" ng-bind="mission.SEQ"></td>
+                            <td ng-bind="mission.NAME"></td>
+                            <td align="center" ng-bind="mission.MSG"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,183 @@
+<style>
+	.modal-dialog.PRD250_BOND .modal-body {
+		max-height: 80vh;
+	}
+</style>
+<div ng-controller="PRD250_BOND_EDITController" ng-cloak>
+	<div class="modal-dialog PRD250_BOND">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.PRD_ID == null ? '新增' : '編輯'}}海外債</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">海外債代碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_id" name="prd_id" class="form-control" ng-model="inputVO.prd_id" ng-blur="checkID()" ng-disabled="row.PRD_ID != null" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.prd_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入海外債代碼</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="!canEdit">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">{{errMsg | i18n:[' ']}}</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">海外債名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="bond_name" name="bond_name" class="form-control" ng-model="inputVO.bond_name" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">ISIN CODE：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="isin_code" name="isin_code" class="form-control" ng-model="inputVO.isin_code" e-length-limit="128"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">債券順位：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="bond_pri" name="bond_pri" class="form-control" ng-model="inputVO.bond_pri" e-length-limit="40"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">發行機構評等-標普：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="rating_sp" name="rating_sp" class="form-control" ng-model="inputVO.rating_sp" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">發行機構評等-穆迪：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="rating_moddy" name="rating_moddy" class="form-control" ng-model="inputVO.rating_moddy" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">發行機構評等-惠譽：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="rating_fitch" name="rating_fitch" class="form-control" ng-model="inputVO.rating_fitch" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">債券評等-標普：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="bond_rating_sp" name="bond_rating_sp" class="form-control" ng-model="inputVO.bond_rating_sp" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">債券評等-穆迪：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="bond_rating_moddy" name="bond_rating_moddy" class="form-control" ng-model="inputVO.bond_rating_moddy" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">債券評等-惠譽：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="bond_rating_fitch" name="bond_rating_fitch" class="form-control" ng-model="inputVO.bond_rating_fitch" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">發行機構提前買回：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="buyback" name="buyback" class="form-control" ng-model="inputVO.buyback" e-length-limit="20"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">需填寫風險檢核表：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id=checklist name="checklist"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.checklist"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*股債類型：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="stock_bond_type" name="stock_bond_type"
+								ng-paramtype="FPS.STOCK_BOND_TYPE"
+								ng-model="inputVO.stock_bond_type"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					style="line-height:20px;"
+			  					required/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.stock_bond_type=='' || inputVO.stock_bond_type==undefined">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入股債類型</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">專案：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="project"
+											ng-paramtype="PRD.BOND_PROJECT"
+											ng-model="inputVO.bondProject"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											width="150px"
+											multiple="true"
+											separator=";"
+											label-separator="；"
+											style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">客群：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="customer_level"
+											ng-paramtype="PRD.BOND_CUSTOMER_LEVEL"
+											ng-model="inputVO.bondCustLevel"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											width="150px"
+											multiple="true"
+											separator=";"
+											label-separator="；"
+											style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

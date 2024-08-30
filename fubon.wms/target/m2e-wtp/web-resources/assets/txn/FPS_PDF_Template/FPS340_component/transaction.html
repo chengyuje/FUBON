@@ -1,0 +1,44 @@
+<div class="block container">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th style="background-color: #93c5e1;">類別</th>
+        <th style="background-color: #93c5e1; width:40%">商品</th>
+        <th style="background-color: #93c5e1;">投資方式</th>
+        <th style="background-color: #93c5e1;">申購/贖回金額</th>
+        <th style="background-color: #93c5e1;">約當台幣</th>
+        <th style="background-color: #93c5e1;">交易指示</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in paramList"
+          ng-if="row.TxnType">
+        <td ng-bind="row.PTYPE|mapping: mapping.pType">
+          <!-- 類別 -->
+        </td>
+        <td class="text-left">
+          <span ng-bind="row.PRD_ID+' '+row.PRD_CNAME"></span>
+          <span ng-bind="row.TARGETS"></span>
+        </td>
+        <td>
+          <!-- 投資方式 -->
+          {{row.INV_TYPE ? (row.INV_TYPE|mapping: mapping.invType) : '--'}}
+        </td>
+        <td ng-bind="row.TRUST_CURR + '  ' + (row.CHG_PERCENT|number :0)"
+            class="textRight">
+          <!-- 調整後原幣金額 -->
+        </td>
+        <td ng-bind="row.NTD_PERCENT|number :0"
+            class="textRight">
+          <!-- 約當台幣-->
+        </td>
+        <td ng-bind="row.TxnType|mapping: row.txnTypeList">
+          <!-- 交易指示 -->
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div ng-show="!checkTransaction">
+    <div style="padding: 8px;">無待執行之交易</div>
+  </div>
+</div>

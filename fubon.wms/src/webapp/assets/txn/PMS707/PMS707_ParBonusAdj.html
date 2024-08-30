@@ -1,0 +1,62 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS707 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 880px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS707/PMS707_ParBonusAdj.js"></script>
+<div ng-controller="PMS707_ParBonusAdjController" ng-cloak>
+	<div class="modal-dialog PMS707">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<!-- <div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a15.gif">請上傳PS獎勵金調整數
+				</div> -->
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請上傳PS獎勵金調整數</h4>
+			</div>
+
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<e-jumping output="outputVO" input="inputVO" query="queryParBonusAdj()"
+					list="resultList"></e-jumping>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						<table class="table-bordered">
+							<thead>
+								<tr>
+									<th>年月</th>
+									<th>員工編號</th>
+									<th>獎勵金調整數(正/負)</th>
+									<th>調整原因</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="y in resultList">
+									<td align="center">{{y.YEARMON}}</td>
+									<td align="center">{{y.PS_EMP_ID}}</td>
+									<td align="center">{{y.BONUS_ADJ}}</td>
+									<td align="center">{{y.BONUS_ADJ_REASON}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="uploadParBonusAdj(yearMon)">上傳資料</button>
+				<button type="button" class="btn btn-default"
+					ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+		</div>
+	</div>
+</div>

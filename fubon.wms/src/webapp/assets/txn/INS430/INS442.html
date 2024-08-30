@@ -1,0 +1,70 @@
+<style>
+/* dialog panl */
+.modal-dialog.INS442 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1250px;
+	height: auto;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/INS430/INS442.js"></script>
+<div ng-controller="INS442Controller" ng-cloak>
+	<div class="modal-dialog INS442">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">其他給付</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;" ng-hide="modifyDisabled">
+					<button type="button" class="btn btn-info" ng-click="addRow()">新增</button><hr>
+					<table>
+						<thead>
+							<tr>
+								<th>功能</th>
+								<th>退休後其他收入名稱</th>
+								<th>退休後每月給付</th>
+								<th>退休後一次給付</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in inputVO.othList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">								
+								<td align = "center"><a class="btn btn-danger btn-circle" ng-click="deleteRow($index, row)"><i class="glyphicon glyphicon-trash"></i></a></td>
+								<td align = "center">
+									<input type="text" class="form-control" ng-model="row.OTH_ITEM" ng-required="true">
+								</td>
+								<td align = "center">
+									<input type="text" class="form-control"
+										   ng-model="row.ARTL_DEBT_AMT_MONTHLY" 
+										   e-input-limit="NN"
+										   maxlength="7" 
+										   ng-blur="count(row, 'month')"
+										   ng-required="true">
+								</td>
+								<td align = "center">
+									<input type="text" class="form-control"
+											   ng-model="row.ARTL_DEBT_AMT_ONCE" 
+											   e-input-limit="NN" 
+											   maxlength="7" 
+											   ng-blur="count(row, 'once')"
+											   ng-required="true">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<br>
+					<div><span>其他每月給付金額合計：{{onceTotal | number}}</span></div>
+					<div><span>其他一次給付金額合計：{{tempOnceNum | number}}</span></div>
+				</div>
+				<br />
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="save()">確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,118 @@
+<script type="text/javascript" src="assets/txn/CRM181/CRM181.js"></script>
+<script type="text/javascript" src="assets/txn/CRM181/CRM181_FETILRW.js"></script>
+<div class="CRM181" ng-controller="CRM181Controller">
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a05.gif"><span style="color: red;">必辦</span>工作事項
+			<a href="#" style="font-size:medium;color:red;" ng-show="reviewCount + mgm113Count > 0 && pri_type == 'show'" ng-click="goMAO151()">待覆核 
+				<span class="badge badge-error" ng-bind="reviewCount + mgm113Count"></span>
+			</a>
+		</div>
+	</div>
+	<div class="panel_content" style="height: 320px;">
+		<div>
+			提醒：每日09:00、14:00、17:00更新統計數
+		</div>
+		<div class="gv_tab_sc scroll_y" style="height:100%;white-space: nowrap;">
+			<table>
+				<thead>
+					<tr>
+						<th style = " width:20%;">有效日</th>
+						<th style = " width:39%;">內容</th>
+						<th style = " width:7%; ">頻率</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td></td>
+						<td ng-if="displayNo1 > 0">內部事件通知(<a href="" onclick="return false" ng-click="goCRM181_1(1);">{{displayNo1}}</a>)</td>
+						<td ng-if="displayNo1 == 0">內部事件通知({{displayNo1}})</td>
+						<td></td>
+					</tr>
+					
+					<!-- 內部事件通知:群組訊息明細 -->
+					<tr class="repeat-row" ng-repeat="row in resultList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" 
+					ng-show = "advanced_1 && row.DISPLAY_NO.substr(0,1) == '1' && row.checkDay >= today && row.SHOW_YN == 'Y'">
+						<td style = " width:20%;" align="center">{{toJsDate(row.EFFDATE) | date:"yyyy/MM/dd"}}</td>
+						<td style = " width:39%;"><a href="" ng-click="report(row)">{{row.RPT_NAME}}</a></td>
+						<td style = " width:7%;"align="center">{{row.FRQ_TYPE | mapping:mappingSet['CRM.FRQ_TYPE']:'F3'}}</td>
+					</tr>
+					
+					<tr ng-show="cus130Count > 0">
+						<td></td>
+						<td><a href="" onclick="return false" ng-click="goCUS130()">回報計畫({{cus130Count}})</a></td>
+						<td></td>
+					</tr>
+					
+					<!-- 20180509 by willis 滿意度待簽核 -->
+					<tr ng-show="sqm120Count > 0">
+						<td></td>
+						<td><a href="" onclick="return false" ng-click="goSQM120()">客戶滿意度報告回覆({{sqm120Count}})</a></td>
+						<td></td>
+					</tr>
+					
+					<!-- 20180620 by willis 客戶服務定期查核 -->
+					<tr ng-show="sqm320Count > 0">
+						<td></td>
+						<td><a href="" onclick="return false" ng-click="goSQM320()">客戶服務定期查核({{sqm320Count}})</a></td>
+						<td></td>
+					</tr>
+					
+					<!-- 20180911 by Sam 資況表 -->
+					<tr ng-show="crm8502Count > 0">
+						<td></td>
+						<td><a href="" onclick="return false" ng-click="goCRM8502()">資況表列印記錄({{crm8502Count.CRM_CUST_ASSET_CNT}})</a></td>
+						<td></td>
+					</tr>
+					
+					<!-- 2022年調換換手系統管控需求(未輪調) 分行主管異常通報為"正常"，但電子/實體回函有異常，於首頁提醒 -->
+					<tr ng-show="rotationBRMsg != ''">
+						<td style = "width:20%;"></td>
+						<td style = "width:39%;">
+							<table>
+								<tr>
+									<td style="white-space:normal;padding: 0px; border:none !important;">
+										帳務確認管理報表：<br/>下列客戶為分行主管異常通報為正常，但電子/實體回函有異常，請重新檢視<br/>
+										<a href="" onclick="return false" ng-click="goPMS429()">{{rotationBRMsg}}</a>
+									</td>
+								</tr>
+							</table>
+						</td>
+						<td style = "width:7%;"></td>
+					</tr>
+					
+					<!-- 重要提醒明細 -->
+					<tr class="repeat-row" ng-repeat="row in resultList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" ng-show = "row.DISPLAY_NO.substr(0,1) == '2' && row.checkDay >= today && row.SHOW_YN == 'Y'">
+						<td style = " width:20%;" align="center">{{toJsDate(row.EFFDATE) | date:"yyyy/MM/dd"}}</td>
+						<td style = " width:39%;">
+							<a href="" ng-click="report(row)">{{row.RPT_NAME}}</a>
+						</td>
+						<td style = " width:7%;"align="center">{{row.FRQ_TYPE | mapping:mappingSet['CRM.FRQ_TYPE']:'F3'}}</td>
+					</tr>
+					
+					<!-- 其他 -->
+					<!-- russle:0不要秀 -->
+					<tr class="repeat-row" ng-repeat="row in resultList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" ng-show = "row.DISPLAY_NO.substr(0,1) != '1' && row.DISPLAY_NO.substr(0,1) != '2' && row.checkDay >= today && (list9_count > 0 || displayNo9 > 0) && row.SHOW_YN == 'Y'">
+						<td style = " width:20%;" align="center">{{toJsDate(row.EFFDATE) | date:"yyyy/MM/dd"}}</td>
+						<td style = " width:39%;"><a href="" ng-click="report(row)">{{row.RPT_NAME}}<h ng-show="row.DISPLAY_NO == '301'">({{list9_count}})</h></a></td>
+						<td style = " width:7%;"align="center">{{row.FRQ_TYPE | mapping:mappingSet['CRM.FRQ_TYPE']:'F3'}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<br />
+			<table ng-if="pri == '002' || pri == '009' || pri == '010' || pri == '011'">
+				<thead>
+					<tr>
+						<th><span style="color:red;">其他重要資訊</span></th>
+					</tr>
+				</thead>
+				<tbody ng-if="fetilrListCount != 0">
+					<tr>
+						<td><a href="" ng-click="openFetilrW(fetilrListW)">近三日國外匯入款入帳清單</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

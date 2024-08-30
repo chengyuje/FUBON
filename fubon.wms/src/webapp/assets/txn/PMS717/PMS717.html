@@ -1,0 +1,247 @@
+<style>
+/* open dialog */
+.ngdialog.PMS717 {
+}
+/* dialog panl */
+.modal-dialog.PMS717 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS717 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PMS717 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS717.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS717_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+.alignleft {
+	text-align: left !important;
+}
+.bigspace {
+	margin-left: 50px !important;
+}
+.datewidth {
+	width: 240px !important;
+}
+.search-table-outter {
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.clas tr th {
+	vertical-align: middle;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+.rstable thead tr th {
+ vertical-align:middle;
+}
+.table_data {
+	margin: 0 10px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS717/PMS717.js"></script>
+<script type="text/javascript" src="assets/txn/PMS717/PMS717_DETAIL.js"></script>
+<div class="PMS717" ng-controller="PMS717Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+						<th>*資料年月： </th>						
+						<td><e-combobox ng-datasource="mappingSet['timeE']" ng-change="changeQuery()"
+								ng-model="inputVO.yearMon" ng-validate="false" ng-readonly="false"
+								ng-editable="false" ng-format="F3" ng-required="true"
+								width="170px" height="30px" style="line-height:20px;" />
+						</td>
+						<th>*主檔類型： </th>						
+						<td><e-combobox ng-datasource="mappingSet['prodType']" ng-change="changeQuery()"
+								ng-model="inputVO.prodType" ng-validate="false" ng-readonly="false"
+								ng-editable="false" ng-format="F3" ng-required="true"
+								width="170px" height="30px" style="line-height:20px;" />
+						</td>
+						<th ><span ng-if=" inputVO.prodType!='7' ">產品ID： </span><span ng-if=" inputVO.prodType=='7' ">險種代碼： </span></th>	
+						<td ><input ng-if=" inputVO.prodType!='7' " type="text" placeholder="請輸入商品代碼..." ng-model="inputVO.prodId" e-length-limit="16">
+							<input ng-if=" inputVO.prodType=='7' " type="text" placeholder="請輸入險種代碼..." ng-model="inputVO.prodId" e-length-limit="16">
+						</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="csvList.length < 1">匯出</button>
+				<button type="button" class="btn btn-info" ng-click="upload()">上傳</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="showList"></e-jumping>
+			<!-- <div>
+				<table>
+			    	<tr>
+			    		<td align="left">&nbsp;&nbsp;&nbsp;&nbsp;報表說明：房貸火地險佣金明細</td>
+			    	</tr>
+		    	</table>
+			</div>	 -->
+			<div class="gv_tab_sc scroll_y" style="min-height: 235px; white-space: nowrap;">
+				<table class="  table-bordered rstable middle">
+					<thead>
+						<!-- 主檔類別：基金 -->
+						<tr ng-if=" inputVO.prodType=='1' ">
+							<th>商品代碼</th>
+							<th>商品名稱</th>
+							<th>主推</th>
+							<th>主推時間起日</th>
+							<th>主推時間訖日</th>
+							<th>CNR分配率</th>
+							<th>拆帳比率</th>
+							<th>CNR加減碼</th>
+							<th>加碼區間起日</th>
+							<th>加碼區間迄日</th>
+							<th>CNR收益扣減率</th>
+							<th>實際收益扣減率</th>
+						<!-- <th>基金實際收益拆分比</th> -->	<!-- 問題單註解 -->
+							<th>CNR基金管理費回饋</th>
+							<th>基金管理費標的計績追溯起日</th>
+							<th>基金管理費標的計績追溯迄日</th>
+						</tr>
+						<tr ng-if=" inputVO.prodType=='2'||inputVO.prodType=='4' ">
+							<th>產品代碼</th>
+							<th>產品名稱</th>
+							<th>CNR分配率</th>
+							<th ng-if=" inputVO.prodType=='2'" >銀行收益率</th>    <!-- 2017/06/12 新增資訊 SI-->
+							<th ng-if=" inputVO.prodType=='4'" >通路服務費率</th>    <!-- 2017/06/12 新增資訊 SN-->	
+							<th>計績檔次</th>    <!-- 2017/06/12 新增資訊 SN SI  -->						
+						</tr>
+						<tr ng-if=" inputVO.prodType=='3'||inputVO.prodType=='5'||inputVO.prodType=='6' ">
+							<th>產品代碼</th>
+							<th>產品名稱</th>
+							<th>CNR分配率</th>
+							<th>CNR加減碼</th>
+							<th>加碼區間起日</th>
+							<th>加碼區間迄日</th>
+							<th ng-if="inputVO.prodType=='6'">交易所代碼</th>
+							<th ng-if="inputVO.prodType=='6'">舊商品註記</th>		
+						</tr>
+						<tr ng-if=" inputVO.prodType=='7' ">
+							<th>險種代碼</th>
+							<th>險種名稱</th>
+							<th>繳費年期</th>
+							<th>保單年度</th>
+							<th>CNR分配率</th>
+							<th>加碼區間起日</th>
+							<th>加碼區間迄日</th>
+							<th>CNR加減碼</th>
+							<th>佣金率</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-if=" inputVO.prodType=='1' "
+							ng-repeat="row in showList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.PRD_ID}}</td>
+							<td align="center">{{row.FUND_CNAME}}</td>
+							<td align="center">{{row.MAIN_PRD}}</td>
+							<td align="center">{{row.MAIN_PRD_SDATE}}</td> <!-- 2017/07/03 新增 起日 -->
+							<td align="center">{{row.MAIN_PRD_EDATE}}</td> <!-- 2017/07/03 新增 訖日 -->							
+							<td align="right">{{row.CNR_YIELD }}</td>
+							<td align="right">{{row.ALLOTMENT_RATIO }}</td>
+							<td align="right">{{row.CNR_MULTIPLE }}</td>
+							<td align="center">{{row.RAISE_FUND_SDATE}}</td>
+							<td align="center">{{row.RAISE_FUND_EDATE}}</td>
+							<td align="right">{{row.CNR_DISCOUNT}}</td>
+							<td align="right">{{row.RATE_DISCOUNT}}</td>
+							<!-- <td align="right">{{row.CNR_COMT_RATE}}</td> --> <!-- 問題單:0003040 -->
+							<td align="right">{{row.CNR_FEE}}</td>
+							<td align="center">{{row.CNR_TARGET_SDATE}}</td>
+							<td align="center">{{row.CNR_TARGET_EDATE}}</td>
+							
+							
+						</tr>
+						<tr class="repeat-row" ng-if=" inputVO.prodType=='2'||inputVO.prodType=='4'"
+							ng-repeat="row in showList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.PRD_ID}}</td>
+							<td align="center">{{row.PRD_CNAME}}</td>
+							<td align="right">{{row.CNR_YIELD}}</td>  
+							<td ng-if=" inputVO.prodType=='2'" align="right">{{0+row.PROFIT_RATE}}</td>  <!-- 2017/06/12 新增資訊 SI-->
+							<td ng-if=" inputVO.prodType=='4'" align="right">{{0+row.RATE_OF_CHANNEL}}</td>  <!-- 2017/06/12 新增資訊 SN-->
+							<td align="center">{{row.PERFORMANCE_REVIEW}}</td>    <!-- 2017/06/12 新增資訊 SN SI  -->	
+						</tr>
+						<tr class="repeat-row" ng-if=" inputVO.prodType=='3'||inputVO.prodType=='5'||inputVO.prodType=='6' "
+							ng-repeat="row in showList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.PRD_ID}}</td>
+							<td align="center">{{row.PRD_CNAME}}</td>
+							<td align="right">{{row.CNR_YIELD}}</td>
+							<td align="right">{{row.CNR_MULTIPLE }}</td>
+							<td align="center">{{row.RAISE_FUND_SDATE }}</td>
+							<td align="center">{{row.RAISE_FUND_EDATE }}</td>
+							<td align="center">{{row.STOCK_CODE }}</td>
+							<td align="center">{{row.OLD_PROD_FLG }}</td>
+						</tr>
+						<tr class="repeat-row" ng-if=" inputVO.prodType=='7' "
+							ng-repeat="row in showList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.INSPRD_ID}}</td>
+							<td align="center">{{row.INSPRD_NAME}}</td>
+							<td align="center">{{row.INSPRD_ANNUAL}}</td>
+							<td align="center">{{row.ANNUAL }}</td>
+							<td align="right">{{row.CNR_YIELD }}</td>
+							<td align="center">{{row.MULTIPLE_SDATE }}</td>
+							<td align="center">{{row.MULTIPLE_EDATE}}</td>
+							<td align="right">{{row.CNR_MULTIPLE}}</td>
+							<td align="right">{{row.COMM_RATE}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,47 @@
+<div class="block container no-border clear-space"
+     ng-if="block.list && block.list.length>0">
+  <div class="title subtitle title-left">
+    <span ng-bind="block.title"></span>
+    <div class="subtitle" style="display:inline-block;">
+      (配置比例
+      <span ng-bind="block.pct"></span> %，約當金額 NT$
+      <span ng-bind="block.amt|number"></span>)
+    </div>
+  </div>
+
+  <table class="table"
+         ng-if="!hasIns">
+    <thead>
+      <tr>
+        <th style="width:55%">商品</th>
+        <th style="width:18%">投入金額</th>
+        <th style="width:18%">約當台幣</th>
+        <th>比例</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in block.list">
+        <td class="text-left">
+          <!-- 商品 -->
+          <span ng-if="row.INV_PRD_TYPE_2==='1'||row.INV_PRD_TYPE_2==='2'"
+                ng-bind="row.INV_PRD_TYPE_2|mapping: mapping.invProdType"></span>
+          <span ng-if="row.INV_PRD_TYPE_2!=='1'&&row.INV_PRD_TYPE_2!=='2'"
+                ng-bind="row.PRD_CNAME"></span>
+        </td>
+        <td class="text-right">
+          <!-- 原幣市值 -->
+          <span ng-bind="row.TRUST_CURR"></span>
+          <span ng-bind="row.PURCHASE_ORG_AMT|number"></span>
+        </td>
+        <td ng-bind="row.PURCHASE_TWD_AMT|number"
+            class="text-right">
+          <!-- 台幣市值 -->
+        </td>
+        <td>
+          <!-- 配置比例 -->
+          <span ng-bind="row.INV_PERCENT|number"></span>%
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

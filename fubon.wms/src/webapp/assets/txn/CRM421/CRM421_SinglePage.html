@@ -1,0 +1,563 @@
+<style>
+/* dialog panl */
+.modal-dialog.CRM421_SinglePage {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1250px;
+	height: auto;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+	
+}
+.rstable tr th {
+    color: #999999;
+    font-weight: normal;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD120/PRD120.js"></script>
+<script type="text/javascript" src="assets/txn/CRM421/CRM421_PRD110_ROUTE.js"></script>
+<script type="text/javascript" src="assets/txn/CRM421/CRM421_PRD120_ROUTE.js"></script>
+<div ng-controller="CRM421_SinglePageController" ng-cloak>
+	<div class="modal-dialog CRM421_SinglePage">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">議價折扣申請</h4>
+			</div>
+			<div class="modal-body">
+				<table width="100%" class="rstable">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 tdpadding">授權類型：</th>
+						<td class="col-md-2 tdpadding">單次議價</td>
+						<th class="col-md-1.5 tdpadding">客戶ID：</th>
+						<td class="col-md-2 tdpadding">{{cust_id}}</td>
+						<th class="col-md-1.5 tdpadding">客戶姓名：</th>
+						<td class="col-md-2 tdpadding">{{cust_name}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 tdpadding">貢獻度等級：</th>
+						<td class="col-md-2 tdpadding">{{con_degree | mapping:mappingSet['CRM.CON_DEGREE']:'F3'}}</td>
+						<th class="col-md-1.5 tdpadding">理財會員等級：</th>
+						<td class="col-md-2 tdpadding">{{vip_degree | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+						<th class="col-md-1.5 tdpadding"><!-- 交易日期： --></th>
+						<td class="col-md-2 tdpadding">
+     						<!-- <div class="input-group datebox datewidth">
+								<input type="text" id="trade_date" name="trade_date"
+									class="form-control" 
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.trade_date" 
+									is-open="model.a"
+									ng-readonly="true" />
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div> -->
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 tdpadding">最高授權層級：</th>
+						<td class="col-md-2 tdpadding">{{highest_auth_lv_name_1}}</td>
+						<th class="col-md-1.5 tdpadding">近一年手收：</th>
+						<td class="col-md-2 tdpadding">{{y_profee | currency:"$":0}}</td>
+						<th class="col-md-1.5 tdpadding">客戶前日AUM：</th>
+						<td class="col-md-2 tdpadding">{{cust_aum | currency:"$":0}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+				<hr>
+				<table width="100%" class="rstable">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-10 tdpadding">
+							<button type="button" class="btn btn-info" ng-click="searchProd('Y')" ng-disabled="inputVO.apply_type == '' || inputVO.apply_type == undefined" ng-hide="inputVO.apply_type == '4'">本月主推</button>
+							<button type="button" class="btn btn-info" ng-click="searchProd('N', 'NF')" ng-disabled="inputVO.apply_type == '' || inputVO.apply_type == undefined" ng-hide="inputVO.apply_type == '4'">基金搜尋</button>
+							<button type="button" class="btn btn-info" ng-click="searchProd('N', 'ETF')" ng-disabled="inputVO.apply_type == '' || inputVO.apply_type == undefined" ng-hide="inputVO.apply_type != '4'">ETF搜尋</button>
+							<button type="button" class="btn btn-info" ng-click="searchProd('N', 'STOCK')" ng-disabled="inputVO.apply_type == '' || inputVO.apply_type == undefined" ng-hide="inputVO.apply_type != '4'">股票搜尋</button>
+						</th>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+				<table width="100%" class="rstable" ng-show ="inputVO.apply_type == '' || inputVO.apply_type == undefined">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">商品類別：</th>
+						<th class="col-md-9 tdpadding">
+							<e-combobox id="apply_type"
+										ng-datasource="mappingSet['CRM.SINGLE_TYPE']"
+										ng-model="inputVO.apply_type"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							ng-change="initquery()"
+			   							style="line-height:20px;" />
+						</th>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+				
+				<!---------------------------------- 基金單筆申購 ---------------------------------->
+				<table width="100%" class="rstable" ng-show ="inputVO.apply_type == '1' || inputVO.apply_type == '3'">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">商品類別：</th>
+						<td class="col-md-9 tdpadding" colspan="5">
+							<e-combobox id="apply_type"
+										ng-datasource="mappingSet['CRM.SINGLE_TYPE']"
+										ng-model="inputVO.apply_type"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							ng-disabled="modifyDisabled"
+			   							ng-readonly="modifyDisabled"
+			   							ng-change="initquery()"
+			   							style="line-height:20px;" />
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">商品代碼：</th>
+						<td class="col-md-3 tdpadding">
+							<input type="text" class="form-control" 
+								style="width:80px;display:inline; 
+								text-transform: uppercase;" 
+								id="prod_id_1" name="prod_id_1" 
+								e-length-limit="20" 
+								ng-model="prod_id_1" 
+								ng-blur="prod_inquire()">{{prod_name_1}}
+						</td>
+						<th class="col-md-1 tdpadding">信託業務別：</th>
+						<td class="col-md-2 tdpadding">
+							<!-- {{trust_curr_1}} -->
+							<e-combobox id="trustCurrType_1" name="trustCurrType_1" 
+										ng-datasource="mappingSet['TRUST_CURR_TYPE']"
+										ng-model="trustCurrType_1"
+										ng-validate="false" 
+										ng-readonly="(prod_id_1 == '' || prod_id_1 == undefined) || trustCurrType_1 == 'C'" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-disabled="(prod_id_1 == '' || prod_id_1 == undefined) || trustCurrType_1 == 'C'"
+										width="100px"
+										ng-change="getDefaultFeeRate()"
+										style="line-height:20px;" />
+						</td>
+						<th class="col-md-2 tdpadding">表定手續費率：</th>
+						<td class="col-md-1 tdpadding">{{defaultFeeRate_1}}{{defaultFeeRate_1 != undefined ? "%" : ""}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">申購金額：</th>
+						<td class="col-md-3 tdpadding">
+							<input type="text" class="form-control" style="width:100%; display:inline;" placeholder="請輸入..." 
+								id="purchase_amt_1" name="purchase_amt_1" 
+								ng-model="purchase_amt_1" 
+								ng-disabled="prod_id_1 == '' || prod_id_1 == undefined"
+								ng-blur="getDefaultFeeRate(); getFee('discount');" 
+								e-input-limit="NC">
+						</td>
+						<th class="col-md-1 tdpadding">申購折扣：</th>
+						<td class="col-md-2 tdpadding">
+							<input type='radio' id="discount_type_1" name="discount_type_1" 
+								ng-model='discount_type_1' 
+								ng-value="1" 
+								ng-disabled="purchase_amt_1 == '' || purchase_amt_1 == undefined || modifyDisabled"/>折扣費率
+							
+							<input type="text" class="form-control" style="width:40%; display:inline;" 
+								id="fee_rate_1" name="fee_rate_1" 
+								ng-model="fee_rate_1" 
+								e-input-limit="ND"
+								ng-disabled="purchase_amt_1 == '' || purchase_amt_1 == undefined || modifyDisabled" 
+								ng-blur="getFee('rate')">%
+							<br />
+							<input type='radio' id="discount_type_1" name="discount_type_1" 
+								ng-model='discount_type_1' 
+								ng-value="2" 
+								ng-disabled="purchase_amt_1 == '' || purchase_amt_1 == undefined || modifyDisabled"/>折扣數
+							
+							<input type="text" class="form-control" style="width:40%; display:inline;" 
+								id="fee_discount_1" name="fee_discount_1" 
+								ng-model="fee_discount_1" 
+								e-input-limit="ND" 
+								ng-disabled="purchase_amt_1 == '' || purchase_amt_1 == undefined || modifyDisabled" 
+								ng-blur="getFee('discount')">折
+							
+						</td>
+						<th class="col-md-2 tdpadding">手續費金額：</th>
+						<td class="col-md-1 tdpadding">{{fee_1 | number : num_1}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">議價原因：
+							</br><span style="font-size: small;">(限輸入50字)</span>
+						</th>
+						<td class="col-md-2 tdpadding" colspan="4">
+							<input type="text" class="form-control" style="width:100%; display:inline;" 
+								id="brg_reason_1" name="brg_reason_1" 
+								ng-model="brg_reason_1" 
+								maxlength="50" 
+								ng-disabled="prod_id_1 == '' || prod_id_1 == undefined || modifyDisabled">
+						</td>
+						<th class="col-md-7 tdpadding">
+							<button type="button" class="btn btn-info" ng-click="addToList()" ng-hide="modifyDisabled" ng-disabled="prod_id_1 == undefined || prod_id_1 == '' || 
+							                                                                                                       defaultFeeRate_1 == undefined || defaultFeeRate_1 == '' || 
+																																   purchase_amt_1 == undefined || purchase_amt_1 == '' || 
+																																   discount_type_1 == undeined || discount_type_1 == '' ||
+																																   fee_rate_1 == undefined || fee_rate_1 == '' || 
+																																   fee_discount_1 == undefined || fee_discount_1 == '' || 
+																																   fee_1 == undefined || fee_1 == '' ||
+																																   highest_auth_lv == undeined || highest_auth_lv == '' || 
+																																   tempList.length == 6">加入清單</button>																							   
+							<button type="button" class="btn btn-info" ng-hide="modifyDisabled" ng-click="clearNow()">清除</button>
+						</th>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+				
+				<!---------------------------------- 基金定期(不)定額申購 ---------------------------------->
+				<table width="100%" class="rstable" ng-show ="inputVO.apply_type == '2'">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">商品類別：</th>
+						<td class="col-md-9 tdpadding" colspan="5">
+							<e-combobox id="apply_type"
+										ng-datasource="mappingSet['CRM.SINGLE_TYPE']"
+										ng-model="inputVO.apply_type"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							ng-readonly="modifyDisabled"
+			   							ng-disabled="modifyDisabled"
+			   							ng-change="initquery()"
+			   							style="line-height:20px;" />
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">商品代碼：</th>
+						<td class="col-md-3 tdpadding">
+							<input type="text" class="form-control" style="width:80px;display:inline; text-transform: uppercase;" id="prod_id_2" name="prod_id_2" ng-model="prod_id_2" e-length-limit="20" ng-blur="prod_inquire()">
+							{{prod_name_2}}
+						</td>
+						<th class="col-md-1 tdpadding">信託業務別：</th>
+						<td class="col-md-2 tdpadding">
+							<!-- {{trust_curr_2}} -->
+							<e-combobox id="trustCurrType_2" name="trustCurrType_2" 
+										ng-datasource="mappingSet['TRUST_CURR_TYPE']"
+										ng-model="trustCurrType_2"
+										ng-validate="false" 
+										ng-readonly="(prod_id_2 == '' || prod_id_2 == undefined) || trustCurrType_2 == 'C'" 
+										ng-disabled="(prod_id_2 == '' || prod_id_2 == undefined) || trustCurrType_2 == 'C'"
+										ng-editable="false"
+										ng-format="F3"
+										width="100px"
+										ng-change="getDefaultFeeRate()"
+										style="line-height:20px;" />
+						</td>
+						<th class="col-md-2 tdpadding">表定手續費率：</th>
+						<td class="col-md-1 tdpadding">{{defaultFeeRate_2}}{{defaultFeeRate_2 != undefined ? "%" : ""}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">申購金額：</th>
+						<td class="col-md-3 tdpadding">
+							<input type="text" class="form-control" style="width:100%;display:inline;" placeholder="請輸入..." 
+								id="purchase_amt_2" name="purchase_amt_2" 
+								ng-model="purchase_amt_2" 
+								ng-disabled="prod_id_2 == '' || prod_id_2 == undefined" 
+								ng-blur="getDefaultFeeRate();getFee('discount');" 
+								e-input-limit="NC">
+						</td>
+						<th class="col-md-1 tdpadding">申購折扣：</th>
+						<td class="col-md-2 tdpadding">
+							<e-combobox id="fee_discount_2" name="fee_discount_2" 
+										ng-paramtype="CRM.SINGLE_REG_DISCOUNT"
+										ng-model="fee_discount_2"
+										ng-validate="false" 
+										ng-readonly="purchase_amt_2 == '' || purchase_amt_2 == undefined || modifyDisabled" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-disabled="purchase_amt_2 == '' || purchase_amt_2 == undefined || modifyDisabled"
+										width="100px"
+										ng-change="getFee('discount')"
+										style="line-height:20px;" />折
+						</td>
+						<th class="col-md-2 tdpadding">手續費金額：</th>
+<!-- 					<td class="col-md-1 tdpadding"><input type="text" class="form-control" style="width:100%;display:inline;" id="fee_2" name="fee_2" ng-model="fee_2" ng-disabled="true"></td> -->
+						<td class="col-md-1 tdpadding">{{fee_2 | number : num_2}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">議價原因：
+							</br><span style="font-size: small;">(限輸入50字)</span>
+						</th>
+						<td class="col-md-3 tdpadding" colspan="4">
+							<input type="text" class="form-control" style="width:100%; display:inline;" 
+								id="brg_reason_2" name="brg_reason_2" 
+								ng-model="brg_reason_2" 
+								maxlength="50" 
+								ng-disabled="prod_id_2 == '' || prod_id_2 == undefined">
+						</td>
+						<th class="col-md-6 tdpadding">
+							<button type="button" class="btn btn-info" ng-click="addToList()" ng-hide="modifyDisabled" ng-disabled="prod_id_2 == undefined || prod_id_2 == '' || 
+																																   defaultFeeRate_2 == undefined || defaultFeeRate_2 == '' || 
+																																   purchase_amt_2 == undefined || purchase_amt_2 == '' || 
+																																   fee_rate_2 == undefined || fee_rate_2 == '' || 
+																																   fee_discount_2 == undefined || fee_discount_2 == '' || 
+																																   fee_2 == undefined || fee_2 == '' ||
+																																   highest_auth_lv == undeined || highest_auth_lv == '' || 
+																																   tempList.length == 6">加入清單</button>
+							<button type="button" class="btn btn-info" ng-hide="modifyDisabled" ng-click="clearNow()">清除</button>
+						</th>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+				
+				<!---------------------------------- 海外ETF/股票 ---------------------------------->
+				<table width="100%" class="rstable" ng-show ="inputVO.apply_type == '4' || inputVO.apply_type == '5'">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">商品類別：</th>
+						<td class="col-md-9 tdpadding" colspan="5">
+							<e-combobox id="apply_type"
+										ng-datasource="mappingSet['CRM.SINGLE_TYPE']"
+										ng-model="inputVO.apply_type"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							ng-disabled="modifyDisabled"
+			   							ng-readonly="modifyDisabled"
+			   							ng-change="initquery()"
+			   							style="line-height:20px;" />
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">商品代碼：</th>
+						<td class="col-md-3 tdpadding">
+							<input type="text" class="form-control" 
+								style="width:80px;display:inline; text-transform: uppercase;" 
+								id="prod_id_4" name="prod_id_4" 
+								ng-model="prod_id_4" 
+								e-length-limit="20" 
+								ng-blur="prod_inquire()">{{prod_name_4}}
+						</td>
+						<th class="col-md-1 tdpadding">信託業務別：</th>
+						<td class="col-md-2 tdpadding">
+							<!-- {{trust_curr_1}} -->
+							<e-combobox id="trustCurrType_4" name="trustCurrType_4" 
+										ng-paramtype="CRM.ETF_TRUST_CURR_TYPE"
+										ng-model="trustCurrType_4"
+										ng-validate="false" 
+										ng-readonly="prod_id_4 == '' || prod_id_4 == undefined" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-disabled="prod_id_4 == '' || prod_id_4 == undefined"
+										width="100px"
+										ng-change="getDefaultFeeRate()"
+										style="line-height:20px;" />
+						</td>
+						<th class="col-md-2 tdpadding">表定手續費率：</th>
+						<td class="col-md-1 tdpadding">{{defaultFeeRate_4}}{{defaultFeeRate_4 != undefined ? "%" : ""}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						
+						<th class="col-md-1 tdpadding">委託數量：</th>
+						<td class="col-md-3 tdpadding">
+							<input type="text" class="form-control" id="entrust_unit_4" name="entrust_unit_4" 
+								style="width:100%; display:inline;" 
+								ng-model="entrust_unit_4" 
+								e-input-limit="NC" 
+								ng-blur="getDefaultFeeRate();getFee('rate');" 
+								ng-disabled="prod_id_4 == '' || prod_id_4 == undefined">
+						</td>
+						
+						<th class="col-md-1 tdpadding">委託價格：</th>
+						<td class="col-md-2 tdpadding">
+							<input type="text" class="form-control" id="entrust_amt_4" name="entrust_amt_4" 
+								style="width:100%;display:inline;" 
+								ng-model="entrust_amt_4" 
+								e-input-limit="NC" 
+								ng-blur="getDefaultFeeRate();getFee('rate');" 
+								ng-disabled="entrust_unit_4 == '' || entrust_unit_4 == undefined">
+						</td>
+						
+						<th class="col-md-2 tdpadding">委託金額：</th>
+						<td class="col-md-1 tdpadding">{{purchase_amt_4 | currency:"$":0}}</td>
+						
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">申購折扣：</th>
+						<td class="col-md-3 tdpadding" colspan="3">
+							<input type='radio' id="discount_type_4" name="discount_type_4" 
+								ng-model='discount_type_4' 
+								ng-value="1" 
+								ng-disabled="entrust_amt_4 == '' || entrust_amt_4 == undefined || modifyDisabled"/>折扣費率
+							
+							<input type="text" class="form-control" id="fee_rate_4" name="fee_rate_4" 
+								style="width:30%; display:inline;" 
+								ng-model="fee_rate_4" 
+								e-input-limit="ND"
+								ng-disabled="entrust_amt_4 == '' || entrust_amt_4 == undefined || modifyDisabled" 
+								ng-blur="getFee('rate')">%
+							
+							<input type='radio' id="discount_type_4" name="discount_type_4" 
+								ng-model='discount_type_4' 
+								ng-value="2" 
+								ng-disabled="entrust_amt_4 == '' || entrust_amt_4 == undefined || modifyDisabled"/>折扣數
+							
+							<input type="text" class="form-control" id="fee_discount_4" name="fee_discount_4" 
+								style="width:30%; display:inline;" 
+								ng-model="fee_discount_4" 
+								e-input-limit="ND"
+								ng-disabled="entrust_amt_4 == '' || entrust_amt_4 == undefined || modifyDisabled" 
+								ng-blur="getFee('discount')">折
+							
+						</td>
+						<th class="col-md-2 tdpadding">手續費金額：</th>
+<!-- 						<td class="col-md-1 tdpadding"> -->
+<!-- 							<input type="text" class="form-control" id="fee_4" name="fee_4"  -->
+<!-- 								style="width:100%; display:inline;"  -->
+<!-- 								ng-model="fee_4"  -->
+<!-- 								e-input-limit="NUU"  -->
+<!-- 								ng-disabled="true"> -->
+<!-- 						</td> -->
+						<td class="col-md-1 tdpadding">{{fee_4 | number : num_4}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">議價原因：
+							</br><span style="font-size: small;">(限輸入50字)</span>
+						</th>
+						<td class="col-md-1 tdpadding" colspan="4">
+							<input type="text" class="form-control" id="brg_reason_4" name="brg_reason_4" 
+								style="width:100%; display:inline;" 
+								ng-model="brg_reason_4" 
+								maxlength="50"
+								ng-disabled="prod_id_4 == '' || prod_id_4 == undefined || modifyDisabled">
+						</td>
+						<th class="col-md-2 tdpadding" ng-hide="modifyDisabled">
+							<button type="button" class="btn btn-info" 
+								ng-click="addToList()" 
+								ng-hide="modifyDisabled" 
+								ng-disabled="prod_id_4 == undefined || prod_id_4 == '' || 
+								               defaultFeeRate_4 == undefined || defaultFeeRate_4 == '' || 
+											   entrust_unit_4 == undefined || entrust_unit_4 == '' || 
+											   entrust_amt_4 == undeined || entrust_amt_4 == '' ||
+											   discount_type_4 == undefined || discount_type_4 == '' || 
+											   fee_rate_4 == undefined || fee_rate_4 == '' || 
+											   fee_discount_4 == undefined || fee_discount_4 == '' || 
+											   fee_4 == undefined || fee_4 == '' ||
+											   highest_auth_lv == undeined || highest_auth_lv == '' || 
+											   tempList.length == 6">加入清單
+							</button>
+							<button type="button" class="btn btn-info" ng-hide="modifyDisabled" ng-click="clearNow()">清除</button>
+						</th>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;" ng-hide="modifyDisabled">
+					<h4 class="h4-title">申請清單</h4>
+					<table>
+						<thead>
+							<tr>
+								<th>商品類別</th>
+								<th>商品代碼</th>
+								<th>商品名稱</th>
+								<th>信託幣別</th>
+								<th>申購金額</th>
+								<th>客戶適用費率</th>
+								<th>折扣後費率</th>
+								<th>申請折數</th>
+								<th>手續費金額</th>
+								<th>移除</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in tempList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">								
+								<td align = "center">{{row.APPLY_TYPE | mapping:mappingSet['CRM.SINGLE_TYPE']:'F3'}}</td>
+								<td align = "center">{{row.PROD_ID}}</td>
+								<td align = "center">{{row.PROD_NAME}}</td>
+								<td align = "center">{{row.TRUST_CURR}}</td>
+								<td align = "right">{{row.PURCHASE_AMT | number : 0}}</td>
+								<td align = "right">{{row.DEFAULT_FEE_RATE}}%</td>
+								<td align = "right">{{row.FEE_RATE}}%</td>
+								<td align = "right">{{row.FEE_DISCOUNT}}</td>
+								<td align = "right">{{row.FEE | number : row.num}}</td>
+								<td align = "center"><a class="btn btn-danger btn-circle" ng-click="deletelist(row)"><i class="glyphicon glyphicon-trash"></i></a></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<br />
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="applySingle()" ng-disabled="tempList.length == 0 || tempList == undefined" ng-hide="modifyDisabled">送出審核</button>
+					<button type="button" class="btn btn-info" 
+						ng-click="updateApplyFlow()" 
+						ng-disabled="prod_id_1 == undefined || prod_id_1 == '' || 
+									   purchase_amt_1 == undefined || purchase_amt_1 == '' || 
+									   discount_type_1 == undeined || discount_type_1 == '' ||
+									   fee_rate_1 == undefined || fee_rate_1 == '' || 
+									   fee_discount_1 == undefined || fee_discount_1 == '' || 
+									   fee_1 == undefined || fee_1 == '' ||
+									   highest_auth_lv == undeined || highest_auth_lv == '' || 
+									   tempList.length == 6" 
+						ng-show="modifyDisabled && inputVO.apply_type == '1'">送出修改</button>
+					<button type="button" class="btn btn-info" 
+						ng-click="updateApplyFlow()" 
+						ng-disabled="prod_id_2 == undefined || prod_id_2 == '' || 
+									   purchase_amt_2 == undefined || purchase_amt_2 == '' || 
+									   fee_rate_2 == undefined || fee_rate_2 == '' || 
+									   fee_discount_2 == undefined || fee_discount_2 == '' || 
+									   fee_2 == undefined || fee_2 == '' ||
+									   highest_auth_lv == undeined || highest_auth_lv == '' || 
+									   tempList.length == 6" 
+						ng-show="modifyDisabled && inputVO.apply_type == '2'">送出修改</button>
+					<button type="button" class="btn btn-info" 
+						ng-click="updateApplyFlow()" 
+						ng-disabled="prod_id_4 == undefined || prod_id_4 == '' || 
+									   entrust_unit_4 == undefined || entrust_unit_4 == '' || 
+									   entrust_amt_4 == undeined || entrust_amt_4 == '' ||
+									   discount_type_4 == undefined || discount_type_4 == '' || 
+									   fee_rate_4 == undefined || fee_rate_4 == '' || 
+									   fee_discount_4 == undefined || fee_discount_4 == '' || 
+									   fee_4 == undefined || fee_4 == '' ||
+									   highest_auth_lv == undeined || highest_auth_lv == '' || 
+									   tempList.length == 6" 
+						ng-show="modifyDisabled && inputVO.apply_type == '4'">送出修改</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,127 @@
+<style>
+.modal-dialog.CRM3103_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: 550px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM3103/CRM3103_EDIT.js"></script>
+<!-- <script type="text/javascript" src="assets/txn/CRM3103/CRM3103_UPLOAD.js"></script> -->
+<div ng-controller="CRM3103_DETAILController" ng-cloak>
+	<div class="modal-dialog CRM3103_DETAIL"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">輪調名單明細資料</h4>
+			</div>
+			<div class="modal-body">
+				<div>
+					<table width="100%">
+						<tr width="100%">
+							<td width="50%"><b>專案名稱：</b>&nbsp;{{inputVO.PRJ_NAME}}</td>
+							<td width="25%"><b>分行：</b>&nbsp;{{inputVO.BRANCH_NBR}}-{{inputVO.BRANCH_NAME}}</td>
+							<td width="25%"><b>理專：</b>&nbsp;{{inputVO.EMP_ID}}-{{inputVO.EMP_NAME}}</td>
+						</tr>
+						<tr width="100%">
+							<td colspan="3">
+								<b>主副CODE總客戶數：</b>{{inputVO.CUST_CNT}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<b>核心客戶數：</b>{{inputVO.goCustNum}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<b>核心客戶比例：</b>{{(inputVO.goCustNum / inputVO.CUST_CNT) * 100 | number: 2}}%
+							</td>
+						</tr>
+					</table>
+					<div class="search_box_btn text-center">
+						<table width="100%">
+							<tr width="100%">
+								<th width="15%" style="text-align: right;">分行主管說明：</th>
+								<td width="35%">
+									<textarea type="text" id="brhRemarks" style="width: 100%; " maxlength="300" ng-model="inputVO.BRH_REMARKS" ng-disabled="!(inputVO.isBMMGRStep1 && inputVO.STEP_STATUS == '2' && inputVO.acttype=='2')"></textarea>
+								</td>
+								<th width="15%" style="text-align: right;">處主管說明：</th>
+								<td width="35%">
+									<textarea type="text" id="rgnRemarks" style="width: 100%; " maxlength="300" ng-model="inputVO.RGN_REMARKS" ng-disabled="!(inputVO.isARMGR && inputVO.STEP_STATUS == '3' && inputVO.acttype=='2')"></textarea>
+								</td>
+							</tr>
+							<tr width="100%">
+								<th width="15%" style="text-align: right;">客戶ID：</th>
+								<td width="35%" colspan="3">
+									<input type="text" class="form-control" id="custId" name="custId" style="width:150px;" ng-model="inputVO.custId" e-length-limit="12">
+								</td>
+							</tr>
+						</table>
+						<button type="button" class="btn btn-info" ng-click="initQuery();">清除</button>
+						<button type="button" class="btn btn-info" ng-click="queryByCust();">查詢</button>
+						<button type="button" class="btn btn-info" ng-click="FCSelected('1');" ng-show="inputVO.isFC && inputVO.acttype=='2' && (inputVO.STEP_STATUS == '1' || inputVO.STEP_STATUS == '4' || inputVO.STEP_STATUS == '5')">儲存</button>
+						<button type="button" class="btn btn-info" ng-click="FCSelected('2');" ng-show="inputVO.isFC && inputVO.acttype=='2' && (inputVO.STEP_STATUS == '1' || inputVO.STEP_STATUS == '4' || inputVO.STEP_STATUS == '5')">送出覆核</button>
+						<button type="button" class="btn btn-info" ng-click="approval(null);" ng-show="((inputVO.isBMMGRStep1 && inputVO.STEP_STATUS == '2') || (inputVO.isARMGR && inputVO.STEP_STATUS == '3')) && inputVO.acttype=='2'">核可</button>
+						<button type="button" class="btn btn-info" ng-click="deny(null);" ng-show="((inputVO.isBMMGRStep1 && inputVO.STEP_STATUS == '2') || (inputVO.isARMGR && inputVO.STEP_STATUS == '3')) && inputVO.acttype=='2'">退回</button>
+						<button type="button" class="btn btn-info" ng-click="addCust();" ng-show="inputVO.isHeadMgr && inputVO.acttype=='2'">新增客戶</button>
+						<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">結束</button>
+					</div>			
+				</div>
+				<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+					<table class="table-bordered middle">
+						<thead>
+							<tr>
+								<th ng-show="inputVO.isHeadMgr">功能</th>
+								<th>核心客戶<br/>
+									<label><input type='checkbox' ng-model='checkVO.clickAll' ng-change='checkrow()' ng-disabled="!(inputVO.isFC && inputVO.acttype=='2' && (inputVO.STEP_STATUS == '1' || inputVO.STEP_STATUS == '4' || inputVO.STEP_STATUS == '5'))"/> 本頁全選</label>
+									<label><input type='checkbox' ng-model='checkVO.clickAll2' ng-change='checkrow2()' ng-disabled="!(inputVO.isFC && inputVO.acttype=='2' && (inputVO.STEP_STATUS == '1' || inputVO.STEP_STATUS == '4' || inputVO.STEP_STATUS == '5'))"/> 全選</label>
+								</th>
+								<!-- 總行在第二階段且輪調未執行前都可修改 或  分行主管於第二階段-->
+								<th ng-show="(inputVO.isHeadMgr && inputVO.acttype=='2' && (inputVO.STEP_STATUS == '6' || inputVO.STEP_STATUS == '7')) || (inputVO.isBMMGR && inputVO.acttype=='2' && inputVO.STEP_STATUS == '6')">功能</th>
+								<th>AO CODE</th>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th ng-show="inputVO.isFC && inputVO.STEP_STATUS == '6'">下載資況表申請書<br/>聲明書</th>
+								<th>第二階段<br/>狀態</th>
+								<th>檢視上傳檔案</th>
+								<th>錄音序號</th>
+								<th>錄音日期</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td ng-show="inputVO.isHeadMgr">
+									<button type="button" class="btn btn-info" ng-click="deleteCust(row);">刪除</button>
+					       		</td>
+								<td align="center">
+									<label>
+										<div>
+											<input type='checkbox' ng-model='row.GO_CUST_YN' ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="!inputVO.isFC || inputVO.acttype!='2' || !(inputVO.STEP_STATUS == '1' || inputVO.STEP_STATUS == '4' || inputVO.STEP_STATUS == '5')">
+										</div>
+									</label>
+								</td>
+								<!-- 分行主管於第二階段 -->
+								<td ng-show="(inputVO.isBMMGR && inputVO.acttype=='2' && inputVO.STEP_STATUS == '6')">
+									<button type="button" class="btn btn-info" ng-click="edit(row);" ng-show="row.STATUS == '2' || row.STATUS == '4'">編輯</button>
+									<button type="button" class="btn btn-info" ng-click="approval(row);" ng-show="row.STATUS == '3' && row.MODIFIER != inputVO.loginUserId">核可</button>
+									<button type="button" class="btn btn-info" ng-click="deny(row);" ng-show="row.STATUS == '3' && row.MODIFIER != inputVO.loginUserId">退回</button>
+					       		</td>
+					       		<!-- 總行在第二階段且輪調未執行前都可修改 -->
+					       		<td ng-show="(inputVO.isHeadMgr && inputVO.acttype=='2' && (inputVO.STEP_STATUS == '6' || inputVO.STEP_STATUS == '7'))">
+					       			<button type="button" class="btn btn-info" ng-click="edit(row);">編輯</button>
+					       		</td>
+								<td>{{row.AO_CODE}}({{row.AO_TYPE | mapping: mappingSet['ORG.AOCODE_TYPE']}})</td>
+								<td>{{row.CUST_ID}}</td>
+								<td>{{row.CUST_NAME}}</td>
+								<td ng-show="inputVO.isFC && inputVO.STEP_STATUS == '6'" align="center">
+									<button type="button" class="btn btn-info" ng-click="download(row)" ng-show="row.STATUS == '1'">下載</button>
+								</td>
+								<td>{{row.STATUS | mapping: mappingSet['CRM.TRS_PRJ_ROT_STATUS_D']}}</td>
+								<td align="center"><button ng-if="row.ATTACH_YN == 'Y'" type="button" class="btn btn-info" ng-click="viewFile(row)">檢視</button></td>
+								<td>{{row.REC_SEQ}}</td>
+								<td>{{toJsDate(row.REC_DATE) | date:'yyyy-MM-dd'}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

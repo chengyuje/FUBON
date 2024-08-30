@@ -1,0 +1,213 @@
+<style>
+.FPS910_EDIT table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.FPS910_EDIT.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_FPS910_EDIT_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD120/PRD120.js"></script>
+<div ng-controller="FPS910_EDITController" ng-cloak>
+	<div class="modal-dialog FPS910_EDIT">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{edit_type == '1' ? '目標理財規劃' : '全資產規劃'}}投組參數新增</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<!-- <tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">投組類型：</th>
+							<td class="col-md-7 tdpadding">
+								<span ng-if="edit_type != '1'">
+									<label><input type="radio" name="inv_prd_type" ng-model="inputVO.inv_prd_type" ng-value="'1'" ng-change="init()" required>儲蓄型保險+存款</label>
+									&emsp;
+								</span>
+								<label><input type="radio" name="inv_prd_type" ng-model="inputVO.inv_prd_type" ng-value="'3'" ng-change="init()" required>基股類商品</label>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.inv_prd_type.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇投組類型</td>
+							<td class="col-xs-1"></td>
+						<tr> -->
+						<tr ng-if="edit_type == '1'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">客戶風險屬性：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="cust_risk_atr" name="cust_risk_atr"
+								ng-paramtype="FPS.CUST_RISK_ATR"
+								ng-model="inputVO.cust_risk_atr"
+								ng-validate="false"
+								ng-disabled="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="edit_type != '1'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">客戶風險屬性：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="cust_risk_atr" name="cust_risk_atr"
+								ng-paramtype="FPS.CUST_RISK_ATR_2"
+								ng-model="inputVO.cust_risk_atr"
+								ng-validate="false"
+								ng-disabled="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.cust_risk_atr.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇客戶風險屬性</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-if="inputVO.inv_prd_type == '1'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">商品名稱：</th>
+							<td class="col-md-7 tdpadding">
+								<label><input type="radio" name="inv_prd_type_2" ng-model="inputVO.inv_prd_type_2" ng-value="'2'" ng-change="clearCURR()" required>外幣存款</label>
+								&emsp;
+								<label><input type="radio" name="inv_prd_type_2" ng-model="inputVO.inv_prd_type_2" ng-value="'3'" ng-change="clearCURR()" required>儲蓄型保險</label>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="inputVO.inv_prd_type == '1'" ng-show="parameterTypeEditForm.inv_prd_type_2.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇商品名稱</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-if="inputVO.inv_prd_type == '1' && inputVO.inv_prd_type_2 == '2'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">幣別：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="currency_std" name="currency_std"
+								ng-paramtype="FPS.DEPOSIT_CUR"
+								ng-model="inputVO.currency_std"
+								ng-validate="false"
+								ng-disabled="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="inputVO.inv_prd_type == '1' && inputVO.inv_prd_type_2 == '2'" ng-show="parameterTypeEditForm.currency_std.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇幣別</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-if="inputVO.inv_prd_type != '1'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">商品類型：</th>
+							<td class="col-md-7 tdpadding">
+								<label><input type="radio" name="prd_type" ng-model="inputVO.prd_type" ng-value="'MFD'" ng-change="checkID()" required>基金</label>
+								&emsp;
+								<label ng-if="edit_type == '2'"><input type="radio" name="prd_type" ng-model="inputVO.prd_type" ng-value="'ETF'" ng-change="checkID()" required>ETF</label>
+								&emsp;
+								<label><input type="radio" name="prd_type" ng-model="inputVO.prd_type" ng-value="'INS'" ng-change="checkID()" required>投資型保險</label>
+								&emsp;
+								<label><input type="radio" name="prd_type" ng-model="inputVO.prd_type" ng-value="'NANO'" ng-change="checkID()" required>奈米投</label>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="inputVO.inv_prd_type != '1'" ng-show="parameterTypeEditForm.prd_type.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇商品類型</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-if="inputVO.inv_prd_type != '1'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">商品代號：</th>
+							<td class="col-md-7 tdpadding">
+								<input id="prd_id" name="prd_id" class="form-control" style="width:190px;display:inline;" type="text" placeholder="請輸入..." ng-model="inputVO.prd_id" e-length-limit="16" ng-blur="checkID()" required>
+								<button type="button" class="btn btn-info" style="margin-top: -4px;" ng-click="goSearch()">搜尋</button>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="inputVO.inv_prd_type != '1'" ng-show="parameterTypeEditForm.prd_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入商品代號</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-if="inputVO.inv_prd_type != '1'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">商品名稱：</th>
+							<td class="col-md-7 tdpadding" ng-if="canEdit">{{inputVO.prd_name}}</td>
+							<td class="col-md-7 tdpadding" ng-if="!canEdit" class="with-errors">無此商品代碼</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="inputVO.inv_prd_type != '1'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">風險等級：</th>
+							<td class="col-md-7 tdpadding">{{inputVO.risk_id}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">佔比%：</th>
+							<td class="col-md-7 tdpadding"><input id="inv_percent" name="inv_percent" class="form-control" style="width:190px;" type="text" placeholder="請輸入..." ng-model="inputVO.inv_percent" e-input-limit="NUU" nuu1="3" nuu2="2" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.inv_percent.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入佔比</td>
+							<td class="col-xs-1"></td>
+						<tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

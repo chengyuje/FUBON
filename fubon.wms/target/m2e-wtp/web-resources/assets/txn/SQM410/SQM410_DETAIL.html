@@ -1,0 +1,220 @@
+<style>
+.SQM410_DETAIL .no_happy {
+	background-color: 	#FFFF00;
+}
+.SQM410_DETAIL .happy {
+	background-color:  #FFFFFF;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SQM410/SQM410_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/SQM120/SQM120_send.js"></script>
+<div ng-controller="SQM410_DETAILController" ng-cloak>
+	<div class="modal-body gv_tab_sc SQM410_DETAIL">
+		<div class="my_tit">
+			<h4 align="center">客戶滿意度調查改善報告</h4>
+		</div>		
+		<table style="width:100%" >
+			<tr><th align="left">分行別：{{inputVO.branch_nbr}}-{{inputVO.branch_name}}</th></tr>
+			<tr><th align="left">客戶ID：{{inputVO.cust_id}}&nbsp;&nbsp;&nbsp;&nbsp;客戶姓名：{{inputVO.cust_name}}</th></tr>
+		</table>
+		<p>
+					
+		<table>
+			<tr><th style="background-color: #FFDDAA">{{inputVO.qtnType | mapping:QTN_LIST}}問卷</th></tr>
+		</table>	
+		<table class="e-table-freeze table td_center" e-height="535px" e-mode="1" e-top="true" e-list="totalList"  style="width:100%;">
+			<thead>
+				<tr class="repeat-row" ng-repeat="row in column track by $index">
+				    <td ng-if="inputVO.qtnType == 'WMS05'" style="height:10%;width: 50%;background-color: #FFDDAA !important;color:#000000;border: 1px solid black !important;word-break:break-all;">{{row.QST_DESC}}</td>
+					<td ng-if="inputVO.qtnType == 'WMS05'" style="height:10%;width: 50%;border: 1px solid black !important;word-break:break-all;" 
+					    ng-class="{'no_happy': (row.ANSWER ==  '4' || row.ANSWER ==  '5'), 'happy': !(row.ANSWER ==  '4' || row.ANSWER ==  '5')}" align='center' valign="middle">{{row.ANSWER | mapping:mappingSet['SQM.ANS_TYPE']:'F3'}}</td>
+					<td ng-if="inputVO.qtnType != 'WMS05'" style="height:10%;width: 70%;background-color: #FFDDAA !important;color:#000000;border: 1px solid black !important;word-break:break-all;">{{row.QST_DESC}}</td>
+					<td ng-if="inputVO.qtnType != 'WMS05'" style="height:10%;width: 30%;border: 1px solid black !important;word-break:break-all;" 
+					    ng-class="{'no_happy': (row.ANSWER ==  '4' || row.ANSWER ==  '5'), 'happy': !(row.ANSWER ==  '4' || row.ANSWER ==  '5')}"  align='center' valign="middle">
+						{{((inputVO.qtnType == 'WMS01' && row.QST_ORDER == 11) ||
+						   (inputVO.qtnType == 'WMS02' && row.QST_ORDER == 13) || 
+						   (inputVO.qtnType == 'WMS03' && row.QST_ORDER == 17) || 
+						   (inputVO.qtnType == 'WMS04' && row.QST_ORDER == 13) ? row.ANSWER : '') | mapping:mappingSet['SQM.ANS_TYPE_PUSH']:'F3'}}
+						{{((inputVO.qtnType == 'WMS01' && row.QST_ORDER != 11) || 
+						   (inputVO.qtnType == 'WMS02' && row.QST_ORDER != 13) ||
+						   (inputVO.qtnType == 'WMS03' && row.QST_ORDER != 17) ||
+						   (inputVO.qtnType == 'WMS04' && row.QST_ORDER != 13) ? row.ANSWER : '') | mapping:mappingSet['SQM.ANS_TYPE']:'F3'}}
+						{{(inputVO.qtnType == 'WMS05' ? row.ANSWER : '') | mapping:ANS_TYPE:'F3'}}
+					</td>
+				</tr>
+			</thead>
+		</table>
+		
+		<table style="width:100%">
+				<tr>
+					<th>客戶質化意見：</th>	
+				</tr>
+				<tr>
+					<td>{{inputVO.resp_note}}</td>
+				</tr>					
+		</table>
+		<br>
+		<table style="width:100%">
+				<tr>
+					<th style="background-color: #00ff00">分行說明/問題釐清</th>	
+				</tr>
+				<tr>
+					<td>{{inputVO.brh_desc}}</td>
+				</tr>	
+		</table>
+		<br>
+		<table style="width:100%">
+				<tr>
+					<th>改善計畫</th>	
+				</tr>
+				<tr>
+					<td>{{inputVO.improve_desc}}</td>
+				</tr>		
+		</table>
+		<br>
+		<table style="width:100%">
+				<tr>
+					<th style="background-color: #fa8072">區長簽核意見(附加其他要項資訊)</th>	
+				</tr>
+				<tr align="left" ng-show="inputVO.qtnType != 'WMS03' && inputVO.qtnType != 'WMS04' "><td>最近一次訪談時間：{{inputVO.last_visit_date}}</td></tr>
+				<tr align="left" ng-show="inputVO.qtnType != 'WMS03' && inputVO.qtnType != 'WMS04' "><td>客戶貢獻度等級：{{inputVO.con_degree_desc}}</td></tr>
+				<tr align="left" ng-show="inputVO.qtnType != 'WMS03' && inputVO.qtnType != 'WMS04' "><td>應聯繫頻率：{{inputVO.frq_day}} <ps ng-show="inputVO.frq_day">天</ps></td></tr>
+				
+				<tr align="left" ng-show="inputVO.qtnType == 'WMS03' || inputVO.qtnType == 'WMS04'"><td style="width:150px";>客戶來行等待時間：{{inputVO.waiting_time}} mins</td></tr>
+				<tr align="left" ng-show="inputVO.qtnType == 'WMS03' || inputVO.qtnType == 'WMS04'"><td style="width:120px";>作業交易時間：{{inputVO.working_time}} mins</td></tr>
+				
+				<tr align="left" ng_show ="inputVO.qtnType != 'WMS03' && inputVO.qtnType != 'WMS04'"><td>專員姓名/員編/職級：<div style="word-break: break-all;">{{inputVO.emp_name}} {{inputVO.emp_id}} {{inputVO.cur_job}}</div></td></tr>
+				<tr align="left" ng_show ="inputVO.qtnType == 'WMS03' || inputVO.qtnType == 'WMS04'"><td>經辦姓名/員編/職級：<div style="word-break: break-all;">{{inputVO.emp_name}} {{inputVO.emp_id}} {{inputVO.cur_job}}</div></td></tr>
+				<tr align="left"><td>主管姓名/員編/職級：<div style="word-break: break-all;">{{inputVO.sup_emp_name}} {{inputVO.sup_emp_id}} {{inputVO.sup_cur_job}}</div></td></tr>
+				<tr ng-show ='inputVO.privilegeID == "012"'><td><input type="radio" name="prededuction_initial" ng-model="inputVO.prededuction_initial" ng-value="'Y'" ng-disabled ='inputVO.privilegeID != "012"' ng-change="addSugg()"> 建議扣分 (請填寫意見200字內)</td></tr>
+				<tr ng-show ='inputVO.privilegeID == "012"'><td><input type="radio" name="prededuction_initial" ng-model="inputVO.prededuction_initial" ng-value="'N'" ng-disabled ='inputVO.privilegeID != "012"' ng-change="addSugg()"> 建議不扣分 (請填寫意見200字內)</td></tr>
+				<tr ng-show ='inputVO.privilegeID == "012"'>
+					<td>
+						<input type="radio" name="prededuction_initial" ng-model="inputVO.prededuction_initial" ng-value="'RL'" ng-disabled ='inputVO.privilegeID != "012"' ng-change="addSugg()"> 退件
+						<span ng-show="inputVO.prededuction_initial!='RL'">{{inputVO.op_sup_reject_reason}}</span>
+						<span ng-show="!(inputVO.prededuction_initial!='RL')">
+							<input type="text"  id="op_sup_reject_reason" ng-model="inputVO.op_sup_reject_reason" style="width: 300px;" maxlength="10"/> (請填寫意見10字內)
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						區長簽核意見(剩餘字數:{{200 - inputVO.op_sup_remark.length}})<br>
+						<span ng-show="inputVO.privilegeID != '012' || inputVO.prededuction_initial=='RL'">{{inputVO.op_sup_remark}}</span>
+						<span ng-show="!(inputVO.privilegeID != '012' || inputVO.prededuction_initial=='RL')">
+							<textarea id="op_sup_remark" placeholder="請輸入..." name="text" class="form-control" ng-model="inputVO.op_sup_remark" style="width: 100%; height: 100px" maxlength="200" maxlength="100"></textarea>
+						</span>
+					</td>
+				</tr>		
+		</table>
+		
+		<br>
+		<table style="width:100%" ng-show ='inputVO.privilegeID == "013"' >
+			<tr><th style="background-color: #dcdcdc">處/副主管批示</th></tr>
+				
+			<tr><td><input type="radio" name="deduction_initial" ng-model="inputVO.deduction_initial" ng-value="'Y'" ng-disabled ='inputVO.privilegeID != "013"' ng-change="addSugg2()"> 扣分 (請填寫意見200字內)</td></tr>
+			<tr><td><input type="radio" name="deduction_initial" ng-model="inputVO.deduction_initial" ng-value="'N'" ng-disabled ='inputVO.privilegeID != "013"' ng-change="addSugg2()"> 不扣分 (請填寫意見200字內)</td></tr>
+			<tr>
+				<td>
+					<input type="radio" name="deduction_initial" ng-model="inputVO.deduction_initial" ng-value="'RL'" ng-disabled ='inputVO.privilegeID != "013"' ng-change="addSugg2()"> 退件
+					<span ng-show="inputVO.deduction_initial!='RL'">{{inputVO.rc_sup_reject_reason1}}</span>
+					<span ng-show="!(inputVO.deduction_initial!='RL')">
+						<input type="text"  id="rc_sup_reject_reason1" ng-model="inputVO.rc_sup_reject_reason1" style="width: 300px;" ng-disabled="inputVO.deduction_initial!='RL'" placeholder="請輸入10個字內..."/>
+					</span>
+			    </td>
+			</tr>
+			<tr>
+				<td>
+					<input type="radio" name="deduction_initial" ng-model="inputVO.deduction_initial" ng-value="'RC'" ng-disabled ='inputVO.privilegeID != "013"' ng-change="addSugg2()"> 退件至建立人
+					<span ng-show="inputVO.deduction_initial!='RC'">{{inputVO.rc_sup_reject_reason2}}</span>
+					<span ng-show="!(inputVO.deduction_initial!='RC')">
+						<input type="text"  id="rc_sup_reject_reason2" ng-model="inputVO.rc_sup_reject_reason2" style="width: 300px;" placeholder="請輸入10個字內..."/>
+					</span>
+				</td>
+			</tr>
+			
+			<tr ng-if="inputVO.jobTitleName == '處副主管'">
+				<th ng-show="inputVO.rc_sup_remark != null" >處主管簽核意見：{{inputVO.rc_sup_remark}}</th> 	
+				</tr>
+				<tr ng-if="inputVO.jobTitleName == '處副主管'">
+				<th style="background-color: #dcdcdc">處副主管簽核意見：(剩餘字數:{{200 - inputVO.rc_vice_sup_remark.length}})</th>
+				</tr>
+				<tr ng-if="inputVO.jobTitleName == '處副主管'">
+					<td>
+						<span ng-show="inputVO.privilegeID != '013' || inputVO.deduction_initial=='RL' || inputVO.deduction_initial=='RC'">{{inputVO.rc_vice_sup_remark}}</span>
+						<span ng-show="!(inputVO.privilegeID != '013' || inputVO.deduction_initial=='RL' || inputVO.deduction_initial=='RC')">
+							<textarea id="text" placeholder="請輸入..." name="text" class="form-control" ng-model="inputVO.rc_vice_sup_remark" style="width: 100%; height: 100px" maxlength="200" ng-disabled ='' maxlength="50"></textarea>
+						</span>
+					</td>									
+				</tr>
+				<tr ng-if="inputVO.jobTitleName == '處主管'">
+					<th ng-show="inputVO.rc_vice_sup_remark != null">處副主管簽核意見：{{inputVO.rc_vice_sup_remark}}</th> 
+					<th ng-show="inputVO.rc_vice_sup_remark == null">處副主管無簽核意見</th>
+				</tr>
+				<tr ng-if="inputVO.jobTitleName == '處主管'">
+					<th>處主管簽核意見：(剩餘字數:{{200 - inputVO.rc_sup_remark.length}})</th>
+				</tr>
+				<tr ng-if="inputVO.jobTitleName == '處主管'">
+					<td>
+						<span ng-show="inputVO.privilegeID != '013' || inputVO.deduction_initial=='RL' || inputVO.deduction_initial=='RC'">{{inputVO.rc_sup_remark}}</span>
+						<span ng-show="!(inputVO.privilegeID != '013' || inputVO.deduction_initial=='RL' || inputVO.deduction_initial=='RC')">
+							<textarea id="text" placeholder="請輸入..." name="text" class="form-control" ng-model="inputVO.rc_sup_remark" style="width: 100%; height: 100px" maxlength="200" maxlength="50"></textarea>
+						</span>
+					</td>									
+				</tr>
+				<tr ng-if="inputVO.jobTitleName != '處主管' && inputVO.jobTitleName != '處副主管'">
+					<th>處/副主管簽核意見：</th>	
+				</tr>
+				<tr ng-if="inputVO.jobTitleName != '處主管' && inputVO.jobTitleName != '處副主管'">
+					<td>
+						<span ng-show="inputVO.privilegeID != '013' || inputVO.deduction_initial=='RL' || inputVO.deduction_initial=='RC'">{{merge_rc_sup_remark}}</span>
+						<span ng-show="!(inputVO.privilegeID != '013' || inputVO.deduction_initial=='RL' || inputVO.deduction_initial=='RC')">
+							<textarea id="text" placeholder="請輸入..." name="text" class="form-control" ng-model="merge_rc_sup_remark" style="width: 100%; height: 100px" maxlength="200" maxlength="50"></textarea>
+						</span>
+					</td>									
+				</tr>			
+		</table>
+		<!-- 營運督導需送簽要自己選 -->
+		<table style="width:100%" ng-show ='inputVO.privilegeID == "012" && inputVO.prededuction_initial!="RL"' >
+			<tr>
+				<th>選擇簽核角色：</th>
+				<td>
+					<e-combobox id="owner_role_id" name="owner_role_id"
+								ng-datasource="roleList"
+								ng-model="inputVO.owner_role_id"
+								ng-validate="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								ng-change="roleChange()"
+								width="150px"
+								style="line-height:20px;" />
+				</td>
+			</tr>
+			<tr>
+				<th>選擇簽核人員：</th>
+				<td>
+					<e-combobox id="owner_emp_id" name="owner_emp_id"
+								ng-datasource="empList"
+								ng-model="inputVO.owner_emp_id"
+								ng-validate="false" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+				</td>		
+			</tr>
+		</table>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" style="font-weight:bold;" ng-click="saveAndSend()">儲存並送出</button>
+			<button type="button" class="btn btn-info" style="font-weight:bold;" ng-click="save()">儲存</button>
+		</div>
+			
+		<br><br>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="backMainList()">回轄下未處理清單</button>
+			<button type="button" class="btn btn-info" ng-click="backCaseList()">回分行案件列表</button>
+		</div>
+	</div>
+</div>		

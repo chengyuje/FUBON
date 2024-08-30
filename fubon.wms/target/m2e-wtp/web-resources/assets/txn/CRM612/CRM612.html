@@ -1,0 +1,326 @@
+<style>
+/* open dialog */
+.ngdialog.CRM612 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM612 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM612 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM612 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM612.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM612_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:188px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.red{
+	color: red;
+}
+.textarea-CRM612
+    {
+      width: 500px;
+      height: 158px;
+      vertical-align: middle;
+    }
+.tfb_content_icon-CRM612 {     
+	left: 600px;
+    position: absolute;
+    width: 70px;
+    height: 52px;
+    background-image: url(../../assets/images/icon/tfb_icon_a00.gif);
+}    
+    
+  
+.tfb_content_tit-CRM612 { 
+ 	height:52px ;  
+ 	color:#FFF ;
+ 	font-size:24px ;
+  	font-weight:bold ;   
+ 	min-width:410px ;
+ 	width:600px ;  
+ 	background-color:#93c5e1 ;
+ 	white-space: nowrap;
+ } 
+ 
+.form-control-CRM612 {
+    padding: 4px 10px;
+    font-size: 16px;
+    color: #666666;
+    background-color: #f4f4f4;
+    border: 1px solid #999999;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-transition: none;
+    -o-transition: none;
+    transition: none;
+	-webkit-border-radius: 0px;
+	-moz-border-radius:0px;
+	border-radius:0px;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/CRM612/CRM612.js"></script>
+<script type="text/javascript" src="assets/txn/CRM612/CRM612_assets_edit.js"></script>
+<script type="text/javascript" src="assets/txn/CRM612/CRM612_group_add.js"></script>
+<script type="text/javascript" src="assets/txn/KYC310/KYC310.js"></script>
+<div ng-controller="CRM612Controller" ng-cloak>
+	<div id = "AA" class="col-md-12">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >投資屬性測驗歷史紀錄</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping output="outputVO_kyc"
+			input="inputVO"
+			query="kyc_inquire()" list="resultList_kyc"></e-jumping>
+		<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+		<table>
+			<thead>
+				<tr>
+					<th  style="width: 5%">#</th>
+					<th  style="width: 15%">測試/聲明代號</th>
+					<th  style="width: 15%">建立人</th>
+					<th  style="width: 15%">紀錄類型</th>
+					<th  style="width: 15%">風險承受度</th>
+					<th  style="width: 10%">屬性測驗結果</th>
+					<th  style="width: 10%">測試/簽署日期</th>
+					<th  style="width: 15%">分行名稱</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row_kyc in resultList_kyc | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					<td style="text-align: center;">{{ $index + 1 }}</td>
+					<td style="text-align: center;">{{row_kyc.SEQ}}</td>
+					<td style="text-align: center;">{{row_kyc.CREATOR}}{{ row_kyc.EMP_NAME != null ? '-' : ''}}{{row_kyc.EMP_NAME}}</td>
+					<td style="text-align: center;">{{row_kyc.REC_TYPE  | mapping: mappingSet['KYC.REC_TYPE']:'F3'}}</td>
+					<td style="text-align: center;">{{row_kyc.CUST_RISK_AFR}}{{ row_kyc.RL_NAME != null ? '-' : ''}}{{row_kyc.RL_NAME}}</td>
+					<td style="text-align: center;">{{row_kyc.RISKRANGE}}</td>
+					<td style="text-align: center;">{{toJsDate(row_kyc.SIGNOFF_DATE) | date: "yyyy/MM/dd"}}</td>
+					<td style="text-align: center;">{{row_kyc.INVEST_BRANCH_NAME}}</td>
+				</tr>
+			</tbody>
+		</table>
+		</div>
+		</div>
+	</div>
+<!-- 	<div class="col-md-12">	 -->
+<!-- 		<div class="tfb_content"> -->
+<!-- 			<div class="tfb_content_icon-CRM612"></div> -->
+<!-- 			<div class="tfb_content_tit-CRM612"><img src="assets/images/icon/tfb_icon_a15.gif" >客戶投資結構型商品交易經驗或行業經歷設定</div> -->
+<!-- 		</div> -->
+<!-- 		<div class="panel_content"> -->
+<!-- 			<table> -->
+<!-- 				<tr> -->
+<!-- 					<td>交易經驗或行業經驗</td> -->
+<!-- 					<td>&nbsp;&nbsp;&nbsp;</td> -->
+<!-- 					<td>建立人： &nbsp;&nbsp; -->
+<!-- 					<input type="text" id="emp_id" name="emp_id" ng-model="emp_name" e-length-limit="15" ng-disabled="true" readonly></td> -->
+<!-- 				</tr> -->
+<!-- 				<tr> -->
+<!-- 					<td colspan = "4"> -->
+<!-- 						<div ng-repeat="com in com_expList"> -->
+<!-- 							<label> -->
+<!-- 								<input type="checkbox" ng-disabled="true" ng-model='com.SELECTED' ng-required="true"> {{com.DATA}}.{{com.LABEL}} -->
+<!-- 							</label> -->
+<!-- 						</div> -->
+<!-- 					</td> -->
+<!-- 				</tr>				 -->
+<!-- 			</table> -->
+<!-- 		</div> -->
+<!-- 	</div> -->
+	<div class="col-md-12">	
+		<div class="tfb_content">
+			<div class="tfb_content_icon-CRM612"></div>
+			<div class="tfb_content_tit-CRM612"><img src="assets/images/icon/tfb_icon_a15.gif" >客戶保管箱承租資訊</div>
+		</div>
+		<div class="panel_content">
+		 	<div class="gv_tab_sc scroll_y" style="height:220px; white-space: nowrap;">
+				<table>
+					<thead>
+							<tr>
+								<th width="12.5%">分行別</th>
+								<th width="12.5%">分行名稱</th>
+								<th width="12.5%">保管箱號</th>
+								<th width="12.5%">承租日期</th>
+								<th width="12.5%">續租日期</th>
+								<th width="12.5%">截止日期</th>
+								<th width="12.5%">租/押金</th>
+								<th width="12.5%">保証金</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row_voc in resultList_voc | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row_voc.BRANCH_NBR}}</td>
+								<td>{{row_voc.BRANCH_NAME}}</td>
+								<td>{{row_voc.SKBOX}}</td>
+								<td>{{row_voc.SKRDAY | date: "yyyy/MM/dd"}}</td>
+								<td>{{row_voc.SKCDAY | date: "yyyy/MM/dd"}}</td>
+								<td>{{row_voc.SKEDAY | date: "yyyy/MM/dd"}}</td>
+								<td>{{row_voc.SKRAMT | currency: '' : 0}}</td>
+								<td>{{row_voc.SKGAMT | currency: '' : 0}}</td>
+							</tr>
+						</tbody>			
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >客戶群組</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping output="outputVO_group"
+				input="inputVO"
+				query="group_inquire()" list="resultList_group"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="height:220px; white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th width="85%">群組名單名稱</th>
+							<th width="15%"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row_group in resultList_group | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row_group.GROUP_NAME}}</td>
+							<td align = "center">
+								<a class="btn btn-danger btn-circle" ng-click="group_delete(row_group)" ng-disabled="ao_check == '' || ao_check == undefined" >
+									<i class="glyphicon glyphicon-trash"></i>
+								</a>
+							</td>
+						</tr>
+						<!-- 加入群組 -->
+						<tr style="background-color: #FAFAFA;">
+							<td>加入群組名稱清單
+								<e-combobox id="groups" 
+									ng-datasource="mappingSet['Groups']"
+									ng-model="groups"
+									ng-validate="false" 
+									ng-readonly="ao_check == '' || ao_check == undefined" 
+									ng-disabled="ao_check == '' || ao_check == undefined"
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									width="200px"
+									style="line-height:20px;" />
+									<button type="button" class="btn btn-info" 
+										ng-click="group_join()" 
+										ng-disabled = "groups == '' || groups == undefined || ao_check == '' || ao_check == undefined" >確定
+									</button>
+							</td>
+							<td align = "center">
+								<button type="button" class="btn btn-info" 
+									ng-click="group_add()" 
+									ng-disabled="ao_check == ''" >新增
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>		
+
+	<div class="col-md-12">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >其他資產</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping output="outputVO_assets"
+					input="inputVO"
+					query="assets_inquire()" list="resultList_assets"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="height:220px;white-space: nowrap;">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<thead>
+							<tr>
+								<th style="width: 5%"></th>
+								<th style="width: 5%">排序</th>
+								<th>資產名稱</th>
+								<th>金額</th>
+								<th>備註</th>
+								<th style="width: 5%"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row text-center" ng-repeat="row_assets in resultList_assets | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td><a class="btn btn-warning btn-circle" ng-click="assets_edit(row_assets)" function-type="maintenance"><i class="glyphicon glyphicon-pencil"></i></a></td>
+								<td>{{$index + 1}}</td>
+								<td align="left">{{row_assets.ASSETS_NAME}}</td>
+								<td align="right">{{row_assets.ASSETS_AMT | number}}</td>
+								<td align="left">{{row_assets.ASSETS_NOTE}}</td>
+								<td align = "center"><a class="btn btn-danger btn-circle" ng-click="assets_delete(row_assets)" function-type="maintenance"><i class="glyphicon glyphicon-trash" ></i></a></td>
+							</tr>
+							<!-- 新增 -->
+							<tr style="background-color:#FAFAFA;">
+								<td></td>
+								<td></td>				
+			   					<td>
+			   						*<input type="text" id="assets_name" name="assets_name" 
+			   							style="width: 100%"
+			   							ng-model="inputVO.assets_name" e-length-limit="30" required>
+				   				</td>
+			   					<td>
+			   						*<input type="text" id="assets_amt" name="assets_amt" 
+			   							style="width: 100%"
+			   							ng-model="inputVO.assets_amt" 
+			   							e-input-limit="ND"
+			   							e-length-limit="12"
+			   							required>
+			   					</td>
+		                       	<td>
+			   						<input type="text" id="assets_note" name="assets_note" 
+			   							style="width: 100%"
+			   							ng-model="inputVO.assets_note" e-length-limit="30">
+			   					</td>
+		                       	<td align = "center"><button type = "button" class="btn btn-info" ng-click="assets_add()" ng-disabled="parameterTypeEditForm.$invalid" >新增 </button></td>
+		                   	</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

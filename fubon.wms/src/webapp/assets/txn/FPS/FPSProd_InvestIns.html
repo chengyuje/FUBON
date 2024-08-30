@@ -1,0 +1,220 @@
+<div ng-controller="FPSProdInvestInsController">
+  <!-- query -->
+  <div class="block query-box container"
+       ng-class="{'no-area': arrowUp}">
+    <!-- fake title -->
+    <div class="content-wrapper"
+         style="background-color:#bfe2f7;margin-top:-1px;">
+      <div class="content-title font-bold">商品清單</div>
+      <div class="content-body">
+        <div class="toggle-wrapper btn-fps"
+             ng-class="{'btn-fps-disabled':isMore}"
+             ng-click="isMore?'':arrowUp=!arrowUp">
+          查詢條件
+          <img ng-src="{{arrowPath[arrowUp?'down':'up']}}"
+               class="icon">
+        </div>
+      </div>
+    </div>
+
+    <!-- fake body -->
+    <div class="content-wrapper product_query"
+         ng-show="!arrowUp">
+      <table>
+        <tbody>
+          <tr>
+            <th>保險代碼：</th>
+            <td>
+              <input type="text"
+                     class="form-control"
+                     style="text-transform: uppercase;"
+                     placeholder="請輸入..."
+                     ng-model="inputVO.insID"
+                     ng-change="inputVO.insID = inputVO.insID.toUpperCase()"
+                     e-length-limit="16">
+            </td>
+            <th>保險名稱：</th>
+            <td>
+              <input type="text"
+                     class="form-control"
+                     style="text-transform: uppercase;"
+                     placeholder="請輸入..."
+                     ng-model="inputVO.insName"
+                     e-length-limit="255">
+            </td>
+          </tr>
+          <!-- <tr> -->
+          <!-- <th>繳費年期：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.PAY_ANNUAL"
+                          ng-model="inputVO.insAnnual"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false" />
+            </td> -->
+          <!-- <th>險種類別：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.INS_TYPE"
+                          ng-model="inputVO.insType"
+                          ng-validate="false"
+                          ng-readonly="true"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-disabled="true"
+                          ng-required="true" />
+            </td> -->
+          <!-- <th>主附約別：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.INS_MAIN_RIDER"
+                          ng-model="inputVO.isMain"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false" />
+            </td> -->
+          <!-- </tr> -->
+          <tr>
+            <!-- <th>保障年期：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.GUARANTEE_ANNUAL"
+                          ng-model="inputVO.insGuarntee"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false" />
+            </td> -->
+            <th>幣別：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.INS_CURRENCY"
+                          ng-model="inputVO.insCurrency"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+            <th>壽險/年金：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.COM01"
+                          ng-model="inputVO.isCom01"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="search_box_btn text-center">
+        <a class="btn-fps"
+           ng-click="inquire()">查詢</a>
+        <a class="btn-fps"
+           ng-click="init()">清除</a>
+      </div>
+    </div>
+  </div>
+  <!-- !query -->
+  <!-- result -->
+  <div>
+    <e-jumping-once output="outputVO"
+                    list="paramList"
+                    totallist="prodList"></e-jumping-once>
+  </div>
+  <table class="table thickerHead">
+    <thead>
+      <tr>
+        <th style="width:2em;"></th>
+        <th>推薦</th>
+        <th>商品</th>
+        <th>保單幣別</th>
+        <!-- <th>繳費年期</th> -->
+        <th>標的名稱</th>
+        <th>標的代碼</th>
+        <th>風險等級</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat-start="row in paramList"
+          ng-show="row.action!='delete'"
+          class="repeat-row"
+          ng-class-odd="'rowOdd'"
+          ng-class-even="'rowEven'">
+        <td>
+          <input type="checkbox"
+                 ng-model="row.selected"
+                 ng-change="selected(row)">
+        </td>
+        <td>
+          <!-- 推薦 -->
+          <img src="assets/images/ic-crown.svg"
+               ng-if="row.PRD_RANK">
+        </td>
+        <td style="text-align:left;
+                   padding-left:16px;">
+          <!-- 商品代號 -->
+          <a ng-bind="row.PRD_ID+' '+row.INSPRD_NAME"
+             ng-click="go('detail', row)"></a>
+          <!-- <span ng-bind="row.TARGETS"></span> -->
+        </td>
+        <td ng-bind="row.CURR_CD">
+          <!-- 保單幣別 -->
+        </td>
+        <!-- <td ng-bind="row.INSPRD_ANNUAL"> -->
+        <!-- 繳費年期 -->
+        <!-- </td> -->
+        <td>
+          <a class="btn-fps"
+             ng-click="toggleTarget(row)">選擇標的</a>
+        </td>
+        <td>
+          <div ng-repeat="target in row.targets"
+               ng-bind="target.TARGET_ID"></div>
+        </td>
+        <td>
+          <div ng-repeat="target in row.targets"
+               ng-bind="target.PRD_RISK"></div>
+        </td>
+      </tr>
+      <tr ng-repeat-end
+          ng-show="row.showTarget">
+        <td colspan="7"
+            style="padding:0;">
+          <table class="table innerTable">
+            <thead>
+              <th style="width:2em;"></th>
+              <th style="width: 75px;">基金代號</th>
+              <th>代號商品</th>
+              <th style="width: 75px;">風險等級</th>
+            </thead>
+            <tbody>
+              <tr ng-repeat="target in row.targetList">
+                <td>
+                  <input type="checkbox"
+                         ng-model="target.selected">
+                </td>
+                <td ng-bind="target.TARGET_ID"></td>
+                <td ng-bind="target.LINKED_NAME"
+                    style="text-align:left;"></td>
+                <td ng-bind="target.PRD_RISK"></td>
+              </tr>
+              <tr>
+                <td colspan="4">
+                  <a class="btn-fps"
+                     ng-click="selectTarget(row)">選擇</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <!-- !result -->
+</div>

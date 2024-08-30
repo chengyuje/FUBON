@@ -1,0 +1,182 @@
+<style>
+/* open dialog */
+.ngdialog.SOT230 {
+	
+}
+/* dialog panl */
+.modal-dialog.SOT230 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* scroll && height */
+.scroll_SOT230_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+	float: left !important;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.alignright {
+	text-align: right !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT230/SOT230.js"></script>
+<script type="text/javascript" src="assets/txn/SOT230/SOT230_dt.js"></script>
+<div class="SOT230" ng-controller="SOT230Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">委託交易即時交易查詢
+		</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+				data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<h4 class="h4-title">股票委託交易、即時交易查詢</h4>
+				<table>
+					<tr>
+						<th>
+							<table align="LEFT">
+
+								<th>*客戶ID：<input type="text" class="form-control"
+									style="width: 20%; display: inline; text-transform: uppercase;"
+									placeholder="請輸入..." id="custId" name="custId"
+									ng-model="inputVO.custId" ng-disabled="cartList.length > 0"
+									e-length-limit="20" required>
+									<button type="button" class="btn btn-info" ng-click="query()">查詢</button></th>
+							</table>
+						</th>
+						<th class="col-md-4"></th>
+					</tr>
+				</table>
+				<h4 class="h4-title">委託交易</h4>
+				<div class="gv_tab_sc " style="white-space: nowrap;">
+					<e-jumping-once output="outputVO" list="data"
+						totallist="custOrderETFVOs"></e-jumping-once>
+					<table class="text-center middle e-table-freeze" e-height="500px"
+						e-mode="1" e-top="true" e-list="data"
+						style="width: 99.9% !important;">
+						<thead>
+							<tr>
+							<tr>
+								<TH>委託結果</TH>
+								<TH>委託日期</TH>
+								<TH>委託類別</TH>
+								<TH>交易指示到期日</TH>
+								<TH>交易幣別</TH>
+								<TH>商品名稱</TH>
+								<TH>委託股數</TH>
+								<TH>委託價格</TH>
+								<TH>成交股數</TH>
+								<TH>成交價格</TH>
+								<TH>入扣帳帳號</TH>
+
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row"
+								ng-repeat="row in data | limitTo:displayLimit track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+
+								<td ng-if="row.state == '0'">處理中</td>
+								<td ng-if="row.state == '1'">委託成功</td>
+								<td ng-if="row.state == '3'">刪單(取消)</td>
+
+								<TD>{{toJsDate(row.entrustDate)|date:"yyyy-MM-dd"}}</TD>
+								<td ng-if="row.entrustType == 'B'">買進</td>
+								<td ng-if="row.entrustType == 'S'">賣出</td>
+								<td ng-if="row.entrustType != 'B' && row.entrustType != 'S'">未知</td>
+								<TD>{{toJsDate(row.tradeDateEnd)|date:"yyyy-MM-dd"}}</TD>
+								<TD>{{row.entrustCur |
+									mapping:mappingSet['FPS.CURRENCY']:'F3'}}</TD>
+								<TD align="left">{{row.insuranceNo}} {{row.insuranceName}}</TD>
+								<td>{{row.entrustAmt | number}}</td>
+								<TD>{{row.entrustPrice | number:6 }}</TD>
+								<!-- 2017/12/19 alice.shao 問題單0004077: 海外ETF委託查詢  state:'0','1','3'全為處理中-->
+<!-- 								<td ng-if="row.state == '0' || row.state == '3' ">處理中</td> -->
+<!-- 								<td ng-if="row.state != '0' && row.state != '3' ">{{row.tradeAmt -->
+<!-- 									| number}}</td> -->
+<!-- 								<td ng-if="row.state == '0' || row.state == '3' ">處理中</td> -->
+<!-- 								<td ng-if="row.state != '0' && row.state != '3' ">{{row.tradePrice -->
+<!-- 									| number}}</td> -->
+								<td>處理中</td>
+								<td>處理中</td>
+								<TD>{{row.costAcc}}</TD>
+
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<h4 class="h4-title">即時成交</h4>
+				<div class="gv_tab_sc " style="white-space: nowrap;">
+					<e-jumping-once output="outputVO" list="data2"
+						totallist="custFillETFVOs"></e-jumping-once>
+					<table class="text-center middle e-table-freeze" e-height="500px"
+						e-mode="1" e-top="true" e-list="data2"
+						style="width: 99.9% !important;">
+						<thead>
+							<tr>
+							<tr>
+
+
+								<TH>委託日期</TH>
+								<TH>成交日期</TH>
+								<TH>商品名稱</TH>
+								<TH>委託類別</TH>
+								<TH>交易幣別</TH>
+								<TH>委託股數</TH>
+								<TH>成交股數</TH>
+								<TH>成交報價</TH>
+								<TH>委託結果</TH>
+								<TH>入扣帳帳號</TH>
+							</tr>
+						</thead>
+						<tr class="repeat-row"
+							ng-repeat="row in data2 | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<TD>{{toJsDate(row.entrustDate) | date:"yyyy-MM-dd" }}</TD>
+							<TD>{{toJsDate(row.tradeDate) | date:"yyyy-MM-dd" }}</TD>
+							<TD align="left"><a href="/next/{{row}}" onclick="return false "
+								ng-click="next(row)" style="text-decoration: none;">{{row.insuranceNo}} {{row.productName}}</a></TD>
+							<TD ng-if="row.entrustType == 'B'">買進</TD>
+							<TD ng-if="row.entrustType == 'S'">賣出</TD>
+							<TD>{{row.entrustCur |
+								mapping:mappingSet['FPS.CURRENCY']:'F3'}}</TD>
+							<TD>{{row.entrustAmt | number}}</TD>
+							<TD>{{row.tradeAmt | number}}</TD>
+							<TD>{{row.tradePrice | number:6}}</TD>
+							<TD ng-if="row.entrustType == 'B'">{{row.result |
+								mapping:mappingSet['CRM.CRM822_BUY_RESULT']:'F3'}}</TD>
+							<TD ng-if="row.entrustType == 'S'">{{row.result |
+								mapping:mappingSet['CRM.CRM822_SELL_RESULT']:'F3'}}</TD>
+							<TD ng-if="row.entrustType == 'B'">{{row.tradeCostAcct}}</TD>
+							<TD ng-if="row.entrustType == 'S'">{{row.tradeSellAcct}}</TD>
+						</tr>
+					</table>
+			</form>
+		</div>
+	</div>
+</div>

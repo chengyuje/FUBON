@@ -1,0 +1,305 @@
+<style>
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+
+.pointer {
+	cursor: pointer;
+}
+.gv_tab_sc td, .tab_month td{
+	padding: 7px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS302/PMS302.js"></script>
+<script type="text/javascript" src="assets/txn/PMS302/PMS302_detail.js"></script>
+<script type="text/javascript" src="assets/txn/PMS302/PMS302_custDetail.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS302" ng-controller="PMS302Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<!-- <tr>
+							<th>*資料統計日期：</th>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="sCreDate" name="sCreDate"
+										class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sCreDate" is-open="model.a" 
+										datepicker-options="bgn_sDateOptions" ng-readonly="true"
+										ng-change="limitDate();dateChange()" />
+									製作日曆button
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+						</tr> -->
+						<tr><th><font color="red">＊</font>查詢類別：</th>
+							<td><e-combobox id="srchType" name="srchType"
+									ng-datasource="mappingSet['srchType']"
+									ng-model="inputVO.srchType" 
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="true" 
+									width="100px" style="line-height:20px;" /></td>
+							<th>業務處：</th>
+							<td><e-combobox id="region_center_id" name="region_center_id" 
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id" 
+									ng-validate="false"
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" 
+									ng-editable="false"
+									ng-format="F3" 
+									ng-required="false" 
+									ng-change="ChangeRegion()"
+									width="150px" style="line-height:20px;" /></td>
+							<th>營運區：</th>
+							<td><e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST" 
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" 
+									ng-editable="false"
+									ng-format="F3" 
+									ng-required="false" 
+									ng-change="ChangeArea()"
+									width="100px" style="line-height:20px;" /></td>
+							<th>分行：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST" 
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" 
+									ng-editable="false"
+									ng-format="F1" 
+									ng-required="false" 
+									ng-change="ChangeBranch()"
+									width="130px" style="line-height:20px;" /></td>
+							
+						</tr>
+						<tr>
+							<th ng-show="inputVO.srchType=='MTD'" ><font color="red">＊</font>資料月份：</th>
+							<td ng-show="inputVO.srchType=='MTD'" ><e-combobox id="eTime"
+										ng-datasource="ymList" ng-model="inputVO.tx_ym"
+									 	ng-validate="false" ng-readonly="false" ng-editable="false"
+										ng-format="F3" ng-required="inputVO.srchType=='MTD'" width="200px" height="30px"
+										style="line-height:20px;" />
+							</td>
+							<th> 理專：</th>
+							<td><e-combobox id="ao_code" name="ao_code"
+									ng-datasource="AO_LIST" 
+									ng-model="inputVO.ao_code"
+									ng-validate="false" 
+									ng-disabled="disableAoCombo"
+									ng-readonly="disableAoCombo" 
+									ng-editable="false" 
+									ng-format="F1"
+									ng-required="false" 
+									ng-change="ChangeAo_code()" 
+									width="90px" style="line-height:20px;" /></td>
+						</tr>	
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info"
+					ng-click="inquireInit();init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()"
+					ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="query()"
+				list="paramList"></e-jumping>
+			<div algin="left">
+				<table>
+					<tr>
+						<td align="right">產出頻率：</td>
+						<td align="left">每日</td>
+					</tr>
+					<tr>
+						<td align="left">產出日：</td>
+						<td align="left">{{toJsDate(cList) | date:'yyyy/MM/dd HH:mm:ss'}}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="flag == 'MAST'">
+					<thead>
+						<tr>
+							<th rowspan="2" style="padding:7px 40px;">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2" style="padding:7px 25px;">分行</th>
+							<th rowspan="2" style="padding:7px 15px;">AO Code</th>
+							<!-- <th colspan="5">上一營業日戰報</th> -->
+							<th ng-if="inputVO.srchType !='MTD' && inputVO.srchType !='HIS_MON'"colspan="5">當日投保日收即時資料</th>
+							<th ng-if="inputVO.srchType =='MTD' || inputVO.srchType =='HIS_MON'" colspan="5">MTD日收即時資料</th>
+						</tr>
+						<tr>
+							<!-- <th>投資實績(E)</th>
+							<th>保險實績(F)</th>
+							<th>投保實績(A)</th>
+							<th>投保目標(B)</th>
+							<th>達成率(A/B)</th> -->
+							<th>投資實績(E)</th>
+							<th>保險實績(F)</th>
+							<th>投保實績(A)</th>
+							<th ng-if="inputVO.srchType !='MTD' && inputVO.srchType !='HIS_MON'">投保日目標(B)</th>
+							<th ng-if="inputVO.srchType =='MTD'|| inputVO.srchType =='HIS_MON'">投保月目標(B)</th>
+							<th>達成率(A/B)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.CENTER_NAME}}</td>
+							<td>{{row.AREA_NAME}}</td>
+							<td>{{row.BRA_NBR}}-{{row.BRANCH_NAME}}</td>
+							<td ng-show="row.AO_CODE=='000'"><a ng-click="bn(row)" class="pointer">{{row.AO_CODE}}</a></td>
+							<td ng-show="row.AO_CODE!='000'"><a ng-click="bn(row)" class="pointer">{{row.AO_CODE}}-{{row.EMP_NAME}}</a></td>
+							<!-- <td align="right">{{0+row.INV_ACT | number:0}}</td>
+							<td align="right">{{0+row.INS_ACT | number:0}}</td>
+							<td align="right">{{0+row.INSU_ACT | number:0}}</td>
+							<td align="right">{{0+row.AMOUNT | number:0}}</td>
+							<td align="right">{{0+((0+row.INSU_ACT)/(0+row.AMOUNT))*100 | number:2}}%</td> -->
+							<td align="right">{{0+row.INV_FEE | number:0}}</td>
+							<td align="right">{{0+row.INS_FEE | number:0}}</td>
+							<td align="right">{{0+row.TOT_FEE | number:0}}</td>
+							<td align="right">{{0+row.TOT_TAR | number:0}}</td>
+							<td align="right">{{0+row.TOT_DAY_RATE || 0 | number:2}}%</td>
+						</tr>
+					</tbody>
+				</table>
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList2" ng-show="flag == 'DETAIL'">
+					<thead>
+						<tr>
+							<th rowspan="2">編號</th>
+							<th rowspan="2">客戶ID</th>
+							<th rowspan="2" style="padding:7px 20px;">姓名</th>
+							<th colspan="8">投資商品</th>
+							<th colspan="5">保險商品</th>
+							<th rowspan="2">投保合計</th>
+						</tr>
+						<tr>
+							<th>基金</th>
+							<th>SI</th>
+							<th>SN</th>
+							<th>DCI</th>
+							<th>海外債</th>
+							<th>海外股票</th>
+							<th>海外ETF</th>
+							<th>匯兌損益</th>
+							<th>小計</th>
+							<th>躉繳</th>
+							<th>短年期</th>
+							<th>長年期</th>
+							<th>投資型</th>
+							<th>小計</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList2 track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{$index+1}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td align="right">{{0+row.MFD | number:0}}</td>
+							<td align="right">{{0+row.SI | number:0}}</td>
+							<td align="right">{{0+row.SN | number:0}}</td>
+							<td align="right">{{0+row.DCI | number:0}}</td>
+							<td align="right">{{0+row.BND | number:0}}</td>
+							<td align="right">{{0+row.STOCK | number:0}}</td>
+							<td align="right">{{0+row.ETF | number:0}}</td>
+							<td align="right">{{0+row.EX_GAIN_LOSS | number:0}}</td>
+							<td align="right">{{0+row.TOTAL_INVE | number:0}}</td>
+							<td align="right">{{0+row.WHO_PAY | number:0}}</td>
+							<td align="right">{{0+row.SHORT_YEAR | number:0}}</td>
+							<td align="right">{{0+row.LONG_YEAR | number:0}}</td>
+							<td align="right">{{0+row.INVEST | number:0}}</td>
+							<td align="right">{{0+row.TOTAL_INS | number:0}}</td>
+							<td align="right">{{0+row.TOTAL_INSU | number:0}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div algin="left">
+				<table>
+                    <!-- 單號 : 5679 -->
+                    <tr>
+                        <td>說明：單位為元，每次更新時間為9:30、13:30、16:30、18:00</td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td>※投資收益含基金小額，海外債.海外ETF/海外股票之收益為鍵機資料，最後計績仍以商品分配／交割月為計績時點。</td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td>※保險收益未以85折計算。</td>
+                        <td></td>
+                    </tr>
+
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

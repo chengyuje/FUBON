@@ -1,0 +1,99 @@
+<style>
+    .CMMGR006 .center {
+        text-align: center;
+    }
+
+    .CMMGR006 .pad {
+        padding: 25px 0px 25px 0px;
+    }
+
+</style>
+
+<script type="text/javascript" src="assets/txn/CMMGR006/CMMGR006.js"></script>
+<script type="text/javascript" src="assets/txn/CMMGR006/CMMGR006_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/COMMON/CommonUtil.js"></script>
+<div class="CMMGR006" ng-controller="CMMGR006_Controller">
+    <div class="tfb_content">
+        <div class="tfb_content_icon"></div>
+        <div class="tfb_content_tit">
+            <img src="assets/images/icon/tfb_icon_a15.gif"><span ng-bind="'系統參數設定'"></span>
+        </div>
+    </div>
+    <div class="panel_content">
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon" ng-bind="'參數種類'"></span>
+                    <input type="text" class="form-control" ng-model="inputVO.paramType" placeholder="請輸入參數種類～"
+                           maxlength="50" autofocus>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon" ng-bind="'參數名稱'"></span>
+                    <input type="text" class="form-control" ng-model="inputVO.ptypeName" placeholder="請輸入參數名稱～"
+                           maxlength="100">
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon" ng-bind="'參數類型'"></span>
+                    <e-combobox ng-datasource="mappingSet['TBSYSPARAMTYPE_PTYPE_BUSS']"
+                                ng-model="inputVO.ptypeBuss"
+                                ng-format="F3"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="center pad">
+                <button type="button" class="btn btn-primary" ng-click="inquire()" function-type="query"
+                        data-toggle="tooltip" title="查詢有哪些參數種類～">
+                    <span class="glyphicon glyphicon-search"></span>
+                    <span ng-bind="'查詢'"></span>
+                </button>
+                <button type="button" class="btn btn-info" ng-click="init()" data-toggle="tooltip" title="清除輸入條件與結果">
+                    <span class="glyphicon glyphicon-erase"></span>
+                    <span ng-bind="'清除'"></span>
+                </button>
+                <button type="button" class="btn btn-warning" ng-click="edit()" function-type="maintenance"
+                        data-toggle="tooltip" title="有新的參數種類與編碼要新增嗎？">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span ng-bind="'新增'"></span>
+                </button>
+                <button type="button" class="btn btn-success" ng-click="exportExcel()" function-type="export"
+                        data-toggle="tooltip" title="匯出參數資料到 Excel！">
+                    <span class="glyphicon glyphicon-export"></span>
+                    <span ng-bind="'匯出'"></span>
+                </button>
+            </div>
+        </div>
+
+        <e-jumping-once output="outputVO" list="subData" totallist="paramData"></e-jumping-once>
+
+        <div class="gv_tab_sc">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th ng-bind="'參數種類'"></th>
+                    <th ng-bind="'參數名稱'"></th>
+                    <th ng-bind="'參數類型'"></th>
+                    <th ng-bind="'生效日期'"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="repeat-row" ng-repeat="row in subData track by $index" data-toggle="tooltip"
+                    title="{{row.PTYPE_DESC}}">
+                    <td><a onclick="return false" ng-click="edit(row)" ng-bind="row.PARAM_TYPE"></a></td>
+                    <td ng-bind="row.PTYPE_NAME"></td>
+                    <td class="center"
+                        ng-bind="row.PTYPE_BUSS | mapping:mappingSet['TBSYSPARAMTYPE_PTYPE_BUSS']:'F3'"></td>
+                    <td class="center" ng-bind="row.CREATETIME | date:'yyyy-MM-dd HH:mm:ss'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

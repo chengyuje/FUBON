@@ -1,0 +1,241 @@
+<style> 
+    .PMS418 .datewidth {
+        width: 180px !important;
+    }
+
+    .PMS418 .rstable thead tr th {
+        vertical-align: middle;
+    }
+
+    .PMS418 .noticed {
+        color: #FF0000;
+    }
+</style>
+<script type="text/javascript" src="assets/txn/PMS418/PMS418.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/COMMON/CommonUtil.js"></script>
+<script type="text/javascript" src="assets/txn/PMS418/PMS418_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS418/PMS418_EXCLUDEIP.js"></script>
+<div class="PMS418" ng-controller="PMS418Controller">
+    <div class="tfb_content">
+        <div class="tfb_content_icon"></div>
+        <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"/>查詢條件</div>
+    </div>
+    <div class="panel_content">
+        <div class="search_table search_box3 scroll_y">
+            <table>
+                <tr>
+                    <th>資料統計日期：</th>
+                    <td colspan="3">
+                        <div class="input-group datebox datewidth" style="float: left">
+                            <input type="text"
+                                   class="form-control"
+                                   uib-datepicker-popup="yyyy/MM/dd"
+                                   ng-model="inputVO.sCreDate"
+                                   is-open="calendar.start"
+                                   datepicker-options="summary.sDateOptions"
+                                   ng-readonly="true"
+                                   ng-change="limitDate(summary, inputVO.sCreDate, inputVO.eCreDate)"/>
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="openCalendar($event,'start')">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div style="float: left">&nbsp;～ &nbsp;</div>
+                        <div class="input-group datebox datewidth">
+                            <input type="text"
+                                   class="form-control"
+                                   uib-datepicker-popup="yyyy/MM/dd"
+                                   ng-model="inputVO.eCreDate"
+                                   datepicker-options="summary.eDateOptions"
+                                   is-open="calendar.end"
+                                   ng-readonly="true"
+                                   ng-change="limitDate(summary, inputVO.sCreDate, inputVO.eCreDate)"/>
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="openCalendar($event,'end')">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>業務處：</th>
+                    <td>
+                        <e-combobox ng-datasource="REGION_LIST"
+                                    ng-model="inputVO.region_center_id"
+                                    ng-disabled="disableRegionCombo"
+                                    ng-readonly="disableRegionCombo"
+                                    ng-format="F3"
+                                    ng-change="ChangeRegion()"
+                                    width="200px"/>
+                    </td>
+                    <th>營運區：</th>
+                    <td>
+                        <e-combobox ng-datasource="AREA_LIST"
+                                    ng-model="inputVO.branch_area_id"
+                                    ng-disabled="disableAreaCombo"
+                                    ng-readonly="disableAreaCombo"
+                                    ng-format="F3"
+                                    ng-change="ChangeArea()"
+                                    width="200px"/>
+                    </td>
+                    <th>分行別：</th>
+                    <td>
+                        <e-combobox ng-datasource="BRANCH_LIST"
+                                    ng-model="inputVO.branch_nbr"
+                                    ng-disabled="disableBranchCombo"
+                                    ng-readonly="disableBranchCombo"
+                                    ng-format="F1"
+                                    ng-change="ChangeBranch()"
+                                    width="200px"/>
+                    </td>
+                </tr>
+                <tr>
+                	<th>IP：</th>
+					<td><input class="form-control" type="text" placeholder="請輸入..." id="custIDSearch" name="ipAddrSearch" ng-model="inputVO.ipAddrSearch" e-length-limit="60"></td>
+					<th>客戶ID：</th>
+					<td><input class="form-control" type="text" placeholder="請輸入..." id="custIDSearch" name="custIDSearch" ng-model="inputVO.custIDSearch" e-length-limit="60"></td>
+					<th>已回覆/未回覆：</th>
+					<td>
+						<e-combobox id="noteStatus" name="noteStatus"
+									ng-paramtype="PMS.NOTE_STATUS"
+									ng-model="inputVO.noteStatus"
+									ng-validate="false"
+									ng-readonly="false"
+									ng-editable="false"
+									ng-format="F3"
+									width="200px"
+									style="line-height:20px;"/>
+					</td>
+				</tr>
+            </table>
+        </div>
+        <div class="search_box_btn text-center">
+            <button type="button" class="btn btn-primary" ng-click="inquireInit();query()" function-type="query"><span class="glyphicon glyphicon-search"></span>查詢</button>
+            <button type="button" class="btn btn-info" ng-click="init()"><span class="glyphicon glyphicon-erase"></span>清除</button>
+            <button type="button" class="btn btn-success" ng-click="exportRPT()" function-type="export" ng-disabled="!ipData.length"><span class="glyphicon glyphicon-save"></span>匯出</button>
+            <button type="button" class="btn btn-default" ng-click="updExcludeIP()" function-type="export" ng-if="inputVO.memLoginFlag == 'ALL'"><span class="glyphicon glyphicon-plus"></span>上傳排除IP</button>
+        </div>
+    </div>
+    <div class="tfb_content">
+        <div class="tfb_content_icon"></div>
+        <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"/>查詢結果</div>
+    </div>
+    <div class="panel_content">
+<!--         <e-jumping output="outputVO" input="inputVO" query="query()" list="ipData"></e-jumping> -->
+		<e-jumping-once output="outputVO" list="data" totallist="ipData"></e-jumping-once>
+        <div algin="left">
+            <div algin="left">
+                <table>
+                    <tr>
+                        <td>產出頻率：</td>
+                        <td>每日</td>
+                    </tr>
+                    <tr>
+                        <td>產出日：</td>
+                        <td ng-bind="toJsDate(ipData[0].CREATETIME) | date:'yyyy/MM/dd'"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+            <table class="table-bordered td_center e-table-freeze"  e-left="6" e-height="700px" e-mode="1" e-top="true" e-list="data">
+                <thead>
+	                <tr>
+	                    <th>更新<br>資料</th>
+	                    <th>報表日期</th>
+	                    <th>分行代碼</th>
+	                    <th>分行名稱</th>
+	                    <th>客戶ID</th>
+	                    <th>客戶姓名</th>
+	                    <th>高齡客戶</th>
+	                    <th>客戶所屬理專</th>
+	                    <th>交易時間</th>
+	                    <th>交易項目</th>
+	                    <th>IP</th>
+						<th>查證方式</th>
+						<th>電訪錄音編號</th>
+						<th>客戶背景或關係</th>
+						<th>具體說明</th>
+	                    <th>初判異常轉法遵部調查</th>
+	                    <th>首次<br>建立時間</th>
+						<th>最新<br>異動人員</th>
+						<th>最新<br>異動日期</th>
+	                </tr>
+                </thead>
+                <tbody>
+	                <tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center"><input type="checkbox" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"></td>
+	                    <td>{{toJsDate(row.CREATETIME) | date:'yyyyMMdd'}}</td>
+	                    <td>{{row.BRANCH_NBR}}</td>
+	                    <td>{{row.BRANCH_NAME}}</td>
+	                    <td>{{row.CUST_ID}}</td>
+	                    <td>{{row.CUST_NAME}}</td>
+	                    <td>{{row.CUST_AGE >= 65 ? row.CUST_AGE : ''}}</td>
+	                    <td>{{row.AO_EMP_NAME}}</td>
+	                    <td>{{row.TXN_TIME}}</td>
+	                    <td><a ng-click="detail(row)">{{row.TASK_NM}}</a></td>
+	                    <td>{{row.IP_ADDR}}</td>
+	                    <td style="text-align:left;">
+	                    	<e-combobox id="checkType" name="checkType"
+										ng-datasource="mappingSet['PMS.CHECK_TYPE']"
+										ng-model="row.NOTE_TYPE"
+										ng-validate="false"
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="updateFlag(row)"
+										ng-readonly="!chkMaintenance"
+										ng-disabled="!chkMaintenance"
+										style="line-height:20px;display:inline;" />
+	                    	<input type="text" class="form-control" style="width: 300px;display:inline;" ng-blur="updateFlag(row)" ng-model="row.NOTE" e-length-limit="200" placeholder="請補充查證方式..." ng-disabled="!chkMaintenance" ng-if="row.NOTE_TYPE == 'O'"/>
+	                    </td>
+	                    <td>
+							<input 	type="text" class="form-control" style="width: 150px;display:inline;" 
+									e-length-limit="12" 
+									e-input-limit="ND"
+									ng-model="row.RECORD_SEQ" 
+									placeholder="請輸入電訪錄音編號..." 
+									ng-if="row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A'" 
+									ng-disabled="!chkMaintenance || row.RECORD_YN == 'N'"
+									ng-blur="updateFlag(row)"/>
+						</td>
+	                    <td>
+	                   	 	<e-combobox id="custBase" name="custBase" 
+										ng-datasource="mappingSet['PMS.CUST_BASE_IP']"
+										ng-model="row.CUST_BASE"
+										ng-validate="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="updateFlag(row);setDefaultVal(row);"
+										ng-readonly="!chkMaintenance" 
+										ng-disabled="!chkMaintenance" 
+										style="line-height:20px;display:inline;" />
+							<input type="text" class="form-control"  style="width:300px;display:inline;" ng-blur="updateFlag(row)" ng-model="row.NOTE2" e-length-limit="600" placeholder="請輸入..." ng-disabled="!chkMaintenance" ng-if="row.CUST_BASE == 'O'">	                    
+	                    </td>
+	                    <td><input type="text" class="form-control" style="width: 300px" ng-blur="updateFlag(row)" ng-model="row.NOTE3" e-length-limit="600" ng-disabled="!chkMaintenance" placeholder="請輸入具體原因或用途..."/></td>
+	                    <td align="center">
+	                        <label>是ー通報有異常<input type="radio" value="Y" ng-change="updateFlag(row)" ng-model="row.EMP_DLG" ng-disabled="!chkMaintenance" /></label>&emsp;
+	                        <label>否ー非行員代客戶操作<input type="radio" value="N" ng-change="updateFlag(row)" ng-model="row.EMP_DLG" ng-disabled="!chkMaintenance" /></label>
+	                    </td>
+	                    <td>{{row.FIRSTUPDATE}}</td>
+	                    <td>{{row.MODIFIER}}</td>
+	                    <td>{{row.LASTUPDATE}}</td>
+	                </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div align="center" ng-show="ipData.length && chkMaintenance">
+            <button type="button" class="btn btn-success" ng-click="save()" function-type="maintenance">
+            	<span class="glyphicon glyphicon-floppy-disk"></span>儲存
+            </button>
+        </div>
+		<div>
+			提醒：<br>
+			(1) 每位客戶請務必依各檢核欄位進行說明留軌，勿僅填<span class="noticed">｢同上｣或｢同前｣</span>等字義，並<span class="noticed">確認非為個金RM代理操作</span>。<br>
+			(2) 查核重點應確認不同客戶出現於相同IP之原因及是否為行員代客戶操作。
+		</div>
+    </div>
+</div>

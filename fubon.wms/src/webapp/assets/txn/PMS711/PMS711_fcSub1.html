@@ -1,0 +1,141 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS711_fcSub1 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 70%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.table-border tr input {
+	width:100px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS711/PMS711_fcSub1.js"></script>
+<div ng-controller="PMS7111_fcSubController" ng-cloak>
+	<div class="modal-dialog PMS711_fcSub1">
+	
+				
+	
+		<div class="modal-content">
+			
+			<div class="tfb_content modal-header">
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{subName}}</h4>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+<!-- 						<span id="met01_flag0" class="table-span common table-span2" ng-show="PMS_711TYPE == '房貸(非購屋+額度式)新承作目標'" -->
+<!-- 							ng-click="changeToCklcmb()">房貸(非購屋)</span> -->
+<!-- 						<span id="met01_flag1" class="table-span special" ng-show="PMS_711TYPE == '房貸(非購屋+額度式)新承作目標'" -->
+<!-- 							ng-click="changeToTbsymb()">房貸(額度式)</span>						 -->
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="batchUpload1(inputVO.date_year)">上傳資料</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+			<e-jumping ng-if="personType==3 || personType==5" output="outputVO" input="inputVO" query="select()"
+					list="showList1" ></e-jumping>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+					
+						<table class="table-bordered table-border">
+							<tr>
+								<th rowspan="2" ng-if="personType==1 || personType==2">理專職級</th>
+								<th rowspan="2" ng-if="personType==3 || personType==5">分行代碼</th>
+								<th rowspan="2" ng-if="personType==3 ||personType==5">組別</th>
+								<th rowspan="2" ng-if="personType==3 ||personType==5">分行名稱</th>
+<!-- 								<th colspan="2" ng-repeat="x in showList">{{x.DATE_YEARMON}}</th> -->
+								<th colspan="2" >{{year}}/01</th>
+								<th colspan="2" >{{year}}/02</th>
+								<th colspan="2" >{{year}}/03</th>
+								<th colspan="2" >{{year}}/04</th>
+								<th colspan="2" >{{year}}/05</th>
+								<th colspan="2" >{{year}}/06</th>
+								<th colspan="2" >{{year}}/07</th>
+								<th colspan="2" >{{year}}/08</th>
+								<th colspan="2" >{{year}}/09</th>
+								<th colspan="2" >{{year}}/10</th>
+								<th colspan="2" >{{year}}/11</th>
+								<th colspan="2" >{{year}}/12</th>
+
+							</tr>
+							<tr>
+<!-- 								<th ng-repeat-start="x in showList">滲透率</th> -->
+<!-- 								<th ng-repeat-end>淨增戶數</th> -->
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+								<th >滲透率</th>
+								<th >淨增戶數</th>
+
+							</tr>
+							
+							<tr ng-repeat="row in showList1 | limitTo:displayLimit track by $index">
+								<td style="color:blue; text-align:center">{{row.BRANCH_NBR}}</td>
+								<td style="color:blue; text-align:center" ng-if="personType==3 ||personType==5">{{row.GROUP_TYPE}}</td>
+								<td style="color:blue; text-align:center" ng-if="personType==3 ||personType==5">{{row.BRANCH_NAME}}</td>
+								<td class="text-right">
+									<!-- <input type="text" style="text-align:right" ng-model="row." e-input-limit='N' e-length-limit="22"/> -->
+<!-- 									{{x.BR}} -->
+									{{row.MONTH1_RATE}}
+								</td>
+								<td class="text-right">
+									<!-- <input type="text" style="text-align:right" ng-model="row." e-input-limit='N' e-length-limit="22"/> -->
+									{{row.MONTH1_M_GOAL}}
+								</td>
+								
+								<td class="text-right">{{row.MONTH2_RATE}}</td>
+								<td class="text-right">{{row.MONTH2_M_GOAL}}</td>
+								<td class="text-right">{{row.MONTH3_RATE}}</td>
+								<td class="text-right">{{row.MONTH3_M_GOAL}}</td>
+								<td class="text-right">{{row.MONTH4_RATE}}</td>
+								<td class="text-right">{{row.MONTH4_M_GOAL}}</td>
+								<td class="text-right">{{row.MONTH5_RATE}}</td>
+								<td class="text-right">{{row.MONTH5_M_GOAL}}</td>
+								<td class="text-right">{{row.MONTH6_RATE}}</td>
+								<td class="text-right">{{row.MONTH6_M_GOAL}}</td>
+								<td class="text-right">{{row.MONTH7_RATE}}</td>
+								<td class="text-right">{{row.MONTH7_M_GOAL}}</td>
+								<td class="text-right">{{row.MONTH8_RATE}}</td>
+								<td class="text-right">{{row.MONTH8_M_GOAL}}</td>
+								<td class="text-right">{{row.MONTH9_RATE}}</td>
+								<td class="text-right">{{row.MONTH9_M_GOAL}}</td>
+								<td class="text-right">{{row.MONTH10_RATE}}</td>
+								<td class="text-right">{{row.MONTH10_M_GOAL}}</td>
+								<td class="text-right">{{row.MONTH11_RATE}}</td>
+								<td class="text-right">{{row.MONTH11_M_GOAL}}</td>
+								<td class="text-right">{{row.MONTH12_RATE}}</td>
+								<td class="text-right">{{row.MONTH12_M_GOAL}}</td>
+								
+								
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+			
+		</div>
+	</div>

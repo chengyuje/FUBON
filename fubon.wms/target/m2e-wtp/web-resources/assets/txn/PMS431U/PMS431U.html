@@ -1,0 +1,166 @@
+<style>
+.PMS431U .datewidth {
+	width:180px !important;
+	float: left !important;
+}
+
+.PMS431U .rstable thead tr th {
+    vertical-align: middle;
+}
+.PMS431U .noticed {
+    color: #FF0000;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS431/PMS431.js"></script>
+<script type="text/javascript" src="assets/txn/PMS431/PMS431_REVIEW.js"></script>
+
+<script type="text/javascript" src="assets/txn/PMS431U/PMS431U.js"></script>
+<script type="text/javascript" src="assets/txn/PMS431U/PMS431U_REVIEW.js"></script>
+
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/COMMON/CommonUtil.js"></script>
+
+<div class="PMS431U" ng-controller="PMS431UController">
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*統計月份：</th>
+							<td>						 						 
+								<e-combobox id="dataMonth" name="dataMonth" 
+											ng-datasource="mappingSet['timeE']"
+											ng-model="inputVO.sCreDate"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-required="true"
+											ng-change="dateChange()"
+											ng-format="F3"
+											width="150px"
+											style="line-height:20px;" />														
+							</td>
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td>
+								<e-combobox id="region_center_id" name="region_center_id"
+											ng-paramtype="PMS.UHRM_RC"
+											ng-model="inputVO.uhrmRC"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeRegion()"
+											width="150px"
+											style="line-height:20px;" />
+							</td>						
+							<th>業務中心：</th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+											ng-paramtype="PMS.UHRM_OP"
+											ng-model="inputVO.uhrmOP"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeArea()"
+											width="150px"
+											style="line-height:20px;" />
+							</td>
+							<th></th>
+							<td>
+							</td>
+						</tr>
+						<tr>
+							<th>行員ID：</th>
+							<td><input class="form-control" type="text" placeholder="請輸入..." id="aoEmpCID" name="aoEmpCID" ng-model="inputVO.aoEmpCID" e-length-limit="60" style="width:150px; text-transform: uppercase;"></td>
+							<th>類別：</th>
+							<td>
+								<e-combobox id="noteStatus" name="noteStatus"
+											ng-paramtype="PMS.HIGH_RISK_INV_TYPE"
+											ng-model="inputVO.highRiskInvType"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											width="150px"
+											style="line-height:20px;"/>
+							</td>
+							<th>已回覆/未回覆：</th>
+							<td>
+								<e-combobox id="noteStatus" name="noteStatus"
+											ng-paramtype="PMS.NOTE_STATUS"
+											ng-model="inputVO.noteStatus"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											width="150px"
+											style="line-height:20px;"/>
+							</td>
+						</tr>			
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query();" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="!data.length"  function-type="export">匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">		    
+        	<e-jumping output="outputVO" input="inputVO" query="query()" list="data"></e-jumping>
+   			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+		        <b>產出頻率：</b>每月10號&emsp;&emsp;&emsp;<b>產出日：</b>{{data[0].CREATETIME}}
+	            <table class="table e-table-freeze td_center" e-height="635px" e-mode="3" e-top="true" e-left="6" e-list="data">
+	                <thead>
+		                <tr>
+		                	<th>查核</th>
+		                    <th>交易統計年月</th>
+		                    <th>行員歸屬行</th>
+		                    <th>行員姓名</th>
+		                    <th>行員ID</th>
+		                    <th>類別</th>
+		                    <th>累積異動金額</th>
+		                    <th>當月底活存餘額(供參考)</th>
+		                    <th>已回覆筆數</th>
+		                    <th>未回覆筆數</th>
+		                </tr>
+	                </thead>
+	                <tbody>
+		                <tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td><button type="button" class="btn btn-warning btn-circle" ng-click="openReview('search', row, 'UHRM')" ><i class="glyphicon glyphicon-search" title="檢視"></i></button></td>
+		                    <td>{{row.SNAP_YYYYMM}}</td>
+		                    <td>{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+		                    <td>{{row.AO_EMP_NAME}}</td>
+		                    <td>{{row.AO_EMP_CID}}</td>
+		                    <td>{{row.KIND_TYPE | mapping:HIGH_RISK_INV_TYPE:'F3' }}</td>
+		                    <td>{{row.TX_AMT_TWD | number:0}}</td>
+		                    <td>{{row.BAL_TWD_ME | number:0}}</td>
+		                    <td>{{row.RESPONDING}}</td>
+		                    <td>{{row.NOT_RESPONDING}}</td>
+		                </tr>
+	                </tbody>
+	            </table>
+	            <br>
+   			</div>
+		</div>
+	</div>
+</div>

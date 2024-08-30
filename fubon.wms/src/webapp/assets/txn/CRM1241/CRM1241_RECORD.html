@@ -1,0 +1,116 @@
+<style>
+/* open dialog */
+.ngdialog.CRM1241_RECORD {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM1241_RECORD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+
+</style>
+<div ng-controller="CRM1241_RECORDController" ng-cloak>
+	<div class="modal-dialog CRM1241_RECORD">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{inputVO.branch_name}}陪訪紀錄</h4>
+			</div>
+			<div class="modal-body">
+				<div class="search_table search_box">
+					<table>		
+						<tr>
+							<th>日期:</th>
+							<td>{{toJsDate(inputVO.as_date) | date:'yyyy/MM/dd'}}</td>
+							<th>時間:</th>
+							<td>{{inputVO.as_datetime_bgn}} ~ {{inputVO.as_datetime_end}}</td>
+						</tr>
+						
+						<tr>
+							<th>客戶:</th>
+							<td>{{inputVO.cust_name}}</td>
+							<th>理專:</th>
+							<td>{{inputVO.ao_name}} - {{inputVO.ao_job_rank}}</td>
+						</tr>
+						
+						<tr>
+							<th>陪訪目的:</th>
+							<td>
+								<e-combobox id="visit_purpose" 
+								ng-datasource="mappingSet['PMS.VISIT_PURPOSE']"
+								ng-model="inputVO.visit_purpose"
+	   							ng-validate="false" 
+	   							ng-readonly="false" 
+	   							ng-editable="false"
+	   							ng-format="F3"
+	   							ng-required="false"
+	   							ng-disabled="type == '1' || inputVO.status == '4C'  || inputVO.complete_yn == 'Y'"
+	   							width="150px"
+	   							style="line-height:20px;" />
+							</td>
+							<th>建議商品:</th>
+							<td>
+							<input type="text" id="product_name" name="product_name" ng-model="inputVO.product_name" disabled />
+							<input type="image" src="assets/images/magnifier.jpg"  alt="查詢建議商品" name="query_product" id="query_product" ng-click="query_product(row)" ng-disabled="type == '1' || inputVO.status == '4C'  || inputVO.complete_yn == 'Y'"/>
+							</td>
+						</tr>
+						
+						<tr>
+							<th>關鍵議題:</th>
+							<td>
+								<input type="text" id="key_issue" name="key_issue" ng-model="inputVO.key_issue" ng-disabled="type == '1' || inputVO.status == '4C'  || inputVO.complete_yn == 'Y'">
+							</td>
+							<th>銷售成功:</th>
+							<td>
+								<e-combobox id="sell_out_yn" 
+								ng-datasource="mappingSet['SELL_OUT_YN']"
+								ng-model="inputVO.sell_out_yn"
+	   							ng-validate="false" 
+	   							ng-readonly="false" 
+	   							ng-editable="false"
+	   							ng-format="F3"
+	   							ng-required="false"
+	   							width="150px"
+	   							ng-disabled="type == '1' || inputVO.status == '4C'  || inputVO.complete_yn == 'Y'"
+	   							style="line-height:20px;" />
+							</td>
+						</tr>
+					</table>
+					<!-- 輔銷理專 -->
+					<!---------------------------------------------------------------------------------------------->
+					<!-- 輔銷科長 -->
+					<table ng-show = "type == '1'">	
+						<tr>
+							<th>要點描述(理專):</th>
+							<td>
+								<textarea rows="5" cols="75" id="visit_memo_ao" ng-model="inputVO.visit_memo_ao" ng-disabled="type == '1' || inputVO.status == '4C'  || inputVO.complete_yn == 'Y'"></textarea>
+							</td>
+						</tr>
+					</table>
+					<table>	
+						<tr>
+							<th>要點描述(輔銷):</th>
+							<td>
+								<textarea rows="5" cols="75" id="visit_memo_as" ng-model="inputVO.visit_memo_as" ng-disabled="type == '1' || inputVO.status == '4C'  || inputVO.complete_yn == 'Y'"></textarea>
+							</td>
+						</tr>
+					</table>
+					<div class="search_box_btn text-center" ng-show = "type == '2' && inputVO.status != '4C' &&  inputVO.complete_yn != 'Y'">
+						<button type="button" class="btn btn-info" ng-click="save_record()">儲存</button>
+						<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+					</div>					
+					<div class="search_box_btn text-center" ng-show = "type == '1' || inputVO.status == '4C'  || inputVO.complete_yn == 'Y'">
+						<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+					</div>
+					<!-- 輔銷科長 -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

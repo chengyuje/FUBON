@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+  http://www.springframework.org/schema/util
+  http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+  
+    <bean id="systemParameterDefaultKey" class="java.lang.String">
+    	<constructor-arg value="#{T (java.net.InetAddress).getLocalHost().getHostName()}"/>
+    </bean>
+    <bean id="systemParameterOthersKey" class="java.lang.String">
+        <constructor-arg value="$OTHERS"/>
+    </bean>
+    
+    <bean id="systemParameterOSKey" class="java.lang.String">
+    	<constructor-arg value="#{T (java.lang.System).getProperty('os.name')}"/>
+    </bean>
+
+	<!--jndi name-->
+   	<bean id="jndiNameFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+            	<!-- 10.7.20.23 websphere -->
+            	<entry key="F22QFubon01" value="java:comp/env/jdbc/esoaf_oracle"/>
+				<!-- 172.19.243.21 SIT -->
+		        <entry key="tpebnkvipap01t" value="java:comp/env/jdbc/esoaf_oracle"/>
+		        <!-- 172.19.243.23 SIT -->
+		        <entry key="tpebnkvipap02t" value="java:comp/env/jdbc/esoaf_oracle"/>
+		        <!--tomcat-->
+		        <entry key-ref="systemParameterOthersKey" value="java:comp/env/jdbc/esoaf_oracle"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <!--jndi name-->
+   	<bean id="jndiNameFactory2" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+            	<!-- 10.7.20.23 websphere -->
+            	<entry key="F22QFubon01" value="java:comp/env/jdbc/esoaf_oracle"/>
+				<!--jboss-->
+		        <entry key="F22Q-PC" value="java:/datasources/esoaf"/><!-- st -->
+		        <entry key="NWNAPUT" value="java:/datasources/esoaf"/><!-- ut -->
+		        <entry key="NWMAPSIT" value="java:/datasources/esoaf"/><!-- sit -->
+		        <entry key="NWMAPUAT" value="java:/datasources/esoaf"/><!-- uat -->
+		        <!--tomcat-->
+		        <entry key-ref="systemParameterOthersKey" value="java:comp/env/jdbc/esoaf_oracle"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <!--jndi name-->
+   	<bean id="jndiNameFactory3" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+            	<!-- 10.7.20.23 websphere -->
+            	<entry key="F22QFubon01" value="java:comp/env/jdbc/esoaf_oracle"/>
+				<!--jboss-->
+		        <entry key="F22Q-PC" value="java:/datasources/esoaf"/><!-- st -->
+		        <entry key="NWNAPUT" value="java:/datasources/esoaf"/><!-- ut -->
+		        <entry key="NWMAPSIT" value="java:/datasources/esoaf"/><!-- sit -->
+		        <entry key="NWMAPUAT" value="java:/datasources/esoaf"/><!-- uat -->
+		        <!--tomcat-->
+		        <entry key-ref="systemParameterOthersKey" value="java:comp/env/jdbc/esoaf_oracle"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+
+	<!--brokerURL-->
+   	<bean id="brokerURLFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <entry key="testap" value="tcp://localhost:61616"/><!-- st -->
+		        <entry key-ref="systemParameterOthersKey" value="tcp://localhost:61616"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+
+	<!--brokerURL-->
+   	<bean id="broadcastPriorityFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <entry key="testap" value="2"/><!-- st -->
+		        <entry key-ref="systemParameterOthersKey" value="1"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <!-- R:正式環境 ;D:開發環境 -->
+   	<bean id="serverModeFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <entry key="testap" value="D"/><!-- st -->
+		        <!-- 172.19.243.21 UAT -->
+		        <entry key="tpebnkvipap01t" value="D"/>
+		        <!-- 172.19.243.23 SIT -->
+		        <entry key="tpebnkvipap02t" value="D"/>
+		        <entry key-ref="systemParameterOthersKey" value="D"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <bean id="urlHelpDocumentText" class="java.lang.String">
+		<constructor-arg value="https://bms.landbank.com.tw/tcb/opeqry.php?acttype=brsshow&amp;mbrcode=%s&amp;opejobno=%s"/>
+	</bean>
+    
+   	<bean id="urlHelpDocumentFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <entry key="testap" value="https://10.253.21.13/BMS/tcb/opeqry.php?acttype=brsshow&amp;mbrcode=%s&amp;opejobno=%s"/><!-- st -->
+		        <entry key-ref="systemParameterOthersKey" value="https://10.253.21.13/BMS/tcb/opeqry.php?acttype=brsshow&amp;mbrcode=%s&amp;opejobno=%s"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <bean id="urlSystemAdwsText" class="java.lang.String">
+		<constructor-arg value="https://adws.landbank.com.tw/WebLdap/UserServiceEX.asmx"/>
+	</bean>
+    
+    <bean id="urlSystemAdwsFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <entry key="testap" value="http://10.253.23.44/WebLdap/UserServiceEX.asmx"/><!-- st -->
+		        <entry key-ref="systemParameterOthersKey" value="http://10.253.23.44/WebLdap/UserServiceEX.asmx"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <bean id="urlBmsMainpageText" class="java.lang.String">
+		<constructor-arg value="https://bms.landbank.com.tw/bms/bms_ab.php?VID=%s&amp;EMPID=%s"/>
+	</bean>
+    
+    <bean id="urlBmsMainpageFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <entry key="testap" value="https://10.253.21.13/BMS/bms/bms_ab.php?VID=%s&amp;EMPID=%s"/><!-- st -->
+		        <entry key-ref="systemParameterOthersKey" value="https://10.253.21.13/BMS/bms/bms_ab.php?VID=%s&amp;EMPID=%s"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <bean id="sealPsAddressText" class="java.lang.String">
+		<constructor-arg value="*.*.*.38"/>
+	</bean>
+    
+    <bean id="sealPsAddressFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <entry key="testap" value="*.*.*.190"/><!-- st -->
+		        <entry key-ref="systemParameterOthersKey" value="*.*.*.190"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <bean id="sealUdpPortText" class="java.lang.String">
+		<constructor-arg value="1919"/>
+	</bean>
+	
+    <bean id="sealUdpPortFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <entry key="testap" value="1919"/><!-- st -->
+		        <entry key-ref="systemParameterOthersKey" value="1919"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <bean id="sealPsPortText" class="java.lang.String">
+		<constructor-arg value="1911"/>
+	</bean>
+	
+    <bean id="sealPsPortFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <entry key="testap" value="1911"/><!-- st -->
+		        <entry key-ref="systemParameterOthersKey" value="1911"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <bean id="sealSsAddressText" class="java.lang.String">
+		<constructor-arg value="10.253.5.179"/>
+	</bean>
+	
+    <bean id="sealSsAddressFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <entry key="testap" value="10.253.23.115"/><!-- st -->
+		        <entry key-ref="systemParameterOthersKey" value="10.253.23.115"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <bean id="sealSsPortText" class="java.lang.String">
+		<constructor-arg value="1911"/>
+	</bean>
+	
+    <bean id="sealSsPortFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <entry key="testap" value="1911"/><!-- st -->
+		        <entry key-ref="systemParameterOthersKey" value="1911"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <bean id="urlSsoCheckFactory" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+		        <!-- <entry key="" value="http://portal.kgibank.com/SSOCheck.aspx?Userid=%s&amp;Userpwd=%s"/>--> <!-- prod -->
+		        <entry key="testap" value="http://portal-test.kgibank.com/SSOCheck.aspx?Userid=%s&amp;Userpwd=%s"/><!-- st -->
+		        <entry key-ref="systemParameterOthersKey" value="http://portal-test.kgibank.com/SSOCheck.aspx?Userid=%s&amp;Userpwd=%s"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+    
+    <bean id="scheduleStart" class="com.systex.jbranch.platform.common.util.DynamicSystemParameter">
+        <property name="paramsMap">
+            <map>
+				<!-- batch server -->
+		        <entry key="TPEBNKVIPBAT01T" value="true"/>
+		        <!-- else -->
+		        <entry key-ref="systemParameterOthersKey" value="false"/>
+            </map>
+        </property>
+        <property name="defaultKey" ref="systemParameterDefaultKey"/>
+        <property name="otherKey" ref="systemParameterOthersKey"/>
+    </bean>
+</beans>

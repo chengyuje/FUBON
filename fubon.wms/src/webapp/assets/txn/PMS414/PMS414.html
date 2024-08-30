@@ -1,0 +1,259 @@
+<style>
+.datewidth {
+	width: 180px !important;
+}
+
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS414/PMS414.js"></script>
+<script type="text/javascript" src="assets/txn/PMS414/PMS414_REASON.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS414" ng-controller="PMS414Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>
+						<th>資料統計日期：</th>
+						<td colspan="5">
+							<div class="input-group datebox datewidth" style="float: left">
+								<input 	type="text" id="sCreDate" name="sCreDate"
+										class="form-control" 
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sCreDate" 
+										is-open="model.a"
+										datepicker-options="bgn_sDateOptions" 
+										ng-readonly="true"
+										ng-change="limitDate();" />
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+							<div style="float: left">&nbsp;～ &nbsp;</div>
+							<div class="input-group datebox datewidth" style="float: left">
+								<input 	type="text" id="eCreDate" name="eCreDate"
+										class="form-control" 
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.eCreDate" 
+										is-open="model.b"
+										datepicker-options="bgn_eDateOptions" 
+										ng-readonly="true"
+										ng-change="limitDate();dateChange()"  
+										ng-blur="test()" autofocus/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id"
+								     	ng-validate="false" 
+								     	ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+								     	ng-editable="false"
+										ng-format="F3"
+								     	ng-required="false"
+										ng-change="ChangeRegion()"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+						<th>營運區： </th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+									    ng-datasource="AREA_LIST"
+									  	ng-model="inputVO.branch_area_id"
+									   	ng-validate="false" 
+									   	ng-disabled="AVAIL_AREA.length == 1"
+									   	ng-readonly="AVAIL_AREA.length == 1" 
+									   	ng-editable="false"
+									  	ng-format="F3"
+									  	ng-required="false"
+									   	ng-change="ChangeArea()"
+									   	width="200px"
+									   	style="line-height:20px;" />
+						</td>
+					
+						<th> 分行別： </th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+							       	    ng-datasource="BRANCH_LIST"
+							            ng-model="inputVO.branch_nbr"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeBranch()"
+										width="150px"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="inquireInit();query()"><span class="glyphicon glyphicon-search"></span>查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();limitDate()"><span class="glyphicon glyphicon-erase"></span>清除</button>
+				<button type="button" class="btn btn-success" ng-click="exportRPT()"><span class="glyphicon glyphicon-save"></span>匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：</td>
+						<td>每日</td>
+					</tr>
+					<tr>
+						<td>產出日：</td>
+						<td>{{toJsDate(paramList[0].CDATE) | date:'yyyy/MM/dd'}}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="table-bordered">
+					<thead>
+						<tr>
+							<th>序號</th>
+							<th>資料日期</th>
+							<th>分行代碼</th>
+							<th>分行名稱</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>AO Code</th>
+							<th>特定客戶</th>
+							<th>交易時間</th>
+							<th>交易項目</th>
+							<th>*本次交易是否<br>有行員在場</th>
+							<th>1.若代「特定客戶」操作，照會是<br>否為客戶本人意願(請註明照會時間)</th>
+							<th>照會時間-小時</th>
+							<th>照會時間-分鐘</th>
+							<th>2.是否為行員代客登<br>入網銀帳號密碼</th>
+							<th>3.客戶登入網銀帳號密碼<br>時，行員是否迴避</th>
+							<th>4.行員協助操作時，客<br>戶是否全程在旁</th>
+							<th>其他說明<br>(限100字內)</th>
+							<th>是否違規</th>
+							<th>首次建立時間</th>
+							<th>最新異動人員</th>
+							<th>最新異動日期</th>
+							<th>最新異動原因</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.ROWNUM}}</td>
+							<td>{{toJsDate(row.CDATE)  | date:'yyyy/MM/dd'}}</td>
+							<td>{{row.BRANCH_NBR}}</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.AO_CODE}}</td>
+							<td>{{row.SPECIFIC_FLAG | mapping:mappingSet['flagYN']:'F3'}} </td>
+							<td>{{row.TRADE_DATE}}</td>
+							<td>{{row.TRADE_ITEM}}</td>
+							<td>
+								<!-- mantis 4801 DISABLE_FLAG => null -->
+								<e-combobox id="staff_YN" name="staff_YN"
+											ng-datasource="mappingSet['flagYN']"
+											ng-model="row.STAFF_THERE_FLAG"
+											ng-validate="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="oboChange(row)"
+											width="100px"
+											ng-readonly="!chkMaintenance"
+											ng-disabled="!chkMaintenance"
+											style="line-height:20px;" />
+							</td>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="meeting_time" name="meeting_time" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="row.MEETING" is-open="model[$index]" datepicker-options="" ng-readonly="true" />
+									<span class="input-group-btn" ng-hide="!chkMaintenance">
+										<button type="button" class="btn btn-default" ng-click="open($event,$index)">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+							<td><input type="text" class="form-control" size="3" e-input-limit="ND" e-length-limit="2" ng-model="row.MEETING_HOUR" ng-disabled="!chkMaintenance" required /></td>
+							<td><input type="text" class="form-control" size="3" e-input-limit="ND" e-length-limit="2" ng-model="row.MEETING_MIN" ng-disabled="!chkMaintenance" required /></td>
+							<td>
+								<e-combobox id="obo_YN" name="obo_YN"
+											ng-datasource="mappingSet['flagYN']"
+											ng-model="row.OBO_CUST_FLAG" 
+											ng-validate="false"
+											ng-editable="false"
+											ng-change="oboChange(row)" 						
+											ng-format="F3"
+											width="100px" 
+											ng-readonly="!chkMaintenance"
+											ng-disabled="!chkMaintenance"
+											style="line-height:20px;" />
+							</td>
+							<td>
+								<e-combobox id="avoid_YN" name="avoid_YN"
+											ng-datasource="mappingSet['flagYN']" ng-model="row.AVOID_FLAG"
+											ng-validate="false" 
+											ng-editable="false"
+											ng-change="oboChange(row)"  
+											ng-format="F3"
+											width="100px" 
+											ng-readonly="!chkMaintenance"
+											ng-disabled="!chkMaintenance"
+											style="line-height:20px;" />
+							</td>
+							<td>
+								<e-combobox id="nearby_YN" name="nearby_YN"
+											ng-datasource="mappingSet['flagYN']"
+											ng-model="row.NEARBY_CUST_FLAG" ng-validate="false"
+											ng-editable="false"
+											ng-change="oboChange(row)" 
+											ng-format="F3"
+											width="100px" 
+											ng-readonly="!chkMaintenance"
+											ng-disabled="!chkMaintenance"
+											style="line-height:20px;" />
+							</td>
+							<td><input type="text" class="form-control" ng-model="row.EXPLANATION" ng-disabled="!chkMaintenance"></td>
+							<td>
+								<label>是<input type="radio" value="Y" ng-model="row.VIOLATION_FLAG" ng-disabled="!chkMaintenance"/></label>&emsp;
+								<label>否<input type="radio" value="N" ng-model="row.VIOLATION_FLAG" ng-disabled="!chkMaintenance"/></label>
+							</td>
+							
+							<td>{{row.FIRSTUPDATE}}</td>
+							<td>{{row.MODIFIER}}</td>
+							<td>{{row.LASTUPDATE}}</td>
+							<td>{{row.REASON}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<br>
+			<div align="center" ng-show="paramList.length > 0 && chkMaintenance">
+				<button type="button" class="btn btn-info" ng-click="save()">儲存</button>
+			</div>
+		</div>
+	</div>
+</div>

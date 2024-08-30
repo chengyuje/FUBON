@@ -1,0 +1,91 @@
+<style>
+/* open dialog */
+.ngdialog.CAM170_STATISTICS {
+	
+}
+/* dialog panl */
+.modal-dialog.CAM170_STATISTICS {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+/* table size */
+.CAM170_STATISTICS table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CAM170_STATISTICS.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CAM170_STATISTICS_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<div>
+	<div ng-controller="CAM170_STATISTICSController" ng-cloak>
+		<div class="modal-dialog CAM170_STATISTICS">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">問卷選項結果統計清單</h4>
+				</div>
+				<div class="modal-body">
+					<div class="scroll_y" >
+						<table>
+							<tr ng-repeat="row in questionList track by $index">
+								<td align="left">
+									<h4 class="h4-title">{{$index + 1}}.&nbsp;{{row.QUESTION_DESC}}</h4>
+									<table class="gv_tab_sc" ng-if="row.QUESTION_TYPE == 'S' || row.QUESTION_TYPE == 'M'">
+										<tr>
+											<td style="width:50%;border-bottom-style: none;"></td>
+											<th style="width:25%;border-bottom-style: none;">答案選項</th>
+											<th style="width:25%;border-bottom-style: none;">人數</th>
+										</tr>
+										<tr ng-repeat="answer in row.answer track by $index">
+											<td style="width:50%;border-bottom-style: none;"></td>
+											<td style="width:25%;border-bottom-style: none;">
+												{{$index + 1}}.&nbsp;
+												<div style="display:inline;" ng-if="answer.COUNTS > 0 && answer.ANSWER_DESC == '其他'"><a onclick="return false" ng-click="others(row, answer)">{{answer.ANSWER_DESC}}</a></div>
+												<div style="display:inline;" ng-if="(answer.COUNTS >= 0 && answer.ANSWER_DESC != '其他') || (answer.COUNTS == 0 && answer.ANSWER_DESC == '其他')">{{answer.ANSWER_DESC}}</div>
+											</td>
+											<td style="width:25%;border-bottom-style: none;">{{answer.COUNTS}}</td>
+										</tr>
+									</table>
+									<table class="gv_tab_sc" ng-if="row.QUESTION_TYPE == 'N' || row.QUESTION_TYPE == 'T'">
+										<tr ng-repeat="answer in row.answer track by $index">
+											<td style="width:50%;border-bottom-style: none;"></td>
+											<td style="width:50%;border-bottom-style: none;" colspan="2">{{$index + 1}}.&nbsp; {{answer.REMARK}}</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

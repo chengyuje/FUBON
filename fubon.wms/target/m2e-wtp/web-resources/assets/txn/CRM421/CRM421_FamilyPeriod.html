@@ -1,0 +1,102 @@
+<style>
+/* dialog panl */
+.modal-dialog.CRM421_FamilyPeriod {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1250px;
+	height: 600px;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/CRM421/CRM421_FamilyPeriod.js"></script>
+<div ng-controller="CRM421_FamilyPeriodController" ng-cloak>
+	<div class="modal-dialog CRM421_FamilyPeriod" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">家庭戶資訊</h4>
+			</div>
+			
+			<div class="modal-body">
+				<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th></th>
+									<th>姓名/<br/>客戶ID</th>
+									<th>AO Code/<br/>理專</th>
+									<th>期間議價折扣</th>
+									<th>優惠期間</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td ng-bind="row.PRV_MBR_MAST_YN == 'Y' ? '主戶' : '從戶'"></td>
+									<td>{{row.CUST_NAME}}<br/>{{row.CUST_ID}}</td>
+									<td>{{row.AO_CODE}}<br/>{{row.EMP_NAME}}</td>
+									<td>
+										<table width="100%" class="rstable">
+											<tr>
+												<td class="col-md-2.5 tdpadding">
+													國內股票型{{row.DMT_STOCK != null ? row.DMT_STOCK : '　'}}折
+												</td>
+												<td class="col-md-2.5 tdpadding">
+													國外股票型{{row.FRN_STOCK != null ? row.FRN_STOCK : '　'}}折
+												</td>
+												<td class="col-md-2.5 tdpadding">
+													買入香港交易所{{row.BUY_HK_MRK != null ? row.BUY_HK_MRK : '　'}}折
+												</td>
+												<td class="col-md-2.5 tdpadding">
+													賣出香港交易所{{row.SELL_HK_MRK != null ? row.SELL_HK_MRK : '　'}}折
+												</td>
+											</tr>
+											<tr>
+												<td class="col-md-2.5 tdpadding">
+													國內債券型{{row.DMT_BOND != null ? row.DMT_BOND : '　'}}折
+												</td>
+												<td class="col-md-2.5 tdpadding">
+													國外債券型{{row.FRN_BOND != null ? row.FRN_BOND : '　'}}折
+												</td>
+												<td class="col-md-2.5 tdpadding">
+													買入美國交易所{{row.BUY_US_MRK != null ? row.BUY_US_MRK : '　'}}折
+												</td>
+												<td class="col-md-2.5 tdpadding">
+													賣出美國交易所{{row.SELL_US_MRK != null ? row.SELL_US_MRK : '　'}}折
+												</td>
+											</tr>
+											<tr>
+												<td class="col-md-2.5 tdpadding">
+													國內平衡型{{row.DMT_BALANCED != null ? row.DMT_BALANCED : '　'}}折
+												</td>
+												<td class="col-md-2.5 tdpadding">
+													國外平衡型{{row.FRN_BALANCED != null ? row.FRN_BALANCED : '　'}}折
+												</td>
+												<td class="col-md-2.5 tdpadding">
+												</td>
+												<td class="col-md-2.5 tdpadding">
+												</td>
+											</tr>
+										</table>
+									</td>
+									<td>基金：<br/>
+										{{toJsDate(row.BRG_BEGIN_DATE) | date:'yyyy/MM/dd'}}
+										{{row.BRG_BEGIN_DATE != null ? '～' : ''}}
+										{{toJsDate(row.BRG_END_DATE) | date:'yyyy/MM/dd'}}
+										<br/>
+										ETF：<br/>
+										{{toJsDate(row.ETF_BRG_BEGIN_DATE) | date:'yyyy/MM/dd'}}
+										{{row.ETF_BRG_BEGIN_DATE != null ? '～' : ''}}
+										{{toJsDate(row.ETF_BRG_END_DATE) | date:'yyyy/MM/dd'}}
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+			</div>
+		</div>
+	</div>
+</div>

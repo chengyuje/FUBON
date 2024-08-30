@@ -1,0 +1,54 @@
+<style>
+.modal-dialog.PMS302Cust {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: auto;
+}
+
+</style>
+<div ng-controller="PMS302_CustController" ng-cloak>
+	<div class="modal-dialog PMS302Cust">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">理專轄下客戶各項商品銷量</h4>
+			</div>
+			<div class="modal-body">
+				<e-jumping-once output="outputVO" list="paramList" totallist="totalList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="table-bordered">
+						<tr>
+							<th>資料日期</th>
+							<th>客戶ID</th>
+							<th>姓名</th>
+							<th>商品類別</th>
+							<th>商品代號</th>
+							<th>憑証/文件編號</th>
+							<th>交易幣別</th>
+							<th>交易金額</th>
+							<th>收益(折台)</th>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index">
+							<td align="center" ng-bind="row.DATA_DATE"></td>
+							<td align="center" ng-bind="row.CUST_ID"></td>
+							<td align="center" ng-bind="row.CUST_NAME"></td>
+							<td align="center" ng-bind="row.ITEM_TYPE | mapping:mappingSet['itemType']:'F3'"></td>
+							<td align="center" ng-bind="row.ITEM_ID"></td>
+							<td align="center" ng-bind="row.CERTIFICATE_ID"></td>
+							<td align="center" ng-bind="row.CURR_TYPE"></td>
+							<td align="right" ng-bind="row.TRADE_AMT | number : 0"></td>
+							<td align="right" ng-bind="row.BAL + (row.FEE || 0) | number : 0"></td>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

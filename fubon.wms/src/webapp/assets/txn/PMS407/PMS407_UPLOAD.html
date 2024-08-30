@@ -1,0 +1,142 @@
+<style>
+/* open dialog */
+.ngdialog.PMS407_INS_EDIT {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS407_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* table size */
+.PMS407_UPLOAD table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS407_UPLOAD.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS407_EDIT_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.titleTB th, td {
+	border-collapse: collapse;
+	padding: 3px;
+	text-align: center;	
+}
+.titleTB th {
+	background-color: lightgray
+}
+.numAlign{
+	text-align: right !important;
+}
+
+#middle{
+	vertical-align: middle;
+	font-size: 1em;
+	font-weight: bold;
+	color: #106987;	
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/PMS407/PMS407_UPLOAD.js"></script>
+<div ng-controller="PMS407_UPLOADController" ng-cloak>
+	<div class="modal-dialog PMS407_UPLOAD"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">訊息上傳</h4>
+			</div>
+			<div class="modal-body">	
+				<div>
+					<table>
+						<tr>
+							<th align="right">&nbsp;&nbsp;報表年月&nbsp;&nbsp;<input type="text" ng-model="inputVO.rptYearMon" size="10" maxlength="6"><font color="blue"> YYYYMM </font></th>
+<!-- 							<td align="left"> -->
+<!-- 								<input type="text" ng-model="inputVO.rptYearMon" size="10" maxlength="6"><font color="blue"> YYYYMM </font> -->
+<!-- 							</td> -->
+							<td>
+								<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+							</td>
+							<td>
+								<button type="button" class="btn btn-info" ng-click="downloadSample()">下載範例檔</button>
+							</td>
+							<td>
+								<e-upload success="uploadFinshed(name,rname)" accept=".csv"></e-upload>
+							</td>
+							<td ng-show="confirm">
+								<button type="button" class="btn btn-primary" ng-click="save()">確定</button>
+							</td>
+						</tr>						
+					</table>
+				</div>
+				<div style="height:25px;"></div>
+				<div style="background-color:#d7edfa; height:35px; vertical-align: middle">
+					<span id="middle">&nbsp;&nbsp;{{rptYM}}&nbsp;商品通知訊息</span>
+				</div>			
+				<e-jumping output="outputVO"
+				input="inputVO"
+				query="query()" list="paramList"></e-jumping>
+				<div class="gv_tab_sc scroll_y" style="height:335px;white-space: nowrap;">
+					<table class="table-bordered">
+					<thead>
+						<tr>
+							<th>報表年月</th>
+							<th>商品類別</th>							
+							<th>商品代碼</th>
+							<th>訊息類別</th>							
+							<th>訊息內容</th>
+							<th>維護日期</th>
+							<th>維護人員</th>							
+						</tr>													
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						 	<td>{{row.YEARMON}}</td>
+						 	<td>{{row.PRD_TYPE}}</td>				 							
+							<td>{{row.PRD_ID}}</td>														
+							<td>{{row.INFO_TYPE}}</td>
+							<td>{{row.INFO}}</td>
+							<td>{{row.LASTUPDATE}}</td>
+							<td>{{row.MODIFIER}}</td>																					
+						</tr>						
+					</tbody>
+				</table>				
+				</div>
+			</div>
+			<div align="center">
+			<e-paging outputVO="outputVO"
+				inputVO="inputVO"
+				callQuery="query()"
+				displayLimit="displayLimit"
+				dataList="paramList">
+				</e-paging>
+			</div>
+			<div><p></p></div>
+		</div>
+	</div> 
+</div>

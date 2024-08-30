@@ -1,0 +1,71 @@
+<script type="text/javascript" src="assets/txn/CMMGR017/CMMGR017_Query.js"></script>
+
+<style>
+    .CMMGR017_QUERY .copyBtn {
+        float: right;
+        margin-top: -32px;
+        opacity: 0.8;
+        color: rgb(45, 122, 168);
+    }
+</style>
+
+<div class="CMMGR017_QUERY" ng-controller="CMMGR017_Query_Controller" ng-cloak>
+    <div class="panel_content" style="height:60vmin;min-height: 600px;padding-top: 10px;">
+        <div style="padding-top: 40px">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input class="form-control" type="text" placeholder="請輸入名稱並點選右邊放大鏡，查詢想要的物件"
+                           ng-model="inputVO.packageName"/>
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" ng-disabled="!inputVO.packageName"
+                                ng-click="qryPck()" data-toggle="tooltip" title="查詢">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6"></div>
+        </div>
+        <div ng-show="pckInfo.length" style="padding-top: 40px" class="col-md-12">
+            <div class="gv_tab_sc scroll_y">
+                <table class="tablesaw table table-striped table-bordered table-hover">
+                    <thead>
+                    <tr ng-click="showBasicInfo()" title="顯示基本資訊">
+                        <th ng-repeat="sub in pckInfo track by $index" class="col-md-6" ng-bind="sub.TYPE"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-show="basicShow">
+                        <td ng-repeat="sub in pckInfo track by $index">
+                            <div ng-repeat="subInfo in sub.basic track by $index">
+                                <span style="color:red" ng-bind="subInfo.ATTR"></span> : <span style="font-weight: bold"
+                                                                                               ng-bind="subInfo.VAL"></span>
+                                <button ng-if="subInfo.ATTR == 'STATUS' && subInfo.VAL == 'INVALID' && sub.ERR_MSG"
+                                        class="btn btn-danger" ng-click="showPckErrMsg(sub)" data-toggle="tooltip"
+                                        title="{{sub.errShow? '收合': '展開'}}詳細錯誤資訊">
+                                    <span ng-class="'glyphicon glyphicon-chevron-' + (sub.errShow? 'up': 'down')"></span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="sub in pckInfo track by $index" ng-show="sub.errShow">
+                        <td colspan="{{pckInfo.length}}">
+                            <div ng-repeat="subErr in errList track by $index"><span ng-bind="subErr"></span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td ng-repeat="sub in pckInfo track by $index">
+                            <textarea ng-model="sub.TEXT" rows="10" ng-class="'copyArea'+$index+' form-control'"></textarea>
+                            <div class="copyBtn">
+                                <button class="btn btn-lg btn-info" data-toggle="tooltip" title="一鍵複製" ng-click="copyText($index)">
+                                    <span class="glyphicon glyphicon-paste"></span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

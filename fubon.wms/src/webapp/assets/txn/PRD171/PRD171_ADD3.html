@@ -1,0 +1,76 @@
+<
+<style>
+<!--
+input:required:invalid {
+	border-color: red;
+}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_ADD3.js"></script>
+<div ng-controller="PRD171_ADD3Controller" ng-cloak>
+	<div class="modal-dialog" style="width: 1080px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title"
+					style="text-align: center;">{{title}}</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab
+					style="width: 100%;">
+					<div class="gv_tab_sc scroll_y">
+						<div style="margin-top: 0.5%;">
+							*險種代碼:&nbsp;
+							<input ng-disabled="updateData" type="text" placeholder="請輸入險種代碼..." ng-model="inputVO.INSPRD_ID" ng-blur = "queryINSPRD_NAME()" style="width: 100px;text-transform: uppercase;" required>
+						</div>
+						<div style="margin-top: 0.5%;">
+							&nbsp;險種名稱:&nbsp;{{inputVO.INSPRD_NAME}}
+						</div>
+<!-- 						<div style="margin-top: 0.5%;"> -->
+<!-- 							&nbsp;繳別:&nbsp;{{inputVO.PAY_TYPE | mapping:mappingSet['IOT.PAY_TYPE']:F3}} -->
+<!-- 						</div>		 -->
+						<div style="margin-top: 0.5%;">
+							*繳費年期:&nbsp;
+							<input ng-disabled="updateData" type="text" placeholder="請輸入繳費年期..." ng-model="inputVO.INSPRD_ANNUAL" style="width: 100px" required>
+						</div>
+<!-- 						<div style="margin-top: 0.5%;"> -->
+<!-- 							<button type="button" class="btn btn-info" ng-click="addRow()">新增題目</button> -->
+<!-- 						</div> -->
+						<div style="margin-top: 1%;">
+							<table>
+							<thead>
+								<tr>
+									<th>*題目代碼</th>
+									<th>題目類型</th>
+									<th>題目名稱</th>
+									<th>*呈現順序</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="row in DILOGList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" >
+									<td><input type="text" placeholder="請輸入題目代碼..." ng-blur="queryQData(row)"
+										ng-model="row.Q_ID" style="width: 100px" ng-disabled="true" required></td>
+									<td>{{row.Q_TYPE | mapping:typelist:F3 }}</td>
+									<td>{{row.Q_NAME}}</td>
+									<td><input type="number" placeholder="請輸入呈現順序..." step="1" min="0" 
+										style="width: 100px" ng-model="row.Q_SEQ"></td>
+								</tr>
+							</tbody>
+							</table>
+						</div>
+					</div>
+					<div style="text-align: center;" class="modal-footer">
+						<button ng-click="btnSubmit()" class="btn btn-info"
+							data-dismiss="modal">確定</button>
+						<button type="button" ng-click="closeThisDialog('cancel')" class="btn btn-info"
+							data-dismiss="modal">取消</button>
+					</div>
+				</form>
+			</div>
+
+		</div>
+	</div>
+
+</div>

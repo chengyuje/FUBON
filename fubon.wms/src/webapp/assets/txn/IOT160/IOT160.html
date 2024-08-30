@@ -1,0 +1,131 @@
+<style>
+
+</style>
+
+<div ng-controller="IOT160Controller" ng-cloak>
+	<div class="modal-dialog" style="width: 70%;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<div id='contentTitle'>
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 class="modal-title" align="center">壽險契約送件點收批次設定</h4>
+				</div>
+			</div>
+			<div class="modal-body">
+				<table class="gv_tab_sc">
+					<tr>
+						<thead>
+						<th>送達方式：</th>
+						<th>批次：</th>
+						<th>送達日：</th>
+						<th>員編：</th>
+						</thead>
+					</tr>
+					<tbody>
+					<tr>
+						<td style="width: 25%;">
+							<e-combobox ng-model="inputVO.shipMethod_1" ng-validate="false" 
+							            ng-readonly="false" ng-editable="false"
+									    ng-format="F3" ng-required="false"
+									    ng-paramtype="IOT.SUBMIT_WAY"
+									    ng-change = "checkData_1()"
+									    width="50%" height="30px" style="line-height:20px;" />
+						</td>
+						<td style="width: 25%;">
+							<e-combobox ng-model="inputVO.batchSeq_1" ng-validate="false" 
+							            ng-readonly="false" ng-editable="false"
+									    ng-format="F3" ng-required="false"
+									    ng-paramtype="IOT.BATCH_SEQ"
+									    ng-change = "checkData_1()"
+									    width="50%" height="30px" style="line-height:20px;" />
+						</td>
+						<td style="padding: 1% 0 1% 0">
+							<div class="input-group datebox datewidth">
+								<input type="text" datepicker-options="endDateOptions"
+									   class="form-control" uib-datepicker-popup="yyyy/MM/dd hh:mm:ss"
+									   ng-change = "checkData_1()"
+									   ng-model="inputVO.date_1" is-open="model.a" 
+									   alt-input-formats="altInputFormats"
+									   ng-readonly="true" ng-required="true"/>
+										<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default"
+													ng-click="open($event,'a')">
+													<i class="glyphicon glyphicon-calendar"></i>
+												</button>
+											</span>
+							</div>
+						</td>
+						<td style="width: 25%; text-align:center;">{{inputVO.empId}}</td>
+					</tr>
+					</tbody>
+				</table>
+				<br/>
+				<table class="gv_tab_sc">
+					<tr>
+					<thead>
+						<th style="width: 25%;">
+							<div>分行批號</div>
+						</th>
+						<th style="width: 25%;">
+							<div>分行批號</div>
+						</th>
+						<th style="width: 25%;">
+							<div>分行批號</div>
+						</th>
+						<th style="width: 25%;">
+							<div>分行批號</div>
+						</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td>
+							<input type="text" tabindex="1" placeholder="請輸入..." id="batchNbr_1" ng-change="toNextIndex('1', '2');" ng-model="inputVO.batchNbr_1" style="text-transform: uppercase;">
+						</td>
+						<td>
+							<input type="text" tabindex="2" placeholder="請輸入..." id="batchNbr_2" ng-change="toNextIndex('2', '3');" ng-model="inputVO.batchNbr_2" style="text-transform: uppercase;">
+						</td>
+						<td>
+							<input type="text" tabindex="3" placeholder="請輸入..." id="batchNbr_3" ng-change="toNextIndex('3', '4');" ng-model="inputVO.batchNbr_3" style="text-transform: uppercase;">
+						</td>
+						<td>
+							<input type="text" tabindex="4" placeholder="請輸入..." id="batchNbr_4" ng-change="toNextIndex('4', '5');" ng-model="inputVO.batchNbr_4" style="text-transform: uppercase;">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="text" tabindex="5" placeholder="請輸入..." id="batchNbr_5" ng-change="toNextIndex('5', '6');" ng-model="inputVO.batchNbr_5" style="text-transform: uppercase;">
+						</td>
+						<td>
+							<input type="text" tabindex="6" placeholder="請輸入..." id="batchNbr_6" ng-change="toNextIndex('6', '7');" ng-model="inputVO.batchNbr_6" style="text-transform: uppercase;">
+						</td>
+						<td>
+							<input type="text" tabindex="7" placeholder="請輸入..." id="batchNbr_7" ng-change="toNextIndex('7', '8');" ng-model="inputVO.batchNbr_7" style="text-transform: uppercase;">
+						</td>
+						<td>
+							<input type="text" tabindex="8" placeholder="請輸入..." id="batchNbr_8" ng-change="toNextIndex('8', '9');" ng-model="inputVO.batchNbr_8" style="text-transform: uppercase;">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="text" tabindex="9" placeholder="請輸入..." id="batchNbr_9" ng-change="toNextIndex('9', '10');" ng-model="inputVO.batchNbr_9" style="text-transform: uppercase;">
+						</td>
+						<td>
+							<input type="text" tabindex="10" placeholder="請輸入..." id="batchNbr_10" ng-model="inputVO.batchNbr_10" ng-blur = "checkData_10()" style="text-transform: uppercase;">
+						</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+					</tbody>
+				</table>
+				<br/>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-default" ng-click="saveData()" ng-disabled="check.pass=='false'">儲存</button>
+					<button type="button" class="btn btn-default" ng-click="init()">清除</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">關閉</button>
+				</div>
+			</div>	
+		</div>
+	</div>
+</div>

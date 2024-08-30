@@ -1,0 +1,260 @@
+<style>
+/* open dialog */
+.ngdialog.PMS105 {
+	
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+/* dialog panl */
+.modal-dialog.PMS105 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+
+
+.PMS105 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS105.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS105_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+a {
+ cursor: pointer; 
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS105/PMS105.js"></script>
+<script type="text/javascript" src="assets/txn/PMS105/PMS105_DETAIL.js"></script>
+<div class="PMS105" ng-controller="PMS105Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table class="rstable">
+						<tr>
+							<th>*報表月份：</th>
+							<td>
+								<e-combobox id="sCreDate"
+								ng-datasource="mappingSet['timeE']" 
+								ng-model="inputVO.sCreDate"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3" 
+								ng-required="true" 
+								width="150px" 
+								height="30px"
+								style="line-height:20px;" 
+								ng-change="dateChange()"/>
+							</td>
+
+							<th> 分行別： </th>
+							<td>
+								<e-combobox id="branch_nbr" name="branch_nbr"
+								ng-datasource="BRANCH_LIST"
+								ng-model="inputVO.branch_nbr"
+								ng-validate="false" 
+								ng-disabled="disableBranchCombo"
+								ng-readonly="disableBranchCombo" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="false"
+								ng-change="ChangeBranch()"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<th colspan="4"><font color="red">註1:未規劃客戶數為已入帳客戶數，當月份無銷售計劃</font></th>
+						</tr>
+						<tr>
+							<th> 營運區： </th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+								ng-datasource="AREA_LIST"
+								ng-model="inputVO.branch_area_id"
+								ng-validate="false" 
+								ng-disabled="disableAreaCombo"
+								ng-readonly="disableAreaCombo" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="ChangeArea()"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+
+							<th> 理專： </th>
+							<td>
+								<e-combobox id="ao_code" name="ao_code"
+								ng-datasource="AO_LIST"
+								ng-model="inputVO.ao_code"
+								ng-validate="false"
+								ng-disabled="disableAoCombo"
+								ng-readonly="disableAoCombo" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="false"
+								ng-change="ChangeAo_code()"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<th colspan="4"><font color="red">註2:已連繫客戶數為當月份有銷售計劃,且計畫日期於「預計約訪日期」至「預計成交日期」內有輸入訪談紀錄</font></th>
+
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="inquireInit();inquire('query')">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList"></e-jumping>
+			<div algin="left">
+				<table>
+				<tr>
+					<td>產出頻率：</td>
+					<td>每月</td>
+				</tr>
+				<tr>
+					<td>產出日：</td>
+					<td >{{toJsDate(paramList[0].CREATETIME) |date:'yyyy/MM/dd'}}</td>
+				</tr>
+			</table>
+			</div>
+			<div class="gv_tab_sc scroll_y"
+				style="white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th rowspan="2">項次</th>
+							<th rowspan="2">統計月份</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行別</th>
+							<th rowspan="2">理專</th>
+							<th rowspan="2">客戶數</th>
+							<th rowspan="2">已入帳客戶數</th>
+							<th rowspan="2">未規劃客戶數</th>
+							<th colspan="2">已規劃客戶數</th>
+
+						</tr>
+						<tr>
+							<th>已連繫客戶數</th>
+							<th>未連繫客戶數</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+
+
+							<td align="center">{{outputVO.currentPageIndex*10+$index+1}}</td>
+							<td align="center">{{row.YEARMON}}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME}}</td>
+							<td align="center">{{row.BRANCH_NAME}}</td>
+							<td align="center">{{row.AO_CODE}}-{{row.AO_NAME}}</td>
+							<td class="text-right">{{row.CUST_CNT}}</td>
+							<td class="text-right"><a onclick="return false" ng-click="detail(row,1)">{{row.CUST_CNT_RECORDED}}</a></td>
+							<td class="text-right"><a onclick="return false" ng-click="detail(row,2)">{{row.CUST_CNT_UNPLAN}}</a></td>
+							<td class="text-right"><a onclick="return false" ng-click="detail(row,3)">{{row.CUST_CNT_CONTACTED}}</a></td>
+							<td class="text-right"><a onclick="return false" ng-click="detail(row,4)">{{row.CUST_CNT_NOT_CONTACT}}</a></td>
+
+						</tr>
+						<tr class="red" >
+							<td colspan="5" align="center">本頁小計</td>
+							<td align="right">{{getSum(paramList, 'CUST_CNT') }}</td>
+							<td align="right">{{getSum(paramList, 'CUST_CNT_RECORDED')	}}</td>
+							<td align="right">{{getSum(paramList, 'CUST_CNT_UNPLAN') }}</td>
+							<td align="right">{{getSum(paramList, 'CUST_CNT_CONTACTED') }}</td>
+							<td align="right">{{getSum(paramList, 'CUST_CNT_NOT_CONTACT') 
+									}}</td>
+								
+						</tr>
+						<tr class="red" ng-if="ya == ya1-1">
+							<td colspan="5" align="center">總計</td>
+							<td align="right">{{paramList2[0].CUST_CNT }}</td>
+							<td align="right">{{paramList2[0].CUST_CNT_RECORDED}}</td>
+							<td align="right">{{paramList2[0].CUST_CNT_UNPLAN }}</td>
+							<td align="right">{{paramList2[0].CUST_CNT_CONTACTED }}</td>
+							<td align="right">{{paramList2[0].CUST_CNT_NOT_CONTACT}}</td>
+							
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div algin="left">
+			<table>
+				<tr>
+					<td align="right">說明：</td>
+					<td align="left"></td>
+				</tr>
+			</table>
+		</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

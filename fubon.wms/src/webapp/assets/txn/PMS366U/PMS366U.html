@@ -1,0 +1,161 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS366U/PMS366U.js"></script>
+<script type="text/javascript" src="assets/txn/PMS366/PMS366.js"></script>
+<script type="text/javascript" src="assets/txn/PMS366/PMS366_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS366U" ng-controller="PMS366UController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>						
+							<th><font color="red">＊</font>資料統計月份：</th>
+							<td>
+								<e-combobox id="sCreDate" name="sCreDate"
+											ng-datasource="mappingSet['timeE']"
+											ng-model="inputVO.sCreDate"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="dateChangeU();inquireInit();"
+											width="200px"
+											style="line-height:20px;" />
+							</td>
+							<th></th>
+							<td></td>
+							<th></th>
+							<td></td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td>
+								<e-combobox id="region_center_id" name="region_center_id"
+											ng-paramtype="PMS.UHRM_RC"
+											ng-model="inputVO.uhrmRC"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeRegion()"
+											width="200px"
+											style="line-height:20px;" />
+							</td>						
+							<th>業務中心：</th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+											ng-paramtype="PMS.UHRM_OP"
+											ng-model="inputVO.uhrmOP"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeArea()"
+											width="200px"
+											style="line-height:20px;" />
+							</td>
+							<th></th>
+							<td></td>
+							<th></th>
+							<td></td>
+						</tr>				
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="inquireInit();query()" ng-disabled="inputVO.sCreDate == '' || inputVO.sCreDate == undefined"><span class="glyphicon glyphicon-search"></span>查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();inquireInit()"><span class="glyphicon glyphicon-erase"></span>清除</button>
+				<button type="button" class="btn btn-success" ng-click="exportRPT()" ng-disabled="paramList.length == 0"><span class="glyphicon glyphicon-save"></span>匯出</button>
+			</div>
+		</div>
+	</div>
+
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="paramList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="table-bordered e-table-freeze" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th rowspan="2" width="170px">資料年月</th>
+							<th rowspan="2" width="170px">資料更新日期</th>
+							<th rowspan="2" width="170px">業務處</th>
+							<th rowspan="2" width="170px">區別</th>
+							<th rowspan="2" width="170px">分行</th>
+							<th rowspan="2" width="170px">AO CODE</th>
+							<th rowspan="2" width="170px">存款類別</th>
+							
+							<th colspan="3">個金存款AUM(新台幣：百萬)</th>					
+						</tr>
+						<tr>
+							<th width="200px">本週</th>
+							<th width="200px">上月月底</th>
+							<th width="200px">差異</th>
+						</tr>
+					</thead>
+
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.YYYYMM}}</td>
+							<td align="center">{{row.DATA_DATE}}</td>
+							<td align="center" ng-show="(row.AO_CODE == 'ZZZZZREGION')">{{row.REGION_CENTER_NAME}} 合計</td>
+							<td align="center" ng-show="!(row.AO_CODE == 'ZZZZZREGION')">{{row.REGION_CENTER_NAME}}</td>
+
+							<td align="center" ng-show="(row.AO_CODE == 'ZZZZZAREA')">{{row.BRANCH_AREA_NAME}} 合計</td>
+							<td align="center" ng-show="!(row.AO_CODE == 'ZZZZZAREA')">{{row.BRANCH_AREA_NAME}}</td>
+
+							<td align="center" ng-show="(row.AO_CODE == 'ZZZZZBRANCH')">{{row.BRANCH_NAME}} 合計</td>
+							<td align="center" ng-show="!(row.AO_CODE == 'ZZZZZBRANCH')">{{row.BRANCH_NAME}}</td>
+							
+							<td align="center" ng-show="(row.AO_CODE == 'ZZZZZREGION' || row.AO_CODE == 'ZZZZZAREA' || row.AO_CODE == 'ZZZZZBRANCH' || row.AO_CODE == 'ZZZZZ')"></td>
+							<td align="center" ng-show="!(row.AO_CODE == 'ZZZZZREGION' || row.AO_CODE == 'ZZZZZAREA' || row.AO_CODE == 'ZZZZZBRANCH' || row.AO_CODE == 'ZZZZZ')">
+								{{row.AO_CODE != null ? row.AO_CODE : ''}}
+								{{row.AO_CODE != null ? (row.AO_TYPE | mapping:mappingSet['AO_TYPE']:'F3') : ''}}
+								{{row.AO_CODE != null ? '-' : ''}}
+								{{row.EMP_NAME}}
+							</td>
+
+							<td align="center">{{row.DEP_TYPE | mapping:mappingSet['PMS.DEP_TYPE']:'F3'}}</td>
+							
+							<td align="right" ng-show="(0 + row.T_M) == 0">{{0 + row.T_M | currency:'':0}}</td>
+							<td align="right" ng-hide="(0 + row.T_M) == 0">{{0 + row.T_M | currency:'':6}}</td>
+							<td align="right" ng-show="(0 + row.L_M) == 0">{{0 + row.L_M | currency:'':0}}</td>
+							<td align="right" ng-hide="(0 + row.L_M) == 0">{{0 + row.L_M | currency:'':6}}</td>
+							<td align="right" ng-show="row.AO_CODE == 'ZZZZZREGION' || row.AO_CODE == 'ZZZZZAREA' || row.AO_CODE == 'ZZZZZBRANCH' || row.AO_CODE == 'ZZZZZ' || (0 + row.DIFF) == 0">{{0 + row.DIFF | currency:'':0}}</td>
+							<td align="right" ng-hide="row.AO_CODE == 'ZZZZZREGION' || row.AO_CODE == 'ZZZZZAREA' || row.AO_CODE == 'ZZZZZBRANCH' || row.AO_CODE == 'ZZZZZ' || (0 + row.DIFF) == 0"><a ng-click="openDialog(row, 'DIFF');">{{0 + row.DIFF | currency:'':6}}</a></td>
+							
+						</tr>
+					</tbody>
+				</table>
+			</div>	
+			<div>
+				說明：報表數據為資料庫每月留存之月底AUM，並不含因基期調整或其他人工異動項目。
+			</div>	
+		</div>
+	</div>
+</div>

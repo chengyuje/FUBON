@@ -1,0 +1,89 @@
+<div class="block container">
+  <div class="title title-left subtitle"
+       style="height: 2.6em;
+                  position: relative;">
+    <b style="font-size: 1em;">基金+連結全委帳戶之投資型保險</b>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="width:23%">商品</th>
+        <th style="width:12%;" ng-if="fromApp">市值/</br>保單價值</th>
+        <th style="width:12%;" ng-if="!fromApp">市值/保單價值</th>
+        <th style="width:10%;">約當台幣</th>
+        <th style="width:5%;">比例</th>
+        <th style="width:2%;background-color: #fff"></th>
+        <th style="width:23%">商品</th>
+        <th style="width:10%;">調整後金額</th>
+        <th style="width:10%;">約當台幣</th>
+        <th style="width:5%;">比例</th>
+      </tr>
+    </thead>
+    <tbody align="center">
+      <tr ng-repeat="row in mixedParamList"
+          ng-show="row.action!='delete'"
+          class="repeat-row">
+        <!-- 商品-->
+        <td class="text-left">
+          <span ng-bind="row.PRD_CNAME"></span>
+          <span ng-bind="row.TARGETS"></span>
+        </td>
+        <!-- 市值/保單價值 約當台幣-->
+        <td class="text-right">
+          <!-- 市值/保單價值 -->
+          <div ng-show="row.STORE_RAW||row.STORE_NTD"
+               ng-bind="row.TRUST_CURR">
+          </div>
+          <div ng-show="row.STORE_RAW||row.STORE_NTD"
+               ng-bind="(row.TRUST_CURR==='TWD'?row.STORE_NTD:row.STORE_RAW)|number :0">
+          </div>
+          <div ng-show="!(row.STORE_RAW||row.STORE_NTD)"
+               ng-bind="'--'">
+          </div>
+        </td>
+        <td class="text-right">
+          <!-- 約當台幣 -->
+          <div ng-show="row.STORE_RAW||row.STORE_NTD"
+               ng-bind="row.STORE_NTD|number :0">
+          </div>
+          <div ng-show="!(row.STORE_RAW||row.STORE_NTD)"
+               ng-bind="'--'">
+          </div>
+        </td>
+        <td>
+          <!-- 比例 -->
+          <div ng-show="(row.STORE_RAW||row.STORE_NTD)"
+               ng-bind="row.INV_PERCENT_OLD + '%'">
+          </div>
+          <div ng-show="!(row.STORE_RAW||row.STORE_NTD)"
+               ng-bind="'--'">
+          </div>
+        </td>
+        <td>
+          <!-- 三角形 -->
+          <span class="glyphicon glyphicon-play"
+                aria-hidden="true"></span>
+        </td>
+        <!-- 商品-->
+        <td class="text-left">
+          <span ng-bind="row.PRD_CNAME"></span>
+          <span ng-bind="row.TARGETS"></span>
+        </td>
+        <!--調整後金額 約當台幣 -->
+        <td class="text-right">
+          <!-- 調整後金額  -->
+          <div ng-bind="row.TRUST_CURR"></div>
+          <div ng-bind="row.CHG_PERCENT|number :0"></div>
+        </td>
+        <td class="text-right">
+          <!-- 約當台幣 -->
+          <div ng-bind="row.NTD_PERCENT|number :0"></div>
+        </td>
+        <!-- 比例 -->
+        <td>
+          <span ng-bind="row.INV_PERCENT"></span>%
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

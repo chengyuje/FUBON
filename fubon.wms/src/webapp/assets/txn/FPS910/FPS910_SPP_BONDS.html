@@ -1,0 +1,87 @@
+<style>
+.FPS910_SPP_BONDS table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.FPS910_SPP_BONDS.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.error-row {
+	color: red !important;
+}
+.pointer {
+	cursor: pointer;
+}
+</style>
+<script type="text/javascript" src="assets/txn/FPS910/FPS910_SPP_BONDS.js"></script>
+<div ng-controller="FPS910_SPP_BONDSController" ng-cloak>
+	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+		<button ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" 
+			type="button" class="btn btn-primary"
+			style="float: right;" 
+			ng-click="add()" 
+			function-type="maintenance">新增商品</button>
+		<br><br>
+		<table class="table td_center">
+			<thead>
+				<tr>
+					<th width="5%" ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" function-type="maintenance">功能</th>
+					<th width="6%">客戶風險屬性</th>
+					<th width="20%">商品類型</th>
+					<th width="10%">商品代號</th>
+					<th width="30%">商品名稱</th>
+					<th>風險等級</th>
+					<th>幣別</th>
+					<th width="6%">佔比%</th>
+					<th>最後修改時間</th>
+				</tr>
+			</thead>
+			<tbody class="repeat-row" ng-repeat="row in inputVO.bondsList track by $index" ng-init="row.showMenu = true">
+				<tr style="background-color: #DDF2F9;">
+					<td function-type="maintenance" ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'"></td>
+					<td ng-click="row.showMenu = !row.showMenu" class="pointer"><i class="fa" ng-class="row.showMenu ? 'fa-minus-square-o' : 'fa-plus-square'" aria-hidden="true"></i>&nbsp;{{row.CUST_RISK_ATR}}</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td ng-class="{'error-row': row.INV_PERCENT != 100}">{{row.INV_PERCENT = SUM_INV_PERCENT(row.SUBITEM)}}</td>
+					<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd"}}</td>
+				</tr>
+				<tr ng-if="row.SUBITEM.length != 0" ng-show="row.showMenu" class="repeat-row" ng-repeat-start="row2 in row.SUBITEM track by $index" ng-init="row2.showMenu = true">
+					<td function-type="maintenance" ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'"></td>
+					<td></td>
+					<td ng-click="row2.showMenu = !row2.showMenu" class="pointer"><i class="fa" ng-class="row2.showMenu ? 'fa-minus-square-o' : 'fa-plus-square'" aria-hidden="true"></i>&nbsp;{{row2.INV_PRD_TYPE | mapping:INV_PRD_TYPE:'F3'}}</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>{{row2.INV_PERCENT = SUM_INV_PERCENT(row2.SUBITEM)}}</td>
+					<td>{{toJsDate(row2.LASTUPDATE) | date:"yyyy/MM/dd"}}</td>
+				</tr>
+				<tr ng-repeat-end ng-if="row2.SUBITEM.length != 0" ng-show="row.showMenu && row2.showMenu" class="repeat-row" ng-repeat="row3 in row2.SUBITEM track by $index">
+					<td function-type="maintenance" ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'"><button type="button" class="btn btn-primary" ng-click="delRow(row3, row2, row)">刪除</button></td>
+					<td></td>
+					<td></td>
+					<td>{{row3.PRD_ID}}</td>
+					<td>
+						{{row3.PRD_NAME}}
+						<span ng-if="row3.fund_list && row3.fund_list.length > 0"><br>標的：</span><span ng-repeat="row4 in row3.fund_list track by $index">{{$last ? row4.TARGET_ID : row4.TARGET_ID + ", "}}</span>
+					</td>
+					<td>
+						{{row3.RISKCATE_ID}}
+						<!-- INS沒有風險等級, 把標的放在這 -->
+						<button ng-if="row3.PRD_TYPE == 'INS' && (Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" type="button" class="btn btn-info" ng-click="openFUND(row3)" function-type="maintenance">搜尋標的</button>
+					</td>
+					<td>{{row3.CURRENCY_STD_ID}}</td>
+					<td><input ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" name="INV_PERCENT" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="row3.INV_PERCENT" e-input-limit="NUU" nuu1="3" nuu2="2"></td>
+					<td>{{toJsDate(row3.LASTUPDATE) | date:"yyyy/MM/dd"}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

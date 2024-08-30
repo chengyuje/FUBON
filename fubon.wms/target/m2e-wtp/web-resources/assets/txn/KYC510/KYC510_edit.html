@@ -1,0 +1,189 @@
+<style>
+.search_title_table td{
+	width: 200px;
+}
+input:required:invalid{
+	border-color: red;
+}
+.modal-dialog.KYC510 {
+	width: 80%;
+}
+</style>
+<script type="text/javascript" src="assets/txn/KYC510/KYC510_edit.js"></script>
+<script type="text/javascript" src="assets/txn/KYC510/KYC510_qst.js"></script>
+<!-- <script type="text/javascript" src="assets/txn/KYC510/KYC510_ans.js"></script> -->
+
+<div ng-controller="KYC510EditController" ng-cloak>
+    <div class="modal-dialog KYC510">
+      <div class="modal-content">
+        <div class="modal-header"> 
+        	<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+          <h4 id="myModalAlertLabel" class="modal-title">{{title}}</h4>
+        </div>
+        <div class="modal-body">
+        <form name="add">
+          <div class="search_table search_box1">
+            <table class="search_title_table">
+              <tr>
+                <th>問卷類別:</th>
+                <td>
+					<e-combobox id="quertiontype" name="quertiontype"
+		                		ng-paramtype="KYC.PRO_TYPE"
+		                		ng-model="inputVO.PRO_TYPE"
+		                		ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								ng-disabled="field_type"
+								width="150px"
+								style="line-height:20px;"  /> 
+				</td>
+				<td ng-if="pr_date"><div style="color: red;">問卷狀態:{{inputVO.STATUS | mapping:STATUS_TYPE:'F3'}}<br></div></td>               
+              </tr>
+              <tr>
+                <th>問卷名稱:</th>
+                <td>
+					<input ng-disabled="field_type" class="form-control" type="text" ng-model="inputVO.EXAM_NAME" style="width: 190px;" ng-required="true">
+				</td>
+				<td ng-if="pr_date" colspan="2"><div style="color: red;">問卷實際生效時間:{{inputVO.APPROVE_TIME}}</div></td>
+              </tr>
+              <tr>
+                <th>版次:</th>
+                <td>
+                	<input ng-disabled="true" class="form-control" type="text" ng-model="inputVO.EXAM_VERSION" style="width: 190px;">
+                </td>
+              </tr>
+              <tr>
+              	<th>問卷啟用日期:</th>
+              	<td>
+              		<div style="width: 150px;" class="input-group datebox datewidth">
+						<input type="text"
+							class="form-control"
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.ACTIVE_DATE"
+							is-open="model.a"
+							datepicker-options="bgn_sDateOptions"
+							ng-readonly="true"
+							ng-required="true"
+							ng-change="limitDate()"
+							/>
+						<!-- 製作日曆button -->
+						<span class="input-group-btn" ng-show="!field_type">
+							<button ng-if="pr_date_type" type="button" class="btn btn-default" ng-click="open($event,'a')">
+								<i class="glyphicon glyphicon-calendar"></i>
+							</button>
+						</span>
+					</div>
+              	</td>
+              	<th>問卷失效日期:</th>
+              	<td>
+              		<div style="width: 150px;" class="input-group datebox datewidth">
+						<input type="text"
+							class="form-control"
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.EXPIRY_DATE"
+							is-open="model.b"
+							datepicker-options="bgn_sDateOptions"
+							ng-readonly="true"
+							ng-required="true"
+							ng-change="limitDate()"
+							/>
+						<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button ng-if="pr_date_type" type="button" class="btn btn-default" ng-click="open($event,'b')">
+								<i class="glyphicon glyphicon-calendar"></i>
+							</button>
+						</span>
+					</div>
+              	</td>
+              </tr>
+            </table>
+          </div>
+          <button ng-if="pr_date_type" type="button" class="btn btn-info" ng-click="addQuest()">新增題目</button>
+          <div ng-if="ae" style="color: #999999">問卷內容</div>
+          <div style="display: inline-block;min-height: 90px;margin-top: 10px;" class="gv_tab_sc scroll_y">
+            <table>
+            <thead>
+              <tr>
+                <th ng-show="!field_type" width="120px">功能</th>
+                <th>題號</th>
+                <th>問題型態</th>
+                <th width="180px">問題描述</th>
+                <th>選項</th>
+                <th>正確答案</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="row in preview_data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                <td ng-show="!field_type">
+                	<e-combobox id="edit" name="edit"
+								ng-datasource="row.edit"
+								ng-model="row.editto"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="edit(row,$index)"
+								width="100px"
+								style="line-height:20px;"
+								ng-disabled="field_type" />
+                </td>
+                <td style="width: 7%;">
+                	<input e-input-limit="N" ng-disabled="field_type" type="text" class="form-control" placeholder="請輸入..." id="qst_no" name="qst_no" ng-model="row.QST_NO" width="30px" ng-required="true">
+                </td>
+                <td>
+                	{{row.QUESTION_TYPE | mapping:Q_TYPE:'F3'}}
+                </td>
+                <td>
+                	{{row.QUESTION_DESC}}
+                </td>
+                <td>
+                	<table>
+                		<tr ng-repeat="row1 in row.answer" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                			<td>
+                				{{row1.ANSWER_DESC}}
+                			</td>
+                		</tr>
+                	</table>
+                </td>
+                <td>{{row.CORR_ANS}}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+	          <table style="margin: 10px 10px 10px 10px;">
+	          	<tr>
+	          		<th style="color: gray;">說明備註:</th>
+	          	</tr>
+          	  </table>
+	         <div class="gv_tab_sc scroll_y"> 
+	          <table style="width: 65%;">
+	          <thead>
+	          	<tr>
+	          		<th>簽核員工</th>
+	          		<th>簽核日期</th>
+	          		<th>簽核備註</th>
+	          	</tr>
+	          	</thead>
+	          	<tbody>
+	          	<tr ng-repeat="row3 in Remark" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	          		<td>{{row3.SIGNOFF_ID}}-{{row3.SIGNOFF_NAME}}</td>
+	          		<td>{{row3.CREATETIME}}</td>
+	          		<td>{{row3.REMARK}}</td>
+	          	</tr>
+	          	</tbody>
+	          </table>
+          </div>
+           <div class="modal-footer" style="text-align: center;">
+		        <button ng-if="pr_date_type" ng-click="editSaveData()" class="btn btn-info" data-dismiss="modal">儲存送交</button> 
+		        <button type="button" ng-if="pr_date_type" ng-click="editCancel()" class="btn btn-info" ng-hide="inputVO.STATUS=='02'" data-dismiss="modal">清除</button> 
+		        <button type="button" ng-click="closeThisDialog('cancel')" class="btn btn-info"data-dismiss="modal">離開</button> 
+        	</div>
+          </form>
+	 	</div>
+      </div>
+    </div>
+  </div>

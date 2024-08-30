@@ -1,0 +1,459 @@
+<style>
+/* open dialog */
+.ngdialog.PMS210 {
+	
+}
+/* dialog panl */
+#ejp>tbody {
+	width: 100% !important;
+}
+
+.modal-dialog.PMS210 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS210 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS210 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS210.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS210_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS210/PMS210.js"></script>
+
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setSpAss.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setSpBen.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setSpLevd.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setBsGoal.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setSpBouns.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setNewCustRate.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setNewSpBen.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setNewBsGoal.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setSpSalBen.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setNewBounty.js"></script>
+
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setBsAss.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setBsAum.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setBsPoint.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setBsPrize.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setBsGoalTar.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setBsBonus.js"></script>
+
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setShortTran.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setSpMar.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setSpUnLackInd.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setConNum.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setDisRate.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setDepositRate.js"></script>
+
+
+<div class="PMS210" ng-controller="PMS210Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif"><span style="font-size:22px">CNR獎金指標參數維護</span>
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table style="width:50%;margin-left: 0;">
+					<tr>
+						<th style="text-align:right; width:15%"><span style="color: red;">*</span>參數月份(YYYYMM)</th>
+						<td style="text-align:center; width:15%">
+							<e-combobox ng-datasource="mappingSet['timeE']"
+								ng-model="inputVO.docYearMon" ng-validate="false" ng-readonly="false"
+								ng-editable="false" ng-format="F3" ng-required="true"
+								width="150px" height="30px" style="line-height:20px;" />
+						</td>
+						<td style="text-align:left; width:30%;padding-left: 25px;">
+							<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+						</td>
+						<td style="text-align:left; width:30%;padding-left: 25px;">
+							<button type="button" class="btn btn-info" ng-click="callProc()">遞延至次月</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content" ng-show = "ifShow">
+			<div class="gv_tab_sc scroll_y"	style="white-space: nowrap;">
+				<table class="table-bordered">
+					<caption><div style="float:left; width:40%;">理專獎金參數表 </div><div style="float:left; width:50%; color:red; font-size:16px;">※外層資料設定完請先按儲存鍵</div></caption>
+					<tr>
+						<th style="background-color:#3399CC; color:white; width:30%; text-align:left">參數1.目標及配分</th>
+						<td style="width:20%; text-align:center"><button class="btn btn-info" ng-click="setSpAss(resultList)">{{SpAss_State}}</button></td>
+						<td style="width:50%">	
+							<input type="radio" name="SP_ASS" value="Y" ng-model="SpAss_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="SP_ASS" value="N" ng-model="SpAss_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數2.本薪倍數</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setSpBen(resultList)">{{SpBen_State}}</button></td>
+						<td>	
+							<input type="radio" name="SP_BEN" value="Y" ng-model="SpBen_IfAuto" >
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="SP_BEN" value="N" ng-model="SpBen_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數3.專員特殊休假對應目標折數</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setSpLevd(resultList)">{{SpLevd_State}}</button></td>
+						<td>
+							<input type="radio" name="SP_LEVD" value="Y" ng-model="SpLevd_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="SP_LEVD" value="N" ng-model="SpLevd_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數4.當月掛Goal日期對應目標折數</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setBsGoal(resultList)">{{BsGoal_State}}</button></td>
+						<td>
+							<input type="radio" name="BS_GOAL" value="Y" ng-model="BsGoal_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="BS_GOAL" value="N" ng-model="BsGoal_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數5.專員獎金率</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setSpBouns(resultList)">{{SpBouns_State}}</button></td>
+						<td ng-readonly="true">	
+							<input type="radio" name="SP_BOUNS" value="Y" ng-model="SpBouns_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="SP_BOUNS" value="N" ng-model="SpBouns_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數6.新戶開發獎金</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setNewCustRate(resultList)">{{NewCustRate_State}}</button></td>
+						<td>	
+							<input type="radio" name="NEW_CUST_RATE" value="Y" ng-model="NewCustRate_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="NEW_CUST_RATE" value="N" ng-model="NewCustRate_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數7.人員新任計績對應領獎門檻（本薪倍數）折數</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setNewSpBen(resultList)">{{NewSpBen_State}}</button></td>
+						<td>	
+							<input type="radio" name="NEW_SP_BEN" value="Y" ng-model="NewSpBen_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="NEW_SP_BEN" value="N" ng-model="NewSpBen_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數8.人員新任標準生產力目標折數</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setNewBsGoal(resultList)">{{NewBsGoal_State}}</button></td>
+						<td>	
+							<input type="radio" name="NEW_BS_GOAL" value="Y" ng-model="NewBsGoal_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="NEW_BS_GOAL" value="N" ng-model="NewBsGoal_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數9.本月掛GOAL專員本薪*本薪倍數</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setSpSalBen(resultList)">{{SpSalBen_State}}</button></td>
+						<td>	
+							<input type="radio" name="SP_SAL_BEN" value="Y" ng-model="SpSalBen_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="SP_SAL_BEN" value="N" ng-model="SpSalBen_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數10.新戶轉介獎金表</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setNewBounty(resultList)">{{NewBounty_State}}</button></td>
+						<td ng-readonly="true">	
+							<input type="radio" name="NEW_BOUNTY" value="Y" ng-model="NewBounty_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="NEW_BOUNTY" value="N" ng-model="NewBounty_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC; color:white; width:30%; text-align:left">參數11.FCH轉介獎金比率</th>
+						<td style="width:20%; text-align:center">
+							<input type="text" style="text-align: right" name="FchBountyRate_State" ng-model="FchBountyRate_State" size="10" maxlength="39" e-input-limit='ND'>%
+						</td>
+						<td style="width:50%">	
+							<input type="radio" name="FCH_BOUNTY_RATE" value="Y" ng-model="FchBountyRate_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="FCH_BOUNTY_RATE" value="N" ng-model="FchBountyRate_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC; color:white; width:30%; text-align:left">參數12.個別商品轉介獎金比率</th>
+						<td style="width:20%; text-align:center">
+							<input type="text" style="text-align: right" name="GoodsBountyRate_State" ng-model="GoodsBountyRate_State" size="10" maxlength="39" e-input-limit='ND'>%
+						</td>
+						<td style="width:50%">	
+							<input type="radio" name="GOODS_BOUNTY_RATE" value="Y" ng-model="GoodsBountyRate_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="GOODS_BOUNTY_RATE" value="N" ng-model="GoodsBountyRate_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+				</table>
+				<table class="table-bordered">
+					<caption>主管獎金參數表</caption>
+					<tr>
+						<th style="background-color:#3399CC; color:white; width:30%; text-align:left">參數1.達成率及配分</th>
+						<td style="width:20%; text-align:center"><button class="btn btn-info" ng-click="setBsAss(resultList)">{{BsAss_State}}</button></td>
+						<td style="width:50%">	
+							<input type="radio" name="BS_ASS" value="Y" ng-model="BsAss_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="BS_ASS" value="N" ng-model="BsAss_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數2.存投保收益目標</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setBsAum(resultList)">{{BsAum_State}}</button></td>
+						<td>	
+							<input type="radio" name="BS_AUM" value="Y" ng-model="BsAum_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="BS_AUM" value="N" ng-model="BsAum_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數3.主管請領分</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setBsPoint(resultList)">{{BsPoint_State}}</button></td>
+						<td>	
+							<input type="radio" name="BS_POINT" value="Y" ng-model="BsPoint_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="BS_POINT" value="N" ng-model="BsPoint_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數4.主管獎金表</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setBsPrize(resultList)">{{BsPrize_State}}</button></td>
+						<td>	
+							<input type="radio" name="BS_PRIZE" value="Y" ng-model="BsPrize_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="BS_PRIZE" value="N" ng-model="BsPrize_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數5.轄下專員達Goal率對應折數</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setBsGoalTar(resultList)">{{BsGoalTar_State}}</button></td>
+						<td>	
+							<input type="radio" name="BS_GOAL_TAR" value="Y" ng-model="BsGoalTar_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="BS_GOAL_TAR" value="N" ng-model="BsGoalTar_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數6.主管調任新舊分行獎金成數</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setBsBonus(resultList)">{{BsBonusInse_State}}</button></td>
+						<td>	
+							<input type="radio" name="BS_BONUS_INSE" value="Y" ng-model="BsBonusInse_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="BS_BONUS_INSE" value="N" ng-model="BsBonusInse_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+				</table>
+				<table class="table-bordered">
+					<caption>共用參數表</caption>
+					<tr>
+						<th style="background-color:#3399CC; color:white; width:30%; text-align:left">參數1.當月獎金發放日</th>
+						<td style="width:20%; text-align:center">
+							{{inputVO.insTime}}<input type="text" style="text-align: center" name="BonusDate_State" ng-model="BonusDate_State" size="2" maxlength="2" e-input-limit='N'>號
+						</td>
+						<td style="width:50%">	
+							<input type="radio" name="BONUS_DATE" value="Y" ng-model="BonusDate_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="BONUS_DATE" value="N" ng-model="BonusDate_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數2.短Trade計入收益</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setShortTran(resultList)">{{ShortTran_State}}</button></td>
+						<td>	
+							<input type="radio" name="SHORT_TRAN" value="Y" ng-model="ShortTran_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="SHORT_TRAN" value="N" ng-model="ShortTran_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數3.非財務扣分明細</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setSpMar(resultList)">{{SpMar_State}}</button></td>
+						<td>	
+							<input type="radio" name="SP_MAR" value="Y" ng-model="SpMar_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="SP_MAR" value="N" ng-model="SpMar_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數4.非財務指標及獨立列示重大缺失最低扣減金額</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setSpUnLackInd(resultList)">{{SpUnLackInd_State}}</button></td>
+						<td>	
+							<input type="radio" name="SP_UN_LACK_IND" value="Y" ng-model="SpUnLackInd_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="SP_UN_LACK_IND" value="N" ng-model="SpUnLackInd_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC; color:white; width:30%; text-align:left">參數5.保險遞延抽佣日</th>
+						<td style="width:20%; text-align:center">
+							<input type="radio" name="Auto_State" value="O" ng-model="Auto_State">
+							開
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="Auto_State" value="C" ng-model="Auto_State">
+							關&nbsp;&nbsp;&nbsp;&nbsp;
+							<span ng-show="Auto_State=='O'">
+							次月<input type="text" style="text-align: center" name="InsDate_State" ng-model="InsDate_State" size="2" maxlength="2" e-input-limit='N'>號
+							</span>
+						</td>
+						<td style="width:50%">	
+							<input type="radio" name="INS_DATE" value="Y" ng-model="InsDate_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="INS_DATE" value="N" ng-model="InsDate_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數6.信託不計績契約編號上傳</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setConNum(resultList)">{{ConNum_State}}</button></td>
+						<td>	
+							<input type="radio" name="CON_NUM" value="Y" ng-model="ConNum_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="CON_NUM" value="N" ng-model="ConNum_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數7.各商品預設CNR分配率</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setDisRate(resultList)">{{DisRate_State}}</button></td>
+						<td>	
+							<input type="radio" name="DIS_RATE" value="Y" ng-model="DisRate_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="DIS_RATE" value="N" ng-model="DisRate_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">參數8.當月四大類存款預算利差率設定</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setDepositRate(resultList)">{{DepositRate_State}}</button></td>
+						<td>	
+							<input type="radio" name="DEPOSIT_RATE" value="Y" ng-model="DepositRate_IfAuto">
+							自動遞延次月
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="DEPOSIT_RATE" value="N" ng-model="DepositRate_IfAuto">
+							逐月設定
+						</td>
+					</tr>
+				</table>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="saveChange()">儲存</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,198 @@
+<style>
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.rstable tbody tr td {
+	vertical-align:middle;
+	text-align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG420/ORG420.js"></script>
+<div ng-controller="ORG420Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3 scroll_y">
+			<table>
+				<tr>
+					<th>統計表：</th>
+					<td colspan="5">
+						<input type="radio" ng-model="inputVO.RPT_TYPE" ng-change="init('JOB')" value="JOB"><label>各職務統計表</label>&nbsp;&nbsp;
+						<input type="radio" ng-model="inputVO.RPT_TYPE" ng-change="init('AREA')" value="AREA"><label>全區域統計表</label>
+					</td>
+				</tr>
+				<tr>
+					<th width="16.6%">業務處：</th>
+					<td width="16.6%">
+						<e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id"
+									ng-validate="false" 
+									ng-disabled="AVAIL_REGION.length == 1"
+									ng-readonly="AVAIL_REGION.length == 1" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeRegion(region)"
+									style="line-height:20px;" />
+				   	</td>
+					<th width="16.6%">營運區：</th>
+					<td width="16.6%">
+						<e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="AVAIL_AREA.length == 1"
+									ng-readonly="AVAIL_AREA.length == 1" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeArea(region)"
+									style="line-height:20px;" />
+				   	</td>
+					<th width="16.6%">分行：</th>
+					<td width="16.6%">
+						<e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="AVAIL_BRANCH.length == 1"
+									ng-readonly="AVAIL_BRANCH.length == 1" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch(region)"
+									style="line-height:20px;" />
+			   		</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="query()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()" >清除</button>
+			<button type="button" class="btn btn-info" ng-click="export()" function-type="export" ng-disabled="empLeftJobLst.length == 0">匯出</button>
+		</div>
+	</div>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>
+	<div class="panel_content">
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="table-striped rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="empLeftJobLst" ng-show="inputVO.RPT_TYPE == 'JOB'">
+				<thead>
+					<tr>
+						<th ng-if="inputVO.RPT_TYPE == 'JOB'" >職務</th>
+						<th>1月份 </th>
+						<th>2月份 </th>
+						<th>3月份 </th>
+						<th>4月份 </th>
+						<th>5月份 </th>
+						<th>6月份 </th>
+						<th>7月份 </th>
+						<th>8月份 </th>
+						<th>9月份 </th>
+						<th>10月份</th>
+						<th>11月份</th>
+						<th>12月份</th>
+						<th>MTD<br/>截至<br/>{{inputVO.toDay}}<br/>離職人數</th>
+						<th>YTD<br/>截至<br/>{{inputVO.toDay}}<br/>離職人數</th>
+						<th>截至<br/>{{inputVO.toDay}}<br/>實際人數</th>
+						<th>YTD<br/>離職率</th>
+						<th>預計離職人數</th>
+						<th>總計</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in empLeftJobLst" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td ng-if="inputVO.RPT_TYPE == 'JOB'" ><div ng-if="row.ROLE_NAME == null"><b>小計</b></div>{{row.ROLE_NAME}}</td>
+						<td>{{row.JAN_CNT}}</td>
+						<td>{{row.FEB_CNT}}</td>
+						<td>{{row.MAR_CNT}}</td>
+						<td>{{row.APR_CNT}}</td>
+						<td>{{row.MAY_CNT}}</td>
+						<td>{{row.JUN_CNT}}</td>
+						<td>{{row.JUL_CNT}}</td>
+						<td>{{row.AUG_CNT}}</td>
+						<td>{{row.SEP_CNT}}</td>
+						<td>{{row.OCT_CNT}}</td>
+						<td>{{row.NOV_CNT}}</td>
+						<td>{{row.DEC_CNT}}</td>
+						<td>{{row.MN_LEAVING}}</td>
+						<td>{{row.YR_LEAVING}}</td>
+						<td>{{row.SERVING}}</td>
+						<td>{{row.RATE_LEAVING}}&nbsp;%</td>
+						<td>{{row.LEAVING}}</td>
+						<td>{{row.TOTAL_LEAVING}}</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<table class="table-striped rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="empLeftJobLst" ng-show="inputVO.RPT_TYPE == 'AREA'">
+				<thead>
+					<tr>
+						<th ng-if="inputVO.RPT_TYPE == 'JOB'" >職務</th>
+						<th ng-if="inputVO.RPT_TYPE == 'AREA'">業務處</th>
+						<th ng-if="inputVO.RPT_TYPE == 'AREA'">營運區</th>
+						<th ng-if="inputVO.RPT_TYPE == 'AREA'">分行別</th>
+						<th ng-if="inputVO.RPT_TYPE == 'AREA'">分行名稱</th>
+						<th>1月份 </th>
+						<th>2月份 </th>
+						<th>3月份 </th>
+						<th>4月份 </th>
+						<th>5月份 </th>
+						<th>6月份 </th>
+						<th>7月份 </th>
+						<th>8月份 </th>
+						<th>9月份 </th>
+						<th>10月份</th>
+						<th>11月份</th>
+						<th>12月份</th>
+						<th>MTD<br/>截至<br/>{{inputVO.toDay}}<br/>離職人數</th>
+						<th>YTD<br/>截至<br/>{{inputVO.toDay}}<br/>離職人數</th>
+						<th>截至<br/>{{inputVO.toDay}}<br/>實際人數</th>
+						<th>YTD<br/>離職率</th>
+						<th>預計離職人數</th>
+						<th>總計</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat-start="center in empLeftJobLst">
+						<td rowspan="{{center.ROWSPAN}}" colspan="{{center.COLSPAN}}">{{center.REGION_CENTER_NAME}}</td>
+					</tr>
+					<tr ng-repeat-start="branchArea in center.BRANCH_AREA">
+						<td rowspan="{{branchArea.ROWSPAN}}" colspan="{{branchArea.COLSPAN}}" ng-if="branchArea.BRANCH_AREA_NAME != null">{{branchArea.BRANCH_AREA_NAME}}</td>
+					</tr>
+					<tr ng-repeat-start="branch in branchArea.BRANCH">
+						<td rowspan="{{branch.ROWSPAN+1}}" ng-if="branch.BRANCH_NAME != null">{{branch.BRANCH_NBR}}</td>
+						<td rowspan="{{branch.ROWSPAN+1}}" ng-if="branch.BRANCH_NAME != null">{{branch.BRANCH_NAME}}</td>
+					</tr>
+					<tr ng-repeat-end ng-repeat="role in branch.ROLE">
+						<td>{{role.JAN_CNT}}</td>
+						<td>{{role.FEB_CNT}}</td>
+						<td>{{role.MAR_CNT}}</td>
+						<td>{{role.APR_CNT}}</td>
+						<td>{{role.MAY_CNT}}</td>
+						<td>{{role.JUN_CNT}}</td>
+						<td>{{role.JUL_CNT}}</td>
+						<td>{{role.AUG_CNT}}</td>
+						<td>{{role.SEP_CNT}}</td>
+						<td>{{role.OCT_CNT}}</td>
+						<td>{{role.NOV_CNT}}</td>
+						<td>{{role.DEC_CNT}}</td>
+						<td>{{role.MN_LEAVING}}</td>
+						<td>{{role.YR_LEAVING}}</td>
+						<td>{{role.SERVING}}</td>
+						<td>{{role.RATE_LEAVING}}&nbsp;%</td>
+						<td>{{role.LEAVING}}</td>
+						<td>{{role.TOTAL_LEAVING}}</td>
+					</tr>
+					<tr ng-repeat-end ng-hide="true"></tr>
+					<tr ng-repeat-end ng-hide="true"></tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

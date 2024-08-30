@@ -1,0 +1,318 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT400/IOT400.js"></script>
+<script type="text/javascript" src="assets/txn/IOT410/IOT410.js"></script>
+<script type="text/javascript" src="assets/txn/IOT421/IOT421.js"></script>
+<div class="IOT421" ng-controller="IOT421Controller" ng-cloak>
+	<!-- 查詢條件 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">保險電訪作業</div>
+		</div>
+	
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th class="col-md-1">適合度檢核編碼：</th>
+					<td class="col-md-5">
+						<input type="text" id="prematch_seq" name="prematch_seq" 
+							placeholder="請輸入..."
+							ng-model="inputVO.prematch_seq" 
+							maxlength="15"
+							class="form-control" 
+							style="width:200px; text-transform: uppercase;">
+					</td>
+					<th class="col-md-1">電訪狀態：</th>
+					<td class="col-md-5">
+						<e-combobox id="status" name="status"
+									ng-paramtype="IOT.CALLOUT_STATUS"
+									ng-model="inputVO.status"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3" 
+									ng-required="false" 
+									style="line-height:20px;"/>
+					</td>
+				</tr>
+				<tr>
+					<th class="col-md-1">案件編號：</th>
+					<td class="col-md-5">
+						<input type="text" id="case_id" name="case_id" 
+							placeholder="請輸入..."
+							ng-model="inputVO.case_id" 
+							maxlength="15"
+							class="form-control" 
+							style="width:200px; text-transform: uppercase;">
+					</td>					
+					<th class="col-md-1">要保人ID：</th>
+					<td class="col-md-5">
+						<input type="text" id="cust_id" name="cust_id" 
+							placeholder="請輸入..."
+							ng-model="inputVO.cust_id" 
+							maxlength="15"
+							class="form-control" 
+							style="width:200px; text-transform: uppercase;">
+					</td>
+				</tr>
+				<!-- <tr>
+					<th class="col-md-1">檢視狀態：</th>
+					<td class="col-md-5">
+						<e-combobox id="review_status" name="review_status"
+									ng-paramtype="CALLOUT.REVIEW_STATUS"
+									ng-model="inputVO.review_status"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3" 
+									ng-required="false" 
+									style="line-height:20px;" />
+					</td>				
+					<th class="col-md-1">電訪員：</th>
+					<td class="col-md-5">
+						<input type="text" id="call_person" name="call_person" 
+							   placeholder="請輸入..."
+							   ng-model="inputVO.call_person" 
+							   maxlength="15"
+							   class="form-control" 
+							   style="width:200px; text-transform: uppercase;">
+					</td>
+				</tr> -->
+				<tr>
+					<th class="col-md-1">要保書填寫申請日：</th>
+					<td class="col-md-5">
+						<div style="float: left" class="input-group datebox datewidth">
+							<input type="text" id="s_apply_date" name="s_apply_date"
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd"
+								   ng-model="inputVO.s_apply_date"
+								   is-open="model.a"
+								   datepicker-options="s_apply_dateOptions"
+								   ng-readonly="true"								
+								   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+							</span>
+						</div>	
+						<div style="float: left">&nbsp;~&nbsp;</div>
+						<div style="float: left" class="input-group datebox datewidth">
+							<input type="text" id="e_apply_date" name="e_apply_date"
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd"
+								   ng-model="inputVO.e_apply_date"
+								   is-open="model.b"
+								   datepicker-options="e_apply_dateOptions"
+								   ng-readonly="true"								
+								   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+							</span>
+						</div>
+					</td>
+					<th class="col-md-1">招攬人員員編：</th>
+					<td class="col-md-5">
+						<input type="text" id="recruit_id" name="recruit_id" 
+							   placeholder="請輸入..."
+							   ng-model="inputVO.recruit_id" 
+							   maxlength="15"
+							   class="form-control" 
+							   style="width:200px; text-transform: uppercase;">
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="export()">匯出</button>
+			<button type="button" class="btn btn-info" ng-click="save()">儲存</button>
+		</div>
+	</div>
+	
+	<!-- 查詢結果 -->
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+	</div>
+	<div class="panel_content">
+		<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="e-table-freeze" e-height="580px" e-left="{{freezeControl}}" e-mode="1" e-top="true" e-list="paramList">
+				<thead>
+					<tr>
+						<th>
+							<label>
+								<input type="checkbox" ng-model="pageControlVO.allChoice" ng-change="all()" /> 全選
+							</label>
+						</th>
+						<th>電訪紀錄登打/查詢</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="STATUS" e-query="query()">電訪狀態</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="PREMATCH_SEQ" e-query="query()">適合度檢核編碼</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="CASE_ID" e-query="query()">案件編號</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="APPLY_DATE" e-query="query()">要保書填寫申請日</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="INSPRD_ID" e-query="query()">主約險種代號</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="PROPOSER_NAME" e-query="query()">要保人姓名</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">要保人ID</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="C_CALL_TYPE" e-query="query()">要保人電訪類型</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="C_TIME" e-query="query()">要保人方便聯絡時段</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_NAME" e-query="query()">被保險人姓名</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_ID" e-query="query()">被保險人ID</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="I_CALL_TYPE" e-query="query()">被保險人電訪類型</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="I_TIME" e-query="query()">被保險人方便聯絡時段</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="PAYER_NAME" e-query="query()">繳款人姓名</e-sorter>
+						</th>
+						
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="PAYER_ID" e-query="query()">繳款人ID</e-sorter>
+						</th>
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="P_CALL_TYPE" e-query="query()">繳款人電訪類型</e-sorter>
+						</th>
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="P_TIME" e-query="query()">繳款人方便聯絡時段</e-sorter>
+						</th>
+						<th scope="col" data-tablesaw-sortable-col>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="RECRUIT_ID" e-query="query()">招攬人員員編</e-sorter>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center">
+							<label style="font-weight: initial; margin-bottom: 0px;">
+								<input type="checkbox" ng-model="row.SELECTED">
+							</label>
+						</td>
+						<td align="center">
+							<a href="#" ng-click="openIOT410(row)">電訪紀錄登打/查詢</a>
+						</td>
+						<td>{{row.STATUS | mapping:mappingSet['CALLOUT_STATUS']:'F3'}}</td>
+						<td>
+							<a href="#" ng-click="openIOT400(row)">{{row.PREMATCH_SEQ}}</a>
+						</td>
+						<td>{{row.CASE_ID}}</td>
+						<td>{{row.APPLY_DATE}}</td>
+						<td>{{row.INSPRD_ID}}</td>
+						
+						<!-- 要保人 -->
+						<td ng-show="row.CALL_C_YN == 'Y'">{{row.PROPOSER_NAME}}</td>
+						<td ng-hide="row.CALL_C_YN == 'Y'"></td>
+						<td ng-show="row.CALL_C_YN == 'Y'">{{row.CUST_ID}}</td>
+						<td ng-hide="row.CALL_C_YN == 'Y'"></td>
+						<td ng-show="row.C_CALL_TYPE == '0000' || row.CALL_C_YN != 'Y'"></td>
+						<td ng-hide="row.C_CALL_TYPE == '0000' || row.CALL_C_YN != 'Y'">{{row.C_CALL_TYPE | mapping:mappingSet['CALLOUT.CALL_TYPE']:'F3'}}</td>
+						<!-- <td>{{row.C_TIME != '0000' ? (row.C_TIME | mapping:mappingSet['CALLOUT.TIME']:'F3') : ''}}</td> -->
+						<td ng-show="row.C_CALL_TYPE == '0000' || row.CALL_C_YN != 'Y'"></td>
+						<td ng-hide="row.C_CALL_TYPE == '0000' || row.CALL_C_YN != 'Y'">
+							<input type="checkbox" ng-model="row.C_TIME1" ng-true-value="'Y'" ng-false-value="'N'"> 09：00～12：00</br>
+	    					<input type="checkbox" ng-model="row.C_TIME2" ng-true-value="'Y'" ng-false-value="'N'"> 12：00～15：00</br>
+	    					<input type="checkbox" ng-model="row.C_TIME3" ng-true-value="'Y'" ng-false-value="'N'"> 15：00～18：00</br>
+	    					<input type="checkbox" ng-model="row.C_TIME4" ng-true-value="'Y'" ng-false-value="'N'"> 18：00～20：00
+	    					<input type="text" id="c_time_memo" name="c_time_memo" 
+								   placeholder="限30個字"
+								   ng-model="row.C_TIME_MEMO" 
+								   maxlength="30"
+								   class="form-control" 
+								   style="width:200px; margin-top: 3px;">
+						</td>
+						
+						<!-- 被保人 -->
+						<td ng-show="row.CALL_I_YN == 'Y'">{{row.INSURED_NAME}}</td>
+						<td ng-hide="row.CALL_I_YN == 'Y'"></td>
+						<td ng-show="row.CALL_I_YN == 'Y'">{{row.INSURED_ID}}</td>
+						<td ng-hide="row.CALL_I_YN == 'Y'"></td>
+						<td ng-show="row.I_CALL_TYPE == '0000' || row.CALL_I_YN != 'Y'"></td>
+						<td ng-hide="row.I_CALL_TYPE == '0000' || row.CALL_I_YN != 'Y'">{{row.I_CALL_TYPE | mapping:mappingSet['CALLOUT.CALL_TYPE']:'F3'}}</td>
+						<!-- <td>{{row.I_TIME != '0000' ? (row.I_TIME | mapping:mappingSet['CALLOUT.TIME']:'F3') : ''}}</td> -->
+						<td ng-show="row.I_CALL_TYPE == '0000' || row.CALL_I_YN != 'Y'"></td>
+						<td ng-hide="row.I_CALL_TYPE == '0000' || row.CALL_I_YN != 'Y'">
+							<input type="checkbox" ng-model="row.I_TIME1" ng-true-value="'Y'" ng-false-value="'N'"> 09：00～12：00</br>
+	    					<input type="checkbox" ng-model="row.I_TIME2" ng-true-value="'Y'" ng-false-value="'N'"> 12：00～15：00</br>
+	    					<input type="checkbox" ng-model="row.I_TIME3" ng-true-value="'Y'" ng-false-value="'N'"> 15：00～18：00</br>
+	    					<input type="checkbox" ng-model="row.I_TIME4" ng-true-value="'Y'" ng-false-value="'N'"> 18：00～20：00
+	    					<input type="text" id="i_time_memo" name="i_time_memo" 
+								   placeholder="限30個字"
+								   ng-model="row.I_TIME_MEMO" 
+								   maxlength="30"
+								   class="form-control" 
+								   style="width:200px; margin-top: 3px;">
+						</td>
+						
+						<!-- 繳款人 -->
+						<td ng-show="row.CALL_P_YN == 'Y'">{{row.PAYER_NAME}}</td>
+						<td ng-hide="row.CALL_P_YN == 'Y'"></td>
+						<td ng-show="row.CALL_P_YN == 'Y'">{{row.PAYER_ID}}</td>
+						<td ng-hide="row.CALL_P_YN == 'Y'"></td>
+						<td ng-show="row.P_CALL_TYPE == '0000' || row.CALL_P_YN != 'Y'"></td>
+						<td ng-hide="row.P_CALL_TYPE == '0000' || row.CALL_P_YN != 'Y'">{{row.P_CALL_TYPE | mapping:mappingSet['CALLOUT.CALL_TYPE']:'F3'}}</td>
+						<!-- <td>{{row.P_TIME != '0000' ? (row.P_TIME | mapping:mappingSet['CALLOUT.TIME']:'F3') : ''}}</td> -->
+						<td ng-show="row.P_CALL_TYPE == '0000' || row.CALL_P_YN != 'Y'"></td>
+						<td ng-hide="row.P_CALL_TYPE == '0000' || row.CALL_P_YN != 'Y'">
+							<input type="checkbox" ng-model="row.P_TIME1" ng-true-value="'Y'" ng-false-value="'N'"> 09：00～12：00</br>
+	    					<input type="checkbox" ng-model="row.P_TIME2" ng-true-value="'Y'" ng-false-value="'N'"> 12：00～15：00</br>
+	    					<input type="checkbox" ng-model="row.P_TIME3" ng-true-value="'Y'" ng-false-value="'N'"> 15：00～18：00</br>
+	    					<input type="checkbox" ng-model="row.P_TIME4" ng-true-value="'Y'" ng-false-value="'N'"> 18：00～20：00
+	    					<input type="text" id="p_time_memo" name="p_time_memo" 
+								   placeholder="限30個字"
+								   ng-model="row.P_TIME_MEMO" 
+								   maxlength="30"
+								   class="form-control" 
+								   style="width:200px; margin-top: 3px;">
+						</td>
+						
+						<td>{{row.RECRUIT_ID}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

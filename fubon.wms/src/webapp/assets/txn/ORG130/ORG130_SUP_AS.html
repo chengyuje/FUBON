@@ -1,0 +1,227 @@
+<style>
+/* dialog panl */
+.modal-dialog.ORG130_AS {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: 100vh;
+
+}
+.red{
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG130/ORG130_AS.js"></script>
+<div ng-controller="ORG130_ASController" ng-cloak>
+	<div class="modal-dialog ORG130_AS"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">面談評估表</h4>
+			</div>
+			<div class="modal-body">
+	 			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			  	<table border="1" class="tablesaw table table-striped table-bordered">
+					<tr>
+						<th width="15%" colspan="2" style="vertical-align:middle;text-align:center;">姓名</th>
+						<td width="20%" colspan="2" style="vertical-align:middle;"><input type="text" class="form-control" ng-model="inputVO.emp_name" ng-disable="inputVO.emp_name != null"  ng-readonly="true" e-length-limit="100" size="20"></td>
+						<th width="15%" colspan="2" rowspan="2" style="vertical-align:middle;text-align:center;">應徵職務</th>
+						<td width="20%" colspan="2" rowspan="2" style="vertical-align:middle;">
+							{{inputVO.ao_job_rank}}
+						</td>
+						<th colspan="2" rowspan="2" width="15%" style="vertical-align:middle;text-align:center;">推薦人</th>
+						<td colspan="2" rowspan="2" width="15%" style="vertical-align:middle;">
+							<input type="text" class="form-control" ng-hide="true" ng-model="inputVO.recommender_emp_id"  ng-readonly="true" e-length-limit="11" size="20" ng-disable="inputVO.recommender_emp_id!=null">
+							<input type="text" class="form-control" ng-model="inputVO.recommender_emp_name"  ng-readonly="true" e-length-limit="11" size="20" ng-disable="inputVO.recommender_emp_name!=null">
+						</td>
+					</tr>
+					<tr>
+						<th width="10%" colspan="2" style="vertical-align:middle;text-align:center;">分行</th>
+						<td width="20%" colspan="2" style="vertical-align:middle;">
+							<e-combobox id="br_id" name="br_id" 
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.br_id"
+										ng-validate="false" 
+										ng-readonly="inputVO.br_id != null" 
+										ng-disabled="inputVO.br_id != null"
+										ng-editable="false"
+										ng-format="F3"
+										width="150px"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+						<tr>
+							<th class="red" colspan="12" style="vertical-align:middle; text-align:center; background-color :#c7bdbd;">必備證照檢核(必填)</th>
+						</tr>
+						<tr>
+							<td colspan="12" style="vertical-align:middle;">
+								<label ng-repeat="req in mappingSet['ORG.REQ_CERTIFICATE']">
+									<input type="checkbox" name="selectedCodes[]" value="{{req.DATA}}" 
+										ng-checked="inputVO.req_certificate.indexOf(req.DATA) > -1" 
+										ng-click= "toggleSelection(req.DATA)"
+										ng-required="true"> {{req.LABEL}}
+									&nbsp;&nbsp;
+								</label>
+								<br />
+								<label style="color :#8100E0;">FC：編號1、2、3、 4金融證照須於任用前取得；FCH：編號1、2、3金融證照須於任用前取得。</label>
+							</td>
+						</tr>
+						<tr>
+							<th colspan="12" style="vertical-align:middle;text-align:center; background-color :#c7bdbd;" >評估項目【前職績效】</th>
+						</tr>
+						<tr>
+							<th colspan="4" width="20%" style="vertical-align:middle;">相關金融工作資歷</th>
+							<td colspan="8" style="vertical-align:middle;">
+								<label ng-repeat="fin in mappingSet['ORG.FINANCIAL_EXP']">
+									<input class="uniform_on" type="radio" name="financial_exp" ng-model="inputVO.financial_exp" value="{{fin.DATA}}" > {{fin.LABEL}}
+									&nbsp;&nbsp;
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th colspan="4" style="vertical-align:middle;">前職金融機構</th>
+							<td colspan="8" style="vertical-align:middle;">
+								<label ng-repeat="pre in mappingSet['ORG.PRE_FIN_INST']">
+									<input class="uniform_on" type="radio" name="pre_fin_inst" ng-model="inputVO.pre_fin_inst"  value="{{pre.DATA}}" ng-change="changepre();" > {{pre.LABEL}}
+									&nbsp;&nbsp;
+								</label><br>
+								<label><input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.other_fi" e-length-limit="100" size="20"></label>
+<!-- 								<label><input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.other_pre_fin_inst" ng-disabled="(inputVO.mroleID != '0')||(inputVO.mroleID == '0' && row.SEQNO != 0 && row.REVIEW_STATUS !='N'&& row.REVIEW_STATUS != null)||(inputVO.mroleID == '0' && row.HIRE_STATUS !='0'&& row.HIRE_STATUS!='4') "  e-length-limit="100" size="20"></label> -->
+							</td>
+						</tr>
+						<tr>
+							<th colspan="4" class="red" style="vertical-align:middle;">前職業績表現(必填)</th>
+							<td colspan="8" style="vertical-align:middle;">
+								<label>每月業績目標(萬)︰<input type="text" class="form-control" placeholder="請輸入..." name="cur_m_goal" ng-model="inputVO.cur_m_goal" ng-maxlength="11" size="20" ></label>
+								<label>實際達成(萬)︰<input type="text" class="form-control" placeholder="請輸入..." name="actual_accomplish" ng-model="inputVO.actual_accomplish" ng-pattern="integerval"  ng-maxlength="11"  size="20" ></label><br>
+								<div class="red" ng-show="parameterTypeEditForm.cur_m_goal.$invalid" >每月業績目標(最多11碼)</div>
+								<div class="red" ng-show="parameterTypeEditForm.actual_accomplish.$invalid">實際達成(最多11碼)</div>
+								<label>管理客戶資產(億)︰<input type="text" class="form-control" placeholder="請輸入..." name="cur_aum" id="cur_aum" ng-model="inputVO.cur_aum" ng-pattern="integerval" ng-maxlength="11" size="20" ></label>
+								<label>管理客戶數︰<input type="text" class="form-control" placeholder="請輸入..." name="cust_cnt" ng-model="inputVO.cust_cnt" ng-pattern="integerval" size="20" ng-maxlength="11" ></label>
+								<div class="red" ng-show="parameterTypeEditForm.cur_aum.$invalid">管理客戶資產(最多11碼)</div>
+								<div class="red" ng-show="parameterTypeEditForm.cur_cnt.$invalid">管理客戶數(最多11碼)</div>
+							</td>
+						</tr>
+						<tr>
+							<th colspan="4" style="vertical-align:middle;">離職原因</th>
+							<td colspan="8" style="vertical-align:middle;">
+								<input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.resign_reason" e-length-limit="500" size="20" width="80px">
+							</td>
+						</tr>
+						<tr>
+							<th colspan="4" style="vertical-align:middle;">客戶紛爭/滿意度</th>
+							<td colspan="8" style="vertical-align:middle;">
+								<input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.cust_satisfaction" e-length-limit="500" size="20" width="80px">
+							</td>
+						</tr>
+						<tr>
+							<th width="60%"  style="vertical-align:middle;" colspan="8">評估項目</th>
+							<th width="7.5%" style="vertical-align:middle;text-align:center;">極佳</th>
+							<th width="7.5%" style="vertical-align:middle;text-align:center;">佳</th>
+							<th width="7.5%" style="vertical-align:middle;text-align:center;">普通</th>
+							<th width="7.5%" style="vertical-align:middle;text-align:center;">待加強</th>
+						</tr>
+						<tr>
+							<th colspan="8" style="vertical-align:middle;">
+								<b>【成就導向】設定清楚明確目標，對成功具有強烈的渴望，要求自己克服障礙，完成具有挑戰性的任務。</b><br />
+								關鍵行為：設定挑戰性的工作目標、期望超越績效標準、展現熱情與行動性、挫敗中仍然積極採取行動
+							</th>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.achievement" value="1"></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.achievement" value="2"></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.achievement" value="3"></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.achievement" value="4"></td>
+						</tr>
+						<tr>
+							<th colspan="8" style="vertical-align:middle;">
+								<b>【抗壓性】在工作壓力及業績要求情況下，仍能維持一定的服務及作業品質，並展現穩定的工作表現。</b><br />
+								關鍵行為：保持工作專注、維持良好人際關係、穩定的情緒表現、適當的壓力處理
+							</th>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.sales_skill" value="1" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.sales_skill" value="2" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.sales_skill" value="3" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.sales_skill" value="4" ></td>
+						</tr>
+						<tr>
+							<th colspan="8" style="vertical-align:middle;">
+								<b>【銷售能力/潛力】能清楚掌握客戶需求，運用適當銷售策略及方法，達成公司業績目標。</b><br />
+								關鍵行為：掌握客戶需求、擬定銷售策略、展現銷售技巧、熟悉金融商品、掌握市場動態
+							</th>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.active" value="1"></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.active" value="2"></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.active" value="3"></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.active" value="4"></td>
+						</tr>
+						<tr>
+							<th colspan="8" style="vertical-align:middle;">
+								<b>【客戶關係維護能力】以積極與熱忱的態度與客戶建立良好互動關係，在不犧牲公司利益之情況下，致力建立顧客滿意度及忠誠度。</b><br />
+								關鍵行為：主動與客戶聯繫、傾聽客戶期望、建立信任關係、追求客戶滿意/創造客戶價值
+							</th>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.pressure_manage" value="1" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.pressure_manage" value="2" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.pressure_manage" value="3" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.pressure_manage" value="4" ></td>
+						</tr>
+						<tr>
+							<th colspan="8" style="vertical-align:middle;">
+								<b>【持續學習】主動尋求學習的機會並積極參與，同時將學習所獲得的新知識與技巧運用在工作中。</b><br />
+								關鍵行為：找出工作需要的學習領域、快速吸取新資訊、願意接受回饋、應用所學技能
+							</th>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.communication" value="1" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.communication" value="2" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.communication" value="3" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.communication" value="4" ></td>
+						</tr>
+						<tr>
+							<th colspan="8" style="vertical-align:middle;">
+								<b>【組織認同】認同組織文化與價值觀，對組織有歸屬感與責任感，展現對企業的向心力。</b><br />
+								關鍵行為：對企業價值認同(認知)、能與團隊融合(成員)、願意為組織目標努力(投入)、具有組織忠誠度(忠誠)
+							</th>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.problem_solving_skill" value="1" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.problem_solving_skill" value="2" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.problem_solving_skill" value="3" ></td>
+							<td style="vertical-align:middle;text-align:center;"><input type="radio" ng-model="inputVO.problem_solving_skill" value="4"></td>
+						</tr>
+						<tr>
+							<th colspan="3" style="vertical-align:middle;text-align:center;"><label>面談主管評語<br /><span class="red">(請輸入五個字以上)</span></label></th><!-- <br><label class="red">建議之職級、職等、職稱(必填)</label> -->
+							<td colspan="9" style="vertical-align:middle;">
+							<textarea name="intv_sup_remark" id="intv_sup_remark" 
+                   					  placeholder="請輸入..." 
+                   					  ng-model="inputVO.intv_sup_remark" 
+                   					  maxlength="500" 
+                   					  ng-minlength="5"
+                   					  style="width: 100%; height: 100px" 
+                   					  class="form-control" 
+                   					  >
+                   			</textarea>
+							</td>
+						</tr>
+						<tr>
+							<th colspan="3" style="vertical-align:middle;text-align:center;"><label>評估未來6M平均手收能力</label></th>
+							<td colspan="4" style="vertical-align:middle;"><input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.fee_6m_ability"  e-input-limit="N"></td>
+							<th colspan="1" style="vertical-align:middle;text-align:center;"><label>評估未來1Y平均手收能力</label></th>
+							<td colspan="4" style="vertical-align:middle;"><input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.fee_1y_ability" e-input-limit="N"></td>
+						</tr>
+						<tr>
+							<th colspan="3" style="vertical-align:middle;text-align:center;"><label>建議職等職稱</label></th>
+							<td colspan="4" style="vertical-align:middle;"><input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.suggest_job"></td>
+							<th colspan="1" style="vertical-align:middle;text-align:center;"><label>建議薪資(整包月薪)</label></th>
+							<td colspan="4" style="vertical-align:middle;"><input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.suggest_salary" e-input-limit="N"></td>
+						</tr>
+					</table>
+				</form>	
+				<div class="search_box_btn text-center" >
+				<button type="button" class="btn btn-info"
+				        ng-click="save(row);">儲存</button>
+				<button type="button" class="btn btn-info"
+				        ng-click="save(row);">暫存</button>
+				<button type="button" class="btn btn-info" ng-click="clear();">重填</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>
+						

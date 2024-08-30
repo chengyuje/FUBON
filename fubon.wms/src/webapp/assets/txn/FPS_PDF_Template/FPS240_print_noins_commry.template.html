@@ -1,0 +1,119 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+
+
+</style>
+
+<!-- 無投保、有推介 -->
+<div class="print A4" ng-controller="FPSPrintController">
+
+  <!-- header -->
+  <section>
+    <img ng-src="{{path.header}}" class="wrapper" print="header">
+  </section>
+
+  <!-- title -->
+  <section print print-top-margin="-5" style="margin-bottom:2em;" class="wrapper">
+    <div ng-include="path.brief"></div>
+  </section>
+
+  <!-- image -->
+  <section>
+    <img ng-if="rptUrl"
+         data-ng-src="{{rptUrl}}"
+         alt="rptUrleName"
+         style="margin-bottom:1em; width:100%;"
+         print="image"
+         print-page="next"
+         print-scale-direction="vertical">
+  </section>
+
+  <!-- cust -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">1</span>基本資料
+    </div>
+    <div class="block container" style="border-radius: 1em;">
+      <div ng-include="path.custInfo" ng-init="isPrint=true"></div>
+    </div>
+  </section>
+
+  <!-- amt FPS210 -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">2</span>您的規劃金額
+    </div>
+    <div class="wrapper">
+      <p class="sub-title-p">您的資產扣除預期支付後，即為可供理財規劃金額。</p>
+      <div class="ps-wrapper" style="float:right;">單位: 新台幣 元</div>
+    </div>
+
+    <div ng-include="path.validAmount"></div>
+    <div ng-include="path.validAmount_ps"></div>
+  </section>
+
+  <!-- charts FPS220 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">3</span>配置比例與商品明細
+      </div>
+    </div>
+
+    <!-- 無投保 -->
+    <div ng-include="path.firstPlanChart" print print-unique="true"></div>
+    <div print style="margin-top: -20px;">
+      <div class="block container" style="border-color:#93c5e1;margin-bottom:0px">
+        <!-- deposit fixed stock -->
+        <div ng-include="path.firstPlanProduct" ng-repeat="block in blockObjects" ng-init="block = block" print-wrapper></div>
+      </div>
+    </div>
+    <div ng-include="path.firstPlanChart_ps" print></div>
+  </section>
+
+  <!-- products FPS230 -->
+  <section ng-if="!notShow.historyPerformance">
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">4</span>投資組合歷史績效
+      </div>
+      <div class="wrapper"><p class="sub-title-p">依前述投資組合中關於基金與ETF之歷史價格資料所計算之投資組合歷史報酬表現。</p></div>
+    </div>
+    <div ng-include="path.historyPerformance" print print-unique="true"></div>
+    <div ng-include="path.historyPerformance_ps" print></div>
+  </section>
+
+  <!-- product performance -->
+  <section print ng-if="!notShow.productPerformance">
+    <div class="title-wrapper">
+      <span class="title-num" ng-bind="5-notShow.historyPerformance"></span>商品歷史績效
+    </div>
+    
+    <div ng-include="path.productPerformance"></div>
+    <div ng-include="path.productPerformance_ps"></div>
+  </section>
+
+  <!-- 使用指南 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num" ng-bind="6-notShow.historyPerformance-notShow.productPerformance"></span>規劃書使用指南
+      </div>
+    </div>
+
+    <div ng-include="path.manual" print></div>
+  </section>
+
+  <!-- 注意事項 -->
+  <section ng-if="transactionList.length>0">
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num" ng-bind="7-notShow.historyPerformance-notShow.productPerformance"></span>注意事項
+      </div>
+    </div>
+
+    <div ng-include="path.notice" print></div>
+  </section>
+  <div id="hiddendom"></div>
+</div>

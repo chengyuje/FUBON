@@ -1,0 +1,257 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/PMS203/PMS203.js"></script>
+<script type="text/javascript" src="assets/txn/PMS203/PMS203_SET_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS203/PMS203_TAR_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS203/PMS203_INS_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS203/PMS203_SALE_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS203/PMS203_PRD_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS203/PMS203_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS203" ng-controller="PMS203Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<div class="search_table search_box3">
+				<table>
+					<tr>
+						<th><font color=red> ＊ </font>查詢月份：</th>
+						<td>						 						 					
+							<e-combobox id="dataMonth" name="dataMonth"
+							ng-datasource="mappingSet['timeE']" 
+							ng-model="inputVO.sCreDate"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false" 
+							ng-required="true" 
+							ng-change="limitDate();dateChange()" 
+							ng-format="F3" 
+							width="120px" style="line-height:20px;" />														
+						</td>
+						<th><font color=red> ＊ </font>目標類型：</th>
+						<td>
+							<e-combobox id="tgtType" name="tgtType" 
+							ng-datasource="mappingSet['target']"
+							ng-model="inputVO.tgtType"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false"	
+							ng-change="target()"						
+							ng-format="F3"
+							ng-required="true"
+							width="200px"
+							style="line-height:20px;" />
+						</td>	
+						<!-- 為客戶要求的畫面，即使理專職級無用也要顯示出來應付一下 -->
+						<th> 分行別： </th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-disabled="disableBranchCombo"
+							ng-readonly="disableBranchCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeBranch()"
+							width="170px"
+							style="line-height:20px;" />
+						</td>
+						
+						<!-- 為客戶要求的畫面，即使理專職級無用也要顯示出來應付一下 -->
+						<th ng-hide="inputVO.tgtType == 'INS' || inputVO.tgtType == 'SALE' || inputVO.tgtType == 'TAR'"> 理專： </th>
+						<td ng-hide="inputVO.tgtType == 'INS' || inputVO.tgtType == 'SALE' || inputVO.tgtType == 'TAR'">
+							<e-combobox id="ao_code" name="ao_code"
+							ng-datasource="AO_LIST"
+							ng-model="inputVO.ao_code"
+							ng-validate="false"
+							ng-disabled="disableAoCombo"
+							ng-readonly="disableAoCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeAo_code()"
+							width="120px"
+							style="line-height:20px;" />
+						</td>
+
+
+						<th ng-hide="inputVO.tgtType != 'TAR'"> 員編： </th>
+						<td ng-hide="inputVO.tgtType != 'TAR'">
+							<e-combobox id="emp_id" name="emp_id"
+							ng-datasource="EMP_LIST"
+							ng-model="inputVO.emp_id"
+							ng-validate="false" 
+							ng-disabled="disableEmpCombo"
+							ng-readonly="disableEmpCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeEmpID()"
+							width="170px"
+							style="line-height:20px;" />
+						</td>
+					</tr>									
+				</table>
+			</div>
+			</form>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT(inputVO.tgtType)" ng-disabled="paramList.length < 1">匯出</button>				
+				<button type="button" class="btn btn-info" ng-click="upload(inputVO.tgtType, inputVO.reportDate)">整批匯入</button>				
+				<button type="button" class="btn btn-info" ng-click="edit(row, inputVO.tgtType)">新增</button>
+				<button type="button" class="btn btn-info" ng-show="inputVO.tgtType == 'SET' || inputVO.tgtType == 'TAR' " ng-click="runJob()" >生產力目標維護更新</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"> {{rsDate}} {{rsTitle}} &nbsp;&nbsp;</div>
+		</div>
+		<!--Content of the panel-->		
+		<div class="panel_content">		    
+			<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>				
+			<div class="gv_tab_sc scroll_y">
+				<table table class="rstable">
+					<thead>
+						<tr>
+							<th ng-show="tbTitle != 'TAR'" width="70px">修改</th>
+							<th ng-show="tbTitle == 'TAR'" width="120px">功能</th>
+
+<!-- 							<th ng-show="editflag">刪除					 		
+								<button data-toggle="modal" class="btn btn-danger btn-circle" ng-click="delData(row, tbTitle)">
+						 			<i class="glyphicon glyphicon-trash"></i>
+						 		</button>
+							</th> -->
+
+							<th ng-show="tbTitle == 'TAR'">資料年月</th>
+							<th ng-show="tbTitle == 'SET'">級距</th>
+							<th ng-show="tbTitle == 'SET'">職等/職稱</th>
+							<th ng-show="tbTitle == 'TAR'">業務處代碼</th>													
+							<th ng-show="tbTitle != 'SET'">業務處</th>
+							<th ng-show="tbTitle == 'TAR'">營運區代碼</th>
+							<th ng-show="tbTitle != 'SET'">營運區</th>
+							<th ng-show="tbTitle != 'SET'">分行</th>
+							<th ng-show="tbTitle == 'TAR'">員編</th>
+							<th ng-show="tbTitle == 'PRD'">理專</th>
+							<th ng-show="tbTitle != 'INS' && tbTitle != 'SALE'">職級</th>	
+							<th ng-show="tbTitle == 'PRD'">主商品代號</th>
+							<th ng-show="tbTitle == 'PRD'">主商品名稱</th>							
+							<th ng-show="tbTitle == 'SET'">生產力目標</th>
+							<th ng-show="tbTitle == 'SET'">維持級距目標</th>
+							
+<!-- 							<th ng-show="tbTitle == 'SET'">晉級目標</th> -->
+
+							<th ng-show="tbTitle == 'SET'">晉級<br>直線級距</th>
+							<th ng-show="tbTitle == 'SET'">晉級<br>橫向級距</th>
+							<th ng-show="tbTitle == 'SET'">晉級<br>45度級距</th>
+							<th ng-show="tbTitle == 'SET'">降級<br>直線級距</th>
+							<th ng-show="tbTitle == 'SET'">降級<br>橫向級距</th>
+							<th ng-show="tbTitle == 'SET'">降級<br>45度級距</th>
+							<th ng-show="tbTitle == 'SET'">定額調薪</th>							
+							<!-- <th ng-show="tbTitle == 'TAR'">到職日</th> -->
+							<!-- <th ng-show="tbTitle == 'TAR'">職稱</th> -->
+							<th ng-show="tbTitle == 'TAR' || tbTitle == 'PRD'">目標金額</th>							
+							<th ng-show="tbTitle == 'INS' || tbTitle == 'SALE'">投資目標金額</th>
+							<th ng-show="tbTitle == 'INS' || tbTitle == 'SALE'">保險目標金額</th>
+							<th ng-show="tbTitle == 'INS'">匯兌目標金額</th>
+							<th ng-show="tbTitle == 'INS' || tbTitle == 'SALE'">總目標金額</th>							
+							<th ng-show="tbTitle != 'SET'">維護日期</th>
+							<th ng-show="tbTitle != 'SET'">維護人員</th>																											
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td ng-show="tbTitle == 'TAR'">
+						 		<button href="#" class="btn btn-warning btn-circle" ng-click="edit2(row, tbTitle)">
+						 			<i class="glyphicon glyphicon-pencil"></i>
+						 		</button>
+						 		
+								<button href="#" class="btn btn-danger btn-circle" ng-click="delTAR(row)" >
+						 			<i class="glyphicon glyphicon-trash"></i>
+						 		</button>
+							</td>
+							 
+							<td ng-show="tbTitle != 'TAR'">
+						 		<button href="#" class="btn btn-warning btn-circle" ng-click="edit2(row, tbTitle)">
+						 			<i class="glyphicon glyphicon-pencil"></i>
+						 		</button>
+							</td>
+							 
+							<td align="center" ng-show="tbTitle == 'SET'">{{row.LEVEL_DISTANCE}}</td>
+							<td ng-show="tbTitle == 'TAR'">{{row.DATA_YEARMON}}</td>	
+							<td ng-show="tbTitle == 'SET'">{{row.OL_TITLE_N}}</td>
+							<td ng-show="tbTitle == 'TAR'">{{row.REGION_CENTER_ID}}</td>					
+							<td ng-show="tbTitle != 'SET'">{{row.REGION_CENTER_NAME}}</td>
+							<td ng-show="tbTitle == 'TAR'">{{row.BRANCH_AREA_ID}}</td>
+							<td ng-show="tbTitle != 'SET'">{{row.BRANCH_AREA_NAME}}</td>
+							<td ng-show="tbTitle != 'SET'">{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+							<td ng-show="tbTitle == 'TAR'">{{row.EMP_ID}} - {{row.EMP_NAME}}</td>	
+							<td ng-show="tbTitle == 'PRD'">{{row.AO_CODE}} - {{row.EMP_NAME}}</td>
+							<!-- <td ng-show="tbTitle == 'TAR'">{{row.AO_CODE}}</td>									 -->
+							<td ng-show="tbTitle != 'INS' && tbTitle != 'SALE'">{{row.JOB_TITLE_ID}}</td>	
+							<td align="center" ng-show="tbTitle == 'PRD'">{{row.MAIN_PRD_ID}}</td>	<!-- 商品目標_主商品代號 -->
+							<td ng-show="tbTitle == 'PRD'">{{row.MAIN_PRD_NAME}}</td>	<!-- 商品目標_主商品名稱 -->						
+							<td align="right" ng-show="tbTitle == 'SET'">{{row.PRODUCT_GOALS | currency:'$':0}}</td>
+							<td align="right" ng-show="tbTitle == 'SET'">{{row.KEEP_GOALS | currency:'$':0}}</td>
+							
+<!-- 							<td align="right" ng-show="tbTitle == 'SET'">{{row.ADVAN_GOALS | currency:'$':2}}</td> -->
+
+							<td align="right" ng-show="tbTitle == 'SET'">{{row.PRO_STR_LINE}}</td>
+							<td align="right" ng-show="tbTitle == 'SET'">{{row.PRO_HOR_LINE}}</td>
+							<td align="right" ng-show="tbTitle == 'SET'">{{row.PRO_SLA_LINE}}</td>
+							<td align="right" ng-show="tbTitle == 'SET'">{{row.DEM_STR_LINE}}</td>
+							<td align="right" ng-show="tbTitle == 'SET'">{{row.DEM_HOR_LINE}}</td>
+							<td align="right" ng-show="tbTitle == 'SET'">{{row.DEM_SLA_LINE}}</td>
+							<td align="right" ng-show="tbTitle == 'SET'">{{row.FIX_SAL | currency:'$':0}}</td>							
+							<!-- <td ng-show="tbTitle == 'TAR'">{{row.FIRST_DATE}}</td> -->
+							<!-- <td ng-show="tbTitle == 'TAR'">{{row.JOB_TITLE}}</td> -->
+							<td align="right" ng-show="tbTitle == 'TAR'">{{row.TAR_AMOUNT | currency:'$':0}}</td>
+							<td align="right" ng-show="tbTitle == 'PRD'">{{row.TAR_AMT | currency:'$':2}}</td>	<!-- 商品目標_目標金額 -->						
+							<td align="right" ng-show="tbTitle == 'INS' || tbTitle == 'SALE'">{{row.INV_TAR_AMOUNT | currency:'$':0}}</td>
+							<td align="right" ng-show="tbTitle == 'INS' || tbTitle == 'SALE'">{{row.INS_TAR_AMOUNT | currency:'$':0}}</td>
+							<td align="right" ng-show="tbTitle == 'INS'">{{row.EXCHG_TAR_AMOUNT | currency:'$':0}}</td>
+							<td align="right" ng-show="tbTitle == 'INS' || tbTitle == 'SALE'">{{row.TOT_TAR_AMOUNT | currency:'$':0}}</td>							
+							<td ng-show="tbTitle != 'SET'">{{row.MAINTAIN_DATE}}</td>
+							<td ng-show="tbTitle != 'SET'">{{row.MAINTAIN_NAME}}</td>																														 				
+						</tr>
+					</tbody>
+				</table>				
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

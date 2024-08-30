@@ -1,0 +1,62 @@
+<script type="text/javascript" src="assets/txn/PRD173/PRD173.js"></script>
+<script type="text/javascript" src="assets/txn/PRD173/PRD173_EDIT.js"></script>
+<div ng-controller="PRD173Controller" ng-cloak>
+    <!--Content of the panel-->
+      <div class="search_box_btn">
+		<button ng-click="addRow()" class="btn btn-info">新增</button>
+	</div>
+      <div class="text-right">
+        <e-jumping-once ng-show="inputVO"
+					output="outputVO"
+					totallist="fxd_dicountlist"
+					list="data"
+					>
+		</e-jumping-once>
+      </div>
+      <div class="gv_tab_sc scroll_y" style="white-space: nowrap;min-height:235px;overflow-x: auto;">
+        <table >
+        <thead>
+          <tr>
+            <th>功能</th>
+            <th>專案名稱</th>
+            <th>商品檔期</th>
+            <th>開始日期</th>
+            <th>截止日期</th>
+            <th>建立時間</th>
+            <th>建立人員</th>
+            <th>異動時間</th>
+            <th>異動人員</th>
+            <th>覆核人員</th>
+            <th>覆核時間</th>
+          </tr>
+       </thead>
+       <tbody>
+          <tr ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+            <td>
+	            <e-combobox id="edit" name="edit"
+								ng-datasource="row.edit"
+								ng-model="row.editto"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="edit($index,row)"
+								width="80px"
+								style="line-height:20px;" />
+            </td>
+            <td>{{row.PROD_NAME}}</td>
+            <td>{{row.PROD_PERIOD}}</td>
+            <td>{{row.EFFECT_DATE}}</td>
+            <td>{{row.EXPIRY_DATE}}</td>
+            <td><div style="width: 100px;">{{row.CREATETIME}}</div></td>
+            <td>{{row.CREATOR}}</td>
+            <td><div style="width: 100px;">{{row.LASTUPDATE}}</div></td>
+            <td>{{row.MODIFIER}}</td>
+            <td>{{row.APPROVER}}</td>
+            <td><div style="width: 100px;">{{row.APP_DATE}}</div></td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+</div>

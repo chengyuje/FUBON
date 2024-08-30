@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--******************** Security ********************-->
+    <bean id="keymanagement" class="com.systex.jbranch.platform.common.security.impl.JBranchKeyManagement"
+          p:keystoreFile="#{dataManager.root}/Config/hsmfile"
+          p:dataAccessManager-ref="dataAccessManager"
+          init-method="init"
+          lazy-init="true"/>
+    <bean id="cryptology" class="com.systex.jbranch.platform.common.security.impl.JBranchCryptology"/>
+
+    <bean id="assignManagement" class="com.systex.jbranch.platform.common.security.privilege.AssignManagement"
+          p:dataAccessManager-ref="dataAccessManager"/>
+    <bean id="roleManagement" class="com.systex.jbranch.platform.common.security.privilege.RoleManagement"
+          p:dataAccessManager-ref="dataAccessManager"/>
+    <bean id="organizationManagement" class="com.systex.jbranch.platform.common.security.privilege.OrganizationManagement"
+          p:dataAccessManager-ref="dataAccessManager"/>
+    <bean id="projectManagement" class="com.systex.jbranch.platform.common.security.privilege.ProjectManagement"
+          p:dataAccessManager-ref="dataAccessManager"/>
+    <bean id="userManagement" class="com.systex.jbranch.platform.common.security.privilege.UserManagement"
+          p:dataAccessManager-ref="dataAccessManager"/>
+    <bean id="privilegeManagement" class="com.systex.jbranch.platform.common.security.privilege.PrivilegeManagement"
+          p:dataAccessManager-ref="dataAccessManager"/>
+
+</beans>

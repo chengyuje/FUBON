@@ -1,0 +1,139 @@
+<style>
+/* open dialog */
+.ngdialog.CMMGR002 {
+	
+}
+/* dialog panl */
+.modal-dialog.CMMGR002 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+/* table size */
+.CMMGR002 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CMMGR002.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CMMGR002_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CMMGR002/CMMGR002.js"></script>
+<script type="text/javascript" src="assets/txn/CMMGR002/CMMGR002_EDIT.js"></script>
+<div class="CMMGR002" ng-controller="CMMGR002_Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >權限群組管理</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<table>
+				<tr>
+					<!-- list -->
+					<td width="55%">
+						<h4>群組清單</h4>
+						<e-jumping output="groupVO" input="inputVO" query="initInquire()" list="adgGroupList"></e-jumping>
+						<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+							<table class="table-bordered">
+								<thead>
+									<tr>
+										<th width="10%">群組代碼</th>
+										<th width="60%">群組名稱</th>
+										<th width="20%">最近更新日期</th>
+										<th width="10%">維護者</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in adgGroupList | limitTo:displayLimit track by $index" ng-click="queryMember(row.PRIVILEGEID)" ng-class="{'selected-row': row.PRIVILEGEID ==  inputVO.priID}" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td><a href="/edit/{{row.PRIVILEGEID}}" onclick="return false" ng-click="edit(row)">{{row.PRIVILEGEID}}</a></td>
+										<td>{{row.NAME}}</td>
+										<td>{{row.LASTUPDATE}}</td>
+										<td>{{row.MODIFIER}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<button type="button" class="btn btn-default" ng-click="edit()" function-type="maintenance" >新增</button>
+					</td>
+					<!-- other -->
+					<td width="45%">
+						<h4>角色清單</h4>
+						<e-jumping-once output="roleVO" list="roleSubList" totallist="adgRole"></e-jumping-once>
+						<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+							<table class="table-bordered">
+								<thead>
+									<tr>
+										<th width="20%">
+											<label>
+												<input type='checkbox' ng-model='clickAll' ng-change='checkrow(clickAll,roleSubList)' />&nbsp;&nbsp;本頁全選
+											</label>
+										</th>
+										<th width="20%">角色代號</th>
+										<th width="60%">角色名稱</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in roleSubList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td><input type='checkbox' ng-model='row.SELECTED' /></td>
+										<td>{{row.ROLEID}}</td>
+										<td>{{row.NAME}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="text-center">
+							<button type="button" class="btn btn-default" ng-click="btnAddFun()" ng-disabled="inputVO.roleID == ''">加入↓</button>
+							<button type="button" class="btn btn-default" ng-click="btnDelFun()" ng-disabled="inputVO.roleID == ''">移除↑</button>
+						</div>
+						<br>
+						<e-jumping-once output="exRoleVO" list="exRoleList" totallist="adgExistRole"></e-jumping-once>
+						<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+							<table class="table-bordered">
+								<thead>
+									<tr>
+										<th width="20%">
+											<label>
+												<input type='checkbox' ng-model='clickAll2' ng-change='checkrow(clickAll2,exRoleList)' />&nbsp;&nbsp;本頁全選
+											</label>
+										</th>
+										<th width="20%">角色代號</th>
+										<th width="60%">角色名稱</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in exRoleList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td><input type='checkbox' ng-model='row.SELECTED' /></td>
+										<td>{{row.ROLEID}}</td>
+										<td>{{row.NAME}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="search_box_btn text-center">
+							<button type="button" class="btn btn-primary" ng-click="save()" ng-disabled="inputVO.groupid == ''" function-type="maintenance" >儲存</button>
+							<button type="button" class="btn btn-default" ng-click="queryMember(inputVO.groupid)" ng-disabled="inputVO.groupid == ''">重置</button>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>

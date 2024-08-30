@@ -1,0 +1,150 @@
+<style>
+/* open dialog */
+.ngdialog.CRM662_prv_add {
+	
+}
+/* dialog panl */
+.modal-dialog-CRM662_prv_add {
+/*     width: 800px; */
+/*     margin: 30px auto; */
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+
+}
+/* table size */
+.CRM662_prv_add table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM662_prv_add.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM662_prv_add_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+
+<div class="CRM662_prv_add" ng-controller="CRM662_prv_addController" ng-cloak>
+	<div class="modal-dialog-CRM662_prv_add">	
+	<div class="modal-content">
+
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+			<h4 id="myModalAlertLabel" class="modal-title" align="center">搜尋客戶</h4>
+		</div>
+	
+		<div class="modal-body">
+
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >搜尋客戶</div>
+			</div>
+
+			<div class="panel_content">
+				<div class="search_table search_box">
+					<table>
+						<tr>
+							<td style="width: 15%;">
+								客戶ID:						
+							</td>
+							<td style="width: 35%;">
+								<input class="banner-input-1 form-control e_size ng-valid ng-dirty ng-valid-parse ng-touched ng-not-empty"
+								type="text" style="text-transform:uppercase;"  
+								id="cust_id" name="cust_id" placeholder="請輸入..." ng-model="inputVO.cust_id" e-length-limit="30" size="20">
+							</td>
+							<td style="width: 15%;">
+								客戶姓名:
+							</td>
+							<td style="width: 35%;">
+								<input class="banner-input-1 form-control e_size ng-valid ng-dirty ng-valid-parse ng-touched ng-not-empty"
+								type="text" id="cust_name" name="cust_name" placeholder="請輸入..." ng-model="inputVO.cust_name" e-length-limit="30" size="20">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="4">註: 輸入查詢之客戶ID與客戶姓名皆可通過模糊比對查詢客戶，提醒您，輸入的客戶ID系統會自動過濾掉既有家庭戶。</td>
+						</tr>
+						<tr>
+							<td colspan="4">註: 家庭戶成員應為申請人的配偶及直系血親(關係戶)。</td>
+						</tr>
+						<tr>
+							<td colspan="4" style="text-align: center;">
+ 								<button type="button" class="btn btn-primary" ng-click="queryCustomer()">查詢客戶</button>
+								<button type="button" class="btn btn-primary" ng-click="queryRelCustomer()">查詢現有關係戶</button>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<!-- ****轄下客戶**** -->
+			<div>
+				<div class="tfb_content">
+					<div class="tfb_content_icon"></div>
+					<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >搜尋客戶結果</div>
+				</div>
+				<div class="panel_content">
+					<div class="gv_tab_sc scroll_y" style="height:200px;white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th></th>
+									<th>#</th>
+									<th>客戶ID</th>
+									<th>客戶姓名</th>
+									<th>關係</th>
+									<th>AO_Code</th>
+									<th>分行</th>
+									<th>理財會員等級</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in resultList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td><input type="checkbox" ng-model="row.select" class="bLarger"></td>
+									<td>{{$index + 1}}</td>
+									<td>{{row.CUST_ID}}</td>
+									<td>{{row.CUST_NAME}}</td>
+									<td>{{row.REL_TYPE_DESC}}</td>
+									<td>{{row.AO_CODE}}_{{row.EMP_NAME}}</td>
+									<td>{{row.BRANCH_NAME}}</td>
+									<td>
+										<span ng-show = "(row.EMP_ID == inputVO.emp_id) && row.M_CHECK == 'Y'">{{row.VIP_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</span>
+										<span ng-show = "row.M_CHECK == 'N'" style="color:#BFBFBF">現有家庭戶</span>
+										<span ng-show = "(row.EMP_ID != inputVO.emp_id) && row.M_CHECK == 'Y'" style="color:#BFBFBF">非轄下客戶不顯示</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="modal-footer" style="text-align: center">
+						<button type="button" class="btn btn-primary" ng-click="prv_add()" >確定帶回</button>
+						<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+</div>

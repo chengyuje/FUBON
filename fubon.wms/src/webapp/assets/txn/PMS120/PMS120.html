@@ -1,0 +1,373 @@
+<script type="text/javascript" src="assets/txn/PMS120/PMS120.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+
+<style>
+/* open dialog */
+.ngdialog.PMS103_DETAIL {
+	
+}
+td.pos-to-right, th.pos-to-right {
+	text-align: right
+}
+
+/* dialog panl */
+.modal-dialog.PMS103_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* table size */
+.PMS103_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS103_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS103_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+.repeat-row td{
+text-align : center;
+}
+
+td.pos-to-right,th.pos-to-right{
+text-align :right
+}
+td.pos-to-left{
+text-align :left
+}
+</style>
+
+<div class="container-fluid">
+	<!-- InstanceBeginEditable name="navbar" -->
+	<!-- InstanceEndEditable -->
+	<!-- content -->
+	<!-- InstanceBeginEditable name="Content" -->
+	<div ng-controller="PMS120Controller" ng-cloak>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">資料查詢
+			</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm">
+				<table>
+
+					<tr>
+						<th>*銷售計劃月份: </th>
+						<td><e-combobox ng-datasource="mappingSet['timeE']"
+								ng-model="inputVO.dataMonth" ng-validate="false" ng-readonly="false"
+								ng-editable="false" ng-format="F3" ng-required="true"
+								width="100px" height="30px" style="line-height:20px;" 
+								ng-change="dateChange()"/></td>
+
+						<th>* 營運區: </th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+							ng-datasource="AREA_LIST"
+							ng-model="inputVO.branch_area_id"
+							ng-validate="false" 
+							ng-disabled="disableAreaCombo"
+							ng-readonly="disableAreaCombo" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change="ChangeArea()"
+							width="85px"
+							style="line-height:20px;" />
+						</td>			
+						<th>* 分行別: </th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-disabled="disableBranchCombo"
+							ng-readonly="disableBranchCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="true"
+							ng-change="ChangeBranch()"
+							width="155px"
+							style="line-height:20px;" />
+						</td>							
+						<th>* 業務人員: </th>
+						<td>
+							<e-combobox id="emp_id" name="emp_id"
+							ng-datasource="EMP_LIST"
+							ng-model="inputVO.emp_id"
+							ng-validate="false"
+							ng-disabled="disableEmpCombo"
+							ng-readonly="disableEmpCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="true"
+							ng-change="ChangeAo_code()"
+							width="145px"
+							style="line-height:20px;" />
+						</td>		
+
+
+
+					</tr>
+				</table>
+			</form>
+			</div>
+			<div class="search_box_btn text-center">
+			
+				<button ng-click="inquire()" class="btn btn-primary">查詢</button> 
+				<button
+					 ng-click="init()" class="btn btn-primary">清除</button>
+			</div>
+	</div>
+	
+	<!-- <div style="background-color: #d7edfa;">
+		<table id="rsTitle">
+			<tr>
+				<td width="40%">
+					<h4><font color="106987">&nbsp;預估核貸量<span style="text-align: right;">(最後統計日期至:{{toJsDate(dataList[0].CREATETIME) | date:'yyyy/MM/dd'}})</span></font></h4>
+				</td>
+				<td width="60%" align="right">
+					<table>
+						<tr class="thick">
+				
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<BR/> 
+		
+	<div class="gv_tab_sc scroll_y">
+	    <div class="tfb_content">
+		 	<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">消金Profile</div>
+		</div>
+		<div class="panel_content">
+		
+		<table id="rsTitle" class="tablesaw table table-striped table-bordered">
+			<tr>
+				<td width="40%" align="center">銷售人員</td>
+				<td width="20%" align="center">本月目標</td>
+				<td width="20%" align="center">本月預估撥款</td>
+				<td width="20%" align="center">本月實際撥款</td>
+			</tr>
+			<tr class="repeat-row"
+						ng-repeat="row in dataList | limitTo:displayLimit track by $index"
+						ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+				<td width="40%" >{{row.EMP_ID}}-{{row.EMP_NAME}}</td>
+				<td width="20%" class="pos-to-right">{{0+row.ACH_GOAL | currency:''}}</td>
+				<td width="20%" class="pos-to-right">{{0+row.EST_AMT_TOTAL | currency:''}}</td>
+				<td width="20%" class="pos-to-right">{{0+row.ACT_AMT_TOTAL | currency:''}}</td>
+			</tr>
+		</table>
+	</div>
+	-->
+		
+			<div class="gv_tab_sc scroll_y">
+				
+						<div class="tfb_content">
+							<div class="tfb_content_icon"></div>
+							<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"> 房貸Pipeline(件數)</div>
+					    </div>
+					    	<div class="panel_content">
+				<table class="tablesaw table table-striped table-bordered">
+					<tr>
+						<th colspan="2">面談</th>
+						<th colspan="2">進件</th>
+						<th colspan="2">撥款</th>
+					</tr>
+					<tr>
+						<th>預計</th>
+						<th>實際</th>
+						<th>預計</th>
+						<th>實際</th>
+						<th>預計</th>
+						<th>實際</th>
+					</tr>
+					<tr class="repeat-row"
+						ng-repeat="row in dataList2 | limitTo:displayLimit track by $index"
+						ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td class="pos-to-right">{{row.EST_MEETING | currency:''}}</td>
+						<td class="pos-to-right">{{row.ACT_MEETING | currency:''}}</td>
+						<td class="pos-to-right">{{row.ESC_INCOM | currency:''}}</td>
+						<td class="pos-to-right">{{row.ACT_INCOM | currency:''}}</td>
+						<td class="pos-to-right">{{row.EST_DEBIT | currency:''}}</td>
+						<td class="pos-to-right">{{row.ACT_DEBIT | currency:''}}</td>
+					</tr>
+				</table>
+			</div>
+			<br>
+			
+			<div class="gv_tab_sc scroll_y">
+				
+						<div class="tfb_content">
+							<div class="tfb_content_icon"></div>
+							<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"> 房貸Pipeline(金額) </div>
+					    </div>
+					    	<div class="panel_content">
+				<table class="tablesaw table table-striped table-bordered">
+					<tr>
+						<th colspan="2">面談金額</th>
+						<th colspan="2">進件金額</th>
+						<th colspan="2">撥款金額</th>
+					</tr>
+					<tr>
+						<th>預計</th>
+						<th>實際</th>
+						<th>預計</th>
+						<th>實際</th>
+						<th>預計</th>
+						<th>實際</th>
+					</tr>	
+					<tr class="repeat-row"
+						ng-repeat="row in dataList4 | limitTo:displayLimit track by $index"
+						ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td class="pos-to-right">{{row.EST_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{row.APPLY_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{row.DEBT_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{row.AAPPLY_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{row.APRV_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{row.DRAW_AMT | currency:''}}</td>
+					</tr>		
+				</table>
+			</div>
+			<br>
+			
+			<div class="gv_tab_sc scroll_y">
+				
+						<div class="tfb_content">
+							<div class="tfb_content_icon"></div>
+							<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"> 信貸Pipeline(件數) </div>
+					    </div>
+					    	<div class="panel_content">
+				<table class="tablesaw table table-striped table-bordered">
+					<tr>
+						<th colspan="2">面談</th>
+						<th colspan="2">進件</th>
+						<th colspan="2">撥款</th>
+					</tr>
+					<tr>
+						<th>預計</th>
+						<th>實際</th>
+						<th>預計</th>
+						<th>實際</th>
+						<th>預計</th>
+						<th>實際</th>
+					</tr>
+					<tr class="repeat-row"
+						ng-repeat="row in dataList5 | limitTo:displayLimit track by $index"
+						ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td class="pos-to-right">{{row.EST_MEETING | currency:''}}</td>
+						<td class="pos-to-right">{{row.ACT_MEETING | currency:''}}</td>
+						<td class="pos-to-right">{{row.ESC_INCOM | currency:''}}</td>
+						<td class="pos-to-right">{{row.ACT_INCOM | currency:''}}</td>
+						<td class="pos-to-right">{{row.EST_DEBIT | currency:''}}</td>
+						<td class="pos-to-right">{{row.ACT_DEBIT | currency:''}}</td>
+					</tr>
+				</table>
+			</div>
+			<br>
+			
+			
+			<div class="gv_tab_sc scroll_y">
+				
+						<div class="tfb_content">
+							<div class="tfb_content_icon"></div>
+							<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"> 信貸Pipeline(金額) </div>
+					    </div>
+					    	<div class="panel_content">
+				<table class="tablesaw table table-striped table-bordered">
+					<tr>
+						<th colspan="2">面談金額</th>
+						<th colspan="2">進件金額</th>
+						<th colspan="2">撥款金額</th>
+					</tr>					
+					<tr>
+						<th>預計</th>
+						<th>實際</th>
+						<th>預計</th>
+						<th>實際</th>
+						<th>預計</th>
+						<th>實際</th>
+					</tr>		
+					<tr class="repeat-row"
+						ng-repeat="row in dataList6 | limitTo:displayLimit track by $index"
+						ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td class="pos-to-right">{{row.EST_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{row.APPLY_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{row.DEBT_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{row.AAPPLY_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{row.APRV_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{row.DRAW_AMT | currency:''}}</td>
+					</tr>										
+				</table>
+			</div>
+			
+			
+			<!-- <div class="gv_tab_sc scroll_y">
+				
+						<div class="tfb_content">
+							<div class="tfb_content_icon"></div>
+							<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"> 差異分析-MTD金額 </div>
+					    </div>
+					    <div class="panel_content">
+					<table class="tablesaw table table-striped table-bordered">
+					<tr>
+						<th>項目</th>
+						<th>預估</th>
+						<th>已核待撥</th>
+						<th>預計次月待撥</th>
+						<th>本月待撥</th>
+						<th>本月已撥</th>
+					</tr>
+					<tr class="repeat-row"
+						ng-repeat="row in dataList3 | limitTo:displayLimit track by $index"
+						ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{row.ITEM_NAME}}</td>
+						<td class="pos-to-right">{{0+row.EST_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{0+row.APPLY_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{0+row.NEXT_MON_APPLY_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{0+row.CURR_MON_APPLY_AMT | currency:''}}</td>
+						<td class="pos-to-right">{{0+row.CURR_MON_DEBIT_AMT | currency:''}}</td>
+					</tr>
+				</table>
+			</div>
+		</div> -->
+	</div>
+	</div>
+	<!-- InstanceEndEditable -->
+	<!-- ./content -->
+</div>

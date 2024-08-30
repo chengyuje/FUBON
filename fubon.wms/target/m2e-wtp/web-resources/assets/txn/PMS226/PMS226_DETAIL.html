@@ -1,0 +1,79 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS226_DETAIL {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 90%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.modal-dialog .repeat-row td,.modal-dialog .repeat-row th{
+	border-right:1px solid #eee;
+	line-height: 20px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS226/PMS226_DETAIL.js"></script>
+<div class="PMS226_DETAIL" ng-controller="PMS226_DETAILController" ng-cloak>
+	<div  class="modal-dialog PMS226_DETAIL" style="margin-top: 120px;">
+		<div class="modal-content">
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a15.gif">明細表
+				</div>
+			</div>
+			<e-jumping output="outputVO" input="inputVO" query="init()"
+				list="datList"></e-jumping>
+			<div algin="left">
+			</div>	
+			<div class="gv_tab_sc scroll_y">
+				<table>
+					<thead class="repeat-row">
+						<tr>
+							<th>計績年月</th>
+							<th>分行代碼</th>
+							<th>客戶ID</th>
+							<th>產品類別</th>
+							<th>TYPE1</th>
+							<th>TYPE2</th>
+							<th>TYPE3</th>
+							<th>TYPE4</th>
+							<th>AO_CODE</th>
+							<th>銷量</th>
+							<th>收益</th>
+							<th>商品代碼</th>
+							<th>交易日期</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in datList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.SNAP_YYYYMM   }}</td>		
+							<td align="center">{{row.BRH_COD }}</td>
+							<td align="center">{{row.CUST_ID }}</td>
+							<td align="center">{{row.PROD_SOURCE }}</td>
+							<td align="center">{{row.TYPE1  }}</td>
+							<td align="center">{{row.TYPE2  }}</td>
+							<td align="center">{{row.TYPE3  }}</td>
+							<td align="center">{{row.TYPE4  }}</td>
+							<td align="center">{{row.AO_CODE  }}</td>
+							<td align="center">{{row.TXN_AMT  }}</td>
+							<td align="center">{{row.CNR_PROFIT_PLUS  }}</td>
+							<td align="center">{{row.PROD_ID }}</td>
+							<td align="center">{{row.TXN_DATE }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+			</div>
+	 	</div>
+ 	</div>
+</div>

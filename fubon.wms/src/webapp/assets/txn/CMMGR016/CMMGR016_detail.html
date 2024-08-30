@@ -1,0 +1,64 @@
+<style>
+    .modal-dialog.CMMGR016Detail {
+        position: relative;
+        top: 100px;
+        right: 0;
+        bottom: 0;
+        left: 0px;
+        width: 70%;
+        height: auto;
+    }
+</style>
+<div ng-controller="CMMGR016_DetailController" ng-cloak>
+    <div class="modal-dialog CMMGR016Detail">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        ng-click="closeThisDialog('cancel')">&times;
+                </button>
+                <h4 id="myModalAlertLabel" class="modal-title" align="center"
+                    ng-bind="(isCreate? '新增 ': isUpdate? '修改 ': '查看 ') + reportVO.code + ' 報表'"></h4>
+            </div>
+            <div class="modal-body" style="min-height: 550px">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="text-muted bootstrap-admin-box-title">
+                            <i class="glyphicon glyphicon-info-sign"></i>&emsp;<span ng-bind="'報表設定說明'"></span>
+                        </div>
+                    </div>
+                    <div class="bootstrap-admin-panel-content" style="position:relative;">
+                        <b>報表設定共有五個頁籤，除報表資訊為必選外，依照需求再選填另外四個頁籤。例子說明如下：</b>
+                        <ul>
+                            <li>1、產出報表：填寫<b>報表資訊頁籤</b>；<b>JOB 頁籤</b> Action 選擇【產出報表】並填妥。報表相對位置為 /temp/reports/ 。</li>
+                            <li>2、產出報表並放置指定 FTP 位置：第一個例子填寫完後，在選填 <b>FTP 頁籤</b>填妥指定 FTP 位置資訊。</li>
+                            <li>3、寄送報表：與第一個例子相符，惟 <b>JOB 頁籤</b> Action 須選擇【寄送報表】；並填寫 <b>MAIL 頁籤</b>完成寄送資訊。</li>
+                            <li>4、驗證檔：若該報表有驗證檔需求，則填寫<b>驗證檔頁籤</b>。</li>
+                        </ul>
+                    </div>
+                </div>
+                <uib-tabset active="1" Justified="true" type="tabs">
+                    <uib-tab index="1" heading="報表資訊">
+                        <div ng-include="'assets/txn/CMMGR016/CMMGR016_reportInfo.html'"></div>
+                    </uib-tab>
+
+                    <uib-tab index="2" heading="驗證檔" ng-hide="isRetrieve && !hasChk">
+                        <div ng-include="'assets/txn/CMMGR016/CMMGR016_chkInfo.html'"></div>
+                    </uib-tab>
+
+                    <uib-tab index="3" heading="JOB" ng-hide="isRetrieve && !hasJob">
+                        <div ng-include="'assets/txn/CMMGR016/CMMGR016_jobInfo.html'"></div>
+                    </uib-tab>
+
+                    <uib-tab index="4" heading="FTP" ng-hide="isRetrieve && !hasFtp">
+                        <div ng-include="'assets/txn/CMMGR016/CMMGR016_ftpInfo.html'"></div>
+                    </uib-tab>
+
+                    <uib-tab index="5" heading="Mail" ng-hide="isRetrieve && !hasMail">
+                        <div ng-include="'assets/txn/CMMGR016/CMMGR016_mailInfo.html'"></div>
+                    </uib-tab>
+
+                </uib-tabset>
+            </div>
+        </div>
+    </div>
+</div>

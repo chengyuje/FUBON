@@ -1,0 +1,223 @@
+<style>
+	.modal-dialog.PRD270_SN .modal-body {
+		max-height: 80vh;
+	}
+</style>
+<div ng-controller="PRD270_SN_EDITController" ng-cloak>
+	<div class="modal-dialog PRD270_SN">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.PRD_ID == null ? '新增' : '編輯'}}境外結構型商品</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*SN代碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_id" name="prd_id" class="form-control" ng-model="inputVO.prd_id" ng-blur="checkID()" ng-disabled="row.PRD_ID != null" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.prd_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入SN代碼</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="!canEdit">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">{{errMsg | i18n:[' ']}}</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">SN名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="cname" name="cname" class="form-control" ng-model="inputVO.cname" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">ISIN CODE：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="isin_code" name="isin_code" class="form-control" ng-model="inputVO.isin_code" e-length-limit="128"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">發行機構評等-標普：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="rating_sp" name="rating_sp" class="form-control" ng-model="inputVO.rating_sp" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">發行機構評等-穆迪：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="rating_moddy" name="rating_moddy" class="form-control" ng-model="inputVO.rating_moddy" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">發行機構評等-惠譽：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="rating_fitch" name="rating_fitch" class="form-control" ng-model="inputVO.rating_fitch" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">保證機構評等-標普：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="sn_rating_sp" name="sn_rating_sp" class="form-control" ng-model="inputVO.sn_rating_sp" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">保證機構評等-穆迪：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="sn_rating_moddy" name="sn_rating_moddy" class="form-control" ng-model="inputVO.sn_rating_moddy" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">保證機構評等-惠譽：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="sn_rating_fitch" name="sn_rating_fitch" class="form-control" ng-model="inputVO.sn_rating_fitch" e-length-limit="10"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">開始受理贖回日：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="buy_Date" name="buy_Date"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.buy_Date"
+									is-open="model.a"
+									datepicker-options="buy_DateOptions"
+									ng-readonly="true" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">固定配息期間：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="fix_Date" name="fix_Date" class="form-control" ng-model="inputVO.fix_Date" e-length-limit="100"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">幣轉：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="exchange" name="exchange" class="form-control" ng-model="inputVO.exchange" e-length-limit="5"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">浮動配息率：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="dividend" name="dividend" class="form-control" ng-model="inputVO.dividend" e-input-limit="NP"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">連結標的(以分號分隔，最多20個)：</th>
+							<td class="col-md-7 tdpadding">
+								<textarea id="target" name="target" class="form-control" ng-model="inputVO.target" style="width: 100%; height: 100px" e-length-limit="2000"></textarea>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">CNR分配率：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="cnr_yield" name="cnr_yield" class="form-control" ng-model="inputVO.cnr_yield" e-input-limit="NUU" nuu1="3" nuu2="6"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">通路服務費率：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="rate_channel" name="rate_channel" class="form-control" ng-model="inputVO.rate_channel" e-input-limit="NUU" nuu1="3" nuu2="6"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">計績檔次：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="performance_review" name="performance_review" class="form-control" ng-model="inputVO.performance_review" e-length-limit="6"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">票面價值：</th>
+							<td class="col-md-7 tdpadding"><input type="number" id="bond_value" name="bond_value" class="form-control" ng-model="inputVO.bond_value" e-length-limit="9"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*股債類型：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="stock_bond_type" name="stock_bond_type"
+								ng-paramtype="FPS.STOCK_BOND_TYPE"
+								ng-model="inputVO.stock_bond_type"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					style="line-height:20px;"
+			  					required/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.stock_bond_type=='' || inputVO.stock_bond_type==undefined">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入股債類型</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">專案：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="project"
+											ng-paramtype="PRD.SN_PROJECT"
+											ng-model="inputVO.snProject"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											multiple="true"
+											separator=";"
+											label-separator="；"
+											style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">客群：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="customer_level"
+											ng-paramtype="PRD.SN_CUSTOMER_LEVEL"
+											ng-model="inputVO.snCustLevel"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											multiple="true"
+											separator=";"
+											label-separator="；"
+											style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,157 @@
+<style>
+.modal-dialog.CRM831_detail {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 700px;
+	height: 550px;
+}
+/* table size */
+.CRM831_detail table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM831_detail table.little{
+	width: 60%;
+}
+/* change row */
+.CRM831_detail.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM831_detail_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<div ng-controller="CRM831_detailController" ng-cloak>
+	<div class="modal-dialog CRM831_detail" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">　　　　保單明細-富壽</h4><!-- 多了一口X會使標題不置中，加空格處理 -->
+			</div>
+			<div class="modal-body">
+				<div ng-repeat="row in resultList track by $index">
+					<div class="tfb_content"></div>
+					<div class="panel_content">
+						<table>
+	     					<tr>
+	     						<th width = "20%">保單類型：</th>
+	     						<td width = "45%">{{row.INS_TYPE| mapping:insTypeList:'F3'}}</td>
+	     						<th width = "20%">保單狀態：</th>
+	     						<td width = "15%">{{row.CONTRACT_STATUS| mapping:contractStatusList:'F3'}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>保單號碼：</th>
+	     						<td>{{inputVO.policy_nbr_str}}</td><!-- {{row.POLICY_NBR}} -->
+	     						<th>資料更新日期：</th>
+	     						<td>{{row.SYS_YEAR}}-{{row.SYS_MONTH}}-{{row.SYS_DAY}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>被保險人姓名：</th>
+	     						<td>{{row.INS_NAME}}</td>
+	     						<th>幣別：</th>
+	     						<td>{{row.CRCY_TYPE}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>被保險人ID：</th>
+	     						<td>{{row.INS_ID}}</td>
+	     						<th>繳別：</th>
+	     						<td>{{row.PAY_TYPE | mapping:payTypeList:'F3'}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>險種簡稱：</th>
+	     						<td>{{row.POLICY_SIMP_NAME}}</td>
+	     						<th>付款方式：</th>
+	     						<td>{{resultList2[0].PAY_WAY | mapping:paywayList:'F3'}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>險種代號：</th>
+	     						<td>{{row.PRD_ID}}</td>
+	     						<th>檔期：</th>
+	     						<td>{{row.TERM_CNT}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>主/附約別：</th>
+	     						<td>{{row.MAST_SLA_TYPE=='Y'?"主約":"附約"}}</td>
+	     						<th>專案名稱：</th>
+	     						<td>{{row.COMM_PRJ_NAME}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>保額(單位)：</th>
+	     						<td>{{row.POLICY_ASSURE_AMT | number}}{{row.UNIT}}</td>
+	     						<th>投資保費：</th>
+	     						<td>{{row.INV_INS_AMT}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>保險始期：</th>
+	     						<td>{{toJsDate(row.POLICY_ACTIVE_DATE) | date:"yyyy-MM-dd"}}</td>
+	     						<th>進場匯率：</th>
+	     						<td>{{row.EXCH_RATE|number:4}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>繳費期滿日：</th>
+	     						<td>{{toJsDate(row.DUE_DATE) | date:"yyyy-MM-dd"}}</td>
+	     						<th>約定外幣幣別：</th>
+	     						<td>{{row.AGMT_CRCY_TYPE_FORD}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>每期應繳保險費：</th>
+	     						<td>{{row.POLICY_FEE|number}}</td>
+	     						<th>約定外幣金額：</th>
+	     						<td>{{row.AGMT_AMT_FORD|number}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>保單年度：</th>
+	     						<td>{{row.POLICY_YEAR}}</td>
+	     						<th>預估解約金額：</th>
+	     						<td>{{row.TERMI_AMT|number}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>繳費年期：</th>
+	     						<td>{{row.PAY_TERM_YEAR}}</td>
+	     						<th>解約金試算日期：</th>
+	     						<td>{{row.CAL_VALUE_YEAR}}{{row.CAL_VALUE_YEAR != null ? '-' : ''}}{{row.CAL_VALUE_MONTH}}{{row.CAL_VALUE_MONTH != null ? '-' : ''}}{{row.CAL_VALUE_DAY}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>已繳次數：</th>
+	     						<td>第{{row.PAY_YEAR}}年{{row.PAY_TIME}}次</td>
+	     						<th>保險密戶：</th>
+	     						<td>{{row.SECRET_YN=='Y'? &quot;是&quot;:&quot;否&quot;}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>累計實繳保費：</th>
+	     						<td>{{row.ACUM_PAID_POLICY_FEE|number}}</td>
+	     						<th></th>
+	     						<td></td>
+	     					</tr>
+						</table>
+					</div>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

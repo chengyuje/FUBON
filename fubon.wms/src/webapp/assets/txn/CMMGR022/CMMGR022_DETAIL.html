@@ -1,0 +1,90 @@
+<style>
+    /* dialog panl */
+    .CMMGR022_DETAIL .modal-dialog {
+        position: relative;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 900px;
+        height: auto;
+    }
+
+    .CMMGR022_DETAIL .copyBtn {
+        float: right;
+        margin-top: -32px;
+        opacity: 0.8;
+        color: rgb(45, 122, 168);
+    }
+</style>
+<div class="CMMGR022_DETAIL" ng-controller="CMMGR022_DETAILController">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        ng-click="closeThisDialog('cancel')">&times;
+                </button>
+                <h4 id="myModalAlertLabel" class="modal-title" ng-bind="'詳細資訊'"></h4>
+            </div>
+            <div class="modal-body gv_tab_sc scroll_y">
+                <div class="gv_tab_sc">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th ng-bind="'流水號'"></th>
+                            <th ng-bind="'編號'"></th>
+                            <th ng-bind="'發送人'"></th>
+                            <th ng-bind="'發送時間'"></th>
+                            <th ng-bind="'結束時間'"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="center" ng-bind="vo.HSTANO"></td>
+                            <td class="center" ng-bind="vo.HTXTID"></td>
+                            <td class="center" ng-bind="vo.CREATOR"></td>
+                            <td class="center" ng-bind="vo.CREATETIME | date:'yyyy-MM-dd HH:mm:ss'"></td>
+                            <td class="center" ng-bind="vo.ENDTIME | date:'yyyy-MM-dd HH:mm:ss'"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="gv_tab_sc">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th ng-bind="'上行電文'"></th>
+                            <th ng-bind="'下行電文'"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <textarea ng-model="vo.onMsg" rows="15" class="on form-control"
+                                          readonly="true"></textarea>
+                                <div class="copyBtn">
+                                    <button class="btn btn-lg btn-info" data-toggle="tooltip" title="一鍵複製"
+                                            ng-click="copyText('.CMMGR022_DETAIL .on')">
+                                        <span class="glyphicon glyphicon-paste"></span>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <textarea ng-model="vo.offMsg" rows="15" class="off form-control"
+                                          readonly="true"></textarea>
+                                <div class="copyBtn">
+                                    <button class="btn btn-lg btn-info" data-toggle="tooltip" title="一鍵複製"
+                                            ng-click="copyText('.CMMGR022_DETAIL .off')">
+                                        <span class="glyphicon glyphicon-paste"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

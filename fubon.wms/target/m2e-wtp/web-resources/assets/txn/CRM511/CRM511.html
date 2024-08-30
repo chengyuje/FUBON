@@ -1,0 +1,213 @@
+<style>
+/* open dialog */
+.ngdialog.CRM511 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM511 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1100px;
+	height: auto;
+}
+/* table size */
+.CRM511 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM511 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM511.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM511_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM511/CRM511.js"></script>
+<script type="text/javascript" src="assets/txn/CRM511/CRM511_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/CRM511/CRM511_DETAIL.js"></script>
+<div class="CRM511" ng-controller="CRM511Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th>題目內容：</th>
+					<td><input type="text" class="form-control" placeholder="請輸入..." id="qstn_content" name="qstn_content" ng-model="inputVO.qstn_type" e-length-limit="200"></td>
+					<th>題目類型：</th>
+					<td>
+						<e-combobox id="qstn_type" 
+							ng-datasource="mappingSet['Type']"
+							ng-model="inputVO.qstn_type"
+	    					ng-validate="false"
+	    					ng-readonly="false" 
+	    					ng-editable="false"
+	    					ng-format="F3"
+	    					ng-required="false"
+	    					width="150px"
+	    					style="line-height:20px;" />
+					</td>
+				</tr>
+				<tr>
+					<th>有效起始日期：</th>
+					<td>
+						<div class="form-group">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="bgn_sDate" name="bgn_sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.bgn_sDate"
+									is-open="model.a"
+									datepicker-options="bgn_sDateOptions"
+									alt-input-formats="altInputFormats"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+							<div style="float: left !important;">～</div>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="bgn_eDate" name="bgn_eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.bgn_eDate"
+									is-open="model.b"
+									datepicker-options="bgn_eDateOptions"
+									alt-input-formats="altInputFormats"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</div>
+					</td>
+					<th>有效截止日期：</th>
+					<td>
+						<div class="form-group">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="end_sDate" name="end_sDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.end_sDate"
+								is-open="model.c"
+								datepicker-options="end_sDateOptions"
+								alt-input-formats="altInputFormats"
+								ng-readonly="true"
+								ng-change="limitDate2()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+							<div style="float: left !important;">～</div>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="end_eDate" name="end_eDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.end_eDate"
+								is-open="model.d"
+								datepicker-options="end_eDateOptions"
+								alt-input-formats="altInputFormats"
+								ng-readonly="true"
+								ng-change="limitDate2()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="edit()" function-type="maintenance">新增</button>
+			<button type="button" class="btn btn-info" ng-click="exportData()" function-type="export">匯出Excel表</button>
+		</div>
+		<!-- 結果區 -->
+		<e-jumping output="outputVO"
+			input="inputVO"
+			query="inquire()" list="paramList" e-connect="XXX"></e-jumping>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th>功能</th>
+						<th><e-sorter e-connect="XXX" e-input="inputVO" e-mode="auto" e-col="QSTN_ID" e-query="inquire()">題目代碼</e-sorter></th>
+						<th>題目內容</th>
+						<th>優先順序</th>
+						<th>題目類型</th>
+						<th>有效起始日期</th>
+						<th><e-sorter e-connect="XXX" e-input="inputVO" e-mode="auto" e-col="VALID_END_DATE" e-query="inquire()">有效截止日期</e-sorter></th>
+						<th>最後修改時間</th>
+						<th>最後修改人</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>
+							<e-combobox id="cmbAction" name="cmbAction"
+							ng-datasource="row.set"
+							ng-model="row.cmbAction"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="action(row)"
+							width="100px"
+							style="line-height:20px;" />
+						</td>
+						<td>{{row.QSTN_ID}}</td>
+						<td><a onclick="return false" ng-click="detail(row)">{{row.QSTN_CONTENT}}</a></td>
+						<td>{{row.DISPLAY_ORDER}}</td>
+						<td>{{row.QSTN_TYPE == "1" ? "客戶經營-KYC" : "Advisory-KYC"}}</td>
+						<td>{{toJsDate(row.VALID_BGN_DATE) | date:"yyyy-MM-dd"}}</td>
+						<td>{{toJsDate(row.VALID_END_DATE) | date:"yyyy-MM-dd"}}</td>
+						<td>{{row.LASTUPDATE}}</td>
+						<td>{{row.EMP_NAME}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

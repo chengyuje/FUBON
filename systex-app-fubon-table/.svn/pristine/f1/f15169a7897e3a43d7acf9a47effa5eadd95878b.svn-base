@@ -1,0 +1,7 @@
+package com.systex.jbranch.app.common.fps.table;
+
+import com.systex.jbranch.platform.common.dataaccess.dao.impl.hibernate.DaoImpl;import java.math.BigDecimal;import java.sql.Timestamp;
+
+public class TBFPS_PORTFOLIO_PLAN_SPPHibernateDAO extends DaoImpl<TBFPS_PORTFOLIO_PLAN_SPPVO, TBFPS_PORTFOLIO_PLAN_SPPPK> implements TBFPS_PORTFOLIO_PLAN_SPPDaoIF {
+
+}

@@ -1,0 +1,122 @@
+<style>
+.modal-dialog.PMS407_PRD_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS407_PRD_UPLOAD table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PMS407_PRD_UPLOAD table.little{
+	width: 60%;
+}
+/* change row */
+.PMS407_PRD_UPLOAD.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS407_PRD_UPLOAD_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS407/PMS407_PRD_UPLOAD.js"></script>
+<div class="PMS407_PRD_UPLOAD" ng-controller="PMS407_PRD_UPLOADController" ng-cloak>
+	<div class="search_table">
+		<table>
+			<tr>
+				<th>報表年月：</th>
+				<td>
+					<div class="input-group datebox datewidth">
+						<input type="text" id="rptYearMon" name="rptYearMon"
+							class="form-control"
+							uib-datepicker-popup="yyyyMM"
+							ng-model="inputVO.rptYearMon"
+							is-open="model.a"
+							datepicker-options="{minMode: 'month'}"
+							ng-readonly="true"
+							show-button-bar="true" />
+						<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+							<i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+					<div style="float: left">
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+					</div>
+					<div style="clear: both;"></div>
+				</td>
+			</tr>
+			<tr>
+				<th>上傳：</th>
+				<td>
+					<div style="float: left">
+						<e-upload success="uploadFinshed(name,rname)" accept=".csv"></e-upload>
+					</div>
+					<div style="float: left">
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-info" ng-click="downloadSample()">下載範例檔</button>
+					</div>
+					<div style="float: right" ng-show="inputVO.fileName">
+						<button type="button" class="btn btn-primary" ng-click="save()">確定</button>
+					</div>
+					<div style="clear: both;"></div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!-- 結果區 -->
+	<h4>{{inputVO.rptYearMon | date:'yyyyMM'}}商品通知訊息</h4>
+	<e-jumping-once output="outputVO" list="data" totallist="paramList"></e-jumping-once>
+	<div class="gv_tab_sc" style="white-space: nowrap;min-height:235px;overflow-x: auto;">
+		<table class="table-bordered">
+			<thead>
+				<tr>
+					<th>報表年月</th>
+					<th>商品類別</th>							
+					<th>商品代碼</th>
+					<th>訊息類別</th>							
+					<th>訊息內容</th>
+					<th>維護日期</th>
+					<th>維護人員</th>							
+				</tr>													
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in data track by $index">																		 						
+				 	<td><div align="center">{{row.YEARMON}}</div></td>
+				 	<td><div align="center">{{row.PRD_TYPE | mapping:PRD_TYPE:'F3'}}</div></td>				 							
+					<td><div align="center">{{row.PRD_ID}}</div></td>														
+					<td><div align="center">{{row.INFO_TYPE | mapping:INFO_TYPE:'F3'}}</div></td>
+					<td>{{row.INFO}}</td>
+					<td><div align="center">{{row.LASTUPDATE}}</div></td>
+					<td><div align="center">{{row.MODIFIER}}</div></td>																					
+				</tr>						
+			</tbody>
+		</table>
+	</div>
+</div>

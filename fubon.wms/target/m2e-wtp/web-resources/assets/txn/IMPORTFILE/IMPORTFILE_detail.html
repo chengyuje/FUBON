@@ -1,0 +1,151 @@
+<style>
+/* open dialog */
+.ngdialog.IMPORTFILE_detail {
+	
+}
+/* dialog panl */
+.modal-dialog.IMPORTFILE_detail {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+/* table size */
+.IMPORTFILE_detail table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.IMPORTFILE_detail.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_IMPORTFILE_detail_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search_box1_IMPORTFILE th {	width: 10%;	}
+.search_box1_IMPORTFILE td {	width: 20%;	}
+
+.glyphicon-remove-sign_IMPORTFILE:before {
+  content: "\e083";
+  position: absolute;
+  right: 5px;
+}
+</style>
+
+
+<div class="IMPORTFILE_detail" ng-controller="IMPORTFILE_detailController" ng-cloak>
+	<div class="modal-dialog IMPORTFILE_detail">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">設定</h4>
+			</div>
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<div class="search_table">
+				<table>
+					<tr>
+						<th width = "12px">設定名稱:</th>
+						<td><input type="text" placeholder="請輸入..." id="add_name" ng-model="add_name" e-length-limit="30"  required></td>
+						<th width = "12px">設定代碼:</th>
+						<td><input type="text" placeholder="[className].[methodName]" id="add_code" ng-model="add_code" e-length-limit="30"  required></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td align = "center">
+							<input type="button" class="btn btn-info" value="新增工作表" ng-click="addSheet(add_sheet)" ng-disabled = "add_sheet == '' || add_sheet == null" />
+            				<input type="number" placeholder="請輸入第幾個工作表..." id="add_sheet" name="add_sheet" ng-model="add_sheet" min="1" >  
+						</td>
+					</tr>
+				</table>
+			</div>
+ 			<uib-tabset active="activeTabIndex"  justified="true">
+    			<uib-tab ng-repeat="sheet in Sheets" >
+    			<uib-tab-heading>
+    			
+    			<span>工作表: {{sheet.SHEET_IDX}}</span><i style="float: right;" class="glyphicon glyphicon-remove-sign"  ng-click="removeSheet(sheet)"></i> 
+    			
+    			</uib-tab-heading>
+    			
+    			<br>
+
+    			<div class="search_table search_box1_IMPORTFILE">
+    			<table>
+    				<tr ng-repeat="set in sheet.settings track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+    					<th>對照資料表名稱: </th>
+    					<td>
+    						<input type="text" placeholder="請輸入資料表名稱..." id="TABLE_NAME" name="TABLE_NAME" ng-model="set.TABLE_NAME" e-length-limit="40" required>
+    					</td>
+    					<th>匯入工作表有無表頭: </th>
+    					<td>
+    						<div style="display:inline;">
+    							<input type="checkbox" id="HAS_HEAD" ng-model="set.HAS_HEAD" ng-true-value="1" ng-false-value="0">
+    						</div>
+    					</td>
+    					<th></th>
+    					<td><a class="btn btn-success btn-circle" ng-click="add(sheet)"><i class="glyphicon glyphicon-plus"></i></a></td>
+    				</tr>
+    			</table>
+    			</div>
+
+    			<div class="gv_tab_sc scroll_y" style="height:270px;white-space: nowrap;">
+				<table>
+					<tr>
+        				<td style="width:25%">欄位列(第幾列,可拖拉排序)</td>
+        				<td style="width:30%">目標欄位名</td>
+        				<td style="width:25%">目標欄位型態</td>
+						<td style="width:20%">刪除</td>
+					</tr>
+					<tbody ui-sortable="sortableOptions" ng-model="sheet.content">
+						<tr class="repeat-row" ng-repeat="row in sheet.content track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td><input type="number" class="form-control" placeholder="請輸入第幾欄位列..." id="SRC_COL_IDX" name="SRC_COL_IDX" ng-model="row.SRC_COL_IDX"  min="1" required></td>
+							<td><input type="text" class="form-control" placeholder="請輸入對照欄位名稱..." id="TAR_COL_NAME" name="TAR_COL_NAME" ng-model="row.TAR_COL_NAME" e-length-limit="50" required></td>
+							<td>
+								<e-combobox id="TAR_DATA_TYPE"
+								ng-datasource="mappingSet['TAR_DATA_TYPE']"
+								ng-model="row.TAR_DATA_TYPE"
+   								ng-validate="false" 
+   								ng-readonly="false" 
+   								ng-editable="false"
+   								ng-format="F3"
+   								width="170px"
+   								style="line-height:20px;" 
+   								required />
+							</td>
+							<td><a class="btn btn-danger btn-circle" ng-click="del(sheet, row)"><i class="glyphicon glyphicon-trash"></i></a></td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+    			</uib-tab>
+			</uib-tabset>
+				
+			</form>
+
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="save()" ng-disabled="parameterTypeEditForm.$invalid" >確定儲存</button>
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+			</div>
+		</div>
+	</div>
+</div>

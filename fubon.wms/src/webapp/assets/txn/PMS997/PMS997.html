@@ -1,0 +1,246 @@
+<style> 
+.datewidth{
+	width:120px !important;
+	float: left !important;
+}
+.PMS997ToolTip .tooltip-inner {
+    font-size: 12pt;
+	max-width: 200px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS997/PMS997.js"></script>
+<div class="PMS997" ng-controller="PMS997Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>						
+						<th><font color=red>＊</font>資料月份：</th>
+						<td class="form-inline" colspan="1">
+		                	<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="importSDate" name="importSDate"
+										   	class="form-control"
+											uib-datepicker-popup="yyyyMM"
+											ng-model="inputVO.importSDate"
+											is-open="model.e"
+											datepicker-options="importStartDateOptions"
+									   		datepicker-mode="'month'"
+											ng-readonly="true"
+											ng-change="limitDate();dateChange()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="importEDate" name="importEDate"
+										   	class="form-control"
+											uib-datepicker-popup="yyyyMM"
+											ng-model="inputVO.importEDate"
+											is-open="model.f"
+											datepicker-options="importEndDateOptions"
+									   		datepicker-mode="'month'"
+											ng-readonly="true"
+											ng-change="limitDate()" 
+											ng-disabled="inputVO.importSDate == undefined" />
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'f')" ng-disabled="inputVO.importSDate == undefined" ng-readonly="inputVO.importSDate == undefined">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+						<th ng-show="priID == '041'">
+							總行上傳名單：
+						</th>
+						<td ng-show="priID == '041'">
+							<span id="careCaseBox" style="display: inline-block;vertical-align: middle;" function-type="export">
+								<e-upload id="updCareCas" success="updCareCase(name, rname)" text="上傳" accept=".csv" ></e-upload>
+							</span>
+							<button type="button" class="btn btn-info" ng-click="getCareCaseExp();" function-type="export">下載範例</button>
+						</td>
+						<th ng-show="priID == '041'">
+							總行上傳內容說明：
+						</th>
+						<td ng-show="priID == '041'">
+							<span id="careTypeBox" style="display: inline-block;vertical-align: middle;" function-type="export">
+								<e-upload id="updCareType" success="updCareType(name, rname)" text="上傳" accept=".csv" ></e-upload>
+							</span>
+							<button type="button" class="btn btn-info" ng-click="getCareTypeExp();" function-type="export">下載範例</button>
+						</td>
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeRegion(test)"
+										style="line-height:20px;" />
+						</td>		
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeArea(test)"
+										style="line-height:20px;" />
+						</td>
+						<th>分行：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_nbr"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeBranch(test)"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th>客戶ID：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" e-length-limit="60" style="width:150px; text-transform: uppercase;"></td>
+						<th>員編：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." id="empID" name="empID" ng-model="inputVO.empID" e-length-limit="60" style="width:150px;"></td>
+						<th>關懷類別：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." id="careType" name="careType" ng-model="inputVO.careType" e-length-limit="60"></td>
+					</tr>		
+					<tr>
+						<th>已回覆/未回覆：</th>
+						<td>
+							<e-combobox id="noteStatus" name="noteStatus" 
+										ng-paramtype="PMS.NOTE_STATUS"
+										ng-model="inputVO.noteStatus"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										style="line-height:20px;"/>
+						</td>
+						<th></th>
+						<td></td>
+						<th></th>
+						<td></td>
+					</tr>		
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="inquireInit();query()"><span class="glyphicon glyphicon-search"></span>查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()"><span class="glyphicon glyphicon-erase"></span>清除</button>
+				<button type="button" class="btn btn-success" ng-click="exportRPT()" ng-disabled="paramList.length < 1" function-type="export"><span class="glyphicon glyphicon-save"></span>匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="700px" e-mode="1" e-top="true" e-left="6" e-list="paramList">
+					<thead>
+						<tr>
+							<th>私銀註記</th>
+							<th>資料月份</th>
+							<th>行員歸屬行</th>
+							<th>員編</th>
+							<th>行員姓名</th>
+							<th>客戶姓名</th>
+							<th>客戶ID</th>
+							<th>高齡客戶</th>
+							<th>關懷類別</th>
+							<th>說明內容</th>
+							<th>查詢方式</th>
+							<th>電訪錄音編號</th>
+							<th>關懷結果</th>
+							<th>初判異常</th>
+							<th>首次<br>建立時間</th>
+							<th>最新<br>異動人員</th>
+							<th>最新<br>異動日期</th>							
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td align="center">{{row.RM_FLAG}}</td>
+						 	<td align="center">{{row.YYYYMM}}</td>
+						 	<td align="center">{{row.BRANCH_NBR}}</td>
+							<td align="center">{{row.EMP_ID}}</td>
+							<td align="center">{{row.EMP_NAME}}</td>
+							<td align="center">{{row.CUST_NAME}}</td>
+						 	<td align="center">{{row.CUST_ID}}</td>
+							<td align="center">
+								<font ng-show="row.AGE >= 65" style="color:red">{{row.AGE | number:0}}</font>
+								<font ng-show="row.AGE < 65">{{row.AGE | number:0}}</font>
+							</td>
+							<td align="center">{{row.CARE_TYPE}}</td>
+							<td align="left" style="white-space: nowrap;">
+								<div uib-tooltip="{{row.CARE_DRCR}}" tooltip-placement="right-bottom" >
+									{{row.CARE_DRCR.length > 10 ? (row.CARE_DRCR | limitTo: 10) + "..." : row.CARE_DRCR}}
+								</div>
+							</td>
+							<td>
+								<e-combobox id="checkType" name="checkType" 
+											ng-datasource="mappingSet['PMS.CHECK_TYPE']"
+											ng-model="row.NOTE_TYPE"
+											ng-validate="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-disabled="!chkMaintenance"
+											ng-readonly="!chkMaintenance"
+											style="line-height:20px;display:inline;" />
+		                    	<input type="text" class="form-control" style="width: 300px;display:inline;" e-length-limit="200" ng-model="row.NOTE" placeholder="請補充查證方式..." ng-if="row.NOTE_TYPE == 'O'" ng-blur="updateFlag(row)" ng-disabled="!chkMaintenance"/>
+							</td>
+							<td>
+								<input 	type="text" class="form-control" style="width: 300px;display:inline;" 
+										e-length-limit="12" 
+										e-input-limit="ND"
+										ng-model="row.RECORD_SEQ" 
+										ng-disabled="!chkMaintenance"
+										placeholder="請輸入電訪錄音編號..." 
+										ng-if="row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A'" 
+										ng-blur="updateFlag(row)"/>
+							</td>
+							<td><input type="text" class="form-control" style="width: 300px" ng-blur="updateFlag(row)" ng-model="row.NOTE2" placeholder="請輸入關懷結果..." ng-disabled="!chkMaintenance"></td>
+							<td align="center">
+								<label>是<input type="radio" value="Y" ng-change="updateFlag(row)" ng-model="row.HR_ATTR" ng-disabled="!chkMaintenance"/></label>&emsp;
+								<label>否<input type="radio" value="N" ng-change="updateFlag(row)" ng-model="row.HR_ATTR" ng-disabled="!chkMaintenance"/></label>
+							</td>
+							<td ng-bind="row.FIRSTUPDATE"></td>
+							<td>{{row.MODIFIER}}</td>
+							<td>{{row.LASTUPDATE}}</td>		
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<br>
+			<div align="center">
+	       		<button type="button" class="btn btn-success" ng-click="save()" ng-disabled="paramList.length < 1" ng-show="chkMaintenance"><span class="glyphicon glyphicon-floppy-disk"></span>儲存</button>
+	       	</div>
+		</div>
+	</div>
+	
+</div>

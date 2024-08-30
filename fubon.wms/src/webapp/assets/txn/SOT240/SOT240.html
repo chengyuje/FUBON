@@ -1,0 +1,139 @@
+<style>
+/* open dialog */
+.ngdialog.SOT240 {
+	
+}
+/* dialog panl */
+.modal-dialog.SOT240 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* scroll && height */
+.scroll_SOT240_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+	float: left !important;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.alignright {
+	text-align: right !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT240/SOT240.js"></script>
+
+<div class="SOT240" ng-controller="SOT240Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">委託失敗、已取消查詢
+		</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+				data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<h4 class="h4-title">股票委託失敗、已取消查詢</h4>
+				<table>
+					<tr>
+						<th>
+							<table align="LEFT">
+
+								<th>*客戶ID：<input type="text" class="form-control"
+									style="width: 20%; display: inline; text-transform: uppercase;"
+									placeholder="請輸入..." id="custId" name="custId"
+									ng-model="inputVO.custId" ng-disabled="cartList.length > 0"
+									e-length-limit="20" required>
+									<button type="button" class="btn btn-info" ng-click="query()">查詢</button></th>
+							</table>
+						</th>
+						<th class="col-md-4"></th>
+					</tr>
+				</table>
+				<h4 class="h4-title">委託交易</h4>
+				<div class="gv_tab_sc " style="white-space: nowrap;">
+					<e-jumping-once output="outputVO" list="data"
+						totallist="custOrderETFVOs"></e-jumping-once>
+					<table class="text-center middle e-table-freeze" e-height="500px"
+						e-mode="1" e-top="true" e-list="data"
+						style="width: 99.9% !important;">
+						<thead>
+							<tr>
+							<tr>
+								<TH>委託結果</TH>
+								<TH>取消日期</TH>
+								<TH>委託日期</TH>
+								<TH>交易指示到期日</TH>
+								<TH>委託類別</TH>
+								<TH>入扣帳帳號</TH>
+								<TH>交易市場<BR>(交易所)</TH>
+								<TH>商品名稱</TH>
+								<TH>交易幣別</TH>
+								<TH>委託股數</TH>
+								<TH>委託價格</TH>
+								<TH>確定已成交股數</TH>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row"
+								ng-repeat="row in data  | limitTo:displayLimit track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+
+
+								<td ng-if="row.state == '1'">已取消</td>
+								<td ng-if="row.state == '2'">已取消，尚未確定股數</td>
+								<td ng-if="row.state == '3'">委託失敗</td>
+								<TD>{{toJsDate(row.entrustCancelDate)|date:"yyyy-MM-dd"}}</TD>
+								<TD>{{toJsDate(row.entrustDate)|date:"yyyy-MM-dd"}}</TD>
+								<TD>{{toJsDate(row.tradeDateEnd)|date:"yyyy-MM-dd"}}</TD>
+								<td ng-if="row.entrustType == 'B'">買進</td>
+								<td ng-if="row.entrustType == 'S'">賣出</td>
+								<td ng-if="row.entrustType != 'B' && row.entrustType != 'S'">未知</td>
+								<TD>{{row.tradeAcct}}</TD>
+								<TD>{{row.trxMarket }}</TD>
+								<TD align="left">{{row.insuranceNo}} {{row.insuranceName}}</TD>
+								<TD>{{row.entrustCur | mapping:mappingSet['FPS.CURRENCY']:'F3' }}</TD>
+								<td>{{row.entrustAmt | number}}</td>
+								<TD>{{row.entrustPrice | number }}</TD>
+								<td ng-if=" row.state == '2' ">處理中</td>
+								<td ng-if=" row.state != '2' ">{{row.entrustAmt - row.tradeAmt | number}}</td>
+
+							</tr>
+						</tbody>
+					</table>
+
+				</div>
+					<TABLE>
+						<TR>
+							<TD>說明：</TD>
+						</TR>
+						<TR>
+							<TD>1.資料期間顯示近六個月委託失敗/已取消資料。</TD>
+						</TR>
+					</TABLE>
+			</form>
+		</div>
+	</div>
+</div>

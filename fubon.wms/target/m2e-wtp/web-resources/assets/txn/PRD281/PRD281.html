@@ -1,0 +1,238 @@
+<style>
+.modal-dialog.PRD281 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+.modal-dialog.PRD281_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 300px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD281/PRD281.js"></script>
+<script type="text/javascript" src="assets/txn/PRD281/PRD281_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PRD281/PRD281_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PRD281/PRD281_PREVIEW.js"></script>
+<div ng-controller="PRD281Controller" ng-cloak>
+	<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >SI_FCI</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+	<div class="search_table search_box3">
+		<table>
+			<tr>
+				<th>&nbsp;&nbsp;報價說明文字：</th>
+				<td>
+					<textarea rows="3" id="price_remark" name="price_remark" 
+						ng-model="paramVO.PRICE_REMARK" e-length-limit="500"
+						style="width:600px;" ></textarea>
+				</td>
+			</tr>
+			<tr>
+				<th class="col-md-2">&nbsp;&nbsp;報價時間起訖：</th>
+				<td class="col-md-10 tdpadding">
+					<e-combobox id="psHour" name="psHour"
+					ng-datasource="mappingSet['hour']"
+					ng-model="paramVO.P_START_HOUR"
+		   			ng-validate="false" 
+		   			ng-readonly="false" 
+		   			ng-editable="false"
+		   			ng-format="F3"
+		   			ng-required="false"
+		   			width="100px"
+		   			height="30px"
+		   			style="line-height:20px;"/>
+				 		：
+					<e-combobox id="psMinute" name="psMinute"
+					ng-datasource="mappingSet['minute']"
+					ng-model="paramVO.P_START_MIN"
+		   			ng-validate="false" 
+				   	ng-readonly="false" 
+				   	ng-editable="false"
+				   	ng-format="F3"
+				   	ng-required="false"
+				   	width="100px"
+				   	height="30px"
+				   	style="line-height:20px;"/>
+					~
+					<e-combobox id="peHour" name="peHour"
+					ng-datasource="mappingSet['hour']"
+					ng-model="paramVO.P_END_HOUR"
+				   	ng-validate="false" 
+				   	ng-readonly="false" 
+				   	ng-editable="false"
+				   	ng-format="F3"
+				   	ng-required="false"
+				   	width="100px"
+				   	height="30px"
+				   	style="line-height:20px;"/>
+					：
+					<e-combobox id="peMinute" name="peMinute"
+					ng-datasource="mappingSet['minute']"
+					ng-model="paramVO.P_END_MIN"
+				   	ng-validate="false" 
+				   	ng-readonly="false" 
+				   	ng-editable="false"
+				   	ng-format="F3"
+				   	ng-required="false"
+				   	width="100px"
+				   	height="30px"
+				   	style="line-height:20px;"/>
+				</td>
+			</tr>
+			<tr>
+				<th class="col-md-2">&nbsp;&nbsp;交易時間起訖：</th>
+				<td class="col-md-10 tdpadding">
+					<e-combobox id="tsHour" name="tsHour"
+					ng-datasource="mappingSet['hour']"
+					ng-model="paramVO.T_START_HOUR"
+		   			ng-validate="false" 
+		   			ng-readonly="false" 
+		   			ng-editable="false"
+		   			ng-format="F3"
+		   			ng-required="false"
+		   			width="100px"
+		   			height="30px"
+		   			style="line-height:20px;"/>
+				 		：
+					<e-combobox id="tsMinute" name="tsMinute"
+					ng-datasource="mappingSet['minute']"
+					ng-model="paramVO.T_START_MIN"
+		   			ng-validate="false" 
+				   	ng-readonly="false" 
+				   	ng-editable="false"
+				   	ng-format="F3"
+				   	ng-required="false"
+				   	width="100px"
+				   	height="30px"
+				   	style="line-height:20px;"/>
+					~
+					<e-combobox id="teHour" name="teHour"
+					ng-datasource="mappingSet['hour']"
+					ng-model="paramVO.T_END_HOUR"
+				   	ng-validate="false" 
+				   	ng-readonly="false" 
+				   	ng-editable="false"
+				   	ng-format="F3"
+				   	ng-required="false"
+				   	width="100px"
+				   	height="30px"
+				   	style="line-height:20px;"/>
+					：
+					<e-combobox id="teMinute" name="teMinute"
+					ng-datasource="mappingSet['minute']"
+					ng-model="paramVO.T_END_MIN"
+				   	ng-validate="false" 
+				   	ng-readonly="false" 
+				   	ng-editable="false"
+				   	ng-format="F3"
+				   	ng-required="false"
+				   	width="100px"
+				   	height="30px"
+				   	style="line-height:20px;"/>
+				</td>
+			</tr>
+			<tr>	
+				<td colspan="2" align="center">
+					<button type="button" class="btn btn-info" ng-click="saveParams()">儲存</button>
+					<button type="button" class="btn btn-info" ng-click="openUpload()">文件上傳</button>
+				</td>
+			</tr>
+		</table>
+	</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">商品資料維護</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<div>	
+			<table>
+				<tr>
+					<td colspan="6">&nbsp;</td>
+				</tr>
+				<tr>
+					<th class="col-md-2">&nbsp;&nbsp;幣別：</th>
+					<td><input type="text" class="form-control" style="text-transform: uppercase; width:300px;" placeholder="請輸入..." id="currId" name="currId" ng-model="inputVO.CURR_ID" e-length-limit="4"></td>
+					<td>
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">查詢</button>&nbsp;&nbsp;
+						<button type="button" class="btn btn-info" ng-click="addProd()">新增</button> &nbsp;&nbsp;
+					</td>
+					<td/>
+					<th/>
+					<td/>
+				</tr>
+				<tr>
+					<td colspan="6">&nbsp;</td>
+				</tr>
+			</table>		    
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+				<table class="table-bordered middle">
+					<thead>
+						<tr>
+							<th>功能</th>
+							<th>幣別</th>
+							<th>風險等級</th>
+							<th>參考報價參數Y%</th>
+							<th>min UF(X%)</th>
+							<th>最低承作金額</th>
+							<th>累加金額</th>
+							<th>交易員CHARGE(%)</th>
+							<th>履約價</th>
+							<th>連結標的</th>
+							<th>生效日</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>
+								<e-combobox id="acttype" name="acttype"
+								ng-datasource="row.func"
+								ng-model="row.acttype"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="doFunc(row)"
+								width="60px"
+								style="line-height:20px;" />
+					    	</td>
+							<td>{{row.CURR_ID | mapping:FCI_CURRENCY:'F1'}}</td>
+					      	<td>{{row.RISKCATE_ID}}</td>
+							<td align="right">{{row.REF_PRICE_Y | number: 2}}</td>
+							<td align="right">{{row.MIN_UF | number: 2}}</td>
+							<td align="right">{{row.BASE_AMT | number: 0}}</td>
+							<td align="right">{{row.UNIT_AMT | number: 0}}</td>
+							<td align="right">{{row.TRADER_CHARGE | number: 2}}</td>
+							<td align="right">{{row.STRIKE_PRICE | number: 4}}</td>
+							<td>{{row.TARGET_CURR_ID}} - {{row.TARGET_CURR_NAME}}</td>
+							<td ng-if="row.EFFECTIVE_YN != 'Y'">{{toJsDate(row.EFFECTIVE_DATE) | date:'yyyy-MM-dd'}}</td>
+							<td ng-if="row.EFFECTIVE_YN == 'Y'">已生效</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>	
+		</div>
+		</div>
+	</div>
+</div>

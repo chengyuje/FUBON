@@ -1,0 +1,111 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .search_box th+td {
+    width: auto;
+    line-height: 15px;
+  }
+.star_ul {
+    list-style: none;
+    padding-left: 1.2em;
+    text-indent: -1.2em;
+}
+.star_ul Li:before {
+    content: "＊";
+    display: block;
+    float: left;
+    width: 1.2em;
+}
+</style>
+<script type="text/javascript"
+        src="assets/txn/FPS200/FPS200.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS210/FPS210.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS220/FPS220.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS230/FPS230.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS240/FPS240.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS250/FPS250.js"></script>
+
+<script type="text/javascript"
+        src="assets/txn/FPS/FPS_SEARCH.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS/FPS200Service.js"></script>
+
+<div ng-controller="FPS200Controller"
+     ng-cloak>
+
+  <!-- <div class="FPS200">
+    <uib-tabset active="activeJustified"
+                Justified="true">
+      <uib-tab index="0"
+               ng-click="getTagInclude(connector('get', 'STEP'))">
+        <uib-tab-heading>理財規劃建議</uib-tab-heading>
+      </uib-tab>
+      <uib-tab index="1"
+               ng-click="getTagInclude(5)">
+        <uib-tab-heading>歷史規劃</uib-tab-heading>
+      </uib-tab>
+    </uib-tabset>
+  </div> -->
+  <div class="tfb_content"
+       id="headingPanel">
+    <div class="tfb_content_icon"></div>
+    <div class="tfb_content_tit">
+      <img src="assets/images/icon/tfb_icon_a15.gif">全資產規劃</div>
+  </div>
+  <div class="panel_content FPS200 FPS" style="padding:0;">
+    <div class="block container" ng-class="{'no-area': arrowUp}" style="margin-bottom: .5em;">
+      <!-- fake title -->
+      <div class="content-wrapper" style="background-color:#bfe2f7;margin-top:-1px;">
+        <div class="content-title"> 客戶ID
+          <div class="input-group" style="display:inline-block">
+            <input type="text"
+                   style="width:150px; text-align: left; text-transform: uppercase; display:inline-block; margin-left:.5em;"
+                   class="form-control"
+                   ng-model="inputVO.custID"
+                   ng-blur="getCust();"
+                   ng-keyup="$event.keyCode===13?getCust():''">
+            <span class="input-group-btn"
+                  style="display:inline-block">
+              <button class="btn btn-info"
+                      type="button"
+                      ng-click="go('search')">
+                <i class="glyphicon glyphicon-search"></i>
+              </button>
+            </span>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="toggle-wrapper btn-fps no-img"
+               ng-click="go('history')"
+               ng-show="fps200.step!='5'&&validCust">
+            歷史規劃
+          </div>
+          <div class="toggle-wrapper btn-fps no-img"
+               ng-click="go('custInfo')"
+               ng-show="hasIns">
+            客戶庫存商品
+          </div>
+          <div class="toggle-wrapper btn-fps"
+               ng-click="arrowUp=!arrowUp">
+            詳細資訊
+            <img ng-src="{{arrowPath[arrowUp?'down':'up']}}"
+                 class="icon">
+          </div>
+        </div>
+      </div>
+
+      <!-- fake body -->
+      <div ng-show="!arrowUp">
+        <div ng-include="'assets/txn/FPS/FPS_CUST.template.html'"></div>
+      </div>
+    </div>
+
+    <!-- body -->
+    <div ng-include="FPS200_module"></div>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+<style>
+.search_box_CMMGR021 TH + TD {	
+	line-height:15px;	
+	width: auto;
+	margin:0 auto;
+}
+.TB_CMMGR021_10 {
+	width: 10%;
+}
+.TB_CMMGR021_30 {
+	width: 30%;
+}
+</style>
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<div ng-controller="CMMGR021_Controller" ng-cloak>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<div class="text-muted bootstrap-admin-box-title"><i class="glyphicon glyphicon-th-large e_margin_right"></i>手動下載-系統LOG</div>
+		</div>
+		<!-- search_box -->
+		<div class="bootstrap-admin-panel-content search_box search_box_CMMGR021">
+			<e-combobox ng-disabled="false"
+						ng-model="cmbModel"
+						ng-datasource="folderList"
+						ng-validate="true" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3" 
+						ng-required="false" 
+						width="125px"
+			 	/>
+		</div>
+		<!-- search_box -->
+		<div class="bootstrap-admin-panel-content">
+			<!-- BTN -->
+			<div class="e_padd_bot"><span class="e_inline e_padd_right"><a class="btn btn-default" ng-click="inquire()" ng-disabled="false" style="font-size:10px;"><i class="glyphicon glyphicon-refresh"></i>重新整理</a></span></div>
+			<div class="e_scroll">
+				<table class="tablesaw table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th class="TB_CMMGR021_10" scope="col">點選</th>
+							<th class="TB_CMMGR021_30" scope="col">檔案名稱</th>
+							<th class="TB_CMMGR021_30" scope="col">檔案大小</th>
+							<th class="TB_CMMGR021_30" scope="col">最後異動時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="row in paramList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">											
+							<!-- <td><input type="checkbox" ng-model='row.SELECTED'></td> -->
+							<!-- <td><input type="button" class="btn btn-default" ng-click="edit(row)" value="編輯"></td> -->
+							<td class="TB_CMMGR021_10"><input type="radio" ng-model='row.SELECTED'></td>
+							<td class="TB_CMMGR021_30">{{row.fileName}}</td>	
+							<td class="TB_CMMGR021_30">{{row.fileSize}}</td>
+							<td class="TB_CMMGR021_30">{{row.lastUpdate}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<!-- BTN -->
+			<div class="search_box_btn text-left"><div class="e_inline" style="padding-right:2.5px;"><a class="btn btn-primary" ng-click="downloadFile()">下載</a></div></div>
+			<!--
+			<e-paging outputVO="outputVO"
+             			inputVO="inputVO"
+              		callQuery="inquire()"
+              		displayLimit="displayLimit"
+              		dataList="paramList"
+              		>
+       		</e-paging>
+       		-->
+		</div>
+	</div>
+</div>

@@ -1,0 +1,322 @@
+<style>
+
+</style>
+<div class="CRM361" ng-controller="CRM361_PROJECTController" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >主管覆核客戶移轉</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table search_box">
+			<form name="parameterTypeEditForm2" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+	   				<tr>
+	   					<th>調整類別：</th>
+	   					<td>
+	   						<e-combobox id="trs_type"
+							ng-datasource="TRS_TYPE"
+							ng-model="inputVO.trs_type"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							style="line-height:20px;" />
+	   					</td>
+	   					<th>分行別：</th>
+	   					<td>
+	   						<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="mappingSet['branchNbr']"
+							ng-model="inputVO.org_branch_nbr"
+							ng-change="getAolist1()"
+							ng-validate="false" 
+							ng-disabled="bra_list.length == 1"
+							ng-readonly="bra_list.length == 1"
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="pri_id == '045'"
+							style="line-height:20px;" />
+	   					</td>
+	   					<th>新理專：</th>
+	   					<td>
+	   						<e-combobox id="org_ao_code"
+							ng-datasource="ao_code_project"
+							ng-model="inputVO.org_ao_code"
+							ng-validate="false" 
+							ng-disabled = "ao_code.length == 1"
+							ng-readonly = "ao_code.length == 1"
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							style="line-height:20px;" />
+	   					</td>
+	   				</tr>
+	   				<tr ng-show="parameterTypeEditForm2.branch_nbr.$error.required">
+	   					<th></th>
+	   					<td></td>
+	   					<th></th>
+	   					<td class="with-errors">請選擇分行別</td>
+	   					<th></th>
+	   					<td></td>
+					<tr>
+	   				<tr>
+	   					<th>客戶ID：</th>
+	   					<td>
+	   						<input type="text" class="form-control" style="width:260px;text-transform:uppercase;" placeholder="請輸入..." id="cust_id" name="cust_id" ng-model="inputVO.cust_id" e-length-limit="15">
+	   					</td>
+	   					<th>等級：</th>
+	   					<td>
+	   						<e-combobox id="con_degree"
+							ng-paramtype="CRM.CON_DEGREE"
+							ng-model="inputVO.con_degree"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							style="line-height:20px;" />
+	   					</td>
+	   					<th>最近異動頻率：</th>
+	   					<td>
+	   						<e-combobox id="chg_frq"
+							ng-datasource="CHG_FRQ"
+							ng-model="inputVO.chg_frq"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							style="line-height:20px;" />
+	   					</td>
+	   				</tr>
+	   				<tr>
+	   					<th>客戶姓名：</th>
+	   					<td>
+	   						<input type="text" class="form-control" style="width:260px;" placeholder="請輸入..." id="cust_name" name="cust_name" ng-model="inputVO.cust_name" e-length-limit="15">
+	   					</td>
+	   					<th>客群身分：</th>
+	   					<td>
+	   						<e-combobox id="vip_degree"
+							ng-paramtype="CRM.VIP_DEGREE"
+							ng-model="inputVO.vip_degree"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							style="line-height:20px;" />
+	   					</td>
+	   					<th>經營頻次符合度：</th>
+	   					<td>
+	   						<e-combobox id="match_yn"
+							ng-datasource="MATCH_YN"
+							ng-model="inputVO.match_yn"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							style="line-height:20px;" />
+	   					</td>
+	   				</tr>
+	   				<tr>
+	   					<th>專案名稱：</th>
+	   					<td>
+	   						<e-combobox id="prj_name"
+							ng-datasource="prj_list"
+							ng-model="inputVO.prj_name"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							style="line-height:20px;" />
+	   					</td>
+	   					<th>篩選範圍：</th>
+	   					<td>
+	   						<e-combobox id="temp_yn"
+							ng-datasource="TEMP_YN"
+							ng-model="inputVO.temp_yn"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							style="line-height:20px;" />
+	   					</td>
+	   					<th></th>
+	   					<td></td>
+	   				</tr>
+				</table>
+			</form>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire_project();">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+		</div>
+	</div>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<!-- 結果區 -->
+		<div class="search_table search_box">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th>新分行別：</th>
+						<td>
+							<e-combobox id="new_branch_nbr"
+							ng-datasource="mappingSet['branchNbr']"
+							ng-model="inputVO2.new_branch_nbr"
+							ng-change="getAolist2()"
+							ng-validate="false"
+							ng-disabled="bra_list.length == 1"
+							ng-readonly="bra_list.length == 1"
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							style="line-height:20px;" />
+						</td>
+						<th>新理專：</th>
+						<td>
+							<e-combobox id="new_ao_code"
+							ng-datasource="ao_code_project2"
+							ng-model="inputVO2.new_ao_code"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="setNewAo()"
+							style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th>處理方式：</th>
+						<td>
+							<e-combobox id="process_type" name="process_type"
+							ng-datasource="PROCESS_TYPE"
+							ng-model="inputVO2.process_type"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							style="line-height:20px;" />
+						</td>
+						<th></th>
+						<td>
+							<button type="button" class="btn btn-info" ng-click="save()">確定儲存</button>
+							<button type="button" class="btn btn-info" ng-click="adjustment()">調整前後統計表</button>
+						</td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.process_type.$error.required">
+						<th></th>
+						<th class="with-errors">請選擇處理方式</th>
+						<th></th>
+						<th></th>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table table-bordered td_center">
+				<thead>
+					<tr>
+						<th>
+							<label>
+								<input type='checkbox' ng-model='clickAll' ng-change='checkrow()' /> 本頁全選
+							</label>
+							<br>
+							<label>
+								<input type='checkbox' ng-model='clickAll2' ng-change='checkrow2()' /> 全選
+							</label>
+						</th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="COMPLAIN_YN" e-query="inquire_project()">客訴</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AGMT_SEQ" e-query="inquire_project()">同意書</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="inquire_project()">客戶ID</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="inquire_project()">客戶姓名</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="TRS_TYPE" e-query="inquire_project()">調整類別</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="TEMP_CAL_YN" e-query="inquire_project()">處理狀態</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="OVER_CUST_NO_LIMIT_UP_YN" e-query="inquire_project()">是否超過最適客戶</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CON_DEGREE" e-query="inquire_project()">等級</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="VIP_DEGREE" e-query="inquire_project()">客群身分</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AUM_AMT" e-query="inquire_project()">AUM</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="ORG_AO_BRH" e-query="inquire_project()">原分行</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="ORG_AO_CODE" e-query="inquire_project()">原理專</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="NEW_AO_BRH" e-query="inquire_project()">新分行</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="NEW_AO_CODE" e-query="inquire_project()">新理專</e-sorter></th>
+						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="APL_REASON" e-query="inquire_project()">異動原因</e-sorter></th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="APL_DATETIME" e-query="inquire_project()">理專/主管</e-sorter>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="APL_BRH_MGR_RPL_DATETIME" e-query="inquire_project()">申請放行時間</e-sorter>
+						</th>
+						<th>專案說明1</th>
+						<th>專案說明2</th>
+						<th>專案說明3</th>
+						<th>專案說明4</th>
+						<th>專案說明5</th>
+						<th>專案說明6</th>
+						<th>專案說明7</th>
+						<th>專案說明8</th>
+						<th>專案說明9</th>
+						<th>專案說明10</th>
+						<th>專案說明11</th>
+						<th>專案說明12</th>
+						<th>專案說明13</th>
+						<th>專案說明14</th>
+						<th>專案說明15</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>
+							<label style="font-weight: initial;margin-bottom: 0px;">
+								<input type='checkbox' ng-model='row.SELECTED'>勾選
+							</label>
+						</td>
+						<td>{{row.COMPLAIN_YN | mapping:COM_YN:'F3'}}</td>
+						<td><button ng-if="row.AGMT_SEQ && row.AGMT_FILE" type="button" class="btn btn-info" ng-click="download(row)">同意書</button></td>
+						<td><a href="#" onclick="return false" ng-click="detail(row)">{{row.CUST_ID}}</a></td>
+						<td>{{row.CUST_NAME}}</td>
+						<td>{{row.TRS_TYPE | mapping:TRS_TYPE:'F3'}}</td>
+						<td>{{row.TEMP_CAL_YN | mapping:TEMP_YN:'F3'}}</td>
+						<td>{{row.OVER_CUST_NO_LIMIT_UP_YN | mapping:COM_YN:'F3'}}</td>
+						<td>{{row.CON_DEGREE | mapping:CON_DEGREE:'F3'}}</td>
+						<td>{{row.VIP_DEGREE | mapping:VIP_DEGREE:'F3'}}</td>
+						<td class="td_right">{{row.AUM_AMT | currency:'':0}}</td>
+						<td>{{row.ORG_AO_BRH}}-{{row.ORG_BRANCH_NAME}}</td>
+						<td>{{row.ORG_AO_CODE}}-{{row.ORG_AO_NAME}}</td>
+						<td>{{row.NEW_AO_BRH}}-{{row.NEW_BRANCH_NAME}}</td>
+						<td>
+							<e-combobox id="ROW_NEW_AO_CODE"
+							ng-datasource="new_ao_list"
+							ng-model="row.NEW_AO_CODE"
+							ng-validate="false" 
+							ng-disabled="row.AGMT_SEQ || row.TRS_TXN_SOURCE == '2'"
+							ng-readonly="row.AGMT_SEQ || row.TRS_TXN_SOURCE == '2'" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="setNewBnr(row)"
+							style="line-height:20px;" />
+						</td>
+						<td>{{row.APL_REASON | mapping:TRS_APL_REASON:'F3'}}</td>
+						<td>{{row.APL_DATETIME}}<br>{{row.APL_BRH_MGR_RPL_DATETIME}}</td>
+						<td>{{row.DATA_01}}</td>
+						<td>{{row.DATA_02}}</td>
+						<td>{{row.DATA_03}}</td>
+						<td>{{row.DATA_04}}</td>
+						<td>{{row.DATA_05}}</td>
+						<td>{{row.DATA_06}}</td>
+						<td>{{row.DATA_07}}</td>
+						<td>{{row.DATA_08}}</td>
+						<td>{{row.DATA_09}}</td>
+						<td>{{row.DATA_10}}</td>
+						<td>{{row.DATA_11}}</td>
+						<td>{{row.DATA_12}}</td>
+						<td>{{row.DATA_13}}</td>
+						<td>{{row.DATA_14}}</td>
+						<td>{{row.DATA_15}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

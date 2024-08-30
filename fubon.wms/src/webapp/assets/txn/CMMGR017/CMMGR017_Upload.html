@@ -1,0 +1,47 @@
+<style>
+    /* table size */
+    .CMMGR017_UPLOAD table {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* change row */
+    .CMMGR017_UPLOAD.table > tbody > tr > td {
+        table-layout: fixed;
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+</style>
+<script type="text/javascript" src="assets/txn/CMMGR017/CMMGR017_Upload.js"></script>
+<div class="CMMGR017_UPLOAD" ng-controller="CMMGR017_Upload_Controller" ng-cloak>
+    <div class="panel_content" style="height:60vmin;min-height: 600px;padding-top: 10px;">
+        <div class="col-md-6">
+            <button style="float: right;" type="button" class="btn btn-default" ng-click="inquireInit()"
+                    ng-disabled="!inputVO.sql"
+                    function-type="maintenance" title="清除"><span class="glyphicon glyphicon-erase"></span>
+            </button>
+            <button style="float: right;" type="button" class="btn btn-success" ng-click="execute()"
+                    ng-disabled="!inputVO.sql"
+                    function-type="maintenance" title="執行敘述句 (Ctrl + Enter)"><span
+                    class="glyphicon glyphicon-play"></span>
+            </button>
+            <textarea placeholder="請輸入執行的SQL，每段SQL請使用 / 來分隔" ng-keyup="keyUpExe($event)"
+                      ng-model="inputVO.sql" rows="25" class="form-control" ng-required="true">
+        </textarea>
+            <div style="float: right; margin-top: -3px;  opacity: 0.5; color: rgb(45, 122, 168);"
+                 ng-bind="(inputVO.sql.length || 0) + ' chars'"></div>
+        </div>
+        <div class="col-md-6" style="padding-top: 40px">
+            <div class="slim-scroll" data-height="520">
+                <table class="table table-hover">
+                    <tbody>
+                    <tr ng-repeat="sub in msgList track by $index" ng-class="sub.STATUS? 'success': 'danger'">
+                        <td ng-bind="sub.MSG"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

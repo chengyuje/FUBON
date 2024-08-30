@@ -1,0 +1,193 @@
+
+<style>
+<!--
+input:required:invalid {
+	border-color: red;
+}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_EDIT1.js"></script>
+<div ng-controller="PRD171_EDIT1Controller" ng-cloak>
+	<div class="modal-dialog PRD171_EDIT1" style="width: 100%;height: 50%;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title"
+					style="text-align: center;">{{title}}</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab
+					style="width: 100%;">
+					<div class="gv_tab_sc scroll_y">
+						<table>
+						<thead>
+							<tr>
+								<th>保險公司</th>
+								<th hidden="">主鍵</th>
+								<th>*險種代碼</th>
+								<th>*產品類型</th>
+								<th>*繳費年期</th>
+								<th>*險種名稱</th>
+								<th>*主/附約別</th>
+								<th>*是否為分紅商品</th>
+								<th>*繳別</th>
+								<th>*幣別</th>
+								<th>保費類型</th>
+								<th>商品收益率</th>
+								<th>CNR收益率</th>
+								<th>倍數</th>
+								<th>*是否需要適配</th>
+								<th>商品風險值</th>
+								<th>證照類型</th>
+								<th>教育訓練</th>
+								<th>匯率</th>
+								<th>非常態交易參考匯率</th>
+								<th>*四大分類</th>
+								<th>特殊條件</th>
+								<th>*上市日期</th>
+								<th>下市日期</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<e-combobox id="companyNum" name="companyNum"
+												ng-datasource="mappingSet['COMPANY']"
+												ng-model="inputVO.COMPANY_NUM"
+												ng-validate="false"
+												ng-readonly="false"
+												ng-editable="false"
+												ng-format="F3"
+												width="360px"
+												style="line-height:20px;"
+									/>
+								</td>
+								<td hidden>隱藏欄位</td>
+								<td><input type="text" ng-model="inputVO.INSPRD_ID"
+									maxlength="16" style="text-transform: uppercase;" required></td>
+								<td><e-combobox ng-paramtype="IOT.PRODUCT_TYPE"
+										ng-model="inputVO.INSPRD_TYPE" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										width="100px" style="line-height:20px;"
+										ng-required="true"></e-combobox></td>
+								<td><input type="text" placeholder="請輸入顯示繳費年期..."
+									maxlength="256" style="width: 100px"
+									ng-model="inputVO.INSPRD_ANNUAL" required></td>
+								<td><input type="text" placeholder="請輸入顯示險種名稱..."
+									style="width: 100px" ng-model="inputVO.INSPRD_NAME" required></td>
+								<td><e-combobox ng-paramtype="PRD.MAIN_RIDER"
+										ng-model="inputVO.MAIN_RIDER" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										 width="100px" style="line-height:20px;"
+										ng-required="true"></e-combobox></td>
+								<td><e-combobox ng-paramtype="COMMON.YES_NO"
+										ng-model="inputVO.DIVIDEND_YN" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										 width="100px" style="line-height:20px;"
+										ng-required="true"></e-combobox></td>
+								<td><e-combobox ng-paramtype="IOT.PAY_TYPE"
+										ng-model="inputVO.PAY_TYPE" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										 width="100px" style="line-height:20px;"
+										ng-required="true"></e-combobox></td>
+								<td><e-combobox ng-paramtype="FPS.CURRENCY"
+										ng-model="inputVO.CURR_CD" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										width="100px" style="line-height:20px;"
+										ng-required="true"></e-combobox></td>
+								<td><e-combobox ng-datasource="mappingSet['type1']"
+										ng-model="inputVO.FEE_STATE" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										ng-required="false" width="100px" style="line-height:20px;"
+										></e-combobox></td>
+								<td><input type="number" placeholder="請輸入商品收益率..."
+									step="0.000001" min="0.000001" max="0.999999"
+									style="width: 100px" ng-model="inputVO.PRD_RATE" /></td>
+								<td><input type="number" placeholder="請輸入CNR收益率..."
+									step="0.000001" min="0.000001" max="0.999999"
+									style="width: 100px" ng-model="inputVO.CNR_RATE" /></td>
+								<td><input type="number" placeholder="請輸入倍數..."
+									step="0.00001" min="0.00001" max="9.99999" style="width: 100px"
+									ng-model="inputVO.COEFFICIENT" ></td>
+								<td><e-combobox ng-datasource="mappingSet['type']"
+										ng-model="inputVO.NEED_MATCH" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										ng-required="true" width="100px" style="line-height:20px;"
+										></e-combobox></td>
+								<td><e-combobox ng-datasource="mappingSet['prd_risk']"
+										ng-model="inputVO.PRD_RISK" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										width="100px" style="line-height:20px;"
+										></e-combobox></td>
+								<td><e-combobox ng-paramtype="PRD.CERT_TYPE"
+										ng-model="inputVO.CERT_TYPE" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										 width="100px" style="line-height:20px;"
+										></e-combobox></td>
+								<td><e-combobox ng-paramtype="PRD.TRAINING_TYPE"
+										ng-model="inputVO.TRAINING_TYPE" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										ng-required="false" width="100px" style="line-height:20px;"
+										></e-combobox></td>
+								<td>匯率檔檔名：IQ053</td>
+								<td><input type="number" placeholder="請輸入非常態交易參考匯率..."
+									step="0.0001" min="0.0001" max="99.9999" style="width: 100px"
+									ng-model="inputVO.AB_EXCH_RATE" ></td>
+								<td><e-combobox ng-paramtype="PRD.INS_CLASS"
+										ng-model="inputVO.INSPRD_CLASS" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										ng-required="true" width="100px" style="line-height:20px;"
+										></e-combobox></td>
+								<td><input type="text" ng-model="inputVO.INSPRD_STYLE"
+									maxlength="256" ></td>
+								<td>
+									<div class="input-group datebox datewidth">
+										<input type="text" id="sDate" name="sDate"
+											class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.EFFECT_DATE" is-open="model.a"
+											datepicker-options="bgn_sDateOptions" ng-readonly="true"
+											ng-change="limitDate()" ng-required="true">
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default"
+												ng-click="open($event,'a')">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+										</span>
+									</div>
+								</td>
+								<td>
+									<div class="input-group datebox datewidth">
+										<input type="text" id="eDate" name="eDate"
+											class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.EXPIRY_DATE" is-open="model.b"
+											datepicker-options="bgn_eDateOptions" ng-readonly="true"
+											ng-change="limitDate()">
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default"
+												ng-click="open($event,'b')">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+										</span>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+						</table>
+					</div>
+					<div style="text-align: center;" class="modal-footer">
+						<button ng-click="btnSubmit()" class="btn btn-info"
+							data-dismiss="modal">確定</button>
+						<button type="button" ng-click="closeThisDialog('cancel')" class="btn btn-info"
+							data-dismiss="modal">取消</button>
+					</div>
+				</form>
+			</div>
+
+		</div>
+	</div>
+
+</div>

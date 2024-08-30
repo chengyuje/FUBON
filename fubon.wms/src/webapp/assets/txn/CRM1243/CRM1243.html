@@ -1,0 +1,76 @@
+<style>
+
+.bigspace{
+	margin-left: 50px !important;
+}
+
+</style>
+
+<script type="text/javascript" src="assets/txn/CRM1243/CRM1243.js"></script>
+<div ng-controller="CRM1243Controller" ng-cloak>
+
+	<div class="tfb_content" ng-show = "homtype != 'HOME'">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >變更駐點分行覆核清單</div>
+	</div>
+	<div class="panel_content" ng-show = "homtype != 'HOME'">
+		<div class="gv_tab_sc scroll_y" style="height:235px;">
+			<table>
+				<thead>
+					<tr>
+						<th>原駐點資訊</th>
+						<th>更新駐點分行</th>
+						<th>修改原因</th>
+						<th>FA/IA</th>
+						<th>勾選</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row text-center" ng-repeat="row in resultList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{toJsDate(row.ONSITE_DATE) | date:"yyyy-MM-dd"}} - {{row.ONSITE_PERIOD | mapping:mappingSet['ONSITE_PERIOD']:'F3'}} <BR> {{row.ONSITE_BRH + '-' + row.ONSITE_BRH_NAME| mapping:mappingSet['branchsDesc']:'F3'}}</td>
+						<td>{{row.NEW_ONSITE_BRH + '-' + row.DEPT_NAME | mapping:mappingSet['branchsDesc']:'F3'}}</td>
+						<td>{{row.CHG_REASON | mapping:mappingSet['CHG_REASON']:'F3'}}{{row.CHG_REASON_OTH}}</td>
+						<td>{{row.AS_EMP_ID}}_{{row.EMP_NAME}}</td>
+						<td><input type='checkbox' ng-model='row.SELECTED' ></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="reply('2')" >退回</button>
+			<span class="bigspace"></span>
+			<button type="button" class="btn btn-info" ng-click="reply('1')" >確認放行</button>
+		</div>	
+	</div>
+	<div  ng-show = "homtype == 'HOME'">
+		<div class="gv_tab_sc scroll_y" style="height:235px;">
+			<table>
+				<thead>
+					<tr>
+						<th>原駐點資訊</th>
+						<th>更新駐點分行</th>
+						<th>修改原因</th>
+						<th>FA/IA</th>
+						<th>勾選</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row text-center" ng-repeat="row in resultList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{toJsDate(row.ONSITE_DATE) | date:"yyyy-MM-dd"}} - {{row.ONSITE_PERIOD | mapping:mappingSet['ONSITE_PERIOD']:'F3'}} <BR> {{row.ONSITE_BRH + '-' + row.ONSITE_BRH_NAME| mapping:mappingSet['branchsDesc']:'F3'}}</td>
+						<td>{{row.NEW_ONSITE_BRH + '-' + row.DEPT_NAME | mapping:mappingSet['branchsDesc']:'F3'}}</td>
+						<td>{{row.CHG_REASON | mapping:mappingSet['CHG_REASON']:'F3'}}{{row.CHG_REASON_OTH}}</td>
+						<td>{{row.AS_EMP_ID}}_{{row.EMP_NAME}}</td>
+						<td><input type='checkbox' ng-model='row.SELECTED' ></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="reply('2')" >退回</button>
+			<span class="bigspace"></span>
+			<button type="button" class="btn btn-info" ng-click="reply('1')" >確認放行</button>
+		</div>	
+	</div>
+</div>

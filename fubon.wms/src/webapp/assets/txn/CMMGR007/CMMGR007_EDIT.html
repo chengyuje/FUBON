@@ -1,0 +1,120 @@
+<style>
+
+</style>
+<div ng-controller="CMMGR007_EditController" ng-cloak>
+	<div class="modal-dialog CMMGR007">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.JOBID == null ? '新增' : '編輯'}}排程JOB</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">JOB代號：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="jobid" name="jobid" ng-model="inputVO.jobid" maxlength="20" required autofocus></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.jobid.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入JOB代號</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">JOB名稱：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="jobname" name="jobname" ng-model="inputVO.jobname" maxlength="30"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">JOB說明：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="description" name="description" ng-model="inputVO.description" maxlength="100"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">BeanId：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="beanid" name="beanid" ng-model="inputVO.beanid" maxlength="30" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.beanid.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入BeanId</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">參數：</th>
+							<td class="col-md-7 tdpadding">
+								<button popover-is-open="group.show" uib-popover-template="templateUrl" 
+										popover-title="{{group.title}}" type="button" class="btn btn-default" 
+										ng-repeat="group in groups" ng-click="pop(group)" >
+									{{group.addTitle || group.title}}{{group.content?'-'+group.content:''}}
+								</button>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<script type="text/ng-template" id="jobParamSetterTemplate.html">
+							<div class="form-group row">
+								<label class="col-md-12 col-form-label">{{group.tip}}</label>
+							</div>
+							<div class="form-group row">
+        						<div class="col-md-12">
+									<e-combobox id="paratype" ng-if="group.add && !group.addTitle && PARATYPE.length"
+										name="paratype" ng-datasource="PARATYPE"
+										ng-model="group.addTitle" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										ng-required="false" style="line-height:20px;width:100px;"
+										ng-change="getTip(group)" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-md-10">
+									<input ng-if="group.add" type="text" ng-model="group.addTitle" class="form-control" placeholder="請輸入自定義參數名稱" ng-change="getTip(group);appeal()">	
+								</div>
+							</div>
+        					<div class="form-group row">
+								<div class="col-md-10">
+									<input type="text" ng-model="group.content" class="form-control" placeholder="請輸入參數值" ng-change="appeal()" >
+								</div>
+								<div class="col-md-2">
+									<button ng-if="group.add" type="button" class="btn btn-info" ng-click="addPara(group)">新增</button>
+									<button ng-if="!group.add" type="button" class="btn btn-danger" ng-click="removePara(group)">移除</button>
+								</div>
+							</div>
+        					
+    					</script>
+    					<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="這裡顯示該JOB設定的參數值..." ng-model="inputVO.parameters" maxlength="500" ng-change="splitParameter()" ></td>
+							<td class="col-xs-1"></td>
+						</tr>   
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">預先處理程序：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="precondition" name="precondition" ng-model="inputVO.precondition" maxlength="100"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">置後處理程序：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="postcondition" name="postcondition" ng-model="inputVO.postcondition" maxlength="100"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >取消</button>
+				<span function-type="maintenance" ><button type="button" class="btn btn-info" ng-click="del()" confirm="確定要刪除?" confirm-settings="{size: 'sm'}" ng-if="isUpdate">刪除</button></span>
+			</div>
+		</div>
+	</div>
+</div>

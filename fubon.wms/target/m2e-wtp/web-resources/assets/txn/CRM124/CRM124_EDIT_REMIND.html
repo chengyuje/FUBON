@@ -1,0 +1,137 @@
+<style>
+/* open dialog */
+.ngdialog.CRM124_EDIT_REMIND {
+	
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+/* dialog panl */
+.modal-dialog.CRM124_EDIT_REMIND {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+
+</style>
+<div ng-controller="CRM124_EDIT_REMINDController" ng-cloak>
+	<div class="modal-dialog CRM124_EDIT_REMIND">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">修改自建提醒</h4>
+			</div>
+			<div class="modal-body search_table">
+				<table>
+					<tr>
+						<th>*提醒日期：</th>
+						<td>
+							<div class="input-group datebox datewidth">
+							<input type="text" id="task_date" name="task_date"
+								class="form-control" 
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.task_date" 
+								is-open="model.a"
+								ng-readonly="true"
+								ng-disabled = "inputVO.task_source == 'A2'" />
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+							</div>
+						</td>
+				
+						<th>*提醒類別：</th>
+						<td>
+							<e-combobox id="task_source" name="task_source"
+								ng-datasource="mappingSet['TASK_SOURCE']"
+								ng-model="inputVO.task_source"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								ng-disabled = "true"
+								width="150px"
+								style="line-height:20px;" />
+						</td>
+					</tr>
+					
+					<tr>
+						<th>*提醒時間：</th>
+						<td colspan = "3">
+							<input type="time" style='width:200px' id="task_stime" name="task_stime" ng-model="task_stime" placeholder="HH:mm" min="08:00" max="17:00" ng-disabled = "inputVO.task_source == 'A2'"/>&nbsp;~&nbsp; 
+							<input type="time" style='width:200px' id="task_etime" name="task_etime" ng-model="task_etime" placeholder="HH:mm" min="08:00" max="17:00" ng-disabled = "inputVO.task_source == 'A2'"/>
+						</td>
+					</tr>
+					
+					<tr>
+						<th>*名稱：</th>
+						<td>
+							<input type="text"  width = "100px" placeholder="請輸入..." id="task_title" name="task_title" ng-model="inputVO.task_title" ng-disabled = "inputVO.task_source == 'A2'">
+						</td>
+				
+						<th>*理專：</th>
+						<td>
+							<e-combobox id="task_emp_id" name="task_emp_id"
+								ng-disabled="inputVO.task_source == 'A2'"
+								ng-datasource="mappingSet['AO_LIST']"
+								ng-model="inputVO.task_emp_id"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								ng-change = "inquire_salesplan()"
+								width="150px"
+								style="line-height:20px;" />
+							<span class="help-block with-errors" ng-show="inputVO.task_emp_id == ''">請選擇理專</span>
+						</td>
+					</tr>
+					
+					<tr ng-show = "inputVO.task_source == 'A2' || inputVO.task_source == 'A5'">
+						<th>*客戶ID：</th>
+						<td>
+							<input ng-disabled="inputVO.task_source == 'A2'" type="text" width = "100px" placeholder="請輸入..." id="task_cust_id" name="task_cust_id" ng-model="inputVO.task_cust_id"  ng-change = "inquire_salesplan()">
+						</td>
+				
+						<th ng-show = "inputVO.task_source == 'A2' && salesplanshow == 'show'">銷售計劃：</th>
+						<td ng-show = "inputVO.task_source == 'A2' && salesplanshow == 'show'">
+							<e-combobox id="salesplan_seq" name="salesplan_seq"						
+								ng-datasource="mappingSet['salesplanList']"
+								ng-model="salesplan_seq"
+								ng-change = "change_salesplan(salesplan_seq)"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"								
+								width="150px"
+								style="line-height:20px;" />
+						</td>
+					</tr>
+					
+					<tr>
+						<th>內容：</th>
+						<td colspan = "3">
+							<textarea rows="5" cols="70" id="task_memo" ng-model="inputVO.task_memo" ng-disabled = "inputVO.task_source == 'A2'"></textarea>
+						</td>
+					</tr>
+					
+				</table>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()">確定</button>
+				<span class="bigspace"></span>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

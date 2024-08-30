@@ -1,0 +1,83 @@
+<style>
+.MGM115 .e_panel_table tr th {
+	background: #efefef;
+	color: black;
+	font-weight: bold;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MGM115/MGM115.js"></script>
+<script type="text/javascript" src="assets/txn/MGM114/MGM114_pointDetail.js"></script>
+<script type="text/javascript" src="assets/txn/MGM114/MGM114_exchangeDetail.js"></script>
+<script type="text/javascript" src="assets/txn/MGM115/MGM115_applyGift.js"></script>
+<div class="MGM115" ng-controller="MGM115Controller" ng-cloak>	
+	<div class="e_panel_table scroll_y" style="min-height: 450px">
+		<br/>
+		<div style="background-color: #d9d9d9; text-align: center;">兌換截止日期：{{toJsDate(EXC_DEADLINE) | date:"yyyy/MM/dd"}}</div>
+		<br/>
+		<div class="ejborder">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>	
+		</div>					
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap; ">
+			<!-- MGM -->
+			<table ng-show="inputVO.act_type == 'M'">
+				<thead>
+					<tr>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="inquire()">推薦人ID</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="inquire()">推薦人姓名</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="BRA_NBR" e-query="inquire()">分行</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="AO_CODE" e-query="inquire()">所屬理專</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="TOTAL" e-query="inquire()">可兌換總點數</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="EXCH_TOTAL" e-query="inquire()">已兌換點數</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="UN_EXCH" e-query="inquire()">未兌換點數</e-sorter>
+						</th>
+						<!-- <th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NAME" e-query="inquire()">分行</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="AO_CODE" e-query="inquire()">兌換人員</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="EMP_NAME" e-query="inquire()">兌換理專姓名</e-sorter>
+						</th> -->
+						<th>兌換</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data">
+						<td>{{row.CUST_ID}}</td>
+						<td>{{row.CUST_NAME}}</td>
+						<td>{{row.BRA_NBR != null ? (row.BRA_NBR + '-' + row.BRA_NAME) : ''}}</td>
+						<td>{{row.AO_CODE != null ? (row.AO_CODE + '-' + row.EMP_NAME) : '空Code'}}</td>
+						<td align="right">
+							<a href="#" ng-click="pointDetail(row)">{{row.TOTAL | number:0}}</a>
+						</td>
+						<td align="right" ng-show="row.EXCH_TOTAL > 0">
+							<a href="#" ng-click="exchangeDetail(row)">{{row.EXCH_TOTAL | number:0}}</a>
+						</td>
+						<td align="right" ng-show="row.EXCH_TOTAL == 0">{{row.EXCH_TOTAL}}</td>
+						<td align="right">{{row.UN_EXCH | number:0}}</td>
+						<!-- <td>{{row.BRANCH_NAME}}</td>
+						<td>{{row.AO_CODE}}</td>
+						<td>{{row.EMP_NAME}}</td> -->
+						<td ng-hide="timeout"><a href="#" ng-click="applyGift(row)">進行兌換</a></td>
+						<td ng-show="timeout">已超過兌換截止日期</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,230 @@
+<style>
+
+.datewidth{
+	width:180px !important;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/PMS416/PMS416.js"></script>
+<script type="text/javascript" src="assets/txn/PMS416U/PMS416U.js"></script>
+
+<div class="PMS416U" ng-controller="PMS416UController" ng-cloak>
+	<div>
+		<div>
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+			</div>
+		</div>
+
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>						
+						<th><font color=red>＊</font>資料月份：</th>
+						<td>						 						 
+							<e-combobox id="dataMonth" name="dataMonth" 
+										ng-datasource="mappingSet['timeE']"
+										ng-model="inputVO.sCreDate"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-required="true"
+										ng-change="dateChangeU()"
+										ng-format="F3"
+										style="line-height:20px;" />														
+						</td>											    												
+						<th>進出頻率：</th>
+						<td>							
+							<input type="radio" ng-model="inputVO.freqType" value="1"><label>３個月內</label>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" ng-model="inputVO.freqType" value="2"><label>４–６個月</label>		
+						</td>
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-paramtype="PMS.UHRM_RC"
+										ng-model="inputVO.uhrmRC"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeRegion()"
+										width="200px"
+										style="line-height:20px;" />
+						</td>						
+						<th>業務中心：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-paramtype="PMS.UHRM_OP"
+										ng-model="inputVO.uhrmOP"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeArea()"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+						<th>員工姓名：</th>
+						<td>
+							<e-combobox id="aoCode" name="aoCode"
+										ng-datasource="mappingSet['EmpName']"
+										ng-model="inputVO.aoCode"
+										ng-validate="false"
+										ng-disabled="false"
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										style="line-height:20px;" />						 
+						</td>
+					</tr>					
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();initPMS416U();">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1" function-type="export">匯出</button>
+			</div>
+		</div>
+	</div>
+	
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：每月10號</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="700px" e-mode="1" e-top="true" e-left="5" e-list="paramList">
+					<thead>
+						<tr>
+							<th>更新<br>資料</th>
+							<th>資料月份</th>
+							<th>業務處</th>
+							<th>區別</th>
+							<th>分行<br>代號</th>
+							<th>分行名稱</th>
+							<th>申購日期</th>
+							<th>贖回日期</th>
+							<th>憑證號碼</th>
+							<th>債券代號</th>
+							<th>計價幣別</th>
+							<th>贖回金額</th>
+							<th>相關配息</th>
+							<th>投資金額</th>
+							<th>申購手續費</th>
+							<th>通路服務費</th>
+							<th>信管費</th>
+							<th>報酬率</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">客戶ID</th>
+							<th>客戶姓名</th>
+							<th>客戶屬性</th>
+							<th>贖回<br>交易來源</th>
+							<th>申購<br>交易來源</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="EMP_ID" e-query="query()">員工編號</th>
+							<th>員工姓名</th>
+							<th>AO<br>CODE</th>	
+							<th>專員是否勸誘客戶<br>短線進出</th>
+							<th>查證方式</th>
+							<th>電訪錄音編號</th>
+							<th>具體原因</th>
+							<th>首次<br>建立時間</th>
+							<th>最新<br>異動人員</th>
+							<th>最新<br>異動日期</th>							
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center"><input type="checkbox" ng-hide="row.PROFIT_RATE >= 0"　ng-disabled="row.PROFIT_RATE >= 0" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"　></td>                    
+						 	<td align="center">{{row.YEARMON}}</td>
+						 	<td align="center">{{row.REGION_CENTER_NAME}}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME}}</td>
+							<td align="center">{{row.BRANCH_NBR}}</td>
+							<td align="center">{{row.BRANCH_NAME}}</td>
+							<td align="center">{{toJsDate(row.INV_DATE) | date:'yyyy/MM/dd'}}</td>
+							<td align="center">{{toJsDate(row.REF_DATE) | date:'yyyy/MM/dd'}}</td>
+							<td align="center">{{row.CERT_NBR}}</td>
+							<td align="center">{{row.BOND_NBR}}</td>
+							<td align="center">{{row.CUR_COD}}</td>
+							<td align="right">{{row.REF_AMT | number}}</td>
+							<td align="right">{{row.DIV_AMT | number}}</td>
+							<td align="right">{{row.INV_AMT | number}}</td>
+							<td align="right">{{row.INV_FEE | number}}</td>
+							<td align="right">{{row.CHANNEL_FEE | number}}</td>
+							<td align="right">{{row.MANAGE_FEE | number}}</td>
+							<td align="right">
+								<font ng-show="row.PROFIT_RATE < 0" color="red">{{row.PROFIT_RATE | number}}%</font>
+								<font ng-show="row.PROFIT_RATE >= 0">{{row.PROFIT_RATE | number}}%</font>
+							</td>
+							<td>{{row.CUST_ID}}</td>
+							<td align="center">{{row.CUST_NAME}}</td>
+							<td align="center">{{row.CUST_ATT}}</td>
+							<td align="center">{{row.TRAN_SRC}}</td>
+							<td align="center">{{row.BUY_TRAN_SRC}}</td>
+							<td align="center">{{row.EMP_ID}}</td>
+							<td align="center">{{row.EMP_NAME}}</td>
+							<td align="center">{{row.AO_CODE}}</td>
+							<td align="center">
+								<label ng-hide="row.PROFIT_RATE >= 0">是<input type="radio" value="Y" ng-change="updateFlag(row)" ng-model="row.HR_ATTR" ng-disabled="row.PROFIT_RATE >= 0"/></label>&emsp;
+								<label ng-hide="row.PROFIT_RATE >= 0">否<input type="radio" value="N" ng-change="updateFlag(row)" ng-model="row.HR_ATTR" ng-disabled="row.PROFIT_RATE >= 0"/></label>
+							</td>
+							<td>
+								<e-combobox id="checkType" name="checkType" 
+											ng-datasource="mappingSet['PMS.CHECK_TYPE']"
+											ng-model="row.NOTE_TYPE"
+											ng-validate="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-hide="row.PROFIT_RATE >= 0"
+											ng-readonly="row.PROFIT_RATE >= 0"
+											ng-disabled="row.PROFIT_RATE >= 0"
+											style="line-height:20px;display:inline;" />
+		                    	<input type="text" class="form-control" style="width: 300px;display:inline;" e-length-limit="200" ng-model="row.NOTE" ng-disabled="row.PROFIT_RATE >= 0" ng-hide="row.PROFIT_RATE >= 0" placeholder="請補充查證方式..." ng-if="row.NOTE_TYPE == 'O'" ng-blur="updateFlag(row)"/>
+							</td>
+							<td>
+								<input 	type="text" class="form-control" style="width: 300px;display:inline;" 
+										e-length-limit="12" 
+										e-input-limit="ND"
+										ng-model="row.RECORD_SEQ" 
+										ng-disabled="row.PROFIT_RATE >= 0 || row.RECORD_YN == 'N'" 
+										ng-hide="row.PROFIT_RATE >= 0" 
+										placeholder="請輸入電訪錄音編號..." 
+										ng-if="row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A'" 
+										ng-blur="updateFlag(row)"/>
+							</td>
+							<td><input type="text" class="form-control" style="width: 300px" ng-blur="updateFlag(row)" ng-model="row.NOTE2" placeholder="請輸入具體原因..." ng-disabled="row.PROFIT_RATE >= 0" ng-hide="row.PROFIT_RATE >= 0"></td>
+							<td ng-bind="row.FIRSTUPDATE"></td>
+							<td>{{row.MODIFIER}}</td>
+							<td>{{row.LASTUPDATE}}</td>		
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<br>
+			<div align="center" ng-show="paramList.length">
+	       		<button type="button" class="btn btn-success" ng-click="save()">
+	            	<span class="glyphicon glyphicon-floppy-disk"></span>儲存
+	           	</button>
+	       	</div>
+			<div>說明：</div>
+			<div>相關配息：已收前手息＋累積現金配息－已付前手息</div>			
+			<div>報酬率：（贖回金額＋相關配息－投資金額－申購手續費－信管費）／投資金額</div>
+		</div>
+	</div>
+</div>

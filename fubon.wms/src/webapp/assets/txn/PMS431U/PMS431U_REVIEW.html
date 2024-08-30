@@ -1,0 +1,127 @@
+<style>
+.modal-dialog.PMS431U_REVIEW {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: 80vh;
+}
+.PMS431U_REVIEW table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS431U_REVIEW.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS431U_REVIEW_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<div ng-controller="PMS431U_REVIEWController" ng-cloak>
+	<div class="modal-dialog PMS431U_REVIEW">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">查核作業</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="table-bordered rstable middle" e-height="535px" e-mode="1" e-top="true" e-list="paramList">
+						<thead>
+							<tr>
+								<th>更新<br>資料</th>
+								
+								<th>資料日期<br>(系統日期)</th>
+								<th>交易日期</th>
+								
+								<th>行員歸屬行</th>
+								<th>行員姓名</th>
+								<th>行員ID</th>
+								<th>行員員編</th>
+								
+								<th>帳號</th>
+								<th>轉入/轉出</th>
+								<th>類別</th>
+								<th>券商代號</th>
+								<th>幣別</th>
+								<th>交易金額</th>
+								<th>交易序號</th>
+								<th>備註</th>
+								
+								<th>
+									初判異常轉法遵部調查<br>
+									<label><input type="radio" value="Y" ng-change="allUpd('Y')" ng-model="allUpdbutton" />是</label>&emsp;
+			                        <label><input type="radio" value="N" ng-change="allUpd('N')" ng-model="allUpdbutton" />否</label>
+								</th>
+								<th>備註(如有異常必填入說明)</th>
+								
+								<th>首次<br>建立時間</th>
+								<th>最新<br>異動人員</th>
+								<th>最新<br>異動日期</th>	
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList track by $index" align="center" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center"><input type="checkbox" ng-disabled="" ng-model="row.UPDATE_FLAG_R" ng-true-value="'Y'" ng-false-value="'N'"></td> 
+								
+								<td>{{row.SNAP_YYYYMM}}</td>
+								<td>{{row.TX_DATE}}</td>
+								
+								<td>{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+								<td>{{row.AO_NAME}}</td>
+								<td>{{row.AO_EMP_CID}}</td>
+								<td>{{row.AO_EMP_ID}}</td>
+								
+								<td>{{row.ACCT_NBR_ORI}}</td>
+								<td>{{row.DRCR | mapping:HIGH_RISK_INV_DRCR:'F3' }}</td>
+								<td>{{row.KIND_TYPE | mapping:HIGH_RISK_INV_TYPE:'F3' }}</td>
+								<td>{{row.STCK_CSTDY_CD}}</td>
+								<td>{{row.CUR}}</td>
+								<td>{{row.TX_AMT_TWD | number:0}}</td>
+								<td>{{row.JRNL_NO}}</td>
+								<td>{{row.REMK}}</td>
+								
+								<td align="center">
+			                        <label>是<input type="radio" value="Y" ng-change="updateFlagR(row)" ng-model="row.HR_ATTR" /></label>&emsp;
+			                        <label>否<input type="radio" value="N" ng-change="updateFlagR(row)" ng-model="row.HR_ATTR" /></label>
+			                    </td>
+								<td><input type="text" class="form-control" style="width: 300px" ng-model="row.NOTE"  ng-blur="updateFlagR(row)" e-length-limit="200" placeholder="備註..." /></td>
+								<td>{{row.FIRSTUPDATE}}</td>
+								<td>{{row.MODIFIER}}</td>
+								<td>{{row.LASTUPDATE}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<br>
+				<div align="center" ng-show="paramList.length">
+		            <button type="button" class="btn btn-success" ng-click="save()">
+		                <span class="glyphicon glyphicon-floppy-disk"></span>儲存
+		            </button>
+		        </div>
+			</div>
+		</div>
+	</div>
+</div>

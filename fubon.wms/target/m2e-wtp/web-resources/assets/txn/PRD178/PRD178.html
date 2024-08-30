@@ -1,0 +1,117 @@
+<script type="text/javascript" src="assets/txn/PRD178/PRD178.js"></script>
+<script type="text/javascript" src="assets/txn/PRD178/PRD178_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PRD178/PRD178_EDIT.js"></script>
+
+<div ng-controller="PRD178Controller" ng-cloak>
+	<div class="search_table search_box3">
+		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab style="width: 85vw;">
+			<table>
+				<tr>
+					<th>*保險公司：</th>
+					<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.CNAME" /></td>
+				</tr>
+				<tr>
+					<th>*專案名稱：</th>
+					<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.PROJECTNAME" /></td>
+				</tr>
+				<tr>
+					<th>*專案代碼：</th>
+					<td><input type="text" class="form-control" style="width: 200px;"  ng-model="inputVO.PROJECTID" /></td>
+				</tr>
+				<tr>
+					<th>開始銷售日：</th>
+					<td colspan="3">
+						<div class="input-group datebox datewidth" style="float: left">
+							<input type="text" id="sCreDate" name="sCreDate" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.sCreDate" is-open="model.a" datepicker-options="bgn_sDateOptions" ng-readonly="true" ng-required="false" ng-change="limitDate()" style="width: 150px;" />
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>停止銷售日：</th>
+					<td colspan="3">
+						<div style="float: left" class="input-group datebox datewidth">
+							<input type="text" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.endDate" is-open="model.b" datepicker-options="bgn_eDateOptions" ng-required="false" ng-readonly="true" ng-change="limitDate()" style="width: 150px;" />
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">查詢</button>
+		<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+		<button type="button" class="btn btn-info" ng-click="upload()">整批上傳</button>
+		<button type="button" class="btn btn-info" ng-click="download()" ng-disabled = "!resultList.length">下載CSV</button>
+	</div>
+
+	<h4 class="h4-title">查詢結果</h4>
+	<div style="float: left">
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+	</div>
+	<div style="clear: both;"></div>
+	<div class="gv_tab_sc" style="white-space: nowrap; min-height: 235px;">
+		<table class="e-table-freeze" e-mode="3" e-height="535px" e-top="true" e-left="4" e-list="roleList">
+			<thead>
+				<tr>
+					<th>功能</th>
+					<th>保險公司</th>
+					<th>專案代碼</th>
+					<th>專案名稱</th>
+					<th>通路型態</th>
+					<th>專案大分類</th>
+					<th>專案中分類</th>
+					<th>專案小分類</th>
+					<th>保費固定</th>
+					<th>開始銷售日</th>
+					<th>停止銷售日</th>
+					<th>保險公司產品名稱</th>
+					<th>保險公司產品代號</th>
+					<th>備註</th>
+					<th>產品代號</th>
+					<th>產品名稱</th>
+					<th>繳費/保障方式</th>
+					<th>單位數</th>
+					<th>保費</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in data track by $index">
+					<td>
+						<button type="button" class="btn btn-success" ng-click="edit(row)">修改</button>
+						<button type="button" class="btn btn-success" ng-click="deleteData(row)">刪除</button>
+					</td>
+					<td>{{row.CNAME}}</td>
+					<td>{{row.PROJECTID}}</td>
+					<td>{{row.PROJECTNAME}}</td>
+					<td>{{row.DEPARTMENTTYPE}}</td>
+					<td>{{row.PROJECTTYPE2}}</td>
+					<td>{{row.PROJECTTYPE}}</td>
+					<td>{{row.PROJECTTYPE1}}</td>
+					<td>{{row.PERMER}}</td>
+					<td>{{toJsDate(row.VALIDFROM) | date:"yyyy/MM/dd"}}</td>	
+					<td>{{toJsDate(row.VALIDTHRU) | date:"yyyy/MM/dd"}}</td>
+					<td>{{row.INSCOPRODUCTNAME}}</td>
+					<td>{{row.INSCOPRODUCTID}}</td>
+					<td>{{row.MEMO}}</td>
+					<td>{{row.MPRODUCTID}}</td>
+					<td>{{row.MPRODUCTNAME}}</td>
+					<td>{{row.PRODUCTPUD}}{{row.PRODUCTPUDTYPE}}/{{row.PRODUCTED}}{{row.PRODUCTEDTYPE}}</td>
+					<td>{{row.COVERAGEDUEPREMIUM}}</td>
+					<td>{{row.CONTCOVERAGEDUEPREMIUM}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

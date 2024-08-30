@@ -1,0 +1,379 @@
+<style>
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS209/PMS209.js"></script>
+<script type="text/javascript" src="assets/txn/PMS209/PMS209_CHART.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS209" ng-controller="PMS209Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">資料查詢
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" ng-show="inputVO.CHKE==1" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*資料起月：</th>
+							<td>
+								<e-combobox ng-datasource="ymList"
+											ng-model="inputVO.sTime" 
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false" 
+											ng-format="F3"
+											ng-required="true" 
+											width="180px" 
+											height="30px"
+											style="line-height:20px;" />
+							</td>
+							<th>*業務處：</th>
+							<td>
+								<e-combobox ng-datasource="REGION_LIST"
+											ng-model="inputVO.region_center_id" 
+											ng-validate="false"
+											ng-disabled="disableRegionCombo"
+											ng-readonly="disableRegionCombo" 
+											ng-editable="false"
+											ng-format="F3" 
+											ng-change="ChangeRegion();" 
+											ng-required="true"
+											width="200px" 
+											height="30px" 
+											style="line-height:20px;" />
+							</td>
+							<th ng-hide="inputVO.type_Q == '3'">職級：</th>
+							<td ng-hide="inputVO.type_Q == '3'">
+								<e-combobox ng-paramtype="PMS.AO_JOB_RANK" 
+											ng-model="inputVO.aojob"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F2" 
+											ng-required="false" 
+											ng-change="clearRes();"
+											width="180px" 
+											height="30px" 
+											style="line-height:20px;" />
+							</td>
+							<th ng-hide="inputVO.type_Q == '3'">商品類型：</th>
+							<td ng-hide="inputVO.type_Q == '3'">
+								<e-combobox ng-paramtype="FPS.PROD_TYPE" 
+											ng-model="inputVO.prodType"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3" 
+											ng-required="false"
+											ng-change="viewProdType();clearRes();" 
+											width="180px"
+											height="30px" 
+											style="line-height:20px;" />
+							</td>
+						</tr>
+						<tr>
+							<th>*資料迄月：</th>
+							<td>
+								<e-combobox ng-datasource="ymList"
+											ng-model="inputVO.eTime" 
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false" 
+											ng-format="F3"
+											ng-required="true" 
+											ng-change="dataMonthChange();" 
+											width="180px"
+											height="30px" 
+											style="line-height:20px;" />
+							</td>
+							<th>*營運區：</th>
+							<td>
+								<e-combobox ng-datasource="AREA_LIST"
+											ng-model="inputVO.branch_area_id" 
+											ng-validate="false"
+											ng-disabled="disableAreaCombo" 
+											ng-readonly="disableAreaCombo"
+											ng-editable="false" 
+											ng-change="ChangeArea();" 
+											ng-format="F3"
+											ng-required="true" 
+											width="200px" 
+											height="30px"
+											style="line-height:20px;" />
+							</td>
+							<th ng-hide="inputVO.type_Q == '3'">理專：</th>
+							<td ng-hide="inputVO.type_Q == '3'">
+								<e-combobox id="ao_code"
+											name="ao_code" 
+											ng-datasource="AO_LIST"
+											ng-model="inputVO.ao_code" 
+											ng-validate="false"
+											ng-disabled="disableAoCombo" 
+											ng-readonly="disableAoCombo"
+											ng-editable="false" 
+											ng-format="F1" 
+											ng-required="false"
+											ng-change="ChangeAo_code();clearRes();" 
+											width="180px"
+											style="line-height:20px;" />
+							</td>
+							<th ng-hide="inputVO.type_Q == '3'">產品名稱：</th>
+							<td ng-hide="inputVO.type_Q == '3'">
+								<e-combobox ng-datasource="mappingSet['COMVIEW']" 
+											ng-model="inputVO.prodID"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F1" 
+											ng-required="false" 
+											ng-change="clearRes();"
+											width="180px" 
+											height="30px" 
+											style="line-height:20px;" />
+							</td>
+						</tr>
+						<tr>
+							<th>檢視類型:</th>
+							<td>
+								<e-combobox ng-datasource="mappingSet['type']"
+											ng-model="inputVO.type_Q" 
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false" 
+											ng-format="F3"
+											ng-required="false" 
+											ng-change="clearRes();" 
+											width="180px"
+											height="30px" 
+											style="line-height:20px;" />
+							</td>
+							<th>分行別：</th>
+							<td>
+								<e-combobox 
+								id="branch_nbr" name="branch_nbr"
+								ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.branch_nbr" 
+											ng-validate="false"
+											ng-disabled="disableBranchCombo"
+											ng-readonly="disableBranchCombo" 
+											ng-format="F1"
+											ng-required="false" 
+											ng-change="ChangeBranch();" 
+											width="200px"
+											height="30px" 
+											style="line-height:20px;" />
+								</td>
+							<th></th>
+							<td></td>
+							<th></th>
+							<td></td>
+						</tr>
+					</table>
+				</form>
+				<!--------------  趨勢圖用分隔線  --------------->
+				<table ng-show="inputVO.CHKE == 2">
+					<tr>
+						<th>*資料起月：</th>
+						<td>
+							<e-combobox ng-datasource="ymList"
+										ng-disabled="false" 
+										ng-change="inquire_view();"
+										ng-model="inputVO.sTime" 
+										ng-validate="false" 
+										ng-readonly="false"
+										ng-editable="false" 
+										ng-format="F3" 
+										ng-required="true"
+										width="180px" 
+										height="30px" 
+										style="line-height:20px;" />
+						</td>
+						<th>*業務處：</th>
+						<td>
+							<e-combobox ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id" 
+										ng-validate="false"
+										ng-disabled="disableRegionCombo"
+										ng-readonly="disableRegionCombo" 
+										ng-editable="false"
+										ng-format="F3" 
+										ng-change="ChangeRegion();" 
+										ng-required="true"
+										width="200px" 
+										height="30px" 
+										style="line-height:20px;" />
+						</td>
+						<th ng-hide="inputVO.type_Q == '3'">職級：</th>
+						<td ng-hide="inputVO.type_Q == '3'">
+							<e-combobox ng-paramtype="PMS.AO_JOB_RANK" 
+										ng-model="inputVO.aojob"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F2" 
+										ng-required="false" 
+										ng-change="clearRes(); inquire_view();"
+										width="180px" 
+										height="30px" 
+										style="line-height:20px;" /></td>
+						<th></th>
+						<td></td>
+					</tr>
+					<tr>
+						<th>*資料迄月：</th>
+						<td>
+							<e-combobox ng-datasource="ymList"
+										ng-disabled="false" 
+										ng-change="inquire_view();"
+										ng-model="inputVO.eTime" 
+										ng-validate="false"
+										ng-readonly="false" 
+										ng-editable="false" 
+										ng-format="F3"
+										ng-required="true" 
+										ng-change="dataMonthChange()" 
+										width="180px"
+										height="30px" style="line-height:20px;" />
+						</td>
+						<th>*營運區：</th>
+						<td>
+							<e-combobox ng-datasource="AREA_LIST"
+										ng-model="inputVO.branch_area_id" 
+										ng-validate="false"
+										ng-disabled="disableAreaCombo" 
+										ng-readonly="disableAreaCombo"
+										ng-editable="false" 
+										ng-change="ChangeArea();inquire_view();" 
+										ng-format="F3"
+										ng-required="true" 
+										width="200px" height="30px"
+										style="line-height:20px;" />
+						</td>
+						<th ng-hide="inputVO.type_Q == '3'">理專：</th>
+						<td ng-hide="inputVO.type_Q == '3'">
+							<e-combobox id="ao_code"
+										name="ao_code" 
+										ng-datasource="AO_LIST"
+										ng-model="inputVO.ao_code" 
+										ng-validate="false"
+										ng-disabled="disableAoCombo" 
+										ng-readonly="disableAoCombo"
+										ng-editable="false" 
+										ng-format="F1" 
+										ng-required="false"
+										ng-change="ChangeAo_code();clearRes();inquire_view();" 
+										width="180px"
+										style="line-height:20px;" />
+						</td>
+						<th></th>
+						<td></td>
+					</tr>
+					<tr>
+						<th>檢視類型:</th>
+						<td>
+							<e-combobox ng-datasource="mappingSet['type']"
+										ng-model="inputVO.type_Q" 
+										ng-validate="false"
+										ng-readonly="false" 
+										ng-editable="false" 
+										ng-format="F3"
+										ng-required="false" 
+										ng-change="clearRes(); inquire_view();" 
+										width="180px"
+										height="30px" 
+										style="line-height:20px;" />
+						</td>
+						<th>分行別：</th>
+						<td>
+							<e-combobox ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_nbr" 
+										ng-validate="false"
+										ng-disabled="disableBranchCombo"
+										ng-readonly="disableBranchCombo" 
+										ng-format="F1"
+										ng-required="false" 
+										ng-change="ChangeBranch();inquire_view();" 
+										width="200px"
+										height="30px" 
+										style="line-height:20px;" />
+						</td>
+						<th></th>
+						<td></td>
+						<th></th>
+						<td></td>
+					</tr>
+				</table>
+
+			</div>
+			<div class="search_box_btn text-center" ng-show="inputVO.CHKE==1">
+				<button type="button" class="btn btn-info" ng-click="inquiredata()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()"
+					ng-disabled="paramList.length == 0">匯出</button>
+			</div>
+			<!-- 結果區 -->
+			<uib-tabset active="0" justified="true"> <!--Content of the panel-->
+				<uib-tab index="0" heading="表格" ng-click="inputVO.CHKE=1;">
+					<e-jumping-once output="outputVO" list="data" totallist="paramList"></e-jumping-once>
+					<div algin="left">
+						<table>
+							<tr>
+								<td align="right">產生頻率：</td>
+								<td align="left">每日</td>
+							</tr>
+						
+							<tr>
+								<td align="right">產出日：</td>
+								<td align="left">{{curDate | date:'yyyy/MM/dd'}}</td>
+							</tr>
+						
+						</table>
+					</div>
+					<div class="gv_tab_sc scroll_y" style="width: 100%; white-space: nowrap; align: right;">
+						<table class="table-bordered rstable">
+							<thead>
+								<th>業務處</th>
+								<th>營運區</th>
+								<th>分行別</th>
+								<th ng-show="(inputVO.aojob || inputVO.ao_code) && inputVO.type_Q != '3'">職級</th>
+								<th ng-show="(inputVO.aojob || inputVO.ao_code) && inputVO.type_Q != '3'">理專</th>
+								<th ng-show="(inputVO.prodType || inputVO.prodID) && inputVO.type_Q != '3'">商品類型</th>
+								<th ng-show="(inputVO.prodType || inputVO.prodID) && inputVO.type_Q != '3'">產品名稱</th>
+								<th ng-repeat="row in titleList track by $index | limitTo:displayLimit">{{row.YYYYMM}}<span ng-show="inputVO.type_Q == '3'"><br />(%)</span></th>
+							</thead>
+							<tbody>
+								<tr ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td>{{row.REGION_CENTER_NAME}}</td>
+									<td>{{row.BRANCH_AREA_NAME}}</td>
+									<td>{{row.BRANCH_NAME}}</td>
+									<td ng-show="(inputVO.aojob || inputVO.ao_code) && inputVO.type_Q != '3'">{{row.AO_JOB_RANK}}</td>
+									<td ng-show="(inputVO.aojob || inputVO.ao_code) && inputVO.type_Q != '3'">{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+									<td ng-show="(inputVO.prodType || inputVO.prodID) && inputVO.type_Q != '3'">{{row.PTYPE | mapping:mappingSet['FPS.PROD_TYPE']:'F3'}}</td>
+									<td ng-show="(inputVO.prodType || inputVO.prodID) && inputVO.type_Q != '3'">{{row.PNAME}}</td>
+									<td ng-repeat="row2 in titleList track by $index | limitTo:displayLimit" align="right">
+										<span ng-show="inputVO.type_Q == '1' || inputVO.type_Q == '2'">{{row[row2.YYYYMM] | number:0}}</span> 
+										<span ng-show="inputVO.type_Q == '3'">{{row[row2.YYYYMM] | number:2}}</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</uib-tab> 
+				<uib-tab index="1" heading="趨勢圖" ng-click="inputVO.CHKE=2;genRegion();initLoad_time();inquire_view();">
+					<div ng-if=" count==1">
+						<nvd3 options="options" data="datas" ng-if="datas.length!=0 "> </nvd3>
+						<div ng-if="datas.length==0" align="center"> 查無資料! </div>
+						<div ng-if="prodType==1" align="center"> 產品資訊過多!!!趨勢圖提供到理專資料 </div>
+					</div>
+				</uib-tab> 
+			</uib-tabset>
+		</div>
+		<!-- 結果區 -->
+	</div>
+</div>

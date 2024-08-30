@@ -1,0 +1,60 @@
+<style>
+/* dialog panl */
+.modal-dialog.MGM114_exchangeDetail {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MGM114/MGM114_exchangeDetail.js"></script>
+
+<div ng-controller="MGM114_exchangeDetailController" ng-cloak>
+	<div class="modal-dialog MGM114_exchangeDetail">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">禮贈品兌換紀錄</h4>
+			</div>
+			<div class="modal-body">
+				<div class="e_panel_table scroll_y">
+					<div class="ejborder">
+						<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>	
+					</div>				
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap; ">
+						<table>
+							<thead>
+								<tr>
+									<th>申請書序號</th>
+									<th ng-show="act_type == 'M'">當次兌換點數</th>
+									<th ng-show="act_type == 'V'">當次兌換金額</th>
+									<th>贈品性質</th>
+									<th>贈品內容</th>
+									<th>兌換數量</th>
+									<th>兌換理專姓名</th>
+									<th>兌換日期</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in data">
+									<td>{{row.APPLY_SEQ}}</td>
+									<td align="right" ng-show="act_type == 'M'">{{row.APPLY_POINTS}}</td>
+									<td align="right" ng-show="act_type == 'V'">{{row.APPLY_REWARD}}</td>
+									<td>{{row.GIFT_KIND | mapping:mappingSet['MGM.GIFT_KIND']:'F3'}}</td>
+									<td>{{row.GIFT_NAME}}</td>
+									<td align="right">{{row.APPLY_NUMBER}}</td>
+									<td>{{row.EMP_NAME}}</td>
+									<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd"}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+	     	</div>
+		</div>
+	</div>
+</div>

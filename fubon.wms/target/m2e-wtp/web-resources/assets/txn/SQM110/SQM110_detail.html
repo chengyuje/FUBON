@@ -1,0 +1,220 @@
+<style>
+.modal-dialog.SQM110_detail{
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: 80vh;
+}
+.SQM110_detail table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+SQM110_detail.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SQM110_detail_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.SQM110_detail .no_happy {
+	background-color: 	#FFFF00;
+}
+.SQM110_detail .happy {
+	background-color:  #FFFFFF;
+}
+</style>
+
+<div class="SQM110" ng-controller="SQM110_detailController" ng-cloak>
+	<div class="modal-dialog SQM110_detail" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header" >
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<session print>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">{{inputVO.qtnType | mapping:QTN_LIST}}滿意度改善檢討報告</h4>
+				</session>
+			</div>
+			<div class="modal-body">
+			<session print>
+				<table style="width:100%" >
+					<tr>
+						<th>分行別：{{inputVO.branch_nbr}}<ps ng-show="BRANCH_NAME">-</ps>{{BRANCH_NAME}}</th>
+						<th>交易日期：{{inputVO.trade_date}}</th>
+						<th>應結案日期：{{inputVO.end_date}}</th>
+						<th>客戶ID：{{inputVO.cust_id}}</th>
+						<th>客戶姓名：{{inputVO.cust_name}}</th>
+						
+					</tr>
+				</table>
+				<p>
+				<table>
+					<tr>
+						<th>{{inputVO.qtnType | mapping:QTN_LIST}}問卷：</th>	
+					</tr>
+				</table>	
+				<table class="e-table-freeze table td_center" e-height="535px" e-mode="1" e-top="true" e-list="totalList"  style="width:100%;">
+					<thead>
+						<tr>
+							<td class="repeat-row" style="height:10%;width: 300px;background-color: #FFDDAA !important;color:#000000;border: 1px solid black !important;" ng-repeat="row in column track by $index" align="center" valign="middle" >
+								{{row.QST_DESC}}
+							</td>	
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="repeat-row" style="border: 1px solid black !important;" ng-class="{'no_happy': (row.ANSWER == '4' || row.ANSWER == '5' || row.ANSWER == '6'), 'happy': !(row.ANSWER == '4' || row.ANSWER == '5' || row.ANSWER == '6')}" ng-repeat="row in column track by $index" align='center' valign="middle" >
+									{{((inputVO.qtnType == 'WMS01' && row.QST_ORDER == 11) ||
+									   (inputVO.qtnType == 'WMS02' && row.QST_ORDER == 13) || 
+									   (inputVO.qtnType == 'WMS03' && row.QST_ORDER == 17) || 
+									   (inputVO.qtnType == 'WMS04' && row.QST_ORDER == 13)     ? row.ANSWER : '') | mapping:ANS_TYPE_PUSH:'F3'}}
+									{{((inputVO.qtnType == 'WMS01' && row.QST_ORDER != 11) || 
+									   (inputVO.qtnType == 'WMS02' && row.QST_ORDER != 13) ||
+									   (inputVO.qtnType == 'WMS03' && row.QST_ORDER != 17) ||
+									   (inputVO.qtnType == 'WMS04' && row.QST_ORDER != 13)    ? row.ANSWER : '') | mapping:ANS_TYPE:'F3'}}
+									{{(inputVO.qtnType == 'WMS05' ? row.ANSWER : '') | mapping:ANS_TYPE:'F3'}}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div>
+					<table style="width:100%">
+							<tr>
+								<th>客戶質化意見：</th>	
+							</tr>
+							<tr>
+								<td><textarea id="text" name="text" class="form-control" ng-model="inputVO.resp_note" style="width: 100%; height: 100px" e-length-limit="2000" ng-disabled ='true'></textarea></td>
+							</tr>					
+					</table>
+					<br>
+					<table style="width:100%">
+							<tr>
+								<th>分行說明/問題釐清：<br>1.請務必聯絡客戶致意(註記聯絡時間)<br>2.請詳細說明客戶不滿意原因</th>	
+							</tr>
+							<tr>
+								<td><textarea id="text" ng-disabled ='true' name="text" class="form-control" ng-model="inputVO.brh_desc" style="width: 100%; height: 100px" maxlength="800" ></textarea></td>
+							</tr>	
+					</table>
+					<br>
+					<table style="width:50%;line-height:25px;"  ng-show="inputVO.qtnType == 'WMS03' || inputVO.qtnType == 'WMS04'">
+						<tr>
+						<th style="width:150px";>客戶來行等待時間：</th>
+						<td style="width:50px";><input type="text" ng-model="inputVO.waiting_time" style="width: 50px;" ng-disabled ='true'></td>
+						<th>mins</th>
+						<th style="width:120px";>交易作業時間：</th>
+					    <td style="width:50px";><input type="text" ng-model="inputVO.working_time" style="width: 50px;" ng-disabled ='true'/></td> 
+					    <th>mins</th>
+						</tr>
+					</table>
+					<table style="width:90%;line-height:25px;">
+							<tr>
+								<th ng_show ="inputVO.qtnType != 'WMS03' && inputVO.qtnType != 'WMS04'">專員姓名：{{inputVO.emp_name}} </th>
+								<th ng_show ="inputVO.qtnType == 'WMS03' || inputVO.qtnType == 'WMS04'">經辦姓名：{{inputVO.emp_name}} </th>
+								<th>員編：</th>
+							    <td><input type="text" id="emp_id" ng-model="inputVO.emp_id" style="width: 200px;" ng-blur="getJob_title_name(inputVO.emp_id)" ng-disabled ='true'/></td>
+							    <th >職級： {{inputVO.cur_job}}</th>
+							    <th style="width: 100px;">現職年資：</th>
+							    <td><input type="text" ng-model="inputVO.cur_job_y" style="width: 50px;" ng-disabled ='true'></td>
+							    <th>年</th>
+							    <td><input type="text" ng-model="inputVO.cur_job_m" style="width: 50px;" ng-disabled ='true'/></td>
+							    <th>月</th>  
+						    </tr>   
+						    <p> 
+						    <tr>
+								<th>主管姓名：{{inputVO.sup_emp_name}} </th>
+								<th >員編：</th>
+							    <td><input type="text" id="sup_emp_id" ng-model="inputVO.sup_emp_id" style="width: 200px;" ng-blur="getSup_Job_title_name(inputVO.sup_emp_id)" ng-disabled ='true'/></td>
+							    <th >職級： {{inputVO.sup_cur_job}}</th>
+						    </tr>  
+					</table>
+					<br>
+					<table style="width:100%">
+							<tr>
+								<th>改善計畫：站在客戶立場，以「多一度的服務」思維擬定改善計畫 </th>	
+							</tr>
+							<tr>
+								<td><textarea id="text" ng-disabled ='true' name="text" class="form-control" ng-model="inputVO.improve_desc" style="width: 100%; height: 100px" maxlength="500"></textarea></td>
+							</tr>		
+					</table>
+					<br>
+					<table style="width:100%">
+							<tr>
+								<th>區長簽核意見：</th>	
+							</tr>
+							<tr>
+								<td><textarea id="text" ng-disabled ='true' name="text" class="form-control" ng-model="inputVO.op_sup_remark" style="width: 100%; height: 100px" maxlength="200"></textarea></td>
+							</tr>		
+					</table>
+					<br>
+					<table style="width:100%" >
+					   <!-- <tr>
+								<th>處副主管簽核意見：</th>	
+							</tr>
+							<tr>
+								<td colspan="3"><textarea id="text" ng-disabled ='true' name="text" class="form-control" ng-model="inputVO.rc_vice_sup_remark" style="width: 100%; height: 100px" maxlength="100"></textarea></td>
+							</tr>
+					   -->
+							<tr ng-show="inputVO.qtnType != 'WMS03' && inputVO.qtnType != 'WMS04' ">
+								<th style="width: 400px;">最後一次訪談紀錄建立時間：{{inputVO.last_visit_date}}</th>
+								<th>貢獻度等級:{{inputVO.con_degree}}</th> 
+								<th>應聯繫頻率:{{inputVO.frq_day}}<ps ng-show="inputVO.frq_day">天</ps></th> 
+							</tr>
+							<tr>	
+								<th colspan="3">
+								處/副主管批示並填寫意見：&emsp;
+								<label><input type="radio" name="deduction_initial" ng-model="inputVO.deduction_initial" ng-value="'Y'"  ng-disabled ='true'>扣分</label>
+								&emsp;
+								<label><input type="radio" name="deduction_initial" ng-model="inputVO.deduction_initial" ng-value="'N'"  ng-disabled ='true'>不扣分</label>
+								</th>
+							</tr>
+					</table>
+					<br>
+					<table style="width:100%">
+							<tr>
+								<th>處/副主管簽核意見：</th>	
+							</tr>
+							<tr>
+								<td><textarea id="text" ng-disabled ='true' name="text" class="form-control" ng-model="merge_rc_sup_remark" style="width: 100%; height: 100px" maxlength="200"></textarea></td>
+							</tr>		
+					</table>
+					<br>
+					<table style="width:100%">
+							<tr>
+								<th>總行簽核意見：</th>	
+							</tr>
+							<tr>
+								<td><textarea id="text" ng-disabled ='true' name="text" class="form-control" ng-model="inputVO.headmgr_remark" style="width: 100%; height: 100px" maxlength="200"></textarea></td>
+							</tr>		
+					</table>
+					
+					
+				</div>
+		   </session>	
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >確定</button>
+					<button type="button" class="btn btn-primary" ng-click="printPdf()" ng-show="headmgr_flag">列印</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

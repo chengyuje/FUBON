@@ -1,0 +1,128 @@
+<style>
+/* open dialog */
+.ngdialog.PMS102_LEADS {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS102_LEADS {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1024px;
+	height: auto;
+}
+/* table size */
+.PMS102_LEADS table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* scroll && height */
+.scroll_PMS102_LEADS_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+</style>
+<div ng-controller="PMS102_LEADSController" ng-cloak>
+	<div class="modal-dialog PMS102_LEADS">
+		<div class="modal-content">
+			<div class="modal-header">
+				
+				<div style="float:left;width:45%">客戶ID:{{row.CUST_ID}}
+				</div>
+				<div style="float:left;width:45%">姓名: {{row.CUST_NAME}}
+				</div>
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+			</div>
+			
+			
+			<div class="modal-body">
+				<div   ng-if="(resultList.length==0 && resultList2.length==0) || resultList.length>0">
+				<e-jumping-once output="outputVO1" input="inputVO" query="getLeadsList()" list="data" totallist="resultList"></e-jumping-once>	
+					<h4>投資明細</h4>
+					<table  class="gv_tab_sc scroll_y tablesaw table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th>商品類別</th>
+								<th>商品細項</th>
+								<th>幣別</th>
+								<th>原幣餘額</th>
+								<th>台幣餘額</th>
+								<th>含息報酬</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row"
+								ng-repeat="row in data | limitTo:displayLimit track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+
+								<td align="center">{{row.PRD_TYPE | mapping:PRD_TYPE:'F3'}}</td>
+								<td align="left">{{row.PRD_DTL}}</td>
+								<td align="center">{{row.CRCY_TYPE}}</td>
+								<td align="right">{{row.BAL_ORGD | currency:''}}</td>
+								<td align="right">{{row.BAL_NTD | currency:''}}</td>
+								<td align="right">{{row.INT_RET | currency:''}}</td>
+
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<br  ng-if="(resultList.length==0 && resultList2.length==0) || resultList.length>0">
+				
+				<div  ng-if="resultList2.length>0" >
+				<e-jumping-once output="outputVO2" input="inputVO" query="queryMod()" list="data2" totallist="resultList2"></e-jumping-once>
+					<h4>利變型保單明細</h4>
+					<table   class="gv_tab_sc scroll_y tablesaw table table-striped table-bordered">
+						<thead>
+						<tr>
+							<th>險種代碼</th>
+							<th>保單簡稱</th>
+							<th>解約費用收取年期</th>
+							<th>保單號碼</th>
+							<th>序號</th>
+							<th>累計實繳保費(原幣)</th>
+							<th>保單生效日</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr class="repeat-row" ng-repeat="row in data2 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.INS_NBR}}</td>
+							<td align="left">{{row.INS_NAME}}</td>
+							<td align="center">{{row.TER_FEE_YEAR}}</td>
+							<td align="center">{{row.POLICY_NO}}</td>
+							<td align="center">{{row.POLICY_SEQ}}</td>
+							<td align="right">{{row.ACUM_PAID_ORGD | currency:''}}</td>
+							<td align="center">{{toJsDate(row.EFFECT_DATE) | date:'yyyy/MM/dd'}}</td>
+						</tr>
+						</tbody>
+					</table>
+			</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button"  class="btn btn-primary"
+					ng-click="closeThisDialog('cancel')">確定</button>
+			</div>
+		</div>
+	</div>
+</div>

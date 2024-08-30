@@ -1,0 +1,64 @@
+<style>
+.CRM512 .datewidth {
+	width:180px !important;
+	float: left !important;
+}
+
+.CRM512 .rstable thead tr th {
+    vertical-align: middle;
+}
+.CRM512 .noticed {
+    color: #FF0000;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/CRM512/CRM512.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512_HIS.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512_BOSS.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512_DETAILS.js"></script>
+
+<div class="CRM512" ng-controller="CRM512Controller">
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th width="10%">*客戶ID：</th>
+							<td width="25%"><input class="form-control" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" e-length-limit="15" ng-change="toUppercase_data(inputVO.custID, 'custid')"></td>
+							<th width="10%"></th>
+							<td width="25%"></td>
+							<th width="10%"></th>
+							<td width="25%"></td>
+						</tr>
+						<tr ng-show="qusBankListAfter.length > 0">
+							<th width="10%">客戶姓名：</th>
+							<td width="25%">{{qusBankListAfter[0].CUST_NAME}}</td>
+							<th width="10%"></th>
+							<td width="25%"></td>
+							<th width="10%"></th>
+							<td width="25%"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" function-type="query" ng-click="getQusBankList();" ng-disabled="inputVO.custID == null || inputVO.custID == '' || inputVO.custID == undefined">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+				<button type="button" class="btn btn-info" function-type="export" ng-click="exportPDF();" ng-disabled="qusBankListAfter.length <= 0 || (qusBankListAfter.length > 0 && qusBankListAfter[0].REPORT_YN == 'N')">匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		
+		<div ng-include="'assets/txn/CRM512/CRM512_DETAILS.html'"></div>
+	</div>
+</div>

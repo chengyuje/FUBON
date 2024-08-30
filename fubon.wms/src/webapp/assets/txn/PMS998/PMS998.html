@@ -1,0 +1,216 @@
+<style>
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS998/PMS998.js"></script>
+<script type="text/javascript" src="assets/txn/PMS998/PMS998_INSERT.js"></script>
+<div ng-controller="PMS998Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3 scroll_y">
+			<table style='width: 100%;'>
+				<tr>
+					<th>建檔日期：</th>
+					<td class="form-inline" colspan="5">
+	             		<div class="form-group">
+							<div class="input-group datebox datewidth">
+								<input 	type="text" id="importSDate" name="importSDate"
+									   	class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.importSDate"
+										is-open="model.e"
+										datepicker-options="importStartDateOptions"
+										alt-input-formats="altInputFormats"
+										ng-readonly="true"
+										ng-change="limitDate()"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+							<div style="float: left !important;">～</div>
+							<div class="input-group datebox datewidth">
+								<input 	type="text" id="importEDate" name="importEDate"
+									   	class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.importEDate"
+										is-open="model.f"
+										datepicker-options="importEndDateOptions"
+										alt-input-formats="altInputFormats"
+										ng-readonly="true"
+										ng-change="limitDate()" 
+										ng-disabled="inputVO.importSDate == undefined" />
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'f')" ng-disabled="inputVO.importSDate == undefined" ng-readonly="inputVO.importSDate == undefined">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</div>
+						
+					</td>
+				</tr>
+				<tr ng-hide="hideFlag == 'Y'">
+					<th width="16.6%">業務處：</th>
+					<td width="16.6%">
+						<e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id"
+									ng-validate="false" 
+									ng-disabled="AVAIL_REGION.length == 1"
+									ng-readonly="AVAIL_REGION.length == 1" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeRegion(region)"
+									style="line-height:20px;" />
+				   	</td>
+					<th width="16.6%">營運區：</th>
+					<td width="16.6%">
+						<e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="AVAIL_AREA.length == 1"
+									ng-readonly="AVAIL_AREA.length == 1" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeArea(region)"
+									style="line-height:20px;" />
+				   	</td>
+					<th width="16.6%">分行：</th>
+					<td width="16.6%">
+						<e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="AVAIL_BRANCH.length == 1"
+									ng-readonly="AVAIL_BRANCH.length == 1" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch(region)"
+									style="line-height:20px;" />
+			   		</td>
+				</tr>
+				<tr ng-hide="hideFlag != 'Y'">
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="uhrmRCList"
+										ng-model="inputVO.uhrmRC"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="uhrmOPList"
+										ng-model="inputVO.uhrmOP"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
+					<th width="16.6%"></th>
+					<td width="16.6%"></td>
+				</tr>
+				<tr>
+					<th ng-if="hideFlag == 'N'">行員員編：</th>
+					<td ng-if="hideFlag == 'N'">
+						<input class="form-control" type="text" placeholder="請輸入..." id="" name="" ng-model="inputVO.EMP_ID" style="width:265px;" maxlength="8">
+					</td>
+			    	<th ng-if="hideFlag == 'Y'">員工姓名：</th>
+					<td ng-if="hideFlag == 'Y'">
+	    				<e-combobox id="uEmpID" name="uEmpID"
+									ng-datasource="mappingSet['UHRM_LIST']"
+									ng-model="inputVO.EMP_ID"
+									ng-validate="false" 
+									ng-disabled="mappingSet['UHRM_LIST'].length == 2"
+									ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="true"
+									style="line-height:20px;" />				 
+					</td>
+					<th width="16.6%"></th>
+					<td width="16.6%"></td>
+					<th width="16.6%"></th>
+					<td width="16.6%"></td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-primary" ng-click="query()" function-type="query"><span class="glyphicon glyphicon-search"></span>查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()" ><span class="glyphicon glyphicon-erase"></span>清除</button>
+			<button type="button" class="btn btn-danger" ng-click="add()" function-type="maintenance"><span class="glyphicon glyphicon-plus"></span>新增</button>
+			<button type="button" class="btn btn-warning" ng-click="export()" function-type="export"><span class="glyphicon glyphicon-download"></span> 匯出</button>
+		</div>
+	</div>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>
+	<div class="panel_content">
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="tablesaw table table-striped table-bordered text-center">
+				<thead>
+					<tr>
+						<th>功能</th>
+						<th>狀態</th>
+						<th>分行代碼</th>
+						<th>分行名稱</th>
+						<th>行員員編</th>
+						<th>行員姓名</th>
+						<th>客戶姓名</th>
+						<th>客戶ID</th>
+						<th>與行員關係</th>
+						<th>確認佐證</th>
+						<th>排除起日</th>
+						<th>排除迄日</th>
+						<th>建檔主管</th>
+						<th>建檔日期</th>
+						<th>放行主管</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row  text-center" ng-repeat="row in data track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center">
+							<button type="button" class="btn btn-success" ng-click="actionGO('RT', row.SEQ)" function-type="confirm"    ng-if="row.CONFIRM_YN == 'Y'"><span class="glyphicon glyphicon-ok"></span>核可</button>
+							<button type="button" class="btn btn-warning" ng-click="actionGO('RF', row.SEQ)" function-type="confirm"    ng-if="row.CONFIRM_YN == 'Y'"><span class="glyphicon glyphicon-remove"></span>退回</button>
+							<button type="button" class="btn btn-danger"  ng-click="actionGO('D',  row.SEQ)" function-type="maintenance" ng-if="row.MAINTENANCE_YN == 'Y'"><span class="glyphicon glyphicon-minus"></span>刪除</button>
+						</td>
+						<td align="center">{{row.STATUS | mapping:mappingSet['PMS.PMS998_STATUS']:'F3'}}</td>
+						<td align="center">{{row.BRANCH_NBR}}</td>
+						<td align="center">{{row.BRANCH_NAME}}</td>
+						<td align="center">{{row.EMP_ID}}</td>
+						<td align="center">{{row.EMP_NAME}}</td>
+						<td align="center">{{row.CUST_NAME}}</td>
+						<td align="center">{{row.CUST_ID}}</td>
+						<td align="center">{{row.C2E_RELATION | mapping:mappingSet['PMS.C2E_RELATION']:'F3'}}</td>
+						<td align="left">{{row.PROVE | mapping:mappingSet['PMS.PROVE']:'F3'}}{{row.PROVE == '03' ? "：" + row.NOTE : ""}}</td>
+						<td align="center">{{row.ALLOW_START_DATE}}</td>
+						<td align="center">{{row.ALLOW_END_DATE}}</td>
+						<td align="center">{{row.CREATE_BOSS}} - {{row.CREATE_BOSS_NAME}}</td>
+						<td align="center">{{row.CREATE_DATE}}</td>
+						<td align="center">{{row.CREVIEW_BOSS}} - {{row.CREVIEW_BOSS_NAME}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

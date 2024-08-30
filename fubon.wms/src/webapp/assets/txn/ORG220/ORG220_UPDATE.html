@@ -1,0 +1,151 @@
+<style>
+/* dialog panl */
+.modal-dialog.ORG220_UPDATE {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1300px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<div>
+	<div ng-controller="ORG220_UPDATEController" ng-cloak>
+		<div class="modal-dialog ORG220_UPDATE"> 
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">代理人設定</h4>
+				</div>
+	 			<div class="modal-body">
+			  		<table width="100%">
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding">員工姓名：</th>
+							<td class="col-md-8 tdpadding">{{inputVO.emp_ao_id | mapping:mappingSet['ac_a']:'F3'}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+					<hr>
+					<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+						<table width="100%">
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-10 tdpadding" colspan="4"><h4 class="h4-title">代理人</h4></th>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-2 tdpadding">員工姓名：</th>
+								<td class="col-md-8 tdpadding" colspan="3">
+									<e-combobox id="aocode" name = "aocode"
+												ng-datasource="mappingSet['aocode']"
+												ng-model="inputVO.emp_id"
+						    					ng-validate="false" 
+						    					ng-readonly="inputVO.emp_id != null" 
+						    					ng-editable="false"
+						    					ng-disabled="inputVO.emp_id != null"
+						    					ng-readonly= "true"
+						    					ng-format="F3"
+						    					ng-required="false"
+						    					style="line-height:20px;" />
+								</td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-2 tdpadding">代理起始時間：</th>
+								<td class="col-md-4 tdpadding">
+									<div class="input-group datebox datewidth">
+										<input type="text" id="sCreDate" name="sCreDate"
+											   class="form-control"
+											   uib-datepicker-popup="yyyy/MM/dd"
+											   ng-model="inputVO.sCreDate"
+											   is-open="model.a"
+											   datepicker-options="bgn_sDateOptions"
+											   ng-readonly="true"
+											   ng-required="true"								
+											   ng-change="limitDate1();checkDate();"/>
+		 								<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>																		
+										</span>
+									</div>
+								</td>
+								<td class="col-md-4 tdpadding" colspan="2">
+									<e-combobox id="timeS" name="timeS"
+												ng-datasource="mappingSet['timeS']"
+												ng-model="inputVO.sTime"
+						    					ng-validate="false" 
+						    					ng-readonly="inputVO.sCreDate == undefined" 
+				    							ng-disabled="inputVO.sCreDate == undefined"
+						    					ng-editable="false"
+						    					ng-change = "timeCheck()"
+						    					ng-format="F3"
+						    					ng-required="false"
+						    					style="line-height:20px;" />
+								</td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-2 tdpadding">代理結束時間：</th>
+								<td class="col-md-4 tdpadding">
+									<div class="input-group datebox datewidth">
+										<input type="text" id="eCreDate" name="eCreDate"
+											   class="form-control"
+											   uib-datepicker-popup="yyyy/MM/dd"
+											   ng-model="inputVO.eCreDate"
+											   is-open="model.b"
+											   datepicker-options="bgn_eDateOptions"
+											   ng-readonly="true"	
+											   ng-required="true"									
+											   ng-change="limitDate();checkDate();"/>
+		 								<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>																		
+										</span>
+									</div>
+								</td>
+								<td class="col-md-4 tdpadding" colspan="2">
+									<e-combobox id="timeE" name="timeE"
+												ng-datasource="mappingSet['timeE']"
+												ng-model="inputVO.eTime"
+						    					ng-validate="false" 
+						    					ng-readonly="inputVO.eCreDate == undefined" 
+				    							ng-disabled="inputVO.eCreDate == undefined"
+						    					ng-editable="false"
+						    					ng-change = "timeCheck()"
+						    					ng-format="F3"
+						    					ng-required="false"
+						    					style="line-height:20px;" />
+								</td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-2 tdpadding">備註：</th>
+								<td class="col-md-8 tdpadding" colspan="3"><input class="form-control" type="text" placeholder="請輸入..." ng-model="inputVO.agent_desc" e-length-limit="300" size="60"></td>
+								<td class="col-xs-1"></td>
+							</tr>
+						</table>
+					</form> 
+				</div>  
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="update()" ng-disabled="inputVO.emp_id == '' || 
+																								inputVO.sCreDate == undefined || 
+																								inputVO.eCreDate == undefined ||
+																								inputVO.sTime == '' ||  
+																								inputVO.eTime == ''" function-type="maintenance">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+				</div>
+			</div>	
+		</div>
+	</div>
+</div>

@@ -1,0 +1,111 @@
+<style>
+/* open dialog */
+.ngdialog.CRM822_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM822_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1100px;
+	height: auto;
+}
+/* table size */
+.CRM822_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM822_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM822_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<div ng-controller="CRM822_DETAILController" ng-cloak>
+	<div class="modal-dialog CRM822_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">海外ETF/海外股票詳細資訊</h4>
+			</div>
+			<div class="modal-body">
+				<h4 class="h4-title">{{row.InsuranceNo == null ? '' : row.InsuranceNo + '- '}}{{row.ProductName}}</h4>
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="table-bordered">
+						<tr>
+							<th class="col-md-2">商品類型：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.ProductType | mapping:mappingSet['ProductType']}}</td>
+							<th class="col-md-2">交易幣別：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.EntrustCur}}</td>
+							<th class="col-md-2">收盤價報價日期：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{toJsDate(row.Date08) | date:"yyyy/MM/dd"}}</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">交易市場(交易所)：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.TrxMarket}}</td>
+							<th class="col-md-2">平均買進價格(B)：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.AvgBuyingPrice | number:6}}</td>
+							<th class="col-md-2">參考匯率(D)：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{cod | number:4}}</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">商品幣別：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.CurCode}}</td>
+							<th class="col-md-2">參考收盤價(C)：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.CurAmt | number:6}}</td>
+							<th class="col-md-2">信託種類：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.TrustBusinessType | mapping:mappingSet['TrustBusinessType']}}</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">庫存股數(A)：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.Number | number:0}}</td>
+							<th class="col-md-2">外幣參考市值(A*C)：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.Number * row.CurAmt | number:2}}</td>
+							<th class="col-md-2">信託帳號：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.TrustAcct}}</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">狀態：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.State | mapping:mappingSet['State']}}</td>
+							<th class="col-md-2">台幣參考市值(A*C*D)：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.Number * row.CurAmt * cod | number:0}}</td>
+							<th class="col-md-2">參考含息報酬率[(A*C+E)/(A*B)-1]%：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.ReturnRateSign2 == '+' ? '' : '-'}}{{row.ReturnRate2 | number:2}}{{row.ReturnRate2 != null ? '%' : ''}}</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">庫存股數累積配息(E)</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.Dividend | number:2}}</td>
+							
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >確定</button>
+			</div>
+		</div>
+	</div>
+</div>

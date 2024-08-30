@@ -1,0 +1,260 @@
+<style>
+/* dialog panl */
+.modal-dialog.CRM431_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1250px;
+	height: auto;
+}
+.border-xxx{
+	border: 1px solid #C4C4C4;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+	
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.rstable tr th {
+    color: #999999;
+    font-weight: normal;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM431/CRM431_DETAIL.js"></script>
+<div ng-controller="CRM431_DETAILController" ng-cloak>
+	<div class="modal-dialog CRM431_DETAIL"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<!-- <button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button> -->
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">議價覆核申請</h4>
+			</div>
+	 		<div class="modal-body">
+	 			<table width="100%" class="rstable">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 http://10.204.2.114:8080/CRM452.html?empID=631019&type=single&custID=C200481206">授權類型：</th>
+						<td class="col-md-2 tdpadding">{{inputVO.apply_cat | mapping:mappingSet['CRM.APPLY.CAT']:F1 }}</td>
+						<th class="col-md-1.5 tdpadding">客戶ID：</th>
+						<td class="col-md-2 tdpadding">{{cust_id}}</td>
+						<th class="col-md-1.5 tdpadding">客戶姓名：</th>
+						<td class="col-md-2 tdpadding">{{cust_name}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 tdpadding">貢獻度等級：</th>
+						<td class="col-md-2 tdpadding">{{con_degree | mapping:mappingSet['CRM.CON_DEGREE']:'F3'}}</td>
+						<th class="col-md-1.5 tdpadding">理財會員等級：</th>
+						<td class="col-md-2 tdpadding">{{vip_degree | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+						<th class="col-md-1.5 tdpadding">客戶前日AUM：</th>
+						<td class="col-md-2 tdpadding">{{aum_amt | currency:"$":0}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1.5 tdpadding">近一年手收：</th>
+						<td class="col-md-2 tdpadding">{{y_profee | currency:"$":0}}</td>
+						<!-- <th class="col-md-1.5 tdpadding">適用優惠期間：</th>
+						<td class="col-md-2 tdpadding">{{toJsDate(brg_begin_date)|date:"yyyy-MM-dd"}}~{{toJsDate(brg_end_date)|date:"yyyy-MM-dd"}}</td> -->
+						<th class="col-md-1.5 tdpadding">最高授權等級：</th>
+						<td class="col-md-5.5 tdpadding" colspan="3">{{highest_auth_lv_name}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+				<hr>
+				
+	 			<!-- 單次議價覆核明細 -->
+	 			<div ng-show="inputVO.apply_cat == '2'">
+					<table width="100%" class="rstable">
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-10 tdpadding" colspan="4"><h4 class="h4-title">申請單</h4></th>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+					<table width="100%" class="rstable">
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-10 tdpadding" colspan="4">
+								<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+									<table>
+										<thead>
+											<tr>
+												<th>商品類別</th>
+												<th>商品代號</th>
+												<th>商品名稱</th>
+												<th>申購幣別</th>
+												<th>申購金額</th>
+												<th>客戶適用費率</th>
+												<th>折扣後費率</th>
+												<th>申請折數</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="rstable" class="repeat-row" ng-repeat="row in detailList track by $index">
+												<td>{{row.APPLY_TYPE  | mapping:mappingSet['CRM.SINGLE_TYPE']:F1}}</td>
+												<td>{{row.PROD_ID}}</td>
+												<td>{{row.PROD_NAME}}</td>
+												<td>{{row.TRUST_CURR}}</td>
+												<td align = "right">{{row.PURCHASE_AMT | number : 0}}</td>
+												<td align = "right">{{row.DEFAULT_FEE_RATE}}{{row.DEFAULT_FEE_RATE != null && row.DEFAULT_FEE_RATE != 0 ? '%' : ''}}</td>
+												<td align = "right">{{row.FEE_RATE}}{{row.FEE_RATE != null && row.FEE_RATEo != 0 ? '%' : ''}}</td>
+												<td align = "right">{{row.FEE_DISCOUNT}}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</th>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+					<table width="100%" class="rstable">
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-10 tdpadding" colspan="4"><h4 class="h4-title">議價原因</h4></th>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+					<table width="100%" class="rstable">
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-10 tdpadding" colspan="4">
+								<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+									<table>
+										<tbody>
+											<tr class="rstable" class="repeat-row" ng-repeat="row in detailList track by $index">
+												<td style="height: 30px">{{row.BRG_REASON}}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</th>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</div>
+				
+				<!-- 期間議價覆核明細 -->
+				<div ng-show = "inputVO.apply_cat == '1'">
+					<table width="100%" class="rstable" class="repeat-row" ng-repeat="row in detailList track by $index">
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-10 tdpadding" colspan="4"><h4 class="h4-title">{{row.APPLY_STATUS == '4' ? '終止單' : '申請單'}}-{{row.APPLY_TYPE == '1' ? '基金' : '海外ETF/股票'}}適用折數</h4></th>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+					<table ng-show="inputVO.apply_type == '1'" width="100%" class="rstable" class="repeat-row" ng-repeat="row in detailList track by $index">
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding border-xxx">國內股票型：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.DMT_STOCK}}&nbsp;折</td>
+							<th class="col-md-2 tdpadding border-xxx">國外股票型：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.FRN_STOCK}}&nbsp;折</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding border-xxx">國內債券型：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.DMT_BOND}}&nbsp;折</td>
+							<th class="col-md-2 tdpadding border-xxx">國外債券型：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.FRN_BOND}}&nbsp;折</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding border-xxx">國內平衡型：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.DMT_BALANCED}}&nbsp;折</td>
+							<th class="col-md-2 tdpadding border-xxx">國外平衡型：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.FRN_BALANCED}}&nbsp;折</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding border-xxx">適用優惠期間：</th>
+							<td class="col-md-8 tdpadding border-xxx" colspan="3" align="left">{{toJsDate(row.BRG_BEGIN_DATE)|date:"yyyy-MM-dd"}}&nbsp;~&nbsp;{{toJsDate(row.BRG_END_DATE)|date:"yyyy-MM-dd"}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding border-xxx">{{row.APPLY_STATUS == '4' ? '終止原因' : '議價原因'}}：</th>
+							<td class="col-md-8 tdpadding border-xxx" colspan="3" align="left" ng-hide="row.APPLY_STATUS == '4'">{{row.BRG_REASON}}</td>
+							<td class="col-md-8 tdpadding border-xxx" colspan="3" align="left" ng-show="row.APPLY_STATUS == '4'">{{BRG_REASON}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+					<table ng-show="inputVO.apply_type == '2'" width="100%" class="rstable" class="repeat-row" ng-repeat="row in detailList track by $index">
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding border-xxx">買入香港交易所：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.BUY_HK_MRK}}&nbsp;折</td>
+							<th class="col-md-2 tdpadding border-xxx">賣出香港交易所：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.SELL_HK_MRK}}&nbsp;折</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding border-xxx">買入美國交易所：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.BUY_US_MRK}}&nbsp;折</td>
+							<th class="col-md-2 tdpadding border-xxx">賣出美國交易所：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.SELL_US_MRK}}&nbsp;折</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding border-xxx">買入英國交易所：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.BUY_UK_MRK}}&nbsp;折</td>
+							<th class="col-md-2 tdpadding border-xxx">賣出英國交易所：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.SELL_UK_MRK}}&nbsp;折</td>
+							<td class="col-xs-1"></td>
+						</tr>	
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding border-xxx">買入日本交易所：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.BUY_JP_MRK}}&nbsp;折</td>
+							<th class="col-md-2 tdpadding border-xxx">賣出日本交易所：</th>
+							<td class="col-md-3 tdpadding border-xxx">{{row.SELL_JP_MRK}}&nbsp;折</td>
+							<td class="col-xs-1"></td>
+						</tr>					
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding border-xxx">適用優惠期間：</td>
+							<td class="col-md-8 tdpadding border-xxx" colspan="3" align="left">{{toJsDate(row.BRG_BEGIN_DATE)|date:"yyyy-MM-dd"}}&nbsp;~&nbsp;{{toJsDate(row.BRG_END_DATE)|date:"yyyy-MM-dd"}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding border-xxx">{{row.APPLY_STATUS == '4' ? '終止原因' : '議價原因'}}：</td>
+							<td class="col-md-8 tdpadding border-xxx" colspan="3" align="left">{{row.APPLY_STATUS == '1' ? row.BRG_REASON : row.TERMINATE_REASON}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+					&nbsp;&nbsp;
+				</div>
+				<table width="100%" class="rstable">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-10 tdpadding" colspan="4"><h4 class="h4-title">簽核備註</h4>(文字內容僅限100字內)</th>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-10 tdpadding" colspan="4"><textarea placeholder="請輸入..." ng-disabled="apply_btn==false" ng-model="inputVO.comments" maxlength="100" style="width: 100%; height: 100px"></textarea></th>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+				&nbsp;&nbsp;
+				<div class="search_box_btn text-center">
+					<button type="button" ng-show="apply_btn" class="btn btn-primary" ng-disabled="actionFlag == true" ng-click="action('accept')">同意</button>
+					<span class="bigspace"></span>
+					<button type="button" ng-show="apply_btn" class="btn btn-warning" ng-disabled="actionFlag == true" ng-click="action('reject')">退回</button>
+					<span class="bigspace"></span>
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button> 
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,80 @@
+<style>
+input:required:invalid{
+	border-color: red;
+
+}
+</style>
+<script type="text/javascript" src="assets/txn/KYC213/KYC213.js"></script>
+<div ng-controller="KYC213Controller" ng-cloak>
+    <div class="modal-dialog" style="width: 1080px;">
+      <div class="modal-content">
+        <div class="modal-header"> 
+        	<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+          <h4 id="myModalAlertLabel" class="modal-title">風險級距設定</h4>
+        </div>
+        <form name="risk">
+        <div class="modal-body">
+	          <div class="search_table search_box1">
+	            <table>
+	              <tr>
+	                <th>風險對照表代號:</th>
+	                <td><input ng-disabled="true" class="form-control" type="text" ng-model="inputVO.RL_VERSION"></td>
+	              </tr>
+	            </table>
+	          </div>
+         	 <h4>新增級距 <button type="button" class="btn btn-info" ng-click="addRow()">┼</button></h4>
+	          <div class="gv_tab_sc scroll_y">
+	            <table>
+	            <thead>
+	              <tr>
+	                <th>功能</th>
+	                <th>級距代碼</th>
+	                <th>級距中文名稱</th>
+	                <th>級距英文名稱</th>
+	                <th><=權重分數上限</th>
+	                <th>商品風險上限</th>
+	              </tr>
+	              </thead>
+	              <tbody>
+	              <tr ng-repeat="row in inputVO.RISK_LEVEL track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	                <td width="10px"><button type="button" class="btn btn-info" ng-click="deleteRow($index,row)">X</button></td>
+	                <td>{{row.CUST_RL_ID}}
+                		<input ng-if="row.CUST_RL_ID ==null?true:false" type="text" class="form-control" placeholder="請輸入..." id="cust_rl_id" name="cust_rl_id" ng-model="row.ECUST_RL_ID" maxlength="2">
+               		 </td>
+               		 <td>{{row.RL_NAME}}
+                		<input ng-if="row.RL_NAME ==null?true:false" type="text" class="form-control" placeholder="請輸入..." id="rl_name" name="rl_name" ng-model="row.ERL_NAME">
+                	</td>
+                	<td>{{row.RL_NAME_ENG}}
+                		<input ng-if="row.RL_NAME_ENG ==null?true:false" type="text" class="form-control" placeholder="請輸入..." id="rl_name_eng" name="rl_name_eng" ng-model="row.ERL_NAME_ENG">
+                	</td>
+                	<td>{{row.RL_UP_RATE}}
+                		<input e-input-limit="N" ng-if="row.RL_UP_RATE ==null?true:false" type="text" class="form-control" placeholder="請輸入..." id="rl_up_rate" name="rl_up_rate" ng-model="row.ERL_UP_RATE">
+               		 </td>
+	                <td>
+	                	<e-combobox id="prod_rl_up_rate"
+	                				name="prod_rl_up_rate"
+	                				ng-paramtype="FPS.PROD_RISK_LEVEL"
+	                				ng-model="row.PROD_RL_UP_RATE"
+	                				ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									style="line-height:20px;"/>
+	                </td>
+	              </tr>
+	              </tbody>
+	            </table>
+	          </div>
+	          <div style="text-align: center;" class="modal-footer">
+		        <button ng-click="saveData()" class="btn btn-info" data-dismiss="modal">確定</button> 
+		        <button ng-click="closeThisDialog('cancel')" type="button" class="btn btn-info"data-dismiss="modal">取消</button> 
+	        </div>
+        </div>
+		</form>
+      </div>
+    </div>
+
+
+
+</div>

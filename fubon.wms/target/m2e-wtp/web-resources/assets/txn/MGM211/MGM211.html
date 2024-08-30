@@ -1,0 +1,246 @@
+<style>
+/* dialog panl */
+.modal-dialog.MGM211 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1150px;
+	height: 600px;
+}
+
+.MGM211 .table tr th {
+	background: #efefef;
+	color: black;
+	font-weight: bold;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MGM211/MGM211.js"></script>
+<script type="text/javascript" src="assets/txn/MGM211/MGM211_GIFT.js"></script>
+<script type="text/javascript" src="assets/txn/MGM211/MGM211_FILE.js"></script>
+<div ng-controller="MGM211Controller" ng-cloak>
+	<div class="modal-dialog MGM211" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">活動維護</h4>
+			</div>
+			<div class="modal-body">
+				<table class="table table-bordered" style="margin-top: 5px">
+<!-- 					<tr> -->
+<!-- 						<th width="16%"><span style="color: red;">*</span>活動類型模組：</th> -->
+<!-- 						<td colspan="5"> -->
+<!-- 							<e-combobox  -->
+<!-- 				        		id="act_type" -->
+<!-- 				              	ng-datasource="mappingSet['MGM.ACT_TYPE']"  -->
+<!-- 				                ng-model="inputVO.act_type" -->
+<!-- 				                ng-validate="false" -->
+<!-- 				                ng-readonly="row != undefined" -->
+<!-- 				                ng-disabled="row != undefined" -->
+<!-- 				                ng-editable="false" -->
+<!-- 				                ng-format="F3" -->
+<!-- 				                ng-required="false" -->
+<!-- 								width="200px" -->
+<!-- 								style="line-height:20px" /> -->
+<!-- 						</td> -->
+<!-- 					</tr> -->
+					<tr>
+						<th width="16%"><span style="color: red;">*</span>活動代碼：</th>
+						<td colspan="5">
+							<input type="text" class="form-control" placeholder="請輸入..." 
+								ng-disabled="row != undefined" 
+								ng-model="inputVO.act_seq"
+								ng-blur="checkActSeq()">
+						</td>
+					</tr>
+					<tr>
+						<th width="16%"><span style="color: red;">*</span>活動名稱：</th>
+						<td colspan="5">
+							<input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.act_name">
+						</td>
+					</tr>
+					<tr>
+						<th width="16%"><span style="color: red;">*</span>生效日期：</th>
+						<td>
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="eff_date" name="eff_date"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.eff_date"
+									   is-open="model.a"
+									   datepicker-options="eff_dateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+						</td>
+						<th width="16%"><span style="color: red;">*</span>截止日期：</th>
+						<td>
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="deadline" name="deadline"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.deadline"
+									   is-open="model.b"
+									   datepicker-options="deadlineOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+						</td>
+						<th width="16%"><span style="color: red;">*</span>兌換截止日期：</th>
+						<td>
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="exc_deadline" name="exc_deadline"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.exc_deadline"
+									   is-open="model.c"
+									   datepicker-options="exc_deadlineOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr ng-show="inputVO.act_type == 'V' && row == undefined">
+						<th width="16%">活動名單：</th>
+						<td colspan="5">
+<!-- 						<button type="button" class="btn btn-info" ng-click="">上傳活動名單</button> -->
+							<span id="csvBox" style="display: inline-block;vertical-align: middle;">
+								<e-upload id="csvUpload" success="upload(name,rname)" accept=".csv" ></e-upload>
+							</span>
+							<button type="button" class="btn btn-info" ng-click="getExample()">範例.csv下載</button>
+							<span style="color: red;" ng-show="isError == true">名單有誤，請重新上傳</span>
+						</td>
+					</tr>
+					<tr>
+						<th width="16%">活動內容：</th>
+						<td colspan="5">
+							<textarea name="act_content" id="act_content" 
+								class="form-control" placeholder="請輸入..." 
+								ng-model="inputVO.act_content"
+								maxlength="150" ng-required></textarea>
+						</td>
+					</tr>
+					<tr>
+						<th width="16%">活動辦法：</th>
+						<td colspan="5">
+							<textarea name="act_approach" id="act_approach" 
+								class="form-control" placeholder="請輸入..." 
+								ng-model="inputVO.act_approach"
+								maxlength="150" ng-required></textarea>
+						</td>
+					</tr>
+					<tr>
+						<th width="16%">注意事項：</th>
+						<td colspan="5">
+							<textarea name="precautions" id="precautions" 
+								class="form-control" placeholder="請輸入..." 
+								ng-model="inputVO.precautions"
+								maxlength="150" ng-required></textarea>
+						</td>
+					</tr>
+					<tr>
+						<th width="16%">活動附件：</th>
+						<td colspan="5">
+<!-- 						<div> -->
+<!-- 							<input id="file" type="file" multiple="multiple" onchange="angular.element(this).scope().upload(this)" style="display: none" /> -->
+<!-- 							<button type="button" class="btn btn-info" onclick="file.click()">上傳活動附件</button> -->
+<!-- 						</div> -->
+							<button type="button" class="btn btn-info" ng-click="openFilePage()">上傳活動附件</button>
+							<table>
+								<tr class="repeat-row" ng-repeat="row in inputVO.fileList">
+									<td>{{row.rname}}</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<th width="16%"><span style="color: red;">*</span>推薦人簽署表單：</th>
+						<td colspan="5">
+							<span style="display: inline-block; vertical-align: middle;">
+								<e-upload success="uploadMgmSignForm(name,rname)"></e-upload>
+							</span>
+							<a href="#" ng-click="formView('R')" ng-bind="mgm_form_name"></a>
+						</td>
+					</tr>
+					<tr>
+						<th width="16%"><span style="color: red;">*</span>被推薦人簽署表單：</th>
+						<td colspan="5">
+							<span style="display: inline-block; vertical-align: middle;">
+								<e-upload success="uploadBeMgmSignForm(name,rname)"></e-upload>
+							</span>
+							<a href="#" ng-click="formView('B')" ng-bind="be_mgm_form_name"></a>
+						</td>
+					</tr>
+<!-- 					<tr> -->
+<!-- 						<th width="18%"><span style="color: red;">*</span>上傳客戶簽收單：</th> -->
+<!-- 						<td colspan="5"> -->
+<!-- 							<span id="csvBox" style="display: inline-block; vertical-align: middle;"> -->
+<!-- 								<e-upload id="csvUpload" success="uploadReceipt(name,rname)" accept=".pdf" ></e-upload> -->
+<!-- 							</span> -->
+<!-- 						</td> -->
+<!-- 					</tr> -->
+					<tr>
+						<th width="16%"><span style="color: red;">*</span>適用贈品：</th>
+						<td colspan="5">
+							<button style="margin-bottom: 10px;" type="button" class="btn btn-info" ng-click="setGift()">設定適用贈品</button>
+							<div class="ejborder">
+								<e-jumping-once output="outputVO" list="data" totallist="inputVO.giftList"></e-jumping-once>	
+							</div>					
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap; ">
+								<table>
+									<thead>
+										<tr class="gift">
+											<th width="20%" style="background: none;">贈品代碼</th>
+											<th width="60%" style="background: none;">贈品名稱</th>
+<!-- 										<th width="20%" style="background: none;" ng-show="inputVO.act_type == 'V'">每單位回饋金</th> -->
+											<th width="20%" style="background: none;">每單位贈品兌換點數</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" ng-repeat="row in data">
+											<td>{{row.GIFT_SEQ}}</td>
+											<td>{{row.GIFT_NAME}}</td>
+											<td align="right">{{row.EXCH_UNI | number:0}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>	
+						</td>
+					</tr>
+				</table>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" 
+						ng-disabled="inputVO.act_seq == undefined || inputVO.act_seq == ''"
+									 ng-click="tempSave()">暫存</button>
+						
+	            	<button type="button" class="btn btn-info" 
+	            		ng-click="save()"
+	            		ng-disabled="inputVO.act_seq == undefined || inputVO.act_seq == '' ||
+ 	            					 inputVO.act_name == undefined || inputVO.act_name == '' ||
+ 	            					 inputVO.eff_date == undefined ||
+ 	            					 inputVO.deadline == undefined ||
+ 	            					 inputVO.exc_deadline == undefined ||
+ 	            					 (inputVO.mgm_form_name == undefined && mgm_form_name == undefined) ||
+ 	            					 (inputVO.be_mgm_form_name == undefined && be_mgm_form_name == undefined) ||
+ 	            					 inputVO.giftList.length == 0">儲存</button>
+	            	<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+	                <button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">取消</button>
+	            </div>
+	     	</div>
+		</div>
+	</div>
+</div>

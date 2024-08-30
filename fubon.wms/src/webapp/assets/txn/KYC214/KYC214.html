@@ -1,0 +1,121 @@
+<style>
+<!--
+input.bLarger{width: 20px; height: 20px;}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/KYC214/KYC214.js"></script>
+
+<div ng-controller="KYC214Controller" ng-cloak>
+  <div class="modal-dialog" style="width: 1080px;">
+	<div class="modal-content">
+		 <div class="modal-header"> 
+	      <button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+	       <h4 id="myModalAlertLabel" class="modal-title">題庫查詢</h4>
+	    </div>
+	    <div class="modal-body">
+	      <div class="search_table">
+	        <table style="width: 45%; margin-left: 30%; margin-right: auto;">
+	          <tr>
+	            <th>題庫題目</th>
+	            <td><input id="QUESTION_DESC" name="QUESTION_DESC" type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.QUESTION_DESC" e-length-limit="200"></td>
+	           </tr>
+	           <tr>
+	            <th>建立日期</th>
+	            <td class="form-inline">
+		            <div class="form-group">
+						<div style="width: 40%;" class="input-group datebox datewidth">
+							<input type="text" id="sDate" name="sDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.sDate"
+								is-open="model.a"
+								datepicker-options="bgn_sDateOptions"
+								ng-readonly="true"
+								ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+						～
+						<div style="width: 40%;" class="input-group datebox datewidth">
+							<input type="text" id="eDate" name="eDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.eDate"
+								is-open="model.b"
+								datepicker-options="bgn_eDateOptions"
+								ng-readonly="true"
+								ng-change="limitDate()"/>
+						<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+					</div>
+				</td>
+	          </tr>
+	        </table>
+	      </div>
+	      <div class="search_box_btn text-center">
+			<button ng-click="queryData()" class="btn btn-info">查詢</button>
+			<button ng-click="btnClear()" class="btn btn-info">清除</button>
+		  </div>
+	      <div class="text-right">
+	        <e-jumping-once ng-show="inputVO"
+						output="outputVO"
+						totallist="questionList"
+						list="data"
+						>
+			</e-jumping-once>
+	      </div>
+	      <div class="gv_tab_sc scroll_y">
+	        <table >
+	        <thead>
+	          <tr>
+	            <th>功能</th>
+	            <th>題庫編號</th>
+	            <th>題庫題目</th>
+	            <th>題目類型</th>
+	            <th>答案清單</th>
+	            <th>是否<br>有其他</th>
+	            <th>是否<br>有補充說明</th>
+	          </tr>
+	          </thead>
+	          <tbody>
+	          <tr ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	            <td>
+		           <input type="checkbox" ng-model="row.select" class="bLarger"> 
+	            </td>
+	            <td>{{row.QUESTION_VERSION}}</td>
+	            <td style="width: 250px;">{{row.QUESTION_DESC}}</td>
+	            <td align="right">{{row.QUESTION_TYPE|mapping:typelist:F3}}</td>
+	            <td>
+		            <table>
+		            	<tr ng-repeat="row1 in row.answer" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+		            		<td align="left">
+		            			{{row1.ANSWER_DESC}}
+		            		</td>
+		            	</tr>
+		            </table>
+	            </td>
+	            <td align="center">{{row.ANS_OTHER_FLAG|mapping:ynlist:F3}}</td>
+	            <td align="center">{{row.ANS_MEMO_FLAG|mapping:ynlist:F3}}</td>
+	          </tr>
+	          </tbody>
+	        </table>
+	        <div style="text-align: center;" class="modal-footer">
+	        	<button ng-click="saveData()" class="btn btn-info" data-dismiss="modal">確定</button> 
+	        	<button ng-click="closeThisDialog('cancel')" class="btn btn-info"data-dismiss="modal">取消</button> 
+        	</div>
+	      </div>
+	    </div>
+      	
+	</div>
+  </div>  
+
+</div>

@@ -1,0 +1,137 @@
+<style>
+.modal-dialog.PMS350_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1200px;
+	height: auto;
+}
+.datewidth {
+	width: 180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+
+.df {
+	font-size: 16px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS350/PMS350.js"></script>
+<script type="text/javascript" src="assets/txn/PMS350/PMS350_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS350/PMS350_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS350/PMS350_INSERTDATA.js"></script>
+<script type="text/javascript" src="assets/txn/PMS350/PMS350_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS350/PMS350_INSERT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS350/PMS350_INSLIST.js"></script>
+<div class="PMS350" ng-controller="PMS350Controller" ng-cloak>
+
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>報表提供單位：</th>
+							<td><e-combobox id="dataMonth"
+									ng-datasource="mappingSet['DEPT_NAME_D']"
+									ng-model="inputVO.RPT_DEPT" ng-validate="false"
+									ng-editable="false" ng-change="TYPE_CHANGES()" ng-format="F3"
+									ng-required="false" width="200px" style="line-height:20px;" />
+							</td>
+							<th></th>
+							<td>
+								<button type="button" class="btn btn-info" ng-if="inputVO.default4==true" ng-click="upload(row)">上傳/更新報表</button>
+							</td>
+							<th></th>
+							<td>
+								<button type="button" class="btn btn-info" ng-if="inputVO.default3==true" ng-click="insertData()">報表設定</button>
+							</td>
+						</tr>
+						<tr>
+							<th>報表類型：</th>
+							<td><e-combobox id="rptType"
+									ng-datasource="mappingSet['RPT_TYPE']"
+									ng-model="inputVO.RPT_TYPE" ng-validate="false"
+									ng-editable="false" ng-change="NAME_CHANGE()" ng-format="F3"
+									ng-required="false" width="200px" style="line-height:20px;" />
+							</td>
+							<th>報表名稱：</th>
+							<td><e-combobox id="rptName"
+									ng-datasource="mappingSet['RPT_NAME_D']"
+									ng-model="inputVO.rptName" ng-validate="false"
+									ng-editable="false" ng-format="F3" ng-required="false" 
+									width="150px" style="line-height:20px;" /></td>
+							<th>報表說明:</th>
+							<td><input type="text" style="width: 150px;"
+								ng-model="inputVO.report_description" size="14" /></td>
+						</tr>
+
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="queryCheck()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="repeatinit()">清除</button>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">報表檢視
+		</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<e-jumping output="outputVO2" input="inputVO" query="queryCheck()"
+			list="paramList2"></e-jumping>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table width="50">
+				<thead>
+					<tr>
+						<th>檢視報表</th>
+						<th>報表名稱</th>
+						<th>報表說明</th>
+						<th>報表類型</th>
+						<th>使用角色</th>
+						<th>跑馬燈內容</th>
+						<th>公告日期</th>
+						<th>最後修改人</th>
+						<th>最後修改日</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-if="row.default2==true" class="repeat-row" ng-repeat="row in paramList2 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td><button ng-if="row.default2==true" type="button"
+								class="btn btn-info" ng-click="RPTDetail(row)">檢視</button></td>
+						<td><span ng-bind-html="row.RPT_NAME">{{row.RPT_NAME}}</span></td>
+						<td><span ng-bind-html="row.RPT_EXPLAIN">{{row.RPT_EXPLAIN}}</span></td>
+						<td>{{row.RPT_TYPE}}</td>
+						<td><span ng-bind-html="row.USER_ROLES">{{row.USER_ROLES}}</span>
+						<td>{{row.MARQUEE_TXT}}</td>
+						<td>{{row.BEGIN_DATE_F}} - {{row.END_DATE_F}}</td>
+						<td>{{row.UPDATER_NAME}}</td>
+						<td>{{row.RPT_LASTUPDATE}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<!-- 結果區 -->

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+    <bean id="pipeline" class="com.systex.jbranch.platform.server.pipeline.flex.PipelineImpl">
+        <property name="wsManager" ref="wsManager"/>
+        <property name="apServerManager" ref="apServerManager"/>
+        <property name="dataManager" ref="dataManager"/>
+        <property name="entryPoints">
+            <util:map>
+                <!-- txnCode -->
+                <entry key="CMFPG000">
+                    <!-- bizCode -->
+                    <util:set>
+                        <value>authenticate</value>
+                        <value>getBranchList</value>
+                        <value>wson</value>
+                        <value>tlronFPS</value>
+                        <value>tlronSSO</value>
+                        <value>tlronBTS</value>
+                        <value>tlron</value>
+                    </util:set>
+                </entry>
+            </util:map>
+        </property>
+    </bean>
+<!--    <bean id="uuid_gernerator" class="com.systex.jbranch.platform.server.pipeline.LBOTUUIDGenerator" p:dam-ref="dataAccessManager"/>-->
+    <bean id="default_uuid_generator" class="com.systex.jbranch.platform.server.pipeline.flex.DefaultUUIDGenerator"/>
+</beans>

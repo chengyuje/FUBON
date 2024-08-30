@@ -1,0 +1,2 @@
+insert into TBSYSI18N(LOCALE, CODE, TEXT, TYPE, VERSION, CREATOR, CREATETIME, MODIFIER, LASTUPDATE) values('en', 'ehl_01_common_001', 'Data Not Found', 'P', 0, 'SYSTEM', current_timestamp, 'SYSTEM', current_timestamp);
+insert into TBSYSI18N(LOCALE, CODE, TEXT, TYPE, VERSION, CREATOR, CREATETIME, MODIFIER, LASTUPDATE) values('en', 'ehl_01_pipeline_001', 'Not Found TxnID', 'P', 0, 'SYSTEM', current_timestamp, 'SYSTEM', current_timestamp);

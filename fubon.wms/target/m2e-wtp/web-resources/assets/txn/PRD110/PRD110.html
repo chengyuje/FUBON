@@ -1,0 +1,373 @@
+<style>
+/* open dialog */
+.ngdialog.PRD110 {
+	
+}
+/* dialog panl */
+.modal-dialog.PRD110 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PRD110 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PRD110 table.little{
+	width: 60%;
+}
+/* change row */
+.PRD110.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PRD110_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.modal-dialog.PRD110_MSG {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 320px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD110/PRD110.js"></script>
+<script type="text/javascript" src="assets/txn/PRD110/PRD110_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD110/PRD110_OVSPRI.js"></script>
+<script type="text/javascript" src="assets/txn/PRD120/PRDDocument.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100_BOSS.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512_DETAILS.js"></script>
+<script type="text/javascript" src="assets/txn/PRD110/PRD110_MSG.js"></script>
+<div class="PRD110" ng-controller="PRD110Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content" style="overflow: auto;">
+		<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table style="white-space: nowrap;">
+					<tr>
+						<td>
+							<label><input type="radio" ng-model="inputVO.type" ng-value="1" ng-change="inquireInit();init()" ng-disabled="isPop"> 依客戶可申購商品查詢</label>
+						</td>
+						<td ng-if="inputVO.type =='1'" class="form-inline">
+							*客戶ID：<input type="text" id="cust_id" name="cust_id" style="text-transform: uppercase;" class="form-control" ng-model="inputVO.cust_id" ng-disabled="cust_id" ng-disabled="isPop" required/>
+							&nbsp;<span class="with-errors" ng-show="inputVO.type =='1' && parameterTypeEditForm.cust_id.$error.required">請輸入客戶ID</span>
+						</td>
+						<td ng-hide="tradeType">
+							<label><input type="radio" ng-model="inputVO.type" ng-value="2" ng-change="inquireInit();init()" ng-disabled="isPop"> 可申購商品查詢</label>
+						</td>
+						<td ng-hide="tradeType">
+							<label><input type="radio" ng-model="inputVO.type" ng-value="3" ng-change="inquireInit();init()" ng-disabled="isPop"> 不可申購商品查詢</label>
+						</td>
+					</tr>
+				</table>
+				<table ng-if="inputVO.type =='1' || inputVO.type =='2'">
+					<tr>
+						<th>基金代碼：</th>
+						<td><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="fund_id" name="fund_id" ng-model="inputVO.fund_id" ng-blur="getName()" e-length-limit="16"></td>
+						<th>基金名稱：</th>
+						<td colspan="5"><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="fund_name" name="fund_name" ng-model="inputVO.fund_name" e-length-limit="255"></td>
+					</tr>
+					<tr>
+						<th>商品風險等級：</th>
+						<td>
+							<e-combobox id="risk_level"
+								ng-paramtype="FPS.PROD_RISK_LEVEL"
+								ng-model="inputVO.risk_level"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					multiple="true"
+			  					separator=";"
+			  					label-separator="；"
+			  					style="line-height:20px;"/>
+						</td>
+						<th>計價幣別：</th>
+						<td>
+							<e-combobox id="currency"
+								ng-paramtype="FPS.CURRENCY"
+								ng-model="inputVO.currency"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" />
+						</td>
+						<th>配息方式：</th>
+						<td>
+							<e-combobox id="dividend_type"
+								ng-paramtype="FPS.DIVIDEND_TYPE"
+								ng-model="inputVO.dividend_type"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" />
+						</td>
+						<th>配息頻率：</th>
+						<td>
+							<e-combobox id="dividend_fre"
+								ng-paramtype="FPS.DIVIDEND_FREQUENCY"
+								ng-model="inputVO.dividend_fre"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" />
+						</td>						
+					</tr>
+					<tr>
+						<th>基金類別：</th>
+						<td>
+							<e-combobox id="fund_type"
+								ng-paramtype="FPS.FUND_TYPE"
+								ng-model="inputVO.fund_type"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					ng-change="getArea()"
+			  					width="150px"
+			  					style="line-height:20px;" />
+						</td>
+						<th>投資區域：</th>
+						<td>
+							<e-combobox id="inv_area"
+								ng-datasource="mappingSet['INV_AREA']"
+								ng-model="inputVO.inv_area"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					ng-change="getTarget()"
+			  					width="150px"
+			  					style="line-height:20px;" />
+						</td>
+						<th>投資標的：</th>
+						<td>
+							<e-combobox id="inv_target"
+								ng-datasource="mappingSet['INV_TARGET']"
+								ng-model="inputVO.inv_target"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" />
+						</td>
+						<th>基金公司：</th>
+						<td>
+							<e-combobox id="trust_com"
+								ng-datasource="TRUST_COM"
+								ng-model="inputVO.trust_com"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F1"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" />
+						</td>						
+					</tr>
+					<tr>
+						<th>報酬率期間：</th>
+						<td>
+							<e-combobox id="roi_dt"
+								ng-paramtype="FPS.ROI_DT"
+								ng-model="inputVO.roi_dt"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					ng-change="clearRoi()"
+			  					width="150px"
+			  					style="line-height:20px;" />
+						</td>
+						<th>報酬率：</th>
+						<td>
+							<e-combobox id="roi" name="roi"
+								ng-paramtype="FPS.ROI"
+								ng-model="inputVO.roi"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="inputVO.roi_dt"
+			  					ng-disabled="!inputVO.roi_dt"
+			  					width="150px"
+			  					style="line-height:20px;" />
+						</td>
+						<th>禁止OBU申購：</th>
+						<td>
+							<e-combobox id="obu_YN" 
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.obu_YN"
+		    					ng-validate="false"
+		    					ng-readonly="false" 
+		    					ng-editable="false"
+		    					ng-format="F3"
+		    					ng-required="false"
+		    					width="150px"
+		    					style="line-height:20px;" />
+						</td>		
+						<th>主題名稱：</th>
+						<td>
+							<e-combobox id="fund_subject"
+								ng-datasource="FUND_SUBJECT"
+								ng-model="inputVO.fund_subject"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					multiple="true"
+			  					separator=";"
+			  					label-separator="；"
+			  					style="line-height:20px;" />
+						</td>										
+					</tr>
+					<tr ng-show="parameterTypeEditForm.roi.$error.required">
+						<th></th>
+						<th></th>
+						<th></th>
+						<th class="with-errors">請選擇報酬率</th>
+					</tr>
+					<tr>
+					    <th>專案名稱：</th>
+						<td>
+							<e-combobox id="fund_project"
+								ng-datasource="FUND_PROJECT"
+								ng-model="inputVO.fund_project"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					multiple="true"
+			  					separator=";"
+			  					label-separator="；"
+			  					style="line-height:20px;" />
+						</td>
+						<th>客群名稱：</th>
+						<td><e-combobox id="fund_customer_level"
+								ng-paramtype="PRD.FUND_CUSTOMER_LEVEL"
+								ng-model="inputVO.fund_customer_level"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					multiple="true"
+			  					separator=";"
+			  					label-separator="；"
+			  					style="line-height:20px;" />
+			  					</td>
+						<th></th>
+						<td></td>
+						<th></th>
+						<td></td>
+					</tr>
+				</table>
+				<table ng-if="inputVO.type =='3'">
+					<tr>
+						<th>基金代碼：</th>
+						<td><input type="text" class="form-control" placeholder="請輸入..." id="fund_id" name="fund_id" ng-model="inputVO.fund_id" ng-blur="getName()" e-length-limit="16"></td>
+						<th>基金名稱：</th>
+						<td><input type="text" class="form-control" placeholder="請輸入..." id="fund_name" name="fund_name" ng-model="inputVO.fund_name" e-length-limit="255"></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div ng-if="inputVO.type" class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-mousedown="inquireInit();inquire()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-mousedown="init();inquireInit()">清除</button>
+			<button type="button" class="btn btn-info" ng-mousedown="openOvsPri();" ng-if="inputVO.showOvsPri">境外私募基金</button>
+		</div>
+		<!-- 結果區 -->
+		<e-jumping-once ng-show="inputVO.type" output="outputVO" list="paramList" totallist="totalList"></e-jumping-once>
+		<div ng-if="inputVO.type" class="gv_tab_sc" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered td_center e-table-freeze" e-height="550px" e-mode="1" e-top="true" e-list="paramList">
+				<thead>
+					<tr>
+						<th ng-if="!IsMobile && inputVO.type !='3'">功能</th>
+						<th>核心衛星</th>
+						<th>專案名稱</th>
+						<th><e-sorter e-input="inputVO" e-col="PRD_ID" e-query="inquire()">基金代碼</e-sorter></th>
+						<th>基金名稱</th>
+						<th>商品風險等級</th>
+						<th>計價幣別</th>
+						<th>基金類別</th>
+						<th>配息頻率</th>
+						<th>警示基金</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td ng-if="!IsMobile && inputVO.type !='3'">
+							<button ng-if="!is910" type="button" class="btn btn-primary" ng-click="jump(row)">{{funName}}</button>
+							<button ng-if="is910" type="button" class="btn btn-primary" ng-click="jump(row)">選擇</button>
+							<button ng-if="inputVO.type =='1'" type="button" class="btn btn-primary" ng-click="save(row)">適配</button>
+						</td>
+						<td>{{row.MAIN_PRD | mapping:FUND_HW_TYPE:'F3'}}</td>
+						<td>{{row.PROJECT | mapping:FUND_PROJECT:'F3':'true'}}</td>
+						<td>{{row.PRD_ID}}</td>
+						<td ng-if="row.OVS_PRIVATE_YN != 'Y'"><a onclick="return false" ng-click="detail(row)">{{row.FUND_CNAME}}</a></td>
+						<td ng-if="row.OVS_PRIVATE_YN == 'Y'">{{row.FUND_CNAME}}</td>
+						<td>{{row.RISKCATE_ID | mapping:PROD_RISK_LEVEL:'F3'}}</td>
+						<td>{{row.CURRENCY_STD_ID | mapping:CURRENCY:'F3'}}</td>
+						<td>{{row.FUND_TYPE | mapping:FUND_TYPE:'F3'}}</td>
+						<td>{{row.DIVIDEND_FREQUENCY | mapping:DIVIDEND_FREQUENCY:'F3'}}</td>
+						<td>{{row.VIGILANT == 'H' ? '持有' : ''}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

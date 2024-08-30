@@ -1,0 +1,113 @@
+<script type="text/javascript" src="assets/txn/CMORG102/CMORG102.js"></script>
+
+<div class=""> 
+<div ng-controller="CMORG102Controller" ng-cloak>
+  <!-- content --> 
+  <!-- InstanceBeginEditable name="Content" -->
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="text-muted bootstrap-admin-box-title"><i class="glyphicon glyphicon-th-large"></i> 角色群組設定 </div>
+        </div>
+        <div class="bootstrap-admin-panel-content search_box">
+              <form>
+                <table style="width:85%">
+                  <tr>
+                    <th style="padding-left: 30px">角色代碼：</th>
+                    <td><input class="form-control" type="text" placeholder="請輸入..." ng-model="inputVO.tipRoleID" ng-disabled="inputVO.updateChange == true"></td>
+                    <th style="padding-left: 30px">角色名稱：</th>
+                    <td><input class="form-control" type="text" placeholder="請輸入..." ng-model="inputVO.tipRoleName"></td>
+                    <th style="padding-left: 30px">組織類型：</th>
+                    <td>
+						<e-combobox id="cmbOrgType" ng-disabled="eComboDisabled" 
+							ng-paramtype="CM.ORG_TYPE"
+							ng-model="inputVO.cmbOrgType"
+							ng-validate="true" 
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F1" 
+							ng-required="false" 					
+							 />
+                    </td>
+                  </tr>
+					<tr>
+						<td colspan="2" style="padding-left:30px">
+							<input type="checkbox" ng-model="inputVO.chkAdmin"> 
+							<font>管理者</font>
+							<input type="checkbox" ng-model="inputVO.chkAO" ng-change="chkAO(inputVO.chkAO)"> 
+							<font>理專人員</font>
+							<input type="checkbox" ng-model="inputVO.chkOP" ng-change="chkOP(inputVO.chkOP)"> 
+							<font>操作人員</font>
+						</td>
+						<th>報表設定：</th>
+						<td>
+							<input type="checkbox" ng-model="inputVO.chkSales" ng-change="chkSales(inputVO.chkSales)"> 
+							<font>業務人員</font>
+							<input type="checkbox" ng-model="inputVO.chkOO" ng-change="chkOO(inputVO.chkOO)"> 
+							<font>作業人員</font>
+						</td>
+						
+<!-- 						<td align="right"> -->
+<!-- 							<button type="button" class="btn btn-primary" ng-click="inquireInit();btnSave()"> 新增</button> -->
+<!-- 						</td> -->
+					</tr>
+                </table>
+                <div class="search_box_btn text-center">
+                  <button type="button" class="btn btn-primary" ng-click="saveRoleOrgSetting();init()" ng-if="inputVO.changeSelect!='update'"> 新增</button>
+                  <button type="button" class="btn btn-primary" ng-click="saveRoleOrgSetting();init()" ng-if="inputVO.changeSelect=='update'"> 修改</button>
+                  <button type="button" class="btn btn-primary" ng-click="init()"> 清除</button>
+                </div>
+              </form>
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <div class="bootstrap-admin-panel-content">
+                <table class="tablesaw table table-striped table-bordered">
+                  <thead>
+                    <tr>
+                      <th>動作</th>
+                      <th>角色代碼</th>
+                      <th>角色名稱</th>
+                      <th>模組類型</th>
+                      <th>管理者</th>
+                      <th>理專人員</th>
+                      <th>操作人員</th>
+                      <th>業務人員</th>
+                      <th>作業人員</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="row in results = lstRoleOrgSetting | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                      <td>
+                      	<span style="width: 120px; display: inline-block;">
+							<select class="form-control" ng-model="row.updorDel" ng-change="update(row)">
+								<option value="">請選擇</option>
+								<option value="update">修改</option>
+								<option value="delete">刪除</option>
+							</select>
+						</span>
+					  </td>
+                      <td style="text-align: center;">{{row.ROLE_ID}}</td>
+                      <td style="text-align: center;">{{row.ROLE_NAME}}</td>
+                      <td style="text-align: center;">{{row.ORG_TYPE}}</td>
+                      <td style="text-align: center;">{{row.IS_ADM == true ? 'V' : ''}}</td>
+                      <td style="text-align: center;">{{row.IS_AO == true ? 'V' : ''}}</td>
+                      <td style="text-align: center;">{{row.IS_OP == true ? 'V' : ''}}</td>
+                      <td style="text-align: center;">{{row.IS_SALES == true ? 'V' : ''}}</td>
+                      <td style="text-align: center;">{{row.IS_OO == true ? 'V' : ''}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <e-paging outputVO="outputVO"
+          			inputVO="inputVO"
+	           		callQuery="inquire()"
+	           		displayLimit="displayLimit"
+	           		dataList="lstRoleOrgSetting"
+	           		mode="2"
+	           		>
+          		</e-paging>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <!-- InstanceEndEditable --> </div>

@@ -1,0 +1,183 @@
+<style>
+
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS411/PMS411.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS411" ng-controller="PMS411Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>						
+						<th>*資料統計月份：</th>
+						<td><e-combobox id="dataMonth" name="dataMonth"
+								ng-datasource="mappingSet['timeE']" ng-model="inputVO.sCreDate"
+								ng-validate="false" ng-readonly="false" ng-editable="false"
+								ng-change="limitDate();dateChange()" ng-format="F3" width="143px"
+								ng-required="true"
+								style="line-height:20px;" /></td>											    												
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+							ng-datasource="REGION_LIST"
+							ng-model="inputVO.region_center_id"
+							ng-validate="false" 
+							ng-disabled="disableRegionCombo"
+							ng-readonly="disableRegionCombo" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="ChangeRegion()"
+							width="143px"
+							style="line-height:20px;" />
+						</td>						
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+							ng-datasource="AREA_LIST"
+							ng-model="inputVO.branch_area_id"
+							ng-validate="false" 
+							ng-disabled="disableAreaCombo"
+							ng-readonly="disableAreaCombo" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="ChangeArea()"
+							width="90px"
+							style="line-height:20px;" />
+						</td>
+						<th>分行：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-disabled="disableBranchCombo"
+							ng-readonly="disableBranchCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeBranch()"
+							width="155px"
+							style="line-height:20px;" />
+						</td>				
+						
+						<th>理專：</th>
+						<td>						
+							<e-combobox id="ao_code" name="ao_code"
+										ng-datasource="AO_LIST"
+										ng-model="inputVO.ao_code"
+										ng-validate="false"
+										ng-disabled="disableAoCombo"
+										ng-readonly="disableAoCombo" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeAo_code()"
+										width="100px"
+										style="line-height:20px;" />						 
+						</td>
+								
+					</tr>					
+				</table>
+				</form>			
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length==0" function-type="export">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+			<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>
+<!-- 		<e-jumping-once  output="outputVO" isend="ON" list="paramList1" totallist="paramList"></e-jumping-once> -->
+			
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：</td>
+						<td>每月</td>
+					</tr>
+					<tr>
+						<td>產出日：</td>
+						<td align="left">{{toJsDate(paramList[0].LASTUPDATE) | date:'yyyy/MM/dd'}}</td>
+					</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y">
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th>序號</th>
+							<th>資料基準日</th>
+							<th>分行代碼</th>
+							<th>AO Code</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>投資總金額</th>
+							<th>不適配投資金額</th>
+							<th>資產總金額</th>
+							<th>風險不適配投資%</th>																				
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td align="center">{{row.ROWNUM}}</td>
+						 	<td align="center">{{row.DATA_DATE}}</td>
+							<td align="center">{{row.BRANCH_NBR}}<ps ng-show="row.BRANCH_NAME">-</ps>{{row.BRANCH_NAME}}</td>
+							<td align="center">{{row.AO_CODE}}</td>
+							<td align="center">{{row.CUST_ID}}</td>
+							<td align="center">{{row.CUST_NAME}}</td>
+							<td align="right">{{0+row.INVEST_AMT | currency:''}}</td>
+							<td align="right">{{0+row.NOMATCH_AMT | currency:''}}</td>
+							<td align="right">{{0+row.AST_AMT | currency:''}}</td>
+							<td align="right">{{0+row.NOMATCH_PERCENT | number:2}}%</td>																															 				
+						</tr>
+						<tr class="red" ng-show="paramList.length > 0">
+							<td colspan="6" align="center">本頁小計</td>
+							<td align="right">{{INVEST_AMT | currency:''}}</td>		
+							<td align="right">{{NOMATCH_AMT | currency:''}}</td>
+							<td align="right">{{AST_AMT | currency:''}}</td>
+							<td align="right">{{NOMATCH_PERCENT | number:2}}%</td>
+						</tr>
+						<tr class="red" ng-if="page == pageT-1 && paramList.length > 0">
+							<td colspan="6" align="center">總計</td>
+							<td align="right">{{INVEST_AMT2 | currency:''}}</td>		
+							<td align="right">{{NOMATCH_AMT2 | currency:''}}</td>
+							<td align="right">{{AST_AMT2 | currency:''}}</td>
+							<td align="right">{{NOMATCH_PERCENT2 | number:2}}%</td>
+							
+						</tr>
+					</tbody>
+				</table>				
+			</div>
+			<td align="left">說明：</td>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,107 @@
+<style>
+    /* dialog panel */
+    .IT0123_PrepareProd_Edit .modal-dialog {
+        position: relative;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 900px;
+        height: auto;
+    }
+
+    .IT0123_PrepareProd_Edit .uploadFileName {
+        color: #ff2b2b;
+        font-weight: bold;
+    }
+
+    .IT0123_PrepareProd_Edit .center {
+        text-align: center;
+    }
+</style>
+<div class="IT0123_PrepareProd_Edit" ng-controller="IT0123_PrepareProd_EditController">
+    <form name="recordEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off"
+          enter-as-tab>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            ng-click="closeThisDialog('cancel')">&times;
+                    </button>
+                    <h4 id="myModalAlertLabel" class="modal-title center"
+                        ng-bind="(isUpdate? '編輯': '新增') + ' 上線必要更新紀錄'"></h4>
+                </div>
+                <div class="modal-body gv_tab_sc scroll_y">
+                    <div class="form-group" style="padding-top: 20px">
+                        <label class="col-form-label col-sm-2" for="snapDate">資料日期</label>
+                        <div class="col-sm-10">
+                            <input id="snapDate" class="form-control" type="text"
+                                   placeholder="格式為 yyyyMMdd，EX:20200101"
+                                   ng-model="inputVO.SNAP_DATE" pattern="\d{8}" title="違反格式 yyyyMMdd！" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label col-sm-2" for="redmineId">Redmine<br/>單號（如有）</label>
+                        <div class="col-sm-10">
+                            <input id="redmineId" class="form-control" type="text" ng-model="inputVO.REDMINE">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label col-sm-2" for="principal">負責人</label>
+                        <div class="col-sm-10">
+                            <input id="principal" class="form-control" type="text" ng-model="inputVO.PRINCIPAL"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label col-sm-2" for="client">提出問題人</label>
+                        <div class="col-sm-10">
+                            <input id="client" class="form-control" type="text" ng-model="inputVO.CLIENT" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label col-sm-2">類型</label>
+                        <div class="col-sm-10">
+                            <e-combobox width="100%" ng-datasource="mappingSet['TYPE']"
+                                        ng-model="inputVO.TYPE" ng-format="F3" required/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label col-sm-2">配合事項與<br/>附件檔名</label>
+                        <div class="col-sm-10">
+                            <e-upload success="uploadFinshed(name,rname)" width="100%" required></e-upload>
+                            <span class="help-block">
+                                <span ng-show="isUpdate">
+                                    原始附件檔名：<span class="uploadFileName" ng-bind="inputVO.PREV_FILE_NAME"></span>
+                                </span>
+                                <br/>
+                                將上傳：<span class="uploadFileName" ng-bind="inputVO.REAL_NAME"></span>
+                            </span>
+                            <span class="help-block">
+                                檔案命名規則：<br/>
+                                <strong>姓名_執行順序_是否需要更新TableJar_ORACLE語法種類(ORACLE OBJECT NAME)。</strong><br/>
+                                檔名示範：Eli_01_N_DDL(TBCRM_AST_DEP_CD_SG).sql<br/>
+                                系統將在姓名前面自動加上系統日期至毫秒，以保證檔案的唯一性。
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label col-sm-2" for="memo">註解</label>
+                        <div class="col-sm-10">
+                            <textarea id="memo" placeholder="針對這則記錄打上些註解，以方便其他人略知一二～"
+                                      ng-model="inputVO.MEMO" rows="5" class="form-control" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer center">
+                    <button type="submit" class="btn btn-success" ng-click="save()">
+                        <span class="glyphicon glyphicon-floppy-disk"></span>儲存
+                    </button>
+                    <button class="btn btn-default" ng-click="cancel()">
+                        <span class="glyphicon glyphicon-remove-circle"></span>取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

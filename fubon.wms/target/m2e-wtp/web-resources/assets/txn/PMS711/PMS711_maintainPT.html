@@ -1,0 +1,133 @@
+<style>
+/* open dialog */
+.ngdialog.PMS711 {
+	
+}
+/* dialog panl */
+#ejp>tbody {
+	width: 100% !important;
+}
+
+.modal-dialog.PMS711 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS711 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS711 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS711.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS711_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+</style>
+<!-- 新增共用controller -->
+<script type="text/javascript" src="assets/txn/PMS711/PMS711_maintainPT.js"></script>
+
+<div class="PMS711" ng-controller="PMS711_miantainPTController" ng-cloak>
+<div class="modal-dialog PMS711">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">人員類別維護</h4>
+				
+			</div>
+			
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<div  class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						<table class="table-bordered table-border">
+							<tr>
+								<th>序號</th>
+								<th>人員類別名稱</th>
+								<th>人員類別簡稱</th>
+								<th></th>
+							</tr>
+							<tr>
+								<td align="center">
+									<input type="text" style="text-align: right" ng-model="PARAM_CODE" e-input-limit='N'  e-length-limit="16"/>
+								</td>
+								<td align="center" >
+									<input type="text" style="width:50%" ng-model="PARAM_NAME" e-length-limit="40"/>
+								</td>
+								<td align="center">
+									<input type="text" ng-model="PARAM_DESC" e-length-limit="16"/>
+								</td>
+								<td align="center" border="0">
+									<button type="button" class="btn btn-primary" ng-click="add()">加入</button>
+								</td>
+							</tr>
+						</table>
+					
+						<table class="table-bordered" id="tab">
+							<tr>
+								<th>刪除</th>
+								<th>序號</th>
+								<th>人員類別名稱</th>
+								<th>人員類別簡稱</th>
+							</tr>
+							<tr ng-repeat="x in showList">
+								<td align="center">
+									<button ng-if="x.PARAM_CODE>7" type="button" class="btn btn-primary" ng-click="del($index)"><i class="glyphicon glyphicon-trash"></i></button>
+								</td>
+								<td style="text-align:center;color:blue">{{x.PARAM_CODE}}</td>
+								<td style="text-align:center;color:blue">{{x.PARAM_NAME}}</td>
+								<td style="text-align:center;color:blue">{{x.PARAM_DESC}}</td>
+								
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()">保存</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>	
+			</div>
+		</div>
+	</div>
+</div>

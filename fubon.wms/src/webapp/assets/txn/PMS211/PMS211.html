@@ -1,0 +1,212 @@
+<style>
+/* open dialog */
+.ngdialog.PMS211 {
+	
+}
+/* dialog panl */
+#ejp>tbody {
+	width: 100% !important;
+}
+
+.modal-dialog.PMS211 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS211 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS211 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS211.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS211_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS211/PMS211.js"></script>
+
+<div class="PMS211" ng-controller="PMS211Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">資料查詢
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>
+						<th style="text-align:right; width:15%">計算月份(YYYYMM)</th>
+						<td style="width:10%">
+							<e-combobox ng-datasource="mappingSet['timeE']"
+								ng-model="inputVO.docYearMon" ng-validate="false" ng-readonly="false"
+								ng-editable="false" ng-format="F3" ng-required="false"
+								width="200px" height="30px" style="line-height:20px;" />
+						</td>
+						<td style="width:15%">
+							<input type="radio" name="version" value="上簽版">上簽版
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="version" value="最新版" checked>最新版
+						</td>
+						<td style="width:10%">
+							<button class="btn btn-info" ng-click="caculate()">計算獎勵金</button>
+						</td>
+						<td style="width:10%">
+							<button class="btn btn-info" ng-click="query()">全部查詢</button>
+						</td>
+						<td style="width:10%">
+							<button class="btn btn-info" ng-click="caculateF()">重算理専獎勵金</button>
+						</td>
+						<td style="width:40%"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">已排入計算獎金月份
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content" ng-show = "true">
+			<div class="gv_tab_sc scroll_y"	style="white-space: nowrap;">
+				<table class="table-bordered">
+				<thead>
+					<tr>
+						<th>編輯</th>
+						<th>版本</th>
+						<th>獎金月份</th>
+						<th>批次排程時間</th>
+						<th>次完成時間</th>
+						<th>批次執行結果</th>
+						<th>下載獎勵金報表</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th align="center"  style="padding-bottom:70px;">
+							<input type="checkbox" id="openSel" >開放查詢
+							<br>
+							<button class="btn btn-info" ng-disabled="openFlag" ng-click="saveData(upLargeAgrList)" >儲存設定</button>
+						</th>
+						<td align="center" >
+							<font color="blue">{{mappingSet['version'][upLargeAgrList.VERSION_CHOOSE].LABEL}}</font>
+						</td>
+						<td align="center" >
+							<font color="blue">{{upLargeAgrList.DATA_MONTH}}</font>
+						</td>
+						<td align="center" >
+							<font color="blue">{{upLargeAgrList.JOB_BEGIN_TIME}}</font>
+						</td>
+						<td align="center" >
+							<font color="blue">{{upLargeAgrList.JOB_END_TIME}}</font>
+						</td>
+						<td align="center" >
+							<font color="blue">{{upLargeAgrList.JOB_STATE}}</font>
+						</td>
+						<td align="center">
+							<button style="width:180px" class="btn btn-info" id="fc_ind_flag"  ng-show="upLargeAgrList.FC_IND_REPORT_FLAG == '1'" ng-click="download(upLargeAgrList,'TBPMS_FC_FIN_RPT')">FC財務非財務報表</button><br/>
+							<button style="width:180px" class="btn btn-info" id="fch_ind_flag" ng-show="upLargeAgrList.FCH_IND_REPORT_FLAG == '1'" ng-click="download(upLargeAgrList,'TBPMS_FCH_FIN_RPT')">FCH財務非財務報表</button><br/>
+							<button style="width:180px" class="btn btn-info" id="zg_ind_flag"  ng-show="upLargeAgrList.ZG_IND_REPORT_FLAG == '1'" ng-click="download(upLargeAgrList,'TBPMS_MNGR_FIN_RPT')">主管財務非財務報表</button><br/>
+							<button style="width:180px" class="btn btn-info" id="fc_flag" ng-show="upLargeAgrList.FC_FLAG == '1'" ng-click="download(upLargeAgrList,'TBPMS_FC_BONUS_RPT')">FC獎勵金報表</button><br/>
+							<button style="width:180px" class="btn btn-info" id="fch_flag" ng-show="upLargeAgrList.FCH_FLAG == '1'" ng-click="download(upLargeAgrList,'TBPMS_FCH_BONUS_RPT')">FCH獎勵金報表</button><br/>
+							<button style="width:180px" class="btn btn-info" id="zg_flag" ng-show="upLargeAgrList.ZG_FLAG == '1'" ng-click="download(upLargeAgrList,'TBPMS_MNGR_BONUS_RPT')">主管獎勵金報表</button><br/>
+							<button style="width:180px" class="btn btn-info" id="lzjx_flag" ng-show="upLargeAgrList.LZJX_FLAG == '1'" ng-click="download(upLargeAgrList,'TBPMS_BUY_PROD_RPT')">理專計績商品報表</button><br/>
+							<button style="width:180px" class="btn btn-info" id="fhsy_flag" ng-show="upLargeAgrList.FHSY_FLAG == '1'" ng-click="download(upLargeAgrList,'TBPMS_BARNCH_PROFIT_RPT')">分行收益報表</button>
+						</td>
+					</tr>
+					<tr >
+						<th align="center" style="padding-bottom:70px;">
+						<input type="checkbox" id="openSave" >開放儲存
+							<br>
+							<button class="btn btn-info" ng-disabled="saveFlag" ng-click="saveData(newLargeAgrList)">儲存版本</button>
+						</th>
+						<td align="center" >
+							<font color="blue">{{mappingSet['version'][newLargeAgrList.VERSION_CHOOSE].LABEL}}</font>
+						</td>
+						<td align="center" >
+							<font color="blue">{{newLargeAgrList.DATA_MONTH}}</font>
+						</td>
+						<td align="center" >
+							<font color="blue">{{newLargeAgrList.JOB_BEGIN_TIME}}</font>
+						</td>
+						<td align="center" >
+							<font color="blue">{{newLargeAgrList.JOB_END_TIME}}</font>
+						</td>
+						<td align="center" >
+							<font color="blue">{{newLargeAgrList.JOB_STATE}}</font>
+						</td>
+						<td align="center">
+							<button style="width:180px" class="btn btn-info" ng-show="newLargeAgrList.FC_IND_REPORT_FLAG == '1'" ng-click="download(newLargeAgrList,'TBPMS_FC_FIN_RPT')">FC財務非財務報表</button><br/>
+							<button style="width:180px" class="btn btn-info" ng-show="newLargeAgrList.FCH_IND_REPORT_FLAG == '1'" ng-click="download(newLargeAgrList,'TBPMS_FCH_FIN_RPT')">FCH財務非財務報表</button><br/>
+							<button style="width:180px" class="btn btn-info" ng-show="newLargeAgrList.ZG_IND_REPORT_FLAG == '1'" ng-click="download(newLargeAgrList,'TBPMS_MNGR_FIN_RPT')">主管財務非財務報表</button><br/>
+							<button style="width:180px" class="btn btn-info" ng-show="newLargeAgrList.FC_FLAG == '1'" ng-click="download(newLargeAgrList,'TBPMS_FC_BONUS_RPT')">FC獎勵金報表</button><br/>
+							<button style="width:180px" class="btn btn-info" ng-show="newLargeAgrList.FCH_FLAG == '1'" ng-click="download(newLargeAgrList,'TBPMS_FCH_BONUS_RPT')">FCH獎勵金報表</button><br/>
+							<button style="width:180px" class="btn btn-info" ng-show="newLargeAgrList.ZG_FLAG == '1'" ng-click="download(newLargeAgrList,'TBPMS_MNGR_BONUS_RPT')">主管獎勵金報表</button><br/>
+							<button style="width:180px" class="btn btn-info" ng-show="newLargeAgrList.LZJX_FLAG == '1'" ng-click="download(newLargeAgrList,'TBPMS_BUY_PROD_RPT')">理專計績商品報表</button><br/>
+							<button style="width:180px" class="btn btn-info" ng-show="newLargeAgrList.FHSY_FLAG == '1'" ng-click="download(newLargeAgrList,'TBPMS_BARNCH_PROFIT_RPT')">分行收益報表</button>
+						</td>
+					</tr>
+				</tbody>
+				</table>
+				<!-- <div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="save()">儲存</button>
+					<button type="button" class="btn btn-info" ng-click="query()">重新整理</button>
+				</div> -->
+			</div>
+		</div>
+	</div>
+</div>

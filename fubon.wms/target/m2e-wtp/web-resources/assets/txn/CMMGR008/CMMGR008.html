@@ -1,0 +1,185 @@
+<style>
+.paddingRight0{
+	padding-right: 0;
+}
+.paddingLeft0{
+	padding-left: 0;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/CMMGR008/CMMGR008.js"></script>
+<div class="">
+	<div ng-controller="CMMGR008_Controller" ng-cloak>
+	  <!-- left, vertical navbar & content -->
+	    <!-- left, vertical navbar --> 
+	    <!-- content -->
+	          <div class="panel panel-default">
+				<div class="panel-heading">
+					<div class="text-muted bootstrap-admin-box-title">
+						<i class="glyphicon glyphicon-th-large"></i>使用者操作記錄查詢
+					</div>
+				</div>
+	            <div class="bootstrap-admin-panel-content text-muted search_box">
+	              <form>
+	              	<table>
+						<tr>
+	                     	<th for="dtfStartDate">起日：</th>
+	           				<td>
+	           					<div class="input-group datebox datewidth">
+									<input type="text" id="dtfStartDate" name="dtfStartDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.dtfStartDate"
+									is-open="model.a"
+									datepicker-options="dtfStartDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+	            			</td>
+		                	<th for="dtfEndDate">迄日:</th>             
+		            		<td>
+		            			<div class="input-group datebox datewidth">
+									<input type="text" id="dtfEndDate" name="dtfEndDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.dtfEndDate"
+									is-open="model.b"
+									datepicker-options="dtfEndDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+		            		</td>   
+		            	</tr>
+	                    <tr>
+	                        <th>分行別：</th>
+	                        <td required><e-combobox id="cmbBRCHID" name="cmbBRCHID"
+								ng-disabled="eComboDisabled"
+								ng-datasource="mappingSet['brchID']"
+								ng-model="inputVO.tipBrchId" ng-validate="true"
+								ng-readonly="false" ng-editable="false" ng-format="F1" 
+								></td>
+								
+							<th>角色名稱：</th>
+	                        <td required><e-combobox id="tipRoleId" name="tipRoleId"
+								ng-disabled="eComboDisabled"
+								ng-datasource="RoleList"
+								ng-model="inputVO.tipRoleId" ng-validate="true"
+								ng-readonly="false" ng-editable="false" ng-format="F1"></td>
+	                    </tr>
+	                	<tr>
+	                	    <th>交易代號：</th>
+							<td>
+	                        <input type="text" class="form-control" 
+								id="tipTxnCode" name="tipTxnCode"
+								ng-model="inputVO.tipTxnCode" 
+								placeholder="交易代號" maxlength="20">
+							</td>
+							<th>櫃員代號：</th>
+	                        <td>
+							<input type="text" class="form-control" 
+								id="tipTellerId" name="tipTellerId"
+								ng-model="inputVO.tipTellerId" 
+								placeholder="櫃員代號" maxlength="10">
+	                        </td>
+	                    </tr>
+	                    <tr>
+	                    	<th>工作站代號：</th>
+							<td>
+	                        <input type="text" class="form-control" 
+								id="tipWsId" name="tipWsId"
+								ng-model="inputVO.tipWsId" 
+								placeholder="工作站代號" maxlength="50">
+							</td>
+	                        <th>功能名稱：</th>
+	                        <td>
+	                        <input type="text" class="form-control" 
+								id="tipBizcodeName" name="tipBizcodeName"
+								ng-model="inputVO.tipBizcodeName" 
+								placeholder="功能名稱" maxlength="300">
+	                        </td>
+	                     </tr>
+						 <tr >
+							 <th>客戶ID：</th>
+	                        <td>
+	                        <input type="text" class="form-control" 
+								id="tipCustomerId" name="tipCustomerId"
+								ng-model="inputVO.tipCustomerId" 
+								placeholder="客戶ID" maxlength="14">
+	                        </td>
+							<th >客戶名稱：</th>
+	                        <td>
+							<input type="text" class="form-control" 
+								id="tipCustomerName" name="tipCustomerName"
+								ng-model="inputVO.tipCustomerName" 
+								placeholder="客戶名稱" maxlength="100">
+							</td>
+	                     </tr>
+						 <tr>
+							<th>說明：</th>
+	                        <td>
+							<input type="text" class="form-control" 
+								id="tipMemo" name="tipMemo"
+								ng-model="inputVO.tipMemo" 
+								placeholder="說明" maxlength="1024">
+							</td>
+	                     </tr>            
+	                </table> 
+	                <div class="search_box_btn text-center">
+	                  <button type="button"  class="btn btn-primary" ng-click="inquireInit();inquire()" >查詢</button>
+	                  <button type="button" class="btn btn-default" ng-click="init()">清除</button> 
+					  <button href="/export/{{paramCode}}" type="button" class="btn btn-default" ng-click="exportData()" ng-disabled="!paramList.length > 0">匯出</button>				  
+	                </div>  
+	              </form>
+	            </div>
+	                <div class="bootstrap-admin-panel-content" style="position:relative;">
+	                		<table class="tablesaw table table-striped table-bordered" data-tablesaw-mode="swipe" data-tablesaw-sortable data-tablesaw-minimap >
+	                  			<thead>
+	                    			<tr>
+	                     				<th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist"><br>交易日期</th>
+	                      				<th scope="col" data-tablesaw-sortable-col><br>分行別</th> 
+	                      				<th scope="col" data-tablesaw-sortable-col><br>工作站代號</th>
+										<th scope="col" data-tablesaw-sortable-col><br>角色名稱</th>
+	                      				<th scope="col" data-tablesaw-sortable-col>交易代號<br/>交易名稱</th>
+	                                    <th scope="col" data-tablesaw-sortable-col>櫃員代號<br/>櫃員名稱</th>
+	                                    <th scope="col" data-tablesaw-sortable-col>客戶ID<br/>客戶名稱</th>
+										<th scope="col" data-tablesaw-sortable-col>功能名稱<br/>說明</th>
+	                    			</tr>
+	                  			</thead>
+	                  			<tbody>
+	                    			<tr ng-repeat="row in results = (paramList | orderBy:predicate:reverse) | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	                      				<td>{{row.TXNDATETIME | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+	                      				<td>{{row.BRCHID}}</td>
+	                      				<td>{{row.WSID}}</td>
+	                      				<td>{{row.ROLEID}}<br/>{{row.ROLENAME}}</td>
+	                      				<td>{{row.TXNCODE}}<br/>{{row.TXNNAME}}</td>
+	                      				<td>{{row.TELLERID}}<br/>{{row.TELLERNAME}}</td>
+	                      				<td>{{row.CUSTOMERID}}<br/>{{row.CUSTOMERNAME}}</td>
+	                                    <td>{{row.BIZCODENAME}}<br/>{{row.MEMO}}</td>
+	                    			</tr>
+	                  			</tbody>
+	                		</table>
+		          		<e-paging outputVO="outputVO"
+		          			inputVO="inputVO"
+			           		callQuery="inquire()"
+			           		displayLimit="displayLimit"
+			           		dataList="paramList"
+			           		mode="2"
+		           		>
+		          		</e-paging>
+	                </div>
+	          </div>
+	        </div>
+</div>

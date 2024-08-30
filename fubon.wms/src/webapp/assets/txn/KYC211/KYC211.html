@@ -1,0 +1,310 @@
+<style>
+.search_title_table td{
+	width: 200px;
+}
+input:required:invalid{
+	border-color: red;
+}
+.modal-dialog.KYC211 {
+	width: 80%;
+}
+</style>
+<script type="text/javascript" src="assets/txn/KYC211/KYC211.js"></script>
+<script type="text/javascript" src="assets/txn/KYC213/KYC213.js"></script>
+<script type="text/javascript" src="assets/txn/KYC212/KYC212.js"></script>
+<script type="text/javascript" src="assets/txn/KYC214/KYC214.js"></script>
+<script type="text/javascript" src="assets/txn/KYC215/KYC215.js"></script>
+<script type="text/javascript" src="assets/txn/KYC216/KYC216.js"></script>
+
+<div ng-controller="KYC211Controller" ng-cloak>
+    <div class="modal-dialog KYC211">
+      <div class="modal-content">
+        <div class="modal-header"> 
+        	<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+          <h4 id="myModalAlertLabel" class="modal-title">{{title}}</h4>
+        </div>
+        <div class="modal-body">
+        <form name="add">
+          <div class="search_table search_box1">
+            <table class="search_title_table">
+              <tr>
+                <th>問卷類別:</th>
+                <td>
+					<e-combobox id="quertiontype" name="quertiontype"
+		                		ng-paramtype="KYC.QUEST_TYPE"
+		                		ng-model="inputVO.QUEST_TYPE"
+		                		ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								ng-disabled="field_type"
+								width="150px"
+								style="line-height:20px;"  /> 
+				</td>
+				<td ng-if="pr_date"><div style="color: red;">問卷狀態:修改中<br></div></td>               
+              </tr>
+              <tr>
+                <th>問卷名稱:</th>
+                <td>
+					<input ng-disabled="field_type" class="form-control" type="text" ng-model="inputVO.EXAM_NAME" style="width: 190px;" ng-required="true">
+				</td>
+				<td ng-if="pr_date"><div style="color: red;">問卷實際生效時間:</div></td>
+              </tr>
+              <tr>
+                <th>版次:</th>
+                <td>
+                	<input ng-disabled="true" class="form-control" type="text" ng-model="inputVO.EXAM_VERSION" style="width: 190px;">
+                </td>
+              </tr>
+              <tr ng-if="pr_date_type">
+              	<th>風險級距:</th>
+              	<td>
+              		<input ng-disabled="true" class="form-control" type="text" ng-model="inputVO.RL_VERSION" style="width: 150px;display: inline;" ng-required="true">
+              		<button type="button" class="btn btn-info" ng-click="popRisckLevel()">設定風險級距</button>
+              	</td>
+              </tr>
+              <tr ng-if="pr_date_type">
+              	<th>風險承受能力:</th>
+              	<td>
+              		<input ng-disabled="true" class="form-control" type="text" ng-model="inputVO.RS_VERSION" style="width: 150px;display: inline;" ng-required="true">
+              		<button type="button" class="btn btn-info" ng-click="WCLevel()">設定風險承受能力</button>
+              	</td>
+              </tr>
+              <tr ng-if="pr_date_type">
+              	<th>可承受風險損失率:</th>
+              	<td>
+              		<input ng-disabled="true" class="form-control" type="text" ng-model="inputVO.RLR_VERSION" style="width: 150px;display: inline;" ng-required="true">
+              		<button type="button" class="btn btn-info" ng-click="RiskRate()">設定可承受風險損失率</button>
+              	</td>
+              </tr>
+              <tr>
+              	<th>問卷啟用日期:</th>
+              	<td>
+              		<div style="width: 150px;" class="input-group datebox datewidth">
+						<input type="text" id="active_date" name="active_date"
+							class="form-control"
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.ACTIVE_DATE"
+							is-open="model.a"
+							datepicker-options="bgn_sDateOptions"
+							ng-readonly="true"
+							ng-required="true"
+							ng-change="limitDate()"
+							/>
+						<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button ng-if="pr_date_type" type="button" class="btn btn-default" ng-click="open($event,'a')">
+								<i class="glyphicon glyphicon-calendar"></i>
+							</button>
+						</span>
+					</div>
+              	</td>
+              </tr>
+              <tr>
+              	<th>截距分:</th>
+              	<td>
+              		<input type="text" ng-pattern="/^\d{0,6}$/" ng-disabled="field_type" class="form-control" ng-model="inputVO.INT_SCORE" style="width: 190px;" ng-required="true">
+                </td>
+              </tr>
+            </table>
+          </div>
+          <button ng-if="pr_date_type" type="button" class="btn btn-info" ng-click="addQuest()">新增題目</button>
+          <div ng-if="ae" style="color: #999999">問卷內容</div>
+          <div style="white-space: nowrap;display: inline-block;min-height: 90px;margin-top: 10px;" class="gv_tab_sc scroll_y">
+            <table>
+            <thead>
+              <tr>
+                <th ng-show="!field_type" width="120px">功能</th>
+                <th>&nbsp題號&nbsp</th>
+                <th>問題型態</th>
+                <th width="180px">問題描述</th>
+                <th>選項/權重</th>
+                <th>需註解</th>
+                <th>是否<br>必須輸入</th>
+                <th>名目權重(%)</th>
+                <th>計分類別</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="row in preview_data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                <td ng-show="!field_type">
+                	<e-combobox id="edit" name="edit"
+								ng-datasource="row.edit"
+								ng-model="row.editto"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="edit(row,$index)"
+								width="100px"
+								style="line-height:20px;"
+								ng-disabled="field_type" />
+                </td>
+                <td>
+                	<input e-input-limit="N" ng-disabled="field_type" type="text" class="form-control" placeholder="請輸入..." id="qst_no" name="qst_no" ng-model="row.QST_NO" width="30px" ng-required="true">
+                </td>
+                <td>
+                	{{row.QUESTION_TYPE | mapping:Q_TYPE:'F3'}}
+                </td>
+                <td>
+                	{{row.QUESTION_DESC}}<br>{{row.QUESTION_DESC_ENG}}
+                </td>
+                <td>
+                	<table>
+                		<tr ng-repeat="row1 in row.answer" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                			<td>
+                				{{row1.ANSWER_DESC}}/{{row1.FRACTION}}分<br>{{row1.ANSWER_DESC_ENG}}
+                			</td>
+                		</tr>
+                	</table>
+                </td>
+                <td style="width: 5%; text-align: center;">
+                	{{row.ANS_MEMO_FLAG|mapping:YNlist:F3}}
+                </td>
+                <td>
+                	<e-combobox id="essential_flag" name="essential_flag"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="row.ESSENTIAL_FLAG"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="60px"
+								style="line-height:20px;"
+								ng-disabled="field_type" />
+                </td>
+                <td>
+                	<input ng-disabled="field_type" type="number" step="0.01" class="form-control" placeholder="請輸入..." ng-model="row.QST_WEIGHT" width="30px" ng-required="true">
+                </td>
+                <td>
+               		 <e-combobox id="SCORE_TYPE" name="SCORE_TYPE"
+								 ng-datasource="mappingSet['SCORE_TYPE']"
+								 ng-model="row.SCORE_TYPE"
+								 ng-validate="false"
+								 ng-readonly="false"
+								 ng-editable="false"
+								 ng-format="F3"
+								 width="60px"
+								 style="line-height:20px;"
+								 ng-disabled="field_type" />
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <table ng-if="ae" style="margin: 10px 10px 10px 10px;">
+          	<tr>
+          		<th style="color: gray;">風險級距:</th>
+          		<td>
+            		<input ng-disabled="field_type" class="form-control" type="text" ng-model="preview_data[0].RL_VERSION" style="width: 190px;">
+          		</td>
+          	</tr>
+          </table>
+          <div class="gv_tab_sc scroll_y">
+	          <table ng-if="ae" style="width: 60%;">
+	          	<tr>
+	          		<th>級距代碼</th>
+	          		<th>級距中文名稱</th>
+	          		<th>級距英文名稱</th>
+	          		<th><=風險比例上限</th>
+	          		<th>商品風險上限</th>
+	          	</tr>
+	          	<tr ng-repeat="row2 in preview_data[0].risk" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	          		<td>{{row2.CUST_RL_ID}}</td>
+	          		<td>{{row2.RL_NAME}}</td>
+	          		<td>{{row2.RL_NAME_ENG}}</td>
+	          		<td>{{row2.RL_UP_RATE}}</td>
+	          		<td>{{row2.PROD_RL_UP_RATE}}</td>
+	          	</tr>
+	          </table>
+	        </div>
+	        
+	      <table ng-if="ae" style="margin: 10px 10px 10px 10px;">
+          	<tr>
+          		<th style="color: gray;">可承受風險損失率:</th>
+          		<td>
+            		<input ng-disabled="field_type" class="form-control" type="text" ng-model="preview_data[0].RLR_VERSION" style="width: 190px;">
+          		</td>
+          	</tr>
+          </table>
+          <div class="gv_tab_sc scroll_y">
+	          <table ng-if="ae" style="width: 60%;">
+	          	<tr>
+	          		<th>級距代碼</th>
+	          		<th>級距名稱</th>
+	          		<th>風險比例上限</th>
+	          	</tr>
+	          	<tr ng-repeat="row in preview_data[0].lRate" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	          		<td>{{row.LRATE_CUST_RL_ID}}</td>
+	          		<td>{{row.LRATE_RL_NAME}}</td>
+	          		<td>{{row.LRATE_RL_UP_RATE}}</td>
+	          	</tr>
+	          </table>
+	       </div>
+	        
+	        <table ng-if="ae" style="margin: 10px 10px 10px 10px;">
+          	<tr>
+          		<th style="color: gray;">風險承受能力:</th>
+          		<td>
+            		<input ng-disabled="field_type" class="form-control" type="text" ng-model="preview_data[0].RS_VERSION" style="width: 190px;">
+          		</td>
+          	</tr>
+          </table>
+          <div class="gv_tab_sc scroll_y">
+	          <table ng-if="ae" style="width: 80%;">
+	          	<thead>
+					 <tr>
+						<th class="text-center" ng-repeat="n in [] | range : (inputVO.C_VAL.length)">{{n == 0 ? '風險偏好分數(w) \\ 風險承受能力(c)' : ''}}
+							{{n != 0 ? inputVO.C_VAL[n-1] : ''}}{{n != 0 ? ' ≤ C < ' : '' }}{{n != 0 ? inputVO.C_VAL[n] : ''}}
+						</th>
+					 </tr>
+				  </thead>
+				  <tbody>
+				   <tr ng-repeat="n in [] | range : (inputVO.W_VAL.length-1)"  ng-init="outerIndex = $index">
+					 	<td class="text-center" ng-repeat="n in [] | range : (inputVO.C_VAL.length)" ng-if="n == 0">
+					 		{{inputVO.W_VAL[outerIndex]}}{{' ≤ W < '}}{{inputVO.W_VAL[outerIndex+1]}}
+					 	</td>
+						<td class="text-center" ng-repeat="n in [] | range : (inputVO.C_VAL.length)" ng-if="n != 0" style="text-transform: uppercase;">
+							{{inputVO.CUST_RL_ID[outerIndex][n-1]}}
+						</td>
+					 </tr> 				 
+				  </tbody>
+	          </table>
+	        </div>
+	        
+	          <table style="margin: 10px 10px 10px 10px;">
+	          	<tr>
+	          		<th style="color: gray;">說明備註:</th>
+	          	</tr>
+          	  </table>
+	         <div class="gv_tab_sc scroll_y"> 
+	          <table style="width: 65%;">
+	          <thead>
+	          	<tr>
+	          		<th>簽核員工</th>
+	          		<th>簽核日期</th>
+	          		<th>簽核備註</th>
+	          	</tr>
+	          	</thead>
+	          	<tbody>
+	          	<tr ng-repeat="row3 in Remark" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	          		<td>{{row3.SIGNOFF_ID}}-{{row3.SIGNOFF_NAME}}</td>
+	          		<td>{{row3.CREATETIME}}</td>
+	          		<td>{{row3.REMARK}}</td>
+	          	</tr>
+	          	</tbody>
+	          </table>
+          </div>
+           <div class="modal-footer" style="text-align: center;">
+		        <button ng-if="pr_date_type" ng-click="editSaveData()" class="btn btn-info" data-dismiss="modal">儲存送交</button> 
+		        <button type="button" ng-if="pr_date_type" ng-click="editCancel()" class="btn btn-info" data-dismiss="modal">清除</button> 
+		        <button type="button" ng-click="closeThisDialog('cancel')" class="btn btn-info"data-dismiss="modal">離開</button> 
+        	</div>
+          </form>
+	 	</div>
+      </div>
+    </div>
+  </div>

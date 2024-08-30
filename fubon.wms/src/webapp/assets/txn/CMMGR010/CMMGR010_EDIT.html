@@ -1,0 +1,111 @@
+<style>
+
+</style>
+<div ng-controller="CMMGR010_EditController" ng-cloak>
+	<div class="modal-dialog CMMGR010">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">FTP連線設定維護</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">Server ID：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control"
+								style="width: 400px" type="text" placeholder="請輸入..."
+								id="hostid" name="hostid" ng-model="inputVO.hostid"
+								ng-pattern="/^[A-Za-z0-9._-]{1,20}$/" maxlength="20" required
+								autofocus ng-disabled="row.HOSTID != undefined"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.hostid.$error.pattern">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<th class="col-md-7 help-block with-errors">&emsp;限輸入20字以內英/數字及._-</th>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">IP：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" style="width: 400px"
+								type="text" placeholder="請輸入..." id="ip" name="ip"
+								ng-model="inputVO.ip"
+								ng-pattern="/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/"
+								maxlength="20"
+								required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.ip.$error.pattern">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<th class="col-md-7 help-block with-errors">&emsp;須符合IP規則
+							</th>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">PORT：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" style="width: 400px"
+								type="text" placeholder="請輸入..." id="port" name="port"
+								ng-model="inputVO.port"
+								ng-pattern="/^(6553[0-5]|655[0-2]\d|65[0-4]\d\d|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3})$/"
+								maxlength="5"
+								required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.port.$error.pattern">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<th class="col-md-7 help-block with-errors">&emsp;須符合PORT號規則</th>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">使用者ID：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" style="width: 400px"
+								type="text" placeholder="請輸入..." id="username" name="username"
+								ng-model="inputVO.username" ng-pattern="/^[A-Za-z0-9._-]{1,20}$/"
+								maxlength="20"
+								required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.username.$error.pattern">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<th class="col-md-7 help-block with-errors">&emsp;限輸入20字以內英/數字及._-
+							</th>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">使用者密碼：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control"
+								style="width: 400px" type="{{tmpstr}}" placeholder="請輸入..."
+								id="{{tmpstr}}" name="{{tmpstr}}" ng-model="inputVO[tmpstr]"
+								ng-pattern="/^[A-Za-z0-9\.\-\_\!\@\#\$\%\&]{1,250}$/"
+								maxlength="50" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.password.$error.pattern">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<th class="col-md-7 help-block with-errors">&emsp;限輸入250字以內英/數字及!@#$%&._-
+							</th>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+				<span function-type="maintenance">
+					<button type="button" class="btn btn-danger" ng-click="del()" confirm="確定要刪除{{name}}?" confirm-title="刪除提醒{{name}}" confirm-settings="{size: 'sm'}" value="刪除" ng-click="del()">刪除</button>
+				</span>
+			</div>
+		</div>
+	</div>
+</div>

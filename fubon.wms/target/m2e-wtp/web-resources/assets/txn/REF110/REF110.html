@@ -1,0 +1,188 @@
+
+<script type="text/javascript" src="assets/txn/REF110/REF110.js"></script>
+<div class="REF110" ng-controller="REF110Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">{{data == "update" ? '修改轉介資料' : '新增轉介資料'}}
+		</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box2">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th style="width:16%">案件編號：</th>
+						<td style="width:16%">{{inputVO.seq}}</td>
+						<th style="width:16%">轉介日期：</th>
+						<td style="width:16%">{{inputVO.dataDate}}</td>
+						<th style="width:16%"></th>
+						<td style="width:16%"></td>
+					</tr>
+					<tr>
+						<th style="width:16%">業務處：</th>
+						<td style="width:16%">
+							{{inputVO.regionName}}
+						</td>
+						<th style="width:16%">營運區：</th>
+						<td style="width:16%">
+							{{inputVO.branchAreaName}}
+						</td>
+						<th style="width:16%">分行：</th>
+						<td style="width:16%">
+							{{inputVO.branchName}}
+						</td>
+					</tr>
+					<tr>
+						<th style="width:16%">轉介人員編號：</th>
+						<td style="width:16%">
+							<div style="display:inline;" ng-show="data == 'update'">{{inputVO.empID}}</div>
+							<input type="text" class="form-control" placeholder="請輸入..." id="empID" name="empID" ng-model="inputVO.empID" e-length-limit="10" ng-blur="querySaleProfile()" ng-show="data != 'update'" required>
+						</td>
+						<th style="width:16%">轉介人員姓名：</th>
+						<td style="width:16%">{{inputVO.empName}}</td>
+						<th style="width:16%">轉介人員身份：</th>
+						<td style="width:16%">{{inputVO.empRoleName | mapping:mappingSet['CAM.REF_SALES_ROLE']:'F3'}}</td>
+					</tr>
+					<tr>
+						<th style="width:16%">客戶ID：</th>
+						<td style="width:16%">
+							<div style="display:inline;" ng-show="!modifyCustIDFlag">{{inputVO.custID}}</div>
+							<input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" e-length-limit="10" ng-blur="queryCustProfile()" ng-show="modifyCustIDFlag" required>
+						</td>
+						<th style="width:16%">客戶姓名：</th>
+						<td style="width:16%">
+							<div style="display:inline;" ng-show="!modifyCustIDFlag">{{inputVO.custName}}</div>
+							<input type="text" class="form-control" placeholder="請輸入..." id="custName" name="custName" ng-model="inputVO.custName" e-length-limit="18" ng-blur="queryCustNameProfile()" ng-disabled="disableCustName" ng-show="modifyCustIDFlag" required>
+						</td>
+						<th style="width:16%">轉介商品：</th>
+						<td style="width:16%">
+							<e-combobox id="refProd" name="refProd" 
+										ng-datasource="mappingSet['REF_RPOD']"
+										ng-model="inputVO.refProd"
+										ng-validate="false" 
+										ng-readonly="mappingSet['REF_RPOD'].length == 2 || (loginID == inputVO.refEmpID && data == 'update') || (data == 'update' && !(inputVO.contRslt == null || inputVO.contRslt == undefined || inputVO.contRslt == '01'))" 
+										ng-disabled="mappingSet['REF_RPOD'].length == 2 || (loginID == inputVO.refEmpID && data == 'update') || (data == 'update' && !(inputVO.contRslt == null || inputVO.contRslt == undefined || inputVO.contRslt == '01'))"
+										ng-editable="false"
+										ng-format="F3"
+										style="line-height:20px;"
+										required />
+						</td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.custID.$error.required || parameterTypeEditForm.custName.$error.required || parameterTypeEditForm.refProd.$error.required">
+						<th style="width:16%"></th>
+						<td style="width:16%" class="col-md-7 help-block with-errors"><font ng-show="parameterTypeEditForm.custID.$error.required">請輸入客戶ID</font></td>
+						<th style="width:16%"></th>
+						<td style="width:16%" class="col-md-7 help-block with-errors"><font ng-show="parameterTypeEditForm.custName.$error.required && !disableCustName">請輸入客戶姓名</font></td>
+						<th style="width:16%"></th>
+						<td style="width:16%" class="col-md-7 help-block with-errors"><font ng-show="parameterTypeEditForm.refProd.$error.required || inputVO.refProd.length == 0">請選擇轉介商品</font></td>
+					</tr>
+					<tr>
+						<th style="width:16%">受轉介人員編：</th>
+						<td style="width:16%">
+							<input type="text" 
+							       class="form-control" 
+							       placeholder="請輸入..." 
+							       id="refEmpID" 
+							       name="refEmpID" 
+							       ng-model="inputVO.refEmpID" 
+							       e-length-limit="16" 
+							       ng-blur="queryUserProfile()" 
+							       ng-disabled="data == 'update'"
+							       required>
+						</td>
+						<th style="width:16%">受轉介人姓名：</th>
+						<td style="width:16%">{{inputVO.refEmpName}}</td>
+						<th style="width:16%">受轉介人職務別：</th>
+						<td style="width:16%">
+							<e-combobox id="refEmpRoleName" name="refEmpRoleName" 
+										ng-datasource="mappingSet['CAM.REF_USER_ROLE']"
+										ng-model="inputVO.refEmpRoleName"
+										ng-validate="false" 
+										ng-readonly="mappingSet['CAM.REF_USER_ROLE'].length == 2 || (loginID == inputVO.refEmpID && data == 'update') || (data == 'update' && !(inputVO.contRslt == null || inputVO.contRslt == undefined || inputVO.contRslt == '01'))"
+										ng-disabled="mappingSet['CAM.REF_USER_ROLE'].length == 2 || (loginID == inputVO.refEmpID && data == 'update') || (data == 'update' && !(inputVO.contRslt == null || inputVO.contRslt == undefined || inputVO.contRslt == '01'))" 
+										ng-editable="false"
+										ng-format="F3"
+										style="line-height:20px;"
+										required />
+						</td>
+					</tr>
+					<tr ng-show="parameterTypeEditForm.refEmpID.$error.required || parameterTypeEditForm.refEmpJobTitleName.$error.required">
+						<th style="width:16%"></th>
+						<td style="width:16%" class="col-md-7 help-block with-errors"><font ng-show="parameterTypeEditForm.custID.$error.required">請輸入受轉介人員編</font></td>
+						<th style="width:16%"></th>
+						<td style="width:16%" class="col-md-7 help-block with-errors"></td>
+						<th style="width:16%"></th>
+						<td style="width:16%" class="col-md-7 help-block with-errors"><font ng-show="parameterTypeEditForm.refEmpJobTitleName.$error.required || inputVO.refEmpJobTitleName.length == 0">請輸入受轉介人職務別</font></td>
+					</tr>
+					<tr>
+						<th style="width:16%" ng-if="loginID == inputVO.refEmpID && data == 'update'">聯絡狀態：</th>
+						<td style="width:16%" ng-if="loginID == inputVO.refEmpID && data == 'update'">
+							<e-combobox id="contRslt" name="contRslt" 
+										ng-paramtype="CAM.REF_INS_CONT_RSLT"
+										ng-model="inputVO.contRslt"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-if="inputVO.refProd == '5'"
+										style="line-height:20px;" />
+							<e-combobox id="contRslt" name="contRslt" 
+										ng-paramtype="CAM.REF_LOAN_CONT_RSLT"
+										ng-model="inputVO.contRslt"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-if="inputVO.refProd != '5'"
+										style="line-height:20px;" />
+						</td>
+						<th style="width:16%" ng-if="loginID == inputVO.refEmpID && data == 'update' && inputVO.refProd != '5' && inputVO.contRslt == 'B12'">已核不撥原因：</th>
+						<td style="width:16%" ng-if="loginID == inputVO.refEmpID && data == 'update' && inputVO.refProd != '5' && inputVO.contRslt == 'B12'">
+							<e-combobox id="nonGrantReason" name="nonGrantReason" 
+										ng-paramtype="CAM.REF_NON_GRANT_REASON"
+										ng-model="inputVO.nonGrantReason"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-if="inputVO.refProd != '5'"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+						<th style="width:16%"></th>
+						<td style="width:16%"></td>
+					</tr>
+					<tr>
+						<th style="width:16%" ng-if="loginID == inputVO.refEmpID && data == 'update'">洽談內容：</th>
+						<td style="width:16%" ng-if="loginID == inputVO.refEmpID && data == 'update'" colspan="5">
+							<input type="text" class="form-control" placeholder="請輸入..." id="comments" name="comments" ng-model="inputVO.comments" e-length-limit="200">
+						</td>
+					</tr>
+				</table>
+				<div class="text-danger">轉介商品為企業貸款時，「受轉介人員編」請鍵入作業主管員編，並由作業主管於系統回覆轉介進度。</div>
+				
+<!-- 				<div class="text-danger" ng-if="inputVO.recYN != null && inputVO.recYN != ''">有/無投保註記：{{inputVO.recYN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</div> -->
+<!-- 				<div class="text-danger" ng-if="inputVO.recYN == null || inputVO.recYN == ''">有/無投保註記：無</div> -->
+			</form>
+		</div>
+	</div>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-primary" function-type="maintenance" ng-disabled="(inputVO.custID == null || inputVO.custID == undefined || inputVO.custID == '') || 
+																							   (inputVO.empID == null || inputVO.empID == undefined || inputVO.empID == '') || 
+																					           (inputVO.refEmpID == null || inputVO.refEmpID == undefined || inputVO.refEmpID == '') ||
+																							   (inputVO.refEmpRoleName == null || inputVO.refEmpRoleName == undefined || inputVO.refEmpRoleName == '' || inputVO.refEmpRoleName == '0' ) || 
+																							   !checkCustStatus || 
+																							   !checkRefEmpStatus || 
+																							   inputVO.refProd.length == 0" ng-click="addData()" ng-show="data != 'update'">確定</button>
+		<button type="button" class="btn btn-primary" function-type="maintenance" ng-disabled="(inputVO.custID == null || inputVO.custID == undefined || inputVO.custID == '') || 
+																							   (inputVO.empID == null || inputVO.empID == undefined || inputVO.empID == '') || 
+																					           (inputVO.refEmpID == null || inputVO.refEmpID == undefined || inputVO.refEmpID == '') ||
+																							   (inputVO.refEmpRoleName == null || inputVO.refEmpRoleName == undefined || inputVO.refEmpRoleName == '' || inputVO.refEmpRoleName == '0' ) || 
+																							   inputVO.refProd.length == 0 || 
+																							   ((inputVO.contRslt == 'B04' || inputVO.contRslt == 'B11') && (inputVO.comments == null || inputVO.comments == undefined || inputVO.comments == '')) ||
+																							   ((inputVO.contRslt == 'B12') && (inputVO.nonGrantReason == null || inputVO.nonGrantReason == undefined || inputVO.nonGrantReason == ''))" ng-click="addData()" ng-show="data == 'update'">確定</button>
+		<button type="button" class="btn btn-primary" ng-click="errorClear();" ng-if="!data">取消</button>
+		<button type="button" class="btn btn-primary" ng-click="goBack();" ng-if="data">回上頁</button>
+	</div>
+</div>

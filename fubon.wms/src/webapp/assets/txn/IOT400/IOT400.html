@@ -1,0 +1,479 @@
+<style>
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+.IOT400ToolTip .tooltip-inner {
+    font-size: 12pt;
+	max-width: 200px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT400/IOT400.js"></script>
+<script type="text/javascript" src="assets/txn/IOT400/IOT400_REJECT.js"></script>
+<div ng-controller="IOT400Controller" ng-cloak>
+    <div class="modal-dialog" style="width: 1080px;">
+      <div class="modal-content">
+        <div class="modal-header"> 
+        	<button type="button" class="close" ng-click="close()">&times;</button>
+          <h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">電訪預約/取消</h4>
+        </div>
+        <div class="modal-body">
+        	<div class="gv_tab_sc scroll_y">
+        		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+        		<table>
+					<tr>
+	    				<td style="width: 25%">適合度檢核編碼</td>
+	    				<td style="width: 25%">{{inputVO.PREMATCH_SEQ}}</td>
+	    				<td style="width: 25%">案件編號</td>
+	    				<td style="width: 25%">{{inputVO.CASE_ID}}</td>
+	    			</tr>
+	    			<tr>
+	    				<td>險種代號</td>
+	    				<td>{{inputVO.INSPRD_ID}}</td>
+	    				<td>險種名稱</td>
+	    				<td>{{inputVO.INSPRD_NAME}}</td>
+	    			</tr>
+	    			<tr>
+	    				<td>實繳保費(原幣)</td>
+	    				<td align="right">{{inputVO.REAL_PREMIUM | number:0}}</td>
+	    				<td>商品幣別</td>
+	    				<td>{{inputVO.CURR_CD}}</td>
+	    			</tr>	    			
+	    			<tr>
+	    				<td>分期繳別</td>
+	    				<td>{{inputVO.PAY_TYPE | mapping:mappingSet['IOT.PAY_TYPE']:F3}}</td>
+	    				<td>投資型</td>
+	    				<td>{{inputVO.INSPRD_TYPE != '1' ? 'Y' : 'N'}}</td>
+	    			</tr>	    			
+	    			<tr>
+	    				<td>購買檢核需電訪之欄位</br>
+	    					<button type="button" class="btn btn-link" ng-click="click('close')">
+								<span class="glyphicon glyphicon-minus"></span>
+							</button>
+							<button type="button" class="btn btn-link" ng-click="click('open')">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+	    				</td>
+	    				<td colspan="3">
+	    					<table>
+								<thead>
+									<tr>
+										<th>需電訪欄位名稱</th>
+										<th>欄位值</th>
+									</tr>
+								</thead>
+								<tbody ng-show="openFlag == 'open'">
+									<tr ng-show="inputVO.C_SALE_SENIOR_YN == 'Y'">
+										<td>要保人高齡</td>
+										<td>{{inputVO.C_SALE_SENIOR_YN == 'Y' ? '是' : '否'}}</td>							
+									</tr>
+									<tr ng-show="inputVO.I_SALE_SENIOR_YN == 'Y'">
+										<td>被保人高齡</td>
+										<td>{{inputVO.I_SALE_SENIOR_YN == 'Y' ? '是' : '否'}}</td>									
+									</tr>
+									<tr ng-show="inputVO.P_SALE_SENIOR_YN == 'Y'">
+										<td>繳款人高齡</td>
+										<td>{{inputVO.P_SALE_SENIOR_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.CONTRACT_END_YN == '1'">
+										<td>業報書投保前三個月內有辦理解約</td>
+										<td>{{inputVO.CONTRACT_END_YN == '1' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.S_INFITEM_LOAN_YN == '1'">
+										<td>業報書投保前三個月內有辦理貸款或保險單借款</td>
+										<td>{{inputVO.S_INFITEM_LOAN_YN == '1' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.LOAN_SOURCE_YN == 'Y'">
+										<td>業報書保費來源為貸款/保單借款</td>
+										<td>{{inputVO.LOAN_SOURCE_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.LOAN_SOURCE2_YN == 'Y'">
+										<td>業報書保費來源為解約</td>
+										<td>{{inputVO.LOAN_SOURCE2_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.C_LOAN_APPLY_DATE != undefined">
+										<td>要保人行內貸款申請日</td>
+										<td>{{toJsDate(inputVO.C_LOAN_APPLY_DATE) | date:"yyyy/MM/dd"}}</td>										
+									</tr>
+									<tr ng-show="inputVO.I_LOAN_APPLY_DATE != undefined">
+										<td>被保人行內貸款申請日</td>
+										<td>{{toJsDate(inputVO.I_LOAN_APPLY_DATE) | date:"yyyy/MM/dd"}}</td>									
+									</tr>
+									<tr ng-show="inputVO.P_LOAN_APPLY_DATE != undefined">
+										<td>繳款人行內貸款申請日</td>
+										<td>{{toJsDate(inputVO.P_LOAN_APPLY_DATE) | date:"yyyy/MM/dd"}}</td>									
+									</tr>
+									<!-- 行內貸款檢核為Y，才呈現 -->
+									<tr ng-show="inputVO.C_LOAN_CHK2_YN == 'Y'">
+										<td>要保人最近撥貸日</td>
+										<td>{{inputVO.C_LOAN_CHK2_DATE}}</td>										
+									</tr>
+									<tr ng-show="inputVO.I_LOAN_CHK2_YN == 'Y'">
+										<td>被保人最近撥貸日</td>
+										<td>{{inputVO.I_LOAN_CHK2_DATE}}</td>										
+									</tr>
+									<tr ng-show="inputVO.LOAN_CHK2_YN == 'Y'">
+										<td>繳款人最近撥貸日</td>
+										<td>{{inputVO.LOAN_CHK2_DATE}}</td>										
+									</tr>
+									<tr ng-show="inputVO.C_LOAN_CHK1_YN == 'Y'">
+										<td>要保人保單借款檢核</td>
+										<td>{{inputVO.C_LOAN_CHK1_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.I_LOAN_CHK1_YN == 'Y'">
+										<td>被保人保單借款檢核</td>
+										<td>{{inputVO.I_LOAN_CHK1_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.LOAN_CHK1_YN == 'Y'">
+										<td>繳款人保單借款檢核</td>
+										<td>{{inputVO.LOAN_CHK1_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.C_LOAN_CHK2_YN == 'Y'">
+										<td>要保人行內貸款檢核</td>
+										<td>{{inputVO.C_LOAN_CHK2_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.I_LOAN_CHK2_YN == 'Y'">
+										<td>被保人行內貸款檢核</td>
+										<td>{{inputVO.I_LOAN_CHK2_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.LOAN_CHK2_YN == 'Y'">
+										<td>繳款人行內貸款檢核</td>
+										<td>{{inputVO.LOAN_CHK2_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.C_LOAN_CHK3_YN == 'Y'">
+										<td>要保人行內保單解約檢核</td>
+										<td>{{inputVO.C_LOAN_CHK3_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.I_LOAN_CHK3_YN == 'Y'">
+										<td>被保人行內保單解約檢核</td>
+										<td>{{inputVO.I_LOAN_CHK3_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.LOAN_CHK3_YN == 'Y'">
+										<td>繳款人行內保單解約檢核</td>
+										<td>{{inputVO.LOAN_CHK3_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.C_CD_CHK_YN == 'Y'">
+										<td>要保人定存不打折檢核</td>
+										<td>{{inputVO.C_CD_CHK_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.I_CD_CHK_YN == 'Y'">
+										<td>被保人定存不打折檢核</td>
+										<td>{{inputVO.I_CD_CHK_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+									<tr ng-show="inputVO.CD_CHK_YN == 'Y'">
+										<td>繳款人定存不打折檢核</td>
+										<td>{{inputVO.CD_CHK_YN == 'Y' ? '是' : '否'}}</td>										
+									</tr>
+								</tbody>
+							</table>
+	    				</td>
+	    			</tr>    			
+	    			<tr>
+	    				<td>電訪類型</td>
+	    				<td colspan="3">{{inputVO.CALL_TYPE_LABEL}}</td>
+	    			</tr>    			
+	    			<tr>
+	    				<td>電訪對象</td>
+	    				<td colspan="3">
+	    					<span ng-show="inputVO.CALL_C_YN == 'Y'">要保人：{{inputVO.PROPOSER_NAME}}</span>
+	    					<span ng-show="inputVO.CALL_C_YN == 'Y' && inputVO.CALL_I_YN == 'Y'">&nbsp;/</span>
+	    					<span ng-show="inputVO.CALL_I_YN == 'Y'">被保人：{{inputVO.INSURED_NAME}}</span>
+	    					<span ng-show="(inputVO.CALL_I_YN == 'Y' && inputVO.CALL_P_YN == 'Y') || 
+	    								   (inputVO.CALL_C_YN == 'Y' && inputVO.CALL_I_YN == 'N' && inputVO.CALL_P_YN == 'Y') ">&nbsp;/</span>
+	    					<span ng-show="inputVO.CALL_P_YN == 'Y'">繳款人：{{inputVO.PAYER_NAME}}</span>
+	    				</td>
+	    			</tr>
+	    			<!-- 要保人 -->
+	    			<tr ng-show="inputVO.CALL_C_YN == 'Y'">
+	    				<td>電訪對象姓名/ID/生日</td>
+	    				<td>{{inputVO.PROPOSER_NAME}}</td>
+	    				<td>{{inputVO.CUST_ID}}</td>
+	    				<td>{{inputVO.PROPOSER_BIRTH | date:"yyyy/MM/dd"}}</td>
+	    			</tr>
+	    			<!-- 如果要保人 >= 18歲則本列隱藏 -->
+	    			<tr ng-show="inputVO.C_AGE < 18 && inputVO.CALL_C_YN == 'Y'">
+	    				<!-- 如果要保人 >= 18歲則本列隱藏 -->
+	    				<td>法代姓名/ID/生日</td>
+	    				<td>{{inputVO.REPRESET_NAME}}</td>
+	    				<td>{{inputVO.REPRESET_ID}}</td>
+	    				<td>{{inputVO.REPRESET_BIRTH | date:"yyyy/MM/dd"}}</td>
+	    			</tr>	    			
+	    			<tr ng-show="inputVO.CALL_C_YN == 'Y'">
+	    				<td>通訊電話</td>
+	    				<td>
+	    					<input type="text" class="form-control" 
+	    						   placeholder="請輸入..." 
+	    						   id="c_tel_no" name="c_tel_no" 
+	    						   ng-model="inputVO.C_TEL_NO"
+	    						   ng-disabled="!editable"
+	    						   style="width:150px;">
+	    				</td>
+	    				<td>手機號碼</td>
+	    				<td>
+	    					<input type="text" class="form-control" 
+	    						   placeholder="請輸入..." 
+	    						   id="c_mobile" name="c_mobile" 
+	    						   ng-model="inputVO.C_MOBILE" 
+	    						   ng-blur="checkMobile('C')"
+	    						   ng-disabled="!editable"
+	    						   style="width:150px;">
+	    				</td>
+	    			</tr>
+	    			<tr ng-show="inputVO.CALL_C_YN == 'Y'">
+	    				<td>方便聯絡時間<span style="color:red;">*</span></br>(可複選)</td>
+	    				<td colspan="3">
+	    					<input type="checkbox" ng-model="inputVO.C_TIME1" ng-true-value="'Y'" ng-false-value="'N'" 
+	    						   ng-change="callTime('C')" ng-disabled="!editable"> 09：00～12：00</br>
+	    					<input type="checkbox" ng-model="inputVO.C_TIME2" ng-true-value="'Y'" ng-false-value="'N'" 
+	    						   ng-change="callTime('C')" ng-disabled="!editable"> 12：00～15：00</br>
+	    					<input type="checkbox" ng-model="inputVO.C_TIME3" ng-true-value="'Y'" ng-false-value="'N'" 
+	    						   ng-change="callTime('C')" ng-disabled="!editable"> 15：00～18：00</br>
+	    					<input type="checkbox" ng-model="inputVO.C_TIME4" ng-true-value="'Y'" ng-false-value="'N'" 
+	    						   ng-change="callTime('C')" ng-disabled="!editable"> 18：00～20：00
+	    				</td>
+	    			</tr>
+	    			<!-- 被保人 -->
+	    			<tr ng-show="inputVO.CALL_I_YN == 'Y'">
+	    				<td>電訪對象姓名/ID/生日</td>
+	    				<td>{{inputVO.INSURED_NAME}}</td>
+	    				<td>{{inputVO.INSURED_ID}}</td>
+	    				<td>{{inputVO.INSURED_BIRTH | date:"yyyy/MM/dd"}}</td>
+	    			</tr>
+	    			<tr ng-show="inputVO.I_AGE < 18 && inputVO.CALL_I_YN == 'Y'">
+	    				<td>法代姓名/ID/生日</td>
+	    				<td>
+	    					<input type="text" class="form-control" 
+	    						   placeholder="請輸入..." 
+	    						   id="i_represet_name" name="i_represet_name" 
+	    						   ng-model="inputVO.I_REPRESET_NAME"
+	    						   ng-disabled="!editable"
+	    						   style="width:150px;">
+	    				</td>
+	    				<td>
+	    					<input type="text" class="form-control" 
+	    						   placeholder="請輸入..." 
+	    						   id="i_represet_id" name="i_represet_id" 
+	    						   ng-model="inputVO.I_REPRESET_ID"
+	    						   ng-disabled="!editable"
+	    						   style="width:150px;">
+	    				</td>
+	    				<td>
+	    					<div style="float: left; width: 220px;" class="input-group datebox datewidth">
+								<input type="text" id="i_represet_birth" name="i_represet_birth"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.I_REPRESET_BIRTH"
+									   is-open="model.a"
+									   ng-readonly="true"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="!editable">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>																		
+								</span>
+							</div>
+	    				</td>
+	    			</tr>
+	    			<tr ng-show="inputVO.CALL_I_YN == 'Y'">
+	    				<td>通訊電話</td>
+	    				<td>
+	    					<input type="text" class="form-control" 
+	    						   placeholder="請輸入..." 
+	    						   id="i_tel_no" name="i_tel_no" 
+	    						   ng-model="inputVO.I_TEL_NO"
+	    						   ng-disabled="!editable"
+	    						   style="width:150px;">
+	    				</td>
+	    				<td>手機號碼</td>
+	    				<td>
+	    					<input type="text" class="form-control" 
+	    						   placeholder="請輸入..." 
+	    						   id="i_mobile" name="i_mobile" 
+	    						   ng-model="inputVO.I_MOBILE"
+	    						   ng-blur="checkMobile('I')"
+	    						   ng-disabled="!editable"
+	    						   style="width:150px;">
+	    				</td>
+	    			</tr>
+	    			<tr ng-show="inputVO.CALL_I_YN == 'Y'">
+	    				<td>方便聯絡時間<span style="color:red;">*</span></br>(可複選)</td>
+	    				<td colspan="3">
+	    					<input type="checkbox" ng-model="inputVO.I_TIME1" ng-true-value="'Y'" ng-false-value="'N'" 
+	    						   ng-change="callTime('I')" ng-disabled="!editable"> 09：00～12：00</br>
+	    					<input type="checkbox" ng-model="inputVO.I_TIME2" ng-true-value="'Y'" ng-false-value="'N'" 
+	    						   ng-change="callTime('I')" ng-disabled="!editable"> 12：00～15：00</br>
+	    					<input type="checkbox" ng-model="inputVO.I_TIME3" ng-true-value="'Y'" ng-false-value="'N'" 
+	    						   ng-change="callTime('I')" ng-disabled="!editable"> 15：00～18：00</br>
+	    					<input type="checkbox" ng-model="inputVO.I_TIME4" ng-true-value="'Y'" ng-false-value="'N'" 
+	    						   ng-change="callTime('I')" ng-disabled="!editable"> 18：00～20：00
+	    				</td>
+	    			</tr>
+	    			<!-- 繳款人 -->
+	    			<tr ng-show="inputVO.CALL_P_YN == 'Y'">
+	    				<td>電訪對象姓名/ID/生日</td>
+	    				<td>{{inputVO.PAYER_NAME}}</td>
+	    				<td>{{inputVO.PAYER_ID}}</td>
+	    				<td>{{inputVO.PAYER_BIRTH | date:"yyyy/MM/dd"}}</td>
+	    			</tr>
+	    			<tr ng-show="inputVO.P_AGE < 18 && inputVO.CALL_P_YN == 'Y'">
+	    				<td>法代姓名/ID/生日</td>
+	    				<td>
+	    					<input type="text" class="form-control" 
+	    						   placeholder="請輸入..." 
+	    						   id="p_represet_name" name="p_represet_name" 
+	    						   ng-model="inputVO.P_REPRESET_NAME"
+	    						   ng-disabled="!editable"
+	    						   style="width:150px;">
+	    				</td>
+	    				<td>
+	    					<input type="text" class="form-control" 
+	    						   placeholder="請輸入..." 
+	    						   id="p_represet_id" name="p_represet_id" 
+	    						   ng-model="inputVO.P_REPRESET_ID"
+	    						   ng-disabled="!editable"
+	    						   style="width:150px;">
+	    				</td>
+	    				<td>
+	    					<div style="float: left; width: 220px;" class="input-group datebox datewidth">
+								<input type="text" id="p_represet_birth" name="p_represet_birth"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.P_REPRESET_BIRTH"
+									   is-open="model.b"
+									   ng-readonly="true"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')" ng-disabled="!editable">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>																		
+								</span>
+							</div>
+	    				</td>
+	    			</tr>
+	    			<tr ng-show="inputVO.CALL_P_YN == 'Y'">
+	    				<td>通訊電話</td>
+	    				<td>
+	    					<input type="text" class="form-control" 
+	    						   placeholder="請輸入..." 
+	    						   id="p_tel_no" name="p_tel_no" 
+	    						   ng-model="inputVO.P_TEL_NO"
+	    						   ng-disabled="!editable"
+	    						   style="width:150px;">
+	    				</td>
+	    				<td>手機號碼</td>
+	    				<td>
+	    					<input type="text" class="form-control" 
+	    						   placeholder="請輸入..." 
+	    						   id="p_mobile" name="p_mobile" 
+	    						   ng-model="inputVO.P_MOBILE"
+	    						   ng-blur="checkMobile('P')"
+	    						   ng-disabled="!editable"
+	    						   style="width:150px;">
+	    				</td>
+	    			</tr>
+	    			<tr ng-show="inputVO.CALL_P_YN == 'Y'">
+	    				<td>方便聯絡時間<span style="color:red;">*</span></br>(可複選)</td>
+	    				<td colspan="3">
+	    					<input type="checkbox" ng-model="inputVO.P_TIME1" ng-true-value="'Y'" ng-false-value="'N'"
+	    						   ng-change="callTime('P')" ng-disabled="!editable"> 09：00～12：00</br>
+	    					<input type="checkbox" ng-model="inputVO.P_TIME2" ng-true-value="'Y'" ng-false-value="'N'"
+	    						   ng-change="callTime('P')" ng-disabled="!editable"> 12：00～15：00</br>
+	    					<input type="checkbox" ng-model="inputVO.P_TIME3" ng-true-value="'Y'" ng-false-value="'N'"
+	    						   ng-change="callTime('P')" ng-disabled="!editable"> 15：00～18：00</br>
+	    					<input type="checkbox" ng-model="inputVO.P_TIME4" ng-true-value="'Y'" ng-false-value="'N'"
+	    						   ng-change="callTime('P')" ng-disabled="!editable"> 18：00～20：00
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>特別注意事項</td>
+	    				<td colspan="3">
+	    					<input type="text" class="form-control"
+	    						   id="special_memo" name="special_memo" 
+	    						   ng-model="inputVO.SPECIAL_MEMO" 
+	    						   ng-disabled="!editable"
+	    						   style="width:100%;" maxlength="100">
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>電子要保書</td>
+	    				<td colspan="3">
+	    					<button type="button" class="btn btn-info" ng-click="getPDF()" ng-disabled="j9">檢視行動投保要保書</button>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>保險購買檢核報表</td>
+	    				<td colspan="3">
+	    					<button type="button" class="btn btn-info" ng-click="printChgCustCheckList()">保險購買檢核報表</button>
+	    				</td>
+	    			</tr>
+	    			<tr>
+						<th colspan="4" style="text-align: left;" class="table_title">上傳文件區</th>
+					</tr>
+					<tr>
+	    				<td>上傳文件</td>
+	    				<td colspan="3">
+	    					<span id="pdfBox" style="display: inline-block;vertical-align: middle;">
+	                       		<e-upload id='pdfUpload' success='upload(name,rname)' model='inputVO.realfileName' width='250px' 
+	                       				  ng-disabled="!editable" accept=".pdf"></e-upload>
+                        	</span>
+	    				</td>
+	    			</tr>
+					<tr>
+	    				<td colspan="4">
+	    					<table>
+								<thead>
+									<tr>
+										<th ng-show="editable">移除</th>
+										<th>檔案</th>
+										<th>上傳時間</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in resultList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td align="center" ng-show="editable">
+											<a ng-click="deleteRow(row)" class="icon clickable">
+								              <img src="assets/images/ic-delete.svg">
+								            </a>
+										</td>
+										<td>
+											<a ng-click="download(row)" class="icon clickable">{{row.FILE_NAME}}</a>
+										</td>
+										<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd"}}</td>							
+									</tr>
+								</tbody>
+							</table>
+							
+	    				</td>
+	    			</tr>
+				</table>
+				<div style="margin: 10px;" ng-show="showWarningMsg">
+					<samp style="color: red; font-weight: bold;">請留意！同案件編號電訪記錄有「電訪疑義」或「取消投保」之記錄！</samp>
+				</div>
+				<div class="search_box_btn text-center" ng-hide="review || showTip">
+					<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="save()" 	ng-disabled="btnCtrl">儲存</button>
+					<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="reserve()" ng-disabled="btnCtrl">送出預約</button>
+					<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="clean()" 	ng-disabled="btnCtrl">清除</button>
+					<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="cancle()" 	ng-disabled="cancleBtnCtrl">取消電訪</button>
+				</div>
+				<div class="search_box_btn text-center" ng-show="showTip && !review">
+					<button type="button" class="btn btn-info" style="display: inline !important;"
+							uib-tooltip="電訪處理中，若欲調整，請通知電訪人員退回電訪狀態為1.未申請，方可異動!" tooltip-class="IOT400ToolTip">儲存</button>
+					<button type="button" class="btn btn-info" style="display: inline !important;" 
+							uib-tooltip="電訪處理中，若欲調整，請通知電訪人員退回電訪狀態為1.未申請，方可異動!" tooltip-class="IOT400ToolTip">送出預約</button>
+					<button type="button" class="btn btn-info" style="display: inline !important;" 
+							uib-tooltip="電訪處理中，若欲調整，請通知電訪人員退回電訪狀態為1.未申請，方可異動!" tooltip-class="IOT400ToolTip">清除</button>
+					
+					<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="cancle()" ng-disabled="cancleBtnCtrl">取消電訪</button>
+				</div>
+				<div class="search_box_btn text-center" ng-show="fromIOT420">
+					<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="reviewOK()">檢視完成</button>
+					<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="reject()">退回</button>
+				</div>
+        	</div>
+        </div>
+      </div>
+    </div>
+</div>

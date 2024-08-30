@@ -1,0 +1,240 @@
+<style>
+.modal-dialog.JSB100_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1100px;
+	height: 650px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+	
+}
+</style>
+<script type="text/javascript" src="assets/txn/JSB100/JSB100_DETAIL.js"></script>
+<div ng-controller="JSB100_DETAILController" ng-cloak>
+	<div class="modal-dialog JSB100_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">保險明細</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">受理編號：</th>
+							<td class="col-md-2.5 tdpadding">{{row.ACCEPTID}}</td>
+							<td class="col-xs-1"></td>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">修改狀態：</th>
+							<td class="col-md-2.5 tdpadding">{{row.STATUS | mapping:mappingSet['JSB.INS_EDIT_STATUS']:'F3'}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">險種名稱(FULL)：</th>
+							<td class="col-md-2.5 tdpadding">{{row.POLICY_FULL_NAME}}</td>
+							<td class="col-xs-1"></td>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">保單號碼：</th>
+							<!-- 
+							<td class="col-md-2.5 tdpadding">{{row.POLICY_NBR}}</td> -->
+							<td class="col-md-2.5 tdpadding">
+								<input class="form-control" type="text" placeholder="請輸入..." id="policy_nbr" name="policy_nbr" ng-model="inputVO.policy_nbr" ng-disabled="row.STATUS == 'P'" required autofocus>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">要保人姓名：</th>
+							<td class="col-md-2.5 tdpadding">
+								<input class="form-control" type="text" placeholder="請輸入..." id="appl_name" name="appl_name" ng-model="inputVO.appl_name" ng-disabled="row.STATUS == 'P'" required autofocus>
+							</td>
+							<td class="col-xs-1"></td>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">被保人姓名：</th>
+							<td class="col-md-2.5 tdpadding">
+								<input class="form-control" type="text" placeholder="請輸入..." id="ins_name" name="ins_name" ng-model="inputVO.ins_name" ng-disabled="row.STATUS == 'P'" required autofocus>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">要保人ID：</th>
+							<td class="col-md-2.5 tdpadding">
+								<input class="form-control" type="text" placeholder="請輸入..." id="cust_id" name="cust_id" ng-model="inputVO.cust_id" ng-disabled="row.STATUS == 'P'" required autofocus>
+							</td>
+							<td class="col-xs-1"></td>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">被保人ID：</th>
+							<td class="col-md-2.5 tdpadding">
+								<input class="form-control" type="text" placeholder="請輸入..." id="ins_id" name="ins_id" ng-model="inputVO.ins_id" ng-disabled="row.STATUS == 'P'" required autofocus>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">要保人生日：</th>
+							<td class="col-md-2.5 tdpadding">
+								<!-- <input class="form-control" type="text" placeholder="請輸入..." id="proposer_birth" name="proposer_birth" ng-model="inputVO.proposer_birth" required autofocus"> -->
+								<div style="float: left" class="input-group datebox datewidth">
+									<input type="text" id="proposer_birth" name="proposer_birth"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.proposer_birth"
+										   is-open="model.a"
+										   datepicker-options="apply_sDateOptions"
+										   ng-readonly="true""/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="row.STATUS == 'P'">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>																		
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">被保人生日：</th>
+							<td class="col-md-2.5 tdpadding">
+								<!-- <input class="form-control" type="text" placeholder="請輸入..." id="insured_birth" name="insured_birth" ng-model="inputVO.insured_birth" required autofocus> -->
+								<div style="float: left" class="input-group datebox datewidth">
+									<input type="text" id="insured_birth" name="insured_birth"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.insured_birth"
+										   is-open="model.b"
+										   datepicker-options="apply_sDateOptions"
+										   ng-readonly="true""/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')" ng-disabled="row.STATUS == 'P'">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>																		
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">專案代號：</th>
+							<td class="col-md-2.5 tdpadding">
+								<input class="form-control" type="text" placeholder="請輸入..." id="project_code" name="project_code" ng-model="inputVO.project_code" ng-disabled="row.STATUS == 'P'" required autofocus>
+							</td>
+							<td class="col-xs-1"></td>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">繳別：</th>
+							<td class="col-md-2.5 tdpadding">
+								<!-- <input class="form-control" type="text" placeholder="請輸入..." id="pay_type" name="pay_type" ng-model="inputVO.pay_type" required autofocus> -->
+								<e-combobox id="pay_type" name="pay_type"
+											ng-paramtype="PMS.PAY_YQD"
+											ng-model="inputVO.pay_type"
+											ng-format="F3"
+											ng-required="true"
+											ng-disabled="row.STATUS == 'P'"
+											width="200px"
+											style="line-height:20px;"></e-combobox>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">保額：</th>
+							<td class="col-md-2.5 tdpadding">
+								<input class="form-control" type="text" placeholder="請輸入..." 
+									   id="policy_assure_amt" name="policy_assure_amt" 
+									   e-input-limit="NN"
+									   ng-model="inputVO.policy_assure_amt" 
+									   ng-disabled="row.STATUS == 'P'" required autofocus>
+							</td>
+							<td class="col-xs-1"></td>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">單位：</th>
+							<td class="col-md-2.5 tdpadding">
+								<input class="form-control" type="text" placeholder="請輸入..." id="unit_nbr" name="unit_nbr" ng-model="inputVO.unit_nbr" ng-disabled="row.STATUS == 'P'" required autofocus>
+								<!-- <e-combobox ng-datasource = "BRANCH_LIST"
+								            ng-model = "inputVO.unit_nbr"
+								            ng-validate = "true"
+								            ng-editable = "false"
+								            ng-disabled="row.STATUS == 'P'"
+								            ng-format = "F1"/> -->
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">契約狀態：</th>
+							<td class="col-md-2.5 tdpadding">
+								<!-- <input class="form-control" type="text" placeholder="請輸入..." id="contract_status" name="contract_status" ng-model="inputVO.contract_status" required autofocus> -->
+								<e-combobox id="contract_status"
+											ng-datasource="mappingSet['CRM.CONTRACT_ST']"
+											ng-model="inputVO.contract_status"
+				   							ng-validate="false" 
+				   							ng-editable="false"
+				   							ng-format="F3"
+				   							ng-required="false"
+				   							ng-disabled="row.STATUS == 'P'"
+				   							width="180px"
+				   							style="line-height:20px;"/>
+							</td>
+							<td class="col-xs-1"></td>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">保單服務人員ID：</th>
+							<td class="col-md-2.5 tdpadding">
+								<input class="form-control" type="text" placeholder="請輸入..." id="service_emp_id" name="service_emp_id" ng-model="inputVO.service_emp_id" ng-disabled="row.STATUS == 'P'" required autofocus>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">參考日期：</th>
+							<td class="col-md-2.5 tdpadding">
+								<!-- <input class="form-control" type="text" placeholder="請輸入..." id="proposer_birth" name="proposer_birth" ng-model="inputVO.proposer_birth" required autofocus"> -->
+								<div style="float: left" class="input-group datebox datewidth">
+									<input type="text" id="data_date" name="data_date"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.data_date"
+										   is-open="model.c"
+										   datepicker-options="data_dateOptions"
+										   ng-readonly="true""/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')" ng-disabled="row.STATUS == 'P'">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>																		
+									</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2.5">異動原因：</th>
+							<td class="col-md-2.5 tdpadding" colspan="5">
+								<input class="form-control" type="text" placeholder="請輸入..." id="update_reason" name="update_reason" ng-model="inputVO.update_reason" ng-disabled="row.STATUS == 'P'" required autofocus>
+							</td>
+						</tr>
+					</table>
+				</form>
+				</br>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" ng-hide="row.STATUS == 'P'">儲存</button>
+					
+					<button type="button" class="btn btn-primary" ng-click="updateStatus('C')" function-type="maintenance" 
+							ng-disabled="row.STATUS == undefined || (row.STATUS != 'E' && row.STATUS != 'R')" ng-hide="row.STATUS == 'P'">取消修改</button>
+							
+					<button type="button" class="btn btn-primary" ng-click="updateStatus('P')" function-type="maintenance" 
+							ng-disabled="!alreadySave" ng-hide="row.STATUS == 'P'">送出覆核</button>
+					
+					<button type="button" class="btn btn-warning" ng-click="updateStatus('R')" function-type="confirm" ng-show="row.STATUS == 'P'">退回</button>
+					<button type="button" class="btn btn-primary" ng-click="approve()" function-type="confirm" ng-show="row.STATUS == 'P'">核可</button>
+					
+							
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">回上一頁</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

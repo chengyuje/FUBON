@@ -1,0 +1,254 @@
+<style>
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+
+/* check box css */
+input.faChkRnd, input.faChkSqr {
+  visibility: hidden;
+}
+input.faChkRnd:checked:after, input.faChkRnd:after,
+input.faChkSqr:checked:after, input.faChkSqr:after {
+  visibility: visible;
+  font-family: FontAwesome;
+  font-size:25px;height: 17px; width: 17px;
+  position: relative;
+  top: -3px;
+  left: 0px;
+  background-color:#FFF;
+  display: inline-block;
+}
+
+input.faChkRnd:checked:after {
+  content: '\f058';
+}
+
+input.faChkRnd:after {
+  content: '\f10c';
+}
+
+input.faChkSqr:checked:after {
+  content: '\f14a';
+}
+
+input.faChkSqr:after {
+  content: '\f096';
+}
+.PMS427 .noticed {
+    color: #FF0000;
+}
+/* check box css */
+
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS427/PMS427.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS427" ng-controller="PMS427Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr>
+						<th>*資料月份：</th>
+						<td>
+							<e-combobox id="dataMonth" name="dataMonth" 
+										ng-datasource="mappingSet['timeE']"
+										ng-model="inputVO.sCreDate"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-required="true"
+										ng-change="dateChange()"
+										ng-format="F3"
+										width="200px"
+										style="line-height:20px;" />	
+						</td>
+						<th ng-show="inputVO.memLoginFlag == 'ALL'">
+							上傳久未輪調理專：
+							</th>
+						<td ng-show="inputVO.memLoginFlag == 'ALL'">
+							<span id="csvBox" style="display: inline-block;vertical-align: middle;" function-type="export">
+								<e-upload id="csvUpload" success="updateAO84MList(name, rname)" text="上傳" accept=".csv" ></e-upload>
+							</span>
+							<button type="button" class="btn btn-info" ng-click="getExample();" function-type="export">下載範例</button>
+						</td>
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeRegion(test)"
+										width="200px"
+										style="line-height:20px;" />
+						</td>						
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeArea(test)"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+						<th>分行：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_nbr"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeBranch(test)"
+										width="200px"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+	    				<th>已回覆/未回覆：</th>
+						<td>
+							<e-combobox id="noteStatus" name="noteStatus" 
+										ng-paramtype="PMS.NOTE_STATUS"
+										ng-model="inputVO.noteStatus"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="200px"
+										style="line-height:20px;"/>
+						</td>
+						<th></th>
+						<td></td>
+						<th></th>
+						<td></td>
+	    			</tr>	
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="queryInit();query();" function-type="query"><span class="glyphicon glyphicon-search"></span>查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();limitDate();dateChange()"><span class="glyphicon glyphicon-erase"></span>清除</button>
+				<button type="button" class="btn btn-success" ng-click="exportRPT()" ng-disabled="resultList.length < 1" function-type="export"><span class="glyphicon glyphicon-save"></span>匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">		    
+			<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+			<div algin="left">
+	            <div algin="left">
+	                <table>
+	                    <tr>
+	                        <td>產出頻率：</td>
+	                        <td>每月15號</td>
+	                    </tr>
+	                </table>
+	            </div>
+	        </div>
+	        <div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="table-bordered td_center e-table-freeze" e-left="6" e-height="700px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th>更新<br>資料</th>
+							
+							<th>資料日期</th>
+							<th>理專歸屬行</th>
+							<th>理專姓名</th>
+							<th>客戶姓名</th>
+							<th>客戶ID</th>
+							<th>對帳單未送達資訊</th>
+							<th>對帳單寄送方式</th>
+							<th>較前月AUM減少比例</th>
+							<th>較前月AUM減少金額</th>		
+							<th>查證方式</th>
+							<th>電訪錄音編號</th>
+							<th>關懷客戶對帳單未收到及資產減少原因是否異常</th>
+							<th>初判異常轉法遵部調查</th>
+							<th>首次建立時間</th>
+							<th>最新異動人員</th>
+							<th>最新異動日期</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center" ><input type="checkbox" ng-disabled="" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"></td>
+							<td style="vertical-align:middle;">{{toJsDate(row.DATA_DATE) | date:"yyyy-MM-dd"}}</td>
+							<td style="vertical-align:middle;">{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+							<td style="vertical-align:middle;">{{row.EMP_NAME}}</td>
+							<td style="vertical-align:middle;">{{row.CUST_NAME}}</td>
+							<td style="vertical-align:middle;">{{row.CUST_ID}}</td>
+							<td style="vertical-align:middle;">{{row.BILL_ND_INFO}}</td>
+							<td style="vertical-align:middle;">{{row.BILL_SEND_METHOD}}</td>
+							<td style="vertical-align:middle;text-align:right;">{{row.REDUCE_AUM_PERCENT | number}}%</td>
+							<td style="vertical-align:middle;text-align:right;">{{row.REDUCE_AUM_AMOUNT | currency:''}}</td>
+							<td style="text-align:left;">
+								<e-combobox id="checkType" name="checkType" 
+											ng-datasource="mappingSet['PMS.CHECK_TYPE']"
+											ng-model="row.NOTE_TYPE"
+											ng-validate="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-readonly="!chkMaintenance"
+											ng-disabled="!chkMaintenance"
+											style="line-height:20px;display:inline;" />
+		                    	<input type="text" class="form-control" style="width: 300px;display:inline;" e-length-limit="200" ng-model="row.NOTE" placeholder="請補充查證方式..." ng-if="row.NOTE_TYPE == 'O'" ng-disabled="!chkMaintenance" ng-blur="updateFlag(row)"/>
+							</td>
+							<td>
+								<input 	type="text" class="form-control" style="width: 150px;display:inline;" 
+										e-length-limit="12" 
+										e-input-limit="ND"
+										ng-model="row.RECORD_SEQ" 
+										placeholder="請輸入電訪錄音編號..." 
+										ng-if="row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A'" 
+										ng-disabled="!chkMaintenance || row.RECORD_YN == 'N'" 
+										ng-blur="updateFlag(row)"/>
+							</td>
+							<td><input type="text" class="form-control" style="width: 300px" ng-blur="updateFlag(row)" ng-disabled="!chkMaintenance" ng-model="row.NOTE2" placeholder="請輸入聯繫客戶情形及敘明原因..."></td>
+							<td align="center">
+								<label>是<input type="radio" value="Y" ng-change="updateFlag(row)" ng-disabled="!chkMaintenance" ng-model="row.HR_ATTR"/></label>&emsp;
+								<label>否<input type="radio" value="N" ng-change="updateFlag(row)" ng-disabled="!chkMaintenance" ng-model="row.HR_ATTR"/></label>
+							</td>
+							<td ng-bind="row.FIRSTUPDATE"></td>
+							<td>{{row.MODIFIER}}</td>
+							<td>{{row.LASTUPDATE}}</td>		
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<br>
+			<div align="center" ng-show="paramList.length"> 
+	            <button type="button" class="btn btn-success" ng-click="save()" >
+	                <span class="glyphicon glyphicon-floppy-disk"></span>儲存
+	            </button>
+	        </div>
+		</div>
+	</div>
+</div>

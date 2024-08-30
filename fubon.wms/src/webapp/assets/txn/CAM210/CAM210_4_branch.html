@@ -1,0 +1,143 @@
+<style>
+/* table size */
+.CAM210_4_BRANCH table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.CAM210_4_BRANCH table.little {
+	width: 89%;
+}
+/* change row */
+.CAM210_4_BRANCH.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CAM210_4_BRANCH_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM210/CAM210_4_branch.js"></script>
+<div ng-controller="CAM210_4_branch_Controller" ng-cloak>
+	<div class="CAM210_4_BRANCH">
+		<e-jumping-once output="branchOutputVO" list="branchData" totallist="sightActivitiesBranchAreaList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th>分行</th>
+						<th>姓名</th>
+						<th>身分別</th>
+						<th>名單數</th>
+						<th>已結案數</th>
+						<th>未結案數</th>
+						<th>待分派數</th>
+						<th>結案率</th>
+<!-- 						<th>投資申購量(百萬)</th> -->
+<!-- 						<th>保險申購量(百萬)</th> -->
+<!-- 						<th>信用卡核卡數</th> -->
+<!-- 						<th>房貸撥款量(百萬)</th> -->
+<!-- 						<th>信貸撥款量(百萬)</th> -->
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="dataRow in branchData track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center">{{dataRow.BRANCH_NAME}}</td>
+						<td align="center" ng-if="dataRow.LEAD_WAIT_COUNTS == 0">
+							<a ng-click="txtAO_4(dataRow)">{{dataRow.EMP_NAME}}</a>
+							<div style="display: none;">{{dataRow.EMP_ID}}</div>
+						</td>
+						<td align="center" ng-if="dataRow.LEAD_WAIT_COUNTS > 0">{{dataRow.EMP_NAME}}</td>
+						<td>{{dataRow.JOB_TITLE_NAME}}</td>
+						<td align="right">{{dataRow.LEAD_COUNTS}}</td>
+						<td align="right">{{dataRow.LEAD_CLOSE}}</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+						<td align="right">{{dataRow.LEAD_COUNTS - dataRow.LEAD_CLOSE}}</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+						<td align="right">{{dataRow.LEAD_WAIT_COUNTS}}</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+						<td align="right" >{{(dataRow.LEAD_CLOSE/dataRow.LEAD_COUNTS)*100 | number:0}}{{dataRow.LEAD_COUNTS != null && dataRow.LEAD_COUNTS != '' ? '%' : ''}}</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+<!-- 						<td align="right">{{dataRow.INVS_BAL}}</td> -->
+<!-- 						<td align="right">{{dataRow.INSS_BAL}}</td> -->
+<!-- 						<td align="right">{{dataRow.CARD_SUM}}</td> -->
+<!-- 						<td align="right">{{dataRow.LOAN1_SUM}}</td> -->
+<!-- 						<td align="right">{{dataRow.LOAN2_SUM}}</td> -->
+					</tr>
+					<tr id='pageTr'>
+						<td align="center">小計</td>
+						<td align="right"></td>
+						<td align="right"></td>
+						<td align="right">{{branchData | sumOfValue:'LEAD_COUNTS'}}</td>
+						<td align="right">{{branchData | sumOfValue:'LEAD_CLOSE'}}</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+						<td align="right">{{(branchData | sumOfValue:'LEAD_COUNTS')-(branchData | sumOfValue:'LEAD_CLOSE')}}</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A<c/td> -->
+						<td align="right">{{(branchData | sumOfValue:'LEAD_WAIT_COUNTS')}}</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+						<td align="right">{{((branchData | sumOfValue:'LEAD_CLOSE')/(branchData | sumOfValue:'LEAD_COUNTS'))*100 | number:0}}%</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+<!-- 						<td align="right">{{branchData | sumOfValue:'INVS_BAL'}}</td> -->
+<!-- 						<td align="right">{{branchData | sumOfValue:'INSS_BAL'}}</td> -->
+<!-- 						<td align="right">{{branchData | sumOfValue:'CARD_SUM'}}</td> -->
+<!-- 						<td align="right">{{(branchData | sumOfValue:'LOAN1_SUM')}}</td> -->
+<!-- 						<td align="right">{{(branchData | sumOfValue:'LOAN2_SUM')}}</td> -->
+					</tr>
+					<tr id='toralTr'>
+						<td align="center">合計</td>
+						<td align="right"></td>
+						<td align="right"></td>
+						<td align="right">{{saba_totalLeadCounts}}</td>
+						<td align="right">{{saba_totalOkLeadCounts}}</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+						<td align="right">{{saba_totalLeadCounts - totalOkLeadCounts}}</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+						<td align="right">{{saba_totalWaitLeadCounts}}</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+						<td align="right">{{(saba_totalOkLeadCounts/saba_totalLeadCounts)*100 | number:0}}%</td>
+<!-- 						<td align="right" ng-if="row.LEAD_TYPE == '04'">N/A</td> -->
+<!-- 						<td align="right">{{saba_totalInvsSum}}</td> -->
+<!-- 						<td align="right">{{saba_totalInssSum}}</td> -->
+<!-- 						<td align="right">{{saba_totalCcdSum}}</td> -->
+<!-- 						<td align="right">{{saba_totalLoan1Sum}}</td> -->
+<!-- 						<td align="right">{{saba_totalLoan2Sum}}</td> -->
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,28 @@
+
+<script type="text/javascript" src="assets/txn/CRM141/CRM141.js"></script>
+
+<div ng-controller="CRM141Controller" ng-cloak>
+	<div class="gv_tab_sc scroll_y text-left">
+		<table>
+			<thead class ="text-center">
+				<tr>
+					<th>上線日期</th>
+					<th>即期名單活動 》<a href = "#" ng-click="detail()">詳細內容</a></th>
+					<th>待聯繫</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-hide = "row.N_CONTACT == 0" class="repeat-row text-left" ng-repeat="row in resultList2 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">	
+					<td class ="text-center">{{toJsDate(row.START_DATE) | date:"yyyy-MM-dd"}}</td>
+					<td>新Pool客戶應聯繫名單</td>
+					<td class ="text-center"><a href = "#" ng-click="detail_2()">{{row.N_CONTACT}}</a></td>
+				</tr>
+				<tr class="repeat-row text-left" ng-repeat="row in resultList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">	
+					<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}" class ="text-center">{{toJsDate(row.START_DATE) | date:"yyyy-MM-dd"}}</td>
+					<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CAMPAIGN_NAME}}</td>
+					<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}" class ="text-right"><a href = "#" ng-click="detail_2(row)">{{row.COUNTS}}</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,88 @@
+<style>
+.modal-dialog.CRM990_NEXT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+
+.row {
+	margin: 1%;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM990/CRM990_NEXT.js"></script>
+<div ng-controller="CRM990_NEXTController" ng-cloak>
+	<div class="modal-dialog CRM990_NEXT">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">下一流程</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<div class="row">
+						<div class="col-md-2">案件分流</div>
+						<div class="col-md-2">
+							<label>
+								<input type="radio" ng-model="inputVO.case_type" value="FM" ng-disabled="true">理財客訴
+							</label>
+						</div>
+						<div class="col-md-2">
+							<label>
+								<input type="radio" ng-model="inputVO.case_type" value="OP" ng-disabled="true">作業客訴
+							</label>
+						</div>
+						<div class="col-md-2">
+							<label>
+								<input type="radio" ng-model="inputVO.case_type" value="CF" ng-disabled="true">消金客訴
+							</label>
+						</div>
+						<div class="col-md-2">
+							<label>
+								<input type="radio" ng-model="inputVO.case_type" value="OTH" ng-disabled="true">其他客訴
+							</label>
+						</div>
+					</div>
+					<div class="row" ng-if="inputVO.pri_emp_id">
+						<div class="col-md-2">上一流程</div>
+						<div class="col-md-8">{{inputVO.pri_dept_name}}{{inputVO.pri_job_title_name}}<span ng-if="inputVO.pri_dept_name">-</span>{{inputVO.pri_emp_name}}</div>
+
+					</div>
+					
+					<div class="row">
+						<div class="col-md-2">目前流程</div>
+						<div class="col-md-8">{{inputVO.dept_name}}{{inputVO.job_title_name}}<span ng-if="inputVO.dept_name">-</span>{{inputVO.emp_name}}({{inputVO.emp_id}})</div>
+					</div>
+					
+					<div class="row">
+						<div class="col-md-2">下一流程<span style="color:red;">*</span></div>
+						<div ng-if="mappingSet['nextEmpList'].length == 0" class="col-md-2">無相關資料</div>
+						<div>
+							<e-combobox id="next_emp_id" name="next_emp_id"
+								ng-datasource="mappingSet['nextEmpList']" 
+								ng-model="inputVO.next_emp_id" 
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3" 
+								ng-required="false" 
+								style="line-height:20px; width:500px" />
+						</div>
+					</div>
+						
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" 
+						ng-disabled="inputVO.next_emp_id == undefined || inputVO.next_emp_id == ''" 
+						ng-click="saveSubmit()">確認</button>
+						
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">返回</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

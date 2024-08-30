@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-lazy="false" package="com.systex.jbranch.platform.common.platformdao.table">
+    <class table="TBSYSORG" name="com.systex.jbranch.platform.common.platformdao.table.TbsysorgVO" optimistic-lock="version">
+        <id column="DIV_NO" name="divNo" type="java.lang.String" length="4">
+            <generator class="assigned"/>
+        </id>
+        <version column="VERSION" generated="never" name="version" type="long"/>
+        <property name="divName" column="DIV_NAME" type="java.lang.String" length="40"/>
+        <property name="description" column="DESCRIPTION" type="java.lang.String" length="60"/>
+        <set name="users" lazy="true">
+            <key column="BRCHID"/>
+            <one-to-many class="com.systex.jbranch.platform.common.platformdao.table.TbsysuserVO"/>
+        </set>
+        <set name="attributes" table="TBSYSORGATTR" lazy="true" cascade="all,delete-orphan" inverse="true">
+            <key column="DIV_NO"/>
+            <one-to-many class="com.systex.jbranch.platform.common.platformdao.table.TbsysorgattrVO"/>
+        </set>
+        <many-to-one name="parent"
+                     column="PARENT"
+                     class="com.systex.jbranch.platform.common.platformdao.table.TbsysorgVO"
+                     lazy="no-proxy"/>
+        <set name="children" lazy="true" inverse="true" order-by="DIV_NO">
+            <key column="PARENT"/>
+            <one-to-many class="com.systex.jbranch.platform.common.platformdao.table.TbsysorgVO"/>
+        </set>
+        <property column="CREATOR" generated="never" lazy="false" length="20"
+                  name="creator" type="java.lang.String"/>
+        <property column="CREATETIME" generated="never" lazy="false"
+                  length="23" name="createtime" type="java.sql.Timestamp"/>
+        <property column="LASTUPDATE" generated="never" lazy="false"
+                  length="23" name="lastupdate" type="java.sql.Timestamp"/>
+        <property column="MODIFIER" generated="never" lazy="false" length="20"
+                  name="modifier" type="java.lang.String"/>
+        <!-- Associations -->
+    </class>
+</hibernate-mapping>

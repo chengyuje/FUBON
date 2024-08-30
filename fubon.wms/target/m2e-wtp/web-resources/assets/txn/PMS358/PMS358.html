@@ -1,0 +1,247 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.deco {
+	pointer-events: none;
+	text-decoration: none !important;
+	color: #666666;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS358/PMS358.js"></script>
+<script type="text/javascript" src="assets/txn/PMS358/PMS358_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS358/PMS358_AO_DETAIL.js"></script>
+
+<div class="PMS358" ng-controller="PMS358Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th>*報表類型： </th>						
+						<td>							
+							<e-combobox id="ReportType" name="ReportType"
+							ng-datasource="mappingSet['ReportType']"
+							ng-change="ChangeReport()"
+							ng-model="ReportType"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							width="200px"
+							style="line-height:20px;" />														
+						</td>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+							ng-datasource="REGION_LIST"
+							ng-model="inputVO.region_center_id"
+							ng-validate="false" 
+							ng-disabled="disableRegionCombo"
+							ng-readonly="disableRegionCombo" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="ChangeRegion()"
+							width="200px"
+							style="line-height:20px;" />
+						</td>						
+						<th> 分行別： </th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-disabled="disableBranchCombo"
+							ng-readonly="disableBranchCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeBranch()"
+							width="150px"
+							style="line-height:20px;" />
+						</td>									
+					</tr>
+					<tr>
+						<th>*資料日期： </th>		
+						<td ng-show = "ReportType != 'week' && ReportType != 'month'">									
+						</td>			
+						<td ng-if = "ReportType == 'week'">							
+								<e-combobox id="sCreDate" name="sCreDate" 
+									ng-datasource="mappingSet['timeW']"
+									ng-model="inputVO.sCreDate"
+									ng-validate="false" 
+									ng-readonly="false"		
+									ng-required="false"	
+									ng-editable="false"
+									ng-change="limitDate();dateChange_week()"
+									ng-format="F3"
+									width="150px"
+									style="line-height:20px;" />
+						</td>
+						<td ng-if = "ReportType == 'month'">
+							<e-combobox id="dataMonth" name="dataMonth"
+							ng-datasource="mappingSet['timeE']" ng-model="inputVO.sCreDate"
+							ng-validate="false" ng-readonly="false" ng-editable="false" 
+							ng-required="true" ng-change="limitDate();dateChange_month()" 
+							ng-format="F3" width="150px" style="line-height:20px;" />
+						</td>	
+						<th> 營運區： </th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+							ng-datasource="AREA_LIST"
+							ng-model="inputVO.branch_area_id"
+							ng-validate="false" 
+							ng-disabled="disableAreaCombo"
+							ng-readonly="disableAreaCombo" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="ChangeArea()"
+							width="200px"
+							style="line-height:20px;" />
+						</td>															 					
+						<th> 理專： </th>
+						<td>
+							<e-combobox id="ao_code" name="ao_code"
+							ng-datasource="AO_LIST"
+							ng-model="inputVO.ao_code"
+							ng-validate="false"
+							ng-disabled="disableAoCombo"
+							ng-readonly="disableAoCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeAo_code()"
+							width="150px"
+							style="line-height:20px;" />
+						</td>						
+					</tr>					
+				</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit();init()">清除</button>				
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		
+		<e-jumping-once  output="outputVO" isend="ON" list="paramList1" totallist="paramList"></e-jumping-once>
+		    
+<!-- 			<e-jumping output="outputVO" input="inputVO" -->
+<!-- 				query="query()" list="paramList"></e-jumping>	 -->
+			<div align="left">
+				<table>
+					<tr>
+						<td>產出頻率：</td>
+						<td>{{TypeName}}</td>
+					</tr>
+					<tr>
+						<td>產出日：</td>
+						<td>{{CREATE_DATE}}</td>	
+					</tr>
+		 		</table>
+			</div>			
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">	
+				<table class="e-table-freeze" e-height="400px" e-mode="1" e-top="true" e-list="paramList1">
+					<thead>
+						<tr>
+							<th>項次</th>
+							<th>資料日期</th>							
+							<th>業務處</th>
+							<th>營運區</th>							
+							<th>分行名稱</th>
+							<th>分行代碼</th>
+							<th ng-show="inputVO.roleType != 'RC'">AO code</th>
+							<th ng-show="inputVO.roleType == 'AO'">客戶ID</th>
+							<th ng-show="inputVO.roleType == 'AO'">客戶姓名</th>
+							<th ng-show="inputVO.roleType == 'BR'">專員姓名</th>
+							<th ng-show="inputVO.roleType == 'RC'">客戶類別</th>
+<!-- 							<th>{{BAL_NAME}}</th>							 -->
+					        <th ng-show="ReportType == 'week'">本週台定餘額</th>					        
+							<th ng-show="ReportType == 'week'">上月台定餘額</th>
+							<th ng-show="ReportType != 'week'">本月台定餘額</th>					        
+							<th ng-show="ReportType != 'week'">上月台定餘額</th>
+<!-- 							<th ng-show="ReportType== 'week'">上周台定餘額</th> -->
+<!-- 							<th ng-show="ReportType== 'month'">上月台定餘額</th> -->
+							<th>較上月底增減</th>
+						</tr>													
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList1 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						 	<td align="center" >{{row.RN}}</td>
+						 	<td align="center" >{{row.DATA_DATE}}</td>
+						 	<td align="center" >{{row.REGION_CENTER_NAME}}</td>				 							
+							<td align="center" >{{row.BRANCH_AREA_NAME}}</td>														
+							<td align="center" ><a ng-click="showDetail(row, 'BR' ,  'dex')" style="cursor:pointer" ng-class="inputVO.roleType == 'RC' ? '': 'deco'">{{row.BRANCH_NAME}}</a></td>
+							<td align="center" >{{row.BRANCH_NBR}}</td>
+							<td align="center" ng-show="inputVO.roleType != 'RC'"><a ng-click="showDetail(row, 'AO', '')" style="cursor:pointer" ng-class="inputVO.roleType != 'AO' ? '': 'deco'" >{{row.AO_CODE}}</a></td>
+							<td align="center"  ng-show="inputVO.roleType == 'AO'">{{row.CUST_ID}}</td>
+							<td align="center"  ng-show="inputVO.roleType == 'AO'">{{row.CUST_NAME}}</td>
+							<td align="center"  ng-show="inputVO.roleType == 'BR'">{{row.EMP_NAME}}</td>
+							<td align="center"  ng-show="inputVO.roleType == 'RC'">{{row.CUST_TYPE}}</td>
+							<td align="right">{{row.WEEK_BAL | number:0}}</td>
+							<td align="right">{{row.LMON_BAL | number:0}}</td>							
+							<td align="right"><span ng-show="row.CD_DIFF > 0" >{{row.CD_DIFF | number:0}}</span>
+											  <span ng-show="row.CD_DIFF <= 0" style="color:red">({{row.CD_DIFF | number:0}})</span></td>
+						</tr>
+						<tr ng-show="sumFlag">
+							<td colspan="9" ng-show="inputVO.roleType == 'AO'" align="center">本頁小計</td>
+							<td colspan="8" ng-show="inputVO.roleType == 'BR'" align="center">本頁小計</td>
+							<td colspan="7" ng-show="inputVO.roleType == 'RC'" align="center">本頁小計</td>
+							<td align="right">{{getSum(paramList1, 'WEEK_BAL') | number:0}}</td>
+							<td align="right">{{getSum(paramList1, 'LMON_BAL') | number:0}}</td>
+							<td align="right"><span ng-show="getSum(paramList1, 'CD_DIFF') > 0" >{{getSum(paramList1, 'CD_DIFF') | number:0}}</span><span ng-show="getSum(paramList1, 'CD_DIFF') <= 0" style="color:red">({{getSum(paramList1, 'CD_DIFF')   | number:0}})</span></td>
+						</tr>
+						
+						<tr ng-show="ON">
+							<td colspan="9" ng-show="inputVO.roleType == 'AO'" align="center">總計</td>
+							<td colspan="8" ng-show="inputVO.roleType == 'BR'" align="center">總計</td>
+							<td colspan="7" ng-show="inputVO.roleType == 'RC'" align="center">總計</td>
+							<td align="right">{{sumWEEK_BAL | number:0}}</td>
+							<td align="right">{{sumLMON_BAL | number:0}}</td>
+							<td align="right"><span ng-show="sumCD_DIFF> 0" >{{sumCD_DIFF | number:0}}</span><span ng-show="sumCD_DIFF <= 0" style="color:red">({{sumCD_DIFF | number:0}})</span></td>
+						</tr>
+						
+					</tbody>
+				</table>								
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

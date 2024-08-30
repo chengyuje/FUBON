@@ -1,0 +1,58 @@
+<div style="width: 98.5%;"
+     class="flex-block-wrapper"
+     ng-style="{'justify-content': yearRateList&&yearRateList.length>0?'':'flex-start'}">
+  <div class="block"
+       style="border-color:#93c5e1; margin-top:0px;margin-bottom:0px">
+    <table class="table gray-stripped"
+           style="table-layout: fixed;">
+      <thead>
+        <tr>
+          <th height="30" class="title subtitle" 
+              style="border-right: 2.5px solid #fff;">項目</th>
+          <th class="title subtitle">數值</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td height="52.5">平均年度報酬率</td>
+          <td ng-bind="yearRate.avg+'%'"
+              ng-class="{'fall':yearRate.avg<0}"></td>
+        </tr>
+        <tr>
+          <td height="52.5">年化波動率</td>
+          <td ng-bind="(volatility !== 0 && !volatility) ? '--' : volatility + '%'"></td>
+        </tr>
+        <tr>
+          <td height="52.5">最佳年度報酬率</td>
+          <td ng-bind="yearRate.best+'%'"
+              ng-class="{'fall':yearRate.best<0}"></td>
+        </tr>
+        <tr>
+          <td height="52.5">最差年度報酬率</td>
+          <td ng-bind="yearRate.worst+'%'"
+              ng-class="{'fall':yearRate.worst<0}"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="block"
+       ng-show="yearRateList&&yearRateList.length>0"
+       style="border-color:#93c5e1; margin-top:0px;margin-bottom:0px">
+    <div style="font-size: 0.9em;
+                text-align: left;
+                position: absolute;
+                left: .5em;
+                top: 0;
+                z-index: 1;"
+         ng-bind="yearRateList.length>5?'年度報酬率':'年份'"></div>
+    <div id="yearRateChart"
+         style="width: 99%;
+                margin: 12px auto 0 auto;
+                height: 230px;"></div>
+    <span style="font-size: 0.9em;
+                 position: absolute;
+                 bottom: 0em;
+                 right: .5em;"
+          ng-bind="yearRateList.length>5?'年份':'年度報酬率'"></span>
+  </div>
+</div>

@@ -1,0 +1,288 @@
+<style>
+/* open dialog */
+.ngdialog.PMS715 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS715 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS715 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS715 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS715.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS715_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.clas tr th {
+	vertical-align: middle;
+}
+
+.middle tbody tr td {
+	vertical-align: middle;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+.spanTD{
+	display: block;
+	border-right: 1px solid #c9eaed!important;
+	float: left;
+	padding: 7px 10px;
+	margin: 0 auto;
+}
+.tdSpan{
+	padding: 0!important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS715/PMS715.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS715" ng-controller="PMS715Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*月份：</th>
+							<td><e-combobox id="eTime"
+									ng-datasource="mappingSet['timeE']" ng-model="inputVO.sTime"
+									ng-validate="false" ng-change="dateChange()"
+									ng-readonly="false" ng-editable="false" ng-format="F3"
+									ng-required="true" width="180px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>業務處：</th>
+							<td><e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id"
+									ng-validate="false" 
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeRegion()"
+									width="180px"
+									style="line-height:20px;" />
+							</td>
+							<th ng-if="role == 1" style="padding-left:5px;" bgcolor="#DDF2F9">開放查詢</th>
+							<td function-type="maintenance" bgcolor="#DDF2F9">
+								<label><input type="radio" name="openFlag"  value="1" ng-model="openFlag"/>是</label>
+								&nbsp;&nbsp;&nbsp;
+								<label><input type="radio" name="openFlag"  value="0" ng-model="openFlag"/>否</label>
+								&nbsp;&nbsp;&nbsp;
+								<button type="button" class="btn btn-info" ng-click="saveChange1()">儲存</button>
+							</td> 
+						</tr>
+						<tr>
+							<th>&nbsp;營運區：</th>
+							<td><e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeArea()"
+									width="180px"
+									style="line-height:20px;" />
+							</td>
+							<th>分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch()"
+									width="180px"
+									style="line-height:20px;" />
+							</td>							
+							<th ng-if="role == 1" style="padding-left:5px;" bgcolor="#DDF2F9">重新計算</th>
+							<td ng-if="role == 1" bgcolor="#DDF2F9"><e-combobox id="eTime"
+									ng-datasource="mappingSet['timeE']" ng-model="inputVO.yearMonOp"
+									ng-validate="false"
+									ng-readonly="false" ng-editable="false" ng-format="F3"
+									ng-required="false" width="100px" height="30px"
+									style="line-height:20px;" />
+							<button type="button" class="btn btn-info" ng-click="saveChange2()">執行</button></td>	
+						</tr>
+						<tr>
+							<th>&nbsp;專員：</th> 
+							<td><e-combobox id="emp_id" name="emp_id"
+									ng-datasource="EMP_LIST"
+									ng-model="inputVO.emp_id"
+									ng-validate="false"
+									ng-disabled="disableEmpCombo"
+									ng-readonly="disableEmpCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									width="180px"
+									style="line-height:20px;" />
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="inquire()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();inquireInit()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()"
+					function-type="export" ng-disabled="showList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList"></e-jumping>
+			<div class="gv_tab_sc scroll_y"
+				style="height: 235px; white-space: nowrap;">
+				<table class="  table-bordered rstable middle">
+					<thead>
+						<tr>
+							<th rowspan="2">項次</th>
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行別</th>
+							<th rowspan="2">員編</th>
+							<th rowspan="2">姓名</th>
+							<th rowspan="2">組別</th>
+							<th rowspan="2">人員類別</th>
+							<th rowspan="2">計績月數</th>
+							<th rowspan="2">職務異動註記</th>
+							<th colspan="4" class="repeat-row"
+							ng-repeat="row in inquireRoleList"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">{{row.SUB_PROJECT_SEQ_NAME}}</th>
+							<!-- <th rowspan="2">考核總分</th> -->
+							<th rowspan="2">原始分數</th>
+							<th rowspan="2">其他加扣分</th>
+							<th rowspan="2">加權後分數</th>
+							<th rowspan="2">最後分數(100%還原)</th>
+							<th rowspan="2">去年12月成績</th>
+							<th rowspan="2">結算分數</th>
+							<th rowspan="2">全行排名</th>
+							<th rowspan="2">各級平均分數</th>
+							<th rowspan="2">全行平均分數</th>
+						</tr>
+						<tr>
+							<th class="repeat-row" ng-repeat="x in showList" 
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">{{x[1]}}</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.NUM }}</td>
+							<td align="center">{{row.REGION_CENTER_NAME }}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME }}</td>
+							<td align="center">{{row.BRANCH_NAME }}</td>
+							<td align="center">{{row.EMP_ID }}</td>
+							<td align="center">{{row.EMP_NAME }}</td>
+							<td align="center">{{row.PERSON_GROUP }}</td>
+							<td align="center">{{row.PERSON_TYPE_NAME }}</td>
+							<td align="center">{{row.CNT_MON }}</td>
+							<td align="center">{{row.DUTY_CHANGE }}</td>
+							<!-- 存投保收益 -->
+							<!-- <td class="tdSpan" align="center"
+								ng-repeat="row1 in inquireRoleList" colspan="4">
+								<span class="spanTD" align="right"  style="width: 23%"
+								ng-bind="row['REAL_'+{{row1.SUB_PROJECT_SEQ_ID}}]"></span>
+								<span class="spanTD" align="right" style="width: 23%"
+								ng-bind="row['TARGET_'+{{row1.SUB_PROJECT_SEQ_ID}}]"></span>
+								<span class="spanTD" align="right" style="width: 31%"
+								ng-bind="row['RATE_'+{{row1.SUB_PROJECT_SEQ_ID}}]"></span>
+								<span class="spanTD" align="right" style="width: 23%"
+								ng-bind="row['SCORE_'+{{row1.SUB_PROJECT_SEQ_ID}}]"></span>
+							</td> -->
+							<td align="right" style="text-align: right" class="repeat-row" ng-repeat="value in getListByComma(row.listValue) track by $index">{{value}}</td>
+							<!-- <td align="right">{{row.ALL_SCORE }}</td> -->
+							<td align="right">{{row.ORI_SCORE }}</td>
+							<td align="right">{{row.OTHER_SCORE }}</td>
+							<td align="right">{{row.ADDAFT_SCORE }}</td>
+							<td align="right">{{row.NEW_SOCRE }}</td>
+							<td align="right">{{row.LAST_YEAR_SCORE }}</td>
+							<td align="right">{{row.TOTAL_SCORE }}</td>
+							<td align="center">{{row.RANKING }}</td>
+							<td align="right">{{row.LEV_AVG_SCORE }}</td>
+							<td align="right">{{row.FULL_AVG_SCORE }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

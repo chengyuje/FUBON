@@ -1,0 +1,321 @@
+<style type="text/css">
+/* Styling for the title (Month and Year) of the calendar */
+div.title {
+    font: x-large Verdana, Arial, Helvetica, sans-serif;
+    text-align: center;
+    height: 40px;
+    background-color: white;
+    color: black;
+    }
+/* Styling for the footer */
+div.footer {
+    font: small Verdana, Arial, Helvetica, sans-serif;
+    text-align: center;
+    }
+/* Styling for the overall table */
+table {
+    font: 100% Verdana, Arial, Helvetica, sans-serif;
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+    }
+/* Styling for the column headers (days of the week) */
+th {
+    padding: 0 0.5em;
+    text-align: center;
+    background-color:gray;
+    color:white;
+    }
+/* Styling for the individual cells (days) */
+td  {     
+    font-size: medium;
+    padding: 0.25em 0.25em;   
+    width: 14%; 
+    height: 80px;
+    text-align: left;
+    vertical-align: top;
+    }
+/* Styling for the date numbers */
+.date  {     
+    font-size: x-large;
+    padding: 0.25em 0.25em;   
+    text-align: left;
+    vertical-align: top;
+    }
+/* Class for individual days (coming in future release) */
+.sun {
+     color:red;
+     }
+/* Hide the month element (coming in future release) */
+th.month {
+    visibility: hidden;
+    display:none;
+    }
+   
+</style>
+
+<script type="text/javascript" src="assets/txn/TESTWALA/TESTWALA.js"></script>
+
+<div ng-controller="TESTWALAController" ng-cloak>
+
+	<div class="title">{{month}} {{year}}</div>
+		<table border="1">
+			<tr>
+				<th>Sun</th>
+				<th>Mon</th>
+				<th>Tue</th>
+				<th>Wed</th>
+				<th>Thu</th>
+				<th>Fri</th>
+				<th>Sat</th>
+			</tr>
+			
+			<tr>
+				<td ng-repeat = "row in dateList" ng-if="$index >=0 && $index <=6 "><span class="date">{{row.date}}</span>
+				
+					<div ng-show = "row.show_up != true && row.date != '' && $index >0 && $index <6">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_up = true;" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+					</div>
+					<div ng-show = "row.show_up == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_up = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+				<br>
+					<div ng-show = "row.show_down != true && row.date != '' && $index >0 && $index <6">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_down = true;" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+					</div>
+					<div ng-show = "row.show_down == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_down = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+					
+				</td>
+			</tr>
+			
+			<tr>
+				<td ng-repeat = "row in dateList" ng-if="$index >=7 && $index <=13 "><span class="date">{{row.date}}</span>
+				
+					<div ng-show = "row.show_up != true && row.date != '' && $index >7 && $index <13">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_up = true;" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+					</div>
+					<div ng-show = "row.show_up == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_up = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+				<br>
+					<div ng-show = "row.show_down != true && row.date != '' && $index >7 && $index <13">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_down = true;" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+					</div>
+					<div ng-show = "row.show_down == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_down = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+					
+				</td>
+			</tr>
+			
+			<tr>
+				<td ng-repeat = "row in dateList" ng-if="$index >=14 && $index <=20 "><span class="date">{{row.date}}</span>
+				
+					<div ng-show = "row.show_up != true && row.date != '' && $index >14 && $index <20">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_up = true;" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+					</div>
+					<div ng-show = "row.show_up == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_up = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+				<br>
+					<div ng-show = "row.show_down != true && row.date != '' && $index >14 && $index <20">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_down = true;" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+					</div>
+					<div ng-show = "row.show_down == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_down = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+					
+				</td>
+			</tr>
+			
+			<tr>
+				<td ng-repeat = "row in dateList" ng-if="$index >=21 && $index <=27 "><span class="date">{{row.date}}</span>
+				
+					<div ng-show = "row.show_up != true && row.date != '' && $index >21 && $index <27">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_up = true;" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+					</div>
+					<div ng-show = "row.show_up == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_up = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+				<br>
+					<div ng-show = "row.show_down != true && row.date != '' && $index >21 && $index <27">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_down = true;" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+					</div>
+					<div ng-show = "row.show_down == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_down = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+					
+				</td>
+			</tr>
+			
+			<tr>
+				<td ng-repeat = "row in dateList" ng-if="$index >=28 && $index <=34 "><span class="date">{{row.date}}</span>
+				
+					<div ng-show = "row.show_up != true && row.date != '' && $index >28 && $index <34">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_up = true;" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+					</div>
+					<div ng-show = "row.show_up == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_up = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+				<br>
+					<div ng-show = "row.show_down != true && row.date != '' && $index >28 && $index <34">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_down = true;" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+					</div>
+					<div ng-show = "row.show_down == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_down = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+					
+				</td>
+			</tr>
+			
+			<tr>
+				<td ng-repeat = "row in dateList" ng-if="$index >=35 && $index <=41 "><span class="date">{{row.date}}</span>
+				
+					<div ng-show = "row.show_up != true && row.date != '' && $index >35 && $index <41">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_up = true;" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+					</div>
+					<div ng-show = "row.show_up == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_up = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+				<br>
+					<div ng-show = "row.show_down != true && row.date != '' && $index >35 && $index <41">
+						<a class="btn btn-success btn-circle" ng-click="add(row); row.show_down = true;" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+					</div>
+					<div ng-show = "row.show_down == true">
+						<e-combobox id="groups" 
+						ng-datasource="mappingSet['Groups']"
+						ng-model="groups"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="100px"
+						style="line-height:20px;" />
+						<a class="btn btn-danger btn-circle" ng-click="del(row); row.show_down = false; "><i class="glyphicon glyphicon-remove"></i></a>
+					</div>
+					
+				</td>
+			</tr>
+			
+		</table>
+		
+		<div class="modal-footer" style="text-align: center">
+			<button type="button" class="btn btn-primary" ng-click="add_data()" >確定</button>
+			<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+		</div>
+
+		
+</div>

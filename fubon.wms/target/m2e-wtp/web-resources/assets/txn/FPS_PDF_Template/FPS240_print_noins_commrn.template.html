@@ -1,0 +1,95 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+
+
+</style>
+
+<!-- 無投保、無推介 -->
+<div class="print A4" ng-controller="FPSPrintController">
+
+  <!-- header -->
+  <section>
+    <img ng-src="{{path.header}}" class="wrapper" print="header">
+  </section>
+
+  <!-- title -->
+  <section print print-top-margin="-5" style="margin-bottom:2em;" class="wrapper">
+    <div ng-include="path.brief"></div>
+  </section>
+
+  <!-- image -->
+  <section>
+    <img ng-if="rptUrl"
+         data-ng-src="{{rptUrl}}"
+         alt="rptUrleName"
+         style="margin-bottom:1em; width:100%;"
+         print="image"
+         print-page="next"
+         print-scale-direction="vertical">
+  </section>
+
+  <!-- cust -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">1</span>基本資料
+    </div>
+    <div class="block container" style="border-radius: 1em;">
+      <div ng-include="path.custInfo" ng-init="isPrint=true"></div>
+    </div>
+  </section>
+
+  <!-- amt FPS210 -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">2</span>您的規劃金額
+    </div>
+    <div class="wrapper">
+      <p class="sub-title-p">您的資產扣除預期支付後，即為可供理財規劃金額。</p>
+      <div class="ps-wrapper" style="float:right;">單位: 新台幣 元</div>
+    </div>
+
+    <div ng-include="path.validAmount"></div>
+    <div ng-include="path.validAmount_ps"></div>
+  </section>
+
+  <!-- charts FPS220 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">3</span>配置比例與商品明細
+      </div>
+    </div>
+
+    <!-- 無投保 -->
+    <div ng-include="path.firstPlanChart" print print-unique="true"></div>
+    <div ng-include="path.firstPlanChart_ps" print></div>
+  </section>
+
+  <section print>
+    <div ng-include="path.noSignAlert"></div>
+  </section>
+
+  <!-- 使用指南 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">4</span>規劃書使用指南
+      </div>
+    </div>
+
+    <div ng-include="path.manual" print></div>
+  </section>
+
+  <!-- 注意事項 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">5</span>注意事項
+      </div>
+    </div>
+
+    <div ng-include="path.notice" print></div>
+  </section>
+  <div id="hiddendom"></div>
+</div>

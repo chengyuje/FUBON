@@ -1,0 +1,92 @@
+<div class="block container"
+     ng-if="block.list && block.list.length>0"
+     style="border-color:#93c5e1;"
+     ng-style="{'margin': index>1?'-3px auto 0 auto':'0 auto'}"
+     print-wrapper>
+  <div class="title subtitle title-left">
+    <span ng-bind="block.title"></span>
+    <div class="subtitle"
+         style="display:inline-block;">
+      (配置比例
+      <span ng-bind="block.nowPct"></span>% &rarr;
+      <span ng-bind="block.pct"></span>%)
+    </div>
+  </div>
+
+  <table class="table talbe-bordered">
+    <thead>
+      <tr>
+        <th style="width:23%">商品</th>
+        <th style="width:12%;">市值</th>
+        <th style="width:10%;">約當台幣</th>
+        <th style="width:5%;">比例</th>
+        <th style="width:2%;background-color: #fff"></th>
+        <th style="width:23%">商品</th>
+        <th style="width:10%;">調整後金額</th>
+        <th style="width:10%;">約當台幣</th>
+        <th style="width:5%;">比例</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in block.list"
+          print-cell>
+        <td class="text-left">
+          <!-- 商品 -->
+          <span ng-if="row.NOW_AMT&&(row.INV_PRD_TYPE_2==='1'||row.INV_PRD_TYPE_2==='2')"
+                ng-bind="row.INV_PRD_TYPE_2|mapping: mapping.invProdType"></span>
+          <span ng-if="row.NOW_AMT&&(row.INV_PRD_TYPE_2!=='1'&&row.INV_PRD_TYPE_2!=='2')"
+                ng-bind="row.PRD_CNAME"></span>
+          <div ng-if="!row.NOW_AMT"
+               class="text-center">--</div>
+        </td>
+        <td>
+          <!-- 原幣市值 -->
+          <div class="text-right"
+               ng-if="row.NOW_AMT">
+            <span ng-bind="row.TRUST_CURR"></span><br/>
+            <span ng-bind="(row.TRUST_CURR==='TWD'?row.NOW_AMT_TWD:row.NOW_AMT)|number"></span>
+          </div>
+          <div ng-if="!row.NOW_AMT">--</div>
+        </td>
+        <td class="text-right">
+          <!-- 台幣市值-->
+          <div ng-bind="row.NOW_AMT_TWD|number"
+               ng-if="row.NOW_AMT"></div>
+          <div ng-if="!row.NOW_AMT">--</div>
+        </td>
+        <td>
+          <!-- 比例 -->
+          <div ng-if="row.NOW_AMT">
+            <span ng-bind="row.NOW_INV_PERCENT|number"></span>%
+          </div>
+          <div ng-if="!row.NOW_AMT">--</div>
+        </td>
+        <td>
+          <!-- 三角形 -->
+          <span class="glyphicon glyphicon-play"
+                aria-hidden="true"></span>
+        </td>
+        <td class="text-left">
+          <!-- 商品 -->
+          <span ng-if="row.PTYPE !== 'NANO' && (row.INV_PRD_TYPE_2==='1'|| row.INV_PRD_TYPE_2==='2')"
+                ng-bind="row.INV_PRD_TYPE_2|mapping: mapping.invProdType"></span>
+          <span ng-if="row.PTYPE === 'NANO' || (row.INV_PRD_TYPE_2!=='1'&&row.INV_PRD_TYPE_2!=='2')"
+                ng-bind="row.PRD_CNAME"></span>
+        </td>
+        <td class="text-right">
+          <!-- 原幣市值 -->
+          <span ng-bind="row.TRUST_CURR"></span><br/>
+          <span ng-bind="row.PURCHASE_ORG_AMT|number"></span>
+        </td>
+        <td class="text-right">
+          <!-- 台幣市值-->
+          <div ng-bind="row.PURCHASE_TWD_AMT|number"></div>
+        </td>
+        <td>
+          <!-- 比例 -->
+          <span ng-bind="row.INV_PERCENT|number"></span>%
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

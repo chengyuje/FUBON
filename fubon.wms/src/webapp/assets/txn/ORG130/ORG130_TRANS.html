@@ -1,0 +1,108 @@
+<style>
+/* dialog panl */
+.modal-dialog.ORG130_TRANS {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/ORG130/ORG130_TRANS.js"></script>
+
+<div ng-controller="ORG130_TRANSController" ng-cloak>
+	<div class="modal-dialog ORG130_TRANS"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="left">轉介至他行</h4>
+			</div>
+ 			<div class="modal-body">
+				<table width="100%">
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-2 tdpadding">面試者ID：</th>
+						<td class="col-md-3 tdpadding">{{inputVO.cust_id}}</td>
+						<th class="col-md-2 tdpadding">面試者姓名：</th>
+						<td class="col-md-3 tdpadding">{{inputVO.emp_name}}</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-2 tdpadding">轉介至：</th>
+						<th class="col-md-2 tdpadding">業務處：</th>
+						<td class="col-md-6 tdpadding" colspan="2">
+							<e-combobox id="region_center_id" name="region_center_id" 
+										ng-datasource="mappingSet['region']"
+								      	ng-model="inputVO.region_center_id"
+								      	ng-validate="false" 
+								       	ng-readonly="false" 
+								       	ng-editable="false"
+								       	ng-change="regionChange()"
+								       	ng-format="F3"
+								       	ng-required="true"
+								       	ng-required="false"			         
+								       	style="line-height:20px;" />
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-2 tdpadding"></th>
+						<th class="col-md-2 tdpadding">營運區：</th>
+						<td class="col-md-6 tdpadding" colspan="2">
+						    <e-combobox id="branch_area_id" name="branch_area_id" 
+										ng-datasource="mappingSet['op']"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-required="true"
+										ng-change="areaChange()"
+										ng-format="F3"
+										style="line-height:20px;" />
+							</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-2 tdpadding"></th>
+						<th class="col-md-2 tdpadding">分行：</th>
+						<td class="col-md-6 tdpadding" colspan="2">
+							<e-combobox id="branch_nbr" name="branch_nbr" 
+										ng-datasource="mappingSet['branch']"
+										ng-model="inputVO.branch_nbr"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-required="true"
+										ng-format="F1"
+										style="line-height:20px;" />
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-2 tdpadding"></th>
+						<th class="col-md-2 tdpadding">備註：</th>
+						<td class="col-md-6 tdpadding" colspan="2"><input type="text" class="form-control" ng-required="true" ng-model="inputVO.trans_remark" e-length-limit="500" size="20"></td>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="trans()" ng-disabled="inputVO.region_center_id == '' || inputVO.region_center_id == undefined || 
+																						   inputVO.branch_area_id == '' || inputVO.branch_area_id == undefined || 
+																						   inputVO.branch_nbr == '' || inputVO.branch_nbr == undefined ||
+																						   inputVO.trans_remark == '' || inputVO.trans_remark == undefined" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+		</div>
+	</div>
+</div>

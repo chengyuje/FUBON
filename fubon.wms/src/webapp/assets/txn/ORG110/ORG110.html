@@ -1,0 +1,154 @@
+<script type="text/javascript" src="assets/txn/ORG110/ORG110.js"></script>
+<script type="text/javascript" src="assets/txn/ORG110/ORG110_REVIEW.js"></script>
+<div class="ORG110" ng-controller="ORG110Controller" ng-cloak>		
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr ng-if="!memLoginFlag.startsWith('uhrm')">
+						<th width="16.6%">業務處：</th>
+						<td width="16.6%">
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion(region)"
+										style="line-height:20px;" />
+					   	</td>
+						<th width="16.6%">營運區：</th>
+						<td width="16.6%">
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(region)"
+										style="line-height:20px;" />
+					   	</td>
+						<th width="16.6%">分行：</th>
+						<td width="16.6%">
+							<e-combobox id="branch_nbr" name="branch_nbr"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_nbr"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeBranch(region)"
+										style="line-height:20px;" />
+				   		</td>
+					</tr>
+					<tr>
+						<th>員工編號：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." id="tipOrgName" name="tipOrgName" ng-model="inputVO.EMP_ID" e-length-limit="60"></td>
+						<th>員工姓名：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." id="tipOrgName" name="tipOrgName" ng-model="inputVO.EMP_NAME" e-length-limit="60"></td>
+						<th>AO Code：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." id="tipOrgName" name="tipOrgName" ng-model="inputVO.AO_CODE" e-length-limit="60" style="text-transform: uppercase;"></td>
+					</tr>
+					
+					<tr>
+						<th>職稱：</th>
+						<td>
+							<e-combobox id="jobTitleId" 
+										ng-paramtype="ORG.JOB_TITLE_NAME_SEARCH"
+										ng-model="inputVO.JOB_TITLE_NAME"
+					   					ng-validate="false" 
+					   					ng-readonly="false" 
+					   					ng-editable="false"
+					   					ng-format="F3"
+					   					ng-required="false"
+					   					style="line-height:20px;" />
+					   	</td>
+						<th>是否有相片：</th>
+						<td>
+							<e-combobox id="" 
+										ng-paramtype="COMMON.YES_NO"
+										ng-model="inputVO.PHOTO_FLAG"
+					   					ng-validate="false" 
+					   					ng-readonly="false" 
+					   					ng-editable="false"
+					   					ng-format="F3"
+					   					ng-required="false"/>
+					   	</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="getOrgMemberLst()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()" >清除</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="getOrgMemberLst()" list="orgMemberLst"></e-jumping>
+			<div class="gv_tab_sc scroll_y">
+				<table>
+				<thead>
+					<tr>
+						<th style="width:15%">業務處</th>
+						<th style="width:10%">營運區</th>
+						<th style="width:10%">分行</th>
+						<th style="width:10%">員工</th>
+						<th style="width:20%">職稱</th>
+						<th style="width:10%">AO Code</th>
+						<th style="width:15%">相片</th>
+						<th style="width:10%">覆核狀態</th>
+						<th style="width:10%">休假</th>
+						<th style="width:10%">回復權限</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" align="center" ng-repeat="row in orgMemberLst track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{row.REGION_CENTER_NAME}}</td>
+						<td>{{row.BRANCH_AREA_NAME}}</td>
+						<td><a href="" ng-Click="openORG210(row)">{{row.BRANCH_NAME}}</a></td>
+						<td>
+							<a href="" ng-Click="openORG111(row)">{{row.EMP_ID}}-{{row.EMP_NAME}}</a>
+						</td>
+						<td>{{row.TW_ROLE_TYPE}}{{row.JOB_TITLE_NAME}}</td>
+						<td>
+							<a href="" ng-click="openORG120(row)" ng-if="(row.AO_CODE != '' || row.AO_CODE != undefined) && (row.PRIVILEGEID == '002' || row.PRIVILEGEID == '003')">{{row.AO_CODE}}</a>
+						</td>
+						<td class="text-center" ng-if="row.PHOTO_FLAG == 'Y'">
+							<a href="" ng-click="getProfilePicture(row)" ng-if="row.pictureSrc=='' || row.pictureSrc==undefined">{{row.PHOTO_FLAG | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</a>
+							<img ng-click="row.pictureSrc=''" ng-if="row.pictureSrc!='' && row.pictureSrc!=undefined" ng-src="{{row.pictureSrc}}" style="max-height: 208px; max-width: 168px"/>
+						</td>
+						<td class="text-center" ng-if="row.PHOTO_FLAG=='N'">{{row.PHOTO_FLAG | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+						<td>
+							<font style="color:red" ng-show="row.REVIEW_STATUS == 'W'">{{(row.REVIEW_STATUS | mapping:mappingSet['COMMON.REVIEW_STATUS']:'F3')}}</font>
+							<font ng-show="row.REVIEW_STATUS != 'W'"><button type="button" class="btn btn-default" ng-hide="row.COUNTS == 0" ng-click="getReviewList(row)">異動歷程</button></font>
+						</td>
+                        <td>{{row.ISUNAUTHED == "Y" ? "Y" : "N"}}</td>
+                        <td><a href="" ng-show="row.ISUNAUTHED == 'Y'" ng-Click="cancelUnauth(row)">回復權限</a></td>
+					</tr>
+				</tbody>
+			</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

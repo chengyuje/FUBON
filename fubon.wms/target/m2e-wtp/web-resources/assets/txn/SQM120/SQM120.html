@@ -1,0 +1,284 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+
+/* check box css */
+input.faChkRnd, input.faChkSqr {
+  visibility: hidden;
+}
+input.faChkRnd:checked:after, input.faChkRnd:after,
+input.faChkSqr:checked:after, input.faChkSqr:after {
+  visibility: visible;
+  font-family: FontAwesome;
+  font-size:25px;height: 17px; width: 17px;
+  position: relative;
+  top: -3px;
+  left: 0px;
+  background-color:#FFF;
+  display: inline-block;
+}
+
+input.faChkRnd:checked:after {
+  content: '\f058';
+}
+
+input.faChkRnd:after {
+  content: '\f10c';
+}
+
+input.faChkSqr:checked:after {
+  content: '\f14a';
+}
+
+input.faChkSqr:after {
+  content: '\f096';
+}
+/* check box css */
+
+</style>
+
+<script type="text/javascript" src="assets/txn/SQM120/SQM120.js"></script>
+<script type="text/javascript" src="assets/txn/SQM120/SQM120_edit.js"></script>
+<script type="text/javascript" src="assets/txn/SQM120/SQM120_contents.js"></script>
+<script type="text/javascript" src="assets/txn/SQM120/SQM120_flowDetail.js"></script>
+<!-- <script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script> -->
+
+<div class="SQM120" ng-controller="SQM120Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box">
+				<table>
+					<tr>						
+						<th><span style="color:red;" text-align='left'>*</span>交易日起訖：</th>
+						<td colspan="7">							
+							<div class="input-group datebox datewidth" style="float:left">
+								<input type="text" id="sCreDate" name="sCreDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.sCreDate"
+								is-open="model.a"
+								datepicker-options="bgn_sDateOptions"								
+								ng-readonly="true"								
+								ng-change="limitDate();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>																					
+							<div style="float:left">&nbsp; ～ &nbsp;</div>	
+							<div class="input-group datebox datewidth" style="float:left">
+								<input type="text" id="eCreDate" name="eCreDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.eCreDate"
+								is-open="model.b"
+								datepicker-options="bgn_eDateOptions"								
+								ng-readonly="true"								
+								ng-change="limitDate();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>								
+						</td>											    											
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+							ng-datasource="REGION_LIST"
+							ng-model="inputVO.region_center_id"
+							ng-validate="false" 
+							ng-disabled="AVAIL_REGION.length == 1"
+							ng-readonly="AVAIL_REGION.length == 1"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change="ChangeRegion(region)"
+							width="155px"
+							style="line-height:20px;" />
+						</td>						
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+							ng-datasource="AREA_LIST"
+							ng-model="inputVO.branch_area_id"
+							ng-validate="false" 
+							ng-disabled="AVAIL_AREA.length == 1"
+							ng-readonly="AVAIL_AREA.length == 1"
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change="ChangeArea(region)"
+							width="100px"
+							style="line-height:20px;" />
+						</td>
+						<th>分行別：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-disabled="AVAIL_BRANCH.length == 1"
+							ng-readonly="AVAIL_BRANCH.length == 1"
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="true"
+							ng-change="ChangeBranch(region)"
+							width="150px"
+							style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th>問卷別：</th>
+						<td>
+							<e-combobox id="qtn_type" name="qtn_type"
+							ng-datasource="QTN_LIST"
+							ng-model="inputVO.qtn_type"
+							ng-validate="false" 
+							ng-editable="false"
+							ng-format="F3"
+							width="150px"
+							style="line-height:20px;" />
+						</td>
+						<th>員編：</th>
+						<td>		
+							<e-combobox id="emp_id" name="emp_id"
+										ng-datasource="EMP_LIST"
+										ng-model="inputVO.emp_id"
+										ng-validate="false" 
+										ng-disabled="EMP_LIST.length == 2"
+										ng-readonly="EMP_LIST.length == 2" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeEmp_id(region)"
+										style="line-height:20px;" />					 					 
+						</td>
+						
+						<th>客戶ID：</th>
+						<td><input type="text" ng-model="inputVO.cust_id" style="width: 100px; "/></td>
+					</tr>	
+					<tr>
+						<th ng-show="headmgr_flag " >案件覆核人：</th>
+							<td>		
+								<e-combobox id="OWNER_EMP_ID" name="OWNER_EMP_ID"
+											ng-datasource="EMP_LIST"
+											ng-model="inputVO.owner_emp_id"
+											ng-validate="false" 
+											ng-disabled="EMP_LIST.length == 2"
+											ng-readonly="EMP_LIST.length == 2" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="false"
+											ng-show="headmgr_flag " 
+											style="line-height:20px;" />					 					 
+							</td>
+					</tr>				
+				</table>
+			</div>
+			<div class="search_box_btn">
+				 <span style="color:red;" text-align='left'>依問卷『整體滿意度』分類</span>
+				 <div style="text-align: center;">
+					<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="init();limitDate()">清除</button>
+				 </div>	
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">			    
+			<e-jumping-once output="outputVO" list="paramList" totallist="totalData"></e-jumping-once>
+	<!-- 	<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping> -->	
+			
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-left="8" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th>功能</th>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="A.BRANCH_NBR" e-query="query()">分行別</e-sorter>
+							</th>
+							<th>員編</th>
+							<th>AO_CODE</th>
+							<th>客戶姓名</th>
+							<th>客戶ID</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="TRADE_DATE" e-query="query()">交易日期</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="RESP_DATE" e-query="query()">回覆日期</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="QTN_TYPE" e-query="query()">問卷類別</e-sorter>
+							</th>
+							<th>處理狀態</th>					
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+							<td style="	vertical-align:middle;"  align="center" >
+							<button type="button" class="btn btn-warning btn-circle" ng-click="edit(row)" >
+								<i class="glyphicon glyphicon-pencil" title="修改"></i>
+							</button>
+							<button type="button" class="btn btn-info btn-circle" ng-click="printPdf(row)" ng-show="row.CASE_NO != null && headmgr_flag " >
+								<i class="glyphicon glyphicon-print" title="列印"></i>
+							</button>
+							</td>
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							<td>{{row.BRANCH_AREA_NAME}}</td></td>
+							<td>{{row.BRANCH_NBR}}<ps ng-show="row.BRANCH_NAME">-</ps>{{row.BRANCH_NAME}}</td>
+							<td>{{row.EMP_ID}}<ps ng-show="row.EMP_NAME">-</ps>{{row.EMP_NAME}}</td></td>
+							<td>{{row.AO_CODE}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.TRADE_DATE}}</td>
+							<td>{{row.RESP_DATE}}</td>
+							<td>{{row.QTN_TYPE | mapping:QTN_LIST}}</td>
+							<td>
+							<button ng-show="row.CASE_STATUS_FLAG != null" style="color:#FFFFFF;width:100px" type="button" class="btn" ng-click="queryFlowDetail(row)" ng-class ="{'btn-warning':(row.CASE_STATUS_FLAG==3||row.CASE_STATUS_FLAG==4),'btn-success':(row.CASE_STATUS_FLAG==1||row.CASE_STATUS_FLAG==2)}">{{row.CASE_STATUS_FLAG | mapping:STATUS_LIST}}</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div>
+				<table>
+					<tr>
+						<td>說明：<br>
+						<span style="color:red;" text-align='left'>
+						(1) 「投資保險」、「個金RM」問卷中，<u>任一題</u>客戶回覆【不滿意/非常不滿意】，即需撰寫改善報告。<br>
+						(2) 「開戶」、簡訊問卷中，依客戶回覆<u>整體滿意度</u>【不滿意/非常不滿意】， 即需撰寫改善報告。<br>
+						(3) 「櫃檯」問卷中，依客戶回覆等候或整體滿意度【不滿意/非常不滿意】即需撰寫改善報告。
+						</span>
+						</td>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+			<br>
+			
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

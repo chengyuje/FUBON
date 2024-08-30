@@ -1,0 +1,223 @@
+<style>
+.CMMGR005 .paddingRight0{
+	padding-right: 0;
+}
+.CMMGR005 .paddingLeft0{
+	padding-left: 0;
+}
+.CMMGR005 .rowOdd{
+	background-color: white;
+}
+.CMMGR005 .rowEven{
+	background-color: lightgray;
+}
+.CMMGR005 .rowOdd:hover,.rowEven:hover{
+	background-color: lightskyblue !important;
+}
+.CMMGR005 .search_box TH + TD{
+	line-height:15px;
+	width: auto;
+}
+.CMMGR005 .datebox{
+	width:25%; 
+	min-width:190px;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/CMMGR005/CMMGR005.js"></script>
+<script type="text/javascript" src="assets/txn/CMMGR005/CMMGR005_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/CMMGR005/CMMGR005_SHOW_EXETIME.js"></script>
+<div ng-controller="CMMGR005Controller" ng-cloak>
+<div class="container CMMGR005">
+  <!-- left, vertical navbar & content -->
+  <div class="row">
+    <!-- left, vertical navbar -->
+    <!-- content -->
+    <div class="col-md-12"> <!-- InstanceBeginEditable name="Content" -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="text-muted bootstrap-admin-box-title"><i class="glyphicon glyphicon-th-large"></i>排程監控</div>
+            </div>
+
+            <div class="bootstrap-admin-panel-content text-muted search_box">
+              <form>
+              	<table>
+                    <tr>
+                    	<th></th>
+                        <th>執行單位代碼：</th>
+                        <td>
+                        <input type="number" class="form-control"
+							id="auditid" name="auditid"
+							ng-model="inputVO.auditid"
+							placeholder="執行單位代碼" maxlength="19" autofocus>
+						</td>
+						<th>JOB代號：</th>
+                        <td>
+                        <input type="text" class="form-control"
+							id="jobId" name="jobId"
+							ng-model="inputVO.jobId"
+							placeholder="JOB代號" maxlength="19">
+						</td>
+						<th>排程代號：</th>
+                        <td>
+                        <input type="text" class="form-control"
+							id="scheduleId" name="scheduleId"
+							ng-model="inputVO.scheduleId"
+							placeholder="排程代號" maxlength="20">
+						</td>
+						<th></th>
+                    </tr>
+                    </table>
+                    <table>
+                	<tr>
+                		<th></th>
+						<th>種類：</th>
+                        <td>
+                        	<e-combobox id="type" name="type"
+								ng-disabled="eComboDisabled"
+								ng-paramtype="CMMGR005.TYPE"
+								ng-model="inputVO.type"
+								ng-validate="true"
+						    	ng-readonly="false"
+						    	ng-editable="false"
+						    	ng-format="F3"
+						    	ng-required="false"
+						    	width="100%"/>
+                        </td>
+						<th>狀態：</th>
+                        <td>
+                        	<e-combobox id="status" name="status"
+								ng-disabled="eComboDisabled"
+								ng-paramtype="CMMGR005.STATUS"
+								ng-model="inputVO.status"
+								ng-validate="true"
+						    	ng-readonly="false"
+						    	ng-editable="false"
+						    	ng-format="F3"
+						    	ng-required="false"
+						    	width="100%"/>
+                        </td>
+                        <th>結果：</th>
+                        <td>
+                        	<e-combobox id="result" name="result"
+								ng-disabled="eComboDisabled"
+								ng-paramtype="CMMGR005.RESULT"
+								ng-model="inputVO.result"
+								ng-validate="true"
+						    	ng-readonly="false"
+						    	ng-editable="false"
+						    	ng-format="F3"
+						    	ng-required="false"
+						    	width="100%"/>
+                        </td>
+                        <th></th>
+                    </tr>
+                    </table>
+                    <table>
+                     <tr>
+                     	<th></th>
+                     	<th>起日：</th>
+           				<td>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="startDate" name="startDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.startDate"
+								is-open="model.a"
+								datepicker-options="startDateOptions"
+								ng-readonly="true"
+								ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</td>
+	                	<th>迄日:</th>
+	            		<td>
+		            		<div class="input-group datebox datewidth">
+								<input type="text" id="endDate" name="endDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.endDate"
+								is-open="model.b"
+								datepicker-options="endDateOptions"
+								ng-readonly="true"
+								ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+	            		</td>
+	            		<td style="width:26%;">
+	            		</td>
+	            		<th></th>  
+	            	</tr>      
+                </table> 
+                <div class="search_box_btn text-center">
+                  <button type="button"  class="btn btn-primary" ng-click="inquireInit();inquire()" function-type="query" >查詢</button>
+                  <button type="button" class="btn btn-default" ng-click="init()">清除</button>
+                  <button type="button" class="btn btn-info" ng-click="showExecuteTime()">批次執行時間</button>
+                </div>  
+              </form>
+            </div>
+
+                <div class="bootstrap-admin-panel-content" style="position:relative;">
+                <!-- 2016/6/6 By:David modify:e-Paging->e-jumping -->
+                	<e-jumping 
+		          		output="outputVO"
+		          		input="inputVO"
+			           	query="inquire()"			           		
+			           	list="paramList"
+		           	></e-jumping> 
+                    
+                		<table class="table table-striped table-bordered">
+                  			<thead>
+                    			<tr>
+                     				<th scope="col"><br>執行單位代碼</th>
+                      				<th scope="col">排程代號<br>JOB代號</th>
+                      				<th scope="col">開始執行時間<br>結束執行時間</th>
+                      				<th scope="col"><br>種類</th>
+                                    <th scope="col">狀態<br>結果</th>
+                                    <th scope="col"><br>訊息</th>
+                                    <th scope="col"><br>自訂訊息</th>
+                                    <!-- <th scope="col">總筆數<br>失敗筆數</th> -->
+                                    <!-- <th scope="col">新增筆數<br>修改筆數</th> -->
+                    			</tr>
+                  			</thead>
+                  			<tbody>
+                    			<tr ng-repeat="row in paramList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                      				<td><a href="/messageInquire/{{row.AUDITID}}" onclick="return false" ng-click="messageInquire(row)">{{row.AUDITID}}</a></td>
+                      				<td>{{row.SCHEDULEID}}<br>{{row.JOBID}}</td>
+                      				<td>{{row.STARTTIME}}<br>{{row.ENDTIME}}</td>
+                      				<td>{{row.TYPE | mapping:mappingSet['CMMGR005.TYPE']:'F3'}}</td>
+                      				<td>{{row.STATUS | mapping:mappingSet['CMMGR005.STATUS']:'F3'}}<br>{{row.RESULT | mapping:mappingSet['CMMGR005.RESULT']:'F3'}}</td>
+                      				<td>{{row.DESCRIPTION}}</td>
+                      				<td>{{row.MEMO}}</td>
+                      				<!-- <td>{{row.TOTALRECORD}}<br>{{row.FAILRECORD}}</td> -->
+                                    <!-- <td>{{row.INSERTRECORD}}<br>{{row.UPDATERECORD}}</td> -->
+                    			</tr>
+                  			</tbody>
+                		</table>
+<!--           		outputVO為java端下行之body，預設請使用此名稱，若有多筆分頁同時進行時，才自行命名outputVO2、outputVO3...等 -->
+<!--           		inputVO為java端上行之body，預設請使用此名稱，若有多筆分頁同時進行時，才自行命名inputVO2、inputVO3...等 -->
+<!--           		callQuery="inquire()"為非同步時要查詢function，需對應至Controller內之function，若無特殊需求，請統一用此命名-->
+<!-- 				displayLimit為每次顯示的筆數，繼承自BaseController，須與ng-repeat="... limitTo:displayLimit"中displayLimit相符，無需修改 -->
+<!-- 				dataList="paramList" 實際顯示的資料內容，命名請與js裡的$scope.pagingList($scope.paramList, tota[0].body.paramList)中scope.paramList一致-->
+		          		
+                </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

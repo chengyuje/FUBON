@@ -1,0 +1,63 @@
+<style>
+    /* open dialog */
+    .ngdialog.CRM827_SI {
+
+    }
+</style>
+<script type="text/javascript" src="assets/txn/CRM824/CRM824.js"></script>
+<script type="text/javascript" src="assets/txn/CRM827/CRM827_SI.js"></script>
+
+<div class="CRM827_SI" ng-controller="CRM827_SIController" ng-cloak>
+    <h4 class="h4-title">組合式商品(SI)</h4>
+    <div class="search_table search_box3">
+        <table>
+            <tr>
+                <th>(約當臺幣)</th>
+                <td colspan = "3"></td>
+            </tr>
+            <tr>
+                <th>庫存總面額：</th>
+                <td colspan = "3">{{SUMIVAMT2 | number :0}}</td>
+            </tr>
+            <tr>
+                <th>含息總報酬率：</th>
+                <td colspan = "3">{{Return | number :2}}%</td>
+            </tr>
+        </table>	
+    </div>
+    <e-jumping-once output="outputVO" list="data" totallist="SIList"></e-jumping-once>
+    <div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+        <table class="modal-body table-bordered">
+            <tr>
+                <th>商品代號</th>
+                <th>商品名稱</th>
+                <th>商品幣別</th>
+                <th>庫存面額</th>
+                <th>交易日</th>
+                <th>起息日</th>
+                <th>最新配息日</th>
+                <th>累計配息率</th>
+                <th>最新參考贖回報價</th>
+                <th>含息報價</th>
+                <th>含息報酬率</th>
+                <th>參考市值</th>
+                <th>契約編號</th>
+            </tr>
+            <tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                <td style="text-align: left;">{{row.PROD_ID}}</a></td>
+                <td style="text-align: left;">{{row.PROD_NAME}}</td>
+                <td style="text-align: left;">{{row.CRCY_TYPE}}</a></td>
+                <td style="text-align: center;">{{row.INV_AMT | currency:''}}</td>
+                <td style="text-align: center;">{{toJsDate(row.START_DATE) | date:"yyyy-MM-dd"}}</td>
+                <td style="text-align: center;">{{toJsDate(row.DUE_DATE) | date:"yyyy-MM-dd"}}</td>
+                <td style="text-align: center;">{{toJsDate(row.LATEST_PAYDAY) | date:"yyyy-MM-dd"}}</td>
+                <td style="text-align: center;">{{row.DIV_RATE}}{{row.DIV_RATE != null && row.DIV_RATE != undefined && row.DIV_RATE != '' ? '%' : ''}}</td>
+                <td style="text-align: center;">{{row.REDEEM_PRICE | currency:''}}</td>
+                <td style="text-align: right;">{{row.INT_PRICE | currency:''}}</td>
+                <td style="text-align: right;">{{row.RATE_OF_RETURN }}{{row.RATE_OF_RETURN != null && row.RATE_OF_RETURN != undefined && row.RATE_OF_RETURN != '' ? '%' : ''}}</td>
+                <td style="text-align: right;">{{row.REF_VAL | currency:''}}</td>
+                <td align="center">{{inputVO.contract_no}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

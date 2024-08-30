@@ -1,0 +1,304 @@
+<style> 
+.datewidth{
+	width:120px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS496/PMS496.js"></script>
+<div class="PMS496" ng-controller="PMS496Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>						
+						<th><font color=red>＊</font>資料月份：</th>
+						<td class="form-inline" colspan="1">
+		                	<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="importSDate" name="importSDate"
+										   	class="form-control"
+											uib-datepicker-popup="yyyyMM"
+											ng-model="inputVO.importSDate"
+											is-open="model.e"
+											datepicker-options="importStartDateOptions"
+									   		datepicker-mode="'month'"
+											ng-readonly="true"
+											ng-change="limitDate();dateChange()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="importEDate" name="importEDate"
+										   	class="form-control"
+											uib-datepicker-popup="yyyyMM"
+											ng-model="inputVO.importEDate"
+											is-open="model.f"
+											datepicker-options="importEndDateOptions"
+									   		datepicker-mode="'month'"
+											ng-readonly="true"
+											ng-change="limitDate()" 
+											ng-disabled="inputVO.importSDate == undefined" />
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'f')" ng-disabled="inputVO.importSDate == undefined" ng-readonly="inputVO.importSDate == undefined">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+						<th>交易類別：</th>
+						<td>							
+							<e-combobox ng-datasource="mappingSet['PMS.SHORT_PRD_TYPE']"
+										ng-model="inputVO.PRD_TYPE"
+					   					ng-validate="false" 
+					   					ng-readonly="false" 
+					   					ng-editable="false"
+					   					ng-format="F3"
+					   					ng-required="false"/>
+						</td>
+						<th ng-if="inputVO.PRD_TYPE == 'FUND'">進出頻率：</th>
+						<td ng-if="inputVO.PRD_TYPE == 'FUND'">							
+							<input type="radio" ng-model="inputVO.freqType" value="1"><label>７日內</label>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" ng-model="inputVO.freqType" value="2"><label>８–３０日內</label>							
+						</td>
+						<th ng-if="inputVO.PRD_TYPE == 'BOND'">進出頻率：</th>										    												
+						<td ng-if="inputVO.PRD_TYPE == 'BOND'">							
+							<input type="radio" ng-model="inputVO.freqType" value="1"><label>３個月內</label>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" ng-model="inputVO.freqType" value="2"><label>４–６個月</label>
+						</td>
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeRegion(test)"
+										style="line-height:20px;" />
+						</td>		
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeArea(test)"
+										style="line-height:20px;" />
+						</td>
+						<th>分行：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_nbr"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeBranch(test)"
+										style="line-height:20px;" />
+						</td>						
+						<th>理專：</th>
+						<td>
+							<e-combobox id="aoCode" name="aoCode"
+										ng-datasource="AO_LIST"
+										ng-model="inputVO.aoCode"
+										ng-validate="false"
+										ng-disabled="AVAIL_AO_CODE.length == 1"
+										ng-readonly="AVAIL_AO_CODE.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeAo_code(test)"
+										style="line-height:20px;" />						 
+						</td>
+					</tr>
+					<tr>
+						<th>已回覆/未回覆：</th>
+						<td>
+							<e-combobox id="noteStatus" name="noteStatus" 
+										ng-paramtype="PMS.NOTE_STATUS"
+										ng-model="inputVO.noteStatus"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										style="line-height:20px;"/>
+						</td>
+						<th>客戶ID：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" e-length-limit="60" style="width:150px; text-transform: uppercase;"></td>
+						<th></th>
+						<td></td>						
+						<th></th>
+						<td></td>
+					</tr>				
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1" function-type="export">匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：每月10號(註：報表產出日)</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="700px" e-mode="1" e-top="true" e-left="6" e-list="paramList">
+					<thead>
+						<tr>
+							<th ng-show="chkMaintenance">更新<br>資料</th>
+							<th>序號</th>
+							<th>私銀註記</th>
+							<th>資料月份</th>
+							<th>分行<br>代號</th>
+							<th>分行名稱</th>
+							
+							<th>交易類別</th>
+							<th>申購日期</th>
+							<th>贖回日期</th>
+							<th>憑證號碼</th>
+							<th>產品代號</th>
+							<th>商品名稱</th>
+							<th>計價幣別</th>
+							<th>參考贖回金額</th>
+							<th>相關配息</th>
+							<th>投資金額</th>
+							<th>相關手續費<br>(e.g 申購手續費、<br>信管費、短線費)</th>
+							<th>通路服務費</th>
+							<th>報酬率</th>
+							
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">客戶ID</th>
+							<th>客戶姓名</th>
+							<th>高齡客戶</th>
+							
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="EMP_ID" e-query="query()">員工編號</th>
+							<th>員工姓名</th>
+							<th>AO<br>CODE</th>	
+							
+							<th>專員是否勸誘客戶<br>短線進出</th>
+							<th>查證方式</th>
+							<th>電訪錄音編號</th>
+							<th>具體原因</th>
+							<th>首次<br>建立時間</th>
+							<th>最新<br>異動人員</th>
+							<th>最新<br>異動日期</th>							
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center" ng-show="chkMaintenance"><input type="checkbox" ng-hide="row.PROFIT_RATE >= 0"　ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"　></td>                    
+						 	<td align="center">{{row.ROWNUM}}</td>
+						 	<td style="vertical-align:middle;">{{row.RM_FLAG}}</td>
+						 	<td align="center">{{row.YEARMON}}</td>
+							<td align="center">{{row.BRANCH_NBR}}</td>
+							<td align="center">{{row.BRANCH_NAME}}</td>
+							
+							<td align="center">{{row.PROD_TYPE | mapping:mappingSet['PMS.SHORT_PRD_TYPE']:'F3'}}</td>
+							<td align="center">{{toJsDate(row.INV_DATE) | date:'yyyy/MM/dd'}}</td>
+							<td align="center">{{toJsDate(row.REF_DATE) | date:'yyyy/MM/dd'}}</td>
+							<td align="center">{{row.CERT_NBR}}</td>
+							<td align="center">{{row.PRD_ID}}</td>
+							<td align="center">{{row.PRD_NAME}}</td>
+							<td align="center">{{row.CUR_COD}}</td>
+							<td align="right">{{row.REF_AMT | number}}</td>
+							<td align="right">{{row.DIV_AMT | number}}</td>
+							<td align="right">{{row.INV_AMT | number}}</td>
+							<td align="right">{{row.INV_FEE + row.MANAGE_FEE | number}}</td>
+							<td align="right">{{row.CHANNEL_FEE | number}}</td>
+							<td align="right">
+								<font ng-show="row.PROFIT_RATE < 0" color="red">{{row.PROFIT_RATE | number}}%</font>
+								<font ng-show="row.PROFIT_RATE >= 0">{{row.PROFIT_RATE | number}}%</font>
+							</td>
+							
+							<td>{{row.CUST_ID}}</td>
+							<td align="center">{{row.CUST_NAME}}</td>
+							<td align="center">{{row.CUST_AGE	}}</td>
+							
+							<td align="center">{{row.EMP_ID}}</td>
+							<td align="center">{{row.EMP_NAME}}</td>
+							<td align="center">{{row.AO_CODE}}</td>
+							
+							<td align="center">
+								<label ng-hide="row.PROFIT_RATE >= 0">是<input type="radio" value="Y" ng-change="updateFlag(row)" ng-model="row.HR_ATTR" ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance"/></label>&emsp;
+								<label ng-hide="row.PROFIT_RATE >= 0">否<input type="radio" value="N" ng-change="updateFlag(row)" ng-model="row.HR_ATTR" ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance"/></label>
+							</td>
+							<td>
+								<e-combobox id="checkType" name="checkType" 
+											ng-datasource="mappingSet['PMS.CHECK_TYPE']"
+											ng-model="row.NOTE_TYPE"
+											ng-validate="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-hide="row.PROFIT_RATE >= 0"
+											ng-readonly="row.PROFIT_RATE >= 0 || !chkMaintenance"
+											ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance"
+											style="line-height:20px;display:inline;" />
+		                    	<input type="text" class="form-control" style="width: 300px;display:inline;" e-length-limit="200" ng-model="row.NOTE" ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance" ng-hide="row.PROFIT_RATE >= 0" placeholder="請補充查證方式..." ng-if="row.NOTE_TYPE == 'O'" ng-blur="updateFlag(row)"/>
+							</td>
+							<td>
+								<input 	type="text" class="form-control" style="width: 300px;display:inline;" 
+										e-length-limit="12" 
+										e-input-limit="ND"
+										ng-model="row.RECORD_SEQ" 
+										ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance || row.RECORD_YN == 'N'" 
+										ng-hide="row.PROFIT_RATE >= 0" 
+										placeholder="請輸入電訪錄音編號..." 
+										ng-if="row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A'" 
+										ng-blur="updateFlag(row)"/>
+							</td>
+							<td><input type="text" class="form-control" style="width: 300px" ng-blur="updateFlag(row)" ng-model="row.NOTE2" placeholder="請輸入具體原因..." ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance" ng-hide="row.PROFIT_RATE >= 0"></td>
+							<td ng-bind="row.FIRSTUPDATE"></td>
+							<td>{{row.MODIFIER}}</td>
+							<td>{{row.LASTUPDATE}}</td>		
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<br>
+			<div align="center" ng-show="paramList.length && chkMaintenance">
+	       		<button type="button" class="btn btn-success" ng-click="save()"><span class="glyphicon glyphicon-floppy-disk"></span>儲存</button>
+	       	</div>
+			<div>說明：</div>
+			<div>1、&nbsp;基金：</div>
+			<div>&emsp;&emsp;(1)&nbsp;參考贖回金額：以系統贖回日前一天淨值另外乘算單位數，匯率則採信託部入帳分配匯率。</div>
+			<div>&emsp;&emsp;(2)&nbsp;相關手續費：含申購手續費、信管費及基金公司所收取之短線費用。</div>
+			<div>&emsp;&emsp;(3)&nbsp;報酬率：{ [ 參考贖回金額 + 相關配息 – 相關手續費 ] / 投資金額 } – 1</div>
+			<div>2、&nbsp;海外債：</div>
+			<div>&emsp;&emsp;(1)&nbsp;相關配息：已收前手息 + 累積現金配息 – 已付前手息。</div>
+			<div>&emsp;&emsp;(2)&nbsp;報酬率：(參考贖回金額 + 相關配息 – 投資金額 – 相關手續費 ) / 投資金額</div>
+		</div>
+	</div>
+</div>

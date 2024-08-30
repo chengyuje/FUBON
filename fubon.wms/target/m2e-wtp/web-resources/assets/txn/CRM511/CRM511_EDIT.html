@@ -1,0 +1,240 @@
+<style>
+
+</style>
+<div ng-controller="CRM511_EDITController" ng-cloak>
+	<div class="modal-dialog CRM511" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.QSTN_ID == null ? '新增' : '編輯'}}題目</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th class="col-md-2">*題目代碼：</th>
+							<td class="col-md-2 tdpadding"><input type="text" id="qstn_id" name="qstn_id" class="form-control" ng-model="inputVO.qstn_id" required disabled></td>
+							<th class="col-md-2">*顯示層級：</th>
+							<td class="col-md-2 tdpadding">
+								<e-combobox id="display_layer" name="display_layer"
+									ng-datasource="mappingSet['Layer']"
+									ng-model="inputVO.display_layer"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									width="150px"
+									style="line-height:20px;" />
+							</td>
+							<th class="col-md-2">優先順序：</th>
+							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="display_order" name="display_order" ng-model="inputVO.display_order" e-input-limit="N" e-length-limit="3"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.qstn_id.$error.required || parameterTypeEditForm.display_layer.$error.required">
+							<th class="col-md-2"></th>
+							<th class="col-md-2 help-block with-errors"><span ng-if="parameterTypeEditForm.qstn_id.$error.required">請輸入題目代碼</span></th>
+							<th class="col-md-2"></th>
+							<th class="col-md-2 help-block with-errors"><span ng-if="parameterTypeEditForm.display_layer.$error.required">請選擇顯示層級</span></th>
+							<th class="col-md-2"></th>
+							<th class="col-md-2"></th>
+						</tr>
+						<tr>
+							<th class="col-md-2">*題目類型：</th>
+							<td class="col-md-2 tdpadding">
+								<e-combobox id="qstn_type" name="qstn_type"
+									ng-datasource="mappingSet['Type']"
+									ng-model="inputVO.qstn_type"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									width="150px"
+									style="line-height:20px;" />
+							</td>
+							<th class="col-md-2">有效起始日期：</th>
+							<td class="col-md-2 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="bgn_sDate" name="bgn_sDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.bgn_sDate"
+										is-open="model.a"
+										datepicker-options="bgn_sDateOptions"
+										alt-input-formats="altInputFormats"
+										ng-readonly="true"
+										ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<th class="col-md-2">有效截止日期：</th>
+							<td class="col-md-2 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="end_sDate" name="end_sDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.end_sDate"
+										is-open="model.b"
+										datepicker-options="end_sDateOptions"
+										alt-input-formats="altInputFormats"
+										ng-readonly="true"
+										ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.qstn_type.$error.required">
+							<th class="col-md-2"></th>
+							<th class="col-md-2 help-block with-errors">請選擇題目類型</th>
+							<th class="col-md-2"></th>
+							<th class="col-md-2"></th>
+							<th class="col-md-2"></th>
+							<th class="col-md-2"></th>
+						</tr>
+						<tr>
+							<th class="col-md-2">*題目內容：</th>
+							<td class="col-md-10 tdpadding" colspan="5">
+								<textarea id="qstn_content" name="qstn_content" class="form-control" ng-model="inputVO.qstn_content" style="width: 100%; height: 100px" e-length-limit="200" required></textarea>
+							</td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.qstn_content.$error.required">
+							<th class="col-md-2"></th>
+							<th class="col-md-10 help-block with-errors" colspan="5">請輸入題目內容</th>
+						</tr>
+						<tr>
+							<th class="col-md-2">說明/話術：</th>
+							<td class="col-md-10 tdpadding" colspan="5">
+								<textarea id="word_surgery" name="word_surgery" class="form-control" ng-model="inputVO.word_surgery" style="width: 100%; height: 100px" e-length-limit="200"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">*格式：</th>
+							<td class="col-md-10 tdpadding" colspan="5">
+								<e-combobox id="qstn_format" name="qstn_format"
+									ng-paramtype="CRM.DKYC_QSTN_FORMAT"
+									ng-model="inputVO.qstn_format"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									ng-change="clearAns()"
+									width="150px"
+									style="line-height:20px;" />
+							</td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.qstn_format.$error.required">
+							<th class="col-md-2"></th>
+							<th class="col-md-10 help-block with-errors" colspan="5">請選擇格式</th>
+						</tr>
+						<tr>
+							<th class="col-md-2">*答案清單：</th>
+							<td class="col-md-10 tdpadding" colspan="5">
+								<table>
+									<tr>
+										<td><button type="button" class="btn btn-info" ng-click="addAU()" >┼</button></td>
+									</tr>
+								</table>
+								<table class="table-bordered">
+									<tr>
+										<th>功能</th>
+										<th>排序</th>
+										<th>答案值</th>
+										<th>答案選項</th>
+									</tr>
+									<tbody ui-sortable="sortableOptions" ng-model="inputVO.au_list">
+										<tr class="repeat-row" ng-repeat="row in inputVO.au_list track by $index">
+											<td><button type="button" class="btn btn-info" ng-click="removeAU($index)" >X</button></td>
+											<td>{{row.DISPLAY_ORDER}}</td>
+											<td>
+												<div ng-switch="inputVO.qstn_format">
+													<!-- 日期格式-->
+													<div class="input-group datebox datewidth" ng-switch-when="D">
+					                                	<input type="text" id="ans_value" name="ans_value"
+					                                	class="form-control"
+														uib-datepicker-popup="yyyy/MM/dd"
+														ng-model="row.ANS_VALUE"
+														is-open="model[$index]"
+														ng-readonly="true" />
+														<!-- 製作日曆button -->
+					                                    <span class="input-group-btn">
+					                                        <button type="button" class="btn btn-default" ng-click="open($event,$index)">
+					                                            <i class="glyphicon glyphicon-calendar"></i>
+					                                        </button>
+					                                    </span>
+					                                </div>
+													<!-- 數字格式-->
+													<div ng-switch-when="N">
+														<input type="text" class="form-control" placeholder="請輸入..." id="ans_value" name="ans_value" ng-model="row.ANS_VALUE" e-length-limit="10" e-length-type="ND" e-input-limit="ND">
+													</div>
+													<div ng-switch-default>
+														<input type="text" class="form-control" placeholder="請輸入..." id="ans_value" name="ans_value" ng-model="row.ANS_VALUE" e-length-limit="10">
+													</div>
+												</div>
+											</td>
+											<td><input type="text" class="form-control" placeholder="請輸入..." id="ans_content" name="ans_content" ng-model="row.ANS_CONTENT" e-length-limit="100"></td>
+										<tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<tr ng-show="((inputVO.qstn_format == 'C' || inputVO.qstn_format == 'M') && inputVO.au_list.length == 0) || check">
+							<th class="col-md-2"></th>
+							<th class="col-md-10 help-block with-errors" colspan="5">請填寫答案</th>
+						</tr>
+						<tr>
+							<th class="col-md-2"></th>
+							<th class="col-md-2 tdpadding">
+								<label>
+									<input class="uniform_on" type='checkbox' id="opt_yn" name="opt_yn" ng-model='inputVO.opt_yn' ng-true-value="'Y'" ng-false-value="'N'" ng-required="inputVO.au_list.length == 0" /> 是否有其他
+								</label>
+							</th>
+							<th class="col-md-2"></th>
+							<th class="col-md-2 tdpadding">
+								<label>
+									<input class="uniform_on" type='checkbox' id="memo_yn" name="memo_yn" ng-model='inputVO.memo_yn' ng-true-value="'Y'" ng-false-value="'N'" /> 是否有補充說明
+								</label>
+							</th>
+							<th class="col-md-2"></th>
+							<th class="col-md-2"></th>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.opt_yn.$error.required">
+							<th class="col-md-2"></th>
+							<th class="col-md-10 help-block with-errors" colspan="5">請選擇是否有其他</th>
+						</tr>
+						<tr>
+							<th class="col-md-2">理財會員等級：</th>
+							<td class="col-md-10 tdpadding" colspan="5">
+								<label ng-repeat="vip in mappingSet['CRM.VIP_DEGREE']">
+									<input type="checkbox" name="selectedCodes[]" value="{{vip.DATA}}" ng-checked="inputVO.vip_degree.indexOf(vip.DATA) > -1" ng-click="toggleSelection(vip.DATA)"> {{vip.LABEL}}
+									&nbsp;&nbsp;
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">貢獻度等級：</th>
+							<td class="col-md-10 tdpadding" colspan="5">
+								<label ng-repeat="vip2 in mappingSet['CRM.CON_DEGREE']">
+									<input type="checkbox" name="selectedCodes2[]" value="{{vip2.DATA}}" ng-checked="inputVO.aum_degree.indexOf(vip2.DATA) > -1" ng-click="toggleSelection2(vip2.DATA)"> {{vip2.LABEL}}
+									&nbsp;&nbsp;
+								</label>
+							</td>
+						</tr>
+					</table>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

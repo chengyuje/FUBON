@@ -1,0 +1,62 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS711_ps12 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 50%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.table-border tr input {
+	width:100px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS711/PMS711_ps12.js"></script>
+<div ng-controller="PMS711_ps12Controller" ng-cloak>
+	<div class="modal-dialog PMS711_ps12">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{subName}}</h4>
+			</div>
+				<!--Content of the panel-->
+			<div class="panel_content">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<e-combobox id="eTime" name="myType" ng-datasource="mappingSet['myType']"
+							ng-model="inputVO.tsType" ng-validate="false" ng-readonly="false" 
+							ng-editable="false" ng-format="F3"  ng-change="myTypeChange()"
+							ng-required="false" width="150px" height="30px" style="line-height:20px;" />
+					<hr>
+					<form>
+						<table class="table-bordered table-border">
+							<tr>
+								<th>分行代碼</th>
+								<th>PS員工編號</th>
+								<th ng-repeat="x in showMonthList">{{x}}</th>
+								<th>合計</th>
+							</tr>
+							<tr ng-repeat="row in showList | limitTo:displayLimit track by $index">
+								<td style="color:blue; text-align:center">{{row.BRANCH_NBR}}</td>
+								<td style="color:blue; text-align:center">{{row.PS_EMP_ID}}</td>
+								<td align="center" class="repeat-row"
+									ng-repeat="x in showRowList | limitTo:displayLimit " ng-if="x!=null">
+									<!-- <input type="text" style="text-align:right" ng-model="row." e-input-limit='N' e-length-limit="22"/> -->
+									{{row[x]}}
+								</td>
+								<td style="color:blue; text-align:center">{{row.TOTAL}}</td>
+							</tr>
+							
+						</table>
+					</form>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<!-- <button type="button" class="btn btn-primary" ng-click="update()">儲存</button> -->
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div>

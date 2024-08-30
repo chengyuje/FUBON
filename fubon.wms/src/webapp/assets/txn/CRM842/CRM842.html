@@ -1,0 +1,129 @@
+<div>
+	<div>
+		<!--Content of the panel-->
+<!-- 			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once> -->
+			
+			<!-- 循環型房貸(額度式) -->
+			<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;" >
+				<table>
+					<thead>
+						<tr>
+							<th style="text-align: center;">貸款類型</th>
+							<th style="text-align: center;">進件業務單位</th>
+						    <th style="text-align: center;">貸款帳號</th>
+						    <th style="text-align: center;">存款透支帳號</th>
+						    <th style="text-align: center;">幣別</th>
+						    <th style="text-align: center;">訂約額度</th>
+							<th style="text-align: center;">已動用透支金額</th>
+							<th style="text-align: center;">可用額度</th>
+							<th style="text-align: center;">每月利息結算日</th>
+							<th style="text-align: center;">到期日</th>
+							<th style="text-align: center;">適用利率</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList842 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" >
+							<td style="text-align: center;">{{row.TYPE}}</td>
+							<td style="text-align: center;">{{row.ACHIVE_ORG_NM}}</td>
+							<td style="text-align: center;">{{row.ACNO}}</td>
+							<td style="text-align: center;">{{row.ACNO_SA }}</td>
+							<td style="text-align: center;">{{row.CUR_COD }}</td>
+							<td style="text-align: right;">{{row.INS_AMT | number:0}}</td>
+							<td style="text-align: right;">{{row.ACT_BAL | number:0}}</td>
+							<td style="text-align: right;">{{row.ORI_LOAN_BAL  | number:0}}</td>
+							<td style="text-align: center;">{{row.INT_CYCLE = '1' ? '20日' : '月底'}}</td><!--  (1:20日, 2:月底 ) -->
+							<td style="text-align: center;">{{row.DUE_DATE}}</td>
+							<td style="text-align: center;">{{row.RATE | number:4}}{{row.RATE != null ? '%' : ''}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<!-- 循環型房貸(回復式) -->
+			<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;" >
+				<table>
+					<thead>
+						<tr>
+							<th style="text-align: center;">貸款類型</th>
+						    <th style="text-align: center;">貸款帳號</th>
+						    <th style="text-align: center;">存款透支帳號</th>
+						    <th style="text-align: center;">幣別</th>
+						    <th style="text-align: center;">訂約額度</th>
+						    <th style="text-align: center;">分期餘額</th>
+							<th style="text-align: center;">已動用透支金額</th>
+							<th style="text-align: center;">可用額度</th>
+							<th style="text-align: center;">每月利息結算日</th>
+							<th style="text-align: center;">到期日</th>
+							<th style="text-align: center;">適用利率</th>
+						</tr>
+					</thead>
+					<tbody>	
+						<tr class="repeat-row" ng-repeat="row in resultList842_1| limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" >
+							<td style="text-align: center;">循環型房貸(回復式)</td>
+							<td style="text-align: center;">{{row.ACNO}}</td>
+							<td style="text-align: center;">{{row.ACNO_SA }}</td>
+							<td style="text-align: center;">{{row.CUR_COD }}</td>
+							<td style="text-align: right;">{{row.INS_AMT | number:0}}</td>
+							<td style="text-align: right;">{{row.AVAL_AMT | number:0}}</td>
+							<td style="text-align: right;">{{row.ACT_BAL | number:0}}</td>
+							<td style="text-align: right;">{{row.ORI_LOAN_BAL | number:0}}</td>
+							<td style="text-align: center;">{{row.INT_CYCLE = '1' ? '20日' : '月底'}}</td><!--  (1:20日, 2:月底 ) -->
+							<td style="text-align: center;">{{row.DUE_DATE}}</td>
+							<td style="text-align: center;">{{row.RATE | number:4}}{{row.RATE != null ? '%' : ''}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<!-- 綜存質借(台幣) -->			
+			<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;" >
+				<table>
+					<thead>
+						<tr>
+						    <th style="text-align: center;">貸款類型</th>
+						    <th style="text-align: center;">綜定帳號</th>
+							<th style="text-align: center;">存款透支帳號</th>
+							<th>訂約額度</th>
+							<th>可用額度</th>
+							<th>已動用透支額度</th>
+							<th style="text-align: center;">適用利率</th>
+							<th style="text-align: center;">到期日</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList842_2 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" >
+							<td style="text-align: center;">綜存質借(台幣)</td>
+							<td style="text-align: center;">{{row.ACNO}}</td>
+							<td style="text-align: center;">{{row.ACNO_SA}}</td>
+							<td style="text-align: right;">{{row.INS_AMT | number:0}}</td>
+							<td style="text-align: right;">{{row.ORI_LOAN_BAL | number:0}}</td>
+							<td style="text-align: right;">{{row.ACT_BAL | number:0}}</td>
+							<td style="text-align: center;">{{row.RATE | number:4}}{{row.RATE != null ? '%' : ''}}</td>
+							<td style="text-align: center;">{{row.DUE_DATE}}</td>			
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in resultList842_3 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" >
+							<td style="text-align: center;">綜存質借(一本萬利外幣)</td>
+							<td style="text-align: center;">{{row.ACNO}}</td>
+							<td style="text-align: center;">{{row.ACNO_SA}}</td>
+							<td style="text-align: right;">{{row.INS_AMT | number:0}}</td>
+							<td style="text-align: right;">{{row.ORI_LOAN_BAL | number:0}}</td>
+							<td style="text-align: right;">{{row.ACT_BAL | number:0}}</td>
+							<td style="text-align: center;">{{row.RATE | number:4}}{{row.RATE != null ? '%' : ''}}</td>
+							<td style="text-align: center;">{{row.DUE_DATE}}</td>			
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in resultList842_4 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" >
+							<td style="text-align: center;">綜存質借(一般外幣)</td>
+							<td style="text-align: center;">{{row.ACNO}}</td>
+							<td style="text-align: center;">{{row.ACNO_SA}}</td>
+							<td style="text-align: right;">{{row.INS_AMT | number:0}}</td>
+							<td style="text-align: right;">{{row.ORI_LOAN_BAL | number:0}}</td>
+							<td style="text-align: right;">{{row.ACT_BAL | number:0}}</td>
+							<td style="text-align: center;">{{row.RATE | number:4}}{{row.RATE != null ? '%' : ''}}</td>
+							<td style="text-align: center;">{{row.DUE_DATE}}</td>					
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	<!-- 結果區 -->
+</div>

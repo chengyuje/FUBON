@@ -1,0 +1,79 @@
+<style>
+.modal-dialog.IOT950 {
+	width: 1000px; 
+}
+.table_title{
+	font-size: medium;
+	font-style: normal;
+	
+}
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+table{
+	font-size: small;
+	font-weight: bold;
+}
+div{
+	font-size: small;
+	font-weight: bold;
+}
+input:required:invalid{
+ 	border-color: red;
+
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT950/IOT950.js"></script>
+<div ng-controller="IOT950Controller" ng-cloak>
+	<div class="modal-dialog IOT950">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">基金適配作業</h4>
+			</div>
+			<div class="modal-body" style="overflow: scroll;">
+				<div>
+					<span>依客戶投資屬性產出適配後標的清單如下：</span><br/><br/>
+					<span>險種名稱：{{inputVO.INSPRD_NAME}}</span><br/>
+					<span>險種代號：{{inputVO.INSPRD_ID}}</span><br/>
+					<span>保險公司：{{inputVO.INS_COM_NAME}}</span>
+				</div>
+				<div class="gv_tab_sc">
+		 			<table>
+	    				<tr>
+							<th>人壽基金標的代號</th>
+							<th>標的名稱</th>							
+							<th>行內標的風險值</th>
+							<th>人壽標的風險值</th>
+							<th>計價幣別</th>
+							<th>配置比例</th>
+						</tr>
+						<tr ng-repeat="row in inputVO.INVESTList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.TARGET_ID}}</td>
+							<td style="width: 400px;">{{row.LINKED_NAME}}</td>							
+							<td>{{row.PRD_RISK}}</td>
+							<td>{{row.COM_PRD_RISK}}</td>
+							<td>{{row.TARGET_CURR}}</td>
+							<td>
+								<input id="allocation_ratio" name="allocation_ratio" type="text" class="form-control" placeholder="請輸入..." 
+									ng-model="row.ALLOCATION_RATIO" style="width: 80px;" e-input-limit="N" 
+									ng-disabled="(inputVO.REG_TYPE == '1' && (inputVO.STATUS!='' && inputVO.STATUS!='1' && inputVO.STATUS!='4') || inputVO.privilegeGroup!='FC')
+											|| (inputVO.REG_TYPE == '2' && (inputVO.STATUS!='' || inputVO.privilegeGroup!='FC'))">
+							</td>
+						</tr>
+		    		</table>								
+		 		</div>
+		 		<div class="modal-footer" style="text-align:center;">
+		 			<button ng-click="returnInvListData()" class="btn btn-info"data-dismiss="modal" >確定</button> 
+			        <button ng-click="closeThisDialog('cancel')" class="btn btn-info"data-dismiss="modal">關閉</button> 
+		        </div>
+			</div>
+		</div>
+	</div>
+</div>

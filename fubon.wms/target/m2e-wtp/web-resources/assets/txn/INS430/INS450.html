@@ -1,0 +1,114 @@
+<style>
+ .title_INS{
+/*  text-align: center; */
+	padding-left: 20px;
+ 	line-height: 50px;
+}
+
+.INS450.bigspace{
+	margin-left: 50px !important;
+}
+
+.INS450.adv_tit{
+ 	font-size: x-large;
+	font-weight: bold;
+	line-height: 50px;
+	display: inline;
+}
+
+
+</style>
+<script type="text/javascript" src="assets/txn/INS430/INS430.js"></script>
+<script type="text/javascript" src="assets/txn/INS430/INS450.js"></script>
+<script type="text/javascript" src="assets/txn/PRD160/PRD160_DETAIL.js"></script>
+<div class="INS450" ng-controller="INS450Controller" ng-cloak>
+	<div ng-class="{false: 'useShow', true: 'noUseShow'} [btnSuggest]">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit title_INS" style="text-align:left">保險商品建議</div>
+		</div>
+		<div class="panel_content" style="height:520px;">
+			<div class="gv_tab_sc scroll_y" style="height:100%;">
+				<div ng-show="hisPlan != '退休規劃'">
+					<div class="INS450 adv_tit">您目前的需求規劃，</div>
+					<div class="INS450 adv_tit" style="color: red">{{years}}</div>
+					<div class="INS450 adv_tit">年後總需求金額為</div>
+					<div class="INS450 adv_tit" style="color: red">{{amount  | number}}</div>
+					<div class="INS450 adv_tit">元</div>
+				</div>
+				<div ng-show="hisPlan == '退休規劃'">
+					<div class="INS450 adv_tit">您目前的需求規劃，總需求缺口為</div>
+					<div class="INS450 adv_tit" style="color: red">{{gap | number}}</div>
+					<div class="INS450 adv_tit">元</div>
+					<div class="INS450 adv_tit">(每月費用缺口</div>
+					<div class="INS450 adv_tit" style="color: red">{{gapPerMonth | number}}</div>
+					<div class="INS450 adv_tit">元)</div>
+				</div>
+				<div ng-show="hisPlan != '退休規劃'">
+					<label ng-repeat="row in mappingSet['FPS.INS_CURRENCY'] | limitTo:displayLimit track by $index">
+						<input type="radio" name="insCurrency" ng-model="inputVO.insCurrency" ng-value="row.DATA" ng-click="!changeSug && getINS(row.DATA,null)" ng-disabled="changeSug"> {{row.LABEL}}
+						<span class="bigspace"></span>
+					</label>				
+				</div>
+				<br>
+				<div ng-show="hisPlan == '退休規劃'" >
+					<h4 style="display: inline-block;vertical-align:top;">資產傳承</h4><span class="bigspace"></span>
+					<label ng-repeat="row in mappingSet['COMMON.YES_NO'] | limitTo:displayLimit track by $index">
+						<input type="radio" name="yesNo" ng-model="inputVO.yesNo" ng-value="row.DATA" ng-click="!changeSug && getINS(null,row.DATA)"> {{row.LABEL}}
+						<span class="bigspace"></span>
+					</label>
+					<br><br>			
+				</div>
+				<table>
+					<thead>
+						<tr>
+						    <th style="width:20px">勾選</th>
+						    <th style="width:30px; text-align:center">險種代號</th>
+						    <th style="width:90%">商品名稱</th>
+						    <th style="width:100px">繳費年期</th>
+						    <th style="width:120px">保額</th>
+						    <th style="width:50px">單位</th>
+						    <th style="width:30px">幣別</th>
+						    <th style="width:120px">年繳表定保費</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td style="width:20px;text-align:center">
+								<input type=radio 
+									   ng-model="inputVO.CHOICE" 
+									   ng-value="row.INSPRD_ID"
+									   ng-click="add(inputVO.CHOICE, row)"
+									   ng-disabled="changeSug">
+							</td>
+							<td style="width:30px"><a ng-click="!changeSug && insDetail(row)" ng-bind="row.INSPRD_ID"></a></td>
+							<td ng-bind="row.INSPRD_NAME"></td>
+							<td style="width:100px">
+								<e-combobox id="ANNUAL" name="ANNUAL"
+											ng-datasource="row.annual"
+											ng-model="row.INSPRD_ANNUAL"
+											ng-validate="inputVO.CHOICE != row.INSPRD_ID" 
+											ng-readonly="inputVO.CHOICE != row.INSPRD_ID" 
+											ng-editable="inputVO.CHOICE != row.INSPRD_ID"
+											ng-required="true"
+											ng-disabled="inputVO.CHOICE != row.INSPRD_ID || changeSug"
+											ng-change="getRefRate(row)"
+											width="100px"
+											ng-format="F2">
+							</td>
+							<td style="width:120px"><input type="text" class = "form-control" style="width:100px;text-align: right;" e-input-limit="NN" ng-model="row.PRICE" ng-blur="getAssureAmt(row)" ng-disabled ="inputVO.CHOICE != row.INSPRD_ID"></td>
+							<td style="width:50px">{{row.PRD_UNIT | mapping: UNIT }}</td>
+							<td style="width:30px" ng-bind="row.CURR_CD"></td>
+							<td style="width:120px;text-align: right" ng-bind="row.policyFee2 | number" ng-model="row.policyFee2"></td>
+						</tr>
+					</tbody>
+				</table>
+				<br>
+				<div style="float: right;">
+					<button type="button" class="btn btn-default" ng-click="previous()" ng-show="hisPlan == '退休規劃'">上一步</button>&nbsp;&nbsp;
+					<button type="button" class="btn btn-default" ng-click="go('PRINT')" >列印建議書</button>&nbsp;&nbsp;
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,157 @@
+<style>
+/* open dialog */
+.ngdialog.CRM3101_MAIN2 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM3101_MAIN2 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM3101_MAIN2 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM3101_MAIN2 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM3101_MAIN2.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM3101_MAIN2_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM3101/CRM3101_MAIN2.js"></script>
+<script type="text/javascript" src="assets/txn/CRM3101/CRM3101_UPLOAD.js"></script>
+<div class="CRM3101_MAIN2" ng-controller="CRM3101_MAIN2Controller" ng-cloak>
+	<div class="search_table search_box2">
+		<table>
+			<tr>
+				<th>分流名單名稱：</th>
+				<td><e-combobox id="list_name" name="list_name" 
+					ng-datasource="ListName"
+			       	ng-model="inputVO.list_name"
+			       	ng-validate="false" 
+			       	ng-readonly="false" 
+			       	ng-editable="false"
+			       	ng-format="F3"
+			       	ng-required="false"				         
+	       			style="line-height:20px;" />
+	       		</td>
+	       		<th>匯入日期：</th>
+				<td>
+					<div class="form-group">
+						<div class="input-group datebox datewidth">
+							<input type="text" id="sdate" name="sdate"
+							class="form-control"
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.sdate"
+							is-open="model.a"
+							datepicker-options="sDateOptions"
+							ng-readonly="true"								
+							ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+								<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+							</span>
+						</div>
+						<div style="float: left !important;">～</div>
+						<div class="input-group datebox datewidth">
+							<input type="text" id="edate" name="edate"
+							class="form-control"
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.edate"
+							is-open="model.b"
+							datepicker-options="eDateOptions"
+							ng-readonly="true"								
+							ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+								<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+							</span>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">查詢</button>
+		<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+		<button type="button" class="btn btn-info" ng-click="insertExp()" >新增匯入</button>
+	</div>
+	<!-- 結果區 -->
+	<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+	<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+		<table class="table table-bordered td_center">
+			<thead>
+				<tr>
+					<th width="10%">狀態</th>
+					<th width="15%">功能</th>
+					<th>匯入人員</th>
+					<th>匯入時間</th>
+					<th>名單名稱</th>
+					<th>名單檔案名稱</th>
+					<th>分行檔案名稱</th>
+					<th>實際匯入數</th>
+					<th>回檔筆數</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in data">
+					<td>{{row.LIST_STATUS | mapping:TRS_DELCAM_ULIST_STATUS:'F3'}}</td>
+					<td>
+						<e-combobox id="cmbAction" name="cmbAction"
+						ng-disabled="row.LIST_STATUS == '0' || row.LIST_STATUS == '2'"
+						ng-readonly="row.LIST_STATUS == '0' || row.LIST_STATUS == '2'"
+						ng-datasource="row.set"
+						ng-model="row.cmbAction"
+						ng-validate="false"
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						ng-change="action(row)"
+						width="100px"
+						style="line-height:20px;" />
+					</td>
+					<td>{{row.CREATOR + '-' + row.EMP_NAME}}</td>
+					<td>{{toJsDate(row.CREATETIME) | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+					<td>{{row.LIST_NAME}}</td>
+					<td><a href="#" onclick="return false" ng-click="download(row)">{{row.LIST_FILE_NAME}}</a></td>
+					<td><a href="#" onclick="return false" ng-click="download2(row)">{{row.BRH_FILE_NAME}}</a></td>
+					<td class="td_right">{{row.TOTAL_CNT}}</td>
+					<td class="td_right">{{row.BACK_CNT}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,186 @@
+<style>
+.modal-dialog.IOT960 {
+	width: 1000px; 
+}
+.table_title{
+	font-size: medium;
+	font-style: normal;
+	
+}
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+table{
+	font-size: small;
+	font-weight: bold;
+}
+div{
+	font-size: small;
+	font-weight: bold;
+}
+input:required:invalid{
+ 	border-color: red;
+
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT960/IOT960.js"></script>
+<div ng-controller="IOT960Controller" ng-cloak>
+	<div class="modal-dialog IOT960">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">高資產投組適配</h4>
+			</div>
+			<div class="modal-body" style="overflow: scroll;">
+				<div width="100%">
+					<table width="100%">
+						<tr>
+							<td>
+								<table class="alignleft">
+									<tr>
+										<th>投組越級適配選擇清單：
+											<e-combobox id="SENIOR_OVER_PVAL" 
+												ng-datasource="mappingSet['SENIOR_OVER_PVAL']" 
+												ng-model="inputVO.SENIOR_OVER_PVAL" 
+												ng-validate="false" 
+												ng-format="F3" 
+												width="80px" 
+												ng-change="getInvestList();"
+												style="line-height:20px;"
+												ng-disabled="true" />
+<!-- 												ng-disabled="(inputVO.REG_TYPE == '1' && (inputVO.STATUS!='' && inputVO.STATUS!='1' && inputVO.STATUS!='4') || inputVO.privilegeGroup!='FC') -->
+<!-- 															|| (inputVO.REG_TYPE == '2' && (inputVO.STATUS!='' || inputVO.privilegeGroup!='FC'))" /> -->
+										</th>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr><td>&nbsp;</td></tr>
+						<tr>
+							<td>
+								<table class="alignleft">
+									<tr><th>依高資產客戶投組適配後標的清單如下：</th></tr>
+									<tr>
+										<th colspan="4">險種名稱：{{inputVO.INSPRD_NAME}}</th>
+									</tr>
+									<tr>
+										<th width="25%">險種代號：{{inputVO.INSPRD_ID}}</th>
+										<th width="25%">實繳保費：{{inputVO.REAL_PREMIUM | number:0}}</th>
+										<th width="25%">保單幣別：{{inputVO.CURR_CD}}</th>
+										<th width="25%">匯率：{{inputVO.prodCurrRate}}</th> 
+									</tr>
+									<tr>
+										<th colspan="4">保險公司：{{inputVO.INS_COM_NAME}}</th>
+									</tr>
+									<tr>
+										<th>客戶ID：{{inputVO.CUST_ID}}</th>
+										<th>風險屬性/效期：{{inputVO.CUST_RISK}}/{{inputVO.CUST_RISK_DUE | date:"yyyy-MM-dd"}}</th>
+										<th colspan="2">特殊客戶：{{inputVO.fp032675Data.custRemarks}}</th> 
+<!-- 										<th>風險檢核值：{{inputVO.custRiskChkVal}}</th> -->
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<table class="alignleft">
+									<tr>
+										<th>高資產客戶/效期/可提供高資產產品或服務：{{inputVO.hnwcData.validHnwcYN}}/<span style={{inputVO.hnwcDateColor}}>{{toJsDate(inputVO.hnwcData.dueDate) | date:"yyyy-MM-dd"}}</span>/{{inputVO.hnwcData.hnwcService}}</th>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr width="100%">
+							<td width="100%">
+								<table width="100%">
+									<tr width="100%">
+<!-- 										<th align="left">投資組合風險權值：{{inputVO.wmshaiaData.RISK_SUM | number:2}}</th> -->
+										<th align="right">資料時間：{{inputVO.dataDate}}</th>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</div>
+				
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="550px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th>P1<br/>最大可申購金額<br/>(折台)</th>
+							<th>--</th>
+							<th>P2<br/>最大可申購金額<br/>(折台)</th>
+							<th align="right" ng-if="inputVO.currentRiskVal < 2 && inputVO.allowRiskVal >= 2">{{inputVO.wmshaiaData.AMT_LEFT_2 | number :0}}</th>
+							<th align="right" ng-if="!(inputVO.currentRiskVal < 2 && inputVO.allowRiskVal >= 2)">--</th>
+							<th>P3<br/>最大可申購金額<br/>(折台)</th>
+							<th align="right" ng-if="inputVO.currentRiskVal < 3 && inputVO.allowRiskVal >= 3">{{inputVO.wmshaiaData.AMT_LEFT_3 | number :0}}</th>
+							<th align="right" ng-if="!(inputVO.currentRiskVal < 3 && inputVO.allowRiskVal >= 3)">--</th>
+							<th>P4<br/>最大可申購金額<br/>(折台)</th>
+							<th align="right" ng-if="inputVO.currentRiskVal < 4 && inputVO.allowRiskVal >= 4">{{inputVO.wmshaiaData.AMT_LEFT_4 | number :0}}</th>
+							<th align="right" ng-if="!(inputVO.currentRiskVal < 4 && inputVO.allowRiskVal >= 4)">--</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th>此次投入折台</th>
+							<td align="right" ng-if="inputVO.currentRiskVal >= 1 || (inputVO.currentRiskVal < 1 && inputVO.allowRiskVal >= 1 && inputVO.SENIOR_OVER_PVAL == 'P1')">{{inputVO.totalInvAmtP1 | number :0}}</td>
+							<td align="right" ng-if="!(inputVO.currentRiskVal >= 1 || (inputVO.currentRiskVal < 1 && inputVO.allowRiskVal >= 1 && inputVO.SENIOR_OVER_PVAL == 'P1'))">--不投入</td>
+							<th>此次投入折台</th>
+							<td align="right" ng-if="inputVO.currentRiskVal >= 2 || (inputVO.currentRiskVal < 2 && inputVO.allowRiskVal >= 2 && inputVO.SENIOR_OVER_PVAL == 'P2')">{{inputVO.totalInvAmtP2 | number :0}}</td>
+							<td align="right" ng-if="!(inputVO.currentRiskVal >= 2 || (inputVO.currentRiskVal < 2 && inputVO.allowRiskVal >= 2 && inputVO.SENIOR_OVER_PVAL == 'P2'))">--不投入</td>
+							<th>此次投入折台</th>
+							<td align="right" ng-if="inputVO.currentRiskVal >= 3 || (inputVO.currentRiskVal < 3 && inputVO.allowRiskVal >= 3 && inputVO.SENIOR_OVER_PVAL == 'P3')">{{inputVO.totalInvAmtP3 | number :0}}</td>
+							<td align="right" ng-if="!(inputVO.currentRiskVal >= 3 || (inputVO.currentRiskVal < 3 && inputVO.allowRiskVal >= 3 && inputVO.SENIOR_OVER_PVAL == 'P3'))">--不投入</td>
+							<th>此次投入折台</th>
+							<td align="right" ng-if="inputVO.currentRiskVal >= 4 || (inputVO.currentRiskVal < 4 && inputVO.allowRiskVal >= 4 && inputVO.SENIOR_OVER_PVAL == 'P4')">{{inputVO.totalInvAmtP4 | number :0}}</td>
+							<td align="right" ng-if="!(inputVO.currentRiskVal >= 4 || (inputVO.currentRiskVal < 4 && inputVO.allowRiskVal >= 4 && inputVO.SENIOR_OVER_PVAL == 'P4'))">--不投入</td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+				
+				<br/>
+				<div class="gv_tab_sc">
+		 			<table>
+	    				<tr>
+							<th>人壽基金標的代號</th>
+							<th>標的名稱</th>							
+							<th>行內標的風險值</th>
+							<th>人壽標的風險值</th>
+							<th>計價幣別</th>
+							<th>配置比例</th>
+							<th>申購金額</th>
+							<th>申購金額折台</th>
+						</tr>
+						<tr ng-repeat="row in inputVO.INVESTList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.TARGET_ID}}</td>
+							<td style="width: 400px;">{{row.LINKED_NAME}}</td>							
+							<td>{{row.PRD_RISK}}</td>
+							<td>{{row.COM_PRD_RISK}}</td>
+							<td>{{row.TARGET_CURR}}</td>
+							<td>
+								<input id="allocation_ratio" name="allocation_ratio" type="text" class="form-control" placeholder="請輸入..." 
+									ng-model="row.ALLOCATION_RATIO" style="width: 80px;" e-input-limit="N" ng-blur="calAmt(row);"
+									ng-disabled="(inputVO.REG_TYPE == '1' && (inputVO.STATUS!='' && inputVO.STATUS!='1' && inputVO.STATUS!='4') || inputVO.privilegeGroup!='FC')
+											|| (inputVO.REG_TYPE == '2' && (inputVO.STATUS!='' || inputVO.privilegeGroup!='FC'))">
+							</td>
+							<td align="right">{{row.ORI_AMT | number:0}}</td>
+							<td align="right">{{row.TWD_AMT | number:0}}</td>
+						</tr>
+		    		</table>								
+		 		</div>
+		 		
+		 		<div class="modal-footer" style="text-align:center;">
+		 			<button ng-click="returnInvListData()" class="btn btn-info"data-dismiss="modal" >確定</button> 
+			        <button ng-click="closeThisDialog('cancel')" class="btn btn-info"data-dismiss="modal">關閉</button> 
+		        </div>
+			</div>
+		</div>
+	</div>
+</div>

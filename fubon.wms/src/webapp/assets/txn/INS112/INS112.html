@@ -1,0 +1,117 @@
+<style>
+table .small_font{
+	font-size: small;
+	font-weight: bold;
+}
+div .small_font{
+	font-size: small;
+	font-weight: bold;
+}
+.scroll {
+  border: 0;
+  border-collapse: collapse;
+}
+.scroll tr {
+  display: flex;
+}
+.scroll td {
+  flex: 1 auto;
+  border: 1px solid #aaa;
+  width: 1px;
+  word-wrap: break;
+}
+.scroll thead tr:after {
+  content: '';
+  overflow-y: scroll;
+  visibility: hidden;
+  height: 0;
+}
+.scroll thead th {
+  flex: 1 ;
+  display: block;
+  border: 1px solid #000;
+}
+.scroll tbody {
+  display: block;
+  width: 100%;
+  overflow-y: auto;
+  height: calc(75vh - 85px);
+}
+</style>
+<script type="text/javascript" src="assets/txn/INS112/INS112.js"></script>
+<div ng-controller="INS112Controller" ng-cloak>
+    <div class="modal-dialog" style="width: 80%;">
+      <div class="modal-content">
+        <div class="modal-header"> 
+        	<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+          <h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">保險商品查詢</h4>
+        </div>
+        <div class="modal-body">
+        	<table class="small_font" style="margin-bottom: 1%;">
+        		<tr>
+        			<td style="width: 8%;">*保險公司：</td>
+        			<td>
+        				<e-combobox id="com_id" name="com_id"
+												ng-datasource="COMList" 
+												ng-model="inputVO.COM_ID" 
+												ng-validate="false"
+												ng-readonly="true"
+												ng-editable="false"
+												ng-format="F3"
+												width="60%"
+												/>
+        			</td>
+        			<td style="width: 7%;">商品狀態：</td>
+        			<td>
+        				<e-combobox id="is_sale" name="is_sale"
+									ng-paramtype="INS.IS_SALE"
+									ng-model="inputVO.IS_SALE"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									width="60%"
+									 />
+        			</td>
+        			<td style="width: 5%;">險種別：</td>
+        			<td>
+        				<e-combobox id="qid" name="qid"
+									ng-paramtype="INS.TYPE_CLASS"
+									ng-model="inputVO.QID"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									width="60%"
+									 />
+        			</td>
+        			<td style="width: 7%;">商品名稱：</td>
+        			<td>
+        				<input id="prd_name" name="prd_name" type="text" placeholder="請輸入..." ng-model="inputVO.PRD_NAME" ng-change="PROD_NAME()" style="width: 80%;">
+        			</td>
+        			<td>
+        				<button type="button" class="btn btn-info" ng-click = "queryData()">查詢</button>
+        			</td>
+        		</tr>
+        	</table>
+        	<div class="gv_tab_sc scroll_y small_font">
+				<table class="scroll">
+					<thead>
+						<th>商品代碼</th>
+						<th>商品名稱</th>
+						<th>險種別</th>
+						<th>狀態</th>
+					</thead>
+					<tr ng-repeat="row in queryDataList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td><a ng-click="returnSelectINSPRDData(row)">{{row.PRD_ID}}</a></td>
+						<td>{{row.PRD_NAME}}</td>
+						<td>{{row.QID | mapping:mappingSet['INS.TYPE_CLASS']:F3}}</td>
+						<td>{{row.IS_SALE | mapping:mappingSet['INS.IS_SALE']:F3}}</td>
+					</tr>
+				</table>
+	 		</div>
+        </div>
+      </div>
+    </div>
+
+</div>

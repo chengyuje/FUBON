@@ -1,0 +1,159 @@
+<style>
+.modal-dialog.PMS204_INSERT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+
+.PMS204_INSERT table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS204_INSERT.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+.search_box TH+TD {
+	line-height: 20px;
+	width: auto;
+}
+
+tr {
+	width: 600px;
+}
+
+table {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#th_width {
+	padding-left: 50px;
+}
+</style>
+
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<div class="container">
+	<div ng-controller="PMS204EditController" ng-cloak>
+		<!-- left, vertical navbar & content -->
+		<div class="modal-dialog PMS204_EDIT">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close"
+						ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">修改戰力分級</h4>
+				</div>
+				<div class="modal-body">
+					<form name="parameterTypeEditForm" class="form-horizontal"
+						data-toggle="validator" role="form" autocomplete="off"
+						enter-as-tab>
+						<table>
+							<tr>
+								<th></th>
+								<td colspan="3"><input  type="hidden"
+										ng-model="inputVO.PLAN_YEARMON" 
+										ng-validate="false"
+										ng-readonly="true" 
+										ng-editable="false" 
+										width="200px" height="30px" style="line-height:20px;"
+										ng-required="true" />
+								</td>
+								
+								<!--  <td>
+									<label>
+										<input type="checkbox" ng-model="inputVO.ADD_MONTH" ng-change="copy_check()"
+										   		>自動遞延次月
+									</label>
+								</td>-->
+							</tr>
+							<tr>
+								<th></th>
+								<td><br></td>
+							</tr>
+							
+							<tr>
+								<th>職級：</th>
+								<td colspan="4"><e-combobox ng-disabled="disabled_else" 
+										ng-paramtype="PMS.AO_JOB_RANK" ng-model="inputVO.JOB_TITLE_ID"
+										ng-validate="false" ng-readonly="false" ng-editable="false"
+										ng-format="F3" ng-required="false" ng-change="sss()"
+										width="100%" />{{inputVO.JOB_TITLE_ID}}</td>
+
+							</tr>
+							<tr>
+
+								<th>*MTD達成率：</th>
+								<td colspan="4"><div style="float: left">
+										<input class="form-control" type="text"
+											placeholder="請輸入數字起..." id="txnCode" name="txnCode"
+											ng-disabled="disabled_else" ng-model="inputVO.MTD_ACH_RATE_SO"
+											maxlength="255">
+									</div>
+									<div style="float: left">~</div>
+									<div style="float: left">
+										<input class="form-control" type="text"
+											placeholder="請輸入數字末..." ng-model="inputVO.MTD_ACH_RATE_EO"
+											maxlength="255" ng-disabled="disabled_else"></td>
+							</tr>
+							<tr>
+
+								<th>Coaching重點：</th>
+								<td style="width: 20%"><label><input
+										type="checkbox" ng-model="inputVO.APOINT" ng-true-value="'A'"
+										ng-false-value="''" ng-disabled="disabled_else">{{"A"|mapping:mappingSet['PMS.COACHING_POINT']:'F1'}}
+
+								</label></td>
+								<td style="width: 20%"><label> <input
+										type="checkbox" ng-model="inputVO.BPOINT" ng-true-value="'B'"
+										ng-false-value="''" ng-disabled="disabled_else">{{"B"|mapping:mappingSet['PMS.COACHING_POINT']:'F1'}}
+								</label></td>
+								<td style="width: 20%"><label><input
+										type="checkbox" ng-model="inputVO.CPOINT" ng-true-value="'C'"
+										ng-false-value="''" ng-disabled="disabled_else">{{"C"|mapping:mappingSet['PMS.COACHING_POINT']:'F1'}}
+
+								</label></td>
+								<td style="width: 20%"><label><input
+										type="checkbox" ng-model="inputVO.DPOINT" ng-true-value="'D'"
+										ng-false-value="''" ng-disabled="disabled_else">{{"D"|mapping:mappingSet['PMS.COACHING_POINT']:'F1'}}
+
+								</label></td>
+							</tr>
+							<tr>
+
+								<th>Coaching頻次：</th>
+								<td colspan="5">
+									<!--ng-model="inputVO.csvType"  --> <e-combobox id="csvType"
+										ng-disabled="disabled_else" ng-paramtype="PMS.COACHING_STATE"
+										ng-model="inputVO.COACHING_STATE" ng-validate="false"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										ng-required="true" ng-change="sss()" width="100%" />
+
+
+								</td>
+							</tr>
+						</table>
+
+						<div class="search_box_btn text-center">
+							<button type="button" class="btn btn-primary" ng-click="save()">修改</button>
+							<!-- function-type="maintenance" -->
+							<button type="button" class="btn btn-default"
+								ng-click="closeThisDialog('cancel')">取消</button>
+							<span function-type="maintenance"></span>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

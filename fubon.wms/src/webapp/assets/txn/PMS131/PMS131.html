@@ -1,0 +1,105 @@
+<style>
+  .search_box th+td {
+    width: auto;
+    line-height: 15px;
+  }
+.star_ul {
+    list-style: none;
+    padding-left: 1.2em;
+    text-indent: -1.2em;
+}
+.star_ul Li:before {
+    content: "＊";
+    display: block;
+    float: left;
+    width: 1.2em;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS131/PMS131.js"></script>
+<div class="PMS131" ng-controller="PMS131Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >團獎試算</div>
+	</div>
+	<div class="panel_content PMS131 FPS" style="padding:0;">
+    	<div class="block container" ng-class="{'no-area': arrowUp}" style="margin-bottom: .5em;">
+			<div class="content-wrapper" style="background-color:#bfe2f7;margin-top:-1px;">
+				<div class="content-title"> DT 查詢碼
+			  		<div class="input-group" style="display:inline-block">
+						<input type="text" style="width:150px; text-align: left; display:inline-block; margin-left:.5em;" class="form-control" ng-model="inputVO.dtccc">
+						<span class="input-group-btn" style="display:inline-block">
+			      			<button class="btn btn-info" type="button" ng-click="queryData();"><i class="glyphicon glyphicon-search"></i></button>
+			    		</span>
+			  		</div>
+				</div>
+	       	</div>
+       	</div>
+       	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+         	<table class="table-bordered">
+         		<thead>
+            		<tr>
+            			<th>編號</th>
+						<th>業務處</th>
+						<th>營運區</th>
+						<th>分行代碼</th>
+						<th>分行名稱</th>
+						<th>姓名</th>
+						<th>員編</th>
+						<th>職級</th>
+						<th>Leader<br>(Y/N)</th>
+						<th>去年<br>平均月收益(元)</th>
+						<th>當月收益(元)<br>(推估)<br><font color="red">請自行輸入</font></th>
+						<th>財務指標分數<br>1~100(推估)<br><font color="red">請自行輸入</font></th>
+<!-- 						<th>生產力(基期)</th> -->
+<!-- 						<th>生產力(推估)</th> -->
+						<th>生產力是否大於基期<br>(Y/N)</th>
+              		</tr>
+             	</thead>
+             	<tbody>
+              		<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+            			<td>{{row.NO}}</td>
+						<td>{{row.REGION_CENTER_NAME}}</td>
+						<td>{{row.BRANCH_AREA_NAME}}</td>
+						<td>{{row.BRANCH_NBR}}</td>
+						<td>{{row.BRANCH_NAME}}</td>
+						<td>{{row.EMP_NAME}}</td>
+						<td>{{row.EMP_ID}}</td>
+						<td>{{row.JOB_TITLE_NAME}}</td>
+						<td>{{row.LEADER_YN}}</td>
+						<td>{{row.LAST_Y_AVRP | number:0}}</td>
+						<td><input type="text" class="form-control" style="width: 150px" ng-model="row.ARBRM" ng-blur="calculate(row);checkColumn(row, 'ARBRM')" e-length-limit="200" placeholder="" e-input-limit="N" ng-change="checkColumn(row, 'ARBRM')" /></td>
+						<td><input type="text" class="form-control" style="width: 150px" ng-model="row.FS"    ng-blur="calculate(row);checkColumn(row, 'FS')"    e-length-limit="3"   placeholder="" e-input-limit="N" ng-change="checkColumn(row, 'FS')" /></td>
+<!-- 						<td>{{row.PDBBP | number:2}}</td> 不顯示 -->
+<!-- 						<td>{{row.PDNBP | number:2}}</td> 不顯示 -->
+						<td>{{row.PD_YN}}</td>
+					</tr>
+				</tbody>
+        	</table>
+       	</div>
+       	<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="calculateDT();">計算</button>
+		</div>
+       	<h4 class="h4-title">DT團隊整體</h4>
+       	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+         	<table class="table-bordered">
+         		<thead>
+            		<tr>
+            			<th>總收益(元)</th>
+						<th>生產力</th>
+						<th>生產力基期</th>
+						<th>團隊獎金(元)</th>
+              		</tr>
+             	</thead>
+             	<tbody>
+              		<tr class="repeat-row" align="center" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+            			<td>{{ARBDT | number:0}}</td>
+						<td>{{PDNBDT | number:2}}</td>
+						<td>{{PDBBDT | number:2}}</td>
+						<td>{{GCBDT | number:0}}</td>
+					</tr>
+				</tbody>
+        	</table>
+       	</div>	
+       	<br>
+	</div>
+</div>

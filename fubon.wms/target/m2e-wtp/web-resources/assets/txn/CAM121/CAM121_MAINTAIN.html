@@ -1,0 +1,144 @@
+<style>
+/* open dialog */
+.ngdialog.CAM121_MAINTAIN {
+	
+}
+/* dialog panl */
+.modal-dialog.CAM121_MAINTAIN {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* table size */
+.CAM121_MAINTAIN table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CAM121_MAINTAIN.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CAM121_MAINTAIN_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<div>
+	<div ng-controller="CAM121_MAINTAINController" ng-cloak>
+		<div class="modal-dialog CAM121_MAINTAIN">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">{{actionType == "insert" ? '新增題目' : '修改題目'}}</h4>
+				</div>
+				<div class="modal-body">
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">題目：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<input class="form-control" type="text" placeholder="請輸入..." id="questionDesc" name="questionDesc" ng-model="inputVO.questionDesc" e-length-limit="200" >
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.questionDesc == ''">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors" colspan="3">請輸入題目</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">題目類型：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="questionType" name="questionType" 
+											ng-paramtype="SYS.QUESTION_TYPE"
+											ng-model="inputVO.questionType"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											width="180px"
+											style="line-height:20px;" />
+								<div class="text-danger" ng-show="inputVO.questionType == 'T'">＊答案只允許使用者輸入文字格式。</div>
+								<div class="text-danger" ng-show="inputVO.questionType == 'N'">＊答案只允許使用者輸入數字格式。</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.questionType == 0">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors" colspan="3">請選擇題目類型</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-hide="inputVO.questionType == 'T' || inputVO.questionType == 'N'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">答案清單：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<div class="gv_tab_sc scroll_y">
+									<table>
+										<thead>
+											<tr>
+												<th style="width:10%">功能</th>
+												<th style="width:90%">答案</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="repeat-row" ng-repeat="row in answerList track by $index">
+												<td style="width:10%" align="center">
+													<a href="#" data-toggle="modal" class="btn btn-warning btn-circle" ng-click="delAnswer(row)"><i class="glyphicon glyphicon-trash"></i></a>
+												</td>
+												<td style="width:90%">{{row.ANSWER_DESC}}</td>
+											</tr>
+											<tr style="background-color:#FAFAFA;">
+												<td style="width:10%" align="center">
+													<button type="button" class="btn btn-primary" onclick= "return false" ng-click="addAnswer()" function-type="maintenance" ng-disabled="inputVO.answerDesc == ''"><i class="glyphicon glyphicon-plus"></i></button>
+												</td>
+												<td style="width:90%">
+													<input class="form-control" type="text" placeholder="請輸入..." id="answerDesc" name="answerDesc" ng-model="inputVO.answerDesc" e-length-limit="200" required>
+												</td>
+											</tr>
+											<tr>
+												<td style="width:10%"></td>
+												<td style="width:90%">
+													<div style="display:inline;"><input type="checkbox" name="inputVO.ansOtherFlag" id="inputVO.ansOtherFlag" ng-model="inputVO.ansOtherFlag" ng-change="checkFlagStatus()">&nbsp;是否有其他項目&nbsp;&nbsp;&nbsp;</div>
+													<div style="display:inline;" ng-show="inputVO.ansOtherFlag"><input type="checkbox" name="inputVO.ansMemoFlag" id="inputVO.ansMemoFlag" ng-model="inputVO.ansMemoFlag">&nbsp;是否有補充說明</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="submitAction()" function-type="maintenance" ng-disabled="inputVO.questionDesc == '' || inputVO.questionType == 0">確定</button>
+					<button type="button" class="btn btn-primary" ng-click="checkQusExist()" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

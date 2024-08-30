@@ -1,0 +1,463 @@
+<style>
+
+</style>
+<div ng-controller="PRD230_Fund_EDITController" ng-cloak>
+	<div class="modal-dialog PRD230_Fund">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.PRD_ID == null ? '新增' : '編輯'}}基金</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*基金代碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_id" name="prd_id" class="form-control" ng-model="inputVO.prd_id" ng-blur="checkID()" ng-disabled="row.PRD_ID != null" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.prd_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入基金代碼</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="!canEdit">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">{{errMsg | i18n}}</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">基金名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="cname" name="cname" class="form-control" ng-model="inputVO.cname" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">理柏基金編號：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="lipper_id" name="lipper_id" class="form-control" ng-model="inputVO.lipper_id" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">拆帳比率：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="allot" name="allot" class="form-control" ng-model="inputVO.allot" e-length-limit="4" e-length-type="ND" e-input-limit="ND"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">衛星時間起迄日：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="main_sDate" name="main_sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.main_sDate"
+									is-open="model.a"
+									datepicker-options="main_sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="main_eDate" name="main_eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.main_eDate"
+									is-open="model.b"
+									datepicker-options="main_eDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">核心時間起迄日：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="raise_sDate" name="raise_sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.raise_sDate"
+									is-open="model.c"
+									datepicker-options="raise_sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate2()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="raise_eDate" name="raise_eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.raise_eDate"
+									is-open="model.d"
+									datepicker-options="raise_eDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate2()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">警示基金：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="vigilant" name="vigilant"
+								ng-paramtype="PRD.FUND_VIGILANT"
+								ng-model="inputVO.vigilant"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">IPO/專案：</th>
+							<td class="col-md-7 tdpadding">
+								<textarea id="ipo" name="ipo" class="form-control" ng-model="inputVO.ipo" style="width: 100%; height: 100px" e-length-limit="100"></textarea>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">IPO/專案時間起迄日：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="ipo_sDate" name="ipo_sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.ipo_sDate"
+									is-open="model.e"
+									datepicker-options="ipo_sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate3()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="ipo_eDate" name="ipo_eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.ipo_eDate"
+									is-open="model.f"
+									datepicker-options="ipo_eDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate3()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'f')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">CNR分配率：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="yield" name="yield" class="form-control" ng-model="inputVO.yield" e-length-limit="4" e-length-type="ND" e-input-limit="ND"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">CNR加減碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="plus" name="plus" class="form-control" ng-model="inputVO.plus" e-length-limit="4" e-length-type="ND" e-input-limit="ND"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">核心區間起迄日：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="multi_sDate" name="multi_sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.multi_sDate"
+									is-open="model.i"
+									datepicker-options="multi_sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate5()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'i')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="multi_eDate" name="multi_eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.multi_eDate"
+									is-open="model.j"
+									datepicker-options="multi_eDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate5()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'j')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">CNR收益扣減率：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="cnr_discount" name="cnr_discount" class="form-control" ng-model="inputVO.cnr_discount" e-length-limit="4" e-length-type="ND" e-input-limit="ND"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">實際收益扣減率：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="rate_discount" name="rate_discount" class="form-control" ng-model="inputVO.rate_discount" e-length-limit="4" e-length-type="ND" e-input-limit="ND"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">基金管理費標的計績追溯起迄日：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="cnrtar_sDate" name="cnrtar_sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.cnrtar_sDate"
+									is-open="model.k"
+									datepicker-options="cnrtar_sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate6()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'k')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="cnrtar_eDate" name="cnrtar_eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.cnrtar_eDate"
+									is-open="model.l"
+									datepicker-options="cnrtar_eDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate6()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'l')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">CNR基金管理費回饋：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="fee" name="fee" class="form-control" ng-model="inputVO.fee" e-input-limit="ND"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*股債類型：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="stock_bond_type" name="stock_bond_type"
+								ng-paramtype="FPS.STOCK_BOND_TYPE"
+								ng-model="inputVO.stock_bond_type"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" 
+			  					required/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.stock_bond_type=='' || inputVO.stock_bond_type==undefined">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入股債類型</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">專案代碼1：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="fund_project1" name="fund_project1"
+								ng-paramtype="PRD.FUND_PROJECT"
+								ng-model="inputVO.fund_project1"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" 
+			  					/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">專案代碼2：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="fund_project2" name="fund_project2"
+								ng-paramtype="PRD.FUND_PROJECT"
+								ng-model="inputVO.fund_project2"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" 
+			  					/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">客群代碼：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="customer_level" name="customer_level"
+								ng-paramtype="PRD.FUND_CUSTOMER_LEVEL"
+								ng-model="inputVO.customer_level"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					multiple="true"
+			  					separator=";"
+			  					label-separator="；"
+			  					style="line-height:20px;" 
+			  					/>	  					
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 with-errors">警語：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="warning" name="warning"
+								ng-paramtype="PRD.FUND_ALERT"
+								ng-model="inputVO.warning"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" 
+			  					/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 with-errors">主題代碼1：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="fund_subject1" name="fund_subject1"
+								ng-paramtype="PRD.FUND_SUBJECT"
+								ng-model="inputVO.fund_subject1"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" 
+			  					/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 with-errors">主題代碼2：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="fund_subject2" name="fund_subject2"
+								ng-paramtype="PRD.FUND_SUBJECT"
+								ng-model="inputVO.fund_subject2"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" 
+			  					/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 with-errors">主題代碼3：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="fund_subject3" name="fund_subject3"
+								ng-paramtype="PRD.FUND_SUBJECT"
+								ng-model="inputVO.fund_subject3"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					width="150px"
+			  					style="line-height:20px;" 
+			  					/>
+							</td>
+							<td class="col-xs-1"><button type="button" class="btn btn-primary" ng-click="editTBPRD_FUND()" function-type="maintenance" >更新紅字標籤</button></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">欲更新紅字標籤範圍，請點擊上方更新按鈕,等待提示訊息顯示結果，不需使用下方確定按鈕。</td>
+							<td class="col-xs-1"></td>
+						<tr>
+					</table>
+				</form>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,119 @@
+<style>
+/* open dialog */
+.ngdialog.CRM321_edit {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM321_edit {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 890px;
+	height: auto;
+}
+/* table size */
+.CRM321_edit table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM321_edit.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM321_edit_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+
+<div ng-controller="CRM321_editController" ng-cloak >
+	<div class="modal-dialog CRM321_edit">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">修改</h4>
+			</div>
+			<div class="modal-body">
+	              <form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+	              	<table>
+	                    <tr>
+	                        <th>FCH駐點行:</th>
+	                        <td>
+	                        	<e-combobox id="branch" name="branch" 
+								ng-datasource="mappingSet['branch']"
+								ng-model="inputVO.fch_mast_brh"
+								ng-change="getBranchNbr()"
+								ng-validate="false" 
+								ng-readonly="true" 
+								ng-editable="true"
+								ng-format="F3"
+								width="150px"
+								style="line-height:20px;" 
+								required/>	
+							</td>
+	                    </tr>
+	                   
+						 <tr>
+						 	<th>分派行：</th>
+							<td>
+								<e-combobox id="ass_brh" name="ass_brh" 
+								ng-datasource="mappingSet['ass_brh']"
+								ng-model="inputVO.ass_brh"
+								ng-validate="false" 
+								ng-disabled = "inputVO.fch_mast_brh == ''"
+   								ng-readonly="inputVO.fch_mast_brh == ''"  
+								ng-editable="false"
+								ng-format="F3"
+								width="150px"
+								style="line-height:20px;" 
+								required/>	
+							</td>
+							<th>順序:</th>
+							<td>
+								<e-combobox id="order" name="order" 
+								ng-datasource="mappingSet['order']"
+								ng-model="inputVO.priority_order"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								width="150px"
+								style="line-height:20px;" 
+								required/>	
+							</td>
+	                     </tr>  
+	                </table> 
+	                </form>
+	                <div class="search_box_btn text-center">
+	                  <button type="button" class="btn btn-primary" ng-click="editConfirm()" ng-disabled="parameterTypeEditForm.$invalid">修改</button>
+	                  <button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button> 
+					  <span function-type="maintenance" ></span>				  
+	        	</div>  
+	    	</div>
+		</div>
+	</div>
+</div>

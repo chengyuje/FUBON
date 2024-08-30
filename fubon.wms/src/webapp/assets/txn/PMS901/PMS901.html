@@ -1,0 +1,199 @@
+<style>
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+
+/* check box css */
+input.faChkRnd, input.faChkSqr {
+  visibility: hidden;
+}
+input.faChkRnd:checked:after, input.faChkRnd:after,
+input.faChkSqr:checked:after, input.faChkSqr:after {
+  visibility: visible;
+  font-family: FontAwesome;
+  font-size:25px;height: 17px; width: 17px;
+  position: relative;
+  top: -3px;
+  left: 0px;
+  background-color:#FFF;
+  display: inline-block;
+}
+
+input.faChkRnd:checked:after {
+  content: '\f058';
+}
+
+input.faChkRnd:after {
+  content: '\f10c';
+}
+
+input.faChkSqr:checked:after {
+  content: '\f14a';
+}
+
+input.faChkSqr:after {
+  content: '\f096';
+}
+/* check box css */
+
+</style>
+<script type="text/javascript" src="assets/txn/PMS901/PMS901.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS901" ng-controller="PMS901Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*資料統計日期：</th>
+							<td colspan="7">
+								<div class="form-group">
+									<div class="input-group datebox datewidth">
+										<input type="text" id="sDate" name="sDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sDate"
+										is-open="model.a"
+										datepicker-options="sDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate()"/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+									<div style="float: left !important;">～</div>
+									<div class="input-group datebox datewidth">
+										<input type="text" id="eDate" name="eDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.eDate"
+										is-open="model.b"
+										datepicker-options="eDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate()"/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td>
+								<e-combobox id="region_center_id" name="region_center_id"
+								ng-datasource="REGION_LIST"
+								ng-model="inputVO.region_center_id"
+								ng-validate="false" 
+								ng-disabled="disableRegionCombo"
+								ng-readonly="disableRegionCombo" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-change="ChangeRegion()"
+								width="200px"
+								style="line-height:20px;" />
+							</td>						
+							<th>營運區：</th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+								ng-datasource="AREA_LIST"
+								ng-model="inputVO.branch_area_id"
+								ng-validate="false" 
+								ng-disabled="disableAreaCombo"
+								ng-readonly="disableAreaCombo" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-change="ChangeArea()"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<th>分行：</th>
+							<td>
+								<e-combobox id="branch_nbr" name="branch_nbr"
+								ng-datasource="BRANCH_LIST"
+								ng-model="inputVO.branch_nbr"
+								ng-validate="false" 
+								ng-disabled="disableBranchCombo"
+								ng-readonly="disableBranchCombo" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-change="ChangeBranch()"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<th>員編：</th>
+						  	<td>
+						  		<e-combobox id="emp_id" name="emp_id"
+									ng-datasource="EMP_LIST"
+									ng-model="inputVO.emp_id"
+									ng-validate="false"
+									ng-readonly="disableEmpCombo" 
+									ng-readonly="disableEmpCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-disabled="disableEmpCombo"
+									ng-change="ChangeAo_code()"
+									width="150px"
+									style="line-height:20px;" />
+						  	</td>
+						</tr>	
+						<tr>
+							<th>圖形設定：</th>
+							<td>
+								<e-combobox id="setupCategory" name="setupCategory"
+								ng-datasource="mappingSet['SETUP_CAT']"
+								ng-model="inputVO.setupCategory"
+								ng-validate="false" 
+								ng-editable="false"
+								ng-format="F3"
+								width="200px"
+								style="line-height:20px;" />
+							</td>
+							<td colspan=3>
+								<e-combobox id="setupProd" name="setupProd"
+								ng-datasource="mappingSet['SETUP_PROD']"
+								ng-model="inputVO.setupProd"
+								ng-validate="false" 
+								ng-editable="false"
+								ng-format="F3"
+								width="250px"
+								style="line-height:20px;" />
+							</td>
+						</tr>				
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<div id="PMS901chartContainer" style="height: 370px; width: 100%;"></div>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

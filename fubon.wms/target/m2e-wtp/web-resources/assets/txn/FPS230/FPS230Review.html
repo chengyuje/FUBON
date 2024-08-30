@@ -1,0 +1,68 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .FPS230Review .modal-dialog {
+    min-width: 70vw;
+  }
+
+  .FPS230Review .modal-content {
+    height: auto;
+  }
+
+  .FPS230Review .text-left {
+    text-align: left;
+  }
+
+</style>
+<!-- WV USE -->
+<script type="text/javascript" src="assets/txn/FPS230/FPS230Review.js"></script>
+<!-- WV USE -->
+<div ng-controller="FPS230ReviewController"
+     ng-cloak
+     class="FPS FPS230Review">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a href="#"
+           class="close"
+           data-dismiss="modal"
+           aria-hidden="true"
+           ng-click="closeThisDialog('cancel')">&times; </a>
+        <h4 id="myModalAlertLabel"
+            class="modal-title">總行配置建議</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th></th>
+              <th>類別</th>
+              <th style="width: 40vw;">代碼商品</th>
+              <th>計價幣別<br/>保單幣別</th>
+              <th>佔比</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="row in paramList">
+              <td>
+                <input type="checkbox"
+                       ng-model="row.selected"
+                       ng-show="!((row.INV_PRD_TYPE==='1'&&row.INV_PRD_TYPE_2!='3')||row.textPRD_CNAME==='--')">
+              </td>
+              <td ng-bind="row.textPTYPE"></td>
+              <td ng-bind="row.textPRD_ID+' '+row.textPRD_CNAME"
+                  class="text-left"></td>
+              <td ng-bind="row.CURRENCY_TYPE"></td>
+              <td ng-bind="row.INV_PERCENT+'%'"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="padding text-center">
+          <a class="btn-fps"
+             ng-click="back2Main()">選購</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

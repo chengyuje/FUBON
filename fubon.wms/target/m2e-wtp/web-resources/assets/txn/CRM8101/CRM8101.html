@@ -1,0 +1,214 @@
+<script type="text/javascript" src="assets/txn/CRM8101/CRM8101.js"></script>
+
+<div class="CRM8101" ng-controller="CRM8101Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th width="10%">*客戶ID：</th>
+							<td width="25%"><input class="form-control" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" e-length-limit="15" ng-change="toUppercase_data(inputVO.custID, 'custid')"></td>
+							<th width="10%"></th>
+							<td width="25%"></td>
+							<th width="10%"></th>
+							<td width="25%"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" function-type="query" ng-click="query();" ng-disabled="inputVO.custID == null || inputVO.custID == '' || inputVO.custID == undefined">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+			</div>
+		</div>
+	</div>
+	<div ng-show="custList.length > 0">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<tr>
+						<td colspan="2">
+							<table>
+								<tr>
+									<th style="background-color:#BDE5FF; color: black;" width="10%">客戶ID：</th>
+									<td>{{custList[0].CUST_ID}}</td>
+								</tr>
+								<tr>
+									<th style="background-color:#BDE5FF; color: black;">客戶姓名：</th>
+									<td>{{custList[0].CUST_NAME}}</td>
+								</tr>
+								<tr>
+									<th style="background-color:#BDE5FF; color: black;" >資料日期：</th>
+									<td>{{custList[0].SNAP_YYYYMMDD}}</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td width="50%" style="vertical-align:top;">
+							<table>
+								<tr>
+									<th style="text-align:center;vertical-align:middle;background-color:#BDE5FF;color:black;" width="50%">投組參考總市值<span style="font-size:13px;">(折合臺幣)</span></th>
+									<th style="text-align:center;vertical-align:middle;background-color:#BDE5FF;color:black;" width="50%" colspan="2">參考總報酬率<span style="font-size:13px;">(含配息)</span></th>
+								</tr>
+								<tr>
+									<td style="text-align:center;">{{custList[0].REF_MK_VALUE | number:0}}</td>
+									<td style="text-align:center;">{{custList[0].REF_ROI | number:2}}&nbsp;%</td>
+									<td style="text-align:center;vertical-align:middle;" "width="5%"><span class="glyphicon glyphicon-warning-sign" style="color:red" ng-if="custList[0].ERROR_ICON == 'Y'"></span></td>
+								</tr>
+								<tr ng-show="openFlag == 'T'">
+									<td colspan="3" style="text-align:center;">
+										<button type="button" class="btn btn-link" ng-click="open('F')">
+											<span style="font-size:13px;">查看詳情&nbsp;<span class="glyphicon glyphicon-minus"></span></span>
+										</button>
+									</td>
+								</tr>
+								<tr ng-show="openFlag == 'F'">
+									<td colspan="3" style="text-align:center;">
+										<button type="button" class="btn btn-link" ng-click="open('T')">
+											<span style="font-size:13px;">查看詳情&nbsp;<span class="glyphicon glyphicon-plus"></span></span>
+										</button>
+									</td>
+								</tr>
+							</table>
+<!-- 							2023/12/13 通知拿掉 -->
+<!-- 							<table ng-show="openFlag == 'T'"> -->
+<!-- 								<tr> -->
+<!-- 									<th colspan="2" style="background-color:#BDE5FF; color: black;">產品風險等級分布</th> -->
+<!-- 								</tr> -->
+<!-- 								<tr> -->
+<!-- 									<td style="text-align:center;" width="50%">P1</td> -->
+<!-- 									<td style="text-align:center;" width="50%">{{custList[0].PROD_RISK_P1_PR | number:2}}&nbsp;%</td> -->
+<!-- 								</tr> -->
+<!-- 								<tr> -->
+<!-- 									<td style="text-align:center;" width="50%">P2</td> -->
+<!-- 									<td style="text-align:center;" width="50%">{{custList[0].PROD_RISK_P2_PR | number:2}}&nbsp;%</td> -->
+<!-- 								</tr> -->
+<!-- 								<tr> -->
+<!-- 									<td style="text-align:center;" width="50%">P3</td> -->
+<!-- 									<td style="text-align:center;" width="50%">{{custList[0].PROD_RISK_P3_PR | number:2}}&nbsp;%</td> -->
+<!-- 								</tr> -->
+<!-- 								<tr> -->
+<!-- 									<td style="text-align:center;" width="50%">P4</td> -->
+<!-- 									<td style="text-align:center;" width="50%">{{custList[0].PROD_RISK_P4_PR | number:2}}&nbsp;%</td> -->
+<!-- 								</tr> -->
+<!-- 							</table> -->
+<!-- 							<table ng-show="openFlag == 'T'"> -->
+<!-- 								<tr> -->
+<!-- 									<th style="text-align:center;vertical-align:middle;background-color:#BDE5FF;color:black;" width="33%">投組風險權值</th> -->
+<!-- 									<th style="text-align:center;vertical-align:middle;background-color:#BDE5FF;color:black;" width="34%">客戶風險屬性</th> -->
+<!-- 									<th style="text-align:center;vertical-align:middle;background-color:#BDE5FF;color:black;" width="33%">是否逾越<br>風險檢核值</th> -->
+<!-- 								</tr> -->
+<!-- 								<tr> -->
+<!-- 									<td style="text-align:center;">{{custList[0].RISK_SUM | number:2}}</td> -->
+<!-- 									<td style="text-align:center;">{{custList[0].CUST_KYC}}<span style="font-size:13px;">(風險檢核值{{custList[0].RISK_VALUE}})</span></td> -->
+<!-- 									<td style="text-align:center;">{{custList[0].VALIDATE_YN | mapping:mappingSet['COMMON.YES_NO']}}</td> -->
+<!-- 								</tr> -->
+<!-- 							</table> -->
+							<table ng-show="openFlag == 'T'">
+								<tr>
+									<th style="text-align:center;vertical-align:middle;background-color:#BDE5FF;color:black;" colspan="2">幣別分布</th>
+								</tr>
+								<tr class="repeat-row" align="center" ng-repeat="row in prdCurrList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td width="50%">{{row.CUR_TYPE_NAME}}</td>
+									<td width="50%">{{row.CUR_PR | number:2}}&nbsp;%</td>
+								</tr>
+							</table>
+							<div>
+								註：<br>
+								1、匯率以資料日期之日終買匯匯率計算<br>
+<!-- 								2、各產品風險等級分布及投組風險權值係依庫存成本進行計算，不含在途交易資訊。<br> -->
+<!-- 								3、若投組風險權值逾越風險檢核值，將不得再進行越級投資，僅能承作符合客戶風險屬性之產品。產品是否能承作，仍以交易當下之投組適配為準。<br> -->
+								2、投資型保險相關資訊僅為富邦人壽商品
+							</div>
+						</td>
+						<!-- 繪圖 : 圓餅圖   -->
+						<td width="50%" align="center">
+							<h3>各產品市值分布(%)</h3>
+							<nvd3 options="options" data="data"></nvd3>
+						</td>
+					</tr>
+					<tr ng-show="openFlag == 'T'">
+						<td colspan="2">
+							<table>
+								<thead>
+									<tr>
+										<th>幣別</th>
+										<th>產品</th>
+										<th>參考總市值<br>(A)</th>
+										<th>參考總投資金額<br>(B)</th>
+										<th>參考總配息<br>(C)</th>
+										<th>參考總損益金額(含配息)<br>(D)=(A)-(B)+(C)</th>
+										<th>參考總報酬率(含配息)<br>(D)/(B)</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" align="center" ng-repeat="row in incomeList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td width="10%" style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'background-color: #D2F1F3;'}}">
+											<span style="font-weight: bold;">{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : row.CUR_TYPE_NAME}}</span>
+										</td>
+										<td width="15%" style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'background-color: #D2F1F3;'}}">
+											<span style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'font-weight: bold;'}}">{{row.PROD_TYPE}}</span>
+										</td>
+										<td width="15%" style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'background-color: #D2F1F3;'}}">
+											<span style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'font-weight: bold;'}}">
+												<font ng-show="row.CUR_TYPE == 'TWD' && row.REF_MK_VALUE != null">{{row.REF_MK_VALUE | number:0}}</font>
+												<font ng-show="row.CUR_TYPE != 'TWD' && row.REF_MK_VALUE != null">{{row.REF_MK_VALUE | number:2}}</font>
+												<font ng-show="row.REF_MK_VALUE == null">ー</font>
+											</span>
+										</td>
+										<td width="15%" style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'background-color: #D2F1F3;'}}">
+											<span style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'font-weight: bold;'}}">
+												<font ng-show="row.CUR_TYPE == 'TWD' && row.REF_INVEST != null">{{row.REF_INVEST | number:0}}</font>
+												<font ng-show="row.CUR_TYPE != 'TWD' && row.REF_INVEST != null">{{row.REF_INVEST | number:2}}</font>
+												<font ng-show="row.REF_INVEST == null">ー</font>
+											</span>
+										</td>
+										<td width="15%" style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'background-color: #D2F1F3;'}}">
+											<span style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'font-weight: bold;'}}">
+												<font ng-show="row.CUR_TYPE == 'TWD' && row.REF_DIVIDEND != null">{{row.REF_DIVIDEND | number:0}}</font>
+												<font ng-show="row.CUR_TYPE != 'TWD' && row.REF_DIVIDEND != null">{{row.REF_DIVIDEND | number:2}}</font>
+												<font ng-show="row.REF_DIVIDEND == null">ー</font>
+											</span>
+										</td>
+										<td width="15%" style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'background-color: #D2F1F3;'}}">
+											<span style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'font-weight: bold;'}}">
+												<font ng-show="row.CUR_TYPE == 'TWD' && row.REF_INCOME != null">{{row.REF_INCOME | number:0}}</font>
+												<font ng-show="row.CUR_TYPE != 'TWD' && row.REF_INCOME != null">{{row.REF_INCOME | number:2}}</font>
+												<font ng-show="row.REF_INCOME == null">ー</font>
+											</span>
+										</td>
+										<td width="15%" style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'background-color: #D2F1F3;'}}">
+											<span style="{{row.CUR_TYPE != null && row.PROD_TYPE != null ? '' : 'font-weight: bold;'}}">{{row.REF_ROI | number:2}}&nbsp;{{row.REF_ROI != null ? '%' : 'ー'}}</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<div>
+								註：<br>
+								1、海外債：參考總配息＝累積配息＋應收前手息ㄧ已付前手息<br>
+								2、海外債-金市：參考總配息＝累積現金配息＋應收前手息(以Actual／365預估計算)ㄧ已付前手息<br>
+								3、金錢信託：金錢信託下之投資商品，目前無提供配息資訊，配息金額全數轉至信託活存專戶。<br>
+								4、黃金存摺：無配息<br>
+								5、投資型保險：<br>
+								&emsp;&nbsp;●投資型保險相關資訊僅為富邦人壽商品<br>
+								&emsp;&nbsp;●投資型保險無提供全委帳戶撥回或標的配息相關資訊<br>
+								&emsp;&nbsp;●投資型保險之損益計算已還原客戶持有保單期間發生之領回或贖回等；投資型保險的預估現金價值可能因客戶申請部分提領、贖回、解約、保單借款或相關原因而減少，亦可能導致參考報酬率下降。<br>
+								&emsp;&nbsp;●欲查詢保單現況，可至保險公司官網之保戶會員專區查詢。<br>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>	

@@ -1,0 +1,244 @@
+<style>
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS111/PMS111.js"></script>
+<div class="PMS111" ng-controller="PMS111Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >名單執行聯繫情形</div>
+	</div>
+	<div class="panel_content">
+		<uib-tabset active="0" justified="true">
+			<uib-tab index="0" heading="留資名單執行統計表" select="init()">
+				<h4 class="h4-title">查詢條件</h4>
+				<div class="search_table search_box3">
+					<table>
+			            <tr>
+			              	<th><font color="red">*</font>名單建立年月：</th>
+			                <td>
+			                	<div style="float:left">
+				            		<e-combobox id="sDate" name="sDate"
+												ng-datasource="SDateList" 
+												ng-model="inputVO.sDate"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-change="getEDateList();cleanList();"
+												ng-format="F3"
+												width="100px"
+												ng-required="true" />
+								</div>
+								<div style="float:left">&nbsp; ～ &nbsp;</div>
+								<div style="float:left">
+									<e-combobox id="eDate" name="eDate"
+												ng-datasource="EDateList" 
+												ng-model="inputVO.eDate"
+												ng-validate="false" 
+												ng-disabled="EDateList.length <= 1"
+												ng-readonly="EDateList.length <= 1" 
+												ng-editable="false"
+												ng-format="F3"
+												width="100px"
+												ng-change="cleanList()"
+												ng-required="true" />	
+								</div>
+							</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th class="with-errors" style="white-space: pre-line;" colspan="4">
+								提示：
+								1.&nbsp;名單建立年月起迄期間最長一年
+							</th>
+						</tr>
+			       </table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="query('execStatistics')" function-type="query">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+					<button type="button" class="btn btn-info" ng-click="export('execStatistics')" function-type="export" ng-disabled="execStatisticsList.length == 0">匯出</button>
+				</div>
+				<h4 class="h4-title">查詢結果</h4>
+	        	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+	          		<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="execStatisticsList">
+	          			<thead>
+		            		<tr>
+		              			<th rowspan="2">業務處</th>
+		              			<th rowspan="2">營運區</th>
+		              			<th rowspan="2">分行別</th>
+		              			<th rowspan="2">分行名稱</th>
+		              			<th rowspan="2">組別</th>
+		              			<th colspan="3">官網線上留資房貸名單</th>
+		              			<th colspan="3">官網線上留資信貸名單</th>
+		              			<th colspan="3">官網轉介房貸名單</th>
+		              			<th colspan="3">電銷轉介房貸名單</th>
+		              			<th colspan="3">名單合計</th>
+		              		</tr>
+		              		<tr>
+		              			<th>未聯繫</th>
+		              			<th>已聯繫</th>
+		              			<th>名單數</th>
+		              			
+		              			<th>未聯繫</th>
+		              			<th>已聯繫</th>
+		              			<th>名單數</th>
+		              			
+		              			<th>未聯繫</th>
+		              			<th>已聯繫</th>
+		              			<th>名單數</th>
+		              			
+		              			<th>未聯繫</th>
+		              			<th>已聯繫</th>
+		              			<th>名單數</th>
+		              			
+		              			<th>未聯繫</th>
+		              			<th>已聯繫</th>
+		              			<th>名單數</th>
+		              		</tr>
+	              		</thead>
+						<tbody>
+							<tr ng-repeat-start="center in execStatisticsList">
+								<td align="center" rowspan="{{center.ROWSPAN}}" colspan="{{center.COLSPAN}}" ng-if="center.REGION_CENTER_NAME != null && !(center.REGION_CENTER_NAME).includes('合計')">{{center.REGION_CENTER_NAME}}</td>
+								<td align="center" rowspan="{{center.ROWSPAN}}" colspan="{{center.COLSPAN+1}}" ng-if="center.REGION_CENTER_NAME != null && (center.REGION_CENTER_NAME).includes('合計')">{{center.REGION_CENTER_NAME}}</td>
+							</tr>
+							<tr ng-repeat-start="branchArea in center.BRANCH_AREA">
+								<td align="center" rowspan="{{branchArea.ROWSPAN}}" colspan="{{branchArea.COLSPAN}}" ng-if="branchArea.BRANCH_AREA_NAME != null">{{branchArea.BRANCH_AREA_NAME}}</td>
+								<td align="center" rowspan="{{branchArea.ROWSPAN}}" ng-if="branchArea.BRANCH_AREA_NAME != null && (branchArea.BRANCH_AREA_NAME).includes('合計')">{{branchArea.BRANCH_AREA_GROUP}}</td>
+							</tr>
+							<tr ng-repeat-start="branch in branchArea.BRANCH">
+								<td align="center" rowspan="{{branch.ROWSPAN+1}}" ng-if="branch.BRANCH_NAME != null">{{branch.BRANCH_NBR}}</td>
+								<td align="center" rowspan="{{branch.ROWSPAN+1}}" ng-if="branch.BRANCH_NAME != null">{{branch.BRANCH_NAME}}</td>
+								<td align="center" rowspan="{{branch.ROWSPAN+1}}" ng-if="branch.BRANCH_NAME != null">{{branch.AREA_GROUP}}</td>
+							</tr>
+							<tr ng-repeat-end ng-repeat="role in branch.ROLE">
+								<td align="right">{{role.L05_NO_CONTENT}}</td>
+								<td align="right">{{role.L05_CONTENT}}</td>
+								<td align="right">{{role.L05_ALL}}</td>
+								<td align="right">{{role.L06_NO_CONTENT}}</td>
+								<td align="right">{{role.L06_CONTENT}}</td>
+								<td align="right">{{role.L06_ALL}}</td>
+								<td align="right">{{role.LH1_NO_CONTENT}}</td>
+								<td align="right">{{role.LH1_CONTENT}}</td>
+								<td align="right">{{role.LH1_ALL}}</td>
+								<td align="right">{{role.LUX_NO_CONTENT}}</td>
+								<td align="right">{{role.LUX_CONTENT}}</td>
+								<td align="right">{{role.LUX_ALL}}</td>
+								<td align="right">{{role.LALL_NO_CONTENT}}</td>
+								<td align="right">{{role.LALL_CONTENT}}</td>
+								<td align="right">{{role.LALL_ALL}}</td>
+							</tr>
+							<tr ng-repeat-end ng-hide="true"></tr>
+							<tr ng-repeat-end ng-hide="true"></tr>
+						</tbody>
+	         		</table>
+	        	</div>
+			</uib-tab> 
+			<uib-tab index="1" heading="留資名單未聯繫明細表" select="init()">
+				<h4 class="h4-title">查詢條件</h4>
+				<div class="search_table search_box3">
+					<table>
+			            <tr>
+			              	<th>*名單建立年月：</th>
+			                <td>
+			                	<div style="float:left">
+				            		<e-combobox id="sDate" name="sDate"
+												ng-datasource="SDateList" 
+												ng-model="inputVO.sDate"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-change="getEDateList()"
+												ng-format="F3"
+												width="100px"
+												ng-required="true" />
+								</div>
+								<div style="float:left">&nbsp; ～ &nbsp;</div>
+								<div style="float:left">
+									<e-combobox id="eDate" name="eDate"
+												ng-datasource="EDateList" 
+												ng-model="inputVO.eDate"
+												ng-validate="false" 
+												ng-disabled="EDateList.length <= 1"
+												ng-readonly="EDateList.length <= 1" 
+												ng-editable="false"
+												ng-format="F3"
+												width="100px"
+												ng-required="true" />	
+								</div>
+							</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th class="with-errors" style="white-space: pre-line;" colspan="4">
+								提示：
+								1.&nbsp;名單建立年月起迄期間最長一年
+							</th>
+						</tr>
+			       </table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="query('noContentDtl')" function-type="query">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+					<button type="button" class="btn btn-info" ng-click="export('noContentDtl')" function-type="export" ng-disabled="noContentDtlList.length == 0">匯出</button>
+				</div>
+				<h4 class="h4-title">查詢結果</h4>
+				<e-jumping-once output="outputVO_T2" list="data_T2" totallist="noContentDtlList"></e-jumping-once>
+				
+	        	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+	          		<table>
+	          			<thead>
+							<tr>
+								<th>名單種類</th>
+								<th>名單日期<br />(名單建立日期)</th>
+								<th>業務處</th>
+								<th>營運區</th>
+								<th>歸屬行</th>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>指定員編</th>
+								<th>名單狀態</th>
+								<th>名單維護者</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in data_T2 track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center">{{row.LEAD_TYPE_NAME}}</td>
+								<td align="center">{{row.CREATETIME}}</td>
+								<td align="center">{{row.REGION_CENTER_NAME}}</td>
+								<td align="center">{{row.BRANCH_AREA_NAME}}</td>
+								<td align="center">{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+								<td align="center">{{row.CUST_ID}}</td>
+								<td align="center">{{row.CUST_NAME}}</td>
+								<td align="center">{{row.EMP_ID}}</td>
+								<td align="center">{{row.RESPONSE_NAME}}</td>
+								<td align="center">{{row.EXEC_EMP_ID}}{{row.EXEC_EMP_NAME == null ? '' : '-' + row.EXEC_EMP_NAME}}</td>
+							</tr>
+						</tbody>
+					</table>
+	        	</div>
+				<div algin="left">
+					<table>
+						<tr>
+							<td>說明：</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>※指定員編：若客戶於本行有理專，則為理專員編；若無，則為空白。</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>※名單維護者：名單執行人員(系統分派或主管指派之人員)。</td>
+							<td></td>
+						</tr>
+					</table>
+				</div>
+			</uib-tab>
+		</uib-tabset>
+	</div>
+	
+</div>

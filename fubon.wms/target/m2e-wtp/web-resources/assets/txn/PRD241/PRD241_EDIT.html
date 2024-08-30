@@ -1,0 +1,97 @@
+<style>
+
+</style>
+<div ng-controller="PRD241_EDITController" ng-cloak>
+	<div class="modal-dialog PRD241">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.PRD_ID == null ? '新增' : '編輯'}}股票</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*股票代碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_id" name="prd_id" class="form-control" ng-model="inputVO.prd_id" ng-disabled="row.PRD_ID != null" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.prd_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入股票代碼</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="!canEdit">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">{{errMsg | i18n:[' ']}}</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">股票名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="stock_name" name="stock_name" class="form-control" ng-model="inputVO.stock_name" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">CNR分配率：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="yield" name="yield" class="form-control" ng-model="inputVO.yield" e-length-limit="4" e-length-type="ND" e-input-limit="ND"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">CNR加減碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="cnr_mult" name="cnr_mult" class="form-control" ng-model="inputVO.cnr_mult" e-length-limit="4" e-length-type="ND" e-input-limit="ND"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">加碼區間起迄日：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="multi_sDate" name="multi_sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.multi_sDate"
+									is-open="model.a"
+									datepicker-options="multi_sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="multi_eDate" name="multi_eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.multi_eDate"
+									is-open="model.b"
+									datepicker-options="multi_eDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

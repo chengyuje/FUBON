@@ -1,0 +1,224 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.middle th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS339/PMS339.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS339" ng-controller="PMS339Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th>*資料年月： </th>						
+						<td><e-combobox id="eTime"
+										ng-datasource="mappingSet['timeE']" ng-model="inputVO.sTime"
+										ng-validate="false" ng-readonly="false" ng-editable="false"
+										ng-change="dateChange()"
+										ng-format="F3" ng-required="true" width="200px" height="30px"
+										style="line-height:20px;" /></td>
+						<th>業務處：</th>
+							<td><e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id"
+									ng-validate="false" 
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeRegion()"
+									width="200px"
+									style="line-height:20px;" />
+							</td>
+						<th>營運區：</th>
+						<td><e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeArea()"
+									width="200px"
+									style="line-height:20px;" />
+						</td>
+						</tr>
+						<tr>
+							<th>&nbsp;分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch()"
+									width="200px"
+									style="line-height:20px;" />
+							</td>
+							<th>理專：</th>
+							<td><e-combobox id="emp_id" name="emp_id"
+									ng-datasource="EMP_LIST"
+									ng-model="inputVO.emp_id"
+									ng-validate="false"
+									ng-disabled="disableEmpCombo"
+									ng-readonly="disableEmpCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeAo_code()"
+									width="200px"
+									style="line-height:20px;" />
+							</td>						
+					</tr>					
+				</table>
+					
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init() ;initRole()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>			
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">	
+			<e-jumping output="outputVO" input="inputVO"
+				query="inquire()" list="paramList"></e-jumping>	    			
+			<div algin="left">
+				<table>
+			    	<tr>
+			    		<td align="right">資料產生日期：</td>
+			    		<td align="left">{{curDate | date:'yyyy/MM/dd'}}</td>
+			    	</tr>
+			    	<tr>
+			    		<td align="right">報表說明：</td>
+			    		<td align="left">房貸壽險獎勵金報表</td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+				<table class="table-bordered">
+					<thead>
+						<tr>
+							<td colspan="{{con_page}}" align="center">{{year}}年{{month}}月 壽險共同行銷保費／佣金明細表</td>
+						</tr>
+						<tr>
+							<!-- 2017/06/27新增三個欄位 START -->
+							<th>保單號碼</th>	
+							<th>要保人ID</th>
+							<th>要保人姓名</th>
+							<!-- 2017/06/27新增三個欄位 END-->
+							
+							<th>工作年</th>							
+							<th>工作月</th>							
+							<th>契約狀態</th>
+							<th>保單年度</th>
+							<th>保單期數</th>
+							<th>險種</th>
+							<th>保費</th>
+							<th ng-if="!psflag">佣金率</th> <!-- 分行權限不能看 個人獎金率 -->
+							<th ng-if="!psflag">佣金</th>							
+						</tr>													
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList | filter: {CONTRACT_STATE : '有效'} track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+							<!-- 2017/06/27新增三個欄位 START -->
+ 						 	<td>{{row.POLICY_NO}}</td>				 							
+							<td>{{row.APPL_ID}}</td>														
+							<td>{{row.APPL_NAME}}</td>
+ 							<!-- 2017/06/27新增三個欄位 END-->	
+ 							 	
+ 						 	<td>{{row.WORK_YY}}</td>				 							
+							<td>{{row.WORK_MM}}</td>														
+							<td>{{row.CONTRACT_STATE}}</td>
+							<td>{{row.POLICY_YEAR}}</td>
+							<td>{{row.POLICY_NOP}}</td>				 							
+							<td>{{row.INSURANCE}}</td>														
+							<td>{{row.INS_FEE | number}}</td>
+							<td ng-if="!psflag">{{row.CMSN_RATE}}%</td>
+							<td ng-if="!psflag">{{row.CMSN | number}}</td>							
+						</tr>
+						<tr ng-repeat="row2 in paramList | filter: {CONTRACT_STATE : '原始總保費／佣金收入合計'} track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						    <th colspan="9">{{year}}年{{month}}月原始總保費／佣金收入合計</th>
+							<th>{{row2.INS_FEE | number}}</th>
+							<th ng-if="!psflag"></th>
+							<th ng-if="!psflag">{{row2.CMSN | number}}</th>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row3 in paramList | filter: {CONTRACT_STATE : '契約撤／取消'} track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<!-- 2017/06/27新增三個欄位 START -->
+ 						 	<td>{{row3.POLICY_NO}}</td>				 							
+							<td>{{row3.APPL_ID}}</td>														
+							<td>{{row3.APPL_NAME}}</td>
+ 							<!-- 2017/06/27新增三個欄位 END-->	
+ 							
+							<td>{{row3.WORK_YY}}</td>				 							
+							<td>{{row3.WORK_MM}}</td>														
+							<td>{{row3.CONTRACT_STATE}}</td>
+							<td>{{row3.POLICY_YEAR}}</td>
+							<td>{{row3.POLICY_NOP}}</td>				 							
+							<td>{{row3.INSURANCE}}</td>														
+							<td>{{row3.INS_FEE | number}}</td>
+							<td ng-if="!psflag">{{row3.CMSN_RATE}}%</td>
+							<td ng-if="!psflag">{{row3.CMSN | number}}</td>
+						</tr>
+						<tr ng-repeat="row4 in paramList | filter: {CONTRACT_STATE : '扣除契約撤銷保費／佣金收入合計'} track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+							<th colspan="9">扣除契約撤銷<br>{{year}}年{{month}}月 保費／佣金收入合計</th>
+							<th>{{row2.INS_FEE+row4.INS_FEE | number}}</th>
+							<th ng-if="!psflag"></th>
+							<th ng-if="!psflag">{{row2.CMSN+row4.CMSN | number}}</th>
+						</tr>
+						
+						<tr ng-repeat="row5 in paramList | filter: {CONTRACT_STATE : '總計'} track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+							<th colspan="9">{{year}}年{{month}}月 總保費／佣金收入合計</th>
+							<th>{{row5.INS_FEE | number}}</th>
+							<th ng-if="!psflag"></th>
+							<th ng-if="!psflag">{{row5.CMSN | number}}</th>
+						</tr>
+					
+					</tbody>
+				</table>								
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

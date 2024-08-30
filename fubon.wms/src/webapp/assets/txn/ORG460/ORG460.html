@@ -1,0 +1,156 @@
+<style>
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.rstable tbody tr td {
+	vertical-align:middle;
+	text-align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG460/ORG460.js"></script>
+<div ng-controller="ORG460Controller" ng-cloak>
+	<div class="tfb_content">
+     	<div class="tfb_content_icon"></div>
+     	<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+  	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3 scroll_y">
+			<table style="width: 100%;">
+				<tr>
+					<th width="16.6%">業務處：</th>
+					<td width="16.6%">
+						<e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id"
+									ng-validate="false" 
+									ng-disabled="AVAIL_REGION.length == 1"
+									ng-readonly="AVAIL_REGION.length == 1" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeRegion(region)"
+									style="line-height:20px;" />
+				   	</td>
+					<th width="16.6%">營運區：</th>
+					<td width="16.6%">
+						<e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="AVAIL_AREA.length == 1"
+									ng-readonly="AVAIL_AREA.length == 1" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeArea(region)"
+									style="line-height:20px;" />
+				   	</td>
+					<th width="16.6%">分行：</th>
+					<td width="16.6%">
+						<e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="AVAIL_BRANCH.length == 1"
+									ng-readonly="AVAIL_BRANCH.length == 1" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch(region)"
+									style="line-height:20px;" />
+			   		</td>
+				</tr>
+				<tr>
+					<th width="20%">職務別：</th>
+					<td width="30%">
+						<e-combobox id="" 
+									ng-datasource="mappingSet['aoRankLst']"
+									ng-model="inputVO.AO_JOB_RANK"
+				   					ng-validate="false" 
+				   					ng-readonly="false" 
+				   					ng-editable="false"
+				   					ng-format="F3"
+				   					ng-required="false"/>
+				   	</td>
+					<th width="20%">掛GOAL月份：</th>
+					<td width="30%">
+						<div class="input-group datebox datewidth">
+							<input type="text" id="" name="" 
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM"
+								   ng-model="inputVO.PERF_EFF_DATE"
+								   datepicker-options="{minMode: 'month'}"
+								   datepicker-mode="'month'"
+								   is-open="model.a"
+								   ng-readonly="true"/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+								<i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="query()" function-type="query">查詢</button>
+		<button type="button" class="btn btn-info" ng-click="init()" >清除</button>
+		<button type="button" class="btn btn-info" ng-click="export()" function-type="export" ng-disabled="aoGoalLst.length == 0">匯出</button>
+		<button type="button" class="btn btn-info" ng-click="exportForHis()" function-type="export" ng-disabled="aoHistLst.length == 0 || aoHistLst == undefined">下載歷史掛Goal資料</button>
+	</div>
+	</div>
+	<div class="tfb_content">
+     	<div class="tfb_content_icon"></div>
+     	<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+  	</div>
+	<div class="panel_content">
+		<e-jumping-once output="outputVO" list="data" totallist="aoGoalLst"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="tablesaw table table-striped table-bordered rstable">
+				<thead>
+					<tr>
+						<th>單位</th>
+						<th>營運區</th>
+						<th>分行代號</th>
+						<th>營業單位</th>
+						<th>員編</th>
+						<th>員工姓名</th>
+						<th>職務別</th>
+						<th>CODE</th>
+						<th>AOCODE建立時間</th>
+						<th>副CODE</th>
+						<th>維護CODE</th>
+						<th>副CODE月份</th>
+						<th>任該職務掛GOAL日</th>
+						<th>掛GOAL日</th>
+						<th>業務主管姓名</th>
+						<th>業務主管員編</th>
+						<th>分組</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{row.REGION_CENTER_NAME}}</td>
+						<td>{{row.BRANCH_AREA_NAME}}</td>
+						<td>{{row.BRANCH_NBR}}</td>
+						<td>{{row.BRANCH_NAME}}</td>
+						<td>{{row.EMP_ID}}</td>
+						<td>{{row.EMP_NAME}}</td>
+						<td>{{row.AO_JOB_RANK}}</td>
+						<td>{{row.AO_CODE}}</td>
+						<td>{{row.CREATETIME}}</td>
+						<td style="white-space: pre">{{row.CODE_LIST_2}}</td>
+						<td style="white-space: pre">{{row.CODE_LIST_3}}</td>
+						<td style="white-space: pre">{{row.ACTDATE_LIST_2}}</td>
+						<td>{{row.JOB_GOAL_DATE | limitTo: 10}}</td>
+						<td>{{row.PERF_EFF_DATE | limitTo: 10}}</td>
+						<td>{{row.SALES_SUP_EMP_NAME}}</td>
+						<td>{{row.SALES_SUP_EMP_ID}}</td>
+						<td>{{row.GROUP_TYPE}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

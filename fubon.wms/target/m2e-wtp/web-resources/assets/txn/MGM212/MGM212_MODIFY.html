@@ -1,0 +1,104 @@
+<style>
+/* dialog panl */
+.modal-dialog.MGM212_MODIFY {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+
+.bigspace {
+    margin-left: 20px !important;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MGM212/MGM212_MODIFY.js"></script>
+<div ng-controller="MGM212_MODIFYController" ng-cloak>
+	<div class="modal-dialog MGM212_MODIFY">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">點數修改</h4>
+			</div>
+			<div class="modal-body">
+		    	<!--Content of the panel-->
+	            <div class="search_table">
+	                <table>
+	                    <tr>
+	                        <th width="10%"><span style="color: red">*</span>案件序號：</th>
+	                        <td width="40%">
+	                            <input type="text" class="form-control" 
+				     				id="seq" name="seq" 
+	                            	placeholder="請輸入..." 
+				     				ng-model="inputVO.seq"
+				     				e-length-limit="300"
+				     				style="width:60%; display: inline;">
+				     			
+				     			<button type="button" class="btn btn-info bigspace" 
+				     				ng-click="getPoints()" 
+				     				ng-disabled="inputVO.seq == undefined || inputVO.seq == ''"
+				     				function-type="query">查詢</button>
+	                        </td>
+	                    </tr>	                	
+	                </table>
+                   	<div class="gv_tab_sc">
+                    	<table class="tablesaw table table-striped table-bordered">
+							<thead>
+								<tr>
+									<th>案件序號</th>
+									<th>推薦人</th>
+									<th>原點數</th>
+									<th><span style="color: red">*</span>修改後點數</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td ng-bind="seq"></td>
+									<td ng-bind="mgm_cust_id"></td>
+									<td ng-bind="be_edit_points == null ? '未達門檻' : be_edit_points"></td>
+									<td style="text-align: center;">
+										<input type="text" class="form-control" 
+						     				id="appr_points" name="appr_points" 
+			                            	placeholder="請輸入..."
+			                            	e-input-limit="N"
+						     				ng-model="inputVO.appr_points"
+						     				style="width:120px; display: inline;">點
+									</td>
+								</tr>
+							</tbody>
+						</table>
+                   	</div>
+					<table>
+						<tr>
+							<th><span style="color: red">*</span>修改原因：<br>(文字內容僅限100字內)</th>
+							<td>
+								<textarea placeholder="請輸入..." class="form-control"
+										  ng-model="inputVO.modify_reason" 
+										  maxlength="100" 
+										  style="width: 100%; height: 100px">
+								</textarea>
+							</td>
+						</tr>
+						<tr>
+							<th>修改憑證上傳：</th>
+							<td>
+								<e-upload success="upload(name,rname)"></e-upload>
+							</td>
+						</tr>					
+					</table>
+	            </div>
+            </div>
+            <div class="search_box_btn text-center">
+            	<button type="button" class="btn btn-info" ng-click="saveModify()" 
+            		ng-disabled="inputVO.seq == undefined || inputVO.seq == '' ||
+            						inputVO.appr_points == undefined || inputVO.appr_points == '' ||
+            						inputVO.modify_reason == undefined || inputVO.modify_reason == ''">確認後儲存</button>
+            	<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+            	<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">取消</button>
+            </div>
+		</div>
+	</div>
+</div>

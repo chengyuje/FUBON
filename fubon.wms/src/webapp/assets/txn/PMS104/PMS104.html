@@ -1,0 +1,288 @@
+<style>
+/* open dialog */
+.ngdialog.PMS104 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS104 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+
+.PMS104 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS104.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS104_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.clas tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<script type="text/javascript" src="assets/txn/PMS104/PMS104.js"></script>
+
+<script type="text/javascript" src="assets/txn/PMS104/PMS104_DETAIL.js"></script>
+
+<div class="PMS104" ng-controller="PMS104Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+						<th>*到期金流名單年月：</th>
+							<td>
+								<e-combobox id="sCreDate"
+								ng-datasource="mappingSet['timeE']" 
+								ng-model="inputVO.sCreDate"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3" 
+								ng-required="true" 
+								width="100px" 
+								height="30px"
+								style="line-height:20px;" 
+								ng-change="dateChange()"/>
+							</td>
+							
+							<th>業務處：</th>
+							<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+								ng-datasource="REGION_LIST"
+								ng-model="inputVO.region_center_id"
+								ng-validate="false" 
+								ng-disabled="disableRegionCombo"
+								ng-readonly="disableRegionCombo" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="ChangeRegion()"
+								width="143px"
+								style="line-height:20px;" />
+							</td>				
+
+							<th> 分行別： </th>
+							<td>
+								<e-combobox id="branch_nbr" name="branch_nbr"
+								ng-datasource="BRANCH_LIST"
+								ng-model="inputVO.branch_nbr"
+								ng-validate="false" 
+								ng-disabled="disableBranchCombo"
+								ng-readonly="disableBranchCombo" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="false"
+								ng-change="ChangeBranch()"
+								width="155px"
+								style="line-height:20px;" />
+							</td>
+						</tr>
+						
+						<tr>
+							<th> 營運區： </th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+								ng-datasource="AREA_LIST"
+								ng-model="inputVO.branch_area_id"
+								ng-validate="false" 
+								ng-disabled="disableAreaCombo"
+								ng-readonly="disableAreaCombo" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="ChangeArea()"
+								width="100px"
+								style="line-height:20px;" />
+							</td>							
+
+							<th> 理專： </th>
+							<td>
+								<e-combobox id="ao_code" name="ao_code"
+								ng-datasource="AO_LIST"
+								ng-model="inputVO.ao_code"
+								ng-validate="false"
+								ng-disabled="disableAoCombo"
+								ng-readonly="disableAoCombo" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="false"
+								ng-change="ChangeAo_code()"
+								width="143px"
+								style="line-height:20px;" />
+							</td>		
+							<th><font style="color:red">註：金流運用率超過999.99%，以999.99%計</font></th>
+							<td></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()"
+					function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList" e-connect="XXX"></e-jumping>
+				<div algin="left">
+					<table>
+						<tr>
+							<td>產出頻率：</td>
+							<td>每月</td>
+						</tr>
+						<tr>
+							<td>產出日：</td>
+							<td >{{toJsDate(paramList[0].CREATETIME)
+								|date:'yyyy/MM/dd'}}</td>
+							
+						</tr>
+					</table>
+				</div>
+			<div class="gv_tab_sc scroll_y">
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr rowspan="2">
+							<th colspan="9" style="vertical-align: midddle" valign="center">上月到期金流</th>
+							<th colspan="3" style="vertical-align: midddle" valign="center">近2個月投保商品成交金額</th>
+						</tr>
+						<tr>
+							<th>項次</th>
+							<th>年月</th>
+							<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<e-sorter e-input="inputVO" e-col="REGION_CENTER_NAME" e-query="inquire()" e-connect="XXX">業務處</e-sorter>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+							<th>&nbsp;&nbsp;&nbsp;<e-sorter e-input="inputVO" e-col="BRANCH_AREA_NAME" e-query="inquire()" e-connect="XXX">營運區</e-sorter>&nbsp;&nbsp;&nbsp;</th>
+							<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<e-sorter e-input="inputVO" e-col="BRANCH_NAME" e-query="inquire()" e-connect="XXX">分行別</e-sorter>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+							<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<e-sorter e-input="inputVO" e-col="AO_CODE" e-query="inquire()" e-connect="XXX">理專</e-sorter>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+							<th><e-sorter e-input="inputVO" e-col="CUST_ID" e-query="inquire()" e-connect="XXX">客戶ID</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-col="CUST_NAME" e-query="inquire()" e-connect="XXX">客戶姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-col="DUE_AMT" e-query="inquire()" e-connect="XXX">到期金額</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-col="PRD_CNT" e-query="inquire()" e-connect="XXX">承作商品筆數</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-col="TOTAL_AMT" e-query="inquire()" e-connect="XXX">承作總金額</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-col="CF_USAGE_RATE" e-query="inquire()" e-connect="XXX">金流使用率</e-sorter></th>
+
+						</tr>
+					</thead>
+					
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.NUM }}</td>
+							<td align="center">{{row.YEARMON}}</td>
+							<td align="center">{{row.REGION_CENTER_NAME }}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME }}</td>
+							<td align="center">{{row.BRANCH_NAME }}</td>
+							<td align="center">{{row.AO_CODE}}<ro ng-if="row.EMP_NAME">-{{row.EMP_NAME }}</ro></td>
+							<td align="center">{{row.CUST_ID }}</td>
+							<td align="center">{{row.CUST_NAME }}</td>
+							<td align="right">{{row.DUE_AMT | currency:"":0}}</td>
+							<td align="center"><a href="#" ng-click="detail(row)">{{row.PRD_CNT}}</a></td>
+							<td align="right">{{row.TOTAL_AMT | currency:"":0}}</td>
+							<td align="right">{{row.CF_USAGE_RATE}}%</td>
+						</tr>
+						<tr class="red" >
+							<td colspan="8" align="center">本頁小計</td>
+						
+							<td align="right">{{getSum(paramList, 'DUE_AMT') |
+									number:0}}</td>
+							<td align="center">{{getSum(paramList, 'PRD_CNT') |
+									number:0}}</td>
+							<td align="right">{{getSum(paramList, 'TOTAL_AMT') |
+									number:0}}</td>
+							<td align="right"></td>
+							
+						</tr>
+						
+						<tr class="red" ng-if="ya == ya1-1">
+							<td colspan="8" align="center">總計</td>
+							
+							<td align="right">{{paramList2[0].DDUE_AMT | number:0}}</td>
+							<td align="center">{{paramList2[0].DPRD_CNT | number:0}}</td>
+							<td align="right">{{paramList2[0].DTOTAL_AMT | number:0}}</td>
+							<td align="right"></td>
+							
+						</tr>
+						
+						
+					</tbody>
+				</table>
+			</div>			
+			
+			<div algin="left">
+				<table>
+
+
+					<tr>
+						<td align="right" style="width: 50px;">說明：</td>
+						<td align="left"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,262 @@
+
+<script type="text/javascript" src="assets/txn/PMS109/PPAP.js"></script>
+<script type="text/javascript" src="assets/txn/PMS106/PMS106.js"></script>
+<script type="text/javascript" src="assets/txn/PMS106/PMS106_BRAN_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS106/PMS106_FDC_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS106/PMS106_BOND_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS106/PMS106_NEWINS_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS106/PMS106_ACUMINS_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS106/PMS106_GI.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<style>
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable tr th {
+	vertical-align: middle  !important;
+}
+.gv_tab_sc td, .tab_month td{
+	padding:7px 5px;
+}
+</style>
+
+<div class="PMS106" ng-controller="PMS106Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table class="rstable">
+						<tr>
+							<th>*報表月份：</th>
+								<td><e-combobox id="dataMonth" name="dataMonth"
+									ng-datasource="mappingSet['timeE']" 
+									ng-model="inputVO.sCreDate"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-change="limitDate();dateChange()" 
+									ng-format="F3"
+									ng-required="true" 
+									width="200px" height="30px" style="line-height:20px;" />
+								</td>
+							<th>營運區：</th>
+								<td><e-combobox id="branch_area_id" 
+									name="branch_area_id"
+									ng-datasource="AREA_LIST" 
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" 
+									ng-editable="false"
+									ng-format="F3" 
+									ng-required="false" 
+									ng-change="ChangeArea()" 
+									width="200px" style="line-height:20px;"/>
+								</td>
+							<th rowspan="2" ng-hide="inputVO.aoflag">統計類別：</th>
+							<td 			ng-hide="inputVO.aoflag"><input type="radio" ng-disabled="inputVO.aoflag" ng-model="inputVO.srchType" value="1" ng-click="changeType()"> 依分行統計</td>
+						</tr>
+						<tr>
+							<th>業務處：</th>
+								<td><e-combobox id="region_center_id"
+									name="region_center_id" 
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id" 
+									ng-validate="false"
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" 
+									ng-editable="false"
+									ng-format="F3" 
+									ng-required="false" 
+									ng-change="ChangeRegion()"
+									width="200px" style="line-height:20px;" />
+								</td>
+							<th>分行別：</th>
+								<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST" 
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" 
+									ng-editable="false"
+									ng-format="F1" 
+									ng-required="false" 
+									ng-change="ChangeBranch()"
+									width="200px" style="line-height:20px;" />
+								</td>
+							<td ng-hide="inputVO.aoflag"><input type="radio"  ng-model="inputVO.srchType" value="2" ng-click="changeType()"> 依理專統計</td>
+						</tr>
+						<tr ng-show="inputVO.srchType==2">
+							<th>理專；</th>
+							<td><e-combobox id="ao_code" name="ao_code"
+									ng-datasource="AO_LIST" 
+									ng-model="inputVO.ao_code"
+									ng-validate="false" 
+									ng-disabled="disableAoCombo"
+									ng-readonly="disableAoCombo" 
+									ng-editable="false" 
+									ng-format="F1"
+									ng-required="false" 
+									ng-change="ChangeAo_code()" 
+									width="200px" style="line-height:20px;" /></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<!-- 
+				<button type="button" class="btn btn-info" ng-click="exportRPT()">匯出</button>
+				 -->
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+
+
+
+
+			<e-jumping output="outputVO" input="inputVO" query="query()"
+				list="paramList"></e-jumping>
+			<div algin="left">
+				<table>				
+					<tr>
+						<td>產出頻率：</td>
+						<td>每月</td>
+					</tr>
+					<tr>
+						<td>產出日：</td>
+						<td >{{toJsDate(paramList[0].CREATETIME) |date:'yyyy/MM/dd'}}</td>
+					</tr>
+				</table>
+			</div>
+
+			
+			<div class="gv_tab_sc scroll_y">
+				<table class="rstable e-table-freeze" e-height="400px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th>項次</th>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行別</th>
+							<th ng-show="inputVO.srchType == '2'">理專</th>
+							<th>台外幣定存</th>
+							<th>債券及組合式商品金額</th>
+							<th>當月新增保險金流</th>
+							<th>利變保險累積金額</th>
+							<th>基金與其他</th>
+							<th>小計</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-show="inputVO.srchType == '1'"
+							ng-repeat="row in paramList track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{outputVO.currentPageIndex*10+$index+1}}</td>
+							<td align="center">{{row.REGION_CENTER_NAME}}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME}}</td>
+							<td align="center">{{row.BRANCH_NAME}}</td>
+							<td align="right"><a ng-show="inputVO.srchType == '1'" ng-click="showDetail(row,'FCD',inputVO.srchType)">{{row.FCD_AMT | number:''}}</a></td>
+							<td align="right"><a ng-show="inputVO.srchType == '1'" ng-click="showDetail(row,'BOND',inputVO.srchType)">{{row.BOND_AMT | number:''}}</a></td>
+							<td align="right"><a ng-show="inputVO.srchType == '1'" ng-click="showDetail(row,'NEWINS',inputVO.srchType)">{{row.NEW_INS_AMT | number:''}}</a></td>
+							<td align="right"><a ng-show="inputVO.srchType == '1'" ng-click="showDetail(row,'ACUMINS',inputVO.srchType)">{{row.ACUM_INS_AMT | number:''}}</a></td>
+							<td align="right"><a ng-show="inputVO.srchType == '1'" ng-click="showDetail(row,'GI',inputVO.srchType)">{{row.OTHER_AMT | number:''}}</a></td>
+							<td align="right">{{row.TOTAL_AMT | number:''}}</td>
+							
+						</tr>
+						<tr class="repeat-row" ng-show="inputVO.srchType == '2'"
+							ng-repeat="row in paramList track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{ outputVO.currentPageIndex*10+$index+1}}</td>
+							<td align="center">{{row.REGION_CENTER_NAME}}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME}}</td>
+							<td align="center">{{row.BRANCH_NAME}}</td>
+							<td align="center">{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+							<td align="right"><a ng-show="inputVO.srchType == '2'" ng-click="showDetail(row,'FCD',inputVO.srchType)">{{row.FCD_AMT | number:''}}</a></td>
+							<td align="right"><a ng-show="inputVO.srchType == '2'" ng-click="showDetail(row,'BOND',inputVO.srchType)">{{row.BOND_AMT | number:''}}</a></td>
+							<td align="right"><a ng-show="inputVO.srchType == '2'" ng-click="showDetail(row,'NEWINS',inputVO.srchType)">{{row.NEW_INS_AMT | number:''}}</a></td>
+							<td align="right"><a ng-show="inputVO.srchType == '2'" ng-click="showDetail(row,'ACUMINS',inputVO.srchType)">{{row.ACUM_INS_AMT | number:''}}</a></td>
+							<td align="right"><a ng-show="inputVO.srchType == '2'" ng-click="showDetail(row,'GI',inputVO.srchType)">{{row.OTHER_AMT | number:''}}</a></td>
+							<td align="right">{{row.TOTAL_AMT | number:''}}</td>
+							
+
+						</tr>
+							<tr class="red" >
+							<td colspan="{{inputVO.srchType == '2'?5:4}}" align="center">本頁小計</td>
+							<td align="right">{{getSum(paramList, 'FCD_AMT')  | number:''}}</td>
+							<td align="right">{{getSum(paramList, 'BOND_AMT')	 | number:''}}</td>
+							<td align="right">{{getSum(paramList, 'NEW_INS_AMT') | number:''}}</td>
+							<td align="right">{{getSum(paramList, 'ACUM_INS_AMT')  | number:''}}</td>
+							<td align="right">{{getSum(paramList, 'OTHER_AMT')  | number:''
+									}}</td>
+							<td align="right">{{getSum(paramList, 'TOTAL_AMT')  | number:''
+									}}</td>
+								
+						</tr>
+						<tr class="red" ng-if="ya == ya1-1">
+							<td colspan="{{inputVO.srchType == '2'?5:4}}" align="center">總計</td>
+							<td align="right">{{paramList2[0].FCD_AMT  | number:''}}</td>
+							<td align="right">{{paramList2[0].BOND_AMT  | number:''}}</td>
+							<td align="right">{{paramList2[0].NEW_INS_AMT  | number:''}}</td>
+							<td align="right">{{paramList2[0].ACUM_INS_AMT  | number:''}}</td>
+							<td align="right">{{paramList2[0].OTHER_AMT | number:''}}</td>
+							<td align="right">{{paramList2[0].TOTAL_AMT | number:''}}</td>
+							
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div algin="left">
+			<table>
+				<tr>
+					<td align="right">說明：</td>
+					<td align="left"></td>
+				</tr>
+			</table>
+		</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

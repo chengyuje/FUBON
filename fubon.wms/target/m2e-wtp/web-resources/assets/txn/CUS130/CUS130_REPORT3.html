@@ -1,0 +1,122 @@
+<style>
+/* open dialog */
+.ngdialog.CUS130_REPORT3 {
+	
+}
+/* dialog panl */
+.modal-dialog.CUS130_REPORT3 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+/* table size */
+.CUS130_REPORT3 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CUS130_REPORT3.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CUS130_REPORT3_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.red{
+	color: red !important;
+}
+</style>
+<div ng-controller="CUS130_REPORT3Controller" ng-cloak>
+	<div class="modal-dialog CUS130_REPORT3">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">檢視回報</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc" style="white-space: normal;">
+					<table class="table-bordered">
+						<thead>
+							<tr>
+								<th>角色名稱</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<span>{{roleName.ROLE_ORG}}</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<br>
+				<e-jumping-once output="branchVO" list="branchChildList" totallist="branchList"></e-jumping-once>
+				<div class="gv_tab_sc">
+					<table class="table-bordered">
+						<thead>
+							<tr>
+								<th>全行</th>
+								<th>業務處</th>
+								<th>營運區</th>
+								<th>分行</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="data in branchChildList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{data.ALL_BRANCH}}</td>
+								<td>{{data.REGION_CENTER_ID | mapping:regionQuery:'F3'}}</td>
+								<td>{{data.BRANCH_AREA_ID | mapping:areaQuery:'F3'}}</td>
+								<td>{{data.BRANCH_NBR}}-{{data.BRANCH_NBR | mapping:branchQuery:'F3'}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<br>
+				<div ng-if="empList.length > 0">
+					<e-jumping-once output="empVO" list="empChildList" totallist="empList"></e-jumping-once>
+					<div class="gv_tab_sc">
+						<table class="table-bordered">
+							<thead>
+								<tr>
+									<th>員工編號</th>
+									<th>備註內容</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="data in empChildList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td>{{data.EMP_ID}}</td>
+									<td>{{data.MEMO_DESC}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確定</button>
+			</div>
+		</div>
+	</div>
+</div>

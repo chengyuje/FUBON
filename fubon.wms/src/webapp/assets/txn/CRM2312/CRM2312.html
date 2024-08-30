@@ -1,0 +1,82 @@
+<script type="text/javascript" src="assets/txn/CRM2312/CRM2312.js"></script>
+<div ng-controller="CRM2312Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+		</div>
+	</div>
+	<!-- 查詢區 -->
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<th>*客戶ID：</th>
+				<td><input type="text" class="form-control" placeholder="請輸入..." id="cust_ID" name="cust_ID" ng-model="inputVO.cust_ID" e-length-limit="20" style="width: 250px"></td>
+				<th>基金公司：</th>
+				<td><e-combobox id="companyName" name="companyName" ng-datasource="mappingSet['PRD.FUND_NEW_LEVEL_LIST']" ng-model="inputVO.companyName" ng-validate="false" ng-readonly="false" ng-editable="false" ng-require="true" ng-format="F2" width="150px" style="line-height:20px;"/></td>
+				<th></th>
+				<td></td>
+			</table>
+			<div class="search_box_btn text-center">
+			    <button type="button" class="btn btn-info" ng-click="inquire_init();inquire();">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();">清除</button>		
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y">
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data" style="white-space: nowrap">
+					<thead>
+						<tr>
+							<th>庫存日期</th>
+							<th>基金代號</th>
+							<th>憑證號碼</th>
+							<th>庫存單位數</th>
+							<th>轉換比率</th>
+							<th>可獲得俄羅斯資產新級別</br>基金單位數
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{toJsDate(row.NET_VALUE_DATE) | date:"yyyy-MM-dd"}}</td>
+							<td align="center">{{row.FUND_CODE}}</td>
+							<td align="center">{{row.CERT_NBR}}</td>
+							<td align="center">{{row.TOTAL_ACUM_INV_UNIT < 0.01 ? 0 : row.TOTAL_ACUM_INV_UNIT | number : 3}}</td>
+							<td align="center">{{row.changeRate}}%</td>
+							<td align="center">{{row.changedUnit | number : 3}}</td>
+
+
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div style="text-align: left;">
+			</br></br>
+			<div ng-if="inputVO.companyName != '鋒裕基金' && inputVO.companyName != '霸菱東歐基金'">
+			1. 上述依基金公司提供之轉換比率，試算之新級別單位數僅供參考，最終以基金公司提供之數據為準。</br>
+            2. 庫存單位數小於0.01基金公司不提供新級別單位數。</br>
+            3. 新級別基金不開放申贖，亦不會在台灣申請註冊，在境外基金管理機構認為符合股東最佳利益時，會將新級別之變現所得返還給客戶，並列入當年度海外財產交易所得。
+			</div>
+		    <div ng-if="inputVO.companyName == '鋒裕基金'">
+			1. 上述依基金公司提供之轉換比率，試算之新級別單位數僅供參考，最終以基金公司提供之數據為準。</br>
+            2. 新級別基金不開放申贖，亦不會在台灣申請註冊，在境外基金管理機構認為符合股東最佳利益時，會將新級別之變現所得返還給客戶，並列入當年度海外財產交易所得。
+		    </div>
+		    <div ng-if="inputVO.companyName == '霸菱東歐基金'">
+			1. 上述依基金公司提供之轉換比率，試算之新級別單位數僅供參考，最終以基金公司提供之數據為準。</br>
+            2. 新級別基金暫停交易，待市場機制重建後清算，會將新級別之變現所得返還給客戶，並列入當年度海外財產交易所得。
+		    </div>
+		    </div>
+		</div>
+	</div>
+</div> 

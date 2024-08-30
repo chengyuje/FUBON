@@ -1,0 +1,215 @@
+<style>
+/* open dialog */
+.ngdialog.CRM846 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM846 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM846 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM846 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM846.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM846_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+
+</style>
+
+
+<div>
+		<!-- 結果區 -->
+	<div>
+<!--
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >信用卡本期帳單剩餘應繳金額</div>
+		</div>
+-->
+		<!--Content of the panel-->
+		<div class="gv_tab_sc scroll_y" style="height:600px;white-space: nowrap;">
+				<table >
+						<tr class="repeat-row" ng-repeat="row in dataList " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					    	<th width=16%>歸戶ID</th>
+					    	<td width=16% style="text-align: right;">{{row.ACCOUNT_ID}}</td>
+					    	<th width=16%>繳款期限</th>
+					    	<td width=16% style="text-align: right;">{{transDate(row.CARD_DMAMT) | date :'yyyy-MM-dd'}}</td>
+					    	<th width=16%>本期關帳日</th>
+					    	<td width=16% style="text-align: right;">{{transDate(row.CARD_WSCLD) | date :'yyyy-MM-dd'}}</td>
+					   	</tr>	
+						<tr class="repeat-row" ng-repeat="row in dataList " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						    <th>歸戶姓名</th>
+						    <td style="text-align: right;">{{row.NAME}}</td>
+						    <th>應繳總額</th>
+						    <td style="text-align: right;">{{row.CARD_PPAYD1 | number:2}}</td>
+						    <th>下期關帳日</th>
+						    <td style="text-align: right;">{{transDate(row.CARD_CMAMT) | date :'yyyy-MM-dd'}}</td>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in dataList " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						    <th>正卡總數</th>
+						    <td style="text-align: right;">{{row.CARD_NUMBER_M_TOTAL | number:0}}</td>
+						    <th>本期最低應繳</th>
+						    <td style="text-align: right;">{{row.CARD_MINPAY | number:2}}</td>
+						    <th>年費</th>
+						    <td style="text-align: right;">{{row.CARD_CBALA | number:2}}</td>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in dataList " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						    <th>附卡總數</th>
+						    <td style="text-align: right;">{{row.CARD_NUMBER_M | number:0}}</td>
+						    <th>本期手續費</th>
+						    <td style="text-align: right;">{{row.CARD_CBALP | number:2}}</td>
+						    <th>掛失費</th>
+						    <td style="text-align: right;">{{row.CARD_CBALL | number:2}}</td>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in dataList " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						    <th>正卡有效卡數</th>
+						    <td style="text-align: right;">{{row.CARD_NUMBER_S_TOTAL | number:0}}</td>
+						    <th>本期已繳金額</th>
+						    <td style="text-align: right;">{{row.CARD_PAYD1 | number:2}}</td>
+						    <th>延滯費</th>
+						    <td style="text-align: right;">{{row.CARD_CBALF | number:2}}</td>
+						</tr>	
+						<tr class="repeat-row" ng-repeat="row in dataList " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<th>附卡有效卡數</th>
+							<td style="text-align: right;">{{row.CARD_NUMBER_S | number:0}}</td>
+							<th>本期消費款尚欠</th>
+							<td style="text-align: right;">{{row.CARD_CBALC | number:2}}</td>
+							<th>循環息</th>
+							<td style="text-align: right;">{{row.CARD_CBALR | number:2}}</td>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in dataList " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						    <th>約定扣帳帳號銀行</th>
+						    <td style="text-align: right;">{{row.CARD_SUBANK}}</td>
+						    <th>上次消費款尚欠</th>
+						    <td style="text-align: right;">{{row.CARD_LSREC | number:2}}</td>
+						    <th>預收款</th>
+						    <td style="text-align: right;">{{row.CARD_CBALD | number:2}}</td>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in dataList " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						    <th>約定扣帳帳號</th>
+						    <td style="text-align: right;">{{row.CARD_SUACC1}}</td>
+						    <th>上期費用</th>
+						    <td style="text-align: right;">{{row.CARD_LSFEE | number:2}}</td>
+						    <th>在途預收款</th>
+						    <td style="text-align: right;">{{row.CARD_PSTPOS | number:2}}</td>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in dataList " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<th>轉帳帳號</th>
+							<td style="text-align: right;">{{row.CARD_ACF21D}}</td>
+						    <th>上期延滯息</th>
+						    <td style="text-align: right;">{{row.CARD_LSINT | number:2}}</td>
+						    <th>客戶註記</th>
+						    <td style="text-align: right;">{{row.CARD_ACCSTS | mapping:mappingSet['CRM.CREDIT_CARD_ACCSTS']:'F3'}}</td>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in dataList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<th>月限額(千元)</th>
+							<td style="text-align: right;">{{row.CARD_AMTMMT/1000 | number:2}}</td>
+						    <th>上期循環息</th>
+						    <td style="text-align: right;">{{row.CARD_LSAMT | number:2}}</td>
+						    <th>扣款類別</th>
+						    <td style="text-align: right;">{{row.CARD_REVTYP | mapping:mappingSet['CRM.CREDIT_CARD_REVTYP']:'F3'}}</td> 
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in dataList " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<th>循環額度(千元)</th>
+							<td style="text-align: right;">{{row.CARD_REVAMT/1000 | number:2}}</td>
+						    <th>爭議款</th>
+						    <td style="text-align: right;">{{row.CARD_CBALE | number:2}}</td>
+						    <th></th>
+						    <td></td>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in dataList " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<th>帳單地址</th>
+							<td style="text-align: right;">
+								<div uib-tooltip="{{row.CARD_ADRES2}}" tooltip-placement="right-bottom">
+									{{row.CARD_ADRES2.length > 6 ? (row.CARD_ADRES2 | limitTo : 6) + "..." : row.CARD_ADRES2}}
+								</div>
+							</td>
+							<th>紅利積點</th>
+						    <td style="text-align: right;">{{row.CARD_BOUSAV | number:0}}</td>
+						    <th></th>
+						    <td></td>
+						</tr>
+				 </table>
+			
+			<span style="font-size:0.6cm;">信用卡清單</span>
+			
+				<table>
+					<thead>
+						<tr>
+							<th>卡片相關</th>
+						    <th>歸戶ID</th>
+						    <th>開卡狀態</th>
+						    <th>卡號</th>
+							<th>卡片名稱</th>
+							<th>發卡日期</th>
+							<th>持卡人姓名</th>
+							<th>卡刷</th>
+							<th>到期日</th>
+							<th>持卡人ID</th>
+							<th>狀態</th>
+							<th>事故日</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in dataList2 " ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td style="text-align: center;">{{row.TYPE | mapping:mappingSet['CRM.CREDIT_CARD_TYPE']:'F3'}}</td>
+							<td style="text-align: center;">{{row.ACCOUNT_ID}}</td>
+							<td style="text-align: center;">{{row.CARD_ACTIVE_CODE}}</td>
+							<td style="text-align: center;">{{row.CARD_NO}}</td>
+							<td style="text-align: center;">{{row.CARD_TYPE | mapping:mappingSet['CRM.CREDIT_CARD_NAME']:'F3'}}</td>
+							<td style="text-align: center;">{{transDate(row.ISSUE_DAY) | date :'yyyy-MM-dd'}}</td>
+							<td style="text-align: center;">{{row.CARD_HOLD_NAME}}</td>
+							<td style="text-align: center;">{{row.CARD_TYPE2 | mapping:mappingSet['CRM.CREDIT_CARD_TYPE2']:'F3'}}</td>
+							<td style="text-align: center;">{{row.CARD_EXPIRED}}</td>
+							<td style="text-align: center;">{{row.CARD_HOLD_ID}}</td>
+							<td style="text-align: center;">{{row.CARD_STATUS | mapping:mappingSet['CRM.CREDIT_CARD_STATUS']:'F3'}}</td>
+							<td style="text-align: center;">{{transDate(row.LAST_ACCICENT_DAY) | date :'yyyy-MM-dd'}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	
+	<!-- 結果區 -->
+</div>

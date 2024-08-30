@@ -1,0 +1,611 @@
+<style>
+/* open dialog */
+.ngdialog.PMS312 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS312 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+/*
+.PMS312 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+*/
+.PMS312 table.little {
+	width: 89%;
+}
+/* change row */
+.PMS312.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+/* scroll && height */
+.scroll_PMS312_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS312/PMS312.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS312" ng-controller="PMS312Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab style="width: 100%;">
+					<table>
+						<tr>
+							<th>*報表年月：</th>
+							<td><e-combobox id="dataMonth" name="dataMonth"
+									ng-datasource="mappingSet['timeE']" ng-model="inputVO.sCreDate"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-change="limitDate();dateChange()" ng-format="F3" ng-required="true"
+									width="143px" height="30px" style="line-height:20px;" /></td>
+							<th>*統計類型</th>
+							<td><e-combobox ng-datasource="mappingSet['seture']"
+									ng-model="inputVO.checked" ng-validate="false"
+									ng-readonly="false" ng-editable="false" ng-format="F3"
+									ng-change="" width="80px" height="30px"
+									style="line-height:20px;" ng-required="true" /></td>
+							<th>*商品類型：</th>
+							<td><e-combobox ng-datasource="mappingSet['type']"
+									ng-model="checked" ng-validate="false" ng-readonly="false"
+									ng-editable="false" ng-format="F3" ng-change="" width="100px"
+									height="30px" style="line-height:20px;" ng-required="true" /></td>
+							<th>*報表類型</th>
+							<td><e-combobox ng-datasource="mappingSet['type2']"
+									ng-model="inputVO.type2" ng-validate="false" ng-change="clear_ba()" 
+									ng-readonly="false" ng-editable="false" ng-format="F3"
+									width="150px" ng-change="inputVO.op=''" height="30px"
+									style="line-height:20px;" ng-required="true" /></td>
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td><e-combobox ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id" ng-validate="false"
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-format="F3" ng-change="ChangeRegion();Region()"
+									ng-required="false" width="143px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>營運區：</th>
+							<td><e-combobox ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id" ng-validate="false"
+									ng-editable="false" ng-change="ChangeArea();Area()"
+									ng-format="F3" ng-required="false" width="80px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>分行別：</th>
+							<td colspan="3"><e-combobox ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr" ng-validate="false"
+									ng-disabled="inputVO.type2 == '2'"
+									ng-readonly="inputVO.type2 == '2'" ng-editable="false"
+									ng-format="F3" ng-required="false"
+									ng-change="ChangeBranch();Branch()" width="150px" height="30px"
+									style="line-height:20px;" /></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList" rowcountlimit="20"></e-jumping>
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：</td>
+						<td>每日</td>
+					</tr>
+					<tr>
+						<td>產出日：</td>
+						<td>{{toJsDate(paramList[0].CREATETIME) | date:'yyyy/MM/dd'}}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y">
+				<div class="gv_tab_sc scroll_y">
+				<!--****轉介人員房貸區 *****-->
+					<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList2"
+						ng-show="inputVO.branch_area_id=='' && inputVO.branch_nbr=='' && 
+								 inputVO.region_center_id!='' && inputVO.type2=='2' && checked=='1'">
+						<thead>
+							<tr class="middle">
+								<th rowspan="2">仲介人員</th>
+								<th colspan="8">(房貸)分行通路
+									<T ng-show="inputVO.checked=='1'">_MTD</T>
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+								<th colspan="14">(房貸)非分行通路
+									<T ng-show="inputVO.checked=='1'">_MTD</T>
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+								<th rowspan="2" colspan="2">(房貸)合計
+									<T ng-show="inputVO.checked=='1'">_MTD</T> 
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+							</tr>
+							<tr class="middle">
+								<th colspan="2">作業</th>
+								<th colspan="2">理專</th>
+								<th colspan="2">分行其他人員</th>
+								<th colspan="2">分行通路小計</th>
+								<th colspan="2">法金</th>
+								<th colspan="2">人壽</th>
+								<th colspan="2">證券</th>
+								<th colspan="2">產險</th>
+								<th colspan="2">銀行其他單位</th>
+								<th colspan="2">PS自行開發</th>
+								<th colspan="2">非分行通路小計</th>
+							</tr>
+							<tr class="middle">
+								<TH>項目</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+							</tr>
+						</thead>
+						<tbody>
+						<!-- 暫時先將判定寫死 -->
+							<tr class="repeat-row" 
+								ng-repeat="row in paramList2 | limitTo:displayLimit track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<!-- 這裡應該要有項目list -->
+								<td>合計數</td> 
+								<td>{{row.M_OP_CNT |number:''}}</td><td>{{row.M_OP_AMT |number:''}}</td>
+								<td>{{row.M_AO_CNT |number:''}}</td><td>{{row.M_AO_AMT |number:''}}</td>
+								<td>{{row.M_BO_CNT |number:''}}</td><td>{{row.M_BO_AMT |number:''}}</td>
+								<td>{{row.M_BT_CNT |number:''}}</td><td>{{row.M_BT_AMT |number:''}}</td>
+								<td>{{row.M_FG_CNT |number:''}}</td><td>{{row.M_FG_AMT |number:''}}</td>
+								<td>{{row.M_LI_CNT |number:''}}</td><td>{{row.M_LI_AMT |number:''}}</td>
+								<td>{{row.M_S_CNT  |number:''}}</td><td>{{row.M_S_AMT  |number:''}}</td>
+								<td>{{row.M_PC_CNT |number:''}}</td><td>{{row.M_PC_AMT |number:''}}</td>
+								<td>{{row.M_OT_CNT |number:''}}</td><td>{{row.M_OT_AMT |number:''}}</td>
+								<td>{{row.M_PS_CNT |number:''}}</td><td>{{row.M_PS_AMT |number:''}}</td>
+								<td>{{row.M_NBT_CNT|number:''}}</td><td>{{row.M_NBT_AMT|number:''}}</td>
+								<td>{{row.M_TT_CNT |number:''}}</td><td>{{row.M_TT_AMT |number:''}}</td>
+							</tr>
+						</tbody>
+					</table>	
+					
+					<!-- *****轉介人員信貸區***** -->
+					<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList2" id="testGrid"
+						ng-show="inputVO.branch_area_id=='' && inputVO.branch_nbr=='' && 
+								 inputVO.region_center_id!='' && inputVO.type2=='2' && checked=='2'">
+						<thead>
+							<tr class="middle">
+								<th rowspan="2">仲介人員</th>
+								<th colspan="8">(信貸)分行通路
+									<T ng-show="inputVO.checked=='1'">_MTD</T>
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+								<th colspan="14">(信貸)非分行通路
+									<T ng-show="inputVO.checked=='1'">_MTD</T>
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+								<th rowspan="2" colspan="2">(信貸)合計
+									<T ng-show="inputVO.checked=='1'">_MTD</T> 
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+							</tr>
+							<tr class="middle">
+								<th colspan="2">作業</th>
+								<th colspan="2">理專</th>
+								<th colspan="2">分行其他人員</th>
+								<th colspan="2">分行通路小計</th>
+								<th colspan="2">法金</th>
+								<th colspan="2">人壽</th>
+								<th colspan="2">證券</th>
+								<th colspan="2">產險</th>
+								<th colspan="2">銀行其他單位</th>
+								<th colspan="2">PS自行開發</th>
+								<th colspan="2">非分行通路小計</th>
+							</tr>
+							<tr class="middle">
+								<TH>項目</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+								<TH>件數</TH><TH>金額</TH>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" 
+								ng-repeat="row in paramList2 | limitTo:displayLimit track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>合計數</td>
+								<td>{{row.C_OP_CNT |number:''}}</td><td>{{row.C_OP_AMT |number:''}}</td>
+								<td>{{row.C_AO_CNT |number:''}}</td><td>{{row.C_AO_AMT |number:''}}</td>
+								<td>{{row.C_BO_CNT |number:''}}</td><td>{{row.C_BO_AMT |number:''}}</td>
+								<td>{{row.C_BT_CNT |number:''}}</td><td>{{row.C_BT_AMT |number:''}}</td>
+								<td>{{row.C_FG_CNT |number:''}}</td><td>{{row.C_FG_AMT |number:''}}</td>
+								<td>{{row.C_LI_CNT |number:''}}</td><td>{{row.C_LI_AMT |number:''}}</td>
+								<td>{{row.C_S_CNT  |number:''}}</td><td>{{row.C_S_AMT  |number:''}}</td>
+								<td>{{row.C_PC_CNT |number:''}}</td><td>{{row.C_PC_AMT |number:''}}</td>
+								<td>{{row.C_OT_CNT |number:''}}</td><td>{{row.C_OT_AMT |number:''}}</td>
+								<td>{{row.C_PS_CNT |number:''}}</td><td>{{row.C_PS_AMT |number:''}}</td>
+								<td>{{row.C_NBT_CNT|number:''}}</td><td>{{row.C_NBT_AMT|number:''}}</td>
+								<td>{{row.C_TT_CNT |number:''}}</td><td>{{row.C_TT_AMT |number:''}}</td>
+							</tr>
+						</tbody>
+					</table>	
+					
+					<br />
+					<!--*****房貸區START*****-->
+					<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="checked=='1'">
+						<thead>
+							<tr class="middle">
+								<th rowspan="3">業務處</th>
+								<th rowspan="3">營運區別</th>
+								<th rowspan="3">分行代號</th>
+								<th rowspan="3">分行組別</th>
+								<th rowspan="3">分行名稱</th>
+								<th colspan="8">(房貸)分行通路
+									<T ng-show="inputVO.checked=='1'">_MTD</T>
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+								<th colspan="14">(房貸)非分行通路
+									<T ng-show="inputVO.checked=='1'">_MTD</T>
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+								<th rowspan="2" colspan="2">(房貸)合計
+									<T ng-show="inputVO.checked=='1'">_MTD</T> 
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+							</tr>
+							<tr class="middle">
+								<th colspan="2">作業</th>
+								<th colspan="2">理專</th>
+								<th colspan="2">分行其他人員</th>
+								<th colspan="2">分行通路小計</th>
+								<th colspan="2">法金</th>
+								<th colspan="2">人壽</th>
+								<th colspan="2">證券</th>
+								<th colspan="2">產險</th>
+								<th colspan="2">銀行其他單位</th>
+								<th colspan="2">PS自行開發</th>
+								<th colspan="2">非分行通路小計</th>
+							</tr>
+							<tr class="middle">
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-show="(AREA_LIST.length>1 && inputVO.branch_area_id==''   &&  inputVO.type2=='2') && a != 'ALL'"
+								ng-repeat-start=" (a,dataA) in paramList | groupBy: 'REGION_CENTER_NAME' as resultA">
+								<td rowspan="{{ dataA.length+numGroups(resultB)+2}}"><div ng-hide="a == 'ALL'">{{a}}</div></td>
+							</tr>
+							<tr ng-show="!(AREA_LIST.length>1 && inputVO.branch_area_id==''   &&  inputVO.type2=='2') && a != 'ALL'">
+								<td rowspan="{{ dataA.length+numGroups(resultB)*2+2}}"><div ng-hide="a == 'ALL'">{{a}}</div></td>
+							</tr>
+							<tr ng-show="inputVO.type2=='1'"
+								ng-repeat-start=" (b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+								<td rowspan="{{dataB.length + 1}}" ng-hide="b == 'REGION' || b == 'ALL'">{{b}}</td>
+							</tr>
+							<tr ng-repeat=" c in dataB" >
+								<td colspan="4" align="center" ng-show="c.YEARMON == 'REGION'">{{c.REGION_CENTER_NAME}} 合計</td>
+								<td colspan="4" align="center" ng-show="c.YEARMON == 'AREA' && inputVO.type2=='2'">{{c.BRANCH_AREA_NAME}} 合計</td>
+								<td colspan="3" align="center" ng-show="c.YEARMON == 'AREA' && inputVO.type2=='1'">{{c.BRANCH_AREA_NAME}} 合計</td>
+								<td colspan="5" align="center" ng-show="c.YEARMON == 'ALL'">全行合計</td>
+								<TD align="right" ng-hide="( (c.YEARMON == 'REGION' || c.YEARMON == 'AREA') && inputVO.type2=='1') || inputVO.type2=='2' || c.YEARMON == 'ALL'">{{c.BRANCH_NBR}}</TD>
+								<TD align="right" ng-hide="( (c.YEARMON == 'REGION' || c.YEARMON == 'AREA') && inputVO.type2=='1') || inputVO.type2=='2' || c.YEARMON == 'ALL'">{{c.BRANCH_CLS}}</TD>
+								<TD align="right" ng-hide="( (c.YEARMON == 'REGION' || c.YEARMON == 'AREA') && inputVO.type2=='1') || inputVO.type2=='2' || c.YEARMON == 'ALL'">{{c.BRANCH_NAME}}</TD>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_OP_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_OP_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_AO_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_AO_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_BO_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_BO_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_BT_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_BT_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_FG_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_FG_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_LI_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_LI_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_S_CNT  |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_S_AMT  |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_PC_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_PC_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_OT_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_OT_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_PS_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_PS_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_NBT_CNT|number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_NBT_AMT|number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_TT_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.M_TT_AMT |number:''}}</td>
+							</tr>
+							<tr ng-repeat-end>
+							</tr>
+							<tr ng-repeat-end>
+							</tr>
+
+							<tr ng-init="percent()" ng-if="inputVO.branch_area_id=='' && inputVO.branch_nbr=='' && 
+								 inputVO.region_center_id!='' && inputVO.type2=='2' && checked=='1'">
+								<td ng-show="AREA_LIST.length > 1 && inputVO.branch_area_id=='' && inputVO.type2=='2'" colspan="5" align="center">{{a}}占比</td>
+								<td align="right">{{M_OP_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_OP_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{M_AO_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_AO_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{M_BO_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_BO_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{M_BT_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_BT_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{M_FG_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_FG_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{M_LI_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_LI_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{M_S_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_S_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{M_PC_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_PC_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{M_OT_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_OT_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{M_PS_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_PS_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{M_NBT_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_NBT_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{M_TT_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{M_TT_AMT*100 | number:'2' }}%</td>
+							</tr>
+						</tbody>
+					</table>
+					<!--******房貸區END******-->
+					<!--*****信貸區START*****-->
+					<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="checked=='2'">
+						<thead>
+							<tr class="middle">
+								<th rowspan="3">業務處</th>
+								<th rowspan="3">營運區別</th>
+								<th rowspan="3">分行代號</th>
+								<th rowspan="3">分行組別</th>
+								<th rowspan="3">分行名稱</th>
+								<th colspan="8">(信貸)分行通路
+									<T ng-show="inputVO.checked=='1'">_MTD</T>
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+								<th colspan="14">(信貸)非分行通路
+									<T ng-show="inputVO.checked=='1'">_MTD</T>
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+								<th rowspan="2" colspan="2">(信貸)合計
+									<T ng-show="inputVO.checked=='1'">_MTD</T> 
+									<T ng-show="inputVO.checked=='2'">_YTM</T>
+								</th>
+							</tr>
+							<tr class="middle">
+								<th colspan="2">作業</th>
+								<th colspan="2">理專</th>
+								<th colspan="2">分行其他人員</th>
+								<th colspan="2">分行通路小計</th>
+								<th colspan="2">法金</th>
+								<th colspan="2">人壽</th>
+								<th colspan="2">證券</th>
+								<th colspan="2">產險</th>
+								<th colspan="2">銀行其他單位</th>
+								<th colspan="2">PS自行開發</th>
+								<th colspan="2">非分行通路小計</th>
+							</tr>
+							<tr class="middle">
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+								<TH>件數</TH>
+								<TH>金額</TH>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-show="(AREA_LIST.length>1 && inputVO.branch_area_id==''   &&  inputVO.type2=='2') && a != 'ALL'"
+								ng-repeat-start=" (a,dataA) in paramList | groupBy: 'REGION_CENTER_NAME' as resultA">
+								<td rowspan="{{ dataA.length+numGroups(resultB)+2}}"><div ng-hide="a == 'ALL'">{{a}}</div></td>
+							</tr>
+							<tr ng-show="!(AREA_LIST.length>1 && inputVO.branch_area_id==''   &&  inputVO.type2=='2') && a != 'ALL'">
+								<td rowspan="{{ dataA.length+numGroups(resultB)*2+2}}"><div ng-hide="a == 'ALL'">{{a}}</div></td>
+							</tr>
+							<tr ng-show="inputVO.type2=='1'"
+								ng-repeat-start=" (b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+								<td rowspan="{{dataB.length + 1}}" ng-hide="b == 'REGION' || b == 'ALL'">{{b}}</td>
+							</tr>
+							<tr ng-repeat=" c in dataB">
+								<td colspan="4" align="center" ng-show="c.YEARMON == 'REGION'">{{c.REGION_CENTER_NAME}} 合計</td>
+								<td colspan="4" align="center" ng-show="c.YEARMON == 'AREA' && inputVO.type2=='2'">{{c.BRANCH_AREA_NAME}} 合計</td>
+								<td colspan="3" align="center" ng-show="c.YEARMON == 'AREA' && inputVO.type2=='1'">{{c.BRANCH_AREA_NAME}} 合計</td>
+								<td colspan="5" align="center" ng-show="c.YEARMON == 'ALL'">全行合計</td>
+								
+								<TD align="right" ng-hide="( (c.YEARMON == 'REGION' || c.YEARMON == 'AREA') && inputVO.type2=='1') || inputVO.type2=='2' || c.YEARMON == 'ALL'">{{c.BRANCH_NBR}}</TD>
+								<TD align="right" ng-hide="( (c.YEARMON == 'REGION' || c.YEARMON == 'AREA') && inputVO.type2=='1') || inputVO.type2=='2' || c.YEARMON == 'ALL'">{{c.BRANCH_CLS}}</TD>
+								<TD align="right" ng-hide="( (c.YEARMON == 'REGION' || c.YEARMON == 'AREA') && inputVO.type2=='1') || inputVO.type2=='2' || c.YEARMON == 'ALL'">{{c.BRANCH_NAME}}</TD>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_OP_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_OP_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_AO_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_AO_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_BO_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_BO_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_BT_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_BT_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_FG_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_FG_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_LI_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_LI_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_S_CNT  |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_S_AMT  |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_PC_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_PC_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_OT_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_OT_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_PS_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_PS_AMT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_NBT_CNT|number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_NBT_AMT|number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_TT_CNT |number:''}}</td>
+								<td align="right" ng-hide="!( c.YEARMON == 'REGION' || c.YEARMON == 'AREA' || c.YEARMON == 'ALL') && inputVO.type2=='2'">{{c.C_TT_AMT |number:''}}</td>
+							</tr>
+							<tr ng-repeat-end>
+							</tr>
+							<tr ng-repeat-end>
+							</tr>
+							<tr ng-init="percent()" ng-if="inputVO.branch_area_id=='' && inputVO.branch_nbr=='' && 
+								 inputVO.region_center_id!='' && inputVO.type2=='2' && checked=='2'">
+								<td ng-show="AREA_LIST.length>1 && inputVO.branch_area_id==''   &&  inputVO.type2=='2'" colspan="5" align="center">{{a}}占比</td>
+								<td align="right">{{0+C_OP_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_OP_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_AO_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_AO_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_BO_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_BO_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_BT_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_BT_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_FG_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_FG_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_LI_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_LI_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_S_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_S_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_PC_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_PC_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_OT_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_OT_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_PS_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_PS_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_NBT_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_NBT_AMT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_TT_CNT*100 | number:'2' }}%</td>
+								<td align="right">{{0+C_TT_AMT*100 | number:'2' }}%</td>
+							</tr>
+						</tbody>
+					</table>
+					<!-- 信貸區END -->
+				</div>
+			</div>
+			<div algin="left">
+				<table>
+					<tr>
+						<td align="right">說明：</td>
+						<td align="left"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,103 @@
+<style>
+/* open dialog */
+.ngdialog.CRM661_rel_add {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM661_rel_add {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+
+</style>
+
+<div ng-controller="CRM661_rel_addController" ng-cloak >
+	<div class="modal-dialog CRM661_rel_add">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">搜尋客戶</h4>
+			</div>
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a16.gif" >搜尋條件</div>
+			</div>
+			<div class="panel_content nav-tabs-content">
+				<BR>
+				<table class="search_table search_box3 scroll_y" style="width: 100%;">
+					<tr>
+						<td style="width: 15%;">
+							客戶ID:						
+						</td>
+						<td style="width: 35%;">
+							<input class="banner-input-1 form-control e_size ng-valid ng-dirty ng-valid-parse ng-touched ng-not-empty"
+							type="text" style="text-transform:uppercase;" 
+							id="cust_id" name="cust_id" placeholder="請輸入..." ng-model="inputVO.cust_id" e-length-limit="30" size="20" >
+						</td>
+						<td style="width: 15%;">
+							客戶姓名:
+						</td>
+						<td style="width: 35%;">
+							<input class="banner-input-1 form-control e_size ng-valid ng-dirty ng-valid-parse ng-touched ng-not-empty"
+							type="text" id="cust_name" name="cust_name" placeholder="請輸入..." ng-model="inputVO.cust_name" e-length-limit="30" size="20" >
+						</td>
+					</tr>
+					<tr>
+						<td colspan="4">註: 輸入查詢之客戶ID與客戶姓名皆可通過模糊比對查詢資料，提醒您，輸入的客戶ID系統會自動過濾掉既有關係戶。</td>
+					</tr>
+					<tr>					
+						<td colspan="4" style="text-align:center;"><HR><button type="button" class="btn btn-primary" ng-click="rel_inquire()">搜尋</button></td>
+					</tr>
+				</table>
+			</div>
+			<BR>
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+			</div>
+			<div class="panel_content nav-tabs-content">
+				<div class="gv_tab_sc scroll_y" style="height:200px;white-space: nowrap;">
+					<BR>
+					<table  class="col-md-6" style="height:200px;white-space: nowrap;">
+						<thead>
+							<tr>
+								<th></th>
+								<th>#</th>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>AO_Code</th>
+								<th>分行</th>
+								<th>理財會員等級</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in resultList_rel_add | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td><input type="radio" name = "choose" ng-model="inputVO.choose" ng-value="row" id = "check"></td>
+								<td>{{$index+1}}</td>
+								<td>{{row.CUST_ID}}</td>
+								<td>{{row.CUST_NAME}}</td>
+								<td>{{row.AO_CODE}}{{row.AO_CODE != null ? '-' : ''}}{{row.EMP_NAME}}</td>
+								<td>{{row.BRANCH_NAME}}</td>
+								<td>
+									<span ng-show = "row.EMP_ID == inputVO.emp_id">{{row.VIP_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</span>
+									<span ng-show = "row.EMP_ID != inputVO.emp_id" style="color:#BFBFBF">非轄下客戶不顯示</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<div class="modal-footer" style="text-align: center">
+					<button type="button" class="btn btn-primary" ng-click="rel_add()" >確定帶回</button>
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>

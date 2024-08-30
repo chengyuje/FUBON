@@ -1,0 +1,223 @@
+<script type="text/javascript" src="assets/txn/REF140/REF140.js"></script>
+<div class="REF140" ng-controller="REF140Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr>
+						<th style="width: 16.6%;">業務處：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="regionID" name="regionID"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.regionID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width: 16.6%;">營運區：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="branchAreaID" name="branchAreaID"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branchAreaID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width: 16.6%;">分行：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="branchID" name="branchID"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branchID"
+									ng-validate="false" 
+									ng-disabled="AVAIL_BRANCH.length == 1"
+									ng-readonly="AVAIL_BRANCH.length == 1" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch(region)"
+									style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th style="width: 16.6%;">受轉介人員編：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="userID" name="userID"
+										ng-datasource="EMP_LIST"
+										ng-model="inputVO.userID"
+										ng-validate="false" 
+										ng-disabled="EMP_LIST.length == 2"
+										ng-readonly="EMP_LIST.length == 2" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeEmp_id(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width: 16.6%;"><font style="color: red;">＊</font>案件年月(YYYYMM)：</th>
+						<td style="width: 16.6%;"><input type="text" class="form-control" placeholder="請輸入..." id="txnDate" name="txnDate" ng-model="inputVO.txnDate" e-length-limit="6"></td>
+						<th style="width: 16.6%;"><font style="color: red;">＊</font>轉介商品：</th>
+						<td style="width: 16.6%;">
+							<e-combobox id="refProd" name="refProd" 
+										ng-datasource="mappingSet['REF_RPOD']"
+										ng-model="inputVO.refProd"
+										ng-validate="false" 
+										ng-disabled="disType"
+										ng-readonly="disType" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="refProdChange()"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()" function-type="query" ng-disabled="(inputVO.txnDate == undefined || inputVO.txnDate == '' || inputVO.txnDate == null) ||
+																												 (inputVO.refProd == undefined || inputVO.refProd == '' || inputVO.refProd == null)">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" function-type="export" ng-disabled="resultList.length == 0">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="e-table-freeze" e-height="500px" e-left="6" e-list="resultList" e-mode="1" e-top="false" ng-show="inputVO.refProd == '5'">
+					<thead>
+						<tr>
+							<th colspan="6">轉介基本資料</th>
+							<th colspan="5">轉介案件處理狀況</th>
+							<th colspan="3">未成交原因</th>
+						</tr>
+						<tr>
+							<th>轉介年月</th>
+							<th>分行名稱</th>
+							<th>受轉介人身份</th>
+							<th>受轉介人姓名</th>
+							<th>員編</th>
+							<th>轉介商品</th>
+							<th>MTD<br />轉介件數</th>
+							<th>MTD<br />已結案轉介件數</th>
+							<th>MTD<br />處理率</th>
+							<th>MTD<br />未結案轉介件數</th>
+							<th>MTD<br />處理中轉介件數</th>
+							<th>MTD<br />未成交原因-商品無競爭力</th>
+							<th>MTD<br />未成交原因-客戶無需求</th>
+							<th>MTD<br />未成交原因-其他</th>
+						</tr>
+					</thead>
+					<tbody ng-show="resultList.length > 0">
+						<tr class="repeat-row" align="center" ng-repeat="row in resultList">
+							<td>{{row.YYYYMM}}</td>
+							<td>{{row.REF_SRC}}</td>
+							<td>{{row.USERROLE | mapping:mappingSet['CAM.REF_USER_ROLE']:'F3'}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td>{{row.EMP_ID}}</td>
+							<td>{{row.REF_PROD | mapping:mappingSet['CAM.REF_PROD']:'F3'}}</td>
+							<td>{{row.MTD_TOT}}</td>
+							<td>{{row.REF_MTD_CLOSE_NUMBER}}</td>
+							<td>{{row.REF_MTD_PROCESSING_RATE}}&nbsp;%</td>
+							<td>{{row.REF_MTD_N_CLOSE_NUMBER}}</td>
+							<td>{{row.REF_MTD_PROCESSING_NUMBER}}</td>
+							<td>{{row.REF_MTD_INS_UNSOLE_R1}}</td>
+							<td>{{row.REF_MTD_INS_UNSOLE_R2}}</td>
+							<td>{{row.REF_MTD_INS_UNSOLE_R3}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<table class="e-table-freeze" e-height="500px" e-left="6" e-list="resultList" e-mode="1" e-top="false" ng-show="inputVO.refProd != '5'">
+					<thead>
+						<tr>
+							<th colspan="6">轉介基本資料</th>
+							<th colspan="5">轉介案件處理狀況</th>
+							<th colspan="5">未進件原因</th>
+							<th colspan="4">已進件未撥款原因</th>
+							<th colspan="6">已核不撥原因</th>
+						</tr>
+						<tr>
+							<th>轉介年月</th>
+							<th>分行名稱</th>
+							<th>受轉介人身份</th>
+							<th>受轉介人姓名</th>
+							<th>員編</th>
+							<th>轉介商品</th>
+							<th>MTD<br />轉介件數</th>
+							<th>MTD<br />已結案轉介件數</th>
+							<th>MTD<br />處理率</th>
+							<th>MTD<br />未結案轉介件數</th>
+							<th>MTD<br />處理中轉介件數</th>
+							<th>MTD<br />未進件數</th>
+							<th>MTD<br />未進件原因-僅詢問</th>
+							<th>MTD<br />未進件原因-利率無競爭力</th>
+							<th>MTD<br />未進件原因-不符合客戶需求</th>
+							<th>MTD<br />未進件原因-其他</th>
+							<th>MTD<br />已進件未撥款件數</th>
+							<th>MTD<br />已進件-徵審婉拒</th>
+							<th>MTD<br />已進件-自行撤件</th>
+							<th>MTD<br />已進件-已核不撥</th>
+							<th>MTD<br />已核不撥原因-額度不符需求</th>
+							<th>MTD<br />已核不撥原因-利率不符需求</th>
+							<th>MTD<br />已核不撥原因-額度及利率不符需求</th>
+							<th>MTD<br />已核不撥原因-已無資金需求</th>
+							<th>MTD<br />已核不撥原因-他行已核貸</th>
+							<th>MTD<br />已核不撥原因-其他</th>
+						</tr>
+					</thead>
+					<tbody ng-show="resultList.length > 0">
+						<tr class="repeat-row" align="center" ng-repeat="row in resultList">
+							<td>{{row.YYYYMM}}</td>
+							<td>{{row.REF_SRC}}</td>
+							<td>{{row.USERROLE | mapping:mappingSet['CAM.REF_USER_ROLE']:'F3'}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td>{{row.EMP_ID}}</td>
+							<td>{{row.REF_PROD | mapping:mappingSet['CAM.REF_PROD']:'F3'}}</td>
+							<td>{{row.MTD_TOT}}</td>
+							<td>{{row.REF_MTD_CLOSE_NUMBER}}</td>
+							<td>{{row.REF_MTD_PROCESSING_RATE}}&nbsp;%</td>
+							<td>{{row.REF_MTD_N_CLOSE_NUMBER}}</td>
+							<td>{{row.REF_MTD_PROCESSING_NUMBER}}</td>
+							<td>{{row.REF_MTD_NO_INTO}}</td>
+							<td>{{row.REF_MTD_NO_INTO_R1}}</td>
+							<td>{{row.REF_MTD_NO_INTO_R2}}</td>
+							<td>{{row.REF_MTD_NO_INTO_R3}}</td>
+							<td>{{row.REF_MTD_NO_INTO_R4}}</td>
+							<td>{{row.REF_MTD_INTO_PIECES_NUMBER}}</td>
+							<td>{{row.REF_MTD_INTO_PIECES_R1}}</td>
+							<td>{{row.REF_MTD_INTO_PIECES_R2}}</td>
+							<td>{{row.REF_MTD_INTO_PIECES_R3}}</td>
+							<td>{{row.REF_MTD_NOT_DIALED_R1}}</td>
+							<td>{{row.REF_MTD_NOT_DIALED_R2}}</td>
+							<td>{{row.REF_MTD_NOT_DIALED_R3}}</td>
+							<td>{{row.REF_MTD_NOT_DIALED_R4}}</td>
+							<td>{{row.REF_MTD_NOT_DIALED_R5}}</td>
+							<td>{{row.REF_MTD_NOT_DIALED_R6}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

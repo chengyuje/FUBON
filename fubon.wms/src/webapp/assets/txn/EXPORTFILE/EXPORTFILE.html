@@ -1,0 +1,122 @@
+<style>
+/* open dialog */
+.ngdialog.EXPORTFILE {
+	
+}
+/* dialog panl */
+.modal-dialog.EXPORTFILE {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.EXPORTFILE table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.EXPORTFILE table.little{
+	width: 60%;
+}
+/* change row */
+.EXPORTFILE.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_EXPORTFILE_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:188px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.red{
+	color: red;
+}
+.textarea-EXPORTFILE
+    {
+      width: 500px;
+      height: 158px;
+      vertical-align: middle;
+    }
+
+</style>
+<script type="text/javascript" src="assets/txn/EXPORTFILE/EXPORTFILE.js"></script>
+<div class="EXPORTFILE" ng-controller="EXPORTFILEController" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >SQL匯出測試用</div>
+	</div>
+		<div class="panel_content">
+			<div class="search_table">
+				<table>
+					<tr>
+						<td style="width:100%; text-align:center;">
+							<textarea class ="textarea-EXPORTFILE" id="sql" ng-model="inputVO.sql"></textarea>
+						</td>
+					</tr>
+				</table>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="test()">執行</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+					&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+					<button type="button" class="btn btn-info" ng-click="export('1')">匯出XLSX</button>
+					<button type="button" class="btn btn-info" ng-click="export('2')">匯出CSV(無表頭)</button>
+					<button type="button" class="btn btn-info" ng-click="export('3')">匯出CSV(有表頭)</button>
+				</div>
+			</div>
+		</div>
+		
+		
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >結果輸出</div>
+	</div>
+		<div class="panel_content">
+			<e-jumping output="outputVO"
+				input="inputVO"
+				query="test()" list="resultList"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th ng-repeat="column in cols">
+								{{column}}
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList">
+							<td ng-repeat="column in cols">
+								{{row[column]}}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+		</div>
+</div>

@@ -1,0 +1,172 @@
+<style>
+<!--
+div .head{
+	margin: 1%;
+}
+.head input {
+	width: 5%;
+}
+-->
+.INS210ToolTip .tooltip-inner {
+	max-width: 350px !important;
+}
+
+.noUseShow {
+	opacity: 0.3;
+}
+.useShow {
+	opacity: 1.0;
+}
+.noLinkPointerEvent {
+	pointer-events: none;
+}
+.linkPointerEvent {
+	pointer-events: visible;
+}
+
+
+</style>
+<script type="text/javascript" src="assets/txn/INS260/INS260.js"></script>
+<script type="text/javascript" src="assets/txn/INS/INS_IOT.js"></script>
+<div ng-controller="INS210Controller" ng-cloak>
+	<div>
+		<h4 class="h4-title">目前保障內容</h4>
+		<table class="gv_tab_sc">
+			<thead>
+				<tr>
+					<th>刪除</th>
+					<th>保單號碼</th>
+					<th>商品名稱</th>
+					<th>幣別</th>
+					<th>保額</th>
+					<th>單位</th>
+					<th ng-if="inputVO.PLAN_TYPE != '4'">保障</th>
+					<th ng-if="inputVO.PLAN_TYPE == '4'">一次給付金</th>
+					<th ng-if="inputVO.PLAN_TYPE == '4'">住院日額</th>
+					<th ng-if="inputVO.PLAN_TYPE == '4'">長期看護每月給付</th>
+					<th>保費(原幣)</th>
+					<th>保費(台幣)</th>
+					<th ng-if="inputVO.PLAN_TYPE == '3'">實支實付</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in inputVO.planList" ng-class-odd="'rowOdd'"
+						ng-class-even="'rowEven'">
+					<td>
+						<button type="button" ng-click="delete_data(row)" class="btn btn-info">刪除</button>
+					</td>
+					<td>{{row.INSSEQ}}</td>
+					<td>{{row.PRD_NAME}}</td>
+					<td>{{row.CURR_CD}}</td>
+					<td style="text-align:right">{{row.INSUREDAMT}}</td>
+					<td>{{row.unit}}</td>
+					<td ng-if="inputVO.PLAN_TYPE != '4'">{{row.coverage | number:0}}</td>
+					<td ng-if="inputVO.PLAN_TYPE == '4'" style="text-align:right">{{row.coverage_D | number:0}}</td>
+					<td ng-if="inputVO.PLAN_TYPE == '4'" style="text-align:right">{{row.coverage_C | number:0}}</td>
+					<td ng-if="inputVO.PLAN_TYPE == '4'" style="text-align:right">{{row.coverage_W | number:0}}</td>
+					<td>{{row.INSYEARFEE | number:0}}</td>
+					<td>{{row.LOCAL_INSYEARFEE |number:0}}</td>
+					<td ng-if="inputVO.PLAN_TYPE == '3'">{{row.IS_HR}}</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="head">
+			<span ng-if="inputVO.PLAN_TYPE == '1'">其他壽險保單保額</span>
+			<span ng-if="inputVO.PLAN_TYPE == '2'">其他意外險保單保額</span>
+			<span ng-if="inputVO.PLAN_TYPE == '3'">其他保單住院日額</span>
+			<input ng-if="inputVO.PLAN_TYPE != '4'" id="extra_protext" name="extra_protext" type="text" placeholder="請輸入..." ng-model="inputVO.EXTRA_PROTEXT" style="text-align:right;" e-input-limit="NUU" nuu1="14" nuu2="2">
+			<button type="button" class="btn btn-info" ng-click="calculaGap()"
+			uib-tooltip="{{CAL_DESC}}" tooltip-placement="auto right" tooltip-append-to-body="true" tooltip-class="INS210ToolTip">確定</button>
+		</div>
+	</div>
+	<div ng-class="{true: 'noUseShow', false: 'useShow'} [!(inputVO.PLAN_KEYNO && inputVO.PLAN_D_KEYNO) && !buttonIsClick]">
+		<h4 class="h4-title">商品推薦</h4>
+		<table>
+			<tr ng-if="inputVO.PLAN_TYPE=='1'" style="width:100%">
+				<td>根據您的需求，尚需要 </td>
+				<td style="text-align: right">{{PROJECT_GAP_ONCE1 | number:0}}</td>
+				<td>元的壽險保障，以下是我們推薦的商品</td>
+			</tr>
+			<tr ng-if="inputVO.PLAN_TYPE=='2'" style="width:100%">
+				<td>根據您的需求，尚需要</td>
+				<td style="text-align: right">{{PROJECT_GAP_ONCE2 | number:0}}</td>
+				<td>元的意外險保障，以下是我們推薦的商品</td>
+			</tr>
+			<tr ng-if="inputVO.PLAN_TYPE=='3' && DemandAnalysisinputVO.TTL_FLAG=='Y'" style="width:100%">
+				<td>根據您的需求，尚需要</td>
+				<td style="text-align: right">{{PROJECT_GAP_ONCE3 | number:0}}</td>
+				<td>元住院醫療日額，以下是我們推薦的商品</td>
+			</tr>
+			<tr ng-if="inputVO.PLAN_TYPE=='3' && DemandAnalysisinputVO.TTL_FLAG=='N'" style="width:100%">
+				<td>根據您的需求，尚需要</td>
+				<td style="text-align: right">{{PROJECT_GAP_ONCE3 | number:0}}</td>
+				<td>元住院醫療日額及實支實付醫療保障，以下是我們推薦的商品</td>
+			</tr>
+			<tr ng-if="inputVO.PLAN_TYPE=='4' && TYPE_CANCER" style="width:100%">
+				<td>根據您的需求，尚需要</td>
+				<td style="text-align: right">{{PROJECT_GAP_ONCE4_2 | number:0}}</td>
+				<td>元住院日額保額癌症險保單，以下是我們推薦的商品</td>
+			</tr>
+			<tr ng-if="inputVO.PLAN_TYPE=='4' && TYPE_MAJOR" style="width:100%">
+				<td>根據您的需求，尚需要</td>
+				<td style="text-align: right">{{PROJECT_GAP_ONCE4_1 | number:0}}</td>
+				<td>元保額的重大疾病保單，以下是我們推薦的商品</td>
+			</tr>
+			<tr ng-if="inputVO.PLAN_TYPE=='4' && TYPE_LT" style="width:100%">
+				<td>根據您的需求，尚需要</td>
+				<td style="text-align: right">{{PROJECT_GAP_ONCE4_3 | number:0}}</td>
+				<td>元月給付的長期看護保單，以下是我們推薦的商品</td>
+			</tr>
+		</table>
+		<table class="gv_tab_sc">
+			<thead>
+				<tr>
+					<th>勾選</th>
+					<th>險種代號</th>
+					<th>商品名稱</th>
+					<th ng-if="inputVO.PLAN_TYPE=='4'">適合類型</th>
+					<th>繳費年期</th>
+					<th>保額</th>
+					<th>單位</th>
+					<th>幣別</th>
+					<th>年繳表定保費</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr	ng-repeat="row in inputVO.suggestList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					<td>
+						<input type='checkbox' ng-model='row.choic' ng-true-value="'Y'" ng-false-value="'N'" ng-click="choic_Suggest(row)" ng-disabled="save_finish"/>
+					</td>
+					<td>{{row.PRD_ID}}</td>
+					<td><a ng-class="{true: 'noLinkPointerEvent', false: 'linkPointerEvent'} [!(inputVO.PLAN_KEYNO && inputVO.PLAN_D_KEYNO) && !buttonIsClick]" ng-click="goDownload(row)">{{row.INSPRD_NAME}}</a></td>
+					<td ng-if="inputVO.PLAN_TYPE=='4'">{{row.SUGGEST_TYPE | mapping:PARA_NO4_SUGGEST_TYPE:F3}}</td>
+					<td>
+						<e-combobox
+						ng-datasource="row.insprd_annualList"
+						ng-model="row.INSPRD_ANNUAL_choic"
+						ng-validate="false" 
+						ng-disabled="save_finish"
+						ng-readonly="save_finish" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						ng-change="choic_Suggest(row)"
+						style="line-height:20px;" />
+					</td>
+					<td>
+						<input id="insured" name="insured" type="text" ng-model="row.Insured" e-input-limit="NUU" nuu1="6" nuu2="2" ng-blur="Caculate_toBack(row)" ng-disabled="save_finish" style="text-align:right"/>
+					</td>
+					<td>{{row.PRD_UNIT | mapping:INS_UNIT:F3}}</td>
+					<td>{{row.CURR_CD}}</td>
+					<td style="text-align:right">{{row.Premium | number:0}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="head">
+		<button type="button" class="btn btn-info" ng-click="save(INS_STATUS_1)" ng-disabled="!(inputVO.PLAN_KEYNO && inputVO.PLAN_D_KEYNO) && !buttonIsClick || inputVO.suggestList.length == 0">儲存</button>
+		<button type="button" class="btn btn-info" ng-click="insured()" ng-disabled="!(inputVO.PLAN_KEYNO && inputVO.PLAN_D_KEYNO) && !buttonIsClick || inputVO.suggestList.length == 0">我要投保</button>
+		<button type="button" class="btn btn-info" ng-click="Insurance_Planning_Print()" ng-disabled="!(inputVO.PLAN_KEYNO && inputVO.PLAN_D_KEYNO) && !buttonIsClick || inputVO.suggestList.length == 0">建議書列印</button>
+	</div>
+
+</div>

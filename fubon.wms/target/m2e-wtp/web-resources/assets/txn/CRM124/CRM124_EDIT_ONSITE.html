@@ -1,0 +1,122 @@
+<style>
+/* open dialog */
+.ngdialog.CRM124_EDIT_ONSITE {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM124_EDIT_ONSITE {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 500px;
+	height: auto;
+}
+
+</style>
+<div ng-controller="CRM124_EDIT_ONSITEController" ng-cloak>
+	<div class="modal-dialog CRM124_EDIT_ONSITE">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">編輯駐點行</h4>
+			</div>
+			<div class="modal-body search_table">
+				<table>
+					<tr>
+						<td></td>
+						<th>原駐點資訊：</th>
+						<td>{{toJsDate(on_date) | date:"yyyy-MM-dd"}} - {{period}} - {{onsite_brh}}</td>
+					</tr>
+					<tr>
+						<td></td>
+						<th>*更新駐點分行：</th>
+						<td>
+							<e-combobox id="new_onsite_brh" name="new_onsite_brh"
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="inputVO.new_onsite_brh"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<th>*修改原因：</th>
+						<td>
+							<e-combobox id="chg_reason" name="chg_reason"
+								ng-datasource="mappingSet['CHG_REASON']"
+								ng-model="inputVO.chg_reason"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr ng-show = "inputVO.chg_reason == '4'">
+						<td></td>
+						<th>其他：</th>
+						<td>
+							<textarea id="chg_reason_oth" ng-model="inputVO.chg_reason_oth"></textarea>
+						</td>
+					</tr>
+					
+					<tr>
+						<td></td>
+						<th>*駐點日期：</th>
+						<td>
+							<div class="input-group datebox datewidth">
+							<input type="text" id="new_on_date" name="new_on_date"
+								class="form-control" 
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.new_on_date" 
+								is-open="model.a"
+								ng-readonly="true"/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<th>*駐點時間：</th>
+						<td>
+							<e-combobox id="new_onsite_period" name="new_onsite_period"
+								ng-datasource="mappingSet['NEW_ONSITE_PERIOD']"
+								ng-model="inputVO.new_onsite_period"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+						</td>
+					</tr>
+					
+				</table>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" 
+					ng-disabled="inputVO.new_onsite_brh == undefined || inputVO.new_onsite_brh == '' ||
+								inputVO.chg_reason == undefined || inputVO.chg_reason == '' ||
+								inputVO.new_on_date == undefined || inputVO.new_on_date == '' ||
+								inputVO.new_onsite_period == undefined || inputVO.new_onsite_period == ''">確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

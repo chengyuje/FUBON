@@ -1,0 +1,60 @@
+--**************************************************************************
+--PROJECT_CODE> TBSQM
+--DATE>2018/07/30
+--AUTHOR> Willis
+--PURPOSE>ST Load
+--**************************************************************************
+
+--**************************************************************************
+--TARGET> TBSQM_CSM_CUSTOM_SG
+--TRUNCATE_BEFORE_INSERT>Y
+--**************************************************************************
+OPTIONS (ERRORS = 0)
+--OPTIONS (direct=true,skip=1)
+LOAD DATA
+CHARACTERSET AL32UTF8
+TRUNCATE
+into table	TBSQM_CSM_CUSTOM_SG
+--FIELDS TERMINATED BY X'09'
+FIELDS TERMINATED BY ',' 
+OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+PAPER_UUID
+,UPDATE_DATE  "TO_DATE(SUBSTR(REPLACE(:UPDATE_DATE,'T',' '),1,19),'YYYY-MM-DD HH24:MI:SS')"
+,OS
+,BROWSER
+,CUSTOMER_ID
+,FIELD0
+,FIELD1
+,FIELD2
+,FIELD3
+,FIELD4
+,FIELD5
+,FIELD6
+,FIELD7
+,FIELD8
+,FIELD9
+,DF_CUST_ATTR1
+,DF_CUST_ATTR2
+,DF_CUST_ATTR3
+,DF_CUST_ATTR4 "substr(:DF_CUST_ATTR4, -3)"
+,DF_CUST_ATTR5
+,DF_CUST_ATTR6
+,DF_CUST_ATTR7
+,DF_CUST_ATTR8
+,DF_CUST_ATTR9
+,DF_CUST_ATTR10
+,DF_CUST_ATTR11
+,DF_CUST_ATTR12
+,DF_CUST_ATTR13
+,DF_CUST_ATTR14
+,DF_CUST_ATTR15
+,DF_CUST_ATTR16
+,DF_CUST_ATTR17
+,DF_CUST_ATTR18
+,DF_CUST_ATTR19
+,DF_CUST_ATTR20
+,DF_CUST_ATTR21
+,DF_CUST_ATTR22
+)

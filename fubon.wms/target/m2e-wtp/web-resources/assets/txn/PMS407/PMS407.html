@@ -1,0 +1,226 @@
+<style>
+
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS407/PMS407.js"></script>
+<script type="text/javascript" src="assets/txn/PMS407/PMS407_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS407" ng-controller="PMS407Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>						
+						<th>*資料統計月份：</th>
+						<td>						 						 													 						
+							<e-combobox id="dataMonth" name="dataMonth" 
+								ng-datasource="mappingSet['timeE']"
+								ng-model="inputVO.sCreDate"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-required="true"
+								ng-editable="false"
+								ng-change="limitDate();dateChange()"
+								ng-format="F3"
+								width="150px"
+								style="line-height:20px;" />														
+						</td>																																											    												
+					</tr>
+					<tr>
+						<th>*業務處：</th>
+						<td>						     
+							
+							<e-combobox id="region_center_id" name="region_center_id"
+							ng-datasource="REGION_LIST"
+							ng-model="inputVO.region_center_id"
+							ng-validate="false" 
+							ng-disabled="disableRegionCombo"
+							ng-readonly="disableRegionCombo" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change="ChangeRegion()"
+							width="150px"
+							style="line-height:20px;" />
+						</td>						
+						<th>*營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+							ng-datasource="AREA_LIST"
+							ng-model="inputVO.branch_area_id"
+							ng-validate="false" 
+							ng-disabled="disableAreaCombo"
+							ng-readonly="disableAreaCombo" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change="ChangeArea()"
+							width="90px"
+							style="line-height:20px;" />
+						</td>
+						<th>*分行：</th>
+											 
+							<td><e-combobox ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr" ng-validate="false"
+									ng-disabled="disableBranchCombo"
+							        ng-readonly="disableBranchCombo" ng-format="F1"
+									ng-required="true" ng-change="ChangeBranch()" width="155px"
+									height="30px" style="line-height:20px;" />
+							</td>
+						<th>理專：</th>
+						<td>						
+							<e-combobox id="ao_code" name="ao_code"
+									ng-datasource="AO_LIST"
+									ng-model="inputVO.ao_code"
+									ng-validate="false"
+									ng-disabled="disableAoCombo"
+									ng-readonly="disableAoCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeAo_code()"
+									width="100px" style="line-height:20px;" />						 
+						</td>						
+					</tr>					
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<div>
+					<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+					<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length ==0" function-type="export">匯出</button>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+			<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>
+			<div algin="left">
+				<table>
+			    	<tr>
+			    		<td>產出頻率：</td>
+			    		<td>每月</td>
+			    	</tr>
+			    	<tr>
+			    		<td>產出日：</td>
+			    		<td>{{toJsDate(paramList[0].CDATE) | date:'yyyy/MM/dd'}}</td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="9" e-list="paramList">
+					<thead>
+						<tr>
+							<th>序號</th>
+							<th>報表年月</th>
+							<th>業務處名稱</th>
+							<th>區名</th>
+							<th>分行代碼</th>
+							<th>分行名稱</th>
+							<th>AO Code</th>							
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>基金<br>投資市值</th>
+							<th>基金<br>投資成本</th>
+							<th>基金<br>流失比率</th>
+							<th>海外ETF<br>投資市值</th>
+							<th>海外ETF<br>投資成本</th>
+							<th>海外ETF<br>流失比率</th>							
+							<th>海外股票<br>投資市值</th>
+							<th>海外股票<br>投資成本</th>
+							<th>海外股票<br>流失比率</th>
+							<th>SI<br>投資市值</th>
+							<th>SI<br>投資成本</th>
+							<th>SI<br>流失比率</th>
+							<th>SN<br>投資市值</th>
+							<th>SN<br>投資成本</th>
+							<th>SN<br>流失比率</th>
+							<th>海外債<br>投資市值</th>
+							<th>海外債<br>投資成本</th>
+							<th>海外債<br>流失比率</th>
+							<th>商品類別</th>
+							<th>商品代碼</th>
+							<th>訊息類別</th>
+							<th>訊息內容</th>
+							<th>訪談記錄</th>
+						</tr>
+					</thead>
+					<tbody >
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td>{{outputVO.currentPageIndex*10+$index+1}}</td>
+							<td>{{row.YEARMON}}</td>
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							<td>{{row.BRANCH_AREA_NAME}}</td>
+							<td>{{row.BRANCH_NBR}}</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.AO_CODE}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							
+							<td align="right" >{{row.FUND_VALU | currency:''}}</td>
+							<td align="right" >{{row.FUND_COST | currency:''}}</td>
+							<td ng-if="row.FUND_LOSS_RATE < 0" class="with-errors" align="right">{{row.FUND_LOSS_RATE}}%</td>
+							<td ng-if="row.FUND_LOSS_RATE >= 0" align="right">{{row.FUND_LOSS_RATE}}%</td>
+														
+							<td align="right">{{row.ETF_VALU | currency:''}}</td>
+							<td align="right">{{row.ETF_COST | currency:''}}</td>
+							<td ng-if="row.ETF_LOSS_RATE < 0" class="with-errors" align="right">{{row.ETF_LOSS_RATE}}%</td>
+							<td ng-if="row.ETF_LOSS_RATE >= 0" align="right">{{row.ETF_LOSS_RATE}}%</td>
+														
+							<td align="right" >{{row.STK_VALU | currency:''}}</td>
+							<td align="right" >{{row.STK_COST | currency:''}}</td>
+							<td ng-if="row.STK_LOSS_RATE < 0" class="with-errors" align="right">{{row.STK_LOSS_RATE}}%</td>
+							<td ng-if="row.STK_LOSS_RATE >= 0" align="right">{{row.STK_LOSS_RATE}}%</td>
+														
+							<td align="right" >{{row.SI_VALU | currency:''}}</td>
+							<td align="right" >{{row.SI_COST | currency:''}}</td>
+							<td ng-if="row.SI_LOSS_RATE < 0" class="with-errors" align="right">{{0+row.SI_LOSS_RATE}}%</td>
+							<td ng-if="row.SI_LOSS_RATE >= 0" align="right">{{0+row.SI_LOSS_RATE}}%</td>
+							
+							<td align="right" >{{row.SN_VALU | currency:''}}</td>
+							<td align="right" >{{row.SN_COST | currency:''}}</td>
+							<td ng-if="row.SN_LOSS_RATE < 0" class="with-errors" align="right">{{0+row.SN_LOSS_RATE}}%</td>
+							<td ng-if="row.SN_LOSS_RATE >= 0" align="right">{{0+row.SN_LOSS_RATE}}%</td>
+														
+							<td align="right" >{{row.BND_VALU | currency:''}}</td>
+							<td align="right" >{{row.BND_COST | currency:''}}</td>
+							<td ng-if="row.BND_LOSS_RATE < 0" class="with-errors" align="right">{{0+row.BND_LOSS_RATE}}%</td>
+							<td ng-if="row.BND_LOSS_RATE >= 0" align="right">{{0+row.BND_LOSS_RATE}}%</td>
+							
+							<!-- <td >{{row.AST_TYPE | mapping:mappingSet['PMS.PRD_TYPE']:'F3'}}</td> -->
+							<td >{{row.AST_TYPE}}</td>
+							<td >{{row.PRD_ID}}</td>
+							<td >{{row.INFO_TYPE | mapping:mappingSet['PMS.INFO_TYPE']:'F3'}}</td>
+							<td >{{row.INFO}}</td>
+							<!-- <td ng-if="row.aa>1" rowspan={{row.aa}}>{{row.INTERVIEW_YN}}</td>	 -->											 					
+						    <td ng-show="row.INFO!=null">{{row.INTERVIEW_YN}}</td>
+						    <td ng-show="row.INFO==null"></td>
+						</tr>
+					</tbody>
+				</table>				
+			</div>
+			<div>說明：</div>
+			<div>本月報僅篩選各產品流失比率小於等於-10%的客戶名單</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,152 @@
+<style>
+.search_box TH {
+	line-height: 20px;
+	padding: 10px;
+	text-align: right;
+}
+
+.search_box TH+TD {
+	line-height: 20px;
+	padding: 10px;
+}
+
+.ngdialog.PMS306 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS306 {
+	position: relative;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS306/PMS306.js"></script>
+
+<div ng-controller="PMS306Controller" ng-cloak>
+	<uib-tabset active="0" justified="true"> <uib-tab
+		index="0" heading="批次執行作業"> <!-- include -->
+
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">批次執行作業
+		</div>
+	</div>
+
+	<div class="panel_content">
+
+		<div class="search_table search_box3 scroll_y">
+			<table>
+				<tr>
+					<td align="left">
+						<div style="float: left">批次時間：</div>&nbsp
+
+
+						<div style="float: left !important;"
+							class="input-group datebox datewidth">
+							<input type="text" class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.SDate"
+								is-open="model.a" datepicker-options="ivgStartDateOptions"
+								ng-readonly="true" ng-change="limitDate()" width="100%" />
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default"
+									ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+
+						<div style="float: left !important;">～</div>
+
+						<div style="float: left !important;"
+							class="input-group datebox datewidth">
+							<input type="text" class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.EDate"
+								is-open="model.b" datepicker-options="ivgEndDateOptions"
+								ng-readonly="true" ng-change="limitDate()" width="100%" />
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default"
+									ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+						<div style="float: left !important;">
+							&nbsp
+							<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+							&nbsp
+							<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+						    &nbsp
+							<button type="button" class="btn btn-info" ng-click="reset()">重算當日戰報 </button>
+							&nbsp
+							<button type="button" class="btn btn-info" ng-click="reset_base()">重算當日底層與戰報 </button>
+						</div>
+				
+				</tr>
+			</table>
+		</div>
+
+	</div>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">已排入計算保險速報
+		</div>
+	</div>
+	<div class="panel_content">
+		<e-jumping output="outputVO" input="inputVO" query="inquire()"
+			list="pislist"></e-jumping>
+		<div algin="left">
+			
+		</div>
+
+		<div class="gv_tab_sc slim-scroll" data-height="460">
+			<table class="tablesaw table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>計算期間</th>
+						<th>批次排程時間</th>
+						<th>批次完成時間</th>
+						<th>批次執行結果</th>
+
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row"
+						ng-repeat="row in pislist | limitTo:displayLimit track by $index"
+						ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{row.SCH_ID + " : "}}{{row.INS_PROFIT_S}}~{{row.INS_PROFIT_E}}</td>
+						<td>{{row.BT_EXEC}}</td>
+						<td>{{row.BT_FINISH}}</td>
+						<td>{{row.BT_STATE | mapping:mappingSet['CMMGR005.STATUS']:'F3'}}<br>{{row.RESULT | mapping:mappingSet['CMMGR005.RESULT']:'F3'}}</td>
+
+					</tr>
+				</tbody>
+			</table>
+		</div>
+			<div algin="left">
+					<table>
+
+						<tr>
+							<td align="right">說明：</td>
+							<td align="left"></td>
+						</tr>
+					</table>
+				</div>
+	</div>
+	</uib-tab> <uib-tab index="2" heading="月目標上傳"> <!-- include -->
+	<div ng-include="'assets/txn/PMS306/PMS306MT.html'"></div>
+	<!-- include --> </uib-tab> <uib-tab index="3" heading="人壽點收時間維護"> <!-- include -->
+	<div ng-include="'assets/txn/PMS306/PMS306TIME.html'"></div>
+	<!-- include --> </uib-tab> <uib-tab index="4" heading="人工調整作業"> <!-- include -->
+	<div ng-include="'assets/txn/PMS306/PMS306PE.html'"></div>
+	<!-- include --> </uib-tab> <uib-tab index="1" heading="保險戰報註解"> <!-- include -->
+	<div ng-include="'assets/txn/PMS306/PMS306NOTE.html'"></div>
+	<!-- include --> </uib-tab> </uib-tabset>
+</div>

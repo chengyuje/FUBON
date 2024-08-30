@@ -1,0 +1,126 @@
+<style>
+.PMS510 .datewidth {
+	width:180px !important;
+	float: left !important;
+}
+
+.PMS510 .rstable thead tr th {
+    vertical-align: middle;
+}
+.PMS510 .noticed {
+    color: #FF0000;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS510/PMS510.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/COMMON/CommonUtil.js"></script>
+
+<div class="PMS510" ng-controller="PMS510Controller">
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th width="10%">*年月：</th>
+							<td width="25%">						 						 
+								<e-combobox id="sCreDate" name="sCreDate" 
+											ng-datasource="mappingSet['timeE']"
+											ng-model="inputVO.sCreDate"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-required="true"
+											ng-format="F3"
+											style="line-height:20px;" />														
+							</td>
+							<th width="10%"></th>
+							<td width="25%"></td>
+							<th width="10%"></th>
+							<td width="25%"></td>
+						</tr>
+						<tr>
+							<th>報表層級：</th>
+							<td>
+								<e-combobox id="reportHierarchy" name="reportHierarchy"
+											ng-datasource="REPORT_HIERARCHY"
+											ng-model="inputVO.reportHierarchy"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-change="getDeptList()"
+											style="line-height:20px;"/>
+							</td>
+							<th>
+								<span ng-show="inputVO.reportHierarchy == 'REGION'">業務處：</span>
+								<span ng-show="inputVO.reportHierarchy == 'AREA'">營運區：</span>
+								<span ng-show="inputVO.reportHierarchy == 'BRH'">分行：</span>
+								<span ng-show="inputVO.reportHierarchy == '' || inputVO.reportHierarchy == 'undefined' || inputVO.reportHierarchy == null || inputVO.reportHierarchy == 'ALL'"></span>
+							</th>
+							<td>
+								<e-combobox id="deptID" name="deptID"
+											ng-datasource="deptList"
+											ng-model="inputVO.deptID"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F1"
+											ng-if="inputVO.reportHierarchy == 'REGION' || inputVO.reportHierarchy == 'AREA' || inputVO.reportHierarchy == 'BRH'"
+											style="line-height:20px;"/>
+							</td>
+							<th></th>
+							<td></td>
+						</tr>			
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" function-type="query" ng-click="query();" >查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+				<button type="button" class="btn btn-info" function-type="export" ng-click="exportRPT()" >匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		
+		<div class="panel_content">		    
+			<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+   			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+	            <table class="table-bordered">
+	                <thead>
+	                	<tr>
+		                	<th ng-repeat="rowBrh in titleBrh track by $index" >
+		                		{{rowBrh}}
+		                	</th>
+		                </tr>
+		                <tr>
+		                	<th ng-repeat="rowCTN in titleColName track by $index" >
+		                		{{rowCTN}}
+		                	</th>
+		                </tr>
+		                </tr>
+	                </thead>
+	                <tbody>
+		                <tr ng-repeat="row in paramList" class="repeat-row" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td ng-repeat="(key, value) in row"> 
+								<span ng-if="isTypeOF(row[titleCol[$index]]) == 'string'">{{row[titleCol[$index]]}}</span>
+								<span ng-if="isTypeOF(row[titleCol[$index]]) == 'number'">{{row[titleCol[$index]] | number: 2}}</span>
+							</td>
+		                </tr>
+	                </tbody>
+	            </table>
+	            <br>
+   			</div>
+		</div>
+	</div>
+</div>

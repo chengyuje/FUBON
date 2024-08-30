@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+		http://www.springframework.org/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+		http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+    <!--******************** Query Utility Setting ********************-->
+    <bean id="queryutilityfactory"
+          class="com.systex.jbranch.platform.common.query.factory.impl.hibernate.QueryUtilityFactoryImpl">
+        <property name="implementations">
+            <util:map>
+                <entry key="1" value-ref="hqlUtilityFactory"/>
+                <entry key="2" value-ref="sqlUtilityFactory"/>
+                <entry key="3" value-ref="sqlUtility2Factory"/>
+            </util:map>
+        </property>
+    </bean>
+    <bean id="hqlUtilityFactory"
+          class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+        <property name="targetBeanName">
+            <idref bean="hqlUtility"/>
+        </property>
+    </bean>
+    <bean id="hqlUtility" class="com.systex.jbranch.platform.common.query.impl.hibernate.HQLUtilityImpl"
+          scope="prototype"/>
+
+    <bean id="sqlUtilityFactory"
+          class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+        <property name="targetBeanName">
+            <idref bean="sqlUtility"/>
+        </property>
+    </bean>
+    <bean id="sqlUtility" class="com.systex.jbranch.platform.common.query.impl.hibernate.SQLUtilityImpl"
+          scope="prototype"/>
+
+    <bean id="sqlUtility2Factory"
+          class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+        <property name="targetBeanName">
+            <idref bean="sqlUtility2"/>
+        </property>
+    </bean>
+    <bean id="sqlUtility2" class="com.systex.jbranch.platform.common.query.impl.hibernate.SQLUtilityImpl2"
+          scope="prototype"/>
+
+    <bean id="queryutilityproxy"
+          class="com.systex.jbranch.platform.common.dataaccess.query.QueryUtilityProxy"/>
+
+
+    <!--******************** data ********************-->
+    <bean id="datasourcerule"
+          class="com.systex.jbranch.platform.common.datasource.DefaultRuleImpl"/>
+    <bean id="daomanager"
+          class="com.systex.jbranch.platform.common.dataaccess.daomanager.impl.hibernate.DaoManagerImpl"/>
+    <bean id="serialnumberutility"
+          class="com.systex.jbranch.platform.common.dataaccess.serialnumber.SerialNumberImpl" scope="prototype" p:dataAccessManager-ref="dataAccessManager"/>
+    <bean id="independenttransactoin"
+          class="com.systex.jbranch.platform.common.dataaccess.transaction.IndependentTransactionImpl"/>
+    <bean id="daoproxy"
+          class="com.systex.jbranch.platform.common.dataaccess.dao.impl.hibernate.DaoProxy"/>
+    <bean id="independenttransaction"
+          class="com.systex.jbranch.platform.common.dataaccess.transaction.IndependentTransactionImpl"/>
+
+    <bean id="dataAccessManager" class="com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager"
+          scope="prototype"
+          p:daoManager-ref="daomanager"
+          p:daoProxy-ref="daoproxy"
+          p:independentTransaction-ref="independenttransaction"
+          p:queryUtilityFactory-ref="queryutilityfactory"
+          p:queryUtilityProxy-ref="queryutilityproxy">
+        <constructor-arg type="boolean" value="true"/>
+        <property name="dataSource">
+            <bean class="com.systex.jbranch.platform.common.dataaccess.datasource.DataSource">
+                <constructor-arg type="com.systex.jbranch.platform.common.dataaccess.datasource.DataSourceRuleIF"
+                                 ref="datasourcerule"/>
+            </bean>
+        </property>
+    </bean>
+</beans>

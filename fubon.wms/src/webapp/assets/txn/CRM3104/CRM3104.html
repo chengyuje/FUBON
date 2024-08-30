@@ -1,0 +1,196 @@
+<style>
+/* open dialog */
+.ngdialog.CRM3104 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM3104 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM3104 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM3104 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM3104.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM3104_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/CRM3104/CRM3104.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="CRM3104" ng-controller="CRM3104Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit" width="40%"><img src="assets/images/icon/tfb_icon_a15.gif" >輪調一年內移回原RM</div>
+	</div>
+	<div class="panel_content search_table search_box2">
+		<table>
+			<tr>
+				<th>業務處：</th>
+				<td>
+					<e-combobox ng-datasource="REGION_LIST"
+	                            ng-model="inputVO.region_center_id"
+	                            ng-disabled="disableRegionCombo"
+	                            ng-readonly="disableRegionCombo"
+	                            ng-format="F3"
+	                            ng-change="ChangeRegion()"
+	                            width="200px"/>
+				</td>						
+				<th>營運區：</th>
+				<td>
+					<e-combobox ng-datasource="AREA_LIST"
+	                            ng-model="inputVO.branch_area_id"
+	                            ng-disabled="disableAreaCombo"
+	                            ng-readonly="disableAreaCombo"
+	                            ng-format="F3"
+	                            ng-change="ChangeArea()"
+	                            width="200px"/>
+				</td>	
+			</tr>	
+			<tr>
+				<th>分行：</th>
+				<td>
+					<e-combobox ng-datasource="BRANCH_LIST"
+	                            ng-model="inputVO.branch_nbr"
+	                            ng-disabled="disableBranchCombo"
+	                            ng-readonly="disableBranchCombo"
+	                            ng-format="F1"
+	                            ng-change="ChangeBranch()"
+	                            width="200px"/>
+				</td>
+				<th>理專：</th>
+				<td>
+					<e-combobox ng-datasource="EMP_LIST"
+								ng-model="inputVO.emp_id"
+								ng-validate="false" 
+								ng-disabled="EMP_LIST.length == 2"
+								ng-readonly="EMP_LIST.length == 2" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="false"
+								ng-change="ChangeEmp_id(region)"
+								width="200px"/>		
+				</td>
+			</tr>
+			<tr>
+				<th>專案名稱：</th>
+				<td><e-combobox id="PRJ_ID" name="PRJ_ID" 
+					ng-datasource="PROJNAME"
+			       	ng-model="inputVO.PRJ_ID"
+			       	ng-validate="false" 
+			       	ng-readonly="false" 
+			       	ng-editable="false"
+			       	ng-format="F3"
+			       	ng-required="false"				         
+	       			style="line-height:20px;" />
+	       		</td>
+				<th class="col-md-1 tdpadding">專案執行日期：</th>
+ 				<td class="col-md-9 tdpadding" colspan="5">
+ 					<div class="input-group datebox datewidth">
+						<input type="text" id="exedate" name="exedate"
+							class="form-control"
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.PRJ_EXE_DATE"
+							is-open="model.c"
+							ng-readonly="true"								
+							required/>
+							<!-- 製作日曆button -->
+		 				<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+								<i class="glyphicon glyphicon-calendar"></i></button>																		
+						</span>
+					</div>
+ 				</td>
+			</tr>
+		</table>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="exportData()" ng-show="isHeadMgr">匯出</button>
+<!-- 			<button type="button" class="btn btn-info" ng-click="exportAllData()" ng-show="isHeadMgr" function-type="export">全部匯出</button> -->
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered middle">
+				<thead>
+					<tr>
+						<th>專案名稱</th>
+						<th>專案執行日</th>
+						<th>客戶ID</th>
+						<th>客戶姓名</th>
+						<th>原分行</th>
+						<th>原理專</th>
+						<th>新分行</th>
+						<th>新理專(輪調理專)</th>
+						<th>移轉日期</th>
+						<th>移轉類別</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{row.PRJ_NAME}}</td>
+						<td>{{toJsDate(row.PRJ_EXE_DATE) | date:'yyyy-MM-dd'}}</td>
+						<td>{{row.CUST_ID}}</td>
+			       		<td>{{row.CUST_NAME}}</td>
+						<td>{{row.ORG_AO_BRH}}-{{row.ORG_BRANCH_NAME}}</td>
+						<td>{{row.ORG_AO_CODE}}-{{row.ORG_EMP_NAME}}</td>
+						<td>{{row.NEW_AO_BRH}}-{{row.NEW_BRANCH_NAME}}</td>
+						<td>{{row.NEW_EMP_ID}}({{row.NEW_AO_CODE}})-{{row.NEW_EMP_NAME}}</td>
+						<td>{{toJsDate(row.ACT_DATE) | date:'yyyy-MM-dd'}}</td>
+						<td>{{row.TRS_TYPE | mapping:mappingSet['CRM.TRS_TYPE']:'F3'}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,205 @@
+<style>
+  .custom-search-box td,
+  .custom-search-box th {
+    padding: 5px 10px;
+  }
+
+  .custom-search-box table {
+    padding: 10px;
+  }
+
+  .custom-search-box {}
+
+  .datebox {}
+
+  .FPS350 input[type=checkbox],
+  .FPS350 input[type=radio] {
+    top: -4px;
+  }
+
+  /* change row */
+
+  table>tbody>tr>td {
+    table-layout: fixed;
+    word-break: break-all;
+    word-wrap: break-word;
+  }
+
+  .datewidth {
+    width: 200px !important;
+    float: left !important;
+  }
+
+  .FPS350 .red {
+    color: red;
+  }
+
+</style>
+<script type="text/javascript"
+        src="assets/txn/FPS350/FPS350.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS350/FPS350_DETAIL.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS350/FPS350_PREVIEW.js"></script>
+
+<div ng-controller="FPS350Controller"
+     ng-clock
+     style="padding-top: 10px;">
+  <!-- content -->
+  <div class="FPS350 FPS">
+    <!-- query -->
+    <div class="bootstrap-admin-panel-content text-muted custom-search-box">
+
+      <table style="margin: 0 auto;">
+        <tr>
+          <th>異動日期：</th>
+          <td>
+            <div class="input-group datebox datewidth">
+              <input type="text"
+                     id="sDate"
+                     name="sDate"
+                     class="form-control"
+                     uib-datepicker-popup="yyyy/MM/dd"
+                     ng-model="inputVO.SD"
+                     is-open="openSD"
+                     ng-readonly="true"
+                     ng-required="false"
+                     datepicker-options="sDateOptions"
+                     ng-change="limitDate()" />
+              <!-- 製作日曆button -->
+              <span class="input-group-btn">
+								<button type="button" 
+										class="btn btn-default" 
+										ng-click="open($event,'openSD')">
+								<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+            </div>
+          </td>
+          <th style="text-align:center;">～</th>
+          <td>
+            <div class="input-group datebox datewidth">
+              <input type="text"
+                     class="form-control"
+                     uib-datepicker-popup="yyyy/MM/dd"
+                     ng-model="inputVO.ED"
+                     is-open="openED"
+                     ng-readonly="true"
+                     datepicker-options="eDateOptions"
+                     ng-change="limitDate()" />
+              <!-- 製作日曆button -->
+              <span class="input-group-btn">
+			              <button type="button"
+			                      class="btn btn-default"
+			                      ng-click="open($event,'openED')">
+			                <i class="glyphicon glyphicon-calendar"></i>
+			              </button>
+			            </span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th>狀態：</th>
+          <td>
+            <e-combobox ng-datasource="mapping.planStatus"
+                        ng-model="inputVO.planStatus"
+                        ng-validate="true"
+                        ng-readonly="false"
+                        ng-editable="false"
+                        ng-format="F3"
+                        width="160" />
+          </td>
+          <th>規劃書有效性：</th>
+          <td>
+            <e-combobox ng-datasource="mapping.fpsYN"
+                        ng-model="inputVO.isDisable"
+                        ng-validate="true"
+                        ng-readonly="false"
+                        ng-editable="false"
+                        ng-format="F3"
+                        width="160" />
+          </td>
+        </tr>
+      </table>
+      <div class="search_box_btn text-center">
+        <a type="button"
+           class="btn-fps"
+           ng-click="inquire()">查詢</a>
+        <a type="button"
+           class="btn-fps"
+           ng-click="init()">清除</a>
+        <a type="button"
+           class="btn-fps"
+           ng-click="kycDisable?'':goFPS310()"
+           ng-class="{'btn-fps-disabled':kycDisable}">建立全新規劃</a>
+      </div>
+    </div>
+    <div class="bootstrap-admin-panel-content">
+      <div>
+        <e-jumping-once output="outputVO"
+                        list="data"
+                        totallist="paramList"></e-jumping-once>
+      </div>
+      <table class="table table-striped">
+        <thead>
+          <th style="padding: .7em 0;"></th>
+          <th>狀態</th>
+          <th>是否有效</th>
+          <th>理財規劃</th>
+          <th>分行/理專</th>
+          <th>最後異動日期</th>
+          <th>建立日期</th>
+          <th>待執行交易</th>
+          <th>轉寄</th>
+          <th>下載</th>
+        </thead>
+        <tbody>
+          <tr ng-repeat="row in data">
+            <td>
+              <!-- 刪除 -->
+              <a ng-click="delete(row,$index)"
+                 class="icon clickable"
+                 ng-show="!((row.IS_PRINT+row.IS_EMAIL)>0||row.PLAN_STATUS=='ACTIVE')">
+                <img src="assets/images/ic-delete.svg">
+              </a>
+            </td>
+            <td ng-bind="row.PLAN_STATUS|mapping: mapping.planStatus"></td>
+            <td>
+              <!-- <div ng-bind="row.VALID_FLAG | mapping : mapping.fpsYN"></div> -->
+              <div ng-bind="row.VALID_FLAG_TEXT"></div>
+              <div ng-bind="row.VALID_FLAG_REASON"></div>
+            </td>
+            <td>
+              <a ng-show="row.VALID_FLAG=='Y'"
+                 ng-click="go(row)">
+                <div ng-bind="row.SPP_TYPE|mapping: mapping.planning"></div>
+                <div ng-bind="row.INV_PLAN_NAME"></div>
+              </a>
+              <div ng-show="row.VALID_FLAG!='Y'">
+                <div ng-bind="row.SPP_TYPE|mapping: mapping.planning"></div>
+                <div ng-bind="row.INV_PLAN_NAME"></div>
+              </div>
+            </td>
+            <td>
+              <span ng-bind="row.BRANCH_NAME"></span>/
+              <span ng-bind="row.EMP_NAME"></span>
+            </td>
+            <td ng-bind="row.LASTUPDATE"></td>
+            <td ng-bind="row.CREATETIME"></td>
+            <td ng-class="{'red': row.COUNTSPP != '無'}"
+                ng-bind="row.COUNTSPP"></td>
+            <td ng-click="row.IS_EMAIL>0 ? goDetail(row) : '' ">
+              <i class="fa fa-envelope-o"
+                 ng-class="{'important blue':row.IS_EMAIL>0}"></i>
+            </td>
+            <td ng-click="row.IS_PRINT>0 ? goDetail(row) : '' ">
+              <i class="fa fa-download"
+                 ng-class="{'important blue':row.IS_PRINT>0}"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <br>
+</div>

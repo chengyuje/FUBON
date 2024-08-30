@@ -1,0 +1,305 @@
+<style>
+/* open dialog */
+.ngdialog.PMS332 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS332 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+
+
+.PMS332 table.little {
+	width: 60%;
+}
+/* change row */
+
+/* scroll && height */
+.scroll_PMS332_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS332/PMS332.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS332" ng-controller="PMS332Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*資料統計月份：</th>
+								<td>
+									<e-combobox id="dataMonth" name="dataMonth"
+												ng-datasource="mappingSet['timeE']" 
+												ng-model="inputVO.sCreDate"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false" 
+												ng-required="true" 
+												ng-change="limitDate();dateChange()" 
+												ng-format="F3" 
+												width="150px" style="line-height:20px;" />
+								</td>
+							<th></th>
+							<td></td>
+							<th></th>
+							<td></td>
+
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td>
+								<e-combobox id="region_center_id" name="region_center_id"
+											ng-datasource="REGION_LIST"
+											ng-model="inputVO.region_center_id"
+											ng-validate="false" 
+											ng-disabled="disableRegionCombo"
+											ng-readonly="disableRegionCombo" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeRegion()"
+											width="200px" style="line-height:20px;" />
+							</td>
+
+							<th>營運區：</th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+											ng-datasource="AREA_LIST"
+											ng-model="inputVO.branch_area_id"
+											ng-validate="false" 
+											ng-disabled="disableAreaCombo"
+											ng-readonly="disableAreaCombo" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeArea()"
+											width="200px" style="line-height:20px;" />
+							</td>
+							<th>分行別：</th>
+							<td>
+								<e-combobox id="branch_nbr" name="branch_nbr"
+											ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.branch_nbr"
+											ng-validate="false" 
+											ng-disabled="disableBranchCombo"
+											ng-readonly="disableBranchCombo" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											ng-change="ChangeBranch()"
+											width="150px" style="line-height:20px;" />
+							</td>
+
+						</tr>
+						<tr>
+							<th>理專職級</th>
+							<td>
+								<e-combobox ng-paramtype="PMS.AO_JOB_RANK"
+											ng-model="inputVO.aojob" 
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false" 
+											ng-format="F2"
+											ng-required="false" 
+											width="200px" height="30px" style="line-height:20px;" />
+							</td>
+
+							<th>理專：</th>
+							<td>
+								<e-combobox id="ao_code" name="ao_code"
+											ng-datasource="AO_LIST"
+											ng-model="inputVO.ao_code"
+											ng-validate="false"
+											ng-disabled="disableAoCombo"
+											ng-readonly="disableAoCombo" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											ng-change="ChangeAo_code()"
+											width="200px" style="line-height:20px;" />
+							</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>*排名依據：</th>
+							<td>
+								<e-combobox ng-paramtype="PMS.CONTRIBUTE_SORT_BY"
+											ng-model="inputVO.BT" 
+											ng-validate="false" 
+											ng-readonly="false"
+											ng-editable="false" 
+											ng-format="F3" 
+											ng-required="false"
+											width="200px" height="30px" style="line-height:20px;" />
+							</td>
+
+							<th>*前N名：</th>
+							<td>
+								<e-combobox ng-datasource="mappingSet['10']"
+											ng-model="inputVO.NNUM" 
+											ng-validate="false" 
+											ng-readonly="false"
+											ng-editable="false" 
+											ng-format="F3" 
+											ng-required="false"
+											width="200px" style="line-height:20px;" />
+							</td>
+							<th>客戶等級</th>
+
+							<td>
+								<e-combobox ng-paramtype="CRM.VIP_DEGREE"
+											ng-model="inputVO.VIP" 
+											ng-validate="false" 
+											ng-readonly="false"
+											ng-editable="false" 
+											ng-format="F3" 
+											ng-required="false"
+											width="180px" height="30px" style="line-height:20px;" />
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList"></e-jumping>
+					<div algin="left">
+				<table>
+			    	<tr>
+			    		<td>產出頻率：</td>
+			    		<td>每月</td>
+			    	</tr>
+			    	<tr>
+			    		<td>產出日：</td>
+			    		<td>{{toJsDate(paramList[0].CREATETIME) | date:'yyyy/MM/dd'}}</td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y">
+				<table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="8" e-list="paramList">
+					<thead>
+						<tr>
+							<th>序號</th>
+							<th>營運區</th>
+							<th>分行代碼</th>
+							<th>分行名稱</th>
+							<th>理專代碼</th>
+							<th>理專姓名</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>客戶等級</th>
+							<th>當年度累計手收(R)</th>
+							<th>前12個月累計手收</th>
+							<th>當月手收<br> (P = A1+A2+A3+B1+B2+B3+B4+E1+E2+E3)
+							</th>
+							<th>單筆基金(A1)</th>
+							<th>ETF(A2)</th>
+							<th>海外債(A3)</th>
+							<th>SI(B1)</th>
+							<th>SN(B2)</th>
+							<th>DCI(B3)</th>
+							<th>其他 (B4)</th>
+							<th>躉繳保險(E1)</th>
+							<th>短年繳保險(E2)</th>
+							<th>長年繳保險(E3)</th>
+							<th>AUM月平均餘額(T)</th>
+							<th>當年度累計手收 /AUM月平均餘額(C=R/T)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{outputVO.currentPageIndex*10+$index+1 }}</td>
+							<td>{{row.BRANCH_AREA_NAME }}</td>
+							<td>{{row.BRANCH_NBR }}</td>
+							<td>{{row.BRANCH_NAME }}</td>
+							<td>{{row.AO_CODE }}</td>
+							<td>{{row.EMP_NAME }}</td>
+							<td>{{row.CUST_ID }}</td>
+							<td>{{row.CUST_NAME }}</td>
+							<td>{{row.VIP_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F1'}}</td>
+							<td align="right">{{row.YTD_FEE | currency:'' }}</td>
+							<td align="right">{{row.ACUM_FEE | currency:'' }}</td>
+							<td align="right">{{row.NEW_MON_FEE | currency:'' }}</td>							
+							<td align="right">{{row.FUND | currency:'' }}</td>
+							<td align="right">{{row.ETF | currency:'' }}</td>
+							<td align="right">{{row.BOND | currency:'' }}</td>
+							<td align="right">{{row.SI | currency:'' }}</td>
+							<td align="right">{{row.SN | currency:'' }}</td>
+							<td align="right">{{row.DCI | currency:'' }}</td>
+							<td align="right">{{row.OTHER | currency:'' }}</td>
+							<td align="right">{{row.INS_OT | currency:'' }}</td>
+							<td align="right">{{row.INS_SY | currency:'' }}</td>
+							<td align="right">{{row.INS_LY | currency:'' }}</td>
+							<td align="right">{{row.AUM | currency:'' }}</td>
+							<td align="right">{{row.CRT | currency:'' }}%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,179 @@
+<style>
+.search_box TH + TD{
+	line-height:20px;
+}
+.little {
+	margin-left: auto;
+	margin-right: auto;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/CMMGR012/CMMGR012.js"></script>
+<div class="">
+	<div ng-controller="CMMGR012_Controller" ng-cloak>
+	  <!-- left, vertical navbar & content -->
+	    <!-- left, vertical navbar --> 
+	    <!-- content -->
+	          <div class="panel panel-default">
+	            <div class="panel-heading">
+					<div class="text-muted bootstrap-admin-box-title">
+						<i class="glyphicon glyphicon-th-large"></i>權限異動查詢
+					</div>
+				</div>
+	            <div class="bootstrap-admin-panel-content text-muted search_box">
+	              <form>
+	              	<table class="little" style="width:55%">
+	                    <tr>
+<!-- 	                        <th>分行別：</th> -->
+<!-- 	                        <td required><e-combobox id="cmbBRCHID" name="cmbBRCHID" -->
+<!-- 								ng-disabled="eComboDisabled" -->
+<!-- 								ng-datasource="mappingSet['brchID']" -->
+<!-- 								ng-model="inputVO.tipBranchId" ng-validate="true" -->
+<!-- 								ng-readonly="false" ng-editable="false" ng-format="F1"  -->
+<!-- 								width="100%"></td> -->
+							<th>維護人員編：</th>
+	                        <td>
+							<input type="text" class="form-control" 
+								id="tipTeller" name="tipTeller"
+								ng-model="inputVO.tipTeller" 
+								placeholder="維護人員編" maxlength="10">
+	                        </td>
+	                    </tr>
+	                    
+<!-- 	                	<tr> -->
+<!-- 	                		<th for="cmbRoleId">角色代號：</th>    -->
+<!-- 	                        <td>   -->
+<!-- 								<e-combobox id="cmbRoleId" name="cmbRoleId" -->
+<!-- 									ng-disabled="eComboDisabled"  -->
+<!-- 									ng-datasource="mappingSet['RoleId']"  -->
+<!-- 									ng-model="inputVO.cmbRoleId" -->
+<!-- 									ng-validate="false"  -->
+<!-- 									ng-readonly="false"  -->
+<!-- 									ng-editable="false" -->
+<!-- 									ng-format="F1"  -->
+<!-- 									ng-required="false"  -->
+<!-- 									width="100%" -->
+<!-- 									 /> -->
+<!--                         	</td> -->
+<!-- 	                		<th>工作站代號：</th> -->
+<!-- 							<td> -->
+<!-- 	                        <input type="text" class="form-control"  -->
+<!-- 								id="tipWorkStationId" name="tipWorkStationId" -->
+<!-- 								ng-model="inputVO.tipWorkStationId"  -->
+<!-- 								placeholder="工作站代號" maxlength="40"> -->
+<!-- 							</td> -->
+<!-- 	                    </tr> -->
+						 <tr>
+						 	<th>功能：</th>
+	                        <td>
+	                        	<e-combobox id="cmbFunctionId" ng-disabled="eComboDisabled" 
+	                        		class=""
+									ng-datasource="mappingSet['FunctionId']" 
+									ng-model="inputVO.cmbFunctionId"
+							    	ng-validate="false" 
+							    	ng-readonly="false" 
+							    	ng-editable="false"
+							    	ng-format="F3" 
+							    	ng-required="false" 
+							    	ng-editable="false"
+							    	width="100%"
+							    	/>				    	
+                        	</td>
+<!-- 						 	<th>交易代號：</th> -->
+<!-- 							<td> -->
+<!-- 	                        <input type="text" class="form-control"  -->
+<!-- 								id="tipTxnCode" name="tipTxnCode" -->
+<!-- 								ng-model="inputVO.tipTxnCode"  -->
+<!-- 								placeholder="交易代號" maxlength="20"> -->
+<!-- 							</td> -->
+	                     </tr>                   
+	                     <tr>
+	                     	<th for="dtfStartDate">最後變更起日：</th>
+	           				<td>
+			              		<div class="input-group datebox">
+									<input type="text" class="form-control" 
+										datepicker-popup="yyyy/MM/dd" 
+										ng-model="inputVO.dtfStartDate"  
+										is-open="opened1"  
+										ng-required="false" 
+										ng-readonly="true" 
+										min-date="minDate" max-date="startMaxDate"
+										ng-change="limitDate()"
+										 />
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,1)"> 
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+	            			</td>
+		                	<th for="dtfEndDate" style="text-align:center">~</th>             
+		            		<td>
+			              		<div class="input-group datebox">
+									<input type="text" class="form-control"
+										datepicker-popup="yyyy/MM/dd" 
+										ng-model="inputVO.dtfLastUpdate" is-open="opened2" 
+										ng-required="false"  
+										ng-readonly="true"
+										min-date="endMinDate" max-date="maxDate"
+										ng-change="limitDate()"
+										 />
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,2)">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+		            		</td>   
+		            	</tr>   
+	                </table> 
+	                <div class="search_box_btn text-center">
+	                  <button type="button"  class="btn btn-info" ng-click="inquireInit();inquire()" >查詢</button>
+	                  <button type="button" class="btn btn-info" ng-click="init()">清除</button> 
+					  <button href="/export/{{paramCode}}" type="button" class="btn btn-info" ng-click="exportData()" ng-disabled="!paramList.length > 0">匯出</button>				  
+	                </div>  
+	              </form>
+	            </div>
+	                <div class="bootstrap-admin-panel-content" style="position:relative;">
+	                		<table class="tablesaw table table-striped table-bordered">
+	                  			<thead>
+	                    			<tr>
+	                      				<th>工作站代號</th> 
+	                      				<th>維護人員編</th>
+										<th>維護人姓名</th>
+	                      				<th>功能代號</th>
+	                                    <th>功能名稱</th>
+	                                    <th>功能</th>
+	                                    <th>角色名稱</th>
+										<th>最後變更日</th>
+	                    			</tr>
+	                  			</thead>
+	                  			<tbody>
+	                    			<tr ng-repeat="row in results = (paramList | orderBy:predicate:reverse) | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	                      				<!-- <td>{{row.BRANCHID}}</td> -->
+	                      				<td>{{row.WORKSTATIONID}}</td>
+	                      				<td>{{row.TELLER}}</td>
+	                      				<td>{{row.TELLERNAME}}</td>
+	                      				<td>{{row.DATA1}}</td>
+	                      				<td>{{row.TXNNAME}}</td>
+	                      				<td>{{row.DATA2}}</td>
+	                      				<td>{{row.ROLENAME}}</td>
+	                      				<td>{{row.LASTUPDATE | date:"yyyy-MM-dd HH:mm:ss"}}</td>	                      				
+	                    			</tr>
+	                  			</tbody>
+	                		</table>
+			          		<e-paging outputVO="outputVO"
+			          			inputVO="inputVO"
+				           		callQuery="inquire()"
+				           		displayLimit="displayLimit"
+				           		dataList="paramList"
+				           		mode="2"
+			           		>
+			          		</e-paging>
+	                </div>
+	          </div>
+	        </div>
+</div>

@@ -1,0 +1,370 @@
+<style type="text/css">
+/* Styling for the title (Month and Year) of the calendar */
+.CRM1241 div.title {
+    font: x-large Verdana, Arial, Helvetica, sans-serif;
+    text-align: center;
+    height: 40px;
+    background-color: white;
+    color: black;
+    }
+/* Styling for the footer */
+.CRM1241 div.footer {
+    font: small Verdana, Arial, Helvetica, sans-serif;
+    text-align: center;
+    }
+/* Styling for the overall table */
+.CRM1241 table {
+    font: 100% Verdana, Arial, Helvetica, sans-serif;
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+    }
+/* Styling for the column headers (days of the week) */
+.CRM1241 th {
+    padding: 0 0.5em;
+    text-align: center;
+    background-color:gray;
+    color:white;
+    }
+/* Styling for the individual cells (days) */
+.CRM1241 td  {     
+	padding: 0.25em 0.25em;   
+    width: 14%; 
+    height: 80px;
+    text-align: left;
+    vertical-align: top;
+    }
+/* Styling for the date numbers */
+.CRM1241 .date  {     
+    padding: 0.25em 0.25em;   
+    text-align: left;
+    vertical-align: top;
+    }
+/* Class for individual days (coming in future release) */
+.CRM1241 .sun {
+     color:red;
+     }
+/* Hide the month element (coming in future release) */
+.CRM1241 th.month {
+    visibility: hidden;
+    display:none;
+    }
+   
+</style>
+
+<script type="text/javascript" src="assets/txn/CRM1241/CRM1241.js"></script>
+<script type="text/javascript" src="assets/txn/CRM124/CRM124_EDIT_ONSITE.js"></script>
+<!-- <script type="text/javascript" src="assets/txn/CRM1241/CRM1241_RECORD.js"></script> -->
+<!-- <script type="text/javascript" src="assets/txn/CRM1241/CRM1241_PRODUCT.js"></script> -->
+<!-- <script type="text/javascript" src="assets/txn/PMS109/PMS109.js"></script> -->
+<!-- <script type="text/javascript" src="assets/txn/PMS109/PPAP.js"></script> -->
+
+
+<div class="CRM1241" ng-controller="CRM1241Controller" ng-cloak>
+	<div class="title">
+		<h2 class="text-center" >
+			<span><a class="btn btn-success btn-info" ng-click="decrement()"><i class="glyphicon glyphicon-arrow-left"></i></a></span>
+			{{inputVO.month}}月 {{inputVO.year}}
+			<span><a class="btn btn-success btn-info" ng-click="increment()"><i class="glyphicon glyphicon-arrow-right"></i></a></span>	
+		</h2>		
+	</div>
+	<!-- 輔銷科長用 -->
+	<div class="text-center" ng-if="pri=='015' || pri =='024'">
+		輔銷人員:		
+		<e-combobox id="emp_id" name="emp_id"
+		ng-datasource="mappingSet['emp_id']"
+		ng-model="inputVO.emp_id"
+		ng-validate="false" 
+		ng-readonly="false" 
+		ng-editable="false"
+		ng-format="F1"
+		ng-required="true"
+		width="150px"
+		style="line-height:20px;" />
+		<button type="button" class="btn btn-primary" ng-click="faia_query()">查詢</button>
+	</div>
+	<table border="1">
+		<tr>
+			<th>Sun</th>
+			<th>Mon</th>
+			<th>Tue</th>
+			<th>Wed</th>
+			<th>Thu</th>
+			<th>Fri</th>
+			<th>Sat</th>
+		</tr>					
+		<tr>
+			<td ng-repeat = "row in dateList" ng-if="$index >=0 && $index <=6 "><span class="date">{{row.date}}</span>					
+				<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+				</div>
+				<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+					<e-combobox id="bnr_id_a" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_a"
+					ng-validate="false" 
+					ng-disabled="row.seq_a != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>
+					<button type="button" class="btn btn-primary" ng-show="row.status_a != '2' && row.seq_a != '' && type != '1'" ng-click="edit_onsite(row.seq_a)">編輯</button>
+					<p style="color:red" ng-show="row.status_a == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_a == '2' && type == '1'" ng-click = "edit_onsite(row.seq_a)">修改待覆核</a>
+				</div>
+				<br>
+				<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+				</div>
+				<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+					<e-combobox id="bnr_id_b" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_b"
+					ng-validate="false" 
+					ng-disabled="row.seq_b != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+					<button type="button" class="btn btn-primary" ng-show="row.status_b != '2' && row.seq_b != '' && type != '1'" ng-click="edit_onsite(row.seq_b)">編輯</button>
+					<p style="color:red" ng-show="row.status_b == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_b == '2' && type == '1'" ng-click = "edit_onsite(row.seq_b)">修改待覆核</a>
+				</div>
+			</td>
+		</tr>					
+		<tr>
+			<td ng-repeat = "row in dateList" ng-if="$index >=7 && $index <=13 "><span class="date">{{row.date}}</span>						
+				<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+				</div>
+				<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+					<e-combobox id="bnr_id_a" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_a"
+					ng-validate="false" 
+					ng-disabled="row.seq_a != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>
+					<button type="button" class="btn btn-primary" ng-show="row.status_a != '2' && row.seq_a != '' && type != '1'" ng-click="edit_onsite(row.seq_a)">編輯</button>
+					<p style="color:red" ng-show="row.status_a == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_a == '2' && type == '1'" ng-click = "edit_onsite(row.seq_a)">修改待覆核</a>
+				</div>
+				<br>
+				<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+				</div>
+				<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+					<e-combobox id="bnr_id_b" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_b"
+					ng-validate="false" 
+					ng-disabled="row.seq_b != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+					<button type="button" class="btn btn-primary" ng-show="row.status_b != '2' && row.seq_b != '' && type != '1'" ng-click="edit_onsite(row.seq_b)">編輯</button>
+					<p style="color:red" ng-show="row.status_b == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_b == '2' && type == '1'" ng-click = "edit_onsite(row.seq_b)">修改待覆核</a>
+				</div>					
+			</td>
+		</tr>					
+		<tr>
+			<td ng-repeat = "row in dateList" ng-if="$index >=14 && $index <=20 "><span class="date">{{row.date}}</span>					
+				<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+				</div>
+				<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+					<e-combobox id="bnr_id_a" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_a"
+					ng-validate="false" 
+					ng-disabled="row.seq_a != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>
+					<button type="button" class="btn btn-primary" ng-show="row.status_a != '2' && row.seq_a != '' && type != '1'" ng-click="edit_onsite(row.seq_a)">編輯</button>
+					<p style="color:red" ng-show="row.status_a == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_a == '2' && type == '1'" ng-click = "edit_onsite(row.seq_a)">修改待覆核</a>
+				</div>
+				<br>
+				<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+				</div>
+				<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+					<e-combobox id="bnr_id_b" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_b"
+					ng-validate="false" 
+					ng-disabled="row.seq_b != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+					<button type="button" class="btn btn-primary" ng-show="row.status_b != '2' && row.seq_b != '' && type != '1'" ng-click="edit_onsite(row.seq_b)">編輯</button>
+					<p style="color:red" ng-show="row.status_b == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_b == '2' && type == '1'" ng-click = "edit_onsite(row.seq_b)">修改待覆核</a>
+				</div>					
+			</td>
+		</tr>					
+		<tr>
+			<td ng-repeat = "row in dateList" ng-if="$index >=21 && $index <=27 "><span class="date">{{row.date}}</span>					
+				<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+				</div>
+				<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+					<e-combobox id="bnr_id_a" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_a"
+					ng-validate="false" 
+					ng-disabled="row.seq_a != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>
+					<button type="button" class="btn btn-primary" ng-show="row.status_a != '2' && row.seq_a != '' && type != '1'" ng-click="edit_onsite(row.seq_a)">編輯</button>
+					<p style="color:red" ng-show="row.status_a == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_a == '2' && type == '1'" ng-click = "edit_onsite(row.seq_a)">修改待覆核</a>
+				</div>
+			<br>
+				<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+				</div>
+				<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+					<e-combobox id="bnr_id_b" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_b"
+					ng-validate="false" 
+					ng-disabled="row.seq_b != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+					<button type="button" class="btn btn-primary" ng-show="row.status_b != '2' && row.seq_b != '' && type != '1'" ng-click="edit_onsite(row.seq_b)">編輯</button>
+					<p style="color:red" ng-show="row.status_b == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_b == '2' && type == '1'" ng-click = "edit_onsite(row.seq_b)">修改待覆核</a>
+				</div>			
+			</td>
+		</tr>					
+		<tr>
+			<td ng-repeat = "row in dateList" ng-if="$index >=28 && $index <=34 "><span class="date">{{row.date}}</span>					
+				<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+				</div>
+				<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+					<e-combobox id="bnr_id_a" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_a"
+					ng-validate="false" 
+					ng-disabled="row.seq_a != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>					
+					<button type="button" class="btn btn-primary" ng-show="row.status_a != '2' && row.seq_a != '' && type != '1'" ng-click="edit_onsite(row.seq_a)">編輯</button>
+					<p style="color:red" ng-show="row.status_a == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_a == '2' && type == '1'" ng-click = "edit_onsite(row.seq_a)">修改待覆核</a>
+				</div>
+				<br>
+				<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+				</div>
+				<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+					<e-combobox id="bnr_id_b" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_b"
+					ng-validate="false" 
+					ng-disabled="row.seq_b != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+					<button type="button" class="btn btn-primary" ng-show="row.status_b != '2' && row.seq_b != '' && type != '1'" ng-click="edit_onsite(row.seq_b)">編輯</button>
+					<p style="color:red" ng-show="row.status_b == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_b == '2' && type == '1'" ng-click = "edit_onsite(row.seq_b)">修改待覆核</a>
+				</div>				
+			</td>
+		</tr>					
+		<tr>
+			<td ng-repeat = "row in dateList" ng-if="$index >=35 && $index <=41 "><span class="date">{{row.date}}</span>						
+				<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+				</div>
+				<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+					<e-combobox id="bnr_id_a" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_a"
+					ng-validate="false" 
+					ng-disabled="row.seq_a != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>
+					<button type="button" class="btn btn-primary" ng-show="row.status_a != '2' && row.seq_a != '' && type != '1'" ng-click="edit_onsite(row.seq_a)">編輯</button>
+					<p style="color:red" ng-show="row.status_a == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_a == '2' && type == '1'" ng-click = "edit_onsite(row.seq_a)">修改待覆核</a>
+				</div>
+				<br>
+				<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true && type != '1'">
+					<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+				</div>
+				<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+					<e-combobox id="bnr_id_b" 
+					ng-datasource="mappingSet['branchsDesc']"
+					ng-model="row.bnr_id_b"
+					ng-validate="false" 
+					ng-disabled="row.seq_b != ''"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="80px"
+					style="line-height:20px;" />
+					<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+					<button type="button" class="btn btn-primary" ng-show="row.status_b != '2' && row.seq_b != '' && type != '1'" ng-click="edit_onsite(row.seq_b)">編輯</button>
+					<p style="color:red" ng-show="row.status_b == '2' && type != '1'">修改待覆核</p>
+					<a style="color:red" ng-show="row.status_b == '2' && type == '1'" ng-click = "edit_onsite(row.seq_b)">修改待覆核</a>
+				</div>
+			</td>
+		</tr>				
+	</table>	
+	<div class="search_box_btn text-center" ng-if="pri=='014' || pri =='023'">
+		<button type="button" class="btn btn-primary" ng-click="save()">確定</button>
+	</div>
+</div>

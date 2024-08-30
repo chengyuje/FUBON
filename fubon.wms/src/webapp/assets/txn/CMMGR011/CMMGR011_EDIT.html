@@ -1,0 +1,169 @@
+<style>
+
+</style>
+<div ng-controller="CMMGR011_EDITController" ng-cloak>
+	<div class="modal-dialog CMMGR011">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.TXNCODE == null ? '新增' : '編輯'}}功能</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">功能代號：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="txnCode" name="txnCode" ng-model="inputVO.txnCode" maxlength="255" required autofocus ng-disabled="row.TXNCODE != undefined"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.txnCode.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入功能代號</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">功能名稱：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="txnName" name="txnName" ng-model="inputVO.txnName" maxlength="30" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.txnName.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入功能名稱</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">子系統別：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="sysType" name="sysType" ng-disabled="eComboDisabled" 
+									ng-paramtype="cmmgr011.sysType"
+									ng-model="inputVO.sysType"
+			    					ng-validate="true" 
+			    					ng-readonly="false" 
+			    					ng-editable="false"
+			    					ng-format="F1" 
+			    					ng-required="true"
+			    					width="291px"
+			    					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.sysType.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇子系統別</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">是否紀錄日誌檔：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="jrnType" name="jrnType" ng-disabled="eComboDisabled" 
+									ng-paramtype="cmmgr011.jrnType"
+									ng-model="inputVO.jrnType"
+			    					ng-validate="true" 
+			    					ng-readonly="false" 
+			    					ng-editable="false"
+			    					ng-format="F1" 
+			    					ng-required="true"
+			    					width="291px"
+			    					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.jrnType.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇是否紀錄日誌檔</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">是否開放使用：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="secApply" name="secApply" ng-disabled="eComboDisabled" 
+									ng-paramtype="cmmgr011.apply"
+									ng-model="inputVO.secApply"
+			    					ng-validate="true" 
+			    					ng-readonly="false" 
+			    					ng-editable="false"
+			    					ng-format="F3" 
+			    					ng-required="true"
+			    					width="291px"
+			    					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.secApply.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇是否開放使用</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">動作：</th>
+							<td class="col-md-7 tdpadding">
+								<label for="chkMaintenance" style="word-wrap:break-word">
+									<input id="chkMaintenance" type='checkbox' ng-model='inputVO.chkMaintenance' />&nbsp;維護
+								</label>
+								<label for="chkQuery" style="word-wrap:break-word">
+									<input id="chkQuery" type='checkbox' ng-model='inputVO.chkQuery' />&nbsp;查詢
+								</label>
+								<label for="chkExport" style="word-wrap:break-word">
+									<input id="chkExport" type='checkbox' ng-model='inputVO.chkExport' />&nbsp;匯出
+								</label>
+								<label for="chkPrint" style="word-wrap:break-word">
+									<input id="chkPrint" type='checkbox' ng-model='inputVO.chkPrint' />&nbsp;列印
+								</label>
+								<label for="chkWatermark" style="word-wrap:break-word">
+									<input id="chkWatermark" type='checkbox' ng-model='inputVO.chkWatermark' />&nbsp;浮水印
+								</label>
+								<label for="chkSecurity" style="word-wrap:break-word">
+									<input id="chkSecurity" type='checkbox' ng-model='inputVO.chkSecurity' />&nbsp;鎖右鍵
+								</label>
+								<label for="chkConfirm" style="word-wrap:break-word">
+									<input id="chkConfirm" type='checkbox' ng-model='inputVO.chkConfirm' />&nbsp;覆核
+								</label>
+								<label for="chkMobile" style="word-wrap:break-word">
+									<input id="chkMobile" type='checkbox' ng-model='inputVO.chkMobile' />&nbsp;行動
+								</label>
+								<label for="chkScreen" style="word-wrap:break-word">
+									<input id="chkScreen" type='checkbox' ng-model='inputVO.chkScreen' />&nbsp;鎖拍螢幕
+								</label>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="chkFuns">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">至少需勾選一個功能！</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">模組代號：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="moduleId" name="moduleId" ng-model="inputVO.moduleId" maxlength="20" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.moduleId.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入模組代號</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				<span function-type="maintenance" ><button type="button" class="btn btn-danger" ng-click="del()" confirm="確定要刪除?" confirm-settings="{size: 'sm'}" ng-if="isUpdate">刪除</button></span>
+			</div>
+		</div>
+	</div>
+</div>

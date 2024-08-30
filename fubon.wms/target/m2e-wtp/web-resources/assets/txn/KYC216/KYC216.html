@@ -1,0 +1,63 @@
+<style>
+input:required:invalid{
+	border-color: red;
+
+}
+</style>
+<script type="text/javascript" src="assets/txn/KYC216/KYC216.js"></script>
+<div ng-controller="KYC216Controller" ng-cloak>
+    <div class="modal-dialog" style="width: 1080px;">
+      <div class="modal-content">
+        <div class="modal-header"> 
+        	<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+          <h4 id="myModalAlertLabel" class="modal-title">可承受風險損失率設定</h4>
+        </div>
+        <form name="risk">
+        <div class="modal-body">
+	          <div class="search_table search_box1">
+	            <table>
+	              <tr>
+	                <th>可承受風險損失率對應C值表代號:</th>
+	                <td><input ng-disabled="true" class="form-control" type="text" ng-model="inputVO.RLR_VERSION"></td>
+	              </tr>
+	            </table>
+	          </div>
+         	 <h4>新增級距 <button type="button" class="btn btn-info" ng-click="addRow()">┼</button></h4>
+	          <div class="gv_tab_sc scroll_y">
+	            <table>
+	            <thead>
+	              <tr>
+	                <th>功能</th>
+	                <th>級距代碼</th>
+	                <th>級距名稱</th>
+	                <th>風險比例上限(%)</th>
+	              </tr>
+	              </thead>
+	              <tbody>
+	              <tr ng-repeat="row in inputVO.LRATE_RISK_LEVEL track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	                <td width="10px"><button type="button" class="btn btn-info" ng-click="deleteRow($index,row)">X</button></td>
+	                <td>{{row.LRATE_CUST_RL_ID}}
+                		<input ng-if="row.LRATE_CUST_RL_ID ==null?true:false" type="text" ng-pattern="/[cC]\d/" class="form-control" placeholder="請輸入..." ng-model="row.LCUST_RL_ID" maxlength="2" required>
+               		 </td>
+               		 <td>{{row.LRATE_RL_NAME}}
+                		<input ng-if="row.LRATE_RL_NAME ==null?true:false" type="text" class="form-control" placeholder="請輸入..." ng-model="row.LRL_NAME">
+                	</td>
+                	<td>{{row.LRATE_RL_UP_RATE}}
+                		<input ng-if="row.LRATE_RL_UP_RATE ==null?true:false" type="text" ng-pattern="/^\d{0,3}(\.\d{0,1})?$/" class="form-control" placeholder="請輸入..." ng-model="row.LRL_UP_RATE" required>
+               		 </td>
+	              </tr>
+	              </tbody>
+	            </table>
+	          </div>
+	          <div style="text-align: center;" class="modal-footer">
+		        <button ng-click="saveData()" class="btn btn-info" data-dismiss="modal">確定</button> 
+		        <button ng-click="closeThisDialog('cancel')" type="button" class="btn btn-info"data-dismiss="modal">取消</button> 
+	        </div>
+        </div>
+		</form>
+      </div>
+    </div>
+
+
+
+</div>

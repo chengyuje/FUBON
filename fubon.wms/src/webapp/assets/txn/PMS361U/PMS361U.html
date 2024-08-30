@@ -1,0 +1,240 @@
+<style>
+/* table size */
+.PMS361U table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PMS361U table.little{
+	width: 60%;
+}
+/* change row */
+.PMS361U.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS361U_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS361/PMS361.js"></script>
+<script type="text/javascript" src="assets/txn/PMS361U/PMS361U.js"></script>
+<div class="PMS361U" ng-controller="PMS361UController" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th>資料統計日期：</th>
+					<td colspan="3">
+						<div class="input-group datebox datewidth">
+							<input 	type="text" id="sDate" name="sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.sDate"
+									is-open="model.a"
+									datepicker-options="sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+						<div style="float: left !important;">～</div>
+						<div class="input-group datebox datewidth">
+							<input 	type="text" id="eDate" name="eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.eDate"
+									is-open="model.b"
+									datepicker-options="eDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>業務處：</th>
+					<td>
+						<e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="uhrmRCList"
+									ng-model="inputVO.uhrmRC"
+									ng-validate="false" 
+									ng-disabled="true"
+									ng-readonly="true" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="true"
+									style="line-height:20px;" />
+					</td>
+					<th>營運區：</th>
+					<td>
+						<e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="uhrmOPList"
+									ng-model="inputVO.uhrmOP"
+									ng-validate="false" 
+									ng-disabled="true"
+									ng-readonly="true" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="true"
+									style="line-height:20px;" />
+					</td>
+				</tr>
+				<tr>
+    				<th>行員員編ID：</th>
+    				<td><input class="form-control" type="text" placeholder="請輸入..." id="empIDSearch" name="empIDSearch" ng-model="inputVO.empIDSearch" e-length-limit="60"></td>
+    				<th>已回覆/未回覆：</th>
+					<td>
+						<e-combobox id="noteStatus" name="noteStatus" 
+									ng-paramtype="PMS.NOTE_STATUS"
+									ng-model="inputVO.noteStatus"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									style="line-height:20px;"/>
+					</td>
+					<th></th>
+					<td></td>
+    			</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-primary" ng-click="inquireInit();inquire()" function-type="query"><span class="glyphicon glyphicon-search"></span>查詢</button>
+			<button type="button" class="btn btn-info" ng-click="inquireInit();init();initPMS361U();"><span class="glyphicon glyphicon-erase"></span>清除</button>
+			<button type="button" class="btn btn-success" ng-click="exportData()" function-type="export" ng-disabled="totalList.length == 0"><span class="glyphicon glyphicon-save"></span>匯出</button>
+		</div>
+		<e-jumping-once output="outputVO" list="paramList" totallist="totalList" limitTotal="200000"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:335px;white-space: nowrap;">
+			<table class="table e-table-freeze td_center" e-mode="3" e-top="true" e-left="5" e-list="paramList">
+				<thead>
+					<tr>
+                  		<th>更新<br>資料</th>
+                  		<th>私銀註記</th>
+                  		<th>資料日期</th>
+						<th>分行代碼</th>
+						<th>分行名稱</th>
+						<th>行員員編</th>
+						<th>行員姓名</th>
+						<th>AO CODE</th>
+						<th>交易時間</th>
+						<th>交易項目</th>
+						<th>客戶ID</th>
+						<th>客戶姓名</th>
+						<th>高齡客戶</th>
+						<th>客戶所屬理專</th>
+						<th>查證方式</th>
+						<th>電訪錄音編號</th>
+						<th>客戶背景或關係</th>
+						<th>具體說明</th>
+						<th>初判異常<br>轉法遵部調查</th>
+						<th>首次<br>建立時間</th>
+						<th>最新<br>異動人員</th>
+						<th>最新<br>異動日期</th>
+						<th>DEVICE ID</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center"><input type="checkbox" ng-disabled="" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"></td> 
+						<td>{{row.RM_FLAG}}</td>
+						<td>{{row.NOTE_CREATETIME}}</td>
+						<td>{{row.BRANCH_NBR}}</td>
+						<td>{{row.BRANCH_NAME}}</td>
+						<td>{{row.EMP_ID}}</td>
+						<td>{{row.EMP_NAME}}</td>
+						<td>{{row.AO_CODE}}</td>
+						<td>{{toJsDate(row.ACCESS_TIME) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+						<td>{{row.TXN_TYP}}</td>
+						<td>{{row.CUST_ID}}</td>
+						<td>{{row.CUST_NAME}}</td>
+						<td>{{row.CUST_AGE >= 65 ? row.CUST_AGE : ''}}</td>
+						<td>{{row.CUST_AO_CODE}}</td>
+						<td style="text-align: left">
+	                    	<e-combobox id="checkType" name="checkType" 
+										ng-datasource="mappingSet['PMS.CHECK_TYPE']"
+										ng-model="row.NOTE_TYPE"
+										ng-validate="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="updateFlag(row)"
+										style="line-height:20px;display:inline;" />
+	                    	<input type="text" class="form-control" style="width: 300px;display:inline;" ng-blur="updateFlag(row)" ng-model="row.NOTE" e-length-limit="200" placeholder="請補充查證方式..." ng-if="row.NOTE_TYPE == 'O'"/>
+	                    </td>
+	                    <td>
+							<input 	type="text" class="form-control" style="width: 150px;display:inline;" 
+									e-length-limit="12" 
+									e-input-limit="ND"
+									ng-model="row.RECORD_SEQ" 
+									placeholder="請輸入電訪錄音編號..." 
+									ng-if="row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A'" 
+									ng-disabled="row.NOTE == '本日無資料' || row.RECORD_YN == 'N'" 
+									ng-blur="updateFlag(row)"/>
+						</td>
+						<td style="text-align: left">
+							<e-combobox id="custBase" name="custBase" 
+										ng-datasource="row.set"
+										ng-model="row.CUST_BASE"
+										ng-validate="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="updateFlag(row);setDefaultVal(row);"
+										ng-readonly="row.NOTE == '本日無資料'" 
+										ng-disabled="row.NOTE == '本日無資料'" 
+										style="line-height:20px;display:inline;" />
+							<input type="text" class="form-control"  style="width:300px;display:inline;" ng-blur="updateFlag(row)" ng-model="row.NOTE2" e-length-limit="600" placeholder="請輸入..." ng-disabled="row.NOTE == '本日無資料'" ng-if="row.CUST_BASE == 'O'">
+						</td>						
+						
+						<td><input type="text" style="width:300px;" class="form-control" placeholder="請輸入..." ng-model="row.NOTE3" e-length-limit="600" ng-disabled="row.NOTE == '本日無異動'"  ng-blur="updateFlag(row)"></td>
+	                    <td align="center">
+	                        <label>是<input type="radio" value="Y" ng-model="row.WARNING_YN" ng-click="updateFlag(row)" ng-disabled="row.NOTE == '本日無資料'" /></label>&emsp;
+	                        <label>否<input type="radio" value="N" ng-model="row.WARNING_YN" ng-click="updateFlag(row)" ng-disabled="row.NOTE == '本日無資料'" /></label>
+	                    </td>
+						<td ng-bind="row.FIRSTUPDATE"></td>
+						<td>{{row.MODIFIER}}</td>
+						<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+						<td>{{row.DEVICE_ID}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<br>
+		<div align="center" ng-show="paramList.length > 0">
+			<button type="button" class="btn btn-success" ng-click="save()">
+				<span class="glyphicon glyphicon-floppy-disk"></span>儲存
+			</button>
+		</div>
+		<div>
+			說明：如「客戶背景或關係」選行員末成年子女。具體說明及初判異常欄位系統自動會帶入。
+		</div>
+	</div>
+</div>

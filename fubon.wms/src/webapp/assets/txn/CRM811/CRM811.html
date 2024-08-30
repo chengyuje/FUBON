@@ -1,0 +1,65 @@
+
+<script type="text/javascript" src="assets/txn/CRM811/CRM811.js"></script>
+
+<div class="CRM811" ng-controller="CRM811Controller" ng-cloak>
+	<h4>帳戶類別: 活存(台幣)</h4>
+	<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+			<table>
+				<thead>
+					<tr>
+						<th>帳戶開戶行</th>
+						<th>帳號</th>
+						<th>開戶日期</th>
+						<th>帳戶餘額</th>
+						<th>可用餘額</th>
+						<th>證券戶</th>
+						<th>異動日</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;">{{row.BRANCH_NBR | mapping:mappingSet['branchName']:'F1'}}</td>
+						<td style="text-align: left;">{{row.ACCT_NBR}}</td>
+						<td style="text-align: left;">{{row.ACCT_OPEN_DATE}}</td>
+						<td style="text-align: right;">{{row.AVAILABLE_AMT_BAL | number : 0}}</td>
+						<td style="text-align: right;">{{row.CURRENT_AMT_BAL | number : 0}}</td>
+						<td style="text-align: left;">{{row.ACCT_STATUS}}</td>
+						<td style="text-align: left;">{{row.ALTERATION}}</td>
+					</tr>
+				</tbody>
+			</table>	
+		</div>
+		<p>* "可用餘額"於臨櫃及自動化皆可透時，方加入定存透支額度。</p>
+		<hr>
+	<h4>帳戶類別: 活存(外幣)</h4>
+	<e-jumping-once output="outputVO2" list="data2" totallist="resultList2"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+			<table>
+				<thead>
+					<tr>
+						<th>帳戶開戶行</th>
+						<th>帳號</th>
+						<th>開戶日期</th>
+						<th>幣別</th>
+						<th>帳戶餘額(原幣)</th>
+						<th>折台金額</th>
+						<th>可用餘額(原幣)</th>
+						<th>異動日</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data2 track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;">{{row.BRANCH_NBR | mapping:mappingSet['branchName']:'F1'}}</td>
+						<td style="text-align: left;">{{row.ACCT_NBR}}</td>
+						<td style="text-align: left;">{{row.ACCT_OPEN_DATE}}</td>
+						<td style="text-align: left;">{{row.CURRENCY_CD}}</td>
+						<td style="text-align: right;">{{row.CURRENT_AMT_BAL_O | number : 2}}</td>
+						<td style="text-align: right;">{{row.CURRENT_AMT_BAL | number : 0}}</td>
+						<td style="text-align: right;">{{row.AVAILABLE_AMT_BAL | number : 2}}</td>
+						<td style="text-align: left;">{{row.ALTERATION}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+</div>

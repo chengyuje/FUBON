@@ -1,0 +1,160 @@
+<style>
+.modal-dialog.PRD235_EDIT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+</style>
+<div ng-controller="PRD235_EDITController" ng-cloak>
+	<div class="modal-dialog PRD235_EDIT">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">境外私募基金商品資訊</h4>
+			</div>
+ 			<div class="modal-body">
+ 				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+ 					<table>
+ 						<tr>
+	 						<td width="10%" style="padding: 5px 5px 5px 5px"></td>
+ 							<th>商品代碼：</th>
+ 							<td style="padding: 5px 5px 5px 5px">
+ 								<input type="text" width="200px" placeholder="請輸入..." 
+ 										id="PRD_ID" name="PRD_ID" ng-model="inputVO.PRD_ID" e-length-limit="16" required
+ 										ng-blur="getPrdName()" ng-disabled="!(inputVO.SEQ_NO == undefined || inputVO.SEQ_NO == null || inputVO.SEQ_NO == '')">
+ 							</td>
+ 							<th>原幣最低申購金額：</th>
+ 							<td style="padding: 5px 5px 5px 5px">
+ 								<input type="text" width="200px" placeholder="請輸入..." id="MIN_PURCHASE_AMT" name="MIN_PURCHASE_AMT" 
+ 								ng-model="inputVO.MIN_PURCHASE_AMT" e-length-limit="15" required e-input-limit="NC">
+ 							</td>
+ 						</tr>
+ 						<tr>
+ 							<td width="10%" style="padding: 5px 5px 5px 5px" colspan="2"></td>
+ 							<td colspan="3">{{inputVO.PRD_NAME}}</td>
+ 						</tr>
+ 						<tr>
+ 							<td style="padding: 5px 5px 5px 5px"></td>
+							<th>交易類別：</th>
+							<td style="padding: 5px 5px 5px 5px" colspan="2">
+								<input type="radio" name="TRADE_TYPE" ng-model="inputVO.TRADE_TYPE" ng-value="'1'" required>
+								申購&nbsp;&nbsp;
+								<input type="radio" name="TRADE_TYPE" ng-model="inputVO.TRADE_TYPE" ng-value="'2'" required>
+								贖回
+				       		</td>
+							<td style="padding: 5px 5px 5px 5px"></td>
+						</tr>
+ 						<tr>
+ 							<td ></td>
+ 							<th>年份：</th>
+ 							<td style="padding: 5px 5px 5px 5px" colspan="2">
+ 								<input type="text" width="200px" placeholder="請輸入..." id="PRD_YEAR" name="PRD_YEAR" 
+ 								ng-model="inputVO.PRD_YEAR" e-length-limit="4" required e-input-limit="N" ng-blur="chkPrdYear()">
+ 							</td>
+ 							<td></td>
+ 						</tr>
+ 						<tr>
+ 							<td ></td>
+ 							<th>次別：</th>
+ 							<td style="padding: 5px 5px 5px 5px" colspan="2">
+ 								<input type="text" width="200px" placeholder="請輸入..." id="PRD_CATEGORY" name="PRD_CATEGORY" 
+ 								ng-model="inputVO.PRD_CATEGORY" e-length-limit="33" required>
+ 							</td>
+ 							<td></td>
+ 						</tr>
+ 						<tr>
+ 							<td></td>	
+ 							<th>開放起訖日：</th>
+ 							<td style="padding: 5px 5px 5px 5px" colspan="2">
+ 								<div class="input-group datebox datewidth">
+									<input type="text" id="sdate" name="sdate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.START_DATE"
+										is-open="model.a"
+										datepicker-options="sDateOptions"
+										ng-readonly="true"								
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+		 							<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+ 								<div style="float: left !important;">～</div>
+ 								<div class="input-group datebox datewidth">
+									<input type="text" id="edate" name="edate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.END_DATE"
+										is-open="model.b"
+										datepicker-options="eDateOptions"
+										ng-readonly="true"								
+										ng-change="limitEndDate()" required/>
+										<!-- 製作日曆button -->
+		 							<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+ 							</td>
+ 							<td></td>
+ 						</tr>
+ 						<tr>
+ 							<td></td>
+ 							<th>申請截止日：</th>
+ 							<td style="padding: 5px 5px 5px 5px" colspan="2">
+ 								<div class="input-group datebox datewidth">
+									<input type="text" id="deadline" name="deadline"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.DEADLINE_DATE"
+										is-open="model.c"
+										datepicker-options="deadlineOptions"
+										ng-readonly="true"								
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+		 							<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+ 							</td>
+ 							<td></td>
+ 						</tr>
+ 						<tr>
+ 							<td></td>
+ 							<th>交易日：</th>
+ 							<td style="padding: 5px 5px 5px 5px">
+ 								<div class="input-group datebox datewidth">
+									<input type="text" id="tradeDate" name="tradeDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.TRADE_DATE"
+										is-open="model.d"
+										datepicker-options="tradeDateOptions"
+										ng-readonly="true"								
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+		 							<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+ 							</td>
+ 							<td></td>
+ 						</tr>
+ 					</table>
+ 				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="save()">確定</button>
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

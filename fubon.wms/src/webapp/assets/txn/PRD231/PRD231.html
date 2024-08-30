@@ -1,0 +1,129 @@
+<style>
+/* dialog panl */
+.modal-dialog.PRD231 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+.modal-dialog.PRD231_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 300px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD231/PRD231.js"></script>
+<script type="text/javascript" src="assets/txn/PRD231/PRD231_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PRD231/PRD231_UPLOAD.js"></script>
+<div ng-controller="PRD231Controller" ng-cloak>
+	<div class="search_table search_box3">
+		<table>
+			<tr>
+				<th>第一層：</th>
+				<td>
+					<e-combobox id="mkt_tier1_list" name="mkt_tier1_list"
+					ng-datasource="MKT_TIER1"
+					ng-model="inputVO.mkt_tier1"
+					ng-validate="false" 
+					ng-disabled="false"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					ng-change="changeMktTier1()"
+					style="line-height:20px;" />
+				</td>
+				<th>第二層(23類)：</th>
+				<td>
+					<e-combobox id="mkt_tier2_list" name="mkt_tier2_list"
+					ng-datasource="MKT_TIER2_LIST"
+					ng-model="inputVO.mkt_tier2"
+					ng-validate="false" 
+					ng-disabled="false"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					ng-change="changeMktTier2()"
+					style="line-height:20px;" />
+				</td>
+				<th>第三層(33類)：</th>
+				<td>
+					<e-combobox id="mkt_tier3_list" name="mkt_tier3_list"
+					ng-datasource="MKT_TIER3_LIST"
+					ng-model="inputVO.mkt_tier3"
+					ng-validate="false" 
+					ng-disabled="false"
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					style="line-height:20px;" />
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6">
+					<div style="float: left">
+						<button type="button" class="btn btn-info" ng-click="inquire()" function-type="query">查詢</button>
+						<button type="button" class="btn btn-info" ng-click="edit()" function-type="maintenance">新增</button>
+						<button type="button" class="btn btn-info" ng-click="upload()" function-type="maintenance">整批上傳</button>
+						<button type="button" class="btn btn-info" ng-click="download()" function-type="export" ng-disabled="(paramList).length == 0">下載CSV</button>
+					</div>
+					<div style="float: right">
+						
+					</div>
+					<div style="clear: both;"></div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!-- 結果區 -->
+	<h4 class="h4-title">查詢結果</h4>
+	<span>共&nbsp;{{paramList.length}}&nbsp;筆資料</span>
+	<div class="gv_tab_sc" style="white-space: nowrap;min-height:235px;overflow-x: auto;">
+		<table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+			<thead>
+				<tr>
+					<th function-type="maintenance">功能</th>
+					<th>第一層</th>
+					<th>第二層(23類)</th>
+					<th>第三層(33類)</th>
+					<th>Lipper Global分類</th>
+					<th>Lipper Global分類英文名稱</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in paramList track by $index">
+					<td function-type="maintenance">
+						<e-combobox id="cmbAction" name="cmbAction"
+						ng-datasource="row.set"
+						ng-model="row.cmbAction"
+						ng-validate="false"
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						ng-change="action(row)"
+						width="100px"
+						style="line-height:20px;" />
+					</td>
+					<td>{{row.MKT_TIER1 | mapping:MKT_TIER1:'F3'}}</td>
+					<td>{{row.MKT_TIER2 | mapping:MKT_TIER2:'F3'}}</td>
+					<td>{{row.MKT_TIER3 | mapping:MKT_TIER3:'F3'}}</td>
+					<td>{{row.GLOBAL_LIPPER_CID}}</td>
+					<td>{{row.GLOBAL_LIPPER_EID}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

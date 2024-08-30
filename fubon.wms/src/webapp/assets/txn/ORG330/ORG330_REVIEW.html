@@ -1,0 +1,59 @@
+<style>
+/* dialog panl */
+.modal-dialog.ORG330_REVIEW {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 950px;
+	height: auto;
+}
+</style>
+<div>
+	<div ng-controller="ORG330_REVIEWController" ng-cloak>
+		<div class="modal-dialog ORG330_REVIEW">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">{{inputVO.ROLE_ID}} 角色異動歷程</h4>
+				</div>
+				<div class="modal-body">
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table style="text-align:center;">
+							<thead>
+								<tr>
+									<th width="11%">角色名稱</th>
+									<th width="11%">人資職稱<br />(限分行單位)</th>
+									<th width="11%">可代理角色</th>
+									<th width="10%">是否為AO</th>
+									<th width="10%">可視範圍</th>
+									<th width="10%">異動註記</th>
+									<th width="11%">覆核狀態</th>
+									<th width="10%">異動人員</th>
+									<th width="15%">異動時間</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in reviewList track by $index">
+									<td style="width:11%">{{row.ROLE_NAME}}</td>
+									<td style="width:11%">{{row.JOB_TITLE_NAME}}</td>
+									<td style="width:11%;white-space: pre;" align="left" >{{row.AGENT_ROLE}}</td>
+									<td style="width:10%">{{(row.IS_AO | mapping:mappingSet['COMMON.YES_NO']:'F3') || '否'}}</td>
+									<td style="width:10%">{{(row.SYS_ROLE | mapping:mappingSet['ORG.SYS_ROLE']:'F3')}}</td>
+									<td style="width:10%">{{(row.ACT_TYPE | mapping:mappingSet['COMMON.ACT_TYPE']:'F3')}}</td>
+									<td style="width:11%">{{(row.REVIEW_STATUS | mapping:mappingSet['COMMON.REVIEW_STATUS']:'F3')}}</td>
+									<td style="width:10%">{{row.CREATOR}}</td>
+									<td style="width:15%">{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" function-type="maintenance">確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

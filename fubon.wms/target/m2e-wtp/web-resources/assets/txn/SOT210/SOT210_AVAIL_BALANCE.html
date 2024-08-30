@@ -1,0 +1,79 @@
+<style>
+/* dialog panl */
+.modal-dialog.SOT210_AVAIL_BALANCE {
+	width: 1187px;
+	height: 600px;
+}
+</style>
+
+<div ng-controller="SOT210_AVAIL_BALANCEController" ng-cloak>
+	<div class="modal-dialog SOT210_AVAIL_BALANCE">
+		<div class="modal-content">	
+			<div class="modal-header">
+  				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title center">可投資餘額明細</h4>
+			</div>
+			<div class="modal-body">
+				<table>
+					<h4 class="h4-title">目前可投資海外ETF/海外股票的餘額</h4>
+				</table>				
+				<table class="table table-bordered">
+					<thead>
+						<tr>							
+							<td>交易市場(交易所)</td>
+							<td colspan="3">{{inputVO.countryCode | mapping: mappingSet['SOT.COUNTRY_CODE']:'F3'}}</td>												
+							<td>幣別</td>
+							<td colspan="1">{{showCurrency}}</td>						
+						</tr>			
+					</thead>
+					<tbody>
+						<tr>						
+							<td>可投資餘額E = A+B+C-D</td>
+							<td>{{showAvbBalance | number:2}}</td>
+							<td>可用餘額A</td>
+							<td>{{avbBalanceAmt | number:2}}</td>
+							<td>今日賣出金額B</td>
+							<td>{{tDaySAmt | number:2}}</td>								
+						</tr>
+						<tr>						
+							<td>在途款總額C</td>
+							<td>{{sellAmt | number:2}}</td>
+							<td>在途款圈存金額D</td>
+							<td>{{sellUseAmt | number:2}}</td>
+							<td>海外ETF/海外股票圈存金額</td>
+							<td>{{bankUseAmt | number:2}}</td>								
+						</tr>
+						<tr>						
+							<td>備註</td>
+							<td colspan="5"></td>								
+						</tr>
+					</tbody>					
+				</table>
+				<table>
+					<tr>						
+						<td>注意事項：</td>								
+					</tr>
+					<tr>						
+						<td>1.	可用餘額為帳戶可投資金額，係指除該帳戶帳上存款餘額外，並扣除各種已圈存或已扣押之金額；今日賣出金額為在該交易所之今日</td>								
+					</tr>
+					<tr>						
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;賣出成交未入帳金額(為預估值，隔日本行帳務結算後，才能為確定實際金額)；在途款總額為今日之前在該交易所賣出成交在途款餘額。</td>								
+					</tr>
+					<tr>						
+						<td>2.	買進委託時，先使用今日賣出金額(若有)圈存，若無，再使用在途款總額圈存，以上圈存金額即為在途款圈存金額；若今日賣出金</td>								
+					</tr>
+					<tr>						
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;額與在款總額無可使用額度，本行將使用可用餘額圈存，使用可用餘額圈存買進之金額即為海外ETF/海外股票圈存金額。</td>								
+					</tr>
+					<tr>						
+						<td>3.	本行帳務結算時，買進成交，先使用今日賣出金額(若有)抵扣，若無，再使用在途款總額抵扣，最後才使用可用餘額扣款。</td>								
+					</tr>
+					<tr>						
+						<td>4.	每日交易所收盤後至本行帳務結算前，買進無法使用在途款總額，僅能使用帳戶可用餘額做申購。</td>								
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+				

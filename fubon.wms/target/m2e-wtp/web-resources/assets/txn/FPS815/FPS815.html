@@ -1,0 +1,122 @@
+<style>
+  .FPS815 .modal-dialog {
+    width: 80vw;
+  }
+
+  /* change row */
+
+  /* fps810 */
+
+  .FPS810 table.report.table {
+    border: 2px solid #fff;
+    background-color: #fff;
+  }
+
+  .FPS810 table.report.table>thead,
+  .FPS810 table.report.table>tbody tr th.fake-th {
+    background-color: #53b0c9;
+    color: #fff;
+  }
+
+  .FPS810 table.report.table>tbody tr.conclusion td {
+    background-color: #fff;
+  }
+
+  .FPS810 table.report.table>tbody tr.details td {
+    background-color: #dbeef4;
+  }
+
+  .FPS810 table.report.table>thead>tr th,
+  .FPS810 table.report.table>thead>tr td,
+  .FPS810 table.report.table>tbody>tr th,
+  .FPS810 table.report.table>tbody>tr td {
+    vertical-align: middle;
+    text-align: center;
+    padding: .3em;
+    border: .5px solid #fff;
+  }
+
+  .FPS810 table.report.table thead th:first-of-type,
+  .FPS810 table.report.table tbody th {
+    border-right: 1px solid #fff;
+  }
+
+  .imp {
+    font-size: 1.5em;
+    color: #28a4c9;
+  }
+
+  section.no-body>h3 {
+    border-radius: 5px;
+  }
+
+  section>h3.title {
+    background-color: #28a4c9;
+    color: #fff;
+  }
+
+  /* hack */
+
+  table.report.table>tbody+tbody {
+    border-top: 2px solid #fff;
+  }
+
+  .red {
+    color: red;
+  }
+
+</style>
+
+<div ng-controller="FPS815Controller"
+     ng-cloak
+     class="FPS800 FPS815 FPS810">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a href="#"
+           class="close"
+           data-dismiss="modal"
+           aria-hidden="true"
+           ng-click="closeThisDialog('cancel')">&times; </a>
+        <h4 id="myModalAlertLabel"
+            class="modal-title">使用理財規劃金額明細</h4>
+      </div>
+      <div class="modal-body">
+        <span class="ps">單位:新台幣元</span>
+        <div class="bootstrap-admin-panel-content">
+          <table class="table report e-table-freeze"
+                 e-height="70vh"
+                 e-top="true">
+            <thead>
+              <th ng-if="roleType==1">營運區</th>
+              <th ng-if="roleType==2">分行</th>
+              <th ng-if="roleType==3">理專級別</th>
+              <th ng-if="roleType==3">理專姓名</th>
+              <th>未下單金額</th>
+              <th>已下單金額</th>
+              <th>金額加總</th>
+              <th>已下單手續費</th>
+            </thead>
+            <tbody>
+              <tr ng-repeat="row in paramList"
+                  class="details">
+                <td ng-if="roleType==1"
+                    ng-bind="row.BRANCH_AREA_NAME"></td>
+                <td ng-if="roleType==2"
+                    ng-bind="row.BRANCH_NAME"></td>
+                <td ng-if="roleType==3"
+                    ng-bind="row.AO_JOB_RANK"></td>
+                <td ng-if="roleType==3"
+                    ng-bind="row.EMP_NAME"></td>
+                <td ng-bind="row.N_PCH|number"></td>
+                <td ng-bind="row.PCH|number"></td>
+                <td ng-bind="row.TOTAL|number"></td>
+                <td ng-bind="row.FEE|number"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

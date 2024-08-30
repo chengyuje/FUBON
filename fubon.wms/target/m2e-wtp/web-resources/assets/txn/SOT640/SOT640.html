@@ -1,0 +1,128 @@
+<style>
+.modal-dialog.SOT640 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT640/SOT640.js"></script>
+<div ng-controller="SOT640Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">FCI當日交易明細查詢</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th>客戶ID：</th>
+						<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.CUST_ID" /></td>
+						<th>下單批號：</th>
+						<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.BATCH_SEQ" /></td>
+						<th>狀態：</th>	
+						<td><e-combobox id="STATUS" 
+									ng-datasource="mappingSet['SOT.FCI_INV_STATUS_TODAY']" 
+									ng-model="inputVO.STATUS" 
+									ng-validate="false" 
+									ng-format="F3"
+									width="200px"
+									style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th>計價幣別：</th>
+						<td><e-combobox id="PROD_CURR" 
+									ng-datasource="mappingSet['PRD.FCI_CURRENCY']" 
+									ng-model="inputVO.PROD_CURR" 
+									ng-validate="false" 
+									ng-format="F1"
+									width="200px"
+									style="line-height:20px;" />
+			       		</td>
+			       		<th>承作天期：</th>	
+						<td><e-combobox id="MON_PERIOD"
+									ng-datasource="mappingSet['MON_PERIOD']" 
+									ng-model="inputVO.MON_PERIOD"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-require="true"
+									ng-format="F3"
+									width="200px"
+									style="line-height:20px;" />
+						</td>
+						<th>理專員編：</th>	
+						<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.EMP_ID" /></td>
+					</tr>
+				</table>
+			</form>	
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit(); inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();inquireInit();">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportData();" function-type="export">匯出</button>
+			</div>	    
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+				<table class="table-bordered middle">
+					<thead>
+						<tr>
+							<th>功能</th>
+							<th>狀態</th>
+							<th>批號</th>
+							<th>客戶ID</th>
+							<th>商品代號</th>
+							<th>申購日</th>
+							<th>起息日</th>
+							<th>承作天期</th>
+							<th>商品收益率</th>
+							<th>計價幣別</th>
+							<th>承作金額</th>
+							<th>比價日</th>
+							<th>到期日</th>
+							<th>理專收益率</th>
+							<th>理專員編</th>
+							<th>分行別</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td ng-if="row.REPRINT_YN == 'Y'">
+								<button type="button" class="btn btn-info" ng-click="goPage(row);">補印表單</button>
+							</td>
+							<td ng-if="row.CONT_YN == 'Y' && (inputVO.isFCIPMRole || row.LOGIN_AS_NARRATOR == 'Y')">
+								<button type="button" class="btn btn-info" ng-click="goPage(row);">繼續交易</button>
+					    	</td>
+					    	<td ng-if="!(row.CONT_YN == 'Y' && (inputVO.isFCIPMRole || row.LOGIN_AS_NARRATOR == 'Y')) && row.REPRINT_YN != 'Y'"></td>
+							<td>{{row.STATUS | mapping:mappingSet['SOT.FCI_INV_STATUS']:'F3'}}</td>
+							<td>{{row.BATCH_SEQ}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.PROD_ID}}</td>
+					      	<td>{{toJsDate(row.TRADE_DATE) | date:'yyyy-MM-dd'}}</td>
+					      	<td>{{toJsDate(row.VALUE_DATE) | date:'yyyy-MM-dd'}}</td>
+					      	<td>{{row.MON_PERIOD}}個月</td>
+							<td align="right">{{row.PRD_PROFEE_RATE | number: 2}}</td>
+							<td>{{row.PROD_CURR | mapping:mappingSet['PRD.FCI_CURRENCY']:'F1'}}</td>
+							<td align="right">{{row.PURCHASE_AMT | number: 2}}</td>
+							<td>{{toJsDate(row.SPOT_DATE) | date:'yyyy-MM-dd'}}</td>
+					      	<td>{{toJsDate(row.EXPIRE_DATE) | date:'yyyy-MM-dd'}}</td>
+							<td align="right">{{row.RM_PROFEE | number: 2}}</td>
+							<td>{{row.EMP_ID}}</td>
+							<td>{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>	
+		</div>
+	</div>
+</div>

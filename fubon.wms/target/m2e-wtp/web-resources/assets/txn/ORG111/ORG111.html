@@ -1,0 +1,165 @@
+<script type="text/javascript" src="assets/txn/ORG111/ORG111.js"></script>
+<script type="text/javascript" src="assets/txn/ORG111/ORG111_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/ORG111/ORG111_EDIT2.js"></script>
+<div class="container-fluid">
+	<div ng-controller="ORG111Controller" ng-cloak>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="tfb_content">
+					<div class="tfb_content_icon"></div>
+					<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">人員資料維護</div>
+				</div>
+				<!--Content of the panel-->
+				<div class="panel_content" ng-repeat="row in results = empDataLst | limitTo:1">
+					<div class="search_table search_box3">
+						<table   class="table-condensed">
+							<tr>
+								<th>分行代碼：</th>
+								<td><font color=blue>{{row.BRANCH_NBR}}</font></td>
+								<th>分行名稱：</th>
+								<td><font color=blue>{{row.BRANCH_NAME}}</font></td>
+								<td rowspan="5" class="text-center" ng-show="row.EMP_PHOTO != null" border="1">
+									<img ng-src="{{pictureSrc}}" style="max-height: 208px; max-width: 168px" />
+								</td>
+								<td rowspan="5" style="border: 1px solid #000000;vertical-align:middle;text-align:center;" ng-show="row.EMP_PHOTO == null" >
+									尚未上傳
+								</td>
+							</tr>
+							<tr>
+								<th>員工編號：</th>
+								<td><font color=blue ng-model="inputVO.EMP_ID">{{row.EMP_ID}}</font></td>
+								<th>員工姓名：</th>
+								<td><font color=blue>{{row.EMP_NAME}}</font></td>
+							</tr>
+							<tr>
+								<th>職稱：</th>
+								<td><font color=blue>{{row.JOB_TITLE_NAME}}</font></td>
+								<th>任該職務日：</th>
+								<td><font color=blue>{{toJsDate(row.JOB_ONBOARD_DATE) | date:'yyyy/MM/dd'}}</font></td>
+							</tr>
+							<tr>
+								<th>業務主管：</th>
+								<td><font color=blue>{{row.SALES_SUP_EMP_NAME}}</td>
+								<th>業務組別：</th>
+								<td><font color=blue>{{row.GROUP_TYPE | mapping:mappingSet['ORG.SALES_GROUP_TYPE']:'F3'}}</td>
+							</tr>
+							<tr>
+								<th>業績生效日：</th>
+								<td colspan="3"><font color=blue>{{toJsDate(row.PERF_EFF_DATE) | date:'yyyy/MM/dd'}}</font></td>
+							</tr>
+							<tr>
+								<th>通訊地址：</th>
+								<td colspan="3"><font color=blue>{{row.EMP_MAIL_ADDRESS}}</td>
+								<td rowspan="5" class="text-center">
+									<div ng-show="(inputVO.loginPrivilegeID == '002' || inputVO.loginPrivilegeID == '003' || inputVO.loginPrivilegeID == 'UHRM002') && row.REVIEW_STATUS != 'W'">
+										<e-upload style="margin: 0 auto;" id="pic" success="uploadFinshed(name,rname)"></e-upload>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<th>電子郵件：</th>
+								<td colspan="3"><font color=blue>{{row.EMP_EMAIL_ADDRESS}}</td>
+							</tr>
+							<tr>
+								<th>通訊電話：</th>
+								<td><font color=blue>{{row.EMP_PHONE_NUM}}</font></td>
+								<th>傳真號碼：</th>
+								<td><font color=blue>{{row.EMP_FAX}}</font></td>
+							</tr>
+							<tr>
+								<th>手機：</th>
+								<td ng-show="(inputVO.loginPrivilegeID == '002' || inputVO.loginPrivilegeID == '003' || inputVO.loginPrivilegeID == 'UHRM002') && row.REVIEW_STATUS != 'W'">
+									<input type="text" class="form-control" id="paramType" name="paramType" ng-model="inputVO.EMP_CELL_NUM" placeholder="請輸入手機號碼" maxlength="10" autofocus>
+								</td>
+								<td ng-show="(inputVO.loginPrivilegeID != '002' && inputVO.loginPrivilegeID != '003' && inputVO.loginPrivilegeID != 'UHRM002') || (inputVO.loginPrivilegeID == '002' || inputVO.loginPrivilegeID == '003' || inputVO.loginPrivilegeID == 'UHRM002') && row.REVIEW_STATUS == 'W'">
+									<font color=blue>{{row.EMP_CELL_NUM}}</font>
+								</td>
+								<th>分機：</th>
+								<td ng-show="(inputVO.loginPrivilegeID == '002' || inputVO.loginPrivilegeID == '003' || inputVO.loginPrivilegeID == 'UHRM002') && row.REVIEW_STATUS != 'W'">
+									<input type="text" class="form-control" id="ptypeName" name="ptypeName" ng-model="inputVO.EMP_DEPT_EXT" placeholder="請輸入分機">
+								</td>
+								<td ng-show="(inputVO.loginPrivilegeID != '002' && inputVO.loginPrivilegeID != '003' && inputVO.loginPrivilegeID != 'UHRM002') || (inputVO.loginPrivilegeID == '002' || inputVO.loginPrivilegeID == '003' || inputVO.loginPrivilegeID == 'UHRM002') && row.REVIEW_STATUS == 'W'">
+									<font color=blue>{{row.EMP_DEPT_EXT}}</font>
+								</td>
+							</tr>
+							<tr>
+								<th>備註：</th>
+								<td colspan="3" ng-show="(inputVO.loginPrivilegeID == '002' || inputVO.loginPrivilegeID == '003' || inputVO.loginPrivilegeID == 'UHRM002') && row.REVIEW_STATUS != 'W'">
+									<input type="text" class="form-control" id="ptypeName" name="ptypeName" ng-model="inputVO.REMARK" placeholder="備註內容事項">
+								</td>
+								<td colspan="3" ng-show="(inputVO.loginPrivilegeID != '002' && inputVO.loginPrivilegeID != '003' && inputVO.loginPrivilegeID != 'UHRM002') || (inputVO.loginPrivilegeID == '002' || inputVO.loginPrivilegeID == '003' || inputVO.loginPrivilegeID == 'UHRM002') && row.REVIEW_STATUS == 'W'">
+									<font color=blue>{{row.REMARK}}</font>
+								</td>
+							</tr>
+						</table>
+						<div class="search_box_btn text-center">
+							<button type="button" class="btn btn-default" ng-show="(inputVO.loginPrivilegeID == '002' || inputVO.loginPrivilegeID == '003' || inputVO.loginPrivilegeID == 'UHRM002') && row.REVIEW_STATUS != 'W'" ng-click="upda()">修改</button>
+							<button type="button" class="btn btn-default" ng-show="(inputVO.loginPrivilegeID == '002' || inputVO.loginPrivilegeID == '003' || inputVO.loginPrivilegeID == 'UHRM002') && row.REVIEW_STATUS != 'W'" ng-click="inquireEMP()">清除</button>
+							<button type="button" class="btn btn-primary" ng-show="inputVO.loginPrivilegeID == '013' || inputVO.loginPrivilegeID == '043'" ng-click="edit()">離職/異動交接</button>
+							<button type="button" class="btn btn-info"  ng-show="row.REVIEW_STATUS != 'Y'" ng-click="review(row, 'Y')" function-type="confirm">核可</button>
+							<button type="button" class="btn btn-info"  ng-show="row.REVIEW_STATUS != 'Y'" ng-click="review(row, 'N')" function-type="confirm">退回</button>
+							<button type="button" class="btn btn-default" ng-click="reBack()">上一頁</button>
+						</div>
+					</div>
+					
+					<div class="gv_tab_sc scroll_y">
+						<h4>角色列表&nbsp;&nbsp;&nbsp;<button type="button" ng-show="inputVO.loginPrivilegeID == '043' || inputVO.loginPrivilegeID == '044'" class="btn btn-primary" ng-click="roedit()">新增</button></h4>
+						<table>
+							<tr>
+								<th width="10%" ng-show="inputVO.loginPrivilegeID == '043' || inputVO.loginPrivilegeID == '044'"></th>
+								<th>角色名稱</th>
+							</tr>
+							<tr ng-repeat="row in results = empRoleLst | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td ng-show="row.privID == '043' || row.privID == '044'">
+									<button type="button" class="btn btn-danger btn-circle" ng-click="del(row)">
+										<i class="glyphicon glyphicon-trash"></i>
+									</button>
+								</td>
+								<td>{{row.ROLE_ID}}-{{row.ROLE_NAME}}<lable ng-show="row.IS_PRIMARY_ROLE=='Y'">(主要)</lable></td>
+							</tr>
+						</table>
+						<br />
+						<h4>金控證照資料</h4>
+						<div class="gv_tab_sc scroll_y">
+							<table>
+								<tr>
+									<th width="75px">是否為主角色</th>
+									<th width="200px">角色名稱</th>
+									<th>證照名稱</th>
+									<th width="150px">登錄日期</th>
+								</tr>
+								<tr ng-repeat="row in Ti | limitTo:30" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td>{{row.IS_PRIMARY_ROLE | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+									<td>{{row.ROLE_NAME}}</td>
+									<td>{{row.CERT_NAME}}</td>
+									<td>
+										<span ng-show="row.REG_DATE == null && row.CERT_NAME != '以下擇一'" style="color: red">暫時未登錄此證照</span> 
+										{{row.REG_DATE}}
+									</td>
+								</tr>
+							</table>
+						</div>
+						<br />
+						<h4>保險證照資料</h4>
+						<div class="gv_tab_sc scroll_y">
+							<table>
+								<tr>
+									<th width="50%">證照名稱</th>
+									<th>登錄日期</th>
+								</tr>
+								<tr ng-repeat="row in ins | limitTo:30" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td>{{row.CERT_NAME}}</td>
+									<td>
+										<span ng-show="row.REG_DATE == null && row.CERT_NAME != '以下擇一'" style="color: red">暫時未登錄此證照</span> 
+											{{row.REG_DATE}}
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- InstanceEndEditable -->
+			<!-- ./content -->
+		</div>
+	</div>

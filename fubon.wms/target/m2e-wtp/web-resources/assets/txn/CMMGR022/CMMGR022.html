@@ -1,0 +1,160 @@
+<style>
+    .CMMGR022 .center {
+        text-align: center;
+    }
+
+    .CMMGR022 .condition {
+        margin-bottom: 10px;
+    }
+
+    .CMMGR022 .itemZone {
+        height: 150px;
+        overflow: auto;
+    }
+
+    .CMMGR022 .itemId {
+        color: #db0847;
+    }
+
+    .CMMGR022 .item {
+        border-radius: 50px;
+        margin: 2px 5px;
+        box-shadow: 0 1px 1px 0 #333333;
+    }
+
+    .CMMGR022 .action {
+        margin-top: 20px;
+    }
+</style>
+<script type="text/javascript" src="assets/txn/CMMGR022/CMMGR022.js"></script>
+<script type="text/javascript" src="assets/txn/CMMGR022/CMMGR022_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/COMMON/CommonUtil.js"></script>
+<div class="CMMGR022" ng-controller="CMMGR022_Controller">
+    <div class="tfb_content">
+        <div class="tfb_content_icon"></div>
+        <div class="tfb_content_tit">
+            <img src="assets/images/icon/tfb_icon_a15.gif"/><span ng-bind="'電文查詢'"></span>
+        </div>
+    </div>
+    <div class="panel_content">
+        <form name="searchForm">
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="input-group condition">
+                        <span class="input-group-addon" ng-bind="'編號'"></span>
+                        <input type="text" class="form-control" ng-model="inputVO.id"
+                               ng-change="filterTx()" placeholder="請輸入電文編號～"/>
+                    </div>
+
+                    <div class="input-group condition">
+                        <span class="input-group-addon" ng-bind="'流水號'"></span>
+                        <input type="text" class="form-control" ng-model="inputVO.number" placeholder="請輸入流水號～"/>
+
+                        <span class="input-group-addon" ng-bind="'發送人'"></span>
+                        <input type="text" class="form-control" ng-model="inputVO.empId" placeholder="請輸入員工編號～"/>
+                    </div>
+
+                    <div class="input-group condition">
+                        <span class="input-group-addon" ng-bind="'發送時間'"></span>
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                        <input type="text"
+                               class="form-control"
+                               uib-datepicker-popup="yyyy/MM/dd"
+                               ng-model="inputVO.start"
+                               is-open="calendar.start"
+                               datepicker-options="tx.sDateOptions"
+                               ng-readonly="true"
+                               ng-change="limitDate(tx, inputVO.start, inputVO.end)"
+                               ng-click="openCalendar($event, 'start')" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-time"></span>
+                        </span>
+                        <input type="time" class="form-control" ng-model="inputVO.startTime"/>
+                    </div>
+
+                    <div class="input-group condition">
+                        <span class="input-group-addon" ng-bind="'結束時間'"></span>
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                        <input type="text"
+                               class="form-control"
+                               uib-datepicker-popup="yyyy/MM/dd"
+                               ng-model="inputVO.end"
+                               datepicker-options="tx.eDateOptions"
+                               is-open="calendar.end"
+                               ng-readonly="true"
+                               ng-change="limitDate(tx, inputVO.start, inputVO.end)"
+                               ng-click="openCalendar($event, 'end')" />
+
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-time"></span>
+                        </span>
+                        <input type="time" class="form-control" ng-model="inputVO.endTime"/>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <!-- 電文一覽 -->
+                    <uib-tabset active="0" Justified="true" type="tabs">
+                        <uib-tab ng-repeat="tx in txList track by $index"
+                                index="$index" heading="{{tx.type + '（' + tx.data.length  + '）'}}">
+                            <div class="itemZone">
+                                <button class="btn btn-default btn-sm item" function-type="query"
+                                        ng-repeat="each in tx.data track by $index"
+                                        ng-click="inputVO.id = each.DATA">
+                                    <span class="itemId" ng-bind="each.DATA"></span>
+                                    <span ng-bind="each.LABEL"></span>
+                                </button>
+                            </div>
+                        </uib-tab>
+                    </uib-tabset>
+                </div>
+            </div>
+
+            <div class="search_box_btn text-center action">
+                <button type="submit" ng-click="query()" class="btn btn-primary" function-type="query">
+                    <span class="glyphicon glyphicon-search"></span>
+                    <span ng-bind="'查詢'"></span>
+                </button>
+                <button ng-click="init()" class="btn btn-info">
+                    <span class="glyphicon glyphicon-erase"></span>
+                    <span ng-bind="'清除'"></span>
+                </button>
+            </div>
+        </form>
+
+        <e-jumping-once output="outputVO" list="subData" totallist="data"></e-jumping-once>
+
+        <div class="gv_tab_sc">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th ng-bind="'功能'">
+                    <th ng-bind="'流水號'"></th>
+                    <th ng-bind="'編號'"></th>
+                    <th ng-bind="'發送人'"></th>
+                    <th ng-bind="'發送時間'"></th>
+                    <th ng-bind="'結束時間'"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="repeat-row" ng-repeat="row in subData track by $index">
+                    <td class="center">
+                        <button ng-click="openDetail(row)" class="btn btn-success" function-type="query">
+                            <span class="glyphicon glyphicon-search"></span>
+                            <span ng-bind="'檢視'"></span>
+                        </button>
+                    </td>
+                    <td class="center" ng-bind="row.HSTANO"></td>
+                    <td class="center" ng-bind="row.HTXTID"></td>
+                    <td class="center" ng-bind="row.CREATOR"></td>
+                    <td class="center" ng-bind="row.CREATETIME | date:'yyyy-MM-dd HH:mm:ss'"></td>
+                    <td class="center" ng-bind="row.ENDTIME | date:'yyyy-MM-dd HH:mm:ss'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

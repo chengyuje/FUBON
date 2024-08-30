@@ -1,0 +1,358 @@
+<style>
+.FPS941_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.FPS941_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_FPS941_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.FPS941_DETAIL .alignRight{
+	text-align: right;
+}
+</style>
+<div ng-controller="FPS941_DETAILController" ng-cloak>
+	<div class="modal-dialog FPS941_DETAIL" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">規劃書參數</h4>
+			</div>
+			<div class="modal-body">
+				<table>
+					<tr>
+						<th>
+							<div style="float: left !important;margin-top: 3px;">
+								資料年月：{{inputVO.date | date:"yyyy/MM"}}&emsp;&emsp;&emsp;
+								生效日：
+							</div>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="date" name="date" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.date"
+									is-open="model.a"
+									datepicker-options="dateOptions"
+									ng-readonly="true" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</th>
+					</tr>
+				</table>
+				<br>
+				<uib-tabset active="0" justified="true">
+					<uib-tab index="0" heading="前言">
+						<h4 class="h4-title">表頭文字，依不同的客戶理財規劃書分成N版</h4>
+						<div class="search_table" ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" function-type="maintenance">
+							<table>
+								<tr>
+									<th>理財規劃書類別：</th>
+									<td>
+										<e-combobox id="plan_type_f" name="plan_type_f"
+										ng-paramtype="FPS.PLAN_TYPE"
+										ng-model="inputVO.plan_type_f"
+					  					ng-validate="false"
+					  					ng-readonly="false" 
+					  					ng-editable="false"
+					  					ng-format="F3"
+					  					ng-required="false"
+					  					width="270px"
+					  					style="line-height:20px;" />
+									</td>
+									<th></th>
+									<td>
+										<button ng-show="!(EditIndex_f || EditIndex_f == 0)" type="button" class="btn btn-primary" ng-click="add_f()">加入</button>
+										<button ng-show="EditIndex_f || EditIndex_f == 0" type="button" class="btn btn-primary" ng-click="edit_f()">修改</button>
+										<button type="button" class="btn btn-primary" ng-click="clear_f()">清除</button>
+									</td>
+								</tr>
+								<tr>
+									<th>內容：</th>
+									<td colspan="3">
+										<textarea id="content_f" name="content_f" class="form-control" ng-model="inputVO.content_f" style="width: 100%; height: 100px" e-length-limit="4000"></textarea>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<br>
+						<div class="gv_tab_sc">
+							<table class="table td_center e-table-freeze" e-height="450px" e-mode="1" e-top="true" e-list="inputVO.manualfList">
+								<thead>
+									<tr>
+										<th width="10%" function-type="maintenance">功能</th>
+										<th width="30%">理財規劃書類別</th>
+										<th width="60%">內容</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in inputVO.manualfList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td function-type="maintenance">
+											<e-combobox id="cmbAction" name="cmbAction"
+											ng-datasource="row.set"
+											ng-model="row.cmbAction"
+											ng-validate="false"
+											ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											ng-readonly="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="action_f(row)"
+											width="100px"
+											style="line-height:20px;" />
+										</td>
+										<td>{{row.FPS_TYPE | mapping:PLAN_TYPE:'F3'}}</td>
+										<td class="td_left">
+											{{row.CONTENT}}
+										</td>
+<!-- 										<td class="td_left"> -->
+<!-- 											<div uib-tooltip="{{row.CONTENT}}" tooltip-placement="auto right" tooltip-append-to-body="true" tooltip-class="FPS941ToolTip"> -->
+<!-- 												{{row.CONTENT.length > 100 ? (row.CONTENT | limitTo: 100) + "..." : row.CONTENT}} -->
+<!-- 											</div> -->
+<!-- 										</td> -->
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</uib-tab>
+					<uib-tab index="1" heading="使用指南">
+						<h4 class="h4-title">說明文字</h4>
+						<div class="search_table" ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" function-type="maintenance">
+							<table>
+								<tr>
+									<th>依理財規劃書類別篩選：</th>
+									<td>
+										<e-combobox id="plan_type" name="plan_type"
+										ng-paramtype="FPS.PLAN_TYPE"
+										ng-model="inputVO.plan_type_m"
+					  					ng-validate="false"
+					  					ng-readonly="false" 
+					  					ng-editable="false"
+					  					ng-format="F3"
+					  					ng-required="false"
+					  					ng-change="refreshList_m()"
+					  					width="270px"
+					  					style="line-height:20px;" />
+									</td>
+									<th>字體：</th>
+									<td>
+										<e-combobox id="font" name="font"
+										ng-datasource="FONT"
+										ng-model="inputVO.font_m"
+					  					ng-validate="false"
+					  					ng-readonly="false" 
+					  					ng-editable="false"
+					  					ng-format="F3"
+					  					ng-required="false"
+					  					style="line-height:20px;" />
+									</td>
+									<th>色彩：</th>
+									<td width="5%">
+										<input id="font_color" name="font_color" type="color" style="border:none;background-color:#fff; padding:0;" ng-model="inputVO.font_color_m">
+									</td>
+									<td>
+										<button ng-show="!(EditIndex_m || EditIndex_m == 0)" type="button" class="btn btn-primary" ng-click="add_m()">加入</button>
+										<button ng-show="EditIndex_m || EditIndex_m == 0" type="button" class="btn btn-primary" ng-click="edit_m()">修改</button>
+										<button type="button" class="btn btn-primary" ng-click="clear_m()">清除</button>
+									</td>
+								</tr>
+								<tr>
+									<th>內容：</th>
+									<td colspan="6">
+										<textarea id="content" name="content" class="form-control" ng-model="inputVO.content_m" style="width: 100%; height: 100px" e-length-limit="4000"></textarea>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<br>
+						<div class="gv_tab_sc" style="white-space: nowrap;">
+							<table class="table td_center e-table-freeze" e-height="450px" e-mode="1" e-top="true" e-list="filterDataList_m">
+								<thead>
+									<tr>
+										<th width="10%" function-type="maintenance">功能</th>
+										<th width="5%">順序</th>
+										<th width="15%">理財規劃書類別</th>
+										<th width="5%">字體</th>
+										<th width="5%">色彩</th>
+										<th width="60%">內容</th>
+									</tr>
+								</thead>
+								<tbody ui-sortable="sortableOptions_m" ng-model="filterDataList_m">
+									<tr class="repeat-row" ng-repeat="row in filterDataList_m track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td width="10%" function-type="maintenance">
+											<e-combobox id="cmbAction" name="cmbAction"
+											ng-datasource="row.set"
+											ng-model="row.cmbAction"
+											ng-validate="false"
+											ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											ng-readonly="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="action_m(row)"
+											width="100px"
+											style="line-height:20px;" />
+										</td>
+										<td>{{row.RANK}}</td>
+										<td>{{row.FPS_TYPE | mapping:PLAN_TYPE:'F3'}}</td>
+										<td>{{row.FONT | mapping:FONT:'F3'}}</td>
+										<td><input type="color" style="border:none;background-color:#fff; padding:0;" ng-model="row.FONT_COLOR" disabled></td>
+										<td class="td_left" style="white-space: normal;">
+											<div uib-tooltip="{{row.CONTENT}}" tooltip-placement="auto right" tooltip-append-to-body="true" tooltip-class="FPS941ToolTip">
+												{{row.CONTENT.length > 100 ? (row.CONTENT | limitTo: 100) + "..." : row.CONTENT}}
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</uib-tab>
+					<uib-tab index="2" heading="注意事項">
+						<h4 class="h4-title">說明文字，By產品區分</h4>
+						<div class="search_table" ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" function-type="maintenance">
+							<table>
+								<tr>
+									<th>依商品類別篩選：</th>
+									<td>
+										<e-combobox id="prd_type" name="prd_type"
+										ng-datasource="PRD_TYPE"
+										ng-model="inputVO.prd_type_w"
+					  					ng-validate="false"
+					  					ng-readonly="false" 
+					  					ng-editable="false"
+					  					ng-format="F3"
+					  					ng-required="false"
+					  					ng-change="refreshList_w()"
+					  					style="line-height:20px;" />
+									</td>
+									<th>字體：</th>
+									<td>
+										<e-combobox id="font" name="font"
+										ng-datasource="FONT"
+										ng-model="inputVO.font_w"
+					  					ng-validate="false"
+					  					ng-readonly="false" 
+					  					ng-editable="false"
+					  					ng-format="F3"
+					  					ng-required="false"
+					  					style="line-height:20px;" />
+									</td>
+									<th>色彩：</th>
+									<td width="5%">
+										<input id="font_color" name="font_color" type="color" style="border:none;background-color:#fff; padding:0;" ng-model="inputVO.font_color_w">
+									</td>
+									<td>
+										<button ng-show="!(EditIndex_w || EditIndex_w == 0)" type="button" class="btn btn-primary" ng-click="add_w()">加入</button>
+										<button ng-show="EditIndex_w || EditIndex_w == 0" type="button" class="btn btn-primary" ng-click="edit_w()">修改</button>
+										<button type="button" class="btn btn-primary" ng-click="clear_w()">清除</button>
+									</td>
+								</tr>
+								<tr>
+									<th>內容：</th>
+									<td colspan="6">
+										<textarea id="content" name="content" class="form-control" ng-model="inputVO.content_w" style="width: 100%; height: 100px" e-length-limit="4000"></textarea>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<br>
+						<div class="gv_tab_sc" style="white-space: nowrap;">
+							<table class="table td_center e-table-freeze" e-height="450px" e-mode="1" e-top="true" e-list="filterDataList_w">
+								<thead>
+									<tr>
+										<th width="10%" function-type="maintenance">功能</th>
+										<th width="5%">順序</th>
+										<th width="15%">商品類別</th>
+										<th width="5%">字體</th>
+										<th width="5%">色彩</th>
+										<th width="60%">內容</th>
+									</tr>
+								</thead>
+								<tbody ui-sortable="sortableOptions_w" ng-model="filterDataList_w">
+									<tr class="repeat-row" ng-repeat="row in filterDataList_w track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td width="10%" function-type="maintenance">
+											<e-combobox id="cmbAction" name="cmbAction"
+											ng-datasource="row.set"
+											ng-model="row.cmbAction"
+											ng-validate="false"
+											ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											ng-readonly="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="action_w(row)"
+											width="100px"
+											style="line-height:20px;" />
+										</td>
+										<td>{{row.RANK}}</td>
+										<td>{{row.PRD_TYPE | mapping:PRD_TYPE:'F3'}}</td>
+										<td>{{row.FONT | mapping:FONT:'F3'}}</td>
+										<td><input type="color" style="border:none;background-color:#fff; padding:0;" ng-model="row.FONT_COLOR" disabled></td>
+										<td class="td_left" style="white-space: normal;">
+											<div uib-tooltip="{{row.WARNING}}" tooltip-placement="auto right" tooltip-append-to-body="true" tooltip-class="FPS941ToolTip">
+												{{row.WARNING.length > 100 ? (row.WARNING | limitTo: 100) + "..." : row.WARNING}}
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</uib-tab>
+					<uib-tab index="3" heading="上傳首頁圖片">
+						<br>
+						<table>
+							<tr>
+								<td width="17%">
+									<e-upload ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" success="uploadFinshed(name,rname)" model="inputVO.realpictureName"></e-upload>
+								</td>
+								<td>
+<!-- 										<button function-type="maintenance" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" type="button" class="btn btn-info" ng-click="removePicture()" >X</button> -->
+									&nbsp;&nbsp;<a ng-if="pictureSrc" ng-click="resizePicture()" style="cursor:pointer"><span ng-class="!is_resizePicture ? 'glyphicon glyphicon-resize-full' : 'glyphicon glyphicon-resize-small'"></span></a>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<br>
+									<img id="fps941_pictureSrc" ng-if="pictureSrc" ng-src="{{pictureSrc}}" height="200" width="200" />
+								</td>
+							</tr>
+						</table>
+					</uib-tab>
+				</uib-tabset>
+				<div class="search_box_btn text-center">
+					<button ng-if="Datarow.STATUS == 'P' && Datarow.MODIFIER != currUser" type="button" class="btn btn-primary" ng-click="review('W')" function-type="confirm">同意</button>
+					<button ng-if="Datarow.STATUS == 'P' && Datarow.MODIFIER != currUser" type="button" class="btn btn-primary" ng-click="review('R')" function-type="confirm">退回</button>
+					<button ng-if="Datarow.STATUS == 'W'" type="button" class="btn btn-primary" ng-click="review('F')" function-type="confirm">失效</button>
+					<button ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" type="button" class="btn btn-primary" ng-click="goReview()" function-type="maintenance">傳送主管覆核</button>
+					<button ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance">儲存</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,360 @@
+<style>
+/* open dialog */
+.ngdialog.CUS130_EDIT {
+	
+}
+/* dialog panl */
+.modal-dialog.CUS130_EDIT {
+	width: 900px;
+	height: auto;
+}
+/* table size */
+.CUS130_EDIT table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CUS130_EDIT.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CUS130_EDIT_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.red{
+	color: red !important;
+}
+</style>
+<div ng-controller="CUS130_EDITController" ng-cloak>
+	<div class="modal-dialog CUS130_EDIT">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.IVG_PLAN_SEQ == null ? '新增' : EditType == 'U' ? '編輯' : '複製'}}回報計畫</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*回報計畫名稱：</th>
+							<td class="col-md-7 tdpadding">
+								<input type="text" id="ivgPlanName" name="ivgPlanName" class="form-control" ng-disabled="startDisable" ng-model="inputVO.ivgPlanName" required>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.ivgPlanName.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入回報計畫名稱</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*回報類型：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="ivgType" name="ivgType"
+								ng-datasource="IVG_TYPE"
+								ng-model="inputVO.ivgType"
+								ng-validate="false"
+								ng-disabled="startDisable" 
+								ng-readonly="startDisable" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.ivgType.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇回報類型</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*計畫狀態：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="ivgPlanType" name="ivgPlanType"
+									ng-paramtype="CUS.IVG_PLAN_TYPE"
+									ng-model="inputVO.ivgPlanType"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									width="150px"
+									style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.ivgPlanType.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇計畫狀態</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*開始日期：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="ivgStartDate" name="ivgStartDate"
+									class="form-control"
+									ng-disabled="startDisable"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.ivgStartDate"
+									is-open="model.a"
+									datepicker-options="ivgStartDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()" required />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-disabled="startDisable" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.ivgStartDate.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇開始日期</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*截止日期：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="ivgEndDate" name="ivgEndDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.ivgEndDate"
+									is-open="model.b"
+									datepicker-options="ivgEndDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()" required />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.ivgEndDate.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇截止日期</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">回報計畫說明：</th>
+							<td class="col-md-7 tdpadding">
+								<textarea id="ivgPlanDesc" name="ivgPlanDesc" class="form-control" ng-disabled="endDisable" ng-model="inputVO.ivgPlanDesc" style="width: 100%; height: 100px" e-length-limit="2000"></textarea>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">附加檔案：</th>
+							<td class="col-md-7 tdpadding">
+								<e-upload success="uploadFinshed(name,rname)" model="alreadyFile" ng-disabled="endDisable"></e-upload>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="EditType == 'U'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">已設定回報：</th>
+							<td class="col-md-7 tdpadding">
+								<button type="button" class="btn btn-primary" ng-click="seeReport()">檢視</button>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="canAddRoleFlag">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">{{EditType != 'U' ? '設定回報對象' : '新增回報對象'}}：</th>
+							<td class="col-md-7 tdpadding">
+								<span ng-if="canAddRoleFlag && EditType == 'U'" class="red">選取的區域將會合併(且無法刪除已存在對象)</span>
+								<div>
+									<input type="radio" ng-model="inputVO.setType" ng-value="1" ng-change="typeChange()">
+									<button type="button" class="btn btn-primary" ng-disabled="inputVO.setType !='1'" ng-click="setReport()">設定回報對象</button>
+								</div>
+								<br ng-if="EditType != 'U'">
+								<div ng-if="EditType != 'U'">
+									<input type="radio" ng-model="inputVO.setType" ng-value="4" ng-change="typeChange()">
+									<button type="button" class="btn btn-primary" ng-disabled="inputVO.setType !='4'" ng-click="setEMP_ID()">選擇轄下理專/PS/個金AO</button>
+								</div>
+								<br ng-if="EditType != 'U'">
+								<div ng-if="EditType != 'U'">
+									<input type="radio" ng-model="inputVO.setType" ng-value="2" ng-change="typeChange()"> 上傳指定回報員編&nbsp;&nbsp;<a onclick="return false" ng-click="downloadSimple()">(下載範例檔案)</a>
+									<e-upload ng-disabled="inputVO.setType !='2'" style="float: right" success="uploadFinshed2(name,rname)"></e-upload>
+								</div>
+								<br ng-if="EditType != 'U'">
+								<div ng-if="EditType != 'U'">
+									<input type="radio" ng-model="inputVO.setType" ng-value="3" ng-change="typeChange()"> 上傳客戶名單&nbsp;&nbsp;<a onclick="return false" ng-click="downloadSimple2()">(下載範例檔案)</a>
+									<e-upload ng-disabled="inputVO.setType !='3'" style="float: right" success="uploadFinshed3(name,rname)"></e-upload>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="canAddRoleFlag && inputVO.setType =='1'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-10" colspan="2">
+								<div class="gv_tab_sc" style="white-space: normal;">
+									<table class="table-bordered">
+										<thead>
+											<tr>
+												<th>角色名稱</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>
+													<span class="repeat-row" ng-repeat="data in inputVO.memberList track by $index">
+														{{$last ? data.ROLE_NAME : data.ROLE_NAME + ","}}
+													</span>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<br>
+								<e-jumping-once output="outputVO" list="reportList" totallist="inputVO.totalList"></e-jumping-once>
+								<div class="gv_tab_sc">
+									<table class="table-bordered">
+										<thead>
+											<tr>
+												<th>全行</th>
+												<th>業務處</th>
+												<th>營運區</th>
+												<th>分行</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="repeat-row" ng-repeat="data in reportList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+												<td>{{data.ALL_BRANCH}}</td>
+												<td>{{data.REGION | mapping:regionQuery:'F3'}}</td>
+												<td>{{data.AREA | mapping:areaQuery:'F3'}}</td>
+												<td>{{data.BRANCH}}-{{data.BRANCH | mapping:branchQuery:'F3'}}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</th>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="canAddRoleFlag && inputVO.setType =='4'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-10" colspan="2">
+								<e-jumping-once output="type4_outputVO" list="type4_child_list" totallist="inputVO.type4_empList"></e-jumping-once>
+								<div class="gv_tab_sc">
+									<table class="table-bordered">
+										<thead>
+											<tr>
+												<th>角色</th>
+												<th>分行</th>
+												<th>提醒員編</th>
+												<th>提醒人員</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="repeat-row" ng-repeat="data in type4_child_list track by $index">
+												<td>{{data.ROLE_NAME}}</td>
+												<td>{{data.BRANCH_NBR}}-{{data.BRANCH_NAME}}</td>
+												<td>{{data.EMP_ID}}</td>
+												<td>{{data.EMP_NAME}}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</th>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="EditType != 'U'" ng-show="!inputVO.setType || (inputVO.totalList.length == 0 && inputVO.empList.length == 0 && inputVO.custList.length == 0 && inputVO.type4_empList.length == 0)">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請設定回報對象</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="EditType != 'U' && inputVO.setType != '4'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">已上傳檔案：</th>
+							<td class="col-md-7 tdpadding">
+								<button type="button" class="btn btn-primary" ng-click="seeTemp()">檢視</button>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+					<br>
+					<h4 align="left"><button type="button" class="btn btn-info" ng-disabled="startDisable" ng-click="add()">新增</button></h4>
+					<div class="gv_tab_sc">
+						<table class="table-bordered">
+							<thead>
+								<tr>
+									<th width="20%" class="text-center">動作</th>
+									<th width="20%" class="text-center">順序(可拖拉)</th>
+									<th width="20%" class="text-center">回報欄位名稱</th>
+									<th width="20%" class="text-center">資料欄位型態</th>
+									<th width="20%" class="text-center">下拉式選單內容</th>
+								</tr>
+							</thead>
+							<tbody ui-sortable="sortableOptions" ng-model="inputVO.listBase">
+								<tr class="repeat-row" ng-repeat="list_row in inputVO.listBase track by $index" ng-class="{'cus130_unsortable': list_row.DISPLAYONLY}">
+									<td>
+										<e-combobox id="cmbAction" name="cmbAction" ng-if="!list_row.DISPLAYONLY"
+										ng-datasource="list_row.set"
+										ng-model="list_row.cmbAction"
+										ng-validate="false"
+										ng-disabled="startDisable"
+										ng-readonly="startDisable" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="action(list_row)"
+										width="100px"
+										style="line-height:20px;" />
+									</td>
+									<td>{{list_row.ORDER_NO}}</td>
+									<td>{{list_row.FIELD_LABEL}}</td>
+									<td>{{list_row.FIELD_TYPE | mapping:FIELD_TYPE:'F3'}}</td>
+									<td>{{list_row.DROPDOWN_CONTENT}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div ng-if="inputVO.listBase.length == 0 || ((inputVO.selectList.length > 0 || inputVO.setType == '3') && inputVO.listBase.length == 3)">
+						<span class="help-block with-errors">請設定回報欄位</span>
+					</div>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

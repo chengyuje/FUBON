@@ -1,0 +1,248 @@
+<style>
+    .PRD177 table {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* change row */
+    .PRD177.table > tbody > tr > td {
+        table-layout: fixed;
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+
+    .PRD177 .tdpadding {
+        padding: 10px 5px 5px 5px;
+    }
+
+    .PRD177 .datewidth {
+        width: 180px !important;
+        float: left !important;
+    }
+
+    .PRD177 .center {
+        text-align: center;
+    }
+
+    .PRD177 .pad {
+        padding: 10px 0px 10px 0px;
+    }
+
+</style>
+<script type="text/javascript" src="assets/txn/COMMON/CommonUtil.js"></script>
+<script type="text/javascript" src="assets/txn/PRD177/PRD177.js"></script>
+<script type="text/javascript" src="assets/txn/PRD177/PRD177_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PRD177/PRD177_UPLOAD.js"></script>
+<div class="PRD177" ng-controller="PRD177Controller" ng-cloak>
+    <form name="prd177InquireForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off"
+          enter-as-tab>
+        <table>
+            <tr>
+                <th><label for="insuranceCoSerialNum">*保險公司：</label></th>
+                <td>
+                    <e-combobox id="insuranceCoSerialNum" name="insuranceCoSerialNum"
+                                ng-datasource="mappingSet['COMPANY']"
+                                ng-model="inputVO.insuranceCoSerialNum"
+                                ng-validate="false"
+                                ng-readonly="false"
+                                ng-editable="false"
+                                ng-format="F3"
+                                width="360px"
+                                style="line-height:20px;"
+                                required
+                    />
+                </td>
+                <th><label for="currency">幣別：</label></th>
+                <td>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="請輸入..."
+                           id="currency"
+                           name="currency"
+                           ng-model="inputVO.currency"
+                           e-length-limit="200"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <th><label for="shortName">保險產品簡稱：</label></th>
+                <td>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="請輸入..."
+                           id="shortName"
+                           name="shortName"
+                           ng-model="inputVO.shortName"
+                           e-length-limit="50"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <th><label for="prdId">英文代碼：</label></th>
+                <td>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="請輸入..."
+                           id="prdId"
+                           name="prdId"
+                           ng-model="inputVO.prdId"
+                           e-length-limit="20"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <th><label>開始銷售日：</label></th>
+                <td class="tdpadding">
+                    <div class="form-group">
+                        <div class="input-group datebox datewidth">
+                            <input type="text" id="productValidFromSDate" name="productValidFromSDate"
+                                   class="form-control"
+                                   uib-datepicker-popup="yyyy/MM/dd"
+                                   ng-model="inputVO.productValidFromSDate"
+                                   is-open="calendar.productValidFromSDate"
+                                   datepicker-options="productValidFrom.sDateOptions"
+                                   ng-readonly="true"
+                                   ng-change="limitDate(productValidFrom, inputVO.productValidFromSDate, inputVO.productValidFromEDate)"
+                            />
+                            <!-- 製作日曆button -->
+                            <span class="input-group-btn">
+							<button type="button" class="btn btn-default"
+                                    ng-click="openCalendar($event,'productValidFromSDate')">
+							<i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+                        </div>
+                        <div style="float: left !important;">～</div>
+                        <div class="input-group datebox datewidth">
+                            <input type="text" id="productValidFromEDate" name="productValidFromEDate"
+                                   class="form-control"
+                                   uib-datepicker-popup="yyyy/MM/dd"
+                                   ng-model="inputVO.productValidFromEDate"
+                                   is-open="calendar.productValidFromEDate"
+                                   datepicker-options="productValidFrom.eDateOptions"
+                                   ng-readonly="true"
+                                   ng-change="limitDate(productValidFrom, inputVO.productValidFromSDate, inputVO.productValidFromEDate)"
+                            />
+                            <!-- 製作日曆button -->
+                            <span class="input-group-btn">
+							<button type="button" class="btn btn-default"
+                                    ng-click="openCalendar($event,'productValidFromEDate')">
+							<i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <div class="row">
+        <div class="center pad">
+            <button type="button" class="btn btn-info" ng-click="inquire()" function-type="query">查詢</button>
+            <button type="button" class="btn btn-info" ng-click="inquireInit()" function-type="query">清除</button>
+            <button type="button" class="btn btn-info" ng-click="upload()" function-type="maintenance">整批上傳</button>
+            <button type="button" class="btn btn-info" ng-click="exportCSV()"
+                    ng-disabled="!totalList.length" function-type="export">下載CSV</button>
+        </div>
+    </div>
+    <!-- 結果區 -->
+    <h4 class="h4-title">查詢結果</h4>
+    <e-jumping-once output="outputVO" list="paramList" totallist="totalList"></e-jumping-once>
+    <div class="gv_tab_sc" style="white-space: nowrap;min-height:235px;overflow-x: auto;">
+        <table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+            <thead>
+            <tr>
+                <th function-type="maintenance">功能</th>
+                <th>保險公司</th>
+                <th>英文代碼</th>
+                <th>核准文號</th>
+                <th>保險產品</th>
+                <th>主推商品</th>
+                <th>保險產品簡稱</th>
+                <th>主附約別</th>
+                <th>可附加附約</th>
+                <th>產品上架日</th>
+                <th>開始銷售日</th>
+                <th>停止銷售日</th>
+                <th>保費必輸檢核-目標保費</th>
+                <th>保費必輸檢核-超額保費</th>
+                <th>產品大分類</th>
+                <th>產品中分類</th>
+                <th>保額型態</th>
+                <th>平台</th>
+                <th>年化佣金註記</th>
+                <th>商品幣別</th>
+                <th>案件來源</th>
+                <th>產品風險</th>
+                <th>風險等級</th>
+                <th>目標佣金率</th>
+                <th>超額佣金率</th>
+                <th>浮動佣金率</th>
+                <th>續期佣金率</th>
+                <th>繳費年期狀態</th>
+                <th>繳費年期</th>
+                <th>保障期狀態</th>
+                <th>保障年期</th>
+                <th>產品年期</th>
+                <th>備註</th>
+                <th>轉換保單</th>
+                <th>證照檢核-壽險證照</th>
+                <th>證照檢核-投資證照</th>
+                <th>證照檢核-外幣商品證照</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="repeat-row" ng-repeat="row in paramList track by $index">
+                <td function-type="maintenance">
+                    <e-combobox id="cmbAction" name="cmbAction"
+                                ng-datasource="mappingSet['ACTION']"
+                                ng-model="row.cmbAction"
+                                ng-validate="false"
+                                ng-readonly="false"
+                                ng-editable="false"
+                                ng-format="F3"
+                                ng-required="false"
+                                ng-change="action(row)"
+                                width="100px"
+                                style="line-height:20px;"
+                </td>
+                <td ng-bind="row.CNAME"></td>
+                <td ng-bind="row.PRODUCTID"></td>
+                <td ng-bind="row.MOF"></td>
+                <td ng-bind="row.PRODUCTNAME"></td>
+                <td ng-bind="row.MAINSTAY_PRODUCT"></td>
+                <td ng-bind="row.PRODUCTSHORTNAME"></td>
+                <td ng-bind="row.CONTRACTID"></td>
+                <td ng-bind="row.ADDSUB_FLAG"></td>
+                <td ng-bind="toJsDate(row.PRODUCTON_DT) | date:'yyyy/MM/dd'"></td>
+                <td ng-bind="toJsDate(row.PRODUCTVALIDFROM) | date:'yyyy/MM/dd'"></td>
+                <td ng-bind="toJsDate(row.PRODUCTVALIDTHRU) | date:'yyyy/MM/dd'"></td>
+                <td ng-bind="row.COMM1_FLAG"></td>
+                <td ng-bind="row.COMM2_FLAG"></td>
+                <td ng-bind="row.PRODUCTTYPE1"></td>
+                <td ng-bind="row.PRODUCTCATEGORY"></td>
+                <td ng-bind="row.SUMASSUMEDTYPE"></td>
+                <td ng-bind="row.PREMIUMTABLE"></td>
+                <td ng-bind="row.CONTRACTBONUS"></td>
+                <td ng-bind="row.CURRENCY1"></td>
+                <td ng-bind="row.CHANNEL"></td>
+                <td ng-bind="row.PRODUCTRISK"></td>
+                <td ng-bind="row.RISKRATE"></td>
+                <td ng-bind="row.COMMRATE"></td>
+                <td ng-bind="row.COMMRATEA"></td>
+                <td ng-bind="row.COMMRATEC"></td>
+                <td><a ng-click="viewBound(row)">檢視</a></td>
+                <td ng-bind="row.PRODUCTPUDTYPE"></td>
+                <td ng-bind="row.PRODUCTPUD"></td>
+                <td ng-bind="row.PRODUCTEDTYPE"></td>
+                <td ng-bind="row.PRODUCTED"></td>
+                <td ng-bind="row.PRODUCTEXPDATE"></td>
+                <td ng-bind="row.MEMO"></td>
+                <td ng-bind="row.CH_FLAG"></td>
+                <td ng-bind="row.A_FLAG"></td>
+                <td ng-bind="row.B_FLAG"></td>
+                <td ng-bind="row.C_FLAG"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

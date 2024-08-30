@@ -1,0 +1,419 @@
+<style>
+/* open dialog */
+.ngdialog.PMS304 {
+
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+/* dialog panl */
+.modal-dialog.PMS304 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+/*
+.PMS304 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+*/
+.PMS304 table.little {
+	width: 89%;
+}
+/* change row */
+.PMS304.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+/* scroll && height */
+.scroll_PMS304_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.spec{
+margin-top: -3px;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+
+
+</style>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS357/PMS357.js"></script>
+<script type="text/javascript" src="assets/txn/PMS357/PMS357_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS357/PMS357_EDIT.js"></script>
+
+<div class="PMS357" ng-controller="PMS357Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab
+					style="width: 100%;">
+					<table>
+						<tr>
+							<th><r color="red">*</r>報表年月：</th>
+							<td><e-combobox ng-datasource="mappingSet['timeE']"
+									ng-model="inputVO.sTime" ng-validate="false"
+									ng-readonly="false" ng-editable="false" ng-format="F3"
+									ng-required="true" width="200px" height="30px"
+									ng-change="dataMonthChange()" style="line-height:20px;" /></td>
+
+							<th>*查詢類型</th>
+							<td><e-combobox ng-datasource="mappingSet['seture']"
+									ng-model="inputVO.checked" ng-validate="false"
+									ng-readonly="false" ng-editable="false" ng-format="F3"
+									 width="200px" height="30px"
+									style="line-height:20px;" ng-required="true" /></td>
+
+							<td ng-show="chk_role" colspan="2">
+								<button type="button" class="btn btn-info" ng-click="btnNew()">上傳分攤後實績</button>&nbsp;
+								<button type="button" class="btn btn-info" ng-click="detail()">檢視檔案上傳結果</button>&nbsp;
+								<button type="button" class="btn btn-info" ng-click="runJob()">計算報表</button>
+							</td>
+
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td><e-combobox id="region_center_id" name="region_center_id"
+											ng-datasource="REGION_LIST"
+											ng-model="inputVO.region_center_id"
+											ng-validate="false"
+											ng-disabled="disableRegionCombo"
+											ng-readonly="disableRegionCombo"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="ChangeRegion()"
+											width="200px"
+											style="line-height:20px;" />
+							</td>
+
+							<th>營運區：</th>
+							<td><e-combobox id="branch_area_id" name="branch_area_id"
+											ng-datasource="AREA_LIST"
+											ng-model="inputVO.branch_area_id"
+											ng-validate="false"
+											ng-disabled="disableAreaCombo"
+											ng-readonly="disableAreaCombo"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="ChangeArea()"
+											width="200px"
+											style="line-height:20px;" />
+							</td>
+
+							<th>分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+											ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.branch_nbr"
+											ng-validate="false"
+											ng-disabled="disableBranchCombo"
+											ng-readonly="disableBranchCombo"
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="false"
+											ng-change="ChangeBranch()"
+											width="150px"
+											style="line-height:20px;" />
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-disabled="csvList.length==0" ng-click="export()">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<!-- <e-jumping output="outputVO" input="inputVO" query="query()"
+				list="paramList"></e-jumping> -->
+
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：不定時</td>
+					</tr>
+					<tr>
+						<td>產出日：{{toJsDate(paramList[0].CREATETIME) | date:'yyyy/MM/dd'}}</td>
+					</tr>
+					<tr>
+						<td>【註1】「其他」包含庫存現金計價利息、學貸利差等項目；「手續費費用」包含跨行服務費、外匯手續費等項目。</td>
+					</tr>
+					<tr>
+						<td>【註2】達成率計算公式為：1+[(實際數-目標數)/絕對值目標數]%，例如：目標值為-100，實際數為-120，其達成率為﹝1+(-120-(-100))/100﹞=﹝1+(-20)/100﹞= 80/100 =80% )</td>
+					</tr>
+					<tr>
+						<td>【註3】達成率為負數者，此項指標的KPI考核分數以0%計。</td>
+					</tr>
+
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<div class="gv_tab_sc scroll_y" style="min-height: 600px; white-space: nowrap;" id="wrap">
+					<table class="e-table-freeze" e-height="500px" e-mode="3" e-top="true" e-left="4" e-list="paramList">
+						<thead class="spec">
+							<tr class="middle">
+
+								<th rowspan="3">業務處</th>
+								<th rowspan="3">營運區</th>
+								<th rowspan="3">分行代碼</th>
+								<th rowspan="3">分行名稱</th>
+								<th colspan="4">A.利息淨收益</th>
+								<th colspan="7">B.非利息淨收益</th>
+								<th colspan="4">C.營業支出</th>
+								<th rowspan="3">提存前分攤後損益<br>實際數(A+B+C)</th>
+								<th rowspan="3"><m ng-show="inputVO.checked=='1'">當月</m>
+									<y ng-show="inputVO.checked=='2'">當年</y>目標</th>
+								<th rowspan="3"><m ng-show="inputVO.checked=='1'">當月</m>
+									<y ng-show="inputVO.checked=='2'">當年</y>達成率</th>
+
+							</tr>
+							<tr class="middle">
+								<th rowspan="2">存款利差</th>
+								<th rowspan="2">房貸利差</th>
+								<th rowspan="2">信貸利差</th>
+								<th rowspan="2">其他</th>
+								<th colspan="5">手續費淨收益</th>
+								<th rowspan="2">評價及已實現損益</th>
+								<th rowspan="2">其他淨收益</th>
+								<th rowspan="2">營業費用</th>
+								<th rowspan="2">其他成本</th>
+								<th rowspan="2">內部計價成本</th>
+								<th rowspan="2">分攤費用</th>
+							</tr>
+							<tr class="middle">
+								<th>存匯手續費收入</th>
+								<th>信託及保管業務收入</th>
+								<th>理財商品收入</th>
+								<th>放款手續費收入</th>
+								<th>手續費費用</th>
+							</tr>
+						</thead>
+						<tbody>
+
+							<tr
+								ng-repeat-start=" (a,dataA) in paramList | groupBy: 'REGION_CENTER_NAME' as resultA">
+								<td rowspan="{{ dataA.length + numGroups(dataA)*2 + 1}}">{{a}}</td>
+							</tr>
+							<tr
+								ng-repeat-start=" (b, dataB) in dataA  | groupBy: 'BRANCH_AREA_NAME' as resultB">
+								<td rowspan="{{dataB.length + 1}}" ng-hide="b == 'REGION' || b == 'AREA'">{{b}}</td>
+							</tr>
+							<tr ng-repeat=" c in dataB">
+							<td colspan="3" align="center" ng-show="c.YEARMON == 'REGION'">{{c.REGION_CENTER_NAME}} 合計</td>
+							<td colspan="2" align="center" ng-show="c.YEARMON == 'AREA'">{{c.BRANCH_AREA_NAME}} 合計</td>
+							<td ng-hide="c.YEARMON == 'REGION' || c.YEARMON == 'AREA' ">{{c.BRANCH_NBR }}</td>
+							<td ng-hide="c.YEARMON == 'REGION' || c.YEARMON == 'AREA' ">{{c.BRANCH_NAME }}</td>
+								<td align="right">{{c.NIT_DEPST | number:0}}</td>
+								<td align="right">{{c.NIT_HLOAN | number:0}}</td>
+								<td align="right">{{c.NIT_CREDIT | number:0}}</td>
+								<td align="right">{{c.NIT_OTHER | number:0}}</td>
+								<td align="right">{{c.UNNIT_DEPST | number:0}}</td>
+								<td align="right">{{c.UNNIT_TUST | number:0}}</td>
+								<td align="right">{{c.UNNIT_CON | number:0}}</td>
+								<td align="right">{{c.UNNIT_LOAN | number:0}}</td>
+								<td align="right">{{c.UNNIT_EXP | number:0}}</td>
+								<td align="right">{{c.UNNIT_LOSS | number:0}}</td>
+								<td align="right">{{c.UNNIT_OTHER | number:0}}</td>
+								<td align="right">{{c.OP_EXPEN | number:0}}</td>
+								<td align="right">{{c.OP_OTHER | number:0}}</td>
+								<td align="right">{{c.OP_INTER | number:0}}</td>
+								<td align="right">{{c.OP_SHARE | number:0}}</td>
+								<td align="right">{{c.BR_PROFIT_LOSS | number:0}}</td>
+								<td align="right">{{c.TARGET | number:0}}</td>
+								<td align="right">{{c.RATE | number:'2'}}%</td>
+							</tr>
+							<tr ng-repeat-end>
+<!--
+								<td colspan="3" align="center">{{b}} 合計</td>
+								<td align="right">{{getSum(dataB, 'NIT_DEPST') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'NIT_HLOAN') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'NIT_CREDIT') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'NIT_OTHER') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'UNNIT_DEPST') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'UNNIT_TUST') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'UNNIT_CON') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'UNNIT_LOAN') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'UNNIT_EXP') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'UNNIT_LOSS') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'UNNIT_OTHER') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'OP_EXPEN') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'OP_OTHER') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'OP_INTER') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'OP_SHARE') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'BR_PROFIT_LOSS') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataB, 'TARGET') | number:0}}</td>
+								<td align="right">{{getSum(dataB, 'BR_PROFIT_LOSS')*100/getSum(dataB, 'TARGET') | number:'2'}}%</td>
+ -->
+							</tr>
+
+							<tr ng-repeat-end>
+<!--
+								<td colspan="4"  align="center">{{a}} 合計</td>
+								<td align="right">{{getSum(dataA, 'NIT_DEPST') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'NIT_HLOAN') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'NIT_CREDIT') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'NIT_OTHER') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'UNNIT_DEPST') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'UNNIT_TUST') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'UNNIT_CON') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'UNNIT_LOAN') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'UNNIT_EXP') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'UNNIT_LOSS') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'UNNIT_OTHER') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'OP_EXPEN') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'OP_OTHER') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'OP_INTER') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'OP_SHARE') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'BR_PROFIT_LOSS') |
+									number:0}}</td>
+								<td align="right">{{getSum(dataA, 'TARGET') | number:0}}</td>
+								<td align="right">{{getSum(dataA, 'BR_PROFIT_LOSS')*100/getSum(dataA, 'TARGET') |
+									number:'2'}}%</td>
+ -->
+							</tr>
+							<!-- 問題單號0001627 -->
+							<tr ng-show = "inputVO.region_center_id == '' && paramList != ''">
+								<td colspan="4"  align="center">全行合計</td>
+								<td align="right">{{getSum(paramList, 'NIT_DEPST') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'NIT_HLOAN') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'NIT_CREDIT') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'NIT_OTHER') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'UNNIT_DEPST') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'UNNIT_TUST') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'UNNIT_CON') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'UNNIT_LOAN') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'UNNIT_EXP') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'UNNIT_LOSS') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'UNNIT_OTHER') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'OP_EXPEN') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'OP_OTHER') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'OP_INTER') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'OP_SHARE') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'BR_PROFIT_LOSS') |
+									number:0}}</td>
+								<td align="right">{{getSum(paramList, 'TARGET') | number:0}}</td>
+								<td align="right">{{getSum(paramList, 'BR_PROFIT_LOSS')*100/getSum(paramList, 'TARGET') |
+									number:'2'}}%</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div algin="left">
+				<table>
+					<tr>
+						<td align="left">說明：</td>
+						<td align="left"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

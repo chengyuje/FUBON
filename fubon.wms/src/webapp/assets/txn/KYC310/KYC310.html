@@ -1,0 +1,258 @@
+<style>
+<!--
+.search_table_spacing{
+	width: 20%;
+}
+input.bLarger{width: 20px; height: 20px;}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/KYC310/KYC310.js"></script>
+<script type="text/javascript" src="assets/txn/KYC311/KYC311.js"></script>
+<script type="text/javascript" src="assets/txn/KYC310/KYC310_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/KYC310/KYC310_REASON.js"></script>
+
+<div ng-controller="KYC310Controller" ng-cloak>
+    <div class="tfb_content">
+      <div class="tfb_content_icon"></div>
+      <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a16.gif" >資料查詢 </div>
+    </div>
+    <!--Content of the panel-->
+    <div class="panel_content">
+      <div class="search_table">
+      <table>
+      <tr>
+      	<th>客戶ID/統編：</th>
+      	<td>
+      		<input id="title_cust_id" name="title_cust_id" type="text" placeholder="請輸入..." ng-model="inputVO.CUST_ID" width="30%" style="text-transform: uppercase;" ng-change="inputVO.CUST_ID=inputVO.CUST_ID.toUpperCase();">
+      	</td>
+      	<th>解說人員：</th>
+      	<td>
+      		<input id="commentary_staff" name="commentary_staff" type="text" placeholder="請輸入..." ng-model="inputVO.COMMENTARY_STAFF" width="30%">
+      	</td>
+      	<td>
+      		<button ng-click="queryData()" class="btn btn-info">查詢</button>
+      	</td>
+      	<td>
+      		最近一次投資風險屬性：
+      		<div ng-if="lastrisklevel" style="display: inline;">
+      			{{lastrisklevel[0].LASTDATE}}&nbsp;{{lastrisklevel[0].CUST_RISK_AFR}}({{lastrisklevel[0].RL_NAME}})
+      		</div>
+      	</td>
+      </tr>
+      </table>
+      </div>
+	<div class="gv_tab_sc scroll_y">
+		<table>
+			<tr>
+				<th>第一部分：個人基本資料</th>
+			</tr>
+			<tr>
+				<td>
+					<div style="display: inline;">
+						姓名(Name)
+						<input id="cust_name" name="cust_name" type="text" ng-model="inputVO.cust_name" placeholder="請輸入..." ng-disabled="company">
+					</div>
+					<div style="display: inline;" >
+						性別(Gender)
+						<input type="checkbox" ng-model="inputVO.gender_M" ng-disabled="inputVO.gender_W || company">男(Male)
+						<input type="checkbox" ng-model="inputVO.gender_W" ng-disabled="inputVO.gender_M || company">女(Female)
+					</div>
+					<div style="display: inline;">
+						身分證字號(ID Number)
+						<input id="cust_id" name="cust_id" type="text" ng-model="inputVO.cust_id" placeholder="請輸入..." style="text-transform: uppercase;" ng-disabled="company" ng-change="inputVO.cust_id=inputVO.cust_id.toUpperCase();">
+					</div>
+					<div style="display: inline;">
+						出生日期(Date of Birth)
+					</div>
+					<div style="display: inline-table;">
+						<div class="input-group datebox datewidth" style="top:10px">
+							<input type="text" id="birthday" name="birthday" 
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.birthday"
+								is-open="model.a"
+								datepicker-options="bgn_sDateOptions"
+								ng-readonly="true"
+							/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="querybirthday">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label><input ng-change="checkupdate()" type="radio" name="group" ng-model="inputVO.Y_N_update" ng-value="1" ng-disabled="company" required>無須更新本行留存資料(No need to update)</label>
+					<label><input ng-change="checkupdate()" type="radio" name="group" ng-model="inputVO.Y_N_update" ng-value="2" ng-disabled="company" required>更新資料如下(Update as following)</label>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="display: inline;">教育程度(Education)：</div>
+						<div ng-repeat="row in mappingEDUCATION track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" style="display: inline;">
+							<label><input ng-disabled="noupdatedata" type="radio" name="education_group" ng-model="inputVO.EDUCATION" ng-value="row.DATA" ng-change="checkEDUCTION()" required>({{$index+1}}){{row.LABEL}}&nbsp;
+							</label>
+						</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="display: inline;">職業(Occupation)：</div>
+						<div ng-repeat="row in mappingCAREER track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" style="display: inline;">
+							<label><input ng-disabled="noupdatedata" type="radio" name="career_group" ng-model="inputVO.CAREER" ng-value="row.DATA" required>({{row.DATA}}){{row.LABEL}}&nbsp;
+							</label>
+						</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="display: inline;">婚姻(Marital Status)：</div>
+						<div ng-repeat="row in mappingMARRAGE track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" style="display: inline;">
+							<label ng-show="row.LABEL !== '其他'"> <!-- KYC 婚姻沒有其他選項 -->
+								<input ng-disabled="noupdatedata" type="radio" name="marrage_group" ng-model="inputVO.MARRAGE" ng-value="row.DATA" required>({{$index+1}}){{row.LABEL}}&nbsp;
+							</label>
+						</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="display: inline;">子女人數(Children)：</div>
+						<div ng-repeat="row in mappingCHILD_NO track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" style="display: inline;">
+							<label><input ng-disabled="noupdatedata" type="radio" name="child_no_group" ng-model="inputVO.CHILD_NO" ng-value="row.DATA" required>({{$index+1}}){{row.LABEL}}&nbsp;
+							</label>
+						</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="display: inline;">聯絡電話(Contact Number)：</div>
+					<div style="display: inline;">
+						<input type="checkbox" ng-model="inputVO.DAY_TYPE" ng-disabled="noupdatedata" ng-change="telephoneChange(inputVO.DAY_TYPE,'DAY')">
+						日(Day)
+						<input id="day" name="day" type="text" ng-model="inputVO.DAY" placeholder="請輸入..." ng-disabled="noupdatedata || inputVO.DAY_TYPE == false" ng-change="chkPhone('DAY');">
+					</div>
+					<div style="display: inline;">
+						<input type="checkbox" ng-model="inputVO.NIGHT_TYPE" ng-disabled="noupdatedata" ng-change="telephoneChange(inputVO.NIGHT_TYPE,'NIGHT')">
+						夜(Night)
+						<input id="night" name="night" type="text" ng-model="inputVO.NIGHT" placeholder="請輸入..." ng-disabled="noupdatedata || inputVO.NIGHT_TYPE == false" ng-change="chkPhone('NIGHT');">
+					</div>
+					<div style="display: inline;">
+						<input type="checkbox" ng-model="inputVO.TEL_NO_TYPE" ng-disabled="noupdatedata" ng-change="telephoneChange(inputVO.TEL_NO_TYPE,'TEL_NO')">
+						行動(Mobile)
+						<input id="tel_no" name="tel_no" type="text" ng-model="inputVO.TEL_NO" placeholder="請輸入..." ng-disabled="noupdatedata || inputVO.TEL_NO_TYPE == false" e-input-limit="N">
+					</div>
+					<div style="display: inline;">
+						<input type="checkbox" ng-model="inputVO.FAX_TYPE" ng-disabled="noupdatedata" ng-change="telephoneChange(inputVO.FAX_TYPE,'FAX')">
+						傳真(Fax)
+						<input id="fax" name="fax" type="text" ng-model="inputVO.FAX" placeholder="請輸入..." ng-disabled="noupdatedata || inputVO.FAX_TYPE == false" e-input-limit="N">
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="display: inline;">通訊地址(Mailing Address)：</div>
+					<div style="display: inline;">
+						<input style="width: 500px;" id="cust_addr_1" name="cust_addr_1" type="text" ng-model="inputVO.CUST_ADDR_1"  placeholder="請輸入..." ng-blur="ChangeToFullWidth(inputVO.CUST_ADDR_1)" ng-disabled="noupdatedata">
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="display: inline;">電子郵件(E-mail Address)：</div>
+					<div style="display: inline;">
+						<input style="width: 500px;" maxlength="100" id="email_addr" name="email_addr" type="text" ng-model="inputVO.EMAIL_ADDR"  placeholder="請輸入..." ng-blur="checkEmail()">
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div>領用全民健康保險重大傷病證明(With Proofof Major Illness and Injury of National Health Insurance)：</div>
+					<div ng-repeat="row in mappingHEALTH track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<label><input ng-disabled="noupdatedata" type="radio" name="sick_type_group" ng-model="inputVO.SICK_TYPE" ng-value="row.DATA" ng-change="checksicktype()" required>
+							{{row.LABEL}}
+						</label>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="gv_tab_sc scroll_y">
+		<table>
+			<tr>
+				<th>第二部分：財務背景、投資經驗、投資需求與風險偏好</th>
+			</tr>
+			<tr>
+				<td>
+					<table ng-repeat="row in quest_list track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<tr>
+							<td width="0.5%">Q{{$index+1}}.{{row.QUESTION_DESC}}({{row.QUESTION_DESC_ENG}})</td>
+						</tr>
+						<tr ng-repeat="row1 in row.ANSWER_LIST track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" 
+							ng-if="row.QST_NO != '3' && ((row.QUEST_TYPE == '02' && row.QST_NO != '11') || (row.QUEST_TYPE == '03' && row.QST_NO != '9'))">
+							<td style="padding-left: 20px;">
+								<div ng-if="row.QUESTION_TYPE != 'S'">
+									<input class="bLarger" type="checkbox" ng-model="row1.select">
+									{{row1.ANSWER_DESC}}({{row1.ANSWER_DESC_ENG}})
+								</div>
+								<div ng-if="row.QUESTION_TYPE == 'S'">
+									<label><input class="bLarger" type="radio" name={{row.QUESTION_VERSION}} ng-model="row1.select" ng-value="true" ng-change="ansClear(row.ANSWER_LIST,row1)">
+									{{row1.ANSWER_DESC}}({{row1.ANSWER_DESC_ENG}})
+									</label>
+								</div>
+							</td>
+						</tr>
+						<!-- Q3 特別處理 !-->
+						<tr ng-if="row.QST_NO == '3'">
+							<td style="padding-left: 20px;">
+								<div style="width:90%;">
+								<table style="text-align:center;">
+								<tr>
+									<td style="width:140px;">&nbsp;</td>
+									<td style="width:100px;" ng-repeat="titleQ3 in inputVO.Q3_PROD_EXPList track by $index">{{titleQ3.LABEL_CH}}<br>({{titleQ3.LABEL_ENG}})</td>
+								</tr>
+								<tr ng-repeat="rowQ3 in inputVO.Q3_PROD_TYPEList track by $index" style="align:center;">
+									<td>{{rowQ3.LABEL_CH}}<br>({{rowQ3.LABEL_ENG}})</td>
+									<td ng-repeat="colQ3 in row.ANSWER_LIST track by $index" ng-if="rowQ3.DATA == colQ3.ANSWER_SEQ.toString().substring(0,1)">
+										<input class="bLarger" type="checkbox" ng-model="colQ3.select" ng-value="true" ng-disabled="colQ3.ansdisabled" ng-change="Q3AnsSelected(row.ANSWER_LIST, rowQ3.DATA, colQ3.ANSWER_SEQ.toString().substring(1,2))">
+									</td>
+								</tr>
+								</table>
+								</div>
+							</td>
+						</tr>
+						<!-- 自然人問卷Q11(原12題改為11題) or 法人問卷Q9 特別處理 !-->
+						<tr ng-if="((row.QUEST_TYPE == '02' && row.QST_NO == '11') || (row.QUEST_TYPE == '03' && row.QST_NO == '9'))">
+							<td><div>
+								<table>
+								<tr>
+									<td rowspan={{row.ANSWER_LIST.length+1}} style="width:15%;"><div><img src="assets/images/KYC_Q11.jpg" ></div></td>
+								</tr>
+								<tr ng-repeat="row1 in row.ANSWER_LIST track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" >
+									<td style="padding-left: 20px; width:85%;" >
+										<div ng-style="setQ11Style($index)">
+											<label><input class="bLarger" type="radio" name={{row.QUESTION_VERSION}} ng-model="row1.select" ng-value="true" ng-change="ansClear(row.ANSWER_LIST,row1)">
+											{{row1.ANSWER_DESC}}({{row1.ANSWER_DESC_ENG}})
+											</label>
+										</div>
+									</td>
+								</tr>								
+								</table>
+							</div></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+    </div>
+	<div class="search_box_btn text-center">
+		<button ng-disabled="majorSick" ng-click="checkPSR()" class="btn btn-info">填寫完成</button>
+		<button ng-click="Initial()" class="btn btn-info">清除</button>
+		<button ng-disabled="majorSick" ng-click="printNewQuestionnaire('CH')" class="btn btn-info">列印空白表單</button>
+		<button ng-disabled="majorSick" ng-click="printNewQuestionnaire('ENG')" class="btn btn-info">列印英文空白表單</button>
+	</div>
+</div>

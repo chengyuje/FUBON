@@ -1,0 +1,127 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM431/CRM431.js"></script>
+<script type="text/javascript" src="assets/txn/CRM431/CRM431_DETAIL.js"></script>
+<div class="CRM431" ng-controller="CRM431Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a14.gif" >議價折扣授權</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>
+						<th>客戶ID：</th>
+						<td><input type="text" class="form-control" placeholder="請輸入..." id="custId" name="cust_id" ng-model="inputVO.cust_id" e-length-limit="12" style="width:180px; text-transform: uppercase;"></td>
+					</tr>
+					<tr>
+						<th>授權狀態：</th>
+						<td>
+							<label ng-repeat="apply in APPLY_STATUS track by $index">
+     							<input type="radio" name="selectedCodes[]" ng-model='inputVO.apply_status' ng-value="apply.DATA"> {{apply.LABEL}} &nbsp;&nbsp;
+							</label>							
+						</td>
+					</tr>
+					<tr>
+						<th>申請/同意/退回日期：</th>
+						<td>
+						     <div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="sdate" name="sdate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.auth_date_bgn"
+									   is-open="model.a"
+									   datepicker-options="sDateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>	
+							<div style="float: left">&nbsp;~&nbsp;</div>
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="edate" name="edate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.auth_date_end"
+									   is-open="model.b"
+									   datepicker-options="eDateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+							<font color="red">【金錢信託不適用「事先」議價授權申請及覆核】</font>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query();">查詢</button>
+				<span class="bigspace"></span>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+			</div>
+		</div>
+		<div class="tfb_content">
+     		<div class="tfb_content_icon"></div>
+     		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+  			</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>	
+							<th>授權序號</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>授權類型</th>
+							<th>商品類別</th>
+							<th>申請內容</th>
+							<th>申請時間</th>
+							<th>申請分行</th>
+							<th>申請理專姓名</th>
+							<th>狀態</th>
+							<th>目前關卡</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index">
+							<td>{{row.APPLY_SEQ}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+								<div uib-tooltip="{{row.CUST_NAME}}" tooltip-placement="right-bottom">
+									{{row.CUST_NAME.length > 4 ? (row.CUST_NAME | limitTo: 4) + "..." : row.CUST_NAME}}
+								</div>
+							</td>
+							<td>{{row.APPLY_CAT | mapping:mappingSet['CRM.APPLY.CAT']:F1 }}</td>
+							<td><label ng-if="row.APPLY_SEQ.indexOf('M')>-1">[金錢信託]</label>{{row.PROD_CAT | mapping:mappingSet['CRM.SINGLE_TYPE']:F1 }}</td>
+							<td align="left" style=" white-space: pre"><a href="#" onclick="return false" ng-click="detail(row)">{{row.PROD_NAME}}</a></td>
+							<td>{{toJsDate(row.APPLY_DATE) | date:"yyyy-MM-dd" }}</td>
+							<td>{{row.BRANCH_NBR == null ? '' : row.BRANCH_NBR + '-'}}{{row.BRANCH_NAME}}</td>
+							<td>{{row.AO_CODE == null ? '' : row.AO_CODE + '-'}}{{row.EMP_NAME}}</td>
+							<td>{{row.APPLY_STATUS | mapping:mappingSet['CRM.APPLY_STATUS']:F1}}</td>
+							<td>{{row.AUTH_STATUS | mapping:mappingSet['CRM.AUTH_STATUS']:F1}}</td>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+					
+					
+					
+					
+					
+					

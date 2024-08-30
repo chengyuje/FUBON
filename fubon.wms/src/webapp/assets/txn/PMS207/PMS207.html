@@ -1,0 +1,318 @@
+<style>
+
+.PMS203 table.little{
+	width: 89%;
+}
+/* change row */
+
+.PMS203.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+/* scroll && height */
+.scroll_PMS207_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+/*
+.alignleft{
+	text-align: left !important;
+}
+*/
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.thick {
+    font-weight: bold;
+}
+.thick td{
+    padding: 5px;
+    text-align: center;
+    white-space: nowrap;
+}
+.tb1 {
+	border: 1px solid gray;
+	border-collapse: collapse;
+}
+.tb1 td {
+	text-align: right;
+}
+.tb1 th {
+	text-align: left;
+}
+#rsTitle {
+	margin-left: 15px; 
+	margin-right: 15px;	
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS207/PMS207.js"></script>
+<div class="PMS207" ng-controller="PMS207Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<div class="search_table search_box3">
+				<table>
+					<tr>						
+						<th> ＊ 計劃月份：</th>
+						<td>						 						 
+							<e-combobox id="dataMonth" name="dataMonth" 
+								ng-datasource="mappingSet['timeE']"
+								ng-model="inputVO.dataMonth"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-required="true"
+								ng-format="F3"
+								width="150px"
+								ng-change="limitDate();dateChange();"
+								style="line-height:20px;" />														
+						</td>
+						<th>統計類別：</th>
+						<td>							
+							<input type="radio" ng-model="inputVO.sttType" value="week" ng-click="showType()"><label>週統計</label>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" ng-model="inputVO.sttType" value="day" ng-click="showType()"><label>日統計</label>							
+						</td>		
+					</tr>
+					<tr>
+						<th> ＊分行名稱：</th>
+						<td>						 
+							<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-disabled="disableBranchCombo"
+							ng-readonly="disableBranchCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeBranch();opchage();"
+							width="150px"
+							style="line-height:20px;" />					 
+						</td>
+						<th> ＊ 理專：</th>
+						<td><e-combobox id="ao_code" name="ao_code"
+							ng-datasource="AO_LIST"
+							ng-model="inputVO.ao_code"
+							ng-validate="false"
+							ng-disabled="disableAoCombo"
+							ng-readonly="disableAoCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="true"
+							ng-change="ChangeAo_code();opchage();"
+							width="150px"
+							style="line-height:20px;" />						
+						</td>																
+					</tr>										
+				</table>
+			</div>
+			</form>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();inquireInit()">清除</button>
+			</div>
+		</div>
+	</div>
+		<div style="background-color: #d7edfa;">
+		<table id="rsTitle">
+			<tr>
+				<td width="40%" ng-show="inputVO.sttType=='week'">
+					<h4><font color="106987">&nbsp;個人月預估收益差異報表(週) (最後統計日期至：{{empDtl.length > 0 ? (toJsDate(empDtl[0].WEEK_END_DATE) > curDate ? curDate : toJsDate(empDtl[0].WEEK_END_DATE)) : curDate | date:'yyyy/MM/dd'}})</font></h4>
+				</td>
+				<td width="40%" ng-show="inputVO.sttType=='day'">
+					<h4><font color="106987">&nbsp;個人月預估收益差異報表(日) (最後統計日期至：{{empDtl.length > 0 ? (toJsDate(empDtl[0].WEEK_END_DATE) > curDate ? curDate : toJsDate(empDtl[0].WEEK_END_DATE)) : curDate | date:'yyyy/MM/dd'}})</font></h4>
+				</td>
+				<td width="60%" align="right">
+					<table>
+						<tr class="thick">
+							<td>本月生產力目標&nbsp;&nbsp;</td>
+							<td><font color="red">{{empDtl.length > 0 ? empDtl[0].TARGET_AMT : 0 | number:0}}</font></td>
+							<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+							<td>預估達成率&nbsp;&nbsp;</td>
+							<td><font color="red">{{empDtl.length > 0 ? empDtl[0].EST_RATE : 0 | number}}%</font></td>
+							<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+							<td>實際達成率&nbsp;&nbsp;</td>
+							<td><font color="red">{{empDtl.length > 0 ? empDtl[0].ACT_RATE : 0 | number}}%</font></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+	<!-- 結果區 -->	
+	<div>
+		
+		<div>
+			<table width="100%">				
+				<tr>
+					<td width="36.4%">
+						<div class="tfb_content">
+							<div class="tfb_content_icon"></div>
+							<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"> 計劃 Profile </div>
+						</div>
+						<!--Content of the panel-->
+						<div class="panel_content">		    												
+							<div class="gv_tab_sc scroll_y" style="height:420px;white-space: nowrap;">
+								<table class="tb1">																
+									<tr>
+									 	<th width="50%">計劃表月份</th>
+									 	<td>{{dataMon}}</td>																			 				
+									</tr>
+									<tr>
+									 	<th>理專</th>
+									 	<td>{{aoEmp}}</td>																			 				
+									</tr>
+									<tr>
+									 	<th>職級</th>
+									 	<td>{{jobRank}}</td>																			 				
+									</tr>
+									<tr>
+									 	<th>MTD目標收益(台幣)</th>
+									 	<td align="right">{{actAMT | currency:''}}</td>																			 				
+									</tr>
+									<tr>
+									 	<th>MTD預估收益(台幣)</th>
+									 	<td align="right">{{row.EST_ROI | currency:''}}</td>																			 				
+									</tr>
+									<tr>
+									 	<th>MTD實際收益(台幣)</th>
+									 	<td align="right">{{row.ACT_ROI | currency:''}}</td>																			 				
+									</tr>
+									<!-- 
+									<tr ng-show="inputVO.sttType == 'day'">
+									 	<th>本月份銷量建議(台幣)</th>
+										<td align="right">{{actAMT | currency:'$'}}</td>																			 				
+									</tr>
+									<tr ng-show="inputVO.sttType == 'day'">
+									 	<th>本月份利潤建議(台幣)</th>
+									 	<td align="right">{{actROI | currency:'$'}}</td>																			 				
+									</tr>								
+									 -->
+								</table>				
+							</div>
+						</div>
+					</td>
+					<TD width="1.6%"></TD>
+					<td width="62%">
+						<div class="tfb_content">
+							<div class="tfb_content_icon"></div>
+							<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"> 收益趨勢圖 </div>
+						</div>
+						<!--Content of the panel-->
+						<div class="panel_content">		    												
+							<div class="gv_tab_sc scroll_y" style="height:420px;white-space: nowrap;">								
+								 <nvd3 ng-if="inputVO.sttType=='week' && paramList_w.length>0" options="options1" data="data"></nvd3>
+								 <nvd3 ng-if="inputVO.sttType=='day' && paramList_d.length>0" options="options2" data="data"></nvd3>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div>
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"> 預估與實際差異分析 </div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">		    												
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="rstable" ng-show="inputVO.sttType=='week'">
+						<thead>
+							<tr>
+								<th></th>
+								<th colspan="2">銷量</th>
+								<th colspan="2">收益</th>																				
+							</tr>
+							<tr>
+								<th>工作週別</th>
+								<th>預估</th>
+								<th>實際</th>
+								<th>預估</th>
+								<th>實際</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList_w track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							 	<th><a ng-click="edi(row)" style="cursor:pointer"> {{row.WORK_DT}} </a></th>							 	
+							 	<td align="right">{{row.EST_AMT | currency:''}}</td>
+							 	<td align="right">{{row.ACT_AMT | currency:''}}</td>
+							 	<td align="right">{{row.EST_ROI | currency:''}}</td>
+							 	<td align="right">{{row.ACT_ROI | currency:''}}</td>																				 				
+							</tr>
+							<tr ng-show="paramList_w.length > 0">
+								<th> 合計 </th>								
+								<td align="right">{{totEstAmt_w | currency:''}}</td>
+								<td align="right">{{totActAmt_w | currency:''}}</td>
+								<td align="right">{{totEstRoi_w | currency:''}}</td>
+								<td align="right">{{totActRoi_w | currency:''}}</td>
+							</tr>
+						</tbody>
+					</table>
+										
+				<table class="rstable" ng-show="inputVO.sttType=='day'">
+						<thead>
+							<tr>
+								<th></th>
+								<th colspan="2">銷量</th>
+								<th colspan="2">收益</th>																				
+							</tr>
+							<tr>
+								<th>工作週別</th>
+								<th>預估</th>
+								<th>實際</th>
+								<th>預估</th>
+								<th>實際</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList_d track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							 	<th><a ng-click="edi(row)" style="cursor:pointer"> {{row.WORK_DT}} </a></th>							 	
+							 	<td align="right">{{row.EST_AMT | currency:''}}</td>
+							 	<td align="right">{{row.ACT_AMT | currency:''}}</td>
+							 	<td align="right">{{row.EST_ROI | currency:''}}</td>
+							 	<td align="right">{{row.ACT_ROI | currency:''}}</td>																				 				
+							</tr>
+							<tr ng-show="paramList_d.length &gt; 0">
+								<th> 合計 </th>								
+								<td align="right">{{totEstAmt_d | currency:''}}</td>
+								<td align="right">{{totActAmt_d | currency:''}}</td>
+								<td align="right">{{totEstRoi_d | currency:''}}</td>
+								<td align="right">{{totActRoi_d | currency:''}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>		
+	</div>	
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,444 @@
+<style>
+/* open dialog */
+.ngdialog.PMS220 {
+}
+/* dialog panl */
+.modal-dialog.PMS220 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS220 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PMS220 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS220.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS220_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+.alignleft {
+	text-align: left !important;
+}
+.bigspace {
+	margin-left: 50px !important;
+}
+.datewidth {
+	width: 180px !important;
+}
+.search-table-outter {
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.clas tr th {
+	vertical-align: middle;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS220/PMS220.js"></script>
+<div class="PMS220" ng-controller="PMS220Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">請輸入查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td colspan="2">
+								<input type="radio" name="empHistRadio"  value="Y" checked/>查詢個人業績
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<input type="radio" name="empHistRadio"  value="N" />查詢轄下主管業績
+							</td>
+						</tr>
+						<tr>
+							<th>*報表年月</th>
+								<td><e-combobox ng-datasource="mappingSet['timeE']" ng-model="inputVO.sCreDate"
+								id="dataMonth" name="dataMonth" ng-change="dateChange();rptVersionChange()"
+								ng-validate="false" ng-readonly="false" ng-editable="false"
+								ng-format="F3" ng-required="true" width="110px" height="30px"
+								style="line-height:20px;" /></td>
+							<th>*報表版本：</th>
+							<td>						
+								<e-combobox id="eTime" name="rptVersion" ng-datasource="mappingSet['rversion']"
+								ng-model="inputVO.rptVersion" ng-validate="false" ng-readonly="false" 
+								ng-editable="false" ng-format="F3" 
+								ng-required="true" width="140px" height="30px" style="line-height:20px;" />						 
+							</td>
+							<th>業務處：</th>
+							<td>
+								<e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id"
+									ng-validate="false" 
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeRegion()"
+									width="135px"
+									style="line-height:20px;" />
+
+							<th>營運區：</th>
+							<td><e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeArea()"
+									width="110px"
+									style="line-height:20px;" /></td>
+						</tr>
+						<tr>
+							<th>&nbsp;分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch()"
+									width="110px"
+									style="line-height:20px;" /></td>
+								  
+							<th>&nbsp;人員類別：</th>
+							<td>						
+								<e-combobox id="eTime" name="personType" ng-datasource="mappingSet['personType']"
+								ng-model="inputVO.personType" ng-validate="false" ng-readonly="false" 
+								ng-editable="false" ng-format="F3" 
+								ng-required="false" width="140px" height="30px" style="line-height:20px;" />						 
+							</td>
+							<th>員工編號：</th>
+							<td><e-combobox id="ao_code" name="ao_code"
+									ng-datasource="EMP_LIST"
+									ng-model="inputVO.ao_code"
+									ng-validate="false"
+									ng-disabled="disableEmpCombo"
+									ng-readonly="disableEmpCombo" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeAo_code()"
+									width="135px"
+									style="line-height:20px;" /></td>
+							<th></th>
+							<td></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();inquireInit()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO"
+				query="inquire()" list="paramList"></e-jumping>
+			<div class="gv_tab_sc scroll_y"
+				style="height: 235px; white-space: nowrap;">
+				<table class="  table-bordered rstable middle">
+					<thead ng-if="role != 1">
+						<tr>
+							<th rowspan="2">資料年月</th>
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行代碼</th>
+							<th rowspan="2">分行別</th>
+							<th rowspan="2">分行組別</th>
+							<th rowspan="2">業務主管<br>組別</th>
+							<th rowspan="2">人員類別</th>
+							<th rowspan="2">員工編號</th>
+							<th rowspan="2">員工姓名</th>
+							<th colspan="6">財務指標-存投保</th>
+							<th colspan="4">財務指標-存款AUM(不含台定)</th>
+							<th colspan="4">財務指標-投保AUM</th>
+							<th rowspan="2">AUM得分</th>
+							<th colspan="5">財務指標-EIP客戶數</th>
+							<th colspan="2">財務指標-新客戶數</th>
+							<th rowspan="2">客戶數<br>達成率</th>
+							<th rowspan="2">客戶數得分</th>
+							<th rowspan="2">AUM+客戶數<br>得分</th>
+							<th rowspan="2">財務指標<br>得分</th>
+							<th rowspan="2">非財務指標扣減<br>百分比%</th>
+							<th rowspan="2">獨立列示重大缺失<br>扣減百分比%</th>
+							<th rowspan="2">缺失內容</th>
+						</tr>
+						<tr>
+							<!-- 財務指標-存投保 -->
+							<th>投保收益(a)</th>
+							<th>投保收益目標(b)</th>
+							<th>存款利差(c)</th>
+							<th>存款利差目標(d)</th>
+							<th>存投保達成率<br>=(a+c)/(b+d)</th>
+							<th>存投保得分</th>
+							<!-- 財務指標-存款AUM(不含台定) -->
+							<th>增量YTD<br>(含台定減量加回)</th>
+							<th>增量目標YTD</th>
+							<th>達成率YTD</th>
+							<th>得分</th>
+							<!-- 財務指標-投保AUM -->
+							<th>增量YTD</th>
+							<th>增量目標YTD</th>
+							<th>達成率YTD</th>
+							<th>得分</th>
+							<!-- 財務指標-EIP客戶數 -->
+							<th>E級客戶<br>增量YTD</th>
+							<th>I級客戶<br>增量YTD</th>
+							<th>P級客戶<br>增量YTD</th>
+							<th>EIP合計<br>增量YTD</th>
+							<th>EIP合計<br>增量目標YTD</th>
+							<!-- 財務指標-新客戶數 -->
+							<th>增量YTD</th>
+							<th>增量目標YTD</th>
+						</tr>
+					</thead>
+					<thead ng-if="role == 1">
+						<tr>
+							<th rowspan="2">資料年月</th>
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行代碼/<br>母行分行代碼</th>
+							<th rowspan="2">分行別/<br>母行別</th>
+							<th rowspan="2">分行組別/<br>區組別</th>
+							<th rowspan="2">業務主管<br>組別</th>
+							<th rowspan="2">人員類別</th>
+							<th rowspan="2">類別註記</th>
+							<th rowspan="2">員工編號</th>
+							<th rowspan="2">員工姓名</th>
+							<th colspan="6">財務指標-存投保</th>
+							<th colspan="6">財務指標-存款AUM(不含台定)</th>
+							<th colspan="6">財務指標-投保AUM</th>
+							<th rowspan="2">AUM得分</th>
+							<th colspan="10">財務指標-EIP客戶數</th>
+							<th colspan="4">財務指標-新客戶數</th>
+							<th rowspan="2">客戶數<br>達成率</th>
+							<th rowspan="2">客戶數得分</th>
+							<th rowspan="2">AUM+客戶數<br>得分</th>
+							<th rowspan="2">財務指標<br>得分</th>
+							<th rowspan="2">非財務指標扣減<br>百分比%</th>
+							<th rowspan="2">獨立列示重大缺失<br>扣減百分比%</th>
+							<th rowspan="2">缺失內容</th>
+						</tr>
+						<tr>
+							<!-- 財務指標-存投保 -->
+							<th>投保收益(a)</th>
+							<th>投保收益目標(b)</th>
+							<th>存款利差(c)</th>
+							<th>存款利差目標(d)</th>
+							<th>存投保達成率<br>=(a+c)/(b+d)</th>
+							<th>存投保得分</th>
+							<!-- 財務指標-存款AUM(不含台定) -->
+							<th>當月增量<br>(含台定減量加回)</th>
+							<th>當月增量目標</th>
+							<th>增量YTD<br>(含台定減量加回)</th>
+							<th>增量目標YTD</th>
+							<th>達成率YTD</th>
+							<th>得分</th>
+							<!-- 財務指標-投保AUM -->
+							<th>當月增量</th>
+							<th>當月增量目標</th>
+							<th>增量YTD</th>
+							<th>增量目標YTD</th>
+							<th>達成率YTD</th>
+							<th>得分</th>
+							<!-- 財務指標-EIP客戶數 -->
+							<th>E級客戶<br>當月增量</th>
+							<th>E級客戶<br>增量YTD</th>
+							<th>I級客戶<br>當月增量</th>
+							<th>I級客戶<br>增量YTD</th>
+							<th>P級客戶<br>當月增量</th>
+							<th>P級客戶<br>增量YTD</th>
+							<th>EIP合計<br>當月增量</th>
+							<th>EIP合計<br>當月目標</th>
+							<th>EIP合計<br>增量YTD</th>
+							<th>EIP合計<br>增量目標YTD</th>
+							<!-- 財務指標-新客戶數 -->
+							<th>當月增量</th>
+							<th>當月增量目標</th>
+							<th>增量YTD</th>
+							<th>增量目標YTD</th>
+						</tr>
+					</thead>
+					<tbody ng-if="role != 1">
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.YEARMON }}</td>
+							<td align="center">{{row.REGION_CENTER_NAME }}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME }}</td>
+							<td align="center">{{row.BRANCH_NBR }}</td>
+							<td align="center">{{row.BRANCH_NAME }}</td>
+							<td align="center">{{row.GROUP_ID }}</td>
+							<td align="center">{{row.MANAGER_GROUP }}</td>
+							<td align="center">
+								<span ng-if="row.PERSON_TYPE=='BM'">分行主管</span>
+								<span ng-if="row.PERSON_TYPE=='SH'">業務主管</span>
+								<span ng-if="row.PERSON_TYPE=='RD'">營運督導</span>
+							</td>
+							<td align="center">{{row.EMP_ID }}</td>
+							<td align="center">{{row.EMP_NAME }}</td>
+							<!-- 財務指標-存投保 -->
+							<td align="right">{{row.INS_INCOME }}</td>
+							<td align="right">{{row.INS_GOAL }}</td>
+							<td align="right">{{row.DEP_DIFF }}</td>
+							<td align="right">{{row.DEP_DIFF_GOAL }}</td>
+							<td align="right">{{row.INS_YIELD_RATE }}</td>
+							<td align="right">{{row.INS_SCORE }}</td>
+							<!-- 財務指標-存款AUM（不含台定) -->
+							<td align="right">{{row.DEP_AUM_IN_YTD }}</td>
+							<td align="right">{{row.DEP_AUM_IN_YTD_GOAL }}</td>
+							<td align="right">{{row.DEP_AUM_IN_YTD_RATE }}</td>
+							<td align="right">{{row.DEP_AUM_SC }}</td>
+							<!-- 財務指標-投保AUM -->
+							<td align="right">{{row.INC_INSU_AUM_YTD }}</td>
+							<td align="right">{{row.INC_INSU_AUM_YTD_GOAL }}</td>
+							<td align="right">{{row.INC_INSU_AUM_YTD_RATE }}</td>
+							<td align="right">{{row.INC_AUM_SC }}</td>
+							<td align="right">{{row.AUM_SC }}</td>
+							<!-- 財務指標-EIP客戶數 -->
+							<td align="right">{{row.E_CL_YTD }}</td>
+							<td align="right">{{row.I_CL_YTD }}</td>
+							<td align="right">{{row.P_CL_YTD }}</td>
+							<td align="right">{{row.EIP_ALL_CL_YTD }}</td>
+							<td align="right">{{row.EIP_ALL_CL_YTD_GOAL }}</td>
+							<!-- 財務指標-新客戶數 -->
+							<td align="right">{{row.NEW_CUST_CL_YTD }}</td>
+							<td align="right">{{row.NEW_CUST_CL_YTD_GOAL }}</td> 
+							<td align="right">{{row.CUST_ACH }}</td>
+							<td align="right">{{row.CUST_SCORE }}</td>
+							<td align="right">{{row.AUM_ICMT_ACH_SCORE }}</td>
+							<td align="right">{{row.FIN_IND_SC }}</td>
+							<td align="right">{{row.UN_FIN_IND_BONUS_RATE }}</td>
+							<td align="right">{{row.LACK_IND_RATE }}</td>
+							<td align="center">{{row.LOST_CONTENT}}</td>
+						</tr>
+					<tbody ng-if="role == 1">
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.YEARMON }}</td>
+							<td align="center">{{row.REGION_CENTER_NAME }}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME }}</td>
+							<td align="center">{{row.BRANCH_NBR }}</td>
+							<td align="center">{{row.BRANCH_NAME }}</td>
+							<td align="center">{{row.GROUP_ID }}</td>
+							<td align="center">{{row.MANAGER_GROUP }}</td>
+							<td align="center">
+								<span ng-if="row.PERSON_TYPE=='BM'">分行主管</span>
+								<span ng-if="row.PERSON_TYPE=='SH'">業務主管</span>
+								<span ng-if="row.PERSON_TYPE=='RD'">營運督導</span>
+							</td>
+							<td align="center">
+							    <span ng-if="row.PERSON_TYPE_NOTE=='1'">兼任</span>
+								<span ng-if="row.PERSON_TYPE_NOTE=='2'">暫代</span>
+							</td>
+							<td align="center">{{row.EMP_ID }}</td>
+							<td align="center">{{row.EMP_NAME }}</td>
+							<!-- 財務指標-存投保 -->
+							<td align="right">{{row.INS_INCOME }}</td>
+							<td align="right">{{row.INS_GOAL }}</td>
+							<td align="right">{{row.DEP_DIFF }}</td>
+							<td align="right">{{row.DEP_DIFF_GOAL }}</td>
+							<td align="right">{{row.INS_YIELD_RATE }}</td>
+							<td align="right">{{row.INS_SCORE }}</td>
+							<!-- 財務指標-存款AUM（不含台定) -->
+							<td align="right">{{row.DEP_AUM_IN }}</td>
+							<td align="right">{{row.DEP_AUM_IN_GOAL }}</td>
+							<td align="right">{{row.DEP_AUM_IN_YTD }}</td>
+							<td align="right">{{row.DEP_AUM_IN_YTD_GOAL }}</td>
+							<td align="right">{{row.DEP_AUM_IN_YTD_RATE }}</td>
+							<td align="right">{{row.DEP_AUM_SC }}</td>
+							<!-- 財務指標-投保AUM -->
+							<td align="right">{{row.INC_INSU_AUM }}</td>
+							<td align="right">{{row.INC_INSU_AUM_GOAL }}</td>
+							<td align="right">{{row.INC_INSU_AUM_YTD }}</td>
+							<td align="right">{{row.INC_INSU_AUM_YTD_GOAL }}</td>
+							<td align="right">{{row.INC_INSU_AUM_YTD_RATE }}</td>
+							<td align="right">{{row.INC_AUM_SC }}</td>
+							<td align="right">{{row.AUM_SC }}</td>
+							<!-- 財務指標-EIP客戶數 -->
+							<td align="right">{{row.E_CL }}</td>
+							<td align="right">{{row.E_CL_YTD }}</td>
+							<td align="right">{{row.I_CL }}</td>
+							<td align="right">{{row.I_CL_YTD }}</td>
+							<td align="right">{{row.P_CL }}</td>
+							<td align="right">{{row.P_CL_YTD }}</td>
+							<td align="right">{{row.EIP_ALL_CL }}</td>
+							<td align="right">{{row.EIP_ALL_CL_GOAL }}</td>
+							<td align="right">{{row.EIP_ALL_CL_YTD }}</td>
+							<td align="right">{{row.EIP_ALL_CL_YTD_GOAL }}</td>
+							<!-- 財務指標-新客戶數 -->
+							<td align="right">{{row.NEW_CUST_CL }}</td>
+							<td align="right">{{row.NEW_CUST_CL_GOAL }}</td> 
+							<td align="right">{{row.NEW_CUST_CL_YTD }}</td>
+							<td align="right">{{row.NEW_CUST_CL_YTD_GOAL }}</td> 
+							<td align="right">{{row.CUST_ACH }}</td>
+							<td align="right">{{row.CUST_SCORE }}</td>
+							<td align="right">{{row.AUM_ICMT_ACH_SCORE }}</td>
+							<td align="right">{{row.FIN_IND_SC }}</td>
+							<td align="right">{{row.UN_FIN_IND_BONUS_RATE }}</td>
+							<td align="right">{{row.LACK_IND_RATE }}</td>
+							<td align="center">{{row.LOST_CONTENT}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

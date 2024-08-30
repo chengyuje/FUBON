@@ -1,0 +1,107 @@
+<style>
+/*     .cust_bar_div { */
+/*         margin: 0px 0px 20px 0px; */
+/*     } */
+
+/*     .cust_bar_cust_input { */
+/*         width: 150px; */
+/*     } */
+
+/*     .cust_bar { */
+/*         width: 100%; */
+/*     } */
+
+/*     .cust_bar tr td { */
+/*         vertical-align: middle; */
+/*         font-size: 12px; */
+/*     } */
+
+/*     .cust_bar th { */
+/*         color: #FFE634; */
+/*         font-size: 14px; */
+/*     } */
+
+/*     .cust_bar2 { */
+/*         width: 100%; */
+/*     } */
+
+/*     .cust_bar2 tr td { */
+/*         padding: 5px 5px 5px 5px; */
+/*     } */
+    
+    .rstable tr th {
+	vertical-align:middle;
+	}
+
+</style>
+<div class="gv_tab_sc">
+    <table class="table-bordered rstable">
+        <tr>
+            <th width="10%">客戶ID:</th>
+            <td width="15%">
+                <input type="text"
+                       ng-model="fps300.inputVO.custId"
+                       class="form-control"
+                       style="width:150px; text-align: left; text-transform: uppercase;"
+                       ng-blur="searchCust()" />
+            </td>
+<!--             <td rowspan="2" width="5%"> -->
+<!--                 <a href="#" -->
+<!--                    data-toggle="modal" -->
+<!--                    class="btn btn-info btn-circle" -->
+<!--                    ng-click="fps300.searchCustDataPage()"> -->
+<!--                     <i class="glyphicon glyphicon-search"></i> -->
+<!--                 </a> -->
+<!--             </td> -->
+            <th width="10%">客戶姓名：</th>
+            <td width="15%">
+                <span ng-bind="fps300.getCustData().CUST_NAME"></span>
+            </td>
+            <th width="10%">年齡：</th>
+            <td width="15%">
+                <span ng-bind="fps300.getCustData().AGE"></span>
+            </td>
+            <th width="10%">專業投資人/效期：</th>
+            <td width="15%">  
+               	<flags ng-if="fps300.getCustData().CUST_PRO_FLAG && fps300.getCustData().CUST_PRO_FLAG != 'N'">Y</flags>
+               	<flags ng-if="fps300.getCustData().CUST_PRO_FLAG == 'N'">N</flags>
+               	<span ng-show="fps300.getCustData().CUST_PRO_DATE">/</span>
+               	<span ng-bind="toJsDate(fps300.getCustData().CUST_PRO_DATE) | date:'yyyy.MM.dd'"></span>
+           	</td>  
+            </td>
+        </tr>
+        <tr>
+        	<th></th>
+           	<td></td>        	
+            <th>KYC等級/效期：</th>
+            <td>
+                <span ng-bind="fps300.getCustData().KYC_LEVEL"></span>
+                <span ng-show="fps300.getCustData().KYC_DUE_DATE">/</span>
+                <span ng-bind="toJsDate(fps300.getCustData().KYC_DUE_DATE) | date:'yyyy.MM.dd'"></span>
+            </td>
+            <th>OBU註記：</th>
+            <td>
+                <span ng-bind="fps300.getCustData().OBU_FLAG"></span>
+            </td>
+            <th>年收入：</th>
+           	<td>
+               	<span ng-bind="fps300.getCustData().ANNUAL_INCOME_AMT"></span>
+           	</td>             	
+        </tr>
+        <tr>
+        	<th></th>
+           	<td></td>
+        	<th>薪資戶：</th>
+           	<td>
+               	<flags ng-if="fps300.getCustData().SAL_COMPANY == 'Y'">是</flags>
+               	<flags ng-if="fps300.getCustData().SAL_COMPANY == 'N'">否</flags>
+           	</td>        	
+           	<th>資金或收入主源：</th>
+           	<td>
+               
+           	</td>
+           	<th></th>
+           	<td></td>           	
+        </tr>                  
+    </table>   
+</div>

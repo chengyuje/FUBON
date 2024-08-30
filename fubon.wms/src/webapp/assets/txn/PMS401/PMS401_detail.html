@@ -1,0 +1,64 @@
+<style>
+.modal-dialog.PMS401 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<div ng-controller="PMS401_QUERYController" ng-cloak>
+	<div class="modal-dialog PMS401">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">該員當日存款異動明細</h4>
+			</div>
+			<div class="modal-body">
+				<button type="button" class="btn btn-success" ng-click="exportRPT()" ng-show="pri == '041' || pri == '042'"><span class="glyphicon glyphicon-save"></span>匯出</button>
+				<br><br>
+				<e-jumping output="outputVO" input="inputVO" query="queryDetail()" list="totalList"></e-jumping>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="table-bordered">
+						<tr>
+							<th>序號</th>
+							<th>資料日期</th>
+							<th>交易日期</th>
+							<th>行員ID</th>
+							<th>轉出/轉入</th>
+							<th>行員帳號</th>
+							<th>對方姓名</th>
+							<th>對方帳號</th>
+							<th>交易金額(台幣)</th>
+							<th>備註</th>
+							<th>摘要</th>
+							<th>交易序號</th>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in totalList track by $index">
+							<td style="text-align:center">{{row.ROWNUM}}</td>
+							<td style="text-align:center">{{row.SNAP_DATE}}</td>	
+							<td style="text-align:center">{{row.TX_DATE}}</td>	
+							<td style="text-align:center">{{row.EMP_ID}}</td>	
+							<td style="text-align:center">{{row.DRCR}}</td>		
+							<td style="text-align:center">{{row.ACCT_NBR_ORI}}</td>			
+							<td style="text-align:center">{{row.CUST_NAME}}</td>			
+							<td style="text-align:center">{{row.RCV_ACCT_NO}}</td>	
+							<td style="text-align:right;">{{row.TX_AMT | currency:'':0}}</td>	
+							<td style="text-align:center">{{row.REMK}}</td>	
+							<td style="text-align:center">{{row.MEMO}}</td>			
+							<td style="text-align:center">{{row.JRNL_NO}}</td>			
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,119 @@
+<style>
+.MGM113 .e_panel_table tr th {
+	background: #efefef;
+	color: black;
+	font-weight: bold;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MGM113/MGM113.js"></script>
+<div class="MGM113" ng-controller="MGM113Controller" ng-cloak>	
+	<div class="e_panel_table scroll_y" style="min-height: 450px">
+		</br>
+		<div class="ejborder">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>	
+		</div>					
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap; ">
+			<table>
+				<thead>
+					<tr>
+						<th>刪除</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.SEQ" e-query="inquire()">案件序號</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.MGM_CUST_ID" e-query="inquire()">推薦人ID</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="ORG.EMP_NAME" e-query="inquire()">推薦人姓名</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.MGM_SIGN_STATUS" e-query="inquire()">推薦簽署表狀態</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.BE_MGM_CUST_ID" e-query="inquire()">被推薦人ID</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.BE_MGM_CUST_NAME" e-query="inquire()">被推薦人姓名</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.BE_MGM_SIGN_STATUS" e-query="inquire()">被推薦簽署表狀態</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.MGM_START_DATE" e-query="inquire()">推薦日</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="CUST.BRA_NBR" e-query="inquire()">分行</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="ORG.EMP_NAME" e-query="inquire()">鍵機人員</e-sorter>
+						</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="MGM.CREATETIME" e-query="inquire()">鍵機日</e-sorter>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data">
+						<td align="center">
+              				<a href="#" data-toggle="modal" class="btn btn-warning btn-circle" ng-click="deleteRow(row)">
+              					<i class="glyphicon glyphicon-trash"></i>
+              				</a>
+              			</td>
+						<td>{{row.SEQ}}</td>
+						<td>{{row.MGM_CUST_ID}}</td>
+						<td>{{row.MGM_CUST_NAME}}</td>
+						<td ng-show="row.MGM_SIGN_STATUS == '1'">(未上傳)</td>
+						
+						<td ng-show="row.MGM_SIGN_STATUS == '2'">
+							<e-combobox id="action1" name="action1" 
+                            	ng-datasource="mappingSet['MGM.ACTION']"
+                            	ng-model="row.action1" 
+                            	ng-validate="false" 
+                            	ng-readonly="false" 
+                            	ng-editable="false" 
+                            	ng-format="F3" 
+                            	ng-required="true" 
+                            	ng-change="action(row.action1, '1', row)" 
+                            	width="110PX" height="30px" 
+                            	style="line-height:20px;" />
+                            	
+<!-- 							<button type="button" class="btn btn-info" ng-click="action('accept', '1', row)">覆核</button> -->
+<!-- 							<button type="button" class="btn btn-info" ng-click="action('reject', '1', row)">退回</button> -->
+						</td>
+						
+						<td ng-show="row.MGM_SIGN_STATUS == '3'">(已覆核)</td>
+						<td ng-show="row.MGM_SIGN_STATUS == '4'">(已退回)</td>
+						<td>{{row.BE_MGM_CUST_ID}}</td>
+						<td>{{row.BE_CUST_NAME}}</td>
+						<td ng-show="row.BE_MGM_SIGN_STATUS == '1'">(未上傳)</td>
+						
+						<td ng-show="row.BE_MGM_SIGN_STATUS == '2'">
+							<e-combobox id="action2" name="action2" 
+                            	ng-datasource="mappingSet['MGM.ACTION']"
+                            	ng-model="row.action2" 
+                            	ng-validate="false" 
+                            	ng-readonly="false" 
+                            	ng-editable="false" 
+                            	ng-format="F3" 
+                            	ng-required="true" 
+                            	ng-change="action(row.action2, '2', row)" 
+                            	width="110PX" height="30px" 
+                            	style="line-height:20px;" />
+                            	
+<!-- 							<button type="button" class="btn btn-info" ng-click="action('accept', '2', row)">覆核</button> -->
+<!-- 							<button type="button" class="btn btn-info" ng-click="action('reject', '2', row)">退回</button> -->
+						</td>
+						
+						<td ng-show="row.BE_MGM_SIGN_STATUS == '3'">(已覆核)</td>
+						<td ng-show="row.BE_MGM_SIGN_STATUS == '4'">(已退回)</td>
+						<td>{{toJsDate(row.MGM_START_DATE) | date:"yyyy/MM/dd"}}</td>
+						<td>{{row.BRA_NBR}}</td>
+						<td>{{row.EMP_NAME}}</td>
+						<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd"}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

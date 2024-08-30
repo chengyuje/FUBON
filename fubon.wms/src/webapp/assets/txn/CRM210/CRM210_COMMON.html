@@ -1,0 +1,593 @@
+<style>
+.formatWidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<!-- 基本資料 -->
+<div class="search_table search_box3">
+	<h4>基本資料</h4>
+	<table>
+     	<tr>
+     		<th ng-if="priID.startsWith('UHRM')"></th>
+     		<td ng-if="priID.startsWith('UHRM')"></td>
+     		<th ng-if="!priID.startsWith('UHRM')">歸屬行：</th>
+     		<td ng-if="!priID.startsWith('UHRM')">
+     			<e-combobox id="cust_02"
+							ng-datasource="mappingSet['branchsDesc']"
+							ng-model="inputVO.cust_02"
+			   				ng-editable="false"
+			   				ng-format="F1"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>
+			<th>理財會員等級：</th>
+     		<td>
+     			<e-combobox id="cust_04" 
+							ng-paramtype="CRM.VIP_DEGREE"
+							ng-model="inputVO.cust_04"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>     		
+			<th>貢獻度等級：</th>
+     		<td>
+     			<e-combobox id="cust_06" 
+							ng-paramtype="CRM.CON_DEGREE"
+							ng-model="inputVO.cust_06"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>
+     	</tr>
+     	<tr>
+     		<th>性別：</th>
+     		<td>
+     			<e-combobox id="cust_03" 
+							ng-paramtype="CRM.CUST_GENDER"
+							ng-model="inputVO.cust_03"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>出生年起：</th>
+			<td>
+				<div class="input-group datebox formatWidth">
+					<input 	type="text" id="cust_05_sDate" name="cust_05_sDate"
+							class="form-control" 
+							uib-datepicker-popup="yyyy"
+							ng-model="inputVO.cust_05_sDate" 
+							is-open="model.a"
+							datepicker-options="cust_05_sDateOptions" 
+							ng-readonly="true"
+							show-button-bar="true"
+							ng-change="limitDate()"/>
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+							<i class="glyphicon glyphicon-calendar"></i>
+						</button>
+					</span>
+				</div>
+			</td>
+			<th>出生年迄：</th>
+			<td>
+				<div class="input-group datebox formatWidth">
+					<input 	type="text" id="cust_05_eDate" name="cust_05_eDate"
+							class="form-control" 
+							uib-datepicker-popup="yyyy"
+							ng-model="inputVO.cust_05_eDate" 
+							is-open="model.b"
+							datepicker-options="cust_05_eDateOptions" 
+							ng-readonly="true"
+							show-button-bar="true"
+							ng-change="limitDate()" />
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+							<i class="glyphicon glyphicon-calendar"></i>
+						</button>
+					</span>
+				</div>
+			</td>
+     	</tr>
+     	<tr>
+     		<th>薪轉戶：</th>
+     		<td>
+     			<e-combobox id="cust_09" 
+							ng-paramtype="CRM.CRM210_SAL_ACC_YN"
+							ng-model="inputVO.cust_09"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>法金戶：</th>
+     		<td>
+     			<e-combobox id="cust_07" 
+							ng-paramtype="CRM.CRM210_CO_ACCT_YN"
+							ng-model="inputVO.cust_07"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>是否實動戶：</th>
+     		<td>
+     			<e-combobox id="IS_ACTUAL" 
+							ng-datasource="mappingSet['YN']"
+							ng-model="inputVO.IS_ACTUAL"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>
+     	</tr>
+     	<tr>
+     		<th>潛力客戶：</th>
+     		<td>
+     			<e-combobox id="cust_18" 
+							ng-datasource="mappingSet['YN']"
+							ng-model="inputVO.cust_18"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>W-8BEN(W-8BEN-E)：</th>
+     		<td>
+     			<e-combobox id="cust_w8ben" 
+							ng-paramtype="CRM.W8BEN_TYPE"
+							ng-model="inputVO.cust_w8ben"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>是否有承租保管箱：</th>
+     		<td>
+     			<e-combobox id="IS_VOC" 
+							ng-datasource="mappingSet['YN']"
+							ng-model="inputVO.IS_VOC"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>
+     	</tr>
+     </table>
+</div>
+<div class="search_table">
+    <input class="uniform_on" type='checkbox' id="cust_10" name="cust_10" ng-model='inputVO.cust_10' ng-true-value="'Y'" ng-false-value="'N'" />&nbsp客訴戶&nbsp&nbsp
+    <input class="uniform_on" type='checkbox' id="cust_11" name="cust_11" ng-model='inputVO.cust_11' ng-true-value="'Y'" ng-false-value="'N'" />&nbsp專業投資人&nbsp&nbsp
+    <input class="uniform_on" type='checkbox' id="cust_12" name="cust_12" ng-model='inputVO.cust_12' ng-true-value="'Y'" ng-false-value="'N'" />&nbsp可推介&nbsp&nbsp
+    <input class="uniform_on" type='checkbox' id="cust_13" name="cust_13" ng-model='inputVO.cust_13' ng-true-value="'Y'" ng-false-value="'N'" />&nbsp拒銷戶(RS)&nbsp&nbsp
+    <input class="uniform_on" type='checkbox' id="cust_14" name="cust_14" ng-model='inputVO.cust_14' ng-true-value="'Y'" ng-false-value="'N'" />&nbsp禁銷戶(NS)&nbsp&nbsp
+    <input class="uniform_on" type='checkbox' id="cust_15" name="cust_15" ng-model='inputVO.cust_15' ng-true-value="'Y'" ng-false-value="'N'" />&nbspC0&nbsp&nbsp
+</div>
+<hr>
+<!-- 資產查詢 -->
+<div class="search_table">
+	<h4>資產查詢</h4>	
+	<table>
+     	<tr>
+     		<th width="10%">資產總餘額：</th>
+     		<td width="23%">
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_total_s" name="amt_total_s" ng-model="inputVO.amt_total_s" e-length-limit="300" e-input-limit="NC"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_total_e" name="amt_total_e" ng-model="inputVO.amt_total_e" e-length-limit="300" e-input-limit="NC"></div>
+    			</div>
+     		</td>
+     		<th width="10%">前日大額100萬以上進出：</th>
+     		<td width="23%">
+				<e-combobox id="amt_19" 
+							ng-paramtype="CRM.CRM210_AMT_19"
+							ng-model="inputVO.amt_19"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th width="10%"></th>
+     		<td width="23%"></td>
+		</tr>
+     	<tr>
+			<th>上月平均全行AUM：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_01_s" name="amt_01_s" ng-model="inputVO.amt_01_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_01_e" name="amt_01_e" ng-model="inputVO.amt_01_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+			</td>
+     		<th></th>
+     		<td></td>
+     		<th></th>
+     		<td></td>
+     	</tr>
+     	<tr>
+			<th>全行台外幣活存餘額：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_02_s" name="amt_02_s" ng-model="inputVO.amt_02_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_02_e" name="amt_02_e" ng-model="inputVO.amt_02_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th>全行境外結構型商品：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_13_s" name="amt_13_s" ng-model="inputVO.amt_13_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_13_e" name="amt_13_e" ng-model="inputVO.amt_13_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th></th>
+     		<td></td>
+     	</tr>
+     	<tr>
+			<th>全行台外幣定存餘額：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_05_s" name="amt_05_s" ng-model="inputVO.amt_05_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_05_e" name="amt_05_e" ng-model="inputVO.amt_05_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th>全行外匯雙享利：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_14_s" name="amt_14_s" ng-model="inputVO.amt_14_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_14_e" name="amt_14_e" ng-model="inputVO.amt_14_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th></th>
+     		<td></td>
+     	</tr>
+     	<tr>
+			<th>全行基金：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_09_s" name="amt_09_s" ng-model="inputVO.amt_09_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_09_e" name="amt_09_e" ng-model="inputVO.amt_09_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th>全行金錢信託：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_15_s" name="amt_15_s" ng-model="inputVO.amt_15_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_15_e" name="amt_15_e" ng-model="inputVO.amt_15_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th></th>
+     		<td></td>
+     	</tr>
+     	<tr>
+			<th>全行海外ETF/海外股票：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_10_s" name="amt_10_s" ng-model="inputVO.amt_10_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_10_e" name="amt_10_e" ng-model="inputVO.amt_10_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th>全行黃金存摺：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_16_s" name="amt_16_s" ng-model="inputVO.amt_16_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_16_e" name="amt_16_e" ng-model="inputVO.amt_16_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th></th>
+     		<td></td>
+     	</tr>
+     	<tr>
+			<th>全行海外債：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_11_s" name="amt_11_s" ng-model="inputVO.amt_11_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_11_e" name="amt_11_e" ng-model="inputVO.amt_11_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th>保險餘額：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_17_s" name="amt_17_s" ng-model="inputVO.amt_17_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_17_e" name="amt_17_e" ng-model="inputVO.amt_17_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th></th>
+     		<td></td>
+     	</tr>
+     	<tr>
+			<th>全行組合式商品：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_12_s" name="amt_12_s" ng-model="inputVO.amt_12_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_12_e" name="amt_12_e" ng-model="inputVO.amt_12_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th>貸款餘額：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_18_s" name="amt_18_s" ng-model="inputVO.amt_18_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_18_e" name="amt_18_e" ng-model="inputVO.amt_18_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th></th>
+     		<td></td>
+     	</tr>
+     	<tr>
+			<th>全行奈米投：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_25_s" name="amt_25_s" ng-model="inputVO.amt_25_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_25_e" name="amt_25_e" ng-model="inputVO.amt_25_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th>全行金市海外債：</th>
+     		<td>
+     			<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_26_s" name="amt_26_s" ng-model="inputVO.amt_26_s" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="amt_26_e" name="amt_26_e" ng-model="inputVO.amt_26_e" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th></th>
+     		<td></td>
+     	</tr>
+     </table>
+</div>
+<hr>
+<!-- 風險訊息 -->
+<div class="search_table">
+	<h4>風險訊息</h4>
+	<table>
+		<tr>
+			<th width="10%">風險屬性：</th>
+     		<td width="23%">
+				<e-combobox id="atr_01" 
+							ng-paramtype="CRM.ATR_01"
+							ng-model="inputVO.atr_01"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				ng-change="test()"
+			   				width="150px"
+			   				style="line-height:20px;" />
+   				
+   				<e-combobox id="atr_02" 
+							ng-paramtype="FPS.CUST_RISK_ATTR"
+							ng-model="inputVO.atr_02"
+			   				ng-validate="false" 
+			   				ng-readonly="inputVO.atr_01 == '' || inputVO.atr_01 == undefined || inputVO.atr_01 == '01'" 
+			   				ng-disabled="inputVO.atr_01 == '' || inputVO.atr_01 == undefined || inputVO.atr_01 == '01'"
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="75px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th width="10%">最後做風險屬性日期：</th>
+     		<td width="23%">
+     			<div class="form-group">
+     				<div class="input-group datebox formatWidth">
+						<input 	type="text" id="atr_03_sDate" name="atr_03_sDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.atr_03_sDate" 
+								is-open="model.c"
+								datepicker-options="atr_03_sDateOptions" 
+								ng-readonly="true"
+								ng-change="limitDate2()" 
+								size="13"/>
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+								<i class="glyphicon glyphicon-calendar"></i>
+							</button>
+						</span>
+     				</div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="input-group datebox formatWidth">
+	     				<input 	type="text" id="atr_03_eDate" name="atr_03_eDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.atr_03_eDate" 
+								is-open="model.d"
+								datepicker-options="atr_03_eDateOptions" 
+								ng-readonly="true"
+								ng-change="limitDate2()" 
+								size="13"/>
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+								<i class="glyphicon glyphicon-calendar"></i>
+							</button>
+						</span>
+     				</div>
+     			</div>
+     		</td>
+     		<th width="10%"></th>
+     		<td width="23%"></td>
+		</tr>
+	</table>
+</div>
+<hr>
+<!-- 經營資訊 -->
+<div  class="search_table">
+	<h4>經營資訊</h4>
+	<table>
+    	<tr>
+			<th width="10%">未經營月數：</th>			
+			<td width="23%">
+				<div class="form-group">
+					<div style="float: left !important;">
+						<e-combobox id="manage_04" 	
+									ng-datasource="mappingSet['COMPARE']"			
+									ng-model="inputVO.manage_04"
+					   				ng-validate="false" 
+					   				ng-readonly="false" 
+					   				ng-editable="false"
+					   				ng-format="F3"
+					   				ng-required="false"
+					   				width="75px"
+					   				style="line-height:20px;" />
+					</div>
+				   	<div style="float: left !important;"></div>
+	     			<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="manage_01" name="manage_01" ng-model="inputVO.manage_01" e-input-limit="ND" e-length-limit="300" style="width:180px;"></div>
+	     		
+				</div>
+				</td>
+     		<th width="10%"></th>
+     		<td width="23%"></td>
+     		<th width="10%"></th>
+     		<td width="23%"></td>
+		</tr>			
+		<tr>     		
+     		<th>經營頻次符合度：</th>
+     		<td>
+     			<e-combobox id="manage_02" 
+							ng-paramtype="TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN"
+							ng-model="inputVO.manage_02"
+			   				ng-validate="false" 
+			   				ng-readonly="false" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				width="225px"
+			   				style="line-height:20px;" />
+     		</td>
+     		<th>新登錄日期：</th>
+     		<td>
+				<div class="form-group">
+					<div class="input-group datebox formatWidth">
+		     			<input type="text" id="manage_03_sDate" name="manage_03_sDate"
+								class="form-control" 
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.manage_03_sDate" 
+								is-open="model.e"
+								datepicker-options="manage_03_sDateOptions" 
+								ng-readonly="true"
+								ng-change="limitDate3()" 
+								size = "13"/>
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+							<i class="glyphicon glyphicon-calendar"></i>
+							</button>
+						</span>
+					</div>
+					<div style="float: left !important;">&nbsp ~ &nbsp</div>
+					<div class="input-group datebox formatWidth">
+						<input 	type="text" id="manage_03_eDate" name="manage_03_eDate"
+								class="form-control" 
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.manage_03_eDate" 
+								is-open="model.f"
+								datepicker-options="manage_03_eDateOptions" 
+								ng-readonly="true"
+								ng-change="limitDate3()" 
+								size = "13"/>
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'f')">
+								<i class="glyphicon glyphicon-calendar"></i>
+							</button>
+						</span>
+					</div>
+				</div>
+     		</td>
+     	</tr>
+<!--      	<tr> -->
+<!--      		<th>活躍度商品數：</th> -->
+<!--      		<td> -->
+<!--      			<e-combobox id="actPrdNums"  -->
+<!-- 							ng-paramtype="CRM.ACT_PRD_NUMS" -->
+<!-- 							ng-model="inputVO.actPrdNums" -->
+<!-- 			   				ng-validate="false"  -->
+<!-- 			   				ng-readonly="false"  -->
+<!-- 			   				ng-editable="false" -->
+<!-- 			   				ng-format="F3" -->
+<!-- 			   				ng-required="false" -->
+<!-- 			   				width="225px" -->
+<!-- 			   				style="line-height:20px;" /> -->
+<!--      		</td> -->
+<!--      		<th></th> -->
+<!--      		<td> -->
+<!--      		</td> -->
+<!--      	</tr> -->
+	</table>
+</div>
+<hr>
+<!-- 手收貢獻度 -->
+<div class="search_table">
+	<h4>手收貢獻度</h4>
+	<table>
+		<tr>
+			<th width="10%">查詢區間：</th>
+			<td width="23%">
+				<e-combobox id="manage_05_Date" name="manage_05_Date"
+							ng-datasource="mappingSet['timeE']" 
+							ng-model="inputVO.manage_05_Date"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false" 
+							ng-format="F3"
+							ng-change="manage_05_Date()" 
+							width="225px"
+							style="line-height:20px;" />
+			</td>
+			<th width="10%">手續費收入：</th>
+			<td width="23%">
+				<div class="form-group">
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="manage_06_fee_s" name="manage_06_fee_s" ng-model="inputVO.manage_06_fee_s" ng-disabled="inputVO.manage_05_Date == undefined" ng-change = "manage_06_fee_s()" e-input-limit="NC" e-length-limit="300"></div>
+     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="manage_06_fee_e" name="manage_06_fee_e" ng-model="inputVO.manage_06_fee_e" ng-disabled="inputVO.manage_05_Date == undefined" ng-change = "manage_06_fee_e()" e-input-limit="NC" e-length-limit="300"></div>
+     			</div>
+     		</td>
+     		<th width="10%"></th>
+     		<td width="23%"></td>
+		</tr>
+	</table>
+</div>

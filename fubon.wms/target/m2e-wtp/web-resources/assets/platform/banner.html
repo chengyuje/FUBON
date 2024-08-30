@@ -1,0 +1,36 @@
+<script type="text/javascript" src="assets/txn/CRM610/CRM610.js"></script>
+<nav class="navbar navbar-default" ng-controller="BannerController">
+	<div><a href="#" class="navbar-header nav-logo" ng-click="reload()"></a></div>
+	<div class="container-fluid text-nowrap" style="overflow: hiden; padding-right: 10px">
+	
+		<!-- marquee -->
+		<!-- *reserved element id* -->
+		<div id="marquee" ng-include="'assets/platform/marquee.html'"></div>
+		
+		<div class="navbar-right form-inline nav_search">
+			<div ng-if="canQuick && !IsMobile" ng-include="'assets/txn/CRM110/CRM110.html'" style="float:left"></div>&nbsp;
+			<button id="banner-btn-2" type="button" class="btn btn-primary" 
+				ng-disabled="inputVO.crm110Type == 'NAME' || (inputVO.crm110Type == 'ID' && inputVO.cust.length < 8)" 
+				ng-click="order()"
+				ng-show="(role == '002' || role == '003') && !IsMobile">下單
+			</button>
+			<e-combobox id="orderOption"
+				ng-paramtype="CRM.ORDER_OPTION" 
+				ng-model="inputVO.orderOption"
+				ng-validate="false" 
+				ng-readonly="false" 
+				ng-editable="false"
+				ng-format="F3"
+				ng-required="false"
+				ng-show="(custExist == 'Y' && inputVO.crm110Type == 'ID') && !IsMobile"
+				ng-change="selectOption()"
+				width="220px"
+				style="line-height:20px;"></e-combobox>
+			<button id="banner-btn-3" type="button" class="btn btn-primary" ng-click="loginOut()">登出</button>
+			<button id="banner-btn-4" type="button" class="btn btn-primary" ng-hide="userList.length <= 1" ng-click="switchRole()">切換角色</button>
+			&nbsp;&nbsp;
+			<!-- 行動投保 -->
+			<button type="button" class="btn btn-primary" ng-click="chkToken($event);" ng-show="AAS_SSO_ACC_PW_ENABLED && role != 'UHRM021' && role != 'UHRM022'">保經代服務網</button>
+		</div>
+	</div>
+</nav>

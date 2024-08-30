@@ -1,0 +1,113 @@
+<style>
+/* dialog panl */
+.modal-dialog.ORG111_EDIT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+
+<div>
+	<div ng-controller="ORG111_EDITController" ng-cloak>
+		<div class="modal-dialog ORG111_EDIT">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">離職/異動交接</h4>
+				</div>
+				<div class="modal-body">
+					<table width="100%">
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">選擇交接原因：</th>
+							<td class="col-md-7 tdpadding">
+								<label ng-repeat="fccode in mappingSet['ORG.RESIGN_HANDOVER']" width="100%">
+									<input type="radio" ng-model="inputVO.RESIGN_HANDOVER" value="{{fccode.DATA}}">{{fccode.LABEL}}
+									&nbsp;&nbsp;
+								</label>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.RESIGN_HANDOVER == null || inputVO.RESIGN_HANDOVER == ''">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇交接原因</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">離職異動原因：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="ptypeRange" 
+											name="ptypeRange"
+											ng-disabled="eComboDisabled" 
+											ng-paramtype="ORG.RESIGN_REASON"
+											ng-model="inputVO.RESIGN_REASON" 
+											ng-validate="true"
+											ng-readonly="false" 
+											ng-editable="false" 
+											ng-format="F3"
+											ng-required="true" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.RESIGN_REASON == ''">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇離職異動原因</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">離職異動動向：</th>
+							<td class="col-md-7 tdpadding ">
+								<e-combobox ng-paramtype="ORG.RESIGN_DESTINATION"
+											ng-model="inputVO.RESIGN_DESTINATION"
+											ng-change="action(inputVO.RESIGN_DESTINATION)"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3" 
+											ng-required="true" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.RESIGN_DESTINATION == ''">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇離職異動動向</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">離職至同業：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="csvType"
+											ng-disabled="!checked" 
+											ng-paramtype="ORG.DESTINATION_BANK_ID"
+											ng-model="inputVO.DESTINATION_BANK_ID" 
+											ng-validate="true"
+											ng-readonly="!checked" 
+											ng-editable="true" 
+											ng-format="F3"
+											ng-required="false" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>						
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" ng-disabled="inputVO.RESIGN_REASON == '' || inputVO.RESIGN_DESTINATION == '' || (inputVO.RESIGN_DESTINATION == '01' && inputVO.DESTINATION_BANK_ID == '')">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>			
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

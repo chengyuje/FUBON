@@ -1,0 +1,140 @@
+<script type="text/javascript" src="assets/txn/SOT330/SOT330.js"></script>
+<div class="SOT312" ng-controller="SOT330Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table style="width: 50%; margin-left: 30%; margin-right: auto;">
+					<tr>
+						<th>*客戶ID：</th>
+						<td style="width: 70%;"><input type="text" class="form-control" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" 
+												ng-blur="toUppercase_data(inputVO.custID,'custid')" e-length-limit="12" style="width: 30%;text-transform: uppercase;" ng-required="true"></td>
+					</tr>
+					<tr>
+						<th>*交易種類：</th>
+						<td>
+							<e-combobox id="tradeType" name="tradeType" 
+										ng-datasource="mappingSet['SOT.BUY_SELL']"
+										ng-model="inputVO.tradeType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="75%"
+										style="line-height:20px;"
+										ng-required="true"/>
+						</td>
+					</tr>
+					<tr>
+						<th>&nbsp;商品代號：</th>
+						<td><input type="text" class="form-control" placeholder="請輸入..." id="prodID" name="prodID" ng-model="inputVO.prodID" e-length-limit="12" ng-blur="toUppercase_data(inputVO.prodID,'prodid')" style="width: 30%;"></td>
+					</tr>
+					<tr>
+						<th>*交易起迄日：</th>
+						<td class="form-inline">
+							<div class="form-group">
+										<div class="input-group datebox datewidth">
+											<input type="text" id="sDate" name="sDate"
+												   class="form-control"
+													uib-datepicker-popup="yyyy/MM/dd"
+													ng-model="inputVO.sDate"
+													is-open="model.a"
+													datepicker-options="startDateOptions"
+													alt-input-formats="altInputFormats"
+													ng-readonly="true"
+													ng-change="limitDate()"
+													ng-required="true"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+												<i class="glyphicon glyphicon-calendar"></i></button>
+											</span>
+										</div>
+									~
+									
+										<div class="input-group datebox datewidth">
+											<input type="text" id="sDate2" name="sDate2"
+												   class="form-control"
+													uib-datepicker-popup="yyyy/MM/dd"
+													ng-model="inputVO.eDate"
+													is-open="model.c"
+													datepicker-options="startDateOptions2"
+													alt-input-formats="altInputFormats"
+													ng-readonly="true"
+													ng-change="limitDate()"
+													ng-required="true"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+												<i class="glyphicon glyphicon-calendar"></i></button>
+											</span>
+										</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+				說明：<br>
+                1. 所查資料僅供參考，如上手通知確認單內容異動，將依更新後資料為準，最終實際成交資料請於分配日後查詢。 <br>
+                2. 「贖回款預計入帳日」資料僅供參考，如遇不可抗力因素、國外假期或外匯市場休假日等，致國外匯款無法準時匯達時，將順延至次一營業日辦理付款作業。<br> 
+                3. 如查詢為空白者，表示尚未接獲交易對手確認，請稍後再查詢。<br>
+				
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()" >查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit();init();">清除</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once input="inputVO" output="outputVO" list="data" totallist="resultList" rowcountlimit="10"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data">
+					<thead>
+						<tr>
+							<th>交易日期</th>
+							<th>客戶ID</th>
+							<th>交易種類</th>
+							<th>商品代號</th>
+							<th>成交面額</th>
+							<th>成交價格</th>
+							<th>通路服務費</th>
+							<th>手續費</th>
+							<th>總扣款金額</th>
+							<th ng-show="inputVO.tradeType == 'S'">贖回款預計入帳日</th>
+							<th>憑證編號</th>
+							<th>成交狀態</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" align="center" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.TxDate}}</td>
+							<td>{{row.CustId}}</td>
+							<td>{{row.TxnType2}}</td>
+							<td>{{row.BondNo}}</td>
+							<td>{{row.TxVal}}</td>
+                            <td>{{row.TxAmt | number : 2}}</td>
+							<td>{{row.ChanCharge| number : 2}}</td>
+							<td>{{row.TxFee| number : 2}}</td>
+							<td>{{row.AcAMT| number : 2}}</td>
+							<td ng-show="inputVO.tradeType == 'S'">{{row.SellAmtDate}}</td>
+							<td>{{row.TrustNo}}</td>
+							<td>{{row.EntrustStatus | mapping:mappingSet['EntrustStatus']:'F3'}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

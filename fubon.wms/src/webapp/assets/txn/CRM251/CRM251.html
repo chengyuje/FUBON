@@ -1,0 +1,175 @@
+<style>
+/* open dialog */
+.ngdialog.CRM251 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM251_EDIT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* dialog panl */
+.modal-dialog.CRM251_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+/* table size */
+.CRM251 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM251 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM251.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM251_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM251/CRM251.js"></script>
+<script type="text/javascript" src="assets/txn/CRM251/CRM251_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/CRM251/CRM251_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/CRM210/CRM210.js"></script>
+<script type="text/javascript" src="assets/txn/CRM211/CRM211.js"></script>
+<script type="text/javascript" src="assets/txn/CRM221/CRM221.js"></script>
+<script type="text/javascript" src="assets/txn/CUS110/CUS110.js"></script>
+<div class="CRM251" ng-controller="CRM251Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th>客戶群組名稱：</th>
+					<td>
+						<e-combobox id="group_id" 
+							ng-datasource="mappingSet['Groups']"
+							ng-model="inputVO.group_id"
+	    					ng-validate="false" 
+	    					ng-readonly="false" 
+	    					ng-editable="false"
+	    					ng-format="F3"
+	    					ng-required="false"
+	    					width="150px"
+	    					style="line-height:20px;" />
+					</td>
+					<th>{{pri.startsWith('UHRM') ? 'UHRM：' : 'AO Code：'}}</th>
+					<td>
+						<e-combobox id="ao_code" 
+									ng-datasource="AOCodes"
+									ng-model="inputVO.ao_code"
+			    					ng-validate="false" 
+			    					ng-disabled="ao_code.length == 1"
+			   						ng-readonly="ao_code.length == 1"
+			   						ng-hide="pri.startsWith('UHRM')"
+			    					ng-editable="false"
+			    					ng-format="F1"
+			    					ng-required="false"
+			    					width="150px"
+			    					style="line-height:20px;" />
+	    				<e-combobox id="uEmpID" name="uEmpID"
+									ng-datasource="mappingSet['UHRM_LIST']"
+									ng-model="inputVO.uEmpID"
+									ng-validate="false" 
+									ng-disabled="pri == 'UHRM002'"
+									ng-readonly="pri == 'UHRM002'" 
+									ng-show="pri.startsWith('UHRM')"
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="true"
+									width="200px"
+									style="line-height:20px;" />
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="edit()" function-type="maintenance">新增</button>
+		</div>
+		<!-- 結果區 -->
+		<e-jumping output="outputVO"
+			input="inputVO"
+			query="inquire()" list="paramList"></e-jumping>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table>
+				<thead>
+					<tr>
+						<th>功能</th>
+						<th>{{pri.startsWith('UHRM') ? 'UHRM' : 'AO Code'}}</th>
+						<th>客戶群組名稱</th>
+						<th>檢視客戶</th>
+						<th>整批客戶新增</th>
+						<th>上次修改時間</th>
+						<th>上次修改人員</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>
+							<e-combobox id="cmbAction" name="cmbAction"
+							ng-datasource="row.set"
+							ng-model="row.cmbAction"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="action(row)"
+							width="100px"
+							style="line-height:20px;" />
+						</td>
+						<td>{{pri.startsWith('UHRM') ? row.EMP_ID : row.AO_CODE}}</td>
+						<td>{{row.GROUP_NAME}}</td>
+						<td class="text-center"><a onclick="return false" ng-click="detail(row)"><span class="glyphicon glyphicon-zoom-in"></span></a></td>
+						<td class="text-center"><a onclick="return false" ng-click="crm211(row)"><span class="glyphicon glyphicon-plus"></span></a></td>
+						<td>{{row.LASTUPDATE}}</td>
+						<td>{{row.EMP_NAME}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

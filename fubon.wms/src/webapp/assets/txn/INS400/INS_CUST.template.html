@@ -1,0 +1,69 @@
+<style>
+  .table.INS400Cust tbody tr td,
+  .table.INS400Cust tbody tr th {
+    padding: .5em 1em;
+  }
+
+  .table.INS400Cust tbody tr td {
+    text-align: right;
+  }
+
+  .INS400Cust td:not(:last-of-type) {
+    border-right: .5px solid #e1e1e1;
+  }
+
+</style>
+
+<div>
+  <table class="table INS400Cust"
+         style="table-layout: fixed;margin: 0;"
+         ng-if="!isPrint">
+    <tr>
+      <th>客戶姓名</th>
+      <td ng-bind="custData.CUST_NAME"></td>
+      <th>學歷</th>
+      <td ng-bind="custData.EDUCATION_STAT|mapping: mappingSet['KYC.EDUCATION']:'F3'"></td>
+      <th>年齡</th>
+      <td ng-bind="custData.AGE + '歲'"></td>
+      
+    </tr>
+    <tr>
+	  <th>KYC等級/效期</th>
+      <td>
+        <span ng-bind="custData.CUST_RISK_ATR"></span>
+        <span ng-bind="custData.KYC_DUE_DATE == null ? '' : '/' + (toJsDate(custData.KYC_DUE_DATE) | date: 'yyyy/MM/dd')"></span>
+      </td>
+      <th>客戶註記</th>
+      <td ng-bind="cust_note"></td>
+      <th>專業投資人</th>
+      <td ng-bind="custData.PROF_INVESTOR_YN"></td>
+    </tr>
+    <tr>
+	  <th>薪轉戶</th>
+      <td ng-bind="custData.SAL_ACC_YN"></td>
+      <th>一年的總所得</th>
+      <td ng-bind="custData.ANNUAL_INCOME_AMT"></td>
+      <th>OBU註記</th>
+      <td>
+        <span ng-bind="custData.OBU_YN"></span>
+      </td>
+    </tr>
+  </table>
+  <!-- print -->
+  <table class="table INS400Cust"
+         style="table-layout: fixed;margin: 0;"
+         ng-if="isPrint">
+    <tr>
+      <th>被保險人姓名</th>
+      <td ng-bind="custData.CUST_NAME"></td>
+      <th>被保險人年齡</th>
+      <td ng-bind="custData.AGE + '歲'"></td>
+    </tr>
+    <tr>
+      <th>目標理財規劃目的</th>
+      <td>
+        <span>{{hisPlan}}</span>
+      </td>
+    </tr>
+  </table>
+</div>

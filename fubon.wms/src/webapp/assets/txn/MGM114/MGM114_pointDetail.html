@@ -1,0 +1,56 @@
+<style>
+/* dialog panl */
+.modal-dialog.MGM114_pointDetail {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MGM114/MGM114_pointDetail.js"></script>
+
+<div ng-controller="MGM114_pointDetailController" ng-cloak>
+	<div class="modal-dialog MGM114_pointDetail">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">推薦人核點明細</h4>
+			</div>
+			<div class="modal-body">
+				<div class="e_panel_table scroll_y">
+					<div class="ejborder">
+						<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>	
+					</div>				
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap; ">
+						<table>
+							<thead>
+								<tr>
+									<th>推薦人姓名</th>
+									<th>被推薦人ID</th>
+									<th>被推薦人姓名</th>
+									<th>核准點數</th>
+									<th>得點日期</th>
+									<th>備註</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in data">
+									<td>{{row.CUST_NAME}}</td>
+									<td>{{row.POINTS_TYPE == '2' ? '--' : row.BE_MGM_CUST_ID}}</td>
+									<td>{{row.POINTS_TYPE == '2' ? '--' : row.BE_MGM_CUST_NAME}}</td>
+									<td align="right">{{row.APPR_POINTS}}</td>
+									<td>{{toJsDate(row.APPR_DATE) | date:"yyyy/MM/dd"}}</td>
+									<td>{{row.POINTS_TYPE == '2' ? '達人加碼' : ''}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+	     	</div>
+		</div>
+	</div>
+</div>

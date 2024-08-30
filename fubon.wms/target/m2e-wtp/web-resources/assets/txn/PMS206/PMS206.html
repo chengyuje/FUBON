@@ -1,0 +1,372 @@
+<style>
+/* open dialog */
+.ngdialog.PMS206 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS206 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS206 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS206 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS206.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS206_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS206/PMS206.js"></script>
+
+<div class="PMS206" ng-controller="PMS206Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th ng-if = "inputVO.checked == '1'">*資料日期： </th>		
+							<td ng-if = "inputVO.checked == '1'">
+								<e-combobox id="dataMonth" name="dataMonth"
+								ng-datasource="weekList" ng-model="inputVO.WEEK"
+								ng-validate="false" ng-readonly="false" ng-editable="false" 
+								ng-required="true" ng-change="inquireInit();limitDate();dateChange_month()" 
+								ng-format="F3" width="200px" style="line-height:20px;" />
+							</td>	
+								
+							<th ng-if = "inputVO.checked == '2'">*資料日期： </th>		
+							<td ng-if = "inputVO.checked == '2'">
+								<e-combobox id="dataMonth" name="dataMonth"
+								ng-datasource="monthList" ng-model="inputVO.MONTH"
+								ng-validate="false" ng-readonly="false" ng-editable="false" 
+								ng-required="true" ng-change="inquireInit();limitDate();dateChange_month()" 
+								ng-format="F3" width="200px" style="line-height:20px;" />
+							</td>	
+						
+							
+						
+							<th>業務處：</th>
+							<td><e-combobox id="region_center_id" name="region_center_id"
+											ng-datasource="REGION_LIST"
+											ng-model="inputVO.region_center_id"
+											ng-validate="false" 
+											ng-disabled="disableRegionCombo"
+											ng-readonly="disableRegionCombo" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="ChangeRegion()"
+											width="200px"
+											style="line-height:20px;" />
+							</td>
+
+							<th>分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+											ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.branch_nbr"
+											ng-validate="false" 
+											ng-disabled="disableBranchCombo"
+											ng-readonly="disableBranchCombo" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="false"
+											ng-change="ChangeBranch()"
+											width="150px"
+											style="line-height:20px;" /></td>
+							
+						</tr>
+						<tr>
+							<th>*檢視頻率：</th>
+							<td><e-combobox ng-datasource="mappingSet['seture']"
+									ng-model="inputVO.checked" ng-validate="false" ng-readonly="false"
+									ng-editable="false" ng-format="F3"  width="200px" ng-change="inquireInit()" 
+									height="30px" style="line-height:20px;" ng-required="true" /></td>
+						
+						
+						
+							<th>營運區：</th>
+							<td><e-combobox id="branch_area_id" name="branch_area_id"
+											ng-datasource="AREA_LIST"
+											ng-model="inputVO.branch_area_id"
+											ng-validate="false" 
+											ng-disabled="disableAreaCombo"
+											ng-readonly="disableAreaCombo" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="ChangeArea()"
+											width="200px"
+											style="line-height:20px;" /></td>
+
+							<th>*理專：</th>
+							<td><e-combobox id="ao_code" name="ao_code"
+											ng-datasource="AO_LIST"
+											ng-model="inputVO.ao_code"
+											ng-validate="false"
+											ng-disabled="disableAoCombo"
+											ng-readonly="disableAoCombo" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											ng-change="ChangeAo_code()"
+											width="150px"
+											style="line-height:20px;" />
+							</td>
+<!-- 							<th></th> -->
+
+							
+
+							<td ng-show="parameterTypeEditForm.checked.$error.required"
+								class="col-md-7 help-block with-errors">*請選擇檢視頻率值</td>
+
+
+
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="inquireInit();inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+
+			</div>
+
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" input="inputVO" query="inquire()"
+				list="paramList1" totallist="paramList"></e-jumping-once>
+
+			<div class="gv_tab_sc scroll_y"
+				style="height: auto; white-space: nowrap;">
+				<table ng-show="inputVO.checked=='1'" class="e-table-freeze" e-height="400px" e-mode="1" e-top="true" e-list="paramList1">
+					<thead>
+						<tr  class="repeat-row" ng-repeat="row in paramList1  | limitTo:1">
+							<th>{{row.AO_JOB_RANK}}理專</th>
+<!-- 							<th colspan="3">{{toJsDate(dateList[0].LAST_WEEK_START_DATE) | date:"yyyy-MM-dd"}}~{{toJsDate(dateList[0].LAST_WEEK_END_DATE) | date:"yyyy-MM-dd"}}(上週)</th> -->
+<!-- 							<th colspan="10">{{toJsDate(dateList[0].THIS_WEEK_START_DATE) | date:"yyyy-MM-dd"}}~{{toJsDate(dateList[0].THIS_WEEK_END_DATE) | date:"yyyy-MM-dd"}}(本週)</th> -->
+							<!-- <th colspan="3" ng-show="flag==true">{{w3}}24~{{w4}}30(上週)</th> -->
+							<th colspan="3" ng-show="flag==false">{{w3}}~{{w4}}(上週)</th>
+							
+							<th colspan="10">{{w1}}~{{w2}}(本週)</th>
+
+							<th colspan="3">本周{{row.AO_JOB_RANK}}均值</th>
+						</tr>
+
+						<tr >
+							<th rowspan="2">客戶別</th>
+							<th rowspan="2">聯繫率<br>(A/客戶數)
+							</th>
+							<th rowspan="2">會面率<br>(M/A)
+							</th>
+							<th rowspan="2">成交率<br>(C/M)
+							</th>
+							<th rowspan="2">客戶數</th>
+
+							<th colspan="2" rowspan="1" style="color: #2E64FE">A</th>
+
+							<th colspan="2" rowspan="1" style="color: #2E64FE">M</th>
+
+							<th colspan="2" rowspan="1" style="color: #2E64FE">C</th>
+
+							<th rowspan="2"
+								style="text-align: center; valign: center; align: center">聯繫率<br />(A/客戶數)
+							</th>
+							<th rowspan="2">會面率<br>(M/A)
+							</th>
+							<th rowspan="2">成交率<br>(C/M)
+							</th>
+							<th rowspan="2">聯繫率<br>(A/客戶數)
+							</th>
+							<th rowspan="2">會面率<br>(M/A)
+							</th>
+							<th rowspan="2">成交率<br>(C/M)
+							</th>
+
+
+
+
+						</tr>
+						<tr  >
+							<th>預估</th>
+							<th>實際</th>
+							<th>預估</th>
+							<th>實際</th>
+							<th>預估</th>
+							<th>實際</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr  class="repeat-row" ng-show="paramList[0].AO_JOB_RANK!='FC' "
+							ng-repeat="row in paramList1 | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<th>{{row.CON_DEGREE}}</th>
+							<td align="right">{{0+row.LA_A_RATE |  number:2}}%</td>
+							<td align="right">{{0+row.LA_M_RATE |  number:2}}%</td>
+							<td align="right">{{0+row.LA_C_RATE |  number:2}}%</td>
+							<td align="right">{{row.CUST_CNT | number:0}}</td>
+							<td align="right">{{row.A_EST_CNT | number:0}}</td>
+							<td align="right">{{row.A_ACT_CNT | number:0}}</td>
+							<td align="right">{{row.M_EST_CNT | number:0}}</td>
+							<td align="right">{{row.M_ACT_CNT | number:0}}</td>
+							<td align="right">{{row.C_EST_CNT | number:0}}</td>
+							<td align="right">{{row.C_ACT_CNT | number:0}}</td>
+							<td align="right">{{0+row.A_RATE |  number:2}}%</td>
+							<td align="right">{{0+row.M_RATE |  number:2}}%</td>
+							<td align="right">{{0+row.C_RATE |  number:2}}%</td>
+							<td align="right">{{0+row.AV_A_RATE |  number:2}}%</td>
+							<td align="right">{{0+row.AV_M_RATE |  number:2}}%</td>
+							<td align="right">{{0+row.AV_C_RATE |  number:2}}%</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<table ng-show="inputVO.checked=='2'" class="e-table-freeze" e-height="400px" e-mode="1" e-top="true" e-list="paramList1">
+					<thead>
+						<tr   class="repeat-row" ng-repeat="row in paramList1  | limitTo:1">
+							<th>{{row.AO_JOB_RANK}}理專</th>
+<!-- 							<th colspan="3">{{toJsDate(dateList[0].LAST_MON_START_DATE) | date:"yyyy-MM-dd"}}~{{toJsDate(dateList[0].LAST_MON_END_DATE) | date:"yyyy-MM-dd"}}(上月)</th> -->
+<!-- 							<th colspan="10">{{toJsDate(dateList[0].THIS_MON_START_DATE) | date:"yyyy-MM-dd"}}~{{toJsDate(dateList[0].THIS_MON_END_DATE) | date:"yyyy-MM-dd"}}(本月)</th> -->
+							<th colspan="3">{{m3}}~{{m4}}(上月)</th>
+							<th colspan="10">{{m1}}~{{m2}}(本月)</th>
+
+							<th colspan="3">本月{{row.AO_JOB_RANK}}均值</th>
+						</tr>
+
+						<tr >
+							<th  rowspan="2">客戶別</th>
+							<th rowspan="2">聯繫率<br>(A/客戶數)
+							</th>
+							<th rowspan="2">會面率<br>(M/A)
+							</th>
+							<th rowspan="2">成交率<br>(C/M)
+							</th>
+							<th rowspan="2">客戶數</th>
+
+							<th colspan="2" rowspan="1" style="color: #2E64FE">A</th>
+
+							<th colspan="2" rowspan="1" style="color: #2E64FE">M</th>
+
+							<th colspan="2" rowspan="1" style="color: #2E64FE">C</th>
+
+							<th rowspan="2"
+								style="text-align: center; valign: center; align: center">聯繫率<br />(A/客戶數)
+							</th>
+							<th rowspan="2">會面率<br>(M/A)
+							</th>
+							<th rowspan="2">成交率<br>(C/M)
+							</th>
+							<th rowspan="2">聯繫率<br>(A/客戶數)
+							</th>
+							<th rowspan="2">會面率<br>(M/A)
+							</th>
+							<th rowspan="2">成交率<br>(C/M)
+							</th>
+						</tr>
+						<tr >
+							<th>預估</th>
+							<th>實際</th>
+							<th>預估</th>
+							<th>實際</th>
+							<th>預估</th>
+							<th>實際</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-show="paramList[0].AO_JOB_RANK!='FC'" class="repeat-row"
+							ng-repeat="row in paramList1 | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<th>{{row.CON_DEGREE}}</th>
+							<td style="text-align: right">{{row.LA_A_RATE || 0 |  number:2}}%</td>
+							<td style="text-align: right">{{row.LA_M_RATE || 0 |  number:2}}%</td>
+							<td style="text-align: right">{{row.LA_C_RATE || 0 |  number:2}}%</td>
+							<td style="text-align: right">{{row.CUST_CNT | number:0}}</td>
+							<td style="text-align: right">{{row.A_EST_CNT | number:0}}</td>
+							<td style="text-align: right">{{row.A_ACT_CNT | number:0}}</td>
+							<td style="text-align: right">{{row.M_EST_CNT | number:0}}</td>
+							<td style="text-align: right">{{row.M_ACT_CNT | number:0}}</td>
+							<td style="text-align: right">{{row.C_EST_CNT | number:0}}</td>
+							<td style="text-align: right">{{row.C_ACT_CNT | number:0}}</td>
+							<td style="text-align: right">{{row.A_RATE  || 0 |  number:2}}%</td>
+							<td style="text-align: right">{{row.M_RATE  || 0 |  number:2}}%</td>
+							<td style="text-align: right">{{row.C_RATE  || 0 |  number:2}}%</td>
+							<td style="text-align: right">{{row.AV_A_RATE  || 0 |  number:2}}%</td>
+							<td style="text-align: right">{{row.AV_M_RATE  || 0 |  number:2}}%</td>
+							<td style="text-align: right">{{row.AV_C_RATE  || 0 |  number:2}}%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

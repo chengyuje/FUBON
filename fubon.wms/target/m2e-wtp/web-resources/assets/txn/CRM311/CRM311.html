@@ -1,0 +1,229 @@
+<style>
+/* open dialog */
+.ngdialog.CRM311 {
+
+}
+/* dialog panl */
+.modal-dialog.CRM311 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM311 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM311 table.little{
+	width: 61%;
+}
+/* change row */
+.CRM311.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM311_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM311/CRM311.js"></script>
+<script type="text/javascript" src="assets/txn/CRM311/CRM311_edit.js"></script>
+<script type="text/javascript" src="assets/txn/CRM311/CRM311_custEdit.js"></script>
+<div class="CRM311" ng-controller="CRM311Controller" ng-cloak>
+	<!-- 結果區 -->
+	<div class="row">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >最適客戶經營目前設定</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="gv_tab_sc" style="white-space: nowrap;">
+				<!-- 最適客戶經營設定 -->
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<thead>
+							<tr>
+								<th>編輯</th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_NAME" e-query="initial()">理專職級</e-sorter></th>
+								<th>是否控管AUM上限</th>
+								<th>日餘額(AUM)上限(台幣)</th>
+								<th>總客戶數上限</th>
+								<th>刪除/新增 </th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in resultList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align = "center">
+									<button type="button" class="btn btn-default" ng-click="aoEdit(row)" function-type="maintenance">編輯</button>
+								</td>
+								<td align = "center">{{row.AO_JOB_RANK | mapping:AO_JOB_RANK:'F3'}}</td>
+								<td align = "center">{{row.LIMIT_BY_AUM_YN | mapping:COM_YN:'F3'}}</td>
+								<td align = "right">{{row.AUM_LIMIT_UP| currency:'':0}}</td>
+								<td align = "right">{{row.TTL_CUST_NO_LIMIT_UP}}</td>
+								<td align = "center">
+									<button type="button" class="btn btn-default" ng-click="aoDelete(row)" function-type="maintenance">刪除</button>
+								</td>
+							</tr>
+							<!-- 新增 -->
+							<tr style="background-color:#e3dfdf;">
+								<td></td>
+								<!-- AO理專級別 -->
+								<td>
+									<e-combobox id="aoJob" name="aoJob"
+									ng-datasource="AO_JOB_RANK"
+									ng-model="inputVO.ao_ao_job_rank"
+									ng-disabled="false"
+									ng-readonly="false"
+			  						ng-validate="false"
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									width="200px" height="30px"
+									style="line-height:20px;" />
+				   				</td>
+			   					<!--是否控管AUM上限  -->
+			   					<td>
+			   						<e-combobox id="checked"
+				   					ng-datasource="COM_YN"
+				   					ng-model="inputVO.limit_by_aum_yn"
+				   					ng-validate="false"
+				   					ng-readonly="false"
+				   					ng-editable="false"
+				   					ng-format="F3"
+				   					ng-required="true"
+				   					ng-change="pins()"
+				   					width="200px"
+				   					height="30px"
+				   					style="line-height:20px;" />
+				   				</td>
+								<!-- 日餘額(AUM)上限(台幣) -->
+			   					<td>
+			   						<input class="form-control"
+				   					type="text" style="ime-mode:disabled"
+				   					id="txnCode" name="txnCode"
+				   					ng-model="inputVO.aum_limit_up"
+				   					ng-required="true"
+				   					e-input-limit="N"
+				   					maxLength="12" required/>
+			   					</td>
+		                       	<!-- 總客戶上限 -->
+			   					<td>
+			   						<input class="form-control"
+				   					type="text" style="ime-mode:disabled"
+				   					id="txnCode" name="txnCode"
+				   					ng-model="inputVO.ttl_cust_no_limit_up"
+				   					ng-required="true"
+				   					e-input-limit="N"
+				   					maxLength="5" required/>
+				   				</td>
+		                       	<td>
+		                       		<button type="button" class="btn btn-default" ng-click="aoAdd()" function-type="maintenance">新增</button>
+		                       	</td>
+		                   	</tr>
+						</tbody>
+					</table>
+                </form>
+			</div>
+			<HR size="20">
+			<e-jumping-once output="outputVO" list="paramList" totallist="List"></e-jumping-once>
+			<div class="gv_tab_sc" style="white-space: nowrap;">
+				<form name="parameterTypeEditForm2" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table class="table e-table-freeze" e-top="true" e-mode="1" e-height="350px" e-list="paramList">
+						<thead>
+							<tr>
+								<th>編輯</th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_NAME" e-query="initial2()">理專職級</e-sorter></th>
+								<th>經營等級</th>
+								<th>客戶數彈性%</th>
+								<th>等級客戶數上限</th>
+								<th>刪除/新增</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align = "center">
+									<button type="button" class="btn btn-default" ng-click="custEdit(row)" function-type="maintenance">編輯</button>
+								</td>
+								<td align = "center">{{row.AO_JOB_RANK | mapping:AO_JOB_RANK:'F3'}}</td>
+								<td align = "center">{{row.VIP_DEGREE |mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+								<td align = "right">{{row.CUST_NO_FLEX_PRCNT}}</td>
+								<td align = "right">{{row.CUST_NO_LIMIT_UP}}</td>
+								<td align = "center">
+									<button type="button" class="btn btn-default" ng-click="custDelete(row)" function-type="maintenance">刪除</button>
+								</td>
+							</tr>
+							<!-- 新增 -->
+							<tr style="background-color:#e3dfdf;">
+								<td></td>
+								<!-- 理專級別下拉式 -->
+								<td><e-combobox id="aojob"
+									ng-datasource="AO_JOB_RANK"
+									ng-model="inputVO.cust_ao_job_rank"
+				   					ng-validate="false"
+				   					ng-readonly="false"
+				   					ng-editable="false"
+				   					ng-format="F3"
+				   					ng-required="true"
+				   					style="line-height:20px;" />
+				   				</td>
+			   					<!-- 經營等級下拉式 -->
+			   					<td><e-combobox id="checked"
+			   						ng-datasource="mappingSet['NEW_CRM.VIP_DEGREE']"
+									ng-model="inputVO.vip_degree"
+				   					ng-validate="false"
+				   					ng-readonly="false"
+				   					ng-editable="false"
+				   					ng-format="F3"
+				   					ng-required="true"
+				   					style="line-height:20px;" />
+				   				</td>
+			   					<!-- 客戶數彈性 -->
+			   					<td><input class="form-control"
+				   					type="text" style="ime-mode:disabled"
+				   					id="txnCode" name="txnCode"
+				   					ng-model="inputVO.cust_no_flex_prcnt"
+				   					e-input-limit="N"
+				   					maxLength="3" required/>
+		                       	</td>
+		                       	<!-- 等級客戶數上限 -->
+		                       	<td><input class="form-control"
+				   					type="text" style="ime-mode:disabled"
+				   					id="txnCode" name="txnCode"
+				   					ng-model="inputVO.cust_no_limit_up"
+				   					e-input-limit="N"
+				   					maxLength="5" required/>
+			   					</td>
+			   					<td>
+			   						<button type="button" class="btn btn-default" ng-click="custAdd()" function-type="maintenance">新增</button>
+			   					</td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,260 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.pointer {
+	cursor: pointer;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS360/PMS360.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS360" ng-controller="PMS360Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<table>
+			   <tr>
+			      <th><font color="red">＊</font> 資料統計日期： </th>
+				  <td>
+					  <e-combobox id="sTime"
+						ng-datasource="mappingSet['time']" 
+						ng-model="inputVO.sCreDate"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-change="dateChange()" 
+						ng-format="F3"
+						ng-required="false" 
+						width="145px" 
+						height="30px"
+						style="line-height:20px;" />
+				</td>
+			   </tr>
+			   <tr>
+			      <th>業務處：</th>
+			      <td>
+			         <e-combobox id="region_center_id" name="region_center_id"
+			            ng-datasource="REGION_LIST"
+			            ng-model="inputVO.region_center_id"
+			            ng-validate="false" 
+			            ng-disabled="disableRegionCombo"
+			            ng-readonly="disableRegionCombo" 
+			            ng-editable="false"
+			            ng-format="F3"
+			            ng-required="false"
+			            ng-change="ChangeRegion()"
+			            width="143px"
+			            style="line-height:20px;" />
+			      </td>
+			      <th>營運區：</th>
+			      <td>
+			         <e-combobox id="branch_area_id" name="branch_area_id"
+			            ng-datasource="AREA_LIST"
+			            ng-model="inputVO.branch_area_id"
+			            ng-validate="false" 
+			            ng-disabled="disableAreaCombo"
+			            ng-readonly="disableAreaCombo" 
+			            ng-editable="false"
+			            ng-format="F3"
+			            ng-required="false"
+			            ng-change="ChangeArea()"
+			            width="90px"
+			            style="line-height:20px;" />
+			      </td>
+			      <th>分行別：</th>
+			      <td>
+			         <e-combobox id="branch_nbr" name="branch_nbr"
+			            ng-datasource="BRANCH_LIST"
+			            ng-model="inputVO.branch_nbr"
+			            ng-validate="false" 
+			            ng-disabled="disableBranchCombo"
+			            ng-readonly="disableBranchCombo" 
+			            ng-editable="false"
+			            ng-format="F1"
+			            ng-required="false"
+			            ng-change="ChangeBranch()"
+			            width="155px"
+			            style="line-height:20px;" />
+			      </td>
+			      <th>員編：</th>
+				  <td>
+					  <e-combobox id="emp_id" name="emp_id"
+						ng-datasource="EMP_LIST"
+						ng-model="inputVO.emp_id"
+						ng-validate="false"
+						ng-readonly="disableEmpCombo" 
+						ng-readonly="disableEmpCombo" 
+						ng-editable="false"
+						ng-format="F1"
+						ng-required="true"
+						ng-disabled="disableEmpCombo"
+						ng-change="ChangeAo_code()"
+						width="110px"
+						style="line-height:20px;" />
+				  </td> 
+			   </tr>
+			</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit();init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+			<e-jumping output="outputVO"
+				input="inputVO"
+				query="query()" list="paramList"></e-jumping>
+			<div algin="left">
+				<table>
+			    	<tr>
+			    		<td>產出頻率：</td>
+			    		<td>每日</td>
+			    	</tr>
+			    	<tr>
+			    		<td>產出日：</td>
+			    		<td>{{toJsDate(paramList[0].GENEDATE1) | date:'yyyy/MM/dd'}}</td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th rowspan="2">業務處</th>							
+							<th rowspan="2">營運區</th>							
+							<th rowspan="2">分行代碼</th>
+							<th rowspan="2">分行名稱</th>
+							<th rowspan="2">專員姓名</th>
+							<th rowspan="2">員編</th>
+							<th rowspan="2">目前職務別</th>
+							<th rowspan="2">月目標</th>
+							<th rowspan="2">SH_分組</th>
+							<th colspan="3">MTD投資</th>
+							<th colspan="3">MTD保險</th>
+							<th colspan="3">MTD匯兌</th>
+							<th colspan="5">MTD合計</th>
+							<th colspan="5">YTD合計</th> 
+						</tr>
+						<tr>
+							<th>手收</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<th>手收</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<th>手收</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<th>手收</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<th>進度達<br>成情形</th>
+							<th>依專員<br>別排名</th>
+							<th>手收</th>
+							<th>目標</th>
+							<th>達成率</th>
+							<th>進度達<br>成情形</th>
+							<th>依專員<br>別排名</th>				
+						</tr>							
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						 	<td align="center">{{row.REGION_CENTER_NAME}}</td>
+						 	<td align="center">{{row.BRANCH_AREA_NAME}}</td>				 							
+							<td align="center">{{row.BRANCH_NBR}}</td>
+							<td align="center">{{row.BRANCH_NAME}}</td>
+							<td align="center">{{row.EMP_NAME}}</td>
+							<td align="center">{{row.EMP_ID}}</td>
+							<td align="center">{{row.AO_JOB_TITLE}}</td>
+							<td align="right">{{0+row.MTD_SUM_GOAL | currency:"":0}}</td>
+							<td  align="center">{{row.GROUP_TYPE}}</td>
+							
+							<!-- MTD -->
+							<td align="right">{{0+row.MTD_INV_FEE  | currency:"":0}}</td>
+							<td align="right">{{0+row.MTD_INV_GOAL | currency:"":0}}</td>
+							<td align="right">{{0+row.MTD_INV_RATE | currency:"":0}}%</td>
+							<td align="right">{{0+row.MTD_INS_FEE  | currency:"":0}}</td>
+							<td align="right">{{0+row.MTD_INS_GOAL | currency:"":0}}</td>
+							<td align="right">{{0+row.MTD_INS_RATE | currency:"":0}}%</td>							
+							<td align="right">{{0+row.MTD_EXG_FEE  | currency:"":0}}</td>
+							<td align="right">{{0+row.MTD_EXG_GOAL | currency:"":0}}</td>
+							<td align="right">{{0+row.MTD_EXG_RATE | currency:"":0}}%</td>																					
+							<td align="right">{{0+row.MTD_SUM_FEE  | currency:"":0}}</td>
+							<td align="right">{{0+row.MTD_INV_GOAL+row.MTD_INS_GOAL+row.MTD_EXG_GOAL | currency:"":0}}</td>
+							<td align="right">{{0+row.MTD_SUM_RATE | currency:"":0}}%</td>
+							<td align="center">
+								<!-- <span ng-show="row.MTD_SUM_RATE >= 100"><img src="assets/images/icon/smile.png"></span>
+								<span ng-show="row.MTD_SUM_RATE < 100"><img	src="assets/images/icon/cry.png"></span> -->
+								<span ng-show="row.MTD_GOAL_FLAG == 'Y'"><img src="assets/images/icon/smile.png"></span>
+								<span ng-show="row.MTD_GOAL_FLAG == 'N'"><img src="assets/images/icon/cry.png"></span>
+							</td>							
+							<td align="center" >{{row.RANK_MTD_ALL_BY_JOB}}
+								<span ng-show="row.RANK_MTD_ALL_BY_JOB == null">1</span>
+							</td>
+							
+							<!-- YTD -->
+							<td align="right">{{0+row.YTD_SUM_FEE  | currency:"":0}}</td>
+							<td align="right">{{0+row.YTD_SUM_GOAL  | currency:"":0}}</td>
+							<td align="right">{{0+row.YTD_SUM_RATE  | currency:"":0}}%</td>
+							<td align="center">
+								<!--  <span ng-show="row.YTD_SUM_RATE >= 100"><img src="assets/images/icon/smile.png"></span>
+								<span ng-show="row.YTD_SUM_RATE < 100"><img	src="assets/images/icon/cry.png"></span>-->
+								<span ng-show="row.YTD_GOAL_FLAG == 'Y'"><img src="assets/images/icon/smile.png"></span>
+								<span ng-show="row.YTD_GOAL_FLAG == 'N'"><img src="assets/images/icon/cry.png"></span>
+							</td>							
+							<td align="center" >{{row.RANK_YTD_ALL_BY_JOB}}
+								<span ng-show="row.RANK_YTD_ALL_BY_JOB == null">1</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>								
+			</div>
+			<div>
+					<table>								
+			  	<tr>
+			    		<td align="right">說明：</td>
+			    		<td align="left"></td>
+			    	</tr>
+			    			</table>								
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

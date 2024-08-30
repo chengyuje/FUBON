@@ -1,0 +1,141 @@
+<style>
+/* open dialog */
+.ngdialog.PRD290 {
+	
+}
+/* dialog panl */
+.modal-dialog.PRD290 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+.modal-dialog.PRD290_Linear {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PRD290 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PRD290 table.little{
+	width: 60%;
+}
+/* change row */
+.PRD290.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PRD290_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD290/PRD290.js"></script>
+<script type="text/javascript" src="assets/txn/PRD290/PRD290_Setting.js"></script>
+<script type="text/javascript" src="assets/txn/PRD290/PRD290_Compare.js"></script>
+<script type="text/javascript" src="assets/txn/PRD290/PRD290_Linear.js"></script>
+<div class="PRD290" ng-controller="PRD290Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th>商品代碼：</th>
+					<td><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="prd_id" name="prd_id" ng-model="inputVO.prd_id" e-length-limit="16"></td>
+<!-- 					<th>商品類型：</th> -->
+<!-- 					<td> -->
+<!-- 						<e-combobox id="type"  -->
+<!-- 							ng-datasource="mappingSet['Type']" -->
+<!-- 							ng-model="inputVO.type" -->
+<!-- 	    					ng-validate="false" -->
+<!-- 	    					ng-readonly="false"  -->
+<!-- 	    					ng-editable="false" -->
+<!-- 	    					ng-format="F3" -->
+<!-- 	    					ng-required="false" -->
+<!-- 	    					width="150px" -->
+<!-- 	    					style="line-height:20px;" /> -->
+<!-- 					</td> -->
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="inquireInit();init()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="setting()" function-type="maintenance">主推商品完整包來源設定</button>
+			<button type="button" class="btn btn-info" ng-show="paramList.length > 0" ng-click="compare()">每日進場累計報酬比較</button>
+		</div>
+		<!-- 結果區 -->
+		<e-jumping-once output="outputVO" list="paramList" totallist="totalList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;">
+			<table class="table table-bordered td_center">
+				<thead>
+					<tr>
+						<th>
+							<label style="font-weight: initial;margin-bottom: 0px;">
+								<input type='checkbox' ng-model='checkVO.clickAll' ng-change='checkrow()' /> 本頁全選
+							</label>
+						</th>
+						<th>商品代碼</th>
+						<th>商品名稱</th>
+						<th>每日進場<br/>最小報酬 %</th>
+						<th>每日進場<br/>最大報酬 %</th>
+						<th>每日進場<br/>平均報酬 %</th>
+						<th>累計漲幅<br/>已超過{{RETURN_TARGET}}%標的</th>
+						<th>標示日期/報酬</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="row in paramList track by $index">
+						<td width="6%">
+							<label>
+								<input type='checkbox' ng-model='row.CHECK' />
+							</label>
+						</td>
+						<td width="10%" class="td_center">{{row.PRD_ID}}</td>
+						<td width="24%" class="td_center"><a onclick="return false" ng-click="detail(row)">{{row.FUND_CNAME_A}}</a></td>
+						<td width="10%" class="td_right">{{row.C_RETURN_MIN * 100 | number:2}}{{row.C_RETURN_MIN ? '%' : ''}}</td>
+						<td width="10%" class="td_right">{{row.C_RETURN_MAX * 100 | number:2}}{{row.C_RETURN_MAX ? '%' : ''}}</td>
+						<td width="10%" class="td_right">{{row.C_RETURN_AVG * 100 | number:2}}{{row.C_RETURN_AVG ? '%' : ''}}</td>
+						<td width="10%" class="td_center"><div ng-if="row.PRICE_DATE_SUM"><img src="assets/images/star-icon.png" height="30" width="30"/></div></td>
+						<td width="20%" class="td_center">
+							<div ng-repeat="row2 in row.PRICE_DATE_SUM track by $index">
+								{{toJsDate(row2.PRICE_DATE) | date:"yyyy-MM-dd"}}&nbsp;/&nbsp;{{row2.C_RETURN * 100 | number:2}}%
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

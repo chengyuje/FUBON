@@ -1,0 +1,124 @@
+<style>
+/* dialog panl */
+.modal-dialog.INS441 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1250px;
+	height: auto;
+}
+.textBoxSize {
+	width: 60px;
+	text-align:center;
+	
+}
+.colSize th{
+	width: 75px;
+}
+.moneyBoxSize{
+	width: 120px;
+}
+.moneycolSize th{
+	width: 150 px;
+}
+.INS441 .table td {
+  text-align: left;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/INS430/INS441.js"></script>
+<script type="text/javascript" src="assets/txn/INS112/INS112.js"></script>
+<div ng-controller="INS441Controller" ng-cloak>
+	<div class="modal-dialog INS441">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">保險商業給付</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;" ng-hide="modifyDisabled">
+					<button type="button" class="btn btn-info" ng-click="addRow()">新增</button><hr>
+					<table style="text-align:left">
+						<thead>
+							<tr>
+								<th>勾選</th>
+								<th>功能</th>
+								<th>保險公司</th>
+								<th>險種</th>
+								<th class="colSize">給付年齡(起)</th>
+								<th class="colSize">給付年齡(迄)</th>
+								<th class="moneycolSize">退休後每月給付</th>
+								<th class="moneycolSize">退休後一次給付</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in inputVO.insList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">								
+								<td align = "center"><input type="checkbox"></td>
+								<td align = "center"><a class="btn btn-danger btn-circle" ng-click="deleteRow($index, row)"><i class="glyphicon glyphicon-trash"></i></a></td>
+								<td align = "center">
+									<e-combobox id="compID" name="compID" 
+												ng-datasource="compList"
+												ng-model="row.COM_ID"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-required="true"
+												ng-format="F3"
+												width="150px"
+												ng-change="getPrdList(row, row.COM_ID)"
+												style="line-height:20px;"/>
+								</td>
+								<td align = "center">
+									<e-combobox id="row.PRD_ID" name="row.PRD_ID" 
+												ng-datasource="row.prdList"
+												ng-model="row.PRD_ID"
+												ng-validate="false" 
+												ng-readonly="false" 
+												ng-editable="false"
+												ng-required="true"
+												ng-format="F3"
+												width="200px"
+												style="line-height:20px;"/>
+									<button type="button" class="btn btn-info" ng-click="toINS112(row)"><span class="glyphicon">&#xe003;</span></button>
+								</td>
+								<td align = "center">
+									<input type="text" class="textBoxSize form-control" ng-model="row.AGE_S" onkeyup="this.value=this.value.replace(/\D/g,'')" maxlength="3" ng-required="true">
+								</td>
+								<td align = "center">
+									<input type="text" class="textBoxSize form-control" ng-model="row.AGE_E" onkeyup="this.value=this.value.replace(/\D/g,'')" maxlength="3" ng-required="true">
+								</td>
+								<td align = "center">
+									<input type="text" class="moneyBoxSize form-control"
+										   ng-model="row.ARTL_DEBT_AMT_ONCE" 
+										   e-input-limit="NN" 
+										   ng-disabled="row.ARTL_DEBT_AMT_MONTHLY != null && row.ARTL_DEBT_AMT_MONTHLY != ''" 
+										   ng-blur="count(row, 'once')"
+										   maxlength="8">
+								</td>
+								<td align = "center">
+									<input type="text" class="moneyBoxSize form-control"
+										   ng-model="row.ARTL_DEBT_AMT_MONTHLY" 
+										   e-input-limit="NN" 
+										   ng-disabled="row.ARTL_DEBT_AMT_ONCE != null && row.ARTL_DEBT_AMT_ONCE != ''" 
+										   ng-blur="count(row, 'month')"
+										   maxlength="8">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<br>
+					<span ng-bind="'商業保險給付金額合計(每月給付/一次給付)：'"></span>
+					<span>{{tempOnceNum | number}}</span>
+					<span>/</span>
+					<span>{{onceTotal | number}}</span>
+				</div>
+				<br />
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="save()">確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

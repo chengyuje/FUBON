@@ -1,0 +1,71 @@
+<
+<style>
+input:required:invalid {
+	border-color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/KYC410/KYC410_edit.js"></script>
+<div ng-controller="KYC410EditController" ng-cloak>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" ng-if= "isUpdate">修改題目</h4>
+				<h4 id="myModalAlertLabel" class="modal-title" ng-if= "isAdd">新增題目</h4>
+			</div>
+			<div class="modal-body">
+				<div class="search_table search_box1">
+					<table>
+						<tr>
+							<th>題目</th>
+							<td>
+								<input class="form-control" type="text" ng-model="inputVO.QUESTION_DESC" ng-required="true">
+							</td>
+						</tr>
+						<tr>
+							<th>題目類型</th>
+							<td><e-combobox id="quertiontype" name="quertiontype"
+									ng-datasource="list"
+									ng-model="inputVO.QUESTION_TYPE" ng-validate="false"
+									ng-readonly="false" ng-editable="false" ng-format="F3"
+									ng-required="true" width="300px" style="line-height:20px;" />
+							</td>
+						</tr>
+						<tr>
+							<th>選項清單</th>
+							<td><button type="button" class="btn btn-info" ng-click="addRow()">新增選項清單</button></td>
+						</tr>
+					</table>
+				</div>
+				<div class="gv_tab_sc scroll_y">
+					<table>
+						<tr>
+							<th>功能</th>
+							<th>正確答案</th>
+							<th>選項</th>
+						</tr>
+						<tr ng-repeat="row in inputVO.ANSWER_DESC track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td width="10px">
+								<button type="button" class="btn btn-info" ng-click="deleteRow($index,row)">X</button>
+							</td>
+							<td>
+								<input ng-if="inputVO.QUESTION_TYPE == 'S'" type="radio" class="form-control" 
+									   placeholder="請輸入..." id="answer_seq" name="answer_seq" ng-model="row.CORR_ANS" ng-value=true>
+								<input ng-if="inputVO.QUESTION_TYPE == 'M'" type="checkbox" class="form-control" 
+									   placeholder="請輸入..." id="answer_seq" name="answer_seq" ng-model="row.CORR_ANS">
+							</td>
+							<td>{{row.ANSWER_DESC}} 
+								<input ng-if="row.ANSWER_DESC == null ? true : false" type="text" class="form-control" 
+									   placeholder="請輸入..." id="answer_desc" name="answer_desc" ng-model="row.ANS_DESC">
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="modal-footer">
+					<button ng-click="saveData()" class="btn btn-info" data-dismiss="modal">確定</button>
+					<button type="button" ng-click="closeThisDialog('cancel')" class="btn btn-info" data-dismiss="modal">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

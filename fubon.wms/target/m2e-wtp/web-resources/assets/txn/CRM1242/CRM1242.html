@@ -1,0 +1,54 @@
+<style>
+
+.bigspace{
+	margin-left: 50px !important;
+}
+
+</style>
+
+<script type="text/javascript" src="assets/txn/CRM1242/CRM1242.js"></script>
+<script type="text/javascript" src="assets/txn/CRM1242/CRM1242_CONFLICT.js"></script>
+<div ng-controller="CRM1242Controller" ng-cloak>
+
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >駐點及陪訪資訊</div>
+	</div>
+		<div class="panel_content">
+		<div class="gv_tab_sc scroll_y" style="height:235px;">
+			<table>
+				<thead>
+					<tr>
+						<th>約訪時間</th>
+						<th>分行</th>
+						<th>理專</th>
+						<th>客戶姓名</th>
+						<th>FA/IA</th>
+						<th>駐點行</th>
+						<th>是否衝突</th>
+						<th>核可</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row text-center" ng-repeat="row in resultList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{toJsDate(row.AS_DATE) | date:"yyyy-MM-dd"}}<BR>{{row.AS_DATETIME_BGN_1}} - {{row.AS_DATETIME_END_1}}</td>
+						<td>{{row.BRANCH_NAME}}</td>
+						<td>{{row.AO_EMP_NAME_1}}</td>
+						<td>{{row.CUST_NAME_1}}</td>
+						<td>{{row.AS_FAIA}}-{{row.EMP_NAME}}</td>
+						<td>{{row.ONSITE_NAME}}</td>
+						<td><a ng-click="conflict(row)" ng-show="row.CHECK == '有衝突'">{{row.CHECK}}</a></td>
+						<td><input type='checkbox' ng-model='row.SELECTED' ></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="reply('2')" >退回理專</button>
+			<span class="bigspace"></span>
+			<button type="button" class="btn btn-info" ng-click="reply('1')" >確認放行</button>
+		</div>
+		
+		</div>
+</div>

@@ -1,0 +1,80 @@
+<style>
+/* 2016/6/7 By:David Add:css */
+.modal-dialog.CMMGR005{
+	width: 1000px;
+	padding: 0%;
+}
+.scroll_CMMGR005_dialog{
+	display: inline-block;
+	overflow:scroll;
+	height: 290px;
+	width: 50%;
+}
+.text_CMMGR005_dialog{
+	display: inline-block;
+	float: right;
+	width: 45%;
+	margin-right: 25px;
+	margin-top: 10px;
+}
+.td_CMMGR005_ellipsis{
+	max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<!-- 2016/6/7 By:David Dialog舊版面更換 -->
+<div ng-controller="CMMGR005EditController" ng-cloak slim-scroll-init>
+	<div class="modal-dialog CMMGR005">
+		<div class="modal-content CMMGR005">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+			<h4 id="myModalAlertLabel" class="modal-title" align="center">排程監控</h4>
+		</div>
+		<div class="modal-body">
+			<div>
+				<div class="scroll_CMMGR005_dialog">
+					<e-jumping 
+		          		output="outputVO"
+		          		input="inputVO"
+			           	query="inquire()"			           		
+			           	list="paramList"
+		           	></e-jumping> 
+					<table class="tablesaw table table-striped table-bordered" id="aba">
+						<thead>
+							<tr>
+								<th>日期時間</th>
+								<th>訊息</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row"
+								ng-repeat="row in paramList"
+								ng-click="showmsg(row)" ng-class-odd="'rowOdd'"
+								ng-class-even="'rowEven'">
+								<td style="width: 40%">{{row.CREATETIME}}</td>
+								<td class="td_CMMGR005_ellipsis">{{row.MESSAGE}}</td>	
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="text_CMMGR005_dialog">
+					<textarea id="u40_input"
+						ng-model="currentDetailRow.MESSAGE"
+						style="width: 100%; height: 290px;">
+					</textarea>					
+				</div>
+			</div>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-primary"
+				ng-click="closeThisDialog('cancel')">離開</button>
+		</div>
+		</div>				
+	</div>
+</div>

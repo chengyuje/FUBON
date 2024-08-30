@@ -1,0 +1,115 @@
+<style>
+.FPS920_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.FPS920_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_FPS920_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/FPS920/FPS920_EDIT.js"></script>
+<div ng-controller="FPS920_DETAILController" ng-cloak>
+	<div class="modal-dialog FPS920_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">Lifestage參數</h4>
+			</div>
+			<div class="modal-body">
+				<table>
+					<tr>
+						<th>
+							<div style="float: left !important;margin-top: 3px;">
+								資料年月：{{inputVO.date | date:"yyyy/MM"}}&emsp;&emsp;&emsp;
+								生效日：
+							</div>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="date" name="date" ng-disabled="Datarow.STATUS != 'S'"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.date"
+									is-open="model.a"
+									datepicker-options="dateOptions"
+									ng-readonly="true" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="Datarow.STATUS != 'S'">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</th>
+						<th><button ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" type="button" class="btn btn-primary" ng-click="add()" function-type="maintenance">新增</button></th>
+					</tr>
+				</table>
+				<br>
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="e-table-freeze table td_center" e-height="535px" e-mode="1" e-top="true" e-list="inputVO.totalList">
+						<thead>
+							<tr>
+								<th function-type="maintenance" ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'">功能</th>
+								<th>年齡(含起日不含訖日)</th>
+								<th>未成年子女</th>
+								<th>房貸</th>
+								<th>財神推薦特定目的項目</th>
+								<th>最後修改時間</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in inputVO.totalList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td function-type="maintenance" width="10%" ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'">
+									<e-combobox id="cmbAction" name="cmbAction"
+									ng-datasource="row.set"
+									ng-model="row.cmbAction"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="action(row)"
+									width="100px"
+									style="line-height:20px;" />
+								</td>
+								<td>{{row.AGE_START}}-{{row.AGE_END}}</td>
+								<td>{{row.CHILD_YN == 'Y' ? '有' : '無'}}</td>
+								<td>{{row.LN_HOUSE_YN == 'Y' ? '有' : '無'}}</td>
+								<td>{{row.MONEY_GOD}}</td>
+								<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd"}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button ng-if="Datarow.STATUS == 'P' && Datarow.MODIFIER != currUser" type="button" class="btn btn-primary" ng-click="review('W')" function-type="confirm">同意</button>
+					<button ng-if="Datarow.STATUS == 'P' && Datarow.MODIFIER != currUser" type="button" class="btn btn-primary" ng-click="review('R')" function-type="confirm">退回</button>
+					<button ng-if="Datarow.STATUS == 'W'" type="button" class="btn btn-primary" ng-click="review('F')" function-type="confirm">失效</button>
+					<button ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" type="button" class="btn btn-primary" ng-click="goReview()" function-type="maintenance">傳送主管覆核</button>
+					<button ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance">儲存</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,187 @@
+<style>
+/* open dialog */
+.ngdialog.CRM671_add {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM671_add {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 890px;
+	height: auto;
+}
+/* table size */
+.CRM671_add table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM671_add.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM671_add_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM610/CRM610.js"></script>
+<script type="text/javascript" src="assets/txn/CRM610/CRM610_DETAIL.js"></script>
+<div ng-controller="CRM671_addController" ng-cloak>
+	<div class="modal-dialog CRM671_add">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">名單與待辦工作內容</h4>
+			</div>
+			
+			<div class="row" ng-hide="true">
+				<div class="col-md-6">
+					<div ng-include="'assets/txn/CRM611/CRM611.html'"></div>
+				</div>
+			</div>
+			
+			<div class="modal-body">
+				<div class="search_table search_box">
+      				<table>
+      					<tr>
+	                      	<th>溝通聯繫方式：</th>
+	                      	<td>
+								<e-combobox id="cmu_type" name="cmu_type" 
+											ng-datasource="mappingSet['CAM.VST_REC_CMU_TYPE']"
+											ng-model="inputVO.cmu_type"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											width="300px"
+											style="line-height:20px;" 
+											required/>
+							</td>
+                   		</tr>
+                   		<tr ng-show="parameterTypeEditForm.cmuType.$error.required">
+							<th></th>
+							<td class="col-md-7 help-block with-errors">請選擇溝通聯繫方式</td>
+						</tr>
+<!--                     	<tr> -->
+<!--                     		<th>制式文字：</th> -->
+<!--                       		<td> -->
+<!--                       			<e-combobox id="rec_text_format" name="rec_text_format"  -->
+<!-- 											ng-datasource="mappingSet['CAM.VST_REC_TEXT_FORMAT']" -->
+<!-- 											ng-model="inputVO.rec_text_format" -->
+<!-- 											ng-validate="false"  -->
+<!-- 											ng-readonly="false"  -->
+<!-- 											ng-editable="false" -->
+<!-- 											ng-format="F3" -->
+<!-- 											ng-change="write()" -->
+<!-- 											width="300px" -->
+<!-- 											style="line-height:20px;"/> -->
+<!--                       		</td> -->
+<!--                     	</tr> -->
+                    	<tr>
+                    		<th>聯繫時間：</th>
+                    		<td>
+                    			<div class="form-group">
+                    				<div class="input-group datebox datewidth" style="float:left">
+										<input 	type="text" id="visit_date" name="visit_date"
+												class="form-control"
+												uib-datepicker-popup="yyyy/MM/dd"
+												ng-model="inputVO.visit_date"
+												is-open="model.f"
+												datepicker-options="visit_date_DateOptions"
+												ng-readonly="true"								
+												ng-change="limitDate();"/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'f')">
+												<i class="glyphicon glyphicon-calendar"></i></button>																		
+										</span>
+									</div>
+	                    			
+									<div style="display:inline;float:left">
+										<input type="time" class="form-control" style="width:150px" ng-model="inputVO.visit_time" placeholder="HH:mm" required >
+									</div>
+								</div>
+                    		</td>
+                    	</tr>
+                    	<tr>
+                    		<th>通知客戶內容：</th>
+                    		<td>
+                    			<textarea name="visit_memo" id="visit_memo" 
+                    					  placeholder="請輸入..." 
+                    					  ng-model="inputVO.visit_memo" 
+                    					  ng-blur="checkDisableText(inputVO.visit_memo, 'visitMemo')"
+                    					  e-length-limit="1000"
+                    					  style="width: 100%; height: 100px" 
+                    					  class="form-control" 
+                    					  required>
+                    			</textarea>
+                    		</td>
+                    	</tr>
+                    	<tr ng-show="parameterTypeEditForm.visit_memo.$error.required || disableTextFormatStatus == false || !parameterTypeEditForm.visit_memo.$valid">
+							<th></th>
+							<td class="col-md-7 help-block with-errors">
+								<div style="display:inline;" ng-show="parameterTypeEditForm.visit_memo.$error.required">請輸入 通知客戶內容</div>
+								<div style="display:inline;" ng-show="disableTextFormatStatus == false">通知客戶內容 含有禁用字串{{tempDisableText}}</div>
+							</td>
+						</tr>
+                    	<tr>
+                    		<th>客戶回應內容：</th>
+                    		<td>
+                    			<textarea name="visit_creply" id="visit_creply" 
+                    					  placeholder="請輸入..." 
+                    					  ng-model="inputVO.visit_creply" 
+                    					  ng-blur="checkDisableText(inputVO.visit_creply, 'visitCreply')"
+                    					  e-length-limit="1000"
+                    					  style="width: 100%; height: 100px" 
+                    					  class="form-control" 
+                    					  required>
+                    			</textarea>
+                    		</td>
+                    	</tr>
+                    	<tr ng-show="parameterTypeEditForm.visit_creply.$error.required || disableTextFormatStatusBYcrp == false || !parameterTypeEditForm.visit_creply.$valid">
+							<th></th>
+							<td class="col-md-7 help-block with-errors">
+								<div style="display:inline;" ng-show="parameterTypeEditForm.visit_creply.$error.required">請輸入 客戶回應內容</div>
+								<div style="display:inline;" ng-show="disableTextFormatStatusBYcrp == false">客戶回應內容 含有禁用字串{{tempDisableTextBYcrp}}</div>
+							</td>
+						</tr>
+                  	</table>
+                </div>
+				<div class="modal-footer" style="text-align: center">
+					<button type="button" class="btn btn-primary" ng-click="save()" 
+							ng-disabled = "inputVO.cmu_type == '' ||
+										   inputVO.visit_memo == '' || 
+										   inputVO.visit_memo == null || 
+										   inputVO.visit_date == '' || 
+										   inputVO.visit_time == '' ||
+										   inputVO.visit_creply == '' ||
+										   inputVO.visit_creply == null ||
+										   (!disableTextFormatStatus) ||
+										   (!disableTextFormatStatusBYcrp) ">存檔</button>
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+                 
+			</div>
+		</div>
+	</div>
+</div>

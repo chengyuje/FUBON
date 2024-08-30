@@ -1,0 +1,296 @@
+<style>
+/* open dialog */
+.ngdialog.PMS324 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS324 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS324 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PMS324 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS324.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS324_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+.alignleft {
+	text-align: left !important;
+}
+.bigspace {
+	margin-left: 50px !important;
+}
+.datewidth {
+	width: 180px !important;
+}
+.search-table-outter {
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 100px;
+	white-space: nowrap;
+}
+.clas tr th {
+	vertical-align: middle;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+.rstable thead tr th {
+ vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS324/PMS324.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS324/PMS324_upload.js"></script>
+<script type="text/javascript" src="assets/txn/PMS324/PMS324_showData.js"></script>
+<script type="text/javascript" src="assets/txn/PMS324/PMS324_parameter.js"></script>
+<div class="PMS324" ng-controller="PMS324Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">請輸入查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*考核區間：</th>
+							<td><e-combobox id="eTime"
+									ng-datasource="mappingSet['timeE']" ng-model="s1Time"
+									ng-validate="false" ng-change="dateChange()"
+									ng-readonly="false" ng-editable="false"
+									ng-format="F3" ng-required="true" width="200px" height="30px"
+									style="line-height:20px;" />
+							</td>
+							<th>業務處：</th>
+							<td><e-combobox id="region_center_id" name="region_center_id" 
+									ng-model="inputVO.region_center_id" ng-disabled="disableRegionCombo"
+									ng-datasource="REGION_LIST" ng-validate="false"
+									ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-format="F3" ng-required="false" ng-change="ChangeRegion()"
+									width="200px" height="30px" style="line-height:20px;" /></td>
+							<th>營運區：</th>
+							<td><e-combobox id="branch_area_id" name="branch_area_id" ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id" ng-validate="false" ng-readonly="disableAreaCombo"
+									ng-editable="false" ng-change="ChangeArea()" ng-format="F3"
+									ng-required="false" width="200px" height="30px"
+									ng-disabled="disableAreaCombo"
+									style="line-height:20px;" /></td>
+							<th><button type="button" class="btn btn-info" ng-click="upload(s1Time)" function-type="maintenance">晉級參數上傳</button></th>
+						</tr>
+						<tr>
+							<th>計算區間：</th>
+							<td><e-combobox id="eTime"
+									ng-datasource="mappingSet['timeEx']" ng-model="s2Time"
+									ng-validate="false" ng-change="dateChange1()"
+									ng-readonly="false" ng-editable="false"
+									ng-format="F3" ng-required="false" width="200px" height="30px"
+									style="line-height:20px;" />
+							</td>
+							<th>分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr"
+									ng-validate="false" ng-editable="false"
+									ng-format="F1" ng-required="false" ng-change="ChangeBranch()"
+									ng-readonly="disableBranchCombo" 
+									ng-disabled="disableBranchCombo"
+									width="200px" height="30px" style="line-height:20px;" /></td>
+							<th>理專：</th>
+							<td><e-combobox id="emp_id" name="emp_id"
+									ng-datasource="EMP_LIST" ng-model="inputVO.emp_id"
+									ng-validate="false" ng-readonly="disableEmpCombo" ng-change="ChangeAo_code()"
+									ng-editable="false" ng-format="F1" ng-required="false" width="200px"
+									ng-disabled="disableEmpCombo"
+									style="line-height:20px;" /></td>
+							<!-- <th><button type="button" class="btn btn-info" ng-click="parameter(inputVO.sTime)" function-type="maintenance">晉級門檻參數</button></th> -->
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();inquireInit()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button> 
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList"></e-jumping>
+			<div class="gv_tab_sc scroll_y"
+				style="height: 235px; white-space: nowrap;">
+				<table class="  table-bordered rstable middle">
+				<thead ng-if="role == 1">
+						<tr>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行代號</th>
+							<th>分行名稱</th>
+							<th>AO CODE</th>
+							<th>姓名</th>
+							<th>員工編號</th>
+							<th>職級</th>
+							<th>職等</th>
+							<th>職稱</th>
+							<th>任業務職掛GOAL日</th>
+							<th>勞動契約</th>
+							<th>{{inputVO.startTime}}~{{inputVO.execTime}}<br>平均實際收益</th>
+							<th>公傷病假</th>
+							<th>喪假</th>
+							<th>婚假</th>
+							<th>產假</th>
+							<th>休假日數</th>
+							<th>上一職級直線標準</th>
+							<th>上一職級直線標<br>準達成率</th>
+							<th>上一職級橫向標準</th>
+							<th>上一職級橫向標<br>準達成率</th>
+							<th>上一職級45度標準</th>
+							<th>上一職級45度<br>標準達成率</th>
+							<th>手收是否達<br>晉級生產力目標</th>
+							<th>房貸件數</th>
+							<th>房貸轉介目標</th>
+							<th>房貸達成率</th>
+							<th>信用卡計績卡數</th>
+							<th>信用卡目標</th>
+							<th>信用卡達成率</th>
+							<th>前一年度<br>考績甲以上(含)</th>
+							<th>違反法令遵循</th>
+							<th>是否晉級</th>
+							<th>晉升後職級</th>
+							<th>晉升後職等</th>
+							<th>晉升後職稱</th>
+							<th>建議調整金額</th>
+						</tr>
+					</thead>
+					<thead ng-if="role != 1">
+						<tr>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行代號</th>
+							<th>分行名稱</th>
+							<th>AO CODE</th>
+							<th>姓名</th>
+							<th>員工編號</th>
+							<th>職級</th>
+							<th>職等</th>
+							<th>職稱</th>
+							<th>{{inputVO.startTime}}~{{inputVO.execTime}}平均實際收益</th>
+							<th>應達生產力目標<br>達成率(註)</th>
+							<th>上一職級直線標<br>準達成率</th>
+							<th>上一職級橫向標<br>準達成率</th>
+							<th>上一職級45度<br>標準達成率</th>
+							<th>房貸件數達成率</th>
+							<th>信用卡計績卡數<br>達成率</th>
+						</tr>
+					</thead>
+					<tbody ng-if="role == 1">
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.REGION_CENTER_NAME }}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME }}</td>
+							<td align="center">{{row.BRANCH_NBR }}</td>
+							<td align="center">{{row.BRANCH_NAME }}</td>
+							<td align="center">{{row.AO_CODE }}</td>
+							<td align="center">{{row.EMP_NAME }}</td>
+							<td align="center">{{row.EMP_ID }}</td>
+							<td align="center">{{row.JOB_TITLE_ID }}</td>
+							<td align="center">{{row.JOB_LEVEL_NAME }}</td>
+							<td align="center">{{row.JOB_POSITION_NAME }}</td>
+							<td align="center">{{row.GOAL_DAY }}</td>
+							<td align="center">{{row.WORK_AGREEMENT }}</td>
+							<td align="right">{{row.AVG_REAL_INCOME | number:0}}</td>
+							<td align="right">{{row.JOB_SICK | number:2}}</td>
+							<td align="right">{{row.FUNERAL_LEAVE | number:2}}</td>
+							<td align="right">{{row.MARRIAGE_LEAVE | number:2}}</td>
+							<td align="right">{{row.MATERNITY_LEAVE | number:2}}</td>
+							<td align="right">{{row.LEAVE_DAYS | number:2}}</td>
+							<td align="right">{{row.LAST_TITLE_STR  | number:0}}</td>
+							<td align="right">{{row.LAST_TITLE_STR_RATE * 100 | number:2}}%</td>
+							<td align="right">{{row.LAST_TITLE_TRA | number:0}}</td>
+							<td align="right">{{row.LAST_TITLE_TRA_RATE * 100 | number:2}}%</td>
+							<td align="right">{{row.LAST_TITLE_45 | number:0}}</td>
+							<td align="right">{{row.LAST_TITLE_45_RATE * 100 | number:2}}%</td>
+							<td align="center">{{row.PROM_PROD_GOAL }}</td>
+							<td align="right">{{row.LOAN_NUM | number:0}}</td>
+							<td align="right">{{row.LOAN_GOAL| number:0}}</td>
+							<td align="right">{{row.LOAN_RATE * 100 | number:2}}%</td>
+							<td align="right">{{row.CARD_NUM | number:0}}</td>
+							<td align="right">{{row.CARD_GOAL | number:0}}</td>
+							<td align="right">{{row.CARD_RATE * 100 | number:2}}%</td>
+							<td align="center">{{row.RESULT_FIRST_OVER }}</td>
+							<td align="center">{{row.VIOL_ORDER }}</td>
+							<td align="center">{{row.IS_PROMO }}</td>
+							<td align="center">{{row.PROM_AFT_RANK }}</td>
+							<td align="center">{{row.PROM_AFT_GRA }}</td>
+							<td align="center">{{row.PROM_AFT_NAME }}</td>
+							<td align="center">{{row.ADJUST_SUM }}</td>
+						</tr>
+					</tbody>
+					<tbody ng-if="role != 1">
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.REGION_CENTER_NAME }}</td>
+							<td align="center">{{row.BRANCH_AREA_NAME }}</td>
+							<td align="center">{{row.BRANCH_NBR }}</td>
+							<td align="center">{{row.BRANCH_NAME }}</td>
+							<td align="center">{{row.AO_CODE }}</td>
+							<td align="center">{{row.EMP_NAME }}</td>
+							<td align="center">{{row.EMP_ID }}</td>
+							<td align="center">{{row.JOB_TITLE_ID }}</td>
+							<td align="center">{{row.JOB_LEVEL_NAME }}</td>
+							<td align="center">{{row.JOB_POSITION_NAME }}</td>
+							<td align="right">{{row.AVG_REAL_INCOME }}</td>
+							<td align="right">{{row.STAT_GOAL }}</td>
+							<td align="right">{{row.LAST_TITLE_STR_RATE * 100 | number:2}}%</td>
+							<td align="right">{{row.LAST_TITLE_TRA_RATE * 100 | number:2}}%</td>
+							<td align="right">{{row.LAST_TITLE_45_RATE * 100 | number:2}}%</td>
+							<td align="right">{{row.LOAN_RATE * 100 | number:2}}%</td>
+							<td align="right">{{row.CARD_RATE * 100 | number:2}}%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,250 @@
+<script type="text/javascript" src="assets/txn/ORG410/ORG410.js"></script>
+<div class="ORG410" ng-controller="ORG410Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr>
+						<th>異動類別：</th>
+						<td>
+							<e-combobox id="" 
+										ng-paramtype="ORG.CHANGE_TYPE"
+										ng-model="inputVO.CHANGE_TYPE"
+					   					ng-validate="false" 
+					   					ng-readonly="false" 
+					   					ng-editable="false"
+					   					ng-format="F3"
+					   					ng-required="false"
+					   					style="line-height:20px;" />
+		   				</td>
+			   			<th></th>
+						<td></td>
+					</tr>
+					<tr>
+			   			<th>員工編號：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." id="" name="" ng-model="inputVO.EMP_ID" e-length-limit="60" maxlength="8"></td>
+						<th>員工姓名：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." id="" name="" ng-model="inputVO.EMP_NAME" maxlength="4"></td>
+					</tr>
+					<tr>
+						<th>區別</th>
+						<td>
+							<e-combobox id="HIS_BRANCH_AREA_ID" name="HIS_BRANCH_AREA_ID"
+										ng-datasource="HIS_AREA_LIST"
+										ng-model="inputVO.HIS_BRANCH_AREA_ID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(region_his)"
+										style="line-height:20px;" />
+		   				</td>
+						<th>異動後區別：</th>
+						<td>
+							<e-combobox id="BRANCH_AREA_ID" name="BRANCH_AREA_ID"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.BRANCH_AREA_ID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(region)"
+										style="line-height:20px;" />
+		   				</td>
+					</tr>
+					<tr>
+						<th>分行：</th>
+						<td>
+							<e-combobox id="HIS_BRANCH_ID" name="HIS_BRANCH_ID"
+										ng-datasource="HIS_BRANCH_LIST"
+										ng-model="inputVO.HIS_BRANCH_ID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeBranch(region_his)"
+										style="line-height:20px;" />
+	   					</td>
+		   				<th>異動後分行：</th>
+						<td>
+							<e-combobox id="BRANCH_ID" name="BRANCH_ID"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.BRANCH_ID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeBranch(region)"
+										style="line-height:20px;" />
+		   				</td>
+			   		</tr>
+			   		<tr>	
+						<th>職務：</th>
+						<td>
+							<e-combobox id=""
+										ng-datasource="mappingSet['AO_JOB_RANK']"
+										ng-model="inputVO.HIS_JOB_TITLE_NAME"
+					   					ng-validate="false" 
+					   					ng-readonly="false" 
+					   					ng-editable="false"
+					   					ng-format="F3"
+					   					ng-required="false"
+			   							style="line-height:20px;" />
+					   	</td>
+						<th>異動後職務：</th>
+						<td>
+							<e-combobox id="" 
+										ng-datasource="mappingSet['AO_JOB_RANK']"
+										ng-model="inputVO.JOB_TITLE_NAME"
+					   					ng-validate="false" 
+					   					ng-readonly="false" 
+					   					ng-editable="false"
+					   					ng-format="F3"
+					   					ng-required="false"
+					   					style="line-height:20px;" />
+					   	</td>
+					</tr>
+					<tr>
+						<th>職等：</th>
+						<td>
+							<e-combobox id="" 
+										ng-paramtype="ORG.JOB_RANK"
+										ng-model="inputVO.HIS_JOB_RANK"
+					   					ng-validate="false" 
+					   					ng-readonly="false" 
+					   					ng-editable="false"
+					   					ng-format="F3"
+					   					ng-required="false"
+					   					style="line-height:20px;" />
+					   	</td>
+						<th>異動後職等：</th>
+						<td>
+							<e-combobox id="" 
+										ng-paramtype="ORG.JOB_RANK"
+										ng-model="inputVO.JOB_RANK"
+					   					ng-validate="false" 
+					   					ng-readonly="false" 
+					   					ng-editable="false"
+					   					ng-format="F3"
+					   					ng-required="false"
+			   							style="line-height:20px;" />
+		   				</td>
+					</tr>
+					<tr>
+						<th>異動時間：</th>
+						<td colspan="2">
+							<table>
+								<tr>
+									<td>
+										<div class="input-group datebox datewidth">
+											<input type="text" id="" name="" 
+												   class="form-control"
+												   uib-datepicker-popup="yyyy/MM/dd"
+												   ng-model="inputVO.START_TIME"
+												   is-open="model.a"
+												   datepicker-options="startDateOptions"
+												   alt-input-formats="altInputFormats"
+												   ng-readonly="true"
+												   ng-change="limitDate()"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+													<i class="glyphicon glyphicon-calendar"></i>
+												</button>
+											</span>
+										</div>
+									</td>
+									<td align="center" style="width:10%">~</td>
+									<td>
+										<div class="input-group datebox datewidth">
+											<input type="text" id="" name=""
+												   class="form-control"
+												   uib-datepicker-popup="yyyy/MM/dd"
+												   ng-model="inputVO.END_TIME"
+												   is-open="model.b"
+												   datepicker-options="endDateOptions"
+												   alt-input-formats="altInputFormats"
+												   ng-readonly="true"
+												   ng-change="limitDate()"/>
+											<!-- 製作日曆button -->
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+													<i class="glyphicon glyphicon-calendar"></i>
+												</button>
+											</span>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>	
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()" >清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" ng-disabled="inputVO.EXPORT_LST.length == 0" function-type="export">匯出</button>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="query()" list="empChangeLst"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th class='text-center'>異動類別</th>
+							<th class='text-center'>員工</th>
+							<th class='text-center'>區別</th>
+							<th class='text-center'>異動後區別</th>
+							<th class='text-center'>分行</th>
+							<th class='text-center'>異動後分行</th>
+							<th class='text-center'>職務</th>
+							<th class='text-center'>異動後職務</th>
+							<th class='text-center'>職等</th>
+							<th class='text-center'>異動後職等</th>
+							<th class='text-center'>異動生效日</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in empChangeLst" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	 						<td class='text-center'>{{row.CHANGE_TYPE | mapping:mappingSet['ORG.CHANGE_TYPE']:'F3'}}</td>
+							<td class='text-center'>{{row.EMP_ID}}{{row.EMP_NAME != null ? '-' : ''}}{{row.EMP_NAME}}</td>
+							<td class='text-center'>{{row.HIS_BRANCH_AREA_NAME}}</td>
+							<td class='text-center'>{{row.BRANCH_AREA_NAME}}</td>
+							<td class='text-center'>{{row.HIS_BRANCH_ID}}{{row.HIS_BRANCH_NAME != null ? '-' : ''}}{{row.HIS_BRANCH_NAME}}</td>
+							<td class='text-center'>{{row.BRANCH_ID}}{{row.BRANCH_NAME != null ? '-' : ''}}{{row.BRANCH_NAME}}</td>
+							<td class='text-center'>{{row.HIS_JOB_TITLE_NAME}}</td>
+							<td class='text-center'>{{row.JOB_TITLE_NAME}}</td>
+							<td class='text-center'>{{row.HIS_JOB_RANK | mapping:mappingSet['ORG.JOB_RANK']:'F3'}}</td>
+							<td class='text-center'>{{row.JOB_RANK | mapping:mappingSet['ORG.JOB_RANK']:'F3'}}</td>
+							<td class='text-center'>{{row.EFFDT | date:"yyyy-MM-dd"}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

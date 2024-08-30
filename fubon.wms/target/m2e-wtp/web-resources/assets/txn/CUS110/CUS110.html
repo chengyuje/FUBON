@@ -1,0 +1,165 @@
+<style>
+.modal-dialog.CUS110 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+.modal-dialog.CUS111 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 550px;
+	height: auto;
+}
+/* table size */
+.CUS110 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CUS110 table.little{
+	width: 60%;
+}
+/* change row */
+.CUS110.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CUS110_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CUS110/CUS111.js"></script>
+<div ng-controller="CUS110Controller" ng-cloak>
+	<div class="modal-dialog CUS110">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">E-mail 發送</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">收件者：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="recipient" name="recipient" class="form-control" ng-model="recipient" ng-disabled="true"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">E-Mail：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="mail" name="mail" class="form-control" ng-model="mail" ng-disabled="true"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">主旨：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="subject" name="subject"
+								ng-datasource="SUBJECT"
+								ng-model="inputVO.subject"
+			  					ng-validate="false" 
+								ng-disabled="isConfirm"
+								ng-readonly="isConfirm" 
+								ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="true"
+			  					ng-change="checkSubject()"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 tdpadding"><input type="text" id="subjectTxt" name="subjectTxt" class="form-control" placeholder="主旨不能與銷售或產品行銷相關" ng-model="inputVO.subjectTxt" ng-disabled="inputVO.subject != '2' || isConfirm" ng-required="inputVO.subject == '2'"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.subject.$error.required || parameterTypeEditForm.subjectTxt.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇主旨</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">訊息內容：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="contentList" name="contentList"
+								ng-datasource="CONTENTLIST"
+								ng-model="inputVO.contentList"
+			  					ng-validate="false" 
+								ng-disabled="isConfirm"
+								ng-readonly="isConfirm" 
+								ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="true"
+			  					ng-change="checkContent()"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 tdpadding">
+								<textarea id="centerTextarea" name="centerTextarea" class="form-control" placeholder="主旨不能與銷售或產品行銷相關" ng-model="inputVO.centerTextarea" style="width: 100%; height: 100px" e-length-limit="4000" ng-disabled="inputVO.contentList != '-1' || isConfirm" ng-required="inputVO.contentList == '-1'"></textarea>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.contentList.$error.required || parameterTypeEditForm.centerTextarea.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇訊息內容</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 tdpadding">附加檔案：</th>
+							<td class="col-md-7 tdpadding">
+								<span ng-show="!isConfirm"><img ng-click="clickAttachFiles()" src="assets/images/icon/u43.png"></span>
+								<table>
+									<tr class="repeat-row" ng-repeat="row in attachList track by $index">
+										<td><a onclick="return false" ng-click="download(row)">{{row.FILENAME}}</a></td>
+										<td ng-show="!isConfirm"><button type="button" class="btn btn-info" ng-click="deleteFiles($index)">X</button></td>
+									<tr>
+								</table>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" ng-show="!isConfirm" class="btn btn-primary" ng-click="btnSendMail()">發送</button>
+					<button type="button" ng-show="!isConfirm" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+					<button type="button" ng-show="isConfirm" class="btn btn-primary" ng-click="btnConfirm('Y')">覆核</button>
+					<button type="button" ng-show="isConfirm" class="btn btn-default" ng-click="btnConfirm('N')">退回</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

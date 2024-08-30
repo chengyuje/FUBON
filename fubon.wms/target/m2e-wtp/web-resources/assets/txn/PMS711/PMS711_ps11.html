@@ -1,0 +1,89 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS711_ps11 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 50%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.table-border tr input {
+	width:100px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS711/PMS711_ps11.js"></script>
+<div ng-controller="PMS711_ps11Controller" ng-cloak>
+	<div class="modal-dialog PMS711_ps11">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{subName}}</h4>
+			</div>
+				<!--Content of the panel-->
+			<div class="panel_content">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						<table class="table-bordered table-border">
+							<tr>
+								<th>分行代碼</th>
+								<th>組別</th>
+								<th>分行名稱</th>
+								<th ng-repeat="x in showMonthList">{{x}}</th>
+								<!-- <th>1月目標</th>
+								<th>2月目標</th>
+								<th>3月目標</th>
+								<th>4月目標</th>
+								<th>5月目標</th>
+								<th>6月目標</th>
+								<th>7月目標</th>
+								<th>8月目標</th>
+								<th>9月目標</th>
+								<th>10月目標</th>
+								<th>11月目標</th>
+								<th>12月目標</th> -->
+								<th>合計</th>
+							</tr>
+							<tr ng-repeat="row in showList">
+								<td style="color:blue; text-align:center">{{row.BRANCH_NBR}}</td>
+								<td style="color:blue; text-align:center">{{row.GROUP_TYPE}}</td>
+								<td style="color:blue; text-align:center">{{row.BRANCH_NAME}}</td>
+								<td align="center" class="repeat-row"
+									ng-repeat="x in showRowList | limitTo:displayLimit " ng-if="x!=null">
+									<!-- <input type="text" style="text-align:right" ng-model="row." e-input-limit='N' e-length-limit="22"/> -->
+									{{row[x]}}
+								</td>
+								<td style="text-align:center">{{row.TOTAL}}</td>
+							</tr>
+							<!-- <tr ng-repeat="row in showList">
+								<td style="color:blue; text-align:center">{{row.BRANCH_NBR}}</td>
+								<td style="color:blue; text-align:center">{{row.GROUP_TYPE}}</td>
+								<td style="color:blue; text-align:center">{{row.BRANCH_NAME}}</td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH1_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH2_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH3_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH4_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH5_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH6_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH7_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH8_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH9_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH10_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH11_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.MONTH12_GOAL" size="10"/> </td>
+								<td align="center"> <input type="text" style="text-align:right;" ng-model="row.TOTAL" size="10"/> </td>
+							</tr> -->
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<!-- <button type="button" class="btn btn-primary" ng-click="update()">儲存</button> -->
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div>

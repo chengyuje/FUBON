@@ -1,0 +1,68 @@
+<style>
+/* dialog panl */
+.modal-dialog.INS100Policy {
+	width: 50%;
+	height: 50%;
+}
+.alignleft{
+	text-align: left !important;
+}
+.alignright{
+	text-align: right !important;
+}
+input:required:invalid{
+ 	border-color: red;
+}
+</style>
+<!-- <script type="text/javascript" src="assets/txn/INS100/INS100_POLICY.js"></script> -->
+<div ng-controller="INS100PolicyController" ng-cloak>
+	<div class="modal-dialog INS100Policy">
+		<div class="modal-content">
+	        <div class="modal-header"> 
+	        	<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+	          <h4 id="myModalAlertLabel" class="modal-title">保單號碼維護</h4>
+	        </div>	        
+	        <div class="modal-body">
+	        <form name="parameterTypeEditForm" class="form-horizontal">
+		        <table>
+		        	<tr>
+		        		<td width="25%"></td>
+						<th width="15%">客戶ID：</th>
+						<th width="25%">{{inputVO.custId}}</th>
+						<th width="15%"></th>
+						<th width="20%"></th>				
+						
+					</tr>					
+					<tr>
+						<td width="25%"></td>
+						<th width="15%">保單號碼：</th>
+						<td width="25%"><input type="text" class="form-control" ng-blur="regclick()" style="width:150px;text-align: left;" maxlength="50" id="policyNbr" name="policyNbr" ng-model="inputVO.policyNbr" required></td>	
+						<th width="15%"><button type="button" class="btn btn-info" ng-click="addPolicyData()" >新增保單號碼</button></th>
+						<td width="20%"></td>						
+					</tr>	
+		        </table>
+	        </form>
+	        <e-jumping-once output="outputVO" list="data" totallist="policyList"></e-jumping-once>
+	  		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="tablesaw table table-striped table-bordered text-center middle">
+					<thead>
+						<tr>
+							<th>刪除</th>
+							<th>保單號碼</th>													
+						</tr>			
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td><button type="button" class="btn btn-primary" ng-click="deletePolicyData(row)">X</button></td>
+							<td>{{row.POLICY_NBR}}</td>								
+						</tr>
+					</tbody>
+				</table>
+			</div>
+	        <div class="modal-footer" style="text-align: center;">		       
+			    <button ng-click="closeThisDialog('confirm')" class="btn btn-info" data-dismiss="modal">確定</button>
+	        </div>
+	      </div>
+		</div>	
+	</div>
+</div>

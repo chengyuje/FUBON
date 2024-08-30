@@ -1,0 +1,257 @@
+<style>
+
+/* dialog panl */
+.modal-dialog.CRM682 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+
+.CRM682 .gv_tab_sc thead:first-child tr th {
+	background-color: #93C5E1;
+	color:white;
+	font-weight: bold;
+}
+.CRM682 .vert_tab  tbody>tr>th ,thead,td{
+	text-align:center;
+	border-collapse: collapse;
+	border: 1px solid black;
+	background-color: #93C5E1;
+	height:30px;
+	color:white;
+	font-weight: bold;
+}
+
+.CRM682 .vert_tab td{
+    background-color:white;
+    color:black;
+}
+.CRM682 .vert_tab  thead>tr>th {
+    background-color: #93C5E1;
+    color:black; 
+    text-align:center; 
+    height:30px;
+}
+.CRM682 .vert_tab table{
+	width:100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* change row */
+.CRM682.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM682_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+
+.nv-label text{
+    font-size:14.5px;
+}
+.outshadow{
+	text-align:center;
+	padding-top:10px;
+    height:40px;
+    background:#93C5E1;
+    
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/CRM682/CRM682.js"></script>
+<div class="CRM682" ng-controller="CRM682Controller" ng-cloak>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >可增貸資訊</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<h3 class="outshadow">房貸可增貸資訊</h3>                
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+			<h4>已設定於本行擔保品之初估可增貸額度</h4>
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true">
+					<thead>
+						<tr>
+							<th>擔保品座落地址</th>							
+							<th>不動產分區</th>							
+							<th>初估可增貸額度</th>
+							<th>火險保額</th>
+							<th>抵押權設定金額</th>
+						</tr>					
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						 	<td align="center" ng-show="row.COLLATERAL_AMT3 != null">{{row.COLLATERAL_ADDR}}</td>
+						 	<td align="center" ng-show="row.COLLATERAL_AMT3 != null">{{row.COLLATERAL_SEC}}</td>
+						 	<td align="center" ng-show="row.COLLATERAL_AMT3 != null">台幣   {{row.COLLATERAL_AMT3 | currency:"":0}}</td>
+						 	<td align="center" ng-show="row.COLLATERAL_AMT3 != null">{{row.ISU_AMT | currency:"":0}}</td>
+						 	<td align="center" ng-show="row.COLLATERAL_AMT3 != null">{{row.ESTABLISHED_AMT | currency:"":0}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<br>								
+			</div>
+			
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+			<h4>貸款參考年利率及貸款期限</h4>
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true">
+					<thead>
+						<tr>
+							<th>貸款類型</th>							
+							<th>貸款參考年利率</th>							
+							<th>貸款期限</th>
+
+						</tr>					
+					</thead>
+					<tbody ng-show="show">
+						<tr>																		 						
+						 	<td align="center">分期型房貸</td>
+						 	<td align="center">l + {{OTH_ADD_RATE1}}% 起 (目前為  {{OTH_ADD_RATE2 | number:2 }}% 起)</td>
+						 	<td align="center">最長 {{OTH_ADD_LIMIT1}} 年</td>
+						</tr>
+						<tr>
+							<td align="center">循環型房貸</td>
+						 	<td align="center">l + {{OTH_ADD_RATE3}}% 起 (目前為  {{OTH_ADD_RATE4 | number:2 }}% 起)</td>
+						 	<td align="center">最長 {{OTH_ADD_LIMIT2}} 年</td>
+						</tr>
+					</tbody>
+				</table>
+				<br>								
+			</div>   
+			
+			<div class="vert_tab" style="height:auto;white-space: nowrap;">
+			<h3 class="outshadow">信貸可(增)貸資訊</h3>
+			<br>
+	
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+			<h4>舊貸資訊</h4>
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true">
+					<thead>
+						<tr>
+							<th>貸款帳號</th>							
+							<th>貸款餘額</th>
+							<th>貸款利率</th>
+							<th>撥款日</th>
+						</tr>						
+					</thead>
+					<tbody>
+							<tr class="repeat-row" ng-repeat="row in resultList2 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">					
+						 	<td align="center">{{row.LIMIT_ACCT_NBR}}</td>
+						 	<td align="center">{{row.OUTSTANDING_BAL_AMT | currency:"":0 }}</td>
+						 	<td align="center">{{row.CREDIT_LOAN_RATE | number:2 }}%</td>
+						 	<td align="center">{{toJsDate(row.INTEREST_START_DATE) | date:'yyyy/MM/dd'}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<br>								
+			</div>
+			
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+			<h4>增貸資訊</h4>
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true">
+					<thead>
+						<tr>
+							<th>預篩信評(B_SCORE/A_SCORE)</th>							
+							<th>可增貸額度_分期</th>
+							<th>可增貸額度_循環</th>
+							<th>是否符合優質貸</th>
+							<th>增貸利率_分期</th>
+							<th>增貸利率_循環</th>
+						</tr>					
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList3 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">					
+						 	<td align="center">{{row.CREDIT_PRE_SCORE}}</td>
+						 	<td align="center">{{row.CREDIT_ALLOCATION | currency:"":0}}</td>
+						 	<td align="center">{{row.CREDIT_ALLOCATION_R | currency:"":0}}</td>
+						 	<td align="center">{{row.QUALITY_COMP | mapping: mappingSet['COMMON.YES_NO']:'F3'}}</td>
+						 	<td align="center">{{row.CREDIT_INC_RATE | number:2 }}%</td>
+						 	<td align="center">{{row.CREDIT_RATES_R | number:2 }}%</td>
+						</tr>
+					</tbody>
+				</table>
+				<br>								
+			</div>    
+			
+		<!-- 	  
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+				
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true">
+					<tbody>
+						<tr>
+							<th style="border-top-left-radius: 8px; border-left-color: transparent; vertical-align:middle" rowspan={{oldlib}}>舊貸資訊</th>							
+							<th>貸款帳號</th>							
+							<th>貸款餘額</th>
+							<th>貸款利率</th>
+							<th style="border-top-right-radius: 8px; border-right-color: transparent;">撥款日</th>
+						</tr>	
+						<tr class="repeat-row" ng-repeat="row in resultList2 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">					
+						 	<td align="center">{{row.LIMIT_ACCT_NBR}}</td>
+						 	<td align="center">{{row.OUTSTANDING_BAL_AMT | currency:"":0 }}</td>
+						 	<td align="center">{{row.CREDIT_LOAN_RATE | number:2 }}%</td>
+						 	<td align="center">{{toJsDate(row.INTEREST_START_DATE) | date:'yyyy/MM/dd'}}</td>
+						</tr>
+						<tr>
+							<th style="vertical-align:middle" rowspan={{newlib}}>增貸資訊</th>							
+							<th>預篩信評(B_SCORE/A_SCORE)</th>							
+							<th>可增貸額度_分期</th>
+							<th>是否符合優質貸</th>
+							<th>增貸利率_分期</th>
+						</tr>					
+						<tr class="repeat-row" ng-repeat="row in resultList3 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">					
+						 	<td align="center">{{row.CREDIT_PRE_SCORE}}</td>
+						 	<td align="center">{{row.CREDIT_ALLOCATION | currency:"":0}}</td>
+						 	<td align="center">{{row.QUALITY_COMP | mapping: mappingSet['COMMON.YES_NO']:'F3'}}</td>
+						 	<td align="center">{{row.CREDIT_INC_RATE | number:2 }}%</td>
+						</tr>
+					</tbody>
+				</table>
+				<br>								
+			</div>
+				<br>								
+			</div>-->
+			
+			<div class="gv_tab_sc scroll_y" style="width:400px;height:auto;white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true">
+					<thead>
+						<tr>
+						 <th colspan="2">信用額度資訊</th>
+						</tr>				
+					</thead>
+					<tbody>
+						<tr>
+							<td style="width:200px;" >目前額度</td>	
+							<td style="width:200px;" align="center">{{CREDIT_CARD_AMT | currency:''}}</td>												
+						</tr>					
+						<tr>																		 						
+						 	<td style="width:200px;">可增加永調額度</td>	
+						 	<td style="width:200px;" align="center">{{CREDIT_CARD_INC_AMT | currency:''}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<br>								
+			</div>
+			
+		</div>
+</div>

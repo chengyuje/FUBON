@@ -1,0 +1,266 @@
+<style>
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS310/PMS310.js"></script>
+<script type="text/javascript" src="assets/txn/PMS310/PMS310_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS310" ng-controller="PMS310Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th><font color="red">＊</font>查詢年月：</th>
+							<td><e-combobox id="dataMonth" name="dataMonth"
+									ng-datasource="mappingSet['timeE']" ng-model="inputVO.sCreDate"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-change="limitDate();dateChange()" ng-format="F3" ng-required="true"
+									width="90px" height="30px" style="line-height:20px;" /></td>
+							
+<!-- 							<td><input type="text" ng-model="inputVO.reportDate" -->
+<!-- 								e-input-limit="ND"  -->
+<!--      							e-length-limit="6" -->
+<!-- 								maxlength="6" ng-blur="querySeen()" required> <font color="blue">YYYYMM</font> -->
+<!-- 							</td> -->
+							<th><font color="red">＊</font>目標類型：</th>
+							<td><e-combobox id="tarType" name="tarType"
+									ng-datasource="mappingSet['tarType']"
+									ng-model="inputVO.tarType" ng-validate="false"
+									ng-readonly="false" ng-editable="false" ng-required="true"
+									ng-change="tarTypeChange();inquireInit()" ng-format="F3" width="115px"
+									style="line-height:20px;" /></td>
+							<th>分行：</th>
+							<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-disabled="disableBranchCombo"
+							ng-readonly="disableBranchCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="inputVO.branch_area_id='';ChangeBranch();"
+							width="155px"
+							style="line-height:20px;" />
+							</td>
+							<th ng-show="inputVO.tarType == '1'">PS：</th>
+							<td ng-show="inputVO.tarType == '1'">
+							<e-combobox
+							ng-datasource="EMP_LIST"
+							ng-model="inputVO.emp_id"
+							ng-validate="false"
+							ng-disabled="disableEmpCombo"
+							ng-readonly="disableEmpCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeAo_code()"
+							width="100px"
+							style="line-height:20px;" />
+									</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info"
+					ng-click="upload(inputVO)">上傳目標</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="query()"
+				list="paramList"></e-jumping>
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：</td>
+						<td>每日</td>
+					</tr>
+					<tr>
+						<td>產出日：</td>
+						<td ng-if="paramList.length>0">{{toJsDate | date:'yyyy/MM/dd'}}</td>
+					</tr>
+				</table>
+			</div>
+
+			<div>
+				<table width="100%">
+					<tr bgcolor="#BFE2F7">
+						<td width="80%"><font color="#2e5cb8"><b>&nbsp;&nbsp;
+									{{date}} {{type}}消金業績目標</b></font></td>
+						<td height="40" align="right" nowrap><font color="#2e5cb8"><b>房信貸單位：百萬元/好運貸單位：元
+									&nbsp;&nbsp;&nbsp;&nbsp;</b></font></td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" >
+				<table class="tablesaw table-bordered rstable">
+					<thead>
+						<tr>
+<!-- 							<th>資料年月</th> -->
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>&nbsp;&nbsp;&nbsp;&nbsp;分行代碼&nbsp;&nbsp;&nbsp;&nbsp;</th>
+							<th>&nbsp;&nbsp;&nbsp;&nbsp;分行&nbsp;&nbsp;&nbsp;&nbsp;</th>
+							<th ng-show="inputVO.tarType =='1'">&nbsp;&nbsp;PS&nbsp;&nbsp;</th>
+							<th ng-show="inputVO.tarType =='1'">&nbsp;&nbsp;PS員編&nbsp;&nbsp;</th>
+							<th>分期型<br>件數
+							</th>
+							<th>分期型<br>撥款
+							</th>
+							<th>循環型<br>件數
+							</th>
+							<th>循環型<br>撥款
+							</th>
+							<th>房貸合計<br>件數
+							</th>
+							<th>房貸合計<br>撥款
+							</th>
+							<th>信貸<br>件數
+							</th>
+							<th>信貸<br>撥款
+							</th>
+							<th>購屋自用<br>件數
+							</th>
+							<th>購屋自用<br>撥款
+							</th>
+							<th>購屋非自用<br>件數
+							</th>
+							<th>購屋非自用<br>撥款
+							</th>
+							<th>購屋<br>件數
+							</th>
+							<th>購屋<br>撥款
+							</th>
+							<th>非購屋<br>件數
+							</th>
+							<th>非購屋<br>撥款
+							</th>
+							<th>一般信貸<br>件數
+							</th>
+							<th>一般信貸<br>撥款
+							</th>
+							<th>職團信貸<br>件數
+							</th>
+							<th>職團信貸<br>撥款
+							</th>
+							<th>卡友信貸<br>件數
+							</th>
+							<th>卡友信貸<br>撥款
+							</th>
+							<th>信用卡<br>卡數
+							</th>
+							<th>房貸壽險<br>保費目標
+							</th>
+<!-- 							<th>維護日期</th> -->
+<!-- 							<th>維護人員</th> -->
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+<!-- 							<td>{{row.YEARMON}}</td> -->
+							<td><span ng-if="row.REGION_CENTER_NAME != 'null'">{{row.REGION_CENTER_NAME}}</span></td>
+							<td><span ng-if="row.BRANCH_AREA_NAME != 'null'">{{row.BRANCH_AREA_NAME}}</span></td>
+							<td>{{row.BRANCH_NBR}}</td>
+							<td ><span ng-if="row.BRANCH_NAME != 'null'">{{row.BRANCH_NAME}}</span></td>
+							<td ng-show="inputVO.tarType =='1'">{{row.PS_EMP_NAME}}</td>
+							<td ng-show="inputVO.tarType =='1'">{{row.PS_EMP_ID}}</td>
+							<td align="right">{{0+row.LT_CNT| currency:''}}</td>
+							<td align="right">{{0+row.LT_FND| currency:''}}</td>
+							<td align="right">{{0+row.LIMIT_CNT| currency:''}}</td>
+							<td align="right">{{0+row.LIMIT_FND| currency:''}}</td>
+							<td align="right">{{0+row.MRTG_CNT| currency:''}}</td>
+							<td align="right">{{0+row.MRTG_FND| currency:''}}</td>
+							<td align="right">{{0+row.CREDIT_CNT| currency:''}}</td>
+							<td align="right">{{0+row.CREDIT_FND| currency:''}}</td>
+							<td align="right">{{0+row.HB_OWN_CNT| currency:''}}</td>
+							<td align="right">{{0+row.HB_OWN_FND| currency:''}}</td>
+							<td align="right">{{0+row.HB_NON_CNT| currency:''}}</td>
+							<td align="right">{{0+row.HB_NON_FND| currency:''}}</td>
+							<td align="right">{{0+row.HB_CNT| currency:''}}</td>
+							<td align="right">{{0+row.HB_FND| currency:''}}</td>
+							<td align="right">{{0+row.NON_HB_CNT| currency:''}}</td>
+							<td align="right">{{0+row.NON_HB_FND| currency:''}}</td>
+							<td align="right">{{0+row.CREDIT_N_CNT| currency:''}}</td>
+							<td align="right">{{0+row.CREDIT_N_FND| currency:''}}</td>
+							<td align="right">{{0+row.CREDIT_G_CNT| currency:''}}</td>
+							<td align="right">{{0+row.CREDIT_G_FND | currency:''}}</td>
+							<td align="right">{{0+row.CREDIT_C_CNT| currency:''}}</td>
+							<td align="right">{{0+row.CREDIT_C_FND | currency:''}}</td>
+							<td align="right">{{0+row.CREDIT_CARD_CNT | currency:''}}</td>
+							<td align="right">{{0+row.SPM_TARGET_FEE | currency:''}}</td>
+<!-- 							<td>{{row.LASTUPDATE}}</td> -->
+<!-- 							<td>{{row.MODIFIER}}<ts ng-if="row.N_EMP_NAME"><br>-</ts>{{row.N_EMP_NAME}}</td> -->
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			
+			
+			<div algin="left">
+				<table>
+
+					<tr>
+						<td align="right">說明：</td>
+						<td align="left"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

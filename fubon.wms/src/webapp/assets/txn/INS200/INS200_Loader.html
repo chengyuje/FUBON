@@ -1,0 +1,208 @@
+<style>
+<!--
+div .head{
+	margin: 1%;
+}
+.head input {
+	width: 5%;
+}
+
+.noUseShow {
+	opacity: 0.3;
+}
+.useShow {
+	opacity: 1.0;
+}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/INS210/INS210.js"></script>
+<script type="text/javascript" src="assets/txn/INS200/INS200_Loader.js"></script>
+<script type="text/javascript" src="assets/txn/PRD120/PRDDocument.js"></script>
+<div ng-controller="INS200_LoaderController" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">保險規劃書</div>
+	</div>
+	<div class="panel_content">
+		<uib-tabset active = "ACTIVE" justified="true">	
+			<uib-tab index="0" heading="壽險" ng-click="clicktab('1')">
+			
+				<div ng-if="validparameter && !INS200_FROM_INS132">
+					<h4 class="h4-title">壽險保障需求分析</h4>
+					<div class="head">● 每月家庭生活準備金
+						<input id="life_expense" name="life_expense" type="text" placeholder="請輸入..." ng-model="inputVO.LIFE_EXPENSE" e-input-limit="N" e-length-limit="6" ng-blur="life_expense_amt()" style="text-align:right;">
+						萬，需要
+						<input id="life_expense_years" name="life_expense_years" type="text" placeholder="請輸入..." ng-model="inputVO.LIFE_EXPENSE_YEARS" e-input-limit="N" e-length-limit="2" ng-blur="life_expense_amt()" style="text-align:right;">
+						年，共需
+						{{inputVO.LIFE_EXPENSE_AMT | number:0}}
+						萬
+					</div>
+					<div class="head">● 負債總額&emsp;&emsp;&emsp;&emsp;&emsp;
+						<input id="loan_amt" name="loan_amt" type="text" placeholder="請輸入..." ng-model="inputVO.LOAN_AMT" e-input-limit="N" e-length-limit="6" ng-blur="add_Thousands('LOAN_AMT')" style="text-align:right;">
+						萬
+					</div>
+					<div class="head">● 子女教育費&emsp;&emsp;&emsp;&emsp;
+						<input id="edu_fee" name="edu_fee" type="text" placeholder="請輸入..." ng-model="inputVO.EDU_FEE" e-input-limit="N" e-length-limit="6" ng-blur="add_Thousands('EDU_FEE')" style="text-align:right;">
+						萬
+					</div>
+					<div class="head">● 已準備資金&emsp;&emsp;&emsp;&emsp;
+						<input id="prepare_amt" name="prepare_amt" type="text" placeholder="請輸入..." ng-model="inputVO.PREPARE_AMT" e-input-limit="N" e-length-limit="6" ng-blur="add_Thousands('PREPARE_AMT')" style="text-align:right;">
+						萬
+					</div>
+<!-- 					<div class="head" ng-if="PROJECT_GAP_ONCE1 != undefined" style="color: red;">壽險缺口已計算，修改需求分析會清除壽險及意外險缺口，需重新點選確定計算缺口</div> -->
+<!-- 					<div class="head" ng-if="PROJECT_GAP_ONCE2 != undefined" style="color: red;">意外險缺口已計算，修改需求分析會清除壽險及意外險缺口，需重新點選確定計算缺口</div> -->
+				</div>
+				<div ng-if="INS200_FROM_INS132">
+					壽險保障至少需要{{showFamilyGap}}
+				</div>
+				
+				<div ng-include="page0" ng-init="pageID='0'"></div>
+			</uib-tab>
+			<uib-tab index="1" heading="意外險" ng-click="clicktab('2')">
+				
+				<div ng-if="validparameter && !INS200_FROM_INS132">
+					<h4 class="h4-title">意外險需求分析</h4>
+					<div class="head">● 每月家庭生活準備金&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+						<input id="life_expense" name="life_expense" type="text" placeholder="請輸入..." ng-model="inputVO.LIFE_EXPENSE" e-input-limit="N" e-length-limit="6" ng-blur="life_expense_amt()" style="text-align:right;">
+						萬，需要
+						<input id="life_expense_years" name="life_expense_years" type="text" placeholder="請輸入..." ng-model="inputVO.LIFE_EXPENSE_YEARS" e-input-limit="N" e-length-limit="2" ng-blur="life_expense_amt()" style="text-align:right;">
+						年，共需
+						{{inputVO.LIFE_EXPENSE_AMT | number:0}}
+						萬
+					</div>
+					<div class="head">● 負債總額&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+						<input id="loan_amt" name="loan_amt" type="text" placeholder="請輸入..." ng-model="inputVO.LOAN_AMT" e-input-limit="N" e-length-limit="6" ng-blur="add_Thousands('LOAN_AMT')" style="text-align:right;">
+						萬
+					</div>
+					<div class="head">● 子女教育費&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+						<input id="edu_fee" name="edu_fee" type="text" placeholder="請輸入..." ng-model="inputVO.EDU_FEE" e-input-limit="N" e-length-limit="6" ng-blur="add_Thousands('EDU_FEE')" style="text-align:right;">
+						萬
+					</div>
+					<div class="head">● 已準備資金&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+						<input id="prepare_amt" name="prepare_amt" type="text" placeholder="請輸入..." ng-model="inputVO.PREPARE_AMT" e-input-limit="N" e-length-limit="6" ng-blur="add_Thousands('PREPARE_AMT')" style="text-align:right;">
+						萬
+					</div>
+					<div class="head">● 若發生意外希望保險每個月可以提供
+						<input id="careFees_accident" name="careFees_accident" type="text" placeholder="請輸入..." ng-model="inputVO.CAREFEES" e-input-limit="N" e-length-limit="6" ng-blur="add_Thousands('CAREFEES')" style="text-align:right;">
+						萬的看護費
+					</div>
+					<div class="head">● 保險給付可以讓我有&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+						<input id="searchWork" name="searchWork" type="text" placeholder="請輸入..." ng-model="inputVO.SEARCH_WORK" e-input-limit="N" e-length-limit="2" ng-blur="add_Thousands('SEARCH_WORK')" style="text-align:right;">
+						年的時間尋找可以勝任的工作
+					</div>
+					<div class="head">● 職業等級&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+						<e-combobox id="prof_grade" name="prof_grade"
+								ng-paramtype="INS.PROF_GRADE"
+								ng-model="inputVO.PROF_GRADE"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-blur="sendDA()"
+								width="50%"
+						/>
+					</div>
+<!-- 					<div class="head" ng-if="PROJECT_GAP_ONCE1 != undefined" style="color: red;">壽險缺口已計算，修改需求分析會清除壽險及意外險缺口，需重新點選確定計算缺口</div> -->
+<!-- 					<div class="head" ng-if="PROJECT_GAP_ONCE2 != undefined" style="color: red;">意外險缺口已計算，修改需求分析會清除壽險及意外險缺口，需重新點選確定計算缺口</div> -->
+				</div>
+				<div ng-if="INS200_FROM_INS132">
+					意外險保障至少需要{{showAccident}}
+				</div>
+				
+				<div ng-include="page1" ng-init="pageID='1'"></div>
+			</uib-tab>
+			<uib-tab index="2" heading="醫療險" ng-click="clicktab('3')">
+			
+				<div ng-if="validparameter && !INS200_FROM_INS132">
+					<h4 class="h4-title">住院醫療需求分析</h4>
+					<div class="head"><b>● 請問您是否有購買實支實付醫療險?</b>
+						<span ng-repeat="row in mappingSet['COMMON.YES_NO']">
+							<input type="radio" name="ttl_flag" ng-model="inputVO.TTL_FLAG" ng-value="row.DATA" ng-click="sendDA()" />{{row.LABEL}}&emsp;&emsp;&emsp;
+						</span>
+					</div>
+					<div class="head"><b>● 生病時通常會在哪裡就醫?&emsp;&emsp;&emsp;&emsp;</b>
+						<span ng-repeat="row in mappingSet['INS.HOSPITAL_TYPE']">
+							<input type="radio" ng-model="inputVO.HOSPITAL_TYPE" ng-value="row.DATA" ng-click="sendDA()" />{{row.LABEL}}
+						</span>
+					</div>
+					<div class="head"><b>● 若需要住院時會選擇甚麼樣的病房?</b>
+						<span ng-repeat="row in mappingSet['INS.WARD_TYPE']">
+							<input type="radio" ng-model="inputVO.WARD_TYPE" ng-value="row.DATA" ng-click="sendDA()" />{{row.LABEL}}
+						</span>
+					</div>
+				</div>
+				<div ng-if="INS200_FROM_INS132">
+					醫療險保障至少需要{{showHealth}}
+				</div>
+			
+				<div ng-include="page2" ng-init="pageID='2'"></div>
+			</uib-tab>
+			<uib-tab index="3" heading="重大疾病" ng-click="clicktab('4')">
+				<div ng-if="validparameter">
+					<h4 class="h4-title">重大疾病需求分析</h4>
+					<!--區塊一 -->
+					<div class="head"><b>● 以下所列是否有您家族遺傳或是您最擔心的疾病?(最多三項)</b>
+						<span ng-repeat="row in DISEASE_LIST">
+							<input type="checkbox" name="disease" ng-model="row.CHOOSE" ng-true-value="'Y'" ng-false-value="'N'" ng-click="selectDisease(row)"/>{{row.LABEL}}
+						</span>
+					</div>
+					<!--區塊二 -->
+					<div ng-if="inputVO.TYPE_CANCER" class="head"><b>● 生病時通常會在哪裡就醫?&emsp;&emsp;&emsp;&emsp;</b>
+						<span ng-repeat="row in mappingSet['INS.HOSPITAL_TYPE']">
+							<input type="radio" ng-model="inputVO.HOSPITAL_TYPE" ng-value="row.DATA" ng-click="sendDA();getTempDisplayCount();" />{{row.LABEL}}
+						</span>
+					</div>
+					<div ng-if="inputVO.TYPE_CANCER" class="head"><b>● 若需要住院時會選擇甚麼樣的病房?</b>
+						<span ng-repeat="row in mappingSet['INS.WARD_TYPE']">
+							<input type="radio" ng-model="inputVO.WARD_TYPE" ng-value="row.DATA" ng-click="sendDA();getTempDisplayCount();" />{{row.LABEL}}
+						</span>
+					</div>
+					
+					<div ng-if="inputVO.TYPE_MAJOR" class="head"><b>● 不幸罹患上述疾病時，您希望能準備多少資金</b>
+						<input id="major_diseases_pay" name="major_diseases_pay" type="text" placeholder="請輸入..." ng-model="inputVO.MAJOR_DISEASES_PAY" e-input-limit="NN" e-length-limit="6" ng-blur="clearMajor()" style="text-align:right;"/>
+						<b>萬照顧自己及家人?</b>
+					</div>
+					
+					<div class="head" ng-repeat="row in inputVO.DIS_DESCList">
+						※{{row}}
+					</div>
+					
+					<div ng-if="inputVO.TYPE_LT">
+						<div class="head">
+							<b>● 若有一天需要被長期照顧，無法自食其力時，您希望獲得的照顧是?</b>
+						</div>
+						<div class="head">
+							<span ng-repeat="row in CARE_WAY">
+								<input type="radio" name="care_way" ng-model="inputVO.CARE_WAY" ng-value="row.DATA" ng-click="clearLtcare()"/>{{row.LABEL}}
+								<e-combobox id="care_style" name="care_style"
+								ng-datasource="row.ltcareList"
+								ng-model="row.NURSE_FEE_PAY"
+								ng-validate="false" 
+								ng-disabled="inputVO.CARE_WAY != row.DATA"
+								ng-readonly="inputVO.CARE_WAY != row.DATA" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="selectData(row)"
+								width="150px"
+								style="line-height:20px;" />
+							</span>
+						</div>
+					</div>
+					<!--區塊三 -->
+					<div class="head">依據您的選擇，您完整的保障應包含：</div>
+					<div ng-if="inputVO.TYPE_CANCER" class="head">● 癌症住院醫療日額 : 
+						<span style="text-align: right;width: 100px;display: inline-block;">{{HOSPIHALDAYS | number:0}}</span>&emsp;元
+					</div>
+					<div ng-if="inputVO.TYPE_MAJOR" class="head">● 重大疾病一次給付 : 
+						<span style="text-align: right;width: 100px;display: inline-block;">{{inputVO.MAJOR_DISEASES_PAY * 10000 | number:0}}</span>&emsp;元
+					</div>
+					<div ng-if="inputVO.TYPE_LT" class="head">● 長期看護每月給付 : 
+						<span style="text-align: right;width: 100px;display: inline-block;">{{MONTH_AMT | number:0}}</span>&emsp;元
+					</div>
+				</div>
+				<div ng-include="page3" ng-init="pageID='3'"></div>
+			</uib-tab>
+		</uib-tabset>
+	</div>
+</div>

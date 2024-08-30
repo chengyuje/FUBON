@@ -1,0 +1,457 @@
+<style>
+/* table size */
+.SOT1650 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.SOT1650.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+.bigspace{
+	margin-left: 50px !important;
+}
+</style>
+<!-- SOT1650-動態鎖利事件變更  -->
+<script type="text/javascript" src="assets/txn/SOT1650/SOT1650.js"></script>
+<script type="text/javascript" src="assets/txn/SOT132/SOT132.js"></script>
+<script type="text/javascript" src="assets/txn/SOT110/SOT110_ROUTE.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100_BOSS.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512_DETAILS.js"></script>
+
+<div class="SOT1650" ng-controller="SOT1650Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >商品資料輸入及適配</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<h4 class="h4-title">交易資料輸入</h4>
+				<div ng-bind="jsLog" class="hidden"></div>
+				<div ng-bind="jsCustKycData"  class="hidden"></div>
+				<div ng-bind="jsLogCustFeePrdDueDate"  class="hidden"></div>
+				<div ng-bind="jsLogCustPLData"  class="hidden"></div>
+				<div ng-bind="jsLogCustAcctData"  class="hidden"></div>
+				<div ng-bind="jsLogCustInfoData"  class="hidden"></div>
+				<div ng-bind="jsLogPRD110Data"  class="hidden"></div>
+                
+				<table>
+					<tr>
+						<td colspan="5">
+							<table>
+								<tr>
+									<th colspan="2">
+										*客戶ID：
+										<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" ng-disabled="carList.length > 0" ng-blur="getSOTCustInfo(false,true);" e-length-limit="200" required >
+										&nbsp;&nbsp;&nbsp;{{inputVO.custName}}
+									</th>
+									<th colspan="2">KYC等級/效期：{{inputVO.kycLV}}/{{inputVO.kycDueDate | date:"yyyy-MM-dd"}}</th>
+								</tr>
+								<tr>
+									<th>&nbsp;客戶註記：{{inputVO.custRemarks | mapping:mappingSet['SOT.SPEC_CUSTOMER']:'F3'}}</th>
+									<th>OBU註記：{{inputVO.isOBU}}</th>
+									<th>同意投資商品諮詢服務：{{inputVO.isAgreeProdAdv}}</th>
+									<th>期間議價效期：{{inputVO.bargainDueDate | date:"yyyy-MM-dd"}}</th>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<br/>
+					<tr>
+						<td colspan="5">
+							<button type="button" class="btn btn-info" ng-disabled="!inputVO.custID" ng-click="goSOT132()" function-type="query">選擇庫存</button>
+						</td>
+					</tr>
+					<tr>
+						<th>&nbsp;母基金名稱：</th>
+						<td>{{inputVO.prodId}}&nbsp;{{inputVO.prodName}}</td>
+						<th>計價幣別：{{inputVO.prodCurr}}</th>
+						<th>產品風險等級：{{inputVO.prodRiskLv}}</th>
+						<td>信託金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmt | number:num}}</td>
+					</tr>
+					<tr>
+						<th>&nbsp;信託型態：</th>
+						<td colspan="4">動態鎖利</td>
+					</tr>
+					<tr>
+						<th>&nbsp;憑證編號：</th>
+						<td colspan="4">{{inputVO.certificateID}}</td>
+					</tr>
+					<tr ng-if="inputVO.prodIdC1">
+						<th>&nbsp;&nbsp;&nbsp;子基金1：</th>
+						<td>{{inputVO.prodIdC1}}&nbsp;{{inputVO.prodNameC1}}</td>
+						<th>每次轉入金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmtC1 | number: 2}}</th>
+						<th>扣款狀態：{{inputVO.eviNumTypeC1 | mapping:mappingSet['SOT.DEDUCTION_STATUS_DYNA']:'F3'}}</th>
+					</tr>
+					<tr ng-if="inputVO.prodIdC2">
+						<th>&nbsp;&nbsp;&nbsp;子基金2：</th>
+						<td>{{inputVO.prodIdC2}}&nbsp;{{inputVO.prodNameC2}}</td>
+						<th>每次轉入金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmtC2 | number: 2}}</th>
+						<th>扣款狀態：{{inputVO.eviNumTypeC2 | mapping:mappingSet['SOT.DEDUCTION_STATUS_DYNA']:'F3'}}</th>
+					</tr>
+					<tr ng-if="inputVO.prodIdC3">
+						<th>&nbsp;&nbsp;&nbsp;子基金3：</th>
+						<td>{{inputVO.prodIdC3}}&nbsp;{{inputVO.prodNameC3}}</td>
+						<th>每次轉入金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmtC3 | number: 2}}</th>
+						<th>扣款狀態：{{inputVO.eviNumTypeC3 | mapping:mappingSet['SOT.DEDUCTION_STATUS_DYNA']:'F3'}}</th>
+					</tr>
+					<tr ng-if="inputVO.prodIdC4">
+						<th>&nbsp;&nbsp;&nbsp;子基金4：</th>
+						<td>{{inputVO.prodIdC4}}&nbsp;{{inputVO.prodNameC4}}</td>
+						<th>每次轉入金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmtC4 | number: 2}}</th>
+						<th>扣款狀態：{{inputVO.eviNumTypeC4 | mapping:mappingSet['SOT.DEDUCTION_STATUS_DYNA']:'F3'}}</th>
+					</tr>
+					<tr ng-if="inputVO.prodIdC5">
+						<th>&nbsp;&nbsp;&nbsp;子基金5：</th>
+						<td>{{inputVO.prodIdC5}}&nbsp;{{inputVO.prodNameC5}}</td>
+						<th>每次轉入金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmtC5 | number: 2}}</th>
+						<th>扣款狀態：{{inputVO.eviNumTypeC5 | mapping:mappingSet['SOT.DEDUCTION_STATUS_DYNA']:'F3'}}</th>
+					</tr>
+					<tr>
+						<th>&nbsp;信託帳號：{{inputVO.trustAcct}}</th>
+						<th>收益入帳帳號：{{inputVO.creditAcct}}</th>
+						<th colspan="3">每月轉換日期：{{inputVO.transDate}}
+						</td>
+					</tr>
+					
+					
+					<tr>
+						<td colspan="5">
+							<table style="background-color:#eeeeee;" class="alignleft">
+								<tr>
+									<td colspan="3"><b>變更事項：</b></td>
+								</tr>
+								<tr ng-if="inputVO.prodIdC1">
+									<th colspan="3">&nbsp;<input type="checkbox" ng-model="inputVO.chgStatusYN" ng-change="onChgStatusYN();" 
+											ng-false-value="'N'" ng-true-value="'Y'">&nbsp;子基金扣款狀態：
+									</th>
+								</tr>
+								<tr ng-if="inputVO.prodIdC1">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;子基金1：</th>
+									<td style="width:5%; white-space: nowrap;">{{inputVO.prodIdC1}}&nbsp;{{inputVO.prodNameC1}}</td>
+									<td>
+										<label ng-repeat="row in mappingSet['SOT.DEDUCTION_STATUS_DYNA'] | limitTo:displayLimit track by $index">
+											<input type="radio" name="fProdStatusC1" id="fProdStatusC1" 
+												   ng-model="inputVO.fProdStatusC1"
+												   ng-value="row.DATA" 
+												   ng-click="checkfProdStatus(row.DATA, '1')" 
+												   ng-disabled="inputVO.chgStatusYN=='N'"> {{row.LABEL}}
+											<span class="bigspace"></span>
+										</label>
+									</td>
+								</tr>
+								<tr ng-if="inputVO.prodIdC2">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;子基金2：</th>
+									<td style="width:5%; white-space: nowrap;">{{inputVO.prodIdC2}}&nbsp;{{inputVO.prodNameC2}}</td>
+									<td>
+										<label ng-repeat="row in mappingSet['SOT.DEDUCTION_STATUS_DYNA'] | limitTo:displayLimit track by $index">
+											<input type="radio" name="fProdStatusC2" id="fProdStatusC2" 
+												   ng-model="inputVO.fProdStatusC2"
+												   ng-value="row.DATA" 
+												   ng-click="checkfProdStatus(row.DATA, '2')" 
+												   ng-disabled="inputVO.chgStatusYN=='N'"> {{row.LABEL}}
+											<span class="bigspace"></span>
+										</label>
+									</td>
+								</tr>
+								<tr ng-if="inputVO.prodIdC3">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;子基金3：</th>
+									<td style="width:5%; white-space: nowrap;">{{inputVO.prodIdC3}}&nbsp;{{inputVO.prodNameC3}}</td>
+									<td>
+										<label ng-repeat="row in mappingSet['SOT.DEDUCTION_STATUS_DYNA'] | limitTo:displayLimit track by $index">
+											<input type="radio" name="fProdStatusC3" id="fProdStatusC3" 
+												   ng-model="inputVO.fProdStatusC3"
+												   ng-value="row.DATA" 
+												   ng-click="checkfProdStatus(row.DATA, '3')" 
+												   ng-disabled="inputVO.chgStatusYN=='N'"> {{row.LABEL}}
+											<span class="bigspace"></span>
+										</label>
+									</td>
+								</tr>
+								<tr ng-if="inputVO.prodIdC4">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;子基金4：</th>
+									<td style="width:5%; white-space: nowrap;">{{inputVO.prodIdC4}}&nbsp;{{inputVO.prodNameC4}}</td>
+									<td>
+										<label ng-repeat="row in mappingSet['SOT.DEDUCTION_STATUS_DYNA'] | limitTo:displayLimit track by $index">
+											<input type="radio" name="fProdStatusC4" id="fProdStatusC4" 
+												   ng-model="inputVO.fProdStatusC4"
+												   ng-value="row.DATA" 
+												   ng-click="checkfProdStatus(row.DATA, '4')" 
+												   ng-disabled="inputVO.chgStatusYN=='N'"> {{row.LABEL}}
+											<span class="bigspace"></span>
+										</label>
+									</td>
+								</tr>
+								<tr ng-if="inputVO.prodIdC5">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;子基金5：</th>
+									<td style="width:5%; white-space: nowrap;">{{inputVO.prodIdC5}}&nbsp;{{inputVO.prodNameC5}}</td>
+									<td>
+										<label ng-repeat="row in mappingSet['SOT.DEDUCTION_STATUS_DYNA'] | limitTo:displayLimit track by $index">
+											<input type="radio" name="fProdStatusC5" id="fProdStatusC5" 
+												   ng-model="inputVO.fProdStatusC5"
+												   ng-value="row.DATA" 
+												   ng-click="checkfProdStatus(row.DATA, '5')" 
+												   ng-disabled="inputVO.chgStatusYN=='N'"> {{row.LABEL}}
+											<span class="bigspace"></span>
+										</label>
+									</td>
+								</tr>
+								<tr ng-if="inputVO.prodIdC1">
+									<th colspan="3">&nbsp;<input type="checkbox" ng-model="inputVO.chgAmountYN" ng-change="onChgAmountYN();"
+											ng-false-value="'N'" ng-true-value="'Y'">&nbsp;子基金轉換金額：
+									</th>
+								</tr>
+								<tr ng-if="inputVO.prodIdC1">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;子基金1：</th>
+									<td style="width:5%; white-space: nowrap;">{{inputVO.prodIdC1}}&nbsp;{{inputVO.prodNameC1}}</td>
+									<td>轉換金額：{{inputVO.trustCurr}}&nbsp;
+										<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fPurchaseAmtC1" name="fPurchaseAmtC1" 
+						    					e-input-limit="NC" ng-model="inputVO.fPurchaseAmtC1"  ng-blur="checkPurchaseAmtLimit('C', '1');"  
+						    					e-length-limit="200" ng-disabled="inputVO.chgAmountYN=='N'">
+						    			<span class="bigspace"></span>
+										最低申購金額：{{inputVO.trustCurr}} {{inputVO.prodMinBuyAmtC1 | number:num}}
+										<span class="bigspace"></span>
+										累進申購面額：{{inputVO.trustCurr}} {{inputVO.prodMinGrdAmtC1 | number:num}}
+									</td>
+								</tr>
+								<tr ng-if="inputVO.prodIdC2">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;子基金2：</th>
+									<td style="width:5%; white-space: nowrap;">{{inputVO.prodIdC2}}&nbsp;{{inputVO.prodNameC2}}</td>
+									<td>轉換金額：{{inputVO.trustCurr}}&nbsp;
+										<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fPurchaseAmtC2" name="fPurchaseAmtC2" 
+						    					e-input-limit="NC" ng-model="inputVO.fPurchaseAmtC2"  ng-blur="checkPurchaseAmtLimit('C', '2');"  
+						    					e-length-limit="200" ng-disabled="inputVO.chgAmountYN=='N'">
+						    			<span class="bigspace"></span>
+										最低申購金額：{{inputVO.trustCurr}} {{inputVO.prodMinBuyAmtC2 | number:num}}
+										<span class="bigspace"></span>
+										累進申購面額：{{inputVO.trustCurr}} {{inputVO.prodMinGrdAmtC2 | number:num}}
+									</td>
+								</tr>
+								<tr ng-if="inputVO.prodIdC3">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;子基金3：</th>
+									<td style="width:5%; white-space: nowrap;">{{inputVO.prodIdC3}}&nbsp;{{inputVO.prodNameC3}}</td>
+									<td>轉換金額：{{inputVO.trustCurr}}&nbsp;
+										<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fPurchaseAmtC3" name="fPurchaseAmtC3" 
+						    					e-input-limit="NC" ng-model="inputVO.fPurchaseAmtC3"  ng-blur="checkPurchaseAmtLimit('C', '3');"  
+						    					e-length-limit="200" ng-disabled="inputVO.chgAmountYN=='N'">
+						    			<span class="bigspace"></span>
+										最低申購金額：{{inputVO.trustCurr}} {{inputVO.prodMinBuyAmtC3 | number:num}}
+										<span class="bigspace"></span>
+										累進申購面額：{{inputVO.trustCurr}} {{inputVO.prodMinGrdAmtC3 | number:num}}
+									</td>
+								</tr>
+								<tr ng-if="inputVO.prodIdC4">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;子基金4：</th>
+									<td style="width:5%; white-space: nowrap;">{{inputVO.prodIdC4}}&nbsp;{{inputVO.prodNameC4}}</td>
+									<td>轉換金額：{{inputVO.trustCurr}}&nbsp;
+										<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fPurchaseAmtC4" name="fPurchaseAmtC4" 
+						    					e-input-limit="NC" ng-model="inputVO.fPurchaseAmtC4"  ng-blur="checkPurchaseAmtLimit('C', '4');"  
+						    					e-length-limit="200" ng-disabled="inputVO.chgAmountYN=='N'">
+						    			<span class="bigspace"></span>
+										最低申購金額：{{inputVO.trustCurr}} {{inputVO.prodMinBuyAmtC4 | number:num}}
+										<span class="bigspace"></span>
+										累進申購面額：{{inputVO.trustCurr}} {{inputVO.prodMinGrdAmtC4 | number:num}}
+									</td>
+								</tr>
+								<tr ng-if="inputVO.prodIdC5">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;子基金5：</th>
+									<td style="width:5%; white-space: nowrap;">{{inputVO.prodIdC5}}&nbsp;{{inputVO.prodNameC5}}</td>
+									<td>轉換金額：{{inputVO.trustCurr}}&nbsp;
+										<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fPurchaseAmtC5" name="fPurchaseAmtC5" 
+						    					e-input-limit="NC" ng-model="inputVO.fPurchaseAmtC5"  ng-blur="checkPurchaseAmtLimit('C', '5');"  
+						    					e-length-limit="200" ng-disabled="inputVO.chgAmountYN=='N'">
+						    			<span class="bigspace"></span>
+										最低申購金額：{{inputVO.trustCurr}} {{inputVO.prodMinBuyAmtC5 | number:num}}
+										<span class="bigspace"></span>
+										累進申購面額：{{inputVO.trustCurr}} {{inputVO.prodMinGrdAmtC5 | number:num}}
+									</td>
+								</tr>
+								<tr>
+									<th>&nbsp;<input type="checkbox" ng-model="inputVO.chgTransDateYN" ng-change="onChgTransDateYN();"
+												ng-false-value="'N'" ng-true-value="'Y'">&nbsp;每月扣款日期：</th>
+									<th colspan="2">
+										<input type="checkbox" ng-change="" ng-model="inputVO.fTransDate1" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="inputVO.chgTransDateYN=='N'">&nbsp;1&nbsp;&nbsp;
+										<input type="checkbox" ng-change="" ng-model="inputVO.fTransDate2" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="inputVO.chgTransDateYN=='N'">&nbsp;11&nbsp;&nbsp;
+										<input type="checkbox" ng-change="" ng-model="inputVO.fTransDate3" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="inputVO.chgTransDateYN=='N'">&nbsp;21&nbsp;&nbsp;
+										<input type="checkbox" ng-change="" ng-model="inputVO.fTransDate4" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="inputVO.chgTransDateYN=='N'">&nbsp;6&nbsp;&nbsp;
+										<input type="checkbox" ng-change="" ng-model="inputVO.fTransDate5" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="inputVO.chgTransDateYN=='N'">&nbsp;16&nbsp;&nbsp;
+										<input type="checkbox" ng-change="" ng-model="inputVO.fTransDate6" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="inputVO.chgTransDateYN=='N'">&nbsp;26&nbsp;&nbsp;(可選擇多日或單日)
+									</th>
+								</tr>
+								<tr ng-if="(!inputVO.isNewContract && !inputVO.prodIdC5) || (inputVO.isNewContract && !inputVO.prodIdC3)">
+									<th colspan="3">&nbsp;<input type="checkbox" ng-model="inputVO.chgAddProdYN" ng-change="onChgAddProdYN();" 
+												ng-false-value="'N'" ng-true-value="'Y'">&nbsp;新增子基金：</th>
+								</tr>
+								<tr ng-if="(!inputVO.isNewContract && !inputVO.prodIdC5) || (inputVO.isNewContract && !inputVO.prodIdC3)">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;新增子基金1：</th>
+									<td>
+										<input type="text" class="form-control" style="width:80px;display:inline;" placeholder="請輸入..." id="fProdIdC1" name="fProdIdC1" 
+											ng-model="inputVO.fProdIdC1" ng-blur="checkFundStatusC1()" e-length-limit="100" ng-disabled="inputVO.chgAddProdYN=='N'">
+										<button type="button" class="btn btn-info" ng-click="goPRD110D('C', '1')" ng-disabled="inputVO.chgAddProdYN=='N'">搜尋子基金</button>
+									</td>
+									<th>基金名稱：{{inputVO.fProdNameC1}}<span class="bigspace"></span>計價幣別：{{inputVO.fProdCurrC1}}<span class="bigspace"></span>產品風險等級：{{inputVO.fProdRiskLvC1}}</th>
+								</tr>
+								<tr ng-if="(!inputVO.isNewContract && !inputVO.prodIdC5) || (inputVO.isNewContract && !inputVO.prodIdC3)">
+									<td></td>
+									<th colspan="2">每次轉入金額：
+									    {{inputVO.trustCurr}} <input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fAddprodAmtC1" name="fAddprodAmtC1" 
+									    					e-input-limit="NC" ng-model="inputVO.fAddprodAmtC1"  ng-blur="checkAddProdAmtLimit('C', '1');"  
+									    					e-length-limit="200"  ng-disabled="inputVO.chgAddProdYN=='N'">
+										<span class="bigspace"></span>
+										最低申購金額：{{inputVO.trustCurr}} {{inputVO.fProdMinBuyAmtC1 | number:num}}
+										<span class="bigspace"></span>
+										累進申購面額：{{inputVO.trustCurr}} {{inputVO.fProdMinGrdAmtC1 | number:num}}
+									</th>
+								</tr>
+								
+								<tr ng-if="(!inputVO.isNewContract && !inputVO.prodIdC4) || (inputVO.isNewContract && !inputVO.prodIdC2)">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;新增子基金2：</th>
+									<td>
+										<input type="text" class="form-control" style="width:80px;display:inline;" placeholder="請輸入..." id="fProdIdC2" name="fProdIdC2" 
+											ng-model="inputVO.fProdIdC2" ng-blur="checkFundStatusC2()" e-length-limit="100" ng-disabled="inputVO.chgAddProdYN=='N'">
+										<button type="button" class="btn btn-info" ng-click="goPRD110D('C', '2')" ng-disabled="inputVO.chgAddProdYN=='N'">搜尋子基金</button>
+									</td>
+									<th>基金名稱：{{inputVO.fProdNameC2}}<span class="bigspace"></span>計價幣別：{{inputVO.fProdCurrC2}}<span class="bigspace"></span>產品風險等級：{{inputVO.fProdRiskLvC2}}</th>
+								</tr>
+								<tr ng-if="(!inputVO.isNewContract && !inputVO.prodIdC4) || (inputVO.isNewContract && !inputVO.prodIdC2)">
+									<td></td>
+									<th colspan="2">每次轉入金額：
+									    {{inputVO.trustCurr}} <input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fAddprodAmtC2" name="fAddprodAmtC2" 
+									    					e-input-limit="NC" ng-model="inputVO.fAddprodAmtC2"  ng-blur="checkAddProdAmtLimit('C', '2');"  
+									    					e-length-limit="200" ng-disabled="inputVO.chgAddProdYN=='N'">
+										<span class="bigspace"></span>
+										最低申購金額：{{inputVO.trustCurr}} {{inputVO.fProdMinBuyAmtC2 | number:num}}
+										<span class="bigspace"></span>
+										累進申購面額：{{inputVO.trustCurr}} {{inputVO.fProdMinGrdAmtC2 | number:num}}
+									</th>
+								</tr>
+								<tr ng-if="(!inputVO.isNewContract && !inputVO.prodIdC3) || (inputVO.isNewContract && !inputVO.prodIdC1)">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;新增子基金3：</th>
+									<td>
+										<input type="text" class="form-control" style="width:80px;display:inline;" placeholder="請輸入..." id="fProdIdC3" name="fProdIdC3" 
+											ng-model="inputVO.fProdIdC3" ng-blur="checkFundStatusC3()" e-length-limit="100" ng-disabled="inputVO.chgAddProdYN=='N'">
+										<button type="button" class="btn btn-info" ng-click="goPRD110D('C', '3')" ng-disabled="inputVO.chgAddProdYN=='N'">搜尋子基金</button>
+									</td>
+									<th>基金名稱：{{inputVO.fProdNameC3}}<span class="bigspace"></span>計價幣別：{{inputVO.fProdCurrC3}}<span class="bigspace"></span>產品風險等級：{{inputVO.fProdRiskLvC3}}</th>
+								</tr>
+								<tr ng-if="(!inputVO.isNewContract && !inputVO.prodIdC3) || (inputVO.isNewContract && !inputVO.prodIdC1)">
+									<td></td>
+									<th colspan="2">每次轉入金額：
+									    {{inputVO.trustCurr}} <input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fAddprodAmtC3" name="fAddprodAmtC3" 
+									    					e-input-limit="NC" ng-model="inputVO.fAddprodAmtC3"  ng-blur="checkAddProdAmtLimit('C', '3');"  
+									    					e-length-limit="200" ng-disabled="inputVO.chgAddProdYN=='N'">
+										<span class="bigspace"></span>
+										最低申購金額：{{inputVO.trustCurr}} {{inputVO.fProdMinBuyAmtC3 | number:num}}
+										<span class="bigspace"></span>
+										累進申購面額：{{inputVO.trustCurr}} {{inputVO.fProdMinGrdAmtC3 | number:num}}
+									</th>
+								</tr>
+								<tr ng-if="(!inputVO.isNewContract && !inputVO.prodIdC2)">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;新增子基金4：</th>
+									<td>
+										<input type="text" class="form-control" style="width:80px;display:inline;" placeholder="請輸入..." id="fProdIdC4" name="fProdIdC4" 
+											ng-model="inputVO.fProdIdC4" ng-blur="checkFundStatusC4()" e-length-limit="100" ng-disabled="inputVO.chgAddProdYN=='N'">
+										<button type="button" class="btn btn-info" ng-click="goPRD110D('C', '4')" ng-disabled="inputVO.chgAddProdYN=='N'">搜尋子基金</button>
+									</td>
+									<th>基金名稱：{{inputVO.fProdNameC4}}<span class="bigspace"></span>計價幣別：{{inputVO.fProdCurrC4}}<span class="bigspace"></span>產品風險等級：{{inputVO.fProdRiskLvC4}}</th>
+								</tr>
+								<tr ng-if="(!inputVO.isNewContract && !inputVO.prodIdC2)">
+									<td></td>
+									<th colspan="2">每次轉入金額：
+									    {{inputVO.trustCurr}} <input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fAddprodAmtC4" name="fAddprodAmtC4" 
+									    					e-input-limit="NC" ng-model="inputVO.fAddprodAmtC4"  ng-blur="checkAddProdAmtLimit('C', '4');"  
+									    					e-length-limit="200" ng-disabled="inputVO.chgAddProdYN=='N'">
+										<span class="bigspace"></span>
+										最低申購金額：{{inputVO.trustCurr}} {{inputVO.fProdMinBuyAmtC4 | number:num}}
+										<span class="bigspace"></span>
+										累進申購面額：{{inputVO.trustCurr}} {{inputVO.fProdMinGrdAmtC4 | number:num}}
+									</th>
+								</tr>
+								<tr ng-if="(!inputVO.isNewContract && !inputVO.prodIdC1)">
+									<th>&nbsp;&nbsp;&nbsp;&nbsp;新增子基金5：</th>
+									<td>
+										<input type="text" class="form-control" style="width:80px;display:inline;" placeholder="請輸入..." id="fProdIdC5" name="fProdIdC5" 
+											ng-model="inputVO.fProdIdC5" ng-blur="checkFundStatusC5()" e-length-limit="100" ng-disabled="inputVO.chgAddProdYN=='N'">
+										<button type="button" class="btn btn-info" ng-click="goPRD110D('C', '5')" ng-disabled="inputVO.chgAddProdYN=='N'">搜尋子基金</button>
+									</td>
+									<th>基金名稱：{{inputVO.fProdNameC5}}<span class="bigspace"></span>計價幣別：{{inputVO.fProdCurrC5}}<span class="bigspace"></span>產品風險等級：{{inputVO.fProdRiskLvC5}}</th>
+								</tr>
+								<tr ng-if="(!inputVO.isNewContract && !inputVO.prodIdC1)">
+									<td></td>
+									<th colspan="2">每次轉入金額：
+									    {{inputVO.trustCurr}} <input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fAddprodAmtC5" name="fAddprodAmtC5" 
+									    					e-input-limit="NC" ng-model="inputVO.fAddprodAmtC5"  ng-blur="checkAddProdAmtLimit('C', '5');"  
+									    					e-length-limit="200" ng-disabled="inputVO.chgAddProdYN=='N'">
+										<span class="bigspace"></span>
+										最低申購金額：{{inputVO.trustCurr}} {{inputVO.fProdMinBuyAmtC5 | number:num}}
+										<span class="bigspace"></span>
+										累進申購面額：{{inputVO.trustCurr}} {{inputVO.fProdMinGrdAmtC5 | number:num}}
+									</th>
+								</tr>
+								<tr>
+									<td></td>
+								</tr>
+<!-- 								<tr> -->
+<!-- 									<th>&nbsp;<input type="checkbox" ng-model="inputVO.chgCreditAcctYN" ng-change="onChgCreditAcctYN();" -->
+<!-- 												ng-false-value="'N'" ng-true-value="'Y'">&nbsp;收益入帳帳號：</th> -->
+<!-- 									<td> -->
+<!-- 										<e-combobox id="qstn_type" -->
+<!-- 										ng-datasource="mappingSet['credit']" -->
+<!-- 										ng-model="inputVO.creditAcct" -->
+<!-- 				    					ng-validate="false" -->
+<!-- 				    					ng-readonly="false" -->
+<!-- 				    					ng-editable="false" -->
+<!-- 				    					ng-format="F3" -->
+<!-- 				    					ng-required="true" -->
+<!-- 				    					ng-disabled="inputVO.chgCreditAcctYN=='N'" -->
+<!-- 				    					width="250px" -->
+<!-- 				    					style="line-height:20px;" /> -->
+<!-- 									</td> -->
+<!-- 								</tr>	 -->
+							</table>
+						</td>
+					</tr>
+						
+					<tr>
+						<th>*交易日期：</th>
+						<th colspan="2" id="tradeDateType">
+							<label ng-repeat="row in mappingSet['SOT.TRADE_DATE_TYPE'] | limitTo:displayLimit track by $index">
+								<input type="radio" 
+									   name="tradeDateType" id="tradeDateType{{row.DATA}}" 
+									   ng-model="inputVO.tradeDateType"
+									   ng-value="row.DATA" 
+									   ng-click="checkTradeDate(row.DATA)" 
+									   required> {{row.LABEL}}
+								<span class="bigspace"></span>
+							</label>
+						    <span>({{reserveTradeDay}}天內的營業日 {{toJsDate(inputVO.reservationTradeDate) | date:"yyyy-MM-dd"}})</span>
+						</th>
+					</tr>
+					<tr>
+						<th>*解說專員：</th>
+						<td colspan="2">
+							<input type="text" class="form-control" style="width:auto;display:inline;" id="narratorID" name="narratorID" ng-model="inputVO.narratorID" ng-blur="getSOTEmpInfo()" ng-disabled="narratorDisabled" e-length-limit="200" required>
+							<span class="bigspace"></span>
+							{{inputVO.narratorName}}
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<br>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+<!-- 			<button type="button" class="btn btn-info" ng-click="save('1');"  ng-hide="inputVO.bargainStatus != null">暫存</button> -->
+			<button type="button" class="btn btn-info" ng-click="validateSeniorCust();" function-type="maintenance">下一步</button>
+			 
+		</div>
+	</div>
+</div>

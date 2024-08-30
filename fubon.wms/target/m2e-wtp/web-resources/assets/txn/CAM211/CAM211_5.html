@@ -1,0 +1,123 @@
+<style>
+/* open dialog */
+.ngdialog.CAM211_5_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.CAM211_5_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+/* table size */
+.CAM211_5_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CAM211_5_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CAM211_5_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+.red {
+	color: red !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM211/CAM211_5.js"></script>
+<div ng-controller="CAM211_5_Controller" ng-cloak>
+	<div class="modal-dialog CAM211_5_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 class="modal-title" align="center">已過期活動一覽</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<div>
+						<table>
+							<tr>
+								<th>活動名稱</th>
+								<th>簡要說明</th>
+								<th>活動到期日</th>
+							</tr>
+							<tr>
+								<td align="center">{{row.CAMPAIGN_NAME}}</td>
+								<td>{{row.CAMPAIGN_DESC}}</td>
+<!-- 								<td style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"> -->
+<!-- 									<div uib-tooltip="{{row.CAMPAIGN_DESC}}" tooltip-placement="right-bottom"> -->
+<!-- 										{{row.CAMPAIGN_DESC.length > 4 ? (row.CAMPAIGN_DESC | limitTo:4) + "..." : row.CAMPAIGN_DESC}} -->
+<!-- 									</div> -->
+<!-- 								</td> -->
+								<td >{{row.END_DATE | limitTo: 10}}</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<br />
+				<e-jumping-once output="aoOutputVO" list="aoData" totallist="expiredActivitiesAoAreaList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="table-bordered">
+						<thead>
+							<tr>
+								<th>員編</th>
+								<th>姓名</th>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>結案狀態</th>
+								<th>投資申購量(百萬)</th>
+								<th>保險申購量(百萬)</th>
+								<th>信用卡核卡數</th>
+								<th>房貸撥款量(百萬)</th>
+								<th>信貸撥款量(百萬)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="dataRow in aoData track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center">{{dataRow.EMP_ID}}</td>
+								<td align="center">{{dataRow.EMP_NAME}}</td>
+								<td align="center"><a href="#" onclick="return false" ng-click="custDTL(dataRow)">{{dataRow.CUST_ID}}</a></td>
+								<td align="center">{{dataRow.CUST_NAME}}</td>
+								<td align="center" ng-if="row.LEAD_TYPE != '04'">{{dataRow.RESPONSE_NAME}}</td>
+								<td align="center" ng-if="row.LEAD_TYPE == '04'">N/A</td>
+								<td align="right">{{dataRow.INVS_BAL}}</td>
+								<td align="right">{{dataRow.INSS_BAL}}</td>
+								<td align="right">{{dataRow.CCD_SUM}}</td>
+								<td align="right">{{dataRow.LOAN1_SUM}}</td>
+								<td align="right">{{dataRow.LOAN2_SUM}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,347 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.red{
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM140/CAM140.js"></script>
+<script type="text/javascript" src="assets/txn/CAM140/CAM140_RES.js"></script>
+<script type="text/javascript" src="assets/txn/CAM140/CAM140_QUS.js"></script>
+<script type="text/javascript" src="assets/txn/CAM140/CAM140_UPLOAD.js"></script>
+<div class="CAM140" ng-controller="CAM140Controller" ng-cloak>
+<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+	<input class="form-control" type="hidden" id="sfaParaID" name="sfaParaID" ng-model="inputVO.sfaParaID" >
+
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">{{data == "insert" ? '新增名單參數' : data == "update" ? '編輯名單參數' : data == "updateImp" ? '文件話術修改' : '手動名單匯入'}}
+		</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box2">
+			<table>
+				<tr>
+					<td style="width: 6%;"></td>
+					<th style="width: 1%;">行銷活動代碼：</th>
+					<td style="width: 10%;"><input class="form-control" ng-disabled="data != 'insert'" type="text" placeholder="請輸入..." id="camp_id" name="camp_id" ng-model="inputVO.camp_id" e-length-limit="15" required></td>
+					<td style="width: 5%;"></td>
+					<th style="width: 1%;">行銷活動名稱：</th>
+					<td style="width: 15%;"><input class="form-control" ng-disabled="columnFlag" type="text" placeholder="請輸入..." id="camp_name" name="camp_name" ng-model="inputVO.camp_name" e-length-limit="150" ng-blur="test()" ng-required="!ISCAM120"></td>
+				</tr>
+				<tr ng-show="parameterTypeEditForm.camp_id.$error.required || parameterTypeEditForm.camp_name.$error.required">
+					<td style="width: 6%;"></td>
+					<th style="width: 1%;"></th>
+					<td style="width: 10%;" class="col-md-7 help-block with-errors"><font ng-show="parameterTypeEditForm.camp_id.$error.required">請輸入行銷活動代碼</font></td>
+					<td style="width: 5%;"></td>
+					<th style="width: 1%;"></th>
+					<td style="width: 10%;" class="col-md-7 help-block with-errors"><font ng-show="parameterTypeEditForm.camp_name.$error.required">請輸入行銷活動名稱</font></td>
+				</tr>
+				<tr>
+					<td style="width: 6%;"></td>
+					<th style="width: 1%;">活動起始日：</th>
+					<td style="width: 10%;">
+						<div class="input-group datebox datewidth">
+							<input type="text" id="sDate" name="sDate"
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd"
+								   ng-model="inputVO.sDate"
+								   is-open="model.a"
+								   datepicker-options="startDateOptions"
+								   alt-input-formats="altInputFormats"
+								   ng-readonly="true"
+								   ng-required="!ISCAM120"
+								   show-button-bar="true"
+								   ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="columnFlag">
+								<i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</div>
+					</td>
+					<td style="width: 6%;"></td>
+					<th style="width: 1%;">使用部隊：</th>
+					<td style="width: 10%;">
+						<e-combobox id="channel" name="channel" 
+							ng-paramtype="CAM.CHANNEL_CODE"
+							ng-model="inputVO.channel"
+							ng-validate="false" 
+							ng-readonly="columnFlag" 
+							ng-editable="false"
+							ng-disabled="columnFlag"
+							ng-format="F3"
+							ng-required="!ISCAM120"
+							width="150px"
+							style="line-height:20px;"/>
+					</td>
+				</tr>
+				<tr ng-show="parameterTypeEditForm.channel.$error.required">
+					<td style="width: 6%;">
+					<th style="width: 1%;"></th>
+					<td style="width: 10%;"></td>
+					<td style="width: 5%;">
+					<th style="width: 1%;"></th>
+					<td style="width: 10%;" class="col-md-7 help-block with-errors">請選擇使用部隊</td>
+				</tr>
+				<tr>
+					<td style="width: 6%;">
+					<th style="width: 1%;">活動終止日：</th>
+					<td style="width: 10%;">
+						<div class="input-group datebox datewidth">
+							<input type="text" id="eDate" name="eDate"
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd"
+								   ng-model="inputVO.eDate"
+								   is-open="model.b"
+								   datepicker-options="endDateOptions"
+								   alt-input-formats="altInputFormats"
+								   ng-readonly="true"
+								   ng-required="!ISCAM120"
+								   show-button-bar="true"
+								   ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')" ng-disabled="columnFlag">
+								<i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</div>
+					</td>
+					<td style="width: 5%;"></td>
+					<th style="width: 1%;"><!-- 第二使用通路：<br />(參考資訊) --></th>
+					<td style="width: 15%;" class="col-md-7 tdpadding" rowspan="2">
+<!-- 						<label ng-repeat="fccode in CHANNEL_CODE2"> -->
+<!-- 							<input type="checkbox" ng-disabled="columnFlag" name="selectedChannel[]" value="{{fccode.DATA}}" ng-checked="inputVO.chkCode.indexOf(fccode.DATA) > -1" ng-click="toggleSelection(fccode.DATA)"> {{fccode.LABEL}} -->
+<!-- 							&nbsp;&nbsp; -->
+<!-- 						</label> -->
+					</td>
+				</tr>
+				<tr ng-show="parameterTypeEditForm.sDate.$error.required || parameterTypeEditForm.eDate.$error.required">
+					<td style="width: 6%;">
+					<th style="width: 1%;"></th>
+					<td style="width: 10%;" class="col-md-7 help-block with-errors">請選擇活動起迄日</td>
+					<td style="width: 5%;">
+					<th style="width: 1%;"></th>
+					<td style="width: 10%;"></td>
+				</tr>
+				<tr ng-show="!ISCAM120">
+					<td style="width: 6%;">
+					<th style="width: 1%;">名單來源：</th>
+					<td style="width: 10%;">
+						<e-combobox id="source_id" name="source_id"
+									ng-datasource="LEAD_SOURCE"
+									ng-model="inputVO.source_id"
+									ng-validate="false" 
+									ng-readonly="sourceFlag" 
+									ng-editable="false"
+									ng-disabled="sourceFlag"
+									ng-format="F3"
+									ng-required="!ISCAM120"
+									width="150px"
+									style="line-height:20px;" />
+					</td>
+					<td style="width: 5%;">
+					<th style="width: 1%;"></th>
+					<td style="width: 10%;" rowspan="5">
+<!-- 						1、匯入必要通知名單，使用部隊選擇FC時，若為高端客戶，名單將派至UHRM，FC自動改為參考資訊。<br /> -->
+<!-- 						2、匯入名單，使用部隊選擇非FC時，若為高端客戶，名單將增加參考資訊予UHRM。 -->
+					</td>
+				</tr>
+				<tr ng-show="parameterTypeEditForm.source_id.$error.required">
+					<td style="width: 6%;">
+					<th style="width: 1%;"></th>
+					<td style="width: 10%;" class="col-md-7 help-block with-errors">請選擇名單來源</td>
+					<td style="width: 5%;">
+					<th style="width: 1%;"></th>
+				</tr>
+				<tr>
+					<td style="width: 6%;">
+					<th style="width: 1%;">名單類型：</th>
+					<td style="width: 10%;">
+						<e-combobox id="type" name="type" 
+									ng-datasource="LEAD_TYPE"
+									ng-model="inputVO.type"
+									ng-validate="false" 
+									ng-readonly="columnFlag" 
+									ng-editable="false"
+									ng-disabled="columnFlag"
+									ng-format="F3"
+									ng-required="!ISCAM120"
+									width="150px"
+									style="line-height:20px;"/>
+					</td>
+					<td style="width: 5%;">
+					<th style="width: 1%;"></th>
+				</tr>
+				<tr ng-show="parameterTypeEditForm.type.$error.required">
+					<td style="width: 6%;">
+					<th style="width: 1%;"></th>
+					<td style="width: 10%;" class="col-md-7 help-block with-errors">請選擇名單類型</td>
+					<td style="width: 5%;">
+					<th style="width: 1%;"></th>
+				</tr>
+				<tr ng-show="!ISCAM120 && !columnFlag">
+					<td style="width: 6%;">
+					<th style="width: 1%;">選擇上傳名單：</th>
+					<td style="width: 10%;" class="col-md-7 help-block with-errors">
+						<e-upload success="uploadFinshed(name,rname)" accept=".csv" required></e-upload>
+					</td>
+					<td style="width: 5%;">
+					<th style="width: 1%;"></th>
+				</tr>
+				<tr ng-show="(data != 'update' && data != 'insert' && data != 'updateImp') && inputVO.tempName.length == 0">
+					<td style="width: 6%;">
+					<th style="width: 1%;" colspan = "2" class="col-md-7 help-block with-errors">
+						<a ng-click="getExample()">請上傳名單(.csv) 包含客戶ID、分行代碼、AO_CODE或員編</a>
+					</th>
+					<td style="width: 5%;">
+					<th style="width: 1%;"></th>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">名單處理方式
+		</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box2">
+			<table>			
+				<tr>
+					<td style="width: 3%;">
+					<th style="width: 1%;">簡要說明：</th>
+					<td style="width: 4%;"><input type="text" ng-disabled="columnFlag" placeholder="請輸入..." id="camp_desc" name="camp_desc" ng-model="inputVO.camp_desc" class="form-control" e-length-limit="150" ng-required="!ISCAM120"></td>
+					<td style="width: 3%;">
+					<th style="width: 1%;" class="form-inline">附帶資料蒐集：</th>
+					<td style="width: 10%;" class="form-inline">
+						<e-combobox id="lead_para1" name="lead_para1" 
+									ng-paramtype="CAM.LEAD_PARA1"
+									ng-model="inputVO.lead_para1"
+									ng-validate="false" 
+									ng-readonly="columnFlag" 
+									ng-editable="false"
+									ng-disabled="columnFlag"
+									ng-format="F3"
+									width="150px"
+									style="line-height:20px;" />
+						<button type="button" ng-disabled="columnFlag || inputVO.lead_para1 != 'Y'" class="btn btn-info" ng-click="editQUS()" function-type="query" >編輯行銷問卷</button>
+					</td>
+				</tr>
+				<tr ng-show="parameterTypeEditForm.camp_desc.$error.required">
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;"></th>
+					<td style="width: 4%;" class="col-md-7 help-block with-errors">請輸入簡要說明</td>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;" class="form-inline"></th>
+					<td style="width: 10%;" class="form-inline"></td>
+				</tr>
+				<tr>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;">名單回應選項類別：</th>
+					<td style="width: 4%;">
+						<e-combobox id="responseCode" name="responseCode"
+									ng-paramtype="CAM.RESPONSE_CODE"
+									ng-model="inputVO.responseCode"
+									ng-validate="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-disabled="columnFlag || responseCodeDisable"
+									ng-readonly="columnFlag || responseCodeDisable"
+									width="150px"
+									style="line-height:20px;" />
+					</td>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;" class="form-inline"></th>
+					<td style="width: 10%;" class="form-inline"></td>
+				</tr>
+				<tr>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;">名單回應選項維護：</th>
+					<td style="width: 4%;">
+						<!-- columnFlag || (inputVO.responseCode == '' || inputVO.responseCode == undefined || inputVO.responseCode == null) -->
+						<button type="button" class="btn btn-info" ng-disabled="!inputVO.responseCode" ng-click="editRes()">編輯名單狀態</button>
+					</td>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;" class="form-inline"></th>
+					<td style="width: 10%;" class="form-inline"></td>
+				</tr>
+				<tr>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;">上傳參考文件:</th>
+					<td style="width: 4%;">
+						<button ng-disabled="!(!columnFlag || data == 'updateImp')" type="button" class="btn btn-info" ng-click="upload()">選擇</button>
+						<table>
+							<tr class="repeat-row" ng-repeat="row in inputVO.fileName track by $index">
+								<td>{{row.DOC_NAME}}</td>
+								<td ng-show="!columnFlag || data == 'updateImp'"><button type="button" class="btn btn-info" ng-click="removeUpload($index)" >X</button></td>
+							<tr>
+						</table>
+					</td>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;" class="form-inline"></th>
+					<td style="width: 10%;" class="form-inline"></td>
+				</tr>
+				<tr>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;">話術：</th>
+					<td colspan = "2" style="width: 5%;">
+						<textarea name="sales_pitch" class="form-control" id="sales_pitch" style="width: 100%; height: 100px" placeholder="請輸入..." ng-model="inputVO.sales_pitch" e-length-limit="2000" ng-required="!ISCAM120"></textarea>
+					</td>
+					<th style="width: 1%;" class="form-inline"></th>
+					<td style="width: 10%;" class="form-inline"></td>
+				</tr>
+				<tr ng-show="parameterTypeEditForm.sales_pitch.$error.required">
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;"></th>
+					<td style="width: 4%;" class="col-md-7 help-block with-errors">請輸入話術</td>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;" class="form-inline"></th>
+					<td style="width: 10%;" class="form-inline"></td>
+				</tr>
+				<tr ng-show="false">
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;">票券/贈品/講座活動代碼：</th>
+					<td style="width: 4%;" class="col-md-7 help-block with-errors">
+						<input type="text" ng-disabled="columnFlag" placeholder="請輸入..." id="gift_camp_id" name="gift_camp_id" ng-model="inputVO.gift_camp_id" e-length-limit="12" class="form-control">
+					</td>
+					<td style="width: 3%;"></td>
+					<th style="width: 1%;" class="form-inline"></th>
+					<td style="width: 10%;" class="form-inline"></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+  	<div class="text-danger">＊執行匯入的總時間會因匯入檔案大小而不同。處理大型檔案的時間可能會花幾分鐘。您可以上傳完成後，到活動名單匯入功能查詢匯入結果。</div>
+	<div class="search_box_btn text-center" ng-show="data != 'update' && data != 'insert' && data != 'updateImp'">
+		<button type="button" class="btn btn-primary" ng-click="addData()" ng-disabled="parameterTypeEditForm.$invalid || inputVO.tempName.length == 0" function-type="maintenance">執行批次匯入</button>
+	</div>
+	<div class="search_box_btn text-center" ng-show="data == 'updateImp'">
+		<button type="button" class="btn btn-primary" ng-click="addData()" ng-disabled="parameterTypeEditForm.$invalid" function-type="maintenance">確定</button>
+		<button type="button" class="btn btn-primary" ng-click="btnCancel()" >取消</button>
+	</div>
+	<div class="search_box_btn text-center" ng-show="data == 'insert' || data == 'update'">
+		<button type="button" class="btn btn-primary" ng-click="addParameter()" ng-disabled="parameterTypeEditForm.$invalid" function-type="maintenance">確定</button>
+		<button type="button" class="btn btn-primary" ng-click="btnCancel()" >取消</button>
+	</div>
+	<!-- div>
+		<table>
+		  	<tr>
+			    <th>建立者：</td>
+			    <td>{{inputVO.loginUser}}</td>
+			    <th>建立日期：</td>
+			    <td>{{inputVO.loginDate}}</td>
+		  	</tr>
+		</table>
+	</div-->
+</form>
+</div>

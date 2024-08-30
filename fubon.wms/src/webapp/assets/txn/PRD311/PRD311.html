@@ -1,0 +1,116 @@
+<style>
+    .PRD311 .condition {
+        padding: 20px;
+    }
+</style>
+<script type="text/javascript" src="assets/txn/PRD311/PRD311.js"></script>
+<script type="text/javascript" src="assets/txn/PRD311/PRD311_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PRD311/PRD311_MODIFY.js"></script>
+<div class="PRD311" ng-controller="PRD311Controller">
+    <div class="tfb_content">
+        <div class="tfb_content_icon"></div>
+        <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"><span ng-bind="'E 學院課程商品查詢'"></span>
+        </div>
+    </div>
+
+    <div class="panel_content">
+        <form name="qryForm">
+            <div class="row condition">
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="input-group">
+                        <span class="input-group-addon" ng-bind="'課程代碼'"></span>
+                        <input type="text" class="form-control" ng-model="inputVO.classId" placeholder="請輸入課程代碼～"/>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="input-group">
+                        <span class="input-group-addon" ng-bind="'商品代碼'"></span>
+                        <input type="text" class="form-control" ng-model="inputVO.prodId" placeholder="請輸入商品代碼～"/>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="input-group">
+                        <span class="input-group-addon" ng-bind="'員工編碼'"></span>
+                        <input type="text" class="form-control" ng-model="inputVO.empId" placeholder="請輸入員工編碼～"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search_box_btn text-center">
+                <button type="submit" ng-click="query()" class="btn btn-primary" function-type="query">
+                    <span class="glyphicon glyphicon-search"></span>
+                    <span ng-bind="'查詢'"></span>
+                </button>
+
+                <button ng-click="clear()" class="btn btn-info" function-type="query">
+                    <span class="glyphicon glyphicon-erase"></span>
+                    <span ng-bind="'清除'"></span>
+                </button>
+
+                <button ng-click="add()" class="btn btn-warning" function-type="maintenance">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span ng-bind="'新增'"></span>
+                </button>
+
+                <button ng-click="upload()" class="btn btn-warning" function-type="maintenance">
+                    <span class="glyphicon glyphicon-upload"></span>
+                    <span ng-bind="'上傳'"></span>
+                </button>
+
+                <button type="button" class="btn btn-success" ng-click="exportExcel()" function-type="export"
+                        data-toggle="tooltip" title="匯出資料到 Excel！">
+                    <span class="glyphicon glyphicon-export"></span>
+                    <span ng-bind="'匯出'"></span>
+                </button>
+            </div>
+        </form>
+
+        <e-jumping-once output="outputVO" list="subData" totallist="data"></e-jumping-once>
+
+        <div class="gv_tab_sc">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th ng-bind="'課程代碼'"></th>
+                    <th ng-bind="'商品代碼'"></th>
+                    <th ng-bind="'商品名稱'"></th>
+                    <th ng-bind="'員工編碼'"></th>
+                    <th ng-bind="'員工姓名'"></th>
+                    <th ng-bind="'通過狀態'"></th>
+                    <th ng-bind="'通過時間'"></th>
+                    <th ng-bind="'功能'"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="repeat-row" ng-repeat="row in subData track by $index">
+                    <td class="center" ng-bind="row.CLASS_ID"></td>
+                    <td class="center" ng-bind="row.PRD_ID"></td>
+                    <td class="center" ng-bind="row.INSPRD_NAME"></td>
+                    <td class="center" ng-bind="row.EMP_ID"></td>
+                    <td class="center" ng-bind="row.EMP_NAME"></td>
+                    <td class="center" ng-bind="row.STATUS | mapping:mappingSet['STATUS']:'F3'"></td>
+                    <td class="center" ng-bind="row.COMPLETE_DATE | date:'yyyy-MM-dd'"></td>
+                    <td class="center">
+                    	<e-combobox id="function"
+									ng-datasource="mappingSet['FUNCTION']"
+									ng-model="row.FUNCTION"
+		   							ng-validate="false" 
+		   							ng-editable="false"
+		   							ng-format="F3"
+		   							ng-required="true"
+		   							ng-change="modify(row)"
+		   							width="180px"
+		   							style="line-height:20px;" />
+                       <!--  <button ng-click="delete(row)" class="btn btn-danger">
+                            <span class="glyphicon glyphicon-trash"></span>
+                            <span ng-bind="'刪除'"></span>
+                        </button> -->
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

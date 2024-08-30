@@ -1,0 +1,203 @@
+<style>
+/* dialog panl */
+.modal-dialog.ORG120_EDIT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.disabled {
+  cursor: not-allowed;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG120/ORG120_EDIT.js"></script>
+<div ng-controller="ORG120_EDITController" ng-cloak>
+	<div class="modal-dialog ORG120_EDIT"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">修改</h4>
+			</div>
+ 			<div class="modal-body">
+ 			<form>
+		  		<table width="100%">
+		  			<thead>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-2 tdpadding">業務處:</th>
+							<td class="col-md-3 tdpadding">{{paramList[0].REGION_CENTER_NAME}}</td>
+							<th class="col-md-2 tdpadding">營運區：</th>
+							<td class="col-md-3 tdpadding">{{paramList[0].BRANCH_AREA_NAME}}</td>
+			    			<td class="col-xs-1"></td>	
+			    		</tr>
+			    		<tr>
+			    			<td class="col-xs-1"></td>
+			    			<th class="col-md-2 tdpadding">分行：</th>
+							<td class="col-md-3 tdpadding">{{paramList[0].BRANCH_NAME}}</td>				
+							<th class="col-md-2 tdpadding">AO Code：</th>
+							<td class="col-md-3 tdpadding">{{inputVO.ao_code}}</td>
+							<td class="col-xs-1"></td>
+						 </tr>
+						 <tr>	
+						 	 <td class="col-xs-1"></td>	    	
+							 <th class="col-md-2 tdpadding">理專：</th>
+							 <td class="col-md-3 tdpadding">{{paramList[0].EMP_NAME}}</td>
+							 <th class="col-md-2 tdpadding">業績生效日：</th>
+							 <td class="col-md-3 tdpadding">
+								 <div class="input-group datebox datewidth">
+									<input type="text" id="aoPerfEffDate" name="aoPerfEffDate"
+										   class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.aoPerfEffDate"
+											is-open="model.e"
+											datepicker-options="startDateOptions"
+											alt-input-formats="altInputFormats"
+											ng-readonly="true"
+											ng-change="limitDate()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							  </td>
+							  <td class="col-xs-1"></td>
+						   </tr>
+					</thead>
+					<tbody ng-if="inputVO.aoType == 'FCH'">
+						<tr>
+							<td class="col-xs-1"></td>
+			    			<td class="col-md-10 tdpadding" colspan="4">
+								<div class="gv_tab_sc scroll_y">
+									<table>
+										<thead>
+											<tr>
+												<th></th>
+												<th>維護Code</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="repeat-row" ng-repeat="row in inputVO.aoList track by $index">
+												<td style="width:10%" align="center">
+													<a href="#" data-toggle="modal" class="btn btn-warning btn-circle" ng-click="delAoCode(row)" ng-class="{disabled: row.COUNTS != 0}"><i class="glyphicon glyphicon-trash"></i></a>
+												</td>
+												<td>{{row.AO_CODE}}</td>
+											</tr>
+											<tr ng-hide="inputVO.aoList.length > 0">
+												<td style="width:10%" align="center">
+													<button type="button" class="btn btn-primary" onclick= "return false" ng-click="addAoCode()" function-type="maintenance" ng-disabled="inputVO.atchCode == ''"><i class="glyphicon glyphicon-plus"></i></button>
+												</td>
+												<td>
+													<e-combobox id="atchCode" name="atchCode" 
+																ng-datasource="mappingSet['freeAoCode']"
+																ng-model="inputVO.atchCode"
+										    					ng-validate="false" 
+										    					ng-readonly="false" 
+										    					ng-editable="false"
+										    					ng-format="F2"
+										    					ng-disabled="tmpCodeCusStatus!=null"
+										    					width="200px"
+										    					ng-required="true"
+										    					style="line-height:20px;" />
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					 </tbody>
+		    		 <tbody ng-if="inputVO.aoType == 'FC'">
+			    		<tr>
+			    			<td class="col-xs-1"></td>
+			    			<td class="col-md-10 tdpadding" colspan="4">
+								<div class="gv_tab_sc scroll_y">
+									<table>
+										<thead>
+											<tr>
+												<th></th>
+												<th>副Code</th>
+												<th>副Code生效日</th>
+												<th>副Code理由</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="repeat-row" ng-repeat="row in inputVO.aoList track by $index">
+												<td style="width:10%" align="center">
+													<a href="#" data-toggle="modal" class="btn btn-warning btn-circle" ng-click="delAoCode(row)" ng-class="{disabled: row.COUNTS != 0}"><i class="glyphicon glyphicon-trash"></i></a>
+												</td>
+												<td>{{row.AO_CODE}}</td>
+												<td>{{row.ACTIVE_DATE | date:"yyyy-MM-dd"}}</td>
+												<td>{{row.AO_CODE_ATCH_REASON | mapping:mappingSet['ORG.ATCH_REASON']:F3}}</td>
+											</tr>
+											<tr>
+												<td style="width:10%" align="center">
+													<button type="button" class="btn btn-primary" onclick= "return false" ng-click="addAoCode()" function-type="maintenance" ng-disabled="inputVO.atchCode == '' || inputVO.activeDate == undefined || inputVO.aoCodeAtchReason == ''"><i class="glyphicon glyphicon-plus"></i></button>
+												</td>
+												<td>
+													<e-combobox id="atchCode" name="atchCode" 
+																ng-datasource="mappingSet['freeAoCode']"
+																ng-model="inputVO.atchCode"
+										    					ng-validate="false" 
+										    					ng-readonly="false" 
+										    					ng-editable="false"
+										    					ng-format="F2"
+										    					ng-disabled="tmpCodeCusStatus!=null"
+										    					width="200px"
+										    					ng-required="true"
+										    					style="line-height:20px;" />
+												</td>
+												<td>
+													<div class="input-group datebox datewidth">
+														<input  type="text"
+																class="form-control"
+																uib-datepicker-popup="yyyy/MM/dd"
+																ng-model="inputVO.activeDate"
+																is-open="model.a"
+																datepicker-options=""
+																ng-readonly="true"
+																ng-disabled="tmpCodeCusStatus != null"	
+																ng-required="true"/>
+						 								<span class="input-group-btn">
+															<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+																<i class="glyphicon glyphicon-calendar"></i>
+															</button>																		
+														</span>
+													</div>
+												</td>
+												<td>
+													<e-combobox ng-paramtype="ORG.ATCH_REASON"
+																ng-model="inputVO.aoCodeAtchReason"
+										    					ng-validate="false" 
+										    					ng-readonly="false" 
+										    					ng-editable="false"
+										    					ng-format="F3"
+										    					ng-disabled="tmpCodeCusStatus!=null"	
+										    					width="200px"
+										    					ng-required="true"
+										    					style="line-height:20px;"/>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+		    		 	</tr>
+					</tbody>
+				</table>
+			</form> 
+			</div>  
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-disabled="" ng-click="addAoCodeSetting()">送交覆核</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+		</div>	
+	</div>
+</div>

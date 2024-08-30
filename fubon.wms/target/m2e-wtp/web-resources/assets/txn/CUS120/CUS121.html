@@ -1,0 +1,109 @@
+<style>
+
+</style>
+<div ng-controller="CUS121Controller" ng-cloak>
+	<div class="modal-dialog CUS120">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center" ng-if="content">新增訊息內容</h4>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center" ng-if="attachment">選擇上傳檔案</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">分類：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="content" name="content"
+								ng-paramtype="SYS.CATEGORY_CONTENT"
+								ng-model="inputVO.content"
+								ng-validate="false" 
+								ng-readonly="false"
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="250px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.content.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇分類</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">產品類別：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="product" name="product"
+								ng-paramtype="SYS.CATEGORY_PRODUCT"
+								ng-model="inputVO.product"
+								ng-validate="false" 
+								ng-readonly="false"
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="250px"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.product.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇產品類別</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="content">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">訊息內容：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="message" name="message" ng-model="inputVO.message" e-length-limit="60" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.message.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入訊息內容</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="attachment">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">選擇檔案：</th>
+							<td class="col-md-7 tdpadding">
+								<e-upload id="dataUpload" success="upload(name,rname)" text="上傳"></e-upload>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="attachment && !inputVO.realDataName">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇上傳檔案</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="attachment">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">文件名稱：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="fileName" name="fileName" ng-model="inputVO.fileName" e-length-limit="60" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.fileName.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入文件名稱</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+				<div class="search_box_btn text-center">
+					<button id='contentBtn' type="button" class="btn btn-info" ng-click="btnContent(row)" ng-if="content">確定</button>
+					<button id='attachmentBtn' type="button" class="btn btn-info"  ng-click="btnAttachment(row)" ng-if="attachment">確定</button>
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

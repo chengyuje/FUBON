@@ -1,0 +1,89 @@
+package com.systex.jbranch.app.common.fps.table;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+/** @Author : SystexDBTool CodeGenerator By LeoLin*/
+public class TBPMS_DYNAMIC_RPT_DTL_RECPK  implements Serializable  {
+
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/** identifier field */
+    private BigDecimal COL_SEQ;
+
+    /** identifier field */
+    private BigDecimal ROW_SEQ;
+
+    /** identifier field */
+    private BigDecimal SEQ;
+
+    /** full constructor */
+    public TBPMS_DYNAMIC_RPT_DTL_RECPK(BigDecimal COL_SEQ, BigDecimal ROW_SEQ, BigDecimal SEQ) {
+        this.COL_SEQ = COL_SEQ;
+        this.ROW_SEQ = ROW_SEQ;
+        this.SEQ = SEQ;
+    }
+
+    /** default constructor */
+    public TBPMS_DYNAMIC_RPT_DTL_RECPK() {
+    }
+
+    public BigDecimal getCOL_SEQ() {
+        return this.COL_SEQ;
+    }
+
+    public void setCOL_SEQ(BigDecimal COL_SEQ) {
+        this.COL_SEQ = COL_SEQ;
+    }
+
+    public BigDecimal getROW_SEQ() {
+        return this.ROW_SEQ;
+    }
+
+    public void setROW_SEQ(BigDecimal ROW_SEQ) {
+        this.ROW_SEQ = ROW_SEQ;
+    }
+
+    public BigDecimal getSEQ() {
+        return this.SEQ;
+    }
+
+    public void setSEQ(BigDecimal SEQ) {
+        this.SEQ = SEQ;
+    }
+
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("COL_SEQ", getCOL_SEQ())
+            .append("ROW_SEQ", getROW_SEQ())
+            .append("SEQ", getSEQ())
+            .toString();
+    }
+
+    public boolean equals(Object other) {
+        if ( (this == other ) ) return true;
+        if ( !(other instanceof TBPMS_DYNAMIC_RPT_DTL_RECPK) ) return false;
+        TBPMS_DYNAMIC_RPT_DTL_RECPK castOther = (TBPMS_DYNAMIC_RPT_DTL_RECPK) other;
+        return new EqualsBuilder()
+            .append(this.getCOL_SEQ(), castOther.getCOL_SEQ())
+            .append(this.getROW_SEQ(), castOther.getROW_SEQ())
+            .append(this.getSEQ(), castOther.getSEQ())
+            .isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(getCOL_SEQ())
+            .append(getROW_SEQ())
+            .append(getSEQ())
+            .toHashCode();
+    }
+
+}

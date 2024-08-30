@@ -1,0 +1,61 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS711_addSub {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 50%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.table-border tr input {
+	width:100px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS711/PMS711_addSub.js"></script>
+<div ng-controller="PMS711_addSubController" ng-cloak>
+	<div class="modal-dialog PMS711_addSub">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{subName}}</h4>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+			    <e-jumping output="outputVO" input="inputVO" query="select()"
+					list="showList"></e-jumping>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						<table class="table-bordered table-border">
+							<tr>
+								<th>年月</th>
+								<th>子項目代碼</th>
+								<th>分行代碼或員編</th>
+								<th>類別</th>
+								<th>累計目標</th>
+								<th>累計實績</th>
+								<th>達成率</th>
+							</tr>
+							<tr ng-repeat="row in showList | limitTo:displayLimit track by $index">
+								<td style="color:blue; text-align:center">{{row.DATE_YEAR}}</td>
+								<td style="color:blue; text-align:center">{{row.SUB_PROJECT_SEQ_ID}}</td>
+								<td style="color:blue; text-align:center">{{row.BRANCH_EMP}}</td>
+								<td style="color:blue; text-align:center">{{row.BRANCH_EMP_TYPE}}</td>
+								<td style="color:blue; text-align:right">{{row.TOTAL_GOAL}}</td>
+								<td style="color:blue; text-align:right">{{row.TOTAL_GRADE}}</td>
+								<td style="color:blue; text-align:right">{{row.RATE}}</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<!-- <button type="button" class="btn btn-primary" ng-click="select()">儲存</button> -->
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >退出</button>				
+			</div>
+		</div>
+	</div>

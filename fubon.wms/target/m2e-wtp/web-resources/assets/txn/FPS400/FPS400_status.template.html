@@ -1,0 +1,165 @@
+<style>
+  .FPS410T {
+    display: flex;
+    justify-content: space-around;
+    width: 98.5%;
+    margin: 0 auto;
+  }
+
+  .FPS410T .block-wrapper:first-of-type {
+    flex: 1;
+  }
+
+  .FPS410T .block-wrapper {
+    background : #ecf6fd;
+    border: .5px solid #28a4c9;
+    flex: 2;
+    padding: .5em;
+    min-height: 8.5em;
+    display: inline-block;
+    border-radius: 5px;
+    margin: 0 .5%;
+    text-align: center;
+    position: relative;
+    vertical-align: top;
+  }
+
+  .FPS410T .block {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+    word-break: break-word;
+  }
+
+  .FPS410T .block-title:first-of-type {
+    /* color: #333; */
+    margin: 0;
+  }
+
+  .FPS410T .block-title {
+    color: #15596d;
+    position: absolute;
+    top: .7em;
+    left: .5em;
+  }
+
+  .FPS410T .content {
+    font-weight: 600;
+    position: absolute;
+    top: 1.5em;
+    left: 0;
+    right: 0;
+    color: #28a4c9;
+  }
+
+  .FPS410T .content .content-big {
+    font-size: 2.5em;
+    font-weight: 700;
+  }
+
+  .FPS410T .content.bottom {
+    top: initial;
+    bottom: 0;
+    display: flex;
+  }
+
+  .FPS410T .content.bottom .content-left,
+  .FPS410T .content.bottom .content-right {
+    flex: 1;
+    color: #333;
+  }
+
+  .FPS410T .content.bottom .content-left {
+    text-align: left;
+    padding: 0 0 .5em 0.5em;
+  }
+
+  .FPS410T .content.bottom .content-right {
+    text-align: right;
+    padding: 0 0.5em .5em 0;
+  }
+
+  .FPS410T .content.bottom .content-subtitle {
+    color: #999;
+  }
+
+  .FPS410T .edit-icon {
+    position: absolute;
+    top: .5em;
+    right: .5em;
+    border: 1px #15596d solid;
+    border-radius: 100%;
+    width: 1.5em;
+    height: 1.5em;
+  }
+
+  .FPS410T .edit-icon>i {
+    font-size: 1em;
+    color: #15596d;
+  }
+
+  .FPS410T .ugly-guy {
+    width: 90px;
+    margin-top: 10px;
+  }
+
+</style>
+<div class="FPS410T">
+  <div class="block-wrapper">
+    <h3 class="block-title">目標進度狀態</h3>
+    <div class="content">
+      <img ng-src="{{hitRateGuy[HIT_RATE_FLAG]}}"
+           ng-alt="{{HIT_RATE_FLAG}}"
+           class="ugly-guy">
+    </div>
+    <div class="content bottom"
+         style="justify-content: space-around;">
+      <span ng-bind="HIT_RATE_DESC"
+      		ng-style="HIT_RATE_DESC == '落後' ? {'color':'red'} : (HIT_RATE_DESC == '微幅落後' ? {'color':'orange'}: '')"></span>
+    </div>
+  </div>
+
+  <div class="block-wrapper">
+    <h3 class="block-title">達成率</h3>
+    <div class="content">
+      <h4 class="content-big">
+        <span ng-bind="HIT_RATE| number:0"></span>%</h4>
+    </div>
+
+    <div class="content bottom">
+      <div class="content-left">
+        <div class="content-subtitle">市值(含息)</div>
+        NT$
+        <span ng-bind="MARKET_VALUE|number:0"></span>
+      </div>
+      <div class="content-right">
+        <div class="content-subtitle">應達目標</div>
+        NT$
+        <span ng-bind="AMT_TARGET|number:0"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="block-wrapper">
+    <h3 class="block-title">含息報酬率</h3>
+    <div class="content">
+      <h4 class="content-big">
+        <span ng-bind="RETURN_RATE| number:2"></span>%</h4>
+    </div>
+
+    <div class="content bottom">
+      <div class="content-left">
+        <div class="content-subtitle">市值(含息)</div>
+        NT$
+        <span ng-bind="MARKET_VALUE|number:0"></span>
+      </div>
+      <div class="content-right">
+        <div class="content-subtitle">投入金額</div>
+        NT$
+        <span ng-bind="INV_AMT_CURRENT|number:0"></span>
+      </div>
+    </div>
+  </div>
+</div>

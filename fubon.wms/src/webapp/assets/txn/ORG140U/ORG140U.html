@@ -1,0 +1,201 @@
+<style>
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG140U/ORG140U.js"></script>
+<script type="text/javascript" src="assets/txn/ORG140/ORG140.js"></script>
+
+<div class="ORG140U" ng-controller="ORG140UController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr>
+						<th width="16.6%">業務處：</th>
+						<td width="16.6%">
+								<e-combobox id="region_center_id" name="region_center_id"
+											ng-paramtype="PMS.UHRM_RC"
+											ng-model="inputVO.uhrmRC"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeRegion()"
+											width="150px"
+											style="line-height:20px;" />
+					   	</td>
+						<th width="16.6%">業務中心：</th>
+						<td width="16.6%">
+								<e-combobox id="branch_area_id" name="branch_area_id"
+											ng-paramtype="PMS.UHRM_OP"
+											ng-model="inputVO.uhrmOP"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeArea()"
+											width="150px"
+											style="line-height:20px;" />
+					   	</td>
+						<th width="16.6%"></th>
+						<td width="16.6%"></td>
+					</tr>
+					<tr>
+						<th width="16.6%">員工編號：</th>
+						<td width="16.6%"><input class="form-control" type="text" placeholder="請輸入..." id="tipOrgName" name="tipOrgName" ng-model="inputVO.empId" e-length-limit="60" maxlength="8"></td>
+						<th width="16.6%">員工姓名：</th>
+						<td width="16.6%"><input class="form-control" type="text" placeholder="請輸入..." id="tipOrgName" name="tipOrgName" ng-model="inputVO.empName" maxlength="4"></td>
+						<th width="16.6%">過試用期：</th>
+						<td width="16.6%">
+							<e-combobox ng-datasource="mappingSet['COMMON.YES_NO']" 
+										ng-model="inputVO.probation"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3" 
+										ng-required="false" 
+										ng-change="bran()"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th>角色：</th>
+						<td>
+							<e-combobox id="person_role" name="person_role"
+										ng-paramtype="PMS.UHRM_ROLE"
+										ng-model="inputVO.person_role"
+										ng-validate="false"
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										width="100px"
+										style="line-height:20px;" />
+						</td>
+						<th>尚缺證照：</th>
+						<td>
+							<e-combobox ng-paramtype="ORG.CERT_ALL"
+										ng-model="inputVO.certID"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3" 
+										ng-required="false" 
+										ng-change="bran()"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th width="16.6%">入行日：</th>
+						<td colspan="2">
+							<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="sDate" name="onboardDateStart"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.onboardDateStart"
+											is-open="model.a"
+											datepicker-options="startDateOptions"
+											alt-input-formats="altInputFormats"
+											ng-readonly="true" 
+											show-button-bar="true" 
+ 											ng-change="limitDate()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="sDate2" name="onboardDateEnd"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.onboardDateEnd"
+											is-open="model.c"
+											datepicker-options="endDateOptions"
+											alt-input-formats="altInputFormats"
+											ng-readonly="true"
+											show-button-bar="true"
+											ng-change="limitDate()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" function-type="export">匯出</button>
+			</div>
+		</div>
+	</div>
+	
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-left="5" e-list="data" e-top="true">
+					<thead>
+						<tr>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行</th>
+							<th>員工編號</th>
+							<th>姓名</th>
+							<th>職務</th>
+							<th>是否為主要角色</th>
+							<th>角色名稱</th>
+							<th>擇一證照</th>
+							<th>擇一證照(尚缺)</th>
+							<th>必備證照</th>
+							<th>必備證照(尚缺)</th>
+							<th>過試用期</th>
+							<th>入行日</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" align="center" ng-repeat="row in data">							
+
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							<td>{{row.BRANCH_AREA_NAME}}</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.EMP_ID}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td>{{row.JOB_TITLE_NAME}}</td>
+							<td>{{row.IS_PRIMARY_ROLE | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.ROLE_NAME}}</td>
+							<td align="left"><div ng-repeat ="value in comma_split(row.CHOOSE_ONE_LIST)">{{value | mapping:mappingSet['ORG.CERT_ALL']:'F3'}}</div></td>
+							<td align="left"><div ng-if="row.CHOOSE_ONE_LIST == row.CHOOSE_ONE_NON_GET_LIST" ng-repeat ="value in comma_split(row.CHOOSE_ONE_NON_GET_LIST)">{{value | mapping:mappingSet['ORG.CERT_ALL']:'F3'}}</div></td>
+							<td align="left"><div ng-repeat ="value in comma_split(row.ESSENTIAL_LIST)">{{value | mapping:mappingSet['ORG.CERT_ALL']:'F3'}}</div></td>
+							<td align="left"><div ng-repeat ="value in comma_split(row.ESSENTIAL_NON_GET_LIST)">{{value | mapping:mappingSet['ORG.CERT_ALL']:'F3'}}</div></td>
+							<td>{{row.EXPECTED_END_FLAG}}</td>
+							<td>{{toJsDate(row.ONBOARD_DATE) | date:'yyyy-MM-dd'}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

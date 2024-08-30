@@ -1,0 +1,258 @@
+<style>
+.bigspace {
+    margin-left: 50px !important;
+}
+
+.form-control-CRM238 {
+    padding: 4px 10px;
+    font-size: 16px;
+    color: #666666;
+    background-color: #f4f4f4;
+    border: 1px solid #999999;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-transition: none;
+    -o-transition: none;
+    transition: none;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM238/CRM238.js"></script>
+<script type="text/javascript" src="assets/txn/CRM230/CRM230.js"></script>
+<script type="text/javascript" src="assets/txn/CUS160/CUS160_ADD.js"></script>
+<script type="text/javascript" src="assets/txn/CRM230/CRM230_COMPANY.js"></script>
+<div ng-controller="CRM238Controller" ng-cloak>
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+        </div>
+        <!--Content of the panel-->
+        <div class="panel_content">
+            <!-- include -->
+            <div ng-include="'assets/txn/CRM230/CRM230_COMMON.html'"></div>
+            <!-- include -->
+            <div class="search_table">
+                <hr>
+                <h4>外匯雙享利</h4>
+                <table>
+                    <tr>
+                        <th width="10%">商品幣別：</th>
+                        <td width="40%">
+                            <e-combobox id="valu_crcy_type" ng-paramtype="FPS.CURRENCY" ng-model="inputVO.valu_crcy_type" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
+                        </td>
+                        <th width="10%">相對幣別：</th>
+                        <td width="40%">
+                            <e-combobox id="mpng_crcy_type" ng-paramtype="FPS.CURRENCY" ng-model="inputVO.mpng_crcy_type" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>商品代號：</th>
+                        <td>
+                            <input type="text" placeholder="請輸入..." id="prod_id" name="prod_id" ng-model="inputVO.prod_id" e-length-limit="50" size="48">
+                        </td>
+                        <th>保值 / 不保值：</th>
+                        <td>
+                            <e-combobox id="hedging_yn" ng-paramtype="CRM.CRM238_HEDGING_YN" ng-model="inputVO.hedging_yn" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>是否轉換：</th>
+                        <td>
+                            <e-combobox id="transfer_yn" ng-paramtype="CRM.CRM230_YN" ng-model="inputVO.transfer_yn" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
+                        </td>
+                        <th>比價日：</th>
+                        <td>
+                            <div>
+                                <input type="text" id="expiry_date_bgn" name="expiry_date_bgn" class="form-control-CRM238" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.expiry_date_bgn" is-open="model.c" datepicker-options="expiry_date_bgn" ng-readonly="true" ng-change="limitDate2()" size="13" />
+                                <!-- 製作日曆button -->
+                                <button type="button" class="btn btn-default" ng-click="open($event,'c')">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                                <label>&nbsp ~ &nbsp</label>
+                                <input type="text" id="expiry_date_end" name="expiry_date_end" class="form-control-CRM238" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.expiry_date_end" is-open="model.d" datepicker-options="expiry_date_end" ng-readonly="true" ng-change="limitDate2()" size="13" />
+                                <!-- 製作日曆button -->
+                                <button type="button" class="btn btn-default" ng-click="open($event,'d')">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>到期日：</th>
+                        <td>
+                            <div>
+                                <input type="text" id="due_date_bgn" name="due_date_bgn" class="form-control-CRM238" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.due_date_bgn" is-open="model.e" datepicker-options="due_date_bgn" ng-readonly="true" ng-change="limitDate3()" size="13" />
+                                <!-- 製作日曆button -->
+                                <button type="button" class="btn btn-default" ng-click="open($event,'e')">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                                <label>&nbsp ~ &nbsp</label>
+                                <input type="text" id="due_date_end" name="due_date_end" class="form-control-CRM238" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.due_date_end" is-open="model.f" datepicker-options="due_date_end" ng-readonly="true" ng-change="limitDate3()" size="13" />
+                                <!-- 製作日曆button -->
+                                <button type="button" class="btn btn-default" ng-click="open($event,'f')">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <th>商品風險等級：</th>
+                        <td>
+                            <e-combobox id="risk_level" ng-paramtype="FPS.PROD_RISK_LEVEL" ng-model="inputVO.risk_level" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="search_box_btn text-center">
+                <button type="button" class="btn btn-info" ng-click="inquireInit_common();inquire();" function-type="query">查詢</button>
+                <button type="button" class="btn btn-info" ng-click="clearAll();init();">清除</button>
+            </div>
+        </div>
+    </div>
+    <!-- 結果區 -->
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+        </div>
+        <!--Content of the panel-->
+        <div class="panel_content">
+            <!-- 分頁 -->
+            <uib-tabset active="0" justified="true">
+                <uib-tab index="0" heading="客戶資訊">
+                    <!-- 新增待辦 -->
+                    <div ng-include="'assets/txn/CRM230/CRM230_INVESTTAB.html'"></div>
+                    <!-- 客戶資訊 -->
+                    <div ng-include="'assets/txn/CRM230/CRM230_CUSTTAB.html'"></div>
+                </uib-tab>
+                <uib-tab index="1" heading="投資資訊">
+                    <e-jumping-once output="outputVO" list="resultListData" totallist="resultList"></e-jumping-once>
+                    <div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+                        <table class="e-table-freeze" e-height="400px" e-left="2" e-list="resultListData" e-mode="3" e-top="true">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="inquire()">客戶ID</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="inquire()">客戶姓名</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="PROD_ID" e-query="inquire()">交易編號</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="PROD_NAME" e-query="inquire()">商品名稱</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="TXN_AMT" e-query="inquire()">交易金額</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="VALU_CRCY_TYPE" e-query="inquire()">商品幣別</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="MPNG_CRCY_TYPE" e-query="inquire()">相對幣別</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="TXN_DATE" e-query="inquire()">交易日</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="EXPIRY_DATE" e-query="inquire()">比價日</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="DUE_DATE" e-query="inquire()">到期日</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="YIELD_RATE" e-query="inquire()">商品收益率(%)</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="VALU_CRCY_TYPE" e-query="inquire()">幣別</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="REF_PROFIT" e-query="inquire()">收益金額</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="CRCY_CHGE_STATUS" e-query="inquire()">是否幣轉</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="CRCY" e-query="inquire()">到期幣別</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="DEL_AMT" e-query="inquire()">到期返還金額</e-sorter>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="repeat-row" ng-repeat="row in resultListData | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                                    <td><a href="" onclick="return false" ng-click="goCRM610(row)">{{row.CUST_ID}}</a></td>
+                                    <!-- 客戶ID -->
+                                    <td>{{row.CUST_NAME}}</td>
+                                    <!-- 客戶姓名 -->
+                                    <td>{{row.PROD_ID}}</td>
+                                    <!-- 交易編號 -->
+                                    <td>{{row.PROD_NAME}}</td>
+                                    <!-- 商品名稱 -->
+                                    <td align="right">{{row.TXN_AMT | number : 2}}</td>
+                                    <!-- 交易金額 -->
+                                    <td>{{row.VALU_CRCY_TYPE | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+                                    <!-- 商品幣別 -->
+                                    <td>{{row.MPNG_CRCY_TYPE | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+                                    <!-- 相對幣別 -->
+                                    <td>{{toJsDate(row.TXN_DATE) | date: "yyyy/MM/dd"}}</td>
+                                    <!-- 交易日 -->
+                                    <td>{{toJsDate(row.EXPIRY_DATE) | date: "yyyy/MM/dd"}}</td>
+                                    <!-- 比價日 -->
+                                    <td>{{toJsDate(row.DUE_DATE) | date: "yyyy/MM/dd"}}</td>
+                                    <!-- 到期日 -->
+                                    <td align="right">{{row.YIELD_RATE | number : 2}}</td>
+                                    <!-- 商品收益率(%) -->
+                                    <td>{{row.VALU_CRCY_TYPE | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+                                    <!-- 幣別 -->
+                                    <td align="right">{{row.REF_PROFIT | number : 2}}</td>
+                                    <!-- 收益金額 -->
+                                    <td>{{row.CRCY_CHGE_STATUS | mapping:mappingSet['CRM.DCI_CRCY_CHGE_STATUS']:'F3'}}</td>
+                                    <!-- 是否幣轉 -->
+                                    <td>{{row.CRCY_CHGE_STATUS ? (row.CRCY | mapping:mappingSet['FPS.CURRENCY']:'F3') : ''}}</td>
+                                    <!-- 到期幣別 -->
+                                    <td align="right">{{row.DEL_AMT | number : 2}}</td>
+                                    <!-- 到期返還金額 -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+                        <table align="left" style="width:30%">
+                            <thead>
+                                <h4>幣別合計</h4>
+                                <tr>
+                                    <th>幣別</th>
+                                    <th>交易金額(商品幣別)</th>
+                                    <th>到期返還金額(到期幣別)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="repeat-row" ng-repeat="row in crcyList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                                    <td>{{row | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+                                    <td align="right">{{txtList[row] != null ? txtList[row] : 0 | number : 2}}</td>
+                                    <td align="right">{{delList[row] != null ? delList[row] : 0 | number : 2}}</td>
+                                </tr>
+                                <!-- <tr class="repeat-row" ng-repeat="(key, data) in resultList | orderBy: 'CRCY' | groupBy: 'CRCY'">
+									<td>{{key | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+									<td></td>
+									<td align = "right">{{getSum(data, 'DEL_AMT_USE_IN_SUM') | number : 2}}</td>         到期返還金額
+								</tr>
+								<tr class="repeat-row" ng-repeat="(key, data) in resultList | orderBy: 'CRCY' | groupBy: 'VALU_CRCY_TYPE'">
+									<td>{{key | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+									<td align = "right">{{getSum(data, 'TXN_AMT') | number : 2}}</td>   交易金額
+									<td></td>
+								</tr> -->
+                            </tbody>
+                        </table>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+            <!-- 分頁 -->
+        </div>
+    </div>
+    <!-- 結果區 -->
+</div>

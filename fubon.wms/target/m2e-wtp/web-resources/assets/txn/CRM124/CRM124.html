@@ -1,0 +1,262 @@
+<style>
+/* open dialog */
+.ngdialog.CRM124 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM124 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+/* .CRM124 table { */
+/* 	width: 100%; */
+/* 	margin-left: auto; */
+/* 	margin-right: auto; */
+/* } */
+/* .CRM124 table.little{ */
+/* 	width: 30%; */
+/* } */
+/* change row */
+.CRM124.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.CRM124 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* scroll && height */
+.scroll_CRM124_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.CRM124 .menu{
+	margin: 0;
+	padding-left: 10px;
+}
+.CRM124 .typeP a{
+	color: purple !important;
+}
+.CRM124 .typeD a{
+	color: red !important;
+}
+.CRM124 .bigspace{
+	margin-left: 50px !important;
+}
+.CRM124 .datewidth{
+	width:180px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM124/CRM124.js"></script>
+<script type="text/javascript" src="assets/txn/CRM124/CRM124_EDIT_ONSITE.js"></script>
+<script type="text/javascript" src="assets/txn/CRM124/CRM124_ADD_REMIND.js"></script>
+<script type="text/javascript" src="assets/txn/CRM124/CRM124_EDIT_REMIND.js"></script>
+<script type="text/javascript" src="assets/txn/CRM124/CRM124_ADD_ONSITE.js"></script>
+<script type="text/javascript" src="assets/txn/CRM121/CRM121_INSERT.js"></script>
+<script type="text/javascript" src="assets/txn/CRM121/CRM121_MODIFY.js"></script>
+<script type="text/javascript" src="assets/txn/CUS160/CUS160_ADD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS103/PMS103.js"></script>
+<script type="text/javascript" src="assets/txn/CRM121/CRM121.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PMS109.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PPAP.js"></script>
+<script type="text/javascript" src="assets/txn/CRM1241/CRM1241_RECORD.js"></script>
+<script type="text/javascript" src="assets/txn/CRM1241/CRM1241_PRODUCT.js"></script>
+
+<div class="CRM124" ng-controller="CRM124Controller">
+	<table td width="100%">
+		<tr>
+			<td width="25%">
+				<div class="btn-group">
+					<button class="btn btn-default" mwl-date-modifier date="viewDate" decrement="calendarView" ng-click="init()">＜</button>
+					<button class="btn btn-default" mwl-date-modifier date="viewDate" set-to-today ng-click="init()">今天</button>
+					<button class="btn btn-default" mwl-date-modifier date="viewDate" increment="calendarView" ng-click="init()">＞</button>
+				</div>
+				<div class="btn-group">
+					<label class="btn btn-info" ng-click="changeView('year')">年曆</label>
+					<label class="btn btn-info" ng-click="changeView('month')">月曆</label>
+				</div>
+			</td>
+			<td width="50%">
+				<h2 class="text-center" ng-bind="viewDate  | date:'yyyy年MM月dd日EEEE'"></h2>
+			</td>
+			<td width="25%">
+				<!-- 輔銷人員用 -->
+				<div style="text-align:right;" ng-show="type != '3'">
+					<button type="button" class="btn btn-primary" ng-click="add_remind()">新增</button>
+					<button type="button" class="btn btn-info" ng-click= "edit_remind(row,updateType)"
+					 ng-disabled =" !((ans.length == 1 && ans2.length != 1 && ans4.length != 1) || 
+					 				  (ans.length != 1 && ans2.length == 1 && ans4.length != 1) ||
+					 				  (ans.length != 1 && ans2.length != 1 && ans4.length == 1)) ">編輯</button>	
+					<button type="button" class="btn btn-info" ng-click = "deleTack()" 
+					ng-disabled = "ans.length == 0 && ans2.length == 0 && ans4.length == 0">刪除</button>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<!-- 輔銷科長用 -->
+				<div class="btn-group" ng-show="type == '1'">
+					輔銷人員:		
+					<e-combobox id="emp_id" name="emp_id"
+					ng-datasource="mappingSet['emp_id']"
+					ng-model="inputVO.emp_id"
+					ng-validate="false" 
+					ng-readonly="false" 
+					ng-editable="false"
+					ng-format="F1"
+					ng-required="true"
+					width="150px"
+					style="line-height:20px;" />
+				</div>
+				<div class="btn-group" ng-show="type == '1'">
+					<button type="button" class="btn btn-primary" ng-click="faia_query()">查詢</button>
+				</div>
+			</td>
+		</tr>
+	</table>	
+	<table>
+		<tr>
+			<!-- 左側時間表 -->
+			<td class="mwl-calendar-wrapper">
+				<mwl-calendar
+					events="events"
+					view="calendarView"
+					view-title="calendarTitle"
+					view-date="viewDate"
+					on-view-change-click="false"
+					on-view-change-click="viewclick()"
+					on-timespan-click="timespanClicked(calendarDate)"
+					custom-template-urls="{calendarMonthCell: 'customMonthCell2.html'}"
+					cell-is-open="false"
+					cell-auto-open-disabled="true">				
+				</mwl-calendar>	
+			</td>
+			<!-- 右側時間表 -->
+			<td class="mwl-calendar-neighbor">
+				<!--輔銷人員用 -->
+				<div ng-show = "type != '3'">
+					<div>
+						<!--=========================提醒=========================-->
+						<div class="my_tit" ng-show = "type == '2'">
+							<h3>
+								<img src="assets/images/icon/my_tit_a01.gif" width="37" height="37">
+								提醒  
+								<span class="badge" ng-bind="remindList.length"></span>
+							</h3>
+						</div>
+						<div class="scroll_y" style="height:75px" ng-show = "type == '2'">
+							<ul ng-repeat="rowR1 in remindList">
+								<li class="checkbox">
+									<label>
+										<input type="checkbox"  ng-model='rowR1.SELECTED' ng-click= "toggleSelection_1(rowR1.SEQ_NO)" >
+										<div style = "margin: 7px 0 0;">
+											{{rowR1.TASK_TITLE}}&nbsp;時間:{{rowR1.TASK_STIME}}~{{rowR1.TASK_ETIME}}
+										</div>
+									</label>
+								</li>
+							</ul>
+						</div>
+						
+						<!--=======================輔銷-待辦事項=======================-->
+						<div class="my_tit">
+							<h3>
+								<img src="assets/images/icon/my_tit_a01.gif" width="37" height="37">
+								{{nowDate.getTime() == viewDate.getTime() ? '本日' : ''}}輔銷待辦事項
+								<span class="badge" ng-bind="remindList2.length"></span>
+							</h3>
+						</div>
+						<div class="scroll_y" style="height:75px">
+							<ul ng-repeat="rowR2 in remindList2">
+								<li class="checkbox">
+									<label>
+										<input type="checkbox"  ng-model='rowR2.SELECTED' ng-click= "toggleSelection_2(rowR2.SEQ_NO)" >
+										<div style = "margin: 7px 0 0;">
+											{{rowR2.CUST_ID}}-{{rowR2.CUST_NAME}}&nbsp;{{rowR2.TITLE}}&nbsp;時間:{{rowR2.STIME}}~{{rowR2.ETIME}}&nbsp;({{rowR2.STATUS| mapping:mappingSet['CAM.TASK_STATUS']:'F3'}})
+										</div>
+									</label>
+								</li>
+							</ul>
+						</div>
+						
+						<!--=========================陪訪紀錄=========================-->
+						<div class="my_tit">
+							<h3>
+								<img src="assets/images/icon/my_tit_a02.gif" width="37" height="37">
+								陪訪紀錄 
+								<span class="badge" ng-bind="remindList3.length"></span>
+							</h3>
+						</div>
+						<div class="scroll_y" style="height: 75px">
+							<ul ng-repeat= "rowR3 in remindList3">
+								<li class="checkbox">
+									<label >
+										{{rowR3.TITLE}}&nbsp;時間:{{rowR3.AS_DATETIME_BGN}}~{{rowR3.AS_DATETIME_END}}&nbsp;{{rowR3.STATUS_TITLE}}
+									</label>
+									<button type="button" class="btn btn-primary" ng-click= "toggleSelection_3(rowR3.SEQ,'1')" ng-show= "rowR3.COMPLETE_YN != 'Y' && type != '1' && rowR3.STATUS != '4C'">
+										編輯
+									</button>
+									<button type="button" class="btn btn-primary" ng-click= "toggleSelection_3(rowR3.SEQ,'2')" ng-show= "rowR3.COMPLETE_YN != 'Y' && type != '1' && rowR3.STATUS != '4C'">
+										完成
+									</button>
+									<button type="button" class="btn btn-primary" ng-click= "toggleSelection_3(rowR3.SEQ,'3')" ng-show= "rowR3.COMPLETE_YN != 'Y' && type != '1' && rowR3.STATUS != '4C'">
+										取消
+									</button>
+									<button type="button" class="btn btn-primary" ng-click= "toggleSelection_3(rowR3.SEQ,'1')" ng-show= "rowR3.COMPLETE_YN == 'Y' || type == '1' || rowR3.STATUS == '4C'">
+										檢視
+									</button>
+								</li>
+							</ul>
+						</div>
+						
+						<!--=======================理專-待辦事項=======================-->
+						<div class="my_tit">
+							<h3>
+								<img src="assets/images/icon/my_tit_a01.gif" width="37" height="37">
+								{{nowDate.getTime() == viewDate.getTime() ? '本日' : ''}}理專待辦事項
+								<span class="badge" ng-bind="remindList2.length"></span>
+							</h3>
+						</div>
+						<div class="scroll_y" style="height:75px">
+							<ul ng-repeat="rowR4 in remindList4">
+								<li class="checkbox">
+									<label>
+										<input type="checkbox"  ng-model='rowR4.SELECTED' ng-click= "toggleSelection_4(rowR4.SEQ_NO)" >
+										<div style = "margin: 7px 0 0;">
+											{{rowR4.CUST_ID}}-{{rowR4.CUST_NAME}}&nbsp;{{rowR4.TITLE}}&nbsp;時間:{{rowR4.STIME}}~{{rowR4.ETIME}}&nbsp;({{rowR4.STATUS| mapping:mappingSet['CAM.TASK_STATUS']:'F3'}})
+										</div>
+									</label>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				
+				<!--理專人員用 -->
+				<div ng-show = "type == '3'">
+					<div class="my_tit">
+						<h3>
+							<img src="assets/images/icon/my_tit_a01.gif" width="37" height="37">輔銷駐點通知 <span class="badge" ng-bind="MyTodoLst.length"></span>
+						</h3>
+					</div>
+					<ul ng-repeat="row1 in MyTodoLst">
+						<li class="checkbox">
+							<label>
+								{{row1.TITLE}}
+							</label>
+						</li>
+					</ul>
+				</div>
+			</td>
+		</tr>
+	</table>
+	
+</div>

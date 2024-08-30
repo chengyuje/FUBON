@@ -1,0 +1,103 @@
+<style>
+.modal-dialog.PMS366_DETAIL{
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: auto;
+}
+.PMS366_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS366_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS366_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+
+</style>
+
+<div class="PMS366" ng-controller="PMS366_DETAILController" ng-cloak>
+	<div class="modal-dialog PMS366_DETAIL">  
+		<div class="modal-content">	
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">個金存款AUM異動日報_{{yyyymm}}_{{aoCode}}{{aoCode == '000' ? 'MASS' : (aoType | mapping:mappingSet['AO_TYPE']:'F3')}}_{{depType | mapping:mappingSet['PMS.DEP_TYPE']:'F3'}}_排行榜</h4>
+			</div>
+			<div class="modal-body">
+				<div>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table class="tablesaw table table-striped table-bordered">
+							<thead>
+								<tr>
+									<th colspan="3">{{depType | mapping:mappingSet['PMS.DEP_TYPE']:'F3'}}減少客戶</th>				
+								</tr>
+								<tr>
+									<th width="125px">客戶ID</th>
+									<th width="125px">客戶姓名</th>
+									<th width="125px">金額</th>
+									
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in dtl_2_List" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td class='text-center'>{{row.CUST_ID}}</td>
+									<td class='text-center'>{{row.CUST_NAME}}</td>
+									<td align="right">{{0 + row.AUM | currency:'':0}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table class="tablesaw table table-striped table-bordered">
+							<thead>
+								<tr>
+									<th colspan="3">{{depType | mapping:mappingSet['PMS.DEP_TYPE']:'F3'}}增加客戶</th>			
+								</tr>
+								<tr>
+									<th width="125px">客戶ID</th>
+									<th width="125px">客戶姓名</th>
+									<th width="125px">金額</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in dtl_1_List" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td class='text-center'>{{row.CUST_ID}}</td>
+									<td class='text-center'>{{row.CUST_NAME}}</td>
+									<td align="right">{{0 + row.AUM | currency:'':0}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="search_box_btn text-center">
+						<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確認</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

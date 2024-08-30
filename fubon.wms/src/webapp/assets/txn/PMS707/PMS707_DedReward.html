@@ -1,0 +1,80 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS707 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 95%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS707/PMS707_DedReward.js"></script>
+<div ng-controller="PMS707_DedRewardController" ng-cloak>
+	<div class="modal-dialog PMS707">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<!-- <div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a15.gif">請上傳扣減獎金之非財務指標及違失情事扣減數明細
+				</div> -->
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請上傳扣減獎金之非財務指標及違失情事扣減數明細</h4>
+			</div>
+
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<e-jumping output="outputVO" input="inputVO" query="queryDedReward()"
+					list="resultList"></e-jumping>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						<table class="table-bordered">
+							<thead>
+								<tr>
+									<th>計績年月</th>
+									<th>違失情事發生年月</th>
+									<th>分行代碼</th>
+									<th>分行名稱</th>
+									<th>PS員編</th>
+									<th>PS姓名</th>
+									<th>違失情事大項原因代碼</th>
+									<th>違失情事細項原因(一)(流程)</th>
+									<th>違失情事細項原因(二)(退補件原因)</th>
+									<th>每件獎勵金扣減(單位:元)</th>
+									<th>是否已扣減註記</th>
+									<th>實際扣減年月</th>
+									<th>剩餘未扣減金額</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="y in resultList">
+									<td align="center">{{y.YEARMON}}</td>
+									<td align="center">{{y.OCCUR_YM}}</td>
+									<td align="center">{{y.BRANCH_NBR}}</td>
+									<td align="center">{{y.BRANCH_NAME}}</td>
+									<td align="center">{{y.PS_EMP_ID}}</td>
+									<td align="center">{{y.PS_EMP_NAME}}</td>
+									<td align="center">{{y.WRONG_TYPE}}</td>
+									<td align="center">{{y.WRONG_DETAIL_1}}</td>
+									<td align="center">{{y.WRONG_DETAIL_2}}</td>
+									<td align="center">{{y.DED_BONUS}}</td>
+									<td align="center">{{y.DED_FLAG}}</td>
+									<td align="center">{{y.DED_YM}}</td>
+									<td align="center">{{y.NO_DED}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="uploadDedReward(yearMon)">上傳資料</button>
+				<button type="button" class="btn btn-default"
+					ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+		</div>
+	</div>
+</div>

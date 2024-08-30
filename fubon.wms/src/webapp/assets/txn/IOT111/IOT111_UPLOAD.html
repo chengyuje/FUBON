@@ -1,0 +1,82 @@
+<style>
+.modal-dialog.IOT111_UPLOAD{
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 90%;
+	height: 720px;
+}
+</style>
+<div ng-controller="IOT111_UPLOADController" ng-cloak>
+	<div class="modal-dialog IOT111_UPLOAD" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">保險資金錄音序號上傳功能</h4>
+			</div>
+		    <!--Content of the panel-->
+		    <div class="modal-body">
+		    	<div class="scroll_y">
+		    		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+		    			<div style="display: flex; justify-content: center; align-items: center;">
+			    			<table style="width: 30%">
+			  			  		<tr>
+			  			  			<th>*資料檔案</th>
+			                        <td>
+			                       		<e-upload success="uploadFinshed(name,rname)" model="inputVO.realfileName" width="250px" required></e-upload>
+			                        </td>
+			  			  		</tr>
+							</table>
+		    			</div>
+		    			</br>
+						<div class="text-center">
+							<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="downLoad()" function-type="query">下載範例檔</button>
+							<button type="button" class="btn btn-info" style="display: inline !important;" ng-click="upload()" function-type="query">上傳</button>
+						</div>
+						</br>
+						<div class="tfb_content">
+							<div class="tfb_content_icon"></div>
+							<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">上傳結果</div>
+						</div>
+						<div class="panel_content">
+							<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+							<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+								<table>
+									<thead>
+										<tr>
+											<th>適合度檢核編碼</th>
+											<th>要保人高齡/</br>保費來源錄音序號</th>
+											<th>檢核結果</th>
+											<th>被保人高齡/</br>保費來源錄音序號</th>
+											<th>檢核結果</th>
+											<th>繳款人高齡/</br>保費來源錄音序號</th>
+											<th>檢核結果</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.PREMATCH_SEQ}}</td>
+											<td>{{row.PREMIUM_TRANSSEQ}}</td>
+											<td>{{row.CHECK_RESULT_1}}</td>
+											<td>{{row.I_PREMIUM_TRANSSEQ}}</td>
+											<td>{{row.CHECK_RESULT_2}}</td>
+											<td>{{row.P_PREMIUM_TRANSSEQ}}</td>
+											<td>{{row.CHECK_RESULT_3}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>	
+						</div>
+						</br>
+						<div class="search_box_btn text-center">
+							<button type="button" class="btn btn-primary" ng-click="confirm()">確定</button>
+							<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+						</div>  			    		
+		    		</form>
+		    	</div>
+		    </div>
+		</div>
+	</div>
+</div>

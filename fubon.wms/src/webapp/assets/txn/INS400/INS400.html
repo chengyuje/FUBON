@@ -1,0 +1,62 @@
+<style>
+	.INS400 {
+    	padding-bottom: 20px;
+	}
+</style>
+<script type="text/javascript" src="assets/txn/INS400/INS400.js"></script>
+<script type="text/javascript" src="assets/txn/INS400/INS_print.js"></script>
+<link rel="stylesheet" type="text/css" href="assets/txn/FPS/FPS.css">
+
+
+<div class="INS400" ng-controller="INS400Controller" ng-cloak>
+  <div class="tfb_content">
+    <div class="tfb_content_icon"></div>
+    <div class="tfb_content_tit">
+      <img src="assets/images/icon/tfb_icon_a15.gif">目標理財規劃</div>
+  </div>
+	<div class="panel_content">
+		<div class="INS400 FPS">
+	    <div class="block container"
+	         ng-class="{'no-area': arrowUp}"
+	         style="margin: .5em 0;width: 100%;">
+	      
+	      <div class="content-wrapper"
+	           style="background-color:#bfe2f7;margin-top:-1px;">
+	        <div class="content-title">
+	          客戶ID
+	          <input type="text"
+	                 style="width:150px; text-align: left; text-transform: uppercase; display:inline-block; margin-left:.5em;"
+	                 class="form-control"
+	                 ng-model="inputVO.cust_id"
+	                 ng-blur="inquire()"
+	                 e-length-limit="15">
+	        </div>
+	        <div class="content-body">
+	          <div class="toggle-wrapper btn-fps"
+	               ng-click="arrowUp=!arrowUp">
+	            詳細資訊
+	            <img ng-src="{{arrowPath[arrowUp?'down':'up']}}"
+	                 class="icon">
+	          </div>
+	        </div>
+	      </div>
+	
+	      <div ng-show="!arrowUp">
+	        <div ng-include="'assets/txn/INS400/INS_CUST.template.html'"></div>
+	      </div>
+	    </div>
+	</div>
+
+		<uib-tabset active="activeJustified" Justified="true">
+			<uib-tab index="1" heading="目標理財規劃" disable="false" ng-click="pagechose(2)"></uib-tab>
+			<uib-tab index="0" heading="歷史規劃" disable="!isShow" ng-click="isShow && pagechose(1)"></uib-tab>
+		</uib-tabset>
+	 	<div ng-include="'assets/txn/INS400/INS400_TAB.html'"></div>
+		<div class="tab-content" style="width: auto;" >
+		    <div ng-include="page_inde" ng-show="!print"></div>
+		    <div ng-include="'assets/txn/INS400/INS_print.template.html'" ng-show="print"></div>
+	    </div>
+
+	</div>
+	</div>
+</div>

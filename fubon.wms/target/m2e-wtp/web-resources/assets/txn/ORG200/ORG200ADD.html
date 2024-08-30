@@ -1,0 +1,82 @@
+<style>
+
+</style>
+<div ng-controller="ORG200_ADDController" ng-cloak>
+	<div class="modal-dialog ORG200">  
+		<div class="modal-content">	
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeORG200ADD()">&times;</button>
+				<h4 id="" class="modal-title" align="center">新增組織類型</h4>
+			</div>
+			<div class="modal-body">
+				<div class="bootstrap-admin-panel-content text-muted search_box">
+					<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab="">
+						<table width="100%">
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-3">代碼：</th>
+								<td class="col-md-7 tdpadding" colspan="3"><input class="form-control" type="text" placeholder="請輸入..." id="tipOrgId" name="tipOrgId" ng-model="newInputVO.DEPT_ID" maxlength="5" required></td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr ng-show="parameterTypeEditForm.tipOrgId.$error.required">
+								<td class="col-xs-1"></td>
+								<th class="col-md-3"></th>
+								<td class="col-md-7 help-block with-errors" colspan="3">請輸入組織代碼</td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-3">名稱：</th>
+								<td class="col-md-7 tdpadding" colspan="3"><input class="form-control" type="text" placeholder="請輸入..." id="tipOrgName" name="tipOrgName" ng-model="newInputVO.DEPT_NAME" maxlength="60" required></td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr ng-show="parameterTypeEditForm.tipOrgName.$error.required">
+								<td class="col-xs-1"></td>
+								<th class="col-md-3"></th>
+								<td class="col-md-7 help-block with-errors" colspan="3">請輸入組織名稱</td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr ng-if="newInputVO.PARENT_ORG_TYPE == '10'">
+								<td class="col-xs-1"></td>
+								<th class="col-md-3">組織類型：</th>
+								<td class="col-md-7 tdpadding" colspan="3">
+									<e-combobox id="orgType" name="orgType"
+												ng-paramtype="ORG.C_TYPE"
+												ng-model="newInputVO.ORG_TYPE"
+												ng-validate="false"
+												ng-readonly="false"
+												ng-editable="false"
+												ng-format="F3"
+												ng-required="false"/>
+								</td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr ng-if="newInputVO.PARENT_ORG_TYPE != null && newInputVO.PARENT_ORG_TYPE != ''">
+								<td class="col-xs-1"></td>
+								<th class="col-md-3">父層級：</th>
+								<td class="col-md-7 tdpadding" colspan="3">
+									<input class="form-control" type="hidden" placeholder="請輸入..." id="orgType" name="orgType" ng-model="newInputVO.ORG_TYPE">
+									
+									<e-combobox id="orgParent" ng-disabled="true" 
+												ng-datasource="mappingSet['newParentDeptLst']"
+												ng-model="newInputVO.PARENT_DEPT_ID"
+												ng-change="getNewOrgType()"
+							   					ng-validate="false" 
+							   					ng-readonly="true" 
+							   					ng-editable="false"
+							   					ng-format="F3"
+							   					ng-required="false"/>
+								</td>
+								<td class="col-xs-1"></td>
+							</tr>
+						</table>
+					</form>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="addDeptDetail()" ng-disabled="newInputVO.DEPT_ID == '' || newInputVO.DEPT_NAME == ''" function-type="maintenance">確認</button>
+					<button type="button" class="btn btn-default" ng-click="closeORG200ADD()" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,419 @@
+<style>
+/* open dialog */
+.ngdialog.CRM411_INSERT {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM411_INSERT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 90%;
+	height: auto;
+}
+/* table size */
+.CRM411_INSERT table {
+ 	width: 100%; 
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM411_INSERT.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM411_INSERT_dialog {
+	overflow: scroll;
+	width: 70%;
+	height: 50%;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+
+</style>
+
+<script type="text/javascript" src="assets/txn/CRM411/CRM411_INSERT.js"></script>
+
+<div ng-controller="CRM411_INSERTController" ng-cloak>
+	<div class="modal-dialog CRM411_INSERT"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">議價授權設定</h4>
+			</div>
+ 		<div class="modal-body">
+ 		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<table width="100%">
+				<tr>
+					<td class="col-xs-1"></td>
+					<th class="col-md-1 tdpadding" colspan="2">產品類別</th>
+					<td class="col-md-9 tdpadding" colspan="5">
+						<label><input type='checkbox' ng-model='clickAll' ng-change='checkrow()' /> 全選</label>
+						<label ng-repeat="req in mappingSet['SOT.PROD_TYPE']">
+							<input type="checkbox" name="selectedCodes" value="{{req.DATA}}" ng-model='req.SELECTED' ng-required="true"> {{req.LABEL}}
+							&nbsp;&nbsp;
+						</label>
+					</td>
+					<td class="col-xs-1"></td>
+				</tr>
+				<tr>
+					<td class="col-xs-1"></td>
+					<th class="col-md-1 tdpadding" colspan="2">貢獻度等級</th>
+					<td class="col-md-9 tdpadding" colspan="5">
+						<label ng-repeat="con in mappingSet['CRM.CON_DEGREE']">
+							<input type="checkbox" name="selectedCodes2" value="{{con.DATA}}" ng-model='con.SELECTED' ng-required="true"> {{con.LABEL}}
+							&nbsp;&nbsp;
+						</label>
+					</td>
+					<td class="col-xs-1"></td>
+				</tr>
+				<tr>
+					<td class="col-xs-1"></td>
+					<th class="col-md-1 tdpadding" rowspan="4">授權層級</th>
+					<td class="col-md-1 tdpadding" align="center">1</td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_a" name="role_a" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV1_A']"
+							       	ng-model="ROLE_a"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							       	ng-change="roletype(ROLE_a)"
+							       	ng-format="F3"
+							       	ng-required="false"				
+							       	width="80%"         
+					       			style="line-height:20px;" />
+				    </td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_b" name="role_b" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV1_B']"
+							       	ng-model="ROLE_b"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							       	ng-change="roletype(ROLE_b)"
+							       	ng-format="F3"
+							       	ng-required="false"			
+							       	width="80%"	         
+					       			style="line-height:20px;" />
+				    </td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_c" name="role_c" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV1_C']"
+							       	ng-model="ROLE_c"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							       	ng-change="roletype(ROLE_c)"
+							       	ng-format="F3"
+							       	ng-required="false"			
+							       	width="80%"	         
+					       			style="line-height:20px;" />
+					</td>
+					<!-- <td class="col-md-2">
+						<e-combobox id="role_d" name="role_d" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV1_D']"
+							       	ng-model="ROLE_d"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							       	ng-change="roletype(ROLE_d)"
+							       	ng-format="F3"
+							       	width = "80%"
+							       	ng-required="false"				         
+					       			style="line-height:20px;" />
+				  	</td> -->
+					<td class="col-md-1 tdpadding">
+						<e-combobox id="discount_a" name="discount_a" 
+									ng-datasource="mappingSet['CRM.DISCOUNT']"
+							       	ng-model="inputVO.DISCOUNT_a"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							       	ng-format="F3"
+							       	ng-required="false"		
+							       	width="70px"		         
+					       			style="line-height:20px;" />
+					</td>
+					<td class="col-md-1 tdpadding">
+						<e-combobox id="discounttype_a" name="discounttype_a" 
+									ng-datasource="mappingSet['CRM.DISCOUNT_RNG_TYPE']"
+							       	ng-model="inputVO.DISCOUNT_RNG_TYPE_a"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							        ng-format="F3"
+							       	ng-required="false"	
+							       	width="110px"		         
+					       			style="line-height:20px;" />
+					</td>
+					<td class="col-xs-1"></td>
+				</tr>
+				<tr>
+					<td class="col-xs-1"></td>
+					<td class="col-md-1 tdpadding" align="center">2</td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_e" name="role_e" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV2_A']"
+							       	ng-model="ROLE_e"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListe.length == 0 && ROLE_e == null" 
+							       	ng-editable="false"
+							       	ng-change="roletype_a(ROLE_e)"
+							       	ng-format="F3"
+							       	ng-disabled = "tempListe.length == 0  && ROLE_e == null"
+							       	ng-required="false"				
+							       	width="80%"         
+					       			style="line-height:20px;" />
+				    </td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_f" name="role_f" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV2_B']"
+							       	ng-model="ROLE_f"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListf.length == 0 && ROLE_f == null " 
+							       	ng-editable="false"
+							       	ng-change="roletype_a(ROLE_f)"
+							       	ng-disabled = "tempListf.length == 0 && ROLE_f == null"
+							       	ng-format="F3"
+							       	ng-required="false"				       
+							       	width="80%"  
+					       			style="line-height:20px;" />
+			       	</td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_g" name="role_g" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV2_C']"
+							       	ng-model="ROLE_g"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListg.length == 0 && ROLE_g == null"
+							       	ng-editable="false"
+							       	ng-change="roletype_a(ROLE_g)"
+							        ng-disabled = "tempListg.length == 0 && ROLE_g == null"
+							       	ng-format="F3"
+							       	ng-required="false"	
+							       	width="80%"
+					       			style="line-height:20px;" />
+			       	</td>
+					<!-- <td class="col-md-2">
+						<e-combobox id="role_h" name="role_h" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV2_D']"
+							       	ng-model="ROLE_h"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListh.length == 0 && ROLE_h ==null " 
+							       	ng-editable="false"
+							       	ng-change="roletype_a(ROLE_h)"
+							       	ng-disabled = "tempListh.length == 0 && ROLE_h == null"
+							       	ng-format="F3"
+							       	ng-required="false"	
+							       	width = "80%"			         
+					       			style="line-height:20px;" />
+			       	</td> -->
+					<td class="col-md-1 tdpadding">
+						<e-combobox id="discount_b" name="discount_b" 
+									ng-datasource="mappingSet['CRM.DISCOUNT']"
+							       	ng-model="inputVO.DISCOUNT_b"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							        ng-format="F3"
+							       	ng-required="false"	
+							       	width="70px"				         
+					       			style="line-height:20px;" />
+			       	</td>
+					<td class="col-md-1 tdpadding">
+						<e-combobox id="discounttype_b" name="discounttype_b" 
+									ng-datasource="mappingSet['CRM.DISCOUNT_RNG_TYPE']"
+							       	ng-model="inputVO.DISCOUNT_RNG_TYPE_b"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							       	ng-format="F3"
+							       	ng-required="false"	
+							       	width="110px"				         
+					       			style="line-height:20px;" />
+			       	</td>
+			       	<td class="col-xs-1"></td>
+				</tr>
+				<tr>
+					<td class="col-xs-1"></td>
+					<td class="col-md-1 tdpadding" align="center">3</td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_i" name="role_i" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV3_A']"
+							       	ng-model="ROLE_i"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListi.length == 0 && ROLE_i == null " 
+							       	ng-editable="false"
+							       	ng-change="roletype_b(ROLE_i)"
+							       	ng-format="F3"
+							       	ng-required="false"
+							       	ng-disabled = "tempListi.length == 0 && ROLE_i== null"	     
+							       	width="80%"    
+					       			style="line-height:20px;" />
+			       	</td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_j" name="role_j" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV3_B']"
+							       	ng-model="ROLE_j"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListj.length == 0 && ROLE_j == null" 
+							       	ng-editable="false"
+							       	ng-change="roletype_b(ROLE_j)"
+							       	ng-format="F3"
+							       	ng-required="false"
+							       	ng-disabled ="tempListj.length == 0  && ROLE_j == null"    
+							       	width="80%"   
+					       			style="line-height:20px;" />
+			       	</td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_k" name="role_k" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV3_C']"
+							       	ng-model="ROLE_k"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListk.length == 0 && ROLE_k == null" 
+							       	ng-editable="false"
+							       	ng-change="roletype_b(ROLE_k)"
+							       	ng-format="F3"
+							       	ng-required="false"
+							       	ng-disabled ="tempListk.length == 0 && ROLE_k == null"     
+							       	width="80%"    
+					       			style="line-height:20px;" />
+			       	</td>
+					<!-- <td class="col-md-2">
+						<e-combobox id="role_l" name="role_l" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV3_D']"
+							       	ng-model="ROLE_l"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListl.length == 0 && ROLE_l == null" 
+							       	ng-editable="false"
+							       	ng-change="roletype_b(ROLE_l)"
+							       	ng-required="false"	
+							        ng-format="F3"
+							       	ng-disabled ="tempListl.length == 0  && ROLE_l == null"
+							       	width = "80%"			         
+					       			style="line-height:20px;" />
+			       	</td> -->
+					<td class="col-md-1 tdpadding">
+						<e-combobox id="discount_c" name="discount_c" 
+									ng-datasource="mappingSet['CRM.DISCOUNT']"
+							       	ng-model="inputVO.DISCOUNT_c"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							       	ng-format="F3"
+							       	ng-required="false"
+							       	width="70px"					         
+					       			style="line-height:20px;" />
+			       	</td>
+					<td class="col-md-1 tdpadding">
+						<e-combobox id="discounttype_c" name="discounttype_c" 
+									ng-datasource="mappingSet['CRM.DISCOUNT_RNG_TYPE']"
+							       	ng-model="inputVO.DISCOUNT_RNG_TYPE_c"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							       	ng-format="F3"
+							       	ng-required="false"		
+							       	width="110px"			         
+					       			style="line-height:20px;" />
+			       </td>
+			       <td class="col-xs-1"></td>
+				</tr>
+				<tr>
+					<td class="col-xs-1"></td>
+					<td class="col-md-1 tdpadding" align="center">4</td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_m" name="role_m" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV4_A']"
+							       	ng-model="ROLE_m"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListm.length == 0 && ROLE_m == null" 
+							       	ng-editable="false"
+							       	ng-change="roletype_c(ROLE_m)"
+							       	ng-format="F3"
+							       	ng-required="false"
+							       	ng-disabled ="tempListm.length == 0 && ROLE_m == null"	
+							       	width="80%"		         
+					       			style="line-height:20px;" />
+				    </td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_n" name="role_n" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV4_B']"
+							       	ng-model="ROLE_n"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListn.length == 0 && ROLE_n == null" 
+							       	ng-editable="false"
+							       	ng-change="roletype_c(ROLE_n)"
+							       	ng-format="F3"
+							       	ng-required="false"
+							       	ng-disabled ="tempListn.length == 0 && ROLE_n == null"
+							       	width="80%"
+					       			style="line-height:20px;" />
+				   	</td>
+					<td class="col-md-2 tdpadding">
+						<e-combobox id="role_o" name="role_o" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV4_C']"
+							       	ng-model="ROLE_o"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListo.length == 0 && ROLE_o == null" 
+							       	ng-editable="false"
+							       	ng-change="roletype_c(ROLE_o)"
+							       	ng-format="F3"
+							       	ng-required="false"
+							       	ng-disabled ="tempListo.length == 0 && ROLE_o == null"
+							       	width="80%"
+					       			style="line-height:20px;" />
+			       	</td>
+					<!-- <td class="col-md-2">
+						<e-combobox id="role_q" name="role_q" 
+									ng-datasource="mappingSet['CRM.ROLEID_LV4_D']"
+							       	ng-model="ROLE_q"
+							       	ng-validate="false" 
+							       	ng-readonly="tempListp.length == 0 && ROLE_q == null" 
+							       	ng-editable="false"
+							       	ng-change="roletype_c(ROLE_q)"
+							       	ng-format="F3"
+							       	ng-required="false"
+							       	ng-disabled ="tempListp.length == 0  && ROLE_q == null"
+							       	width = "80%"				         
+					       			style="line-height:20px;" />
+			       	</td> -->
+					<td class="col-md-1 tdpadding">
+						<e-combobox id="discount_d" name="discount_d" 
+									ng-datasource="mappingSet['CRM.DISCOUNT']"
+							       	ng-model="inputVO.DISCOUNT_d"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							       	ng-format="F3"
+							       	ng-required="false"		
+							       	width="70px"			         
+					       			style="line-height:20px;" />
+					</td>
+					<td class="col-md-1 tdpadding">
+						<e-combobox id="discounttype_d" name="discounttype_d" 
+									ng-datasource="mappingSet['CRM.DISCOUNT_RNG_TYPE']"
+							       	ng-model="inputVO.DISCOUNT_RNG_TYPE_d"
+							       	ng-validate="false" 
+							       	ng-readonly="false" 
+							       	ng-editable="false"
+							       	ng-format="F3"
+							       	ng-required="false"		
+							       	width="110px"			         
+					       			style="line-height:20px;" />
+					</td>
+					<td class="col-xs-1"></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="insert()" ng-disabled = "req.SELECTED.length == 0 || con.SELECTED.length == 0 || inputVO.roleList.length ==0 || inputVO.DISCOUNT_a == '' || inputVO.DISCOUNT_a == null || inputVO.DISCOUNT_RNG_TYPE_a == ''|| inputVO.DISCOUNT_RNG_TYPE_a == null" >儲存</button>
+		<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+	</div>
+</div>	

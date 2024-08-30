@@ -1,0 +1,156 @@
+<style>
+
+.datewidth{
+	width:180px !important;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/CRM999/CRM999.js"></script>
+<script type="text/javascript" src="assets/txn/CRM999/CRM999_edit.js"></script>
+<script type="text/javascript" src="assets/txn/CRM999/CRM999_edit.js"></script>
+<script type="text/javascript" src="assets/txn/CRM999/CRM999_backComplainFlow.js"></script>
+<script type="text/javascript" src="assets/txn/CRM999/CRM999_nextComplainFlow.js"></script>
+<script type="text/javascript" src="assets/txn/CRM999/CRM999_showComplainFlow.js"></script>
+
+<div class="CRM999" ng-controller="CRM999Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">客訴查詢條件</div>
+	</div>
+
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th class="col-md-1">客戶統編：</th>
+					<td class="col-md-5"><input type="text" id="cust_id" name="cust_id" ng-model="inputVO.custId" maxlength="15" class="form-control" style="text-transform: uppercase;"></td>
+					<th class="col-md-1">分行別：</th>
+					<td class="col-md-5"><e-combobox id="branchId" name="branchId" ng-datasource="BRANCH_LIST" ng-model="inputVO.branchId" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" style="line-height:20px;" /></td>
+				</tr>
+				<tr>
+					<th class="col-md-1">日期起迄:</th>
+					<td class="col-md-5">
+						<div style="float: left" class="input-group datebox datewidth">
+							<input type="text" id="sdate" name="sdate"
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd"
+								   ng-model="inputVO.startDate"
+								   is-open="model.a"
+								   datepicker-options="sDateOptions"
+								   ng-readonly="true"								
+								   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+							</span>
+						</div>	
+						<div style="float: left">&nbsp;~&nbsp;</div>
+						<div style="float: left" class="input-group datebox datewidth">
+							<input type="text" id="edate" name="edate"
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd"
+								   ng-model="inputVO.endDate"
+								   is-open="model.b"
+								   datepicker-options="eDateOptions"
+								   ng-readonly="true"								
+								   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+							</span>
+						</div>
+					</td>
+					<th class="col-md-1">狀態:</th>
+					<td class="col-md-5"><e-combobox id="status" name="status" ng-datasource="mappingSet['status']" ng-model="inputVO.status" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" style="line-height:20px;" /></td>
+				</tr>
+			</table>
+
+
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="query()" ng-disabled="!isEnabledUser">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquireInit1();init();" ng-disabled="!isEnabledUser">清除</button>
+			<!-- <button type="button" class="btn btn-info" ng-click="add()" ng-disabled="!isEnabledUser">新增</button> -->
+		</div>
+	</div>
+	<div class="tfb_content" ng-show="isEnableUser || paramList">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+		</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content" ng-show="isEnableUser || paramList">
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="exportMemo()" ng-disabled="!paramList">列印備查簿</button>
+			<button type="button" class="btn btn-info" ng-click="exportExcel()" ng-disabled="!paramList">產生Excel</button>
+		</div>
+		<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height: 235px; white-space: nowrap;">
+			<table class="tablesaw table table-striped table-bordered" data-tablesaw-mode="swipe" data-tablesaw-sortable data-tablesaw-minimap>
+				<thead>
+					<tr>
+						<th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist">功能</th>
+						<th><label> <input type="checkbox" ng-model="pageControlVO.pageChoice" ng-change="pageOn()" /> 本頁全選
+						</label> <br> <label> <input type="checkbox" ng-model="pageControlVO.allChoice" ng-change="allOn()" /> 全選
+						</label>&nbsp;&nbsp;
+							<button type="button" class="btn btn btn-danger" ng-show="pageControlVO.pageChoice || pageControlVO.allChoice" ng-click="send()">覆核</button></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_ID_TEXT" e-query="query()">分行別</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="GRADE" e-query="query()">等級</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="FMT_CREATE_DATE" e-query="query()">日期</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="HANDLE_STEP" e-query="query()">狀態</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="query()">姓名</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID1" e-query="query()">身份證字號</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="COMPLAIN_PRODUCT" e-query="query()">客訴商品或項目</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="PERSON_NAME" e-query="query()">服務或銷售人員</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_KIND" e-query="query()">類別</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="FMT_END_DATE" e-query="query()">結案日期</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="COST_TIME" e-query="query()">處理天數</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="EDITOR_CONDITION1" e-query="query()">第一級</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="EDITOR_CONDITION2" e-query="query()">第二級</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="EDITOR_CONDITION3" e-query="query()">第三級</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="EDITOR_CONDITION5" e-query="query()">第四級</e-sorter></th>
+						<th scope="col" data-tablesaw-sortable-col><e-sorter e-input="inputVO" e-mode="auto" e-col="EDITOR_CONDITION6" e-query="query()">第五級</e-sorter></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center" s>
+							<button ng-if="row.MYCASE == 'Y'" type="button" class="btn btn-default" ng-click="update(row)">編輯</button>
+							<button ng-if="row.MYCASE != 'Y'" type="button" class="btn btn-default" ng-click="update(row)">查詢</button>
+							<button type="button" class="btn btn-default" ng-click="exportPdf(row)">列印</button>
+							<button ng-if="row.UNDO == 'Y'" type="button" class="btn btn-default" ng-click="cancel(row)">取消結案</button>
+						</td>
+						<td align="center"><label style="font-weight: initial; margin-bottom: 0px;" ng-show="row.MYCASE == 'Y'"> <input type='checkbox' ng-model='row.SELECTED' ng-disabled="checkLogic(row)">勾選
+						</label></td>
+						<td align="center" ng-bind="row.BRANCH_ID_TEXT"></td>
+						<td align="center" ng-bind="row.GRADE"></td>
+						<td align="center" ng-bind="row.FMT_CREATE_DATE"></td>
+
+						<td align="center" ng-if="row.HANDLE_STEP == 'E'">
+							<button type="button" class="btn btn-success" ng-click="showComplainFlow(row)">結案</button>
+						</td>
+						<td align="center" ng-if="row.HANDLE_STEP !='E'"><buttton type="button" class="btn btn-warning" ng-click="showComplainFlow(row)">目前處理人員 {{row.NEXT_EMP_ID}}-{{row.NEXT_EMP_NM}}</buttton></td>
+
+						<td align="center" ng-bind="row.CUST_NAME"></td>
+						<td align="center" ng-bind="row.CUST_ID"></td>
+						<td align="center" ng-bind="row.COMPLAIN_PRODUCT"></td>
+						<td align="center" ng-bind="row.PERSON_NAME"></td>
+						<td align="center" ng-bind="row.CUST_KIND"></td>
+						<td align="center" ng-bind="row.FMT_END_DATE"></td>
+						<td align="center" ng-bind="row.COST_TIME"></td>
+						<td align="center">{{row.EDITOR_CONDITION1}}<span ng-if="row.EDITOR_CONDITION1">-</span>{{row.EDITOR_CONDITION1_NM}}
+						</td>
+						<td align="center">{{row.EDITOR_CONDITION2}}<span ng-if="row.EDITOR_CONDITION2">-</span>{{row.EDITOR_CONDITION2_NM}}
+						</td>
+						<td align="center">{{row.EDITOR_CONDITION3}}<span ng-if="row.EDITOR_CONDITION3">-</span>{{row.EDITOR_CONDITION3_NM}} <br />
+							<div ng-if="row.EDITOR_CONDITION4">{{row.EDITOR_CONDITION4}}-{{row.EDITOR_CONDITION4_NM}}</div>
+						</td>
+						<td align="center">{{row.EDITOR_CONDITION5}}<span ng-if="row.EDITOR_CONDITION5">-</span>{{row.EDITOR_CONDITION5_NM}}
+						<td align="center">{{row.EDITOR_CONDITION6}}<span ng-if="row.EDITOR_CONDITION6">-</span>{{row.EDITOR_CONDITION6_NM}}
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

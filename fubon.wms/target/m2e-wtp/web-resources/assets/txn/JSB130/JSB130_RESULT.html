@@ -1,0 +1,72 @@
+<style>
+/* dialog panl */
+.modal-dialog.JSB130_RESULT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1100px;
+	height: 650px;
+}
+</style>
+<div ng-controller="JSB130_RESULTController" ng-cloak>
+	<div class="modal-dialog JSB130_RESULT">
+		<div class="modal-content" style="height:auto">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{inputVO.ins_com_id | mapping:mappingSet['JSB.INS_COM_NAME_03']:'F3'}}{{inputVO.data_month}}_上傳後結果檢視</h4>
+			</div>
+			<div class="modal-body" style="height:auto">
+				<table class="table table-striped table-bordered" align="center">
+					<thead>
+						<tr>
+							<th style="text-align:center">保險公司</th>
+							<th style="text-align:center">對帳單年月</th>
+							<th style="text-align:center">參考日期</th>
+							<th style="text-align:center">上傳日期</th>
+							<th style="text-align:center">轉入對帳單</br>彙整檔資料筆數</th>
+							<th style="text-align:center">契約狀況有效</br>但無上傳資料保單數</th>
+							<th style="text-align:center">比對有差異數</th>
+							<th style="text-align:center">錯誤保單數</th>
+							<th style="text-align:center">總計保單數</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList track by $index">
+							<td style="text-align:left;">{{inputVO.ins_com_id | mapping:mappingSet['JSB.INS_COM_NAME_03']:'F3'}}</td>
+							<td style="text-align:center;">{{inputVO.data_month}}</td>
+							<td style="text-align:center;">{{toJsDate(row.DATA_DATE) | date:"yyyy/MM/dd"}}</td>
+							<td style="text-align:center;">{{toJsDate(row.TODAY) | date:"yyyy/MM/dd hh:mm:ss"}}</td>
+							<td style="text-align:right;">
+								<a href="#" ng-click="export('OK')">{{row.IMP_ROW_COUNT | number:0}}</a>
+							</td>
+							<td style="text-align:right;">
+								<a href="#" ng-click="export('E06')">{{row.E07_ROW_COUNT | number:0}}</a>
+							</td>
+							<td style="text-align:right;">
+								<a href="#" ng-click="export('W')">{{row.WARN_ROW_COUNT | number:0}}</a>
+							</td>
+							<td style="text-align:right;">
+								<a href="#" ng-click="export('FAIL')">{{row.FAIL_ROW_COUNT | number:0}}</a>
+							</td>
+							<td style="text-align:right;">{{row.TOTAL_COUNT | number:0}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<p style="color: red; font-weight: bold;">
+					*轉入對帳單彙整檔保單數：上傳寫入對帳單彙整檔的資料筆數</br>
+					*契約狀況有效但無上傳資料保單：該保險公司，保險庫存檔且契約狀態為有效或停效，比對寫入對帳單彙整檔的保單號碼是否存在，保單號碼不存在對帳單彙整檔則須呈現</br>
+					*錯誤保單數：</br>
+					類型1：此次上傳原幣別累積實繳保費＜庫存累積實繳保費</br>
+					類型2：此次上傳要保人ID=庫存要保人ID，但姓名不相同（去除空白後比對）；</br>
+					類型3：此次上傳被保人ID=庫存被保人ID，但姓名不相同（去除空白後比對）；</br>
+				</p>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="goMerge()" function-type="maintenance">確定</button>
+					<button type="button" class="btn btn-default" ng-click="cancel()">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

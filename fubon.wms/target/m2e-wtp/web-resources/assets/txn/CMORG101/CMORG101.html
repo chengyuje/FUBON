@@ -1,0 +1,310 @@
+<style>
+/* open dialog */
+.ngdialog.CMORG101 {
+	
+}
+/* dialog panl */
+.modal-dialog.CMORG101 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CMORG101 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CMORG101 table.little{
+	width: 60%;
+}
+/* change row */
+.CMORG101.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CMORG101_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.menu{
+	margin: 0;
+	padding-left: 10px;
+}
+.typeP a{
+	color: purple !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CMORG101/CMORG101.js"></script>
+<div ng-controller="CMORG101Controller" ng-cloak>
+	<div class="CMORG101 panel panel-default">
+		<div class="panel-heading">
+			<div class="text-muted bootstrap-admin-box-title"><i class="glyphicon glyphicon-th-large"></i>組織設定</div>
+		</div>
+		<div class="bootstrap-admin-panel-content text-muted search_box">
+			<table>
+				<tr>
+					<!-- menu -->
+					<td width="20%">
+						<ul>
+							<li ng-repeat="row in treeDEFNTreeBase track by $index">
+								<span ng-class="row.SUBITEM == null ? 'typeP' : ''"><a href="" onclick="return false" ng-click="showMenu2 = !showMenu2; show(row)">{{row.DESCR}}</a></span>
+								<ul ng-show="showMenu2" class="menu">
+									<li ng-repeat="row2 in row.SUBITEM track by $index">
+										<span ng-class="row2.SUBITEM == null ? 'typeP' : ''"><a href="" onclick="return false" ng-click="showMenu3 = !showMenu3; show(row2,row,row2)">{{row2.DESCR}}</a></span>
+										<ul ng-show="showMenu3" class="menu">
+											<li ng-repeat="row3 in row2.SUBITEM track by $index">
+												<span ng-class="row3.SUBITEM == null ? 'typeP' : ''"><a href="" onclick="return false" ng-click="showMenu4 = !showMenu4; show(row3,row2,row2)">{{row3.DESCR}}</a></span>
+												<ul ng-show="showMenu4" class="menu">
+													<li ng-repeat="row4 in row3.SUBITEM track by $index">
+														<span ng-class="row4.SUBITEM == null ? 'typeP' : ''"><a href="" onclick="return false" ng-click="showMenu5 = !showMenu5; show(row4,row3,row2)">{{row4.DESCR}}</a></span>
+														<ul ng-show="showMenu5" class="menu">
+															<li ng-repeat="row5 in row4.SUBITEM track by $index">
+																<span ng-class="row5.SUBITEM == null ? 'typeP' : ''"><a href="" onclick="return false" ng-click="showMenu6 = !showMenu6; show(row5,row4,row2)">{{row5.DESCR}}</a></span>
+																<ul ng-show="showMenu6" class="menu">
+																	<li ng-repeat="row6 in row5.SUBITEM track by $index">
+																		<span class="typeP"><a href="" onclick="return false" ng-click="show(row6,row5,row2)">{{row6.DESCR}}</a></span>
+																	</li>
+																</ul>
+															</li>
+														</ul>
+													</li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</td>
+					<td width="80%">
+						<h4>組織修改</h4>
+						<div class="bootstrap-admin-panel-content text-muted search_box">
+							<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+								<table>
+									<tr>
+										<th>單位代碼：</th>
+										<td><input class="form-control" type="text" placeholder="請輸入..." id="tipTerritoryID" name="tipTerritoryID" ng-model="inputVO.tipTerritoryID" e-length-limit="10" required></td>
+									</tr>
+									<tr ng-show="parameterTypeEditForm.tipTerritoryID.$error.required">
+										<th></th>
+										<td class="with-errors">請輸入單位代碼</td>
+									</tr>
+									<tr>
+										<th>單位名稱：</th>
+										<td><input class="form-control" type="text" placeholder="請輸入..." id="tipDESCR" name="tipDESCR" ng-model="inputVO.tipDESCR" e-length-limit="100" required></td>
+									</tr>
+									<tr ng-show="parameterTypeEditForm.tipDESCR.$error.required">
+										<th></th>
+										<td class="with-errors">請輸入單位名稱</td>
+									</tr>
+									<tr>
+										<th>組織類型：</th>
+										<td>
+											<e-combobox id="cmbOrgType" name="cmbOrgType" ng-disabled="cmbTypeDisabled"
+											ng-datasource="mappingSet['orgsDesc']"
+											ng-model="inputVO.cmbOrgType"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="typechange()"
+											width="150px"
+											style="line-height:20px;" />
+										</td>
+									</tr>
+									<tr ng-show="parameterTypeEditForm.cmbOrgType.$error.required">
+										<th></th>
+										<td class="with-errors">請選擇組織類型</td>
+									</tr>
+									<tr>
+										<th>層級：</th>
+										<td>
+											<e-combobox id="cmbOrgSeq" name="cmbOrgSeq" ng-disabled="cmbSeqDisabled"
+											ng-datasource="mappingSet['seqsDesc']"
+											ng-model="inputVO.cmbOrgSeq"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="checkSeq()"
+											width="150px"
+											style="line-height:20px;" />
+											<span class="bigspace"></span>
+											<e-combobox id="cmbBrchCLS" name="cmbBrchCLS" ng-disabled="cmbClsDisabled" 
+											ng-paramtype="BRCH_CLS"
+											ng-model="inputVO.cmbBrchCLS"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											width="150px"
+											style="line-height:20px;" />
+										</td>
+									</tr>
+									<tr ng-show="parameterTypeEditForm.cmbOrgSeq.$error.required">
+										<th></th>
+										<td class="with-errors">請選擇層級</td>
+									</tr>
+									<tr>
+										<th>父單位名稱：</th>
+										<td><input class="form-control" type="text" placeholder="請輸入..." id="tipParDESCR" name="tipParDESCR" ng-model="inputVO.tipParDESCR" e-length-limit="100" disabled></td>
+									</tr>
+								</table>
+							</form>
+							<div class="search_box_btn text-center">
+								<button type="button" class="btn btn-info" ng-click="btnConfirm()" function-type="maintenance" >確認</button>
+								<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+								<button type="button" class="btn btn-info" ng-click="btnAdd()" function-type="maintenance" >新增平層</button>
+								<button type="button" class="btn btn-info" ng-click="btnSubAdd()" function-type="maintenance" >新增下層</button>
+								<button type="button" class="btn btn-info" ng-click="btnEdit()" function-type="maintenance">修改平層</button>
+								<button type="button" class="btn btn-info" ng-click="btnDel()" function-type="maintenance" >刪除</button>
+							</div>
+						</div>
+						<h4>組織人員</h4>
+						<div class="bootstrap-admin-panel-content text-muted search_box">
+							<form name="parameterTypeEditForm2" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+								<table>
+									<tr>
+										<th>員工代碼：</th>
+										<td><input class="form-control" type="text" placeholder="請輸入..." id="tipEmpID" name="tipEmpID" ng-model="inputVO.tipEmpID" e-length-limit="30" required></td>
+										<th>員工姓名：</th>
+										<td><input class="form-control" type="text" placeholder="請輸入..." id="tipEmpName" name="tipEmpName" ng-model="inputVO.tipEmpName" e-length-limit="30" required></td>
+										<th>角色：</th>
+										<td>
+											<e-combobox id="cmbRole" name="cmbRole" 
+											ng-datasource="mappingSet['rolesDesc']"
+											ng-model="inputVO.cmbRole"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											width="150px"
+											style="line-height:20px;" />
+										</td>
+									</tr>
+									<tr ng-show="parameterTypeEditForm2.tipEmpID.$error.required || parameterTypeEditForm2.tipEmpName.$error.required || parameterTypeEditForm2.cmbRole.$error.required">
+										<th></th>
+										<td class="with-errors"><span ng-show="parameterTypeEditForm2.tipEmpID.$error.required">請輸入員工代碼</span></td>
+										<th></th>
+										<td class="with-errors"><span ng-show="parameterTypeEditForm2.tipEmpName.$error.required">請輸入員工姓名</span></td>
+										<th></th>
+										<td class="with-errors"><span ng-show="parameterTypeEditForm2.cmbRole.$error.required">請選擇群組</span></td>
+									</tr>
+									<tr>
+										<th>AO Code：</th>
+										<td><input class="form-control" type="text" placeholder="請輸入..." id="tipAOCode" name="tipAOCode" ng-model="inputVO.tipAOCode" e-length-limit="30"></td>
+										<th>身分證字號：</th>
+										<td><input class="form-control" type="text" placeholder="請輸入..." id="tipPID" name="tipPID" ng-model="inputVO.tipPID" e-length-limit="16"></td>
+										<th>本單位到職日期：</th>
+										<td>
+											<div class="input-group datebox datewidth">
+												<input type="text" id="onboardDT" name="onboardDT"
+												class="form-control"
+												datepicker-popup="yyyy/MM/dd"
+												ng-model="inputVO.onboardDT"
+												is-open="opened1"
+												date-disabled="disabled(date, mode)"
+												ng-readonly="true"
+												ng-disabled="disStartDt" required/>
+												<!-- 製作日曆button -->
+												<span class="input-group-btn">
+													<button type="button" class="btn btn-default"
+													ng-click="open($event,1)"
+													ng-disabled="disStartDt">
+													<i class="glyphicon glyphicon-calendar"></i>
+													</button>
+												</span>
+											</div>
+										</td>
+									</tr>
+									<tr ng-show="parameterTypeEditForm2.tipPID.$error.required || parameterTypeEditForm2.onboardDT.$error.required">
+										<th></th>
+										<td></td>
+										<th></th>
+										<td></td>
+										<th></th>
+										<td class="with-errors"><span ng-show="parameterTypeEditForm2.onboardDT.$error.required">請選擇到職日期</span></td>
+										</tr>
+									<tr>
+										<th>Email：</th>
+										<td colspan="5"><input class="form-control" type="text" placeholder="請輸入..." id="tipEmail" name="tipEmail" ng-model="inputVO.tipEmail" e-length-limit="100"></td>
+									</tr>
+								</table>
+							</form>
+							<div class="search_box_btn text-center">
+								<button id="btnSave" type="button" class="btn btn-info" ng-click="btnSave()" function-type="maintenance" >新增</button>
+								<button type="button" class="btn btn-info" ng-click="btnClear1()">清除</button>
+								<button type="button" class="btn btn-info" ng-click="btnSaveDEFN()" function-type="maintenance" >確定存入單位組織</button>
+							</div>
+						</div>
+						<div class="bootstrap-admin-panel-content" style="position:relative;">
+							<table class="tablesaw table table-striped table-bordered">
+								<thead>
+								<tr>
+									<th>勾選</th>
+									<th>角色</th>
+									<th>員工代碼</th>
+									<th>AO Code</th>
+									<th>員工姓名</th>
+									<th>身分證字號</th>
+									<th>本單位到職日期</th>
+									<th>EMail</th>
+									<th>動作</th>
+								</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in adgEmp track by $index">
+										<td><input class="uniform_on" type='checkbox' ng-model='row.IsEmpID' ng-true-value="Y" ng-false-value="N" /></td>
+										<td>{{row.SA_JOB_TITLE_DESC}}</td>
+										<td class="td_right">{{row.EMP_ID}}</td>
+										<td>{{row.AO_CODE}}</td>
+										<td>{{row.EMP_NAME}}</td>
+										<td>{{row.EMP_PID}}</td>
+										<td>{{toJsDate(row.ON_BOARD_DATE) | date:'yyyy/MM/dd'}}</td>
+										<td>{{row.E_MAIL}}</td>
+										<td>
+											<e-combobox id="cmbAction" name="cmbAction"
+											ng-datasource="row.set"
+											ng-model="row.cmbAction"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="action(row)"
+											width="100px"
+											style="line-height:20px;" />
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<e-paging outputVO="outputVO"
+								inputVO="inputVO"
+								callQuery="getEmp()"
+								displayLimit="displayLimit"
+								dataList="adgEmp"></e-paging>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>

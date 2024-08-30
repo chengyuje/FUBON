@@ -1,0 +1,196 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS349 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS349 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS349.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS349_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+.alignleft {
+	text-align: left !important;
+}
+.bigspace {
+	margin-left: 50px !important;
+}
+.datewidth {
+	width: 180px !important;
+}
+.search-table-outter {
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.clas tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS349/PMS349.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/PMS349/PMS349_DETAIL.js"></script>
+<div class="PMS349" ng-controller="PMS349Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*資料統計日期：</th>
+							<td>
+								<div class="input-group datebox datewidth" style="float: left">
+									<input type="text" id="eCreDate" name="eCreDate"
+										class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+										ng-required="true" ng-model="inputVO.eCreDate" is-open="model.b"
+										datepicker-options="bgn_eDateOptions" ng-readonly="true"
+										ng-change="limitDate();dateChange();" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td><e-combobox id="region_center_id"
+									name="region_center_id" ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id" ng-validate="false"
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-format="F3" ng-required="false" ng-change="ChangeRegion()"
+									width="250px" style="line-height:20px;" /></td>
+							<th>營運區：</th>
+							<td><e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST" ng-model="inputVO.branch_area_id"
+									ng-validate="false" ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" ng-editable="false"
+									ng-format="F3" ng-required="false" ng-change="ChangeArea()"
+									width="150px" style="line-height:20px;" /></td>
+							<th>分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr"
+									ng-validate="false" ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" ng-editable="false"
+									ng-format="F1" ng-required="false" ng-change="ChangeBranch()"
+									width="220px" style="line-height:20px;" /></td>
+						</tr>
+						<tr>	
+							<th>理專：</th>
+							<td><e-combobox id="ao_code" name="ao_code"
+									ng-datasource="AO_LIST" ng-model="inputVO.ao_code"
+									ng-validate="false" ng-disabled="disableAoCombo"
+									ng-readonly="disableAoCombo" ng-editable="false" ng-format="F1"
+									ng-required="false" ng-change="ChangeAo_code()" width="170px"
+									style="line-height:20px;" /></td>				
+							<th>客戶ID：</th>
+							<td><input name="cust_id" ng-model="inputVO.cust_id"
+							type="text" width="170px"></td>
+						</tr>	
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" ng-disabled="paramList.length < 1" function-type="export">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList"></e-jumping>
+				<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：每日</td>
+					</tr>
+					<tr>
+						<td>產出日：{{toJsDate(paramList[0].CREATETIME) | date:'yyyy/MM/dd'}}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y"
+				style=" white-space: nowrap;">
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr rowspan="3">
+							<th rowspan="3" style="vertical-align: midddle" valign="center">分行</th>
+							<th rowspan="3" style="vertical-align: midddle" valign="center">理專</th>
+							<th rowspan="3" style="vertical-align: midddle" valign="center">AO Code</th>
+							<th class="css" rowspan="3" style="vertical-align: midddle"	valign="center">職級</th>
+							<th class="css" rowspan="1" colspan="5">客戶投資損益</th>
+						</tr>
+						<tr>
+							<th rowspan="1" colspan="5">整體損益</th>
+						</tr>
+						<tr>
+							<th>-5%以下</th>
+							<th>-5%(含) ~ 0%</th>
+							<th>0%(含) ~ 5%</th>
+							<th>5%(含) ~ 10%</th>
+							<th>10%(含) ~</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.BRANCH_NAME}}</td>
+							<td align="center">{{row.EMP_NAME}}</td>
+							<td align="center">{{row.AO_CODE}}</td>
+							<td align="center">{{row.AO_JOB_RANK}}</td>
+							<TD align="right"><a onclick="return false"	ng-click="detail(row,1)">{{row.LV1 | number:0}}</a></TD>
+							<TD align="right"><a onclick="return false"	ng-click="detail(row,2)">{{row.LV2 | number:0}}</a></TD>
+							<TD align="right"><a onclick="return false"	ng-click="detail(row,3)">{{row.LV3 | number:0}}</a></TD>
+							<TD align="right"><a onclick="return false"	ng-click="detail(row,4)">{{row.LV4 | number:0}}</a></TD>
+							<TD align="right"><a onclick="return false"	ng-click="detail(row,5)">{{row.LV5 | number:0}}</a></TD>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div>說明：</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

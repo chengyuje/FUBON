@@ -1,0 +1,166 @@
+<style>
+.border-style {
+	border: .5px solid #ddd;
+}
+</style>
+<div class="blockcontainer" style="border-color: 3px solid #93c5e1;margin-left: 15px;margin-right: 15px;">
+	<div
+		style="display: flex; justify-content: space-around; margin: 0 auto;">
+		<!-- 無投保 -->
+		<div class="block clear-space" ng-if="!hasIns">
+			<div class="title subtitle">資產</div>
+			<div class="content-wrapper border-style">
+				<div class="content-title">
+					A.存款 <span class="tiny-font">(不含支存)</span>
+				</div>
+				<div class="content-body">
+					<span ng-bind="headList.deposit|number"></span>
+				</div>
+			</div>
+			<div class="content-wrapper border-style">
+				<div class="content-title">B.預計行外匯入金額</div>
+				<div class="content-body">
+					<span ng-bind="headList.sowAmt|number"></span>
+				</div>
+			</div>
+			<div ng-if="!hasIns" class="content-wrapper"
+				style="border: .5px solid #ddd;">
+				<div class="content-title"></div>
+				<div class="content-body">
+					<span>&nbsp</span>
+				</div>
+			</div>
+			<div class="content-wrapper border-style">
+				<div class="content-title">小計</div>
+				<div class="content-body">
+					<span ng-bind="headList.price|number"></span>
+				</div>
+			</div>
+		</div>
+
+		<!-- 有投保 -->
+		<div class="block clear-space" style="border-right: .5px solid #ddd;"
+			ng-if="hasIns">
+			<div class="title subtitle">資產</div>
+			<div class="content-wrapper border-style">
+				<div class="content-title">A.帳上資產</div>
+				<div class="content-body">
+					<span ng-bind="headList.liquidAmt|number"></span>
+				</div>
+			</div>
+			<div class="content-wrapper border-style">
+				<div class="content-title content-title-sub">
+					A1.存款 <span class="tiny-font">(不含支存)</span>
+				</div>
+				<div class="content-body">
+					<span ng-bind="headList.deposit|number"> </span>
+				</div>
+			</div>
+			<div class="content-wrapper border-style">
+				<div class="content-title content-title-sub">A2.基金 + ETF + 奈米投</div>
+				<div class="content-body">
+					<span ng-bind="(headList.mfdProd + headList.etfProd + headList.nanoProd)|number"></span>
+				</div>
+			</div>
+			<!--       <div class="content-wrapper border-style"> -->
+			<!--         <div class="content-title content-title-sub">A3.投資型保險 <span class="tiny-font">(全委保單)</span></div> -->
+			<!--         <div class="content-body"> -->
+			<!--           <span ng-bind="headList.insProd|number"></span> -->
+			<!--         </div> -->
+			<!--       </div> -->
+			<div class="content-wrapper border-style">
+				<div class="content-title content-title-sub">A3.海外債 + SN + SI</div>
+				<div class="content-body">
+					<span
+						ng-bind="(headList.bondProd + headList.snProd +headList.siProd)|number"></span>
+				</div>
+			</div>
+			<div class="content-wrapper border-style">
+				<div class="content-title">B.預計行外匯入金額</div>
+				<div class="content-body">
+					<span ng-bind="headList.sowAmt|number"></span>
+				</div>
+			</div>
+			<div class="content-wrapper border-style">
+				<div class="content-title">小計</div>
+				<div class="content-body">
+					<span ng-bind="headList.price|number"></span>
+				</div>
+			</div>
+		</div>
+
+		<!-- 支出 -->
+		<div class="block clear-space">
+			<div class="title subtitle">支出及現金準備</div>
+			<div class="content-wrapper border-style">
+				<div class="content-title">C.未來一年所需現金部位</div>
+				<div class="content-body">
+					<span ng-bind="headList.cash|number"></span>
+				</div>
+			</div>
+			<div class="content-wrapper border-style">
+				<div class="content-title">D.未來一年保險投保費用</div>
+				<div class="content-body">
+					<span ng-bind="headList.ins|number"></span>
+				</div>
+			</div>
+			<div class="content-wrapper border-style">
+				<div class="content-title">E.現金準備</div>
+				<div class="content-body">
+					<span ng-bind="headList.cashPrepare|number"></span>
+				</div>
+			</div>
+			<div ng-if="hasIns" class="content-wrapper"
+				style="border: .5px solid #ddd;">
+				<div class="content-title"></div>
+				<div class="content-body">
+					<span>&nbsp</span>
+				</div>
+			</div>
+			<!--       <div ng-if="hasIns" class="content-wrapper" style="border: .5px solid #ddd;"> -->
+			<!--         <div class="content-title"></div> -->
+			<!--         <div class="content-body"> -->
+			<!--           <span>&nbsp</span> -->
+			<!--         </div> -->
+			<!--       </div> -->
+			<div ng-if="hasIns" class="content-wrapper"
+				style="border: .5px solid #ddd;">
+				<div class="content-title"></div>
+				<div class="content-body">
+					<span>&nbsp</span>
+				</div>
+			</div>
+			<!--       <div class="content-wrapper" -->
+			<!--            ng-if="hasIns"> -->
+			<!--         <div class="content-title content-title-sub">D1.保障型保費</div> -->
+			<!--         <div class="content-body"> -->
+			<!--           <span ng-bind="headList.insPolicyAmt|number"></span> -->
+			<!--         </div> -->
+			<!--       </div> -->
+			<!--       <div class="content-wrapper" -->
+			<!--            ng-if="hasIns"> -->
+			<!--         <div class="content-title content-title-sub">D2.儲蓄型保費</div> -->
+			<!--         <div class="content-body"> -->
+			<!--           <span ng-bind="headList.insSavAmt|number"></span> -->
+			<!--         </div> -->
+			<!--       </div> -->
+			<div class="content-wrapper border-style">
+				<div class="content-title">小計</div>
+				<div class="content-body">
+					<span"
+						ng-bind="headList.cash + headList.ins + headList.cashPrepare|number"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="block container no-area clear-space"
+		style="text-align: left;">
+		<div class="content-wrapper Last">
+			<div class="content-title">規劃金額</div>
+			<div class="content-body">
+				<span style="font-weight: bold"; 
+					  ng-bind="headList.price - headList.cash - headList.ins - headList.cashPrepare|number"></span>
+			</div>
+		</div>
+	</div>
+</div>

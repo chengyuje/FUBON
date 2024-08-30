@@ -1,0 +1,140 @@
+<style>
+.search_box TH + TD{
+	line-height:20px;
+	width: auto;
+}
+.ngdialog {
+    margin-top:-150px;
+}
+.little{
+	width:1200px !important;
+	margin-left:auto; 
+	margin-right:auto;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/CMMGR003/CMMGR003.js"></script>
+<div class="container">
+	<div ng-controller="CMMGR003_Controller" ng-cloak>
+	  <!-- left, vertical navbar & content -->
+	  <div class="row"> 
+	    <!-- left, vertical navbar --> 
+	    <!-- content -->
+	    <div class="col-md-12 "> <!-- InstanceBeginEditable name="Content" -->
+	      <div class="row">
+	        <div class="col-md-12">
+	          <div class="panel panel-default">
+	            <div class="panel-heading">
+	              <div class="text-muted bootstrap-admin-box-title"><i class="glyphicon glyphicon-th-large"></i>排程Engine管理</div>
+	            </div>
+	            <div class="bootstrap-admin-panel-content text-muted search_box">
+	              <form name="parameterTypeForm">
+	              	<table class="little">
+	                    <tr>
+	                    	<th></th>
+	                        <th>執行主機</th>
+	                        <td  style="padding:10px 5px 0px 5px">
+	                        <e-combobox id="processor" name="processor"
+	                        		ng-disabled="eComboDisabled" 
+									ng-datasource="mappingSet['processor']"
+									ng-model="inputVO.processor"
+									ng-validate="true" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"/>
+							<span style="padding-right:50px"></span>
+							<button type="button" class="btn btn-default" style="margin-right:20px" ng-click="inquire()" function-type="query" >發動查詢</button>
+							<button type="button" class="btn btn-default" style="margin-right:10px" ng-click="inquireInit();refresh()" function-type="query" >更新查詢</button>							
+							(可查詢AP及DB Server目前Quartz內執行中的JOB)</td>
+							<th></th>
+	                    </tr>
+	                    
+	                    <tr>
+	                    	<th></th>
+							<th></th>
+						<td id="paddingUp0" class="help-block with-errors" style="padding:0px" ng-show="parameterTypeForm.processor.$error.required"> 請輸入主機</td>
+						</tr>
+						
+						<tr>
+							<th></th>
+							<th></th>
+							<td  style="padding:0px 5px 5px 5px">
+	                        <button type="button" class="btn btn-default" style="margin-right:10px" ng-click="restart()" function-type="maintenance" >重起</button>
+	                        (可重起AP Server的排程Engine)
+							</td>   
+							<th></th>          	
+	                    </tr>
+	                    <tr>
+	                    	<th></th>
+	                        <th>行事曆</th>
+	                        <td>
+	                        <e-combobox id="calendar" name="calendar"
+	                        		ng-disabled="eComboDisabled" 
+									ng-paramtype="CMMGR003.CALENDAR"
+									ng-model="inputVO.calendar"
+									ng-validate="true" 
+									ng-readonly="false"
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"/>
+							<span style="padding-right:50px"></span>
+							<button type="button" class="btn btn-default" style="margin-right:10px" ng-click="refreshCandlander()" function-type="maintenance" >更新行事曆</button>							
+							(更新所有排程Engine的行事曆)</td>
+							<th></th>
+	                    </tr>
+	                    <tr ng-repeat="row in results = (paramList | orderBy:predicate:reverse) | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	                    <th></th> 
+	                    <th>發動查詢時間</th>
+						<td>
+						<input class="form-control" type="text" value="{{row.CREATETIME}}"
+						ng-readonly="true">
+						(顯示指定執行主機最後一次發動查詢結果)</td>	
+						<th></th>
+	                </tr>			 
+	                </table>
+	              </form>
+	            </div>
+	                <div class="bootstrap-admin-panel-content" style="position:relative;">
+	                		<table class="tablesaw table table-striped table-bordered" data-tablesaw-mode="swipe" data-tablesaw-sortable data-tablesaw-minimap >
+	                  			<thead>
+	                    			<tr>
+	                     				<th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist">排程代號</th>
+										<th scope="col" data-tablesaw-sortable-col>排程名稱</th>
+	                      				<th scope="col" data-tablesaw-sortable-col>JOB代號</th>
+	                                    <th scope="col" data-tablesaw-sortable-col>JOB名稱</th>
+	                                    <th scope="col" data-tablesaw-sortable-col>執行單位代號</th>
+	                                    <th scope="col" data-tablesaw-sortable-col>開始執行時間</th>
+	                                    <th scope="col" data-tablesaw-sortable-col>下次執行時間</th>
+	                    			</tr>
+	                  			</thead>
+	                  			<tbody>
+	                    			<tr ng-repeat="row in results = (paramList | orderBy:predicate:reverse) | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	                      				<td>{{row.SCHEDULEID}}</td>
+	                      				<td>{{row.SCHEDULENAME}}</td>
+	                      				<td>{{row.JOBID | mapping:mappingSet['TBSYSPARAMTYPE.PTYPE_BUSS']:'F1'}}</td>
+	                      				<td>{{row.JOBNAME | mapping:mappingSet['TBSYSPARAMTYPE.CSV_TYPE']:'F1'}}</td>
+	                      				<td>{{row.AUDITID}}</td>
+	                      				<td>{{row.FIRETIME | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+	                      				<td>{{row.NEXT_FIRETIME | date:"yyyy-MM-dd HH:mm:ss"}}</td>                				
+	                    			</tr>
+	                  			</tbody>
+	                		</table>
+			 				<e-paging outputVO="outputVO"
+			          			inputVO="inputVO"
+				           		callQuery="refresh()"
+				           		displayLimit="displayLimit"
+				           		dataList="paramList"
+			           		>
+			          		</e-paging>
+	                </div>
+	          </div>
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+</div>

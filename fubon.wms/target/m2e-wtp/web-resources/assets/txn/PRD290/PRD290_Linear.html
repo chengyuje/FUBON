@@ -1,0 +1,68 @@
+<style>
+
+</style>
+<div ng-controller="PRD290_LinearController" ng-cloak>
+	<div class="modal-dialog PRD290_Linear">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">查詢資料</h4>
+			</div>
+			<div class="modal-body">
+				<h4 class="h4-title">查詢條件</h4>
+				<table>
+					<tr>
+						<th><label><input type="radio" ng-model="inputVO.type" ng-value="1" ng-change="clearData()"> 淨值</label></th>
+						<td>
+							<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="sDate" name="sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.sDate"
+									is-open="model.a"
+									datepicker-options="sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="eDate" name="eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.eDate"
+									is-open="model.b"
+									datepicker-options="eDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th colspan="2"><label><input type="radio" ng-model="inputVO.type" ng-value="2" ng-change="clearData()"> 單日報酬</label></th>
+					</tr>
+					<tr>
+						<th><label><input type="radio" ng-model="inputVO.type" ng-value="3" ng-change="clearData()"> 每日進場累計報酬</label></th>
+						<th><button type="button" class="btn btn-info" ng-click="getLinear()" function-type="query">查詢</button></th>
+					</tr>
+				</table>
+				<h4 class="h4-title">折線圖</h4>
+				<nvd3 options="options" data="data"></nvd3>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確定</button>
+			</div>
+		</div>
+	</div>
+</div>

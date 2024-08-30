@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+	
+    <bean id="defaultSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="abdbdayDataSource"/>
+               <property name="mappingLocations">
+			<list>
+				<value>classpath:com/systex/jbranch/platform/common/platformdao/table/*.hbm.xml</value>
+				<value>classpath:com/systex/jbranch/app/common/fps/table/*.hbm.xml</value>
+			</list>
+        </property>
+        <property name="hibernateProperties" ref="abdbdayHibernateProperties"/>
+    </bean>
+    
+    <bean id="abdbmonSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="abdbmonDataSource"/>
+               <property name="mappingLocations">
+			<list>
+				<value>classpath:com/systex/jbranch/app/common/fps/table/*.hbm.xml</value>
+			</list>
+        </property>
+        <property name="hibernateProperties" ref="abdbhisHibernateProperties"/>
+    </bean>
+    
+    <bean id="abdbhisSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="abdbhisDataSource"/>
+               <property name="mappingLocations">
+			<list>
+				<value>classpath:com/systex/jbranch/app/common/fps/table/*.hbm.xml</value>
+			</list>
+        </property>
+        <property name="hibernateProperties" ref="abdbhisHibernateProperties"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+</beans>

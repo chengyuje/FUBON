@@ -1,0 +1,53 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .FPS412PrintPreview .modal-dialog {
+    min-width: 95vw;
+  }
+
+  .FPS412PrintPreview .modal-content {
+    height: auto;
+  }
+
+  .FPS412PrintPreview .modal-body {
+    height: 85vh;
+    font-size: 18px;
+  }
+  
+  .webview .FPS .print.A4.iPad{
+  	width: auto;
+    font-size: calc(100vw / 1111 * 18);
+  }
+
+</style>
+<link rel="stylesheet" href="assets/txn/FPS/FPSPrint.css">
+<script type="text/javascript" src="assets/txn/FPS410/FPS410_print.js"></script>
+<script type="text/javascript" src="assets/txn/FPS410/FPS410PrintPreview.js"></script>
+<div ng-controller="FPS410PrintPreviewController"
+     ng-cloak
+     class="FPS FPS412PrintPreview">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a href="#"
+           class="close"
+           data-dismiss="modal"
+           aria-hidden="true"
+           ng-click="closeBack()">&times; </a>
+        <h4 id="myModalAlertLabel"
+            class="modal-title">理財績效報告書</h4>
+      </div>
+      <div class="modal-body">
+        <div style="text-align:right;
+                    margin-bottom:.3em;">
+          <a class="btn-fps"
+          	 ng-hide="hideDownload"
+             ng-click="go('generatePDF','download')">下載</a>
+          <a class="btn-fps"
+             ng-click="go('generatePDF','resend')">轉寄</a>
+        </div>
+        <div ng-include="printTemplate"></div>
+      </div>
+    </div>
+  </div>
+</div>

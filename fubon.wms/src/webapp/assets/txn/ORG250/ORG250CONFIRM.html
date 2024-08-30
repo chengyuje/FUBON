@@ -1,0 +1,66 @@
+<style>
+/* open dialog */
+.ngdialog.ORG250_CONFIRM {
+	
+}
+/* dialog panl */
+.modal-dialog.ORG250_CONFIRM {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+.red{
+	color: red;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<div ng-controller="ORG250_CONFIRMController" ng-cloak>
+	<div class="modal-dialog ORG250_CONFIRM">  
+		<div class="modal-content">	
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="" class="modal-title" align="center">確認上傳資料</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc slim-scroll" style="white-space: nowrap;">
+				<label class ="red" >＊＊請確認上傳資料＊＊</label>
+					<table class="tablesaw table table-striped table-bordered text-center">
+						<thead>
+							<tr>
+								<th>業務處</th>
+								<th>營運區</th>
+								<th>分行</th>
+								<th>被代理人</th>
+								<th>代理人1</th>
+								<th>代理人2</th>
+								<th>代理人3</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row  text-center" ng-repeat="row in inputVO.AGENT_LST" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row.REGION_CENTER_NAME}}</td>
+								<td>{{row.BRANCH_AREA_NAME}}</td>
+								<td>{{row.BRANCH_NAME}}</td>
+								<td>{{row.EMP_ID}} &nbsp; {{row.EMP_NAME}}</td>
+								<td>{{row.AGENT_ID_1}} &nbsp; {{row.AGENT_NAME_1}}</td>
+								<td>{{row.AGENT_ID_2}} &nbsp; {{row.AGENT_NAME_2}}</td>
+								<td>{{row.AGENT_ID_3}} &nbsp; {{row.AGENT_NAME_3}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="confirm()">確定</button>
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

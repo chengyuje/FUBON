@@ -1,0 +1,99 @@
+<style>
+.modal-dialog.SOT620_ADDPROD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 700px;
+	height: 450px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<div ng-controller="SOT620_ADDPRODController" ng-cloak>
+	<div class="modal-dialog SOT620_ADDPROD"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">新增欲委託高風險投資明細</h4>
+			</div>
+			<div class="modal-body">
+ 				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+ 					<table>
+						<tr>
+	 						<th class="col-md-4 tdpadding">商品種類：</th>
+ 							<td class="col-md-6 tdpadding">
+ 								<e-combobox id="prodType" name="prodType" 
+										ng-datasource="mappingSet['SOT.CENTRATE_PROD_TYPE']"
+										ng-model="inputVO.prodType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-required="true"
+										ng-format="F3"
+										ng-change="prodTypeOnChange()"
+										width="250px"
+										style="line-height:20px;" required/>
+ 							</td>
+ 						</tr>
+ 						<tr ng-show="(inputVO.prodType == '1' || inputVO.prodType == '2' || inputVO.prodType == '4' || inputVO.prodType == '6')">
+	 						<th class="col-md-4 tdpadding">商品代號：</th>
+ 							<td class="col-md-6 tdpadding">
+ 								<input type="text" class="form-control" id="prodID" name="prodID" style="width:200px;" ng-model="inputVO.prodID" e-length-limit="12" ng-blur="getProdData();">
+ 							</td>
+ 						</tr>
+						<tr ng-show="(inputVO.prodType == '1' || inputVO.prodType == '2' || inputVO.prodType == '4' || inputVO.prodType == '6')">
+	 						<th class="col-md-4 tdpadding">商品名稱 / 計價幣別：</th>
+ 							<td class="col-md-6 tdpadding">{{inputVO.prodName}} / {{inputVO.prodCurr}}</td>
+ 						</tr>
+ 						<tr ng-show="!(inputVO.prodType == '1' || inputVO.prodType == '2' || inputVO.prodType == '4' || inputVO.prodType == '6')">
+	 						<th class="col-md-4 tdpadding">計價幣別：</th>
+ 							<td class="col-md-6 tdpadding">
+ 								<e-combobox id="prodCurr" name="prodCurr" 
+										ng-datasource="mappingSet['FPS.CURRENCY']"
+										ng-model="inputVO.prodCurr"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-required="true"
+										ng-format="F3"
+										ng-change="inputVO.purchaseAmt = undefined;"
+										width="200px"
+										style="line-height:20px;" required/>
+ 							</td>
+ 						</tr>
+ 						<tr ng-show="(inputVO.prodType == '1' || inputVO.prodType == '2' || inputVO.prodType == '4')">
+	 						<th class="col-md-4 tdpadding">最低申購面額 / 累進申購面額：</th>
+ 							<td class="col-md-6 tdpadding">{{inputVO.prodMinBuyAmt | currency:''}} / {{inputVO.prodMinGrdAmt | currency:''}}</td>
+ 						</tr>
+ 						<tr ng-show="inputVO.prodType == '6'">
+	 						<th class="col-md-4 tdpadding">最低申購金額：</th>
+ 							<td class="col-md-6 tdpadding">{{inputVO.prodMinBuyAmt | currency:''}}</td>
+ 						</tr>
+ 						<tr ng-show="inputVO.prodType == '4'">
+	 						<th class="col-md-4 tdpadding">參考報價 / 報價日期：</th>
+ 							<td class="col-md-6 tdpadding">{{inputVO.refVal}}% / {{inputVO.refValDate | date:"yyyy-MM-dd"}}</td>
+ 						</tr>
+ 						<tr>
+	 						<th class="col-md-4 tdpadding">申購金額 / 面額：</th>
+ 							<td class="col-md-6 tdpadding">
+ 								<input type="text" class="form-control" id="purchaseAmt" name="purchaseAmt" e-input-limit="NUU" nuu1="14" nuu2="2" style="width:150px;" ng-model="inputVO.purchaseAmt" e-length-limit="16" ng-blur="validPurchaseAmt();">
+ 							</td>
+ 						</tr>
+ 						<tr ng-show="inputVO.prodType == '4'">
+	 						<th class="col-md-4 tdpadding">信託本金：</th>
+ 							<td class="col-md-6 tdpadding">{{inputVO.trustAmt | currency:''}}</td>
+ 						</tr>
+ 					</table>
+ 				</form>
+ 				<br/>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="add()">新增</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

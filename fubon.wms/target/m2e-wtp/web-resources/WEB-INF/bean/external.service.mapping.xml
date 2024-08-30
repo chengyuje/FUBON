@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+   		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd
+   		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+   		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+   		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+   		http://www.springframework.org/schema/mvc
+   		http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+
+	<!-- 用於繼承的抽象模型定義、vo參數型態定義、request與response來回參數處理定義 -->
+	<import resource="ws/external.service.format.model.xml" />
+	<!-- 各個模組的web service設定 -->
+	<import resource="ws/external.service.mapping.FPS.xml" />
+	<import resource="ws/external.service.mapping.INS.xml" />
+	<import resource="ws/external.service.mapping.MAO.xml" />
+	<import resource="ws/external.service.mapping.SSO.xml" />
+	<import resource="ws/external.service.mapping.OTHER.xml" />
+	<import resource="ws/external.service.mapping.OTHER.xml" />
+	<import resource="webview/external.webview.mapping.xml" />
+	<import resource="webview/external.webview.initJs.mapping.xml" />
+
+	<!-- injection to The object used -->
+	<bean id="ExternalConfigFactory" class="com.systex.jbranch.ws.external.service.ExternalConfigFactory"
+		p:webViewPathMapping-ref="webViewPathMapping" 
+		p:webViewJsMapping-ref="webViewJsMapping">
+		<!-- 引入個模組的設定 -->
+		<property name="externalConfigList">
+			<list>
+				<ref bean="OTHER" />
+				<ref bean="FPS" />
+				<ref bean="INS" />
+				<ref bean="MAO" />
+				<ref bean="SSO" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="WsRemotingService" class="com.systex.jbranch.ws.external.service.WsRemotingService" 
+		scope="prototype" 
+		p:pipeline-ref="WsPpipeline" />
+
+	<bean id="WsPpipeline" class="com.systex.jbranch.ws.external.service.WSPipelineImpl"
+		scope="prototype" p:wsManager-ref="wsManager" p:apServerManager-ref="apServerManager"
+		p:dataManager-ref="dataManager">
+		<property name="entryPoints">
+			<util:map>
+				<!-- txnCode -->
+				<entry key="CMFPG000">
+					<!-- bizCode -->
+					<util:set>
+						<value>authenticate</value>
+						<value>getBranchList</value>
+						<value>wson</value>
+						<value>tlronFPS</value>
+						<value>tlronSSO</value>
+						<value>tlronBTS</value>
+						<value>tlron</value>
+					</util:set>
+				</entry>
+			</util:map>
+		</property>
+	</bean>
+</beans>

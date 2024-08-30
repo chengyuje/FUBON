@@ -1,0 +1,138 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS362/PMS362.js"></script>
+<script type="text/javascript" src="assets/txn/PMS362/PMS362_EXPORT.js"></script>
+<div class="PMS362" ng-controller="PMS362Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon" style="left:400px"></div>
+			<div class="tfb_content_tit" style="width:400px"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th>*資料類型: </th>
+						<td>
+							<e-combobox id="srchType" name="srchType"
+							ng-datasource="mappingSet['srchType']"
+							ng-model="inputVO.srchType" 
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false" 
+							ng-format="F3"
+							ng-required="true" 
+							width="220px" 
+							style="line-height:20px;" />
+						</td>
+						<!-- 空白th、td是為了調整版面用 -->
+						<th></th>
+						<td></td>
+					</tr>
+					<!-- 
+					<tr>
+						<th>*戰報統計日期:</th>
+							<td>
+								<div class="input-group datebox datewidth" style="float:left">
+									<input type="text" 
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.sTimes"
+									is-open="model.a"
+									datepicker-options="bgn_sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate();"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float:left">&nbsp; ～ &nbsp;</div>
+								<div class="input-group datebox datewidth" style="float:left">
+									<input type="text"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.eTimes"
+									is-open="model.b"
+									datepicker-options="bgn_eDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate();"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+						<th></th>
+						<td></td>
+					</tr>-->
+				</table>
+				</form>
+			</div>
+			<!-- 改自CRM3101， -->
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-disabled="inputVO.srchType == undefined || inputVO.srchType == ''" ng-click="queryData()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();limitDate()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="uploadFile()">選擇上傳檔案</button>
+				<button type="button" class="btn btn-info" ng-click="downloadExm()">下載範例</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+				<table class="table-bordered middle">
+					<thead>
+						<tr>
+							<th>資料類型</th>
+							<th>戰報統計日期</th>
+							<th>資料匯入人員</th>
+							<th>建立時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.DATA_TYPE | mapping:srchType:'F3'}}</td>
+							<td>{{row.DATA_DATE}}</td>
+							<td>{{row.MODIFIER}}</td>
+							<td>{{toJsDate(row.LASTUPDATE) | date:'yyyy/MM/dd HH:mm:ss'}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

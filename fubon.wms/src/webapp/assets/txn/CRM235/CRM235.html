@@ -1,0 +1,249 @@
+<style>
+.bigspace {
+    margin-left: 50px !important;
+}
+.formatWidth{
+	width:150px !important;
+	float: left !important;
+}
+.datewidthByClass{
+	width:120px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM230/CRM230.js"></script>
+<script type="text/javascript" src="assets/txn/CRM235/CRM235.js"></script>
+<script type="text/javascript" src="assets/txn/CUS160/CUS160_ADD.js"></script>
+<script type="text/javascript" src="assets/txn/CRM230/CRM230_COMPANY.js"></script>
+<div class="CRM235" ng-controller="CRM235Controller" ng-cloak>
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+        </div>
+        <div class="panel_content">
+            <div ng-include="'assets/txn/CRM230/CRM230_COMMON.html'"></div>
+            <div class="search_table search_box3">
+                <hr>
+                <h4>海外債</h4>
+                <table>
+                    <tr>
+                        <th>商品幣別：</th>
+                        <td>
+                            <e-combobox id="currency_std_id" 
+                            			ng-paramtype="FPS.CURRENCY" 
+                            			ng-model="inputVO.currency_std_id" 
+                            			ng-validate="false" 
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3" 
+                            			ng-required="false" 
+                            			width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
+                        </td>
+                        <th>商品代號：</th>
+                        <td>
+                            <input type="text" class="form-control" placeholder="請輸入..." id="bond_nbr" name="bond_nbr" ng-model="inputVO.bond_nbr" e-length-limit="50" size="48" style="width: 200px;">
+                        </td>
+                        <th></th>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>到期年度：</th>
+                        <td>
+                            <div class="input-group datebox datewidthByClass">
+                            	<input 	type="text" id="year_of_maturity" name="year_of_maturity" 
+                            			class="form-control" 
+                            			uib-datepicker-popup="yyyy" 
+                            			ng-model="inputVO.year_of_maturity" 
+                            			is-open="model.zz" 
+                            			datepicker-options="yomDateOptions" 
+                            			ng-readonly="true" />
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" ng-click="open($event,'zz')">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </td>
+                        <th>商品名稱：</th>
+                        <td>
+                            <input type="text" class="form-control" placeholder="請輸入..." id="prod_name" name="prod_name" ng-model="inputVO.prod_name" e-length-limit="300" size="48" style="width: 200px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>商品風險等級：</th>
+                        <td>
+                            <e-combobox id="riskcate_id" 
+                            			ng-paramtype="FPS.PROD_RISK_LEVEL" 
+                            			ng-model="inputVO.riskcate_id" 
+                            			ng-validate="false" 
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3" 
+                            			ng-required="false" 
+                            			width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
+                        </td>
+                        <th>發行機構：</th>
+                        <td>
+                            <input type="text" class="form-control" placeholder="請輸入..." id="instition_of_flotation" name="instition_of_flotation" ng-model="inputVO.instition_of_flotation" e-length-limit="300" size="48" style="width: 200px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>債券類型：</th>
+                        <td>
+                            <e-combobox id="bond_cate_id" 
+                            			ng-paramtype="CRM.CRM235_PRD_TYPE" 
+                            			ng-model="inputVO.bond_cate_id" 
+                            			ng-validate="false" 
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3" 
+                            			ng-required="false" 
+                            			width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
+                        </td>
+                        <th></th>
+                        <td></td>
+<!-- 上[2080] 退[2073]                        <th>含息報酬率：</th> -->
+<!--                         <td> -->
+<!--                            	<div class="form-group"> -->
+<!-- 			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="rtn_rate_wd_min" name="rtn_rate_wd_min" style="margin-right: 3px;" ng-model="inputVO.rtn_rate_wd_min" e-input-limit="ND"></div> -->
+<!-- 			     				<div style="float: left !important;">%&nbsp ~ &nbsp</div> -->
+<!-- 			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="rtn_rate_wd_max" name="rtn_rate_wd_max" style="margin-right: 3px;" ng-model="inputVO.rtn_rate_wd_max" e-input-limit="ND"></div> -->
+<!-- 			     				<div style="float: left !important;">%</div> -->
+<!-- 			     			</div> -->
+<!--                         </td> -->
+                    </tr>
+                </table>
+            </div>
+            <div class="search_box_btn text-center">
+                <button type="button" class="btn btn-info" ng-click="inquireInit_common();inquire();" function-type="query">查詢</button>
+                <button type="button" class="btn btn-info" ng-click="clearAll();">清除</button>
+            </div>
+        </div>
+    </div>
+    <!-- 結果區 -->
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+        </div>
+        <!--Content of the panel-->
+        <div class="panel_content">
+            <!-- 分頁 -->
+            <uib-tabset active="0" justified="true">
+                <uib-tab index="0" heading="客戶資訊">
+                    <!-- 新增待辦 -->
+                    <div ng-include="'assets/txn/CRM230/CRM230_INVESTTAB.html'"></div>
+                    <!-- 客戶資訊 -->
+                    <div ng-include="'assets/txn/CRM230/CRM230_CUSTTAB.html'"></div>
+                </uib-tab>
+                <uib-tab index="1" heading="投資資訊">
+                    <e-jumping-once output="outputVO" list="resultListData" totallist="resultList"></e-jumping-once>
+                    <div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+                        <table class="e-table-freeze" e-height="400px" e-left="2" e-list="resultListData" e-mode="3" e-top="true">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="inquire()">客戶ID</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="inquire()">客戶姓名</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="CERT_NBR" e-query="inquire()">憑證編號</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="BOND_NBR" e-query="inquire()">債券代號</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="PROD_NAME" e-query="inquire()">債券名稱</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="VALU_CRCY_TYPE" e-query="inquire()">商品幣別</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="DENO_AMT" e-query="inquire()">庫存面額</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="INV_AMT_TWD" e-query="inquire()">信託本金</e-sorter>
+                                    </th>
+                                    <th>
+                                        <e-sorter e-input="inputVO" e-mode="auto" e-col="REF_PRICE" e-query="inquire()">參考贖回報價</e-sorter>
+                                    </th>
+                                    <!-- <th><e-sorter e-input="inputVO" e-mode="auto" e-col="T_DIV_TWD" e-query="inquire()">累積現金配息</e-sorter></th> -->
+                                    <!-- <th><e-sorter e-input="inputVO" e-mode="auto" e-col="PRE_INT" e-query="inquire()">應收前手息</e-sorter></th> -->
+                                    <!-- <th><e-sorter e-input="inputVO" e-mode="auto" e-col="RTN_RATE_WD_TWD" e-query="inquire()">含息報酬率</e-sorter></th> -->
+<!-- 上[2080] 退[2073]                                   <th><e-sorter e-input="inputVO" e-mode="auto" e-col="RTN_RATE_WD" e-query="inquire()">含息報酬率</e-sorter></th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="repeat-row" ng-repeat="row in resultListData | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                                    <td><a onclick="return false" ng-click="goCRM610(row)">{{row.CUST_ID}}</a></td>
+                                    <!-- 客戶ID -->
+                                    <td align="center">{{row.CUST_NAME}}</td>
+                                    <!-- 客戶姓名 -->
+                                    <td align="center">{{row.CERT_NBR}}</td>
+                                    <!-- 憑證編號 -->
+                                    <td align="center">{{row.BOND_NBR}}</td>
+                                    <!-- 債卷代號 -->
+                                    <td>{{row.PROD_NAME}}</td>
+                                    <!-- 債卷名稱 -->
+                                    <td align="center">{{row.VALU_CRCY_TYPE | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+                                    <!-- 商品幣別 -->
+                                    <td align="right">{{row.DENO_AMT | number : 0}}</td>
+                                    <!-- 庫存面額 -->
+                                    <td align="right">{{row.INV_AMT_TWD | number : 2}}</td>
+                                    <!-- 信托金額 -->
+                                    <td align="right">{{row.REF_PRICE | number : 4}}</td>
+                                    <!-- 參考贖回報價 -->
+                                    <!-- <td align = "right">{{row.T_DIV_TWD | number : 0}}</td> -->
+                                    <!-- 累積現金配息  -->
+                                    <!-- <td align = "right">{{row.PRE_INT | number : 0}}</td>	 -->
+                                    <!-- 應收前手息 -->
+                                    <!-- <td align = "right">{{row.RTN_RATE_WD_TWD | number : 2}}</td> -->
+                                    <!-- 含息報酬率  -->
+<!-- 上[2080] 退[2073]                                    <td align="right">{{row.RTN_RATE_WD | number : 2}}</td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+                        <table align="left" style="width:30%">
+                            <thead>
+                                <h4>幣別合計</h4>
+                                <tr>
+                                    <th>幣別</th>
+                                    <th>庫存面額</th>
+                                    <th>信託本金</th>
+                                    <!-- <th>累積現金配息</th> -->
+                                    <!-- <th>應收前手息</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="repeat-row" ng-repeat="(key, data) in resultList | orderBy: 'VALU_CRCY_TYPE' | groupBy: 'VALU_CRCY_TYPE'">
+                                    <td>{{key | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+                                    <td align="right">{{getSum(data, 'DENO_AMT') | number : 0}}</td>
+                                    <!-- 庫存面額 -->
+                                    <td align="right">{{getSum(data, 'INV_AMT_TWD') | number : 2}}</td>
+                                    <!-- 信托金額 -->
+                                    <!-- <td align = "right">{{getSum(data, 'T_DIV_TWD') | number : 0}}</td> -->
+                                    <!-- 累積現金配息 -->
+                                    <!-- <td align = "right">{{getSum(data, 'PRE_INT') | number : 0}}</td>-->
+                                    <!-- 應收前手息 -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+            <!-- 分頁 -->
+        </div>
+    </div>
+    <!-- 結果區 -->
+</div>

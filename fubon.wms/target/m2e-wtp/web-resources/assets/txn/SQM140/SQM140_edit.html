@@ -1,0 +1,140 @@
+<style>
+.modal-dialog.SQM140_edit{
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: auto;
+}
+.SQM140_edit table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.SQM140_edit.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SQM140_edit_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.SQM140_edit .no_happy {
+	background-color: 	#FFFF00;
+}
+.SQM140_edit .happy {
+	background-color:  #FFFFFF;
+}
+</style>
+
+<div ng-controller="SQM140_editController" ng-cloak>
+	<div class="modal-dialog SQM140_edit">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">滿意度問卷修改</h4>
+			</div>
+			<div class="modal-body">
+				<table style="width:100%" >
+					<tr>
+<!-- 						<th>業務處：</th> -->
+<!-- 						<td><input type="text" ng-model="inputVO.region_center_id" style="width: 100px; "/></td> -->
+<!-- 						<th>營運區：</th> -->
+<!-- 						<td><input type="text" ng-model="inputVO.branch_area_id" style="width: 100px; "/></td> -->
+<!-- 						<th>分行別：</th> -->
+<!-- 						<td><input type="text" ng-model="inputVO.branch_nbr" style="width: 100px; "/></td> -->
+						<th>分行別：</th>
+						<td style="width: 200px;" >
+							<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-readonly="disableBranchCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							width="150px"
+							style="line-height:20px;" />
+						</td>
+						<th>員編：</th>
+						<td><input type="text" ng-model="inputVO.emp_id" style="width: 100px; "/></td>
+						<th>應結案日期：{{END_DATE}}</th>
+						<th>客戶ID：{{inputVO.cust_id}}</th>
+						<th>客戶姓名：{{inputVO.cust_name}}</th>
+						
+					</tr>
+				</table>
+				<p>
+				<table>
+					<tr>
+						<th>{{inputVO.qtnType | mapping:QTN_LIST}}問卷：</th>	
+					</tr>
+				</table>	
+				<div class="gv_tab_sc" >
+					<table class="e-table-freeze table td_center" e-height="535px" e-mode="1" e-top="true" e-list="totalList"  style="width:100%;">
+						<thead>
+							<tr>
+								<td class="repeat-row" style="height:10%;width: 300px;background-color: #FFDDAA !important;color:#000000;border: 1px solid black !important;" ng-repeat="row in column track by $index" align="center" valign="middle" >
+									{{row.QST_DESC}}
+								</td>	
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="repeat-row" style="border: 1px solid black !important;" ng-class="{'no_happy': (row.ANSWER == '4' || row.ANSWER == '5' || row.ANSWER == '6'), 'happy': !(row.ANSWER == '4' || row.ANSWER == '5' || row.ANSWER == '6')}" ng-repeat="row in column track by $index" align='center' valign="middle" >
+									{{((inputVO.qtnType == 'WMS01' && row.QST_ORDER == 11) ||
+									   (inputVO.qtnType == 'WMS02' && row.QST_ORDER == 13) || 
+									   (inputVO.qtnType == 'WMS03' && row.QST_ORDER == 17) || 
+									   (inputVO.qtnType == 'WMS04' && row.QST_ORDER == 13)     ? row.ANSWER : '') | mapping:ANS_TYPE_PUSH:'F3'}}
+									{{((inputVO.qtnType == 'WMS01' && row.QST_ORDER != 11) || 
+									   (inputVO.qtnType == 'WMS02' && row.QST_ORDER != 13) ||
+									   (inputVO.qtnType == 'WMS03' && row.QST_ORDER != 17) ||
+									   (inputVO.qtnType == 'WMS04' && row.QST_ORDER != 13)    ? row.ANSWER : '') | mapping:ANS_TYPE:'F3'}}
+									{{(inputVO.qtnType == 'WMS05' ? row.ANSWER : '') | mapping:ANS_TYPE:'F3'}}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p>
+				<div>
+					<table style="width:100%">
+						<thead>
+							<tr>
+								<th>客戶質化意見：</th>	
+							</tr>
+						<thead>
+						<tbody>
+							<tr>
+								<td><textarea id="text" name="text" class="form-control" ng-model="inputVO.resp_note" style="width: 100%; height: 200px" e-length-limit="200"></textarea></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" >儲存</button>
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

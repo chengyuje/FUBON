@@ -1,0 +1,61 @@
+<style>
+/* dialog panl */
+.modal-dialog.ORG120_REVIEW {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 950px;
+	height: auto;
+}
+</style>
+<div>
+	<div ng-controller="ORG120_REVIEWController" ng-cloak>
+		<div class="modal-dialog ORG120_REVIEW">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">異動歷程</h4>
+				</div>
+				<div class="modal-body">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table style="text-align:center;">
+							<thead>
+								<tr>
+									<th>員工編號</th>
+									<th>AO Code</th>
+									<th>型態</th>
+									<th>副Code理由</th>
+									<th>掛CODE日期</th>
+									<th>業績生效日(掛GOAL日)</th>
+									<th>異動註記</th>
+									<th>主管覆核狀態</th>
+									<th>異動人員</th>
+									<th>異動時間</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in reviewList track by $index">
+									<td>{{row.EMP_ID}}</td>
+									<td>{{row.AO_CODE}}</td>
+									<td>{{(row.TYPE | mapping:mappingSet['ORG.AOCODE_TYPE']:'F3')}}</td>
+									<td>{{(row.AO_CODE_ATCH_REASON | mapping:mappingSet['ORG.ATCH_REASON']:'F3')}}</td>
+									<td>{{toJsDate(row.ACTIVE_DATE) | date:"yyyy-MM-dd"}}</td>
+									<td>{{toJsDate(row.PERF_EFF_DATE)| date:"yyyy-MM-dd"}}</td>
+									<td>{{(row.ACT_TYPE | mapping:mappingSet['COMMON.ACT_TYPE']:'F3')}}</td>
+									<td>{{(row.REVIEW_STATUS | mapping:mappingSet['COMMON.REVIEW_STATUS']:'F3')}}</td>
+									<td>{{row.CREATOR}}</td>
+									<td>{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" function-type="maintenance">確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

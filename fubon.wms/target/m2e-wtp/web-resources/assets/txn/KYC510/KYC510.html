@@ -1,0 +1,147 @@
+<style>
+<!--
+.search_table_spacing{
+	width: 20%;
+}
+-->
+.search_table{
+	align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/KYC510/KYC510.js"></script>
+<script type="text/javascript" src="assets/txn/KYC510/KYC510_edit.js"></script>
+
+<div ng-controller="KYC510Controller" ng-cloak>
+    <div class="tfb_content">
+      <div class="tfb_content_icon"></div>
+      <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a16.gif" >資料查詢 </div>
+    </div>
+    <!--Content of the panel-->
+    <div class="panel_content">
+      <div class="search_table">
+      <table style="width: 10%; margin-left: 36.5%; margin-right: auto;">
+      <tr>
+      	<th class="search_table_spacing">問卷名稱：</th>
+      	<td>
+      		<input id="exam_name" name="exam_name" type="text" placeholder="請輸入..." ng-model="inputVO.EXAM_NAME" width="30%">
+      	</td>
+      </tr>
+      <tr>
+      	<th class="search_table_spacing">版次：</th>
+      	<td>
+      		<input id="exam_version" name="exam_version" type="text" placeholder="請輸入..." ng-model="inputVO.EXAM_VERSION" width="30%">
+      	</td>
+      </tr>
+      <tr>
+      	<th class="search_table_spacing">問卷類別︰</th>
+      	<td>
+      		<e-combobox id="quest_type" name="quest_type"
+								ng-paramtype="KYC.PRO_TYPE"
+								ng-model="inputVO.PRO_TYPE"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="300px"
+								style="line-height:20px;" />
+      	</td>
+      </tr>
+      <tr>
+      	<th class="search_table_spacing">問卷狀態：</th>
+      	<td>
+      		<e-combobox id="status" name="status"
+						ng-paramtype="PRO.QUEST_STATUS"
+						ng-model="inputVO.STATUS"
+						ng-validate="false"
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false"
+						width="300px"
+						style="line-height:20px;" />
+      	</td>
+      </tr>
+      <tr>
+      	<th class="search_table_spacing">最後修改日期：</th>
+      	<td>
+			<div class="input-group datebox datewidth">
+				<input type="text" id="lastupdate" name="lastupdate"
+						class="form-control"
+						uib-datepicker-popup="yyyy/MM/dd"
+						ng-model="inputVO.LASTUPDATE"
+						is-open="model.a"
+						datepicker-options="bgn_sDateOptions"
+						ng-readonly="true"
+						/>
+					<!-- 製作日曆button -->
+				<span class="input-group-btn">
+					<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+						<i class="glyphicon glyphicon-calendar"></i>
+					</button>
+				</span>
+			</div>
+      	</td>
+      </tr>
+      </table>
+      </div>
+      <div class="search_box_btn text-center">
+		<button ng-click="queryData()" class="btn btn-info">查詢</button>
+		<button ng-click="btnClear()" class="btn btn-info">清除</button>
+		<button ng-click="addQuestionnaire()" class="btn btn-info">新增問卷</button>
+	</div>
+      <div class="text-right">
+        <e-jumping input="inputVO"
+					output="outputVO"
+					list="questionList"
+					query="queryData()"
+					>
+		</e-jumping>
+      </div>
+      <div class="gv_tab_sc scroll_y">
+        <table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true">
+        <thead>
+          <tr>
+            <th width="150px">功能</th>
+            <th>問卷名稱</th>
+            <th>版次</th>
+            <th>問卷狀態</th>
+            <th>啟用日期</th>
+            <th>失效日期</th>
+            <th>最後維護者</th>
+            <th>最後修改日期</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="row in questionList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+            <td align="center">
+	            <e-combobox id="edit" name="edit"
+								ng-datasource="row.edit"
+								ng-model="row.editto"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="edit(row)"
+								width="100px"
+								style="line-height:20px;"
+								 />
+            </td>
+            <td align="center">{{row.EXAM_NAME}}</td>
+            <td align="center">{{row.EXAM_VERSION}}</td>
+            <td align="center">{{row.STATUS|mapping:questtypelist:F3}}</td>
+            <td align="center">{{row.ACTIVE_DATE}}</td>
+            <td align="center">{{row.EXPIRY_DATE}}</td>
+            <td align="center">{{row.MODIFIER}}</td>
+            <td align="center">{{row.LASTUPDATE}}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+
+
+</div>

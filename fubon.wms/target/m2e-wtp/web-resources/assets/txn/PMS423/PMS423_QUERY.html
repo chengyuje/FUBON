@@ -1,0 +1,68 @@
+<style>
+.modal-dialog.PMS423_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+/* table size */
+.PMS423_UPLOAD table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/PMS423/PMS423_UPLOAD.js"></script>
+<div class="PMS423_UPLOAD" ng-controller="PMS423_UPLOADController" ng-cloak>
+	<table>
+		<tr>				
+			<th style="padding-left:40%; width:50%;">資料年月: </th>
+			<td style="padding-right:25%; width:50%;">
+			<e-combobox id="DATE_LIST" name="DATE_LIST"
+						ng-datasource="mappingSet['DATE_LIST']"
+						ng-model="inputVO.data_date" 
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false" 
+						ng-format="F3"
+						ng-required="true" 
+						width="100px" 
+						style="line-height:20px;" />
+				
+			</th>
+		</tr>
+	</table>
+	<br>
+	<div class=" text-center">
+		<button type="button" class="btn btn-info" ng-click="query()" function-type="query">查詢</button>
+		<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+		<button type="button" class="btn btn-info" ng-click="delete()">刪除</button>
+	</div>
+	<br>
+	<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+		<table class="table-bordered middle">
+			<thead>
+				<tr>
+					<th>資料年月</th>
+					<th>角色名稱</th>
+					<th>存款不含台定增量目標</th>
+					<th>投保不含黃金存摺增量目標</th>
+					<th>EIP客戶增量目標</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in resultList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					<td>{{row.YYYYMM}}</td>
+					<td>{{row.ROLE_NAME}}</td>
+					<td>{{row.WK_GOAL_DEP}}</td>
+					<td>{{row.WK_GOAL_INV}}</td>
+					<td>{{row.WK_GOAL_EIP}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,190 @@
+<style>
+/* open dialog */
+.ngdialog.PRD280_SI {
+	
+}
+/* dialog panl */
+.modal-dialog.PRD280_SI {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+.modal-dialog.PRD280_SI_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 300px;
+	height: auto;
+}
+.modal-dialog.PRD280_SI_UPLOAD_TEMP {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 300px;
+	height: auto;
+}
+/* table size */
+.PRD280_SI table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PRD280_SI table.little{
+	width: 60%;
+}
+/* change row */
+.PRD280_SI.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PRD280_SI_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD280/PRD280_SI.js"></script>
+<script type="text/javascript" src="assets/txn/PRD280/PRD280_SI_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PRD280/PRD280_SI_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PRD280/PRD280_SI_UPLOAD_TEMP.js"></script>
+<script type="text/javascript" src="assets/txn/PRD280/PRD280_SI_UPLOAD_CUSTOMER_LEVEL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD280/PRD280_SI_UPLOAD_PROJECT.js"></script>
+<div class="PRD280" ng-controller="PRD280_SIController" ng-cloak>
+	<div class="search_table search_box3">
+		<table>
+			<tr>
+				<th>SI代碼：</th>
+				<td><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="prd_id" name="prd_id" ng-model="inputVO.prd_id" e-length-limit="16"></td>
+				<td>
+					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<div style="float: left">
+<!-- 						<button type="button" class="btn btn-info" ng-click="edit()" function-type="maintenance">新增</button> -->
+						<button type="button" class="btn btn-info" ng-click="upload()" function-type="export">整批上傳</button>
+						<button type="button" class="btn btn-info" ng-click="uploadTemp()" function-type="export">臨時新增商品</button>
+						<button type="button" class="btn btn-info" ng-click="download()" function-type="export">下載CSV</button>
+						<button type="button" class="btn btn-success" ng-click="downloadProject()" function-type="export" >下載專案參數</button>
+						<button type="button" class="btn btn-success" ng-click="uploadProject()" function-type="export" >上傳專案參數</button>			
+						<button type="button" class="btn btn-info" ng-click="downloadCustomerLevel()" function-type="export" >下載客群參數</button>
+						<button type="button" class="btn btn-info" ng-click="uploadCustomerLevel()" function-type="export" >上傳客群參數</button>
+					</div>
+					<div style="float: right" ng-if="conDis">
+						<button type="button" class="btn btn-info" ng-click="review('Y')" function-type="confirm">核可</button>
+						<button type="button" class="btn btn-info" ng-click="review('N')" function-type="confirm">退回</button>
+					</div>
+					<div style="clear: both;"></div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!-- 結果區 -->
+	<h4 class="h4-title">查詢結果</h4>
+	<e-jumping-once output="outputVO" list="data" totallist="roleList"></e-jumping-once>
+	<div class="gv_tab_sc" style="white-space: nowrap;min-height:235px;overflow-x: auto;">
+		<table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data">
+			<thead>
+				<tr>
+					<th>
+						<label style="font-weight: initial;margin-bottom: 0px;" function-type="confirm">
+							<input type='checkbox' ng-model='checkVO.clickAll' ng-change='checkrow()' /> 本頁全選
+						</label>
+					</th>
+					<th>功能</th>
+					<th>覆核狀態</th>
+					<th>SI代碼</th>
+					<th>SI名稱</th>
+					<th>開始受理贖回日</th>
+					<th>固定配息率</th>
+					<th>固定配息期間</th>
+					<th>浮動配息率</th>
+					<th>幣轉</th>
+					<th>連結標的</th>
+					<th>CNR分配率</th>
+					<th>銀行收益率</th>
+					<th>計績檔次</th>
+					<!-- <th>狀態</th> -->
+					<th>股債類型</th>
+					<th>保本率</th>
+					<th>最低申購金額</th>
+					<th>申購單位金額</th>
+					<th>專案名稱</th>
+					<th>客群名稱</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in data track by $index">
+					<td ng-if="row.REVIEW_STATUS == 'W' && row.CREATOR != currUser" class="td_center">
+						<label style="font-weight: initial;margin-bottom: 0px;" function-type="confirm">
+							<input type='checkbox' ng-model='row.SELECTED'>勾選
+						</label>
+					</td>
+					<td ng-if="!(row.REVIEW_STATUS == 'W' && row.CREATOR != currUser)"></td>
+					<td ng-if="row.REVIEW_STATUS == 'W'"></td>
+					<td ng-if="row.REVIEW_STATUS != 'W'">
+						<div function-type="maintenance">
+							<e-combobox id="cmbAction" name="cmbAction"
+							ng-datasource="row.set"
+							ng-model="row.cmbAction"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="action(row)"
+							width="100px"
+							style="line-height:20px;" />
+						</div>
+					</td>
+					<td>{{row.REVIEW_STATUS == 'W' ? '覆核中' : '已覆核'}}</td>
+					<td>{{row.PRD_ID}}</td>
+					<td>{{row.SI_CNAME}}</td>
+					<td>{{toJsDate(row.START_DATE_OF_BUYBACK) | date:"yyyy-MM-dd"}}</td>
+					<td>{{row.FIXED_DIVIDEND_RATE ? row.FIXED_DIVIDEND_RATE + '%' : row.FIXED_DIVIDEND_RATE}}</td>
+					<td>{{row.FIXED_RATE_DURATION}}</td>
+					<td>{{row.FLOATING_DIVIDEND_RATE ? row.FLOATING_DIVIDEND_RATE + '%' : row.FLOATING_DIVIDEND_RATE}}</td>
+					<td>{{row.CURRENCY_EXCHANGE}}</td>
+					<td>{{row.INVESTMENT_TARGETS}}</td>
+					<td class="td_right">{{row.CNR_YIELD}}</td>
+					<td class="td_right">{{row.RATE_OF_RETURN}}</td>
+					<td>{{row.PERFORMANCE_REVIEW}}</td>
+<!-- 					<td ng-show="false">{{row.ACT_TYPE == 'A' ? '新增' : row.ACT_TYPE == 'M' ? '編輯' : '刪除'}}</td> -->
+<!-- 					<td ng-show="false"></td> -->
+					<!-- <td ng-if="row.REVIEW_STATUS == 'W'">{{row.ACT_TYPE == 'A' ? '新增' : row.ACT_TYPE == 'M' ? '編輯' : '刪除'}}</td>
+					<td ng-if="row.REVIEW_STATUS != 'W'"></td> -->	
+					<td>{{row.STOCK_BOND_TYPE | mapping:mappingSet['FPS.STOCK_BOND_TYPE']:'F3'}}</td>
+					<td>{{row.RATE_GUARANTEEPAY | number:2}}</td>
+					<td>{{row.BASE_AMT_OF_PURCHASE | number:2}}</td>
+					<td>{{row.UNIT_AMT_OF_PURCHASE | number:2}}</td>
+					<td>{{row.PROJECT | mapping:mappingSet['PRD.SI_PROJECT']:'F3':'true'}}</td>
+					<td>{{row.CUSTOMER_LEVEL | mapping:mappingSet['PRD.SI_CUSTOMER_LEVEL']:'F3':'true'}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

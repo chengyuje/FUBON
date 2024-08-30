@@ -1,0 +1,344 @@
+<style>
+	.tdpadding {
+		padding: 10px 5px 5px 5px;
+	}
+	
+	.alignleft {
+		text-align: left !important;
+	}
+	
+	.bigspace {
+		margin-left: 50px !important;
+	}
+	
+	.datewidth {
+		width: 180px !important;
+	}
+	
+	.search-table-outter {
+		overflow-x: scroll;
+	}
+	
+	.colwidth>thead>tr>th {
+		min-width: 150px;
+		white-space: nowrap;
+	}
+	
+	.rstable thead tr th {
+		vertical-align: middle;
+	}
+	</style>
+	<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+	<script type="text/javascript" src="assets/txn/PMS316/PMS316.js"></script>
+	
+	<div class="PMS316" ng-controller="PMS316Controller" ng-cloak>
+		<div>
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+				</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<div class="search_table search_box3">
+					<form name="parameterTypeEditForm" class="form-horizontal"
+						data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+						<table>
+							<tr>
+								<td><input type="radio" ng-model="inputVO.srchDate" ng-change="inputVO.time_type='0'"
+									value="1" ng-click="sdType()"> 依報表日期查詢：</td>
+								<td>
+									<div class="input-group datebox datewidth">									
+										<input type="text" id="sCreDate" name="sCreDate"
+												class="form-control"
+												uib-datepicker-popup="yyyy/MM/dd"
+												ng-model="inputVO.sCreDate"
+												is-open="model.a"
+												datepicker-options="bgn_sDateOptions"
+												ng-disabled="inputVO.srchDate == '2'"						
+												ng-readonly="true"								
+												ng-change="limitDate();dateChange()"/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>																		
+										</span>
+									</div>
+								</td>
+								<td colspan="4">
+									<input type="radio" ng-change="inputVO.time_type='0'"
+									ng-model="inputVO.srchDate" value="2" ng-click="sdType()"> 依計績月份累計： 
+									<e-combobox
+										id="dataMonth_S" name="dataMonth_S"
+										ng-datasource="ymList"
+										ng-model="inputVO.dataMonth_S" ng-validate="false"
+										ng-disabled="inputVO.srchDate == '1'"								
+										ng-change="dataMonthChange()"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										ng-required="inputVO.srchDate == '2'" width="150px"
+										style="line-height:20px;" /> 
+										
+									&nbsp;&nbsp;至&nbsp;&nbsp;
+									
+									<e-combobox id="dataMonth_E" name="dataMonth_E"
+										ng-datasource="ymList"
+										ng-model="inputVO.dataMonth_E" ng-validate="false"
+										ng-disabled="inputVO.srchDate == '1'"
+										ng-change="dataMonthChange()"
+										ng-readonly="false" ng-editable="false" ng-format="F3"
+										ng-required="inputVO.srchDate == '2'" width="150px"
+										style="line-height:20px;" />						
+							</td>
+							</tr>
+							<tr>
+								<th>業務處：</th>
+								<td><e-combobox id="region_center_id" name="region_center_id"
+												ng-datasource="REGION_LIST"
+												ng-model="inputVO.region_center_id"
+												ng-validate="false" 
+												ng-disabled="disableRegionCombo"
+												ng-readonly="disableRegionCombo" 
+												ng-editable="false"
+												ng-format="F3"
+												ng-required="false"
+												ng-change="ChangeRegion()"
+												width="200px"
+												style="line-height:20px;" /></td>
+								<th>營運區：</th>
+								<td><e-combobox id="branch_area_id" name="branch_area_id"
+												ng-datasource="AREA_LIST"
+												ng-model="inputVO.branch_area_id"
+												ng-validate="false" 
+												ng-disabled="disableAreaCombo"
+												ng-readonly="disableAreaCombo" 
+												ng-editable="false"
+												ng-format="F3"
+												ng-required="false"
+												ng-change="ChangeArea()"
+												width="200px"
+												style="line-height:20px;" /></td>
+								<th>分行：</th>
+								<td><e-combobox id="branch_nbr" name="branch_nbr"
+												ng-datasource="BRANCH_LIST"
+												ng-model="inputVO.branch_nbr"
+												ng-validate="false" 
+												ng-disabled="disableBranchCombo"
+												ng-readonly="disableBranchCombo" 
+												ng-editable="false"
+												ng-format="F1"
+												ng-required="false"
+												ng-change="ChangeBranch()"
+												width="150px"
+												style="line-height:20px;" /></td>
+							
+							</tr>
+						   <tr ng-show="inputVO.srchDate == '1'">
+						   <th>收益選擇方式: </th>
+							 <td><e-combobox id="income" name="income"
+											 ng-datasource="mappingSet['income']"
+											 ng-model="inputVO.income"
+											 ng-validate="false" 
+										     ng-editable="false"
+											 ng-format="F3"
+											 ng-disabled="inputVO.srchDate == 2"
+											 ng-required="false"
+											 ng-change="lock()"
+											 width="150px"
+											 style="line-height:20px;" /></td>
+						   </tr>
+					   </table>
+					</form>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info"
+						ng-click="inquireInit();query()">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+					<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+				</div>
+			</div>
+		</div>
+		<!-- 結果區 -->
+		<div>
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+				</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<e-jumping output="outputVO" input="inputVO" query="query()"
+					list="paramList"></e-jumping>
+				<div algin="left">
+					<table>
+						<tr>
+							<td>產出頻率：</td>
+							<td>每日</td>
+						</tr>
+						<tr>
+							<td>產出日：</td>
+							<td ng-if="paramList[0].CREATETIME">{{toJsDate(paramList[0].CREATETIME) | date:'yyyy/MM/dd'}}</td>
+							<td ng-if="!paramList[0].CREATETIME ">
+								<sl ng-if="inputVO.srchDate=='2' && inputVO.dataMonth_E!='' && inputVO.time_type=='1' ">
+									{{inputVO.dataMonth_E.substring(0,4)+'/'+inputVO.dataMonth_E.substring(4,6)+'/01'}}
+								</sl>
+								<sl ng-if="inputVO.srchDate=='1'  && inputVO.sCreDate!=undefinded &&  inputVO.time_type=='1'">
+									{{inputVO.sCreDate | date: 'yyyy/MM/dd'}}
+								</sl>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="gv_tab_sc scroll_y"
+					style="height: auto; white-space: nowrap;">
+					<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+						<thead>
+							<tr>
+								<th rowspan="2">業務處</th>
+								<th rowspan="2">營運區</th>
+								<th rowspan="2">分行代碼</th>
+								<th rowspan="2">分行名稱</th>
+								<th rowspan="2">組別</th>
+								<!--<th colspan="5" ng-if="inputVO.srchDate==2">投資</th>-->
+								<!-- <th colspan="5" ng-if="inputVO.srchDate==2">匯兌</th> -->
+								<!--<th colspan="5" ng-if="inputVO.srchDate==2">保險</th>
+								<th colspan="6" ng-if="inputVO.srchDate==2">合計</th>-->
+							   
+							    <th colspan="5" ng-if="inputVO.income == '' ">投資</th>
+								<th colspan="5" ng-if="inputVO.income == '' ">保險</th>
+								<th colspan="6" ng-if="inputVO.income == '' ">合計</th>
+								
+								<th colspan="5" ng-if="inputVO.income == 1">MTD投資</th>
+								<!-- <th colspan="5" ng-if="inputVO.income==1">MTD匯兌</th> -->
+								<th colspan="5" ng-if="inputVO.income == 1">MTD保險</th>
+								<th colspan="6" ng-if="inputVO.income == 1">MTD合計</th>
+							   
+	
+								<th colspan="5" ng-if="inputVO.income == 2">QTD投資</th>
+								<!-- <th colspan="5" ng-if="inputVO.income == 2">QTD匯兌</th> -->
+								<th colspan="5" ng-if="inputVO.income == 2">QTD保險</th>
+								<th colspan="6" ng-if="inputVO.income == 2">QTD合計</th>
+							
+								<!-- <th colspan="7" ng-if="inputVO.income==3">YTD投資</th>
+								<th colspan="5" ng-if="inputVO.income==3">YTD保險</th>
+								<th colspan="6" ng-if="inputVO.income==3">YTD合計</th> -->
+	
+								<th colspan="5" ng-if="inputVO.income == 3"">YTD投資</th>
+								<!-- <th colspan="5" ng-if="inputVO.income == 3">YTD匯兌</th> -->
+								<th colspan="5" ng-if="inputVO.income == 3"">YTD保險</th>
+								<th colspan="6" ng-if="inputVO.income == 3"">YTD合計</th>
+							</tr>
+							<tr>
+								<th>投資商品<br>戰報實績</th>
+								<!-- 
+								<th>匯兌損益<br>戰報實績</th>
+								<th>SI、SN、<br>海外債在<br>途件</th>
+								-->	
+								<th>投資<br>目標</th>
+								<th>已達<br>成率 </th>
+								<th>應達<br>成率</th>
+								<th>達成率</th>
+
+								<!-- <th>匯兌戰報<br>實績</th>
+								<th>匯兌<br>目標</th>
+								<th>已達<br>成率</th>
+								<th>應達<br>成率</th>
+								<th>達成率</th> -->
+
+								<th>保險戰報<br>實績</th>
+								<th>保險<br>目標</th>
+								<th>已達<br>成率</th>
+								<th>應達<br>成率</th>
+								<th>達成率</th>
+
+								<th>戰報實績</th>
+								<th>分行目標</th>
+								<th>已達<br>成率</th>
+								<th>應達<br>成率</th>
+								<th>達成率</th>							
+								<th>分組排名</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat-start=" (a, dataA) in paramList | groupBy: 'REGION_CENTER_NAME' as resultA">
+									<td rowspan="{{dataA.length+numGroups(resultB)*2+1}}" ng-show="a != 'TOTAL'">{{a}}</td>
+							</tr>
+							<tr ng-repeat-start=" (b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+									<td rowspan="{{dataB.length+1 }}" ng-show=" b != 'REGION' && b != 'TOTAL' ">{{b}}</td>
+							</tr>
+							<tr class="repeat-row" ng-repeat=" c in dataB" >
+								<td align="center" colspan="5" ng-show="c.BRANCH_NAME == 'TOTAL'">總計</td>
+								<td align="center" ng-show="c.BRANCH_NAME == 'REGION'" colspan="4">{{a}}合計</td>
+								<td align="center" ng-show="c.BRANCH_NAME == 'AREA'" colspan="3">{{b}}合計</td>
+								<td ng-show="c.BRANCH_NAME != 'AREA' && c.BRANCH_NAME != 'REGION' && c.BRANCH_NAME != 'TOTAL'">{{c.BRANCH_NBR}}</td>
+								<td ng-show="c.BRANCH_NAME != 'AREA' && c.BRANCH_NAME != 'REGION' && c.BRANCH_NAME != 'TOTAL'">{{c.BRANCH_NAME}}</td>
+								<td ng-show="c.BRANCH_NAME != 'AREA' && c.BRANCH_NAME != 'REGION' && c.BRANCH_NAME != 'TOTAL'">{{c.BRANCH_CLS}}</td>
+								<!--<td ng-show="c.BRANCH_NAME == 'AREA' ">{{c.BRANCH_CLS}}</td>-->
+
+								<!-- MTD -->
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_INV_SALE | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_INV_SALE_GOAL | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_INV_SALE_RATE | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_INV_SALE_RATE_MM | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' " ng-show='c.MTD_INV_SALE_RATE_MM == 0'>0.00%</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' " ng-show='c.MTD_INV_SALE_RATE_MM != 0'>{{c.MTD_INV_SALE_RATE_NOW | number:2}}%</td>
+									
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_INS_SALE | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_INS_SALE_GOAL | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_INS_SALE_RATE | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_INS_SALE_RATE_MM | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' " ng-show='c.MTD_INS_SALE_RATE_MM == 0'>0.00%</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' " ng-show='c.MTD_INS_SALE_RATE_MM != 0'>{{c.MTD_INS_SALE_RATE_NOW | number:2}}%</td>
+								
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_ALL_SALE | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_ALL_SALE_GOAL | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_ALL_SALE_RATE | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' ">{{c.MTD_ALL_SALE_RATE_MM | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' " ng-show='c.MTD_ALL_SALE_RATE_MM == 0'>0.00%</td>
+								<td align="right" ng-if="inputVO.income == 1 || inputVO.srchDate == '2' " ng-show='c.MTD_ALL_SALE_RATE_MM != 0'>{{c.MTD_ALL_SALE_RATE_NOW | number:2}}%</td>
+								
+								<td align="center" ng-if="(inputVO.income == 1 && c.BRANCH_NAME != 'TOTAL') || (inputVO.srchDate == '2' && c.BRANCH_NAME != 'TOTAL' )">{{c.RANK_MTD_ALL_BY_CLS}}</td>
+								
+								<!-- YTD -->
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_INV_SALE | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_INV_SALE_GOAL | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_INV_SALE_RATE | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_INV_SALE_RATE_MM | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 3" ng-show='c.YTD_INV_SALE_RATE_MM == 0'>0.00%</td>
+								<td align="right" ng-if="inputVO.income == 3" ng-show='c.YTD_INV_SALE_RATE_MM != 0'>{{c.YTD_INV_SALE_RATE_NOW | number:2}}%</td>
+									
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_INS_SALE | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_INS_SALE_GOAL | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_INS_SALE_RATE | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_INS_SALE_RATE_MM | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 3" ng-show='c.YTD_INS_SALE_RATE_MM == 0'>0.00%</td>
+								<td align="right" ng-if="inputVO.income == 3" ng-show='c.YTD_INS_SALE_RATE_MM != 0'>{{c.YTD_INS_SALE_RATE_NOW | number:2}}%</td>
+								
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_ALL_SALE | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_ALL_SALE_GOAL | number:0}}</td>
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_ALL_SALE_RATE | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 3">{{c.YTD_ALL_SALE_RATE_MM | number:2}}%</td>
+								<td align="right" ng-if="inputVO.income == 3" ng-show='c.YTD_ALL_SALE_RATE_MM == 0'>0.00%</td>
+								<td align="right" ng-if="inputVO.income == 3" ng-show='c.YTD_ALL_SALE_RATE_MM != 0'>{{c.YTD_ALL_SALE_RATE_NOW | number:2}}%</td>
+								
+								<td align="center" ng-if="inputVO.income == 3 && c.BRANCH_NAME != 'TOTAL'">{{c.RANK_YTD_ALL_BY_CLS}}</td>
+							</tr>
+							<tr ng-repeat-end> </tr>
+							<tr ng-repeat-end> </tr>
+						</tbody>
+					</table>
+				</div>
+					<div algin="left">
+					<table>
+						<tr>
+							<td align="right">說明：</td>
+							<td align="left"></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<!-- 結果區 -->
+	</div>

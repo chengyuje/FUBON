@@ -1,0 +1,116 @@
+<script type="text/javascript" src="assets/txn/PMS353/PMS353.js"></script>
+<script type="text/javascript" src="assets/txn/PMS353/PMS353_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS353/PMS353_LEADS.js"></script>
+
+
+<style>
+/* open dialog */
+.ngdialog.PMS353_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS353_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* table size */
+.PMS353_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS353_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS353_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+
+<div class="container-fluid" > <!-- InstanceBeginEditable name="navbar" --> <!-- InstanceEndEditable --> 
+  <!-- content --> 
+  <!-- InstanceBeginEditable name="Content" -->
+ <div ng-controller="PMS353Controller" ng-cloak>
+  <div class="tfb_content">
+    <div class="tfb_content_icon"></div>
+    <div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >IPO戰報參數設定主頁</div>
+  </div>
+  <div class="panel_content">
+ <a href="#myModal1" ng-click="sys({},1)" data-toggle="modal" class="btn btn-primary">新增參數設定</a> 
+    <div class="gv_tab_sc">
+    <br/><br/>
+      <div class="gv_tab_btn">
+       
+      </div>
+     
+        	<e-jumping output="outputVO"
+				input="inputVO"
+				query="inquire()" list="paramList"></e-jumping>
+     
+     
+    </div>
+    <div class="gv_tab_sc scroll_y">
+      <table class="tablesaw table table-striped table-bordered" >
+      <thead>
+        <tr>
+        <th colspan="6">已設定參數列表</th>
+        </tr>
+        
+        <tr>
+          <th>項次</th>
+          <th>專案名稱</th>
+          <th>活動區間</th>
+          <th>建立時間</th>
+          <th>建立人員</th>
+          <th>維護</th>
+       
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+          	<td align="center">{{row.NUM}}</td>
+			
+			<td align="center">{{row.PRJ_NAME}}</td>
+			<td align="center">{{toJsDate(row.START_DT) | date:"yyyy-MM-dd"}}~{{toJsDate(row.END_DT) | date:"yyyy-MM-dd"}}</TD>
+			<td align="center">{{row.CREATETIME}}</TD>
+			
+			<td align="center">{{row.CREATOR}}</TD>
+			          	
+			
+			<td align="center"><a href="#" data-toggle="modal" class="btn btn-warning btn-circle" ng-click="sys(row,2)"><i class="glyphicon glyphicon-pencil"></i></a>
+			&nbsp;&nbsp;&nbsp;
+			<button type="button" class="btn btn-danger btn-circle" ng-click="del(row)"><i class="glyphicon glyphicon-trash"></i></button></td>
+        </tr>
+      </tbody>
+      </table>
+    </div>
+  </div>
+  
+ 
+</div>
+  <!-- InstanceEndEditable --> 
+  <!-- ./content --> 
+</div>

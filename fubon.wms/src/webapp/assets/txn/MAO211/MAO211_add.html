@@ -1,0 +1,60 @@
+
+<style>
+/* dialog panl */
+.modal-dialog.MAO211_add {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 950px;
+	height: auto;
+}
+</style>
+<div>
+	<div ng-controller="MAO211_addController" ng-cloak>
+		<div class="modal-dialog MAO211_add">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">新增關係人</h4>
+				</div>
+				<div class="modal-body">
+				<e-jumping-once output="outputVO" list="data" totallist="addList"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th></th>
+									<th>客戶姓名</th>
+									<th>客戶ID</th>
+									<th>關係戶</th>
+									<th>分行</th>
+									<th>服務理專</th>
+									<th>服務UHRM</th>
+									<th>歸戶服務(主戶)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in data">
+									<td><input type="checkbox" ng-model="row.SELECTED"></td>
+									<td>{{row.CUST_NAME}}</td>
+									<td>{{row.CUST_ID}}</td>
+									<td>{{row.REL_TYPE | mapping:mappingSet['CRM.REL_TYPE']:'F3'}}</td>
+									<td>{{row.BRA_NBR | mapping:mappingSet['branch_nbr_all']:'F3'}}</td>
+									<td>{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+									<td>{{row.UEMP_ID}}-{{row.UEMP_NAME}}</td>
+									<td>{{row.JOIN_SRV_CUST_ID}}{{(row.JOIN_SRV_CUST_ID != '' && row.JOIN_SRV_CUST_ID != null  ? "-" : "")}}{{row.JOIN_SRV_CUST_NAME}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="add()" >加入清單</button>
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

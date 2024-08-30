@@ -1,0 +1,490 @@
+<style>
+.FPS940_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.FPS940_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_FPS940_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.FPS940_DETAIL .alignRight{
+	text-align: right;
+}
+.FPS940_DETAIL .old_not_same {
+	border: 1px solid red !important;
+}
+</style>
+<div ng-controller="FPS940_DETAILController" ng-cloak>
+	<div class="modal-dialog FPS940_DETAIL" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">其他參數</h4>
+			</div>
+			<div class="modal-body">
+				<table>
+					<tr>
+						<th>
+							<div style="float: left !important;margin-top: 3px;">
+								資料年月：{{inputVO.date | date:"yyyy/MM"}}&emsp;&emsp;&emsp;
+								生效日：
+							</div>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="date" name="date" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+									class="form-control"
+									ng-class="{'old_not_same': confirm_check_obj && toJsDate(confirm_check_obj.EFFECT_START_DATE).getTime() != inputVO.date.getTime()}"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.date"
+									is-open="model.a"
+									datepicker-options="dateOptions"
+									ng-readonly="true" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</th>
+					</tr>
+				</table>
+				<br>
+				<div class="e_panel_table scroll_y">
+					<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+						<table class="table">
+							<thead>
+								<tr>
+									<th width="30%">分類</th>
+									<th width="30%" colspan="2">項目說明</th>
+									<th width="15%">參數</th>
+									<th width="10%">單位</th>
+									<th width="15%">備註</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>財神-理專首頁《待理財規劃客戶門檻》</td>
+									<td colspan="2">(存款-預定保費支出-預期貸款支出) >=</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.PLAN_AMT_1) != parseFloat(inputVO.plan_amt_1)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="plan_amt_1" name="plan_amt_1" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.plan_amt_1" e-input-limit="NN" e-length-limit="4" required>
+									</td>
+									<td>新台幣/萬元</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>財神-客戶首頁《資產負債總覽》區塊</td>
+									<td colspan="2">(存款-預定保費支出-預期貸款支出) >=</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.PLAN_AMT_2) != parseFloat(inputVO.plan_amt_2)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="plan_amt_2" name="plan_amt_2" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.plan_amt_2" e-input-limit="NN" e-length-limit="4" required>
+									</td>
+									<td>新台幣/萬元</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td style="vertical-align: middle;">財神-待理財規劃客戶名單邏輯</td>
+									<td colspan="2">排除過去</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.GEN_LEAD_PARA1) != parseFloat(inputVO.gen_lead_para1)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="gen_lead_para1" name="gen_lead_para1" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.gen_lead_para1" e-input-limit="NN" e-length-limit="3" required>
+									</td>
+									<td>週M紀錄</td>
+									<td>檢視理專M紀錄</td>
+								</tr>
+								<tr>
+									<td>理財規劃</td>
+									<td colspan="2">認定為失效的狀態</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.FAIL_STATUS) != parseFloat(inputVO.fail_status)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="fail_status" name="fail_status" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.fail_status" e-input-limit="NN" e-length-limit="3" required>
+									</td>
+									<td>週</td>
+									<td></td>
+								</tr>
+								<!-- <tr rowspan="2">
+									<td rowspan="2" style="vertical-align: middle;">效率前緣</td>
+									<td colspan="2">逐檔標的比例下限</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.EFFICIENT_LIMIT) != parseFloat(inputVO.efficient_limit)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="efficient_limit" name="efficient_limit" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.efficient_limit" e-input-limit="NUU" nuu1="3" nuu2="2" required>
+									</td>
+									<td>%</td>
+									<td></td>
+								</tr> -->
+								<!-- <tr>
+									<td colspan="2">預設執行的點個數</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.EFFICIENT_POINTS) != parseFloat(inputVO.efficient_points)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="efficient_points" name="efficient_points" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.efficient_points" e-input-limit="NN" e-length-limit="4" required>
+									</td>
+									<td>個</td>
+									<td></td>
+								</tr> -->
+								<!-- <tr>
+									<td style="vertical-align: middle;">存款商品幣別設定</td>
+									<td colspan="2" style="vertical-align: middle;">理財規劃科PM維護可查詢幣別參數資料，只有可查詢的商品會顯示在此頁面上</td>
+									<td>
+										<div ng-class="{'old_not_same': confirm_check_obj && !same_chkCode}">
+											<label>
+												<input ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" type='checkbox' ng-model='clickAll' ng-change='checkrow()'> 全部
+												&nbsp;&nbsp;
+											</label>
+											<label ng-repeat="curcode in DEPOSIT_CUR">
+												<input ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" type="checkbox" name="selectedCodes[]" value="{{curcode.DATA}}" ng-checked="chkCode.indexOf(curcode.DATA) > -1" ng-click="toggleSelection(curcode.DATA)"> {{curcode.LABEL}}
+												&nbsp;&nbsp;
+											</label>
+										</div>
+									</td>
+									<td></td>
+									<td></td>
+								</tr> -->
+								<!-- <tr>
+									<td>全資產規劃_有投保部位波動度警示值檢視門檻</td>
+									<td colspan="2">基股商品AUM >=</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.FUND_AUM) != parseFloat(inputVO.fund_aum)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="fund_aum" name="fund_aum" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.fund_aum" e-input-limit="NN" e-length-limit="4" required>
+									</td>
+									<td>新台幣/萬元</td>
+									<td></td>
+								</tr> -->
+								<!-- <tr>
+									<td>全資產規劃_有投保部位rebalance儲蓄型保險+存款部位建議</td>
+									<td colspan="2">存款 ></td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.DEPOSIT_AUM) != parseFloat(inputVO.deposit_aum)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="deposit_aum" name="deposit_aum" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.deposit_aum" e-input-limit="NN" e-length-limit="3" required>
+									</td>
+									<td>新台幣/萬元</td>
+									<td></td>
+								</tr> -->
+								<tr rowspan="3">
+									<td rowspan="3" style="vertical-align: middle;">全資產規劃_有投保部位固定收益商品配置邏輯</td>
+									<td colspan="2">SI最低申購門檻</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.SISN_BASE_PURCHASE) != parseFloat(inputVO.sisn_base_purchase)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="sisn_base_purchase" name="sisn_base_purchase" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.sisn_base_purchase" e-input-limit="NN" e-length-limit="3" required>
+									</td>
+									<td>萬美元</td>
+									<td>換算成約當臺幣</td>
+								</tr>
+								<tr>
+									<td colspan="2">海外債最低申購金額</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.BOND_BASE_PURCHASE) != parseFloat(inputVO.bond_base_purchase)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="bond_base_purchase" name="bond_base_purchase" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.bond_base_purchase" e-input-limit="NN" e-length-limit="3" required>
+									</td>
+									<td>萬美元</td>
+									<td>換算成約當臺幣</td>
+								</tr>
+								<tr>
+									<td colspan="2">匯率變動彈性</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.EXCHANGE_RATE) != parseFloat(inputVO.exchange_rate)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="exchange_rate" name="exchange_rate" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.exchange_rate" e-input-limit="NN" e-length-limit="3" required>
+									</td>
+									<td>%</td>
+									<td>預留匯率變動彈性</td>
+								</tr>
+								<tr rowspan="2">
+									<td rowspan="2" style="vertical-align: middle;">目標理財-目標規劃進度落後</td>
+									<td colspan="2">紅燈：達成率 <</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.SPP_ACHIVE_RATE_1) != parseFloat(inputVO.spp_achive_rate_1)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="spp_achive_rate_1" name="spp_achive_rate_1" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.spp_achive_rate_1" e-input-limit="NUU" nuu1="3" nuu2="2" required>
+									</td>
+									<td>%</td>
+									<td>不為紅燈或綠燈情況即為黃燈</td>
+								</tr>
+								<tr>
+									<td colspan="2">綠燈：達成率 >=</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.SPP_ACHIVE_RATE_2) != parseFloat(inputVO.spp_achive_rate_2)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="spp_achive_rate_2" name="spp_achive_rate_2" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.spp_achive_rate_2" e-input-limit="NUU" nuu1="3" nuu2="2" required>
+									</td>
+									<td>%</td>
+									<td>不為紅燈或綠燈情況即為黃燈</td>
+								</tr>
+								<!-- <tr>
+									<td>無風險利率</td>
+									<td colspan="2">無風險利率</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.RF_RATE) != parseFloat(inputVO.rf_rate)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="rf_rate" name="rf_rate" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.rf_rate" e-input-limit="NUU" nuu1="4" nuu2="4" required>
+									</td>
+									<td>%</td>
+									<td>夏普指數使用2年期台灣公債利率</td>
+								</tr> -->
+								<tr>
+									<td>全資產規劃_step1確認理財規劃金額</td>
+									<td colspan="2">可供理財規劃金額>=</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.AVAILABLE_AMT) != parseFloat(inputVO.available_amt)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="available_amt" name="available_amt" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.available_amt" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣/萬元</td>
+									<td></td>
+								</tr>
+								<!-- 目標理財-留遊學 -->
+								<tr rowspan="18">
+									<td rowspan="18" style="vertical-align: middle;">目標理財-留遊學</td>
+									<td rowspan="2" style="vertical-align: middle;">大學_公立</td>
+									<td>學費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.UNIVERSITY_FEE_1) != parseFloat(inputVO.university_fee_1)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="university_fee_1" name="university_fee_1" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.university_fee_1" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>生活費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.UNIVERSITY_COST_1) != parseFloat(inputVO.university_cost_1)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="university_cost_1" name="university_cost_1" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.university_cost_1" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td rowspan="2" style="vertical-align: middle;">大學_私立</td>
+									<td>學費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.UNIVERSITY_FEE_2) != parseFloat(inputVO.university_fee_2)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="university_fee_2" name="university_fee_2" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.university_fee_2" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>生活費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.UNIVERSITY_COST_2) != parseFloat(inputVO.university_cost_2)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="university_cost_2" name="university_cost_2" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.university_cost_2" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td rowspan="2" style="vertical-align: middle;">大學_留學</td>
+									<td>學費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.UNIVERSITY_FEE_3) != parseFloat(inputVO.university_fee_3)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="university_fee_3" name="university_fee_3" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.university_fee_3" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>生活費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.UNIVERSITY_COST_3) != parseFloat(inputVO.university_cost_3)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="university_cost_3" name="university_cost_3" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.university_cost_3" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td rowspan="2" style="vertical-align: middle;">碩士_公立</td>
+									<td>學費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.GRADUATED_FEE_1) != parseFloat(inputVO.graduated_fee_1)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="graduated_fee_1" name="graduated_fee_1" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.graduated_fee_1" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>生活費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.GRADUATED_COST_1) != parseFloat(inputVO.graduated_cost_1)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="graduated_cost_1" name="graduated_cost_1" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.graduated_cost_1" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td rowspan="2" style="vertical-align: middle;">碩士_私立</td>
+									<td>學費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.GRADUATED_FEE_2) != parseFloat(inputVO.graduated_fee_2)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="graduated_fee_2" name="graduated_fee_2" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.graduated_fee_2" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>生活費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.GRADUATED_COST_2) != parseFloat(inputVO.graduated_cost_2)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="graduated_cost_2" name="graduated_cost_2" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.graduated_cost_2" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td rowspan="2" style="vertical-align: middle;">碩士_留學</td>
+									<td>學費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.GRADUATED_FEE_3) != parseFloat(inputVO.graduated_fee_3)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="graduated_fee_3" name="graduated_fee_3" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.graduated_fee_3" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>生活費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.GRADUATED_COST_3) != parseFloat(inputVO.graduated_cost_3)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="graduated_cost_3" name="graduated_cost_3" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.graduated_cost_3" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td rowspan="2" style="vertical-align: middle;">博士_公立</td>
+									<td>學費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.DOCTORAL_FEE_1) != parseFloat(inputVO.doctoral_fee_1)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="doctoral_fee_1" name="doctoral_fee_1" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.doctoral_fee_1" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>生活費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.DOCTORAL_COST_1) != parseFloat(inputVO.doctoral_cost_1)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="doctoral_cost_1" name="doctoral_cost_1" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.doctoral_cost_1" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td rowspan="2" style="vertical-align: middle;">博士_私立</td>
+									<td>學費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.DOCTORAL_FEE_2) != parseFloat(inputVO.doctoral_fee_2)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="doctoral_fee_2" name="doctoral_fee_2" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.doctoral_fee_2" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>生活費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.DOCTORAL_COST_2) != parseFloat(inputVO.doctoral_cost_2)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="doctoral_cost_2" name="doctoral_cost_2" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.doctoral_cost_2" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td rowspan="2" style="vertical-align: middle;">博士_留學</td>
+									<td>學費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.DOCTORAL_FEE_3) != parseFloat(inputVO.doctoral_fee_3)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="doctoral_fee_3" name="doctoral_fee_3" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.doctoral_fee_3" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>生活費</td>
+									<td>
+										<input ng-class="{'old_not_same': confirm_check_obj && parseFloat(confirm_check_obj.DOCTORAL_COST_3) != parseFloat(inputVO.doctoral_cost_3)}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="doctoral_cost_3" name="doctoral_cost_3" class="form-control alignRight" type="text" placeholder="請輸入..." ng-model="inputVO.doctoral_cost_3" e-input-limit="NN" e-length-limit="8" required>
+									</td>
+									<td>新台幣元/年</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>總行推薦的特色說明</td>
+									<td colspan="2">總行推薦的特色說明</td>
+									<td>
+										<textarea ng-class="{'old_not_same': confirm_check_obj && confirm_check_obj.FEATURE_DESC != inputVO.feature_desc}" ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')" id="feature_desc" name="feature_desc" class="form-control" ng-model="inputVO.feature_desc" style="width: 100%; height: 50px" e-length-limit="1000"></textarea>
+									</td>
+									<td></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="table" style="align-self: center;">
+							<thead>
+								<tr>
+									<th width="20%">建議比例</th>
+									<th width="20%">≤ {{inputVO.cash_prepare_age_1}} 歲</th>
+									<th width="20%">
+										<input type="text" class="form-control" 
+											style="width:50px; display:inline; text-align: right;" 
+											e-input-limit="NUU" nuu1="3" nuu2="0" 
+											id="cash_prepare_age_1" name="cash_prepare_age_1" 
+											ng-model="inputVO.cash_prepare_age_1" 
+											ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											required> 歲 < 年齡 ≤ {{inputVO.cash_prepare_age_2}} 歲
+									</th>
+									<th width="20%">
+										<input type="text" class="form-control" 
+											style="width:50px; display:inline; text-align: right;" 
+											e-input-limit="NUU" nuu1="3" nuu2="0" 
+											id="cash_prepare_age_2" name="cash_prepare_age_2" 
+											ng-model="inputVO.cash_prepare_age_2" 
+											ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											required> 歲 < 年齡 ≤ {{inputVO.cash_prepare_age_3}} 歲
+									</th>
+									<th width="20%">> 
+										<input type="text" class="form-control" 
+											style="width:50px; display:inline; text-align: right;" 
+											e-input-limit="NUU" nuu1="3" nuu2="0" 
+											id="cash_prepare_age_3" name="cash_prepare_age_3" 
+											ng-model="inputVO.cash_prepare_age_3" 
+											ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											required> 歲
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td style="text-align: center;">上限</td>
+									<td style="text-align: center;">
+										<input type="text" class="form-control" 
+											style="width:180px; display:inline; text-align: right;" 
+											e-input-limit="NUU" nuu1="3" nuu2="0" 
+											id="cash_prepare_1" name="cash_prepare_1" 
+											ng-model="inputVO.cash_prepare_1" 
+											ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											required> %
+									</td>
+									<td style="text-align: center;">
+										<input type="text" class="form-control" 
+											style="width:180px; display:inline; text-align: right;" 
+											e-input-limit="NUU" nuu1="3" nuu2="0" 
+											id="cash_prepare_2" name="cash_prepare_2" 
+											ng-model="inputVO.cash_prepare_2" 
+											ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											required> %
+									</td>
+									<td style="text-align: center;">
+										<input type="text" class="form-control" 
+											style="width:180px; display:inline; text-align: right;" 
+											e-input-limit="NUU" nuu1="3" nuu2="0" 
+											id="cash_prepare_3" name="cash_prepare_3" 
+											ng-model="inputVO.cash_prepare_3" 
+											ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											required> %
+									</td>
+									<td style="text-align: center;">
+										<input type="text" class="form-control" 
+											style="width:180px; display:inline; text-align: right;" 
+											e-input-limit="NUU" nuu1="3" nuu2="0" 
+											id="cash_prepare_4" name="cash_prepare_4" 
+											ng-model="inputVO.cash_prepare_4" 
+											ng-disabled="!(Datarow.STATUS == 'S' || Datarow.STATUS == 'R')"
+											required> %
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+				<div class="search_box_btn text-center">
+					<button ng-if="Datarow.STATUS == 'P' && Datarow.MODIFIER != currUser" type="button" class="btn btn-primary" ng-click="review('W')" function-type="confirm">同意</button>
+					<button ng-if="Datarow.STATUS == 'P' && Datarow.MODIFIER != currUser" type="button" class="btn btn-primary" ng-click="review('R')" function-type="confirm">退回</button>
+					<button ng-if="Datarow.STATUS == 'W'" type="button" class="btn btn-primary" ng-click="review('F')" function-type="confirm">失效</button>
+					<button ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" type="button" class="btn btn-primary" ng-click="goReview()" function-type="maintenance">傳送主管覆核</button>
+					<button ng-if="Datarow.STATUS == 'S' || Datarow.STATUS == 'R'" type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance">儲存</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

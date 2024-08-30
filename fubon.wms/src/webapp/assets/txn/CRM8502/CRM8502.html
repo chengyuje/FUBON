@@ -1,0 +1,243 @@
+<style>
+/* scroll && height */
+.scroll_CRM8502_dialog {
+	overflow: scroll;
+	width: 1024px;
+	height: 900px;
+}
+input:required:invalid{
+ 	border-color: red;
+
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM8502/CRM8502.js"></script>
+<script type="text/javascript" src="assets/txn/CRM8502/CRM8502_PRINT_REVIEW.js"></script>
+<div class="CRM8502" ng-controller="CRM8502Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >客戶資產現況表列印</div>			
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">		
+		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<table>					
+				<tr>
+					<th width="15%"></th>
+					<th width="6%">
+						<input type="radio" name="condition" ng-change="conditionChange()"  ng-model="radioValue" value="cust_id"/> 客戶ID：
+					</th>
+					<td width="10%">
+						<input type="text"
+							   class="form-control" 
+							   style="width: 200px; text-align: left; text-transform: uppercase;" 
+							   maxlength="16" 
+							   id="custID" 
+							   name="custID" 
+							   ng-model="inputVO.custID"
+							   ng-disabled="radioValue != 'cust_id' && radioValue != ''"
+							   />
+					</td>
+					<th width="1%"></th>
+					<th width="15%"></th>
+					<th width="6%">
+						<input type="radio"
+							   name="condition" 
+						       ng-change="conditionChange()"
+						       ng-model="radioValue" 
+						       value="branch" /> 分行別：
+					</th>
+					<th width="30%">
+						<e-combobox id="branchNbr" name="branchNbr"
+								ng-datasource="BRANCH_LIST"
+								ng-model="inputVO.branchNbr"
+								ng-validate="false" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-disabled="radioValue != 'branch' && radioValue != ''"
+		                        ng-readonly="radioValue != 'branch' && radioValue != ''"
+								ng-required="false"
+								ng-change=""
+								style="line-height:20px;" />
+					</th>
+				</tr>
+				<tr>
+					<th></th>
+					<th>申請日期：</th>
+					<td>
+						<div class="input-group datebox datewidth">
+							<input type="text" id="applySdate" name="applySdate"
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd"
+								   ng-model="inputVO.applySdate"
+								   is-open="model.a"
+								   datepicker-options="bgn_sDateOptions"
+								   ng-readonly="true"
+								   ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+							</span>
+						</div>
+					</td>
+					<th>～</th>
+					<td>
+						<div class="input-group datebox datewidth">
+							<input type="text" id="applyEdate" name="applyEdate"
+								   class="form-control" 
+								   uib-datepicker-popup="yyyy/MM/dd" 
+								   ng-model="inputVO.applyEdate" 
+								   is-open="model.b" 
+								   datepicker-options="bgn_eDateOptions" 
+								   ng-readonly="true" 
+								   ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+							</span>
+						</div>
+					</td>
+					<th>列印狀態：</th>
+					<th><input type="radio" name="printStatus" ng-model="inputVO.printStatus" value="N">&nbsp;&nbsp;否&nbsp;&nbsp;
+						<input type="radio" name="printStatus" ng-model="inputVO.printStatus" value="Y">&nbsp;&nbsp;是&nbsp;&nbsp;
+						<input type="radio" name="printStatus" ng-model="inputVO.printStatus" value="ALL">&nbsp;&nbsp;全部
+					</th>
+				</tr>	
+				<tr ng-show="inputVO.custID == '' && inputVO.branchNbr == ''">
+					<th width="15%"></th>
+					<th class="with-errors" colspan="5">請至少輸入客戶ID或選擇分行別</th>
+				</tr>																
+			</table>
+			<div class="search_box_btn text-center">
+				<th>
+					<button type="button" 
+							class="btn btn-info" 
+							ng-click="inquire()" 
+							ng-disabled="!(inputVO.custID != '' || inputVO.branchNbr != '') || radioValue == ''">
+							查詢
+					</button>
+				</th>
+				<th><button type="button" class="btn btn-info" ng-click="exPort()" ng-disabled="show_hide">匯出</button></th>
+			</div>	
+		</form>
+		<div>	
+			<th><h4 class="h4-title">客戶資產現況表申請記錄</h4></th>
+			<e-jumping-once output="outputVO" list="data" totallist="custAssetDocList1"></e-jumping-once>
+			<div class="gv_tab_sc" style="width: 100%;">
+				<table class="table table-striped text-center middle" e-list="custAssetDocList1">
+					<thead>
+						<tr>
+							<th>申請日期</th>
+							<th>分行別</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>申請專員</th>
+							<th>專員AOCODE</th>
+							<th width="10%">記錄編號</th>
+							<th>列印人員所屬行</th>
+							<th>列印人員員編</th>
+							<th>列印人員姓名</th>
+							<th>列印狀態</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{toJsDate(row.APPLY_DATE) | date:"yyyy/MM/dd"}}</td>
+							<td>{{row.PRINT_BRA_NBR}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td>{{row.AO_CODE}}</td>
+							<td>{{row.APPLY_NO}}</td>
+							<td>{{row.AUTH_BRA_NBR}}</td>
+							<td>{{row.AUTH_ID}}</td>
+							<td>{{row.AUTH_NAME}}</td>
+							<td>{{row.PRINT_STATUS | mapping:mappingSet['COMMON.YES_NO']:F3}}</td>
+							<td>
+								<button type="button" class="btn btn-info" function-type="print" ng-click="printReport(row)" ng-if="row.applyStage" ng-disabled="inputVO.printReportDisabled">列印PDF</button>
+							    <button type="button" class="btn btn-info" function-type="print" ng-click="printReview(row)" ng-if="row.applyStage" ng-disabled="inputVO.printPreviewDisabled">預覽列印</button>
+							</td>							
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div></br>
+<!-- 		<div> -->
+<!-- 			<th><h4 class="h4-title">資況表約定書簽署記錄</h4></th> -->
+<!-- 			<e-jumping-once output="outputVO2" list="data2" totallist="custAssetDocList2"></e-jumping-once> -->
+<!-- 			<div class="gv_tab_sc" style="width: 100%;"> -->
+<!-- 				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="4" e-list="custAssetDocList2"> -->
+<!-- 					<thead> -->
+<!-- 						<tr> -->
+<!-- 							<th>申請日期</th> -->
+<!-- 							<th>分行別</th> -->
+<!-- 							<th>客戶ID</th> -->
+<!-- 							<th>客戶姓名</th> -->
+<!-- 							<th>申請專員</th> -->
+<!-- 							<th>專員AOCODE</th> -->
+<!-- 							<th width="10%">記錄編號</th> -->
+<!-- 							<th>申請狀態</th> -->
+<!-- 							<th>操作</th> -->
+<!-- 						</tr> -->
+<!-- 					</thead> -->
+<!-- 					<tbody> -->
+<!-- 						<tr class="repeat-row" ng-repeat="row in data2 track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'"> -->
+<!-- 							<td>{{toJsDate(row.APPLY_DATE) | date:"yyyy/MM/dd"}}</td> -->
+<!-- 							<td>{{row.PRINT_BRA_NBR}}</td> -->
+<!-- 							<td>{{row.CUST_ID}}</td> -->
+<!-- 							<td>{{row.CUST_NAME}}</td> -->
+<!-- 							<td>{{row.EMP_NAME}}</td> -->
+<!-- 							<td>{{row.AO_CODE}}</td> -->
+<!-- 							<td>{{row.APPLY_NO}}</td> -->
+<!-- 							<td>{{row.PRINT_STATUS | mapping:mappingSet['COMMON.YES_NO']:F3}}</td> -->
+<!-- 							<td>{{row.APPLY_TYPE | mapping:mappingSet['CRM.APPLY_PRINT_STATUS']:'F3'}}</td> -->
+<!-- 							<td><button type="button" class="btn btn-info" ng-click="getFile(row)" ng-if="applyStage = 'Y'" >補列印</button></td>							 -->
+<!-- 						</tr> -->
+<!-- 					</tbody> -->
+<!-- 				</table> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+		<div>
+			<th><h4 class="h4-title">列印記錄</h4></th>
+			<e-jumping-once output="outputVO3" list="data3" totallist="custAssetPrintHisList"></e-jumping-once>
+			<div class="gv_tab_sc" style="width: 100%;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="4" e-list="custAssetPrintHisList">
+					<thead>
+						<tr>
+							<th>列印日期</th>
+							<th>申請日期</th>
+							<th>分行別</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>申請專員</th>
+							<th>專員AOCODE</th>
+							<th width="10%">記錄編號</th>
+							<th>列印人員所屬行</th>
+							<th>列印人員員編</th>
+							<th>列印人員姓名</th>
+							<th>列印狀態</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data3 track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{toJsDate(row.PRINT_DATE) | date:"yyyy/MM/dd"}}</td>
+							<td>{{toJsDate(row.APPLY_DATE) | date:"yyyy/MM/dd"}}</td>
+							<td>{{row.PRINT_BRA_NBR}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td>{{row.AO_CODE}}</td>
+							<td>{{row.APPLY_NO}}</td>
+							<td>{{row.AUTH_BRA_NBR}}</td>
+							<td>{{row.AUTH_ID}}</td>
+							<td>{{row.AUTH_NAME}}</td>
+							<td>{{row.PRINT_STATUS | mapping:mappingSet['COMMON.YES_NO']:F3}}</td>						
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>			
+	</div>				
+</div>

@@ -1,0 +1,101 @@
+<style>
+
+</style>
+<div ng-controller="CRM511_DETAILController" ng-cloak>
+	<div class="modal-dialog CRM511">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">題目內容檢視</h4>
+			</div>
+			<div class="modal-body">
+				<table>
+					<tr>
+						<th class="col-md-2">題目代碼：</th>
+						<td class="col-md-2 tdpadding">{{inputVO.qstn_id}}</td>
+						<th class="col-md-2">顯示層級：</th>
+						<td class="col-md-2 tdpadding">{{inputVO.display_layer | mapping:mappingSet['Layer']:'F3'}}</td>
+						<th class="col-md-2">優先順序：</th>
+						<td class="col-md-2 tdpadding">{{inputVO.display_order}}</td>
+					</tr>
+					<tr>
+						<th class="col-md-2">題目類型：</th>
+						<td class="col-md-2 tdpadding">{{inputVO.qstn_type | mapping:mappingSet['Type']:'F3'}}</td>
+						<th class="col-md-2">有效起始日期：</th>
+						<td class="col-md-2 tdpadding">{{inputVO.bgn_sDate | date:"yyyy-MM-dd"}}</td>
+						<th class="col-md-2">有效截止日期：</th>
+						<td class="col-md-2 tdpadding">{{inputVO.end_sDate | date:"yyyy-MM-dd"}}</td>
+					</tr>
+					<tr>
+						<th class="col-md-2">題目內容：</th>
+						<td class="col-md-10 tdpadding" colspan="5">
+							<textarea id="qstn_content" name="qstn_content" class="form-control" ng-model="inputVO.qstn_content" style="width: 100%; height: 100px" e-length-limit="200" disabled></textarea>
+						</td>
+					</tr>
+					<tr>
+						<th class="col-md-2">說明/話術：</th>
+						<td class="col-md-10 tdpadding" colspan="5">
+							<textarea id="word_surgery" name="word_surgery" class="form-control" ng-model="inputVO.word_surgery" style="width: 100%; height: 100px" e-length-limit="200" disabled></textarea>
+						</td>
+					</tr>
+					<tr>
+						<th class="col-md-2">格式：</th>
+						<td class="col-md-10 tdpadding" colspan="5">{{inputVO.qstn_format | mapping:DKYC_QSTN_FORMAT:'F3'}}</td>
+					</tr>
+					<tr>
+						<th class="col-md-2">答案清單：</th>
+						<td class="col-md-10 tdpadding" colspan="5">
+							<table class="table-bordered">
+								<tr>
+									<th>答案值</th>
+									<th>答案選項</th>
+								</tr>
+								<tr class="repeat-row" ng-repeat="row in inputVO.au_list track by $index">
+									<td>{{row.ANS_VALUE}}</td>
+									<td>{{row.ANS_CONTENT}}</td>
+								<tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<th class="col-md-2"></th>
+						<th class="col-md-2 tdpadding">
+							<label>
+								<input class="uniform_on" type='checkbox' id="opt_yn" name="opt_yn" ng-model='inputVO.opt_yn' ng-true-value="'Y'" ng-false-value="'N'" disabled /> 是否有其他
+							</label>
+						</th>
+						<th class="col-md-2"></th>
+						<th class="col-md-2 tdpadding">
+							<label>
+								<input class="uniform_on" type='checkbox' id="memo_yn" name="memo_yn" ng-model='inputVO.memo_yn' ng-true-value="'Y'" ng-false-value="'N'" disabled /> 是否有補充說明
+							</label>
+						</th>
+						<th class="col-md-2"></th>
+						<th class="col-md-2"></th>
+					</tr>
+					<tr>
+						<th class="col-md-2">理財會員等級：</th>
+						<td class="col-md-10 tdpadding" colspan="5">
+							<label ng-repeat="vip in VIP_DEGREE">
+								<input type="checkbox" name="selectedCodes[]" value="{{vip.DATA}}" ng-checked="inputVO.vip_degree.indexOf(vip.DATA) > -1" disabled > {{vip.LABEL}}
+								&nbsp;&nbsp;
+							</label>
+						</td>
+					</tr>
+					<tr>
+						<th class="col-md-2">貢獻度等級：</th>
+						<td class="col-md-10 tdpadding" colspan="5">
+							<label ng-repeat="vip2 in CON_DEGREE">
+								<input type="checkbox" name="selectedCodes2[]" value="{{vip2.DATA}}" ng-checked="inputVO.aum_degree.indexOf(vip2.DATA) > -1" disabled> {{vip2.LABEL}}
+								&nbsp;&nbsp;
+							</label>
+						</td>
+					</tr>
+				</table>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

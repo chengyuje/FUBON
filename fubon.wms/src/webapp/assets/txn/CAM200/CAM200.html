@@ -1,0 +1,690 @@
+<style>
+.selected-class-name {
+	background-color:  #BCDBED;
+	font-weight: bold;
+}
+
+.CAM200ToolTip .tooltip-inner {
+    font-size: 12pt;
+	max-width: 200px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM200/CAM200.js"></script>
+<script type="text/javascript" src="assets/txn/CAM200/CAM200_FILES.js"></script>
+<script type="text/javascript" src="assets/txn/CUS160/CUS160_ADD.js"></script>
+<script type="text/javascript" src="assets/txn/CAM200/CAM200_QUS.js"></script>
+<script type="text/javascript" src="assets/txn/CAM200/CAM200_PHONE.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PMS109.js"></script>
+<script type="text/javascript" src="assets/txn/CRM610/CRM610.js"></script>
+<script type="text/javascript" src="assets/txn/CRM610/CRM610_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/CRM621/CRM621_phone.js"></script>
+<script type="text/javascript" src="assets/txn/CRM210/CRM210.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PPAP.js"></script>
+<div class="CAM200" ng-controller="CAM200Controller" ng-cloak>
+  
+	<div class="row" ng-if="!custID.startsWith('SFA')">
+		<div class="col-md-6">
+			<div ng-include="'assets/txn/CRM611/CRM611.html'"></div>
+		</div>
+		<div class="col-md-6">
+			<div ng-include="'assets/txn/CRM621/CRM621.html'"></div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12">
+			<div class="tfb_content">
+        		<div class="tfb_content_icon"></div>
+        		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif">名單執行紀錄</div>
+      		</div>
+      		<!--Content of the panel-->
+     		<div class="panel_content" ng-init="mainTab = (tabType == 'tab1') ? 0 : (tabType == 'tab2' ? 1 : 2)">
+     			<uib-tabset active="mainTab" justified="true">
+					<uib-tab index="0" heading="待聯繫" ng-click="init(); goAction('tab1');">
+						<div id="tab1">
+				        	<div class="gv_tab_sc scroll_y">
+				        		<table>
+				          			<thead>
+						            	<tr>
+						            		<th width="10%">
+												<label style="font-weight: initial;margin-bottom: 0px;">
+													<input type='checkbox' ng-model='checkVO.clickConAll' ng-change='checkConrow()' ng-disabled="leadCheckLock == 'lock' ? (controlLockID != '' ? true : false) : false" /> 全選
+												</label>
+											</th>
+						          	    	<th>名單/待辦工作名稱</th>
+						              		<th>名單到期日</th>
+						              		<th>簡要說明</th>
+						              		<th>話術</th>
+						              		<th>參考文件</th>
+						              		<th>名單專屬資訊</th>
+						              		<th>處理狀態</th>
+						              		<th>附帶問卷</th>
+						              		<th>問卷</th>
+						            	</tr>
+						            </thead>
+					            	<tbody class="repeat-row" align="center" ng-repeat="row in beContactList track by $index ">
+						        		<tr ng-class="{ 'selected-class-name': $index == selectedIndex }" >
+						        			<td>
+						        				<label>
+													<input 	type='checkbox' 
+															ng-model='row.CHECK' 
+															ng-change='showDetail(row, $index)' 
+															ng-disabled="leadCheckLock == 'lock' ? ((row.SFA_LEAD_ID == controlLockID && controlLockType == '') || (controlLockID == '' && row.LEAD_TYPE != controlLockType)  ? false : true) : false"
+															/> <!-- ng-if="row.LEAD_TYPE != '04' -->
+												</label>
+						        			</td>
+											<td>
+<!-- 												<a onclick="return false" ng-click="rowDTL(row, beContactTempList[$index], $index, tabType)" ng-show="row.VISIT_SEQ != null">{{row.CAMPAIGN_NAME}}</a> -->
+												<div ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CAMPAIGN_NAME}}</div>
+											</td>
+											<td style="white-space: nowrap;" ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{toJsDate(row.END_DATE) | date:'yyyy/MM/dd'}}</td>
+											<td style="white-space: nowrap;" ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">
+												<div uib-tooltip="{{row.CAMPAIGN_DESC}}" tooltip-placement="right-bottom" tooltip-class="CAM200ToolTip">
+													{{row.CAMPAIGN_DESC.length > 10 ? (row.CAMPAIGN_DESC | limitTo: 10) + "..." : row.CAMPAIGN_DESC}}
+												</div>
+											</td>
+											<td style="white-space: nowrap;" ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">
+												<div uib-tooltip="{{row.SALES_PITCH}}" tooltip-placement="right-bottom" tooltip-class="CAM200ToolTip">
+													{{row.SALES_PITCH.length > 10 ? (row.SALES_PITCH | limitTo: 10) + "..." : row.SALES_PITCH}}
+												</div>
+											</td>
+											<td><button type="button" class="btn btn-info" ng-click="getFileList(row)" ng-show="row.LEAD_PARA2 == 'Y'">下載</button></td>
+											<td> <!-- {{row.INFO | mapping:mappingSet['COMMON.YES_NO']:'F3'}} -->
+												<button type="button" class="btn btn-info" ng-click="showDetail(row, $index)" ng-show="row.INFO == 'Y'">內容</button>
+											</td>
+											<td>
+<!-- 												{{row.LEAD_TYPE == '04' ? '參考用' : ''}} ng-show="row.LEAD_TYPE != '04'" -->
+												<!-- ng-readonly="row.EXAMRECORD == 'Y'"  -->
+												<e-combobox id="cmbAction" name="cmbAction"
+															ng-datasource="row.set"
+															ng-model="row.LEAD_STATUS"
+															ng-validate="false"
+															ng-editable="false"
+															ng-format="F3"
+															ng-required="false"
+															ng-change="changeStatusTypeOne(row)"
+															ng-hide="row.EXAMRECORD_STATUS == 'N'"
+															width="350px"
+															style="line-height:20px;" />
+												<div ng-show="row.EXAMRECORD_STATUS == 'N'">
+													請先填寫右方問卷，方可選擇名單處理狀態
+												</div>
+											</td>
+											<td>
+												<div id="status" ng-show="row.LEAD_PARA1 == 'C' && row.KYC == 'Y' && row.KYC_LENGTH_OPEN == 'Y'">
+													<img src="assets/images/icon/u1210.jpg">
+												</div>
+												<div id="status" ng-show="row.EXAMRECORD == 'Y' && row.QUS_WRITE_OPEN == 'Y'">
+													<img src="assets/images/icon/u1210.jpg">
+												</div>
+											</td>
+											<td>
+												<div ng-show="row.LEAD_PARA1 == 'C' && row.KYC == 'Y'">
+													<button type="button" class="btn btn-info" ng-click="goCRM651()">深度KYC</button>
+												</div>
+												<div ng-show="row.EXAM_ID != null && row.QUS_WRITE_OPEN == 'Y'">
+													<button type="button" class="btn btn-info" ng-click="writeQuestion(row, 'write')">填寫</button>
+												</div>
+											</td>
+						            	</tr>
+						            </tbody>
+					          	</table>
+				        	</div>
+						</div>
+					</uib-tab> 
+					<uib-tab index="1" heading="未結案已過期" ng-click="init(); goAction('tab2');">
+						<div class="tab-pane fade {{tabType == 'tab2' ? 'in active' : ''}}" id="tab2">
+						<e-jumping output="expiredListOutputVO" input="inputVO" query="getExpiredList()" list="expiredList"></e-jumping>
+				        	<div class="gv_tab_sc scroll_y">
+				          		<table>
+				          			<thead>
+						            	<tr>
+						          	    	<th>名單/待辦工作名稱</th>
+						              		<th>&nbsp;&nbsp;&nbsp;名單到期日&nbsp;&nbsp;&nbsp;</th>
+						              		<th>簡要說明</th>
+						              		<th>話術</th>
+						              		<th>參考文件</th>
+						              		<th>名單專屬資訊</th>
+						              		<th width="465px">處理狀態</th>
+						              		<th>附帶問卷</th>
+						              		<th>問卷</th>
+						            	</tr>
+						            </thead>
+					            	<tbody class="repeat-row" align="center" ng-repeat="row in expiredList | limitTo:displayLimit track by $index">
+					            		<tr ng-class="{ 'selected-class-name': $index == selectedIndex }" ng-click="rowDTL(row, expiredTempList[$index], $index, tabType)">
+											<td>
+<!-- 												<a onclick="return false" ng-click="rowDTL(row, expiredTempList[$index], $index, tabType)" ng-show="row.VISIT_SEQ != null">{{row.CAMPAIGN_NAME}}</a> -->
+												<div>{{row.CAMPAIGN_NAME}}</div>
+											</td>
+											<td>{{row.END_DATE | limitTo: 10}}</td>
+											<td style="white-space: nowrap;">
+												<div uib-tooltip="{{row.CAMPAIGN_DESC}}" tooltip-placement="right-bottom" tooltip-class="CAM200ToolTip">
+													{{row.CAMPAIGN_DESC.length > 10 ? (row.CAMPAIGN_DESC | limitTo: 10) + "..." : row.CAMPAIGN_DESC}}
+												</div>
+											</td>
+											<td style="white-space: nowrap;">
+												<div uib-tooltip="{{row.SALES_PITCH}}" tooltip-placement="right-bottom" tooltip-class="CAM200ToolTip">
+													{{row.SALES_PITCH.length > 10 ? (row.SALES_PITCH | limitTo: 10) + "..." : row.SALES_PITCH}}
+												</div>
+											</td>
+											<td><button type="button" class="btn btn-info" ng-click="getFileList(row)" ng-show="row.LEAD_PARA2 == 'Y'">下載</button></td>
+											<td>{{row.INFO | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+											<td width="465px">
+<!-- 												{{row.LEAD_TYPE == '04' ? '參考用' : (row.RESPONSE_NAME)}} -->
+<!-- 												{{row.RESPONSE_NAME}} -->
+												<div ng-if="row.LEAD_TYPE != '99'">{{row.RESPONSE_NAME}}</div>
+												<!-- ng-readonly="row.EXAMRECORD == 'Y'"  -->
+												<e-combobox id="cmbAction" name="cmbAction"
+															ng-datasource="row.set"
+															ng-model="row.LEAD_STATUS"
+															ng-validate="false"
+															ng-editable="false"
+															ng-format="F3"
+															ng-required="false"
+															ng-change="changeStatus(row, tabType)"
+															ng-hide="row.EXAMRECORD_STATUS == 'N'"
+															ng-if="row.LEAD_TYPE == '99'"
+															width="350px"
+															style="line-height:20px;" />
+												<div ng-if="row.LEAD_TYPE == '99'" ng-show="row.EXAMRECORD_STATUS == 'N'">
+													請先填寫右方問卷，方可選擇名單處理狀態
+												</div>
+											</td>
+											<td>
+												<div id="status" ng-show="{{row.EXAMRECORD == 'Y'}}">
+													<img src="assets/images/icon/u1210.jpg">
+												</div>
+											</td>
+											<td>
+												<div ng-show="row.EXAM_ID != null">
+													<button type="button" class="btn btn-info" ng-click="writeQuestion(row, (row.LEAD_TYPE != '99' ? 'read' : 'write'))">{{row.LEAD_TYPE == '99' ? '填寫' : '查看'}}</button>
+												</div>
+											</td>
+						            	</tr>
+					            	</tbody>
+					          	</table>
+				        	</div>
+						</div>
+					</uib-tab>
+					<uib-tab index="2" heading="已結案" ng-click="init(); goAction('tab3');">
+						<div class="tab-pane fade {{tabType == 'tab3' ? 'in active' : ''}}" id="tab3">
+				        	<e-jumping output="closedListVO" input="inputVO" query="getClosedList()" list="closedList"></e-jumping>
+				        	<div class="gv_tab_sc scroll_y">
+				          		<table>
+					            	<thead>
+						            	<tr>
+						          	    	<th>名單/待辦工作名稱</th>
+						              		<th>&nbsp;&nbsp;&nbsp;名單到期日&nbsp;&nbsp;&nbsp;</th>
+						              		<th>簡要說明</th>
+						              		<th>話術</th>
+						              		<th>參考文件</th>
+						              		<th>名單專屬資訊</th>
+						              		<th>處理狀態</th>
+						              		<th>附帶問卷</th>
+						              		<th>問卷</th>
+						            	</tr>
+						            </thead>
+					            	<tbody class="repeat-row" align="center" ng-repeat="row in closedList | limitTo:displayLimit track by $index">
+					            		<tr ng-class="{ 'selected-class-name': $index == selectedIndex }" ng-click="rowDTL(row, closedTempList[$index], $index, tabType)">
+											<td>
+<!-- 												<a onclick="return false" ng-click="rowDTL(row, closedTempList[$index], $index, tabType)" ng-show="row.VISIT_SEQ != null">{{row.CAMPAIGN_NAME}}</a> -->
+												<div>{{row.CAMPAIGN_NAME}}</div>
+											</td>
+											<td>{{row.END_DATE | limitTo: 10}}</td>
+											<td style="white-space: nowrap;">
+												<div uib-tooltip="{{row.CAMPAIGN_DESC}}" tooltip-placement="right-bottom" tooltip-class="CAM200ToolTip">
+													{{row.CAMPAIGN_DESC.length > 10 ? (row.CAMPAIGN_DESC | limitTo: 10) + "..." : row.CAMPAIGN_DESC}}
+												</div>
+											</td>
+											<td style="white-space: nowrap;">
+												<div uib-tooltip="{{row.SALES_PITCH}}" tooltip-placement="right-bottom" tooltip-class="CAM200ToolTip">
+													{{row.SALES_PITCH.length > 10 ? (row.SALES_PITCH | limitTo: 10) + "..." : row.SALES_PITCH}}
+												</div>
+											</td>
+											<td><button type="button" class="btn btn-info" ng-click="getFileList(row)" ng-show="row.LEAD_PARA2 == 'Y'">下載</button></td>
+											<td>{{row.INFO | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+											<td>
+												{{(closedTempList[$index].LEAD_STATUS == '03C' || row.LEAD_TYPE == '07' || row.LEAD_TYPE == '08') || (closedTempList[$index].LEAD_STATUS != '03B' && (row.LEAD_TYPE == '05' || row.LEAD_TYPE == '06' || row.LEAD_TYPE == 'H1' || row.LEAD_TYPE == 'UX')) ? '' : (closedTempList[$index].LEAD_STATUS | mapping:row.set:'F3')}}
+												<e-combobox id="cmbAction" name="cmbAction"
+															ng-datasource="row.set"
+															ng-model="row.LEAD_STATUS"
+															ng-validate="false"
+															ng-readonly="false" 
+															ng-editable="false"
+															ng-format="F3"
+															ng-required="false"
+															ng-show="(closedTempList[$index].LEAD_STATUS == '03C' || row.LEAD_TYPE == '07' || row.LEAD_TYPE == '08') || 
+															         (closedTempList[$index].LEAD_STATUS != '03B' && (row.LEAD_TYPE == '05' || row.LEAD_TYPE == '06' || row.LEAD_TYPE == 'H1' || row.LEAD_TYPE == 'UX'))"
+															ng-change="changeStatus(row, tabType)"
+															width="350px"
+															style="line-height:20px;" />
+											</td>
+											<td>
+												<div id="status" ng-show="{{row.EXAMRECORD == 'Y'}}">
+													<img src="assets/images/icon/u1210.jpg">
+												</div>
+											</td>
+											<td>
+												<div ng-show="row.EXAM_ID != null">
+													<button type="button" class="btn btn-info" ng-click="writeQuestion(row, (closedTempList[$index].LEAD_STATUS != '03C' ? 'read' : 'write'))">{{closedTempList[$index].LEAD_STATUS != '03C' ? '查看' : '填寫'}}</button>
+												</div>
+											</td>
+						            	</tr>
+					            	</tbody>
+					          	</table>
+				        	</div>
+						</div>
+					</uib-tab>
+				</uib-tabset>
+			</div>
+		</div>        		
+	</div>
+	<div class="row">
+		
+		<div class="col-md-6">
+			<div class="tfb_content">
+        		<div class="tfb_content_icon"></div>
+        		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >名單專屬資訊 </div>
+      		</div>
+      		<!--Content of the panel-->
+      		<div class="panel_content">
+      			<div class="gv_tab_sc scroll_y" style="height:600px">
+      				<!-- 2017/8/14 beContactList => beContactDetailList -->
+      				<table style="table-layout: fixed;word-wrap:break-word;" class="repeat-row" align="center" ng-repeat="row in (tabType == 'tab1' ? beContactDetailList : (tabType == 'tab2' ? expiredList : closedList))">
+                    	<tr ng-show="INFO_Y == 'Y' && ((tabType == 'tab2' || tabType == 'tab3') ? $index == selectedIndex : true)">
+                    		<td ng-show="INFO_Y == 'Y'"><b>{{row.CAMPAIGN_NAME}}</b><br />
+                    			<div ng-show="row.VAR_FIELD_VALUE1 != null">{{row.VAR_FIELD_LABEL1}}：{{row.VAR_FIELD_VALUE1}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE2 != null">{{row.VAR_FIELD_LABEL2}}：{{row.VAR_FIELD_VALUE2}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE3 != null">{{row.VAR_FIELD_LABEL3}}：{{row.VAR_FIELD_VALUE3}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE4 != null">{{row.VAR_FIELD_LABEL4}}：{{row.VAR_FIELD_VALUE4}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE5 != null">{{row.VAR_FIELD_LABEL5}}：{{row.VAR_FIELD_VALUE5}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE6 != null">{{row.VAR_FIELD_LABEL6}}：{{row.VAR_FIELD_VALUE6}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE7 != null">{{row.VAR_FIELD_LABEL7}}：{{row.VAR_FIELD_VALUE7}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE8 != null">{{row.VAR_FIELD_LABEL8}}：{{row.VAR_FIELD_VALUE8}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE9 != null">{{row.VAR_FIELD_LABEL9}}：{{row.VAR_FIELD_VALUE9}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE10 != null">{{row.VAR_FIELD_LABEL10}}：{{row.VAR_FIELD_VALUE10}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE11 != null">{{row.VAR_FIELD_LABEL11}}：{{row.VAR_FIELD_VALUE11}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE12 != null">{{row.VAR_FIELD_LABEL12}}：{{row.VAR_FIELD_VALUE12}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE13 != null">{{row.VAR_FIELD_LABEL13}}：{{row.VAR_FIELD_VALUE13}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE14 != null">{{row.VAR_FIELD_LABEL14}}：{{row.VAR_FIELD_VALUE14}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE15 != null">{{row.VAR_FIELD_LABEL15}}：{{row.VAR_FIELD_VALUE15}}&emsp;<br /></div>
+								<div ng-show="row.VAR_FIELD_VALUE16 != null">
+									{{row.VAR_FIELD_LABEL16}}：
+									<span ng-repeat="row16 in custom_split(row.VAR_FIELD_VALUE16) track by $index">
+										{{row16}}<br>
+									</span>
+								</div>
+								<div ng-show="row.VAR_FIELD_VALUE17 != null">
+									{{row.VAR_FIELD_LABEL17}}：
+									<span ng-repeat="row17 in custom_split(row.VAR_FIELD_VALUE17) track by $index">
+										{{row17}}<br>
+									</span>
+								</div>
+								<div ng-show="row.VAR_FIELD_VALUE18 != null">
+									{{row.VAR_FIELD_LABEL18}}：
+									<span ng-repeat="row18 in custom_split(row.VAR_FIELD_VALUE18) track by $index">
+										{{row18}}<br>
+									</span>
+								</div>
+								<div ng-show="row.VAR_FIELD_VALUE19 != null">
+									{{row.VAR_FIELD_LABEL19}}：
+									<span ng-repeat="row19 in custom_split(row.VAR_FIELD_VALUE19) track by $index">
+										{{row19}}<br>
+									</span>
+								</div>
+								<div ng-show="row.VAR_FIELD_VALUE20 != null">
+									{{row.VAR_FIELD_LABEL20}}：
+									<span ng-repeat="row20 in custom_split(row.VAR_FIELD_VALUE20) track by $index">
+										{{row20}}<br>
+									</span>
+								</div>
+                    		</td>
+                    	</tr>
+                  	</table>
+      			</div>
+      		</div>
+   		</div>
+		
+		<div class="col-md-6">
+			<div class="tfb_content">
+        		<div class="tfb_content_icon"></div>
+        		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >名單與待辦工作內容</div>
+      		</div>
+      		<!--Content of the panel-->
+      		<div class="panel_content">
+      			<div class="search_table search_box2" style="height:600px">
+      				<form style="margin:0px;display: inline" name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+	      				<table ng-hide="(tabType == 'tab3') || (tabType == 'tab2' && (!inputVO.cmuType && inputVO.leadType != '99'))">
+	      					<tr>
+		                      	<th>溝通聯繫方式：</th>
+		                      	<td>
+									<e-combobox id="cmuType" name="cmuType"
+												ng-paramtype="CAM.VST_REC_CMU_TYPE"
+												ng-model="inputVO.cmuType"
+												ng-validate="false"
+												ng-disabled="tabType == 'tab2' && inputVO.leadType != '99'"
+												ng-readonly="tabType == 'tab2' && inputVO.leadType != '99'"
+												ng-editable="false"
+												ng-format="F3"
+												width="300px"
+												style="line-height:20px;" required/>
+								</td>
+	                   		</tr>
+	                   		<tr ng-show="parameterTypeEditForm.cmuType.$error.required">
+								<th></th>
+								<td class="col-md-7 help-block with-errors">請選擇 溝通聯繫方式</td>
+							</tr>
+	                    	<tr ng-hide="loginType == 'PS'">
+	                    		<th>聯繫時間：</th>
+	                      		<td>
+                    				<div class="input-group datebox datewidth" style="float:left">
+										<input 	type="text" id="visitDate" name="visitDate"
+												class="form-control"
+												uib-datepicker-popup="yyyy/MM/dd"
+												ng-model="inputVO.visitDate"
+												is-open="model.f"
+												datepicker-options="visit_date_DateOptions"
+												ng-readonly="true"								
+												ng-change="limitDate();"/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn" ng-hide="tabType == 'tab2' && inputVO.leadType != '99'">
+											<button type="button" class="btn btn-default" ng-click="open($event,'f')">
+												<i class="glyphicon glyphicon-calendar"></i></button>																		
+										</span>
+									</div>
+	                    			
+									<div style="display:inline;float:left">
+										<input 	type="time"  
+												id="visitTime" name="visitTime" 
+												class="form-control" 
+												style="width:150px" 
+												ng-model="inputVO.visitTime" 
+												placeholder="HH:mm" 
+												ng-disabled="tabType == 'tab2' && inputVO.leadType != '99'"
+												ng-readonly="tabType == 'tab2' && inputVO.leadType != '99'"
+												required >
+									</div>
+	                      		</td>
+	                    	</tr>
+	                    	<tr ng-hide="loginType == 'PS'">
+	                    		<th>通知客戶內容：</th>
+	                    		<td>
+	                    			<textarea name="visitMemo" id="visitMemo" 
+	                    					  placeholder="請輸入..." 
+	                    					  ng-disabled="tabType == 'tab2' && inputVO.leadType != '99'" 
+	                    					  ng-model="inputVO.visitMemo" 
+	                    					  ng-blur="checkDisableText(inputVO.visitMemo, 'visitMemo')"
+	                    					  e-length-limit="1000" 
+	                    					  ng-minlength="5"
+	                    					  style="width: 100%; height: 100px" 
+	                    					  class="form-control" 
+	                    					  required>
+	                    			</textarea>
+	                    		</td>
+	                    	</tr>
+							<tr ng-hide="loginType == 'PS' || (tabType == 'tab2' && inputVO.leadType != '99')" ng-show="parameterTypeEditForm.visitMemo.$error.required || disableTextFormatStatus == false || !parameterTypeEditForm.visitMemo.$valid">
+								<th></th>
+								<td class="col-md-7 help-block with-errors">
+									<div style="display:inline;" ng-show="parameterTypeEditForm.visitMemo.$error.required">請輸入 通知客戶內容</div>
+									<div style="display:inline;" ng-show="disableTextFormatStatus == false">通知客戶內容 含有禁用字串{{tempDisableText}}</div>
+									<div style="display:inline;" ng-show="!parameterTypeEditForm.visitMemo.$valid">至少5個字</div>
+								</td>
+							</tr>
+	                    	<tr ng-hide="loginType == 'PS'">
+	                    		<th>客戶回應內容：</th>
+	                    		<td>
+	                    			<textarea name="visitCreply" id="visitCreply" 
+	                    					  placeholder="請輸入..." 
+	                    					  ng-disabled="tabType == 'tab2' && inputVO.leadType != '99'" 
+	                    					  ng-model="inputVO.visitCreply" 
+	                    					  ng-blur="checkDisableText(inputVO.visitCreply, 'visitCreply')"
+	                    					  e-length-limit="1000" 
+	                    					  ng-minlength="5"
+	                    					  style="width: 100%; height: 100px" 
+	                    					  class="form-control" 
+	                    					  required>
+	                    			</textarea>
+	                    		</td>
+	                    	</tr>
+	                    	<tr ng-hide="loginType == 'PS' || (tabType == 'tab2' && inputVO.leadType != '99')" ng-show="parameterTypeEditForm.visitCreply.$error.required || disableTextFormatStatusBYcrp == false || !parameterTypeEditForm.visitCreply.$valid">
+								<th></th>
+								<td class="col-md-7 help-block with-errors">
+									<div style="display:inline;" ng-show="parameterTypeEditForm.visitCreply.$error.required">請輸入 客戶回應內容</div>
+									<div style="display:inline;" ng-show="disableTextFormatStatusBYcrp == false">客戶回應內容 含有禁用字串{{tempDisableTextBYcrp}}</div>
+									<div style="display:inline;" ng-show="!parameterTypeEditForm.visitCreply.$valid">至少5個字</div>
+								</td>
+							</tr>
+							<tr ng-if="(inputVO.leadTypeList[0] == '05' || inputVO.leadTypeList[0] == '06' || inputVO.leadTypeList[0] == 'H1' || inputVO.leadTypeList[0] == 'UX') && inputVO.leadStatusList[0] == '03B'">
+	                    		<th>預計承作商品：</th>
+	                    		<td>
+		                    		<e-combobox id="estPrd" name="estPrd"
+												ng-paramtype="PMS.PIPELINE_PRD"
+												ng-model="inputVO.estPrd"
+												ng-validate="false"
+												ng-editable="false"
+												ng-format="F3"
+												width="300px"
+												style="line-height:20px;" required/>
+	                    		</td>
+	                    	</tr>
+	                    	<tr ng-if="(inputVO.leadTypeList[0] == '05' || inputVO.leadTypeList[0] == '06' || inputVO.leadTypeList[0] == 'H1' || inputVO.leadTypeList[0] == 'UX') && inputVO.leadStatusList[0] == '03B'">
+	                    		<th>預計申請金額：</th>
+	                    		<td>
+	                    			<input type="text" class="form-control" e-input-limit="NUU" nuu1="3" nuu2="2" ng-model="inputVO.estAmt" style="display:inline;width: 100px;" required>
+	                    			<div style="display:inline;font-size:13px;">單位：百萬元</div>
+	                    		</td>
+	                    	</tr>
+	                    	<tr ng-if="(inputVO.leadTypeList[0] == '05' || inputVO.leadTypeList[0] == '06' || inputVO.leadTypeList[0] == 'H1' || inputVO.leadTypeList[0] == 'UX') && inputVO.leadStatusList[0] == '03B'">
+	                    		<th>接手業務人員：</th>
+	                    		<td>
+	                    			<e-combobox id="planEmpID" name="planEmpID" 
+												ng-datasource="PASO_LIST"
+												ng-model="inputVO.planEmpID"
+												ng-validate="false"
+												ng-editable="false"
+												ng-format="F3"
+												width="300px"
+												style="line-height:20px;"
+												required />
+	                    		</td>
+	                    	</tr>
+	                  	</table>
+      				</form>
+      				
+      				
+      				<form style="margin:0px;display: inline" name="parameterTypeEditForm2" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+	                  	<table ng-hide="tabType != 'tab3' || selectedIndex == -1">
+	                    	<tr>
+		                      	<th>溝通聯繫方式：</th>
+		                      	<td>
+									<e-combobox id="closedCmuType" name="closedCmuType" 
+												ng-paramtype="CAM.VST_REC_CMU_TYPE"
+												ng-model="inputVO.closedCmuType"
+												ng-validate="false" 
+												ng-disabled="tempDisable"
+												ng-readonly="tempDisable"
+												ng-editable="false"
+												ng-format="F3"
+												width="300px"
+												style="line-height:20px;" required/>
+								</td>
+	                   		</tr>
+	                   		<tr ng-show="parameterTypeEditForm2.closedCmuType.$error.required">
+								<th></th>
+								<td class="col-md-7 help-block with-errors">請選擇 溝通聯繫方式</td>
+							</tr>
+							<tr ng-hide="loginType == 'PS'">
+	                    		<th>聯繫時間：</th>
+	                      		<td>
+                    				<div class="input-group datebox datewidth" style="float:left">
+										<input 	type="text" id="closedVisitDate" name="closedVisitDate"
+												class="form-control"
+												uib-datepicker-popup="yyyy/MM/dd"
+												ng-model="inputVO.closedVisitDate"
+												is-open="model.f"
+												datepicker-options="visit_date_DateOptions"
+												ng-readonly="true"								
+												ng-change="limitDate();"/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn" ng-hide="tempDisable">
+											<button type="button" class="btn btn-default" ng-click="open($event,'f')">
+												<i class="glyphicon glyphicon-calendar"></i></button>																		
+										</span>
+									</div>
+	                    			
+									<div style="display:inline;float:left" >
+										<input  type="time" 
+												id="closedVisitTime" name="closedVisitTime" 
+												class="form-control" 
+												style="width:150px" 
+												ng-model="inputVO.closedVisitTime" 
+												placeholder="HH:mm" 
+												ng-disabled="tempDisable"
+												required >
+									</div>
+	                      		</td>
+	                    	</tr>
+	                    	<tr ng-hide="loginType == 'PS'">
+	                    		<th>通知客戶內容：</th>
+	                    		<td>
+	                    			<textarea name="closedVisitMemo" id="closedVisitMemo" 
+	                    					  placeholder="請輸入..." 
+	                    					  ng-disabled="tempDisable" 
+	                    					  ng-model="inputVO.closedVisitMemo" 
+	                    					  ng-blur="checkDisableText(inputVO.closedVisitMemo, 'visitMemo')"
+	                    					  e-length-limit="1000" 
+	                    					  ng-minlength="5"
+	                    					  style="width: 100%; height: 100px" 
+	                    					  class="form-control" 
+	                    					  required>
+	                    			</textarea>
+	                    		</td>
+	                    	</tr>
+							<tr ng-hide="loginType == 'PS'">
+	                    		<th>客戶回應內容：</th>
+	                    		<td>
+	                    			<textarea name="closedVisitCreply" id="closedVisitCreply" 
+	                    					  placeholder="請輸入..." 
+	                    					  ng-disabled="tempDisable" 
+	                    					  ng-model="inputVO.closedVisitCreply" 
+	                    					  ng-blur="checkDisableText(inputVO.closedVisitCreply, 'visitCreply')"
+	                    					  e-length-limit="1000" 
+	                    					  ng-minlength="5"
+	                    					  style="width: 100%; height: 100px" 
+	                    					  class="form-control" 
+	                    					  required>
+	                    			</textarea>
+	                    		</td>
+	                    	</tr>
+	                    	<tr ng-if="(inputVO.leadTypeList[0] == '05' || inputVO.leadTypeList[0] == '06' || inputVO.leadTypeList[0] == 'H1' || inputVO.leadTypeList[0] == 'UX') && inputVO.leadStatusList[0] == '03B'">
+	                    		<th>預計承作商品：</th>
+	                    		<td>
+		                    		<e-combobox id="estPrd" name="estPrd"
+												ng-paramtype="PMS.PIPELINE_PRD"
+												ng-model="inputVO.closedEstPrd"
+												ng-validate="false" 
+												ng-disabled="tempDisable"
+												ng-readonly="tempDisable"
+												ng-editable="false"
+												ng-format="F3"
+												width="300px"
+												style="line-height:20px;"/>
+	                    		</td>
+	                    	</tr>
+	                    	<tr ng-if="(inputVO.leadTypeList[0] == '05' || inputVO.leadTypeList[0] == '06' || inputVO.leadTypeList[0] == 'H1' || inputVO.leadTypeList[0] == 'UX') && inputVO.leadStatusList[0] == '03B'">
+	                    		<th>預計申請金額：</th>
+	                    		<td>
+	                    			<input type="text" class="form-control" e-input-limit="NUU" nuu1="3" nuu2="2" ng-model="inputVO.closedEstAmt" style="display:inline;width: 100px;" ng-readonly="tempDisable" ng-disabled="tempDisable">
+	                    			<div style="display:inline;font-size:13px;">單位：百萬元</div>
+	                    		</td>
+	                    	</tr>
+	                    	<tr ng-if="(inputVO.leadTypeList[0] == '05' || inputVO.leadTypeList[0] == '06' || inputVO.leadTypeList[0] == 'H1' || inputVO.leadTypeList[0] == 'UX') && inputVO.leadStatusList[0] == '03B'">
+	                    		<th>接手業務人員：</th>
+	                    		<td><input type="text" class="form-control" ng-readonly="tempDisable" ng-disabled="tempDisable" ng-model="inputVO.closedPlanEmpID"></td>
+	                    	</tr>
+	                  	</table>
+	                </form>
+	                <!-- 當留資(05/06/H1/H2/UX) 且 選擇03C(約訪收件)時，該區域顯示 -->
+	                <div class="search_box_btn text-center" ng-show="((tabType == 'tab1') || 
+                  													  (tabType == 'tab2' && selectedIndex != -1) ||
+                  													  (tabType == 'tab3' && selectedIndex != -1 && !tempDisable)) && 
+                  													 ((inputVO.leadTypeList[0] == '05' || inputVO.leadTypeList[0] == '06' || inputVO.leadTypeList[0] == 'H1' || inputVO.leadTypeList[0] == 'UX') && inputVO.leadStatusList[0] == '03B')">
+	                	<button type="button" class="btn btn-info" 
+                  				ng-show="tabType == 'tab1'" 
+                  				ng-click="save(tabType, 'pipeline')" 
+                  				ng-disabled="(tabType == 'tab1' && 
+										      (
+										       (inputVO.leadStatusList.length == 0) ||
+										       (parameterTypeEditForm.$invalid ? ((loginType == 'PS' && inputVO.visitMemo == '' && inputVO.cmuType != '') ? false : parameterTypeEditForm.$invalid) : false) || 
+								  	 	       (!disableTextFormatStatus) || 
+								  	 	       (!disableTextFormatStatusBYcrp) 
+								  	 	      )
+								  	 	     )">存檔</button>
+	                </div>
+	                <!-- 當留資(05/06/H1/H2/UX) 且 選擇03C(約訪收件)時，該區域不顯示 -->
+                  	<div class="search_box_btn text-center" ng-show="((tabType == 'tab1') || 
+                  													  (tabType == 'tab2' && selectedIndex != -1) ||
+                  													  (tabType == 'tab3' && selectedIndex != -1 && !tempDisable)) && 
+                  													 !((inputVO.leadTypeList[0] == '05' || inputVO.leadTypeList[0] == '06' || inputVO.leadTypeList[0] == 'H1' || inputVO.leadTypeList[0] == 'UX') && inputVO.leadStatusList[0] == '03B')"> <!--  ng-hide="(tabType != 'tab1')"  -->
+                  		<button type="button" class="btn btn-info" 
+                  				ng-show="tabType == 'tab1'" 
+                  				ng-click="save(tabType, 'other')" 
+                  				ng-disabled="(tabType == 'tab1' && 
+										      (
+										       (inputVO.leadStatusList.length == 0) ||
+										       (parameterTypeEditForm.$invalid ? ((loginType == 'PS' && inputVO.visitMemo == '' && inputVO.cmuType != '') ? false : parameterTypeEditForm.$invalid) : false) || 
+								  	 	       (!disableTextFormatStatus) || 
+								  	 	       (!disableTextFormatStatusBYcrp) 
+								  	 	      )
+								  	 	     )">存檔</button>
+                  		<button type="button" class="btn btn-info" 
+                  				ng-if="!(inputVO.leadTypeList[0] == '05' || inputVO.leadTypeList[0] == '06' || inputVO.leadTypeList[0] == 'H1' || inputVO.leadTypeList[0] == 'UX')"
+                  				ng-show="tabType == 'tab1'" 
+                  				ng-click="save(tabType, 'sellPlan')" 
+                  				ng-disabled="(tabType == 'tab1' && 
+										      (
+										       (inputVO.leadStatusList.length == 0) ||
+										       (parameterTypeEditForm.$invalid ? ((loginType == 'PS' && inputVO.visitMemo == '' && inputVO.cmuType != '') ? false : parameterTypeEditForm.$invalid) : false) || 
+								  	 	       (!disableTextFormatStatus) || 
+								  	 	       (!disableTextFormatStatusBYcrp) 
+								  	 	      )
+								  	 	     )">存檔並新增銷售計畫</button>
+								  	 	     
+                  		<button type="button" class="btn btn-info" 
+                  				ng-show="tabType == 'tab2' && tempDisableByEXP" 
+                  				ng-click="save(tabType, 'other')" 
+                  				ng-disabled="(tabType == 'tab2' && 
+										      (
+										       (inputVO.sfaLeadIDList.length == 0) ||
+										       (parameterTypeEditForm.$invalid ? ((loginType == 'PS' && inputVO.visitMemo == '' && inputVO.cmuType != '') ? false : parameterTypeEditForm.$invalid) : false) || 
+								  	 	       (!disableTextFormatStatus) || 
+								  	 	       (!disableTextFormatStatusBYcrp) 
+								  	 	      )
+								  	 	     )">存檔</button>
+                  		<!-- 
+	                  		tabType → 頁籤
+	                  		inputVO.sfaLeadIDList.length != haveChangeCount → 修改名單總數=名單總數 才可存檔
+	                  		!disableTextFormatStatus → 不可含有禁用字串；true:不含/false:含
+	                  		questionStatus.indexOf('Y') > -1 && !(inputVO.leadStatusList.indexOf('03C') < 0) → 問卷有未填寫的 且 名單有03C的
+                  		 -->
+						<button type="button" class="btn btn-info" 
+								ng-show="tabType == 'tab3'" 
+								ng-click="save(tabType, 'other')" 
+								ng-disabled="(tabType == 'tab3' && 
+										   	  (
+										   	   (inputVO.sfaLeadIDList.length == 0) || 
+										       (parameterTypeEditForm2.$invalid ? ((loginType == 'PS' && inputVO.visitMemo == '' && inputVO.cmuType != '') ? false : parameterTypeEditForm2.$invalid) : false) || 
+										       (!disableTextFormatStatus) || 
+										       (!disableTextFormatStatusBYcrp)
+										      ) 
+										     ) && tempDisable">存檔</button>
+						
+						<!-- 名單結案的畫面，原已把＂電話錯誤註記＂欄位隱藏（在＂存檔＂欄位右邊），但剛看又跑出來了，現在在換版抓不到畫面，請隱藏 -->
+<!-- 						<button type="button" class="btn btn-info" ng-show="tabType == 'tab1'" ng-click="goCAM200Phone()" ng-disabled="">電話錯誤註記</button> -->
+					</div>
+      			</div>
+      		</div>
+   		</div>
+   				
+    </div>
+</div>

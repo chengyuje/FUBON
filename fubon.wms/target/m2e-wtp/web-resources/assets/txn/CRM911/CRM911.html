@@ -1,0 +1,41 @@
+<script type="text/javascript" src="assets/txn/CRM911/CRM911.js"></script>
+<div class="CRM911" ng-controller="CRM911Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >常用連結設定</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="gv_tab_sc" style="white-space: nowrap;">
+				<table class="table table-bordered e-table-freeze" e-top="true" e-mode="1" e-height="30vw" e-list="listBase">
+					<thead>
+						<tr>
+							<th width="10%" function-type="maintenance">順序(可拖拉)</th>
+							<th width="10%" function-type="maintenance">新增</th>
+							<th width="10%" function-type="maintenance">刪除</th>
+							<th width="20%">顯示文字</th>
+							<th width="50%">連結網址</th>
+						</tr>
+					</thead>
+					<tbody ui-sortable="sortableOptions" ng-model="listBase">
+						<tr class="repeat-row" ng-repeat="row in listBase track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td function-type="maintenance">{{row.ORDER_NO}}</td>
+							<td function-type="maintenance"><button type="button" class="btn btn-info" ng-click="add($index)">新增</button></td>
+							<td function-type="maintenance"><button type="button" class="btn btn-info" ng-click="del($index)">刪除</button></td>
+							<td><input type="text" class="form-control" placeholder="請輸入..." id="LINK_NAME" name="LINK_NAME" ng-model="row.LINK_NAME" ng-disabled="!CanEdit" e-length-limit="50"></td>
+							<td>
+								<textarea id="LINK_URL" name="LINK_URL" class="form-control" ng-model="row.LINK_URL" style="width: 100%; height: 50px" ng-disabled="!CanEdit" e-length-limit="1000"></textarea>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<h4 align="center" ng-if="listBase.length == 0"><button type="button" class="btn btn-info" ng-click="add(0)" function-type="maintenance">新增</button></h4>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="save()" function-type="maintenance">儲存</button>
+				<button type="button" class="btn btn-info" ng-click="init()" function-type="maintenance">取消</button>
+			</div>
+		</div>
+	</div>
+</div>

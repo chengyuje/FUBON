@@ -1,0 +1,47 @@
+<style>
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.rstable tbody tr td {
+	vertical-align:middle;
+	text-align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG431/ORG431.js"></script>
+<div ng-controller="ORG431Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>
+	<div class="panel_content">
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<div class="text-center">
+				<button type="button" class="btn btn-success" ng-click="export()" function-type="export" ng-disabled="aoCntLst.length == 0"><span class="glyphicon glyphicon-save"></span>匯出</button>
+			</div>
+			<br>
+			<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="aoCntLst">
+				<thead>
+					<tr>
+						<th rowspan="2">職務</th>
+						<th rowspan="2">{{inputVO.nowMonth}}&nbsp;掛Goal人數</th>
+						<th colspan="3">{{inputVO.year}}應有員額</th>
+					</tr>
+					<tr>
+						<th>截至&nbsp;{{inputVO.toDay}}&nbsp;實際數</th>
+						<th>員額</th>
+						<th>缺額</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in aoCntLst track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td class='text-center' width="20%">{{row.ROLE_TYPE}}</td>
+						<td class='text-center' width="20%">{{row.GOAL_COUNTS}}</td>
+						<td class='text-center' width="20%">{{row.ACTUAL_COUNTS}}</td>
+						<td class='text-center' width="20%">{{row.QUOTA_COUNTS}}</td>
+						<td class='text-center' width="20%">{{row.SHORT_COUNTS}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

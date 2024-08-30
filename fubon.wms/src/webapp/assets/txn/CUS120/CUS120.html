@@ -1,0 +1,217 @@
+<style>
+/* open dialog */
+.ngdialog.CUS120 {
+	
+}
+/* dialog panl */
+.modal-dialog.CUS120 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 550px;
+	height: auto;
+}
+/* table size */
+.CUS120 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CUS120 table.little{
+	width: 60%;
+}
+/* change row */
+.CUS120.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CUS120_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CUS110/CUS110.js"></script>
+<script type="text/javascript" src="assets/txn/CUS120/CUS120.js"></script>
+<script type="text/javascript" src="assets/txn/CUS120/CUS121.js"></script>
+<div class="CUS120" ng-controller="CUS120Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >設定</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<uib-tabset active="0" justified="true">
+			<uib-tab index="0" heading="Email設定">
+				<div class="search_table search_box3">
+					<table>
+						<tr>
+							<td>
+								<div style="float: left">
+									<button class="btn btn-info" type="button" ng-click="btnAddContent()">新增訊息內容</button>
+<!-- 									<button class="btn btn-info" type="button" ng-click="testCust()">CUS110 Test-CUST</button> -->
+<!-- 									<button class="btn btn-info" type="button" ng-click="testAO()">CUS110 Test-AO</button> -->
+								</div>
+								<div style="float: right" ng-if="emailContent.conDis">
+									<button type="button" class="btn btn-info" ng-click="reviewContent('Y')" function-type="confirm">核可</button>
+									<button type="button" class="btn btn-info" ng-click="reviewContent('N')" function-type="confirm">退回</button>
+								</div>
+								<div style="clear: both;"></div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<!-- 結果區 -->
+				<e-jumping-once output="emailContent.outputVO_1" list="emailContent.data_1" totallist="emailContent.emailContentList"></e-jumping-once>
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="table-bordered td_center">
+						<thead>
+							<tr>
+								<th width="10%">
+									<label style="font-weight: initial;margin-bottom: 0px;" function-type="confirm">
+										<input type='checkbox' ng-model='emailContent.clickAll' ng-change='checkrowContent()' /> 本頁全選
+									</label>
+								</th>
+								<th width="10%">功能</th>
+								<th width="10%">覆核狀態</th>
+								<th width="10%">狀態</th>
+								<th>訊息內容</th>
+								<th>分類</th>
+								<th>產品分類</th>
+								<th>新增日期</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in emailContent.data_1 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td ng-if="row.REVIEW_STATUS == 'W'">
+									<label style="font-weight: initial;margin-bottom: 0px;" function-type="confirm">
+										<input type='checkbox' ng-model='row.SELECTED'>勾選
+									</label>
+								</td>
+								<td ng-if="row.REVIEW_STATUS != 'W'"></td>
+								<td ng-if="row.REVIEW_STATUS == 'W'"></td>
+								<td ng-if="row.REVIEW_STATUS != 'W'">
+									<div function-type="maintenance">
+										<e-combobox id="cmbAction" name="cmbAction"
+										ng-datasource="row.set"
+										ng-model="row.cmbAction"
+										ng-validate="false"
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="actionContent(row)"
+										width="100px"
+										style="line-height:20px;" />
+									</div>
+								</td>
+								<td>{{row.REVIEW_STATUS == 'W' ? '覆核中' : '已覆核'}}</td>
+								<td ng-if="row.REVIEW_STATUS == 'W'">{{row.ACT_TYPE == 'A' ? '新增' : row.ACT_TYPE == 'M' ? '編輯' : '刪除'}}</td>
+								<td ng-if="row.REVIEW_STATUS != 'W'"></td>
+								<td>{{row.CONTENT}}</td>
+								<td>{{row.CATEGORY_BY_CONTENT | mapping:CATEGORY_CONTENT:'F3'}}</td>
+								<td>{{row.CATEGORY_BY_PRODUCT | mapping:CATEGORY_PRODUCT:'F3'}}</td>
+								<td>{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd"}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</uib-tab> 
+			<uib-tab index="1" heading="附加檔案上傳" ng-click="emailAttachment()">
+				<div class="search_table search_box3">
+					<table>
+						<tr>
+							<td>
+								<div style="float: left">
+									檔案上傳&nbsp;
+									<button type="button" class="btn btn-info" ng-click="btnUploadAttachmnet()">選擇上傳檔案</button>
+								</div>
+								<div style="float: right" ng-if="attachContent.conDis">
+									<button type="button" class="btn btn-info" ng-click="reviewAttachmnet('Y')" function-type="confirm">核可</button>
+									<button type="button" class="btn btn-info" ng-click="reviewAttachmnet('N')" function-type="confirm">退回</button>
+								</div>
+								<div style="clear: both;"></div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<!-- 結果區 -->
+				<e-jumping-once output="attachContent.outputVO_2" list="attachContent.data_2" totallist="attachContent.emailAttachmentList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="table-bordered td_center">
+						<thead>
+							<tr>
+								<th width="10%">
+									<label style="font-weight: initial;margin-bottom: 0px;" function-type="confirm">
+										<input type='checkbox' ng-model='attachContent.clickAll' ng-change='checkrowAttachment()' /> 本頁全選
+									</label>
+								</th>
+								<th width="10%">功能</th>
+								<th width="10%">覆核狀態</th>
+								<th width="10%">狀態</th>
+								<th>文件編號</th>
+								<th>文件名稱</th>
+								<th>檔案名稱</th>
+								<th>分類</th>
+								<th>產品分類</th>
+								<th>上傳日期</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in attachContent.data_2 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td ng-if="row.REVIEW_STATUS == 'W'">
+									<label style="font-weight: initial;margin-bottom: 0px;" function-type="confirm">
+										<input type='checkbox' ng-model='row.SELECTED'>勾選
+									</label>
+								</td>
+								<td ng-if="row.REVIEW_STATUS != 'W'"></td>
+								<td ng-if="row.REVIEW_STATUS == 'W'"></td>
+								<td ng-if="row.REVIEW_STATUS != 'W'">
+									<div function-type="maintenance">
+										<e-combobox id="cmbAction" name="cmbAction"
+										ng-datasource="row.set"
+										ng-model="row.cmbAction"
+										ng-validate="false"
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="actionAttachmnet(row)"
+										width="100px"
+										style="line-height:20px;" />
+									</div>
+								</td>
+								<td>{{row.REVIEW_STATUS == 'W' ? '覆核中' : '已覆核'}}</td>
+								<td ng-if="row.REVIEW_STATUS == 'W'">{{row.ACT_TYPE == 'A' ? '新增' : row.ACT_TYPE == 'M' ? '編輯' : '刪除'}}</td>
+								<td ng-if="row.REVIEW_STATUS != 'W'"></td>
+								<td>{{row.DOC_ID}}</td>
+								<td><a onclick="return false" ng-click="download(row)">{{row.DOCNAME}}</a></td>
+								<td>{{row.FILENAME}}</td>
+								<td>{{row.CATEGORY_BY_CONTENT | mapping:CATEGORY_CONTENT:'F3'}}</td>
+								<td>{{row.CATEGORY_BY_PRODUCT | mapping:CATEGORY_PRODUCT:'F3'}}</td>
+								<td>{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd"}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</uib-tab> 
+		</uib-tabset>
+	</div>
+</div>

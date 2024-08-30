@@ -1,0 +1,348 @@
+<style>
+/* open dialog */
+.ngdialog.PMS307 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS307 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+/*
+.PMS307 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+*/
+.PMS307 table.little {
+	width: 89%;
+}
+/* change row */
+.PMS307.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+/* scroll && height */
+.scroll_PMS307_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS307/PMS307.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS307" ng-controller="PMS307Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="on" enter-as-tab>
+					<table>
+						<tr>
+							<th>*報表類型</th>
+							<td><e-combobox ng-datasource="mappingSet['seture1']"
+									ng-model="checked" 
+									ng-validate="false" 
+									ng-readonly="false"
+									ng-editable="false" 
+									ng-format="F3" 
+									ng-required="true"
+									ng-change="Reports();ChangeReport()" 
+									width="200px" height="30px" style="line-height:20px;"  /></td>
+							<th>業務處：</th>
+							<td><e-combobox ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id" 
+									ng-validate="false"
+									ng-disabled="disableRegionCombo"
+							        ng-readonly="disableRegionCombo" 
+							        ng-editable="false" 
+							        ng-format="F3"
+									ng-change="ChangeRegion()" 
+									ng-required="false" 
+									width="200px" height="30px" style="line-height:20px;" /></td>
+							<th>分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr" 
+									ng-validate="false"
+									ng-disabled="disableBranchCombo"
+							        ng-readonly="disableBranchCombo" 
+							        ng-editable="false" 
+							        ng-format="F1"
+									ng-required="false" 
+									ng-change="ChangeBranch()" 
+									width="200px"
+									height="30px" style="line-height:20px;" /></td>
+						</tr>
+						<tr>
+							<th ng-if="inputVO.seture1 != 2"><r color="red">*</r>資料統計日期：</th>
+							<td ng-if="inputVO.seture1 != 2">
+								<div class="input-group datebox datewidth">
+									<input type="text" class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd" 
+										ng-model="inputVO.sCreDate"
+										is-open="model.a" 
+										datepicker-options="bgn_sDateOptions"
+										alt-input-formats="altInputFormats" 
+										ng-readonly="true"
+										ng-change="limitDate();dateChange()" 
+										ng-required="true" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" 
+											class="btn btn-default"
+											ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>				
+							<th ng-if="inputVO.seture1 == 2"><r color="red">*</r>資料統計月份：</th>
+							<td ng-if="inputVO.seture1 == 2">						 						 
+								<e-combobox id="dataMonth" name="dataMonth" 
+									ng-datasource="mappingSet['timeE']"
+									ng-model="inputVO.sCreDate"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-required="true"
+									ng-change="limitDate();dateMonthChange()"
+									ng-format="F3"
+									width="150px"
+									style="line-height:20px;" />														
+							</td>						
+							<th>營運區：</th>
+							<td><e-combobox ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id" 
+									ng-validate="false" 
+									ng-disabled="disableAreaCombo"
+							        ng-readonly="disableAreaCombo"
+									ng-editable="false" 
+									ng-change="ChangeArea()" 
+									ng-format="F3"
+									ng-required="false" 
+									width="200px" height="30px" style="line-height:20px;" /></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+<!-- 			<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping> -->
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：</td>
+						<td>每日</td>
+					</tr>
+					<tr>
+						<td>產出日：</td>
+						<td>{{toJsDate(paramList[0].CREATETIME) | date:'yyyy/MM/dd'}}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="height: 500px; white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr class="middle">
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行<br>代號</th>
+							<th rowspan="2">營業單位</th>
+							<th rowspan="2">組別</th>						
+							<th colspan="2" ng-show="checked !='3'">保險戰報實績</th>							
+							<th colspan="3" ng-show="checked !='3'">已核實預估佣收</th>
+							<th colspan="3" ng-show="checked !='1'">已發單已結案(A)</th>
+							<th colspan="3">核保通過,待結案(B)</th>
+							<th colspan="3">照會中(D&E)</th>
+							<th colspan="3">核保中(C)</th>
+							<th colspan="3">契撤/取消/拒保/延期(FGHI)</th>							
+							<th colspan="2" ng-show="checked =='1'">其他(J)</th>
+							<th colspan="3" ng-show="checked !='1'">其他(J)</th>					
+						</tr>
+						<tr class="middle">
+							<TH ng-show="checked !='3'">件數</TH>
+							<TH ng-show="checked !='3'">預估收益</TH>
+							<TH ng-show="checked !='3'">件數</TH>
+							<TH ng-show="checked !='3'">核實佣收</TH>
+							<TH ng-show="checked !='3'">比例</TH>		
+							<TH ng-show="checked !='1'">件數</TH>
+							<TH ng-show="checked !='1'">核實佣收</TH>
+							<TH ng-show="checked !='1'">比例</TH>						
+							<TH>件數</TH>
+							<TH>預估收益</TH>
+							<TH>比例</TH>		
+							<TH>件數</TH>
+							<TH>預估收益</TH>
+							<TH>比例</TH>								
+							<TH>件數</TH>
+							<TH>預估收益</TH>
+							<TH>比例</TH>								
+							<TH>件數</TH>
+							<TH>預估收益</TH>
+							<TH>比例</TH>								
+							<TH>件數</TH>
+							<TH>預估收益</TH>
+							<TH ng-show="checked !='1'">比例</TH>																
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat-start=" (a,dataA) in paramList | orderBy: 'REGION_CENTER_ID' | groupBy: 'REGION_CENTER_NAME' as resultA">
+							<td rowspan="{{ dataA.length + numGroups(resultB)*2+1}}">{{a}}</td>
+						</tr>
+						<tr ng-repeat-start=" (b, dataB) in dataA | orderBy: 'BRANCH_AREA_ID' | groupBy: 'BRANCH_AREA_NAME' as resultB">
+							<td rowspan="{{dataB.length + 1}}">{{b}}</td>
+						</tr>
+						<tr ng-repeat=" c in dataB">
+							<td>{{c.BRANCH_NBR}}</td>
+							<td>{{c.BRANCH_NAME}}</td>
+							<td>{{c.BRANCH_CLS}}</td>
+							<td align="right" ng-show="checked !='3'">{{0+c.BASE_TX_CNT }}</td>
+							<td align="right" ng-show="checked !='3'">{{0+c.BASE_ANNU_ACT_FEE | currency:''}}</td>								
+							<td align="right" ng-show="checked !='3'">{{0+c.DAY_CLOSE_CNT }}</td>
+							<td align="right" ng-show="checked !='3'">{{0+c.DAY_CLOSE_COMIS_Y | currency:''}}</td>
+							<td align="right" ng-show="checked !='3'">{{0+c.DAY_CLOSE_PETG | currency:''}}</td>	
+							<td align="right" ng-show="checked !='1'">{{0+c.A_CNT }}</td>
+							<td align="right" ng-show="checked !='1'">{{0+c.A_ANNU_ACT_FEE | currency:''}}</td>
+							<td align="right" ng-show="checked !='1'">{{0+c.A_PETG | currency:''}}</td>						
+							<td align="right">{{0+c.B_CNT }}</td>
+							<td align="right">{{0+c.B_ANNU_ACT_FEE | currency:'' }}</td>
+							<td align="right">{{0+c.B_PETG | currency:'' }}</td>
+							<td align="right">{{0+c.DE_CNT }}</td>
+							<td align="right">{{0+c.DE_ANNU_ACT_FEE | currency:'' }}</td>
+							<td align="right">{{0+c.DE_PETG | currency:'' }}</td>							
+							<td align="right">{{0+c.C_CNT }}</td>
+							<td align="right">{{0+c.C_ANNU_ACT_FEE | currency:'' }}</td>
+							<td align="right">{{0+c.C_PETG | currency:'' }}</td>								
+							<td align="right">{{0+c.FGHI_CNT }}</td>
+							<td align="right">{{0+c.FGHI_ANNU_ACT_FEE | currency:'' }}</td>
+							<td align="right">{{0+c.FGHI_PETG | currency:'' }}</td>								
+							<td align="right">{{0+c.J_CNT }}</td>
+							<td align="right">{{0+c.J_ANNU_ACT_FEE | currency:'' }}</td>	
+							<td align="right" ng-show="checked !='1'">{{0+c.J_PETG | currency:'' }}</td>							
+						</tr>
+						<tr ng-repeat-end="">
+							<td colspan="4" align="center">{{b}} 合計</td>
+							<td align="right" ng-show="checked !='3'">{{0+getSum(dataB, 'BASE_TX_CNT') }}</td>
+							<td align="right" ng-show="checked !='3'">{{0+getSum(dataB, 'BASE_ANNU_ACT_FEE') | currency:''}}</td>
+							<td align="right" ng-show="checked !='3'">{{0+getSum(dataB, 'DAY_CLOSE_CNT') }}</td>
+							<td align="right" ng-show="checked !='3'">{{0+getSum(dataB, 'DAY_CLOSE_COMIS_Y') | currency:''}}</td>
+							<td align="right" ng-show="checked !='3'">{{0+getSum(dataB, 'DAY_CLOSE_PETG') | currency:''}}</td>
+							<td align="right" ng-show="checked !='1'">{{0+getSum(dataB, 'A_CNT') }}</td>
+							<td align="right" ng-show="checked !='1'">{{0+getSum(dataB, 'A_ANNU_ACT_FEE') | currency:''}}</td>
+							<td align="right" ng-show="checked !='1'">{{0+getSum(dataB, 'A_PETG') | currency:''}}</td>
+							<td align="right">{{0+getSum(dataB, 'B_CNT') }}</td>
+							<td align="right">{{0+getSum(dataB, 'B_ANNU_ACT_FEE') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataB, 'B_PETG') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataB, 'DE_CNT') }}</td>
+							<td align="right">{{0+getSum(dataB, 'DE_ANNU_ACT_FEE') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataB, 'DE_PETG') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataB, 'C_CNT') }}</td>
+							<td align="right">{{0+getSum(dataB, 'C_ANNU_ACT_FEE') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataB, 'C_PETG') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataB, 'FGHI_CNT') }}</td>
+							<td align="right">{{0+getSum(dataB, 'FGHI_ANNU_ACT_FEE') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataB, 'FGHI_PETG') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataB, 'J_CNT') }}</td>
+							<td align="right">{{0+getSum(dataB, 'J_ANNU_ACT_FEE') | currency:'' }}</td>	
+							<td align="right" ng-show="checked !='1'">{{0+getSum(dataB, 'J_PETG') | currency:'' }}</td>							
+						</tr>
+						<tr ng-repeat-end="">
+							<td colspan="5" align="center">{{a}} 合計</td>
+							<td align="right" ng-show="checked !='3'">{{0+getSum(dataA, 'BASE_TX_CNT') }}</td>
+							<td align="right" ng-show="checked !='3'">{{0+getSum(dataA, 'BASE_ANNU_ACT_FEE') | currency:''}}</td>
+							<td align="right" ng-show="checked !='3'">{{0+getSum(dataA, 'DAY_CLOSE_CNT') }}</td>
+							<td align="right" ng-show="checked !='3'">{{0+getSum(dataA, 'DAY_CLOSE_COMIS_Y') | currency:''}}</td>
+							<td align="right" ng-show="checked !='3'">{{0+getSum(dataA, 'DAY_CLOSE_PETG') | currency:''}}</td>
+							<td align="right" ng-show="checked !='1'">{{0+getSum(dataA, 'A_CNT') }}</td>
+							<td align="right" ng-show="checked !='1'">{{0+getSum(dataA, 'A_ANNU_ACT_FEE') | currency:''}}</td>
+							<td align="right" ng-show="checked !='1'">{{0+getSum(dataA, 'A_PETG') | currency:''}}</td>
+							<td align="right">{{0+getSum(dataA, 'B_CNT') }}</td>
+							<td align="right">{{0+getSum(dataA, 'B_ANNU_ACT_FEE') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataA, 'B_PETG') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataA, 'DE_CNT') }}</td>
+							<td align="right">{{0+getSum(dataA, 'DE_ANNU_ACT_FEE') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataA, 'DE_PETG') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataA, 'C_CNT') }}</td>
+							<td align="right">{{0+getSum(dataA, 'C_ANNU_ACT_FEE') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataA, 'C_PETG') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataA, 'FGHI_CNT') }}</td>
+							<td align="right">{{0+getSum(dataA, 'FGHI_ANNU_ACT_FEE') | currency:''}}</td>
+							<td align="right">{{0+getSum(dataA, 'FGHI_PETG') | currency:'' }}</td>
+							<td align="right">{{0+getSum(dataA, 'J_CNT') }}</td>
+							<td align="right">{{0+getSum(dataA, 'J_ANNU_ACT_FEE') | currency:'' }}</td>
+							<td align="right" ng-show="checked !='1'">{{0+getSum(dataA, 'J_PETG') | currency:'' }}</td>					
+						</tr>
+					</tbody>
+				</table>	
+			</div>
+			<div algin="left">
+				<table>
+					<tr>
+						<td align="right">說明：</td>
+						<td align="left"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

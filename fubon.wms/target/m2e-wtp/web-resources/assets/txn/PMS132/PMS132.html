@@ -1,0 +1,153 @@
+
+<script type="text/javascript" src="assets/txn/PMS132/PMS132.js"></script>
+<div class="PMS132" ng-controller="PMS132Controller" ng-cloak>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="tfb_content">
+        		<div class="tfb_content_icon"></div>
+        		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >團獎試算參數維護</div>
+      		</div>
+      		<!--Content of the panel-->
+			<div class="panel_content">
+				<uib-tabset active="0" justified="true">
+					<uib-tab index="0" heading="業務處回覆組別明細檔" select="init();">
+						<div id="tab1">
+							<h4 class="h4-title">查詢條件</h4>
+			        		<div class="search_table search_box2 scroll_y">
+			          			<table>
+						            <tr>
+						              	<th>DT查詢碼：</th>
+						                <td><input type="text" class="form-control" placeholder="請輸入..." id="DTCCC" name="DTCCC" ng-model="inputVO.dtccc" e-length-limit="15" style="width:150px; text-align: left; display:inline-block; margin-left:.5em;"></td>
+										<th></th>
+										<td></td>
+										<th></th>
+										<td></td>
+									</tr>
+				          		</table>
+			        		</div>
+			        		<div class="search_box_btn text-center">
+								<button type="button" class="btn btn-info" ng-click="queryData('G');" function-type="query">查詢</button>
+								<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+								<button type="button" class="btn btn-info" ng-click="getExample('G');" function-type="export">下載範例</button>
+								<span id="csvBox" style="display: inline-block;vertical-align: middle;" function-type="export">
+									<e-upload id="csvUpload" success="updGroupBonusCal(name, rname)" text="上傳" accept=".csv" ></e-upload>
+								</span>
+								<button type="button" class="btn btn-info" ng-click="export('G');" function-type="export" ng-disabled="paramList.length == 0">匯出</button>
+							</div>
+			        		<h4 class="h4-title">查詢結果</h4>
+				        	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				          		<table class="table-bordered">
+				          			<thead>
+					            		<tr>
+					              			<th>DT查詢碼</th>
+											<th>編號</th>
+											<th>業務處回覆組別</th>
+											<th>DT CODE</th>
+											<th>業務處</th>
+											<th>營運區</th>
+											<th>分行代碼</th>
+											<th>分行名稱</th>
+											<th>職級</th>
+											<th>員編</th>
+											<th>姓名</th>
+											
+											<th>成本</th>
+											<th>倍數</th>
+											<th>財務指標得分</th>
+											<th>行為指標扣減金額</th>
+											
+											<th>門檻</th>
+											<th>生產力基期</th>
+											<th>DT生產力基期</th>
+											
+											<th>DT獎金率</th>
+											<th>DT獎金率加碼</th>
+											<th>無違規/客訴加碼</th>
+											
+											<th>去年收益</th>
+											<th>去年成本</th>
+											<th>去年掛GOAL月數</th>
+										  	<th>去年收益/平均每月</th>
+											<th>DT去年收益</th>
+											<th>DT去年成本</th>
+											
+											<th>是否Leader</th>
+					              		</tr>
+				              		</thead>
+				              		<tbody>
+					              		<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.DTCCC}}</td>
+											<td>{{row.NO}}</td>
+											<td>{{row.GRN}}</td>
+											<td>{{row.DT_CODE}}</td>
+											<td>{{row.REGION_CENTER_NAME}}</td>
+											<td>{{row.BRANCH_AREA_NAME}}</td>
+											<td>{{row.BRANCH_NBR}}</td>
+											<td>{{row.BRANCH_NAME}}</td>
+											<td>{{row.JOB_TITLE_NAME}}</td>
+											<td>{{row.EMP_ID}}</td>
+											<td>{{row.EMP_NAME}}</td>
+											
+											<td>{{row.WANBP | number:0}}</td>
+											<td>{{row.MUL | number:1}}</td>
+											<td>{{row.FS | number:0}}</td>
+											<td>{{row.BP | number:0}}</td>
+											
+											<td>{{row.QUAL | number:0}}</td>
+											<td>{{row.PDBBP | number:2}}</td>
+											<td>{{row.PDBB_DT | number:2}}</td>
+											
+											<td>{{row.GCPOR_DT | number:2}} %</td>
+											<td>{{row.GCPORUP1_DT | number:0}}</td>
+											<td>{{row.GCPORUP2_DT | number:2}} %</td>
+											
+											<td>{{row.LAST_Y_REBP | number:10}}</td>
+											<td>{{row.LAST_Y_TWPCBP | number:0}}</td>
+											<td>{{row.LAST_Y_GM | number:0}}</td>
+											<td>{{row.LAST_Y_AVRP | number:0}}</td>
+											<td>{{row.LAST_Y_REBDT_DT | number:0}}</td>
+											<td>{{row.LAST_Y_TWPCBP_DT | number:0}}</td>
+											
+											<td>{{row.LEADER_YN}}</td>
+										</tr>
+									</tbody>
+				         		</table>
+				        	</div>
+						</div>
+					</uib-tab> 
+					<uib-tab index="1" heading="個人獎金率" select="queryData('P');">
+						<div id="tab2">
+							<div class="search_box_btn text-left">
+								<button type="button" class="btn btn-info" ng-click="getExample('P');" function-type="export">下載範例</button>
+								<span id="csvBox2" style="display: inline-block;vertical-align: middle;"  function-type="export">
+									<e-upload id="csvUpload2" success="updPersonalBonusCal(name, rname)" text="上傳" accept=".csv"></e-upload>
+								</span>
+								<button type="button" class="btn btn-info" ng-click="export('P');" function-type="export" ng-disabled="paramList.length == 0">匯出</button>
+							</div>
+			        		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				          		<table class="table-bordered">
+				          			<thead>
+										<tr>
+											<th>收益絕對數(最小值)</th>
+											<th>收益絕對數(最大值)</th>
+											<th>職稱</th>
+											<th>獎金率</th>
+										</tr>
+									</thead>
+									<tbody>
+					              		<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.INCOME_MIN | number:0}}</td>
+											<td>{{row.INCOME_MAX | number:0}}</td>
+											<td>{{row.JOB_TITLE_NAME}}</td>
+											<td>{{row.BONUS_RATE | number:2}} %</td>
+										</tr>
+									</tbody>
+								</table>
+				        	</div>
+						</div>
+					</uib-tab>
+				</uib-tabset>
+			</div>
+		</div>        		
+	</div>
+</div>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.systex.jbranch.platform.common.platformdao.table">
+    <class table="TBSYSDMSECTION" name="TbsysdmsectionVO" optimistic-lock="version">
+        <id name="sectionID" column="SECTIONID" type="string"/>
+        <version column="VERSION" generated="never" name="version" type="long"/>
+        <property name="luNo" column="LUNO" type="string"/>
+        <property name="txnCode" column="TXNCODE" type="string"/>
+        <property name="txnName" column="TXNNAME" type="string"/>
+        <many-to-one name="workstation"
+                     class="TbsysdmworkstationVO"
+                     column="WSID"
+                     not-null="true"/>
+        <one-to-one name="serverTransaction" class="TbsysdmservertransactionVO" constrained="true" cascade="delete"/>
+        <one-to-one name="clientTransaction" class="TbsysdmclienttransactionVO" constrained="true" cascade="delete"/>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,83 @@
+<style>
+    /* open dialog */
+    .ngdialog.CRM827_ETF {
+
+    }
+</style>
+<script type="text/javascript" src="assets/txn/CRM822/CRM822.js"></script>
+<script type="text/javascript" src="assets/txn/CRM827/CRM827_ETF.js"></script>
+
+<div class="CRM827_ETF" ng-controller="CRM827_ETFController" ng-cloak>
+    <h4 class="h4-title">海外ETF/海外股票</h4>
+    <div class="search_table search_box3">
+			<table>
+				<tr style="margin-left: 10px">
+					<th>參考總市值(約當新臺幣)：</th>
+					<!-- 參考總資產=庫存+在途款+賣出委託之庫存市值-已使用在途款-帳戶圈存金額+買進委託。 -->
+					<!-- 參考總資產= 0001 台幣市值 + 0009台幣數字 + 0004台幣市值 – 0006台幣數字 – 0007台幣數字 + 0008 台幣數字 -->
+					<td style="text-align: right;">{{TotalAssets |currency:''}}</td>
+					<td></td>
+					<th>庫存投資報酬率(不含配息)：</th>
+					<td style="text-align: right;">{{Return | number :2}} %</td>
+					<td></td>
+				</tr>
+				<tr style="margin-left: 10px">
+					<th>庫存總市值：</th>	<!-- 商品庫存市值加總 -->
+					<td style="text-align: right;">{{SUMCurBalNT | currency:''}}</td>
+					<td></td>
+					<th></th>
+					<td style="text-align: right;"></td>
+					<td></td>
+				</tr>
+				<tr style="margin-left: 10px">
+					<th>庫存投資金額：</th>
+					<td style="text-align: right;">{{SUMCurBalCost | currency:''}}</td>
+					<td></td>
+					<th></th>
+					<td style="text-align: right;"></td>
+					<td></td>
+				</tr>
+				<tr style="margin-left: 10px">
+					<th>庫存投資損益金額：</th>
+					<td style="text-align: right;">{{SUMProfitAndLoss | currency:''}}</td>
+					<td></td>
+					<th></th>
+					<td style="text-align: right;"></td>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+    <e-jumping-once output="outputVO" list="data" totallist="ETFList"></e-jumping-once>
+    <div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+        <table class="modal-body table-bordered">
+            <tr>
+                <th>商品代號</th>
+                <th>商品名稱</th>
+                <th>股數</th>
+                <th>交易幣別</th>
+                <th>參考收盤價</th>
+                <th>外幣參考市值</th>
+                <th>參考報酬率</th>
+                <th>投資金額</th>
+                <th>契約編號</th>
+            </tr>
+            <tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                <td style="text-align: left;"> {{row.PROD_ID}}</td>
+                <td style="text-align: right;">{{row.PROD_NAME}}</td>
+                <td style="text-align: left;"> {{row.STK_AMT}}</td>
+                <td style="text-align: right;">{{row.CRCY_TYPE}}</td>
+                <td style="text-align: right;">{{row.CLOSE_PRICE | currency:''}}</td>
+                <td style="text-align: right;">{{row.REF_MKT_VAL | currency:''}}</td>
+                <td style="text-align: right;">{{row.REF_RATE_RETURN}}{{row.REF_RATE_RETURN != null && row.REF_RATE_RETURN != undefined && row.REF_RATE_RETURN != '' ? '%' : ''}}</td>
+                <td style="text-align: right;">{{row.INV_AMT     | currency:''}}</td>
+                <td style="text-align: right;">{{inputVO.contract_no}}</td>
+            </tr>
+        </table>
+    </div>
+    <div style="text-align: left;">
+         注意事項：</br>
+    1.「參考總資產（約當新臺幣）」係依上述各商品庫存、在途款、賣出委託的資產折換為臺幣估算，若商品庫存含盤中成交之商品，將扣除盤中買進成交商品之已使用在途款及帳戶圈存金額；參考總資產=庫存+在途款+賣出委託之庫存市值-已使用在途款-帳戶圈存金額+買進委託。</br>
+	2.「庫存投資金額」為商品庫存之投資本金(不含包含費用)加總。</br>
+	3.「庫存投資損益金額」為商品庫存總市值減去庫存投資金額(不含包含費用)。
+</div>
+</div>

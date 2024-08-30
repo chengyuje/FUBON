@@ -1,0 +1,135 @@
+	<style>
+/* open dialog */
+.ngdialog.CRM661_rel_set {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM661_rel_set {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+/* table size */
+.CRM661_rel_set table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM661_rel_set.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM661_rel_set_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpseting{
+	pseting:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+
+/* check box css */
+input.faChkRnd, input.faChkSqr {
+  visibility: hidden;
+}
+input.faChkRnd:checked:after, input.faChkRnd:after,
+input.faChkSqr:checked:after, input.faChkSqr:after {
+  visibility: visible;
+  font-family: FontAwesome;
+  font-size:22px;height: 14px; width: 14px;
+  position: relative;
+  top: -3px;
+  left: 0px;
+  background-color:#FFF;
+  display: inline-block;
+}
+
+input.faChkRnd:checked:after {
+  content: '\f058';
+}
+
+input.faChkRnd:after {
+  content: '\f10c';
+}
+
+input.faChkSqr:checked:after {
+  content: '\f14a';
+}
+
+input.faChkSqr:after {
+  content: '\f096';
+}
+
+</style>
+
+
+
+<div ng-controller="CRM661_rel_setController" ng-cloak >
+	<div class="modal-dialog  CRM661_rel_set">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">歸戶服務設定</h4>
+			</div>
+			<div class="modal-body panel_content">
+			<div class="gv_tab_sc scroll_y" style="height:250px;white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>客戶姓名</th>
+							<th>客戶ID</th>
+							<th>關係</th>
+							<th>分行</th>
+							<th>歸戶服務</th>
+							<th>主戶設定</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList_rel_set | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align = "center">{{$index + 1}}</td>
+							<td align = "center">{{row.CUST_NAME}}</td>
+							<td align = "center">{{row.CUST_ID}}</td>
+							<td align = "center">{{row.REL_TYPE| mapping:mappingSet['CRM.REL_TYPE']:'F3'}}</td>
+							<td align = "center">{{row.BRANCH_NAME}}</td>
+							<td align = "center">
+								<input type="checkbox" name="checkbox" class="faChkSqr" 
+								ng-model = "row.JOIN_SRV_YN" 
+								ng-true-value="'Y'" ng-false-value="'N'">
+							</td>
+							<td align = "center">
+								<input type="radio" name = "join_srv_cust_id" 
+								ng-model="inputVO.join_srv_cust_id" 
+								ng-value="row.CUST_ID" 
+								ng-disabled = "row.JOIN_SRV_YN_CHECK != 'Y' || row.REL_STATUS == 'RAJ'">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<div class="modal-footer" style="text-align: center">
+				<button type="button" class="btn btn-primary" ng-click="rel_set()" >儲存</button>
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+		</div>
+		</div>
+	</div>
+	
+</div>

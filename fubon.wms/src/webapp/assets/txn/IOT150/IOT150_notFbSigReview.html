@@ -1,0 +1,198 @@
+<style>
+    /* dialog panel */
+    .modal-dialog.IOT150_notFbSigReview {
+        position: relative;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        min-width: 95vw;
+        height: auto;
+    }
+
+    .modal-dialog.IOT150_notFbSigReview .modal-body {
+        max-height: 75vh;
+    }
+
+    /* table size */
+    .IOT150_notFbSigReview table {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* change row */
+    .IOT150_notFbSigReview.table > tbody > tr > td {
+        table-layout: fixed;
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+
+    .IOT150_notFbSigReview .datewidth {
+        width: 180px !important;
+        float: left;
+    }
+</style>
+<div ng-controller="IOT150_notFbSigReviewController" ng-cloak>
+    <form name="IOT150NotFbSigReviewForm" class="form-horizontal" data-toggle="validator" role="form"
+          autocomplete="off" enter-as-tab>
+        <div class="modal-dialog IOT150_notFbSigReview">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+                    <h4 id="myModalAlertLabel" class="modal-title" align="center">
+                        送件明細表保險公司簽收回覆作業(非富壽)
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <!-- Inquire Zone -->
+                    <table style="width: 80%;margin-left: auto;margin-right: auto;">
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3">*類型：</th>
+                            <td class="col-md-7 tdpadding">
+                                <input id="isNewReg" type="radio" name="isNewReg" ng-model="inputVO.isNewReg" value="true" required>
+                                <label for="isNewReg">新契約</label>
+                                    &emsp;&emsp;&emsp;&emsp;
+                                <input id="isNonNewReg" type="radio" name="isNewReg" ng-model="inputVO.isNewReg" value="false" required>
+                                <label for="isNonNewReg">非新契約</label>
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3">文件狀態</th>
+                            <td class="col-md-7 tdpadding">總行點收送件(簽署後)</td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3">*送保險公司日期：</th>
+                            <td class="col-md-7 tdpadding">
+                                <div class="form-group">
+                                    <div class="input-group datebox datewidth">
+                                        <input type="text" id="notFbBatchDateStart" name="notFbBatchDateStart"
+                                               class="form-control"
+                                               uib-datepicker-popup="yyyy/MM/dd"
+                                               ng-model="inputVO.notFbBatchDateStart"
+                                               is-open="calendar.notFbBatchDateStart"
+                                               datepicker-options="notFbBatchDateObj.sDateOptions"
+                                               ng-readonly="true"
+                                               ng-change="limitDate(notFbBatchDateObj, inputVO.notFbBatchDateStart, inputVO.notFbBatchDateEnd)"
+                                               style="width:150px;"
+                                        />
+                                        <!-- 製作日曆button -->
+                                        <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default"
+                                                ng-click="openCalendar($event,'notFbBatchDateStart')">
+                                        <i class="glyphicon glyphicon-calendar"></i></button>
+						            </span>
+                                    </div>
+                                    <div style="float: left !important;">～</div>
+                                    <div class="input-group datebox datewidth">
+                                        <input type="text" id="notFbBatchDateEnd" name="notFbBatchDateEnd"
+                                               class="form-control"
+                                               uib-datepicker-popup="yyyy/MM/dd"
+                                               ng-model="inputVO.notFbBatchDateEnd"
+                                               is-open="calendar.notFbBatchDateEnd"
+                                               datepicker-options="notFbBatchDateObj.eDateOptions"
+                                               ng-readonly="true"
+                                               ng-change="limitDate(notFbBatchDateObj, inputVO.notFbBatchDateStart, inputVO.notFbBatchDateEnd)"
+                                               style="width:150px;"
+                                        />
+                                        <!-- 製作日曆button -->
+                                        <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default"
+                                                ng-click="openCalendar($event,'notFbBatchDateEnd')">
+                                        <i class="glyphicon glyphicon-calendar"></i></button>
+						            </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3">點收經辦員編：</th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text"
+                                       class="form-control"
+                                       name="aftSignOprId"
+                                       ng-model="inputVO.aftSignOprId"/>
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3">*保險公司：</th>
+                            <td class="col-md-7 tdpadding">
+                                <e-combobox id="insuranceCoSerialNum" name="insuranceCoSerialNum"
+                                            ng-datasource="mappingSet['COMPANY']"
+                                            ng-model="inputVO.companyNum"
+                                            ng-validate="false"
+                                            ng-readonly="false"
+                                            ng-editable="false"
+                                            ng-format="F3"
+                                            width="360px"
+                                            style="line-height:20px;"
+                                            required
+                                />
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                    </table>
+                    <div class="search_box_btn text-center">
+                        <button function-type="query" ng-click="inquire()" class="btn btn-info">查詢</button>
+                    </div>
+                    <!-- 結果區 -->
+                    <h4 class="h4-title">查詢結果</h4>
+                    <e-jumping-once output="outputVO" list="paramList" totallist="totalList"></e-jumping-once>
+                    <div class="gv_tab_sc" style="white-space: nowrap;min-height:235px;overflow-x: auto;">
+                        <table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true"
+                               e-list="paramList">
+                            <thead>
+                            <tr>
+                                <th function-type="maintenance">
+                                    <label for="clickAll">勾選</label>
+                                    <input id="clickAll" type='checkbox' ng-model="checkVO.clickAll"
+                                           ng-click="checkRow()">
+                                </th>
+                                <th>保險文件編號</th>
+                                <th>險種代號</th>
+                                <th>送件類型</th>
+                                <th>保險公司</th>
+                                <th>備註(傳給人壽)</th>
+                                <th>送保險公司批號</th>
+                                <th>送保險公司日期</th>
+                                <th>保險公司回饋簽收日期</th>
+                                <th>保險公司簽收窗口</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="repeat-row" ng-repeat="row in paramList track by $index">
+                                <td function-type="maintenance"><input type='checkbox' ng-model='row.SELECTED'/></td>
+                                <td ng-bind="row.INS_ID"></td>
+                                <td ng-bind="row.INSPRD_ID"></td>
+                                <td ng-bind="row.REG_TYPE_NAME"></td>
+                                <td ng-bind="row.COMPANY_NUM | mapping:mappingSet['COMPANY']:F3 "></td>
+                                <td ng-bind="row.REMARK_BANK"></td>
+                                <td ng-bind="row.NOT_FB_BATCH_SEQ"></td>
+                                <td ng-bind="toJsDate(row.NOT_FB_BATCH_DATE) | date:'yyyy/MM/dd'"></td>
+                                <td ng-bind="toJsDate(row.NOT_FB_SIGN_DATE) | date:'yyyy/MM/dd'"></td>
+                                <td ng-bind="row.NOT_FB_OP_NAME"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="search_box_btn text-center">
+                    <button type="button" class="btn btn-primary" ng-click="review()"
+                            ng-disabled="lockPrintButton" function-type="maintenance">
+                        產生保險公司簽收紀錄(非富壽)
+                    </button>
+                    <button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">關閉</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

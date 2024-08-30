@@ -1,0 +1,439 @@
+<style>
+/* open dialog */
+.ngdialog.PMS305 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS305 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+/*
+.PMS305 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+*/
+.PMS305 table.little {
+	width: 89%;
+}
+/* change row */
+.PMS305.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS305_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS305/PMS305.js"></script>
+<script type="text/javascript" src="assets/txn/PMS305/PMS305_QUERY.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS305" ng-controller="PMS305Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th width="80px"><r color="red">*</r>戰報日：</th>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd" 
+											ng-model="inputVO.sCreDate"
+											is-open="model.a" 
+											datepicker-options="bgn_sDateOptions"
+											alt-input-formats="altInputFormats" 
+											ng-readonly="true"
+											ng-change="limitdate();dateChange()"
+											 style="width: 145px; "
+										 	ng-required="true" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+							<th width="70px">業務處：</th>
+							<td>
+								<e-combobox ng-datasource="REGION_LIST"
+											ng-model="inputVO.region_center_id" 
+											ng-validate="false"
+											ng-disabled="disableRegionCombo"
+							        		ng-readonly="disableRegionCombo" 
+							        		ng-editable="false" 
+							        		ng-format="F3"
+											ng-change="ChangeRegion()" 
+											ng-required="false" 
+											width="143px" height="30px" style="line-height:20px;" />
+							</td>
+
+							<th>分行別：</th>
+							<td>
+								<e-combobox ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.branch_nbr" 
+											ng-validate="false"
+											ng-disabled="disableBranchCombo"
+							        		ng-readonly="disableBranchCombo" 
+							        		ng-editable="false" 
+							        		ng-format="F1"
+											ng-required="false" 
+											ng-change="ChangeBranch()"
+											width="155px" height="30px" style="line-height:20px;" /></td>
+							<th>險種名稱：</th>
+							<td><input type="text"  ng-model="inputVO.INS_NAME" style="width: 100px; "/></td>
+
+						</tr>
+						<tr>
+							<th></th>
+							<td></td>
+							<th>營運區：</th>
+							<td>
+								<e-combobox ng-datasource="AREA_LIST"
+											ng-model="inputVO.branch_area_id" 
+											ng-validate="false" 
+											ng-disabled="disableAreaCombo"
+							        		ng-readonly="disableAreaCombo"
+											ng-editable="false" 
+											ng-change="ChangeArea()" 
+											ng-format="F3"
+											ng-required="false" 
+											width="143px" height="30px" style="line-height:20px;" />
+							</td>
+
+							<th>招攬人員：</th>
+							<td ng-show="inputVO.branch_nbr !=''">
+								<e-combobox ng-datasource="AO_EMP_LIST"
+											ng-model="inputVO.ao_code" 
+											ng-validate="false"
+											ng-disabled="disableAoCombo"
+							       		    ng-readonly="disableAoCombo" 
+							      		    ng-editable="false" 
+							        		ng-format="F3"
+											ng-change="ChangeAo_code()"
+											ng-required="false" 
+											width="155px" style="line-height:20px;" />
+							</td>
+							<td ng-show="inputVO.branch_nbr ==''">
+								<e-combobox ng-datasource=""
+											ng-model="inputVO.ao_code" 
+											ng-validate="false"
+											ng-disabled="disableAoCombo"
+							       		    ng-readonly="disableAoCombo" 
+							      		    ng-editable="false" 
+							        		ng-format="F3"
+											ng-change="ChangeAo_code()"
+											ng-required="false" 
+											width="155px" style="line-height:20px;" />
+							</td>
+
+							
+							<th>險種代碼：</th>
+							<td><input type="text"  style="width: 70px; " ng-model="inputVO.INS_ID"   size="14"/> <!-- 製作日曆button -->
+							 <input type="image" src="assets/images/magnifier.jpg" ng-click="qu(inputVO.INS_ID)">
+							</td>
+
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info"
+					ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()"
+					ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" totallist="csvList"
+				list="paramList"></e-jumping-once>
+
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：</td>
+						<td>每日</td>
+					</tr>
+					<tr>
+						<td>產出日：</td>
+						<td >{{inputVO.sCreDate | date:'yyyy/MM/dd'}}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y"
+				 white-space: nowrap;">
+				<div class="gv_tab_sc scroll_y"
+					 white-space: nowrap;">
+					<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-left="2" e-top="true" e-list="paramList" >
+						<thead>
+							<tr>
+								
+								<th rowspan="2">險種代號</th>
+								<th rowspan="2">險種名稱</th>
+																
+								<th colspan="4">躉繳(當日)</th>
+								<th colspan="4">投資型(當日)</th>
+								<th colspan="4">短年期繳(當日)</th>
+								<th colspan="4">長年期繳(當日)</th>
+								<th colspan="5">小計(當日)</th>
+																
+								<th colspan="4">躉繳(當月)</th>
+								<th colspan="4">投資型(當月)</th>
+								<th colspan="4">短年期繳(當月)</th>
+								<th colspan="4">長年期繳(當月)</th>
+								<th colspan="5">小計(當月)</th>							
+							</tr>
+							<tr>
+								<!--上一營業日戰報  -->
+								<th>件數</th>
+								<th>保費</th>
+								<th>手收100%</th>
+								<th>手收{{inputVO.PD_RATE*100}}%</th>
+																
+							    <th>件數</th>
+								<th>保費</th>
+								<th>手收100%</th>
+								<th>手收{{inputVO.PD_RATE*100}}%</th>
+								<th>件數</th>
+								<th>保費</th>
+								<th>手收100%</th>
+								<th>手收{{inputVO.PD_RATE*100}}%</th>
+								<th>件數</th>
+								<th>保費</th>
+								<th>手收100%</th>
+								<th>手收{{inputVO.PD_RATE*100}}%</th>
+															
+								<th>件數</th>
+								<th>保費100%</th>
+								<th>保費{{inputVO.SALE_RATE*100}}%</th>
+								<th>手收100%</th>
+								<th>手收{{inputVO.PD_RATE*100}}%</th>
+							
+							    <th>件數</th>
+								<th>保費</th>
+								<th>手收100%</th>
+								<th>手收{{inputVO.PD_RATE*100}}%</th>
+								
+								
+							    <th>件數</th>
+								<th>保費</th>
+								<th>手收100%</th>
+								<th>手收{{inputVO.PD_RATE*100}}%</th>
+								<th>件數</th>
+								<th>保費</th>
+								<th>手收100%</th>
+								<th>手收{{inputVO.PD_RATE*100}}%</th>
+								<th>件數</th>
+								<th>保費</th>
+								<th>手收100%</th>
+								<th>手收{{inputVO.PD_RATE*100}}%</th>
+							
+							    <th>件數</th>
+								<th>保費100%</th>
+								<th>保費{{inputVO.SALE_RATE*100}}%</th>
+								<th>手收100%</th>
+								<th>手收{{inputVO.PD_RATE*100}}%</th>
+							
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row"
+								ng-repeat="row in paramList track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								
+								<td>{{row.INS_ID }}</td>
+								<td>{{row.INS_NAME }}</td>
+								
+								<td align="right">{{0+row.OT_DAY_CNT }}</td>
+								<td align="right">{{0+row.OT_DAY_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.OT_DAY_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.OT_DAY_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.IV_DAY_CNT }}</td>
+								<td align="right">{{0+row.IV_DAY_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.IV_DAY_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.IV_DAY_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.SY_DAY_CNT }}</td>
+								<td align="right">{{0+row.SY_DAY_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SY_DAY_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SY_DAY_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.LY_DAY_CNT }}</td>
+								<td align="right">{{0+row.LY_DAY_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.LY_DAY_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.LY_DAY_FEE_DIS | number : 0}}</td>
+								
+								
+								<td align="right">{{0+row.SUM_DAY_CNT }}</td>
+								<td align="right">{{0+row.SUM_DAY_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SUM_DAY_PREM_DIS | number : 0}}</td>
+								<td align="right">{{0+row.SUM_DAY_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SUM_DAY_FEE_DIS | number : 0}}</td>
+								
+								
+								<td align="right">{{0+row.OT_MON_CNT }}</td>
+								<td align="right">{{0+row.OT_MON_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.OT_MON_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.OT_MON_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.IV_MON_CNT }}</td>
+								<td align="right">{{0+row.IV_MON_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.IV_MON_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.IV_MON_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.SY_MON_CNT }}</td>
+								<td align="right">{{0+row.SY_MON_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SY_MON_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SY_MON_FEE_DIS | number : 0}}</td>
+								
+								
+								<td align="right">{{0+row.LY_MON_CNT }}</td>
+								<td align="right">{{0+row.LY_MON_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.LY_MON_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.LY_MON_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.SUM_MON_CNT }}</td>
+								<td align="right">{{0+row.SUM_MON_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SUM_MON_PREM_DIS | number : 0}}</td>
+								<td align="right">{{0+row.SUM_MON_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SUM_MON_FEE_DIS | number : 0}}</td>
+							</tr>
+							<tr ng-repeat="row in totalList">
+								<td colspan="2" align="center" >全行 合計</td>
+								
+								<td align="right">{{0+row.OT_DAY_CNT }}</td>
+								<td align="right">{{0+row.OT_DAY_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.OT_DAY_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.OT_DAY_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.IV_DAY_CNT }}</td>
+								<td align="right">{{0+row.IV_DAY_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.IV_DAY_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.IV_DAY_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.SY_DAY_CNT }}</td>
+								<td align="right">{{0+row.SY_DAY_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SY_DAY_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SY_DAY_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.LY_DAY_CNT }}</td>
+								<td align="right">{{0+row.LY_DAY_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.LY_DAY_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.LY_DAY_FEE_DIS | number : 0}}</td>
+								
+								
+								<td align="right">{{0+row.SUM_DAY_CNT }}</td>
+								<td align="right">{{0+row.SUM_DAY_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SUM_DAY_PREM_DIS | number : 0}}</td>
+								<td align="right">{{0+row.SUM_DAY_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SUM_DAY_FEE_DIS | number : 0}}</td>
+								
+								
+								<td align="right">{{0+row.OT_MON_CNT }}</td>
+								<td align="right">{{0+row.OT_MON_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.OT_MON_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.OT_MON_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.IV_MON_CNT }}</td>
+								<td align="right">{{0+row.IV_MON_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.IV_MON_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.IV_MON_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.SY_MON_CNT }}</td>
+								<td align="right">{{0+row.SY_MON_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SY_MON_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SY_MON_FEE_DIS | number : 0}}</td>
+								
+								
+								<td align="right">{{0+row.LY_MON_CNT }}</td>
+								<td align="right">{{0+row.LY_MON_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.LY_MON_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.LY_MON_FEE_DIS | number : 0}}</td>
+								
+								<td align="right">{{0+row.SUM_MON_CNT }}</td>
+								<td align="right">{{0+row.SUM_MON_PREM_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SUM_MON_PREM_DIS | number : 0}}</td>
+								<td align="right">{{0+row.SUM_MON_FEE_FULL | number : 0}}</td>
+								<td align="right">{{0+row.SUM_MON_FEE_DIS | number : 0}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+			</div>
+			<div algin="left">
+				<table>
+
+					<tr>
+						<td align="right">說明：</td>
+						<td align="left"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

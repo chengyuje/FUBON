@@ -1,0 +1,352 @@
+<style>
+/* open dialog */
+.rstable thead tr th {
+	vertical-align: middle;
+}
+/* dialog panl */
+.modal-dialog.IOT190 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+/*
+.IOT190 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+*/
+.IOT190 table.little {
+	width: 89%;
+}
+/* change row */
+.IOT190.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+/* scroll && height */
+.scroll_IOT190_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT190/IOT190.js"></script>
+<div class="IOT190" ng-controller="IOT190Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">壽險其他送件查詢</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">區別：</th>
+							<td ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+								<e-combobox ng-datasource="mappingSet['op']"
+											ng-model="inputVO.BRANCH_AREA_ID" ng-validate="false"
+											ng-readonly="false" ng-editable="false" ng-format="F3"
+											ng-required="false" ng-change="genBranch()" width="200px"
+											height="30px" style="line-height:20px;" 
+										 	ng-disabled="mappingSet['op'].length == 1"/>
+							</td>
+							<th ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">業務處：</th>
+							<td ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+								<e-combobox id="region_center_id" name="region_center_id"
+											ng-paramtype="PMS.UHRM_RC"
+											ng-model="inputVO.region_center_id"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeRegion()"
+											style="line-height:20px;" />
+							</td>			
+							<th>險種代碼：</th>
+							<td><input type="text" class="form-control" ng-model="inputVO.INSPRD_ID" style="width:180px"/></td>
+						</tr>
+						<tr>
+							<th ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">分行：</th>
+							<td ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+								<e-combobox ng-datasource="mappingSet['branch']"
+											ng-model="inputVO.BRANCH_NBR" ng-validate="false"
+											ng-readonly="false" ng-editable="false" ng-format="F3"
+											ng-required="false" ng-change="bran()" width="200px"
+											height="30px" style="line-height:20px;"
+									 		ng-disabled="mappingSet['branch'].length == 1"/>
+							</td>
+							<th ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">業務中心：</th>
+							<td ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+								<e-combobox id="branch_area_id" name="branch_area_id"
+											ng-paramtype="PMS.UHRM_OP"
+											ng-model="inputVO.branch_area_id"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="ChangeArea()"
+											style="line-height:20px;" />
+							</td>
+							<th>*鍵機日：</th>
+							<td colspan="3">
+								<div class="input-group datebox datewidth" style="float:left">
+									<input 	type="text" 
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.KEYIN_DATE_B"
+											is-open="model.a"
+											datepicker-options="bgn_sDateOptions"
+											alt-input-formats="altInputFormats" ng-readonly="true"
+ 											ng-change="limitDate()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float:left">&nbsp;&nbsp;～&nbsp;&nbsp;</div>
+								<div class="input-group datebox datewidth" style="float:left">
+									<input 	type="text" class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.KEYIN_DATE_E" is-open="model.b"
+											datepicker-options="bgn_eDateOptions"
+											alt-input-formats="altInputFormats" ng-readonly="true"
+											ng-change="limitDate()" />
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>文件簽收狀態：</th>
+							<td>
+								<e-combobox ng-paramtype="IOT.MAIN_STATUS"
+											ng-model="inputVO.STATUS" ng-validate="false"
+											ng-readonly="false" ng-editable="false" ng-format="F3"
+											ng-required="false" width="200px" style="line-height:20px;"
+											required /></td>
+							<th>*保險文件編號：</th>
+							<td><input type="text" class="form-control" ng-model="inputVO.INS_ID" style="width:180px"/></td>
+						</tr>
+						<tr>
+							<th>送件類型：</th>
+							<td>
+								<e-combobox ng-paramtype="IOT.REG_TYPE34"
+											ng-model="inputVO.REG_TYPE" ng-validate="false"
+											ng-readonly="false" ng-editable="false" ng-format="F3"
+											ng-required="false" width="200px" style="line-height:20px;"
+											required /></td>
+							<th>商品檔期：</th>
+							<td><input type="text" class="form-control" ng-model="inputVO.PROD_PERIOD" style="width:180px"></td>
+						</tr>
+						<tr>
+							<th>*要保人ID：</th>
+							<td><input type="text" class="form-control" ng-model="inputVO.CUST_ID" style="text-transform: uppercase;width:180px;" /></td>
+							<th>*保單號碼：</th>
+							<td>
+								<input type="text" class="form-control" ng-model="inputVO.POLICY_NO1" size="10" maxlength="10" style="width:180px;display:inline;"/>&nbsp;–&nbsp;
+								<input type="text" class="form-control" ng-model="inputVO.POLICY_NO2" size="2" maxlength="2" style="width:50px;display:inline;"/>&nbsp;–&nbsp;
+								<input type="text" class="form-control" ng-model="inputVO.POLICY_NO3" size="2" maxlength="2" style="width:50px;display:inline;"/>
+							</td>
+						</tr>
+						<tr>
+							<th>*進件來源</th>
+							<td>
+								<e-combobox id="insSource" 
+									ng-datasource="mappingSet['INS_SOURCE']"
+									ng-model="inputVO.FB_COM_YN"
+					   				ng-validate="false" 
+					   				ng-readonly="false" 
+					   				ng-editable="false"
+					   				ng-format="F3"
+					   				ng-required="false"
+					   				width="200px"
+					   				style="line-height:20px;" />
+							</td>
+							<th>*保險公司：</th>
+	                        <td>
+	                        	<e-combobox id="insuranceCoSerialNum" name="insuranceCoSerialNum"
+	                                            ng-datasource="mappingSet['COMPANY']"
+	                                            ng-model="inputVO.COMPANY_NUM"
+	                                            ng-validate="false"
+	                                            ng-readonly="false"
+	                                            ng-editable="false"
+	                                            ng-disabled="inputVO.FB_COM_YN == 'Y'"
+	                                            ng-format="F3"
+	                                            width="360px"
+	                                            style="line-height:20px;"
+	                                            required
+	                                />
+	                    	</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="clear()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="print()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" totallist="paramList" list="data"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="height: 600px; white-space: nowrap;">
+				<div class="gv_tab_sc scroll_y" style="height: 600px; white-space: nowrap;">
+					<table class="rstable e-table-freeze" e-height="1000px" e-left="4" e-list="data" e-mode="1" e-top="false">
+						<thead>
+							<tr class="middle">
+								<th>文件簽收狀態</th>
+								<th>鍵機日</th>
+								<th>分行送件批號</th>
+								<th>保險文件編號</th>
+								<th>保單號碼</th>
+								<th>文件種類</th>
+								<th>要保人ID</th>
+								<th>要保人/立約人姓名</th>
+								<th>要保人/立約人生日</th>
+								<th>分行代碼</th>
+								<th>分行名稱</th>
+								<th>解約</th>
+								<th>適用專案</th>
+								<th>立約人帳號</th>
+								<th>商品檔期</th>
+								<th>文件申請日</th>
+								<th>被保人ID</th>
+								<th>送件人員編</th>
+								<th>送件人姓名</th>
+								<th>險種名稱</th>
+								<th>建立人</th>
+								<th>簽收時間</th>
+								<th>簽收人</th>
+								<th>送人壽時間</th>
+								<th>送人壽處理人</th>
+								<th>刪除時間</th>
+								<th>刪除人</th>
+								<th>此次有無辦理要保人變更</th>
+								<th>要保人適合度檢核編碼</th>
+								<th>AML風險等級</th>
+								<th>Pre-check結果</th>
+								<th>覆核否</th>
+								<th>繳費用途</th>
+								<th>繳費管道</th>
+								<th>繳款人ID</th>
+								<th>要保書申請日</th>
+								<th>保費來源是否為貸款</th>
+								<th>繳款人與要保人關係</th>
+								<th>繳款人保單貸款檢核</th>
+								<th>繳款人行內貸款檢核</th>
+								<th>繳款人定存不打折檢核</th>
+								<th>保費來源錄音序號</th>
+								<th>進件來源</th>
+								<th>保險公司</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row.STATUS | mapping:mappingSet['IOT.MAIN_STATUS']:'F3'}}</td>
+								<td>{{toJsDate(row.CREATETIME) | date:'yyyy/MM/dd HH:mm:ss' }}</td>
+								<td>{{row.OP_BATCH_NO }}</td>
+								<td>{{row.INS_ID }}</td>
+								<td>{{row.POLICY_NO }}</td>
+								<td>{{row.OTH_TYPE | mapping:mappingSet['IOT.OTH_TYPE']:'F3'}}</td>
+								<td>{{row.CUST_ID }}</td>
+								<td>{{row.PROPOSER_NAME }}</td>
+								<td>{{toJsDate(row.PROPOSER_BIRTH) | date:'yyyy/MM/dd'}}</td>
+								<td>{{row.BRANCH_NBR }}</td>
+								<td>{{row.BRANCH_NAME }}</td>
+								<td>{{row.TERMINATED_INC }}</td>
+								<td>{{row.PROD_NAME }}</td>
+								<td>{{row.PROPOSER_ACCNBR}}</td>
+								<td>{{row.PROD_PERIOD }}</td>
+								<td>{{toJsDate(row.DOC_KEYIN_DATE) | date:'yyyy/MM/dd' }}</td>
+								<td>{{row.INSURED_ID }}</td>
+								<td>{{row.RECRUIT_ID }}</td>
+								<td>{{row.RECRUIT_NAME }}</td>
+								<td>{{row.INSPRD_NAME }}</td>
+								<td>{{row.CREATOR }}</td>
+								<td>{{toJsDate(row.AFT_SIGN_DATE) | date:'yyyy/MM/dd' }}</td>
+								<td>{{row.AFT_SIGN_OPRID }}</td>
+								<td>{{toJsDate(row.INS_RCV_DATE) | date:'yyyy/MM/dd'}}</td>
+								<td>{{row.INS_RCV_OPRID}}</td>
+								<td>{{toJsDate(row.DELETE_DATE) | date:'yyyy/MM/dd'}}</td>
+								<td>{{row.DELETE_OPRID}}</td>
+								<td>{{row.QC_PROPOSER_CHG}}</td>
+								<td>{{row.PREMATCH_SEQ}}</td>  
+								<td>{{row.AML}}</td>      	
+								<td>{{row.PRECHECK}}</td>      
+								<td>{{row.AUTH_YN}}</td>      
+								<td>{{row.PREMIUM_USAGE | mapping:mappingSet['IOT.PREMIUM_USAGE']:'F3'}}</td> 
+								<td>{{row.PAY_WAY | mapping:mappingSet['IOT.PAY_WAY']:'F3'}}</td>      
+								<td>{{row.PAYER_ID}}</td>     
+								<td>{{toJsDate(row.APPLY_DATE) | date:'yyyy/MM/dd'}}</td>    
+								<td>{{row.LOAN_SOURCE_YN}}</td>
+								<td>{{row.RLT_BT_PROPAY | mapping:mappingSet['IOT.PAYER_REL_PROPOSER']:'F3'}}</td> 
+								<td>{{row.LOAN_CHK1_YN}}</td>  
+								<td>{{row.LOAN_CHK2_YN}}</td>  
+								<td>{{row.CD_CHK_YN}}</td>     
+								<td>{{row.PREMIUM_TRANSSEQ}}</td>
+								<td>{{row.INS_SOURCE}}</td>
+						 		<td>{{row.INS_COM_NAME}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

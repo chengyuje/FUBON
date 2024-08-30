@@ -1,0 +1,32 @@
+<script type="text/javascript" src="assets/txn/IT0123/IT0123.js"></script>
+<script type="text/javascript" src="assets/txn/IT0123/IT0123_KycEffect.js"></script>
+<div class="IT0123_KycEffect" ng-controller="IT0123_KycEffect_Controller" ng-cloak>
+    <div class="panel_content" style="height:60vmin;min-height: 600px;padding-top: 10px;">
+        <div class="input-group">
+            <input class="form-control" type="text" placeholder="輸入客戶ID，多組請用','分隔"
+                   ng-model="inputVO.custId" ng-change="listenKycInput()" ng-keyup="keyUpExe($event)"/>
+            <div class="input-group-btn">
+                <button class="btn btn-success" ng-click="execute()" data-toggle="tooltip"
+                        title="執行生效 (Ctrl + Enter)" ng-disabled="!result.length">
+                    <span class="glyphicon glyphicon-play"></span>
+                </button>
+            </div>
+        </div>
+        <div ng-show="result.length" class="gv_tab_sc scroll_y">
+            <hr/>
+            <table class="e-table-freeze" e-height="490px" e-mode="1" e-top="true" e-list="result">
+                <thead>
+                <tr>
+                    <th class="col-md-2" ng-bind="'客戶ID'"></th>
+                    <th class="col-md-10" ng-bind="'執行結果'"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="sub in result track by $index">
+                    <td ng-bind="sub.custId"></td>
+                    <td ng-bind="sub.msg"></td>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

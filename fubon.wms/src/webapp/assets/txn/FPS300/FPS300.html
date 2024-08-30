@@ -1,0 +1,97 @@
+<style>
+  .FPS300S {
+    padding-bottom: 20px;
+  }
+
+</style>
+<script type="text/javascript"
+        src="assets/txn/FPS300/FPS300.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS310/FPS310_COMFIRM.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS411/FPS411_COMFIRM.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS310/FPS310.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS/FPS_SEARCH.js"></script>
+
+<div class="FPS300"
+     ng-controller="FPS300_Controller"
+     ng-cloak>
+  <div class="tfb_content">
+    <div class="tfb_content_icon"></div>
+    <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">目標理財規劃</div>
+  </div>
+  <div class="panel_content">
+    <div class="FPS300 FPS">
+      <div class="block container"
+           ng-class="{'no-area': arrowUp}"
+           style="margin: .5em 0;width: 100%;">
+
+        <div class="content-wrapper"
+             style="background-color:#bfe2f7;margin-top:-1px;">
+          <div style="float: right;">
+            <div class="toggle-wrapper btn-fps no-img"
+                 ng-click="fps300.chgTab('2')"
+                 ng-show="fps300.step=='2'">
+              績效追蹤與投組調整
+            </div>
+            <div class="toggle-wrapper btn-fps no-img"
+                 ng-click="fps300.chgTab('3')"
+                 ng-show="fps300.step=='2' || fps300.step=='3'">
+              歷史規劃
+            </div>
+            <div class="toggle-wrapper btn-fps no-img"
+                 ng-click="go('custInfo')"
+                 ng-show="hasIns">
+              客戶庫存商品
+            </div>
+            <div class="toggle-wrapper btn-fps"
+                 ng-click="arrowUp=!arrowUp">
+              詳細資訊
+              <img ng-src="{{arrowPath[arrowUp?'down':'up']}}"
+                   class="icon">
+            </div>
+          </div>
+
+          <div>
+            <input id="fps300focusCustId01"
+                   style="width: 0px; height: 0px; border: 0px; padding: 0px;"> 客戶ID
+            <div class="input-group"
+                 style="display:inline-block">
+              <input type="text"
+                     style="width:150px; text-align: left; text-transform: uppercase; display:inline-block; margin-left:.5em;"
+                     class="form-control"
+                     ng-model="fps300.inputVO.custID"
+                     ng-blur="getCust();"
+                     ng-keyup="$event.keyCode===13?getCust():''">
+              <span class="input-group-btn"
+                    style="display:inline-block">
+		                <button class="btn btn-info"
+		                        type="button"
+		                        ng-click="go('search')">
+		                  <i class="glyphicon glyphicon-search"></i>
+		                </button>
+		              </span>
+            </div>
+          </div>
+        </div>
+
+        <div ng-show="!arrowUp">
+          <div ng-include="'assets/txn/FPS/FPS_CUST.template.html'"></div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content"
+         style="width: auto;">
+      <div ng-include="fps300.tabBarUrl"
+           ng-show="true"></div>
+      <div ng-include="fps300.contentUrl">
+        <div role="fps300.tabpanel"
+             class="tab-pane active"
+             id="tab">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

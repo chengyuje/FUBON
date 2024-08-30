@@ -1,0 +1,119 @@
+<style>
+  .FPS410Bar .bg-wrapper {
+    background: #e2e2e2;
+    /* Old browsers */
+    background: -moz-linear-gradient(to bottom, #e2e2e2 0%, #dbdbdb 60%, #989494 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(to bottom, #e2e2e2 0%, #dbdbdb 60%, #989494 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, #e2e2e2 0%, #dbdbdb 60%, #989494 100%);
+    border-radius: 5px;
+    position: relative;
+    height: 80px;
+  }
+
+  .FPS410Bar .text-wrapper {
+    position: relative;
+    top: 50%;
+    transform: translateY(-55%);
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .FPS410Bar table td {
+    padding: 3px;
+    text-align: center;
+  }
+
+  .FPS410Bar table {
+    width: 100%;
+  }
+
+  .FPS410Bar .dot {
+    width: 23px;
+    height: 23px;
+    display: inline-block;
+    border-radius: 100%;
+    margin-top: 5px;
+  }
+
+  .FPS410Bar .red.dot {
+    background: radial-gradient(farthest-corner at 5px 5px, #FFE4E4, rgba(241, 111, 92, 1), #999);
+  }
+
+  .FPS410Bar .yellow.dot {
+    background: radial-gradient(farthest-corner at 5px 5px, rgba(248, 248, 248, 0.95), rgb(241, 239, 92), #999);
+  }
+
+  .FPS410Bar .green.dot {
+    background: radial-gradient(farthest-corner at 5px 5px, rgba(248, 248, 248, 0.95), rgb(82, 239, 57), #999);
+  }
+
+  .FPS410Bar .digital {
+    color: red;
+    font-size: 200%;
+    font-weight: 800;
+    font-style: italic;
+  }
+
+</style>
+<!-- query -->
+<div class="FPS410Bar">
+  <table>
+    <tr>
+      <td>
+        <div class="bg-wrapper">
+          <div class="text-wrapper">
+            <div>
+              目標進度狀態
+            </div>
+            <div ng-if="currentProgress.HIT_RATE >= 100"
+                 style="text-align:center">
+              <span class="green dot"></span>
+            </div>
+            <div ng-if="fps300.stored.rate <= currentProgress.HIT_RATE && currentProgress.HIT_RATE < 100"
+                 style="text-align:center">
+              <span class="yellow dot"></span>
+            </div>
+            <div ng-if="currentProgress.HIT_RATE < fps300.stored.rate"
+                 style="text-align:center">
+              <span class="red dot"></span>
+            </div>
+          </div>
+        </div>
+      </td>
+      <td calspan="2">
+        <div class="bg-wrapper">
+          <div class="text-wrapper">
+            <div>
+              <span style="width:45%">達成率%：</span>
+              <span class="digital"><b ng-bind="currentProgress.HIT_RATE"></b>%</span>
+            </div>
+            <div>
+              <span style="width:45%">市值 / 應達目標：</span>
+              <span ng-bind="currentProgress.MARKET_VALUE"></span> /
+              <span ng-bind="currentProgress.AMT_TARGET"></span>
+            </div>
+          </div>
+        </div>
+      </td>
+      <td calspan="2">
+        <div class="bg-wrapper">
+          <div class="text-wrapper">
+            <div>
+              <span style="width:45%">報酬率%：</span>
+              <span class="digital">
+                <b ng-bind="currentProgress.RETURN_RATE"></b>%</span>
+            </div>
+            <div>
+              <span style="width:45%">市值 / 本金：</span>
+              <span ng-bind="currentProgress.MARKET_VALUE"></span> /
+              <span ng-bind="currentProgress.INV_AMT_CURRENT"></span>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+</div>

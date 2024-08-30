@@ -1,0 +1,177 @@
+<style>
+.modal-dialog.PRD230_Fund {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: 80vh;
+}
+.modal-dialog.PRD230_Fund_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 300px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD230/PRD230_Fund.js"></script>
+<script type="text/javascript" src="assets/txn/PRD230/PRD230_Fund_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PRD230/PRD230_Fund_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PRD230/PRD230_Fund_UPLOADWARNING.js"></script>
+<script type="text/javascript" src="assets/txn/PRD230/PRD230_Fund_UPLOAD_SUBJECT.js"></script>
+<script type="text/javascript" src="assets/txn/PRD230/PRD230_Fund_UPLOAD_PROJECT.js"></script>
+<script type="text/javascript" src="assets/txn/PRD230/PRD230_Fund_UPLOAD_CUSTOMER_LEVEL.js"></script>
+<div class="PRD230" ng-controller="PRD230_FundController" ng-cloak>
+	<div class="search_table search_box3">
+		<table>
+			<tr>
+				<th>基金代碼：</th>
+				<td><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="prd_id" name="prd_id" ng-model="inputVO.prd_id" e-length-limit="4"></td>
+				<td>
+					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query" ng-disabled="!inputVO.prd_id || (inputVO.prd_id).length < 2">查詢</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<div style="float: left">
+						<button type="button" class="btn btn-info" ng-click="edit()" function-type="maintenance">新增</button>
+						<button type="button" class="btn btn-info" ng-click="upload()" function-type="export">整批上傳</button>
+						<button type="button" class="btn btn-info" ng-click="download()" function-type="export" ng-disabled="!inputVO.prd_id || (inputVO.prd_id).length < 2">下載CSV</button>
+						<button type="button" class="btn btn-info" ng-click="downloadWarning()" function-type="export" >下載警語參數</button>
+						<button type="button" class="btn btn-info" ng-click="uploadWarning()" function-type="export" >上傳警語參數</button>
+						<button type="button" class="btn btn-success" ng-click="downloadSubject()" function-type="export" >下載主題參數</button>
+						<button type="button" class="btn btn-success" ng-click="uploadSubject()" function-type="export" >上傳主題參數</button>
+						<button type="button" class="btn btn-info" ng-click="downloadProject()" function-type="export" >下載專案參數</button>
+						<button type="button" class="btn btn-info" ng-click="uploadProject()" function-type="export" >上傳專案參數</button>
+						<button type="button" class="btn btn-success" ng-click="downloadCustomerLevel()" function-type="export" >下載客群參數</button>
+						<button type="button" class="btn btn-success" ng-click="uploadCustomerLevel()" function-type="export" >上傳客群參數</button>
+					</div>
+					<div style="float: right" ng-if="conDis">
+						<button type="button" class="btn btn-info" ng-click="review('Y')" function-type="confirm">核可</button>
+						<button type="button" class="btn btn-info" ng-click="review('N')" function-type="confirm">退回</button>
+					</div>
+					<div style="clear: both;"></div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!-- 結果區 -->
+	<h4 class="h4-title">查詢結果</h4>
+	<div style="float: left">
+		<e-jumping-once output="outputVO" list="data" totallist="roleList"></e-jumping-once>
+	</div>
+	<div style="float: left;margin-top: 2px;" function-type="confirm">
+		<span>&nbsp;/&nbsp;{{roleListConfirm}}&nbsp;筆資料待覆核</span>
+	</div>
+	<div style="clear: both;"></div>
+<!-- 	<span>共&nbsp;{{roleList.length}}&nbsp;筆資料</span><span function-type="confirm">&nbsp;/&nbsp;{{roleListConfirm}}&nbsp;筆資料待覆核</span> -->
+	<div class="gv_tab_sc" style="white-space: nowrap;min-height:235px;">
+		<table class="e-table-freeze" e-mode="3" e-height="535px" e-top="true" e-left="4" e-list="roleList">
+			<thead>
+				<tr>
+					<th function-type="confirm">
+						<label style="font-weight: initial;margin-bottom: 0px;">
+							<input type='checkbox' ng-model='checkVO.clickAll' ng-change='checkrow()' /> 本頁全選
+						</label>
+						<label style="font-weight: initial;margin-bottom: 0px;">
+							<input type='checkbox' ng-model='checkVO.clickAll2' ng-change='checkrow2()' /> 全選
+						</label>
+					</th>
+					<th>功能</th>
+					<th>覆核狀態</th>
+					<th>基金代碼</th>
+					<th>基金名稱</th>
+					<th>拆帳比率%</th>
+					<th>警示基金</th>
+					<th>衛星</th>
+					<th>衛星時間起日</th>
+					<th>衛星時間迄日</th>
+					<th>核心</th>
+					<th>核心時間起日</th>
+					<th>核心時間迄日</th>
+					<th>IPO/專案</th>
+					<th>IPO/專案時間起日</th>
+					<th>IPO/專案時間迄日</th>
+					<th>CNR分配率%</th>
+					<th>CNR加減碼</th>
+					<th>核心區間起日</th>
+					<th>核心區間迄日</th>
+					<th>CNR收益扣減率%</th>
+					<th>實際收益扣減率%</th>	
+					<th>基金管理費標的計績追溯起日</th>
+					<th>基金管理費標的計績追溯迄日</th>
+					<th>CNR基金管理費回饋</th>
+					<th>股債類型</th>
+					<th>警語</th>
+					<th>主題名稱1</th>
+					<th>主題名稱2</th>
+					<th>主題名稱3</th>
+					<th>專案名稱1</th>
+					<th>專案名稱2</th>
+					<th>客群名稱</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in data track by $index">
+					<td function-type="confirm" ng-if="row.REVIEW_STATUS == 'W' && row.CREATOR != currUser" class="td_center" align="center">
+						<label style="font-weight: initial;margin-bottom: 0px;">
+							<input type='checkbox' ng-model='row.SELECTED'>
+						</label>
+					</td>
+					<td function-type="confirm" ng-if="!(row.REVIEW_STATUS == 'W' && row.CREATOR != currUser)"></td>
+					<td ng-if="row.REVIEW_STATUS == 'W'"></td>
+					<td ng-if="row.REVIEW_STATUS != 'W'">
+						<div function-type="maintenance">
+							<e-combobox id="cmbAction" name="cmbAction"
+							ng-datasource="row.set"
+							ng-model="row.cmbAction"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="action(row)"
+							width="100px"
+							style="line-height:20px;" />
+						</div>
+					</td>
+					<td>{{row.REVIEW_STATUS == 'W' ? '覆核中' : '已覆核'}}</td>
+					<td>{{row.PRD_ID}}</td>
+					<td>{{row.FUND_CNAME_A}}</td>
+					<td align="right">{{row.ALLOTMENT_RATIO }}</td>
+					<td>{{row.VIGILANT | mapping:mappingSet['PRD.FUND_VIGILANT']:'F3'}}</td>
+					<td>{{row.MAIN_PRD | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+					<td>{{toJsDate(row.MAIN_PRD_SDATE) | date:"yyyy-MM-dd"}}</td>
+					<td>{{toJsDate(row.MAIN_PRD_EDATE) | date:"yyyy-MM-dd"}}</td>
+					<td>{{row.RAISE_FUND | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+					<td>{{toJsDate(row.RAISE_FUND_SDATE) | date:"yyyy-MM-dd"}}</td>
+					<td>{{toJsDate(row.RAISE_FUND_EDATE) | date:"yyyy-MM-dd"}}</td>
+					<td>{{row.IPO }}</td>
+					<td>{{toJsDate(row.IPO_SDATE) | date:"yyyy-MM-dd"}}</td>
+					<td>{{toJsDate(row.IPO_EDATE) | date:"yyyy-MM-dd"}}</td>
+					<td align="right">{{row.CNR_YIELD | number:0}}</td>
+					<td align="right">{{row.CNR_MULTIPLE | number:0}}</td>
+					<td>{{toJsDate(row.MULTIPLE_SDATE) | date:"yyyy-MM-dd"}}</td>
+					<td>{{toJsDate(row.MULTIPLE_EDATE) | date:"yyyy-MM-dd"}}</td>
+					<td align="right">{{row.CNR_DISCOUNT }}</td>
+					<td align="right">{{row.RATE_DISCOUNT }}</td>
+					<td>{{toJsDate(row.CNR_TARGET_SDATE) | date:"yyyy-MM-dd"}}</td>
+					<td>{{toJsDate(row.CNR_TARGET_EDATE) | date:"yyyy-MM-dd"}}</td>
+					<td align="right">{{row.CNR_FEE | number:6}}</td>
+					<td>{{row.STOCK_BOND_TYPE | mapping:mappingSet['FPS.STOCK_BOND_TYPE']:'F3'}}</td>
+					<td>{{row.WARNING | mapping:mappingSet['PRD.FUND_ALERT']:'F3'}}</td>
+					<td>{{row.SUBJECT1 | mapping:mappingSet['PRD.FUND_SUBJECT']:'F3'}}</td>
+					<td>{{row.SUBJECT2 | mapping:mappingSet['PRD.FUND_SUBJECT']:'F3'}}</td>
+					<td>{{row.SUBJECT3 | mapping:mappingSet['PRD.FUND_SUBJECT']:'F3'}}</td>
+					<td>{{row.PROJECT1 | mapping:mappingSet['PRD.FUND_PROJECT']:'F3'}}</td>
+					<td>{{row.PROJECT2 | mapping:mappingSet['PRD.FUND_PROJECT']:'F3'}}</td>
+					<td>{{row.CUSTOMER_LEVEL | mapping:mappingSet['PRD.FUND_CUSTOMER_LEVEL']:'F3':'true'}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

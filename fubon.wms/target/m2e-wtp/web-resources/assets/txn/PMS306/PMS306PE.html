@@ -1,0 +1,223 @@
+<style>
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS306/PMS306PE.js"></script>
+
+<div class="PMS306PE" ng-controller="PMS306PEController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">人工調整作業查詢
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+				data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<div class="search_table search_box3">
+					<table>
+						<tr>
+							<td>
+								<div style="float: left">&nbsp保險文件編號：</div>
+								<div style="float: left">
+									&nbsp<input type="text" size="20" maxlength="20"
+										ng-model="inputVO.INSFNO" ng-required="true"><font color=blue> </font>
+								</div>
+								<div style="float: left">
+									&nbsp
+									<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+								</div>
+							</td>
+
+						</tr>
+					</table>
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif"> 人工調整作業維護
+				&nbsp;&nbsp;
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" list=paramList  input="inputVO"  query="inquire()"></e-jumping>
+			<div algin="left">
+				</div>
+			<div class="gv_tab_sc scroll_y"
+				style="height: auto; white-space: nowrap;">
+				<table table
+					class="tablesaw table table-striped table-bordered rstable">
+					<thead>
+						<tr>
+							<TH>編輯</TH>
+							<TH>調整</TH>
+							<TH>保險文件編號</TH>
+							<TH>進件日期</TH>
+							<TH>要保人ID</TH>
+							<TH>要保人姓名</TH>
+							<TH>招攬人員員編</TH>
+							<TH>招攬人員姓名</TH>
+							<TH>險種代碼</TH>
+							<TH>繳別</TH>
+							<TH>實收保費(原幣)</TH>
+							<th>幣別</th>
+							<TH>實際收益</TH>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row"
+							ng-repeat="row in paramList track by $index"
+							ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						     	
+							<td ng-show=" row.TX_TYPE=='B' && (row.AD == null || row.AD == '0')">
+								<button type="button"
+									class="btn btn-info" ng-hide=" row.AD == '0' || row.FF == '4' "
+									ng-click="changes(row,$index)">編輯</button>
+							</td>
+							<td ng-show=" row.TX_TYPE=='B' && (row.AD == null || row.AD == '0') ">原紀錄</td>
+							
+							<td ng-show=" row.TX_TYPE=='A' "></td>
+							<td ng-show=" row.TX_TYPE=='A' ">沖正</td>
+							
+							<td ng-show=" row.TX_TYPE=='M' && (row.AD == null || row.AD == '0') ">
+								<!-- <button type="button"
+									class="btn btn-info" ng-hide=" row.AD == '0' "
+									ng-click="changes(row,$index)">編輯</button>&nbsp;&nbsp; -->
+								<!-- <button type="button" class="btn btn-info"
+									ng-click="clnce(row,$index)">取消</button> -->
+								<button type="button"
+									class="btn btn-info" ng-hide="row.AD == '0'" ng-click="delPe(row)">刪除</button>
+							</td>
+							<td ng-show=" row.TX_TYPE=='M' && (row.AD == null || row.AD == '0') ">調整後</td>
+							
+							<!-- 僅在畫面顯示而尚未儲存  -->
+							<td ng-show="row.AD =='2'">
+								<button type="button"
+									class="btn btn-info" ng-click="save(row,$index)">儲存</button>&nbsp;&nbsp;
+								<button type="button" class="btn btn-info"
+									ng-click="clnce2(row,$index)">取消</button>
+							</td>
+							<td ng-show=" row.AD =='2' ">調整後</td>
+							
+							<td ng-show=" row.AD =='3' "></td>
+							<td ng-show=" row.AD =='3' ">沖正</td>
+							<!-- 結尾 -->
+							
+							<td ng-show="row.AD=='1'">
+								<button type="button"
+									class="btn btn-info" ng-click="copys(row,$index);clean(row,$index)">確認</button>&nbsp;&nbsp;
+								<button type="button" class="btn btn-info"
+									ng-click="clnce(row,$index)">取消</button>
+							</td>
+							<td ng-show=" row.AD=='1' ">調整</td>
+							
+							
+							<TD>{{row.INS_ID }}</td>
+							<TD>{{row.KEYIN_DATE }}</td>
+							<TD>
+								<font>{{ row.CUST_ID }}</font>
+								<font ng-show="row.index=='1'"> </font>
+							</td>
+							<TD>{{row.PROPOSER_NAME }}</td>
+							<TD>
+								<font ng-show="row.AD!='1'">{{row.RECRUIT_ID }}</font>
+								<font ng-show="row.AD=='1'"><input type="text" ng-model="row.RECRUIT_ID" ng-blur="getRecruitInfo(row);"></font>
+							</td>
+							<TD>{{row.RECRUIT_NAME }}</td>
+							<TD>
+								<font ng-show="row.AD!='1'">{{row.PRD_ID }}</font>
+								<font ng-show="row.AD=='1'"><input type="text" ng-model="row.PRD_ID"></font>
+							</td>
+							<TD>
+								<font ng-show="row.AD!='1'">{{row.MOP2 | mapping:mappingSet['PMS.PAY_YQD']:'F3' }}</font>
+								<font ng-show="row.AD=='1'">
+									<e-combobox
+										ng-paramtype="PMS.PAY_YQD" ng-model="row.MOP2"
+										ng-validate="false" ng-readonly="false" ng-editable="false"
+										ng-change="" ng-disabled="false" ng-format="F3"
+										ng-required="true" width="180px" style="line-height:20px;" />
+								</font>
+							</td>
+							<TD align="right">
+								<font ng-show=" row.TX_TYPE=='B' && (row.AD == null || row.AD == '0') " >{{0+row.REAL_PREMIUM | currency:''}}</font>
+								<font ng-show=" (row.AD !='1' && row.AD !='3') && row.TX_TYPE=='M' " >{{0+row.REAL_PREMIUM | currency:''}}</font>
+								<font ng-show=" row.AD !='1' && row.TX_TYPE=='A' " >{{row.REAL_PREMIUM | currency:''}}</font>
+								
+								<!-- 僅在畫面顯示而尚未儲存  -->
+								<font ng-show=" row.AD=='2' && row.TX_TYPE=='B' " >{{0+row.REAL_PREMIUM | currency:''}}</font>
+								<font ng-show=" row.AD=='3' && (row.TX_TYPE=='B' || row.TX_TYPE=='M') " >{{-row.REAL_PREMIUM | currency:''}}</font>
+								<font ng-show=" row.AD=='1' "><input type="text" ng-model="row.REAL_PREMIUM"></font>
+								<!-- 結尾 -->
+							</td>
+							<TD>
+								<font ng-show="row.AD!='1'">{{row.CURR_CD | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</font>
+								<font ng-show="row.AD=='1'">
+									<e-combobox
+										ng-paramtype="FPS.CURRENCY" ng-model="row.CURR_CD"
+										ng-validate="false" ng-readonly="false" ng-editable="false"
+										ng-change="" ng-disabled="false" ng-format="F3"
+										ng-required="true" width="180px" style="line-height:20px;" />
+								</font>
+							</TD>
+						<!-- 	<TD align="right">{{0+row.ACT_FEE | currency:''}}</td>-->
+							<TD align="right">
+								<font ng-show=" row.TX_TYPE=='B' && (row.AD == null || row.AD == '0') " >{{0+row.ACT_FEE | currency:''}}</font>
+								<font ng-show=" (row.AD !='1' && row.AD !='3') && row.TX_TYPE=='M' " >{{0+row.ACT_FEE | currency:''}}</font>
+								<font ng-show=" row.AD !='1' && row.TX_TYPE=='A' " >{{row.ACT_FEE | currency:''}}</font>
+								
+								<!-- 僅在畫面顯示而尚未儲存  -->
+								<font ng-show=" row.AD=='2' && row.TX_TYPE=='B' " >{{0+row.ACT_FEE | currency:''}}</font>
+								<font ng-show=" row.AD=='3' && (row.TX_TYPE=='B' || row.TX_TYPE=='M') " >{{-row.ACT_FEE | currency:''}}</font>
+								<font ng-show=" row.AD=='1' ">{{0+row.ACT_FEE | currency:''}}</font>
+								<!-- 結尾 -->
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div algin="left">
+				<table>
+					<tr>
+						<td align="right">說明：</td>
+						<td align="left"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

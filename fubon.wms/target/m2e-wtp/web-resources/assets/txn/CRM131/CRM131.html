@@ -1,0 +1,182 @@
+<style>
+.middle tbody tr td {
+	vertical-align: middle;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/CAM190/CAM190.js"></script>
+<script type="text/javascript" src="assets/txn/CAM210/CAM210.js"></script>
+<script type="text/javascript" src="assets/txn/CAM211/CAM211.js"></script>
+<script type="text/javascript" src="assets/txn/CRM131/CRM131.js"></script>
+<div class="CRM131" ng-controller="CRM131Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >聯繫名單</div>
+		</div>
+		
+		<!-- 理專 -->
+		<div class="panel_content gv_tab_sc" style="height: 530px;white-space: nowrap;overflow-y:scroll;">
+			<div>
+				提醒：每日09:00、14:00、17:00更新統計數
+			</div>
+			<table  class="tablesaw table table-striped table-bordered text-center middle" ng-show ="inputVO.mroleid =='0'">
+				<thead>
+					<tr>
+					    <th>今日應聯繫</th>
+					    <th>內稽內控名單應聯繫</th>
+					    <th>今日已聯繫</th>
+					    <th>完成率</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in resultList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center" ng-show="row.CONTACT_CUST == 0">{{row.CONTACT_CUST | currency:'':0}}</td>
+						<td align="center" ng-hide="row.CONTACT_CUST == 0"><a href = "#" onclick="return false" ng-click="detail(1, undefined, undefined)">{{row.CONTACT_CUST | currency:'':0}}</a></td>
+						
+						<td align="center" ng-show="row.TOTAL_CONTROL_CUST == 0">{{row.TOTAL_CONTROL_CUST | currency:'':0}}</td>
+						<td align="center" ng-hide="row.TOTAL_CONTROL_CUST == 0"><a href = "#" onclick="return false" ng-click="detail(9, undefined, '99')">{{row.TOTAL_CONTROL_CUST | currency:'':0}}</a></td>
+						
+						<td>{{row.CONTACTED_CUST | currency:'':0}}</td>
+						<td>{{row.CMPLT_R == '0%' ? '0%' : row.CMPLT_R}}</td>
+					</tr>
+				</tbody>
+			</table>
+		
+			<!-- 消金 -->
+			<table class="tablesaw table table-striped table-bordered text-center middle" ng-show ="inputVO.mroleid =='4'">
+				<thead>
+					<tr>
+					    <th>未結案</th>
+					    <th>內稽內控名單未結案</th>
+					    <th>已結案</th>
+					    <th>完成率</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in resultList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center" ng-show="row.CONTACT_CUST == 0">{{row.CONTACT_CUST | currency:'':0}}</td>
+						<td align="center" ng-hide="row.CONTACT_CUST == 0"><a href = "#" onclick="return false" ng-click="detail(1, undefined, undefined)">{{row.CONTACT_CUST | currency:'':0}}</a></td>
+						
+						<td align="center" ng-show="(row.TOTAL_CONTROL_CUST) == 0">{{row.TOTAL_CONTROL_CUST | currency:'':0}}</td>
+						<td align="center" ng-hide="(row.TOTAL_CONTROL_CUST) == 0"><a href = "#" onclick="return false" ng-click="detail(9, undefined, '99')">{{row.TOTAL_CONTROL_CUST | currency:'':0}}</a></td>
+									
+						<td>{{row.CONTACTED_CUST | currency:'':0}}</td>
+						<td>{{row.CMPLT_R == '0%' ? '100%' : row.CMPLT_R}}</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<!-- //inputVO.mroleid 0-分行理專 、1-輔銷FA、2-輔銷IA、3-主管 、4-消金  客戶聯繫頻率報表 -->
+			<table class="tablesaw table table-striped table-bordered text-center middle" ng-show="(inputVO.mroleid =='0' || inputVO.mroleid =='3' || inputVO.mroleid =='5') && (inputVO.pri_id != '006') && (inputVO.pri_id != '013') && (inputVO.pri_id != '012') && (roleId != 'RA')"> <!-- 20210420 add by ocean => 君榮=> inputVO.mroleid =='1' || inputVO.mroleid =='2' ||  -->
+				<thead>
+					<tr>
+					    <th colspan="2">客戶聯繫率報表</th>					    				   
+					</tr>
+					<tr>
+					    <th>即將不符合頻率名單</th>
+					    <th>已不符合頻率名單</th>					   
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td align="center" ng-show="inputVO.NEAR_UNDERSERV_CNT == 0">{{inputVO.NEAR_UNDERSERV_CNT | currency:'':0}}</td>
+						<td align="center" ng-hide="inputVO.NEAR_UNDERSERV_CNT == 0"><a href = "#" onclick="return false" ng-click="detail(4, 1, undefined)">{{inputVO.NEAR_UNDERSERV_CNT}}</a></td>
+						
+						<td align="center" ng-show="inputVO.BELLOW_UNDERSERV_CNT == 0">{{inputVO.BELLOW_UNDERSERV_CNT | currency:'':0}}</td>
+						<td align="center" ng-hide="inputVO.BELLOW_UNDERSERV_CNT == 0"><a href = "#" onclick="return false" ng-click="detail(4, 2, undefined)">{{inputVO.BELLOW_UNDERSERV_CNT}}</a></td>						
+					</tr>
+				</tbody>
+			</table>
+			
+			<!-- 主管 -->
+			<table  class="tablesaw table table-striped table-bordered text-center middle" ng-show ="inputVO.mroleid =='3' && inputVO.pri_id != '013' && inputVO.pri_id != '012'" >
+				<thead>
+					<tr>
+						<th colspan="4">理專</th>
+					    <th rowspan="2">主管應聯絡數</th>
+					    <th rowspan="2">未分派名單數</th>
+					</tr>
+					<tr>
+						<th>今日應聯繫</th>
+						<th>內稽內控名單應聯繫</th>
+					    <th>已聯繫</th>
+					    <th>完成率</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td align="center" ng-show="inputVO.RM_CONTACT_CUST == 0">{{inputVO.RM_CONTACT_CUST | currency:'':0}}</td>
+						<td align="center" ng-hide="inputVO.RM_CONTACT_CUST == 0"><a ng-click="detail(2, 0, undefined)">{{inputVO.RM_CONTACT_CUST | currency:'':0}}</a></td>
+				
+						<td align="center" ng-show="inputVO.RM_TOT_CONTROL_CUST == 0">{{inputVO.RM_TOT_CONTROL_CUST | currency:'':0}}</td>
+						<td align="center" ng-hide="inputVO.RM_TOT_CONTROL_CUST == 0"><a ng-click="detail(2, 0, '99')">{{inputVO.RM_TOT_CONTROL_CUST | currency:'':0}}</a></td>
+
+						<td>{{inputVO.RM_CONTACTED_CUST | currency:'':0}}</td>
+						<td>{{inputVO.RM_CMPLT_R}}</td>
+						
+						<td ng-show="inputVO.M_CONTACT_CUST == 0">{{inputVO.M_CONTACT_CUST}}</td>
+						<td ng-hide="inputVO.M_CONTACT_CUST == 0"><a href = "#" onclick="return false" ng-click="detail(1, undefined, undefined)">{{inputVO.M_CONTACT_CUST | currency:'':0}}</a></td>
+						
+						<td align="center" ng-show="CanCAM220"><a href="#" onclick="return false" ng-click="detail(3, undefined, undefined)">{{inputVO.WAIT_DISPATCH_LEADS | currency:'':0}}</a></td>
+						<td align="center" ng-hide="CanCAM220">{{inputVO.WAIT_DISPATCH_LEADS | currency:'':0}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="tablesaw table table-striped table-bordered text-center middle" ng-show ="inputVO.mroleid =='3' && inputVO.pri_id != '013' && inputVO.pri_id != '012'" >
+				<thead>
+					<tr>   
+	   					<th>非理專人員名單總數</th>
+	   					<th>非理專人員內稽內控名單總數</th>
+	    				<th>已結案</th>
+	    				<th>完成率</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr >
+						<td align="center" ng-show="inputVO.NRM_CONTACT_CUST == 0">{{inputVO.NRM_CONTACT_CUST | currency:'':0}}</td>
+						<td align="center" ng-hide="inputVO.NRM_CONTACT_CUST == 0"><a href = "#" onclick="return false" ng-click="detail(2, 1, undefined)">{{inputVO.NRM_CONTACT_CUST | currency:'':0}}</a></td>
+						
+						<td align="center" >{{inputVO.NRM_TOT_CONTROL_CUST | currency:'':0}}</td>
+						<td align="center" >{{inputVO.NRM_CONTACTED_CUST | currency:'':0}}</td>
+						<td>{{inputVO.NRM_CMPLT_R}}</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<!-- 主管 -->
+			<table  class="tablesaw table table-striped table-bordered text-center middle" ng-show ="inputVO.mroleid =='5'" >
+				<thead>
+					<tr>
+						<th colspan="4">UHRM</th>
+					    <th rowspan="2">主管應聯絡數</th>
+					</tr>
+					<tr>
+						<th>今日應聯繫</th>
+						<th>內稽內控名單應聯繫</th>
+					    <th>已聯繫</th>
+					    <th>完成率</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td align="center" ng-show="inputVO.RM_CONTACT_CUST == 0">{{inputVO.RM_CONTACT_CUST | currency:'':0}}</td>
+						<td align="center" ng-hide="inputVO.RM_CONTACT_CUST == 0"><a ng-click="detail(5, 0, undefined)">{{inputVO.RM_CONTACT_CUST | currency:'':0}}</a></td>
+				
+						<td align="center" ng-show="inputVO.RM_TOT_CONTROL_CUST == 0">{{inputVO.RM_TOT_CONTROL_CUST | currency:'':0}}</td>
+						<td align="center" ng-hide="inputVO.RM_TOT_CONTROL_CUST == 0"><a ng-click="detail(5, 0, '99')">{{inputVO.RM_TOT_CONTROL_CUST | currency:'':0}}</a></td>
+
+						<td>{{inputVO.RM_CONTACTED_CUST | currency:'':0}}</td>
+						<td>{{inputVO.RM_CMPLT_R}}</td>
+						
+						<td ng-show="inputVO.M_CONTACT_CUST == 0">{{inputVO.M_CONTACT_CUST}}</td>
+						<td ng-hide="inputVO.M_CONTACT_CUST == 0"><a href = "#" onclick="return false" ng-click="detail(5, undefined, undefined)">{{inputVO.M_CONTACT_CUST | currency:'':0}}</a></td>
+					</tr>
+				</tbody>
+			</table>
+			<!-- #0716 : FA/IA科長工作首頁緩慢 移除名單統計項目  by 祐傑 -->
+			
+			<div ng-include="'assets/txn/CRM141/CRM141.html'" ng-if="!(inputVO.pri_id == '015' || inputVO.pri_id == '024')"></div>
+		</div>
+	</div>
+</div>

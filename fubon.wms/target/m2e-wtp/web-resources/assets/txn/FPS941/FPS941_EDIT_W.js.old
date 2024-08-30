@@ -1,0 +1,122 @@
+'use strict';
+eSoafApp.controller('FPS940_EDIT_WController',
+	function($scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter, getParameter) {
+		$controller('BaseController', {$scope: $scope});
+		$scope.controllerName = "FPS940_EDIT_WController";
+		
+		// combobox
+		$scope.PRD_TYPE = [{"LABEL":"基金", "DATA":"FUND"}, {"LABEL":"ETF", "DATA":"ETF"}, {"LABEL":"海外債", "DATA":"BOND"}
+		, {"LABEL":"SI", "DATA":"SI"}, {"LABEL":"SN", "DATA":"SN"}];
+		$scope.inputVO = {};
+		
+		// ui-sortable原生內建BUG, 官方無解這裡爆破
+		$scope.refreshList = function() {
+			if(!$scope.inputVO.prd_type) {
+				$scope.filterDataList = angular.copy($scope.dataList);
+				return;
+			}
+			if($scope.inputVO.prd_type != $scope.EditPRD_TYPE) {
+				$scope.EditIndex = null;
+				$scope.inputVO.content = "";
+			}
+			$scope.filterDataList = [];
+			var groupByPRD_TYPE = _.chain($scope.dataList).groupBy('PRD_TYPE')
+	    	.toPairs().map(function (pair) {
+	    		return _.zipObject(['PRD_TYPE', 'DATA'], pair); 
+	    	}).value();
+			// every PRD_TYPE is obj
+			angular.forEach(groupByPRD_TYPE, function(group) {
+				if(group.PRD_TYPE == $scope.inputVO.prd_type)
+					$scope.filterDataList = group.DATA;
+			});
+		};
+		$scope.refreshList();
+		$scope.generateList = function(FINANS) {
+			// 清空
+			if(FINANS.length == 0) {
+				// 非全部
+				if($scope.inputVO.prd_type)
+					$scope.dataList = _.filter($scope.dataList, function(o) { return !(o.PRD_TYPE == $scope.inputVO.prd_type); });
+				else
+					$scope.dataList = [];
+			} else {
+				var groupByPRD_TYPE = _.chain(FINANS).groupBy('PRD_TYPE')
+		    	.toPairs().map(function (pair) {
+		    		return _.zipObject(['PRD_TYPE', 'DATA'], pair); 
+		    	}).value();
+				// every PRD_TYPE is obj
+				angular.forEach(groupByPRD_TYPE, function(group) {
+					// add back
+					$scope.dataList = _.filter($scope.dataList, function(o) { return !(o.PRD_TYPE == group.PRD_TYPE); });
+					angular.forEach(group.DATA, function(row, index) {
+						row.RANK = index + 1;
+						// 讓之後編輯能快速找到那筆, 定一個ID
+						row.ROW_ID = row.PRD_TYPE + (index + 1);
+						$scope.dataList.push(row);
+					});
+				});
+			}
+		};
+		
+		// 排序用
+		$scope.sortableOptions = {
+			stop: function(e, ui) {
+				$scope.generateList(ui.item.sortable.droptargetModel);
+			}
+		};
+		$scope.action = function(row) {
+			if(row.cmbAction) {
+				if(row.cmbAction == "D") {
+					$confirm({text: '是否刪除此筆資料？ '}, {size: 'sm'}).then(function() {
+						var delIndex = $scope.filterDataList.indexOf(row);
+						$scope.filterDataList.splice(delIndex, 1);
+						$scope.EditPRD_TYPE = null;
+						$scope.EditIndex = null;
+						$scope.generateList($scope.filterDataList);
+						$scope.showSuccessMsg('ehl_01_common_004');
+		            });
+				} else {
+					$scope.EditPRD_TYPE = angular.copy(row.PRD_TYPE);
+					$scope.EditIndex = angular.copy(row.ROW_ID);
+					$scope.inputVO.prd_type = row.PRD_TYPE;
+					$scope.inputVO.content = row.WARNING;
+				}
+				row.cmbAction = "";
+			}
+		};
+		
+		$scope.add = function() {
+			if(!$scope.inputVO.prd_type) {
+				$scope.showErrorMsg('請選擇商品類別');
+        		return;
+			}
+			$scope.filterDataList.push({'PRD_TYPE': $scope.inputVO.prd_type, 'RANK': 999, 'WARNING': $scope.inputVO.content, 'set': [{LABEL: "修改", DATA: "U"}, {LABEL: "刪除", DATA: "D"}]});
+			$scope.inputVO.content = "";
+			$scope.generateList($scope.filterDataList);
+			$scope.showSuccessMsg('ehl_01_common_004');
+		};
+		
+		$scope.edit = function() {
+			var newIndex = $scope.filterDataList.map(function(e) { return e.ROW_ID; }).indexOf($scope.EditIndex);
+			$scope.filterDataList[newIndex].PRD_TYPE = angular.copy($scope.inputVO.prd_type);
+			$scope.filterDataList[newIndex].WARNING = angular.copy($scope.inputVO.content);
+			$scope.EditPRD_TYPE = null;
+			$scope.EditIndex = null;
+			$scope.inputVO.content = "";
+			$scope.generateList($scope.filterDataList);
+			$scope.showSuccessMsg('ehl_01_common_004');
+		};
+		
+		$scope.clear = function() {
+			$scope.EditPRD_TYPE = null;
+			$scope.EditIndex = null;
+			$scope.inputVO.content = "";
+		};
+		
+		$scope.save = function() {
+			$scope.closeThisDialog($scope.dataList);
+		};
+		
+		
+		
+});

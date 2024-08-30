@@ -1,0 +1,207 @@
+<style>
+.modal-dialog.PRD232 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+.modal-dialog.PRD232_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 300px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD232/PRD232.js"></script>
+<script type="text/javascript" src="assets/txn/PRD232/PRD232_UPLOAD.js"></script>
+<div ng-controller="PRD232Controller" ng-cloak>
+	<div class="search_table search_box3">
+		<table>
+			<tr>
+				<th>基金代碼：</th>
+				<td><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="prd_id" name="prd_id" ng-model="inputVO.prd_id" e-length-limit="4"></td>
+				<td colspan="3">
+					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query"  ng-disabled="!inputVO.prd_id || (inputVO.prd_id).length < 2">查詢</button>
+				</td>
+			</tr>
+			<tr>
+				<th>欲整批更新欄位：</th>
+				<td>
+					<e-combobox id="edit_col" 
+					ng-datasource="mappingSet['edit_col']"
+					ng-model="inputVO.edit_col"
+   					ng-validate="false"
+   					ng-readonly="false" 
+   					ng-editable="false"
+   					ng-format="F3"
+   					ng-required="false"
+   					ng-change="setMAX()"
+   					width="150px"
+   					style="line-height:20px;" />
+				</td>
+				<th>欄位值：</th>
+				<td>
+					<div ng-switch="inputVO.edit_col">
+						<div ng-switch-when="1">
+							<e-combobox id="col" name="col"
+							ng-paramtype="COMMON.YES_NO"
+							ng-model="inputVO.col"
+		  					ng-validate="false"
+		  					ng-readonly="false"
+		  					ng-editable="false"
+		  					ng-format="F3"
+		  					ng-required="false"
+		  					width="150px"
+		  					style="line-height:20px;" />
+						</div>
+						<div ng-switch-default>
+							<input type="text" class="form-control" placeholder="請輸入..." id="col" name="col" ng-model="inputVO.col" e-length-limit="10">
+						</div>
+					</div>
+				</td>
+				<td>
+					<button type="button" class="btn btn-info" ng-click="save()">確定</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<div style="float: left">
+						<button type="button" class="btn btn-info" ng-click="upload()" function-type="export">整批上傳</button>
+						<button type="button" class="btn btn-info" ng-click="download()">下載參數檔</button>
+					</div>
+					<div style="float: right" ng-if="conDis">
+						<button type="button" class="btn btn-info" ng-click="review('Y')" function-type="confirm">核可</button>
+						<button type="button" class="btn btn-info" ng-click="review('N')" function-type="confirm">退回</button>
+					</div>
+					<div style="clear: both;"></div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!-- 結果區 -->
+	<h4 class="h4-title">查詢結果</h4>
+	    <div style="float: left">
+		       <e-jumping-once output="outputVO" list="data" totallist="paramList"></e-jumping-once>
+	    </div>
+		<div  ng-if="rowCount">
+				<div style="text-align:left !important; vertical-align: middle !important;">
+					<table style="display:block !important;">
+        				<tr>        				
+        					<td style="padding:0 3px 3px 0 !important;"><p style="display:inline !important;height:30px !important;  text-align: center;  vertical-align: middle;">&nbsp;共&nbsp;</p></td>
+        					<td style="padding:0 3px 3px 0 !important;"><label style="display:inline !important;height:30px !important;  text-align: center;  vertical-align: middle;">{{rowCount}}</label></td>
+        					<td style="padding:0 3px 3px 0 !important;"><p style="display:inline !important;height:30px !important;  text-align: center;  vertical-align: middle;">&nbsp;筆資料</p></td>
+        				</tr>
+        			</table>
+        		</div>
+			</div>
+	<!-- <e-jumping-once output="outputVO" list="paramList" totallist="totalList"></e-jumping-once> -->
+	<div class="gv_tab_sc" style="min-height:235px;white-space: nowrap;">
+		<table class="e-table-freeze" e-height="500px" e-mode="1" e-left="4" e-list="paramList">
+			<thead>
+				<tr>
+					<th function-type="confirm">
+						<label style="font-weight: initial;margin-bottom: 0px;">
+							<input type='checkbox' ng-model='checkVO.clickAll2' ng-change='checkrow2()' /> 覆核
+						</label>
+					</th>
+					<th>
+						<label style="font-weight: initial;margin-bottom: 0px;">
+							<input type='checkbox' ng-model='checkVO.clickAll' ng-change='checkrow()' /> 更新
+						</label>
+					</th>
+					<th>覆核狀態</th>
+					<th>基金代碼</th>
+					<th>基金名稱</th>
+					<th>可銷售</th>
+					<!--主推建議售出拔掉2017/4/27-->
+					<!-- <th>主推</th>
+					<th>建議售出</th> -->   
+					<th>Tier Level</th>
+					<th>RR風險等級</th>
+					<th>幣別</th>
+					<th>發行公司名稱</th>
+					<th>轉換手續費%</th>
+					<th>轉換手續費(本行)%</th>
+					<th>申購手續費%</th>
+					<th>申購手續費(本行)%</th>
+					<th>嘉實經理費%</th>
+					<th>分銷費%</th>
+					<th>12B-1 FEE%</th>
+					<th>其他經銷費%</th>
+					<th>經銷費合計(表單數字)%</th>
+					<th>經理費(本行)%</th>
+					<th>教育訓練獎勵金(萬)</th>
+					<th>其他報酬_投信(萬)</th>
+					<th>其他報酬_總代理人(萬)</th>
+					<th>其他報酬_境外基金結構(萬)</th>
+					<th>投資標的</th>
+					<th>商品風險等級</th>
+				<!-- 	<th>狀態</th>  -->
+					<th>IPO預購起日</th>
+					<th>IPO預購迄日</th>
+					<th>IPO募集起日</th>
+					<th>IPO募集迄日</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in data track by $index">
+					<td ng-if="row.REVIEW_STATUS == 'W' && row.CREATOR != currUser" class="td_center" function-type="confirm">
+						<label style="font-weight: initial;margin-bottom: 0px;">
+							<input type='checkbox' ng-model='row.SELECTED'>
+						</label>
+					</td>
+					<td ng-if="!(row.REVIEW_STATUS == 'W' && row.CREATOR != currUser)" function-type="confirm"></td>
+					<td class="td_center">
+						<label ng-if="row.REVIEW_STATUS != 'W' || (row.REVIEW_STATUS == 'W' && row.CREATOR == currUser)" style="font-weight: initial;margin-bottom: 0px;">
+							<input type='checkbox' ng-model='row.CHECK' />
+						</label>
+					</td>
+					<td>{{row.REVIEW_STATUS == 'W' ? '覆核中' : '已覆核'}}</td>
+					<td>{{row.PRD_ID}}</td>
+					<td>{{row.FUND_CNAME}}</td>
+					<td>{{row.IS_SALE | mapping:YES_NO:'F3'}}</td>
+					<!--主推建議售出拔掉2017/4/27-->
+					<!-- <td>{{row.MAIN_PRD | mapping:YES_NO:'F3'}}</td>   
+					<td>{{row.SELLING | mapping:YES_NO:'F3'}}</td> -->	
+					<td>{{row.TIER_LEVEL}}</td>
+					<td>{{row.RRNOTES}}</td>
+					<td>{{row.CURRENCY_STD_ID | mapping:CURRENCY:'F3'}}</td>
+					<td>{{row.TRUST_COM}}</td>
+					<td align="right">{{row.FEE | number:4}}</td>
+					<td align="right">{{row.FEE1 | number:4}}</td>
+					<td align="right">{{row.FEE2 | number:4}}</td>
+					<td align="right">{{row.FEE3 | number:4}}</td>
+					<td align="right">{{row.M_FEE | number:4}}</td>
+
+					<td align="right">{{row.DISTRIBUTION_RATE | number:4}}</td>
+					<td align="right">{{row.TB1_FEE | number:4}}</td>
+					<td align="right">{{row.OTHER_DISTRIBUTION | number:4}}</td>
+					<td align="right">{{row.DISTRIBUTION_FEE | number:4}}</td>
+
+					<td align="right">{{row.M_FEE_RATE | number:4}}</td>
+					<td align="right">{{row.TRAIN}}</td>
+					<td align="right">{{row.OTHER_REWARD_INV}}</td>
+					<td align="right">{{row.OTHER_REWARD_AGN}}</td>
+					<td align="right">{{row.OTHER_REWARD_FRN}}</td>
+					<td>{{row.INV_TARGET | mapping:MKT_TIER3:'F3'}}</td>
+					<td>{{row.RISKCATE_ID}}</td>
+					<!-- <td ng-if="row.REVIEW_STATUS == 'W'">{{row.ACT_TYPE == 'A' ? '新增' : row.ACT_TYPE == 'M' ? '編輯' : '刪除'}}</td>
+					<td ng-if="row.REVIEW_STATUS != 'W'"></td> -->
+					<td>{{row.IPO_START}}</td>
+					<td>{{row.IPO_END}}</td>
+					<td>{{row.IPO_RAISE_START}}</td>
+					<td>{{row.IPO_RAISE_END}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

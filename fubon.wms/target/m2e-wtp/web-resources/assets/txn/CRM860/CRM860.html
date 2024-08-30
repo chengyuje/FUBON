@@ -1,0 +1,139 @@
+<style>
+.modal-dialog.CRM860 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: 900px;
+	overflow:auto;
+}
+/* table size */
+.CRM860 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM860.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM860_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.red{
+	color: red !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM860/CRM860.js"></script>
+<div class="CRM860" ng-controller="CRM860Controller" ng-cloak>
+	<div class="modal-dialog CRM860">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">已贖回/到期商品歷史交易查詢({{custVO.CUST_ID}}<span style="font-weight: normal;">{{custVO.CUST_NAME}}</span>)</h4>
+			</div>
+			<div class="modal-body">
+				<div class="search_table search_box3">
+					<table>
+						<tr>
+							<th>贖回起日：</th>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="startDate" name="startDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.startDate"
+										is-open="model.a"
+										datepicker-options="startDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<th>贖回迄日：</th>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="endDate" name="endDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.endDate"
+										is-open="model.b"
+										datepicker-options="endDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire();inquire2()" function-type="query">查詢</button>
+				</div>
+				<!-- 結果區 -->
+				<uib-tabset active="0" justified="true">
+					<uib-tab index="0" heading="全商品" select="setPtype()">
+						<div ng-include="'assets/txn/CRM860/CRM860_QUERY.html'"></div>
+					</uib-tab>
+					<uib-tab index="1" heading="基金" select="setPtype('01')">
+						<div ng-include="'assets/txn/CRM860/CRM860_QUERY.html'"></div>
+					</uib-tab>
+					<uib-tab index="2" heading="海外ETF/股票" select="setPtype('02')">
+						<div ng-include="'assets/txn/CRM860/CRM860_QUERY.html'"></div>
+					</uib-tab>
+					<uib-tab index="3" heading="海外債" select="setPtype('03')">
+						<div ng-include="'assets/txn/CRM860/CRM860_QUERY.html'"></div>
+					</uib-tab>
+ 					<!--<uib-tab index="4" heading="組合式商品(SI)" select="setPtype('04')">
+						<div ng-include="'assets/txn/CRM860/CRM860_QUERY.html'"></div>
+					</uib-tab>
+					<uib-tab index="5" heading="境外結構型商品(SN)" select="setPtype('05')">
+						<div ng-include="'assets/txn/CRM860/CRM860_QUERY.html'"></div> -->
+<!-- 					</uib-tab> -->
+<!-- 					<uib-tab index="6" heading="外匯雙享利(DCI)" select="setPtype('06')"> -->
+<!-- 						<div ng-include="'assets/txn/CRM860/CRM860_QUERY.html'"></div> -->
+<!-- 					</uib-tab> -->
+<!-- 					<uib-tab index="7" heading="金錢信託" select="setPtype('07')"> -->
+<!-- 						<div ng-include="'assets/txn/CRM860/CRM860_QUERY.html'"></div> -->
+<!-- 					</uib-tab> -->
+					<uib-tab index="8" heading="黃金存摺" select="setPtype('08')">
+						<div ng-include="'assets/txn/CRM860/CRM860_QUERY.html'"></div>
+					</uib-tab>
+					<uib-tab index="9" heading="奈米投" select="setPtype('09')">
+						<div ng-include="'assets/txn/CRM860/CRM860_QUERY.html'"></div>
+					</uib-tab>
+					<uib-tab index="10" heading="金市海外債" select="setPtype('10')">
+						<div ng-include="'assets/txn/CRM860/CRM860_QUERY.html'"></div>
+					</uib-tab>
+				</uib-tabset>
+			</div>
+		</div>
+	</div>
+</div>

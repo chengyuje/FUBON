@@ -1,0 +1,247 @@
+<style>
+/* open dialog */
+.ngdialog.CRM3103 {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM3103 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.CRM3103 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM3103 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM3103.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM3103_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/CRM3103/CRM3103.js"></script>
+<script type="text/javascript" src="assets/txn/CRM3103/CRM3103_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="CRM3103" ng-controller="CRM3103Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >輪調專案名單</div>
+	</div>
+	<div class="panel_content search_table search_box2">
+		<table>
+			<tr>
+				<th>業務處：</th>
+				<td>
+					<e-combobox ng-datasource="REGION_LIST"
+	                            ng-model="inputVO.region_center_id"
+	                            ng-disabled="disableRegionCombo"
+	                            ng-readonly="disableRegionCombo"
+	                            ng-format="F3"
+	                            ng-change="ChangeRegion()"
+	                            width="200px"/>
+				</td>						
+				<th>營運區：</th>
+				<td>
+					<e-combobox ng-datasource="AREA_LIST"
+	                            ng-model="inputVO.branch_area_id"
+	                            ng-disabled="disableAreaCombo"
+	                            ng-readonly="disableAreaCombo"
+	                            ng-format="F3"
+	                            ng-change="ChangeArea()"
+	                            width="200px"/>
+				</td>	
+			</tr>	
+			<tr>
+				<th>分行：</th>
+				<td>
+					<e-combobox ng-datasource="BRANCH_LIST"
+	                            ng-model="inputVO.branch_nbr"
+	                            ng-disabled="disableBranchCombo"
+	                            ng-readonly="disableBranchCombo"
+	                            ng-format="F1"
+	                            ng-change="ChangeBranch()"
+	                            width="200px"/>
+				</td>
+				<th>理專：</th>
+				<td>
+					<e-combobox ng-datasource="EMP_LIST"
+								ng-model="inputVO.emp_id"
+								ng-validate="false" 
+								ng-disabled="EMP_LIST.length == 2"
+								ng-readonly="EMP_LIST.length == 2" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="false"
+								ng-change="ChangeEmp_id(region)"
+								width="200px"/>		
+				</td>
+			</tr>
+			<tr>
+				<th>專案名稱：</th>
+				<td><e-combobox id="PRJ_ID" name="PRJ_ID" 
+					ng-datasource="PROJNAME"
+			       	ng-model="inputVO.PRJ_ID"
+			       	ng-validate="false" 
+			       	ng-readonly="false" 
+			       	ng-editable="false"
+			       	ng-format="F3"
+			       	ng-required="false"				         
+	       			style="line-height:20px;" />
+	       		</td>
+				<th>&nbsp;</th>
+				<td>&nbsp;</td>
+			</tr>
+<!-- 			<tr> -->
+<!-- 				<th>匯入日期：</th> -->
+<!-- 				<td> -->
+<!-- 					<div class="form-group"> -->
+<!-- 						<div class="input-group datebox datewidth"> -->
+<!-- 							<input type="text" id="sdate" name="sdate" -->
+<!-- 							class="form-control" -->
+<!-- 							uib-datepicker-popup="yyyy/MM/dd" -->
+<!-- 							ng-model="inputVO.sdate" -->
+<!-- 							is-open="model.a" -->
+<!-- 							datepicker-options="sDateOptions" -->
+<!-- 							ng-readonly="true"								 -->
+<!-- 							ng-change="limitDate()"/> -->
+<!-- 							製作日曆button -->
+<!-- 								<span class="input-group-btn"> -->
+<!-- 								<button type="button" class="btn btn-default" ng-click="open($event,'a')"> -->
+<!-- 									<i class="glyphicon glyphicon-calendar"></i></button>																		 -->
+<!-- 							</span> -->
+<!-- 						</div> -->
+<!-- 						<div style="float: left !important;">～</div> -->
+<!-- 						<div class="input-group datebox datewidth"> -->
+<!-- 							<input type="text" id="edate" name="edate" -->
+<!-- 							class="form-control" -->
+<!-- 							uib-datepicker-popup="yyyy/MM/dd" -->
+<!-- 							ng-model="inputVO.edate" -->
+<!-- 							is-open="model.b" -->
+<!-- 							datepicker-options="eDateOptions" -->
+<!-- 							ng-readonly="true"								 -->
+<!-- 							ng-change="limitDate()"/> -->
+<!-- 							製作日曆button -->
+<!-- 								<span class="input-group-btn"> -->
+<!-- 								<button type="button" class="btn btn-default" ng-click="open($event,'b')"> -->
+<!-- 									<i class="glyphicon glyphicon-calendar"></i></button>																		 -->
+<!-- 							</span> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</td> -->
+<!-- 			</tr> -->
+		</table>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+<!-- 			<button type="button" class="btn btn-info" ng-click="exportData()" function-type="export">匯出</button> -->
+			<button type="button" class="btn btn-info" ng-click="exportAllData()" ng-show="isHeadMgr">全部匯出</button>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<div class="search_box_btn text-center">
+				<button ng-show="isARMGR" type="button" class="btn btn-info" ng-click="approval();">核可</button>
+				<button ng-show="isARMGR" type="button" class="btn btn-info" ng-click="deny();">退回</button>
+			</div>
+			<table class="table-bordered middle">
+				<thead>
+					<tr>
+						<th ng-show="isARMGR">理專覆核勾選<br/>
+							<label><input type='checkbox' ng-model='checkVO.clickAll' ng-change='checkrow()' ng-disabled="!isARMGR"/> 本頁全選</label>
+							<label><input type='checkbox' ng-model='checkVO.clickAll2' ng-change='checkrow2()' ng-disabled="!isARMGR"/> 全選</label>
+						</th>
+						<th>功能</th>
+						<th>分行代碼</th>
+						<th>分行名稱</th>
+						<th>理專ID</th>
+						<th>理專名稱</th>
+						<th>主副CODE<br/>合計客戶數</th>
+						<th>核心客戶數</th>
+						<th>核心客戶比例</th>
+						<th>名單狀態</th>
+						<th>專案起日</th>
+						<th>專案訖日</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center" ng-show="isARMGR">
+							<label><div>
+								<input type='checkbox' ng-model='row.IS_SELECTED' ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="row.selectedDisabled">勾選
+							</div></label>
+						</td>
+						<td>
+							<e-combobox id="PRJ_ACT" name="PRJ_ACT"
+							ng-datasource="row.func"
+							ng-model="row.acttype"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="doFunc(row)"
+							width="100px"
+							style="line-height:20px;" />
+			       		</td>
+			       		<td>{{row.BRANCH_NBR}}</td>
+			       		<td>{{row.BRANCH_NAME}}</td>
+						<td>{{row.EMP_ID}}</td>
+						<td>{{row.EMP_NAME}}</td>
+						<td align="right">{{row.CUST_CNT | number: 0}}</td>
+						<td align="right">{{row.GO_CUST_CNT | number: 0}}</td>
+						<td align="right">{{row.GO_CUST_PERC | number: 2}}%</td>
+						<td>{{row.STEP_STATUS | mapping: mappingSet['CRM.TRS_PRJ_ROT_STEP_STATUS']}}</td>
+						<td>{{toJsDate(row.PRJ_DATE_BGN) | date:'yyyy-MM-dd'}}</td>
+						<td>{{toJsDate(row.PRJ_DATE_END) | date:'yyyy-MM-dd'}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		</div>
+	</div>
+</div>

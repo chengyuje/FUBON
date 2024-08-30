@@ -1,0 +1,342 @@
+<style type="text/css">
+/* open dialog */
+.ngdialog.CRM124_ADD_ONSITE {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM124_ADD_ONSITE {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1100px;
+	height: auto;
+}
+/* Styling for the title (Month and Year) of the calendar */
+div.title {
+    font: x-large Verdana, Arial, Helvetica, sans-serif;
+    text-align: center;
+    height: 40px;
+    background-color: white;
+    color: black;
+    }
+/* Styling for the footer */
+div.footer {
+    font: small Verdana, Arial, Helvetica, sans-serif;
+    text-align: center;
+    }
+/* Styling for the overall table */
+table {
+    font: 100% Verdana, Arial, Helvetica, sans-serif;
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+    }
+/* Styling for the column headers (days of the week) */
+th {
+    padding: 0 0.5em;
+    text-align: center;
+    background-color:gray;
+    color:white;
+    }
+/* Styling for the individual cells (days) */
+td  {     
+    font-size: medium;
+    padding: 0.25em 0.25em;   
+    width: 14%; 
+    height: 80px;
+    text-align: left;
+    vertical-align: top;
+    }
+/* Styling for the date numbers */
+.date  {     
+    font-size: x-large;
+    padding: 0.25em 0.25em;   
+    text-align: left;
+    vertical-align: top;
+    }
+/* Class for individual days (coming in future release) */
+.sun {
+     color:red;
+     }
+/* Hide the month element (coming in future release) */
+th.month {
+    visibility: hidden;
+    display:none;
+    }
+   
+</style>
+<div ng-controller="CRM124_ADD_ONSITEController" ng-cloak>
+	<div class="modal-dialog CRM124_ADD_ONSITE">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">輔銷人員設定駐點行</h4>
+			</div>			
+			<div class="title">
+			<span><a class="btn btn-success btn-info" ng-click="decrement()"><i class="glyphicon glyphicon-arrow-left"></i></a></span>
+			{{inputVO.month}}月 {{inputVO.year}}
+			<span><a class="btn btn-success btn-info" ng-click="increment()"><i class="glyphicon glyphicon-arrow-right"></i></a></span>			
+			</div>
+				<table border="1">
+					<tr>
+						<th>Sun</th>
+						<th>Mon</th>
+						<th>Tue</th>
+						<th>Wed</th>
+						<th>Thu</th>
+						<th>Fri</th>
+						<th>Sat</th>
+					</tr>					
+					<tr>
+						<td ng-repeat = "row in dateList" ng-if="$index >=0 && $index <=6 "><span class="date">{{row.date}}</span>					
+							<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+							</div>
+							<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+								<e-combobox id="bnr_id_a" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_a"
+								ng-validate="false" 
+								ng-disabled="row.seq_a != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>
+						<br>
+							<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+							</div>
+							<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+								<e-combobox id="bnr_id_b" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_b"
+								ng-validate="false" 
+								ng-disabled="row.seq_b != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>
+							
+						</td>
+					</tr>					
+					<tr>
+						<td ng-repeat = "row in dateList" ng-if="$index >=7 && $index <=13 "><span class="date">{{row.date}}</span>
+						
+							<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+							</div>
+							<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+								<e-combobox id="bnr_id_a" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_a"
+								ng-validate="false" 
+								ng-disabled="row.seq_a != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>
+						<br>
+							<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+							</div>
+							<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+								<e-combobox id="bnr_id_b" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_b"
+								ng-validate="false" 
+								ng-disabled="row.seq_b != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>							
+						</td>
+					</tr>					
+					<tr>
+						<td ng-repeat = "row in dateList" ng-if="$index >=14 && $index <=20 "><span class="date">{{row.date}}</span>
+						
+							<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+							</div>
+							<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+								<e-combobox id="bnr_id_a" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_a"
+								ng-validate="false" 
+								ng-disabled="row.seq_a != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>
+						<br>
+							<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+							</div>
+							<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+								<e-combobox id="bnr_id_b" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_b"
+								ng-validate="false" 
+								ng-disabled="row.seq_b != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>							
+						</td>
+					</tr>					
+					<tr>
+						<td ng-repeat = "row in dateList" ng-if="$index >=21 && $index <=27 "><span class="date">{{row.date}}</span>
+						
+							<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+							</div>
+							<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+								<e-combobox id="bnr_id_a" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_a"
+								ng-validate="false" 
+								ng-disabled="row.seq_a != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>
+						<br>
+							<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+							</div>
+							<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+								<e-combobox id="bnr_id_b" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_b"
+								ng-validate="false" 
+								ng-disabled="row.seq_b != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>
+							
+						</td>
+					</tr>					
+					<tr>
+						<td ng-repeat = "row in dateList" ng-if="$index >=28 && $index <=34 "><span class="date">{{row.date}}</span>
+						
+							<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+							</div>
+							<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+								<e-combobox id="bnr_id_a" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_a"
+								ng-validate="false" 
+								ng-disabled="row.seq_a != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>
+						<br>
+							<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+							</div>
+							<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+								<e-combobox id="bnr_id_b" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_b"
+								ng-validate="false" 
+								ng-disabled="row.seq_b != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>
+							
+						</td>
+					</tr>					
+					<tr>
+						<td ng-repeat = "row in dateList" ng-if="$index >=35 && $index <=41 "><span class="date">{{row.date}}</span>
+						
+							<div ng-show = "row.seq_a == '' && row.holiday != true && row.date != '' && row.show_a != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_a = true; row.period_a = '1'" ><i class="glyphicon glyphicon-plus"></i></a>上午時段
+							</div>
+							<div ng-show = "row.bnr_id_a != '' || row.show_a != false">
+								<e-combobox id="bnr_id_a" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_a"
+								ng-validate="false" 
+								ng-disabled="row.seq_a != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_a == ''" class="btn btn-danger btn-info" ng-click="row.show_a = false; row.bnr_id_a = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>
+						<br>
+							<div ng-show = "row.seq_b == '' && row.holiday != true && row.date != '' && row.show_b != true">
+								<a class="btn btn-success btn-info" ng-click="row.show_b = true; row.period_b = '2'" ><i class="glyphicon glyphicon-plus"></i></a>下午時段
+							</div>
+							<div ng-show = "row.bnr_id_b != '' || row.show_b != false">
+								<e-combobox id="bnr_id_b" 
+								ng-datasource="mappingSet['branchsDesc']"
+								ng-model="row.bnr_id_b"
+								ng-validate="false" 
+								ng-disabled="row.seq_b != ''"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="100px"
+								style="line-height:20px;" />
+								<a ng-show = "row.seq_b == ''" class="btn btn-danger btn-info" ng-click="row.show_b = false; row.bnr_id_b = ''"><i class="glyphicon glyphicon-remove"></i></a>
+							</div>							
+						</td>
+					</tr>
+					
+				</table>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()">確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,88 @@
+<style>
+.modal-dialog.KYC320_KYCebank{
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 40%;
+	height: 60vh;
+}
+.KYC320_KYCebank.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+th {
+	padding-top: 10px;
+    padding-bottom:10px
+}
+span{
+	padding-top: 0px;
+    padding-bottom:0px
+}
+
+</style>
+
+<script type="text/javascript" src="assets/txn/KYC320/KYC320_KYCebank.js"></script>
+
+<div ng-controller="KYC320_KYCebankController" ng-cloak>
+	<div class="modal-dialog KYC320_KYCebank">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 class="modal-title" align="left">查詢網銀KYC</h4>
+			</div>
+			<div class="modal-body">
+				<div style="margin: 20px 20px 20px 20px;" align="center" width="300px" height="300px">
+					<div style=" display: inline;">
+						
+						<table>
+						<tr>
+							<th>
+								<font style="color: red">*</font>客戶ID/統編：
+							</th>
+							<td>
+								<input type="text" 
+									   ng-model="inputVO.KYCcustID" 
+									   style="text-transform: uppercase;" 
+									   ng-blur="text_toUppercase(inputVO.KYCcustID,'CUST_ID')"
+									   required
+								/>
+							</td>
+						</tr>
+						<tr>	
+							<th>*KYC建立日期  : </th>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" 
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd" 
+										ng-model="inputVO.KYCcreateDate"
+										is-open="model.a" 
+										datepicker-options="bgn_sDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate()" 
+										required />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+						</tr>
+					</table>
+					</div>
+				</div>
+				<div class="search_box_btn text-center">
+					<br>
+					<button type="button" class="btn btn-default" ng-click="queryKYC()">查詢</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

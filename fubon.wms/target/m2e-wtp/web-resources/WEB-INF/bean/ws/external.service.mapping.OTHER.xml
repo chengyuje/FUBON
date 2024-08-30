@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+   		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd
+   		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+   		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+   		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+   		http://www.springframework.org/schema/mvc
+   		http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+    
+    <!-- loginAuthenticate的特殊處理 -->
+	<bean id="LOGIN_BEFORE_FORMAT" class="com.systex.jbranch.fubon.webservice.ws.callback.mobile.ExternalLoginBeforeCallBack"/>
+	<bean id="LOGIN_AFTER_FORMAT" class="com.systex.jbranch.fubon.webservice.ws.callback.mobile.ExternalLoginAfterCallBack"/>
+    
+	<util:list id="OTHER">
+		<!-- LDAP檢核登入帳號密碼 ，並把登入者資料、兼職資料、代理人資料回傳 -->
+	    <bean p:id = "login" parent="MODEL_2" p:txnCode="CMFPG000" p:bizCode="mobAuthenticate" p:beforeFormat-ref="LOGIN_BEFORE_FORMAT" p:returnFormat-ref="LOGIN_AFTER_FORMAT"/>
+	    <!-- 選取一筆進行登入作業  -->	  
+	    <bean p:id = "getLoginInfo" parent="MODEL_2" p:txnCode="CMFPG000" p:bizCode="mobLogin"/>
+	    <!-- 選取一筆進行登入作業  -->	  
+	    <bean p:id = "logout" parent="MODEL_2" p:txnCode="CMFPG000" p:bizCode="tlroff"/>
+	    <!-- 選取一筆進行登入作業  -->	  
+		<bean p:id = "alive" parent="MODEL_2" p:txnCode="CMFPG000" p:bizCode="aliveUpdate"/>
+		<!-- 取得共用資料 -->
+	    <!-- <bean p:id = "getReferenceData" parent="MODEL_2" p:txnCode="CMFPG000" p:bizCode="getReferenceData"/> -->
+	    <bean p:id = "getReferenceData" parent="MODEL_2" p:txnCode="CMFPG000" p:bizCode="getReferenceData" p:beforeFormat-ref="LOGIN_BEFORE_FORMAT" />
+	    
+	    <bean p:id = "loadSysInfoData" parent="MODEL_2" p:txnCode="CMFPG000" p:bizCode="loadSysInfoData"/>
+	</util:list>
+</beans>

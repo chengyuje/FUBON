@@ -1,0 +1,215 @@
+<style>
+.CRM821 .gv_tab_sc thead:first-child tr th {
+	background-color: #93C5E1;
+	color: black;
+	font-weight: bold;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM821/CRM821.js"></script>
+<script type="text/javascript" src="assets/txn/CRM821/CRM821_CHARGE.js"></script>
+<script type="text/javascript" src="assets/txn/CRM821/CRM821_COUPON.js"></script>
+<script type="text/javascript" src="assets/txn/CRM821/CRM821_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD110/PRD110_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD120/PRDDocument.js"></script>
+<div class="CRM821" ng-controller="CRM821Controller" ng-cloak>
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th>(約當臺幣)</th>
+					<td></td>
+					<th></th>
+					<td></td>
+				</tr>
+				<tr>
+					<th>參考總市值：</th>
+					<td>{{SUMCurBal | number :0}}</td>
+					<th>股票：</th>
+					<td>{{FundType_1 | number :0}}</td>
+				</tr>
+				<tr>
+					<th>參考總投資金額：</th>
+					<td>{{SUMCurAmt | number :0}}</td>
+					<th>債券：</th>
+					<td>{{FundType_4 | number :0}}</td>
+				</tr>
+				<tr>
+					<th>參考總損益金額：</th>
+					<td>{{SUMProfitAndLoss | number :0}}</td>
+					<th>平衡：</th>
+					<td>{{FundType_5 | number :0}}</td>
+				</tr>
+				<tr>
+					<th>參考總報酬率(不含配息)：</th>
+					<td>{{Return | number :2}} {{Return != null ? '%' : ''}}</td>
+					<th>貨幣：</th>
+					<td>{{FundType_3 | number :0}}</td>
+				</tr>
+				<tr>
+					<th>參考總報酬率(含配息)：</th>
+					<td>{{Return_int | number :2}} {{Return_int != null ? '%' : ''}}</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="goCharge()" function-type="query">一般小額扣款查詢</button>
+			<button type="button" class="btn btn-info" ng-click="goCoupon()" function-type="query">配息/配權查詢</button>
+		</div>
+		<!-- 結果區 -->
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th ng-if="!IsMobile && (pri == '002' || pri == '003')">功能</th>
+						<th ng-click = "sortBy('TxType')">
+							<e-sorter e-input="inputVO">信託型態</e-sorter>
+						</th>
+						<th ng-click = "sortBy('DynamicType')">
+							<e-sorter e-input="inputVO">憑證註記</e-sorter>
+						</th>
+						<th ng-click = "sortBy('FUS20')">
+						    <e-sorter e-input="inputVO">境內/外基金</e-sorter>
+						</th>
+						<th ng-click = "sortBy('EviNum')">
+							<e-sorter e-input="inputVO" >憑證編號</e-sorter>
+						</th>
+						<th ng-click = "sortBy('FundNO')">
+							<e-sorter e-input="inputVO" >基金名稱</e-sorter>
+						</th>
+						<th ng-click = "sortBy('CurCode')">
+							<e-sorter e-input="inputVO" >交易幣別</e-sorter>
+						</th>
+						<th ng-click = "sortBy('CurAmt')">
+							<e-sorter e-input="inputVO" >投資金額</e-sorter>
+						</th>
+						<th ng-click = "sortBy('CurBal')">
+							<e-sorter e-input="inputVO" >參考市值</e-sorter>
+						</th>
+						<th ng-click = "sortBy('ProfitAndLoss')">
+							<e-sorter e-input="inputVO" >投資損益</e-sorter>
+						</th>
+						<th ng-click = "sortBy('Return')">
+							<e-sorter e-input="inputVO" >參考報酬率</br>(不含配息)</e-sorter>
+						</th>
+						<th ng-click = "sortBy('AccAllocateRewRate')">
+							<e-sorter e-input="inputVO" >參考報酬率</br>(含現金配息)</e-sorter>
+						</th>
+						<th ng-click = "sortBy('VigCheck')">
+							<e-sorter e-input="inputVO" >警示基金</e-sorter>
+						</th>
+<!-- 						<th ng-click = "sortBy('Vigilant')"> -->
+<!-- 							<e-sorter e-input="inputVO" >持有/減碼</e-sorter> -->
+<!-- 						</th> -->
+<!-- 						<th ng-click = "sortBy('IsPledged')"> -->
+<!-- 							<e-sorter e-input="inputVO">是否質借</e-sorter> -->
+<!-- 						</th> -->
+<!-- 						<th>市場展望</th>  市場展望這個欄位目前PM不維護，先拿掉-->
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td ng-if="!IsMobile && (pri == '002' || pri == '003') && !(row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2'))"> <!-- 一般基金 -->
+							<e-combobox id="cmbAction" name="cmbAction"
+							ng-datasource="row.set"
+							ng-model="row.cmbAction"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="action(row)"
+							width="100px"
+							style="line-height:20px;" />
+						</td>
+						<td ng-if="!IsMobile && (pri == '002' || pri == '003') && row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2')"> <!-- 動態鎖利 -->
+							<e-combobox id="cmbAction" name="cmbAction"
+							ng-datasource="row.setDyna"
+							ng-model="row.cmbAction"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="actionDyna(row)"
+							ng-disabled="row.Dynamic == '2'"
+							width="100px"
+							style="line-height:20px;" />
+						</td>
+						<td style="text-align: center;">{{row.TxType}}</td>
+<!-- 					<td style="text-align: left;">{{row.AssetType | mapping:mappingSet['AssetType']:'F3'}}</td> -->
+						<td style="text-align: center;">{{row.DynamicType}}</td>
+						<td style="text-align: center;">{{row.FUS20}}</td>
+						<td style="text-align: center;"><a href="#" onclick="return false" ng-click="goDetail(row)">{{row.EviNum}}</a></td>
+						<td style="text-align: center;"><a href="#" onclick="return false" ng-click="goPrdDetail(row)">{{(row.FundNO || '') + ' ' + row.FundName}}</a></td>
+						<td style="text-align: center;">{{row.CurCode}}</td>
+						<td style="text-align: right;">{{row.CurAmt | number :0}}</td>
+						<td style="text-align: right;">{{row.CurBal | number :0}}</td>
+						<td style="text-align: right;">{{row.ProfitAndLoss | number :0}}</td>
+						<td style="text-align: right;">{{row.Return | number : 2}}{{row.Return != null ? '%' : ''}}</td>
+						<td style="text-align: right;" ng-show="row.AssetType != '0006'">{{row.AccAllocateRewRate | number:2}}{{row.AccAllocateRewRate != null ? '%' : ''}} </td>
+						<td style="text-align: right;" ng-show="row.AssetType == '0006'">暫不提供</td>
+						<td style="text-align: center;">{{row.VigCheck}}</td>
+<!-- 						<td style="text-align: center;">{{row.Vigilant | mapping:mappingSet['PRD.FUND_VIGILANT']:'F3'}}</td> -->
+<!-- 						<td style="text-align: center;">{{row.IsPledged}}</td> -->
+<!-- 					<td style="text-align: center;">{{row.xxx}}</td> 市場展望這個欄位目前PM不維護，先拿掉-->
+					</tr>
+				</tbody>
+			</table>
+			<div class="text-danger">含息報酬率 = (總市值 - 原始信託本金 + 調整後累積現金配息) / 原始信託本金</div>
+			<div class="text-danger">「調整後累積現金配息」為信託憑證的累積現金配息扣除投資期間該憑證進行轉換、部分轉換或部分贖回基金時，已等比例領回支配息金額</div>
+			<div class="text-danger">憑證註記為動態鎖利母子基金僅適用AS400鍵機交易</div>
+		</div></br>
+		<!-- 結果區 -->
+		<label>贖回在途資料</label>
+		<e-jumping-once output="redeemOutputVO" list="redeemData" totallist="redeemResultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th ng-click = "redeemSortBy('EffDate')">
+							<e-sorter e-input="inputVO">贖回日</e-sorter>
+						</th>
+						<th ng-click = "redeemSortBy('EviNum')">
+							<e-sorter e-input="inputVO">信託號碼</e-sorter>
+						</th>
+						<th ng-click = "redeemSortBy('FundNO')">
+							<e-sorter e-input="inputVO">基金名稱</e-sorter>
+						</th>
+						<th ng-click = "redeemSortBy('CurFund')">
+							<e-sorter e-input="inputVO">基金幣別</e-sorter>
+						</th>
+						<th ng-click = "redeemSortBy('CurUntNum')">
+							<e-sorter e-input="inputVO">贖回單位數</e-sorter>
+						</th>
+						<th ng-click = "redeemSortBy('RedeemNetValue')">
+							<e-sorter e-input="inputVO">贖回淨值</e-sorter>
+						</th>
+						<th ng-click = "redeemSortBy('RedeemOrgAmt')">
+							<e-sorter e-input="inputVO">預計贖回原幣金額(註1)</e-sorter>
+						</th>
+						<th ng-click = "redeemSortBy('PostingDate')">
+							<e-sorter e-input="inputVO">本行預計入帳日(註2)</e-sorter>
+						</th>						
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in redeemData | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: center;">{{toJsDate(row.EffDate) | date:"yyyy/MM/dd"}}</td>
+						<td style="text-align: center;">{{row.EviNum}}</td>
+						<td style="text-align: center;">{{(row.FundNO || '') + ' ' + row.FundName}}</td>
+						<td style="text-align: center;">{{row.CurFund}}</td>
+						<td style="text-align: center;">{{row.CurUntNum | number :4}}</td>
+						<td style="text-align: center;">{{row.RedeemNetValue | number :4}}</td>
+						<td style="text-align: center;">{{row.RedeemOrgAmt | number :2}}</td>
+						<td style="text-align: center;">{{toJsDate(row.PostingDate) | date:"yyyy/MM/dd"}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="text-danger">備註：</div>
+			<div class="text-danger">1.「預計贖回原幣金額」：本金額未扣除相關費用，如為台幣信託請再折台計算。</div>
+			<div class="text-danger">2.「本行預計入帳日」資料僅供參考，如遇不可抗力因素致暫停報價或國外匯款無法準時匯達時，將順延至次一營業日辦理付款作業。實際入帳日以本行解付入帳日辦理。</div>
+			<div class="text-danger">※&nbsp;&nbsp;若「贖回淨值」、「預計贖回原幣金額」及「本行預計入帳日」為空白，代表本行未收到基金公司回覆之相關資料。</div>
+		</div>
+	</div>
+</div>

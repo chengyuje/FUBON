@@ -1,0 +1,66 @@
+<wsdl:definitions xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://www.fubon.com/sso/webservices/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.fubon.com/sso/webservices/">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">依照北富銀新理專系統所需，提供MAPP電子要保書欄位</wsdl:documentation>
+<wsdl:types>
+<s:schema elementFormDefault="qualified" targetNamespace="http://www.fubon.com/sso/webservices/">
+<s:element name="GetCase">
+<s:complexType>
+<s:sequence>
+<s:element minOccurs="0" maxOccurs="1" name="DataDisp" type="s:string"/>
+</s:sequence>
+</s:complexType>
+</s:element>
+<s:element name="GetCaseResponse">
+<s:complexType>
+<s:sequence>
+<s:element minOccurs="0" maxOccurs="1" name="GetCaseResult" type="s:string"/>
+</s:sequence>
+</s:complexType>
+</s:element>
+</s:schema>
+</wsdl:types>
+<wsdl:message name="GetCaseSoapIn">
+<wsdl:part name="parameters" element="tns:GetCase"/>
+</wsdl:message>
+<wsdl:message name="GetCaseSoapOut">
+<wsdl:part name="parameters" element="tns:GetCaseResponse"/>
+</wsdl:message>
+<wsdl:portType name="GetMappCaseSoap">
+<wsdl:operation name="GetCase">
+<wsdl:input message="tns:GetCaseSoapIn"/>
+<wsdl:output message="tns:GetCaseSoapOut"/>
+</wsdl:operation>
+</wsdl:portType>
+<wsdl:binding name="GetMappCaseSoap" type="tns:GetMappCaseSoap">
+<soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+<wsdl:operation name="GetCase">
+<soap:operation soapAction="http://www.fubon.com/sso/webservices/GetCase" style="document"/>
+<wsdl:input>
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output>
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+</wsdl:binding>
+<wsdl:binding name="GetMappCaseSoap12" type="tns:GetMappCaseSoap">
+<soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+<wsdl:operation name="GetCase">
+<soap12:operation soapAction="http://www.fubon.com/sso/webservices/GetCase" style="document"/>
+<wsdl:input>
+<soap12:body use="literal"/>
+</wsdl:input>
+<wsdl:output>
+<soap12:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+</wsdl:binding>
+<wsdl:service name="GetMappCase">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">依照北富銀新理專系統所需，提供MAPP電子要保書欄位</wsdl:documentation>
+<wsdl:port name="GetMappCaseSoap" binding="tns:GetMappCaseSoap">
+<soap:address location="http://10.42.70.194/FBMAPPService/GetMappCase.asmx"/>
+</wsdl:port>
+<wsdl:port name="GetMappCaseSoap12" binding="tns:GetMappCaseSoap12">
+<soap12:address location="http://10.42.70.194/FBMAPPService/GetMappCase.asmx"/>
+</wsdl:port>
+</wsdl:service>
+</wsdl:definitions>

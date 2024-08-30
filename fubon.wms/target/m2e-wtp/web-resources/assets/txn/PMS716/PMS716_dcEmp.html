@@ -1,0 +1,65 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS716 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 95%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS716/PMS716_dcEmp.js"></script>
+<div ng-controller="PMS716_dcEmpController" ng-cloak>
+	<div class="modal-dialog PMS716">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請上傳信用卡實績明細-專員</h4>
+			</div>
+
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<e-jumping output="outputVO" input="inputVO" query="queryDcEmp()"
+					list="resultList"></e-jumping>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						<table class="table-bordered">
+							<thead>
+								<tr>
+									<th>計績年月</th>
+									<th>分行代碼</th>
+									<th>分行別</th>
+									<th>人員編號</th>
+									<th>人員姓名</th>
+									<th>計績卡數</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="y in resultList">
+									<td align="center">{{y.YEARMON}}</td>
+									<td align="center">{{y.BRANCH_NBR}}</td>
+									<td align="center">{{y.BRANCH_NAME}}</td>
+									<td align="center">{{y.PERSON_ID}}</td>
+									<td align="center">{{y.PERSON_NAME}}</td>
+									<td align="center">{{y.CARD_NUM}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="uploadDcEmp(sTime)">上傳資料</button>
+				<button type="button" class="btn btn-default"
+					ng-click="closeThisDialog('cancel')">取消</button>
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-info" ng-click="downloadSample()">下載範例檔</button>
+					
+			</div>
+		</div>
+	</div>
+</div>

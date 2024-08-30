@@ -1,0 +1,228 @@
+<style>
+/* open dialog */
+.ngdialog.SOT521 {
+	
+}
+/* dialog panl */
+.modal-dialog.SOT521 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.SOT521 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.SOT521 table.little{
+	width: 60%;
+}
+/* change row */
+.SOT521.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SOT521_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT521/SOT521.js"></script>
+<div class="SOT521" ng-controller="SOT521Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >SN庫存查詢及贖回</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<h4 class="h4-title">SN贖回資料輸入</h4>
+			<table>
+				<tr>
+					<!-- 交易資料 -->
+					<td width="80%">
+					    <h4 class="h4-title">交易資料</h4>
+						<table  class="rstable">
+							<tr ng-hide='true'>
+								<th>來行人員：</th>
+								<th>
+									<label ng-repeat="row in mappingSet['SOT.CUST_TYPE'] | limitTo:displayLimit track by $index">
+										<!-- 代理人先disable -->
+										<input type="radio" name="custType" ng-model="inputVO.custType" ng-value="row.DATA" disabled> {{row.LABEL}}
+										<span class="bigspace"></span>
+									</label>
+								</th>
+							</tr>
+							<tr>
+								<th>客戶ID：</th>
+								<td>
+									<table>
+										<tr>
+											<th>
+												<input type="text" class="form-control" style="width:auto;display:inline;"  id="custID" name="custID" ng-model="inputVO.custID" e-length-limit="200" disabled>
+											</th>
+											<th>{{inputVO.custName}}</th>
+											<th>KYC等級/效期：{{inputVO.kycLV}}/{{inputVO.kycDueDate | date:"yyyy-MM-dd"}}</th>
+										</tr>
+										<tr>
+											<th>客戶註記：{{inputVO.custRemarks | mapping:mappingSet['SOT.SPEC_CUSTOMER']:'F3'}}</th>
+											<th>OBU註記：{{inputVO.isOBU}}</th>
+											<th>專業投資人/效期：{{inputVO.profInvestorYN}}/{{inputVO.piDueDate | date:"yyyy-MM-dd"}}</th>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr ng-hide='true'>
+								<th>代理人：</th>
+								<td>
+									<input type="text" class="form-control" style="width:auto;display:inline;" id="proxyCustID" name="proxyCustID" ng-model="inputVO.proxyCustID" e-length-limit="200" disabled>
+									<span class="bigspace"></span>
+									{{inputVO.proxyCustName}}
+								</td>
+							</tr>
+						</table>
+						<h4 class="h4-title">交易明細</h4>
+						<table>	
+							<tr>
+								<th>信託業務別：</th>
+								<th>{{inputVO.trustCurrType | mapping:mappingSet['SOT.TRUST_CURR_TYPE']:'F3'}}</th>
+								<th></th>
+							</tr>
+							<tr>
+								<th>債券市場種類：</th>
+								<th>
+									{{inputVO.marketType | mapping:mappingSet['SOT.MARKET_TYPE']:'F3'}}
+								</th>
+								<th></th>
+							</tr>
+							<tr>
+								<th>商品代號/名稱：</th>
+								<th>{{inputVO.prodID}}/{{inputVO.prodName}}&nbsp;{{inputVO.prodRiskLV}}</th>
+							 
+								<th>最低贖回面額/累進贖回面額：{{inputVO.prodMinBuyAmt | number}}/{{inputVO.prodMinGrdAmt | number}}</th>
+							</tr>
+							<tr>
+								<th>計價幣別：</th>
+								<th>{{inputVO.prodCurr}}</th>
+								<th></th>
+							</tr>
+							<tr>
+								<th>申購面額：</th>
+								<th>{{inputVO.purchaseAmt | number}}</th>
+								<th></th>
+							</tr>
+							<tr>
+								<th>贖回面額：</th>
+								<th>
+									<label ng-repeat="row in mappingSet['SOT.REDEEM_TYPE'] | limitTo:displayLimit track by $index">
+										<!-- 代理人先disable -->
+										<input type="radio" name="redeemType" ng-model="inputVO.redeemType" ng-change="chRedeemType()" ng-value="row.DATA"> {{row.LABEL}}
+											<span class="bigspace"></span>
+									</label>
+								</th>
+								<th><input type="text" name='redeemAmt' ng-model="inputVO.redeemAmt" ng-disabled="inputVO.redeemType != '2'" ng-blur="checkRedeemAmt()" class="form-control" style="width:auto;display:inline;"></th>
+							</tr>
+							<tr>
+								<th>參考報價：</th>
+								<th>{{inputVO.refVal}}&nbsp;%</th>
+								<th>報價日期：{{inputVO.refValDate  | date:"yyyy-MM-dd"}}</th>
+							</tr>	
+							<tr>
+								<th>贖回方式：</th>
+								<td>
+									<div ng-repeat="row in mappingSet['SOT.ENTRUST_TYPE_REDEEM_SN']" style="display:inline;">
+										<input type="radio" name="entrustType" ng-model="inputVO.entrustType" ng-value="row.DATA" ng-click="calculate()">
+											<span ng-if="row.DATA == '2'">
+												&nbsp;{{row.LABEL}}&nbsp;&nbsp;
+											</span>
+											<span ng-if="row.DATA == '4'">{{row.LABEL}}&nbsp;&nbsp;&nbsp;{{inputVO.refVal - 1}}&nbsp;%</span>
+											<span ng-if="row.DATA == '5'">{{row.LABEL}}&nbsp;&nbsp;&nbsp;{{inputVO.refVal - 3}}&nbsp;%</span>
+											<span ng-if="row.DATA == '6'">{{row.LABEL}}&nbsp;&nbsp;&nbsp;{{inputVO.refVal - 5}}&nbsp;%</span>
+											<br />
+									</div>
+								</td>
+								<th></th>
+							</tr>
+							<tr>
+								<th>預估信託管理費</th>
+								<th>{{inputVO.fee | currency:''}}</th>
+								<th>信託管理費率：{{inputVO.feeRate}}</th>
+							</tr>
+							<tr>
+								<th>信託帳號：</th>
+								<th>{{inputVO.trustAcct}}</th>
+								<th></th>
+							</tr>
+							<tr>
+								<th>贖回款入帳帳號：</th>
+								<td><e-combobox id="creditAcct"
+									ng-datasource="mappingSet['credit']"
+									ng-model="inputVO.creditAcct"
+			    					ng-validate="false"
+			    					ng-readonly="false" 
+			    					ng-editable="false"
+			    					ng-format="F3"
+			    					ng-required="false"
+			    					ng-disabled="cmbCreditAcct"
+			    					width="150px"
+			    					style="line-height:20px;" /></td>			    				
+								<th></th> 	
+							</tr>
+							<tr> 
+								<th>解說專員：</th>
+								<td><input type="text" class="form-control" style="width:auto;display:inline;" ng-blur="getTellerName('narratorID',inputVO.narratorID)" id="narratorID" name="narratorID" ng-model="inputVO.narratorID" required>{{inputVO.narratorName}}</td>
+							</tr>					
+						</table>
+					</td>
+					<td width="20%">
+						<h4 class="h4-title">系統訊息</h4>
+						<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+							<table class="table-bordered">
+								<tr>
+									<th>非常規交易</th> 
+								</tr>
+								<tr>
+									<td>										
+										<div ng-hide="custAge == ''">{{custAge}}</div> 
+									</td> 
+								</tr>
+								<tr>
+									<th>傳送狀態</th>
+								</tr>
+								<tr>
+									<td><span ng-show="inputVO.tradeStatus == '3'">{{'ehl_02_SOT_002' | i18n}}</span></td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-disabled="inputVO.tradeStatus == '3'" ng-click="newTrade()">取消</button>
+			<button type="button" class="btn btn-info" ng-disabled="inputVO.goOPDisabled || inputVO.tradeStatus == '3'" ng-click="verifyTradeBond()">傳送OP交易及列印申請書</button>
+			<button type="button" class="btn btn-info" ng-disabled="inputVO.tradeStatus != '3'" ng-click="newTrade()">繼續交易</button>
+		</div>
+	</div>
+</div>

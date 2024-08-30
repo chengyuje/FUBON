@@ -1,0 +1,72 @@
+<div print-wrapper  ng-if="MFDPerformanceList.length > 0">
+<div class="wrapper">
+  <p ng-if="fromFps !== '340'" class="sub-title-p">【基金/ETF】</p>
+</div>
+  <div class="block container" style="border-color:#93c5e1;">
+  <table class="table" style="table-layout: fixed;">
+    <thead>
+      <tr>
+      	<th ng-if="fromFps !== '340'" class="title subtitle" rowspan="2">類別</th>
+        <th class="title subtitle" rowspan="2" style="width:260px;">商品</th>
+        <th class="title subtitle" colspan="5">報酬率%</th>
+        
+        <th class="title subtitle" rowspan="2">年化<br/>波動率%</th>
+        <th class="title subtitle" rowspan="2">配息頻率</th>
+<!--         <th class="title subtitle" rowspan="2">最近一次<br/>配息率%</th> -->
+        <th class="title subtitle" rowspan="2">最新參考<br/>淨值</th>
+      </tr>
+      <tr>
+      	<th class="title subtitle">三個月</th>
+      	<th class="title subtitle">六個月</th>
+        <th class="title subtitle">一年</th>
+        <th class="title subtitle">二年</th>
+        <th class="title subtitle">三年或成<br/>立以來</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in MFDPerformanceList" print-cell>
+      	<td ng-if="fromFps !== '340'" ng-bind="row.PRD_TYPE"></td>
+        <td ng-bind="row.PRD_CNAME" class="text-left"></td>
+        <td ng-bind="row.RETURN_3M != '--' ? (row.RETURN_3M|number:2) : '--'"></td>
+        <td ng-bind="row.RETURN_6M != '--' ? (row.RETURN_6M|number:2) : '--'"></td>
+        <td ng-bind="row.RETURN_1Y != '--' ? (row.RETURN_1Y|number:2) : '--'"></td>
+        <td ng-bind="row.RETURN_2Y != '--' ? (row.RETURN_2Y|number:2) : '--'"></td> 
+        <td ng-bind="row.RETURN_3Y != '--' ? (row.RETURN_3Y|number:2) : '--'"></td>
+        <td ng-bind="row.VOLATILITY != '--' ? (row.VOLATILITY|number:2) : '--'"></td>
+        <td ng-bind="row.FREQUENCY"></td>
+        <td ng-bind="row.PRD_NAV"></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div print-wrapper ng-if="DEBTPerformanceList.length >0">
+<div class="wrapper">
+  <p class="sub-title-p" ng-if="!hasIns">【 海外債】</p>
+  <p class="sub-title-p" ng-if="hasIns">【 海外債/SN/SI】</p></div>
+  <div class="block container" style="border-color:#93c5e1;margin-top: 0px;margin-bottom: 0px;">
+  <table class="table" style="table-layout: fixed;">
+    <thead>
+      <tr>
+      	<th class="title subtitle">類別</th>
+        <th class="title subtitle" style="width:340px;">商品</th>
+        <th class="title subtitle">剩餘年限</th>
+        <th class="title subtitle">配息頻率</th>
+        <th class="title subtitle">最近一次<br/>配息率%</th>
+        <th class="title subtitle">最新參考<br/>報價%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in DEBTPerformanceList" print-cell>
+      	<td ng-bind="row.PRD_TYPE"></td>
+        <td ng-bind="row.BOND_CNAME" class="text-left"></td>
+        <td ng-bind="row.DATE_OF_MATURITY != '--' ? (row.DATE_OF_MATURITY|number:2) : '--'"></td>
+        <td ng-bind="row.FREQUENCY_OF_INTEST_PAY"></td>
+        <td ng-bind="row.LASTRATE != '--' ? (row.LASTRATE|number:2) : '--'"></td>
+        <td ng-bind="row.BUY_PRICE != '--' ? (row.BUY_PRICE|number:2) : '--'"></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>

@@ -1,0 +1,340 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+
+
+</style>
+<script type="text/javascript" src="assets/txn/FPS210/FPS210.js"></script>
+<script type="text/javascript" src="assets/txn/FPS210/FPS210_CASH.js"></script>
+
+<div ng-controller="FPS210Controller" class="FPS" ng-cloak>
+  <!-- tabs -->
+  <div ng-include="'assets/txn/FPS/FPS200_TAB.html'"></div>
+  <div style="text-align: right; padding-right: 1.5em;">單位：新台幣元</div>
+  <form name="FPS210Form" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+    <div style="display:flex; width: 99.5%; justify-content: space-around; margin: 0 auto;">
+      <!-- 無投保 -->
+      <section class="block" ng-if="!hasIns">
+        <div class="title title-left">資產</div>
+        <div class="content-wrapper">
+          <div class="content-title">A.存款<span style="font-size:.8em">(不含支存)</span></div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.deposit"
+                   ng-disabled="true">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title">B.預計行外匯入金額</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.sowAmt"
+                   ng-blur="chgAmt('sowAmt')"
+                   ng-change="inputVO.sowAmt = inputVO.sowAmt.replace('-' , '');">
+          </div>
+        </div>
+        <div class="content-wrapper last prefix">
+          <div class="content-title">小計</div>
+          <div class="content-body">
+          </div>
+        </div>
+        <div class="content-wrapper last">
+          <div class="content-title">小計</div>
+          <div class="content-body">
+            <span ng-bind="inputVO.price|number"></span>
+          </div>
+        </div>
+      </section>
+     
+      <!-- 有投保 -->
+      <section class="block" ng-if="hasIns">
+        <div class="title title-left">投資資產</div>
+        <div class="content-wrapper">
+          <div class="content-title">A.帳上投資資產</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.liquidAmt"
+                   ng-disabled="true">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">A1.存款<span style="font-size:.8em">(不含支存)</span></div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.deposit"
+                   ng-disabled="true">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">A2.基金</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.mfdProd"
+                   ng-disabled="true">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">A3.ETF</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.etfProd"
+                   ng-disabled="true">
+          </div>
+        </div>
+<!--         <div class="content-wrapper"> -->
+<!--           <div class="content-title content-title-sub">A4.投資型保險</div> -->
+<!--           <div class="content-body"> -->
+<!--             <input type="text" -->
+<!--                    e-input-limit="NC" -->
+<!--                    class="form-control" -->
+<!--                    style="text-align: right;" -->
+<!--                    ng-model="inputVO.insProd" -->
+<!--                    ng-disabled="true"> -->
+<!--           </div> -->
+<!--         </div> -->
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">A4.海外債</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.bondProd"
+                   ng-disabled="true">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">A5.SN</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.snProd"
+                   ng-disabled="true">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">A6.SI</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.siProd"
+                   ng-disabled="true">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">A7.奈米投</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.nanoProd"
+                   ng-disabled="true">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title">B.預計行外匯入金額</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.sowAmt"
+                   ng-blur="chgAmt('sowAmt')"
+                   ng-change="inputVO.sowAmt = inputVO.sowAmt.replace('-' , '');">
+          </div>
+        </div>
+        <div class="content-wrapper last prefix">
+          <div class="content-title">小計</div>
+          <div class="content-body">
+          </div>
+        </div>
+        <div class="content-wrapper last">
+          <div class="content-title">小計</div>
+          <div class="content-body">
+            <span ng-bind="inputVO.price | number"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 支出 -->
+      <section class="block">
+        <div class="title title-left">支出及現金準備</div>
+        <div class="content-wrapper">
+          <div class="content-title">C.未來一年所需現金部位
+            <a ng-href="#"
+               ng-click="setItem()">
+              <i class="fa fa-question-circle fa-lg" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.cash"
+                   ng-disabled="true">
+          </div>
+        </div>
+		<!-- CR BY SEN ↓-->
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">C1.生活必要支出</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.needExpenses"
+                   ng-blur="chgAmt()">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">C2.貸款支出</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.loanExpenses"
+                   ng-blur="checkCashAmt(chgAmt,'loanExpenses')">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">C3.其他支出</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.otherExpenses"
+                   ng-blur="checkCashAmt(chgAmt,'otherExpenses')">
+          </div>
+        </div>
+        <!-- CR BY SEN ↑ -->
+        <div class="content-wrapper">
+          <div class="content-title">D.未來一年保險投保費用</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.ins"
+                   ng-disabled="true">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">D1.保障型保費</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.insPolicyAmt"
+                   ng-blur="chgAmt('insPolicyAmt');"
+                   ng-change="inputVO.insPolicyAmt = inputVO.insPolicyAmt.replace('-' , '');">
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-title content-title-sub">D2.儲蓄型保費</div>
+          <div class="content-body">
+            <input type="text"
+                   e-input-limit="NC"
+                   class="form-control"
+                   style="text-align: right;"
+                   ng-model="inputVO.insSavAmt"
+                   ng-blur="chgAmt('insSavAmt');"
+                   ng-change="inputVO.insSavAmt = inputVO.insSavAmt.replace('-' , '');">
+          </div>
+        </div>
+        <!-- CR BY SEN ↓ -->
+        <div class="content-wrapper">
+          <div class="content-title">E.現金準備(建議不宜超過 {{cashPreparePct}} %)</div>
+          <div class="content-body">
+	          <input type="text"
+	                   e-input-limit="NC"
+	                   class="form-control"
+	                   style="text-align: right;"
+	                   ng-model="inputVO.cashPrepare"
+	                   ng-blur="changeCashPrepare()">
+          </div>
+        </div>
+        <div class="content-wrapper">
+       		<drag-bar percent="{{inputVO.percent}}"
+                 options="dragOptions"
+                 draggable="true"
+                 btn-on-drag="dragBarOnDrag(newPct)"></drag-bar>
+        </div>
+        <!-- CR BY SEN ↑ -->
+        <div class="content-wrapper last prefix">
+          <div class="content-title">小計</div>
+          <div class="content-body">
+          </div>
+        </div>
+        <div class="content-wrapper last">
+          <div class="content-title">小計</div>
+          <div class="content-body">
+            <span ng-bind="cost|number"></span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="block container no-area"
+             style="text-align: left;">
+      <div class="content-wrapper">
+        <div class="content-title"><b>F.可供理財規劃金額</b></div>
+        <div class="content-body">
+          <b ng-bind="total|number"></b>
+        </div>
+      </div>
+    </section>
+  </form>
+  
+  <section class="clear" style="text-align: left;">
+    <div class="ps-wrapper" style="display:inline-block;width: 75%;">
+      <div class="ps" style="color:#ff5d5d;font-weight: bold;">＊提醒您，理財規劃金額為客戶最近資產部位，非當日即時資料，可能出現差異，請特別留意。</div>
+      <ul ng-if="!hasIns" class="star_ul">
+		<li class="ps">全資產理財規劃資料基準日皆截至<span ng-bind="prevBusiDay"></span>為止本行可取得之最新資料；如需計算折合台幣金額時，折台匯率係採本行前一營業日台幣對外幣之匯率；金額欄位數字皆四捨五入計算至整數位。</li>
+		<li class="ps">資產=A+B ，支出及現金準備=C+D+E ，其中D.未來一年保險投保費用僅包含保障型保險及儲蓄型保險分期繳保費。</li>
+	  </ul>	
+	  <ul ng-if="hasIns" class="star_ul">
+		<li class="ps">全資產理財規劃資料基準日皆截至<span ng-bind="prevBusiDay"></span>為止本行可取得之最新資料；如需計算折合台幣金額時，折台匯率係採本行前 一營業日台幣對外幣之匯率；金額欄位數字皆四捨五入計算至整數位。</li>
+		<li class="ps">資產=A+B ，支出及現金準備=C+D+E ，其中D.未來一年保險投保費用僅包含保障型保險及儲蓄型保險分期繳保費。</li>
+	  </ul>
+    </div>
+    <div style="margin-right: 15px; float: right; margin-top: 1em;" ng-if="newFlag">
+      <a type="button" class="btn-fps"
+         ng-class="{'btn-fps-disabled':kycInvalid}"
+         ng-click="kycInvalid?'':go('save')"
+         style="margin-right: 15px;">儲存</a>
+      <a type="button" class="btn-fps"
+         ng-class="{'btn-fps-disabled':kycInvalid}"
+         ng-click="kycInvalid?'':changeStep()">下一步</a>
+    </div>
+  </section>
+
+
+
+</div>

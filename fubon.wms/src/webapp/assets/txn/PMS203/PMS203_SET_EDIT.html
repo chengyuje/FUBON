@@ -1,0 +1,169 @@
+<style>
+/* open dialog */
+.ngdialog.PMS413_EDIT {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS203_SET_EDIT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* table size */
+.PMS203_SET_EDIT table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS203_SET_EDIT.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS413_EDIT_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+td {
+	padding: 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS203/PMS203_SET_EDIT.js"></script>
+<div ng-controller="PMS203_SET_EDITController" ng-cloak>
+	<div class="modal-dialog PMS203_SET_EDIT"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row == null ? '生產力目標維護_新增' : '生產力目標維護_修改'}}理專職級設定</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th><font color="red">＊</font> 資料年月：</th>
+							<td>
+								<e-combobox id="dataMonth" name="dataMonth"
+								ng-datasource="mappingSet['timeE']" 
+								ng-model="inputVO.sCreDate"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false" 
+								ng-required="true" 
+								ng-change="limitDate();dateChange()" 
+								ng-format="F3" 
+								width="150px" style="line-height:20px;" />	
+							</td>
+							<th><font color="red">＊</font> 級距：</th>
+							<td>
+								<input type="text"  e-input-limit="N" e-length-limit="8"  style="text-align: right" ng-model="inputVO.levelDist" ng-disabled="row != null" required>
+							</td>
+						</tr>
+						<tr>
+							<th><font color="red">＊</font> 職等/職稱：</th>
+							<td>						     
+								<e-combobox id="olTitle" name="olTitle" 
+							       ng-paramtype ="PMS.RANK_TITLE"
+							       ng-model="inputVO.olTitle"
+							       ng-validate="false" 
+							       ng-readonly="false" 
+							       ng-editable="false"
+							       ng-change=""
+							       ng-disabled="row != null"
+							       ng-format="F3"
+							       ng-required="true"
+							       width="180px"						         
+							       style="line-height:20px;" />
+							</td>
+	     					<th><font color="red">＊</font> 職級：</th>
+							<td>						 
+								<e-combobox id="jobTitleId" name="jobTitleId" 
+								ng-paramtype ="PMS.AO_JOB_RANK"
+								ng-model="inputVO.jobTitleId"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-change=""
+								ng-disabled="row != null"
+								ng-format="F3"
+								ng-required="true"
+								width="140px"
+								style="line-height:20px;" />						 
+							</td>
+						</tr>
+						<tr>													
+							<th><font color="red">＊</font> 生產力目標：</th>
+							<td>
+								<input type="text"  e-input-limit="N" e-length-limit="17"  ng-model="inputVO.prodGoals" style="text-align: right"  required>
+							</td>
+							<th><font color="red">＊</font> 維持級距目標：</th>
+							<td>
+								<input type="text"  e-input-limit="N" e-length-limit="17"  ng-model="inputVO.keepGoals" style="text-align: right"  required>
+							</td>
+						</tr>
+						<tr>					
+							<th>晉級直線級距：</th>
+							<td>
+								<input type="text"   e-input-limit="N" e-length-limit="3" ng-model="inputVO.proStrLine" style="text-align: right" required>
+							</td>
+							<th>降級直線級距：</th>
+							<td>
+								<input type="text" e-input-limit="N" e-length-limit="3"  ng-model="inputVO.demStrLine" style="text-align: right" required>
+							</td>
+						</tr>
+						<tr>							
+							<th>晉級橫向級距：</th>
+							<td>
+								<input type="text" e-input-limit="N" e-length-limit="3"ng-model="inputVO.proHorLine" style="text-align: right" required>
+							</td>
+							<th>降級橫向級距：</th>
+							<td>
+								<input type="text" e-input-limit="N" e-length-limit="3"  ng-model="inputVO.demHorLine" style="text-align: right" required>
+							</td>
+						</tr>
+						<tr>							
+							<th>晉級45度級距：</th>
+							<td>
+								<input type="text"  e-input-limit="N" e-length-limit="3" ng-model="inputVO.proSlaLine" style="text-align: right" required>
+							</td>
+							<th>降級45度級距：</th>
+							<td>
+								<input type="text"  e-input-limit="N" e-length-limit="3" ng-model="inputVO.demSlaLine" style="text-align: right" required>
+							</td>
+						</tr>
+						<tr>				
+							<th><font color="red">＊</font> 定額調薪：</th>
+							<td>
+								<input type="text"  e-input-limit="ND" e-length-limit="17"  style="text-align: right"  ng-model="inputVO.fixSal" required>
+							</td>
+							<th></th>
+							<td></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()">確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div> 
+</div>

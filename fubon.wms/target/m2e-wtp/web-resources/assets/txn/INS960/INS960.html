@@ -1,0 +1,284 @@
+<style>
+.INS910 .title {
+ 	padding-left: 30px;
+ 	line-height: 50px;
+}
+.INS910ToolTip .tooltip-inner {
+	max-width: 350px !important;
+}
+  .inputStyle {
+    width: 50%;
+    display: inline-block;
+    text-align: right;
+  }
+
+  .left {
+    text-align: left;
+    float: left;
+  }
+
+  /*  */
+
+  .deletePic {
+    color: #2a8960;
+    font-size: 25px;
+  }
+
+  .section-wrapper {
+    text-align: center
+  }
+
+  section {
+    vertical-align: top;
+    margin: 1em auto;
+    width: 96%;
+    border-radius: 5px;
+    background-color: #ecf6fd;
+    display: inline-block;
+  }
+
+  section>h3 {
+    margin: 0;
+    padding: .5em 0;
+    text-align: center;
+    border: 0.5px solid #28a4c9;
+    background-color: #fff;
+    color: #28a4c9;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  section.tri {
+    width: 31.15%;
+    margin: .5em .5%;
+  }
+
+  section.dou {
+    width: 100%;
+    margin: .5em .5%;
+  }
+  
+  .section-body {
+    padding: .7em;
+    border-bottom: 0.5px solid #28a4c9;
+    border-left: 0.5px solid #28a4c9;
+    border-right: 0.5px solid #28a4c9;
+    border-top: 1px solid #ddd;
+    margin-top: -1px;
+    position: relative;
+  }
+
+  section .section-body:first-of-type {
+    border-top: 0px;
+    margin-top: 0px;
+  }
+
+  .section-body::after {
+    display: block;
+    content: '';
+    clear: both;
+  }
+</style>
+<script type="text/javascript" src="assets/txn/INS960/INS960.js"></script>
+<div class="INS910" ng-controller="INS960Controller" ng-cloak>
+	<!-- 未完成Mapping -->
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit title">未完成Mapping</div>
+	</div>
+	<div class="panel_content">
+		<div class="e_panel_table">
+        <section class="dou">
+          <h3>資訊源商品</h3>
+          <div class="section-body">
+          <div>
+			<div class="input-group" style="display:inline-block; vertical-align:top">
+	            <input type="text" style="width:150px; text-align: left; text-transform: uppercase; display:inline-block; margin-left:.5em;" 
+	            class="form-control ng-pristine ng-untouched ng-valid ng-not-empty" ng-model="inputVO.prdID" ng-blur="inquireInit();" placeholder="查詢保險資訊源險種代碼">
+	            <span class="input-group-btn" style="display:inline-block">
+	              <button class="btn btn-info" type="button">
+	                <i class="glyphicon glyphicon-search"></i>
+	              </button>
+	            </span>
+          	</div>
+          	<div style="margin:10px 7px">
+				<e-jumping-once output="insDataOutputList" list="insData" totallist="insDataOutputList"></e-jumping-once>
+			</div>
+          </div>
+            <!-- result -->
+            <div style="overflow-x:scroll">
+              <table class="table report">
+                <thead>
+                  <tr>
+                    <th>點選</th>
+                    <th>險種代碼</th>
+                    <th>險種名稱</th>
+                    <th>Title_Y</th>
+                    <th>Item_Y</th>
+                    <th>Title_A</th>
+                    <th>Item_A</th>
+                    <th>Title_O</th>
+                    <th>Item_O</th>
+                    <th>Title_K</th>
+                    <th>Item_k</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="repeat-row" ng-repeat="row in insData" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                    <th><input type=radio ng-model="inputVO.insDataCHOICE" ng-value="row.KEY_NO"></th>
+                    <th ng-bind="row.PRD_ID"></th>
+                    <td ng-bind="row.PRD_NAME"></td>
+                    <td ng-bind="row.TITLE_Y"></td>
+                    <td ng-bind="row.LIST_Y"></td>
+                    <td ng-bind="row.TITLE_A"></td>
+                    <td ng-bind="row.LIST_A"></td>
+                    <td ng-bind="row.TITLE_O"></td>
+                    <td ng-bind="row.LIST_O"></td>
+                    <td ng-bind="row.TITLE_K"></td>
+                    <td ng-bind="row.LIST_K"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="dou">
+          <h3>富邦人壽商品</h3>
+          <div class="section-body">
+<!--           <div style="height:45px"></div> -->
+            
+           
+            <!-- result -->
+            <div>
+              <table class="table report">
+                <thead>
+                  <tr>
+                    <th>點選</th>
+                    <th>險種<br/>代號</th>
+                    <th>險種<br/>名稱</th>
+                    <th>主附<br/>約別</th>
+                    <th>幣別</th>
+                    <th>繳費<br/>年期</th>
+                    <th>保障<br/>年期</th>
+                    <th>計劃<br/>單位</th>
+                    <th>商品<br/>上市日</th>
+                    <th>商品<br/>下市日</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="repeat-row" ng-repeat="row in insOutputList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                    <th><input type=radio ng-model="inputVO.insCHOICE" ng-value="row.KEY_NO"></th>
+                    <th ng-bind="row.PRD_ID"></th>
+                    <td ng-bind="row.INSPRD_NAME"></td>
+                    <td>{{row.MAIN_RIDER | mapping: mapping.insMain}}</td>
+                    <td ng-bind="row.CURR_CD"></td>
+                    <td ng-bind="row.INSPRD_ANNUAL"></td>
+                    <td ng-bind="row.GUARANTEE_ANNUAL"></td>
+                    <td>{{row.PRD_UNIT | mapping: mapping.insUnit}}</td>
+                    <td ng-bind="row.SALE_SDATE"></td>
+                    <td ng-bind="row.SALE_EDATE"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+		</div>
+		<div style="text-align:center">
+			<button type="button" class="btn btn-default" ng-click="save()" >Mapping</button>
+		</div>
+	</div>
+	
+	<!-- 已完成Mapping -->
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit title">已完成Mapping</div>
+	</div>
+	<div class="panel_content">
+		<div>
+			<div class="input-group" style="display:inline-block; vertical-align:top">
+			<input type="text" style="width:150px; text-align: left; text-transform: uppercase; display:inline-block; margin-left:.5em;" 
+				   class="form-control ng-pristine ng-untouched ng-valid ng-not-empty" ng-model="inputVO.fubonPrdID" ng-blur="finishMapping();" 
+				   placeholder="查詢富邦險種代碼">
+				<span class="input-group-btn" style="display:inline-block">
+			    <button class="btn btn-info" type="button">
+			      <i class="glyphicon glyphicon-search"></i>
+			    </button>
+			  </span>
+			</div>
+			<div style="margin:10px 7px">
+				<e-jumping-once output="outputVO" list="data" totallist="outputList"></e-jumping-once>
+			</div>
+       </div>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;max-height:700px">
+			<table>
+				<thead>
+					
+					<tr><th rowspan="2">勾選</th>
+						<th colspan="12" class="text-center">資訊源</th>
+						<th colspan="9" class="text-center">富邦人壽</th>
+					</tr>
+					<tr>
+						
+						<th>險種代碼</th>
+						<th>險種名稱</th>
+						<th>幣別</th>
+						<th>主附約別</th>
+						<th>Title_Y</th>
+                    	<th>Item_Y</th>
+	                    <th>Title_A</th>
+	                    <th>Item_A</th>
+	                    <th>Title_O</th>
+	                    <th>Item_O</th>
+	                    <th>Title_K</th>
+	                    <th>Item_k</th>
+					
+						<th>險種代碼</th>
+						<th>險種名稱</th>
+						<th>幣別</th>
+						<th>主附約別</th>
+						<th>繳費年期</th>
+						<th>保障年期</th>
+						<th>計劃或單位</th>
+						<th>商品上市日</th>
+						<th>商品下市日</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>
+							<!-- 勾選 -->
+							<input type='checkbox' ng-model="row.isCheck"/>
+						</td>
+						<td ng-bind="row.INSDATAPRDID" style="text-align: left;"><!-- 險種代碼 --></td>
+						<td ng-bind="row.PRD_NAME" style="text-align: left;"><!-- 險種名稱 --></td>
+						<td ng-bind="row.INSDATACURRCD" style="text-align: left;"><!-- 幣別 --></td>
+						<td style="text-align: left;">{{row.IS_MAIN | mapping: mapping.insFubonMain}}<!-- 主附約 --></td>
+						<td ng-bind="row.TITLE_Y" style="text-align: center;"></td>
+	                    <td ng-bind="row.LIST_Y" style="text-align: left;"></td>
+	                    <td ng-bind="row.TITLE_A" style="text-align: left;"></td>
+	                    <td ng-bind="row.LIST_A" style="text-align: left;"></td>
+	                    <td ng-bind="row.TITLE_O" style="text-align: left;"></td>
+	                    <td ng-bind="row.LIST_O" style="text-align: left;"></td>
+	                    <td ng-bind="row.TITLE_K" style="text-align: left;"></td>
+	                    <td ng-bind="row.LIST_K" style="text-align: left;"></td>
+						
+						<td ng-bind="row.INSPRDID" style="text-align: left;"><!-- 險種代碼 --></td>
+						<td ng-bind="row.INSPRD_NAME" style="text-align: left;"><!-- 險種名稱 --></td>
+						<td ng-bind="row.CURR_CD" style="text-align: left;"><!-- 幣別 --></td>
+						<td style="text-align: left;">{{row.MAIN_RIDER | mapping: mapping.insMain}}<!-- 主附約 --></td>
+						<td ng-bind="row.INSPRD_ANNUAL" style="text-align: left;"><!-- 繳費年期 --></td>
+						<td ng-bind="row.GUARANTEE_ANNUAL" style="text-align: left;"><!-- 保障年度 --></td>
+						<td style="text-align: left;">{{row.PRD_UNIT | mapping: mapping.insUnit}}<!-- 計劃或單位 --></td>
+						<td ng-bind="row.SALE_SDATE" style="text-align: left;"><!-- 商品上市日  --></td>
+						<td ng-bind="row.SALE_EDATE" style="text-align: left;"><!-- 商品下市日 --></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div style="text-align:center">
+			<button type="button" class="btn btn-default" ng-click="deleteMapping()" >解除Mapping</button>
+		</div>
+
+	</div>
+</div>

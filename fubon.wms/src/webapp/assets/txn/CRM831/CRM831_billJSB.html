@@ -1,0 +1,128 @@
+<style>
+/* open dialog */
+.dialog.CRM831_billJSB {
+
+}
+/* dialog panl */
+.modal-dialog-CRM831_billJSB {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+    width: 1200px;
+    margin: 30px auto;
+}
+/* table size */
+.CRM831_billJSB table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM831_billJSB.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM831_billJSB_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<div class="CRM831_billJSB" ng-controller="CRM831_billJSBController" ng-cloak>
+	<div class="modal-dialog-CRM831_billJSB" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header" style ="padding-left: 85px;"><!-- 多了一口X會使標題不置中，加空格處理 -->
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 class="modal-title" align="center">日盛保代歷史對帳單</h4>
+			</div>
+			<div class="modal-body">
+				<div class="tfb_content">
+					<div class="tfb_content_icon"></div>
+					<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >日盛保代歷史對帳單</div>
+				</div>
+				<div class="panel_content">
+					<br/>
+					<table style="align:center; width:70%">
+					<tr>
+						<td>對帳單年月：
+						<e-combobox id="yearMon" name="yearMon"
+									ng-datasource="mappingSet['YEARMONTH']" 
+									ng-model="inputVO.year_mon"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-require="true"
+									ng-format="F3"
+									width="150px"
+									style="line-height:20px;" />
+						<button type="button" class="btn btn-info" ng-click="inquireBillJSB()">查詢</button>
+						</td>
+					</tr>
+					</table>
+					<br/>
+					<e-jumping output="outputVOBill" input="inputVO" query="inquireBillJSB()" list="resultListBill"></e-jumping>
+					<div class="gv_tab_sc scroll_y" style="height:300px;white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th>年月</th>
+									<th>要保人ID</th>
+									<th>被保險人</th>
+									<th>保險公司</th>
+									<th>保險商品</th>
+									<th>生效日期</th>
+									<th>幣別</th>
+									<th>累計保費</th>
+									<th>參考日期</th>
+									<th>保險類型</th>
+									<th>保單號碼</th>
+									<th>保單狀態</th>
+									<th>繳別</th>
+									<th>保單價值</th>
+								</tr>
+							</thead>
+									
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in resultListBill| limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td align="center">{{row.YEARMONTH}}</td>
+									<td align="center">{{row.APPL_ID}}</td>
+									<td align="center">{{row.INSURED_NAME}}</td>
+									<td align="center">{{row.COM_NAME}}</td>
+									<td align="center">{{row.PRODUCT_NAME}}</td>
+									<td align="center">{{toJsDate(row.EFF_DATE)|date:"yyyy-MM-dd"}}</td>
+									<td align="center">{{row.CURRENCY}}</td>
+									<td align="center">{{row.ACCU_PREM_ORI | number}}</td>
+									<td align="center">{{toJsDate(row.PREM_DATE)|date:"yyyy-MM-dd"}}</td>
+									<td align="center">{{row.PRODUCTTYPE}}</td>
+									<td align="center">{{row.POLICY_NO}}</td>
+									<td align="center">{{row.POLICYSTATUS}}</td>
+									<td align="center">{{row.POLICYMODE}}</td>
+									<td align="center">{{row.ACC_VALUE_ORGD | number}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+			</div>
+		</div>
+	</div>
+</div>

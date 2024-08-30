@@ -1,0 +1,916 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .important {
+    font-weight: 600;
+  }
+
+  .FPS table img {
+    vertical-align: middle;
+  }
+
+  .input-number {
+    text-align: right;
+    max-width: 130px;
+    margin: 0 0 0 auto;
+  }
+
+  .more-wrapper {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+  }
+
+  .more {
+    font-size: .7em;
+    color: #28a4c9;
+  }
+
+  table.info tbody tr td,
+  table.info tbody tr th {
+    padding: 3px 5px;
+  }
+
+  .has-error .e-combobox {
+    border: 1px solid #a94442;
+    border-radius: 5px;
+  }
+  
+  .under-line-show {
+  	border-bottom: .5px solid #eee;
+  }
+  .under-line-hide {
+  	border-bottom: none;
+  }
+
+</style>
+<script type="text/javascript" src="assets/txn/FPS230/FPS230.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPS200Service.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSChartUtils.js"></script>
+<!-- prod -->
+<script type="text/javascript" src="assets/txn/FPS/FPSProd.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_SavingIns.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_Currency.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_MFD.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_ETF.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_InvestIns.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_Bond.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_SI.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_SN.js"></script>
+<!-- 325 -->
+<script type="text/javascript" src="assets/txn/FPS325/FPS325.js"></script>
+<!-- detail -->
+<script type="text/javascript" src="assets/txn/PRD110/PRD110_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD130/PRD130_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD140/PRD140_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD150/PRD150_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD160/PRD160_DETAIL.js"></script>
+<!-- models -->
+<script type="text/javascript" src="assets/txn/FPS230/FPS230Models.js"></script>
+<script type="text/javascript" src="assets/txn/FPS230/FPS230Review.js"></script>
+
+<div ng-controller="FPS230Controller" ng-cloak class="FPS">
+  <!-- tabs -->
+  <div ng-include="'assets/txn/FPS/FPS200_TAB.html'"></div>
+
+  <!-- banner block -->
+  <section class="block container">
+     <div class="title title-left">類債券及類股票商品配置
+       <div class="ps-wrapper clickable">
+         <div class="toggle-wrapper btn-fps" ng-click="arrowUp=!arrowUp">
+	        	市場概況<img ng-src="{{arrowPath[arrowUp?'down':'up']}}" class="icon">
+	      </div>
+       </div>
+     </div>
+     
+     <div class="content-wrapper no-border" ng-show="!arrowUp">
+      	<p ng-bind="marketOverview"></p>
+     </div>
+
+     <div style="display:flex; justify-content: space-around; margin: 0 auto;">
+       <div class="block clear-space">
+         <div style="text-align: left; padding-left: 2em; font-weight: 600; padding-top: 2em;">{{hasIns ? '【調整前配置】':'【建議配置】'}}</div>
+         <div class="content-wrapper no-border">
+           <div class="chart-content">
+             <div id="beforeChart" class="chart" style="width:40%;float:left;"></div>
+             <div  style="width:45%;float:right;margin-top:30px;background-color: #fafafa;margin-right: 5%;">
+             	<div ng-repeat="row in chartTables.afterChart" style="margin:8px;margin-left: 25px;display:flex; border-bottom: .5px solid #eee;" ng-if="row.beforePct >=0">
+             		<div style="float:left;margin-right:5px">
+             			<div class="color-block" ng-style="{'background-color': row.color,'flaot':'left'}"></div>
+             		</div>
+             		<div style="width:150px;float:left">
+             			<span ng-bind="row.label"></span><br/>
+             			<label style="color:#a5a5a5;font-size: 13px;">(NT $<span ng-bind="row.beforeValue|number"></span>)</label>
+             		</div>
+             		<div style="width: 35%;float:right;text-align: -webkit-right;"><span ng-bind="row.beforePct+' %'"></span></div>
+             	</div>
+             </div>
+           </div>
+         </div>
+       </div>
+       <div class="block clear-space">
+         <div style="text-align: left; padding-left: 2em; font-weight: 600; padding-top: 2em;">【調整後配置】
+         </div>
+         <div class="content-wrapper no-border">
+           <div class="chart-content">
+             <div id="afterChart" class="chart" style="width:40%;float:left;"></div>
+             <div  style="width:45%;float:right;margin-top:30px;background-color: #fafafa;margin-right: 5%;">
+             	<div ng-repeat="row in chartTables.afterChart" style="margin:8px;margin-left: 25px;display:flex;" ng-class="row.color ? 'under-line-show' :'under-line-hide'">
+             		<div style="float:left;margin-right:5px">
+             			<div class="color-block" ng-style="{'background-color': row.color,'flaot':'left'}"></div>
+             		</div>
+             		<div style="width:150px;float:left">
+             			<span ng-bind="row.label"></span><br/>
+             			<label style="color:#a5a5a5;font-size: 13px;">(NT $<span ng-bind="row.amt|number"></span>)</label>
+             		</div>
+             		<div style="width: 35%;float:right;text-align: -webkit-right;"><span ng-bind="row.value"></span><span ng-show="row.color"> %</span></div>
+             	</div>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+     <div class="block clear-space container no-border" ng-show="hasIns">
+       <table style="width:100%;">
+         <thead style="background-color:#eee">
+           <tr>
+             <th class="text-center">內容</th>
+             <th class="text-center">目前比例</th>
+             <th class="text-center">建議比例</th>
+             <th class="text-center">調整方向</th>
+             <th class="text-center">調整後比例</th>
+           </tr>
+         </thead>
+         <tbody class="content-wrapper" style="text-align:center;">
+           <tr ng-repeat="row in chartTables.afterChart" ng-if="row.beforeValue>=0">
+             <td style="text-align:center;">
+             	<div style="display:inline-flex">
+	               <div style="display:inline-flex">
+		               <div class="color-block" ng-style="{'background-color': row.color}"></div>
+	               </div>
+	               <div  style="margin-left:10px">
+	               		<span ng-bind="row.label"></span>
+	               </div>
+               	</div>
+             </td>
+             <td>
+             	<div><label ng-bind="row.beforePct+' %'"></label></div>
+             	<div style="color:#a5a5a5;">(NT $<span ng-bind="row.beforeValue|number"></span>)</div>
+             </td>
+             <td ng-bind="row.advice"></td>
+             <td ng-bind="row.adviceMsg"></td>
+             <td>
+             	<div><label ng-bind="row.value+' %'"></label></div>
+             	<div style="color:#a5a5a5;">(NT $<span ng-bind="row.amt|number"></span>)</div>
+             </td>
+           </tr>
+         </tbody>
+       </table>
+     </div>
+   </section>
+
+  <!-- banner block -->
+  <section class="block banner container no-area"
+           style="text-align: left;">
+    <div class="content-wrapper">
+      <div class="content-title">{{hasIns?'客戶可供理財規劃金額為':'客戶規劃金額'}}
+        <span class="important blue"> NT $ </span>
+        <span class="important blue"
+              ng-bind="STEP1VO.PLAN_AMT|number"></span>
+      </div>
+      <div class="content-body">
+        <div class="important orange"
+             ng-show="STEP1VO.PLAN_AMT-totalAmt!=0">
+          <span ng-bind="STEP1VO.PLAN_AMT-totalAmt>=0?'尚未規劃':'超出規劃'"></span>
+          (NT$ <span ng-bind="((STEP1VO.PLAN_AMT-totalAmt)*(STEP1VO.PLAN_AMT-totalAmt>=0?1:-1))|number"></span>)
+        </div>
+      </div>
+    </div>
+    <div class="content-wrapper">
+      <drag-bar percent="{{100-leftPct}}"
+                options="dragOptions"></drag-bar>
+    </div>
+  </section>
+
+  <!-- fixed -->
+  <section class="block container">
+    <div class="title title-left">類債券商品</div>
+    <div class="content-wrapper no-border">
+      <div class="content-title">
+        <table class="info">
+          <tbody>
+            <tr>
+              <th class="text-right">建議配置 </th>
+              <td>
+<!--                 NT$<span ng-bind="hasIns? orignFixedAmt :STEP2VO.PORTFOLIO2_AMT_AFTER_ORIGIN|number"></span> ( -->
+                <span ng-bind="hasIns? orignFixedPct :STEP2VO.PORTFOLIO2_RATIO_AFTER_ORIGIN"></span>%
+<!--                 ) -->
+              </td>
+            </tr>
+            <tr>
+              <th class="text-right">已規劃 </th>
+              <td class="important blue">
+<!--                 NT$<span ng-bind="fixedAmt|number"></span> ( -->
+                <span ng-bind="STEP2VO.PORTFOLIO2_RATIO_AFTER"></span>%
+<!--                 ) -->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="content-body" style="vertical-align:bottom;">
+      	<a class="btn-fps" ng-click="go('models', 'fixed')">投資組合配置</a>
+        <a class="btn-fps" ng-click="go('fixed')">新增商品</a>
+      </div>
+    </div>
+    <div class="ps-wrapper">
+      <img src="assets/images/ic-refresh.svg"
+           style="height:1.5em;
+                  vertical-align:middle;">
+      <div style="position: absolute;
+                  top:50%;
+                  transform: translateY(-50%);
+                  left:2.5em;">3個工作天內募集結束</div>
+    </div>
+   
+    <!-- 無投保 -->
+    <table class="table table-striped" ng-if="!hasIns">
+      <thead>
+        <tr>
+          <th></th>
+          <th style="width: 7vw;">類別</th>
+          <th>推薦</th>
+          <th style="width: 18vw;">商品</th>
+          <th style="width: 6vw;">
+            <div>計價幣別</div>
+          </th>
+          <th>申購幣別</th>
+          <th>投資方式</th>
+          <th>短期展望</th>
+          <th>投入金額</th>
+          <th>約當台幣</th>
+          <th>比例</th>
+          <th>
+            <div>申購門檻</div>
+            <div>累進金額</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="row in fixedList" ng-show="row.action!='delete'">
+          <!-- 刪除 -->
+          <td>
+            <a ng-click="deleteRow('fixed',row,$index)" class="icon clickable">
+              <img src="assets/images/ic-delete.svg">
+            </a>
+          </td>
+          <!-- 類別 -->
+          <td ng-bind="row.PTYPE|mapping: mapping.prodType"></td>
+          <!-- 推薦 -->
+          <td>
+            <img src="assets/images/ic-refresh.svg" ng-if="row.MAIN_PRD ==='Y' && row.PTYPE!=='BND' && (row.PTYPE !== 'MFD' && row.PTYPE !== 'ETF' && row.PTYPE !== 'INS' && row.PTYPE !== 'NANO')">
+            <img src="assets/images/ic-crown.svg" ng-if="row.MAIN_PRD === 'Y' && (row.PTYPE === 'MFD' || row.PTYPE === 'ETF' || row.PTYPE === 'INS' || row.PTYPE === 'BND' || row.PTYPE === 'NANO')">
+          </td>
+          <!-- 商品 -->
+          <!-- <td class="text-left">
+            <a ng-bind="row.PRD_ID+' '+row.PRD_CNAME" ng-click="go('detail', row.PTYPE, row)"></a>
+          </td> -->
+          <td class="text-left">
+            <a ng-bind="row.PRD_CNAME"
+               ng-if="row.PTYPE=='NANO'"></a>
+            <a ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+               ng-click="go('detail', row.PTYPE, row)"
+               ng-if="row.PTYPE!='ETF' && row.PTYPE !='NANO'"></a>
+            <a ng-href="https://www.fubon.com/banking/personal/fund_trust/ETF_search/ETF_search.htm?show=m5&Pram=$ETFWEB$HTML$ET011001]DJHTM#ETFID}{{row.PRD_ID}}"
+               target="_blank"
+               ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+               ng-if="row.PTYPE=='ETF'">
+            </a>
+          </td>
+          <!-- 計價幣別 -->
+          <td ng-bind="row.CURRENCY_TYPE"></td>
+          <!-- 申購幣別 -->
+          <td ng-class="{'has-error':row.PTYPE!='ETF'&&!row.buyCur}">
+            <e-combobox ng-datasource="mapping.buyCur"
+                        ng-model="row.buyCur"
+                        ng-hide="row.PTYPE==='ETF' || row.PTYPE==='NANO' || row.PTYPE === 'SI' || row.PTYPE === 'SN' || row.PTYPE === 'BND'"
+                        ng-disabled="row.PTYPE==='INS'||(row.PTYPE==='MFD'&&row.CURRENCY_TYPE==='TWD')"
+                        ng-validate="true"
+                        ng-readonly="row.PTYPE==='INS'||(row.PTYPE==='MFD'&&row.CURRENCY_TYPE==='TWD')"
+                        ng-editable="false"
+                        ng-format="F3"
+                        ng-required="true"
+                        ng-change="chgBuyCur(row)"
+                        width="60" />
+            <span ng-show="row.PTYPE==='ETF' || row.PTYPE==='NANO' || row.PTYPE === 'SI' || row.PTYPE === 'SN' || row.PTYPE === 'BND'">--</span>
+          </td>
+          <!-- 投資方式 -->
+          <td ng-class="{'has-error':row.PTYPE==='MFD'&&!row.INV_TYPE}">
+            <e-combobox ng-datasource="row.PTYPE==='NANO'?mapping.NANOInvType:mapping.invType"
+                        ng-model="row.INV_TYPE"
+                        ng-hide="(row.PTYPE!=='MFD'&&row.PTYPE!=='NANO') || row.PTYPE === 'SI' || row.PTYPE === 'SN' || row.PTYPE === 'BND'"
+                        ng-validate="true"
+                        ng-readonly="false"
+                        ng-editable="false"
+                        ng-format="F3"
+                        ng-required="true"
+                        ng-change="chgInvType(row)"
+                        width="100" />
+            <span ng-show="(row.PTYPE!=='MFD'&&row.PTYPE!=='NANO') || row.PTYPE === 'SI' || row.PTYPE === 'SN' || row.PTYPE === 'BND'">--</span>
+          </td>
+          <!-- 短期展望 -->
+          <td>
+            <img ng-src="{{mapping.trendPath[row.CIS_3M]}}" alt="{{row.CIS_3M}}">
+            <span ng-if="!row.CIS_3M||row.PTYPE==='INS'">--</span>
+            <div ng-if="row.PTYPE!=='INS' && row.PTYPE!=='BND' && row.PTYPE!=='SN' && row.PTYPE!=='SI' && row.CIS_3M">
+              <a class="more" ng-click="go('product','fixed',row)">more</a>
+            </div>
+          </td>
+          <!-- 投入金額 -->
+          <td ng-class="{'has-error':row.hasError} ">
+            <input type="text"
+                   class="form-control input-number"
+                   ng-model="row.PURCHASE_ORG_AMT"
+                   ng-blur="chgORGWrapper(row,'fixed')"
+                   ng-change="row.PURCHASE_ORG_AMT = row.PURCHASE_ORG_AMT.replace('-' , '');"
+                   e-input-limit="NC">
+          </td>
+          <!-- 約當台幣 -->
+          <td ng-bind="row.PURCHASE_TWD_AMT|number" class="text-right"></td>
+          <!-- 比例 -->
+          <td>
+            <span ng-bind="row.INV_PERCENT"></span>%
+          </td>
+          <!-- 申購門檻 -->
+          <!-- 累進金額 -->
+          <td style="padding-right:12px;" class="text-right"  ng-if="row.PTYPE === 'BND' || row.PTYPE === 'SI' || row.PTYPE === 'SN'">
+            <div>
+              <span ng-if="row.GEN_SUBS_MINI_AMT_FOR" ng-bind="row.GEN_SUBS_MINI_AMT_FOR|number"></span>
+              <span ng-if="!row.GEN_SUBS_MINI_AMT_FOR">--</span>
+            </div>
+            <div>
+              <span ng-bind="row.PRD_UNIT|number" ng-if="row.PRD_UNIT"></span>
+              <span ng-if="!row.PRD_UNIT">--</span>
+            </div>
+          </td>
+          <td style="padding-right:12px;" class="text-right" ng-if="row.PTYPE === 'MFD' || row.PTYPE === 'ETF' || row.PTYPE === 'NANO'">
+            <div>
+              <span ng-bind="row.limitAmt|number" ng-if="row.limitAmt"></span>
+              <span ng-if="!row.limitAmt">--</span>
+            </div>
+            <div>
+              <span>--</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 有投保 -->
+    <table class="table table-striped" ng-if="hasIns">
+      <thead>
+        <tr>
+          <th></th>
+          <th style="width: 7vw;">類別</th>
+          <th>推薦</th>
+          <th style="width: 18vw;">商品</th>
+          <th style="width: 6vw;">
+            <div>計價幣別</div>
+          </th>
+          <th>申購幣別</th>
+          <th>投資方式</th>
+          <th>短期展望</th>
+          <th>
+            <div>市值</div>
+            <div>約當台幣</div>
+          </th>
+          <th style="width: 10vw;">
+            <div>調整後金額</div>
+            <div>約當台幣</div>
+          </th>
+          <th>比例</th>
+          <th style="width: 10vw;">交易指示</th>
+          <th>
+            <div>申購門檻</div>
+            <div>累進金額</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="row in fixedList" ng-show="row.action!='delete'">
+          <!-- 刪除 -->
+          <td>
+            <a ng-click="deleteRow('fixed',row,$index)" class="icon clickable" ng-show="!row.isStock">
+              <img src="assets/images/ic-delete.svg">
+            </a>
+            <a ng-show="row.isStock">
+              <span class="glyphicon glyphicon-info-sign"
+                    aria-hidden="true"
+                    uib-tooltip="{{row.tooltipInfo}}"
+                    tooltip-placement="auto right"
+                    tooltip-append-to-body="true"
+                    tooltip-class="FPSTooltip"></span>
+            </a>
+          </td>
+          <!-- 類別 -->
+          <td ng-bind="row.PTYPE|mapping:mapping.prodType"></td>
+          <!-- 推薦 -->
+          <td>
+            <img src="assets/images/ic-refresh.svg" ng-if="row.MAIN_PRD=='Y' && row.PTYPE!='BND' && (row.PTYPE != 'MFD' && row.PTYPE != 'ETF' && row.PTYPE != 'INS' && row.PTYPE != 'NANO')">
+            <img src="assets/images/ic-crown.svg" ng-if="row.MAIN_PRD == 'Y' && (row.PTYPE == 'MFD' || row.PTYPE == 'ETF' || row.PTYPE == 'INS' || row.PTYPE == 'BND' || row.PTYPE == 'NANO')">
+          </td>
+          <!-- 商品 -->
+          <!-- <td class="text-left">
+            <a ng-bind="row.PRD_ID+' '+row.PRD_CNAME" ng-click="go('detail',row.PTYPE,row)"></a>
+          </td> -->
+          <td class="text-left">
+            <a ng-bind="row.PRD_CNAME"
+               ng-if="row.PTYPE=='NANO'"></a>
+            <a ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+               ng-click="go('detail', row.PTYPE, row)"
+               ng-if="row.PTYPE!='ETF' && row.PTYPE!='NANO'"></a>
+            <a ng-href="https://www.fubon.com/banking/personal/fund_trust/ETF_search/ETF_search.htm?show=m5&Pram=$ETFWEB$HTML$ET011001]DJHTM#ETFID}{{row.PRD_ID}}"
+               target="_blank"
+               ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+               ng-if="row.PTYPE=='ETF'">
+            </a>
+          </td>
+          <!-- 計價幣別 -->
+          <td ng-bind="row.CURRENCY_TYPE"></td>
+          
+          <!-- 申購幣別 -->
+          <td ng-class="{'has-error':row.PTYPE!='ETF'&&!row.buyCur}">
+            <e-combobox ng-datasource="mapping.buyCur"
+                        ng-model="row.buyCur"
+                        ng-if="row.PTYPE!=='ETF'&& row.PTYPE!=='NANO'&& row.PTYPE !== 'SI' && row.PTYPE !== 'SN' && row.PTYPE !== 'BND'&&!row.isStock"
+                        ng-disabled="row.PTYPE==='INS'||(row.PTYPE==='MFD'&&row.CURRENCY_TYPE==='TWD')"
+                        ng-validate="true"
+                        ng-readonly="row.PTYPE==='INS'||(row.PTYPE==='MFD'&&row.CURRENCY_TYPE==='TWD')"
+                        ng-editable="false"
+                        ng-format="F3"
+                        ng-required="true"
+                        ng-change="chgBuyCur(row)"
+                        width="60" />
+            <span ng-if="row.isStock&&row.PTYPE!='ETF' && row.PTYPE !='NANO' && row.PTYPE !== 'SI' && row.PTYPE !== 'SN' && row.PTYPE !== 'BND'" ng-bind="row.buyCur|mapping: mapping.buyCur"></span>
+            <span ng-if="row.PTYPE==='ETF' || row.PTYPE==='NANO' || row.PTYPE === 'SI' || row.PTYPE === 'SN' || row.PTYPE === 'BND'">--</span>
+          </td>
+          <!-- 投資方式 -->
+          <td ng-class="{'has-error':row.PTYPE==='MFD'&&!row.isStock&&!row.INV_TYPE}">
+            <e-combobox ng-datasource="row.PTYPE==='NANO'?mapping.NANOInvType:mapping.invType"
+                        ng-model="row.INV_TYPE"
+                        ng-if="(row.PTYPE==='MFD'|| row.PTYPE==='NANO')&& row.PTYPE !== 'SI' && row.PTYPE !== 'SN' && row.PTYPE !== 'BND'&&!row.isStock"
+                        ng-validate="true"
+                        ng-readonly="false"
+                        ng-editable="false"
+                        ng-format="F3"
+                        ng-required="true"
+                        ng-change="chgInvType(row)"
+                        width="100" />
+            <span ng-bind="row.INV_TYPE|mapping: mapping.invType" ng-if="row.isStock&&row.PTYPE==='MFD'&& row.PTYPE !== 'SI' && row.PTYPE !== 'SN' && row.PTYPE !== 'BND'"></span>
+            <span ng-bind="row.INV_TYPE|mapping: mapping.NANOInvType" ng-if="row.isStock&&row.PTYPE==='NANO'"></span>
+            <span ng-if="(row.PTYPE!=='MFD'&&row.PTYPE!=='NANO') || row.PTYPE === 'SI' || row.PTYPE === 'SN' || row.PTYPE === 'BND'">--</span>
+          </td>
+          <!-- 短期展望 -->
+          <td>
+            <img ng-src="{{mapping.trendPath[row.CIS_3M]}}" alt="{{row.CIS_3M}}">
+            <span ng-if="!row.CIS_3M||row.PTYPE==='INS'">--</span>
+            <div ng-if="row.PTYPE!=='INS' && row.PTYPE!=='BND' && row.PTYPE!=='SN' && row.PTYPE!=='SI' && row.CIS_3M">
+              <a class="more" ng-click="go('product', 'fixed',row)">more</a>
+            </div>
+          </td>
+          <!-- 調整前 市值/約當台幣-->
+          <td>
+            <div class="text-right">
+              <span ng-bind="row.NOW_AMT|number"></span>
+              <span ng-if="row.NOW_AMT!=0&&!row.NOW_AMT">--</span>
+            </div>
+            <div class="text-right">
+              <span ng-bind="row.NOW_AMT_TWD|number"></span>
+              <span ng-if="row.NOW_AMT_TWD!=0&&!row.NOW_AMT">--</span>
+            </div>
+          </td>
+          <!-- 調整後 調整後金額/約當台幣-->
+          <td ng-class="{'has-error':row.hasError}">
+            <input type="text"
+                   class="form-control
+                    input-number"
+                   ng-model="row.PURCHASE_ORG_AMT"
+                   ng-blur="chgORGWrapper(row,'fixed')"
+                   ng-change="row.PURCHASE_ORG_AMT=row.PURCHASE_ORG_AMT.replace('-','');"
+                   e-input-limit="NC">
+            <div ng-bind="row.PURCHASE_TWD_AMT|number" class="text-right"></div>
+          </td>
+          <!-- 比例 -->
+          <td>
+            <span ng-bind="row.INV_PERCENT"></span>%
+          </td>
+          <!-- 交易指示 -->
+          <td ng-class="{'has-error':!row.TXN_TYPE&&(row.TRUST_CURR==='TWD'?row.NOW_AMT_TWD:row.NOW_AMT)!==row.PURCHASE_ORG_AMT}">
+            <e-combobox ng-datasource="row.txnTypeList"
+            			ng-hide="row.TXN_TYPE == ''"
+                        ng-model="row.TXN_TYPE"
+                        ng-validate="true"
+                        ng-readonly="row.txnTypeListLength<=1||(row.TRUST_CURR==='TWD'?row.NOW_AMT_TWD:row.NOW_AMT)===row.PURCHASE_ORG_AMT"
+                        ng-disabled="row.txnTypeListLength<=1||(row.TRUST_CURR==='TWD'?row.NOW_AMT_TWD:row.NOW_AMT)===row.PURCHASE_ORG_AMT"
+                        ng-editable="false"
+                        ng-format="F3"
+                        ng-required="true"
+                        width="75" />
+            <span ng-show="row.TXN_TYPE == ''">--</span>
+          </td>
+          <!-- 申贖門檻 -->
+          <!-- 累進金額 -->
+          <td style="padding-right:12px;" class="text-right" ng-if="row.PTYPE === 'BND' || row.PTYPE === 'SI' || row.PTYPE === 'SN'">
+            <div>
+              <!-- 申購 -->
+              <div ng-if="!row.isStock">
+                <span ng-if="row.GEN_SUBS_MINI_AMT_FOR" ng-bind="row.GEN_SUBS_MINI_AMT_FOR|number"></span>
+                <span ng-if="!row.GEN_SUBS_MINI_AMT_FOR">--</span>
+              </div>
+              <!-- 贖回 -->
+              <div ng-if="row.isStock">
+<!--                 <span ng-if="row.SML_SUBS_MINI_AMT_FOR" ng-bind="row.SML_SUBS_MINI_AMT_FOR|number"></span> -->
+<!--    	            <span ng-if="!row.SML_SUBS_MINI_AMT_FOR">--</span> -->
+<!--                 <div ng-if="row.PTYPE !== 'ETF'"> -->
+                <span>--</span>
+<!--                 </div> -->
+              </div>
+            </div>
+            <div ng-if="!row.isStock">
+              <span ng-bind="row.PRD_UNIT|number" ng-if="row.PRD_UNIT"></span>
+              <span ng-if="!row.PRD_UNIT">--</span>
+            </div>
+            <div ng-if="row.isStock">
+              <span>--</span>
+            </div>
+          </td>
+          <td style="padding-right:12px;" class="text-right" ng-if="row.PTYPE === 'MFD' || row.PTYPE === 'ETF' || row.PTYPE === 'NANO'">
+            <div>
+            	<div ng-if="!row.isStock">
+	              <span ng-bind="row.limitAmt|number" ng-if="row.limitAmt"></span>
+	              <span ng-if="!row.limitAmt">--</span>
+	            </div>
+	            <div ng-if="row.isStock">
+	              <span>--</span>
+	            </div>
+            </div>
+            <div>
+              <div ng-if="!row.isStock">
+                <span ng-bind="row.PRD_UNIT|number" ng-if="row.PRD_UNIT"></span>
+                <span ng-if="!row.PRD_UNIT">--</span>
+              </div>	
+              <div ng-if="row.isStock">
+	            <span>--</span>
+	          </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div ng-if="fixedList.length<=0">
+      <img src="assets/images/money_SVG/money_beg.svg"
+           class="money-svg">
+      <div class="money-svg-text">本次無配置比例與金額</div>
+    </div>
+  </section>
+
+  <!-- stock -->
+  <section class="block container">
+    <div class="title title-left">類股票商品 </div>
+    <div class="content-wrapper">
+      <div class="content-title">
+        <table class="info">
+          <tbody>
+            <tr>
+              <th class="text-right">建議配置 </th>
+              <td>
+<!--                 NT$<span ng-bind="hasIns? orignStockAmt :STEP2VO.PORTFOLIO3_AMT_AFTER_ORIGIN|number"></span> ( -->
+                <span ng-bind="hasIns? orignStockPct :STEP2VO.PORTFOLIO3_RATIO_AFTER_ORIGIN"></span>%
+<!--                 ) -->
+              </td>
+            </tr>
+            <tr>
+              <th class="text-right">已規劃 </th>
+              <td class="important blue">
+<!--                 NT$<span ng-bind="stockAmt|number"></span> ( -->
+                <span ng-bind="STEP2VO.PORTFOLIO3_RATIO_AFTER"></span>%
+<!--                 ) -->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="content-body" style="vertical-align:bottom;">
+        <a class="btn-fps" ng-click="go('models', 'stock')">投資組合配置</a>
+        <a class="btn-fps" ng-click="go('stock')">新增商品</a>
+      </div>
+    </div>
+
+    <!-- 無投保 -->
+    <table class="table table-striped" ng-if="!hasIns">
+      <thead>
+        <tr>
+          <th></th>
+          <th style="width: 7vw;">類別</th>
+          <th>推薦</th>
+          <th style="width: 18vw;">商品</th>
+          <th style="width: 6vw;">
+            <div>計價幣別</div>
+          </th>
+          <th>申購幣別</th>
+          <th>投資方式</th>
+          <th>短期展望</th>
+          <th>投入金額</th>
+          <th>約當台幣</th>
+          <th>比例</th>
+          <th>申購門檻</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="row in stockList" ng-show="row.action!='delete'">
+          <!-- 刪除 -->
+          <td>
+            <a ng-click="deleteRow('stock',row,$index)" class="icon clickable">
+              <img src="assets/images/ic-delete.svg">
+            </a>
+          </td>
+          <!-- 類別 -->
+          <td ng-bind="row.PTYPE|mapping: mapping.prodType"></td>
+          <!-- 推薦 -->
+          <td>
+            <img src="assets/images/ic-crown.svg" ng-if="row.MAIN_PRD == 'Y'">
+          </td>
+          <!-- 商品 -->
+          <td class="text-left">
+            <a ng-bind="row.PRD_CNAME"
+               ng-if="row.PTYPE=='NANO'"></a>
+            <a ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+               ng-click="go('detail', row.PTYPE, row)"
+               ng-if="row.PTYPE!='ETF' && row.PTYPE!='NANO'"></a>
+            <a ng-href="https://www.fubon.com/banking/personal/fund_trust/ETF_search/ETF_search.htm?show=m5&Pram=$ETFWEB$HTML$ET011001]DJHTM#ETFID}{{row.PRD_ID}}"
+               target="_blank"
+               ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+               ng-if="row.PTYPE=='ETF'">
+            </a>
+            <span ng-bind="row.targetIDs" ng-if="row.PTYPE=='INS'"></span>
+          </td>
+          <!-- 計價幣別 -->
+          <td ng-bind="row.CURRENCY_TYPE"></td>
+          <!-- 申購幣別 -->
+          <td ng-class="{'has-error':row.PTYPE!='ETF'&&!row.buyCur}">
+            <e-combobox ng-datasource="mapping.buyCur"
+                        ng-model="row.buyCur"
+                        ng-if="row.PTYPE!='ETF'&&row.PTYPE!='NANO'"
+                        ng-disabled="row.PTYPE==='INS'||(row.PTYPE==='MFD'&&row.CURRENCY_TYPE==='TWD')"
+                        ng-validate="true"
+                        ng-readonly="row.PTYPE==='INS'||(row.PTYPE==='MFD'&&row.CURRENCY_TYPE==='TWD')"
+                        ng-editable="false"
+                        ng-format="F3"
+                        ng-required="true"
+                        ng-change="chgBuyCur(row)"
+                        width="60" />
+            <span ng-if="row.PTYPE==='ETF'||row.PTYPE==='NANO'">--</span>
+          </td>
+          <!-- 投資方式 -->
+          <td ng-class="{'has-error':row.PTYPE==='MFD'&&!row.INV_TYPE}">
+            <e-combobox ng-datasource="row.PTYPE==='NANO'?mapping.NANOInvType:mapping.invType"
+                        ng-model="row.INV_TYPE"
+                        ng-if="row.PTYPE==='MFD' || row.PTYPE==='NANO'"
+                        ng-validate="true"
+                        ng-readonly="false"
+                        ng-editable="false"
+                        ng-format="F3"
+                        ng-required="true"
+                        ng-change="chgInvType(row)"
+                        width="100" />
+            <span ng-if="row.PTYPE!=='MFD' && row.PTYPE!=='NANO'">--</span>
+          </td>
+          <!-- 短期展望 -->
+          <td>
+            <img ng-src="{{mapping.trendPath[row.CIS_3M]}}" alt="{{row.CIS_3M}}">
+            <span ng-if="!row.CIS_3M||row.PTYPE==='INS'">--</span>
+            <div ng-if="row.PTYPE!=='INS' && row.CIS_3M">
+              <a class="more" ng-click="go('product', 'stock',row)">more</a>
+            </div>
+          </td>
+          <!-- 約當原幣 -->
+          <td ng-class="{'has-error':row.hasError}">
+            <input type="text"
+                   class="form-control input-number"
+                   ng-model="row.PURCHASE_ORG_AMT"
+                   ng-blur="chgORGWrapper(row,'stock')"
+                   ng-change="row.PURCHASE_ORG_AMT = row.PURCHASE_ORG_AMT.replace('-' , '');"
+                   e-input-limit="NC">
+          </td>
+          <td ng-bind="row.PURCHASE_TWD_AMT|number" class="text-right"></td>
+          <!-- 比例 -->
+          <td>
+            <span ng-bind="row.INV_PERCENT"></span>%
+          </td>
+          <!-- 申購門檻 -->
+          <td style="padding-right:12px;" class="text-right">
+            <div>
+              <span ng-bind="row.limitAmt|number" ng-if="row.limitAmt"></span>
+              <span ng-if="!row.limitAmt">--</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 有投保 -->
+    <table class="table table-striped" ng-if="hasIns">
+      <thead>
+        <tr>
+          <th></th>
+          <th style="width: 7vw;">類別</th>
+          <th>推薦</th>
+          <th style="width: 18vw;">商品</th>
+          <th style="width: 6vw;">
+            <div>計價幣別</div>
+          </th>
+          <th>申購幣別</th>
+          <th>投資方式</th>
+          <th>短期展望</th>
+          <th>
+            <div>市值</div>
+            <div>約當台幣</div>
+          </th>
+          <th style="width: 10vw;">
+            <div>調整後金額</div>
+            <div>約當台幣</div>
+          </th>
+          <th>比例</th>
+          <th style="width: 10vw;">交易指示</th>
+          <th>申購門檻</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="row in stockList" ng-show="row.action!='delete'">
+          <!-- 刪除 -->
+          <td>
+            <a ng-click="deleteRow('stock',row,$index)" class="icon clickable" ng-show="!row.isStock">
+              <img src="assets/images/ic-delete.svg">
+            </a>
+            <a ng-show="row.isStock">
+              <span class="glyphicon glyphicon-info-sign"
+                    aria-hidden="true"
+                    uib-tooltip="{{row.tooltipInfo}}"
+                    tooltip-placement="auto right"
+                    tooltip-append-to-body="true"
+                    tooltip-class="FPSTooltip"></span>
+            </a>
+          </td>
+          <!-- 類別 -->
+          <td ng-bind="row.PTYPE|mapping: mapping.prodType"></td>
+          <!-- 推薦 -->
+          <td>
+            <img src="assets/images/ic-crown.svg" ng-if="row.MAIN_PRD == 'Y'">
+          </td>
+          <!-- 商品 -->
+          <td class="text-left">
+          	<a ng-bind="row.PRD_CNAME"
+               ng-if="row.PTYPE=='NANO'"></a>
+            <a ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+               ng-click="go('detail', row.PTYPE, row)"
+               ng-if="row.PTYPE!='ETF' && row.PTYPE!='NANO'"></a>
+            <a ng-href="https://www.fubon.com/banking/personal/fund_trust/ETF_search/ETF_search.htm?show=m5&Pram=$ETFWEB$HTML$ET011001]DJHTM#ETFID}{{row.PRD_ID}}"
+               target="_blank"
+               ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+               ng-if="row.PTYPE=='ETF'">
+            </a>
+            <span ng-bind="row.targetIDs" ng-if="row.PTYPE=='INS'" class="ps"></span>
+          </td>
+          <!-- 計價幣別 -->
+          <td ng-bind="row.CURRENCY_TYPE"></td>
+          <!-- 申購幣別 -->
+          <td ng-class="{'has-error':row.PTYPE!='ETF'&&!row.buyCur}">
+            <e-combobox ng-datasource="mapping.buyCur"
+                        ng-model="row.buyCur"
+                        ng-if="row.PTYPE!=='ETF'&&row.PTYPE!='NANO'&&!row.isStock"
+                        ng-disabled="row.PTYPE==='INS'||(row.PTYPE==='MFD'&&row.CURRENCY_TYPE==='TWD')"
+                        ng-validate="true"
+                        ng-readonly="row.PTYPE==='INS'||(row.PTYPE==='MFD'&&row.CURRENCY_TYPE==='TWD')"
+                        ng-editable="false"
+                        ng-format="F3"
+                        ng-required="true"
+                        ng-change="chgBuyCur(row)"
+                        width="60" />
+            <span ng-if="row.isStock&&row.PTYPE!='ETF'&&row.PTYPE!='NANO'" ng-bind="row.buyCur|mapping: mapping.buyCur"></span>
+            <span ng-if="row.PTYPE==='ETF'||row.PTYPE==='NANO'">--</span>
+          </td>
+          <!-- 投資方式 -->
+          <td ng-class="{'has-error':row.PTYPE==='MFD'&&!row.isStock&&!row.INV_TYPE}">
+            <e-combobox ng-datasource="row.PTYPE==='NANO'?mapping.NANOInvType:mapping.invType"
+                        ng-model="row.INV_TYPE"
+                        ng-if="(row.PTYPE==='MFD' || row.PTYPE==='NANO')&&!row.isStock"
+                        ng-validate="true"
+                        ng-readonly="false"
+                        ng-editable="false"
+                        ng-format="F3"
+                        ng-required="true"
+                        ng-change="chgInvType(row)"
+                        width="100" />
+            <span ng-bind="row.INV_TYPE|mapping: mapping.invType" ng-if="row.isStock&&row.PTYPE==='MFD'"></span>
+            <span ng-bind="row.INV_TYPE|mapping: mapping.NANOInvType" ng-if="row.isStock&&row.PTYPE==='NANO'"></span>
+            <span ng-if="row.PTYPE!=='MFD' && row.PTYPE!=='NANO'">--</span>
+          </td>
+          <!-- 短期展望 -->
+          <td>
+            <img ng-src="{{mapping.trendPath[row.CIS_3M]}}" alt="{{row.CIS_3M}}">
+            <span ng-if="!row.CIS_3M||row.PTYPE==='INS'">--</span>
+            <div ng-if="row.PTYPE!=='INS' && row.CIS_3M">
+              <a class="more" ng-click="go('product', 'stock',row)">more</a>
+            </div>
+          </td>
+          <!-- 調整前 市值/約當台幣-->
+          <td>
+            <div class="text-right">
+              <span ng-bind="(row.TRUST_CRR === 'TWD'?row.NOW_AMT_TWD:row.NOW_AMT)|number" ng-if="row.isStock"></span>
+              <span ng-if="!row.isStock">--</span>
+            </div>
+            <div class="text-right">
+              <span ng-bind="row.NOW_AMT_TWD|number" ng-if="row.isStock"></span>
+              <span ng-if="!row.isStock">--</span>
+            </div>
+          </td>
+          <!-- 調整後 調整後金額/約當台幣-->
+          <td ng-class="{'has-error':row.hasError}">
+            <input type="text"
+                   class="form-control input-number"
+                   ng-model="row.PURCHASE_ORG_AMT"
+                   ng-blur="chgORGWrapper(row,'stock')"
+                   ng-change="row.PURCHASE_ORG_AMT = row.PURCHASE_ORG_AMT.replace('-' , '');"
+                   e-input-limit="NC">
+            <div ng-bind="row.PURCHASE_TWD_AMT|number" class="text-right"></div>
+          </td>
+          <!-- 比例 -->
+          <td>
+            <span ng-bind="row.INV_PERCENT"></span>%
+          </td>
+          <!-- 交易指示 -->
+          <td ng-class="{'has-error':!row.TXN_TYPE&&(row.TRUST_CURR==='TWD'?row.NOW_AMT_TWD:row.NOW_AMT)!==row.PURCHASE_ORG_AMT}">
+            <e-combobox ng-datasource="row.txnTypeList"
+            			ng-hide="row.TXN_TYPE == ''"
+                        ng-model="row.TXN_TYPE"
+                        ng-validate="true"
+                        ng-readonly="row.txnTypeListLength<=1||(row.TRUST_CURR==='TWD'?row.NOW_AMT_TWD:row.NOW_AMT)===row.PURCHASE_ORG_AMT"
+                        ng-disabled="row.txnTypeListLength<=1||(row.TRUST_CURR==='TWD'?row.NOW_AMT_TWD:row.NOW_AMT)===row.PURCHASE_ORG_AMT"
+                        ng-editable="false"
+                        ng-format="F3"
+                        ng-required="true"
+                        width="75" />
+            <span ng-show="row.TXN_TYPE == ''">--</span>
+          </td>
+          <!-- 申贖門檻 -->
+          <td style="padding-right:12px;" class="text-right">
+            <div ng-if="!row.isStock">
+              <span ng-bind="row.limitAmt|number" ng-if="row.limitAmt"></span>
+              <span ng-if="!row.limitAmt">--</span>
+            </div>
+            <div ng-if="row.isStock">
+<!--               <div ng-if="row.PTYPE === 'ETF'"> -->
+<!-- 	              <span ng-bind="row.limitAmt|number" ng-if="row.limitAmt"></span> -->
+<!-- 	              <span ng-if="!row.limitAmt">--</span> -->
+<!--               </div> -->
+<!--               <div ng-if="row.PTYPE !== 'ETF'"> -->
+            	  <span>--</span>	
+<!--               </div> -->
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div ng-if="stockList.length<=0">
+      <img src="assets/images/money_SVG/money_beg.svg"
+           class="money-svg">
+      <div class="money-svg-text">本次無配置比例與金額</div>
+    </div>
+  </section>
+
+  <section class="clear" style="text-align: left;">
+    <div class="ps-wrapper" style="display:inline-block;width: 70%;">
+      <ul ng-if="!hasIns" class="star_ul">
+		<li class="ps">類債券商品包含債券型基金、平衡型基金(投資債券占比較高者)、貨幣型基金、債券型ETF、海外債、SI、SN及奈米投(投資債券比例較高者)；類股票商品包含股票型基金、平衡型基金(投資股票占比較高)、股票型ETF及奈米投(投資股票比例較高者)，本行將不定期依標的投資比例變化，調整商品的股債分類。</li>
+	  </ul>	
+	  <ul ng-if="hasIns" class="star_ul">
+	  	<li class="ps">類債券商品包含債券型基金、平衡型基金(投資債券占比較高者)、貨幣型基金、債券型ETF、海外債、SI、SN及奈米投(投資債券比例較高者)；類股票商品包含股票型基金、平衡型基金(投資股票占比較高)、股票型ETF及奈米投(投資股票比例較高者)，本行將不定期依標的投資比例變化，調整商品的股債分類。</li>
+      	<li class="ps">調整前及調整後比例皆以約當台幣金額計算占比；庫存商品不包含存款、儲蓄型保險及投資型保險。</li>
+      	<li class="ps">「市值」欄位依商品特性不同而有定義差異，海外債、SI、SN為參考贖回報價*庫存面額；基金、ETF及奈米投為參考市值。</li>
+	  </ul>
+    </div>
+    <div style="float: right; margin-top: 1em;">
+      <a type="button" class="btn-fps"
+       ng-class="{'btn-fps-disabled':kycInvalid}"
+       ng-click="kycInvalid?'':go('prev')">上一步</a>
+      <a type="button" class="btn-fps"
+       ng-class="{'btn-fps-disabled':kycInvalid}"
+       ng-click="kycInvalid?'':go('save')">儲存</a>
+      <a type="button" class="btn-fps"
+       ng-class="{'btn-fps-disabled':kycInvalid}"
+       ng-click="kycInvalid?'':go('next')"
+       style="margin-right: 15px;">下一步</a>
+    </div>
+  </section>
+</div>

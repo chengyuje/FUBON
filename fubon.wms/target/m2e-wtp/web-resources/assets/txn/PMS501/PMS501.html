@@ -1,0 +1,33 @@
+<script type="text/javascript" src="assets/txn/PMS501/PMS501.js"></script>
+<div ng-controller="PMS501Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+	</div>
+	<div class="panel_content">
+		<div class="text-left">
+			<button type="button" class="btn btn-info" ng-click="getExample();" function-type="export">下載範例</button>
+			<span id="csvBox" style="display: inline-block;vertical-align: middle;"  function-type="export">
+				<e-upload id="csvUpload" success="updFile(name, rname);" text="上傳" accept=".csv"></e-upload>
+			</span>
+			<button type="button" class="btn btn-info" ng-click="export('P');" function-type="export" ng-disabled="paramList.length == 0">匯出</button>
+		</div>
+		<br>
+    	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th width="50%">預計承作商品</th>
+						<th width="50%">預估收益率</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{row.EST_PRD_NAME}}</td>
+						<td>{{row.EST_RETURN_RATE | number:2}} {{row.EST_RETURN_RATE != null ? '%' : ''}}</td>
+					</tr>
+				</tbody>
+			</table>
+    	</div>
+	</div>
+</div>

@@ -1,0 +1,106 @@
+<form name="form.report" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+    <div class="form-group">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label for="code" ng-bind="'報表代號'"></label>
+                <input ng-readonly="funcType!='C'" id="code" class="form-control"
+                       type="text" placeholder="請輸入報表代號～" ng-model="reportVO.code"
+                       e-length-limit="100" required/>
+            </div>
+
+            <div class="form-group">
+                <label for="name">
+                    <span ng-bind="'報表名稱'"></span>
+                    <i class="glyphicon glyphicon-info-sign" ng-click="openDateRuleUI()"></i>
+                </label>
+                <input ng-readonly="!isCreateOrUpdate" id="name" class="form-control"
+                       type="text" placeholder="報表名稱可支援日期格式化！" ng-model="reportVO.name"
+                       e-length-limit="100" required/>
+            </div>
+
+            <div class="form-group">
+                <label for="desc" ng-bind="'報表說明'"></label>
+                <input ng-readonly="!isCreateOrUpdate" id="desc" class="form-control"
+                       type="text" placeholder="請輸入報表說明～" ng-model="reportVO.desc"
+                       e-length-limit="200"/>
+            </div>
+
+            <div class="form-group">
+                <label ng-bind="'檔案編碼'"></label>
+                <e-combobox ng-readonly="!isCreateOrUpdate" style="line-height:20px;"
+                            ng-datasource="mappingSet['coding']" ng-model="reportVO.fileCoding"
+                            ng-format="F3" width="140px" required/>
+            </div>
+
+            <div class="form-group">
+                <label ng-bind="'執行環境'"></label>
+                <e-combobox ng-readonly="!isCreateOrUpdate" style="line-height:20px;"
+                            ng-datasource="mappingSet['sql_type']" ng-model="reportVO.sqlType"
+                            ng-format="F3" width="140px" required/>
+            </div>
+
+            <div class="form-group">
+                <label ng-bind="'報表種類'"></label>
+                <e-combobox ng-readonly="!isCreateOrUpdate" style="line-height:20px;"
+                            ng-datasource="mappingSet['type']" ng-model="reportVO.type"
+                            ng-format="F3" width="140px" required />
+            </div>
+
+            <div ng-if="reportVO.type == 'T' || reportVO.type == 'N'" class="form-group">
+                <label ng-bind="'分隔方式'"></label>
+                <e-combobox ng-readonly="!isCreateOrUpdate" style="line-height:20px;"
+                            ng-datasource="mappingSet['txt_delimiter']" ng-model="reportVO.delimiter"
+                            ng-format="F3" width="140px" required/>
+            </div>
+
+            <div ng-if="(reportVO.type == 'T' || reportVO.type == 'N') && reportVO.delimiter == 'FIX'" class="form-group">
+                <label for="width" ng-bind="'設定寬度'"></label>
+                <input id="width" class="form-control" ng-readonly="!isCreateOrUpdate"
+                       type="text" placeholder="請輸入寬度(以,分隔)..." ng-model="reportVO.width"
+                       e-length-limit="195" required ng-pattern="/[0-9,]+/"/>
+            </div>
+
+            <div class="form-group">
+                <label for="headChecker" title="是否需要HEADER ?">
+                    <span ng-bind="'Header'"></span>
+                    <input id="headChecker" type="checkbox" ng-model="reportVO.needHeader"
+                           ng-disabled="!isCreateOrUpdate"
+                           ng-true-value="'Y'" ng-false-value="'N'"/>
+                </label>
+                &emsp;
+                <label for="quoteChecker" title="資料是否加上雙引號 ?">
+                    <span ng-bind="'雙引號'"></span>
+                    <input id="quoteChecker" type="checkbox" ng-model="reportVO.needDoubleQuotes"
+                           ng-disabled="!isCreateOrUpdate"
+                           ng-true-value="'Y'" ng-false-value="'N'"/>
+                </label>
+            </div>
+        </div>
+
+        <div class="col-sm-6" style="padding-left: 5px">
+            <div class="form-group">
+                <label for="sql" ng-bind="'報表SQL'"></label>
+                <textarea ng-readonly="!isCreateOrUpdate" id="sql" placeholder="請輸入 SQL～"
+                          ng-model="reportVO.sql" rows="20" class="form-control on" required></textarea>
+                <div style="float: right;
+                            margin-top: -32px;
+                            opacity: 0.8;
+                            color: rgb(45, 122, 168);">
+                    <button class="btn btn-lg btn-info" data-toggle="tooltip" title="一鍵複製"
+                            ng-click="copyText('.CMMGR016Detail .on')">
+                        <span class="glyphicon glyphicon-paste"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr/>
+
+    <div ng-if="isCreateOrUpdate" class="text-center">
+        <button type="button" class="btn btn-success" ng-click="createOrUpdate()" data-toggle="tooltip" title="儲存設定～">
+            <span class="glyphicon glyphicon-floppy-disk"></span>
+            <span ng-bind="'儲存'"></span>
+        </button>
+    </div>
+</form>

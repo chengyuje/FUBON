@@ -1,0 +1,105 @@
+<style>
+.INS910 .title {
+ 	padding-left: 30px;
+ 	line-height: 50px;
+}
+.INS910ToolTip .tooltip-inner {
+	max-width: 350px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/INS910/INS910.js"></script>
+<script type="text/javascript" src="assets/txn/INS910/INS910_AddData.js"></script>
+<div class="INS910" ng-controller="INS910Controller" ng-cloak>
+	<!-- 意外險保障規劃參數 -->
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit title">{{inputVO.ins_type | mapping:PLAN_TYPE:F3}}參數</div>
+	</div>
+	<div class="panel_content" style="min-height:0px">
+		<div class="e_panel_table">
+			<div>目前狀態：{{INIT_STATUS | mapping:PARA_HEADER_STATUS:F3}}</div>
+			<table class="table td_center">
+				<thead>
+					<tr ng-if="inputVO.ins_type == '1' || inputVO.ins_type == '2'">
+						<th width="15%">{{inputVO.ins_type | mapping:PLAN_TYPE:F3}}計算公式</th>
+						<td>
+							<textarea ng-disabled="CanConfirm" id="cal_desc" name="cal_desc" class="form-control" ng-model="inputVO.cal_desc" style="width: 100%; height: 100px" e-length-limit="256"></textarea>
+						</td>
+					</tr>
+					<tr ng-show="inputVO.ins_type == '1' || inputVO.ins_type == '2' || inputVO.ins_type == '3' || inputVO.ins_type == '4'">
+						<th width="15%">小幫手：</th>
+						<td ng-show="false"><e-upload process="waitFile" success="finishUpload(name,rname)"  style="visibility:hidden;" allow="pdf"></e-upload></td>
+						<td>
+							{{REPORT_FILE_NAME}}
+							<button ng-if="inputVO.file_seq" class="btn btn-info" ng-click="downloadDoc()">查看</button>
+							<button type="button" class="btn btn-info" ng-click="uploadT()" ng-if="!CanConfirm" function-type="maintenance">上傳圖檔</button>
+						</td>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+	<!-- 主力商品設定 -->
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit title">主力商品設定</div>
+	</div>
+	<div class="panel_content">
+		<div ng-if="!CanConfirm" function-type="maintenance">
+			<button ng-click="editData()" class="btn btn-info">新增</button>
+			<br>
+			<br>
+		</div>
+		<div class="gv_tab_sc" style="white-space: nowrap;">
+			<table class="table td_center e-table-freeze" e-height="435px" e-mode="1" e-top="true" e-list="inputVO.suggestList">
+				<thead>
+					<tr>
+						<th ng-if="!CanConfirm" function-type="maintenance">功能</th>
+			            <th>險種代碼</th>
+			            <th>險種名稱</th>
+			            <th>繳費年期</th>
+			            <th ng-if="inputVO.ins_type == '5'">資產傳承</th>
+			            <th>保額下限</th>
+			            <th>保額上限</th>
+			            <th>保額單位</th>
+			            <th>保額累加級距</th>
+			            <th>年齡下限</th>
+						<th>年齡上限</th>
+			            <th>保障比</th>
+			            <th ng-if="inputVO.ins_type == '9'">滿期金計算類型</th>
+			            <th ng-if="inputVO.ins_type == '9'">滿期金年度</th>
+			            <th ng-if="inputVO.ins_type == '9'">滿期金比</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in inputVO.suggestList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td ng-if="!CanConfirm" function-type="maintenance">
+			            	<button ng-click="delData(row)" class="btn btn-info">刪除</button>
+			            </td>
+			            <td>{{row.PRD_ID}}</td>
+			            <td ng-if="!CanConfirm"><a ng-click="editData(row)">{{row.INSPRD_NAME}}</a></td>
+			            <td ng-if="CanConfirm">{{row.INSPRD_NAME}}</td>
+			            <td>{{row.INSPRD_ANNUAL}}</td>
+			            <td ng-if="inputVO.ins_type == '5'">{{row.ESTATE_PLAN}}</td>
+			            <td class="td_right">{{row.POLICY_AMT_MIN | number}}</td>
+			            <td class="td_right">{{row.POLICY_AMT_MAX | number}}</td>
+			            <td class="td_right">{{row.PRD_UNIT | mapping:INS_UNIT:F3}}</td>
+			            <td class="td_right">{{row.POLICY_AMT_DISTANCE | number}}</td>
+			            <td class="td_right">{{row.MIN_AGE}}</td>
+			            <td class="td_right">{{row.MAX_AGE}}</td>
+			            <td class="td_right">{{row.CVRG_RATIO}}</td>
+			            <td ng-if="inputVO.ins_type == '9'">{{row.EARNED_CAL_WAY | mapping:EARNED_CAL_WAY:F3}}</td>
+			            <td ng-if="inputVO.ins_type == '9'">{{row.EARNED_YEAR}}</td>
+			            <td ng-if="inputVO.ins_type == '9'">{{row.EARNED_RATIO}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="search_box_btn text-center">
+		<button ng-if="!CanConfirm" function-type="maintenance" ng-click="goReview()" class="btn btn-info">送出審核</button>
+		<button ng-if="!CanConfirm" function-type="maintenance" ng-click="init()" class="btn btn-info">重置</button>
+		<button ng-if="CanConfirm && INIT_STATUS == 'P'" function-type="confirm" ng-click="review('A')" class="btn btn-info">同意</button>
+		<button ng-if="CanConfirm && INIT_STATUS == 'P'" function-type="confirm" ng-click="review('R')" class="btn btn-info">不同意</button>
+	</div>
+</div>

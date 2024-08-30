@@ -1,0 +1,242 @@
+<style>
+/* open dialog */
+.ngdialog.CRM372 {
+	
+}
+/* dialog panl */
+.modal-dialog {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 950px;
+	height: 550px;
+}
+/* table size */
+.CRM372 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM372 table.little{
+	width: 60%;
+}
+/* change row */
+.CRM372.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM372_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+
+#lstBox1, #lstBox2{
+  height:150px;
+  width:200px;
+}
+
+.approveTermsContainer{
+  display:flex;
+  justify-content:center;
+}
+
+.transferBtns {
+  margin-right: 30px;
+  margin-left: 30px;
+}
+
+.transferBtns{
+  float:left; 
+  align-self:center;
+}
+</style>
+<div ng-controller="CRM372_EDITController" ng-cloak>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row ? '編輯' : '新增'}}理專十保計劃</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr ng-show="!isNew">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*專案代碼：</th>
+							<td class="col-md-7 tdpadding">
+							  <input type="text" id="prj_code" name="prj_code" class="form-control" placeholder="請輸入..."  ng-model="inputVO.prj_code" ng-blur="checkID()" ng-disabled="true" ng-required="inputVO.shared == 'N'" e-length-limit="25">
+							  <!--<div ng-show="row == undefined"><a href="#" ng-click="createPrjCode()" >自動產生</a> </div> -->
+							</td>
+							<td class="col-xs-1">
+								<img src="assets/images/icon/cancel-4.png" ng-if="showPrdIDError">
+								<img src="assets/images/icon/checked-2.png" ng-if="showPrdIDOk">
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">專案名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_name" name="prd_name" class="form-control" ng-model="inputVO.prd_name" maxlength="30" ng-disabled=" row != undefined && row.PRJ_STATUS != 'S0' && row.PRJ_STATUS != 'S1'">(限30個字)</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">起始日期：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="startDate" name="startDate"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.startDate"
+										   datepicker-options="bgn_sDateOptions"
+										   is-open="model.a"
+										   ng-readonly="true"								
+										   ng-change="limitDate()"
+										    />
+	 								<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>																		
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">結束日期：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="endDate" name="endDate"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.endDate"
+										   datepicker-options="bgn_eDateOptions"
+										   is-open="model.b"s
+										   ng-readonly="true"								
+										   ng-required="false"
+										   ng-change="limitDate()" 
+										    />
+	 								<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>																		
+									</span>
+								</div>
+							</td>
+							
+							
+							<td class="col-xs-1">
+							
+							</td>
+						</tr>
+						<tr ng-show="row == undefined || row.PRJ_STATUS == 'S0' || row.PRJ_STATUS == 'S1'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">上傳人員檔案：</th>
+							<td class="col-md-7 tdpadding">
+								<a onclick="return false" ng-click="downloadSimple()">(下載範例檔案)</a>
+							    <e-upload success="uploadFinshed(name,rname)"></e-upload>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+					<div>
+						<label style="color:red">{{replyStatus}}</label>
+					</div>
+					<div class="bootstrap-admin-panel-content">
+				        <e-jumping-once output="outputVO" list="data" totallist="inputVO.csvDataList"></e-jumping-once>
+				      
+				      <table class="table table-striped"
+				             style="text-align:center;">
+				        <thead>
+				          <th>
+							<label>
+								<input type='checkbox' ng-model='checkVO.clickAll' ng-change='checkrow()' /> 本頁全選
+							</label>
+							<br>
+							<label>
+								<input type='checkbox' ng-model='checkVO.clickAll2' ng-change='checkrow2()' /> 全選
+							</label>
+						  </th>       
+				          <th style="text-align: center;">類別</th>
+				          <th style="text-align: center;">業務處</th>
+				          <th style="text-align: center;">營運區</th>
+				          <th style="text-align: center;">分行名稱</th>
+				          <th style="text-align: center;">員編</th>
+				          <th style="text-align: center;">職稱</th>
+				          <th style="text-align: center;">理專姓名</th>
+				          <th style="text-align: center;">回報結果</th>
+				          <th style="text-align: center;">狀態</th>
+				        </thead>
+				        <tbody>
+				          <tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+				            <td>
+								<label style="font-weight: initial;margin-bottom: 0px;">
+									<input type='checkbox' ng-model='row.SELECTED'>勾選
+								</label>
+						    </td>
+				          	<td ng-bind="row.CHG_TYPE2 | mapping:chgTypeList2:'F3'"></td>
+				            <td ng-bind="row.REGION_CENTER_NAME"></td>
+				            <td ng-bind="row.BRANCH_AREA_NAME"></td>
+				            <td ng-bind="row.BRANCH_NAME"></td>
+				            <td ng-bind="row.EMP_ID"></td>
+				            <td ng-bind="row.JOB_TITLE_NAME"></td>
+				            <td ng-bind="row.EMP_NAME"></td>
+				            <td ng-bind="row.CHG_TYPE | mapping:crmChgTypeList:'F3'"></td>
+				            <td ng-bind="row.STATUS | mapping:reviewStatusList:'F3'"></td>
+				          </tr>
+				        </tbody>
+				      </table>
+				    </div>
+				</form>
+				
+<!-- 				test -->
+<!-- 				<div class="approveTermsContainer" ng-show="inputVO.csvDataList.length>0"> -->
+<!-- 					<div class="newItems"> -->
+<!-- 					<b>主要名單:</b><br/> -->
+<!-- 							<select multiple="multiple" id='lstBox1' ng-model="model1"> -->
+<!-- 					              <option ng-repeat="list in mainList" value="{{list.EMP_ID}}" ng-disabled="list.CHG_TYPE2 == 'M'">{{list.EMP_ID}}</option> -->
+<!-- 							</select> -->
+<!-- 					</div> -->
+<!-- 					<div class="transferBtns"> -->
+<!-- 						<button type="button" class="btn btn-primary glyphicon glyphicon-chevron-right" ng-click="toReferenceList()" ></button> -->
+<!-- 						<br/> -->
+<!-- 						<br/> -->
+<!-- 						<button type="button" class="btn btn-primary glyphicon glyphicon-chevron-left" ng-click="toMainList()" ></button> -->
+<!-- 					</div> -->
+<!-- 					<div class="approvedItems"> -->
+<!-- 					        <b>參考名單:</b><br/> -->
+<!-- 					        <select multiple="multiple" id='lstBox2' ng-model="model2"> -->
+<!-- 					        	<option ng-repeat="list in referenceList" value="{{list.EMP_ID}}">{{list.EMP_ID}}</option> -->
+<!-- 					        </select> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 				<br/> -->
+				
+				<div class="search_box_btn text-center">
+					<button function-type="maintenance" type="button" class="btn btn-primary" ng-click="confirm()" ng-show="row == undefined || row.PRJ_STATUS == 'S0' || row.PRJ_STATUS == 'S1'">確定</button>
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >取消</button>
+					<button function-type="maintenance" type="button" class="btn btn-primary" ng-click="prjEnabled()" ng-show="row.PRJ_STATUS == 'S3'">啟用</button>
+					<button function-type="maintenance" type="button" class="btn btn-primary" ng-click="reject()" ng-show="row.PRJ_STATUS == 'S2'||row.PRJ_STATUS == 'S3'">退回</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,106 @@
+<style>
+/* open dialog */
+.ngdialog.CRM821_COUPON {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM821_COUPON {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+
+</style>
+<div class="CRM821_COUPON" ng-controller="CRM821_COUPONController" ng-cloak>
+	<div class="modal-dialog CRM821_COUPON">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">查詢條件</h4>
+			</div>
+			<div class="modal-body">
+				<div class="search_table search_box">
+					<table>
+						<tr>						
+							<th>查詢期間：</th>
+							<td colspan="7">							
+								<div class="input-group datebox datewidth" style="float:left">
+									<input type="text" id="sDate" name="sDate"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.sDate"
+										   is-open="model.a"
+										   datepicker-options="sDateOptions"
+										   ng-readonly="true"
+										   ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>																					
+								<div style="float:left">&nbsp; ～ &nbsp;</div>	
+								<div class="input-group datebox datewidth" style="float:left">
+									<input type="text" id="eDate" name="eDate"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.eDate"
+										   is-open="model.b"
+										   datepicker-options="eDateOptions"
+										   ng-readonly="true"
+										   ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>								
+							</td>											    											
+						</tr>
+						<tr>
+							<th colspan = "12">(提供最近三年的交易明細查詢，每次選擇查詢範圍不可超過一年)</th>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="init(); inquireInit();">清除</button>
+				</div>
+				<!-- 結果區 -->
+<!-- 				<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once> -->
+				<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+					<table class="table-bordered">
+						<thead>
+							<tr>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="TXN_DATE" e-query="inquire()">日期</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="TYPE" e-query="inquire()">交易類別</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CERT_NBR" e-query="inquire()">憑證號碼</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="TR106" e-query="inquire()">信託型態</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="FUND_CNAME" e-query="inquire()">基金名稱</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CURRENCY" e-query="inquire()">交易幣別</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="TXN_DIVID_ORGD" e-query="inquire()">配息金額</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="TR141" e-query="inquire()">配權單位數</e-sorter></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in resultList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td style="text-align: center;">{{row.TXN_DATE|date:'yyyy-MM-dd'}}</td>
+								<td style="text-align: center;">{{row.TYPE}}</td>
+								<td style="text-align: center;">{{row.CERT_NBR}}</td>
+								<td style="text-align: center;">{{row.TR106|mapping:mappingSet['SOT.CHANGE_TRADE_SUB_TYPE']:'F3'}}</td>
+								<td style="text-align: center;">{{row.FUND_CNAME}}</td>
+								<td style="text-align: center;">{{row.CURRENCY}}</td>
+								<td style="text-align: right;">{{row.TXN_DIVID_ORGD}}</td>
+								<td style="text-align: right;">{{row.TR141|number}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

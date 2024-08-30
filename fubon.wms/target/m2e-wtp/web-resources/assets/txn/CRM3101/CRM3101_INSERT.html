@@ -1,0 +1,172 @@
+<style>
+.modal-dialog.CRM3101_INSERT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1200px;
+	height: auto;
+}
+/* table size */
+.CRM3101_INSERT table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM3101/CRM3101_INSERT.js"></script>
+<div ng-controller="CRM3101_INSERTController" ng-cloak>
+	<div class="modal-dialog CRM3101_INSERT"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請輸入專案名稱及相關資訊</h4>
+			</div>
+ 			<div class="modal-body">
+ 				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+ 					<table>
+						<tr>
+	 						<td class="col-xs-1"></td>
+	 						<th class="col-md-1 tdpadding">既有專案</th>
+	 						<td class="col-md-9 tdpadding" colspan="5">
+	 							<e-combobox id="PRJ_ID" name="PRJ_ID" 
+								ng-datasource="PROJNAME"
+						       	ng-model="inputVO.PRJ_ID"
+						       	ng-validate="false" 
+						       	ng-readonly="false" 
+						       	ng-editable="false"
+						       	ng-change="PRJDTL()"
+						       	ng-format="F3"
+						       	ng-required="false"
+						       	width="100%"
+				       			style="line-height:20px;" />
+				       		</td>
+	 						<td class="col-xs-1"></td>
+	 					</tr>
+	 					<tr>
+	 						<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">專案名稱</th>
+ 							<td class="col-md-9 tdpadding" colspan="5"><input type="text" class="form-control" placeholder="請輸入..." id="PRJ_NAME" name="PRJ_NAME" ng-model="inputVO.PRJ_NAME" e-length-limit="100" required></td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr ng-show="parameterTypeEditForm.PRJ_NAME.$error.required">
+							<td class="col-xs-1"></td>
+							<td class="col-xs-1"></td>
+							<td class="col-md-9 help-block with-errors" colspan="5">請輸入專案名稱</th>
+							<td class="col-xs-1"></td>
+						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">專案說明</th>
+ 							<td class="col-md-9 tdpadding" colspan="5">
+ 								<textarea id="PRJ_NOTE" name="PRJ_NOTE" class="form-control" ng-model="inputVO.PRJ_NOTE" style="width: 100%; height: 100px" e-length-limit="500"></textarea>
+ 							</td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>	
+ 							<th class="col-md-1 tdpadding">專案起訖日</th>
+ 							<td class="col-md-9 tdpadding" colspan="5">
+ 								<div class="form-group">
+ 									<div class="input-group datebox datewidth">
+										<input type="text" id="sdate" name="sdate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sdate"
+										is-open="model.a"
+										datepicker-options="sDateOptions"
+										ng-readonly="true"								
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+		 								<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+												<i class="glyphicon glyphicon-calendar"></i></button>																		
+										</span>
+									</div>
+ 									<div style="float: left !important;">～</div>
+ 									<div class="input-group datebox datewidth">
+										<input type="text" id="edate" name="edate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.edate"
+										is-open="model.b"
+										datepicker-options="eDateOptions"
+										ng-readonly="true"								
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+		 								<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+												<i class="glyphicon glyphicon-calendar"></i></button>																		
+										</span>
+									</div>
+ 								</div>
+ 							</td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr ng-show="parameterTypeEditForm.sdate.$error.required || parameterTypeEditForm.edate.$error.required">
+							<td class="col-xs-1"></td>
+							<td class="col-xs-1"></td>
+							<td class="col-md-9 help-block with-errors" colspan="5">請選擇專案起訖日</th>
+							<td class="col-xs-1"></td>
+						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">欄位一說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_01" name="DESC_01" ng-model="inputVO.DESC_01" e-length-limit="100"></td>
+ 							<th class="col-md-1 tdpadding">欄位六說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_06" name="DESC_06" ng-model="inputVO.DESC_06" e-length-limit="100"></td>
+ 							<th class="col-md-2 tdpadding">欄位十一說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_11" name="DESC_11" ng-model="inputVO.DESC_11" e-length-limit="100"></td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">欄位二說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_02" name="DESC_02" ng-model="inputVO.DESC_02" e-length-limit="100"></td>
+ 							<th class="col-md-1 tdpadding">欄位七說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_07" name="DESC_07" ng-model="inputVO.DESC_07" e-length-limit="100"></td>
+ 							<th class="col-md-2 tdpadding">欄位十二說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_12" name="DESC_12" ng-model="inputVO.DESC_12" e-length-limit="100"></td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">欄位三說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_03" name="DESC_03" ng-model="inputVO.DESC_03" e-length-limit="100"></td>
+ 							<th class="col-md-1 tdpadding">欄位八說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_08" name="DESC_08" ng-model="inputVO.DESC_08" e-length-limit="100"></td>
+ 							<th class="col-md-2 tdpadding">欄位十三說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_13" name="DESC_13" ng-model="inputVO.DESC_13" e-length-limit="100"></td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">欄位四說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_04" name="DESC_04" ng-model="inputVO.DESC_04" e-length-limit="100"></td>
+ 							<th class="col-md-1 tdpadding">欄位九說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_09" name="DESC_09" ng-model="inputVO.DESC_09" e-length-limit="100"></td>
+ 							<th class="col-md-2 tdpadding">欄位十四說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_14" name="DESC_14" ng-model="inputVO.DESC_14" e-length-limit="100"></td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">欄位五說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_05" name="DESC_05" ng-model="inputVO.DESC_05" e-length-limit="100"></td>
+ 							<th class="col-md-1 tdpadding">欄位十說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_10" name="DESC_10" ng-model="inputVO.DESC_10" e-length-limit="100"></td>
+ 							<th class="col-md-2 tdpadding">欄位十五說明</th>
+ 							<td class="col-md-2 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." id="DESC_15" name="DESC_15" ng-model="inputVO.DESC_15" e-length-limit="100"></td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 					</table>
+ 				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="add()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

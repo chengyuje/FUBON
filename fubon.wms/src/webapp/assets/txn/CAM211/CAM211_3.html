@@ -1,0 +1,175 @@
+<style>
+/* dialog panl */
+.modal-dialog.CAM211_3_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 720px;
+	height: auto;
+}
+/* table size */
+.CAM211_3_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CAM211_3_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<div ng-controller="CAM211_3_Controller" ng-cloak>
+	<div class="modal-dialog CAM211_3_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<div class="tfb_content_icon"></div>
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 class="modal-title" align="center">名單改派/作廢({{row.CUST_ID}})</h4>
+			</div>
+			<div class="modal-body">
+				<h3 align="center">
+					<input type="radio" name="location"  checked="checked" ng-click="reassign()">改派
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="radio" name="location" ng-click="invalid()">作廢
+				</h3>
+				<div id='reassign_1'>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">名單/待辦工作名稱：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="toDoList"
+											ng-datasource="mappingSet['toDoList']" 
+											ng-model="inputVO.toDoList"
+						   					ng-validate="false" 
+						   					ng-readonly="false" 
+						   					ng-editable="false"
+						   					ng-format="F3"
+						   					ng-required="false"
+						   					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">改派人員類別：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="channel" 
+											ng-datasource="mappingSet['CAM.DISPATCH_CHANNEL']" 
+											ng-model="inputVO.channel"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-change="action(row)"
+											ng-format="F3"/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">改派人員：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="aoList" 
+									        name="aoList"
+									        ng-datasource="mappingSet['aoList']"
+											ng-model="inputVO.aoList"
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3" /> 
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors" colspan="3">AO CODE + 姓名 + 得處理名單數</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">改派形式：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="style" 
+											name="style"
+											ng-datasource="mappingSet['STYLE']" 
+											ng-model="inputVO.style"
+											ng-validate="false" 
+											ng-readonly="inputVO.channel != '002' && inputVO.channel != '003'" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-disabled="inputVO.channel != '002' && inputVO.channel != '003'"/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</div>
+				<div id='invalid_1' style="display: none">
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">名單/待辦工作名稱：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="toDoList"
+											ng-datasource="mappingSet['toDoList2']" 
+											ng-model="inputVO.toDoList"
+						   					ng-validate="false" 
+						   					ng-readonly="false" 
+						   					ng-editable="false"
+						   					ng-format="F3"
+						   					ng-required="false"
+						   					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">作廢原因：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="reason" 
+											name="reason"
+											ng-paramtype="CAM.INVALID_MEMO"
+											ng-model="inputVO.reason"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-change="selectReason(row)"
+											ng-format="F3" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<textarea id="otherReason" cols="40" rows="5" ng-model="inputVO.otherReason" ng-disabled="inputVO.reason != '其他'"></textarea>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center" id='reassign_2'>
+					<button type="button" class="btn btn-info"
+						ng-click="upDataList(row)">改派
+					</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除
+					</button>
+				</div>
+				<div class="search_box_btn text-center" id='invalid_2' style="display: none">
+					<button type="button" class="btn btn-info"
+						ng-click="invalidList(row)">作廢
+					</button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

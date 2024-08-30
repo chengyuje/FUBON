@@ -1,0 +1,103 @@
+<style>
+/* open dialog */
+.ngdialog.CAM211_1_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.CAM211_1_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+/* table size */
+.CAM211_1_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CAM211_1_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CAM211_1_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.red{
+	color: red !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM211/CAM211_1.js"></script>
+<div ng-controller="CAM211_1Controller" ng-cloak>
+	<div class="modal-dialog CAM211_1_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 class="modal-title" align="center">({{row.EMP_NAME}})理專下活動資訊</h4>
+			</div>
+			<div class="modal-body">			
+				<div>
+					<e-jumping-once output="outputVO" list="data" totallist="AoParamList"></e-jumping-once>
+				</div>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="table-bordered">
+						<thead>
+							<tr>
+								<th align="center">活動名稱</th>
+								<th align="center">簡要說明</th>
+								<th align="center">活動到期日</th>
+								<th align="center">名單數</th>
+								<th align="center">已結案數</th>
+								<th align="center">完成率</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row"
+								ng-repeat="row in data track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row.CAMPAIGN_NAME}}</td>
+								<td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+									<div uib-tooltip="{{row.CAMPAIGN_DESC}}" tooltip-placement="right-bottom">
+										{{row.CAMPAIGN_DESC.length > 10 ? (row.CAMPAIGN_DESC | limitTo: 10) + "..." : row.CAMPAIGN_DESC}}
+									</div>
+								</td>
+								<td>{{row.END_DATE}}</td>
+								<td align="right">{{row.TOTAL_COUNTS}}</td>
+								<td align="right">{{row.CLOSE_COUNTS}}</td>
+								<td align="right">{{(row.CLOSE_COUNTS/row.TOTAL_COUNTS)*100 | number:0}}%</td>
+							</tr>
+							<tr id='toralTr'>
+								<td align="center">合計</td>
+								<td></td>
+								<td></td>
+								<td align="right">{{totalList}}</td>
+								<td align="right">{{totalClose}}</td>
+								<td align="right">{{(totalClose/totalList)*100 | number:0}}%</td>
+							</tr>
+						</tbody>
+					</table>	
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

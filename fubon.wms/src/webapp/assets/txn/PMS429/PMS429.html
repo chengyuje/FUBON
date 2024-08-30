@@ -1,0 +1,409 @@
+<style>
+
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS429/PMS429.js"></script>
+
+<div class="PMS429" ng-controller="PMS429Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th>專案名稱：</th>
+						<td><e-combobox id="PRJ_ID" name="PRJ_ID" 
+							ng-datasource="TRS_PROJNAME"
+					       	ng-model="inputVO.PRJ_ID"
+					       	ng-validate="false" 
+					       	ng-readonly="false" 
+					       	ng-editable="false"
+					       	ng-format="F3"
+					       	ng-required="false"				         
+			       			style="line-height:20px;" />
+			       		</td>
+			       		<th/>
+			       		<td/>
+					</tr>
+					<tr>
+						<th>客戶ID：</th>
+						<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.custId" /></td>
+						<th>對帳單寄送方式：</th>	
+						<td><e-combobox id="statement_send_type" name="statement_send_type"
+									ng-datasource="mappingSet['PMS.STATEMENT_SEND_TYPE']" 
+									ng-model="inputVO.statement_send_type"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-require="true"
+									ng-format="F3"
+									width="150px"
+									style="line-height:20px;" /></td>
+					</tr>
+					<!-- <tr>
+						<th>檢視所有名單(回函/未回函)：</th>
+						<td>
+						<input type="checkbox" ng-model="dateCheck" ng-true-value="'Y'" ng-false-value="'N'" ng-click="dateChangeByCheckBox()" >是
+						</td>
+					</tr> -->
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+	                                    ng-model="inputVO.region_center_id"
+	                                    ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+	                                    ng-change="ChangeRegion(region)"
+	                                    width="200px"/>
+						</td>						
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="AREA_LIST"
+	                                    ng-model="inputVO.branch_area_id"
+	                                    ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(region)"
+	                                    width="200px"/>
+						</td>	
+					</tr>	
+					<tr>
+						<th>分行：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+										ng-datasource="BRANCH_LIST"
+	                                    ng-model="inputVO.branch_nbr"
+	                                    ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeBranch(region)"
+	                                    width="200px"/>
+						</td>				
+						
+						<th>理專：</th>
+						<td>						
+							<e-combobox id="ao_code" name="ao_code"
+										ng-datasource="AO_LIST"
+										ng-model="inputVO.ao_code"
+										ng-validate="false"
+										ng-disabled="AVAIL_AO_CODE.length == 1"
+										ng-readonly="AVAIL_AO_CODE.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeAo_code(region)"
+										width="200px"/>					 
+						</td>
+					</tr>
+					<tr>						
+						<th>確認單回函日期：</th>
+						<td>							
+							<div class="input-group datebox datewidth" style="float:left">
+							<input type="text" id="sCreDate" name="sCreDate"
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM/dd"
+								   ng-model="inputVO.sCreDate"
+								   is-open="model.a"
+								   datepicker-options="bgn_sDateOptions"									
+								   ng-readonly="true" ng-required="true"		
+								   ng-change="limitDate();dateChange()"
+								   style="width:150px;"/>
+							<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>				
+								</span>
+								
+							</div>		
+						<div style="float:left">&nbsp; ～ &nbsp;</div>
+						<div style="float:left" class="input-group datebox datewidth">
+							<input  type="text" 
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd" 
+									ng-model="inputVO.endDate"
+									is-open="model.b" 
+									datepicker-options="bgn_eDateOptions" 
+									ng-required="true"
+									ng-readonly="true" 
+									ng-change="limitDate()" 
+									style="width:150px;" />
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</span>
+						</div>
+						</td>
+						<th ng-hide="isFC">客戶處理情形：</th>
+						<td ng-hide="isFC">
+							<e-combobox id="cust_proce_status" name="cust_proce_status"
+										ng-datasource="mappingSet['PMS.CUST_PROCE_STATUS']" 
+										ng-model="inputVO.cust_proce_status"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-require="true"
+										ng-format="F3"
+										ng-disabled = "isFC"
+										width="150px"
+										style="line-height:20px;" />
+						</td>						    												
+					</tr>
+					<tr>
+						<th ng-show = "inputVO.privilegeId=='043' || inputVO.privilegeId=='044'">確認單處理狀態：</th>
+						<td>
+							<e-combobox id="process_status" name="process_status"
+									ng-datasource="mappingSet['PMS.ROTATION_PROCESS_STATUS']" 
+									ng-model="inputVO.process_status"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-require="true"
+									ng-format="F3"
+									ng-show = "inputVO.privilegeId=='043' || inputVO.privilegeId=='044'"
+									width="300px"
+									style="line-height:20px;" /></td>
+						</td>
+						<th></th>	
+						<td></td>
+					</tr>
+				</table>
+				</form>			
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit(); query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportData()" function-type="export">匯出</button>
+				<button type="button" class="btn btn-info" ng-click="exportAllData()" function-type="export">全部匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+		<e-jumping-once  output="outputVO" list="data" totallist="paramList"></e-jumping-once> 
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;overflow-x: auto;">
+				<table class="rstable e-table-freeze" e-left="5" e-height="500px" e-mode="1" e-top="true" e-list="data">
+					<thead>
+						<tr>
+<!-- 						<th>對帳單基準日</th> -->
+<!-- 						<th>業務處</th> -->
+<!-- 						<th>區別</th> -->
+						    <th ng-hide="isFC">歸屬行</th>
+						    <th><e-sorter e-input="inputVO" e-mode="auto" e-col="SM_BRANCH_NBR" e-query="query()">對帳單<br/>寄送分行</e-sorter></th>
+						    <th>客戶註記</th>
+						    <th>前一年度</br>貢獻度等級</th>
+						    <!-- <th>客訴戶</th>
+						    <th>NS禁銷戶</th>
+						    <th>RS拒銷戶</th>
+						    <th>死亡戶</th> -->
+						    <th>客戶姓名</th>
+						    <th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">身分證號</e-sorter></th>
+						    <th>客戶年齡</th>
+						    <th><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_CODE" e-query="query()">現任理專</e-sorter></th>
+						    <th>經營滿5年理專</th>
+<!-- 						<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_CODE" e-query="query()">AOCODE</e-sorter></th> -->
+						    <th>對帳單</br>寄送方式</th>
+						    <th>電子/實體確認單</br>寄送日期</th>
+						    <th>回函日期</th>
+						    <th ng-hide="isFC">回函結果</br>帳務相符</th>
+						    <th ng-hide="isFC">回函結果理專</br>是否有不當情事</th>
+						    <th ng-hide="isFC">實體確認單聯絡單日期</th>
+						    <th ng-hide="isFC">實體確認單聯絡單</br>回覆日期</th>
+						    <th>自取確認單</br>是否已連繫</th>
+						    <th ng-hide="isBMMGR">自取確認單</br>聯繫日期</th>
+						    <th ng-hide="isBMMGR || isFC">自取確認單</br>聯繫員編</th>
+						    <th ng-hide="isFC">異常通報</br>(正常/異常)</th>
+						    <th ng-hide="isBMMGR">客戶處理情形</th>
+						    <th ng-hide="isFC">訪談(含錄音)紀錄</th>
+						    <th ng-hide="isFC">錄音日期</th>
+						    <th ng-hide="isFC">錄音序號</th>
+						    <th ng-hide="isFC">聯繫內容</th>
+						    <th ng-hide="isFC">聯繫員編</th>
+						    <th ng-show = "inputVO.privilegeId=='043' || inputVO.privilegeId=='044'">確認單處理狀態</th>
+<!-- 						<th>確認單寄送前後</br>RM有差異</th> -->
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+<!-- 						<td align="center">{{row.STATEMENT_DATE.substring(0,4)}}-{{row.STATEMENT_DATE.substring(4,6)}}-{{row.STATEMENT_DATE.substring(6,8)}}</td> 	 -->
+<!-- 						<td align="center">{{row.REGION_CENTER_NAME}}</td> -->
+<!-- 						<td align="center">{{row.BRANCH_AREA_NAME}}</td> -->
+							<td align="center" ng-hide="isFC">{{row.BRANCH_NBR}} - {{row.BRANCH_NAME}}</td>
+							<td align="center">{{row.SM_BRANCH_NBR}} - {{row.SM_BRANCH_NAME}}</td>
+							<td align="center">{{row.CUST_FLAG}}</td>
+							<td align="center">{{row.PRFT_LAST_YEAR_NOTE}}</td>
+							<!-- <td align="center">{{row.COMPLAIN_YN}}</td>
+							<td align="center">{{row.COMM_NS_YN}}</td>
+							<td align="center">{{row.COMM_RS_YN}}</td>
+							<td align="center">{{row.DEATH_YN}}</td> -->
+							<td align="center">{{row.CUST_NAME}}</td>
+							<td align="center"><a onclick="return false" ng-click="custDTL(row)">{{row.CUST_ID}}</td>
+							<td align="center"><span style="color:{{row.CUST_AGE >= 65 ? 'red' : 'black'}}">{{row.CUST_AGE}}</span></td>
+							<td align="center">{{row.AO_CODE}} - {{row.EMP_NAME}}</td>
+							<td align="center">{{row.EMP_5Y_SHOW}}</td>
+<!-- 						<td align="center">{{row.AO_CODE}}</td> -->
+							<td align="center">{{row.STATEMENT_SEND_TYPE | mapping:mappingSet['PMS.STATEMENT_SEND_TYPE']:'F3'}}</td>
+							<td align="center">{{toJsDate(row.SEND_DATE) | date:"yyyy-MM-dd"}}</td>
+							<td align="center">{{toJsDate(row.RECEIVE_DATE) | date:"yyyy-MM-dd"}}</td>
+							
+							<td align="center" ng-hide="isFC">{{row.RTN_STATUS_AST | mapping:mappingSet['RTN_STATUS_AST']:'F3'}}</td>
+							<td align="center" ng-hide="isFC">{{row.RTN_STATUS_NP | mapping:mappingSet['RTN_STATUS_NP']:'F3'}}</td>
+							<td align="center" ng-hide="isFC">{{toJsDate(row.MAIL_CONTACT_DATE) | date:"yyyy-MM-dd"}}</td>	
+							<td align="center" ng-hide="isFC">{{toJsDate(row.MAIL_REPLY_DATE)  | date:"yyyy-MM-dd"}}</td>
+							<td align="center">
+							<div ng-show="row.STATEMENT_SEND_TYPE == '3'">
+		                        <label>是
+		                        	<input type="radio" value="Y" 
+		                        		   ng-change="updateFlag(row)" 
+		                        		   ng-model="row.AO_CONTACT_YN" 
+		                        		   ng-disabled="(!isFC && !(checkNull(row.AO_CODE) && isBMMGR)) || 
+		                        		   				 !(row.STATEMENT_SEND_TYPE == '3') || 
+		                        		   				 !(row.PROCESS_STATUS == null) || row.EDIT_YN == 'N'"/>
+		                        </label>&emsp;
+		                        <label>否
+		                        	<input type="radio" value="N" 
+		                        		   ng-change="updateFlag(row)" 
+		                        		   ng-model="row.AO_CONTACT_YN" 
+		                        		   ng-disabled="(!isFC && !(checkNull(row.AO_CODE) && isBMMGR)) || 
+		                        		   				 !(row.STATEMENT_SEND_TYPE == '3') || 
+		                        		   				 !(row.PROCESS_STATUS == null) || row.EDIT_YN == 'N'"/>
+		                        </label>
+		                    </div>
+							</td> 
+							<td align="center" ng-hide="isBMMGR">{{toJsDate(row.AO_CONTACT_DATE) | date:"yyyy-MM-dd"}}</td>
+							<td align="center" ng-hide="isBMMGR || isFC">{{row.AO_CONTACT_EMP_ID}}</td>
+							<td align="center" ng-hide="isFC">
+		                        <label>正常<input type="radio" value="Y"  ng-model="row.BRN_MGM_YN" ng-disabled="true"/></label>&emsp;
+		                        <label>異常<input type="radio" value="N"  ng-model="row.BRN_MGM_YN" ng-disabled="true"/></label>
+							</td>
+							<td ng-hide="isBMMGR" align="center">{{row.CUST_PROCE_STATUS | mapping:mappingSet['PMS.CUST_PROCE_STATUS']:'F3'}}</td> 
+							<td align="center" ng-hide="isFC">
+								<e-combobox id="CONTACT_STATUS" name="CONTACT_STATUS" 
+											width="400px"
+											style="line-height:20px;"
+											ng-datasource="mappingSet['PMS.ROTATION_BRMGR_STATUS']"
+											ng-model="row.CONTACT_STATUS"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-require="true"
+											ng-change="updateFlag(row); pairBRN_MGM_YN_CONTACT_STATUS(row);"
+											ng-format="F3"
+											ng-disabled="!isBMMGR || 
+														 (row.STATEMENT_SEND_TYPE == '3' && row.PROCESS_STATUS == null) || 
+														 row.PROCESS_STATUS == '4' || 
+														 row.PROCESS_STATUS == '5' || 
+														 row.PROCESS_STATUS == '6' ||
+														 row.PROCESS_STATUS == '7' ||
+														 row.EDIT_YN == 'N'"/> 
+							</td>
+							<td align="center" ng-hide="isFC">
+								<div style="float:left" class="input-group datebox datewidth">
+									<input  type="text" 
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd" 
+											ng-model="row.REC_DATE"
+											is-open="row.isOpen" 
+											datepicker-options="rec_dateOptions" 
+											ng-required="true"
+											ng-readonly="true" 
+											ng-change="updateFlag(row); validateRecseq(row);"
+											style="width:150px;" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" 
+												ng-click="openForRow($event, row)"
+												ng-disabled="!isBMMGR || 
+															 (row.STATEMENT_SEND_TYPE == '3' && row.PROCESS_STATUS == null) || 
+															 row.PROCESS_STATUS == '4' || 
+															 row.PROCESS_STATUS == '5' || 
+															 row.PROCESS_STATUS == '6' ||
+															 row.PROCESS_STATUS == '7' ||
+															 row.EDIT_YN == 'N'"/>
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+							<td align="center" ng-hide="isFC">
+								 <input type="text" class="form-control" 
+								 		style="width: 150px" 
+								 		ng-model="row.REC_SEQ" 
+								 		e-length-limit="12" 
+								 		e-input-limit="N"
+								 		placeholder="請輸入錄音序號..." 
+								 		ng-blur="updateFlag(row); validateRecseq(row);" 
+								 		ng-disabled="!isBMMGR || 
+								 					 (row.STATEMENT_SEND_TYPE == '3' && row.PROCESS_STATUS == null) || 
+								 					 row.PROCESS_STATUS == '4' || 
+								 					 row.PROCESS_STATUS == '5' || 
+								 					 row.PROCESS_STATUS == '6' ||
+								 					 row.PROCESS_STATUS == '7' ||
+								 					 row.EDIT_YN == 'N'"/>
+							</td>
+							<td align="center" ng-hide="isFC">
+								 <textarea class="form-control" style="width: 300px" 
+								 		   ng-model="row.CONTACT_MEMO" 
+								 		   e-length-limit="300" 
+								 		   placeholder="請輸入備註..." 
+								 		   ng-blur="updateFlag(row)" 
+								 		   ng-disabled="!isBMMGR || 
+								 		   				(row.STATEMENT_SEND_TYPE == '3' && row.PROCESS_STATUS == null) || 
+								 		   				row.PROCESS_STATUS == '4' || 
+								 		   				row.PROCESS_STATUS == '5' || 
+								 		   				row.PROCESS_STATUS == '6' || 
+								 		   				row.PROCESS_STATUS == '7' ||
+								 		   				row.EDIT_YN == 'N'"></textarea>
+							</td>
+							<td align="center" ng-hide="isFC">{{row.CONTACT_EMP_ID}}</td> 
+							<td align="center" ng-show = "(inputVO.privilegeId=='043' || inputVO.privilegeId=='044') && (row.PROCESS_STATUS == '4' || row.PROCESS_STATUS == '5' || row.PROCESS_STATUS == '6' || row.PROCESS_STATUS == '7')">
+								{{row.PROCESS_STATUS | mapping:mappingSet['PMS.ROTATION_PROCESS_STATUS']:'F3'}}
+							</td> 
+							<td align="center" ng-show = "!((inputVO.privilegeId=='043' || inputVO.privilegeId=='044') && (row.PROCESS_STATUS == '4' || row.PROCESS_STATUS == '5' || row.PROCESS_STATUS == '6' || row.PROCESS_STATUS == '7'))"></td> 
+<!-- 						<td align="center">{{row.RM_DIFF_YN}}</td> -->
+						</tr>
+					</tbody>
+				</table>
+				<br>
+				<div align="center" ng-show="paramList.length > 0">
+		            <button type="button" class="btn btn-success" ng-click="save()" ng-disabled="!isFC && !isBMMGR ">
+		                <span class="glyphicon glyphicon-floppy-disk"></span>儲存
+		            </button>
+		        </div>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

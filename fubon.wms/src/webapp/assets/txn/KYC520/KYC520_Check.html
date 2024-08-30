@@ -1,0 +1,89 @@
+<script type="text/javascript" src="assets/txn/KYC520/KYC520_Check.js"></script>
+
+<div ng-controller="KYC520_CheckController" ng-cloak="ng-cloak">
+  <div class="modal-dialog" style="width: 70%;height:auto;">
+  	<div class="modal-content">
+  	
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+      <h4 id="myModalAlertLabel" align="center" class="modal-title">審核問卷</h4>
+    </div>
+    <div class="modal-body">
+    	<div class="search_table">
+	      <table>
+	        <tr>
+	          <th>問卷類別</th>
+	          <td>{{row.QUEST_TYPE | mapping:mappingSet['KYC.PRO_TYPE']:F3}}</td>
+	          <th>問卷名稱</th>
+	          <td>{{row.EXAM_NAME}}</td>
+	        </tr>
+	        <tr>
+	          <th>版次</th>
+	          <td>{{row.EXAM_VERSION}}</td>
+	          <th>問卷啟用日期</th>
+	          <td>{{toJsDate(row.ACTIVE_DATE)|date:'yyyy/MM/dd'}}</td>
+	        </tr>
+	        <tr>
+	          <th>問卷失效日期</th>
+	          <td>{{toJsDate(row.EXPIRY_DATE)|date:'yyyy/MM/dd'}}</td>
+	        </tr>
+	      </table>
+      </div>
+      <div style="color: gray;margin: 1% 0% 1% 0%;">問卷內容</div>
+      <div class="gv_tab_sc scroll_y">
+        <table>
+          <tr>
+            <th>題號</th>
+            <th>問題型態</th>
+            <th>問題描述</th>
+            <th>選項</th>
+            <th> 正確答案</th>
+          </tr>
+          <tr ng-repeat="row2 in checkParamList track by $index">
+            <td>{{row2.QST_NO}}</td>
+            <td>{{row2.QUESTION_TYPE}}</td>
+            <td>{{row2.QUESTION_DESC}}</td>
+            <td style="width: 40%;">
+            	<table>
+	                <tr ng-repeat="correct in row2.ANS track by $index">
+	                	<td>{{correct.ANSWER_DESC}}</td>
+	                </tr>
+            	</table> 
+            </td>
+            <td>{{row2.CORR_ANS}}</td>
+          </tr>
+        </table>
+      </div>
+      <table style="margin: 1% 1% 1% 1%;">
+	   <tr>
+	      <th style="color: gray;">說明備註</th>
+	   </tr>
+      </table>
+      <div class="gv_tab_sc scroll_y">
+        <table style="width: 65%;">
+          <tr>
+            <th>簽核員工</th>
+            <th>簽核日期</th>
+            <th>簽核備註</th>
+          </tr>
+          <tr ng-repeat="flw in flwList track by $index">
+            <td>{{flw.SIGNOFF_NAME}}</td>
+            <td>{{toJsDate(flw.CREATETIME)|date:"yyyy-MM-dd"}}</td>
+            <td>	<font ng-show="flw.EMP_ID!=inputVO.empID" class="remark">{{flw.REMARK}}</font>
+              <input id="inputRemark" type="text" placeholder="請輸入..." name="remark" ng-model="flw.REMARK" e-length-limit="30" ng-show="flw.EMP_ID==inputVO.empID" class="remark"/>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="modal-footer" style="text-align: center;">
+        <button type="button" ng-click="reject();" class="btn btn-info">退回</button>
+        <button type="button" ng-disabled="notpass" ng-click="approve();" class="btn btn-info">放行</button>
+        <button type="button" ng-click="closeThisDialog('cancel');" class="btn btn-info">離開</button>
+      </div>
+    </div>
+    
+    
+    
+    </div>
+  </div>
+</div>

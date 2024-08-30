@@ -1,0 +1,177 @@
+<style>
+  .FPS813 .modal-dialog {
+    width: 80vw;
+  }
+
+  /* change row */
+
+  /* fps810 */
+
+  .FPS810 table.report.table {
+    border: 2px solid #fff;
+    background-color: #fff;
+  }
+
+  .FPS810 table.report.table>thead,
+  .FPS810 table.report.table>tbody tr th.fake-th td {
+    background-color: #53b0c9;
+    color: #fff;
+  }
+
+  .FPS810 table.report.table>tbody tr.conclusion td {
+    background-color: #fff;
+  }
+
+  .FPS810 table.report.table>tbody tr.details td {
+    background-color: #dbeef4;
+  }
+
+  .FPS810 table.report.table>thead>tr th,
+  .FPS810 table.report.table>thead>tr td,
+  .FPS810 table.report.table>tbody>tr th,
+  .FPS810 table.report.table>tbody>tr td {
+    vertical-align: middle;
+    text-align: center;
+    padding: .3em;
+    border: .5px solid #fff;
+  }
+
+  .FPS810 table.report.table thead th:first-of-type,
+  .FPS810 table.report.table tbody th {
+    border-right: 1px solid #fff;
+  }
+
+  .imp {
+    font-size: 1.5em;
+    color: #28a4c9;
+  }
+
+  section.no-body>h3 {
+    border-radius: 5px;
+  }
+
+  section>h3.title {
+    background-color: #28a4c9;
+    color: #fff;
+  }
+
+  /* hack */
+
+  table.report.table>tbody+tbody {
+    border-top: 2px solid #fff;
+  }
+
+  .red {
+    color: red;
+  }
+
+</style>
+<div ng-controller="FPS813Controller"
+     ng-cloak
+     class="FPS800 FPS813 FPS810">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a href="#"
+           class="close"
+           data-dismiss="modal"
+           aria-hidden="true"
+           ng-click="closeThisDialog('cancel')">&times; </a>
+        <h4 id="myModalAlertLabel"
+            class="modal-title">使用理財規劃功能的理專數</h4>
+      </div>
+      <div class="modal-body">
+        <div class="bootstrap-admin-panel-content">
+          <table class="table report e-table-freeze" e-height="70vh" e-top="true">
+            <thead>
+            	<tr>
+            		<th>理專分級</th>
+            		<th>FC1</th>
+		            <th>FC2</th>
+		            <th>FC3</th>
+		            <th>FC4</th>
+		            <th>FC5</th>
+		            <th ng-if="roleType!==3">加總</th>
+            	</tr>
+            </thead>
+            <tbody>
+              <tr class="conclusion">
+                <td>全行各級理專使用比例</td>
+                <td>
+                  <span ng-bind="all.FC1|number"></span>%
+                </td>
+                <td>
+                  <span ng-bind="all.FC2|number"></span>%
+                </td>
+                <td>
+                  <span ng-bind="all.FC3|number"></span>%
+                </td>
+                <td>
+                  <span ng-bind="all.FC4|number"></span>%
+                </td>
+                <td>
+                  <span ng-bind="all.FC5|number"></span>%
+                </td>
+                <td ng-if="roleType!==3">
+                  <span ng-bind="all.total|number"></span>%
+                </td>
+              </tr>
+              <tr class="conclusion">
+                <td>轄下各級理專使用比例</td>
+                <td ng-class="{'red': domination.FC1 <= all.FC1}">
+                  <span ng-bind="domination.FC1|number"></span>%
+                </td>
+                <td ng-class="{'red': domination.FC2 <= all.FC2}">
+                  <span ng-bind="domination.FC2|number"></span>%
+                </td>
+                <td ng-class="{'red': domination.FC3 <= all.FC3}">
+                  <span ng-bind="domination.FC3|number"></span>%
+                </td>
+                <td ng-class="{'red': domination.FC4 <= all.FC4}">
+                  <span ng-bind="domination.FC4|number"></span>%
+                </td>
+                <td ng-class="{'red': domination.FC5 <= all.FC5}">
+                  <span ng-bind="domination.FC5|number"></span>%
+                </td>
+                <td ng-if="roleType!==3" ng-class="{'red': domination.total <= all.total}">
+                  <span ng-bind="domination.total|number"></span>%
+                </td>
+              </tr>
+              <tr ng-repeat="row in paramList"
+                  class="details">
+                <td ng-if="roleType==1">{{row.BRANCH_AREA_NAME}}</td>
+                <td ng-if="roleType==2">{{row.BRANCH_NAME}}</td>
+                <td ng-if="roleType==3 && $index == 0"
+                    rowspan="{{paramList.length}}">有使用的理專姓名</td>
+                <td ng-class="{'red': roleType!==3&&row.FC1_PERCENT<=all.FC1}">
+                  <span ng-bind="roleType===3?row.FC1:(row.FC1_PERCENT|number)"></span>
+                  <span ng-show="roleType!==3">%</span>
+                </td>
+                <td ng-class="{'red': roleType!==3&&row.FC2_PERCENT<=all.FC2}">
+                  <span ng-bind="roleType===3?row.FC2:(row.FC2_PERCENT|number)"></span>
+                  <span ng-show="roleType!==3">%</span>
+                </td>
+                <td ng-class="{'red': roleType!==3&&row.FC3_PERCENT<=all.FC3}">
+                  <span ng-bind="roleType===3?row.FC3:(row.FC3_PERCENT|number)"></span>
+                  <span ng-show="roleType!==3">%</span>
+                </td>
+                <td ng-class="{'red': roleType!==3&&row.FC4_PERCENT<=all.FC4}">
+                  <span ng-bind="roleType===3?row.FC4:(row.FC4_PERCENT|number)"></span>
+                  <span ng-show="roleType!==3">%</span>
+                </td>
+                <td ng-class="{'red': roleType!==3&&row.FC5_PERCENT<=all.FC5}">
+                  <span ng-bind="roleType===3?row.FC5:(row.FC5_PERCENT|number)"></span>
+                  <span ng-show="roleType!==3">%</span>
+                </td>
+                <td ng-if="roleType!==3" ng-class="{'red': roleType!==3&&row.TOTAL<all.TOTAL}">
+                  <span ng-bind="row.TOTAL|number"></span>
+                  <span>%</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

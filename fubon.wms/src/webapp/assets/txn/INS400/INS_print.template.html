@@ -1,0 +1,444 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .important {
+    font-weight: 500;
+  }
+  .INS_Print {
+  	font-size: 18px;
+  }
+  .important.blue {
+    color: #28a4c9;
+  }
+
+  .important.orange {
+    color: #e96143;
+  }
+
+  .FPS table img {
+    vertical-align: middle;
+  }
+
+  .input-number {
+    text-align: right;
+    max-width: 130px;
+    margin: 0 auto;
+  }
+
+  .more-wrapper {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+  }
+
+  .more {
+    font-size: .7em;
+    color: #28a4c9;
+  }
+
+  .FPS table.table {
+    margin-bottom: 0;
+  }
+
+  .FPS .prod-detail .title.subtitle {
+    background-color: #89d4d7;
+  }
+
+  .FPS .print .count {
+    width: 1.5em;
+    height: 1.5em;
+    line-height: 1.2em;
+    display: inline-block;
+    border: 2.5px solid #f5f5f5;
+    border-radius: .75em;
+    position: absolute;
+    left: 0.1em;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    background-color: #f5f5f5;
+    color: #333;
+  }
+
+  .FPS .print .count::after {
+    content: '';
+    width: 1.3em;
+    height: 1.3em;
+    display: inline-block;
+    border: 1.5px solid #2889bc;
+    border-radius: .65em;
+    position: absolute;
+    left: -0.5px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+  }
+
+  .FPS .print .title.main {
+    width: 16em;
+    border-radius: 1em;
+    position: relative;
+    padding-left: 2em;
+    margin-left: 1.5%;
+    background-color: #2889bc;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    color: #fff;
+  }
+
+  .FPS .print .wrapper {
+    text-align: left;
+    width: 97.5%;
+    margin: 0 auto;
+  }
+
+  .FPS .print .tiny-font {
+    font-size: .7em;
+  }
+
+  .FPS .print section {
+    margin-bottom: .5em;
+  }
+
+  .INS th {
+    text-align: center;
+  }
+
+  tr:nth-child(5n) {
+    background-color: #f5f5f5;
+  }
+
+  #hiddendom {
+    position: relative;
+    left: -100vw;
+  }
+
+</style>
+
+<script type="text/javascript"
+        src="assets/txn/INS430/INS430.js"></script>
+<script type="text/javascript" 
+		src="assets/txn/INS400/INS_print.js"></script>
+<script type="text/javascript" src="assets/txn/INS/INS_IOT.js"></script>
+<link rel="stylesheet" type="text/css" href="assets/txn/FPS/FPS.css">
+<link rel="stylesheet" type="text/css" href="assets/txn/FPS/FPSPrint.css">
+<div class="FPS INS_Print">
+  <div class="print A4"
+       ng-controller="INSPrintController">
+    <div print>
+      <!-- INS -->
+      <section>
+        <div ng-include="'assets/txn/INS400/INS_print_header.template.html'">
+        </div>
+      </section>
+
+      <!-- cust -->
+      <section>
+        <div class="title title-left main">
+          <span class="count">{{$index+1}}</span> 客戶基本資料</div>
+        <div class="block container"
+             style="border-radius: 1em;">
+          <div ng-include="'assets/txn/INS400/INS_CUST.template.html'"
+               ng-init="isPrint=true"></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="title title-left main">
+          <span class="count">{{$index+2}}</span>規劃目標
+        </div>
+        <div class="block container"
+             style="border-color:#93c5e1;">
+          <div style="display:flex; 
+	                justify-content: space-around; 
+	                margin: 0 auto;">
+
+            <!-- 退休規劃 -->
+            <div class="block clear-space container"
+                 ng-show="hisPlan == '退休規劃'">
+              <div class="title subtitle title-left ">目標設定</div>
+              <div class="content-wrapper">
+                <div class="content-title">1.預計退休年齡</div>
+                <div class="content-body">
+                  <span ng-bind="outputList.AVG_RETIRE"></span>
+                </div>
+              </div>
+              <div class="content-wrapper">
+                <div class="content-title">2.每月所需生活費用</div>
+                <div class="content-body">
+                  <span>{{outputList.D_AMT1 | number}}元</span>
+                </div>
+              </div>
+              <div class="content-wrapper last"
+                   style="position:relative">
+                <div class="content-title">假設平均餘命{{outputList.AVG_LIFE}}歲，退休金使用期間{{outputList.AVG_LIFE - outputList.AVG_RETIRE}}年</div>
+              </div>
+            </div>
+
+            <!-- !退休規劃 -->
+            <div class="block clear-space container"
+                 ng-show="hisPlan != '退休規劃'">
+              <div class="title subtitle title-left ">目標設定</div>
+              <div class="content-wrapper">
+                <div class="content-title">1.目標年期</div>
+                <div class="content-body">
+                  <span ng-bind="outputList.D_YEAR"></span>年
+                </div>
+              </div>
+              <div class="content-wrapper">
+                <div class="content-title">2.目標需求金額</div>
+                <div class="content-body">
+                  <span>{{outputList.D_AMT2 | number}}元</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- 3退休規劃 -->
+      <section ng-show="hisPlan == '退休規劃'">
+        <div class="title title-left main">
+          <span class="count">{{$index+3}}</span>已準備退休規劃
+        </div>
+        <div class="block container"
+             style="border-color:#93c5e1;">
+          <div style="display:flex; 
+	                justify-content: space-around; 
+	                margin: 0 auto;">
+            <div class="block clear-space container">
+              <table style="width:100%;
+	                        table-layout:fixed;">
+                <thead class="title subtitle">
+                  <tr>
+                    <th>給付類型</th>
+                    <th>每月給付</th>
+                    <th>一次給付</th>
+                  </tr>
+                </thead>
+                <tbody class="content-wrapper"
+                       style="text-align:center">
+                  <tr>
+                    <td>社會保險</td>
+                    <td ng-bind="outputList.LABOR_INS_AMT1 | number"></td>
+                    <td ng-bind="outputList.LABOR_INS_AMT2 | number"></td>
+                  </tr>
+                  <tr>
+                    <td>退休制度</td>
+                    <td ng-bind="outputList.PENSION1 | number"></td>
+                    <td ng-bind="outputList.PENSION2 | number"></td>
+                  </tr>
+                  <tr>
+                    <td>商業保險</td>
+                    <td ng-bind="outputList.OTH_INS_AMT1 | number"></td>
+                    <td ng-bind="outputList.OTH_INS_AMT2 | number"></td>
+                  </tr>
+                  <tr>
+                    <td>其他</td>
+                    <td ng-bind="outputList.OTH_AMT1 | number"></td>
+                    <td ng-bind="outputList.OTH_AMT2 | number"></td>
+                  </tr>
+                  <tr style="background-color: #e5f3fc;">
+                    <td colspan="2"
+                        style="text-align:left">已備的退休金，平均每月約 {{outputList.have | number}}元</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+	<div print print-unique="true">
+      <!-- 4退休規劃 -->
+      <section ng-show="hisPlan == '退休規劃'">
+        <div class="title title-left main">
+          <span class="count">{{$index+4}}</span>退休規劃缺口
+        </div>
+        <div class="wrapper">您目前的需求規劃，每月生活需求金額為{{outputList.D_AMT1 | number}}元，已備退休月給付金額 {{outputList.have | number}}元，需求缺口為{{outputList.retiredGAP | number}}元。</div>
+        <div class="block container"
+             style="border-color:#93c5e1;">
+          <!-- deposit -->
+          <div class="flex-block">
+            <div class="title subtitle title-left">退休規劃缺口</div>
+            <div class="content-wrapper no-border chart-wrapper" style="background-color: white;">
+              <div class="chart-content">
+                <div id="p_retiredChart"
+                     class="chart"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+	</div>
+    <section>
+      <div print>
+        <div class="title title-left main"
+             ng-show="hisPlan != '退休規劃'">
+          <span class="count">{{$index+3}}</span>規劃保險商品推薦</div>
+        <div class="title title-left main"
+             ng-show="hisPlan == '退休規劃'">
+          <span class="count">{{$index+5}}</span>退休規劃保險商品推薦</div>
+        <div class="wrapper">
+          <div style="padding:0.1em 1.5em"> {{custData.CUST_NAME}} 先生/小姐</div>
+          <div style="padding:0.1em 1.5em"
+               ng-show="hisPlan == '退休規劃'">您 {{hisPlan}} 需求金額為 {{outputList.retiredGAP | number}} 元。</div>
+          <div style="padding:0.1em 1.5em"
+               ng-show="hisPlan != '退休規劃'">您 {{hisPlan}} 需求金額為 {{outputList.D_AMT2 | number}} 元。</div>
+          <div style="padding:0.1em 1.5em">建議商品保障內容如下：</div>
+          <div style="padding:0.1em 1.5em"
+               ng-show="outputList.IS_ANNUITY == 'Y'">透過[{{outputList.INSPRD_NAME}}]於年金給付期間每年給付年金之特性，支應退休生活費用，讓您安享銀髮生涯。</div>
+          <div style="padding:0.1em 1.5em"
+               ng-show="outputList.IS_REPAY == 'Y'">透過[{{outputList.INSPRD_NAME}}]定期給付生存保險金之特性，支應退休生活費用，讓您安享銀髮生涯。</div>
+          <div style="padding:0.1em 1.5em"
+               ng-show="outputList.IS_INCREASING == 'Y'">透過[{{outputList.INSPRD_NAME}}]長期資產增值的特性，累積財富達成您的理財目標。</div>
+        </div>
+        <div class="wrapper"
+             style="font-weight:bold;font-size:18px;padding:10px;">一、建議投保內容摘要</div>
+        <div class="block container"
+             style="border-color:#93c5e1;">
+          <table style="width:100%;table-layout:fixed;">
+            <thead class="title subtitle title-left">
+              <tr class="INS">
+                <th>保險公司<br/>投保年齡</th>
+                <th>險種代碼<br/>險種名稱</th>
+                <th>繳費年期</th>
+                <th>保額</th>
+                <th>保費<br/>幣別</th>
+                <th>年繳總保費</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-class-odd="'rowOdd'"
+                  ng-class-even="'rowEven'">
+                <td>富邦人壽<br/>{{paramList[0].THEAGE}}</td>
+                <td>{{outputList.PRD_ID}}<br/>{{outputList.INSPRD_NAME}}</td>
+                <td>{{outputList.PAY_YEARS}}</td>
+                <td>{{outputList.POLICY_ASSURE_AMT | number}}{{outputList.UNIT | mapping: UNIT}}</td>
+                <td>{{outputList.POLICY_FEE | number}}<br/>{{outputList.CURR_CD}}</td>
+                <td>{{outputList.POLICY_FEE | number}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+      </div>
+
+      <div print>
+      	<div class="wrapper"
+             style="font-weight:bold;font-size:18px;padding:10px;">二、保障內容一覽表</div>
+      </div>
+      <div print>
+        <div class="block container"
+             style="border-color:#93c5e1;"
+             print-wrapper>
+          <table style="width:100%;table-layout:fixed;">
+            <thead class="title subtitle title-left">
+              <tr class="INS">
+                <th>年度</th>
+                <th>年齡</th>
+                <th>壽險保障</th>
+                <th>意外保障</th>
+                <th>癌症保障</th>
+                <th>重大疾病</th>
+                <th>保費</th>
+                <th>還本</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="row in paramList"
+                  ng-class-odd="'rowOdd'"
+                  ng-class-even="'rowEven'"
+                  print-cell>
+                <td>民國{{row.ROCYEAR}}年</td>
+                <td>{{row.THEAGE}}</td>
+                <td>{{row.LIFE | number}}</td>
+                <td>{{row.PA | number}}</td>
+                <td>{{row.CL | number}}</td>
+                <td>{{row.DDB | number}}</td>
+                <td>{{row.PREMIUM | number}}</td>
+                <td>{{row.REPAY | number}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 免責聲明 -->
+    <section print
+             print-top-margin="10">
+      <div class="title title-left main">
+        <span class="count"
+              ng-show="hisPlan != '退休規劃'">{{$index+4}}</span>
+        <span class="count"
+              ng-show="hisPlan == '退休規劃'">{{$index+6}}</span> 免責聲明
+      </div>
+      <div class="wrapper">
+        <div class="ps">本文件內容僅提供予 貴客戶參考並僅限 貴客戶閱覽。未經台北富邦商業銀行(以下稱本行)書面同意，不得複印、節錄，也不得以任何方式引用、轉載或傳送本文件之任何內容。 本文件所載的內容只提供給 貴客戶作參考之用，並非提供保險顧問服務，亦非作為或被視為投保或購買任何保險商品的要約引誘、要約或構成對任何人的保險建議， 貴客戶不應依賴本文件中的任何內容作出任何投保決定，貴客戶應根據本身的保險需求、風險評估、財務及稅務狀況等因素獨立作出判斷。 此外，本文件內容是依照製作當下之資料與數據為之，惟因資訊時刻變化，且歷史數據分析功能上之限制，對於保險需求與其他影響的因素或許無法詳盡描述，故本文件僅供參考，
+          本行無法針對本文件之即時性與正確性作任何擔保，如有疏漏，本行及相關人員皆不負任何法律責任，貴客戶應審慎評估風險承受能力並對其投保結果自行負責。
+        </div>
+      </div>
+    </section>
+
+    <!-- 注意事項 -->
+    <section>
+      <div print
+      print-top-margin="15">
+        <div class="title title-left main">
+          <span class="count"
+                ng-show="hisPlan != '退休規劃'">{{$index+5}}</span>
+          <span class="count"
+                ng-show="hisPlan == '退休規劃'">{{$index+7}}</span> 注意事項
+        </div>
+      </div>
+      <div print>
+        <div class="wrapper"
+             print-wrapper>
+          <div class="ps"
+               print-cell>1.本商品為不分紅保險單，不參加紅利分配，並無紅利給付項目。</div>
+          <div class="ps"
+               print-cell>2.人壽保險之死亡給付及年金保險之確定年金給付於被保險人死亡後給付於指定受益人者，依保險法第一百十二條規定不得作為被保險人之遺產，惟如涉有規避遺產稅等稅捐情事者，稽徵機關仍得依據有關稅法規定或稅捐稽徵法第十二條之一所定實質課稅原則辦理。相關實務案例請至富邦人壽官網詳閱。</div>
+          <div class="ps"
+               print-cell>3.富邦人壽資訊公開說明文件放置網址http://www.fubon.com，歡迎上網查詢。</div>
+          <div class="ps"
+               print-cell>4.本商品為利率變動型商品，宣告利率將隨經濟環境波動，除契約另有規定外，本公司不負最低宣告利率保證之責。</div>
+          <div class="ps"
+               print-cell>5.宣告利率非固定利率，會隨本公司定期宣告而改變，宣告利率之下限亦可能因市場利率偏低，而導致無最低保證。</div>
+          <div class="ps"
+               print-cell>6.本簡介僅供參考，詳細商品內容及變更，以投保當時保單條款內容及富邦人壽核保、保全作業等規定為準。</div>
+          <div class="ps"
+               print-cell>7.本商品經富邦人壽合格簽署人員檢視其內容業已符合一般精算原則及保險法令，惟為確保權益，基於保險公司與消費者衡平對等原則，消費者仍應詳加閱讀保險單條款與相關文件，審慎選擇保險商品。本商品如有虛偽不實或違法情事，應由富邦人壽及負責人依法負責。</div>
+          <div class="ps"
+               print-cell>8.稅法相關規定或解釋之改變可能會影響本險之稅賦優惠。</div>
+          <div class="ps"
+               print-cell>9.有關本險所繳保險費加計利息的退還之利息計算方式，可至富邦人壽網站參考本險商品內容說明。</div>
+          <div class="ps"
+               print-cell>10.保險契約各項權利義務皆詳列於保單條款，消費者務必詳加閱讀了解，並把握保險契約契約撤銷之時效(收到保單翌日起十日內)。</div>
+          <div class="ps"
+               print-cell>11.本商品保險保障部分受「財團法人保險安定基金」之「人身保險安定基金專戶」保障，並非存款項目，故不受存款保險之保障。</div>
+          <div class="ps"
+               print-cell>12.投保後解約或不繼續繳費可能不利消費者，請慎選符合需求之保險商品。</div>
+          <div class="ps"
+               print-cell>13.本商品由富邦人壽提供，透過台北富邦商業銀行股份有限公司為行銷通路招攬銷售，惟富邦人壽保留本專案商品核保及最後承保與否之一切權利。</div>
+          <div class="ps"
+               print-cell>14.消費者於購買前，應詳閱各種銷售文件內容。如要詳細了解其他相關資訊，請洽富邦人壽業務員、服務中心(免費服務及申訴電話：0809-000-880)或網站(www.fubon.com)，以保障您的權益。</div>
+          <div class="ps"
+               print-cell>15.富邦人壽保險股份有限公司/地址：台北市敦化南路一段108號14樓/電話：(02)8771-6699</div>
+        </div>
+      </div>
+    </section>
+    <div id="hiddendom"
+         style="position: relative;
+							 -left: 100vw;"></div>
+    <div>
+      <button type="button"
+              class="btn btn-default"
+              ng-click="downloadPDF()">下載</button>
+      <button type="button"
+              class="btn btn-default"
+              ng-click="insured()"
+              ng-disabled="!inputVO.downloadBtn">我要投保</button>
+    </div>
+  </div>
+</div>

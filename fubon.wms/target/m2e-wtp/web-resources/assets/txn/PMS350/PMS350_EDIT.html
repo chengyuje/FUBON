@@ -1,0 +1,247 @@
+<style>
+/* open dialog */
+.ngdialog.PMS350_EDIT {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS350_EDIT {
+ 	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* table size */
+.PMS350_EDIT table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS350_EDIT.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS350_EDIT_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+.mainTB th, td {		
+	border-collapse: collapse;
+	padding: 5px;
+	
+}
+.subTB td {
+	padding: 5px;
+	 
+}
+
+</style>
+<div ng-controller="PMS350_EDITController" ng-cloak>
+	<div class="modal-dialog PMS350_EDIT" resizable="true"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 ng-hide="wtfflag=='true' || wtfflag=='save'" id="myModalAlertLabel" class="modal-title" align="center">報表資料{{x == true ? '檢視' : '修改' }}</h4>
+				<h4 ng-show="wtfflag=='true'" id="myModalAlertLabel" class="modal-title" align="center">報表設定的報表資料{{x == true ? '檢視' : '修改' }}</h4>
+				<h4 ng-show="wtfflag=='save'" id="myModalAlertLabel" class="modal-title" align="center">報表資料新增</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table class="mainTB" border="1px" width="100%">
+						<tr ng-hide="onlyflag=='true' || wtfflag=='true'">
+							<th nowrap>公告期間</th>	     					
+		     				<td>
+		     					<div class="input-group datebox datewidth">
+									<input type="text" id="sCreDate" name="sCreDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.sCreDate"
+									is-open="model.a"
+									datepicker-options="bgn_sDateOptions"								
+									ng-readonly="true"								
+									ng-disabled="x==true"
+									ng-required="true"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')" ng-disabled="x==true">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>									
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="eCreDate" name="eCreDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.eCreDate"
+									is-open="model.b"
+									datepicker-options="bgn_eDateOptions"								
+									ng-readonly="true"								
+									ng-disabled="x==true"
+									ng-required="true"
+									ng-change="limitDate();"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')" ng-disabled="x==true">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+		     					<div style="float: left !important;padding-left: 20px;">
+		     						<label><input type="radio" ng-model="inputVO.valid" ng-disabled="x==true" value="Y"> 有效 </label>
+     								&nbsp;&nbsp;&nbsp;
+     								<label><input type="radio" ng-model="inputVO.valid" ng-disabled="x==true" value="N"> 無效 </label>
+		     					</div>
+							</td>	 							
+						</tr>
+						<!-- 
+						<tr>
+		     				<th>原公告期間</th>
+		     				<td>{{toJsDate(row.BEGIN_DATE) | date:'yyyy/MM/dd'}}~{{toJsDate(row.END_DATE) | date:'yyyy/MM/dd'}}</td>
+		     			</tr>
+		     			 -->
+						<tr ng-hide="wtfflag=='true'">
+							<th>報表名稱</th>
+							<td align="left">
+								<input type="text" id="rptName" name="rptName" class="form-control" ng-model="inputVO.rptName" e-length-limit="70" required disabled>
+							</td>
+						</tr>
+						<tr ng-show="wtfflag=='true'">
+							<th>報表名稱</th>
+							<td align="left">
+								<input type="text" id="rptName" name="rptName" class="form-control" ng-model="inputVO.rptName" e-length-limit="70" required>
+							</td>
+						</tr>
+						<tr ng-hide="onlyflag=='true' || wtfflag=='true'">						
+							<th>*報表說明</th>
+							<td align="left">
+								<textarea ng-disabled="x==true" id="rptExplain" name="rptExplain" class="form-control" ng-model="inputVO.rptExplain" style="width: 100%; height: 50px" e-length-limit="100"></textarea>
+							</td>
+						</tr>
+						<tr ng-hide="onlyflag=='true' || wtfflag=='true'">
+							<th>跑馬燈</th>
+							<td >
+								<label>
+									<input type="checkbox" ng-disabled="x==true" ng-model="inputVO.marqueeFlag" ng-true-value="'Y'" ng-false-value="'N'">使用跑馬燈
+								</label>
+								&nbsp;&nbsp;
+								<input ng-disabled="x==true" type="text" id="marqueeTxt" name="marqueeTxt" class="form-control" style="width:60%;display:inline;" ng-model="inputVO.marqueeTxt" e-length-limit="55" ng-required="inputVO.marqueeFlag == 'Y'">
+							</td>
+						</tr>
+						<tr>
+							<th>報表提供單位 </th>
+							<td align="left">
+									{{row.RPT_DEPT_1_NAME}}&nbsp;&nbsp;&nbsp;
+									{{row.RPT_DEPT_2_NAME}}&nbsp;&nbsp;&nbsp;
+									{{row.RPT_DEPT_NAME}}&nbsp;&nbsp;&nbsp;
+								</td>
+						</tr>
+						<tr ng-hide="wtfflag=='true'">
+							<th>報表類型</th>
+							 <td align="left">
+							 	<input type="text" id="RPT_TYPE" name="RPT_TYPE" class="form-control" ng-model="inputVO.RPT_TYPE" e-length-limit="40" required disabled>
+							 </td>
+						</tr>
+						<tr ng-show="wtfflag=='true'">
+							<th>報表類型</th>
+							 <td align="left">
+							 	<input type="text" id="RPT_TYPE" name="RPT_TYPE" class="form-control" ng-model="inputVO.RPT_TYPE" e-length-limit="40" required>
+							 </td>
+						</tr>
+						<tr ng-hide="wtfflag=='true'">
+							<th>可上傳角色資料</th>
+							<td ng-bind-html="row.UPLOAD_ROLES">{{row.UPLOAD_ROLES}}</td>
+						</tr>
+						<tr ng-show="wtfflag=='true'">
+							<th>修改前可上傳角色資料</th>
+							<td ng-bind-html="row.UPLOAD_ROLES">{{row.UPLOAD_ROLES}}</td>
+						</tr>
+						<tr ng-show="wtfflag=='true'">
+							<th>可上傳角色資料</th>
+							<td>
+								<input type="image" src="assets/images/magnifier.jpg" ng-click="qu('uploader', inputVO.roleName_1)">
+								<br>
+								<span class="repeat-row" ng-repeat="row in wtfupload track by $index">
+									{{row.NAME}}<br>
+								</span>
+							</td>
+						</tr>
+						<tr ng-hide="onlyflag=='true' || wtfflag=='true'">
+							<th>*資料檔案</th>
+							<td >
+								<table class="subTB">
+									<tr>
+										<td ng-hide="x==true">	
+											<div style="float:left">
+												<e-upload success="uploadFinshed(name,rname)" accept=".csv" ng-disabled="x==true"></e-upload>	
+											</div>
+											<div style="float:left">&nbsp;&nbsp;&nbsp;</div>
+											<div style="float:left">																	 
+												<button type="button" class="btn btn-info" ng-disabled="x==true" ng-click="downloadSample()" >下載範例檔</button>
+											</div>										
+										</td>
+										<td ng-hide="isUpdate==false">{{row.FILENAME}}</td>
+									</tr>
+								</table>						 
+							</td>							
+						</tr>
+						<tr ng-hide="wtfflag=='true'">
+							<th>使用角色</th>
+							<td><span ng-bind-html="row.NEW_USER_ROLES">{{row.NEW_USER_ROLES}}</span>
+								<!-- <span ng-bind-html="row.ROLES">{{row.ROLES}}</span></td> -->
+						</tr>
+						<tr ng-show="wtfflag=='true'">
+							<th>修改前使用角色</th>
+							<td><span ng-bind-html="row.NEW_USER_ROLES">{{row.NEW_USER_ROLES}}</span>
+								<!-- <span ng-bind-html="row.ROLES">{{row.ROLES}}</span></td> -->
+						</tr>
+						<tr ng-show="wtfflag=='true'">
+							<th>使用角色</th>
+							<td>
+								<input type="image" src="assets/images/magnifier.jpg" ng-click="qu('user', inputVO.roleName_2)">
+								<br>
+								<span class="repeat-row" ng-repeat="row2 in wtfuser2 track by $index">
+									{{row2.NAME}}<br>
+								</span>
+								<span class="repeat-row" ng-repeat="row3 in roles track by $index">
+									{{row3.NAME}}(檢視所屬資料)<br>
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<th>無個資可提供匯出功能</th>
+							<td>
+								<input type="checkbox" ng-model="inputVO.EXPORT_YN" ng-disabled="wtfflag == undefined || wtfflag == 'save'"/>(勾選)
+							</td>
+						</tr>
+					</table>
+				</form>
+				<div class="text-right" style="padding:0 15px 5px 0;" ng-hide="onlyflag=='true' || wtfflag=='true'">
+					最後修改：{{row.UPDATER_NAME}}&nbsp;&nbsp;日期：{{row.RPT_LASTUPDATE}}
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" ng-disabled="x==true || successfullySave == true">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div> 
+</div>

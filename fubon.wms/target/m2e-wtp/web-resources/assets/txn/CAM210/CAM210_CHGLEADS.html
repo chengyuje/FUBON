@@ -1,0 +1,99 @@
+<style>
+/* dialog panl */
+.modal-dialog.CAM210_CHGLEADS_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 720px;
+	height: auto;
+}
+/* table size */
+.CAM210_CHGLEADS_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CAM210_CHGLEADS_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<div ng-controller="CAM210_CHGLEADS_Controller" ng-cloak>
+	<div class="modal-dialog CAM210_CHGLEADS_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<div class="tfb_content_icon"></div>
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 class="modal-title" align="center">名單一次性改派</h4>
+			</div>
+			<div class="modal-body">
+				<div id='reassign_1'>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">改派分行：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="channel" 
+											ng-datasource="mappingSet['branchList']" 
+											ng-model="inputVO.branch_Name"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-change="reSetDefault()"
+											ng-format="F3"/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">改派人員類別：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="channel" 
+											ng-datasource="mappingSet['CAM.DISPATCH_CHANNEL']" 
+											ng-model="inputVO.channel"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-change="queryAoData(row)"
+											ng-format="F3"/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">改派人員：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="aoList" 
+									        name="aoList"
+									        ng-datasource="mappingSet['aoList']"
+											ng-model="inputVO.aoList"
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3" /> 
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors" colspan="3">AO CODE + 姓名 + 得處理名單數</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center" id='reassign_2'>
+					<button type="button" class="btn btn-info" ng-click="reSetLeads()"><span class="glyphicon glyphicon-refresh"></span>改派 </button>
+					<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

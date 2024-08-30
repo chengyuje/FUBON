@@ -1,0 +1,169 @@
+<script type="text/javascript"
+        src="assets/txn/INS300/INS300.js"></script>
+<div class="INS300"
+     ng-controller="INS300Controller"
+     ng-cloak>
+  <div>
+    <div class="tfb_content">
+      <div class="tfb_content_icon"></div>
+      <div class="tfb_content_tit">
+        <span style="vertical-align: middle;padding-left:20px;">
+          <span class="glyphicon glyphicon-th-large"></span>請輸入查詢條件</span>
+      </div>
+    </div>
+    <!--Content of the panel-->
+    <div class="panel_content">
+      <div class="search_table">
+        <form name="INS300QueryForm"
+              class="form-horizontal"
+              data-toggle="validator"
+              role="form"
+              autocomplete="off"
+              enter-as-tab
+              style="width: 100%;">
+          <table>
+            <tr>
+              <td>保險公司</td>
+              <td>
+                <e-combobox ng-datasource="mapping.COM_NAME"
+                            ng-model="query.COM_NAME"
+                            ng-validate="false"
+                            ng-readonly="false"
+                            ng-editable="false"
+                            ng-format="F3"
+                            ng-required="false"
+                            width="200px"
+                            height="30px"
+                            ng-change="" />
+              </td>
+              <td>險種類別</td>
+              <td>
+                <e-combobox ng-datasource="mapping.TYPE_CLASS"
+                            ng-model="query.QID"
+                            ng-validate="false"
+                            ng-readonly="false"
+                            ng-editable="false"
+                            ng-format="F3"
+                            ng-required="true"
+                            width="200px"
+                            height="30px"
+                            ng-change="" />
+              </td>
+              <td>主/附約</td>
+              <td style="width: 15%;">
+                <label ng-repeat="item in mapping.IS_MAIN">
+                  <input type="radio"
+                         name="is_main"
+                         ng-model="query.IS_MAIN"
+                         value="{{item.DATA}}">{{item.LABEL}}</label>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>險種名稱</td>
+              <td>
+                <input type="text"
+                       class="form-control"
+                       ng-model="query.PRD_NAME">
+              </td>
+              <td>*是否停售</td>
+              <td style="width: 15%;">
+              	<label ng-repeat="item in mapping.IS_SALE">
+					<input type="checkbox" name="selectedCodes[]" value="{{item.DATA}}" 
+						ng-checked="query.req_certificate.indexOf(item.DATA) > -1" 
+						ng-click= "toggleSelection(item.DATA)"
+						ng-required="true"> {{item.LABEL}}
+				</label>
+<!--                 <label ng-repeat="item in mapping.IS_SALE"> -->
+<!--                   <input type="checkbox" -->
+<!--                          name="is_sale" -->
+<!--                          ng-model="query.IS_SALE+item.DATA" -->
+<!--                          value="{{item.DATA}}">{{item.LABEL}}</label> -->
+              </td>
+            </tr>
+          </table>
+          <div class="text-center">
+            <button type="button"
+                    class="btn btn-info"
+                    ng-click="queryData()">查詢</button>
+            <button type="button"
+                    class="btn btn-info"
+                    ng-click="btnClear()">清除</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- 結果區 -->
+  <div>
+    <div class="tfb_content">
+      <div class="tfb_content_icon"></div>
+      <div class="tfb_content_tit">
+        <span style="vertical-align: middle;padding-left:20px;">
+          <span class="glyphicon glyphicon-th-large"></span>查詢結果</span>
+      </div>
+    </div>
+    <!--Content of the panel-->
+    <div class="panel_content">
+      <e-jumping-once output="outputVO"
+                      list="paramList"
+                      totallist="totalParamList"></e-jumping-once>
+      <!-- <e-jumping output="outputVO"
+                 input="inputVO"
+                 query="queryData()"
+                 list="paramList"></e-jumping> -->
+      <div>
+        <button class="btn btn-danger"
+                ng-click="initCheckedList()">清除
+        </button>
+        <button class="btn btn-info"
+                ng-click="btnDescription()">檢視說明</button>
+        <button class="btn btn-info"
+                ng-click="btnTerms()">檢視條款</button>
+        <button class="btn btn-info"
+                ng-click="btnContent()">檢視完整內容</button>
+        <button class="btn btn-info"
+                ng-click="btnPrint()">列印</button>
+        <button class="btn btn-info"
+                ng-click="btnComp()">比較</button>
+      </div>
+      <div class="gv_tab_sc"
+           style="margin-top:1em;">
+        <table>
+          <thead class="spec">
+            <tr>
+              <th>勾選</th>
+              <th>保險公司</th>
+              <th>險種類別</th>
+              <th>險種名稱</th>
+              <th>年期</th>
+              <th>主/附約</th>
+              <th>現售/停售</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="row in paramList | limitTo :displayLimit track by $index">
+              <td>
+                <input type="checkbox"
+                       class="form-control"
+                       ng-model="row.checked">
+              </td>
+              <td class="text-center"
+                  ng-bind="row.COM_NAME"></td>
+              <td class="text-center"
+                  ng-bind="row.QID | mapping: mapping.TYPE_CLASS"></td>
+              <td ng-bind="row.PRD_NAME"></td>
+              <td ng-bind="row.ITEM_Y"></td>
+              <td class="text-center"
+                  ng-bind="row.IS_MAIN | mapping: mapping.IS_MAIN"></td>
+              <td class="text-center"
+                  ng-bind="row.IS_SALE | mapping: mapping.IS_SALE"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- 結果區 -->
+</div>

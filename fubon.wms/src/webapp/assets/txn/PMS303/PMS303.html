@@ -1,0 +1,636 @@
+<style>
+/* open dialog */
+.ngdialog.PMS303 {
+	
+}
+.tfb_content_tit {
+	font-size: 50%;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+/* dialog panl */
+.modal-dialog.PMS303 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+/*
+.PMS303 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+*/
+.PMS303 table.little {
+	width: 89%;
+}
+/* change row */
+.PMS303.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+/* scroll && height */
+.scroll_PMS303_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS303/PMS303.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS303" ng-controller="PMS303Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box4" >
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab
+					style="width: 1024px;">
+					<table>
+						<tr>
+							<th  width="80px !important;">*戰報日：</th>
+							<td width="70px"><div class="input-group datebox datewidth">
+									<input type="text" id="sCreDate" name="sCreDate"
+										class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sCreDate" is-open="model.a"
+										ng-required="true"
+										style="width: 150px" datepicker-options="bgn_sDateOptions"
+										ng-readonly="true" ng-change="limitDate();dateChange()" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div></td>
+
+							<th  width="70px">營運區：</th>
+							<td width="140px"><e-combobox id="op_id" name="op_id"
+									ng-datasource="AREA_LIST" ng-model="inputVO.branch_area_id"
+									ng-validate="false" ng-disabled="disableAreaCombo"
+							       ng-readonly="disableAreaCombo" ng-change="ChangeArea();Area()"
+									ng-required="false"
+									ng-format="F3" width="140px" style="line-height:20px;" /></td>
+							
+							<th colspan="1" rowspan="2"><h4 ng-show="inputVO2.NOTE==''">
+									註1:送件日期系止送件給人壽的日期.<br />註2:已扣除契撤業績.<br />註3:外幣保單以前日日終匯率計價.
+								</h4>
+								<h4 ng-show="$scope.inputVO2.NOTE!=''">
+									註:{{inputVO2.NOTE}}.<br />
+								</h4>
+								</th>
+						</tr>
+						<tr>
+							<th  width="80px !important;">業務處：</th>
+							<td width="10px;"><e-combobox id="rc_id" name="rc_id"
+									ng-datasource="REGION_LIST" ng-model="inputVO.region_center_id"
+									ng-validate="false" ng-disabled="disableRegionCombo"
+							        ng-readonly="disableRegionCombo"  ng-editable="false"
+									ng-change="ChangeRegion();Region()" 
+									ng-format="F3" ng-required="false" width="150px"
+									style="line-height:20px;" /></td>
+
+							<th  width="70px">分行別：</th>
+							<td width="140px"><e-combobox id="br_id" name="br_id"
+									ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+                                    ng-disabled="disableBranchCombo"
+							        ng-readonly="disableBranchCombo"
+									ng-editable="false" ng-change="ChangeBranch();Branch()"
+									ng-required="false"
+									ng-format="F1" width="140px" style="line-height:20px;" /></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()"
+					ng-disabled="paramList2.length < 1">匯出</button>
+			    <button type="button" class="btn btn-info" ng-click="btnport()" ng-show="pri_type == 'show'">下載明細</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+ 			<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList2"></e-jumping> 
+<!-- 			<e-jumping-once output="outputVO" list="paramList" totallist="paramList2"></e-jumping-once> -->
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：</td>
+						<td>每日</td>
+					</tr>
+					<tr>
+						<td>產出日：</td>
+						<td>{{paramList2[0].DATA_DATE}}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="table-bordered rstable e-table-freeze" e-height="500px" e-mode="1" e-left="5" e-top="true" e-list="paramList2">
+						<thead>
+							<tr>
+								<th rowspan="3">業務處</th>
+								<th rowspan="3">營運區</th>
+								<th rowspan="3">分行<br>代號</th>
+								<th rowspan="3">營業單位</th>
+								<th rowspan="3">組別</th>
+								<th colspan="4">躉繳(當日)</th>
+								<th colspan="4">投資型(當日)</th>
+								<TH colspan="4">短年期繳(當日)</TH>
+								<TH colspan="4">長年期繳(當日)</TH>
+								<TH colspan="5">小計(當日)</TH>
+								<TH colspan="6">躉繳(當月)-應達成率{{0+rate*100}}%</TH>
+								<TH colspan="6">投資型(當月)-應達成率{{0+rate*100}}%</TH>
+								<TH colspan="6">短年期繳(當月)-應達成率{{0+rate*100}}%</TH>
+								<TH colspan="6">長年期繳(當月)-應達成率{{0+rate*100}}%</TH>
+								<TH colspan="6">分期繳(當月)-應達成率{{0+rate*100}}%</TH>
+								<TH colspan="12">小計(當月)-應達成率{{0+rate*100}}%</TH>
+							</tr>
+							<tr>
+								<TH rowspan="2">件數</TH>
+								<TH rowspan="2">保費</TH>
+								<TH colspan="2">手收</TH>
+								
+								<TH rowspan="2">件數</TH>
+								<TH rowspan="2">保費</TH>
+								<TH colspan="2">手收</TH>
+								
+								<TH rowspan="2">件數</TH>
+								<TH rowspan="2">保費</TH>
+								<TH colspan="2">手收</TH>
+								
+								<TH rowspan="2">件數</TH>
+								<TH rowspan="2">保費</TH>
+								<TH colspan="2">手收</TH>
+								
+								<TH rowspan="2">件數</TH>
+								<TH colspan="2">保費</TH>
+								<TH colspan="2">手收</TH>
+								
+								<TH rowspan="2">件數</TH>
+								<TH rowspan="2">保費</TH>
+								<TH colspan="2">手收</TH>
+								<TH rowspan="2">保費<br>已達成率</TH>
+								<TH rowspan="2">手收<br>已達成率</TH>
+								
+								<TH rowspan="2">件數</TH>
+								<TH rowspan="2">保費</TH>
+								<TH colspan="2">手收</TH>
+								<TH rowspan="2">保費<br>已達成率</TH>
+								<TH rowspan="2">手收<br>已達成率</TH>
+								
+								<TH rowspan="2">件數</TH>
+								<TH rowspan="2">保費</TH>
+								<TH colspan="2">手收</TH>
+								<TH rowspan="2">保費<br>已達成率</TH>
+								<TH rowspan="2">手收<br>已達成率</TH>
+								
+								<TH rowspan="2">件數</TH>
+								<TH rowspan="2">保費</TH>
+								<TH colspan="2">手收</TH>
+								<TH rowspan="2">保費<br>已達成率</TH>
+								<TH rowspan="2">手收<br>已達成率</TH>
+								
+								<TH rowspan="2">件數</TH>
+								<TH rowspan="2">保費</TH>
+								<TH colspan="2">手收</TH>
+								<TH rowspan="2">保費<br>已達成率</TH>
+								<TH rowspan="2">手收<br>已達成率</TH>
+								
+								<TH rowspan="2">件數</TH>
+								<TH colspan="2">保費</TH>
+								<TH rowspan="2">保費目標</TH>
+								<TH rowspan="2">保費<br>已達成率</TH>
+								<TH rowspan="2">保費<br>達成率</TH>
+								<TH colspan="2">實際手收</TH>
+								<TH rowspan="2">手收目標</TH>
+								<TH rowspan="2">手收<br>已達成率</TH>
+								<TH rowspan="2">手收<br>達成率</TH>
+							</tr>
+							<tr>
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+								
+								<TH>100%</TH>
+								<TH>{{inputVO2.PD_RATE*100}}%</TH>
+
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat-start=" (a,dataA) in paramList2 | groupBy: 'REGION_CENTER_NAME' as resultA">
+								<td rowspan="{{ dataA.length + numGroups(resultB)*2+1}}">{{a}}</td>
+							</tr>
+							<tr ng-repeat-start=" (b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+								<td rowspan="{{dataB.length+2}}">{{b}}</td>
+							</tr>
+							<tr ng-repeat=" row in dataB">
+								<td>{{row.BRANCH_NBR}}</td>
+								<td>{{row.BRANCH_NAME}}</td>
+								<td>{{row.GROUP_ID}}</td>
+								<td align="right">{{0+row.OT_DAY_CNT | number:0 }}</td>
+								<td align="right">{{0+row.OT_DAY_PREM_FULL | number:0  }}</td>
+								<td align="right">{{0+row.OT_DAY_FEE_FULL | number:0 }}</td>	
+								<td align="right">{{0+row.OT_DAY_FEE_DIS | number:0 }}</td>
+								
+								<td align="right">{{0+row.IV_DAY_CNT | number:0}}</td>
+								<td align="right">{{0+row.IV_DAY_PREM_FULL | number:0 }}</td>
+								<td align="right">{{0+row.IV_DAY_FEE_FULL | number:0 }}</td>	
+								<td align="right">{{0+row.IV_DAY_FEE_DIS | number:0 }}</td>		
+															
+								<td align="right">{{0+row.SY_DAY_CNT | number:0}}</td>
+								<td align="right">{{0+row.SY_DAY_PREM_FULL |currency:''}}</td>
+								<td align="right">{{0+row.SY_DAY_FEE_FULL | number:0 }}</td>
+								<td align="right">{{0+row.SY_DAY_FEE_DIS | number:0 }}</td>
+								
+								<td align="right">{{0+row.LY_DAY_CNT | number:0}}</td>
+								<td align="right">{{0+row.LY_DAY_PREM_FULL | number:0 }}</td>
+								<td align="right">{{0+row.LY_DAY_FEE_FULL | number:0 }}</td>
+								<td align="right">{{0+row.LY_DAY_FEE_DIS | number:0 }}</td>
+								
+								<td align="right">{{0+row.SUM_DAY_CNT| number:0}}</TD>
+								<td align="right">{{0+row.SUM_DAY_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_DAY_PREM_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_DAY_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_DAY_FEE_DIS | number:0 }}</TD>
+								
+								<td align="right">{{0+row.OT_MON_CNT | number:0}}</TD>
+								<td align="right">{{0+row.OT_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.OT_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.OT_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.OT_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.OT_MON_FEE_FULL_ARATE | number:2 }}%</TD>
+								
+								<td align="right">{{0+row.IV_MON_CNT | number:0}}</TD>
+								<td align="right">{{0+row.IV_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.IV_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.IV_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.IV_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.IV_MON_FEE_FULL_ARATE | number:2 }}%</TD>
+								
+								<td align="right">{{0+row.SY_MON_CNT | number:0}}</TD>
+								<td align="right">{{0+row.SY_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SY_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SY_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.SY_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.SY_MON_FEE_FULL_ARATE | number:2 }}%</TD>
+								
+								<td align="right">{{0+row.LY_MON_CNT | number:0}}</TD>
+								<td align="right">{{0+row.LY_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.LY_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.LY_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.LY_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.LY_MON_FEE_FULL_ARATE | number:2 }}%</TD>
+								
+								<td align="right">{{0+row.SYLY_MON_CNT | number:0}}</TD>
+								<td align="right">{{0+row.SYLY_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SYLY_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SYLY_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.SYLY_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.SYLY_MON_FEE_FULL_ARATE| number:2 }}%</TD>
+								
+								<td align="right">{{0+row.SUM_MON_CNT | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_PREM_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_PREM_TAR | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.SUM_MON_PREM_FULL_RRATE | number:2 }}%</TD> 
+								<td align="right">{{0+row.SUM_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_FEE_TAR | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_FEE_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.SUM_MON_FEE_FULL_RRATE | number:2 }}%</TD>
+							</tr>
+						  
+						    <tr ng-repeat-end="">
+								<td colspan="3" align="center">{{b}} 合計</td>
+								<td align="right">{{getBranchTotal(dataB, 'OT_DAY_CNT') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'OT_DAY_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'OT_DAY_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'OT_DAY_FEE_DIS') | number:0 }}</td>
+								
+								<td align="right">{{getBranchTotal(dataB, 'IV_DAY_CNT') | number:0}}</td>
+								<td align="right">{{getBranchTotal(dataB, 'IV_DAY_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'IV_DAY_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'IV_DAY_FEE_DIS') | number:0 }}</td>
+								
+								<td align="right">{{getBranchTotal(dataB, 'SY_DAY_CNT') | number:0}}</td> 
+								<td align="right">{{getBranchTotal(dataB, 'SY_DAY_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SY_DAY_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SY_DAY_FEE_DIS') | number:0 }}</td>
+								
+								<td align="right">{{getBranchTotal(dataB, 'LY_DAY_CNT') | number:0}}</td>
+								<td align="right">{{getBranchTotal(dataB, 'LY_DAY_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'LY_DAY_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'LY_DAY_FEE_DIS') | number:0 }}</td>
+							
+								<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_CNT') | number:0}}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_PREM_DIS') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_FEE_DIS') | number:0 }}</td>
+								
+								<td align="right">{{getBranchTotal(dataB, 'OT_MON_CNT') | number:0}}</td>
+								<td align="right">{{getBranchTotal(dataB, 'OT_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'OT_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'OT_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'OT_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getBranchTotal(dataB, 'OT_MON_FEE_FULL_ARATE')  | number:2 }}%</td>
+								
+								<td align="right">{{getBranchTotal(dataB, 'IV_MON_CNT') | number:0}}</td>
+								<td align="right">{{getBranchTotal(dataB, 'IV_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'IV_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'IV_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'IV_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getBranchTotal(dataB, 'IV_MON_FEE_FULL_ARATE')  | number:2 }}%</td>
+								
+								<td align="right">{{getBranchTotal(dataB, 'SY_MON_CNT') | number:0}}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SY_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SY_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SY_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SY_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getBranchTotal(dataB, 'SY_MON_FEE_FULL_ARATE')  | number:2 }}%</td>
+								
+								<td align="right">{{getBranchTotal(dataB, 'LY_MON_CNT') | number:0}}</td>
+								<td align="right">{{getBranchTotal(dataB, 'LY_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'LY_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'LY_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'LY_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getBranchTotal(dataB, 'LY_MON_FEE_FULL_ARATE')  | number:2 }}%</td>
+								
+								<td align="right">{{getBranchTotal(dataB, 'SYLY_MON_CNT') | number:0}}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SYLY_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SYLY_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SYLY_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SYLY_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getBranchTotal(dataB, 'SYLY_MON_FEE_FULL_ARATE')  | number:2 }}%</td>
+								
+								<td align="right">{{getBranchTotal(dataB, 'SUM_MON_CNT') | number:0}}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_MON_PREM_DIS') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_MON_PREM_TAR') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_MON_PREM_FULL_RRATE')  | number:2 }}%</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_MON_FEE_TAR') | number:0 }}</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_MON_FEE_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getBranchTotal(dataB, 'SUM_MON_FEE_FULL_RRATE')  | number:2 }}%</td>
+							</tr>
+						<tr ng-repeat-end="">
+						<td colspan="5" align="center">{{a}} 合計</td>
+								
+								<td align="right">{{getRegionTotal(a, 'OT_DAY_CNT') | number:0}}</td>
+								<td align="right">{{getRegionTotal(a, 'OT_DAY_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'OT_DAY_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'OT_DAY_FEE_DIS') | number:0 }}</td>
+									
+								<td align="right">{{getRegionTotal(a, 'IV_DAY_CNT') | number:0}}</td>
+								<td align="right">{{getRegionTotal(a, 'IV_DAY_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'IV_DAY_FEE_FULL') | number:0 }}</td>	
+								<td align="right">{{getRegionTotal(a, 'IV_DAY_FEE_DIS') | number:0 }}</td>
+									
+								<td align="right">{{getRegionTotal(a, 'SY_DAY_CNT') | number:0}}</td>
+								<td align="right">{{getRegionTotal(a, 'SY_DAY_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SY_DAY_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SY_DAY_FEE_DIS') | number:0 }}</td>
+									
+								<td align="right">{{getRegionTotal(a, 'LY_DAY_CNT') | number:0}}</td>
+								<td align="right">{{getRegionTotal(a, 'LY_DAY_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'LY_DAY_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'LY_DAY_FEE_DIS') | number:0 }}</td>
+							
+								<td align="right">{{getRegionTotal(a, 'SUM_DAY_CNT') | number:0}}</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_DAY_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_DAY_PREM_DIS') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_DAY_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_DAY_FEE_DIS') | number:0 }}</td>
+								
+								<td align="right">{{getRegionTotal(a, 'OT_MON_CNT') | number:0}}</td>
+								<td align="right">{{getRegionTotal(a, 'OT_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'OT_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'OT_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'OT_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getRegionTotal(a, 'OT_MON_FEE_FULL_ARATE') | number:2 }}%</td>
+									
+								<td align="right">{{getRegionTotal(a, 'IV_MON_CNT') | number:0}}</td>
+								<td align="right">{{getRegionTotal(a, 'IV_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'IV_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'IV_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'IV_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getRegionTotal(a, 'IV_MON_FEE_FULL_ARATE')  | number:2 }}%</td>
+								
+								<td align="right">{{getRegionTotal(a, 'SY_MON_CNT') | number:0}}</td>
+								<td align="right">{{getRegionTotal(a, 'SY_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SY_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SY_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SY_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getRegionTotal(a, 'SY_MON_FEE_FULL_ARATE')  | number:2 }}%</td>
+								
+								<td align="right">{{getRegionTotal(a, 'LY_MON_CNT') | number:0}}</td>
+								<td align="right">{{getRegionTotal(a, 'LY_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'LY_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'LY_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'LY_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getRegionTotal(a, 'LY_MON_FEE_FULL_ARATE')  | number:2 }}%</td>
+								
+								<td align="right">{{getRegionTotal(a, 'SYLY_MON_CNT') | number:0}}</td>
+								<td align="right">{{getRegionTotal(a, 'SYLY_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SYLY_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SYLY_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SYLY_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getRegionTotal(a, 'SYLY_MON_FEE_FULL_ARATE')  | number:2 }}%</td>
+								
+								<td align="right">{{getRegionTotal(a, 'SUM_MON_CNT') | number:0}}</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_MON_PREM_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_MON_PREM_DIS') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_MON_PREM_TAR') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_MON_PREM_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_MON_PREM_FULL_RRATE') | number:2 }}%</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_MON_FEE_FULL') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_MON_FEE_DIS') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_MON_FEE_TAR') | number:0 }}</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_MON_FEE_FULL_ARATE') | number:2 }}%</td>
+								<td align="right">{{getRegionTotal(a, 'SUM_MON_FEE_FULL_RRATE') | number:2 }}%</td>
+							</tr>
+						<tr ng-repeat="row in totalList">
+						<td colspan="5" align="center">全行合計</td>
+								
+								<td align="right">{{0+row.OT_DAY_CNT | number:0 }}</td>
+								<td align="right">{{0+row.OT_DAY_PREM_FULL | number:0  }}</td>
+								<td align="right">{{0+row.OT_DAY_FEE_FULL | number:0 }}</td>	
+								<td align="right">{{0+row.OT_DAY_FEE_DIS | number:0 }}</td>
+								
+								<td align="right">{{0+row.IV_DAY_CNT | number:0}}</td>
+								<td align="right">{{0+row.IV_DAY_PREM_FULL | number:0 }}</td>
+								<td align="right">{{0+row.IV_DAY_FEE_FULL | number:0 }}</td>	
+								<td align="right">{{0+row.IV_DAY_FEE_DIS | number:0 }}</td>		
+															
+								<td align="right">{{0+row.SY_DAY_CNT | number:0}}</td>
+								<td align="right">{{0+row.SY_DAY_PREM_FULL |currency:''}}</td>
+								<td align="right">{{0+row.SY_DAY_FEE_FULL | number:0 }}</td>
+								<td align="right">{{0+row.SY_DAY_FEE_DIS | number:0 }}</td>
+								
+								<td align="right">{{0+row.LY_DAY_CNT | number:0}}</td>
+								<td align="right">{{0+row.LY_DAY_PREM_FULL | number:0 }}</td>
+								<td align="right">{{0+row.LY_DAY_FEE_FULL | number:0 }}</td>
+								<td align="right">{{0+row.LY_DAY_FEE_DIS | number:0 }}</td>
+								
+								<td align="right">{{0+row.SUM_DAY_CNT| number:0}}</TD>
+								<td align="right">{{0+row.SUM_DAY_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_DAY_PREM_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_DAY_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_DAY_FEE_DIS | number:0 }}</TD>
+								
+								<td align="right">{{0+row.OT_MON_CNT | number:0}}</TD>
+								<td align="right">{{0+row.OT_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.OT_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.OT_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.OT_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.OT_MON_FEE_FULL_ARATE | number:2 }}%</TD>
+								
+								<td align="right">{{0+row.IV_MON_CNT | number:0}}</TD>
+								<td align="right">{{0+row.IV_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.IV_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.IV_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.IV_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.IV_MON_FEE_FULL_ARATE | number:2 }}%</TD>
+								
+								<td align="right">{{0+row.SY_MON_CNT | number:0}}</TD>
+								<td align="right">{{0+row.SY_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SY_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SY_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.SY_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.SY_MON_FEE_FULL_ARATE | number:2 }}%</TD>
+								
+								<td align="right">{{0+row.LY_MON_CNT | number:0}}</TD>
+								<td align="right">{{0+row.LY_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.LY_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.LY_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.LY_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.LY_MON_FEE_FULL_ARATE | number:2 }}%</TD>
+								
+								<td align="right">{{0+row.SYLY_MON_CNT | number:0}}</TD>
+								<td align="right">{{0+row.SYLY_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SYLY_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SYLY_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.SYLY_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.SYLY_MON_FEE_FULL_ARATE| number:2 }}%</TD>
+								
+								<td align="right">{{0+row.SUM_MON_CNT | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_PREM_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_PREM_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_PREM_TAR  | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_PREM_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.SUM_MON_PREM_FULL_RRATE | number:2 }}%</TD> 
+								<td align="right">{{0+row.SUM_MON_FEE_FULL | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_FEE_DIS | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_FEE_TAR | number:0 }}</TD>
+								<td align="right">{{0+row.SUM_MON_FEE_FULL_ARATE | number:2 }}%</TD>
+								<td align="right">{{0+row.SUM_MON_FEE_FULL_RRATE | number:2 }}%</TD>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div algin="left">
+				<table>
+					<tr>
+						<td align="right">說明：</td>
+						<td align="left"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

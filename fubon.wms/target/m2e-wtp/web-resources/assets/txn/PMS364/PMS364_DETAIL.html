@@ -1,0 +1,93 @@
+<style>
+.modal-dialog.PMS364_DETAIL{
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: auto;
+}
+.PMS364_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS364_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS364_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+
+</style>
+
+<div class="PMS364" ng-controller="PMS364_DETAILController" ng-cloak>
+	<div class="modal-dialog PMS364_DETAIL">  
+		<div class="modal-content">	
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">客戶明細資料</h4>
+			</div>
+			<div class="modal-body">
+				<button type="button" class="btn btn-info" ng-click="exportDtlRPT()" >匯出</button>
+				<br /><br />
+				<e-jumping-once output="outputVO" list="data" totallist="dtlList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="tablesaw table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th>分行別	</th>
+								<th>理專</th>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>專業投資人效期</th>
+								<th>信託同意</th>
+								<th>衍商同意</th>
+								<th>客訴戶</th>
+								<th>拒銷戶</th>
+								<th>禁銷戶</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td class='text-center'>{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+								<td class='text-center'>{{row.CUST_AO}}</td>
+								<td class='text-center'>{{row.CUST_ID}}</td>
+								<td class='text-center'>{{row.CUST_NAME}}</td>
+								<td class='text-center'>{{row.PROF_INVESTOR_DATE}}</td>
+								<td class='text-center'>{{row.TX_FLAG}}</td>
+								<td class='text-center'>{{row.IS_EFFETIVE}}</td>
+								<td class='text-center'>{{row.COMPLAIN_YN}}</td>
+								<td class='text-center'>{{row.COMM_RS_YN}}</td>
+								<td class='text-center'>{{row.COMM_NS_YN}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確認</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

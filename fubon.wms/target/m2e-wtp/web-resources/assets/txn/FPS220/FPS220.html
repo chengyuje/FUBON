@@ -1,0 +1,362 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .deletePic {
+    color: #2a8960;
+    font-size: 25px;
+  }
+
+  .chart-content.single {
+    width: 50%;
+    margin: 0 0 0 10%;
+    display: inline-block;
+  }
+
+  .recommendation {
+    font-size: .8em;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: 0.3px;
+    text-align: center;
+    color: #4a4a4a;
+  }
+
+  .input-wrapper,
+  .input-wrapper input {
+    text-align: right;
+    padding: 0em .5em;
+  }
+
+  .input-wrapper-title {
+    position: absolute;
+    top: 50%;
+    left: 1em;
+    transform: translateY(-50%);
+  }
+
+  .FPS .block.tri {
+    flex: 1;
+  }
+
+  .important.red {
+    color: #dc6b60;
+  }
+
+  .FPS .block:not(.no-area) .content-wrapper.last::after {
+    display: block;
+    height: 50px;
+  }
+
+  .FPS .chart-wrapper {
+    background-color: #fff;
+  }
+
+  .due-chart-wrapper {
+    width: 99.5%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+  }
+
+</style>
+
+<script type="text/javascript"
+        src="assets/txn/FPS220/FPS220.js"></script>
+
+<div ng-controller="FPS220Controller"
+     class="FPS"
+     ng-cloak>
+  <!-- tabs -->
+  <div ng-include="'assets/txn/FPS/FPS200_TAB.html'"></div>
+  <!-- Main -->
+  <!-- banner -->
+  <section class="block banner container no-area"
+           style="text-align: left;
+                  background-color: #bfe2f7;
+                  border-color: #bfe2f7;">
+    <div class="content-wrapper"
+         style="height:36px;
+                line-height:1em;">
+      <div class="content-title"
+           style="font-size:1.2em;
+                  font-weight: 600;">客戶可供理財規劃金額為
+        <span class="important blue"> NT $ </span>
+        <span class="important blue"
+              ng-bind="STEP1VO.PLAN_AMT|number"></span>
+      </div>
+      <div class="content-body">
+        <a class="toggle-wrapper btn-fps"
+           ng-click="arrowUp=!arrowUp"
+           style="right: 15px;
+                  position: absolute;
+                  top: 0;">
+          市場概況
+          <img ng-src="{{arrowPath[arrowUp?'down':'up']}}"
+               class="icon">
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block banner-content container"
+           ng-show="!arrowUp">
+    <div class="content-wrapper no-border">
+      <p ng-bind="marketOverview"></p>
+    </div>
+  </section>
+
+  <!-- chart -->
+  <!-- 無投保 -->
+  <section ng-show="!hasIns">
+    <div class="title title-left"
+         style="background-color: transparent;">
+      【 理財配置建議 】
+      <span class="subtitle"
+            style="color:#a5a5a5;">如要調整比例或金額請使用下方區塊</span>
+    </div>
+    <div class="content-wrapper no-border chart-wrapper">
+      <div class="chart-content single">
+        <div id="stockChart"
+             class="chart"></div>
+      </div>
+      <div class="block clear-space no-border"
+           style="position: absolute;
+                  transform: translateY(-50%);
+                  top: 50%;
+                  left: 50%;">
+        <div class="content-wrapper no-border"
+             style="background-color: #fafafa;
+                    display: inline-block;">
+          <table class="chart-table">
+            <tbody>
+              <tr ng-repeat="row in chartTables.stockChart"
+                  style="border-bottom: .5px solid #eee;">
+                <td>
+                  <div class="color-block"
+                       ng-style="{'background-color': row.color}"></div>
+                </td>
+                <td ng-bind="row.label"></td>
+                <td ng-bind="row.value+' %'"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 有投保 -->
+  <div class="due-chart-wrapper"
+       ng-show="hasIns">
+    <section class="block">
+      <div class="title title-left">【 調整前理財配置 】</div>
+      <div class="content-wrapper no-border chart-wrapper">
+        <div class="chart-content">
+          <div id="beforeChart"
+               class="chart"></div>
+        </div>
+      </div>
+      <div class="block clear-space container no-border">
+        <table class="table">
+          <thead style="background-color:#eee">
+            <tr>
+              <th></th>
+              <th>內容</th>
+              <th>目前比例</th>
+              <th>建議</th>
+            </tr>
+          </thead>
+          <tbody class="content-wrapper"
+                 style="text-align:center">
+            <tr ng-repeat="row in chartTables.beforeChart">
+              <td style="text-align:right;">
+                <div class="color-block"
+                     ng-style="{'background-color': row.color}"></div>
+              </td>
+              <td style="text-align:left;">
+                <div ng-bind="row.label"></div>
+                <div style="color:#a5a5a5;">(NT $
+                  <span ng-bind="row.amt|number"></span>)</div>
+              </td>
+              <td ng-bind="row.value+' %'"
+                  ng-style="{'color':row.down?'red':''}"></td>
+              <td ng-bind="row.advice"></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td style="text-align:left;">年化波動率</td>
+              <td ng-bind="stockVolatility||stockVolatility===0?stockVolatility+'%':'--'"></td>
+              <td ng-bind="(stockVolatility||0)>(recoVolatility||0)?'降低':'--'"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="title title-left">【 調整後理財配置 】
+        <span class="subtitle"
+              style="color:#a5a5a5;
+                     float:right;
+                     margin-right: .5em;">如要調整比例或金額請使用下方區塊</span>
+      </div>
+      <div class="content-wrapper no-border chart-wrapper">
+        <div class="chart-content">
+          <div id="afterChart"
+               class="chart"></div>
+        </div>
+      </div>
+      <div class="block clear-space container no-border">
+        <table class="table">
+          <thead style="background-color:#eee">
+            <tr>
+              <th colspan="2">內容</th>
+              <th>調整後比例</th>
+              <th>建議比例</th>
+            </tr>
+          </thead>
+          <tbody class="content-wrapper"
+                 style="text-align:center;">
+            <tr ng-repeat="row in chartTables.afterChart">
+              <td style="text-align:right;">
+                <div class="color-block"
+                     ng-style="{'background-color': row.color}"></div>
+              </td>
+              <td style="text-align:left;">
+                <div ng-bind="row.label"></div>
+                <div style="color:#a5a5a5;">(NT $
+                  <span ng-bind="row.amt|number"></span>)</div>
+              </td>
+              <td ng-bind="row.value+' %'"></td>
+              <td ng-bind="row.advice"></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td style="text-align:left;">年化波動率</td>
+              <td>--</td>
+              <td ng-bind="recoVolatility+'%'"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- input -->
+  <form style="text-align:center;
+               display:flex;
+               width: 98.5%;
+               margin: 0 auto;"
+        name="amtForm">
+    <section class="block tri">
+      <div class="title title-left">儲蓄型保險+存款</div>
+      <div class="content-wrapper">
+        <div style="text-align:right;margin-top:-.5em;">
+          <span class="recommendation"
+                ng-bind="'建議上限'+recommend.deposit+'%'"></span>
+        </div>
+        <drag-bar percent="{{inputVO.depositPct}}"
+                  options="dragOptions"
+                  draggable="true"
+                  btn-on-drag="dragBarOnDrag(newPct,'depositAmt')"></drag-bar>
+        <div style="text-align:right;">
+          <span class="recommendation important red">請調整拉霸或輸入數值</span>
+        </div>
+      </div>
+      <div class="content-wrapper no-border">
+        <div class="input-wrapper form-inline">
+          <span class="input-wrapper-title">NT$</span>
+          <input type="text"
+                 class="form-control inputStyle"
+                 e-input-limit="NC"
+                 ng-model="inputVO.depositAmt"
+                 ng-change="balancePercent('depositAmt');changePie();inputVO.depositAmt = inputVO.depositAmt.replace('-' , '');">
+        </div>
+      </div>
+    </section>
+
+    <section class="block tri">
+      <div class="title title-left">固定收益商品</div>
+      <div class="content-wrapper">
+        <div style="text-align:right;margin-top:-.5eum;">
+          <span class="recommendation"
+                ng-bind="'建議上限'+recommend.fixed+'%'"></span>
+        </div>
+        <drag-bar percent="{{inputVO.fixedPct}}"
+                  options="dragOptions"
+                  draggable="true"
+                  btn-on-drag="dragBarOnDrag(newPct,'fixedAmt')"></drag-bar>
+        <div style="text-align:right;">
+          <span class="recommendation important red">請調整拉霸或輸入數值</span>
+        </div>
+      </div>
+      <div class="content-wrapper no-border">
+        <div class="input-wrapper form-inline">
+          <span class="input-wrapper-title">NT$</span>
+          <input type="text"
+                 class="form-control inputStyle"
+                 e-input-limit="NC"
+                 ng-model="inputVO.fixedAmt"
+                 ng-change="balancePercent('fixedAmt');changePie();inputVO.fixedAmt = inputVO.fixedAmt.replace('-' , '');">
+        </div>
+      </div>
+    </section>
+
+    <section class="block tri">
+      <div class="title title-left">基金+ETF+投資型保險</div>
+      <div class="content-wrapper">
+        <div style="text-align:right;margin-top:-.5em;visibility:hidden;">
+          <span class="recommendation"
+                ng-bind="'建議上限'+recommend.stock+'%'"></span>
+        </div>
+        <drag-bar percent="{{inputVO.stockPct}}"
+                  options="dragOptions"
+                  draggable="false"></drag-bar>
+        <div style="text-align:right;visibility:hidden;">
+          <span class="recommendation important red">請調整拉霸或輸入數值</span>
+        </div>
+      </div>
+      <div class="content-wrapper no-border last"
+           style="height:50px;">
+        <div class="input-wrapper form-inline">
+          <span class="input-wrapper-title">NT$</span>
+          <span ng-bind="inputVO.stockAmt|number"></span>
+        </div>
+      </div>
+    </section>
+  </form>
+
+  <div style="padding-bottom:10px; text-align:left;"
+       class="clear">
+    <div class="ps-wrapper"
+         style="display:inline-block;">
+      <div ng-if="hasIns">
+        <div class="ps">＊存款 = 本行存款 + 行外可能匯入資金 – 未來一年所需現金部位- 未來一年保險投保費用</div>
+        <div class="ps">＊折算台幣匯率採用前一天營業日之匯率</div>
+        <div class="ps">＊固定收益商品包含海外債、SN及SI；投資型保險僅包含類全委投資型保險</div>
+      </div>
+      <div ng-if="!hasIns">
+        <div class="ps">＊固定收益商品包含海外債、SN及SI</div>
+        <div class="ps">＊投資型保險僅包含類全委投資型保險</div>
+      </div>
+    </div>
+    <div style="margin-right:10px;float:right;margin-top: 1em;">
+      <a type="button"
+         class="btn-fps"
+         ng-class="{'btn-fps-disabled':kycInvalid}"
+         ng-click="kycInvalid?'':go('prev')">上一步</a>
+      <a type="button"
+         class="btn-fps"
+         ng-class="{'btn-fps-disabled':kycInvalid}"
+         ng-click="kycInvalid?'':go('save')">儲存</a>
+      <a type="button"
+         class="btn-fps"
+         ng-class="{'btn-fps-disabled':kycInvalid}"
+         ng-click="kycInvalid?'':go('next')"
+         style="margin-right : 15px;">下一步</a>
+    </div>
+  </div>
+
+</div>

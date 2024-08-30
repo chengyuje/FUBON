@@ -1,0 +1,337 @@
+<style>
+/* open dialog */
+.ngdialog.PRD130 {
+
+}
+/* dialog panl */
+.modal-dialog.PRD130 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PRD130 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PRD130 table.little{
+	width: 60%;
+}
+/* change row */
+.PRD130.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PRD130_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+/* dialog panl */
+.modal-dialog.PRD110_MSG {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 320px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD130/PRD130.js"></script>
+<script type="text/javascript" src="assets/txn/PRD130/PRD130_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD120/PRDDocument.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100_BOSS.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512_DETAILS.js"></script>
+<script type="text/javascript" src="assets/txn/PRD110/PRD110_MSG.js"></script>
+<div class="PRD130" ng-controller="PRD130Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content" style="overflow: auto;">
+		<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table style="white-space: nowrap;">
+					<tr>
+						<td>
+							<label><input type="radio" ng-model="inputVO.type" ng-value="1" ng-change="inquireInit();init()" ng-disabled="isPop"> 依客戶可申購商品查詢</label>
+						</td>
+						<td ng-if="inputVO.type =='1'" class="form-inline">
+							*客戶ID：<input type="text" id="cust_id" name="cust_id" style="text-transform: uppercase;" class="form-control" ng-model="inputVO.cust_id" ng-blur="checkCustID()" ng-disabled="isPop" required>
+							&nbsp;<span class="with-errors" ng-show="inputVO.type =='1' && parameterTypeEditForm.cust_id.$error.required">請輸入客戶ID</span>
+						</td>
+						<td>
+							<label><input type="radio" ng-model="inputVO.type" ng-value="2" ng-change="inquireInit();init()" ng-disabled="isPop"> 可申購商品查詢</label>
+						</td>
+						<td>
+							<label><input type="radio" ng-model="inputVO.type" ng-value="3" ng-change="inquireInit();init()" ng-disabled="isPop"> 不可申購商品查詢</label>
+						</td>
+					</tr>
+				</table>
+				<table>
+					<tr>
+						<th>海外債代號：</th>
+						<td><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="prd_id" name="prd_id" ng-model="inputVO.prd_id" ng-blur="getName()" e-length-limit="16"></td>
+						<th>海外債名稱：</th>
+						<td colspan="5"><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="bond_name" name="bond_name" ng-model="inputVO.bond_name" e-length-limit="255"></td>
+					</tr>
+					<tr>
+						<th>債券類型：</th>
+						<td>
+							<e-combobox id="bond_cate"
+								ng-paramtype="PRD.BOND_TYPE"
+								ng-model="inputVO.bond_cate"
+		    					ng-validate="false"
+		    					ng-readonly="false"
+		    					ng-editable="false"
+		    					ng-format="F3"
+		    					ng-required="false"
+		    					width="150px"
+		    					style="line-height:20px;" />
+						</td>
+						<th>計價幣別：</th>
+						<td>
+							<e-combobox id="currency"
+								ng-paramtype="PRD.BOND_CURRENCY"
+								ng-model="inputVO.currency"
+		    					ng-validate="false"
+		    					ng-readonly="false"
+		    					ng-editable="false"
+		    					ng-format="F3"
+		    					ng-required="false"
+		    					width="150px"
+		    					style="line-height:20px;" />
+						</td>
+						<th>票面利率：</th>
+						<td>
+							<e-combobox id="face_value"
+								ng-paramtype="PRD.FACE_VALUE"
+								ng-model="inputVO.face_value"
+		    					ng-validate="false"
+		    					ng-readonly="false"
+		    					ng-editable="false"
+		    					ng-format="F3"
+		    					ng-required="false"
+		    					width="150px"
+		    					style="line-height:20px;" />
+						</td>
+						<th>剩餘年期：</th>
+						<td>
+							<e-combobox id="maturity"
+								ng-paramtype="PRD.DATE_OF_MATURITY"
+								ng-model="inputVO.maturity"
+		    					ng-validate="false"
+		    					ng-readonly="false"
+		    					ng-editable="false"
+		    					ng-format="F3"
+		    					ng-required="false"
+		    					width="150px"
+		    					style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+<!-- 						<th>YTM：</th> -->
+<!-- 						<td> -->
+<!-- 							<e-combobox id="ytm"  -->
+<!-- 								ng-paramtype="PRD.BOND_YTM" -->
+<!-- 								ng-model="inputVO.ytm" -->
+<!-- 		    					ng-validate="false" -->
+<!-- 		    					ng-readonly="false"  -->
+<!-- 		    					ng-editable="false" -->
+<!-- 		    					ng-format="F3" -->
+<!-- 		    					ng-required="false" -->
+<!-- 		    					width="150px" -->
+<!-- 		    					style="line-height:20px;" /> -->
+<!-- 						</td> -->
+						<th>限OBU申購：</th>
+						<td>
+							<e-combobox id="obu_YN"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.obu_YN"
+		    					ng-validate="false"
+		    					ng-readonly="false"
+		    					ng-editable="false"
+		    					ng-format="F3"
+		    					ng-required="false"
+		    					width="150px"
+		    					style="line-height:20px;" />
+						</td>
+						<th>標普信評：</th>
+						<td>
+							<e-combobox id="rating_sp"
+								ng-paramtype="PRD.CREDIT_RATING_SP"
+								ng-model="inputVO.rating_sp"
+		    					ng-validate="false"
+		    					ng-readonly="false"
+		    					ng-editable="false"
+		    					ng-format="F3"
+		    					ng-required="false"
+		    					width="150px"
+		    					style="line-height:20px;" />
+						</td>
+						<th>商品風險等級：</th>
+						<td>
+							<e-combobox id="risk_level"
+								ng-paramtype="FPS.PROD_RISK_LEVEL"
+								ng-model="inputVO.risk_level"
+		    					ng-validate="false"
+		    					ng-readonly="false"
+		    					ng-editable="false"
+		    					ng-format="F3"
+		    					ng-required="false"
+		    					width="150px"
+								multiple="true"
+								separator=";"
+								label-separator="；"
+		    					style="line-height:20px;" />
+						</td>
+						<th>限專投申購：</th>
+						<td>
+							<e-combobox id="pi_YN"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.pi_YN"
+		    					ng-validate="false"
+		    					ng-readonly="false"
+		    					ng-editable="false"
+		    					ng-format="F3"
+		    					ng-required="false"
+		    					width="150px"
+		    					style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th>專案名稱：</th>
+						<td>
+							<e-combobox id="bondProject"
+										ng-datasource="mappingSet['PRD.BOND_PROJECT']"
+										ng-model="inputVO.bondProject"
+										ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										width="150px"
+										multiple="true"
+										separator=";"
+										label-separator="；"
+										style="line-height:20px;" />
+						</td>
+						<th>客群名稱：</th>
+						<td><e-combobox id="bondCustLevel"
+										ng-datasource="mappingSet['PRD.BOND_CUSTOMER_LEVEL']"
+										ng-model="inputVO.bondCustLevel"
+										ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										width="150px"
+										multiple="true"
+										separator=";"
+										label-separator="；"
+										style="line-height:20px;" />
+						</td>
+						<th>限高資產客戶申購</th>
+						<td>
+							<e-combobox id="hnwc_YN"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.hnwc_YN"
+		    					ng-validate="false"
+		    					ng-readonly="false"
+		    					ng-editable="false"
+		    					ng-format="F3"
+		    					ng-required="false"
+		    					width="150px"
+		    					style="line-height:20px;" />
+		    			</td>
+						<th></th>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<th></th>
+						<td></td>
+						<th></th>
+						<td></td>
+						<th></th>
+						<td></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-mousedown="inquireInit();inquire()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-mousedown="init();inquireInit();">清除</button>
+		</div>
+		<!-- 結果區 -->
+		<e-jumping-once ng-show="inputVO.type" output="outputVO" input="inputVO" list="paramList" totallist="totalList" e-connect="GridTabBond"></e-jumping-once>
+		<div class="gv_tab_sc" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered td_center e-table-freeze" e-height="510px" e-mode="1" e-top="true" e-list="paramList">
+				<thead>
+					<tr>
+						<th width="5%" ng-if="!IsMobile && inputVO.type != '3'">功能</th>
+						<th width="10%"><e-sorter e-connect="GridTabBond" e-input="inputVO" e-col="PRD_ID" e-query="inquire()">海外債代號</e-sorter></th>
+						<th>海外債名稱</th>
+						<th width="5%">是否可銷售</th>
+						<th width="5%">計價幣別</th>
+						<th width="5%">商品風險等級</th>
+						<th width="5%">限OBU申購</th>
+						<th>剩餘年期</th>
+						<th>標普信評</th>
+						<th>YTM</th>
+						<th width="5%">限專投申購</th>
+						<th width="5%">限高資產申購</th>
+						<th>類型</th>
+						<th>專案名稱</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td ng-if="!IsMobile && inputVO.type != '3'">
+							<button type="button" class="btn btn-primary" ng-click="jump(row)">下單</button>
+							<button ng-if="inputVO.type =='1'" type="button" class="btn btn-primary" ng-click="save(row)">適配</button>
+						</td>
+						<td>{{row.PRD_ID}}</td>
+						<td><a onclick="return false" ng-click="detail(row)">{{row.BOND_CNAME}}</a></td>
+						<td>{{row.IS_SALE == 'Y' && nowDate <= toJsDate(row.MATURITY_DATE) ? '是' : '否'}}</td>
+						<td>{{row.CURRENCY_STD_ID | mapping:mappingSet['PRD.BOND_CURRENCY']:'F3'}}</td>
+						<td>{{row.RISKCATE_ID | mapping:mappingSet['FPS.PROD_RISK_LEVEL']:'F3'}}</td>
+						<td>{{row.OBU_BUY | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+						<td>{{row.DATE_OF_MATURITY}}</td>
+						<td>{{row.BOND_CREDIT_RATING_SP}}</td>
+						<td>{{row.YTM | mapping:mappingSet['PRD.BOND_YTM']:'F3'}}</td>
+						<td>{{row.PI_BUY | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+						<td>{{row.HNWC_BUY | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+						<td>{{row.BOND_CATE_ID | mapping:mappingSet['PRD.BOND_TYPE']:'F3'}}</td>
+						<td>{{row.PROJECT | mapping:mappingSet['PRD.BOND_PROJECT']:'F3':'true'}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

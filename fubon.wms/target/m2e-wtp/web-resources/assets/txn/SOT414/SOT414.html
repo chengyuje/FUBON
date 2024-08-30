@@ -1,0 +1,248 @@
+<style>
+/* open dialog */
+.ngdialog.SOT414 {
+	
+}
+/* dialog panl */
+.modal-dialog.SOT414 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.SOT414 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.SOT414 table.little{
+	width: 60%;
+}
+/* change row */
+.SOT414.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SOT414_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT414/SOT414.js"></script>
+<div class="SOT414" ng-controller="SOT414Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >風險檢核控管</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content" width="100%">
+		<div class="search_table" width="100%">
+			<h4 class="h4-title">交易資料</h4>
+			<table width="100%">
+				<tr width="100%">
+					<!-- 交易資料 -->
+					<td width="80%">
+						<table>
+<!-- 							<tr ng-hide='true'> -->
+<!-- 								<th>來行人員：</th> -->
+<!-- 								<th> -->
+<!-- 									<label ng-repeat="row in mappingSet['SOT.CUST_TYPE'] | limitTo:displayLimit track by $index"> -->
+<!-- 										代理人先disable -->
+<!-- 										<input type="radio" name="custType" ng-model="inputVO.custType" ng-value="row.DATA" disabled> {{row.LABEL}} -->
+<!-- 										<span class="bigspace"></span> -->
+<!-- 									</label> -->
+<!-- 								</th> -->
+<!-- 							</tr> -->
+							<tr>
+								<td colspan="3">
+									<table class="alignleft">
+									<tr>
+									<th>客戶ID：
+										<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" e-length-limit="200" disabled>
+										{{inputVO.custName}}
+									</th>
+									<th>KYC等級/效期：{{inputVO.kycLv}}/{{inputVO.kycDueDate | date:"yyyy-MM-dd"}}</th>
+									</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="3">
+									<table class="alignleft">
+									<tr>
+									<th>客戶註記：{{inputVO.custRemarks | mapping:mappingSet['SOT.SPEC_CUSTOMER']:'F3'}}</th>
+									<th>OBU註記：{{inputVO.isOBU}}</th>
+									<th>專業投資人/效期：{{inputVO.profInvestorYN}}/{{inputVO.piDueDate | date:"yyyy-MM-dd"}}</th> 
+									</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="3">
+									<table style="background-color:#eeeeee;" class="alignleft">
+										<tr>
+											<th><b>商品名稱：</b></th>
+											<td>{{inputVO.prodName}}</td>
+											<th><b>商品幣別：</b></th>
+											<td>{{inputVO.prodCurr | mapping:mappingSet['PRD.FCI_CURRENCY']:'F1'}}</td>
+											<th><b>連結標的：</b></th>
+											<td>{{inputVO.targetName}}</td>
+											<th><b>風險等級：</b></th>
+											<td>{{inputVO.prodRiskLv}}</td>
+										</tr>
+										<tr>
+											<th><b>申購日：</b></th>
+											<td>{{inputVO.tradeDate | date:"yyyy-MM-dd"}}</td>
+											<th><b>扣款(起息)日：</b></th>
+											<td style="white-space: nowrap;">{{inputVO.valueDate | date:"yyyy-MM-dd"}}</td>
+											<th><b>比價日：</b></th>
+											<td style="white-space: nowrap;">{{inputVO.spotDate | date:"yyyy-MM-dd"}}</td>
+											<th><b>到期(入帳)日：</b></th>
+											<td style="white-space: nowrap;">{{inputVO.expireDate | date:"yyyy-MM-dd"}}</td>
+										</tr>
+										<tr>
+											<th><b>天期：</b></th>
+											<td>{{inputVO.monPeriod}}個月</td>
+											<th><b>計息天數：</b></th>
+											<td>{{inputVO.intDates}}</td>
+											<th><b>履約價：</b></th>
+											<td>{{inputVO.strikePrice | number:4}}</td>
+											<th><b></b></th>
+											<td></td>
+										</tr>
+										<tr>
+											<th><b>預估年化收益率：</b></th>
+											<td>{{inputVO.prdProfeeRate | number:2}}%</td>
+											<th colspan="4"><b>到期若比價匯率大於等於履約價</b></th>
+										</tr>
+											<th></th>
+											<td>{{inputVO.lessProfeeRate | number:2}}%</td>
+											<th colspan="4"><b>到期比價匯率小於履約價</b></th>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<th>申購金額：</th>
+								<td colspan="2">{{inputVO.purchaseAmt | currency:''}}</td>
+							</tr>
+							<tr>
+								<th style="white-space: nowrap; width: 20%;">到期若比價匯率大於等於履約價：</th>
+								<td colspan="2">{{inputVO.prodCurr}} {{inputVO.prdProfeeAmt | number:2}} (預估收益金額)</td>
+							</tr>
+							<tr>
+								<th>到期比價匯率小於履約價：</th>
+								<td colspan="2">{{inputVO.prodCurr}} {{inputVO.lessProfeeAmt | number:2}} (預估收益金額)</td>
+							</tr>
+							<tr>
+								<th>組合式商品帳號：</th>
+								<td colspan="2">{{inputVO.prodAcct}}</td>
+							</tr>
+							<tr>
+								<th>扣款帳號：</th>
+								<td colspan="2">{{inputVO.debitAcct}}</td>
+							</tr>
+							<tr>
+								<th>授權交易人員：</th>
+								<td colspan="2">{{inputVO.authID}} </td>
+							</tr>
+							<tr>
+								<th>解說專員：</th>
+								<td colspan="2">{{inputVO.narratorID}}<span class="bigspace"></span> {{inputVO.narratorName}}</td>
+							</tr>
+							<tr>
+								<th>主管：</th>
+								<td colspan="2">{{inputVO.bossID}}<span class="bigspace"></span> {{inputVO.bossName}}</td>
+							</tr>
+							<tr>
+								<th>錄音代碼：</th>
+								<td colspan="2">{{inputVO.recCode}}</td>
+							</tr>
+						</table>
+						<p style="color:red;">批號：{{inputVO.batchSeq}}</p>
+					</td>
+					<!-- 交易控管 -->
+					<td width="20%">
+						<h4 class="h4-title" width="100%">交易控管</h4>
+						<div class="gv_tab_sc scroll_y" style="min-height:235px;" width="100%">
+							<table class="table-bordered" width="100%">
+								<tr width="100%">
+									<th>非常規交易</th>
+								</tr>
+								<tr width="100%">
+									<td>
+										<div ng-hide="isFirstTrade == ''">{{isFirstTrade}}</div>
+										<div ng-hide="ageUnder70Flag == ''">{{ageUnder70Flag}}</div><!-- //特定客戶已改為65歲 -->
+										<div ng-hide="eduJrFlag == ''">{{eduJrFlag}}</div>
+										<div ng-hide="healthFlag == ''">{{healthFlag}}</div>
+										<div ng-hide="custAge == ''">{{custAge}}</div> 
+										<div ng-hide="inputVO.signAgmMsg1 == ''">{{inputVO.signAgmMsg1}}</div>
+										<div ng-hide="inputVO.signAgmMsg2 == ''">{{inputVO.signAgmMsg2}}</div>
+										<div ng-hide="inputVO.signAgmMsg3 == ''">{{inputVO.signAgmMsg3}}</div>
+										<div ng-hide="inputVO.signAgmMsg4 == ''">{{inputVO.signAgmMsg4}}</div>
+									</td>
+								</tr>
+								<tr>
+									<th>錄音序號</th>
+								</tr>
+								<tr>
+									<td>
+										<input type="text" class="form-control" style="width:auto;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="recSEQ" name="recSEQ" ng-model="inputVO.recSEQ" ng-hide="mainList[0].IS_REC_NEEDED == 'N'" ng-blur="validateRecSeq()" e-length-limit="12" ng-required="mainList[0].IS_REC_NEEDED == 'Y'">
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<button type="button" class="btn btn-info" ng-click="printRecCaseSHR()">SI錄音案例分享</button>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<h4 class="h4-title" width="100%" >系統訊息</h4>
+						<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;" width="100%">
+							<table class="table-bordered">
+								<tr>
+									<th>提示訊息</th>
+								</tr>
+								<tr>
+<!-- 									<td><div ng-repeat="str in inputVO.warningMsg.split('\n') track by $index" ng-bind="str"></div></td> -->
+									<td><span style="font-size:14px">※風險宣告錄音專線：02-8751-6665按168-2-1-4-1<br>或分行速撥*3888按4-1-4-1錄音</span></td>
+								</tr>
+								<tr>
+									<th>傳送狀態</th>
+								</tr>
+								<tr>
+									<td><span ng-show="inputVO.tradeStatus == '3'">傳送OP成功</span></td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="delTrade()"  ng-disabled="inputVO.tradeStatus == '3'">取消</button>
+<!-- 			<button type="button" class="btn btn-info" ng-click="goPage()"  ng-disabled="inputVO.tradeStatus == '3'">修改</button> -->
+			<button type="button" class="btn btn-info" ng-click="goOP()"  ng-disabled="inputVO.goOPDisabled || inputVO.tradeStatus == '3'">送出</button>
+		</div>
+	</div>
+</div>

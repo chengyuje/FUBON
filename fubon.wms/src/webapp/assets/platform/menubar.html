@@ -1,0 +1,46 @@
+<style>
+</style>
+<div ng-controller="MenuBarController">
+	<nav id="top-bar" class="navbar navbar-default navbar-bg2">
+		<div class="container-fluid text-nowrap">
+			<ul class="navnew navbar-nav">
+				<li ng-repeat="row in MenuBar track by $index" ng-mouseover="menuVisible(true, $index)" ng-mouseleave="menuVisible(false, $index)">
+					<a onclick="return false" ng-bind="row.MENU_NAME"></a>
+					<div class="menuBar" ng-if="row.MENU_TYPE == 'F'">
+						<div ng-repeat="row2 in row.SUBITEM" class="nav-column">
+							<h3 ng-bind="row2.MENU_NAME"></h3>
+							<ul ng-if="row2.MENU_TYPE == 'F'">
+								<li ng-repeat="row3 in row2.SUBITEM" ng-class="row3.MENU_TYPE == 'F' ? 'nav-column-in' : ''">
+									<!-- 常用連結 -->
+									<a ng-if="row3.MENU_TYPE == 'U'" class="typeP" ng-href="{{row3.MENU_ID}}" target="_blank" ng-click="menuNon()" ng-bind="row3.MENU_NAME"></a>
+									<!-- 常用連結 -->
+									<a ng-if="row3.MENU_TYPE == 'P'" class="typeP" ng-href="{{row3.ITEM_ID}}" onclick="return false" ng-click="GeneratePage({'txnName':row3.MENU_NAME,'txnId':row3.MENU_ID,'txnPath':[{'MENU_ID':row.MENU_ID,'MENU_NAME':row.MENU_NAME},{'MENU_ID':row2.MENU_ID,'MENU_NAME':row2.MENU_NAME},{'MENU_ID':row3.MENU_ID,'MENU_NAME':row3.MENU_NAME}]}); menuNon()" ng-bind="row3.MENU_NAME"></a>
+									<!-- 2017/2/23 績效管理太多 績效管理收合only -->
+									<strong ng-init="(row.MENU_NAME=='績效管理' || row2.MENU_NAME=='投資下單') ? row3.showMenu=false : row3.showMenu=true;" ng-click="row3.showMenu = !row3.showMenu;" ng-if="row3.MENU_TYPE == 'F'" class="typeM" ng-bind="row3.MENU_NAME"></strong>
+									<ul ng-show="row3.showMenu" ng-if="row3.MENU_TYPE == 'F'">
+										<li ng-repeat="row4 in row3.SUBITEM" ng-class="row3.MENU_TYPE == 'F' ? 'nav-column-in' : ''">
+											<a ng-if="row4.MENU_TYPE == 'P'" class="typeP" ng-href="{{row4.ITEM_ID}}" onclick="return false" ng-click="GeneratePage({'txnName':row4.MENU_NAME,'txnId':row4.MENU_ID,'txnPath':[{'MENU_ID':row.MENU_ID,'MENU_NAME':row.MENU_NAME},{'MENU_ID':row2.MENU_ID,'MENU_NAME':row2.MENU_NAME},{'MENU_ID':row3.MENU_ID,'MENU_NAME':row3.MENU_NAME},{'MENU_ID':row4.MENU_ID,'MENU_NAME':row4.MENU_NAME}]}); menuNon()" ng-bind="row4.MENU_NAME"></a>
+											<strong ng-if="row4.MENU_TYPE == 'F'" ng-init="row4.showMenu=true;" ng-click="row4.showMenu = !row4.showMenu;" class="typeM5" ng-bind="row4.MENU_NAME"></strong>
+											<ul ng-show="row4.showMenu" ng-if="row4.MENU_TYPE == 'F'">
+												<li ng-repeat="row5 in row4.SUBITEM" ng-class="row4.MENU_TYPE == 'F' ? 'nav-column-in' : ''">
+													<a class="typeP5" ng-href="{{row5.ITEM_ID}}" onclick="return false" ng-click="GeneratePage({'txnName':row5.MENU_NAME,'txnId':row5.MENU_ID,'txnPath':[{'MENU_ID':row.MENU_ID,'MENU_NAME':row.MENU_NAME},{'MENU_ID':row2.MENU_ID,'MENU_NAME':row2.MENU_NAME},{'MENU_ID':row3.MENU_ID,'MENU_NAME':row3.MENU_NAME},{'MENU_ID':row4.MENU_ID,'MENU_NAME':row4.MENU_NAME},{'MENU_ID':row5.MENU_ID,'MENU_NAME':row5.MENU_NAME}]}); menuNon()" ng-bind="row5.MENU_NAME"></a>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</li>
+				<li ng-if="isLocal" class="e_align e_padding" style="padding:8px 0 8px 8px;"><input class="form-control e_size" style="width:132px;text-transform:uppercase;box-shadow:inset 0 0 10px #999;" ng-model="txnCode" ng-enter="customEnter(txnCode)" type="text"></li>
+			</ul>
+			<div style="margin-top:-30px;float:right;color:#fff"> <!-- class="navbar-right navbar-out" -->
+					<span class="e-info-content"><i class="glyphicon glyphicon-user"></i>&nbsp;</span>
+					<span class="e-info-content" ng-if="UserName"><label ng-bind="UserName"></label>&nbsp;</span>
+	            	<span class="e-info-content" ng-if="RoleName"><label ng-bind="RoleName"></label>&nbsp;</span>
+	            	<span class="e-info-content" ng-if="BranchName"><label ng-bind="BranchName"></label>&nbsp;</span>
+			</div>
+		</div>
+	</nav>
+</div>

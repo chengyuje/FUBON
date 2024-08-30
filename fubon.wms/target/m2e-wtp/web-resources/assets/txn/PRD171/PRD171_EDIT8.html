@@ -1,0 +1,123 @@
+<
+<style>
+<!--
+input:required:invalid {
+	border-color: red;
+}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_EDIT8.js"></script>
+<div ng-controller="PRD171_EDIT8Controller" ng-cloak>
+	<div class="modal-dialog PRD171_EDIT8" style="width: 100%;height: 50%;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title"
+					style="text-align: center;">{{title}}</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab
+					style="width: 100%;">
+					<div class="gv_tab_sc scroll_y">
+						<table>
+						<thead>
+							<tr>
+								<th>保險公司</th>
+								<th>*險種代號</th>
+								<th>*繳費年期</th>
+								<th>*保單年度</th>
+								<th>*保費種類</th>
+								<TH>險種名稱</TH>
+								<th>*商品收益率</th>
+								<th>*CNR收益率</th>
+								<th>CNR分配率</th>
+								<th>CNR加減碼</th>
+								<th>CNR加碼區間起日</th>
+								<th>CNR加碼區間迄日</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<e-combobox id="companyNum" name="companyNum"
+												ng-datasource="mappingSet['COMPANY']"
+												ng-model="inputVO.COMPANY_NUM"
+												ng-validate="false"
+												ng-readonly="false"
+												ng-editable="false"
+												ng-format="F3"
+												width="360px"
+												style="line-height:20px;"
+									/>
+								</td>
+								<td><input type="text" placeholder="請輸入商品代號..." ng-blur="idck()"
+									ng-model="inputVO.INSPRD_ID" style="width: 100px;text-transform: uppercase;" required></td>
+								<td><input type="text" placeholder="請輸入繳費年期..."
+									ng-model="inputVO.INSPRD_ANNUAL" style="width: 100px" required></td>
+								<td><input type="text" placeholder="請輸入保單年度..."
+									ng-model="inputVO.ANNUAL" style="width: 100px" required></td>
+								<td><input type="text" placeholder="請輸入保單種類..."
+									ng-model="inputVO.TYPE" style="width: 100px" required></td>
+								<td>{{inputVO.INSPRD_NAME}}</td>
+								<td><input type="number" placeholder="請輸入商品收益率..."
+									step="0.00001" min="0" max="1" style="width: 100px"
+									ng-model="inputVO.COMM_RATE" required></td>
+
+								<td><input type="number" placeholder="請輸入CNR收益率..."
+									step="0.00001" min="0" max="100" style="width: 100px"
+									ng-model="inputVO.CNR_RATE" required></td>
+								<td><input type="number" placeholder="請輸入CNR分配率..."
+									step="0.00001" min="0" max="100" style="width: 100px"
+									ng-model="inputVO.CNR_YIELD"></td>
+								<td><input type="number" placeholder="請輸入CNR加減碼..."
+									step="0.00001" min="0" max="100" style="width: 100px"
+									ng-model="inputVO.CNR_MULTIPLE"></td>
+								<td>
+									<div class="input-group datebox datewidth">
+										<input type="text" id="multiple_sdate" name="multiple_sdate"
+										class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.MULTIPLE_SDATE" is-open="model.a"
+										datepicker-options="bgn_sDateOptions" ng-readonly="true"/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default"
+												ng-click="open($event,'a')">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+										</span>
+									</div>
+								</td>
+								<td>
+									<div class="input-group datebox datewidth">
+										<input type="text" id="multiple_edate" name="multiple_edate"
+											class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.MULTIPLE_EDATE" is-open="model.b"
+											datepicker-options="bgn_eDateOptions" ng-readonly="true"/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default"
+												ng-click="open($event,'b')">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+										</span>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+						</table>
+					</div>
+					<div style="text-align: center;" class="modal-footer">
+						<button ng-click="btnSubmit()" class="btn btn-info"
+							data-dismiss="modal">確定</button>
+						<button type="button" ng-click="closeThisDialog('cancel')" class="btn btn-info"
+							data-dismiss="modal">取消</button>
+					</div>
+				</form>
+			</div>
+
+		</div>
+	</div>
+
+</div>

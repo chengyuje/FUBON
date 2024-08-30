@@ -1,0 +1,125 @@
+<style>
+  .FPS320T {
+    display: flex;
+    justify-content: space-around;
+    width: 98.5%;
+    margin: 0 auto;
+  }
+
+  .FPS320T .block-wrapper:first-of-type {
+    flex: 1.5;
+  }
+
+  .FPS320T .block-wrapper {
+    background-color: #ecf6fd;
+    border: none;
+    flex: 1;
+    padding: .5em;
+    min-height: 6.5em;
+    display: inline-block;
+    border-radius: 5px;
+    margin: 0 .6%;
+    text-align: center;
+    position: relative;
+    vertical-align: top;
+  }
+
+  .FPS320T .block {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+    word-break: break-word;
+  }
+
+  .FPS320T .block-title:first-of-type {
+    /* color: #333; */
+    margin: 0;
+  }
+
+  .FPS320T .block-title {
+    color: #15596d;
+    position: absolute;
+    top: .7em;
+    left: .5em;
+  }
+
+  .FPS320T .content:first-of-type {
+    left: 1em;
+    margin: 0;
+  }
+
+  .FPS320T .content {
+    font-size: 1em;
+    font-weight: 600;
+    position: absolute;
+    bottom: 1.5em;
+    left: 0;
+    right: 0;
+    color: #2868c9;
+  }
+
+  .FPS320T .edit-icon {
+    position: absolute;
+    top: .5em;
+    right: .5em;
+    border: 1px #15596d solid;
+    border-radius: .75em;
+    width: 1.5em;
+    height: 1.5em;
+  }
+
+  .FPS320T .edit-icon>i {
+    font-size: 1em;
+    color: #15596d;
+    position: absolute;
+    top: 0.15em;
+    left: 0.3em;
+  }
+  
+  .thin-font-size {
+  	  font-size: 10px;
+  }
+</style>
+<!-- query -->
+<div class="FPS320T">
+  <div class="block-wrapper">
+    <h3 ng-bind="recommendations.planningName"
+        class="block-title"></h3>
+    <h4 ng-bind="recommendations.PLANNAME"
+        class="content"></h4>
+  </div>  
+  <div class="block-wrapper">
+    <div class="block-title" ng-if="isReb"><b>單筆已投入金額<span class="thin-font-size">(NT$)</span></b></div>
+    <div class="block-title" ng-if="!isReb"><b>期初投資<span class="thin-font-size">(NT$)</span></b></div>
+    <div class="content" ng-if="!isReb">
+      {{recommendations.ONETIME | number:0}}
+    </div>
+    <div class="content" ng-if="isReb">
+      {{recommendations.ONETIME_R | number:0}}
+    </div>
+  </div>
+  <div class="block-wrapper">
+    <div class="block-title" ng-if="isReb"><b>定期已投入金額<span class="thin-font-size">(NT$)</span></b></div>
+    <div class="block-title" ng-if="!isReb"><b>每月投資<span class="thin-font-size">(NT$)</span></b></div>
+    <div class="content" ng-if="!isReb">
+      {{recommendations.PERMONTH | number:0}}
+    </div>
+    <div class="content" ng-if="isReb">
+      {{recommendations.PERMONTH_R | number:0}}
+    </div>
+  </div>
+  <div class="block-wrapper">
+    <div class="block-title"><b>投資天期</b></div>
+    <div class="content">
+      <span ng-bind="recommendations.PLANHEAD"></span>年
+    </div>
+  </div>
+  <div class="block-wrapper">
+    <div class="block-title"><b>目標金額<span class="thin-font-size">(NT$)</span></b></div>
+    <div class="content">
+      {{recommendations.TARGET | number}}
+    </div>
+  </div>  
+</div>

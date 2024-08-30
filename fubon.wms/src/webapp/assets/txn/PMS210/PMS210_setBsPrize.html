@@ -1,0 +1,87 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS210 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 65%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setBsPrize.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_UPLOAD.js"></script>
+<div ng-controller="PMS210_setBsPrizeController" ng-cloak>
+	<div class="modal-dialog PMS210">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+<!-- 				<div class="tfb_content_icon"></div> -->
+<!-- 				<div class="tfb_content_tit"> -->
+<!-- 					<img src="assets/images/icon/tfb_icon_a15.gif">請輸入主管獎金表 -->
+<!-- 				</div> -->
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請輸入主管獎金表</h4>
+
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<e-jumping output="outputVO" input="inputVO" query="select()"
+					list="bsPrizeList"></e-jumping>
+					<form>
+						<table class="table-bordered">
+							<tr>
+								<th rowspan="2" >績效值（分）</th>
+								<th colspan="2">營運區</th>
+								<th colspan="3">分行</th>
+							</tr>
+							<tr>
+								<th >A組</th>
+								<th >B組</th>
+								<th >A組</th>
+								<th >B組</th>
+								<th >C組</th>
+							</tr>
+							<tr ng-repeat="y in bsPrizeList">
+								<!-- index=1 對應 PERF_VALUES-->
+								<td style="color:blue; text-align:center"  >
+									{{y.PERF_VALUES}}
+								</td>
+								<!-- index=2 對應 BRANCH_AREA_A-->
+								<td style="color:blue; text-align:center" >
+									{{y.BRANCH_AREA_A}}
+								</td>
+								<!-- index=0 對應 BRANCH_AREA_B-->
+								<td style="color:blue; text-align:center" >
+									{{y.BRANCH_AREA_B}}
+								</td>
+								<!-- index=4 對應 BRANCH_A-->
+								<td style="color:blue; text-align:center" >
+									{{y.BRANCH_A}}
+								</td>
+								<!-- index=5 對應 BRANCH_B-->
+								<td style="color:blue; text-align:center" >
+									{{y.BRANCH_B}}
+								</td>
+								<!-- index=3 對應 BRANCH_C-->
+								<td style="color:blue; text-align:center" >
+									{{y.BRANCH_C}}
+								</td>
+							</tr>
+							
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="upload(resultList.YEARMON)">上傳資料</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div>
+</div>	

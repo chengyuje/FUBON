@@ -1,0 +1,144 @@
+<style>
+/* open dialog */
+.ngdialog.PMS106_INS_EDIT {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS106_BOND_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* table size */
+.PMS106_INS_EDIT table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS106_INS_EDIT.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS106_EDIT_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.titleTB th, td {
+	border-collapse: collapse;
+	padding: 3px;
+	
+}
+
+.titleTB th {
+	background-color: lightgray
+}
+
+.numAlign {
+	text-align: right !important;
+}
+
+.strAlign {
+	text-align: left !important;
+}
+
+</style>
+<script type="text/javascript"
+	src="assets/txn/PMS106/PMS106_BOND_DETAIL.js"></script>
+<div ng-controller="PMS106_BOND_DETAILController" ng-cloak>
+	<div class="modal-dialog PMS106_BOND_DETAIL" style="width:1000px">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">債券及組合式商品金流客戶明細</h4>
+			</div>
+			<div class="modal-body">
+				<div align="center">
+					<table class="titleTB gv_tab_sc scroll_y" border="1px" style="width: 100%">
+						<tr>
+							<th>報表月份：</th>
+							<td>{{strYrMn}}</td>
+							<th>營運區：</th>
+							<td>{{row.BRANCH_AREA_NAME}}</td>
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							<th>分行別：</th>
+							<td>{{row.BRANCH_NAME}}</td>
+						</tr>
+					</table>
+				</div>
+				<div>
+					<p></p>
+				</div>
+				<div>
+				<e-jumping output="outputVO" input="inputVO" query="queryBO()" list="paramList"></e-jumping>
+					<table  class="gv_tab_sc scroll_y" style="width: 1500px">
+						<thead>
+							<tr>
+								<th>項次</th>
+								<th>理專</th>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>商品種類</th>
+								<th>商品代碼</th>
+								<th>商品名稱</th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CRCY_TYPE" e-query="queryBO()">幣別</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AMT" e-query="queryBO()">金額(原幣)</e-sorter></th>
+								<th><e-sorter e-input="inputVO" e-mode="auto" e-col="DUE_DATE" e-query="queryBO()">到期日</e-sorter></th>
+								<th>參考匯率</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row"
+								ng-repeat="rows in paramList track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td  align="center">{{outputVO.currentPageIndex*10+$index+1}}</td>
+								<td  align="center">{{rows.AO_CODE}}-{{rows.EMP_NAME}}</td>
+								<td  align="center">{{rows.CUST_ID }}</td>
+								<td  align="center">{{rows.CUST_NAME}}</td>
+								<td  align="center">{{rows.PRD_TYPE |
+									mapping:mappingSet['FPS.PROD_TYPE']:'F3'}}</td>
+								<td  align="center">{{rows.PRD_NBR}}</td>
+								<td class="strAlign">{{rows.PRD_NAME }}</td>
+								<td  align="center">{{rows.CRCY_TYPE }}</td>
+								<td class="numAlign">{{rows.AMT | number:0}}</td>
+								<td>{{rows.DUE_DATE}}</td>
+								<td class="numAlign">{{rows.REF_EXCH_RATE}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div>
+				<p></p>
+			</div>
+		</div>
+	</div>
+</div>

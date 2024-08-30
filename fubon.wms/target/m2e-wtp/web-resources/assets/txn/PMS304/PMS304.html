@@ -1,0 +1,865 @@
+<style>
+/* open dialog */
+.ngdialog.PMS304 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS304 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+/*
+.PMS304 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+*/
+.PMS304 table.little {
+	width: 89%;
+}
+/* change row */
+.PMS304.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS304_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS304/PMS304.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS304" ng-controller="PMS304Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab
+					style="width: 100%;">
+					<table>
+						<tr>
+							<th><r color="red">*</r>戰報日：</th>
+							<td>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="sCreDate" name="sCreDate"
+										class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sCreDate" is-open="model.a"
+										datepicker-options="bgn_sDateOptions" ng-readonly="true"
+										ng-required="true" ng-change="limitDate();dateChange();" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+											ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+							<th>業務處：</th>
+							<td><e-combobox id="rc_id" name="rc_id"
+									ng-datasource="REGION_LIST" ng-model="inputVO.region_center_id"
+									ng-validate="false" ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-change="ChangeRegion()" ng-format="F3" ng-required="false"
+									width="180px" style="line-height:20px;" /></td>
+							<th>分行別：</th>
+							<td><e-combobox id="br_id" name="br_id"
+									ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr"
+									ng-validate="false" ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" ng-editable="false"
+									ng-change="ChangeBranch()" ng-required="false" ng-format="F1"
+									width="180px" style="line-height:20px;" /></td>
+						</tr>
+						<tr>
+							<th>*報表類型：</th>
+							<td><e-combobox ng-datasource="mappingSet['seture']"
+									ng-model="checked" ng-validate="false" ng-readonly="false"
+									ng-editable="false" ng-format="F3" ng-change="Reports()"
+									width="200px" height="30px" style="line-height:20px;"
+									ng-required="true" /></td>
+							<th>營運區：</th>
+							<td><e-combobox id="op_id" name="op_id"
+									ng-datasource="AREA_LIST" ng-model="inputVO.branch_area_id"
+									ng-validate="false" ng-disabled="disableAreaCombo"
+									ng-readonly="disableAreaCombo" ng-editable="false"
+									ng-change="ChangeArea()" ng-required="false" ng-format="F3"
+									width="180px" style="line-height:20px;" /></td>
+							<th>招攬人員：</th>
+							<td ng-show="inputVO.branch_nbr !=''"><e-combobox id="ao_code" name="ao_code"
+									ng-datasource="AO_EMP_LIST" ng-model="inputVO.ao_code"
+									ng-validate="false" ng-disabled="disableAoCombo"
+									ng-readonly="disableAoCombo" ng-editable="false"
+									ng-required="false" ng-change="ChangeAo_code()" ng-format="F3"
+									width="180px" style="line-height:20px;" /></td>
+							<td ng-show="inputVO.branch_nbr ==''"><e-combobox id="ao_code" name="ao_code"
+									ng-datasource="" ng-model="inputVO.ao_code"
+									ng-validate="false" ng-disabled="disableAoCombo"
+									ng-readonly="disableAoCombo" ng-editable="false"
+									ng-required="false" ng-change="ChangeAo_code()" ng-format="F3"
+									width="180px" style="line-height:20px;" /></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit();init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：</td>
+						<td>每日</td>
+					</tr>
+					<tr>
+						<td>產出日：</td>
+						<td>{{toJsDate(paramList[0].CREATETIME) | date:'yyyy/MM/dd'}}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="height: 600px; white-space: nowrap;" ng-show="checked=='1'">
+<!-- 		checked = 1 : 分行統計　|　checked = 2 : 理專統計 -->
+					<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-left="5" e-top="true" e-list="paramList" >				
+					<thead>
+						<tr class="middle">
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行代號</th>
+							<th rowspan="2">營業單位</th>
+							<th rowspan="2">組別</th>
+							
+							<th colspan="4">躉繳(當月)</th>
+							<th colspan="4">投資型(當月)</th>
+							<th colspan="4">短年期繳(當月)</th>
+							<th colspan="4">長年期繳(當月)</th>
+							<th colspan="5">小計(當月)</th>
+							<th colspan="4">躉繳(當日)</th>
+							<th colspan="4">投資型(當日)</th>
+							<th colspan="4">短年期繳(當日)</th>
+							<th colspan="4">長年期繳(當日)</th>
+							<th colspan="5">小計(當日)</th>
+						</tr>
+						<tr class="middle">
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費100%</th>
+							<th>保費{{inputVO.SALE_RATE*100}}%</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費100%</th>
+							<th>保費{{inputVO.SALE_RATE*100}}%</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat-start="(a,dataA) in paramList |  groupBy: 'REGION_CENTER_NAME' as resultA">
+							<td rowspan="{{dataA.length + numGroups(resultB)*2 + 1}}" >{{a}}</td>
+						</tr>
+						<tr ng-repeat-start="(b, dataB) in dataA |  groupBy: 'BRANCH_AREA_NAME' as resultB">
+							<td rowspan="{{dataB.length + 1}}" >{{b}}</td>
+						</tr>
+						<tr ng-repeat="d in dataB">
+							<td align="center">{{d.BRANCH_NBR}}</td>	
+							<td align="center">{{d.BRANCH_NAME}}</td>
+							<td align="center">{{d.GROUP_ID}}</td>	
+							<td align="right">{{0+d.OT_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+d.OT_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.OT_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.OT_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.IV_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+d.IV_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.IV_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.IV_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.SY_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+d.SY_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.SY_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.SY_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.LY_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+d.LY_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.LY_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.LY_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.SUM_MON_CNT | number:0}}</td>
+							<td align="right">{{0+d.SUM_MON_PREM_FULL | number:0}}</td>
+							<td align="right">{{0+d.SUM_MON_PREM_DIS | number:0}}</td>
+							<td align="right">{{0+d.SUM_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.SUM_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.OT_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+d.OT_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.OT_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.OT_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.IV_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+d.IV_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.IV_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.IV_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.SY_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+d.SY_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.SY_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.SY_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.LY_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+d.LY_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.LY_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.LY_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.SUM_DAY_CNT | number:0}}</td>
+							<td align="right">{{0+d.SUM_DAY_PREM_FULL | number:0}}</td>
+							<td align="right">{{0+d.SUM_DAY_PREM_DIS | number:0}}</td>
+							<td align="right">{{0+d.SUM_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.SUM_DAY_FEE_DIS | number:0}}</td>
+						</tr>
+						
+						<tr ng-repeat-end>
+						
+							<td colspan="4" align="center" ng-show="checked=='1'">{{b}} 合計</td>
+							
+							<td align="right">{{getBranchTotal(dataB, 'OT_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'IV_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'SY_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'LY_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'SUM_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_MON_PREM_DIS') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'OT_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'IV_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'SY_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'LY_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_PREM_DIS') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_FEE_DIS') | number:0}}</td>
+						</tr>
+						<tr ng-repeat-end>
+							<td colspan="5" align="center"  ng-show="checked=='1'">{{a}} 合計</td>
+							
+							<td align="right">{{getRegionTotal(a, 'OT_MON_CNT')}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'IV_MON_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'SY_MON_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_MON_FEE_DIS') | number:0}}</td>
+							
+							<td align="right">{{getRegionTotal(a, 'LY_MON_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'SUM_MON_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_MON_PREM_DIS') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'OT_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'IV_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'SY_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'LY_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'SUM_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_DAY_PREM_DIS') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_DAY_FEE_DIS') | number:0}}</td>
+						</tr>
+						<tr ng-repeat="row in totalList">
+							<td colspan="5" align="center"  ng-show="checked=='1'">全行  合計</td>
+								
+							<td align="right">{{0+row.OT_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+row.OT_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.OT_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.OT_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.IV_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+row.IV_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.IV_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.IV_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.SY_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+row.SY_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.SY_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.SY_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.LY_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+row.LY_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.LY_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.LY_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.SUM_MON_CNT | number:0}}</td>
+							<td align="right">{{0+row.SUM_MON_PREM_FULL | number:0}}</td>
+							<td align="right">{{0+row.SUM_MON_PREM_DIS | number:0}}</td>
+							<td align="right">{{0+row.SUM_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.SUM_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.OT_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+row.OT_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.OT_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.OT_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.IV_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+row.IV_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.IV_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.IV_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.SY_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+row.SY_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.SY_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.SY_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.LY_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+row.LY_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.LY_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.LY_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.SUM_DAY_CNT | number:0}}</td>
+							<td align="right">{{0+row.SUM_DAY_PREM_FULL | number:0}}</td>
+							<td align="right">{{0+row.SUM_DAY_PREM_DIS | number:0}}</td>
+							<td align="right">{{0+row.SUM_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.SUM_DAY_FEE_DIS | number:0}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<div class="gv_tab_sc scroll_y" style="height: 600px; white-space: nowrap;" ng-show="checked=='2'">
+					<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-left="8" e-top="true" e-list="paramList" >				
+					<thead>
+						<tr class="middle">
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行代號</th>
+							<th rowspan="2">營業單位</th>
+							<th rowspan="2">組別</th>
+							
+							<th rowspan="2" ng-show="checked=='2'">專員別</th>
+							<th rowspan="2" ng-show="checked=='2'">招攬人員員編</th>
+							<th rowspan="2" ng-show="checked=='2'">招攬人員姓名</th>
+							
+							<th colspan="4">躉繳(當月)</th>
+							<th colspan="4">投資型(當月)</th>
+							<th colspan="4">短年期繳(當月)</th>
+							<th colspan="4">長年期繳(當月)</th>
+							<th colspan="5">小計(當月)</th>
+							<th colspan="4">躉繳(當日)</th>
+							<th colspan="4">投資型(當日)</th>
+							<th colspan="4">短年期繳(當日)</th>
+							<th colspan="4">長年期繳(當日)</th>
+							<th colspan="5">小計(當日)</th>
+						</tr>
+						<tr class="middle">
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費100%</th>
+							<th>保費{{inputVO.SALE_RATE*100}}%</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+
+							<th>件數</th>
+							<th>保費100%</th>
+							<th>保費{{inputVO.SALE_RATE*100}}%</th>
+							<th>手收100%</th>
+							<th>手收{{inputVO.PD_RATE*100}}%</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat-start="(a,dataA) in paramList | groupBy: 'REGION_CENTER_NAME' as resultA">
+							<!-- arthur: 增加一個判斷條件區數量>1就等於-區數量, 等於1就等於-0 -->
+							<td rowspan="{{dataA.length + numGroupsA(dataA)*2 - 1 - (numGroups(resultB) > 1 ? numGroups(resultB) : 0) }}" ng-show="checked=='2'">{{a}}</td>
+						</tr>
+						<tr ng-repeat-start="(b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+							<td rowspan="{{dataB.length + numGroupsB(dataB)*2 + 1}}" ng-show="checked=='2'">{{b}}</td>
+						</tr>
+						<tr ng-repeat-start="(c, dataC) in dataB | groupBy: 'BRANCH_NAME' as resultC" >
+							<td rowspan="{{dataC.length + 1}}" align="center">{{dataC[0].BRANCH_NBR}}</td>	
+							<td rowspan="{{dataC.length + 1}}" align="center">{{dataC[0].BRANCH_NAME}}</td>
+							<td rowspan="{{dataC.length + 1}}" align="center">{{dataC[0].GROUP_ID}}</td>			
+						</tr>
+						<tr ng-repeat="d in dataC">
+
+							<td ng-show="checked=='2'">{{d.ROLE_NAME}}</td>
+							<td ng-show="checked=='2'">{{d.EMP_ID}}</td>
+							<td ng-show="checked=='2'">{{d.EMP_NAME}}</td>
+							
+							<td align="right">{{0+d.OT_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+d.OT_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.OT_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.OT_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.IV_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+d.IV_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.IV_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.IV_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.SY_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+d.SY_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.SY_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.SY_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.LY_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+d.LY_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.LY_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.LY_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.SUM_MON_CNT | number:0}}</td>
+							<td align="right">{{0+d.SUM_MON_PREM_FULL | number:0}}</td>
+							<td align="right">{{0+d.SUM_MON_PREM_DIS | number:0}}</td>
+							<td align="right">{{0+d.SUM_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.SUM_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.OT_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+d.OT_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.OT_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.OT_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.IV_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+d.IV_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.IV_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.IV_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.SY_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+d.SY_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.SY_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.SY_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.LY_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+d.LY_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+d.LY_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.LY_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+d.SUM_DAY_CNT | number:0}}</td>
+							<td align="right">{{0+d.SUM_DAY_PREM_FULL | number:0}}</td>
+							<td align="right">{{0+d.SUM_DAY_PREM_DIS | number:0}}</td>
+							<td align="right">{{0+d.SUM_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+d.SUM_DAY_FEE_DIS | number:0}}</td>
+						</tr>
+						<tr ng-show="checked=='2'">
+							<td colspan="6" align="center" ng-show="checked=='2'">{{c}} 合計</td>
+							
+							<td align="right">{{getBranchNbrTotal(dataC, 'OT_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'OT_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'OT_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'OT_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchNbrTotal(dataC, 'IV_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'IV_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'IV_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'IV_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchNbrTotal(dataC, 'SY_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SY_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SY_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SY_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchNbrTotal(dataC, 'LY_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'LY_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'LY_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'LY_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchNbrTotal(dataC, 'SUM_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SUM_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SUM_MON_PREM_DIS') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SUM_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SUM_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchNbrTotal(dataC, 'OT_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'OT_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'OT_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'OT_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchNbrTotal(dataC, 'IV_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'IV_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'IV_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'IV_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchNbrTotal(dataC, 'SY_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SY_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SY_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SY_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchNbrTotal(dataC, 'LY_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'LY_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'LY_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'LY_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchNbrTotal(dataC, 'SUM_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SUM_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SUM_DAY_PREM_DIS') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SUM_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchNbrTotal(dataC, 'SUM_DAY_FEE_DIS') | number:0}}</td>
+						</tr>
+						<tr ng-repeat-end ng-hide="true"> </tr>
+						<tr ng-repeat-end>
+						
+							<td colspan="7" align="center" ng-show="checked=='2'">{{b}} 合計</td>
+							
+							<td align="right">{{getBranchTotal(dataB, 'OT_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'IV_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'SY_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'LY_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'SUM_MON_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_MON_PREM_DIS') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'OT_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'OT_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'IV_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'IV_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'SY_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SY_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'LY_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'LY_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_PREM_DIS') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getBranchTotal(dataB, 'SUM_DAY_FEE_DIS') | number:0}}</td>
+						</tr>
+						<tr ng-repeat-end>
+							<td colspan="8" align="center"  ng-show="checked=='2'">{{a}} 合計</td>
+							
+							<td align="right">{{getRegionTotal(a, 'OT_MON_CNT')}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'IV_MON_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'SY_MON_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_MON_FEE_DIS') | number:0}}</td>
+							
+							<td align="right">{{getRegionTotal(a, 'LY_MON_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'SUM_MON_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_MON_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_MON_PREM_DIS') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_MON_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_MON_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'OT_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'OT_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'IV_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'IV_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'SY_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SY_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'LY_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'LY_DAY_FEE_DIS') | number:0}}</td>
+
+							<td align="right">{{getRegionTotal(a, 'SUM_DAY_CNT') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_DAY_PREM_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_DAY_PREM_DIS') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_DAY_FEE_FULL') | number:0}}</td>
+							<td align="right">{{getRegionTotal(a, 'SUM_DAY_FEE_DIS') | number:0}}</td>
+						</tr>
+						<tr ng-repeat="row in totalList">
+							<td colspan="8" align="center"  ng-show="checked=='2'">全行 合計</td>
+								
+							<td align="right">{{0+row.OT_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+row.OT_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.OT_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.OT_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.IV_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+row.IV_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.IV_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.IV_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.SY_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+row.SY_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.SY_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.SY_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.LY_MON_CNT | number:0 }}</td>
+							<td align="right">{{0+row.LY_MON_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.LY_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.LY_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.SUM_MON_CNT | number:0}}</td>
+							<td align="right">{{0+row.SUM_MON_PREM_FULL | number:0}}</td>
+							<td align="right">{{0+row.SUM_MON_PREM_DIS | number:0}}</td>
+							<td align="right">{{0+row.SUM_MON_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.SUM_MON_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.OT_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+row.OT_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.OT_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.OT_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.IV_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+row.IV_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.IV_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.IV_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.SY_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+row.SY_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.SY_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.SY_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.LY_DAY_CNT | number:0 }}</td>
+							<td align="right">{{0+row.LY_DAY_PREM_FULL | number:0 }}</td>
+							<td align="right">{{0+row.LY_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.LY_DAY_FEE_DIS | number:0}}</td>
+
+							<td align="right">{{0+row.SUM_DAY_CNT | number:0}}</td>
+							<td align="right">{{0+row.SUM_DAY_PREM_FULL | number:0}}</td>
+							<td align="right">{{0+row.SUM_DAY_PREM_DIS | number:0}}</td>
+							<td align="right">{{0+row.SUM_DAY_FEE_FULL | number:0}}</td>
+							<td align="right">{{0+row.SUM_DAY_FEE_DIS | number:0}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p align="left">說明：</p>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

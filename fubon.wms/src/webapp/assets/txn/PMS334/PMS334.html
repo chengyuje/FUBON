@@ -1,0 +1,292 @@
+<style>
+/* open dialog */
+.ngdialog.PMS334 {
+
+}
+/* dialog panl */
+.modal-dialog.PMS334 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS334 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS334 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS334.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS334_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS334/PMS334.js"></script>
+<script type="text/javascript"
+	src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+
+
+<div class="PMS334" ng-controller="PMS334Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>報表月份：</th>
+							<td><e-combobox id="dataMonth" name="dataMonth"
+									ng-datasource="ymList" ng-model="inputVO.sCreDate"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-change="limitDate();dateChange()" ng-format="F3"
+									width="143px" style="line-height:20px;" /></td>
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td><e-combobox ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id" ng-validate="false"
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-format="F3" ng-change="ChangeRegion();Region()"
+									ng-required="false" width="143px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>營運區：</th>
+							<td><e-combobox ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id" ng-validate="false"
+									ng-disabled="disableAreaCombo" ng-readonly="disableAreaCombo"
+									ng-editable="false" ng-change="ChangeArea();Area()"
+									ng-format="F3" ng-required="false" width="85px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>分行：</th>
+							<td><e-combobox ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr" ng-validate="false"
+									ng-disabled="disableBranchCombo"
+									ng-readonly="disableBranchCombo" ng-editable="false"
+									ng-format="F1" ng-required="false"
+									ng-change="ChangeBranch();Branch()" width="155px" height="30px"
+									style="line-height:20px;" /></td>
+							<th>理專：</th>
+							<td><e-combobox id="ao_code" name="ao_code"
+									ng-datasource="AO_LIST" ng-model="inputVO.ao_code"
+									ng-validate="false" ng-disabled="disableAoCombo"
+									ng-readonly="disableAoCombo" ng-editable="false" ng-format="F1"
+									ng-required="false" ng-change="ChangeAo_code()" width="100px"
+									style="line-height:20px;" /></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()"
+					ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<div class="gv_tab_sc scroll_y"
+					style=" white-space: nowrap;" >
+					<table class="e-table-freeze" e-height="500px" e-left="7" e-top="true" e-list="paramList">
+						<thead>
+							<tr rowspan="2">
+								<th rowspan="2">業務處</th>
+								<th rowspan="2">區別</th>
+								<th rowspan="2">分行代碼</th>
+								<th rowspan="2">分行名稱</th>
+								<th rowspan="2">理專等級</th>
+								<th rowspan="2">AO CODE</th>
+								<th rowspan="2">員編</th>
+								<th rowspan="1" colspan="2">最適客戶上限</th>
+								<th rowspan="1" colspan="5">轄下客戶狀況</th>
+								<th rowspan="1" colspan="4">私人銀行</th>
+								<th rowspan="1" colspan="4">白金理專</th>
+								<th rowspan="1" colspan="4">個人理財</th>
+								<th rowspan="1" colspan="4">潛力客群</th>
+							</tr>
+							<tr>
+								<th>客戶數<br>(A)
+								</th>
+								<th>AUM</th>
+								<th>總戶數<BR>(B)
+								</th>
+								<th>戶數占比<BR>((B)-(C))/(A)
+								</th>
+								<th>不計入總量控管<BR>戶數(C)
+								</th>
+								<th>AUM</th>
+								<th>與最適客戶數差<BR>異((B)-(C)-(A))
+								</th>
+								<th>戶數<BR>(D)
+								</th>
+								<th>不計入總量控管<BR>戶數(C)
+								</th>
+								<th>AUM</th>
+								<th>與最適客戶數差<BR>異
+								</th>
+								<th>戶數<BR>(F)
+								</th>
+								<th>不計入總量控管<BR>戶數(C)
+								</th>
+								<th>AUM</th>
+								<th>與最適客戶數差<BR>異
+								</th>
+								<th>戶數<BR>(H)
+								</th>
+								<th>不計入總量控管<BR>戶數(C)
+								</th>
+								<th>AUM</th>
+								<th>與最適客戶數差<BR>異
+								</th>
+								<th>戶數<BR>(H)
+								</th>
+								<th>不計入總量控管<BR>戶數(C)
+								</th>
+								<th>AUM</th>
+								<th>與最適客戶數差<BR>異
+								</th>
+							</tr>
+							<tr>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								ng-repeat-start=" (a,dataA) in paramList | groupBy: 'REGION_CENTER_NAME' as resultA">
+								<td rowspan="{{ (dataA.length + numGroups(resultB))*2 +1}}">{{a}}</td>
+							</tr>
+
+							<tr
+								ng-repeat-start=" (b,dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+								<td rowspan="{{ dataB.length + numGroups(resultC)*2 +2}}"
+									ng-hide="b == 'REGION'">{{b}}</td>
+							</tr>
+							<tr
+								ng-repeat-start=" (c, dataC) in dataB | groupBy: 'BRANCH_NAME' as resultC">
+								<td rowspan="{{dataC.length + 2}}"
+									ng-hide="c == 'REGION' || c == 'AREA'">{{dataC[0].BRANCH_NBR }}</td>
+								<td rowspan="{{dataC.length + 2}}"
+									ng-hide="c == 'REGION' || c == 'AREA'">{{c}}</td>
+
+
+							</tr>
+							<tr ng-repeat="c1 in dataC">
+							<td colspan="6" align="center" ng-show="c1.AO_CODE == 'ZZZZZREGION'">{{c1.REGION_CENTER_NAME}} 合計</td>
+							<td colspan="5" align="center" ng-show="c1.AO_CODE == 'ZZZZZAREA'">{{c1.BRANCH_AREA_NAME}} 合計</td>
+							<td colspan="3" align="center" ng-show="c1.AO_CODE == 'ZZZZZBRANCH'">{{c1.BRANCH_NAME}} 合計</td>
+							<td ng-hide="c1.AO_CODE == 'ZZZZZREGION' || c1.AO_CODE == 'ZZZZZAREA' || c1.AO_CODE == 'ZZZZZBRANCH' ">{{c1.AO_JOB_RANK}}</PS></td>
+							<td ng-hide="c1.AO_CODE == 'ZZZZZREGION' || c1.AO_CODE == 'ZZZZZAREA' || c1.AO_CODE == 'ZZZZZBRANCH' ">{{c1.AO_CODE}}</PS></td>
+							<td ng-hide="c1.AO_CODE == 'ZZZZZREGION' || c1.AO_CODE == 'ZZZZZAREA' || c1.AO_CODE == 'ZZZZZBRANCH' ">{{c1.EMP_ID}}</PS></td>
+							<!-- 	<td
+									ng-hide="c1.AO_CODE == 'ZZZZZREGION' || c1.AO_CODE == 'ZZZZZAREA' || c1.AO_CODE == 'ZZZZZBRANCH' ">{{c1.YM}}</td> -->
+
+								<td align="right">{{0+c1.MAX_CUST_CNT_TOT | number:''}}</td>
+								<td align="right">{{0+c1.MAX_AUM | currency:'':0}}</td>
+								<td align="right">{{0+c1.TOT_CUST_CNT | number:''}}</td>
+								<td align="right">{{0+c1.TOT_CUST_PCTG}}%</td>
+								<td align="right">{{0+c1.TOT_NOT_IN_CTRL | number:''}}</td>
+								<td align="right">{{0+c1.TOT_AUM | currency:'':0}}</td>
+								<td align="right">{{0+c1.TOT_CUST_DIFF | number:''}}</td>
+								<td align="right">{{0+c1.V_CUST_CNT | number:''}}</td>
+								<td align="right">{{0+c1.V_NOT_IN_CTRL | number:''}}</td>
+								<td align="right">{{0+c1.V_AUM | currency:'':0}}</td>
+								<td align="right">{{0+c1.V_CUST_DIFF | number:''}}</td>
+								<td align="right">{{0+c1.A_CUST_CNT | number:''}}</td>
+								<td align="right">{{0+c1.A_NOT_IN_CTRL | number:''}}</td>
+								<td align="right">{{0+c1.A_AUM | currency:'':0}}</td>
+								<td align="right">{{0+c1.A_CUST_DIFF | number:''}}</td>
+								<td align="right">{{0+c1.B_CUST_CNT | number:''}}</td>
+								<td align="right">{{0+c1.B_NOT_IN_CTRL | number:''}}</td>
+								<td align="right">{{0+c1.B_AUM | currency:'':0}}</td>
+								<td align="right">{{0+c1.B_CUST_DIFF | number:''}}</td>
+								<td align="right">{{0+c1.M_CUST_CNT | number:''}}</td>
+								<td align="right">{{0+c1.M_NOT_IN_CTRL | number:''}}</td>
+								<td align="right">{{0+c1.M_AUM | currency:'':0}}</td>
+								<td align="right">{{0+c1.M_CUST_DIFF | number:''}}</td>
+							</tr>
+							<tr ng-repeat-end>
+
+							</tr>
+							<tr ng-repeat-end ng-hide="inputVO.branch_nbr !=''">
+
+							</tr>
+							<tr ng-repeat-end ng-hide="inputVO.branch_nbr !=''">
+
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+
+			</div>
+			<table>
+				<tr>
+					<th colspan="4"><font color="blue">[註一]客戶差異數:+客戶需移出,-客戶數不足</font></th>
+				</tr>
+				<tr>
+					<th colspan="4"><font color="blue">[註二]不計入總量控管戶數:80歲(含)以上或風險等級C0者</font></th>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

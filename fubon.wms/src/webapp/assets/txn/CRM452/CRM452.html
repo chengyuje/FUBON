@@ -1,0 +1,204 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM452/CRM452.js"></script>
+<div ng-controller="CRM452ListController" ng-cloak>
+	<div class="modal-header">
+		<h4 id="myModalAlertLabel" class="modal-title" align="center">{{inputVO.type == 'single' ? '單次議價授權覆核' : '期間議價授權覆核'}}</h4>
+	</div>
+	<div class="modal-body">
+		<table width="100%" class="rstable">
+			<tr>
+				<th>客戶ID：</th>
+				<td>{{cust_id}}</td>
+			</tr>
+			<tr>
+				<th>貢獻度等級：</th>
+				<td>{{con_degree | mapping:mappingSet['CRM.CON_DEGREE']:'F3'}}</td>
+			</tr>
+			<tr>
+				<th>理財會員等級：</th>
+				<td>{{vip_degree | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+			</tr>
+			<tr>
+				<th>近一年手收：</th>
+				<td>{{y_profee | currency:"$":0}}</td>
+			</tr>
+			<tr>
+				<th>前日AUM：</th>
+				<td>{{aum_amt | currency:"$":0}}</td>
+			</tr>
+		</table>
+		<div ng-repeat="row in paramList track by $index" ng-show="inputVO.type == 'single'">
+			<hr />
+			<div class="gv_tab_sc scroll_y">
+				<h4 class="h4-title">{{row.APPLY_STATUS == '4' ? '終止單' : '申請單'}}</h4>
+				<table class="rtable" width="100%">
+					<thead>
+						<tr>
+							<th width="25%">授權序號</th>
+							<th width="25%">商品類型</th>
+							<th width="25%">申購幣別</th>
+							<th width="25%">申購金額</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row">
+							<td>{{row.APPLY_SEQ}}</td>
+							<td>{{row.APPLY_TYPE_NAME}}</td>
+							<td>{{row.TRUST_CURR}}</td>
+							<td>{{row.PURCHASE_AMT | number : 0}}</td>
+						</tr>
+					</tbody>
+					<thead>
+						<tr>
+							<th>商品名稱</th>
+							<th>申請折數</th>
+							<th>適用費率</th>
+							<th>折扣後費率</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>{{row.PROD_NAME}}</td>
+							<td>{{row.FEE_DISCOUNT}}&nbsp;折</td>
+							<td>{{row.DEFAULT_FEE_RATE}}&nbsp;%</td>
+							<td>{{row.FEE_DISCOUNT * 0.1 * row.DEFAULT_FEE_RATE|number:2}}&nbsp;%</td>									
+						</tr>
+					</tbody>
+					<thead>
+						<tr>
+							<th>議價原因</th>
+							<td colspan="3">{{row.BRG_REASON}}</td>
+						</tr>
+						<tr>
+							<th>最高授權層級</th>
+							<td colspan="3">{{row.HIGHEST_AUTH_LV_NAME}}</td>
+						</tr>
+					</thead>
+				</table>
+				<br>
+				<div>
+					<label>簽核意見</label>&nbsp;&nbsp;
+					<button type="button" class="btn btn-primary" ng-click="action('accept', row)">同意</button>&nbsp;&nbsp;
+					<button type="button" class="btn btn-warning" ng-click="action('reject', row)">退回</button>
+					<br /><br />
+				</div>
+			</div>
+			<div>
+				<textarea placeholder="請輸入...(文字內容僅限100字內)" ng-model="row.comments" maxlength="100" style="width: 100%; height: 100px"></textarea>
+			</div>
+		</div>
+		<div ng-repeat="row in paramList track by $index" ng-show="inputVO.type == 'period'">
+			<hr />
+			<div class="gv_tab_sc scroll_y">
+				<h4 class="h4-title">{{row.APPLY_TYPE == '1' ? '基金' : '海外ETF/股票'}}&nbsp;{{row.APPLY_STATUS == '4' ? '終止單' : '申請單'}}</h4>
+				<table ng-show="row.APPLY_TYPE == '1'" width="100%">
+					<thead>
+						<tr>
+							<th width="25%">國內股票型</th>
+							<td width="25%">{{row.DMT_STOCK}}&nbsp;折</td>
+							<th width="25%">國外股票型</th>
+							<td width="25%">{{row.FRN_STOCK}}&nbsp;折</td>
+						</tr>
+						<tr>
+							<th>國內債券型</th>
+							<td>{{row.DMT_BOND}}&nbsp;折</td>
+							<th>國外債券型</th>
+							<td>{{row.FRN_BOND}}&nbsp;折</td>
+						</tr>
+						<tr>
+							<th>國內平衡型</th>
+							<td>{{row.DMT_BALANCED}}&nbsp;折</td>
+							<th>國外平衡型</th>
+							<td>{{row.FRN_BALANCED}}&nbsp;折</td>
+						</tr>
+						<tr>
+							<th>適用優惠期間</th>
+							<td colspan="3">{{toJsDate(row.BRG_BEGIN_DATE)|date:"yyyy-MM-dd"}}&nbsp;~&nbsp;{{toJsDate(row.BRG_END_DATE)|date:"yyyy-MM-dd"}}</td>
+						</tr>
+						<tr>
+							<th>{{row.APPLY_STATUS == '1' ? '議價原因' : '終止原因'}}</th>
+							<td colspan="3" ng-show="row.APPLY_STATUS == '1'">{{row.BRG_REASON}}</td>
+							<td colspan="3" ng-show="row.APPLY_STATUS == '4'">{{row.TERMINATE_REASON}}</td>
+						</tr>
+						<tr>
+							<th>最高授權層級</th>
+							<td colspan="3">{{row.HIGHEST_AUTH_LV_NAME}}</td>
+						</tr>
+					</thead>
+				</table>
+				<table ng-show="row.APPLY_TYPE == '2'" width="100%">
+					<thead>
+						<tr>
+							<th width="25%">買入香港交易所</th>
+							<td width="25%">{{row.BUY_HK_MRK}}&nbsp;折</td>
+							<th width="25%">賣出香港交易所</th>
+							<td width="25%">{{row.SELL_HK_MRK}}&nbsp;折</td>
+						</tr>
+						<tr>
+							<th>買入美國交易所</th>
+							<td>{{row.BUY_US_MRK}}&nbsp;折</td>
+							<th>賣出美國交易所</th>
+							<td>{{row.SELL_US_MRK}}&nbsp;折</td>
+						</tr>
+						<tr>
+							<th>買入英國交易所</th>
+							<td>{{row.BUY_UK_MRK}}&nbsp;折</td>
+							<th>賣出英國交易所</th>
+							<td>{{row.SELL_UK_MRK}}&nbsp;折</td>
+						</tr>
+						<tr>
+							<th>買入日本交易所</th>
+							<td>{{row.BUY_JP_MRK}}&nbsp;折</td>
+							<th>賣出日本交易所</th>
+							<td>{{row.SELL_JP_MRK}}&nbsp;折</td>
+						</tr>
+						<tr>
+							<th>適用優惠期間</th>
+							<td colspan="3">{{toJsDate(row.BRG_BEGIN_DATE)|date:"yyyy-MM-dd"}}&nbsp;~&nbsp;{{toJsDate(row.BRG_END_DATE)|date:"yyyy-MM-dd"}}</td>
+						</tr>
+						<tr>
+							<th>{{row.APPLY_STATUS == '1' ? '議價原因' : '終止原因'}}</th>
+							<td colspan="3" ng-show="row.APPLY_STATUS == '1'">{{row.BRG_REASON}}</td>
+							<td colspan="3" ng-show="row.APPLY_STATUS == '4'">{{row.TERMINATE_REASON}}</td>
+						</tr>
+						<tr>
+							<th>最高授權層級</th>
+							<td colspan="3">{{row.HIGHEST_AUTH_LV_NAME}}</td>
+						</tr>
+					</thead>
+				</table>
+				<br>
+				<div>
+					<label>簽核意見</label>&nbsp;&nbsp;
+					<button type="button" class="btn btn-primary" ng-click="action('accept', row)">同意</button>&nbsp;&nbsp;
+					<button type="button" class="btn btn-warning" ng-click="action('reject', row)">退回</button>
+					<br /><br />
+				</div>
+			</div>
+			<div>
+				<textarea placeholder="請輸入...(文字內容僅限100字內)" ng-model="row.comments" maxlength="100" style="width: 100%; height: 50px"></textarea>
+			</div>
+		</div>
+		<br />
+		<div style="text-align: center;" ng-show = "cust_id == '' || cust_id == undefined">
+			<span style="color: red;">議價申請已覆核完成</span>
+		</div>
+		<div class="search_box_btn text-center" ng-hide="cust_id == '' || cust_id == undefined">
+			<button type="button" class="btn btn-primary" ng-click="action('allAccept', undefined)" ng-disabled = "cust_id == '' || cust_id == undefined">全部同意</button>&nbsp;&nbsp;
+			<button type="button" class="btn btn-warning" ng-click="action('allReject', undefined)" ng-disabled = "cust_id == '' || cust_id == undefined">全部退回</button>
+		</div>
+	</div>
+</div>
+					
+					
+					
+					
+					
+					

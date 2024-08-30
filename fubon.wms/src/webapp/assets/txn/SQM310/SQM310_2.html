@@ -1,0 +1,170 @@
+<style>
+/* table size */
+.SQM310_2 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.SQM310_2 table.little{
+	width: 60%;
+}
+/* change row */
+.SQM310_2.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SQM310_2_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<div class="SQM310_2" ng-controller="SQM310_2Controller" ng-cloak>
+	<div class="search_table">
+		<table>
+			<tr>
+				<th>活動截止日區間：</th>
+				<td>
+					<div class="input-group datebox datewidth">
+						<input type="text" id="sDate" name="sDate"
+						class="form-control"
+						uib-datepicker-popup="yyyy/MM/dd"
+						ng-model="queryVO.sDate"
+						is-open="model.a"
+						datepicker-options="sDateOptions"
+						ng-readonly="true"
+						ng-change="limitDate()"/>
+						<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+							<i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+					<div style="float: left !important;">～</div>
+					<div class="input-group datebox datewidth">
+						<input type="text" id="eDate" name="eDate"
+						class="form-control"
+						uib-datepicker-popup="yyyy/MM/dd"
+						ng-model="queryVO.eDate"
+						is-open="model.b"
+						datepicker-options="eDateOptions"
+						ng-readonly="true"
+						ng-change="limitDate()"/>
+						<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+							<i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+				</td>
+				<th>名單類型：</th>
+				<td>
+					<e-combobox id="lead_type" name="lead_type"
+					ng-paramtype="CAM.LEAD_TYPE"
+					ng-model="queryVO.lead_type"
+					ng-validate="false"
+					ng-readonly="false"
+					ng-editable="false"
+					ng-format="F3"
+					ng-required="false"
+					width="150px"
+					style="line-height:20px;" />
+				</td>
+				<th>
+					是否100%結案：
+					<input type="checkbox" ng-model="queryVO.closed" ng-false-value="'N'" ng-true-value="'Y'">
+				</th>
+			</tr>
+			<tr>
+				<th>名單名稱：</th>
+				<td><input type="text" id="camp_name" name="camp_name" class="form-control" ng-model="queryVO.camp_name" e-length-limit="150"></td>
+				<td><button type="button" class="btn btn-info" ng-click="inquire()" function-type="query">查詢活動</button></td>
+			</tr>
+		</table>
+	</div>
+	<table class="td_center">
+		<tr>
+			<td width="45%">
+				<h4 class="h4-title">未設定</h4>
+				<div class="gv_tab_sc" style="height:400px;">
+					<table class="table table-bordered e-table-freeze" e-top="true" e-mode="1" e-height="400px" e-list="resultList">
+						<thead>
+							<tr>
+								<th width="10%">
+									<label style="font-weight: initial;margin-bottom: 0px;">
+										<input type='checkbox' ng-model='checkVO.clickAll' ng-change='checkrow()' /> 全選
+									</label>
+								</th>
+								<th width="30%">名單類型</th>
+								<th width="30%">名單來源</th>
+								<th width="30%">名單名稱</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in resultList track by $index">
+								<td><input type='checkbox' ng-model='row.SELECTED' /></td>
+								<td>{{row.LEAD_TYPE | mapping:LEAD_TYPE:F3}}</td>
+								<td>{{row.LEAD_SOURCE_ID | mapping:LEAD_SOURCE:F3}}</td>
+								<td>{{row.CAMPAIGN_NAME}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</td>
+			<td width="10%">
+				<button type="button" class="btn btn-default" ng-click="btnAddFun()">加入→</button>
+				<br>
+				<br>
+				<button type="button" class="btn btn-default" ng-click="btnDelFun()">移除←</button>
+			</td>
+			<td width="45%">
+				<h4 class="h4-title">已設定</h4>
+				<div class="gv_tab_sc" style="height:400px;">
+					<table class="table table-bordered e-table-freeze" e-top="true" e-mode="1" e-height="400px" e-list="inputVO.totalList">
+						<thead>
+							<tr>
+								<th width="10%">
+									<label style="font-weight: initial;margin-bottom: 0px;">
+										<input type='checkbox' ng-model='checkVO.clickAll2' ng-change='checkrow2()' /> 全選
+									</label>
+								</th>
+								<th width="25%">名單類型</th>
+								<th width="25%">名單來源</th>
+								<th width="25%">名單名稱</th>
+								<th width="15%">查核戶數</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in inputVO.totalList track by $index">
+								<td><input type='checkbox' ng-model='row.SELECTED' /></td>
+								<td>{{row.LEAD_TYPE | mapping:LEAD_TYPE:F3}}</td>
+								<td>{{row.LEAD_SOURCE_ID | mapping:LEAD_SOURCE:F3}}</td>
+								<td>{{row.CAMPAIGN_NAME}}</td>
+								<td><input type="text" class="form-control" placeholder="請輸入..." ng-model="row.SC_CNT"  e-input-limit="NN" e-length-limit="5"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="save()" function-type="maintenance">確定儲存</button>
+		<button type="button" class="btn btn-info" ng-click="init()">重置</button>
+	</div>
+</div>

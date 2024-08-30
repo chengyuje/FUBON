@@ -1,0 +1,232 @@
+<style>
+/* open dialog */
+.ngdialog.PRD220 {
+	
+}
+/* dialog panl */
+.modal-dialog.PRD220 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PRD220 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PRD220 table.little{
+	width: 60%;
+}
+/* change row */
+.PRD220.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PRD220_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<div ng-controller="PRD220_EDITController" ng-cloak>
+	<div class="modal-dialog PRD220">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row ? '編輯' : '新增'}}輔銷文件</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*商品代碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_id" name="prd_id" class="form-control" ng-model="inputVO.prd_id" ng-blur="checkID()" ng-disabled="row || inputVO.shared == 'Y'" ng-required="inputVO.shared == 'N'" e-length-limit="25"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.prd_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入商品代碼</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="!canEdit && inputVO.shared == 'N'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">{{'ehl_01_common_026' | i18n}}</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">商品名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="name" name="name" class="form-control" ng-model="inputVO.name" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">文件編號：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="doc_id" name="doc_id" class="form-control" ng-model="inputVO.doc_id" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">文件名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="doc_name" name="doc_name" class="form-control" ng-model="inputVO.doc_name" e-length-limit="1000"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="ptype == 'SI'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">文件類型：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="doc_type" name="doc_type"
+								ng-datasource="DOC_TYPE"
+								ng-model="inputVO.doc_type"
+			  					ng-validate="false"
+			  					ng-disabled="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="true"
+			  					ng-change="ClearUpload2()"
+			  					width="150px"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">
+								<label><input type="radio" name="group" ng-model="inputVO.type" ng-value="1" ng-change="ClearUpload()" required> *檔案上傳：</label>
+							</th>
+							<td class="col-md-7 tdpadding">
+								<div ng-switch="inputVO.doc_type">
+									<!-- 商品說明書文件 -->
+									<div ng-switch-when="03">
+										<e-upload success="uploadFinshed(name,rname)" model="inputVO.realfileName" accept=".pdf"></e-upload>
+									</div>
+									<div ng-switch-default>
+										<e-upload success="uploadFinshed(name,rname)" model="inputVO.realfileName"></e-upload>
+									</div>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">
+								<label><input type="radio" name="group" ng-model="inputVO.type" ng-value="2" ng-change="ClearUpload()" required> URL網址：</label>
+							</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="web" name="web" ng-model="inputVO.web" e-length-limit="4000"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.group.$error.required || (inputVO.type == 1 && !inputVO.realfileName) || (inputVO.type == 2 && !inputVO.web)">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請上傳檔案或輸入URL</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="parameterTypeEditForm.doc_type.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇文件類型</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">是否共用：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="shared" name="shared"
+								ng-paramtype="COMMON.YES_NO"
+								ng-model="inputVO.shared"
+			  					ng-validate="false"
+			  					ng-disabled="row"
+			  					ng-readonly="row" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					ng-change="ClearID()"
+			  					width="150px"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*起迄日：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="form-group" style="padding-left:0px">
+									<div class="input-group datebox datewidth">
+										<input type="text" id="doc_sDate" name="doc_sDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										alt-input-formats="['yyyy/M!/d!','yyyy-M!-d!','yyyyM!d!']"
+										ng-model="inputVO.doc_sDate"
+										ng-model-options="{ debounce: 300 }"
+										is-open="model.a"
+										datepicker-options="doc_sDateOptions"
+										ng-readonly="false"
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+									<div style="float: left !important;padding-left:10px;">～</div>
+									<div class="input-group datebox datewidth" style="padding-left: 10px;">
+										<input type="text" id="doc_eDate" name="doc_eDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										alt-input-formats="['yyyy/M!/d!','yyyy-M!-d!','yyyyM!d!']"
+										ng-model="inputVO.doc_eDate"
+										ng-model-options="{ debounce: 300 }"
+										is-open="model.b"
+										datepicker-options="doc_eDateOptions"
+										ng-readonly="false"
+										ng-change="limitDate()" required/>
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="!inputVO.doc_sDate || !inputVO.doc_eDate">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇起迄日</td>
+							<td class="col-xs-1"></td>
+						<tr>
+					</table>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

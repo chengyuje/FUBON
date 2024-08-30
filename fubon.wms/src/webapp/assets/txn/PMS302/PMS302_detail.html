@@ -1,0 +1,84 @@
+<style>
+.modal-dialog.PMS302 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0px;
+	width: 90%;
+	height: auto;
+}
+
+.pointer {
+	cursor: pointer;
+}
+
+</style>
+<div ng-controller="PMS302_QUERYController" ng-cloak>
+	<div class="modal-dialog PMS302">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">理專轄下客戶各項商品收益</h4>
+			</div>
+			<div class="modal-body">
+				<e-jumping-once output="outputVO" list="paramList" totallist="totalList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="table-bordered">
+						<tr>
+							<th rowspan="2">客戶ID</th>
+							<th rowspan="2">姓名</th>
+							<th colspan="8">投資商品</th>
+							<th colspan="5">保險商品</th>
+							<th rowspan="2">投保合計</th>
+						</tr>
+						<tr>
+							<th>基金</th>
+							<th>SI</th>
+							<th>SN</th>
+							<th>DCI</th>
+							<th>海外債</th>
+							<th>海外股票</th>
+							<th>海外ETF</th>
+							<!-- <th>匯兌損益</th> -->
+							<th>小計</th>
+							<th>躉繳</th>
+							<th>短年期</th>
+							<th>長年期</th>
+							<th>投資型</th>
+							<th>小計</th>
+						</tr>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index">
+							<td style="text-align:center">{{row.CUST_ID}}</td>
+							<td style="text-align:center">{{row.CUST_NAME}}</td>	
+							<td align="right">{{0+row.MFD | number:0}}</td>
+							<td align="right">{{0+row.SI | number:0}}</td>
+							<td align="right">{{0+row.SN | number:0}}</td>
+							<td align="right">{{0+row.DCI | number:0}}</td>
+							<td align="right">{{0+row.BND | number:0}}</td>
+							<td align="right">{{0+row.STOCK | number:0}}</td>
+							<td align="right">{{0+row.ETF | number:0}}</td>
+							<!-- <td align="right">{{0+row.EX_GAIN_LOSS | number:0}}</td> -->
+							<td align="right">{{0+row.MFD+row.SI+row.SN++row.DCI+row.BND+row.STOCK+row.ETF | number:0}}</td>
+							<td align="right">{{0+row.WHO_PAY | number:0}}</td>
+							<td align="right">{{0+row.SHORT_YEAR | number:0}}</td>
+							<td align="right">{{0+row.LONG_YEAR | number:0}}</td>
+							<td align="right">{{0+row.INVEST | number:0}}</td>
+							<td align="right">{{0+row.WHO_PAY+row.SHORT_YEAR+row.LONG_YEAR+row.INVEST | number:0}}</td>
+							<!-- 投保合計 -->
+							<td style="text-align:right">
+								<a ng-click="questCustDetail(row.CUST_ID)" class="pointer">
+									{{0+row.MFD+row.SI+row.SN++row.DCI+row.BND+row.STOCK+row.ETF
+									  +row.WHO_PAY+row.SHORT_YEAR+row.LONG_YEAR+row.INVEST  | number:0}}
+								</a>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')" >確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

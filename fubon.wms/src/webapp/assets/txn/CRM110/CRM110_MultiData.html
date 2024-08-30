@@ -1,0 +1,64 @@
+<style>
+/* dialog panl */
+.modal-dialog.MultiData {
+	position: relative;
+	top: 20vh;
+	width: 70vw;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM610/CRM610.js"></script>
+<div ng-controller="CRM110_MultiDataController" ng-cloak>
+	<div class="modal-dialog MultiData">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請選擇客戶</h4>
+			</div>
+			<div class="modal-body gv_tab_sc">
+				<div>
+					<e-jumping-once ng-show="inputVO" output="totaBody" totallist="userList" list="data" rowcountlimit="5">
+					</e-jumping-once>
+				</div>
+				<table class="tablesaw table table-striped table-bordered" align="center">
+					<thead>
+						<tr>
+							<th style="text-align:center"><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="inquire()">客戶ID</th>
+							<th style="text-align:center"><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="inquire()">客戶姓名</th>
+							<th style="text-align:center"><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_CODE" e-query="inquire()">AO Code</th>
+							<th style="text-align:center"><e-sorter e-input="inputVO" e-mode="auto" e-col="BRA_NBR" e-query="inquire()">歸屬行</th>
+							<th style="text-align:center" ng-show="(inputVO.priID == '002' || inputVO.priID == '003')">下單</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index">
+							<td style="text-align:center">
+								<a href="#" ng-click="goCRM610(row)">{{row.CUST_ID}}</a>
+							</td>
+							<td style="text-align:center">{{row.CUST_NAME}}</td>
+							<td style="text-align:center">{{row.AO_CODE}}</td>
+							<td style="text-align:center">{{row.BRA_NBR | mapping:mappingSet['branchsDesc_all']:'F1'}}</td>
+							<td style="text-align:center" ng-show="(inputVO.priID == '002' || inputVO.priID == '003')">
+								<e-combobox id="orderOption"
+									ng-paramtype="CRM.ORDER_OPTION" 
+									ng-model="row.OPTION"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="selectOption(row)"
+									width="220px"
+									style="line-height:20px;" />
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button id="savebut" type="button" class="btn btn-info" ng-click="save()" autofocus>確定</button>
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

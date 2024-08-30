@@ -1,0 +1,84 @@
+<style>
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.rstable tbody tr td {
+	text-align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS713/PMS713.js"></script>
+<div ng-controller="PMS713Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table style="width: 40%; margin-left: 20px;">
+				<tr>
+					<th><span style="color: red;">*</span>查詢年月：</th>
+					<td><e-combobox ng-datasource="mappingSet['timeE']" ng-model="inputVO.yearMon"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="true" width="100px" height="30px"
+							style="line-height:20px;" /></td>
+					<th>員工編號：</th>
+					<td>						
+						<input type="text" placeholder="請輸入員工編號" ng-change="genEmpId()" ng-model="inputVO.empId" e-length-limit="10">						 
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()" >清除</button>
+			<button type="button" class="btn btn-info" ng-click="downLoad()" >匯出</button>
+			<button type="button" class="btn btn-info" ng-click="downLoad1()" >下載範例</button>
+			<span id="csvBox" style="display: inline-block;vertical-align: middle;"><e-upload id="csvUpload" success="upload(name,rname)" text="上傳"></e-upload></span>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire();inquireInit()" list="resultList"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="height: 235px; white-space: nowrap;">
+				<table class="  table-bordered rstable middle">
+					<thead>
+						<tr>
+							<th>刪除</th>
+							<th>員工編號</th>
+							<th>組別</th>
+							<th>FC1<br>員額數</th>
+							<th>FC2<br>員額數</th>
+							<th>FC3<br>員額數</th>
+							<th>FC4<br>員額數</th>
+							<th>FC5<br>員額數</th>
+							<th>FCH<br>員額數</th>
+							<th>建立者</th>
+							<th>建立時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td class='text-center'><button type="button" class="btn btn-info" ng-click="del(row)" >刪除</button></td>
+							<td class='text-center'>{{row.EMP_ID}}</td>
+							<td class='text-center'>{{row.GROUP_TYPE}}</td>
+							<td class='text-center'>{{row.FC1_CNT}}</td>
+							<td class='text-center'>{{row.FC2_CNT}}</td>
+							<td class='text-center'>{{row.FC3_CNT}}</td>
+							<td class='text-center'>{{row.FC4_CNT}}</td>
+							<td class='text-center'>{{row.FC5_CNT}}</td>
+							<td class='text-center'>{{row.FCH_CNT}}</td>
+							<td class='text-center'>{{row.CREATOR}}</td>
+							<td class='text-center'>{{row.CREATETIME}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,255 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+.middle tbody tr td {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG220/ORG220.js"></script>
+<script type="text/javascript" src="assets/txn/ORG220/ORG220_INSERT.js"></script>
+<script type="text/javascript" src="assets/txn/ORG220/ORG220_UPDATE.js"></script>
+<script type="text/javascript" src="assets/txn/CUS110/CUS110.js"></script>
+
+<div class="ORG220" ng-controller="ORG220Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table >
+					<tr>
+						<th style="width:10%"><input type="radio" ng-model="inputVO.RPT_TYPE"  value="ORG"><label>組織選取</label></th>
+						<th style="width:22.5%" ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">業務處：</th>
+						<td style="width:22.5%" ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width:22.5%" ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">營運區：</th>
+						<td style="width:22.5%" ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width:22.5%" ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">業務處：</th>
+						<td style="width:22.5%" ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-paramtype="PMS.UHRM_RC"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeRegion()"
+										style="line-height:20px;" />
+						</td>						
+						<th style="width:22.5%" ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">業務中心：</th>
+						<td style="width:22.5%" ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-paramtype="PMS.UHRM_OP"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeArea()"
+										style="line-height:20px;" />
+						</td>
+					</tr>	
+					</tr>
+					<tr>
+						<th style="width:10%"></th>
+						<th style="width:22.5%" ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">分行：</th>
+						<td style="width:22.5%" ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="branch_nbr" name="branch_nbr"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_nbr"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeBranch(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width:22.5%">員工姓名：</th>
+						<td ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="emp_id" name="emp_id"
+										ng-datasource="EMP_LIST"
+										ng-model="inputVO.emp_id"
+										ng-validate="false" 
+										ng-disabled="EMP_LIST.length == 2"
+										ng-readonly="EMP_LIST.length == 2" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeEmp_id(region)"
+										style="line-height:20px;" />
+				    	</td>
+						<td ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+	     					<e-combobox id="uEmpID" name="uEmpID"
+										ng-datasource="mappingSet['UHRM_LIST']"
+										ng-model="inputVO.uEmpID"
+										ng-validate="false" 
+										ng-disabled="mappingSet['UHRM_LIST'].length == 2"
+										ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />				 
+						</td>
+					</tr>
+					
+					<tr>
+						<th style="width:10%"><input type="radio" ng-model="inputVO.RPT_TYPE" ng-change="emp()" value="EMP"><label>員工編號</label></th>
+						<td style="width:22.5%" colspan="4"><input class="form-control" type="text" placeholder="請輸入..." ng-model="inputVO.emp_id_txt" ng-disabled="inputVO.RPT_TYPE != 'EMP'||inputVO.mroleid =='0'" e-length-limit="11"></td>
+					</tr>
+					<tr>
+						<th style="width:10%">代理起始時間：</th>
+						<td style="width:22.5%">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="sCreDate" name="sCreDate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.sCreDate"
+									   is-open="model.a"
+									   datepicker-options="bgn_sDateOptions"
+									   ng-readonly="true"
+									   ng-change="limitDate1()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+						</td>
+						<td style="width:22.5%">
+							<e-combobox id="timeS" name="timeS"
+										ng-datasource="mappingSet['timeS']"
+										ng-model="inputVO.sTime"
+				    					ng-validate="false" 
+				    					ng-readonly="inputVO.sCreDate == undefined" 
+				    					ng-disabled="inputVO.sCreDate == undefined"
+				    					ng-editable="false"
+				    					ng-format="F3"
+				    					ng-required="false"
+				    					style="line-height:20px;" />
+		    			</td>
+					</tr>
+					<tr>		
+						<th style="width:10%">代理結束時間：</th>
+						<td style="width:22.5%">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="eCreDate" name="eCreDate"
+									   class="form-control" 
+									   uib-datepicker-popup="yyyy/MM/dd" 
+									   ng-model="inputVO.eCreDate" 
+									   is-open="model.b" 
+									   datepicker-options="bgn_eDateOptions" 
+									   ng-readonly="true" 
+									   ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+						</td>
+						<td style="width:22.5%">
+							<e-combobox id="timeE" name="timeE"
+										ng-datasource="mappingSet['timeE']"
+										ng-model="inputVO.eTime"
+				    					ng-validate="false" 
+				    					ng-readonly="inputVO.sCreDate == undefined" 
+				    					ng-disabled="inputVO.sCreDate == undefined"
+				    					ng-editable="false"
+				    					ng-format="F3"
+				    					ng-required="false"
+				    					style="line-height:20px;" />
+		    			</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire();" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="initial();">清除</button>
+				<button type="button" class="btn btn-info" ng-click="insert(row)" function-type ="maintenance">新增</button>
+			</div>
+		</div>
+		<div class="tfb_content">
+      		<div class="tfb_content_icon"></div>
+      		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+   		</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="table-striped text-center middle e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="resultList" ng-init="totals = {}">
+					<thead>
+						<tr>
+							<th>動作</th>
+							<th>被代理人組織</th>
+							<th>被代理人</th>
+							<th>代理組織</th>
+							<th>代理人</th>
+							<th>代理狀態</th>
+							<th>起始時間</th>
+							<th>終止時間</th>
+							<th>備註</th>
+							<th>修改者</th>
+							<th>最後修改日期</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>
+								<button type="button" class="btn btn-info" 	  ng-click="action(row, 'Y')" ng-if="row.AGENT_ID == loginID && row.AGENT_STATUS == 'W'">同意</button>
+								<button type="button" class="btn btn-warning" ng-click="action(row, 'N')" ng-if="row.AGENT_ID == loginID && row.AGENT_STATUS == 'W'">不同意</button>
+								<button type="button" class="btn btn-info" 	  ng-click="action(row, 'E')" ng-if="row.EMP_ID == loginID && row.AGENT_STATUS == 'S'">代理結束</button>
+								<button type="button" class="btn btn-warning" ng-click="action(row, 'C')" ng-if="row.EMP_ID == loginID && (row.AGENT_STATUS == 'U' || row.AGENT_STATUS == 'W')">代理取消</button>
+								<button type="button" class="btn btn-info"	  ng-click="action(row, 'M')" ng-if="row.EMP_ID == loginID && (row.AGENT_STATUS == 'U' || row.AGENT_STATUS == 'W')">代理修改</button>
+							</td>
+							<td>{{row.DEPT_NAME}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td>{{row.AGENT_DEPT_NAME}}</td>
+							<td>{{row.AGENT_NAME}}</td>
+							<td>
+								<div uib-tooltip="{{row.AUTO_END_REASON}}" tooltip-placement="right-bottom">
+									{{row.AGENT_STATUS_NAME}}
+								</div>
+							</td>
+							<td>{{row.START_DATE}}</td>
+							<td>{{row.END_DATE}}</td>
+							<td>{{row.AGENT_DESC}}</td>
+							<td>{{row.MODIFIER}}</td>
+							<td>{{row.LASTUPDATE}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

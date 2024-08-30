@@ -1,0 +1,128 @@
+<script type="text/javascript" src="assets/txn/MAO241/MAO241.js"></script>
+<script type="text/javascript" src="assets/txn/MAO241/MAO241_map.js"></script>
+<script type="text/javascript" src="assets/txn/MAO241/MAO241_add.js"></script>
+<div class="MAO241" ng-controller="MAO241Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >設備管理查詢</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box2">
+				<table>
+					<tr>
+						<th>設備編號：</th>
+						<td>
+							<input type="text" class="form-control" id="dev_nbr" name="dev_nbr" ng-model="inputVO.dev_nbr" e-length-limit="15">
+						</td>
+					</tr>
+					<tr>
+						<th>狀態：</th>
+						<td>
+							<e-combobox id="dev_status"
+										ng-datasource="mappingSet['MAO.DEV_STATUS']" 
+										ng-model="inputVO.dev_status"
+			   							ng-validate="false" 
+			   							ng-readonly="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							style="line-height:20px;" />
+						</td>
+						<th>使用地點 : </th>
+						<td>
+							<e-combobox id="dev_site_type"
+										ng-datasource="mappingSet['MAO.DEV_SITE_TYPE']" 
+										ng-model="inputVO.dev_site_type"
+			   							ng-validate="false" 
+			   							ng-readonly="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							style="line-height:20px;" />
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit(); inquire();" >查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit(); init()" >清除</button>
+				<button type="button" class="btn btn-info" ng-click="add_page()" ng-if="auth">新增</button>
+				<button type="button" class="btn btn-info" ng-click="exportfile()" ng-disabled="resultList.length == 0">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<table width="100%">
+				<tr>
+					<td width="30%">
+						<div class="tfb_content_tit">
+							<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+						</div>
+					</td>
+					<td width="70%">
+						<div align="right">
+							<button type="button" class="btn btn-info" ng-click="deletefile()" ng-if="auth">刪除</button>
+							<button type="button" class="btn btn-info" ng-click="lost()" ng-if="auth">遺失</button>
+							<button type="button" class="btn btn-info" ng-click="save()">儲存</button>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<div id="exportable">
+					<table>
+						<thead>
+							<tr>
+								<th>勾選</th>
+								<th>使用人</th>
+								<th>員編</th>
+								<th>建立人</th>
+								<th>設備編號</th>
+								<th>裝置保管人</th>
+								<th>使用地點</th>
+								<th>座標</th>
+								<th>資料更新日期</th>
+								<th>狀態</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td><input type='checkbox' ng-model='row.SELECTED' ></td>
+								<td>{{row.AO_CODE}}{{row.AO_CODE == undefined ? '' : '-'}}{{row.EMP_NAME}}</td>
+								<td>{{row.EMP_ID}}</td>
+								<td>{{row.CREATOR}}</td>
+								<td>{{row.DEV_NBR}}</td>
+								<td><input type="text" class="form-control" id="dev_take_emp" name="dev_take_emp" ng-model="row.DEV_TAKE_EMP" ng-blur="showName(row)" e-length-limit="6" style="display: inline; width: 100px">{{row.KEEPER_NAME}}</td>
+								<td ng-if="!auth">{{row.DEV_SITE_TYPE | mapping:mappingSet['MAO.DEV_SITE_TYPE']:'F3'}}</td>
+								<td ng-if="auth">
+									<e-combobox id="dev_site_type"
+										ng-datasource="mappingSet['MAO.DEV_SITE_TYPE']" 
+										ng-model="row.DEV_SITE_TYPE"
+			   							ng-validate="false" 
+			   							ng-readonly="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							style="line-height:20px;" />
+								</td>
+								<td><a ng-if="row.POS_LONG && row.POS_LATI" onclick="return false" ng-click="map(row)">經度: {{row.POS_LONG}}, 緯度: {{row.POS_LATI}} </a></td>
+								<td>{{row.LASTUPDATE}}</td>
+								<td>{{row.DEV_STATUS | mapping:mappingSet['MAO.DEV_STATUS']:'F3'}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

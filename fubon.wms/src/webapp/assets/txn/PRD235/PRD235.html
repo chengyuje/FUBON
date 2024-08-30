@@ -1,0 +1,158 @@
+<style>
+.modal-dialog.PRD235 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+.modal-dialog.PRD235_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 300px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD235/PRD235.js"></script>
+<script type="text/javascript" src="assets/txn/PRD235/PRD235_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PRD235/PRD235_EDITUNIT.js"></script>
+<script type="text/javascript" src="assets/txn/PRD235/PRD235_FEE.js"></script>
+<div ng-controller="PRD235Controller" ng-cloak>
+	<div class="search_table search_box3">
+		<table>
+			<tr>
+				<th>&nbsp;&nbsp;基金代碼：</th>
+				<td><input type="text" class="form-control" style="text-transform: uppercase; width:300px;" placeholder="請輸入..." id="prd_id" name="prd_id" ng-model="inputVO.PRD_ID" e-length-limit="4"></td>
+				<th>&nbsp;&nbsp;申購/贖回：</th>
+				<td>
+					<input type="radio" name="TRADE_TYPE" ng-model="inputVO.TRADE_TYPE" ng-value="'1'" required ng-change="tradeTypeChanged();">申購&nbsp;&nbsp;
+					<input type="radio" name="TRADE_TYPE" ng-model="inputVO.TRADE_TYPE" ng-value="'2'" required ng-change="tradeTypeChanged();">贖回
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">查詢</button>&nbsp;&nbsp;
+		<button type="button" class="btn btn-info" ng-click="addProd()">新增</button> &nbsp;&nbsp;
+		<button type="button" class="btn btn-info" ng-click="feeSetup()">費用率及報酬率設定</button>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<!-- 申購 -->
+			<table class="table-bordered middle" ng-if="inputVO.TRADE_TYPE=='1'">
+				<thead>
+					<tr>
+						<th>功能</th>
+						<th>基金代碼</th>
+						<th>基金名稱</th>
+						<th>申購/贖回</th>
+						<th>年份</th>
+						<th>次別</th>
+						<th>開放起日</th>
+						<th>開放訖日</th>
+						<th>申請截止日</th>
+						<th>交易日</th>
+						<th>原幣<br/>最低申購金額</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>
+							<e-combobox id="PRJ_ACT" name="PRJ_ACT"
+							ng-datasource="row.func"
+							ng-model="row.acttype"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="doFunc(row)"
+							width="60px"
+							style="line-height:20px;" />
+				    	</td>
+						<td>{{row.PRD_ID}}</td>
+				      	<td>{{row.PRD_NAME}}</td>
+						<td align="center">{{row.TRADE_TYPE | mapping: mappingSet['PRD_CATEGORY']}}</td>
+						<td>{{row.PRD_YEAR}}</td>
+						<td>{{row.PRD_CATEGORY}}</td>
+						<td>{{toJsDate(row.START_DATE) | date:'yyyy-MM-dd'}}</td>
+						<td>{{toJsDate(row.END_DATE) | date:'yyyy-MM-dd'}}</td>
+						<td>{{toJsDate(row.DEADLINE_DATE) | date:'yyyy-MM-dd'}}</td>
+						<td>{{toJsDate(row.TRADE_DATE) | date:'yyyy-MM-dd'}}</td>
+						<td align="right">{{row.MIN_PURCHASE_AMT | number: 0}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<!-- 贖回 -->
+			<table class="table-bordered middle" ng-if="inputVO.TRADE_TYPE=='2'">
+				<thead>
+					<tr>
+						<th>功能</th>
+						<th>基金代碼</th>
+						<th>基金名稱</th>
+						<th>申購/贖回</th>
+						<th>年份</th>
+						<th>次別</th>
+						<th>開放起日</th>
+						<th>開放訖日</th>
+						<th>申請截止日</th>
+						<th>交易日</th>
+						<th>原幣<br/>最低申購金額</th>
+						<th>贖回總表</th>
+						<th>新單位數</th>
+						<th>狀態</th>
+						<th>明細</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>
+							<e-combobox id="PRJ_ACT" name="PRJ_ACT"
+							ng-datasource="row.func"
+							ng-model="row.acttype"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="doFunc(row)"
+							width="60px"
+							style="line-height:20px;" />
+				    	</td>
+						<td>{{row.PRD_ID}}</td>
+				      	<td>{{row.PRD_NAME}}</td>
+						<td align="center">{{row.TRADE_TYPE | mapping: mappingSet['PRD_CATEGORY']}}</td>
+						<td>{{row.PRD_YEAR}}</td>
+						<td>{{row.PRD_CATEGORY}}</td>
+						<td>{{toJsDate(row.START_DATE) | date:'yyyy-MM-dd'}}</td>
+						<td>{{toJsDate(row.END_DATE) | date:'yyyy-MM-dd'}}</td>
+						<td>{{toJsDate(row.DEADLINE_DATE) | date:'yyyy-MM-dd'}}</td>
+						<td>{{toJsDate(row.TRADE_DATE) | date:'yyyy-MM-dd'}}</td>
+						<td align="right">{{row.MIN_PURCHASE_AMT | number: 0}}</td>
+						<td><button type="button" class="btn btn-info" ng-click="printReport(row);" ng-disabled="row.STATUS_1 == 'N'">產出</button></td>
+						<td><button type="button" class="btn btn-info" ng-click="editUnitNum(row);" ng-disabled="row.STATUS_2 == 'N'">填寫</button></td>
+						<td>{{row.STATUS | mapping: mappingSet['PRD.OVSPRI_RDM_ADJ_STATUS']}}</td>
+						<td><button type="button" class="btn btn-info" ng-click="editUnitNum(row);" ng-disabled="row.STATUS_3 == 'N'">查詢</button></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,119 @@
+<style>
+    .modal-content {
+        margin-top: 150px;
+        width: 80vw;
+        ng-min-height: 24vh;
+        max-height: 100vh;
+    }
+
+    .scrollable {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    .textRight {
+        text-align: right;
+    }
+
+    .inputSize.lg {
+        width: 180px;
+    }
+
+    .inputSize.sm {
+        width: 80px;
+    }
+
+</style>
+<div ng-controller="FPS324_STOCKController"
+     ng-cloak>
+    <div class="modal-dialog">
+        <!--  panel_content  -->
+        <div class="modal-content ">
+            <div class="modal-header">
+                <button type="button"
+                        class="close"
+                        ng-click="closeThisDialog('cancel')">&times;</button>
+                <h4 id="myModalAlertLabel"
+                    class="modal-title"
+                    align="left">
+                    <label>基金查詢</label>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <!-- result -->
+                <div class="bootstrap-adng-min-panel-content ">
+                    <div>帳號：
+                        <e-combobox id="account"
+                                    name="account"
+                                    ng-datasource="accountList"
+                                    ng-model="inputVO.account"
+                                    ng-validate="true"
+                                    ng-readonly="false"
+                                    ng-editable="false"
+                                    ng-format="F3"></e-combobox>
+                    </div>
+                    <div class="search_box_btn text-center">
+                        <button type="button"
+                                class="btn btn-info"
+                                ng-click="inquire()">查詢</button>
+                        <button type="button"
+                                class="btn btn-info"
+                                ng-click="closeThisDialog('cancel')">取消</button>
+                        <button type="button"
+                                class="btn btn-info"
+                                ng-click="add()">加入</button>
+                    </div>
+
+                    <div>
+                        <e-jumping output="outputVO"
+                                   input="inputVO"
+                                   query="inquire()"
+                                   list="paramList">
+                        </e-jumping>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">勾選</th>
+                                <th scope="col">帳號</th>
+                                <th scope="col">投資標的</th>
+                                <th scope="col">首次申請日</th>
+                                <th scope="col">風險等級</th>
+                                <th scope="col">計價幣別</th>
+                                <th scope="col">單位數</th>
+                                <th scope="col">淨值基準日</th>
+                                <th scope="col">淨值</th>
+                                <th scope="col">平均單位淨值</th>
+                                <th scope="col">基準日市值</th>
+                                <th scope="col">投資幣別</th>
+                                <th scope="col">原始投資金額</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in paramList"
+                                ng-class-odd="'rowOdd'"
+                                ng-class-even="'rowEven'">
+                                <td>
+                                    <input type="checkbox"
+                                           ng-model="row.isChecked">
+                                </td>
+                                <td>{{row.ACC_NO}}</td>
+                                <td>{{row.PRD_ID}}<br/>{{row.PRD_NAME}}</td>
+                                <td>{{row.BUY_DATE}}</td>
+                                <td>{{row.RISK_LEVEL}}</td>
+                                <td>{{row.CUR_ID}}</td>
+                                <td>{{row.UNIT_BUY}}</td>
+                                <td>{{row.NAV_DATE}}</td>
+                                <td>{{row.NAV}}</td>
+                                <td>{{row.AVG_FUND_NAV}}</td>
+                                <td>{{row.AMT_NOW_FOR}}</td>
+                                <td>{{row.BUY_CUR_ID}}</td>
+                                <td>{{row.AMT_BUY}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

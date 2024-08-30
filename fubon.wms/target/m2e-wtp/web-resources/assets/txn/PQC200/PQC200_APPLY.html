@@ -1,0 +1,163 @@
+<style>
+/* dialog panl */
+.modal-dialog.PQC200_APPLY {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1300px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<div ng-controller="PQC200_APPLYController" ng-cloak>
+    <div class="modal-dialog PQC200_APPLY">
+        <div class="modal-content">
+        	<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">預約申請額度</h4>
+			</div>
+    		<div class="modal-body">
+    			<form name="parameterTypeEditForm">
+					<table width="100%">
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>產品類別：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+                                <e-combobox id="prdType" name="prdType"
+                                			ng-paramtype="PQC.PRD_TYPE"
+											ng-model="inputVO.prdType" 
+											ng-validate="false"
+											ng-editable="false" 
+											ng-format="F3"
+											ng-required="true" 
+											ng-change="getActivePrd()"
+											style="line-height:20px;" 
+											required/>
+		    				</td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>產品：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+                                <e-combobox id="prdID" name="prdID"
+                                			ng-datasource="mappingSet['ACTIVE_PRD_LIST']"
+											ng-model="inputVO.prdID" 
+											ng-validate="false"
+											ng-editable="false" 
+											ng-format="F3"
+											ng-required="true" 
+											ng-disabled="inputVO.prdType == '' || inputVO.prdType == undefined || inputVO.prdType == null"
+											ng-readonly="inputVO.prdType == '' || inputVO.prdType == undefined || inputVO.prdType == null"
+											style="line-height:20px;" 
+											ng-change="getLaveQuota()"
+											required/>
+		    				</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="parameterTypeEditForm.prdType.$error.required || parameterTypeEditForm.prdID.$error.required ">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"><font ng-show="parameterTypeEditForm.prdType.$error.required">請選擇產品類別</font></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"><font ng-show="parameterTypeEditForm.prdID.$error.required">請選擇產品</font></td>
+							<td class="col-xs-1"></td>
+						</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>客戶ID：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<input 	id="custId" name= "custId"
+		    							class="form-control" 
+				    					type="text" 
+				    					placeholder="請輸入客戶 ID" 
+				    					ng-model="inputVO.custId" 
+				    					style="text-transform: uppercase;width:200px"/>
+		    				</td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>客戶姓名：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<input 	id="custName" name="custName"
+		    							class="form-control" 
+				    					type="text" 
+				    					placeholder="請輸入客戶姓名" 
+				    					ng-model="inputVO.custName" 
+                                        style="width:200px"/>
+				    		</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="(inputVO.custId == '' || inputVO.custId == undefined) || (inputVO.custName == '' || inputVO.custName == undefined)">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"><font ng-show="inputVO.custId == '' || inputVO.custId == undefined">請輸入客戶ID</font></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"><font ng-show="inputVO.custName == '' || inputVO.custName == undefined">請輸入客戶姓名</font></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-hide="parameterTypeEditForm.prdID.$error.required">
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">回報開始日：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{toJsDate(inputVO.SHOW_START_DATE) | date:"yyyy-MM-dd"}}</td>
+		    				<th class="col-xs-1.5 tdpadding">回報結束日：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{toJsDate(inputVO.SHOW_END_DATE) | date:"yyyy-MM-dd"}}</td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-hide="parameterTypeEditForm.prdID.$error.required">
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">最低申購金額：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{inputVO.MIN_QUOTA | number}}</td>
+		    				<th class="col-xs-1.5 tdpadding"><!-- 最高申購金額： --></th>
+		    				<td class="col-xs-2.5 tdpadding"><!-- {{inputVO.MAX_QUOTA | number}} --></td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-hide="parameterTypeEditForm.prdID.$error.required">
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding">剩餘額度：</th>
+		    				<td class="col-xs-2.5 tdpadding">{{inputVO.LAVE_QUOTA | number}}</td>
+		    				<th class="col-xs-1.5 tdpadding"></th>
+		    				<td class="col-xs-2.5 tdpadding"></td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr>
+	    					<td class="col-xs-1"></td>
+		    				<th class="col-xs-1.5 tdpadding"><font color="red">*</font>欲申請額度：</th>
+		    				<td class="col-xs-2.5 tdpadding">
+		    					<input 	id="applyQuota" name="applyQuota"
+		    							type="text" 
+		    							class="form-control inputTr" 
+		    							ng-model="inputVO.applyQuota" 
+		    							e-input-limit="N"
+		    							e-length-limit="18" 
+		    							placeholder="請輸入欲申請額度" 
+                                        style="width:200px"
+                                        required/>
+		    				</td>
+		    				<th class="col-xs-1.5 tdpadding"></th>
+		    				<td class="col-xs-2.5 tdpadding"></td>
+		    				<td class="col-xs-1"></td>
+	    				</tr>
+	    				<tr ng-show="parameterTypeEditForm.applyQuota.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"><font ng-show="parameterTypeEditForm.applyQuota.$error.required">請輸入欲申請額度</font></td>
+							<th class="col-xs-1.5 tdpadding"></th>
+							<td class="col-xs-2.5 tdpadding help-block with-errors"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+            </div>
+            <div class="search_box_btn text-center">
+                <button class="btn btn-primary" 
+                		ng-bind="'確定'" 
+                		ng-disabled="parameterTypeEditForm.prdType.$error.required ||
+									 parameterTypeEditForm.prdID.$error.required ||
+									 parameterTypeEditForm.custId.$error.required ||
+									 parameterTypeEditForm.custName.$error.required ||
+									 parameterTypeEditForm.applyQuota.$error.required"
+                		ng-click="save()"></button>
+                <button class="btn btn-default" ng-bind="'取消'" ng-click="cancel()"></button>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,40 @@
+<script type="text/javascript" src="assets/txn/IOT131/IOT131.js"></script>
+<div ng-controller="IOT131Controller" ng-cloak>
+    <div class="modal-dialog" style="width: 1080px;">
+      <div class="modal-content">
+        <div class="modal-header"> 
+        	<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+          <h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">投資連結標的清單</h4>
+        </div>
+        <div class="modal-body">
+        	<div class="gv_tab_sc scroll_y">
+				<table>
+					<tr>
+						<th>人壽基金標的代號</th>
+						<th>人壽基金標的名稱</th>
+						<th>配置比例</th>
+						<th>風險等級-銀行</th>
+						<th>客戶風險承受度</th>
+						<th>風險值適配日</th>
+					</tr>
+					<tr ng-repeat="row in MatchList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{row.TARGET_ID}}</td>
+						<td>{{row.LINKED_NAME}}</td>
+						<td>
+							<input id="link_pct" name="link_pct" type="text" ng-model="row.LINK_PCT" ng-disabled="inputVO.in_OPRSTATUS=='Read'">
+						</td>
+						<td>{{row.PRD_RISK}}</td>
+						<td>{{inputVO.in_RISK}}</td>
+						<td>{{inputVO.MATCH_DATE}}</td>
+					</tr>
+				</table>
+				<div class="search_box_btn text-center">
+					<button ng-click="saveData()" class="btn btn-info" data-dismiss="modal">確定</button> 
+	        		<button ng-click="closeThisDialog('cancel')" class="btn btn-info"data-dismiss="modal">取消</button> 
+				</div>
+	 		</div>
+        </div>
+      </div>
+    </div>
+
+</div>

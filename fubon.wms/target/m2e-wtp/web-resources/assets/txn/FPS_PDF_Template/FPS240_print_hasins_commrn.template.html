@@ -1,0 +1,134 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .FPS .print .flex-block-wrapper .flex-block:nth-of-type(1) {
+    flex: 3;
+  }
+
+  .FPS .print .flex-block-wrapper .flex-block:nth-of-type(2) {
+    border-left: 1px solid #eee;
+    border-right: 0.5px solid #eee;
+    flex: 4;
+  }
+
+  .FPS .print .flex-block-wrapper .flex-block:nth-of-type(3) {
+    border-left: .5px solid #eee;
+    flex: 4;
+  }
+
+  table.conclusion>thead>tr th:nth-of-type(1) {
+    width: calc(100%/11*3);
+  }
+
+  table.conclusion>thead>tr th:nth-of-type(2),
+  table.conclusion>thead>tr th:nth-of-type(3) {
+    width: calc(100%/11*4);
+  }
+
+  /* table.conclusion>thead>tr th:nth-of-type(4) {
+    width: calc(100%/11*1);
+  } */
+
+</style>
+
+<!-- 有投保、有推介 -->
+<div class="print A4 iPad" ng-controller="FPSPrintController">
+
+  <!-- header -->
+  <section>
+    <img ng-src="{{path.header}}" class="wrapper" print="header">
+  </section>
+
+  <!-- title -->
+  <section print print-top-margin="-5" style="margin-bottom:2em;" class="wrapper">
+    <div ng-include="path.brief"></div>
+  </section>
+
+  <!-- image -->
+  <section>
+    <img ng-if="rptUrl"
+         data-ng-src="{{rptUrl}}"
+         alt="rptUrleName"
+         style="margin-bottom:5em; width:100%;"
+         print="image"
+         print-page="next"
+         print-scale-direction="vertical">
+  </section>
+
+  <!-- cust -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">1</span>基本資料
+    </div>
+    <div class="block container" style="border-radius: 1em;">
+      <div ng-include="path.custInfo" ng-init="isPrint=true"></div>
+    </div>
+  </section>
+
+  <!-- amt FPS210 -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">2</span>可供理財規劃金額
+    </div>
+    <div class="wrapper">
+      <p class="sub-title-p">您的資產扣除預期支付後，即為可供理財規劃金額。</p>
+      <div class="ps-wrapper" style="float:right;">單位: 新台幣 元</div>
+    </div>
+
+    <div ng-include="path.validAmount"></div>
+    <div ng-include="path.validAmount_ps"></div>
+  </section>
+
+  <!-- charts FPS220 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">3</span>理財規劃配置
+      </div>
+      <div class="wrapper">
+        <p class="sub-title-p">調整前與調整後之資產配置情況說明如下：</p>
+        <div class="ps-wrapper" style="float:right;">單位: 新台幣 元</div>
+      </div>
+    </div>
+
+    <!-- 有投保 -->
+    <!-- 圖表 (print inside) -->
+    <div ng-include="path.hasStockChart"></div>
+    <!-- 圖表結論  -->
+    <div ng-include="path.hasStockChartConclusion" print></div>
+
+    <div print>
+    	<ol class="ps-wrapper wrapper tiny-font">
+			<li class="ps">類債券商品包含債券型基金、平衡型基金(投資債券占比較高者)、貨幣型基金、債券型ETF、海外債、組合式商品SI、境外結構型商品SN及奈米投(投資債券比例較高者)；類股票商品包含股票型基金、平衡型基金(投資股票占比較高)、股票型ETF及奈米投(投資股票比例較高者)，台北富邦商業銀行將不定期依標的投資比例變化，調整商品的股債分類。</li>
+		  <li class="ps">調整前及調整後比例皆以約當台幣金額計算占比。</li>
+		</ol>
+    </div>
+  </section>
+
+  <section print>
+    <div ng-include="path.noSignAlert"></div>
+  </section>
+
+  <!-- 使用指南 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">4</span>規劃書使用指南
+      </div>
+    </div>
+
+    <div ng-include="path.manual" print></div>
+  </section>
+
+  <!-- 注意事項 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">5</span>注意事項
+      </div>
+    </div>
+
+    <div ng-include="path.notice" print></div>
+  </section>
+  <div id="hiddendom"></div>
+</div>

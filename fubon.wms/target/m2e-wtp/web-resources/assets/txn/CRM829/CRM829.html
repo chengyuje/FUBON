@@ -1,0 +1,130 @@
+<script type="text/javascript" src="assets/txn/CRM829/CRM829.js"></script>
+<div class="CRM828" ng-controller="CRM829Controller" ng-cloak>
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th>(約當臺幣)</th>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<th>投資計畫總數：</th>
+					<td>{{totalPlanNo | number : 0}}</td>
+				</tr>
+				<tr>
+					<th>總投資金額：</th>
+					<td>{{totalInvestmentTwd | number :0}}</td>
+				</tr>
+				<tr>
+					<th>參考總市值：</th>
+					<td>{{totalMarketValueTwd | number :0}}</td>
+				</tr>
+			</table>
+		</div>
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="rstable e-table-freeze" e-left="3" e-height="500px" e-mode="1" e-top="true" e-list="data">
+				<thead>
+					<tr>
+						<th>契約編號</th>
+						<th>目標類型</th>
+						<th>產品代號</th>
+						<th>計畫名稱</th>
+						<th>投資策略</th>
+						<th>投資幣別</th>
+						<th>投資金額(原幣)</th>
+						<th>投資金額(台幣)</th>
+						<th>參考市值(原幣)</th>
+						<th>參考市值(台幣)</th>
+						<th>已入帳之現金配息</th>
+						<th>投資報酬率<br/>(含已入帳之現金配息)</th>
+						<th>參考損益</th>
+						<th>投資報酬率</th>
+						<th>投資起日</th>
+						<th>配息方式</th>
+						<th>投資方式</th>
+						<th>每月扣款日期</th>
+						<th>扣款方式</th>						
+						<th>每月投資金額</th>
+						<th>目標金額</th>
+						<th>計畫年限</th>
+						<th>邊刷邊投累積狀態</th>
+						<th>邊刷邊投累積金額<br/>(達1000扣款)</th>
+						<th>邊刷邊投單次上限</th>
+						<th>邊刷邊投卡類</th>
+						<th>邊刷邊投加速</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;">{{row.PotId}}</td>
+						<td style="text-align: left;">{{row.target | mapping:mappingSet['CRM.NANO_TARGET']:'F3'}}</td>
+						<td style="text-align: left;">{{row.Strategy | mapping:mappingSet['CRM.NANO_STRATEGY']:'F3'}}</td>
+						<td style="text-align: left;">{{row.PlanName}}</td>						
+						<td style="text-align: left;" ng-show="row.Strategy != '2'">{{row.RiskPref != null ? 'Level '+ row.RiskPref : ''}}</td>
+						<td style="text-align: left;" ng-show="row.Strategy == '2'">{{row.RiskPref | mapping:mappingSet['CRM.NANO2_RISKPREF']:'F3'}}</td>
+						<td style="text-align: left;">{{row.Currency}}</td>
+						<td style="text-align: right;">{{row.IncreaseAmtBas | number : 2}}</td>
+						<td style="text-align: right;">{{row.IncreaseAmtTwd | number : 0}}</td>
+						<td style="text-align: right;">{{row.MarketValBas | number : 2}}</td>
+						<td style="text-align: right;">{{row.MarketValTwd | number : 0}}</td>
+						<td style="text-align: right;">{{row.Dividendamount | number : 0}}</td>
+						<td style="text-align: right;">{{(row.Signcod == '-' ? '-' : '')}}{{row.Interestrateofreturn | number : 2}}%</td>
+						<td style="text-align: right;">{{(row.SignDigitBas == '-' ? '-' : '')}}{{row.ProfitAndLossBas | number : 2}}</td>
+						<td style="text-align: right;">{{(row.SignDigitBas == '-' ? '-' : '')}}{{row.RetrunBas | number : 2}}%</td> 
+						<td style="text-align: left;">{{toJsDate(row.StarDate) | date : "yyyy/MM/dd"}}</td>
+						<td style="text-align: left;">{{row.DivType | mapping:mappingSet['CRM.NANO_DIV_TYPE']:'F3'}}</td>
+						<td style="text-align: left;">{{row.Type | mapping:mappingSet['CRM.NANO_TYPE']:'F3'}}</td>
+						<td style="text-align: left;">{{row.ChargeDate}}</td>	
+						<td style="text-align: left;">{{row.Exchange | mapping:mappingSet['CRM.NANO_EXCHANGE']:'F3'}}</td>					
+						<td style="text-align: right;">{{row.Amt | number : 0}}</td>
+						<td style="text-align: right;">{{row.TargetAmt | number : 2}}</td>
+						<td style="text-align: right;">{{row.yearLimit}}</td>
+						<td style="text-align: left;">{{row.IsCumulativeSwitchOn | mapping:mappingSet['CRM.NANO_CUM_SWITCH_ON']:'F3'}}</td>
+						<td style="text-align: right;">{{row.CumulativeAmount | number : 0}}</td>
+						<td style="text-align: right;">{{row.MaximumInvestmentAmount | number : 0}}</td>
+						<td style="text-align: left;">{{row.SelectedCardsName}}</td>
+						<td style="text-align: left;">{{row.CumulativeMultiple | mapping:mappingSet['CRM.NANO_CUM_MULTIPLE']:'F3'}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div></br>
+		<label>贖回在途資料</label>
+		<e-jumping-once output="outputVO2" list="data2" totallist="sellList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table>
+				<thead>
+					<tr>
+						<th>贖回申請日</th>
+						<th>契約編號</th>
+						<th>計畫名稱</th>
+						<th>產品代號</th>
+						<th>投資策略</th>
+						<th>投資幣別</th>
+						<th>投資金額(原幣)</th>
+						<th>投資金額(台幣)</th>
+						<th>參考市值(原幣)</th>
+						<th>參考市值(台幣)</th>
+						<th>投資報酬率</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data2 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;">{{row.ModifyTime}}</td>
+						<td style="text-align: left;">{{row.PotId}}</td>
+						<td style="text-align: left;">{{row.PlanName}}</td>						
+						<td style="text-align: left;">{{row.Strategy | mapping:mappingSet['CRM.NANO_STRATEGY']:'F3'}}</td>
+						<td style="text-align: left;" ng-show="row.Strategy != '2'">{{row.RiskPref != null ? 'Level '+ row.RiskPref : ''}}</td>
+						<td style="text-align: left;" ng-show="row.Strategy == '2'">{{row.RiskPref | mapping:mappingSet['CRM.NANO2_RISKPREF']:'F3'}}</td>
+						<td style="text-align: left;">{{row.Currency}}</td>
+						<td style="text-align: right;">{{row.IncreaseAmtBas | number : 2}}</td>
+						<td style="text-align: right;">{{row.IncreaseAmtTwd | number : 0}}</td>
+						<td style="text-align: right;">{{row.MarketValBas | number : 2}}</td>
+						<td style="text-align: right;">{{row.MarketValTwd | number : 0}}</td>
+						<td style="text-align: right;">{{(row.SignDigitBas == '-' ? '-' : '')}}{{row.RetrunBas | number : 2}}%</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

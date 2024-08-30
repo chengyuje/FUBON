@@ -1,0 +1,256 @@
+<style>
+.rstable tr th {
+	vertical-align:middle;
+}
+.rstable tr td {
+	vertical-align:middle;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG131/ORG131.js"></script>
+<script type="text/javascript" src="assets/txn/ORG131/ORG131_INSERT.js"></script>
+<script type="text/javascript" src="assets/txn/ORG131/ORG131_HIRE.js"></script>
+<script type="text/javascript" src="assets/txn/ORG131/ORG131_DETAIL.js"></script> 
+<script type="text/javascript" src="assets/txn/ORG131/ORG131_AS.js"></script>
+<script type="text/javascript" src="assets/txn/ORG131/ORG131_SAS.js"></script>
+<script type="text/javascript" src="assets/txn/ORG131/ORG131_TRANS.js"></script>
+<script type="text/javascript" src="assets/txn/ORG131/ORG131_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/ORG131/ORG131_DOWNLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/ORG131/ORG131_REVIEW.js"></script>
+<div class="ORG131" ng-controller="ORG131Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table class="rstable">
+					<tr>
+						<th style="width:16.6%;vertical-align: middle;">業務處：</th>
+						<td style="width:16.6%">
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width:16.6%">營運區：</th>
+						<td style="width:16.6%">
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(region)"
+										style="line-height:20px;" />
+						</td>
+						<th style="width:16.6%">分行：</th>
+						<td style="width:16.6%">
+							<e-combobox id="branch_nbr" name="branch_nbr"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_nbr"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeBranch(region)"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th>應徵者：</th>
+						<td><input type="text" class="form-control" ng-model="inputVO.emp_name" e-length-limit="100" size="20"></td>
+						<th>進件日期：</th>
+						<td colspan="3">
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="recv_case_sdate" name="recv_case_sdate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.recv_case_sdate"
+									   is-open="model.a"
+									   datepicker-options="recv_case_sDateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+ 								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>	
+							<div style="float: left">~</div>
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="recv_case_edate" name="recv_case_edate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.recv_case_edate"
+											is-open="model.b"
+											datepicker-options="recv_case_eDateOptions"
+											ng-readonly="true"								
+											ng-change="limitDate()"/>
+			 								<span class="input-group-btn">
+												<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+													<i class="glyphicon glyphicon-calendar"></i></button>																		
+											</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>目前狀態：</th>
+						<td>
+							<e-combobox id="status" name="status" 
+										ng-paramtype="ORG.HIRE_STATUS"
+										ng-model="inputVO.status"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3" />
+						</td>
+						<th>預定報到日期：</th>
+						<td colspan="3">
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="book_onbo_sdate" name="book_onbo_sdate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.book_onbo_sdate"
+									   is-open="model.c"
+									   datepicker-options="book_onbo_sDateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate1()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>	
+							<div style="float: left">~</div>
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="book_onbo_edate" name="book_onbo_edate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.book_onbo_edate"
+									   is-open="model.d"
+									   datepicker-options="book_onbo_eDateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate1()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+						</td>
+					</tr>
+				</table>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="query()" function-type ="query" >查詢</button>
+					<button type="button" class="btn btn-info" ng-click="initial();init()">清除</button>
+					<button type="button" class="btn btn-info" ng-click="insert()" ng-if="inputVO.mroleID =='0'"function-type="maintenance" >新增</button>
+					<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="resultList2.length == 0" function-type ="export">匯出</button>
+					<button type="button" class="btn btn-default" ng-click="download()" function-type ="export">下載</button>
+				</div>
+			</div>
+		</div>
+		<div class="tfb_content">
+      		<div class="tfb_content_icon"></div>
+      		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+   		</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList2"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;min-height:435px;">
+				<table class="tablesaw table table-striped table-bordered text-center middle "  ng-init="totals = {}">
+					<thead>
+						<tr>
+							<th>功能</th>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行</th>
+							<th>應徵者</th>
+							<th>職務</th>
+							<th>狀態</th>
+							<th>進用狀態</th>
+							<th>分行進件日</th>
+							<th>總行收件日</th>
+							<th>處主管複試日</th>
+							<th>預定報到日</th>
+							<th>備註</th>
+							<th>黑名單</th>
+							<th>最後修改人</th>
+							<th>最後修改時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>
+								<div ng-show="row.REVIEW_STATUS == 'W' && row.SEQNO != 0 &&  inputVO.mroleID == '1' && !inputVO.isSupervisor"  style="display:inline;">
+									<button type="button" class="btn btn-primary" ng-click="review(row)" function-type="confirm">核可</button>
+									<button type="button" class="btn btn-warning" ng-click="reback(row)" function-type="confirm">退回</button>
+								</div>
+                                <!--督導-->
+								<div style="display:inline;" ng-show="row.REVIEW_STATUS == 'S' && inputVO.mroleID == '1' && inputVO.isSupervisor">
+									<button type="button" class="btn btn-primary" ng-click="review(row)" >核可</button>
+									<button type="button" class="btn btn-warning" ng-click="reback(row)" >退回</button>
+									<!-- <button type="button" class="btn btn-default" ng-click=" action(row, (((inputVO.mroleID == '0' && priID > 13) || ((inputVO.mroleID == '0' || priID < 13) && (row.HIRE_STATUS != '1' && row.HIRE_STATUS != '3')) && (row.STATUS != '08' && row.STATUS != '09' && row.STATUS != '10')) ? 'A' : 'B')) ">
+										 {{(
+										 	((inputVO.mroleID == '0' && priID > 13) || ((inputVO.mroleID == '0' || priID < 13) && (row.HIRE_STATUS != '1' && row.HIRE_STATUS != '3')) && 
+										     (row.STATUS != '08' && row.STATUS != '09' && row.STATUS != '10')
+										   ) ? '編輯' : '詳細')}} 
+									</button> -->
+								</div>
+								<div ng-show="(row.REVIEW_STATUS == 'W'||row.REVIEW_STATUS == 'S') && row.SEQNO == 0 && inputVO.mroleID != '1'"><label>待覆核</label></div>
+								<div style="display:inline;" ng-hide = "(row.REVIEW_STATUS == 'W' || row.REVIEW_STATUS == 'S') && inputVO.mroleID != '1'">
+									<button type="button" class="btn btn-default" ng-click="action(row , ((inputVO.mroleID == '1' && priID >= 13)||(inputVO.mroleID == '0' && priID >= 13) || ((inputVO.mroleID == '0' || priID <= 13) && (row.HIRE_STATUS != '1' && row.HIRE_STATUS != '3')) && 
+										     (row.STATUS != '08' && row.STATUS != '09' && row.STATUS != '10')) ? 'A' : 'B') ">
+										 {{(
+										 	((inputVO.mroleID == '1' && priID >= 13)||(inputVO.mroleID == '0' && priID >= 13) || ((inputVO.mroleID == '0' || priID <= 13) && (row.HIRE_STATUS != '1' && row.HIRE_STATUS != '3')) && 
+										     (row.STATUS != '08' && row.STATUS != '09' && row.STATUS != '10')
+										   ) ? '編輯' : '詳細')}} 
+									</button>
+								</div>
+								<div  style="display:inline;" ng-show="!((row.REVIEW_STATUS == 'W'||row.REVIEW_STATUS == 'S') && row.SEQNO == 0 && inputVO.mroleID != '1')">
+									<button type="button" class="btn btn-default" ng-click="action(row,'D')">金控版面談評估表</button>
+                                    <!--分行主管，未送件前-->
+									<button type="button" ng-show = "row.STATUS == '01' && inputVO.mroleID != '1'"
+                                            class="btn btn-default" ng-click="deleteData(row)">刪除</button>
+									<!--處主管，分行主管已送件-->
+                                    <button type="button" ng-show="row.REVIEW_STATUS == 'W' && row.SEQNO != 0 &&  inputVO.mroleID == '1'"
+                                            class="btn btn-default" ng-click="deleteData(row)">刪除</button>
+									<!--總行人員-->
+                                    <button type="button" ng-show="inputVO.isHeadMgr && row.STATUS != '01'"
+                                            class="btn btn-default" ng-click="deleteData(row)">刪除</button>
+								</div>
+							</td>
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							<td>{{row.BRANCH_AREA_NAME}}</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.EMP_NAME }}</td>
+							<td>{{row.AO_JOB_RANK}}</td>
+							<td>{{row.STATUS_NAME}}</td>
+							<td>{{row.HIRE_STATUS| mapping:mappingSet['hire_status']:'F3'}}</td>
+							<td>{{row.BRCH_RECV_CASE_DATE}}</td>
+							<td>{{toJsDate(row.HO_RECV_CASE_DATE)|date:"yyyy-MM-dd"}}</td>
+							<td>{{toJsDate(row.OA_SUP_RT_DATE)|date:"yyyy-MM-dd"}}</td>
+							<td>{{toJsDate(row.BOOKED_ONBOARD_DATE)|date:"yyyy-MM-dd"}}</td>
+							<td>{{row.RECRUIT_REMARK}}</td>
+							<td>{{row.BLACK_LISTED| mapping:mappingSet['black']:'F3'}}</td>
+							<td>{{row.MODIFIER}}</td>
+							<td>{{row.LASTUPDATE}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,260 @@
+<style>
+  .FPS322 .modal-content {
+    width: 65vw;
+    min-width: 750px;
+  }
+
+  .FPS322 .scrollable {
+    max-height: 250px;
+    overflow-y: auto;
+  }
+
+  .FPS322 .textRight {
+    text-align: right;
+  }
+
+  .FPS322 input.inputSize.sm {
+    width: 75px !important;
+  }
+
+</style>
+<div ng-controller="FPS322Controller"
+     class="FPS322 FPS"
+     ng-cloak>
+  <div class="modal-dialog ">
+    <!--  modal-dialog -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button"
+                class="close"
+                ng-click="closeThisDialog('cancel')">&times;</button>
+        <h4 id="myModalAlertLabel"
+            class="modal-title"
+            align="center">
+          <label>計算退休計畫所需資金</label>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="bootstrap-adng-min-panel-content ">
+          <div class="search_box text-center">
+            <div style="text-align: right; padding: .5em; border-bottom: 0.5px solid #e1e1e1;">單位:新台幣元</div>
+
+            <table style="width:100%;">
+              <tbody>
+                <tr>
+                  <th style="width: 540px;">預計退休年齡</th>
+                  <th class="form-inline textRight">
+                    <input type="text"
+                           e-input-limit="NC"
+                           name="age"
+                           class="inputSize textRight form-control"
+                           ng-model="inputVO.retired"
+                           ng-blur="chgMomey();"
+                           ng-change="getRetired();inputVO.retired = inputVO.retired.replace('-' , '');"> 歲
+                  </th>
+                </tr>
+                <tr style="background-color: #e5f3fc;">
+                  <th class="form-inline">以平均餘命
+                    <input type="text"
+                           e-input-limit="NC"
+                           ng-model="avgAge"
+                           ng-blur="chgMomey();"
+                           ng-change="getRetired();avgAge = avgAge.replace('-' , '');"
+                           class="form-control inputSize sm textRight">歲計算，退休期間共</th>
+                  <th class="text-right">{{retire}}年</th>
+                </tr>
+                <tr>
+                  <th>A.退休後每個月花費</th>
+                  <th class="form-inline textRight">
+                    <input type="text"
+                           e-input-limit="NC"
+                           name="spendMonth"
+                           class="inputSize textRight form-control"
+                           ng-model="inputVO.spendMonth"
+                           ng-change="Funds();inputVO.spendMonth = inputVO.spendMonth.replace('-' , '');"
+                           ng-blur="chgMomey();"> 元
+                  </th>
+                </tr>
+                <tr>
+                  <th>B.已準備的退休金額</th>
+                  <th class="form-inline text-right">
+                    {{money | number}} 元
+                  </th>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <form name="myForm">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>給付類型</th>
+                  <th>每月給付</th>
+                  <th>一次給付</th>
+                  <th>試算</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th style="border-bottom: 0px;">社會保險給付</th>
+                  <th class="inputSize form-inline"
+                      style="border-bottom: 0px;">
+                    <input type="text"
+                           e-input-limit="NC"
+                           name="insMonth"
+                           ng-model="inputVO.insMonth"
+                           class="textRight form-control"
+                           ng-change="sumMonth();inputVO.insMonth = inputVO.insMonth.replace('-' , '');"
+                           ng-blur="chgMomey();"> 元
+                  </th>
+                  <th class="inputSize form-inline"
+                      style="border-bottom: 0px;">
+                    <input type="text"
+                           e-input-limit="NC"
+                           name="insOneTime"
+                           ng-model="inputVO.insOneTime"
+                           class="textRight form-control"
+                           ng-change="sumOneTime();inputVO.insOneTime = inputVO.insOneTime.replace('-' , '');"
+                           ng-blur="chgMomey();"> 元
+                  </th>
+                  <th class="inputSize"
+                      style="border-bottom: 0px;">
+                    <a class="btn btn-info"
+                       ng-href="{{mapping.links[0]}}"
+                       target="_blank">勞保</a>
+                    <a class="btn btn-info"
+                       ng-href="{{mapping.links[1]}}"
+                       target="_blank">國民年金</a>
+                    <a class="btn btn-info"
+                       ng-href="{{mapping.links[2]}}"
+                       target="_blank">公保</a>
+                  </th>
+                </tr>
+                <tr>
+                  <th style="border-bottom: 0px;">社會福利給付</th>
+                  <th class="inputSize form-inline"
+                      style="border-bottom: 0px;">
+                    <input type="text"
+                           e-input-limit="NC"
+                           name="welfareMonth"
+                           ng-model="inputVO.welfareMonth"
+                           class="textRight form-control"
+                           ng-change="sumMonth();inputVO.welfareMonth = inputVO.welfareMonth.replace('-' , '');"
+                           ng-blur="chgMomey();"> 元
+                  </th>
+                  <th class="inputSize form-inline"
+                      style="border-bottom: 0px;">
+                    <input type="text"
+                           e-input-limit="NC"
+                           name="welfareOneTime"
+                           ng-model="inputVO.welfareOneTime"
+                           class="textRight form-control"
+                           ng-change="sumOneTime();inputVO.welfareOneTime = inputVO.welfareOneTime.replace('-' , '');"
+                           ng-blur="chgMomey();"> 元
+                  </th>
+                  <th class="inputSize"
+                      style="border-bottom: 0px;">
+                    <a class="btn btn-info"
+                       ng-href="{{mapping.links[3]}}"
+                       target="_blank">勞工退休金</a>
+                    <a class="btn btn-info"
+                       ng-href="{{mapping.links[4]}}"
+                       target="_blank">公職退休金</a>
+                  </th>
+                </tr>
+                <tr>
+                  <th style="border-bottom: 0px;">商業保險給付</th>
+                  <th class="inputSize form-inline"
+                      style="border-bottom: 0px;">
+                    <input type="text"
+                           e-input-limit="NC"
+                           name="insMonth_B"
+                           ng-model="inputVO.insMonth_B"
+                           class="textRight form-control"
+                           ng-change="sumMonth();inputVO.insMonth_B = inputVO.insMonth_B.replace('-' , '');"
+                           ng-blur="chgMomey();"> 元
+                  </th>
+                  <th class="inputSize form-inline"
+                      style="border-bottom: 0px;">
+                    <input type="text"
+                           e-input-limit="NC"
+                           name="insOneTime_B"
+                           ng-model="inputVO.insOneTime_B"
+                           class="textRight form-control"
+                           ng-change="sumOneTime();inputVO.insOneTime_B = inputVO.insOneTime_B.replace('-' , '');"
+                           ng-blur="chgMomey();"> 元
+                  </th>
+                  <th style="border-bottom: 0px;"></th>
+                </tr>
+                <tr>
+                  <th style="border-bottom: 0px;">其他給付</th>
+                  <th class="inputSize form-inline"
+                      style="border-bottom: 0px;">
+                    <input type="text"
+                           e-input-limit="NC"
+                           name="otherMonth"
+                           ng-model="inputVO.otherMonth"
+                           class="textRight form-control"
+                           ng-change="sumMonth();inputVO.otherMonth = inputVO.otherMonth.replace('-' , '');"
+                           ng-blur="chgMomey();"> 元
+                  </th>
+                  <th class="inputSize form-inline"
+                      style="border-bottom: 0px;">
+                    <input type="text"
+                           e-input-limit="NC"
+                           name="otherOneTime"
+                           ng-model="inputVO.otherOneTime"
+                           class="textRight form-control"
+                           ng-change="sumOneTime();inputVO.otherOneTime = inputVO.otherOneTime.replace('-' , '');"
+                           ng-blur="chgMomey();"> 元
+                  </th>
+                  <th style="border-bottom: 0px;"></th>
+                </tr>
+                <tr style="background-color: #EFEFEF;">
+                  <th>小計</th>
+                  <th>{{totalMonth | number}} 元</th>
+                  <th>{{totalOneTime | number}} 元</th>
+                  <th></th>
+                </tr>
+              </tbody>
+            </table>
+            <div>
+              <table style="width:100%;">
+                <tbody>
+                  <tr>
+                    <th style="width: 540px;">C.希望能傳承給親屬的金額</th>
+                    <th class="form-inline textRight">
+                      <input type="text"
+                             e-input-limit="NC"
+                             name="hopeMoney"
+                             class="inputSize textRight form-control"
+                             ng-model="inputVO.hopeMoney"
+                             ng-change="Funds();inputVO.hopeMoney = inputVO.hopeMoney.replace('-' , '');"
+                             ng-blur="chgMomey();"> 元
+                    </th>
+                  </tr>
+                  <tr style="background-color: #e5f3fc;">
+                    <th>退休所需資金 (A x 12 x 退休期間{{retire}}年 - B + C)
+                    </th>
+                    <th class="text-right">共 {{retireFunds | number}} 元</th>
+                  </tr>
+                </tbody>
+              </table>
+              </div>
+              <div class="search_box_btn text-center">
+                <a type="button"
+                   class="btn-fps"
+                   ng-click="clear()">清空</a>
+                <a type="button"
+                   class="btn-fps"
+                   ng-click="closeThisDialog('cancel')">取消</a>
+                <a type="button"
+                   class="btn-fps"
+                   ng-click="backFPS320()">確認</a>
+              </div>
+          </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

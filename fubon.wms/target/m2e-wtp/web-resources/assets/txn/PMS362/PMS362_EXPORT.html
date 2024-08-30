@@ -1,0 +1,94 @@
+<style>
+.modal-dialog.PMS362_EXPORT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 700px;
+	height: auto;
+}
+/* table size */
+.PMS362_EXPORT table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/PMS362/PMS362_EXPORT.js"></script>
+<div>
+	<div ng-controller="PMS362_EXPORTController" ng-cloak>
+		<div class="modal-dialog PMS362_EXPORT"> 
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">上傳檔案</h4>
+				</div>
+	 			<div class="modal-body">
+	 				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+	 					<table>
+	 						<tr>
+	 							<td class="col-xs-1"></td>
+	 							<th class="col-md-3">資料類型：</th>
+	 							<td class="col-md-7 tdpadding">
+	 								<e-combobox id="srchType" name="srchType"
+									ng-datasource="mappingSet['srchType']"
+									ng-model="inputVO.srchType" 
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="true" 
+									width="220px" 
+									style="line-height:20px;" />
+	 							</td>
+	 							<td class="col-xs-1"></td>
+	 						</tr>
+	 						<!-- 
+	 						<tr>
+	 							<td class="col-xs-1"></td>
+	 							<th class="col-md-3">戰報統計月份：</th>
+	 							<td class="col-md-7 tdpadding">
+	 								<div class="input-group datebox datewidth" style="float:left">
+									<input type="text" id="time" name="time"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.time"
+									is-open="model.a"
+									datepicker-options="bgn_sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate();"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+	 							</td>
+	 							<td class="col-xs-1"></td>
+	 						</tr> -->
+	 						<tr>
+	 							<td class="col-xs-1"></td>
+	 							<th class="col-md-3">選擇上傳檔案：</th>
+	 							<td class="col-md-7 tdpadding">
+	 								<e-upload id="csvUpload" success="uploadFinshed(name,rname)" text="上傳" accept=".csv"></e-upload>
+	 							</td>
+	 							<td class="col-xs-1"></td>
+	 						</tr>
+	 					</table>
+	 				</form>
+ 				</div>
+ 					<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="insertExpt()">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,243 @@
+<style>
+/* open dialog */
+.ngdialog.PMS103_DETAIL {
+	
+}
+
+.gv_tab_scs td{
+	white-space: nowrap;
+	padding: 7px 10px;
+	text-align: center;
+	color: #106987;
+	vertical-align: bottom;
+	background-color: 106987;
+	border: 0px solid #fff;
+}
+
+/* dialog panl */
+.modal-dialog.PMS103_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+
+/* table size */
+.PMS103_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* change row */
+.PMS103_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+/* scroll && height */
+.scroll_PMS103_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+.rstd  {
+	vertical-align:middle; 
+	text-align:center;
+}
+.rstdnum  {
+	vertical-align:middle; 
+	text-align:right;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS103/PMS103.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PMS109.js"></script>
+<script type="text/javascript" src="assets/txn/PMS108/PMS108.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PPAP.js"></script>
+<script type="text/javascript" src="assets/txn/PMS103/PMS103_LEADS.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<script type="text/javascript" src="assets/txn/CRM211/CRM211_ROUTE.js"></script>
+<script type="text/javascript" src="assets/js/filters/eMasking.js"></script>
+<script type="text/javascript" src="assets/txn/CRM210/CRM210.js"></script>
+<script type="text/javascript" src="assets/txn/CRM121/CRM121.js"></script>
+
+<div class="container-fluid">
+	<div ng-controller="PMS103Controller" ng-cloak>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">資料查詢</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th><span style="color: red;">*</span>預計成交月份：</th>
+							<td>
+								<e-combobox ng-datasource="ymList"
+											ng-model="inputVO.sTime" 
+											ng-validate="false" 
+											ng-readonly="false"
+											ng-editable="false" 
+											ng-change="dateChange();"
+											ng-format="F3" 
+											width="120px" height="30px" style="line-height:20px;" />
+							</td>
+							<th></th>
+							<td></td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>分行別：</th>
+							<td>
+								<e-combobox id="branch_nbr" name="branch_nbr"
+											ng-datasource="BRANCH_LIST"
+											ng-model="inputVO.branch_nbr"
+											ng-validate="false" 
+											ng-disabled="disableBranchCombo"
+											ng-readonly="disableBranchCombo" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="false"
+											ng-change="ChangeBranch();"
+											style="line-height:20px;" />
+							</td>
+							<th>個金RM：</th>
+							<td>
+								<e-combobox id="ao_code" name="ao_code"
+											ng-datasource="AO_LIST"
+											ng-model="inputVO.ao_code"
+											ng-validate="false"
+											ng-disabled="disableAoCombo"
+											ng-readonly="disableAoCombo" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="false"
+											ng-change="ChangeAo_code();"
+											style="line-height:20px;" />
+							</td>
+							<th>客戶ID：</th>
+							<td><input class="form-control" ng-model="inputVO.CUST_ID" type="text" style="width: 120px"></td>
+						</tr>
+					</table>			
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+			</div>
+			<div>				
+				<e-jumping-once  output="outputVO" isend="SAL" list="paramList1" totallist="paramList"></e-jumping-once>
+				<div style="background-color: #d7edfa;">
+					<table>
+						<tr>
+							<td width="58%">
+								<h4><font color="106987">&nbsp;&nbsp;&nbsp;&nbsp;{{inputVO.sTime==''?"":inputVO.sTime.substring(0,4)+'/'+inputVO.sTime.substring(4,6)}}  我的銷售計畫內容</font></h4>
+							</td>
+							<td width="42%" align="right">
+								<table class="gv_tab_scs" >
+									<tr >
+<!-- 										<td>生產力目標&nbsp;&nbsp;</td> -->
+<!-- 										<td><font color="red">{{0 + SALETARGET | number}}</font></td> -->
+<!-- 										<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td> -->
+<!-- 										<td>預估達成率&nbsp;&nbsp;</td> -->
+<!-- 										<td><font color="red">{{(SALETARGET == 0 || SALETARGET == undefined ? 0 : (0 + (EST_EARNINGS / SALETARGET) * 100))}}%</font></td> -->
+										<td><button ng-click="goCRM211()" class="btn btn-info btn-circle"><i class="glyphicon glyphicon-plus-sign"></i></button></td>						
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="gv_tab_sc scroll_y">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList1">
+				<thead>
+					<tr>
+						<th>序號</th>
+						<th>修改</th>
+						<th>刪除</th>
+						<th>客戶ID</th>
+						<th>客戶姓名</th>
+						<th>計劃來源</th>
+						<th>預計承作商品</th>
+						<th>預計承作金額</th>
+						<th>預估收益</th>
+						<th>
+							預計約訪日期(A)
+							<div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>
+							預計見面日期(M)
+						</th>
+						<th>預計成交日期(C)</th>
+						<th>建立人</th>
+						<th>建立時間</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList1 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="	vertical-align:middle; text-align:center;">{{outputVO.currentPageIndex * 10 + $index + 1}}</td> 
+						<td style="	vertical-align:middle; " align="center">
+							<a href="#" data-toggle="modal" class="btn btn-warning btn-circle" ng-click="ppap(row, row.SEQ, row.CUST_ID, row.CUST_NAME, row.SRC_TYPE, 'upd') "><i class="glyphicon glyphicon-pencil"></i></a>
+						</td>
+						<td style="	vertical-align:middle;"  align="center">
+							<button type="button" class="btn btn-danger btn-circle" ng-click="del(row)"><i class="glyphicon glyphicon-trash"></i></button>
+						</td>
+						<td style="	vertical-align:middle; "align="center">{{row.CUST_ID}}</td>
+						<td style="	vertical-align:middle;  text-align:center;">{{row.CUST_NAME}}</td>
+						<td style="	vertical-align:middle;" align="center">{{row.SRC_TYPE | mapping:mappingSet['PMS.SALE_PLAN_SRC']:'F3'}}</td>
+						<td style="	vertical-align:middle;  text-align:center;">{{row.EST_PRD | mapping:mappingSet['PMS.SALE_PLAN_PTYPE']:'F3'}}</td>
+						<td class="rstdnum" style="	vertical-align:middle;">{{row.EST_AMT | number:0}}</td>
+						<td class="rstdnum" style="	vertical-align:middle;">{{row.EST_EARNINGS | number:0}}</td>
+						<td style="	vertical-align:middle;  text-align:center;">
+							{{toJsDate(row.ACTION_DATE) | date:'yyyy/MM/dd'}}
+							<div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>
+							{{toJsDate(row.MEETING_DATE) | date:'yyyy/MM/dd'}}
+						</td>
+						<td style="	vertical-align:middle;  text-align:center;">{{toJsDate(row.CLOSE_DATE) | date:'yyyy/MM/dd'}}</td>
+						<td style="	vertical-align:middle;  text-align:center;">{{row.EMP_ID}}-{{row.EMP_NAME}}</td>
+						<td style="	vertical-align:middle;  text-align:center;">{{toJsDate(row.CREATETIME) | date:'yyyy/MM/dd HH:mm:ss'}}</td>
+					</tr>
+					<tr ng-if="SAL">
+						<th align="right" colspan="6">總計</th>					
+						<td></td>
+						<td align="right"><font color="red">{{EST_AMT | number:0}}</font></td>
+						<td align="right"><font color="red">{{EST_EARNINGS | number:0}}</font></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+				</table>
+			</div>
+			<div algin="left">
+				<table>
+					<tr>
+						<td align="right">說明：</td>
+						<td align="left"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

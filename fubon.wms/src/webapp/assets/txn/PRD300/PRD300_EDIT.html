@@ -1,0 +1,183 @@
+<style>
+/* open dialog */
+.ngdialog.PRD300 {
+	
+}
+/* dialog panl */
+.modal-dialog {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: 450px;
+}
+/* table size */
+.PRD300 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PRD300 table.little{
+	width: 60%;
+}
+/* change row */
+.PRD300.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PRD300_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<div ng-controller="PRD300_EDITController" ng-cloak>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row ? '編輯' : '新增'}}奈米投商品</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*商品代碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_id" name="prd_id" class="form-control" placeholder="請輸入..."  ng-model="inputVO.prd_id" ng-blur="checkID()" ng-disabled="row || inputVO.shared == 'Y'" ng-required="inputVO.shared == 'N'" e-length-limit="25"></td>
+							<td class="col-xs-1">
+								<img src="assets/images/icon/cancel-4.png" ng-if="showPrdIDError">
+								<img src="assets/images/icon/checked-2.png" ng-if="showPrdIDOk">
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">商品名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_name" name="prd_name" class="form-control" ng-model="inputVO.prd_name"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">風險等級：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="riskcate_id" name="riskcate_id"
+								ng-datasource="PROD_RISK_LEVEL"
+								ng-model="inputVO.riskcate_id"
+			  					ng-validate="false"
+			  					ng-disabled="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="true"
+			  					width="150px"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">投資策略：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="inv_level" name="inv_level"
+								ng-datasource="PROD_INV_LEVEL"
+								ng-model="inputVO.inv_level"
+			  					ng-validate="false"
+			  					ng-disabled="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="true"
+			  					width="150px"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">類股票/類債券：</th>
+							<td class="col-md-7 tdpadding">
+								<label>
+									<input type="radio" name="stock_bond_type" ng-model="inputVO.stock_bond_type" value="S"> 類股票
+								</label>
+								&nbsp;&nbsp;
+								<label>
+									<input type="radio" name="stock_bond_type" ng-model="inputVO.stock_bond_type" value="B"> 類債券
+								</label>
+							</td>
+							<td class="col-xs-1">
+							
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">核心/衛星：</th>
+							<td class="col-md-7 tdpadding">
+								<label>
+									<input type="radio" name="core_type" ng-model="inputVO.core_type" value="M"> 核心
+								</label>
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<label>
+									<input type="radio" name="core_type" ng-model="inputVO.core_type" value="S"> 衛星
+								</label>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">計價幣別：</th>
+							<td class="col-md-7 tdpadding">
+							<!--<input class="form-control" type="text" placeholder="請輸入..." id="web" name="web" ng-model="inputVO.currency_std_id" e-length-limit="3">-->
+								<e-combobox id="currency"
+									ng-datasource="CURRENCY"
+									ng-model="inputVO.currency_std_id"
+				  					ng-validate="false"
+				  					ng-readonly="false" 
+				  					ng-editable="false"
+				  					ng-format="F3"
+				  					ng-required="false"
+				  					width="150px"
+				  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">是否可銷售：</th>
+							<td class="col-md-7 tdpadding">
+								<label>
+									<input type="radio" name="is_sale" ng-model="inputVO.is_sale" value="Y"> 現售
+								</label>
+								&nbsp;&nbsp;
+								<label>
+									<input type="radio" name="is_sale" ng-model="inputVO.is_sale" value="N"> 停售
+								</label>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,243 @@
+<body ng-controller="InitController">
+	<!-- zoom-01:watermark -->
+	<div id="watermark" class="hidden">
+		<div ng-repeat="row in WATERMARK" ng-bind="row.LABEL"></div>
+	</div>
+	
+	<!-- zoom-02:banner -->
+	<div id="banner" ng-include="'/assets/platform/banner.html'"></div>
+	
+	<!-- zoom-03:menubar -->
+	<!-- *reserved element id*
+	<div id="menubar" ng-include="'/assets/platform/menubar.html'"></div>
+	 -->
+	<!-- zoom-04:pathrow -->
+	<div id="pathrow"><table ng-if="menuItemInfo.txnPath"><tr><td><a ng-click="MenuBarLink(path,0)"><i class="glyphicon glyphicon-home"></i></a><i class="glyphicon glyphicon-chevron-right e_padding_2"></i></td><td ng-repeat="path in menuItemInfo.txnPath track by $index"><label class="e_padding_2"><a ng-click="MenuBarLink(path,1)">{{path.MENU_NAME}}</a></label><i ng-if="!$last" class="glyphicon glyphicon-chevron-right e_padding_2"></i></td></tr></table></div>
+	
+	<!-- zoom-05:wrapper -->
+	<div id="wrapper" class="container-fluid">
+		<div ng-include="menuItemInfo.url"></div>
+	</div>
+
+	<!-- zoom-06:info -->
+	<div class="tfb_footer">
+		<i class="glyphicon glyphicon-copyright-mark"></i> 台北富邦商業銀行股份有限公司<br> 建議瀏覽器版本：IE11 或 Chrome 59 以上 最佳解析度 1024×768
+	</div>
+	
+	<!-- zoom-07:messagebar --> <!-- css:footer&footer2 has been cannel -->
+	<div id="footer-msgbar">
+   		<div style="margin:6px 0 0 0;"><msg-bar></msg-bar></div>
+   	</div>
+	
+	<!-- zoom-08:dialogbox -->
+	<div id="dialog_box">
+		<div id="#dialog_insitBox">
+			<e-dialogbox></e-dialogbox>
+		</div>
+	</div>
+	
+	<!-- 沒有圓圈圈的行事曆template -->
+	<script id="customMonthCell.html" type="text/ng-template">
+		<div mwl-droppable
+			on-drop="vm.handleEventDrop(dropData.event, day.date, dropData.draggedFromDate)"
+			mwl-drag-select="!!vm.onDateRangeSelect"
+			on-drag-select-start="vm.onDragSelectStart(day)"
+			on-drag-select-move="vm.onDragSelectMove(day)"
+			on-drag-select-end="vm.onDragSelectEnd(day)"
+			class="cal-month-day {{ day.cssClass }}"
+			ng-class="{
+			'cal-day-outmonth': !day.inMonth,
+			'cal-day-inmonth': day.inMonth,
+			'cal-day-weekend': day.isWeekend,
+			'cal-day-past': day.isPast,
+			'cal-day-today': day.isToday,
+			'cal-day-future': day.isFuture,
+			'cal-day-selected': vm.dateRangeSelect && vm.dateRangeSelect.startDate <= day.date && day.date <= vm.dateRangeSelect.endDate,
+			'cal-day-open': dayIndex === vm.openDayIndex}">
+		
+			<table>
+				<tr style="height:50px">
+					<td>
+						<span
+						class="pull-right"
+						data-cal-date
+						ng-click="vm.calendarCtrl.dateClicked(day.date)"
+						ng-bind="day.label">
+							</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<small
+						class="cal-events-num badge badge-important pull-left"
+						ng-show="day.badgeTotal > 0"
+						ng-bind="day.badgeTotal">
+						</small>
+					</td>
+				</tr>
+			</table>
+			
+			<div class="cal-day-tick" ng-show="dayIndex === vm.openDayIndex && (vm.cellAutoOpenDisabled || vm.view[vm.openDayIndex].events.length > 0) && !vm.slideBoxDisabled">
+			<i class="glyphicon glyphicon-chevron-up"></i>
+			<i class="fa fa-chevron-up"></i>
+			</div>
+			
+			<!-- <ng-include src="vm.customTemplateUrls.calendarMonthCellEvents || vm.calendarConfig.templates.calendarMonthCellEvents"></ng-include> -->
+			
+			<div id="cal-week-box" ng-if="$first && rowHovered">
+			<span ng-bind="vm.getWeekNumberLabel(day)"></span>
+			</div>
+		</div>
+		</script>
+	<!-- group的行事曆template -->
+	<script id="customMonthCell2.html" type="text/ng-template">
+		<div mwl-droppable
+			on-drop="vm.handleEventDrop(dropData.event, day.date, dropData.draggedFromDate)"
+			mwl-drag-select="!!vm.onDateRangeSelect"
+			on-drag-select-start="vm.onDragSelectStart(day)"
+			on-drag-select-move="vm.onDragSelectMove(day)"
+			on-drag-select-end="vm.onDragSelectEnd(day)"
+			class="cal-month-day {{ day.cssClass }}"
+			ng-class="{
+			'cal-day-outmonth': !day.inMonth,
+			'cal-day-inmonth': day.inMonth,
+			'cal-day-weekend': day.isWeekend,
+			'cal-day-past': day.isPast,
+			'cal-day-today': day.isToday,
+			'cal-day-future': day.isFuture,
+			'cal-day-selected': vm.dateRangeSelect && vm.dateRangeSelect.startDate <= day.date && day.date <= vm.dateRangeSelect.endDate,
+			'cal-day-open': dayIndex === vm.openDayIndex}">
+			
+			<table>
+				<tr height="80">
+					<td>
+						<span
+						class="pull-right"
+						data-cal-date
+						ng-click="vm.calendarCtrl.dateClicked(day.date)"
+						ng-bind="day.label"
+						style="width: 100%;text-align: center;">
+						</span>
+					</td>
+				</tr>
+				<tr height="20">
+					<td align="center">
+						<div ng-show="day.badgeTotal > 0"style="width:8px;height:8px;border-radius: 50%;background-color: grey;"></div>
+					</td>
+				</tr>
+			</table>
+			
+			<div class="cal-day-tick" ng-show="dayIndex === vm.openDayIndex && (vm.cellAutoOpenDisabled || vm.view[vm.openDayIndex].events.length > 0) && !vm.slideBoxDisabled">
+			<i class="glyphicon glyphicon-chevron-up"></i>
+			<i class="fa fa-chevron-up"></i>
+			</div>
+			
+			<!-- <ng-include src="vm.customTemplateUrls.calendarMonthCellEvents || vm.calendarConfig.templates.calendarMonthCellEvents"></ng-include> -->
+			
+			<div id="cal-week-box" ng-if="$first && rowHovered">
+			<span ng-bind="vm.getWeekNumberLabel(day)"></span>
+			</div>
+		</div>
+		</script>
+	<script type="text/javascript">
+		$(function () {
+		    $('#graph_bar01').highcharts({ //目標的div
+		        chart: {
+		            type: 'column', //圖表的種類
+					marginTop: 10,
+					marginRight: 0,
+					spacingLeft: 0,
+					spacingBottom: 0
+						},
+		        title: { text: '', //標題}
+		        },
+		        subtitle: { //副標題
+		            text: ''
+		        },
+		        xAxis: {//x軸
+		            categories: [
+		                '實際收益',
+		                '目標收益',
+		                '好運貸'
+		            ],
+		        },
+		        yAxis: {//y軸
+		            min: 0,
+		            title: {
+		                text: '<span style="font-size:13px;font-weight:bold">( 萬元 )</span>'
+		            },
+		        },
+		        tooltip: { //提示框
+		            headerFormat: '<span style="font-size:16px">{point.key}</span><table>',
+		            pointFormat: '<tr><td style="color:#000;padding:0">{series.name}: </td>' +
+		                '<td style="padding:0"><b>{point.y:.1f} 萬元</b></td></tr>',
+		            footerFormat: '</table>',
+		            shared: true,
+		            useHTML: true
+		        },
+		        plotOptions: {
+		            column: {
+		                pointPadding: 0.2,
+		                borderWidth: 0
+		            }
+		        },
+				exporting: { enabled: false } ,//隱藏列印按鈕
+				legend: { enabled: false }, //隱藏底下文字
+		        series: [{//這裡是圖表的資料
+		            name: '金額',
+		            data: [16, 19, 17],
+					color: '#ff99af',
+		        }]
+		    });
+			
+			$('#graph_bar02').highcharts({ //目標的div
+		        chart: {
+		            type: 'column', //圖表的種類
+					marginTop: 10,
+					marginRight: 0,
+					spacingLeft: 0,
+					spacingBottom: 0
+						},
+		        title: { text: '', //標題}
+		        },
+		        subtitle: { //副標題
+		            text: ''
+		        },
+		        xAxis: {//x軸
+		            categories: [
+		                '實際收益',
+		                '目標收益',
+		                '好運貸'
+		            ],
+		        },
+		        yAxis: {//y軸
+		            min: 0,
+		            title: {
+		                text: '<span style="font-size:13px;font-weight:bold">( 萬元 )</span>'
+		            },
+		        },
+		        tooltip: { //提示框
+		            headerFormat: '<span style="font-size:16px">{point.key}</span><table>',
+		            pointFormat: '<tr><td style="color:#000;padding:0">{series.name}: </td>' +
+		                '<td style="padding:0"><b>{point.y:.1f} 萬元</b></td></tr>',
+		            footerFormat: '</table>',
+		            shared: true,
+		            useHTML: true
+		        },
+		        plotOptions: {
+		            column: {
+		                pointPadding: 0.2,
+		                borderWidth: 0
+		            }
+		        },
+				exporting: { enabled: false } ,//隱藏列印按鈕
+				legend: { enabled: false }, //隱藏底下文字
+		        series: [{//這裡是圖表的資料
+		            name: '金額',
+		            data: [80, 95, 85],
+					color: '#ffce66',
+		        }]
+		    });
+		});
+	</script>
+</body>

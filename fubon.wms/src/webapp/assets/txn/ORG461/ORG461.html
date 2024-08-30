@@ -1,0 +1,94 @@
+<style>
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.rstable tbody tr td {
+	vertical-align:middle;
+	text-align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ORG461/ORG461.js"></script>
+<div ng-controller="ORG461Controller" ng-cloak>
+	<div class="tfb_content">
+     	<div class="tfb_content_icon"></div>
+     	<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+  	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3 scroll_y">
+			<table style="width: 100%;">
+				<tr>
+					<th width="20%">職務別：</th>
+					<td width="30%">
+						<e-combobox ng-datasource="mappingSet['ORG.UHRM_AO_JOB_RANK']"
+									ng-model="inputVO.AO_JOB_RANK"
+				   					ng-validate="false" 
+				   					ng-readonly="false" 
+				   					ng-editable="false"
+				   					ng-format="F3"
+				   					ng-required="false"/>
+				   	</td>
+					<th width="20%">掛GOAL月份：</th>
+					<td width="30%">
+						<div class="input-group datebox datewidth">
+							<input type="text" id="" name="" 
+								   class="form-control"
+								   uib-datepicker-popup="yyyy/MM"
+								   ng-model="inputVO.PERF_EFF_DATE"
+								   datepicker-options="{minMode: 'month'}"
+								   datepicker-mode="'month'"
+								   is-open="model.a"
+								   ng-readonly="true"/>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')"><i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-primary" ng-click="query()" function-type="query"><span class="glyphicon glyphicon-search"></span>查詢</button>
+		<button type="button" class="btn btn-info" ng-click="init()" ><span class="glyphicon glyphicon-erase"></span>清除</button>
+		<button type="button" class="btn btn-success" ng-click="export()" function-type="export" ng-disabled="aoGoalLst.length == 0"><span class="glyphicon glyphicon-save"></span>匯出</button>
+	</div>
+	</div>
+	<div class="tfb_content">
+     	<div class="tfb_content_icon"></div>
+     	<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+  	</div>
+	<div class="panel_content">
+		<e-jumping-once output="outputVO" list="data" totallist="aoGoalLst"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="tablesaw table table-striped table-bordered rstable">
+				<thead>
+					<tr>
+						<th>員編</th>
+						<th>員工姓名</th>
+						<th>職務別</th>
+						<th>CODE</th>
+						<th>AOCODE建立時間</th>
+						<th>副CODE</th>
+						<th>維護CODE</th>
+						<th>副CODE月份</th>
+						<th>任該職務掛GOAL日</th>
+						<th>掛GOAL日</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>{{row.EMP_ID}}</td>
+						<td>{{row.EMP_NAME}}</td>
+						<td>{{row.AO_JOB_RANK}}</td>
+						<td>{{row.AO_CODE}}</td>
+						<td>{{row.CREATETIME}}</td>
+						<td style="white-space: pre">{{row.CODE_LIST_2}}</td>
+						<td style="white-space: pre">{{row.CODE_LIST_3}}</td>
+						<td style="white-space: pre">{{row.ACTDATE_LIST_2}}</td>
+						<td>{{row.JOB_GOAL_DATE | limitTo: 10}}</td>
+						<td>{{row.PERF_EFF_DATE | limitTo: 10}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

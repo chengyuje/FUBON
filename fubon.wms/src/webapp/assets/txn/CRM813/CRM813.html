@@ -1,0 +1,93 @@
+
+<!-- 結果區 -->
+<script type="text/javascript" src="assets/txn/CRM813/CRM813.js"></script>
+
+<div class="CRM813" ng-controller="CRM813Controller" ng-cloak>
+<h4>帳戶類別: 定存(台幣)</h4>
+	<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+			<table>
+				<thead>
+					<tr>
+						<th>帳戶開戶行</th>
+						<th>起息日期~到期日期</th>
+						<th>定存帳號</th>
+						<th>存單編號</th>
+						<th>存款期間</th>
+						<th>利率別</th>
+						<th>利率</th>
+						<th>存單金額</th>
+						<th>本利轉入帳號</th>
+						<th>到期續存方式</th>
+						<th>利息領取方式</th>
+						<th>續轉剩餘次數</th>
+						<th>質借金額</th>			
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;">{{row.BRA | mapping:mappingSet['branchName']:'F1'}}</td>
+						<td style="text-align: left;">{{row.BK_VALUE}}{{row.DUE_DTE != null ? '~' : ''}}{{row.DUE_DTE}}</td>
+						<td style="text-align: left;">{{row.ACNO}}</td>
+						<td style="text-align: left;">{{row.SLIP_NO}}</td>
+						<td style="text-align: left;">{{row.DPR_MM | limitTo : -2}}{{row.DPR_MM != null ? '月' : ''}}{{row.DPR_DDD | limitTo : -2}}{{row.DPR_DDD != null ? '日' : ''}}</td>
+						<td style="text-align: left;">{{row.INT_TYP | mapping:mappingSet['CRM.INT_TYPE']:'F3'}}</td>
+						<td style="text-align: right;">{{row.INT_RATE | number : 4}}{{row.INT_RATE != null ? '%' : ''}}</td>
+						<td style="text-align: right;">{{row.OPN_DPR_AMT | number : 0}}</td>
+						<td style="text-align: left;">{{row.ACNO_SA}}</td>
+						<td style="text-align: left;">{{row.AUTO_TR_TYP | mapping:mappingSet['CRM.CBS.AUTO_TR_TYPE']:'F3'}}</td>
+						<td style="text-align: left;">{{checkINT_PAY_TYP(row) | mapping:mappingSet['CRM.CBS.INT_PAY_TYPE']:'F3'}}</td>
+						<td style="text-align: right;">{{row.AUTO_TR_LEFT}}</td>
+						<td style="text-align: right;">{{row.CRLN_UTL | number : 2}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<hr>
+<h4>帳戶類別: 定存(外幣)</h4>
+	<e-jumping-once output="outputVO2" list="data2" totallist="resultList2"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+			<table>
+				<thead>
+					<tr>
+						<th>帳戶開戶行</th>
+						<th>起息日期~到期日期</th>
+						<th>定存帳號</th>
+						<th>存單編號</th>
+						<th>存款期間</th>
+						<th>利率別</th>
+						<th>利率</th>
+						<th>幣別</th>
+						<th>存單金額</th>
+						<th>折台金額</th>
+						<th>本利轉入帳號</th>
+						<th>到期續存方式</th>
+						<th>利息領取方式</th>	
+						<th>續轉剩餘次數</th>
+						<th>專案名稱</th>
+						<th>質借金額</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data2 | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;">{{row.BRA | mapping:mappingSet['branchName']:'F1'}}</td>
+						<td style="text-align: left;">{{row.BK_VALUE}}{{row.DUE_DTE != null ? '~' : ''}}{{row.DUE_DTE}}</td>
+						<td style="text-align: left;">{{row.ACNO}}</td>
+						<td style="text-align: left;">{{row.SLIP_NO}}</td>
+						<td style="text-align: left;">{{row.DPR_MM | limitTo : -2}}{{row.DPR_MM != null ? '月' : ''}}{{row.DPR_DDD | limitTo : -2}}{{row.DPR_DDD != null ? '日' : ''}}</td>
+						<td style="text-align: left;">{{row.INT_TYP | mapping:mappingSet['CRM.INT_TYPE']:'F3'}}</td>
+						<td style="text-align: right;">{{row.INT_RATE | number : 4}}{{row.INT_RATE != null ? '%' : ''}}</td>
+						<td style="text-align: left;">{{row.CUR}}</td>
+						<td style="text-align: right;">{{row.OPN_DPR_AMT | number : 2}}</td>
+						<td style="text-align: right;">{{row.OPN_DPR_AMT_TWD | number : 0}}</td>
+						<td style="text-align: left;">{{row.ACNO_SA}}</td>
+						<td style="text-align: left;">{{row.AUTO_TR_TYP | mapping:mappingSet['CRM.CBS.AUTO_TR_TYPE']:'F3'}}</td>
+						<td style="text-align: left;">{{checkINT_PAY_TYP(row) | mapping:mappingSet['CRM.CBS.INT_PAY_TYPE']:'F3'}}</td>
+						<td style="text-align: right;">{{row.AUTO_TR_LEFT}}</td>
+						<td style="text-align: left;">{{row.PROD_NAME}}</td>
+						<td style="text-align: right;">{{row.CRLN_UTL | number : 2}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>	
+</div>

@@ -1,0 +1,78 @@
+<e-jumping-once output="obj.outputVO" list="obj.data" totallist="obj.resultList"></e-jumping-once>
+<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+	<table class="e-table-freeze" e-height="550px" e-left="4" e-mode="1" e-top="true" e-list="data">
+		<thead>
+			<tr>
+				<th>
+					<label>
+						<input type='checkbox' ng-model='obj.clickAll' ng-change='checkrow()' /> 本頁全選
+					</label>
+					<br>
+					<label>
+						<input type='checkbox' ng-model='obj.clickAll2' ng-change='checkrow2()' /> 全選
+					</label>
+				</th>
+				<th>銷售計畫</th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="inquire()">客戶ID</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="inquire()">客戶姓名</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AMT_TOTAL" e-query="inquire()">歸戶總資產</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AUM_SEC_TOTAL" e-query="inquire()">歸戶總資產<br>(含有價證券信託、證券往來)</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_06" e-query="inquire()">貢獻度等級</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_04" e-query="inquire()">理財會員等級</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_18" e-query="inquire()">潛力註記</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_16" e-query="inquire()">家庭戶</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_10" e-query="inquire()">客訴戶</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_12" e-query="inquire()">可否推介</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_W8BEN" e-query="inquire()">W-8BEN(W-8BEN-E)</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="UNTAKE_CARE_MONTH" e-query="inquire()">未經營月數</e-sorter></th>
+<!-- 				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="ACT_PRD_NUMS" e-query="inquire()">活躍度商品數</e-sorter></th> -->
+<!-- 				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="TAKE_CARE_MATCH_YN" e-query="inquire()">經營頻次符合度</e-sorter></th> -->
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_CODE" e-query="inquire()">目前AO Code</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="UEMP_ID" e-query="inquire()">目前UHRM</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_03" e-query="inquire()">性別</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_05" e-query="inquire()">出生年</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="ATR_03" e-query="inquire()">最後做風險屬性日期</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_07" e-query="inquire()">法金戶</e-sorter></th>
+				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_02" e-query="inquire()">歸屬行</e-sorter></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="repeat-row" ng-repeat="row in obj.data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+				<td>
+					<label>
+						<input type='checkbox' ng-model='row.SELECTED' >勾選
+					</label>
+				</td>
+				<!--<td><button type="button" class="btn btn-info" ng-click="add(row)" function-type="maintenance">加入</button></td> -->
+				<td><button type="button" class="btn btn-info" ng-click="ppap(undefined, undefined, row.CUST_ID, row.CUST_NAME, '3', 'add')" function-type="maintenance">加入</button></td>
+				<td><a href="#" onclick="return false" ng-click="goCRM610(row)" >{{row.CUST_ID}}</a></td>
+				<td>{{row.CUST_NAME}}</td>                                                 	<!--客戶姓名 -->
+				<td align = "right">{{row.AMT_TOTAL | number : 0}}</td>                    	<!--歸戶總資產 -->
+				<td align = "right">{{row.AUM_SEC_TOTAL | number : 0}}</td>                 <!--歸戶總資產(含有價證券信託、證券往來) -->
+				<td>{{row.CUST_06 | mapping:mappingSet['CRM.CON_DEGREE']:'F3'}}</td>       	<!--貢獻度等級 -->
+				<td>{{row.CUST_04 == null ? 'M' : row.CUST_04 | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>     	  <!--理財會員等級 -->
+				<td>{{row.CUST_18 | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>      	<!--潛力註記 -->
+				<td>{{row.CUST_16 | mapping:mappingSet['CRM.FAMILY_DEGREE']:'F3'}}</td> 	<!--家庭戶 -->
+				<td>{{row.CUST_10 | mapping:mappingSet['YN']:'F3'}}</td>                   	<!--客訴戶 -->
+				<td>{{row.CUST_12 | mapping:mappingSet['YN']:'F3'}}</td>                   	<!--可否推介 -->
+				<td>{{row.CUST_W8BEN | mapping:mappingSet['YN']:'F3'}}</td>                 <!--W-8BEN(W-8BEN-E)-->
+				<td>{{row.UNTAKE_CARE_MONTH}}</td>                                         	<!--未經營月數-->
+<!-- 				<td>{{row.ACT_PRD_NUMS}}</td>                                         		活躍度商品數 -->
+<!-- 				<td>{{row.TAKE_CARE_MATCH_YN | mapping:mappingSet['TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN']:'F3'}}</td>       經營頻次符合度 -->
+				
+				<!-- 0004141: 客戶移轉篩選、分行客戶查詢、我的客戶查詢，今天已跨分行移轉的會無法同分行移轉 sen 2018/01/10 -->
+				<!-- <td>{{row.AO_CODE}}{{row.AO_01 != null ? '_' : ''}}{{row.AO_01}}</td>      目前AO Code-->
+				<td>{{row.AO_CODE}}{{row.EMP_NAME != null ? '_' : ''}}{{row.EMP_NAME}}{{row.C_TYPE_NAME != '' ? row.C_TYPE_NAME : ''}}</td>      <!--目前AO Code-->
+				<td>{{row.UEMP_ID}}{{row.UEMP_ID != null ? '_' : ''}}{{row.UEMP_NAME}}</td>      <!--目前AO Code-->
+				<td>{{row.CUST_03 | mapping:mappingSet['GENDER']:'F3'}}</td>               <!--性別-->
+				<td>{{toJsDate(row.CUST_05) | date: "yyyy"}}</td>                          <!--出生年-->
+				<td>{{toJsDate(row.ATR_03) | date: "yyyy-MM-dd"}}</td>                     <!--最後做風險屬性日期-->
+				<td>{{row.CUST_07 | mapping:mappingSet['YN']:'F3'}}</td>                   <!--法金板塊-->
+				
+				<!-- 0004141: 客戶移轉篩選、分行客戶查詢、我的客戶查詢，今天已跨分行移轉的會無法同分行移轉 sen 2018/01/10 -->
+				<!-- <td>{{row.CUST_02 | mapping:mappingSet['branchsDesc_all']:'F3'}}</td>      歸屬行-->
+				<td>{{row.BRA_NBR | mapping:mappingSet['branchsDesc_all']:'F3'}}</td>      <!--歸屬行-->
+			</tr>
+		</tbody>
+	</table>
+</div>

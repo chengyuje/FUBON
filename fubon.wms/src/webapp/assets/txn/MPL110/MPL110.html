@@ -1,0 +1,40 @@
+<style>
+	/* 奇偶數行用不同顏色作區隔 */
+	.myTable tr:nth-child(even) {background: #DDD}	/* 偶數行 */
+	.myTable tr:nth-child(odd) {background: #FFF}	/* 奇數行 */
+</style>
+<script type="text/javascript" src="assets/txn/MPL110/MPL110.js"></script>
+<div ng-controller="MPL110ListController" ng-cloak>
+	<div class="modal-body gv_tab_sc">
+		<h4 align="center">轄下分行清單</h4>
+		
+		<table ng-show="inputVO.isHEADMGR == 'Y'" class="table-bordered td_center myTable">
+			<tr><td><a onclick="return false" ng-click="detail_ALL(row)">台北富邦銀行全行統計</a></td></tr>
+		</table>
+		<br/>
+		<table class="table-bordered td_center myTable">
+			<thead>
+				<tr>
+					<th>業務處</th>
+					<th>營運區</th>
+					<th>分行</th>						
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in resultList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					<td ng-show="inputVO.isHEADMGR == 'Y' || inputVO.isARMGR == 'Y'"><a onclick="return false" ng-click="detail_AR(row)">{{row.REGION_CENTER_NAME}}</a></td>
+					<td ng-show="!(inputVO.isHEADMGR == 'Y' || inputVO.isARMGR == 'Y')">{{row.REGION_CENTER_NAME}}</td>
+					<td ng-show="inputVO.isHEADMGR == 'Y' || inputVO.isARMGR == 'Y' || inputVO.isMBRMGR == 'Y'"><a onclick="return false" ng-click="detail_MBR(row)">{{row.BRANCH_AREA_NAME}}</a></td>
+					<td ng-show="!(inputVO.isHEADMGR == 'Y' || inputVO.isARMGR == 'Y' || inputVO.isMBRMGR == 'Y')">{{row.BRANCH_AREA_NAME}}</td>
+					<td><a onclick="return false" ng-click="detail(row)">{{row.BRANCH_NBR}}{{row.BRANCH_NAME}}</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>	
+</div>
+					
+					
+					
+					
+					
+					

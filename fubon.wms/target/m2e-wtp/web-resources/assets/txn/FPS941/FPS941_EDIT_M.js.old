@@ -1,0 +1,125 @@
+'use strict';
+eSoafApp.controller('FPS940_EDIT_MController',
+	function($scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter, getParameter) {
+		$controller('BaseController', {$scope: $scope});
+		$scope.controllerName = "FPS940_EDIT_MController";
+		
+		// combobox
+		getParameter.XML(["FPS.PLAN_TYPE"], function(totas) {
+			if (totas) {
+				$scope.PLAN_TYPE = totas.data[totas.key.indexOf('FPS.PLAN_TYPE')];
+			}
+		});
+		$scope.inputVO = {};
+		
+		// ui-sortable原生內建BUG, 官方無解這裡爆破
+		$scope.refreshList = function() {
+			if(!$scope.inputVO.plan_type) {
+				$scope.filterDataList = angular.copy($scope.dataList);
+				return;
+			}
+			if($scope.inputVO.plan_type != $scope.EditFPS_TYPE) {
+				$scope.EditIndex = null;
+				$scope.inputVO.content = "";
+			}
+			$scope.filterDataList = [];
+			var groupByFPS_TYPE = _.chain($scope.dataList).groupBy('FPS_TYPE')
+	    	.toPairs().map(function (pair) {
+	    		return _.zipObject(['FPS_TYPE', 'DATA'], pair); 
+	    	}).value();
+			// every FPS_TYPE is obj
+			angular.forEach(groupByFPS_TYPE, function(group) {
+				if(group.FPS_TYPE == $scope.inputVO.plan_type)
+					$scope.filterDataList = group.DATA;
+			});
+		};
+		$scope.refreshList();
+		$scope.generateList = function(FINANS) {
+			// 清空
+			if(FINANS.length == 0) {
+				// 非全部
+				if($scope.inputVO.plan_type)
+					$scope.dataList = _.filter($scope.dataList, function(o) { return !(o.FPS_TYPE == $scope.inputVO.plan_type); });
+				else
+					$scope.dataList = [];
+			} else {
+				var groupByFPS_TYPE = _.chain(FINANS).groupBy('FPS_TYPE')
+		    	.toPairs().map(function (pair) {
+		    		return _.zipObject(['FPS_TYPE', 'DATA'], pair); 
+		    	}).value();
+				// every FPS_TYPE is obj
+				angular.forEach(groupByFPS_TYPE, function(group) {
+					// add back
+					$scope.dataList = _.filter($scope.dataList, function(o) { return !(o.FPS_TYPE == group.FPS_TYPE); });
+					angular.forEach(group.DATA, function(row, index) {
+						row.RANK = index + 1;
+						// 讓之後編輯能快速找到那筆, 定一個ID
+						row.ROW_ID = row.FPS_TYPE + (index + 1);
+						$scope.dataList.push(row);
+					});
+				});
+			}
+		};
+		
+		// 排序用
+		$scope.sortableOptions = {
+			stop: function(e, ui) {
+				$scope.generateList(ui.item.sortable.droptargetModel);
+			}
+		};
+		$scope.action = function(row) {
+			if(row.cmbAction) {
+				if(row.cmbAction == "D") {
+					$confirm({text: '是否刪除此筆資料？ '}, {size: 'sm'}).then(function() {
+						var delIndex = $scope.filterDataList.indexOf(row);
+						$scope.filterDataList.splice(delIndex, 1);
+						$scope.EditFPS_TYPE = null;
+						$scope.EditIndex = null;
+						$scope.generateList($scope.filterDataList);
+						$scope.showSuccessMsg('ehl_01_common_004');
+		            });
+				} else {
+					$scope.EditFPS_TYPE = angular.copy(row.FPS_TYPE);
+					$scope.EditIndex = angular.copy(row.ROW_ID);
+					$scope.inputVO.plan_type = row.FPS_TYPE;
+					$scope.inputVO.content = row.CONTENT;
+				}
+				row.cmbAction = "";
+			}
+		};
+		
+		$scope.add = function() {
+			if(!$scope.inputVO.plan_type) {
+				$scope.showErrorMsg('請選擇理財規劃書類別');
+        		return;
+			}
+			$scope.filterDataList.push({'FPS_TYPE': $scope.inputVO.plan_type, 'DESC_TYPE': 'M', 'RANK': 999, 'CONTENT': $scope.inputVO.content, 'set': [{LABEL: "修改", DATA: "U"}, {LABEL: "刪除", DATA: "D"}]});
+			$scope.inputVO.content = "";
+			$scope.generateList($scope.filterDataList);
+			$scope.showSuccessMsg('ehl_01_common_004');
+		};
+		
+		$scope.edit = function() {
+			var newIndex = $scope.filterDataList.map(function(e) { return e.ROW_ID; }).indexOf($scope.EditIndex);
+			$scope.filterDataList[newIndex].FPS_TYPE = angular.copy($scope.inputVO.plan_type);
+			$scope.filterDataList[newIndex].CONTENT = angular.copy($scope.inputVO.content);
+			$scope.EditFPS_TYPE = null;
+			$scope.EditIndex = null;
+			$scope.inputVO.content = "";
+			$scope.generateList($scope.filterDataList);
+			$scope.showSuccessMsg('ehl_01_common_004');
+		};
+		
+		$scope.clear = function() {
+			$scope.EditFPS_TYPE = null;
+			$scope.EditIndex = null;
+			$scope.inputVO.content = "";
+		};
+		
+		$scope.save = function() {
+			$scope.closeThisDialog($scope.dataList);
+		};
+		
+		
+		
+});

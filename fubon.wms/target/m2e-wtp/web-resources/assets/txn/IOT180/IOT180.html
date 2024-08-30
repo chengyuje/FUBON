@@ -1,0 +1,1019 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/IOT180/IOT180.js"></script>
+<script type="text/javascript" src="assets/txn/IOT180/IOT180_INV_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/IOT180/IOT180_RIDER_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/IOT180/IOT180_REPORT_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="IOT180" ng-controller="IOT180Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >新契約送件查詢分行</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+				       	<th ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">業務處：</th>
+				       	<td ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+				         	<e-combobox id="region_center_id" name="region_center_id"
+							            ng-datasource="REGION_LIST"
+							            ng-model="inputVO.region_center_id"
+							            ng-validate="false" 
+							            ng-disabled="disableRegionCombo"
+							            ng-readonly="disableRegionCombo" 
+							            ng-editable="false"
+							            ng-format="F3"
+							            ng-required="false"
+							            ng-change="ChangeRegion()"
+							            width="143px"
+							            style="line-height:20px;" />
+				       </td>
+				       <th ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">營運區：</th>
+				       <td ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+				        	<e-combobox id="branch_area_id" name="branch_area_id"
+							            ng-datasource="AREA_LIST"
+							            ng-model="inputVO.branch_area_id"
+							            ng-validate="false" 
+							            ng-disabled="disableAreaCombo"
+							            ng-readonly="disableAreaCombo" 
+							            ng-editable="false"
+							            ng-format="F3"
+							            ng-required="false"
+							            ng-change="ChangeArea()"
+							            width="90px"
+							            style="line-height:20px;" />
+				       </td>
+				       <th ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">分行別：</th>
+				       <td ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+				        	<e-combobox id="branch_nbr" name="branch_nbr"
+							            ng-datasource="BRANCH_LIST"
+							            ng-model="inputVO.branch_nbr"
+							            ng-validate="false" 
+							            ng-disabled="disableBranchCombo"
+							            ng-readonly="disableBranchCombo" 
+							            ng-editable="false"
+							            ng-format="F1"
+							            ng-required="false"
+							            ng-change="ChangeBranch()"
+							            width="155px"
+							            style="line-height:20px;" />
+				    	</td>
+						<th ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">業務處：</th>
+						<td ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-paramtype="PMS.UHRM_RC"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeRegion()"
+										style="line-height:20px;" />
+						</td>
+						<th ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">業務中心：</th>
+						<td ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-paramtype="PMS.UHRM_OP"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeArea()"
+										style="line-height:20px;" />
+						</td>
+						<th ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'"></th>
+						<td ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'"></td>
+				    </tr>
+				    <tr>  
+				       	<th ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">理專：</th>
+					   	<td ng-hide="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+						  	<e-combobox id="emp_id" name="emp_id"
+										ng-datasource="EMP_LIST"
+										ng-model="inputVO.emp_id"
+										ng-validate="false"
+										ng-readonly="disableEmpCombo" 
+										ng-readonly="disableEmpCombo" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-disabled="disableEmpCombo"
+										ng-change="ChangeAo_code()"
+										width="110px"
+										style="line-height:20px;" />
+					 	</td>
+					  	<th ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">UHRM：</th>
+						<td ng-show="memLoginFlag.startsWith('UHRM') && memLoginFlag != 'UHRM'">
+	     					<e-combobox id="uEmpID" name="uEmpID"
+										ng-datasource="mappingSet['UHRM_LIST']"
+										ng-model="inputVO.uEmpID"
+										ng-validate="false" 
+										ng-disabled="mappingSet['UHRM_LIST'].length == 2"
+										ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										style="line-height:20px;" />				 
+						</td>
+				    	<th><p style="color:red; display:inline;font-weight:bolder;">* </p>查詢報表:</th>
+				    	<td>
+							<e-combobox id="rptType" name="rptType"
+										ng-datasource="mappingSet['Report']"
+										ng-model="inputVO.ReportType"
+										ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="RptTypeChange()"
+										width="150px"
+										style="line-height:20px;" />
+						</td>
+						<th>
+          				<td colspan="2">
+          					<div style="color: red;text-shadow: black;padding-left: 1%;">註:*為必輸欄位<span ng-show="inputVO.ReportType != undefined && inputVO.ReportType != '' && inputVO.ReportType != 5">，請擇一輸入</span></div>
+          				</td>
+          			</tr>
+					<tr ng-show="inputVO.ReportType != undefined && inputVO.ReportType != '' && inputVO.ReportType != 5">
+						<th><p style="color:red; display:inline;font-weight:bolder;">* </p>保險文件編號：</th>
+						<td>
+							<input type="text" class="form-control" ng-model="inputVO.insID" style="text-transform: uppercase;width:180px;" ng-blur="text_toUppercase(inputVO.insID,'insID')">
+						</td>
+						<th ng-show="inputVO.ReportType != 4">保險產品類型：</th>
+						<td ng-show="inputVO.ReportType != 4">
+							<e-combobox id="insPrdType" name="insPrdType"
+						       ng-paramtype="IOT.PRODUCT_TYPE"
+						       ng-model="inputVO.insPrdType"
+						       ng-validate="false"
+						       ng-readonly="false"
+						       ng-editable="false"
+						       ng-format="F3"
+						       ng-required="false"
+						       width="150px"
+						       style="line-height:20px;" />
+						</td>
+						<th ng-show="inputVO.ReportType != 2"><p style="color:red; display:inline;font-weight:bolder;">* </p>保單號碼：</th>
+						<td ng-show="inputVO.ReportType != 2">
+							<input type="text" class="form-control" ng-model="inputVO.policyNo1" size="10" maxlength="10" style="width:50%;display:inline;text-transform: uppercase;" ng-blur="text_toUppercase(inputVO.policyNo1,'policyNo1')" />&nbsp;–&nbsp;
+							<input type="text" class="form-control" ng-model="inputVO.policyNo2" size="2" maxlength="2" style="width:50px;display:inline;text-transform: uppercase;"ng-blur="text_toUppercase(inputVO.policyNo2,'policyNo2')" />&nbsp;–&nbsp;
+							<input type="text" class="form-control" ng-model="inputVO.policyNo3" size="2" maxlength="2" style="width:50px;display:inline;text-transform: uppercase;" ng-blur="text_toUppercase(inputVO.policyNo3,'policyNo3')"/>
+						</td>
+						<th></th>
+						<td></td>
+					</tr>
+					<tr ng-show="inputVO.ReportType != undefined && inputVO.ReportType != '' && inputVO.ReportType != 5"">
+						<th ng-show="inputVO.ReportType != 4">文件簽收狀態：</th>
+						<td ng-show="inputVO.ReportType != 4">
+							<e-combobox id="docStatus" name="docStatus"
+										ng-paramtype="IOT.MAIN_STATUS"
+										ng-model="inputVO.docStatus"
+										ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F3"
+										width="150px"
+										style="line-height:20px;" />
+						</td>
+						<th><p style="color:red; display:inline;font-weight:bolder;">* </p>險種代碼：</th>
+						<td>
+							<input type="text" class="form-control" ng-model="inputVO.insPrdID" style="text-transform: uppercase;width:180px" ng-blur="text_toUppercase(inputVO.insPrdID,'insPrdID')">
+						</td>						
+						<th ng-show="inputVO.ReportType != undefined || inputVO.ReportType != null"><p style="color:red; display:inline;font-weight:bolder;">* </p>招攬人員編：</th>
+						<td ng-show="inputVO.ReportType != undefined || inputVO.ReportType != null">
+							<input type="text" class="form-control" ng-model="inputVO.recruitID" style="text-transform: uppercase;width:180px" ng-blur="text_toUppercase(inputVO.recruitID,'recruitID')">
+						</td>
+					</tr>
+					<tr ng-show="inputVO.ReportType == 4">
+						<th>預估收益金額：</th>
+						<td>
+							<input type="number" class="form-control" class="form-control" ng-model="inputVO.estIncomeLowLimit" style="width: 100px;"> ~ 
+							<input type="number" class="form-control" class="form-control" ng-model="inputVO.estIncomeUpLimit" style="width: 100px;">
+						</td>
+						<th>實際收益金額：</th>
+						<td>
+							<input type="number" class="form-control" class="form-control" ng-model="inputVO.actIncomeLowLimit" style="width: 100px;"> ~
+							<input type="number" class="form-control" class="form-control" ng-model="inputVO.actIncomeUpLimit" style="width: 100px;">
+						</td>
+					</tr>
+					<tr ng-show="inputVO.ReportType != undefined && inputVO.ReportType != '' && inputVO.ReportType != 5"">
+						<th><p style="color:red; display:inline;font-weight:bolder;">* </p>要保人ID：</th>
+						<td>
+							<input type="text" class="form-control" ng-model="inputVO.custID" style="text-transform: uppercase;width:180px;" ng-blur="text_toUppercase(inputVO.custID,'custID')">
+						</td>
+						<th ng-show="inputVO.ReportType != 4 && inputVO.ReportType != 2">首期繳費方式：</th>
+						<td ng-show="inputVO.ReportType != 4 && inputVO.ReportType != 2">
+							<e-combobox id="fstPayWay" name="fstPayWay"
+										ng-paramtype="CRM.PAY_WAY"
+										ng-model="inputVO.fstPayWay"
+										ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F1"
+										width="150px"
+										style="line-height:20px;" />
+						</td>
+						<th ng-show="inputVO.ReportType != 4 && inputVO.ReportType != 2"><p style="color:red; display:inline;font-weight:bolder;">* </p>投資標的代號：</th>
+						<td ng-show="inputVO.ReportType != 4 && inputVO.ReportType != 2">
+							<input type="text" class="form-control" ng-model="inputVO.invInsId" style="text-transform: uppercase;width:180px" ng-blur="text_toUppercase(inputVO.invInsId,'invInsId')">
+						</td>
+					</tr>
+					<tr ng-show="inputVO.ReportType != undefined && inputVO.ReportType != '' && inputVO.ReportType != 5"">
+						<th><p style="color:red; display:inline;font-weight:bolder;">* </p>被保人ID：</th>
+						<td>
+							<input type="text" class="form-control" ng-model="inputVO.insuredID" style="text-transform: uppercase;width:180px;" ng-blur="text_toUppercase(inputVO.insuredID,'insuredID')">
+						</td>
+						<th><p style="color:red; display:inline;font-weight:bolder;">* </p> 依鍵機日查詢：</th>
+						<td colspan="3" ng-show="inputVO.ReportType != undefined || inputVO.ReportType != null">
+							<div class="input-group datebox datewidth" style="float:left">
+								<input 	type="text" id="sCreDate" name="sCreDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sCreDate"
+										is-open="model.a"
+										datepicker-options="bgn_sDateOptions"
+										ng-readonly="true"
+										ng-change="limitDate();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+							<div style="float:left">&nbsp; ～ &nbsp;</div>
+							<div class="input-group datebox datewidth" style="float:left">
+								<input type="text" id="eCreDate" name="eCreDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.eCreDate"
+								is-open="model.b"
+								datepicker-options="bgn_eDateOptions"
+								ng-readonly="true"
+								ng-change="limitDate();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr ng-show="inputVO.ReportType != undefined && inputVO.ReportType != '' && inputVO.ReportType != 5"">
+						<th ng-show="inputVO.ReportType == 3 || inputVO.ReportType == 4">人壽受理進度:</th>
+						<td ng-show="inputVO.ReportType == 3 || inputVO.ReportType == 4">
+							<e-combobox id="policyStatus" name="policyStatus"
+										ng-paramtype="IOT.POLICY_STATUS"
+										ng-model="inputVO.policyStatus"
+										ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F3"
+										width="150px"
+										style="line-height:20px;" />
+						</td>
+						<th ng-show="inputVO.ReportType == 3 || inputVO.ReportType == 4"><p style="color:red; display:inline;font-weight:bolder;">* </p>要保書填寫申請日：</th>
+						<td colspan="3"  ng-show="inputVO.ReportType == 3 || inputVO.ReportType == 4">
+							<div class="input-group datebox datewidth" style="float:left">
+								<input 	type="text" id="sApplyDate" name="sApplyDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sApplyDate"
+										is-open="model.e"
+										datepicker-options="s_AppDateOptions"
+										ng-readonly="true"
+										ng-change="ApplyDate();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="openA($event,'e')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+							<div style="float:left">&nbsp; ～ &nbsp;</div>
+							<div class="input-group datebox datewidth" style="float:left">
+								<input type="text" id="eApplyDate" name="eApplyDate"
+								class="form-control"
+								uib-datepicker-popup="yyyy/MM/dd"
+								ng-model="inputVO.eApplyDate"
+								is-open="model.f"
+								datepicker-options="e_AppDateOptions"
+								ng-readonly="true"
+								ng-change="ApplyDate();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="openA($event,'f')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr ng-show="inputVO.ReportType == 4">
+						<th><p style="color:red; display:inline;font-weight:bolder;">* </p>結案日區間：</th>
+						<td colspan="3"  ng-show="inputVO.ReportType == 4">
+							<div class="input-group datebox datewidth" style="float:left">
+								<input 	type="text" id="sCloseDate" name="sCloseDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sCloseDate"
+										is-open="model.g"
+										datepicker-options="s_CDateOptions"
+										ng-readonly="true"
+										ng-change="CloseDate();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="openC($event,'g')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+							<div style="float:left">&nbsp; ～ &nbsp;</div>
+							<div class="input-group datebox datewidth" style="float:left">
+								<input 	type="text" id="eCloseDate" name="eCloseDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.eCloseDate"
+										is-open="model.h"
+										datepicker-options="e_CDateOptions"
+										ng-readonly="true"
+										ng-change="CloseDate();"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="openC($event,'h')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr ng-show="inputVO.ReportType == 4">
+						<th><p style="color:red; display:inline;font-weight:bolder;">* </p>計績工作年月:</th>
+						<td>
+							<e-combobox id="sWorkDate"
+										ng-datasource="mappingSet['timeS']" 
+										ng-model="inputVO.sWorkDate"
+										ng-validate="false" ng-readonly="false" ng-editable="false"
+										ng-change="chtimeS();dateChange()"
+										ng-format="F3" ng-required="false" width="100px" 
+										style="line-height:20px;" /> ~
+							
+							<e-combobox id="eWorkDate"
+										ng-datasource="mappingSet['timeE']" 
+										ng-model="inputVO.eWorkDate"
+										ng-validate="false" ng-readonly="false" ng-editable="false"
+										ng-change="chtimeE();dateChange()"
+										ng-format="F3" ng-required="false" width="100px" 
+										style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr ng-show="inputVO.ReportType != undefined && inputVO.ReportType != '' && inputVO.ReportType != 5">
+						<th ng-show="inputVO.ReportType == 3 || inputVO.ReportType == 4">保險工作年:</th>
+						<td ng-show="inputVO.ReportType == 3 || inputVO.ReportType == 4">
+							<e-combobox id="WorkYear" name="WorkYear"
+										ng-datasource="mappingSet['Year']"
+										ng-model="inputVO.WorkYear"
+										ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F3"
+										width="150px"
+										style="line-height:20px;" />
+						</td>
+						<th ng-show="inputVO.ReportType == 3 || inputVO.ReportType == 4">保險工作月:</th>
+						<td ng-show="inputVO.ReportType == 3 || inputVO.ReportType == 4">
+							<e-combobox id="WorkMonth" name="WorkMonth"
+										ng-datasource="mappingSet['Month']"
+										ng-model="inputVO.WorkMonth"
+										ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F3"
+										width="150px"
+										style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr ng-show="inputVO.ReportType == 1">
+						<th>*進件來源</th>
+						<td>
+							<e-combobox id="insSource" 
+								ng-datasource="mappingSet['INS_SOURCE']"
+								ng-model="inputVO.FB_COM_YN"
+				   				ng-validate="false" 
+				   				ng-readonly="false" 
+				   				ng-editable="false"
+				   				ng-format="F3"
+				   				ng-required="false"
+				   				width="200px"
+				   				style="line-height:20px;" />
+						</td>
+						<th>*保險公司：</th>
+                        <td colspan="3">
+                        	<e-combobox id="insuranceCoSerialNum" name="insuranceCoSerialNum"
+                                            ng-datasource="mappingSet['COMPANY']"
+                                            ng-model="inputVO.COMPANY_NUM"
+                                            ng-validate="false"
+                                            ng-readonly="false"
+                                            ng-editable="false"
+                                            ng-disabled="inputVO.FB_COM_YN == 'Y'"
+                                            ng-format="F3"
+                                            width="360px"
+                                            style="line-height:20px;"
+                                            required
+                                />
+                    	</td>
+					</tr>
+				</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()" ng-disabled="inputVO.ReportType == undefined || inputVO.ReportType == '' " >查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();limitDate()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="inputVO.ReportType == undefined || inputVO.ReportType == '' || inputVO.ReportType == 5 || paramList.length == 0">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" totallist="paramList" list="data" limitTotal="1000000"></e-jumping-once>
+			
+			<!-- 鍵機資訊-->
+			<div class="gv_tab_sc scroll_y" style="height:335px;white-space: nowrap;" ng-if="inputVO.ReportType == 1">
+				<table class="e-table-freeze" e-height="335px" e-left="4" e-list="data" e-mode="1" e-top="false">
+					<thead>
+						<tr>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="KEYIN_DATE" e-query="query()">鍵機日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="APPLY_DATE" e-query="query()">要保書填寫申請日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="OP_BATCH_NO" e-query="query()">送件批號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INS_ID" e-query="query()">保險文件編號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="POLICY_NO" e-query="query()">保單號碼</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NBR" e-query="query()">分行代碼</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NAME" e-query="query()">分行名稱</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="RECRUIT_ID" e-query="query()">招攬人員編</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="M_CUST_ID" e-query="query()">招攬人ID</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="M_EMP_NAME" e-query="query()">招攬人姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_CODE" e-query="query()">AO CODE</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_NAME" e-query="query()">被保險人姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_ID" e-query="query()">被保險人ID</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PROPOSER_NAME" e-query="query()">要保人姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">要保人ID</e-sorter></th>
+							<th>進件來源</th>
+							<th>保險公司</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSPRD_ID" e-query="query()">主約險種代碼</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSPRD_NAME" e-query="query()">主約險種名稱</e-sorter></th>
+							<th>商品風險值</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="STATUS" e-query="query()">文件簽收狀態</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSPRD_TYPE" e-query="query()">保險產品類型</e-sorter></th>
+							<th>首期繳費方式</th>							
+							<th>繳費年期</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PAY_TYPE" e-query="query()">躉繳/分期繳</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="MOP2" e-query="query()">分期繳別</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="SPECIAL_CONDITION" e-query="query()">特殊條件</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CURR_CD" e-query="query()">幣別</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="EXCH_RATE" e-query="query()">參考匯率</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REAL_PREMIUM" e-query="query()">實收保費(原幣)</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BASE_PREMIUM" e-query="query()">基本保費(原幣)</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="MATCH_DATE" e-query="query()">適配日期</e-sorter></th>
+							<th>投資型連結標的</th>
+							<th>附約明細</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REF_CON_ID" e-query="query()">轉介編號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="SALES_PERSON" e-query="query()">轉介人員編</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="SALES_NAME" e-query="query()">轉介人姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REG_TYPE" e-query="query()">要保書類型</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="WRITE_REASON" e-query="query()">使用手寫要保書原因</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="WRITE_REASON_OTH" e-query="query()">原因描述</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="QC_ANC_DOC" e-query="query()">要保文件內是否有檢附保險通報單</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INS_RCV_DATE" e-query="query()">人壽簽收時間</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INS_RCV_OPRID" e-query="query()">人壽簽收人</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REMARK_BANK" e-query="query()">備註</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="DELETE_DATE" e-query="query()">刪除時間</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="DELETE_OPRID" e-query="query()">刪除人</e-sorter></th>									
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td>{{row.KEYIN_DATE}}</td>
+						 	<td>{{row.APPLY_DATE}}</td>
+						 	<td>{{row.OP_BATCH_NO}}</td>
+							<td>{{row.INS_ID}}</td>
+							<td>{{row.POLICY_NO}}</td>
+							<td>{{row.BRANCH_NBR}}</td>
+						 	<td>{{row.BRANCH_NAME}}</td>
+						 	<td>{{row.RECRUIT_ID}}</td>
+						 	<td>{{row.M_CUST_ID | eMasking:1}}</td>
+							<td>{{row.M_EMP_NAME}}</td>
+							<td>{{row.AO_CODE}}</td>
+							<td>{{row.INSURED_NAME | eMasking:7}}</td>
+						 	<td>{{row.INSURED_ID | eMasking:1}}</td>
+						 	<td>{{row.PROPOSER_NAME | eMasking:7}}</td>
+						 	<td>{{row.CUST_ID | eMasking:1}}</td>
+						 	<td>{{row.INS_SOURCE}}</td>
+						 	<td>{{row.INS_COM_NAME}}</td>
+							<td>{{row.INSPRD_ID}}</td>
+							<td>{{row.INSPRD_NAME}}</td>
+							<td>{{row.IOT_PRD_RISK}}</td>
+							<td>{{row.STATUS | mapping:mappingSet['IOT.MAIN_STATUS']:'F3'}}</td>
+							<td>{{row.INSPRD_TYPE | mapping:mappingSet['IOT.PRODUCT_TYPE']:'F3'}}</td>
+							<td>{{row.FIRST_PAY_WAY | mapping:mappingSet['IOT.FIRST_PAY_WAY']:'F3'}}</td>
+						 	<td>{{row.INSPRD_ANNUAL}}</td>
+						 	<td>{{row.PAY_TYPE | mapping:mappingSet['IOT.PAY_TYPE']:'F3'}}</td>
+							<td>{{row.MOP2 | mapping:mappingSet['PMS.PAY_YQD']:'F3'}}</td>
+							<td>{{row.SPECIAL_CONDITION}}</td>
+							<td>{{row.CURR_CD}}</td>
+							<td>{{row.EXCH_RATE}}</td>
+						 	<td align="right">{{row.REAL_PREMIUM | currency:''}}</td>
+						 	<td align="right">{{row.BASE_PREMIUM | currency:''}}</td>
+							<td>{{row.MATCH_DATE}}</td>
+						 	<td align="center"><a ng-click="getDetail(row, 'tar')" ><span class="glyphicon glyphicon-zoom-in"></span></a></td>
+						 	<td align="center"><a ng-click="getDetail(row, 'rider')" ><span class="glyphicon glyphicon-zoom-in"></span></a></td>
+							<td>{{row.REF_CON_ID}}</td>
+							<td>{{row.SALES_PERSON}}</td>
+							<td>{{row.SALES_NAME}}</td>
+							<td>{{row.REG_TYPE | mapping:mappingSet['IOT.REG_TYPE12']:'F3'}}</td>
+							<td>{{row.WRITE_REASON | mapping:mappingSet['IOT.WRITE_REASON']:'F3'}}</td>
+							<td>{{row.WRITE_REASON_OTH}}</td>
+							<td>{{row.QC_ANC_DOC}}</td>
+							<td>{{row.INS_RCV_DATE}}</td>
+							<td>{{row.INS_RCV_OPRID}}</td>
+							<td>{{row.REMARK_BANK}}</td>
+							<td>{{row.DELETE_DATE}}</td>
+							<td>{{row.DELETE_OPRID}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+            <!-- 品質檢核-->
+			<div class="gv_tab_sc scroll_y" style="height:335px;white-space: nowrap;" ng-if="inputVO.ReportType == 2">
+				<table>
+					<thead>
+						<tr>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="KEYIN_DATE" e-query="query()">鍵機日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INS_ID" e-query="query()">保險文件編號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NBR" e-query="query()">分行代碼</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NAME" e-query="query()">分行名稱</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_NAME" e-query="query()">被保險人姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_ID" e-query="query()">被保險人ID</e-sorter></th>
+							<th>被保人生日</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PROPOSER_NAME" e-query="query()">要保人姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">要保人ID</e-sorter></th>
+							<th>要保人生日</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CREATOR" e-query="query()">檢核人</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="OP_DATE" e-query="query()">檢核時間</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="QC_ERASER" e-query="query()">是否以可擦拭文具書寫</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="QC_STAMP" e-query="query()">驗印是否符合</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="QC_IMMI" e-query="query()">是否有檢附立即投入批註書</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="QC_APEC" e-query="query()">檢視電子要保書地址、電話、EMAIL、<br/>手機與套印要保書是否相符</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="QC_LOAN_CHK" e-query="query()">檢視業報書前3個月貸款/保單借款、<br/>業報書前3個月保單解約之勾選<br/>與要保人保險購買檢核報表相符</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="QC_SIGNATURE" e-query="query()">檢核要保書客戶與業務員<br/>之簽名欄位均有簽名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="LOAN_SOURCE_YN" e-query="query()">保費來源是否為貸款</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_TRANSSEQ" e-query="query()">被保人錄音序號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PROPOSER_TRANSSEQ" e-query="query()">要保人錄音序號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AB_TRANSSEQ" e-query="query()">非常態錄音序號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PREMIUM_TRANSSEQ" e-query="query()">要保人高齡/保費來源錄音序號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="I_PREMIUM_TRANSSEQ" e-query="query()">被保人高齡/保費來源錄音序號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="P_PREMIUM_TRANSSEQ" e-query="query()">繳款人高齡/保費來源錄音序號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="C_SALE_SENIOR_TRANSSEQ" e-query="query()">要保人銷售過程錄音序號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="I_SALE_SENIOR_TRANSSEQ" e-query="query()">被保人銷售過程錄音序號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="P_SALE_SENIOR_TRANSSEQ" e-query="query()">繳款人銷售過程錄音序號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="SENIOR_AUTH_REMARKS" e-query="query()">高齡客戶投保關懷說明</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="SENIOR_AUTH_ID" e-query="query()">關懷主管員編</e-sorter></th>
+							
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PROPOSER_CM_FLAG" e-query="query()">要保人戶況</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_RISK" e-query="query()">要保人KYC等級</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_RISK_DUE" e-query="query()">要保人KYC效期</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AML" e-query="query()">要保人AML風險等級</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PRECHECK" e-query="query()">要保人Pre-check結果</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PROPOSER_INCOME1" e-query="query()">要保人工作年收入(業報)</e-sorter></th>
+							<th>要保人行內KYC收入</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PROPOSER_INCOME3" e-query="query()">要保人工作年收入(授信)</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_INCOME1" e-query="query()">被保人工作年收入(業報)</e-sorter></th>
+							<th>被保人行內KYC收入</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_INCOME3" e-query="query()">被保人工作年收入(授信)</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PAYER_ID" e-query="query()">繳款人ID</e-sorter></th>
+							<th>繳款人生日</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="RLT_BT_PROPAY" e-query="query()">繳款人與要保人關係</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="LOAN_CHK1_YN" e-query="query()">繳款人保單貸款檢核</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="LOAN_CHK2_YN" e-query="query()">繳款人行內貸款檢核</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CD_CHK_YN" e-query="query()">繳款人定存不打折檢核</e-sorter></th>
+							<th style="width: 250px;"><e-sorter e-input="inputVO" e-mode="auto" e-col="INCOME_REMARK" e-query="query()">工作年收入與授信審核表不一致說明</e-sorter></th>
+							<th style="width: 250px;"><e-sorter e-input="inputVO" e-mode="auto" e-col="LOAN_SOURCE_REMARK" e-query="query()">客戶保費來源說明</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="SIGNOFF_DATE" e-query="query()">覆核日期</e-sorter></th>
+							<th>保費來源為解約</th>
+							<th>業報投保前三個月有解約</th>
+							<th>業報投保前三個月有貸款</th>
+							<th>要保人保單貸款檢核</th>
+							<th>要保人行內貸款檢核</th>
+							<th>要保人定存不打折檢核</th>
+							<th>要保人解約檢核</th>
+							<th>被保人保單貸款檢核</th>
+							<th>被保人行內貸款檢核</th>
+							<th>被保人定存不打折檢核</th>
+							<th>被保人解約檢核</th>
+							<th>繳款人解約檢核</th>
+							<th>要保人行內貸款申請日</th>
+							<th>被保人行內貸款申請日</th>
+							<th>繳款人行內貸款申請日</th>
+							<th>要保人舊保單提領保額/保價日</th>
+							<th>適合度檢核編碼</th>
+							<th>案件編號</th>
+							<th>契撤案件</th>
+							<th>保險資金電訪<br/>欄位註記</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td>{{row.KEYIN_DATE}}</td>
+							<td>{{row.INS_ID}}</td>
+							<td>{{row.BRANCH_NBR}}</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.INSURED_NAME | eMasking:7}}</td>
+							<td>{{row.INSURED_ID | eMasking:1}}</td>
+							<td>{{row.INSURED_BIRTH}}</td>
+							<td>{{row.PROPOSER_NAME | eMasking:7}}</td>
+							<td>{{row.CUST_ID | eMasking:1}}</td>
+							<td>{{row.PROPOSER_BIRTH}}</td>
+							<td>{{row.CREATOR}}</td>
+							<td>{{row.OP_DATE}}</td>
+							<td>{{row.QC_ERASER | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.QC_STAMP | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.QC_IMMI | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.QC_APEC | mapping:mappingSet['IOT.QC_APEC']:'F3'}}</td>
+							<td>{{row.QC_LOAN_CHK | mapping:mappingSet['IOT.QC_LOAN_CHK']:'F3'}}</td>
+							<td>{{row.QC_SIGNATURE | mapping:mappingSet['IOT.QC_SIGNATURE']:'F3'}}</td>
+							<td>{{row.LOAN_SOURCE_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.INSURED_TRANSSEQ}}</td>
+							<td>{{row.PROPOSER_TRANSSEQ}}</td>
+							<td>{{row.AB_TRANSSEQ}}</td>
+							<td>{{row.PREMIUM_TRANSSEQ}}</td>
+							<td>{{row.I_PREMIUM_TRANSSEQ}}</td>
+							<td>{{row.P_PREMIUM_TRANSSEQ}}</td>
+							<td>{{row.C_SALE_SENIOR_TRANSSEQ}}</td>
+							<td>{{row.I_SALE_SENIOR_TRANSSEQ}}</td>
+							<td>{{row.P_SALE_SENIOR_TRANSSEQ}}</td>
+							<td>{{row.SENIOR_AUTH_REMARKS}}</td>
+							<td>{{row.SENIOR_AUTH_ID}}</td>
+							
+							<td>{{row.PROPOSER_CM_FLAG | mapping:mappingSet['IOT.CM_FLAG']:'F3'}}</td>
+							<td>{{row.CUST_RISK}}</td>
+							<td>{{row.CUST_RISK_DUE}}</td>
+							<td>{{row.AML}}</td>
+							<td>{{row.PRECHECK}}</td>
+							<td align="right">{{row.PROPOSER_INCOME1 | number :4}}</td>
+							<td>{{row.C_KYC_INCOME}}</td>
+							<td align="right">{{row.PROPOSER_INCOME3 | number :0}}</td>
+							<td align="right">{{row.INSURED_INCOME1 | number :4}}</td>
+							<td>{{row.I_KYC_INCOME}}</td>
+							<td align="right">{{row.INSURED_INCOME3 | number :0}}</td>
+							<td>{{row.PAYER_ID | eMasking:1}}</td>
+							<td>{{row.PAYER_BIRTH}}</td>
+							<td>{{row.RLT_BT_PROPAY | mapping:mappingSet['IOT.PAYER_REL_PROPOSER']:'F3'}}</td>
+							<td>{{row.LOAN_CHK1_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.LOAN_CHK2_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.CD_CHK_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td style="width: 250px;">{{row.INCOME_REMARK}}</td>
+							<td style="width: 250px;">{{row.LOAN_SOURCE_REMARK}}</td>
+							<td>{{row.SIGNOFF_DATE}}</td>
+							
+							<td>{{row.LOAN_SOURCE2_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.CONTRACT_END_YN | mapping:mappingSet['COMMON.YES_NO_12']:'F3'}}</td>
+							<td>{{row.S_INFITEM_LOAN_YN | mapping:mappingSet['COMMON.YES_NO_12']:'F3'}}</td>
+							<td>{{row.C_LOAN_CHK1_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.C_LOAN_CHK2_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.C_CD_CHK_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.C_LOAN_CHK3_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.I_LOAN_CHK1_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.I_LOAN_CHK2_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.I_CD_CHK_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.I_LOAN_CHK3_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.LOAN_CHK3_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.C_LOAN_APPLY_DATE}}</td>
+							<td>{{row.I_LOAN_APPLY_DATE}}</td>
+							<td>{{row.P_LOAN_APPLY_DATE}}</td>
+							<td>{{row.C_PREM_DATE}}</td>
+							<td>{{row.PREMATCH_SEQ}}</td>
+							<td>{{row.CASE_ID}}</td>
+							<td>{{row.CANCEL_CONTRACT_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td>{{row.RECORD_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<!-- 受理查詢-->
+			<div class="gv_tab_sc scroll_y" style="height:335px;white-space: nowrap;" ng-if="inputVO.ReportType == 3">
+				<table class="e-table-freeze" e-height="335px" e-left="4" e-list="data" e-mode="1" e-top="false">
+					<thead>
+						<tr>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INS_ID" e-query="query()">保險文件編號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="POLICY_STATUS" e-query="query()">保單發單狀態</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_NAME" e-query="query()">被保險人姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSURED_ID" e-query="query()">被保險人ID</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PROPOSER_NAME" e-query="query()">要保人姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">要保人ID</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CREATETIME" e-query="query()">鍵機日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="APPLY_DATE" e-query="query()">要保書填寫申請日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="POLICY_NO" e-query="query()">保單號碼</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INS_NO" e-query="query()">主附約別</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INS_ITEM" e-query="query()">險種代號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PREM_YEAR_STR" e-query="query()">繳費年期</e-sorter></th>
+							<th>保額</th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PAY_TYPE" e-query="query()">繳別</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="EMPY_YN" e-query="query()">員工件</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="DEPT_CODE" e-query="query()">專案代號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="NB_NOTE_DT" e-query="query()">核保照會日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="NB_CONTENT" e-query="query()">核保照會內容</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="RN_NOTE_DT" e-query="query()">保費照會日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="RM_CONTENT" e-query="query()">保費照會原因</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INSPECT_DATE" e-query="query()">核保完成日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PREM_PAYABLE" e-query="query()">保單應繳保費</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="APPL_DATE" e-query="query()">保單生效日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="DOWN_PAY_TYPE" e-query="query()">首期繳費方式</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="SEND_DATE" e-query="query()">保單發單日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="SEND_TYPE" e-query="query()">保單郵寄方式</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="SIGN_DATE" e-query="query()">保單簽收日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REGISTER_NO" e-query="query()">保單掛號號碼</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="POLI_YEAR" e-query="query()">保單年度</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="POLI_PERD" e-query="query()">保單期數</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="POLICY_CUR" e-query="query()">保單幣別</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NBR" e-query="query()">保單招攬單位</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="ITEM_REMRK" e-query="query()">險種性質</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="COMU_RATE" e-query="query()">特殊佣金比率</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="POLICY_EXCH" e-query="query()">宣告匯率</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="POLICY_EXCH_DATE" e-query="query()">宣告匯率日期</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="GET_YYMMDD" e-query="query()">佣金產生日期</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="COMU" e-query="query()">預計發佣日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PREM" e-query="query()">預計核實保費(臺幣)</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="COMIS" e-query="query()">預計核實佣金(臺幣)</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="ANNU_ACT_FEE" e-query="query()">預估收益(臺幣)</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="DECL_ECHG" e-query="query()">預計核實保費/佣金計算匯率</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REAL_COMU_DATE" e-query="query()">實際發佣日</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REAL_PREM" e-query="query()">實際核實保費</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REAL_COMIS" e-query="query()">實際核實佣金</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REAL_DECL_ECHG" e-query="query()">實際核實保費/佣金計算匯率</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="RECRUIT_ID" e-query="query()">招攬人員編</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="RECRUIT_NAME" e-query="query()">招攬人姓名</e-sorter></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td>{{row.INS_ID}}</td>
+						 	<td>{{row.POLICY_STATUS | mapping:mappingSet['CRM.CRM239_CONTRACT_STATUS']:'F3'}}</td>
+						 	<td>{{row.INSURED_NAME | eMasking:7}}</td>
+						 	<td>{{row.INSURED_ID | eMasking:1}}</td>
+						 	<td>{{row.PROPOSER_NAME | eMasking:7}}</td>
+						 	<td>{{row.CUST_ID | eMasking:1}}</td>
+						 	<td>{{row.CREATETIME}}</td>
+						 	<td>{{row.APPLY_DATE}}</td>
+						 	<td>{{row.POLICY_NO}}</td>
+						 	<td ng-show="row.INS_NO == 00">主約</td>
+						 	<td ng-show="row.INS_NO != 00">附約</td>
+						 	<td>{{row.INS_ITEM}}</td>
+						 	<td>{{row.PREM_YEAR_STR}}</td>
+						 	<td align="right">{{row.INS_YEAR_STR}}</td>
+						 	<td>{{row.PAY_TYPE | mapping:mappingSet['PMS.PAY_YQD']:'F3'}}</td>
+						 	<td>{{row.EMPY_YN}}</td>
+						 	<td>{{row.DEPT_CODE}}</td>
+						 	<td>{{row.NB_NOTE_DT}}</td>
+						 	<td>{{row.NB_CONTENT}}</td>
+						 	<td>{{row.RN_NOTE_DT}}</td>
+						 	<td>{{row.RM_CONTENT}}</td>
+						 	<td>{{row.INSPECT_DATE}}</td>
+						 	<td align="right">{{row.PREM_PAYABLE | currency:''}}</td>
+						 	<td>{{toJsDate(row.APPL_DATE) | date:"yyyy-MM-dd"}}</td>
+						 	<td>{{row.DOWN_PAY_TYPE  | mapping:mappingSet['CRM.PAY_WAY']:'F3'}}</td>
+						 	<td>{{toJsDate(row.SEND_DATE) | date:"yyyy-MM-dd"}}</td>
+						 	<td>{{row.SEND_TYPE  | mapping:mappingSet['IOT.SEND_TYPE']:'F3'}}</td>
+						 	<td>{{toJsDate(row.SIGN_DATE) | date:"yyyy-MM-dd"}}</td>
+						 	<td>{{row.REGISTER_NO}}</td>
+						 	<td>{{row.POLI_YEAR}}</td>
+						 	<td>{{row.POLI_PERD}}</td>
+						 	<td>{{row.POLICY_CUR}}</td>
+						 	<td>{{row.BRANCH_NBR}}</td>
+						 	<td>{{row.ITEM_REMRK}}</td>
+						 	<td>{{row.COMU_RATE}}</td>
+						 	<td>{{row.POLICY_EXCH}}</td>
+						 	<td>{{row.POLICY_EXCH_DATE}}</td>
+						 	<td>{{row.GET_YYMMDD}}</td>
+						 	<td>{{row.COMU}}</td>
+						 	<td align="right">{{row.PREM | currency:''}}</td>
+						 	<td align="right">{{row.COMIS | currency:''}}</td>
+						 	<td align="right">{{row.ANNU_ACT_FEE | currency:''}}</td>
+						 	<td>{{row.DECL_ECHG}}</td>
+						 	<td>{{row.REAL_COMU_DATE}}</td>
+						 	<td align="right">{{row.REAL_PREM | currency:''}}</td>
+						 	<td align="right">{{row.REAL_COMIS | currency:''}}</td>
+						 	<td>{{row.REAL_DECL_ECHG}}</td>
+						 	<td>{{row.RECRUIT_ID}}</td>
+						 	<td>{{row.RECRUIT_NAME}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<!-- 核實報表-->
+			<div class="gv_tab_sc scroll_y" style="height:335px;white-space: nowrap;" ng-if="inputVO.ReportType == 4">
+				<table class="e-table-freeze" e-height="335px" e-left="5" e-list="data" e-mode="1" e-top="false">
+					<thead>
+						<tr>
+							<th rowspan="2">處別</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行</th>
+							<th rowspan="2">分行名稱</th>
+							<th rowspan="2">組別</th>
+							<th colspan="2">保險戰報預估收益</th>
+							<th colspan="3">已核實預估佣收</th>
+							<th colspan="3">核保通過待結案</th>
+							<th colspan="3">照會中</th>
+							<th colspan="3">核保中</th>
+							<th colspan="3">契約/取消/拒保/延期</th>
+							<th colspan="3">待確認</th>
+						</tr>
+						<tr>
+							<th>件數</th>
+							<th>預估收益</th>
+							<th>件數</th>
+							<th>核實佣收</th>
+							<th>比例</th>
+							<th>件數</th>
+							<th>預估收益</th>
+							<th>比例</th>
+							<th>件數</th>
+							<th>預估收益</th>
+							<th>比例</th>
+							<th>件數</th>
+							<th>預估收益</th>
+							<th>比例</th>
+							<th>件數</th>
+							<th>預估收益</th>
+							<th>比例</th>
+							<th>件數</th>
+							<th>預估收益</th>
+							<th>比例</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat-start="(a,dataA) in data |  groupBy: 'REGION_CENTER_NAME' as resultA">
+								<td rowspan="{{dataA.length + numGroups(resultB)*2 + 1}}" >{{a}}</td>
+							</tr>
+							<tr ng-repeat-start="(b, dataB) in dataA |  groupBy: 'BRANCH_AREA_NAME' as resultB">
+								<td rowspan="{{dataB.length + 1}}" >{{b}}</td>
+							</tr>
+							<tr ng-repeat="d in dataB">
+								<td>{{d.BRANCH_NBR}}</td>
+								<td>{{d.BRANCH_NAME}}</td>
+								<td>{{d.BRANCH_CLS == 0 ? '' : d.BRANCH_CLS}}</td>
+								<td><a ng-click="getRptDetail(inputVO, d.TOTAL_CNT,d.BRANCH_NBR,d.BRANCH_CLS, 'total')" >{{d.TOTAL_CNT}}</a></td>
+								<td>{{d.TOTAL_SUM | currency:"":0:0}}</td>
+								<td><a ng-click="getRptDetail(inputVO, d.COM_CNT,d.BRANCH_NBR,d.BRANCH_CLS,'com')" >{{d.COM_CNT}}</a></td>
+								<td>{{d.COMIS | currency:"":0}}</td>
+								<td>{{d.COM_RATE*100 | number:2}}%</td>
+								<td><a ng-click="getRptDetail(inputVO, d.B_CNT,d.BRANCH_NBR,d.BRANCH_CLS,'b')" >{{d.B_CNT}}</a></td>
+								<td>{{d.B_SUM | currency:"":0}}</td>
+								<td>{{d.B_RATE*100 | number:2}}%</td>
+								<td><a ng-click="getRptDetail(inputVO, d.D_CNT,d.BRANCH_NBR,d.BRANCH_CLS,'d')" >{{d.D_CNT}}</a></td>
+								<td>{{d.D_SUM | currency:"":0}}</td>
+								<td>{{d.D_RATE*100 | number:2}}%</td>
+								<td><a ng-click="getRptDetail(inputVO, d.D_CNT,d.BRANCH_NBR,d.BRANCH_CLS,'c')" >{{d.C_CNT}}</a></td>
+								<td>{{d.C_SUM | currency:"":0}}</td>
+								<td>{{d.C_RATE*100 | number:2}}%</td>
+								<td><a ng-click="getRptDetail(inputVO, d.F_CNT,d.BRANCH_NBR,d.BRANCH_CLS,'f')" >{{d.F_CNT}}</a></td>
+								<td>{{d.F_SUM | currency:"":0}}</td>
+								<td>{{d.F_RATE*100 | number:2}}%</td>
+								<td><a ng-click="getRptDetail(inputVO, d.J_CNT,d.BRANCH_NBR,d.BRANCH_CLS,'j')" >{{d.J_CNT}}</a></td>
+								<td>{{d.J_SUM | currency:"":0}}</td>
+								<td>{{d.J_RATE*100 | number:2}}%</td>
+							</tr>
+							<tr ng-repeat-end>
+								<td colspan="4" align="center">{{b}} 合計</td>
+								<td>{{getBranchTotal(dataB, 'TOTAL_CNT') | number:0}}</td>
+								<td>{{getBranchTotal(dataB, 'TOTAL_SUM') | currency:"":0:0}}</td>
+								<td>{{getBranchTotal(dataB, 'COM_CNT')}}</td>
+								<td>{{getBranchTotal(dataB, 'COMIS') | currency:"":0}}</td>
+								<td>{{getBranchTotal(dataB, 'COM_RATE')*100 | number:2}}%</td>
+								<td>{{getBranchTotal(dataB, 'B_CNT')}}</td>
+								<td>{{getBranchTotal(dataB, 'B_SUM') | currency:"":0}}</td>
+								<td>{{getBranchTotal(dataB, 'B_RATE')*100 | number:2}}%</td>
+								<td>{{getBranchTotal(dataB, 'D_CNT')}}</td>
+								<td>{{getBranchTotal(dataB, 'D_SUM') | currency:"":0}}</td>
+								<td>{{getBranchTotal(dataB, 'D_RATE')*100 | number:2}}%</td>
+								<td>{{getBranchTotal(dataB, 'C_CNT')}}</td>
+								<td>{{getBranchTotal(dataB, 'C_SUM') | currency:"":0}}</td>
+								<td>{{getBranchTotal(dataB, 'C_RATE')*100 | number:2}}%</td>
+								<td>{{getBranchTotal(dataB, 'F_CNT')}}</td>
+								<td>{{getBranchTotal(dataB, 'F_SUM') | currency:"":0}}</td>
+								<td>{{getBranchTotal(dataB, 'F_RATE')*100 | number:2}}%</td>
+								<td>{{getBranchTotal(dataB, 'J_CNT')}}</td>
+								<td>{{getBranchTotal(dataB, 'J_SUM') | currency:"":0}}</td>
+								<td>{{getBranchTotal(dataB, 'J_RATE')*100 | number:2}}%</td>
+							</tr>
+							<tr ng-repeat-end>
+								<td colspan="5" align="center">{{a}} 合計</td>
+								<td>{{getRegionTotal(a, 'TOTAL_CNT') | number:0}}</td>
+								<td>{{getRegionTotal(a, 'TOTAL_SUM') | currency:"":0:0}}</td>
+								<td>{{getRegionTotal(a, 'COM_CNT')}}</td>
+								<td>{{getRegionTotal(a, 'COMIS') | currency:"":0}}</td>
+								<td>{{getRegionTotal(a, 'COM_RATE')*100 | number:2}}%</td>
+								<td>{{getRegionTotal(a, 'B_CNT')}}</td>
+								<td>{{getRegionTotal(a, 'B_SUM') | currency:"":0}}</td>
+								<td>{{getRegionTotal(a, 'B_RATE')*100 | number:2}}%</td>
+								<td>{{getRegionTotal(a, 'D_CNT')}}</td>
+								<td>{{getRegionTotal(a, 'D_SUM') | currency:"":0}}</td>
+								<td>{{getRegionTotal(a, 'D_RATE')*100 | number:2}}%</td>
+								<td>{{getRegionTotal(a, 'C_CNT')}}</td>
+								<td>{{getRegionTotal(a, 'C_SUM') | currency:"":0}}</td>
+								<td>{{getRegionTotal(a, 'C_RATE')*100 | number:2}}%</td>
+								<td>{{getRegionTotal(a, 'F_CNT')}}</td>
+								<td>{{getRegionTotal(a, 'F_SUM') | currency:"":0}}</td>
+								<td>{{getRegionTotal(a, 'F_RATE')*100 | number:2}}%</td>
+								<td>{{getRegionTotal(a, 'J_CNT')}}</td>
+								<td>{{getRegionTotal(a, 'J_SUM') | currency:"":0}}</td>
+								<td>{{getRegionTotal(a, 'J_RATE')*100 | number:2}}%</td>
+							</tr>
+							<tr ng-repeat="row in totalList">
+								<td colspan="5" align="center">全行  合計</td>
+								<td>{{row.TOTAL_CNT}}</td>
+								<td>{{row.TOTAL_SUM | currency:"":0:0}}</td>
+								<td>{{row.COM_CNT}}</td>
+								<td>{{row.COMIS | currency:"":0}}</td>
+								<td>{{row.COM_RATE*100 | number:2}}%</td>
+								<td>{{row.B_CNT}}</td>
+								<td>{{row.B_SUM | currency:"":0}}</td>
+								<td>{{row.B_RATE*100 | number:2}}%</td>
+								<td>{{row.D_CNT}}</td>
+								<td>{{row.D_SUM | currency:"":0}}</td>
+								<td>{{row.D_RATE*100 | number:2}}%</td>
+								<td>{{row.C_CNT}}</td>
+								<td>{{row.C_SUM | currency:"":0}}</td>
+								<td>{{row.C_RATE*100 | number:2}}%</td>
+								<td>{{row.F_CNT}}</td>
+								<td>{{row.F_SUM | currency:"":0}}</td>
+								<td>{{row.F_RATE*100 | number:2}}%</td>
+								<td>{{row.J_CNT}}</td>
+								<td>{{row.J_SUM | currency:"":0}}</td>
+								<td>{{row.J_RATE*100 | number:2}}%</td>
+							</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<!-- 匯率查詢 -->
+			<div class="gv_tab_sc scroll_y" style="height:335px;white-space: nowrap;" ng-if="inputVO.ReportType == 5">
+				<table>
+					<thead>
+						<tr>
+							<th>工作月</th>
+							<th>台幣(NTD)</th>
+							<th>美金(USD)</th>
+							<th>澳幣(AUD)</th>
+							<th>人民幣(CNY)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td align="center">{{row.MTN_DATE}}</td>
+						 	<td align="right">1.0000</td>
+						 	<td align="right">{{row.USD | number:4}}</td>
+						 	<td align="right">{{row.AUD | number:4}}</td>
+						 	<td align="right">{{row.CNY | number:4}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+				
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

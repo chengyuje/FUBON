@@ -1,0 +1,64 @@
+<style>
+/* dialog panl */
+.modal-dialog.SOT132 {
+	width: 80%;
+	height: 80%;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT132/SOT132.js"></script>
+<div ng-controller="SOT132Controller" ng-cloak>
+    <div class="modal-dialog SOT132">
+	      <div class="modal-content">
+	        <div class="modal-header"> 
+	        	<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+	          <h4 id="myModalAlertLabel" class="modal-title">庫存列表</h4>
+	        </div>
+	        <div class="modal-body">
+	          <e-jumping-once output="outputVO" list="data" totallist="astList"></e-jumping-once>
+	          <div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table class="table-striped text-center middle e-table-freeze" e-height="360px" e-mode="1" e-top="true" e-list="data">
+							<thead>
+								<tr>
+									<th>選擇</th>
+									<th>信託類型</th>
+									<th>憑證編號</th>
+									<th>基金代號</th>
+									<th>基金名稱</th>
+									<th>投資幣別</th>
+									<th>投資金額</th>
+									<th>參考市值</th>
+									<th>投資損益</th>
+									<th>參考報酬率<br>(不含配息)</th>
+									<th>參考報酬率<br>(含配息)</th>
+									<th>信託帳號</th><!-- test -->
+<!-- 								<th>狀態</th>test -->
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in data track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<td ng-if="!dynamicYN || dynamicYN != 'Y'"><button ng-click="checkEviNumAndCloseDialog(row)" class="btn btn-info" ng-hide="disButton && (row.AssetType=='0004' || row.AssetType =='0005')" data-dismiss="modal">選擇</button></td>
+									<td ng-if="dynamicYN && dynamicYN == 'Y'"><button ng-click="getDynaData(row)" class="btn btn-info" ng-disabled="row.Dynamic == '2'" data-dismiss="modal">選擇</button></td>
+									<td>{{row.assetTradeSubTypeD| mapping:mappingSet['SOT.ASSET_TRADE_SUB_TYPE']:'F3'}}</td>
+<!-- 									<td>{{row.assetTradeSubType}}</td> -->
+									<td>{{row.EviNum}}</td>
+									<td>{{row.FundNO}}</td>
+									<td>{{row.FundName}}</td>
+									<td>{{row.CurCode}}</td>
+									<td style="text-align: right;">{{row.CurAmt | number}}</td>
+									<td style="text-align: right;">{{row.CurBal | number}}</td>
+									<td style="text-align: right;">{{row.ProfitAndLoss | number}}</td>
+									<td style="text-align: right;">{{row.SignDigit}}{{row.Return}}%</td>	
+									<td style="text-align: right;">{{row.RewRateDigit}}{{row.AccAllocateRewRate}}%</td>
+									<td>{{row.AcctId02}}</td><!-- test -->
+<!-- 									<td>{{row.Status}}</td>test -->
+								</tr>
+							</tbody>
+						</table>
+				</div>
+	        <div class="modal-footer"  style="text-align: center">
+		       
+		        <button ng-click="closeThisDialog('cancel')" class="btn btn-info"data-dismiss="modal">取消</button> 
+	        </div>
+	      </div>
+    </div>
+</div>

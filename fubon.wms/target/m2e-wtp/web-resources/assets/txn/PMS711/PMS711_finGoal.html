@@ -1,0 +1,82 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS711_finGoal {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 50%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.table-border tr input {
+	width:100px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS711/PMS711_finGoal.js"></script>
+<div ng-controller="PMS711_finGoalController" ng-cloak>
+	<div class="modal-dialog PMS711_finGoal">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{subName}}</h4>
+			</div>
+				<!--Content of the panel-->
+			<div class="panel_content">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						<table class="table-bordered">
+							<tr>
+								<th>基期滲透率%（起）</th>
+								<th>基期滲透率%（迄）</th>
+								<th>每人凈增戶數（月目標）</th>
+								<th></th>								
+							</tr>
+							<tr>
+								<td style="width:25%; text-align:right">
+									<input type="text" style="width:100%; text-align:right" ng-model="START_RATE" e-input-limit='N' e-length-limit="3" ng-required="true"/>
+								</td>
+								<td style="width:25%; text-align:right">
+									<input type="text" style="width:100%; text-align:right" ng-model="END_RATE" e-input-limit='N' e-length-limit="3" ng-required="true"/>
+								</td>
+								<td style="width:25%; text-align:right">
+									<input type="text" style="width:100%; text-align:right" ng-model="M_GOAL" e-input-limit='N' e-length-limit="3" ng-required="true"/>
+								</td>
+								<td style="width:25%; text-align:center; border-right=0px">
+									<button type="button" class="btn btn-primary" ng-click="add()">加入</button>
+								</td>
+							</tr>
+						</table>
+					</form>
+					<form>
+						<table class="table-bordered table-border">
+							<tr>
+								<th rowspan="2" style="line-height:96px; text-align:center">刪除</th>
+								<th colspan="2">各級理專之<br>基期滲透率（單位:%）</th>
+								<th rowspan="2" style="line-height:96px; text-align:center">每人淨增戶數（月目標）</th>
+							</tr>
+							<tr>
+								<th>起</th>
+								<th>迄</th>
+							</tr>
+							<tr ng-repeat="row in showList| limitTo:displayLimit track by $index">
+								<td align="center"><button type="button" class="btn btn-primary" ng-click="del($index)">
+										<i class="glyphicon glyphicon-trash"></i></button>
+								</td>
+								<td style="color:blue; text-align:center">{{row.START_RATE}}</td>
+								<td style="color:blue; text-align:center">{{row.END_RATE}}</td>
+								<td style="color:blue; text-align:center">{{row.M_GOAL}}</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="update()">儲存</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div>

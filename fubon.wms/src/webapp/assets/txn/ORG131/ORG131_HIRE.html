@@ -1,0 +1,484 @@
+<style>
+.modal-dialog.ORG131_HIRE {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1400px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/ORG131/ORG131_HIRE.js"></script>
+<script type="text/javascript" src="assets/txn/ORG131/ORG131_TRANS.js"></script>
+<div ng-controller="ORG131_HIREController" ng-cloak>
+	<div class="modal-dialog ORG131_HIRE"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">進件資料編輯</h4>
+			</div>
+ 			<div class="modal-body" style="white-space: nowrap;">
+ 			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">分行人員：</th>
+						<td class="col-md-4 tdpadding" colspan="3"><input type="text" class="form-control" ng-model="inputVO.emp_name" e-length-limit="100" size="10" style="width:150px"></td>
+						<th class="col-md-1 tdpadding">進件日期：</th>
+						<td class="col-md-4 tdpadding" colspan="5">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="brch_recv_case_date" name="brch_recv_case_date"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.brch_recv_case_date"
+									   is-open="model.h"
+									   datepicker-options="brch_recv_case_DateOptions"
+									   ng-disable = "inputVO.brch_recv_case_date!=null"	
+									   ng-readonly="true"/>							
+<!--									   ng-change="limitDate5()"/> WMS-CR-20180205-02改不限制可選日期 -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'h')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>																		
+								</span>
+							</div>
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-10 tdpadding" colspan="10" style="font-size: 20px;font-weight: bold;color: #3399cc;background-color: #DDF2F9;padding: 10px;margin: 3px;">應徵者面試條件</th>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">＊目前狀態：</th>
+						<td class="col-md-3 tdpadding" colspan="3">
+							<e-combobox id="status" name="status" 
+										ng-paramtype="ORG.HIRE_STATUS"
+										ng-model="inputVO.status"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-required="true"
+										ng-format="F3"
+										width="180px"
+										style="line-height:20px; " />
+						</td>
+						<th class="col-md-1 tdpadding">＊可報到日：</th>
+						<td class="col-md-3 tdpadding" colspan="3">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="able_onboard_date" name="able_onboard_date"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.able_onboard_date"
+									   is-open="model.d"
+									   datepicker-options="able_onboard_DateOptions"
+								       ng-readonly="true"/>								
+<!--									   ng-change="limitDate3();"/> WMS-CR-20180205-02改不限制可選日期 -->
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>																		
+								</span>
+							</div>
+<!-- 							<div class="input-group datebox datewidth"> -->
+<!-- 								<input type="text" id="able_onboard_date" name="able_onboard_date" -->
+<!-- 									   class="form-control" -->
+<!-- 									   uib-datepicker-popup="yyyy/MM/dd" -->
+<!-- 								   	   ng-model="inputVO.able_onboard_date" -->
+<!-- 								 	   is-open="model.d" -->
+<!-- 									   datepicker-options="able_onboard_DateOptions" -->
+<!-- 									   ng-readonly="true" -->
+<!-- 									   ng-disabled="inputVO.able_onboard_date!=null||inputVO.able_onboard_date==null"								 -->
+<!-- 									   ng-change="limitDate3()"/> -->
+<!-- 									製作日曆button -->
+<!-- 									<span class="input-group-btn"> -->
+<!-- 										<button type="button" class="btn btn-default" ng-click="open($event,'d')"> -->
+<!-- 											<i class="glyphicon glyphicon-calendar"></i> -->
+<!-- 										</button>																		 -->
+<!-- 									</span> -->
+<!-- 								</div> -->
+						</td>
+<!-- 						<th class="col-md-1 tdpadding">＊月份：</th> -->
+<!-- 						<td class="col-md-3 tdpadding" colspan="3"> -->
+<!-- 							<div class="input-group datebox datewidth"> -->
+<!-- 								<input type="text" id="createtime" name="createtime" -->
+<!-- 									   class="form-control" -->
+<!-- 									   uib-datepicker-popup="yyyy/MM/dd" -->
+<!-- 									   ng-model="inputVO.createtime" -->
+<!-- 									   is-open="model.a" -->
+<!-- 									   datepicker-options="booked_onboard_DateOptions" -->
+<!-- 									   ng-disabled="inputVO.createtime!=null" -->
+<!-- 									   ng-readonly="true"								 -->
+<!-- 									   ng-change="limitDate()"/> -->
+<!-- 								製作日曆button -->
+<!-- 								<span class="input-group-btn"> -->
+<!-- 									<button type="button" class="btn btn-default" ng-click="open($event,'a')"> -->
+<!-- 										<i class="glyphicon glyphicon-calendar"></i> -->
+<!-- 									</button>																		 -->
+<!-- 								</span> -->
+<!-- 							</div> -->
+<!-- 						</td> -->
+						<th class="col-md-1 tdpadding">確定<br />報到日：</th>
+						<td class="col-md-1 tdpadding">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="sCreDate" name="sCreDate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.sCreDate"
+									   is-open="model.b"
+									   datepicker-options="bgn_sDateOptions"
+								       ng-readonly="true"/>
+<!--									   ng-change="limitDate1();checkDate()"/> WMS-CR-20180205-02改不限制可選日期 -->
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>																		
+								</span>
+							</div>
+							<div class="red" ng-show="inputVO.sCreDate==''">該日期非工作日，請重新輸入。</div>
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">員編：</th>
+						<td class="col-md-1 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." ng-model="inputVO.emp_id" e-length-limit="11" style="width:150px"></td>
+						<th class="col-md-1 tdpadding">＊職等：</th>
+						<td class="col-md-1 tdpadding">
+							<e-combobox id="job_rank" 
+										ng-paramtype="ORG.JOB_RANK"
+										ng-model="inputVO.job_rank"
+				    					ng-validate="false" 
+				    					ng-readonly="false" 
+				    					ng-editable="false"
+				    					ng-format="F3"
+				    					ng-required="false"
+				    					width="100px"
+				    					style="line-height:20px;" />
+						</td>
+						<th class="col-md-1 tdpadding">＊職稱：</th>
+						<td class="col-md-1 tdpadding">
+							<e-combobox id="job_title_name" 
+										ng-paramtype="ORG.MEET_JOB_TITLE"
+										ng-model="inputVO.job_title_name"
+				    					ng-validate="false" 
+				    					ng-readonly="false" 
+				    					ng-editable="false"
+				    					ng-format="F3"
+				    					ng-required="false"
+				    					width="100px"
+				    					style="line-height:20px;" />
+						</td>
+						<th class="col-md-1 tdpadding">職務：</th>
+						<th class="col-md-1 tdpadding">
+							<e-combobox id="ao_job_rank" 
+										ng-paramtype="ORG.MEET_OFF_JOB"
+										ng-model="inputVO.ao_job_rank"
+				    					ng-validate="false" 
+				    					ng-readonly="false" 
+				    					ng-editable="false"
+				    					ng-format="F3"
+				    					ng-required="false"
+				    					width="100px"
+				    					style="line-height:20px;" />
+						</th>
+						<th class="col-md-1 tdpadding">＊適性<br />測驗日<br />(總行填寫)：</th>
+						<th class="col-md-1 tdpadding">
+							<div class="input-group datebox datewidth">
+									<input type="text" id="testDate" name="testDate"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.testDate"
+										   is-open="model.c"
+										   datepicker-options="test_DateOptions"
+										   ng-readonly="true"
+										   ng-disabled="!isHeadMgr"/>
+<!--										   ng-change="limitDate2();checkDate()"/> WMS-CR-20180205-02改不限制可選日期 -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')" ng-disabled="!isHeadMgr">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+							<div class="red" ng-show="inputVO.testDate==''">該日期非工作日，請重新輸入。</div>
+						</th>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">狀態/不回報<br />原因：</th>
+						<td class="col-md-3 tdpadding" colspan="3"><textarea class="form-control" placeholder="請輸入..." ng-model="inputVO.status_reason" e-length-limit="500"></textarea></td>
+						<th class="col-md-1 tdpadding">複試面談<br />結果<br />(處主管填寫)：</th>
+						<td class="col-md-5 tdpadding" colspan="5"><textarea class="form-control" placeholder="請輸入..." ng-model="inputVO.result" e-length-limit="500"></textarea></td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">回任：</th>
+						<td class="col-md-3 tdpadding" colspan="3">
+							<e-combobox id="resign_return" 
+										ng-paramtype="ORG.RESIGN_RETURN"
+										ng-model="inputVO.resign_return"
+				    					ng-validate="false" 
+				    					ng-readonly="false" 
+				    					ng-editable="false"
+				    					ng-format="F3"
+				    					ng-required="false"
+				    					width="180px"
+				    					style="line-height:20px;" />
+						</td>
+						<th class="col-md-1 tdpadding">備註：</th>
+						<td class="col-md-3 tdpadding" colspan="3"><textarea class="form-control" placeholder="請輸入..." ng-model="inputVO.desc" e-length-limit="500"></textarea></td>
+<!-- 						<th class="col-md-1 tdpadding">備註/回任：</th> -->
+<!-- 						<td class="col-md-3 tdpadding" colspan="3"><textarea class="form-control" placeholder="請輸入..." ng-model="inputVO.return_remark" e-length-limit="500"></textarea></td> -->
+						<th class="col-md-1 tdpadding">黑名單：</th>
+						<td class="col-md-1 tdpadding"><input class="uniform_on" type='checkbox' ng-model="inputVO.black_listed"  ng-true-value="'Y'" ng-false-value="'N'"></textarea></td>
+						<td class="col-xs-1"></td>
+					</tr>
+<!-- 					<tr > -->
+<!-- 						<td class="col-xs-1"></td> -->
+<!-- 						<th class="col-md-10 tdpadding" colspan="10" style="font-size: 20px;font-weight: bold;color: #3399cc;background-color: #DDF2F9;padding: 10px;margin: 3px;">應徵者工作經驗</th> -->
+<!-- 						<td class="col-xs-1"></td> -->
+<!-- 					</tr> -->
+<!-- 					<tr> -->
+<!-- 						<td class="col-xs-1"></td> -->
+<!-- 						<th class="col-md-1 tdpadding">＊任職經歷：</th> -->
+<!-- 						<td class="col-md-3 tdpadding" colspan="3"> -->
+<!-- 							<e-combobox id="prev_job_exp"  -->
+<!-- 										ng-paramtype="ORG.PRE_JOB_EXP" -->
+<!-- 										ng-model="inputVO.prev_job_exp" -->
+<!-- 				    					ng-validate="false"  -->
+<!-- 				    					ng-readonly="false"  -->
+<!-- 				    					ng-editable="false" -->
+<!-- 				    					ng-format="F3" -->
+<!-- 				    					ng-required="false" -->
+<!-- 				    					width="180px" -->
+<!-- 				    					style="line-height:20px;" /> -->
+<!-- 						</td> -->
+<!-- 						<th class="col-md-1 tdpadding">＊服務<br />機構名稱：</th> -->
+<!-- 						<td class="col-md-3 tdpadding" colspan="3"> -->
+<!-- 							<input type="text" placeholder="請輸入..." class="form-control" ng-model="inputVO.cur_job" e-length-limit="50" style="width:150px"> -->
+<!-- 						</td> -->
+<!-- 						<th class="col-md-1 tdpadding">＊職務<br />(主要職責)：</th> -->
+<!-- 						<td class="col-md-1 tdpadding"> -->
+<!-- 							<input type="text" placeholder="請輸入..." class="form-control" ng-model="inputVO.cur_job_name" e-length-limit="50" style="width:150px"> -->
+<!-- 						</td> -->
+<!-- 						<td class="col-xs-1"></td> -->
+<!-- 					</tr> -->
+<!-- 					<tr> -->
+<!-- 						<td class="col-xs-1"></td> -->
+<!-- 						<th class="col-md-1 tdpadding">＊管理<br />客戶資產<br />(單位：億)：</th> -->
+<!-- 						<td class="col-md-3 tdpadding" colspan="3"><input type="number" class="form-control" placeholder="請輸入..." name="cur_aum" ng-pattern="integerval" ng-model="inputVO.cur_aum" ng-maxlength="11" style="width:150px"> -->
+<!-- 						<div class="red" ng-show="parameterTypeEditForm.cur_aum.$invalid">管理AUM(最多11碼)</div> -->
+<!-- 						</td> -->
+<!-- 						<th class="col-md-1 tdpadding">＊每月業績<br />目標<br />(單位：萬)：</th> -->
+<!-- 						<td class="col-md-3 tdpadding" colspan="3"><input type="number" class="form-control" placeholder="請輸入..." name="cur_m_goal" ng-pattern="integerval" ng-model="inputVO.cur_m_goal"  ng-maxlength="11" style="width:150px"> -->
+<!-- 						<div class="red" ng-show="parameterTypeEditForm.cur_m_goal.$invalid">每月業績(最多11碼)</div> -->
+<!-- 						</td> -->
+<!-- 						<th class="col-md-1 tdpadding">實際達成<br />(新台幣)<br />(單位：萬)：</th> -->
+<!-- 						<td class="col-md-1 tdpadding"><input type="number" class="form-control" placeholder="請輸入..." name="cur_fee_income" ng-pattern="integerval" ng-model="inputVO.cur_fee_income"   ng-maxlength="11" style="width:150px"> -->
+<!-- 						<div class="red" ng-show="parameterTypeEditForm.cur_fee_income.$invalid">實際手收(最多11碼)</div> -->
+<!-- 						</td> -->
+<!-- 						<td class="col-xs-1"></td> -->
+<!-- 					</tr> -->
+<!-- 					<tr> -->
+<!-- 						<td class="col-xs-1"></td> -->
+<!-- 						<th class="col-md-1 tdpadding">銀行財管<br />年資：</th> -->
+<!-- 						<td class="col-md-3 tdpadding" colspan="3"><input type="number" placeholder="請輸入..." class="form-control" name="ao_year_of_exp" ng-pattern="integerval" ng-model="inputVO.ao_year_of_exp"  ng-maxlength="2" style="width:150px"> -->
+<!-- 						<div class="red" ng-show="parameterTypeEditForm.ao_year_of_exp.$invalid">銀行財管年資(最多2碼)</div> -->
+<!-- 						</td> -->
+<!-- 						<th class="col-md-1 tdpadding">＊可報到日：</th> -->
+<!-- 						<td class="col-md-3 tdpadding" colspan="3"> -->
+<!-- 							<div class="input-group datebox datewidth"> -->
+<!-- 								<input type="text" id="able_onboard_date" name="able_onboard_date" -->
+<!-- 									   class="form-control" -->
+<!-- 									   uib-datepicker-popup="yyyy/MM/dd" -->
+<!-- 								   	   ng-model="inputVO.able_onboard_date" -->
+<!-- 								 	   is-open="model.d" -->
+<!-- 									   datepicker-options="able_onboard_DateOptions" -->
+<!-- 									   ng-readonly="true"								 -->
+<!-- 									   ng-change="limitDate3();checkDate();"/> -->
+<!-- 									製作日曆button -->
+<!-- 									<span class="input-group-btn"> -->
+<!-- 										<button type="button" class="btn btn-default" ng-click="open($event,'d')"> -->
+<!-- 											<i class="glyphicon glyphicon-calendar"></i> -->
+<!-- 										</button>																		 -->
+<!-- 									</span> -->
+<!-- 								</div> -->
+<!-- 								<div class="red" ng-show="inputVO.able_onboard_date==''">該日期非工作日，請重新輸入。</div> -->
+<!-- 						</td> -->
+<!-- 						<th class="col-md-1 tdpadding">前職：</th> -->
+<!-- 						<td class="col-md-1 tdpadding"><input type="text" placeholder="請輸入..." class="form-control" ng-model="inputVO.prev_job" e-length-limit="50" style="width:150px"></td> -->
+<!-- 						<td class="col-xs-1"></td> -->
+<!-- 					</tr> -->
+					<tr >
+						<td class="col-xs-1"></td>
+						<th class="col-md-10 tdpadding" colspan="10" style="font-size: 20px;font-weight: bold;color: #3399cc;background-color: #DDF2F9;padding: 10px;margin: 3px;">進件單位資料</th>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">業務處：</th>
+						<td class="col-md-3 tdpadding" colspan="3">
+							{{inputVO.region_center_id | mapping:REGION_LIST:'F3'}}
+						</td>
+						<th class="col-md-1 tdpadding">營運區：</th>
+						<td class="col-md-3 tdpadding" colspan="3">
+							{{inputVO.branch_area_id | mapping:AREA_LIST:'F3'}}
+						</td>
+						<th class="col-md-1 tdpadding">分行：</th>
+						<td class="col-md-1 tdpadding">
+							{{inputVO.branch_nbr | mapping:BRANCH_LIST:'F1'}}
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">面試日期：</th>
+						<td class="col-md-3 tdpadding" colspan="3">
+							<div class="input-group datebox datewidth">
+									<input type="text" id="brch_ini_int_date" name="brch_ini_int_date"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.brch_ini_int_date"
+										   is-open="model.e"
+										   datepicker-options="brch_ini_int_DateOptions"
+										   ng-disable="inputVO.brch_ini_int_date!=null"
+										   ng-readonly="true"/>
+<!--										   ng-change="limitDate4();checkDate()"/> WMS-CR-20180205-02改不限制可選日期 -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+											<i class="glyphicon glyphicon-calendar"></i></button>																		
+									</span>
+								</div>
+							<div class="red" ng-show="inputVO.brch_ini_int_date==''">該日期非工作日，請重新輸入。</div>
+						</td>
+						<th class="col-md-1 tdpadding"><!-- 業務處<br />主管： --></th>
+						<td class="col-md-3 tdpadding" colspan="3">
+<!-- 							<e-combobox id="rc_sup_emp_id" name="rc_sup_emp_id"  -->
+<!-- 										ng-datasource="mappingSet['rc_sup']" -->
+<!-- 										ng-model="inputVO.rc_sup_emp_id" -->
+<!-- 										ng-validate="false"  -->
+<!-- 										ng-readonly="mappingSet['rc_sup'].length == 2"  -->
+<!-- 										ng-editable="false" -->
+<!-- 										ng-disabled="mappingSet['rc_sup'].length == 2" -->
+<!-- 										ng-format="F1" -->
+<!-- 										width="150px" -->
+<!-- 										style="line-height:20px;" /> -->
+						</td>
+						<th class="col-md-1 tdpadding"><!-- 營運督導： --></th>
+						<td class="col-md-1 tdpadding">
+<!-- 							<e-combobox id="op_sup_emp_id" name="op_sup_emp_id"  -->
+<!-- 										ng-datasource="mappingSet['op_sup']" -->
+<!-- 										ng-model="inputVO.op_sup_emp_id" -->
+<!-- 										ng-validate="false"  -->
+<!-- 										ng-readonly="mappingSet['op_sup'].length == 2"  -->
+<!-- 										ng-editable="false" -->
+<!-- 										ng-disabled="mappingSet['op_sup'].length == 2" -->
+<!-- 										ng-format="F1" -->
+<!-- 										width="150px" -->
+<!-- 										style="line-height:20px;" /> -->
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">人資<br />負責窗口：</th>
+						<td class="col-md-3 tdpadding" colspan="3"><input type="text" placeholder="請輸入..." class="form-control" ng-model="inputVO.hr"  e-length-limit="300" size="20" style="width:150px"></td>
+						<th class="col-md-1 tdpadding">轉介行：</th>
+						<td class="col-md-3 tdpadding" colspan="3"><input type="text" placeholder="請輸入..." class="form-control" ng-model="inputVO.trans_from_branch_id" ng-readonly="true" e-length-limit="10" style="width:150px"></td>
+						<th class="col-md-1 tdpadding">轉介單位<br />備註：</th>
+						<td class="col-md-1 tdpadding"><input type="text" placeholder="請輸入..." class="form-control" ng-model="inputVO.trans_remark" ng-readonly="true" e-length-limit="500" style="width:150px"></td>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr >
+						<td class="col-xs-1"></td>
+						<th class="col-md-10 tdpadding" colspan="10" style="font-size: 20px;font-weight: bold;color: #3399cc;background-color: #DDF2F9;padding: 10px;margin: 3px;">履歷來源</th>
+						<td class="col-xs-1"></td>
+					</tr>
+					<tr>
+						<td class="col-xs-1"></td>
+						<th class="col-md-1 tdpadding">履歷來源：</th>
+						<td class="col-md-1 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.resume_source" e-length-limit="50" style="width:150px"></td>
+						<th class="col-md-1 tdpadding">推薦人<br />員編：</th>
+						<td class="col-md-1 tdpadding"><input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.recomm_emp_id" ng-blur ="reempid()"e-length-limit="11" style="width:150px"></td>
+						<th class="col-md-1 tdpadding">推薦人：</th>
+						<td class="col-md-1 tdpadding">
+							<e-combobox id="recommender_emp_id" name="recommender_emp_id" 
+										ng-datasource="mappingSet['red']"
+										ng-model="inputVO.recommender_emp_id"
+										ng-validate="false" 
+										ng-readonly="inputVO.recommend_awardee_emp_id!=null" 
+										ng-editable="false"
+										ng-disabled="inputVO.recommender_emp_id!=null"
+										ng-format="F3"
+										width="100px"
+										style="line-height:20px;" />
+						</td>
+						<th class="col-md-1 tdpadding">領推薦<br />獎金者：</th>
+						<td class="col-md-1 tdpadding">
+							<e-combobox id="recommend_awardee_emp_id" name="recommend_awardee_emp_id" 
+										ng-datasource="mappingSet['red']"
+										ng-model="inputVO.recommend_awardee_emp_id"
+										ng-validate="false" 
+										ng-readonly="inputVO.recommend_awardee_emp_id!=null" 
+										ng-editable="false"
+										ng-disabled="inputVO.recommend_awardee_emp_id!=null"
+										ng-format="F3"
+										width="100px"
+										style="line-height:20px;" />
+						</td>
+						<th class="col-md-1 tdpadding">推薦表：</th>
+						<td class="col-md-1 tdpadding">
+							<e-combobox id="recommend_letter" 
+										ng-datasource="mappingSet['letter']"
+										ng-model="inputVO.recommend_letter"
+				    					ng-validate="false" 
+				    					ng-readonly="false" 
+				    					ng-editable="false"
+				    					ng-format="F3"
+				    					ng-required="false"
+				    					width="165px"
+				    					style="line-height:20px;" />
+						</td>
+						<td class="col-xs-1"></td>
+					</tr>
+				</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="pass(row)" 
+				        ng-disabled="row.ED == null ||  
+                                     inputVO.able_onboard_date  ==  null    ||
+                                     inputVO.testDate   ==  null" 
+						ng-show="(mroleID == 0 && priID < 13)"	
+						function-type="maintenance">通過</button>
+				<button type="button" class="btn btn-info" ng-click="unpass(row)"
+						ng-disabled = "inputVO.hire_status !='0' && inputVO.hire_status!='4'" 
+						ng-show="(mroleID == 0 && priID < 13)"	
+						function-type="maintenance">不通過</button>
+				<button type="button" class="btn btn-info" ng-click="transelse(row)" 
+						ng-disabled = "inputVO.hire_status !='0' && inputVO.hire_status!='4'" 
+						ng-show="(mroleID == 0 && priID < 13)"	
+						function-type="maintenance">轉介至他行</button>
+				<button type="button" class="btn btn-info" ng-click="temp(row)" function-type="maintenance">暫存</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+			<div class ="text-center"><label class="red" ng-show = "row.ED == null";>＊面談評估表未填寫不可點選「通過」</label></div>
+			<div class ="text-center"><label class="red" ng-show = "inputVO.ho_recv_case_date == null" >＊總行未收件</label></div>
+		</div>
+	</div>
+</div>
+					
+						

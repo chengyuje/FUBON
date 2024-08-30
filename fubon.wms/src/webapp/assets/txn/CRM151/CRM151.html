@@ -1,0 +1,407 @@
+<style>
+
+/* table size */
+.CRM151 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM151 table.little{
+	width: 30%;
+}
+/* change row */
+.CRM151.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.datewidth{
+	width:180px !important;
+}
+/* scroll && height */
+.scroll_CRM151{
+	]width: auto;
+    height: 500px;
+    overflow-x: show;
+	overflow-y: show;
+}
+.CRM151 .tick line {
+  display: none;
+}
+
+/*  .CRM151 rect {  */
+/*  	width: 20px;  */
+/*  	vertical-align : middle !important; */
+/*  }  */
+</style>
+
+<script type="text/javascript" src="assets/txn/CRM151/CRM151.js"></script>
+<script type="text/javascript" src="assets/txn/CRM151/CRM151_DETAIL.js"></script>
+
+<div class="CRM151" ng-controller="CRM151Controller" ng-cloak>
+	<div class= "scroll_CRM151" >
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a03.gif" >當月業績達成</div>
+		</div>
+	<!--Content of the panel-->
+		<!-- 業績達成狀況 - 前線人員 -->
+		<div class="panel_content" style="height: 530px;">
+			<div class="text-center"  ng-if = "inputVO.Role == '0'" >
+			<table style="table-layout: fixed;">
+				<tr>
+					<td width="40%">
+						<table>
+							<tr>
+								<td><h4>本月達成狀況</h4></td>
+							</tr>
+							<tr>
+								<!--長條圖 -->
+								<td><nvd3 borderWidth="1" options="options_month" data="data_month"></nvd3></td>
+							</tr>
+							<tr>
+								<td><h4>年度達成狀況</h4></td>
+							</tr>
+							<tr>
+								<!--長條圖 -->
+								<td><nvd3 borderWidth="1" options="options_year" data="data_year"></nvd3></td>
+							</tr>
+						</table>
+					</td>
+					<td width="2%">
+						<table>
+							<tr>
+								<td>&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+					<td width="58%" style="vertical-align:top">
+						<div class="gv_tab_sc">
+							<table class="table">
+								<thead>
+									<tr>
+										<th colspan="2">業績概況</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="text-left">MTD排名</td>
+										<td>{{result[0].RANK_MTD_ALL_BY_JOB}} / {{result[0].CNT_MTD_ALL_BY_JOB}}</td>
+									</tr>
+									<tr>
+										<td class="text-left">MTD應達/已達成率</td>
+										<td><img src="assets/images/ICON03.gif" ng-show = "result[0].MTD_GOAL_FLAG == 'Y'">
+											<img src="assets/images/ICON01.gif" ng-show = "result[0].MTD_GOAL_FLAG == 'N'">
+											<br>
+										{{result[0].MTD_SUM_RATE_MM |number:2}}% / {{result[0].MTD_SUM_RATE |number:2}}%</td>
+										
+									</tr>
+									<tr>
+										<td class="text-left">YTD排名</td>
+										<td>{{result[0].RANK_YTD_ALL_BY_JOB}} / {{result[0].CNT_YTD_ALL_BY_JOB}}</td>
+									</tr>
+									<tr>
+										<td class="text-left">YTD應達/已達成率</td>
+										<td><img src="assets/images/ICON03.gif" ng-show = "result[0].YTD_GOAL_FLAG == 'Y'">
+											<img src="assets/images/ICON01.gif" ng-show = "result[0].YTD_GOAL_FLAG == 'N'">
+											<br>
+										{{result[0].YTD_SUM_RATE_YY |number:2}}% / {{result[0].YTD_SUM_RATE |number:2}}%</td>
+										
+									</tr>
+									<tr>
+										<td class="text-left">本月尚須努力目標</td>
+										<td>{{result[0].STILL_NEED >= 0 ? result[0].STILL_NEED : '' | number:0 }}</td>
+									</tr>
+									<tr>
+										<td class="text-left">近一年未達目標月份數</td>
+										<td ng-if="result[0].CNT == 0">{{result[0].CNT}}</td>
+										<td ng-if="result[0].CNT != 0"><a onclick="return false" ng-click="detail(1)" >{{result[0].CNT}}</a></td>
+									</tr>
+								</tbody>
+							</table>
+<!-- 							<table class="table e-table-freeze" e-top="true" e-mode="1" e-height="150px"> -->
+<!-- 								<thead style="white-space: nowrap;"> -->
+<!-- 									<tr> -->
+<!-- 										<th>本月專案執行成效</th> -->
+<!-- 										<th>實際承做</th> -->
+<!-- 									</tr> -->
+<!-- 								</thead> -->
+<!-- 								<tbody> -->
+<!-- 									<tr ng-repeat="row2 in IPO track by $index" > -->
+<!-- 										<td>{{row2.PNAME}}</td> -->
+<!-- 										<td>{{row2.IPO_AMT | number:0 }}</td> -->
+<!-- 									</tr> -->
+<!-- 								</tbody> -->
+<!-- 							</table> -->
+						</div>
+					</td>
+				</tr>
+			</table>
+			</div>
+		<!-- 業績達成狀況 - 輔銷人員/輔銷科長 -->
+			<div class=" text-center "  ng-if = "inputVO.Role == '2'">
+			<table style="table-layout: fixed;">
+				<tbody>
+					<tr>
+						<td style="float:center" colspan="2" ng-if = "pri == '023' || pri == '024'">
+							<table>
+								<tr>
+									<td colspan="2" class="col-md-2 tdpadding"><h4>本月投保達成狀況</h4></td>
+								</tr>
+								<tr>				
+									<!--長條圖 -->
+									<td width="50%"><nvd3 options="options_ins" data="data_ins"></nvd3></td>						
+									<td width="50%">
+									<p>已達成率 ： {{result[0].INS_RATE}}%</p>
+									<p>MTD達成率 ： {{result[0].MTD_INS_RATE}}%</p></td>									
+								</tr>
+								<tr>
+									<td colspan="2" ><h4>理專達成goal</h4></td>
+								</tr>
+								<tr>
+									<td width="50%"><li>理專MTD達goal率>100% </li></td>
+									<td width="50%">{{result[0].ACH_INS100_CNT}}人</td>
+								</tr>
+								<tr>
+									<td width="50%"><li>理專MTD達goal率<100% </li></td>
+									<td width="50%">{{result[0].UN_ACH_INS100_CNT}}人</td>
+								</tr>
+							</table>
+						</td>
+						<td style="float:center" colspan="2"  ng-if = "pri == '014' || pri == '015'">
+							<table>
+							<tbody>
+								<tr>
+									<td colspan="2" class="col-md-2 tdpadding"><h4>本月投資達成狀況</h4></td>
+								</tr>
+								<tr >
+									<!--長條圖 -->
+									<td width="50%"><nvd3 options="options_inv" data="data_inv"></nvd3></td>				
+									<td width="50%">
+									<p>已達成率 ： {{result[0].INV_RATE}}%</p>
+									<p>MTD達成率 ： {{result[0].MTD_INV_RATE}}%</p></td>									
+								</tr>
+								<tr>
+									<td colspan="2" ><h4>理專達成goal</h4></td>
+								</tr>
+								<tr>
+									<td width="50%"><li>理專MTD達goal率>100% </li></td>
+									<td width="50%">{{result[0].ACH_INV100_CNT}}人</td>
+								</tr>
+								<tr>
+									<td width="50%"><li>理專MTD達goal率<100% </li></td>
+									<td width="50%">{{result[0].UN_ACH_INV100_CNT}}人</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table e-table-freeze" e-top="true" e-mode="1" e-height="150px">
+				<thead style="white-space: nowrap;">
+					<tr>
+						<th>本月專案執行成效</th>
+						<th>實際承做</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="row2 in IPO track by $index" >
+						<td>{{row2.PNAME}}</td>
+						<td>{{row2.IPO_AMT | number:0 }}</td>
+					</tr>
+				</tbody>
+			</table>
+			</div>
+		<!-- 業績達成狀況 - 主管 -->
+			<div class="text-center "  ng-if = "inputVO.Role == '1'"  >
+			<table style="table-layout: fixed;">
+				<tr style="vertical-align:top">
+					<td width="40%">
+						<table>
+							<tr>
+								<td><h4>本月達成狀況</h4></td>
+							</tr>
+							<tr>
+								<!--長條圖 -->
+								<td><nvd3 options="options_month" data="data_month"></nvd3></td>
+							</tr>
+							<tr>
+								<td><h4>年度達成狀況</h4></td>
+							</tr>
+							<tr>
+								<!--長條圖 -->
+								<td><nvd3 options="options_year" data="data_year"></nvd3></td>
+							</tr>
+						</table>
+					</td>
+					<td width="2%">
+						<table>
+							<tr>
+								<td>&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+					<td  width="58%" style="vertical-align:top">
+						<div class="gv_tab_sc">
+							<table class="table"  style="white-space: nowrap;">
+								<thead>
+									<tr>
+										<th colspan="2">業績概況</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="text-left">MTD排名</td>
+										<td ng-if = "pri == '013' || pri == '012'">{{result[0].RANK_MTD_ALL_BY_CLS}} / {{result[0].TOTAL_CNT}}</td>
+										<td ng-if = "pri != '013' && pri != '012'">{{result[0].RANK_MTD_ALL_BY_CLS}} / {{result[0].CNT_MTD_ALL_BY_CLS}}</td>
+									</tr>
+									<tr>
+										<td class="text-left">MTD應達/已達成率</td>
+										<td><img src="assets/images/ICON03.gif" ng-show="result[0].MTD_ALL_FEE_FLAG == 'Y'">
+											<img src="assets/images/ICON01.gif" ng-show="result[0].MTD_ALL_FEE_FLAG == 'N'">
+											<br>
+											{{result[0].MTD_ALL_FEE_RATE_MM | number:2}}% / {{result[0].MTD_ALL_FEE_RATE | number:2}}%</td>
+									</tr>
+									<tr>
+										<td class="text-left">YTD排名</td>
+										<td ng-if = "pri == '013' || pri == '012'">{{result[0].RANK_YTD_ALL_BY_CLS}} / {{result[0].TOTAL_CNT}}</td>
+										<td ng-if = "pri != '013' && pri != '012'">{{result[0].RANK_YTD_ALL_BY_CLS}} / {{result[0].CNT_YTD_ALL_BY_CLS}}</td>
+									</tr>
+									<tr>
+										<td class="text-left">YTD應達/已達成率</td>
+										<td><img src="assets/images/ICON03.gif" ng-show="result[0].YTD_ALL_FEE_FLAG == 'Y'">
+											<img src="assets/images/ICON01.gif" ng-show="result[0].YTD_ALL_FEE_FLAG == 'N'">
+											<br>
+										{{result[0].YTD_ALL_FEE_RATE_MM | number:2}}% / {{result[0].YTD_ALL_FEE_RATE | number:2}}%</td>
+										
+									</tr>
+<!-- 									<tr> -->
+<!-- 										<td class="text-left">當日實際手收</td> -->
+<!-- 										<td>{{result[0].TD_FEE | number:0 }}</td> -->
+<!-- 									</tr> -->
+<!-- 									<tr> -->
+<!-- 										<td class="text-left">本月尚須努力目標</td> -->
+<!-- 										<td ng-if ="result[0].MTD_TAR_AMT >= result[0].MTD_FEE">{{result[0].MTD_TAR_AMT-result[0].MTD_FEE | number:0 }}</td> -->
+<!-- 										<td ng-if ="result[0].MTD_TAR_AMT < result[0].MTD_FEE">0</td> -->
+<!-- 									</tr> -->
+									<tr>
+										<td class="text-left">近一年未達目標月份數</td>
+										<td ng-if = "result[0].MON_NOT_ACH == 0">{{result[0].MON_NOT_ACH}}</td>
+										<td ng-if = "result[0].MON_NOT_ACH != 0"><a onclick="return false" ng-click="detail(2)">{{result[0].MON_NOT_ACH}}</a></td>
+									</tr>
+<!-- 									<tr> -->
+<!-- 										<td class="text-left">近一年未達目標專員數</td> -->
+<!-- 										<td ng-if = "result[0].MON_NOT_ACH_AO == 0">{{result[0].MON_NOT_ACH_AO}}</td> -->
+<!-- 										<td ng-if = "result[0].MON_NOT_ACH_AO != 0"><a onclick="return false" ng-click="detail(1)">{{result[0].MON_NOT_ACH_AO}}</a></td> -->
+<!-- 									</tr> -->
+								</tbody>
+							</table>
+<!-- 							<table class="table e-table-freeze" e-top="true" e-mode="1" e-height="150px"> -->
+<!-- 								<thead style="white-space: nowrap;"> -->
+<!-- 									<tr> -->
+<!-- 										<th>本月專案執行成效</th> -->
+<!-- 										<th>實際承做</th> -->
+<!-- 									</tr> -->
+<!-- 								</thead> -->
+<!-- 								<tbody> -->
+<!-- 									<tr ng-repeat="row2 in IPO track by $index" > -->
+<!-- 										<td>{{row2.PNAME}}</td> -->
+<!-- 										<td>{{row2.IPO_AMT | number:0 }}</td> -->
+<!-- 									</tr> -->
+<!-- 								</tbody> -->
+<!-- 							</table> -->
+						</div>
+					</td>
+				</tr>
+			</table>
+			</div>
+		<!-- 業績達成狀況 - 消金PS -->
+			<div class="text-center " ng-if = "inputVO.Role == '3'"  >
+			<table style="table-layout: fixed;">
+				<tr>
+					<td class="col-md-6 tdpadding">
+						<table>
+							<tr>
+								<td class="col-md-2 tdpadding"><h4>本月達成狀況</h4></td>
+							</tr>
+							<tr>
+								<!--長條圖 -->
+								<td class="col-md-10 tdpadding"><nvd3 options="options_month" data="data_month"></nvd3></td>
+							</tr>
+							<tr>
+								<td class="col-md-2 tdpadding"><h4>年度達成狀況</h4></td>
+							</tr>
+							<tr>
+								<!--長條圖 -->
+								<td class="col-md-10 tdpadding"><nvd3 options="options_year" data="data_year"></nvd3></td>
+							</tr>
+						</table>
+					</td>			
+					<td class="col-md-6 tdpadding">
+						<div class="gv_tab_sc">
+							<table class="table">
+								<thead>
+									<tr>
+										<th colspan="3">本月業績概況</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="text-left">房貸</td>
+										<td>MTD排名</td>
+										<td>{{PSMTD[0].RANK1 || 0}} / {{PSMTD[0].TOTAL1 || 0}}</td>
+									</tr>
+									<tr>
+										<td class="text-left">信貸</td>
+										<td>MTD排名</td>
+										<td>{{PSMTD[0].RANK2 || 0}} / {{PSMTD[0].TOTAL2 || 0}}</td>
+									</tr>
+									<tr>
+										<td class="text-left">好運貸</td>
+										<td>MTD排名</td>
+										<td>{{PSMTD[0].RANK3 || 0}} / {{PSMTD[0].TOTAL3 || 0}}</td>									
+									</tr>
+<!-- 								<tr> -->
+<!-- 									<td class="text-left">信用卡</td> -->
+<!-- 									<td>MTD排名</td> -->
+<!-- 									<td>{{PSMTD[0].RANK4 || 0}} / {{PSMTD[0].TOTAL4 || 0}}</td> -->
+<!-- 								</tr> -->
+								</tbody>
+							</table>
+							<table class="table">
+								<thead>
+									<tr>
+										<th colspan="3">年度業績概況</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="text-left">房貸</td>
+										<td>YTD排名</td>
+										<td>{{PSYTD[0].RANK1 || 0}} / {{PSYTD[0].TOTAL1 || 0}}</td>
+									</tr>
+									<tr>
+										<td class="text-left">信貸</td>
+										<td>YTD排名</td>
+										<td>{{PSYTD[0].RANK2 || 0}} / {{PSYTD[0].TOTAL2 || 0}}</td>
+									</tr>
+									<tr>
+										<td class="text-left">好運貸</td>
+										<td>YTD排名</td>
+										<td>{{PSYTD[0].RANK3 || 0}} / {{PSYTD[0].TOTAL3 || 0}}</td>
+									</tr>
+<!-- 								<tr> -->
+<!-- 									<td class="text-left">信用卡</td> -->
+<!-- 									<td>YTD排名</td> -->
+<!-- 									<td>{{PSYTD[0].RANK4 || 0}} / {{PSYTD[0].TOTAL4 || 0}}</td> -->
+<!-- 								</tr> -->
+								</tbody>
+							</table>
+						</div>
+					</td>
+				</tr>
+			</table>
+			</div>
+		</div>
+	</div>
+</div>

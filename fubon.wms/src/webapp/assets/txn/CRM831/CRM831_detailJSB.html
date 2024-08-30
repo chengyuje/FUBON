@@ -1,0 +1,133 @@
+<style>
+.modal-dialog.CRM831_detailJSB {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: 550px;
+}
+/* table size */
+.CRM831_detailJSB table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM831_detailJSB table.little{
+	width: 60%;
+}
+/* change row */
+.CRM831_detailJSB.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM831_detailJSB_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<div ng-controller="CRM831_detailJSBController" ng-cloak>
+	<div class="modal-dialog CRM831_detailJSB" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">　　　　保單明細-非富壽</h4><!-- 多了一口X會使標題不置中，加空格處理 -->
+			</div>
+			<div class="modal-body">
+<!-- 				<div ng-repeat="row in resultList track by $index"> -->
+					<div class="tfb_content"></div>
+					<div class="panel_content">
+						<table>
+	     					<tr>
+	     						<th width = "20%">保單類型：</th>
+	     						<td width = "35%">{{row.INS_TYPE_STR}}</td>
+	     						<th width = "20%">保單狀態：</th>
+	     						<td width = "25%">{{row.CONTRACT_TEXT}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>保單號碼：</th>
+	     						<td>{{row.POLICY_NBR_STR}}</td>
+	     						<th>資料更新日期：</th>
+	     						<td>{{row.SYS_YEAR}}-{{row.SYS_MONTH}}-{{row.SYS_DAY}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>被保險人姓名：</th>
+	     						<td>{{row.INS_NAME}}</td>
+	     						<th>幣別：</th>
+	     						<td>{{row.CRCY_TYPE}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>被保險人ID：</th>
+	     						<td>{{row.INS_ID}}</td>
+	     						<th>繳別：</th>
+	     						<td>{{row.PAY_TYPE | mapping:payTypeList:'F3'}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>產品名稱：</th>
+	     						<td>{{row.POLICY_SIMP_NAME}}</td>
+	     						<th>進件保費(台幣)：</th>
+	     						<td>{{row.POLICY_FEE * row.BUY_RATE | number}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>主/附約別：</th>
+	     						<td>{{row.MAST_SLA_TYPE=='Y'?"主約":"附約"}}</td>
+	     						<th>進件保費(原幣)：</th>
+	     						<td>{{row.POLICY_FEE | number}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>保險始期：</th>
+	     						<td>{{toJsDate(row.POLICY_ACTIVE_DATE) | date:"yyyy-MM-dd"}}</td>
+	     						<th>配息(原幣)：</th>
+	     						<td>{{row.ACUM_INT_AMT | number}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>每期保險：</th>
+	     						<td>{{row.POLICY_FEE | number}}</td>
+	     						<th>參考保費/帳戶價值(原幣)：</th>
+	     						<td>{{row.ACC_VALUE | number}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>累計實繳保費：</th>
+	     						<td>{{row.ACUM_INS_AMT_ORGD | number}}</td>
+	     						<th>參考保費/帳戶價值(台幣)：</th>
+	     						<td>{{row.ACC_VALUE * row.BUY_RATE |number}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th>部提金額(原幣)：</th>
+	     						<td>{{row.ACUM_WDRAW_POLICY_FEE | number}}</td>
+	     						<th>保價參考日：</th>
+	     						<td>{{row.CAL_VALUE_YEAR}}-{{row.CAL_VALUE_MONTH}}-{{row.CAL_VALUE_DAY}}</td>
+	     					</tr>
+	     					<tr>
+	     						<th></th>
+	     						<td></td>
+	     						<th>對帳單：</th>
+	     						<td>{{row.INS_BILL_YN}}</td>
+	     					</tr>
+						</table>
+					</div>
+<!-- 				</div> -->
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

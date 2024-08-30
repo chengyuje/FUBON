@@ -1,0 +1,152 @@
+<style>
+.rstable tr th {
+	vertical-align:middle;
+}
+.rstable tr td {
+	vertical-align:middle;
+	height: 50px;
+}
+.rstableDTL thead tr th {
+	vertical-align:middle;
+}
+.rstableDTL tbody tr td {
+	vertical-align:middle;
+	text-align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT151/SOT151.js"></script>
+<div class="SOT151" ng-controller="SOT151Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >風險檢核控管</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+		    <form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<table>
+				<tr>
+					<!-- 交易資料 -->
+					<td width="80%">
+						<h4 class="h4-title">交易資料</h4>
+						<table class="rstable">
+							<tr ng-hide='true'>
+								<th width="15%">來行人員：</th>
+								<td colspan="6">
+									<div ng-repeat="row in mappingSet['SOT.CUST_TYPE']" style="display:inline;">
+										<input type="radio" name="custType" ng-model="inputVO.custType" ng-value="row.DATA" ng-hide="row.DATA == 'AGENT'"><span ng-hide="row.DATA == 'AGENT'">&nbsp;{{row.LABEL}}&nbsp;&nbsp;</span></input>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle" rowspan="3">客戶資訊：</th>
+							</tr>
+							<tr>
+								<td width="30%">客戶ID：{{inputVO.custID}}</td>
+								<td width="20%">{{inputVO.custName}}</td>
+								<td width="20%">KYC等級/效期：</td>
+								<td width="30%">{{inputVO.kycLV}}/{{inputVO.kycDueDate | date:"yyyy-MM-dd"}}</td>
+							</tr>
+							<tr>
+								<td width="30%">客戶註記：{{inputVO.custRemarks | mapping:mappingSet['SOT.SPEC_CUSTOMER']:'F3'}}</td>
+								<td width="20%">OBU註記：{{inputVO.isOBU}}</td>
+								<td width="20%">同意投資商品諮詢服務：</td>
+								<td width="30%">{{inputVO.isAgreeProdAdv}}</td>
+							</tr>
+							<!-- <tr>
+								<th>代理人：</th>
+								<td></td>
+								<td colspan="5"></td>
+							</tr> -->
+						</table>
+						<h4 class="h4-title">交易明細</h4>
+						<table>
+							<tr>
+								<td>
+									<div class="repeat-row" ng-repeat-start="(a, dataA) in cartList | orderBy: 'SEQ_NO' | groupBy: 'SEQ_NO'">
+										<div class="gv_tab_sc scroll_y" style="border-width: 1px;border-style:solid;border-color: #E3E3E3;margin-bottom: 10px;">
+											<table class="table-bordered rstableDTL">
+												<tr>
+													<td width="20%">投資標的代號/名稱：</td>
+													<td width="16%">{{dataA[0].B_PROD_ID}}&nbsp;{{dataA[0].B_PROD_NAME}}</td>
+													<td width="16%">商品風險等級：</td>
+													<td width="16%">{{dataA[0].B_PROD_RISK_LV}}</td>
+													<td width="16%">信託型態：</td>
+													<td width="16%">{{dataA[0].TRADE_SUB_TYPE_D | mapping:mappingSet['SOT.CHANGE_TRADE_SUB_TYPE']:'F3'}}</td>
+												</tr>
+												<tr>
+													<td>憑證編號：</td>
+													<td>{{dataA[0].CERTIFICATE_ID}}</td>
+													<td>信託幣別：</td>
+													<td>{{dataA[0].B_TRUST_CURR_TYPE | mapping:mappingSet['SOT.TRUST_CURR_TYPE']:'F3'}}</td>
+													<td></td>
+													<td></td>
+												</tr>
+												<tr>
+													<th colspan="6">變更項目</th>
+												</tr>
+												<tr>
+													<td colspan="2"></td>
+													<td colspan="2">變更前</td>
+													<td colspan="2">變更後</td>
+												</tr>
+												<tr ng-repeat = "row in dataA">
+													<td colspan="2">{{row.CHANGE_TYPE | mapping:mappingSet['SOT.NF_CHANGE_TYPE']:'F3'}}</td>
+													<td colspan="2" align="left" style=" white-space: pre">{{row.BEFORE_DATA}}</td>
+													<td colspan="2" align="left" style=" white-space: pre">{{row.AFTER_DATA}}</td>
+												</tr>
+											</table>
+											<div class="search_box_btn text-center">
+												<button type="button" class="btn btn-info" ng-click="goPage(a)" function-type="maintenance" ng-disabled="inputVO.tradeStatus == '3'">修改</button>
+												<button type="button" class="btn btn-info" ng-click="delCar(a)" function-type="maintenance" ng-disabled="inputVO.tradeStatus == '3'">移除</button>
+											</div>
+										</div>
+									</div>
+									<div ng-repeat-end></div>
+								</td>
+							</tr>
+						</table>
+					</td>
+					<!-- 交易控管 -->
+					<td width="20%">
+						<h4 class="h4-title">交易控管</h4>
+						<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+							<table class="table-bordered">
+								<tr>
+									<th>風控錄音檢核</th>
+								</tr>
+								<tr>
+									<td>
+										<div ng-hide="isFirstTrade == ''">{{isFirstTrade}}</div>
+										<div ng-hide="ageUnder70Flag == ''">{{ageUnder70Flag}}</div>
+										<div ng-hide="eduJrFlag == ''">{{eduJrFlag}}</div>
+										<div ng-hide="healthFlag == ''">{{healthFlag}}</div>
+									</td>
+								</tr>
+								<tr ng-show="mainList[0].IS_REC_NEEDED == 'Y'">
+									<th>錄音序號</th>
+								</tr>
+								<tr ng-show="mainList[0].IS_REC_NEEDED == 'Y'">
+									<td>
+										<input type="text" class="form-control" style="width:auto;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="recSEQ" name="recSEQ" ng-model="inputVO.recSEQ" ng-show="mainList[0].IS_REC_NEEDED == 'Y'" ng-disabled="mainList[0].IS_REC_NEEDED == 'N'" ng-blur="validateRecSeq()" e-length-limit="12">
+									</td>
+								</tr>
+								<tr>
+									<th>傳送狀態</th>
+								</tr>
+								<tr>
+									<td><span ng-show="inputVO.tradeStatus == '3'">{{'ehl_02_SOT_002' | i18n}}</span></td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+			</table>
+			</form>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="goOP()" function-type="maintenance" ng-disabled="inputVO.goOPDisabled || inputVO.tradeStatus == '3' || recSeqFlag == 'Y'">傳送OP交易及列印表單</button>
+			<button type="button" class="btn btn-info" ng-click="newTrade()" function-type="maintenance" ng-disabled="inputVO.tradeStatus != '3'">繼續交易</button>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,59 @@
+<style>
+/* open dialog */
+.ngdialog.CRM3121_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM3121_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+
+</style>
+<div class="CRM3121_DETAIL" ng-controller="CRM3121_DETAILController" ng-cloak>
+	<div class="modal-dialog CRM3121_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">未完成客戶明細</h4>
+				<button type="button" class="btn btn-default" align="right" ng-click="exportfile()" >匯出</button>
+			</div>
+			<div class="modal-body">
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="table-bordered">
+					<thead>
+						<tr>
+							<th>項次</th>
+							<th>客戶姓名</th>
+							<th>客戶ID</th>
+							<th>AO_CODE</th>
+							<th>異動日期</th>
+							<th>限辦日期</th>
+							<th>等級</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList2 track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{$index + 1}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+							<td>{{row.LETGO_DATETIME}}</td>
+							<td>{{row.LAST_REVIEW_DATE}}</td>
+							<td>{{row.CON_DEGREE}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確定</button>
+			</div>
+		</div>
+	</div>
+</div>

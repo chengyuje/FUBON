@@ -1,0 +1,475 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.red{
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM190/CAM190.js"></script>
+<script type="text/javascript" src="assets/txn/CAM190/CAM190_ROUTE.js"></script>
+<div class="CAM190" ng-controller="CAM190Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+	      		<div class="tfb_content_icon"></div>
+	      		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif">名單查詢</div>
+	    		</div>
+	    		<!--Content of the panel-->
+	   		 <div class="panel_content" ng-init="mainTab = (tabType == 'tab1') ? 0 : (tabType == 'tab2' ? 1 : (tabType == 'tab3' ? 2 : (tabType == 'tab4' ? 3 : 4)))">
+	   			<uib-tabset active="mainTab" justified="true">
+				<uib-tab index="0" heading="By 客戶ID(即期)" ng-click="init();clearList();goAction('tab1', null, null);">
+					<div id="tab1">
+						<e-jumping-once output="custNExpiredVO" list="custNExpiredChildList" totallist="custNExpiredList"></e-jumping-once>
+			        	<div class="gv_tab_sc scroll_y">
+			        		<table>
+			          			<thead>
+					            	<tr>
+					          	    	<th style="width:10%">聯絡</th>
+					              		<th style="width:10%">分行</th>
+					              		<th style="width:10%">AO CODE</th>
+					              		<th style="width:10%">AO 姓名</th>
+					              		<th style="width:15%"><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="CUST_ID" e-query="getCustNExpiredList()">客戶身分證字號</e-sorter></th>
+					              		<th style="width:10%"><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="CUST_NAME" e-query="getCustNExpiredList()">客戶姓名</e-sorter></th>
+					              		<th style="width:10%">待聯繫<br />活動筆數</th>
+					              		<th style="width:15%"><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="MAX_END_DATE" e-query="getCustNExpiredList()">最近名單到期日</e-sorter></th>
+					              		<th style="width:10%">狀態</th>
+					            	</tr>
+					            </thead>
+				            	<tbody class="repeat-row" align="center" ng-repeat="row in custNExpiredChildList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					            	<tr>
+										<td style="width:10%"><button type="button" class="btn btn-info" ng-click="custConnectData(row, 'tab1')">聯絡</button></td>
+										<td style="width:10%">{{row.BRANCH_NAME}}</td>
+										<td style="width:10%">{{row.AO_CODE}}</td>
+										<td style="width:10%">{{row.EMP_NAME}}</td>
+										<td style="width:15%"><a href="#" onclick="return false" ng-click="custDTL(row)">{{row.CUST_ID}}</a></td>
+										<td style="width:10%">{{row.CUST_NAME}}</td>
+										<td style="width:10%">{{row.COUNTS}}</td>
+										<td style="width:15%">{{row.MAX_END_DATE | limitTo: 10}}</td>
+										<td style="width:10%">
+											<div id="status" ng-show="{{row.STATUS == 'Y'}}">
+												<img src="assets/images/icon/u1210.jpg">
+											</div>
+										</td>
+					            	</tr>
+					            </tbody>
+				          	</table>
+			        	</div>
+					</div>
+					<div class="text-danger">＊本頁僅顯示需要由您自己執行之名單，若要查詢轄下同仁之名單資訊，請使用「分行全部名單」功能。</div>
+				</uib-tab> 
+				<uib-tab index="1" heading="By 客戶ID(已過期)" ng-click="init();clearList();goAction('tab2', null, null);">
+					<div class="tab-pane fade {{tabType == 'tab2' ? 'in active' : ''}}" id="tab2">
+						<e-jumping-once output="custExpiredVO" list="custExpiredChildList" totallist="custExpiredList"></e-jumping-once>
+			        	<div class="gv_tab_sc scroll_y">
+			          		<table>
+			          			<thead>
+					            	<tr>
+					              		<th style="width:10%">分行</th>
+					              		<th style="width:10%">AO CODE</th>
+					              		<th style="width:10%">AO 姓名</th>
+					              		<th style="width:15%"><e-sorter e-connect="GridTab2" e-input="inputVO" e-col="CUST_ID" e-query="getCustExpiredList()">客戶身分證字號</e-sorter></th>
+					              		<th style="width:10%"><e-sorter e-connect="GridTab2" e-input="inputVO" e-col="CUST_NAME" e-query="getCustExpiredList()">客戶姓名</e-sorter></th>
+					              		<th style="width:20%">未結案已過期<br />活動筆數</th>
+					              		<th style="width:15%"><e-sorter e-connect="GridTab2" e-input="inputVO" e-col="MAX_END_DATE" e-query="getCustExpiredList()">最近名單到期日</e-sorter></th>
+					            	</tr>
+					            </thead>
+				            	<tbody class="repeat-row" align="center" ng-repeat="row in custExpiredChildList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					            	<tr>
+										<td style="width:10%">{{row.BRANCH_NAME}}</td>
+										<td style="width:10%">{{row.AO_CODE}}</td>
+										<td style="width:10%">{{row.EMP_NAME}}</td>
+										<td style="width:15%"><a href="#" onclick="return false" ng-click="custDTL(row)">{{row.CUST_ID}}</a></td>
+										<td style="width:10%">{{row.CUST_NAME}}</td>
+										<td style="width:20%">{{row.COUNTS}}</td>
+										<td style="width:15%">{{row.MAX_END_DATE | limitTo: 10}}</td>
+					            	</tr>
+					            </tbody>
+				          	</table>
+			        	</div>
+					</div>
+					<div class="text-danger">＊本頁僅顯示需要由您自己執行之名單，若要查詢轄下同仁之名單資訊，請使用「分行全部名單」功能。</div>
+				</uib-tab>
+				<uib-tab index="2" heading="By 活動(即期)" ng-click="init();clearList();goAction('tab3', null, null);">
+					<div class="tab-pane fade {{tabType == 'tab3' ? 'in active' : ''}}" id="tab3">
+						<e-jumping-once output="campNExpiredVO" list="campNExpiredChildList" totallist="campNExpiredList"></e-jumping-once>
+						<div class="gv_tab_sc scroll_y">
+			          		<table>
+				            	<thead>
+					            	<tr>
+					          	    	<th style="width:300px"><e-sorter e-connect="GridTab3" e-input="inputVO" e-col="CAMPAIGN_NAME" e-query="getCampNExpiredList()">活動名稱</e-sorter></th>
+					              		<th width="100px">簡要說明</th>
+					            		<th width="250px">名單類型</th>
+					              		<th width="100px"><e-sorter e-connect="GridTab3" e-input="inputVO" e-col="START_DATE" e-query="getCampNExpiredList()">&nbsp;&nbsp;活動起始日&nbsp;&nbsp;</e-sorter></th>
+					              		<th width="100px"><e-sorter e-connect="GridTab3" e-input="inputVO" e-col="END_DATE" e-query="getCampNExpiredList()">&nbsp;&nbsp;活動到期日&nbsp;&nbsp;</e-sorter></th>
+					              		<th>名單數</th>
+					              		<th>已結案數</th>
+					              		<th>結案率</th>
+					              		<th>未結案待聯繫<br />名單數</th>
+<!-- 					              		<th>投資申購量<br />(百萬)</th> -->
+<!-- 					              		<th>保險申購量<br />(百萬)</th> -->
+<!-- 					              		<th>信用卡<br />核卡數</th> -->
+<!-- 					              		<th>房貸撥款量<br />(百萬)</th> -->
+<!-- 					              		<th>信貸撥款量<br />(百萬)</th> -->
+					            	</tr>
+					            </thead>
+					            <tbody class="repeat-row" align="center" ng-repeat="row in campNExpiredChildList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					            	<tr>
+										<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CAMPAIGN_NAME}}</td>
+										<td style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"  ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">
+											<div uib-tooltip="{{row.CAMPAIGN_DESC}}" tooltip-placement="right-bottom">
+												{{row.CAMPAIGN_DESC.length > 4 ? (row.CAMPAIGN_DESC | limitTo: 4) + "..." : row.CAMPAIGN_DESC}}
+											</div>
+										</td>
+					            		<td  ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.LEAD_TYPE | mapping:mappingSet['CAM.LEAD_TYPE']:'F3'}}</td>
+										<td  ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.START_DATE | limitTo: 10}}</td>
+										<td  ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.END_DATE | limitTo: 10}}</td>
+										<td  ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">
+											<a href="#" onclick="return false" ng-click="clearList();goAction('tab5', row, 'tab97')">{{row.LEAD_COUNTS}}</a>
+										</td>
+										<td  ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.LEAD_CLOSE}}</td>
+										<td  ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{(row.LEAD_CLOSE / row.LEAD_COUNTS * 100 | number:2) + '%'}}</td>
+										<td  ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">
+											<a href="#" onclick="return false" ng-click="clearList();goAction('tab5', row, 'tab97')" ng-hide="(row.LEAD_COUNTS - row.LEAD_CLOSE) == 0">{{row.LEAD_COUNTS - row.LEAD_CLOSE}}</a>
+											<div ng-show="(row.LEAD_COUNTS - row.LEAD_CLOSE) == 0">{{row.LEAD_COUNTS - row.LEAD_CLOSE}}</div>
+										</td>
+<!-- 										<td>{{row.INVS_BAL}}</td> -->
+<!-- 										<td>{{row.INSS_BAL}}</td> -->
+<!-- 										<td>{{row.CARD_SUM}}</td> -->
+<!-- 										<td>{{row.LOAN1_SUM}}</td> -->
+<!-- 										<td>{{row.LOAN2_SUM}}</td> -->
+					            	</tr>
+					            </tbody>
+				          	</table>
+			        	</div>
+					</div>
+					<div class="text-danger">名單類型屬「內稽內控名單」，請務必於期限內完成結案，以免影響客戶權益。</div>
+				</uib-tab>
+				<uib-tab index="3" heading="By 活動(已過期)" ng-click="init();clearList();goAction('tab4', null, null);">
+					<div class="tab-pane fade {{tabType == 'tab4' ? 'in active' : ''}}" id="tab4">
+						<e-jumping-once output="campExpiredVO" list="campExpiredChildList" totallist="campExpiredList"></e-jumping-once>
+			        	<div class="gv_tab_sc scroll_y">
+			          		<table>
+				            	<thead>
+					            	<tr>
+					          	    	<th style="width:300px"><e-sorter e-connect="GridTab4" e-input="inputVO" e-col="CAMPAIGN_NAME" e-query="getCampExpiredList()">活動名稱</e-sorter></th>
+					              		<th width="100px">簡要說明</th>
+					              		<th width="250px">名單類型</th>
+					              		<th width="100px"><e-sorter e-connect="GridTab4" e-input="inputVO" e-col="END_DATE" e-query="getCampExpiredList()">&nbsp;&nbsp;活動到期日&nbsp;&nbsp;</e-sorter></th>
+					              		<th>名單數</th>
+					              		<th>已結案數</th>
+					              		<th>結案率</th>
+					              		<th>未結案已過期<br />名單數</th>
+<!-- 					              		<th>投資申購量<br />(百萬)</th> -->
+<!-- 					              		<th>保險申購量<br />(百萬)</th> -->
+<!-- 					              		<th>信用卡<br />核卡數</th> -->
+<!-- 					              		<th>房貸撥款量<br />(百萬)</th> -->
+<!-- 					              		<th>信貸撥款量<br />(百萬)</th> -->
+					            	</tr>
+					            </thead>
+					            <tbody class="repeat-row" align="center" ng-repeat="row in campExpiredChildList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					            	<tr>
+										<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CAMPAIGN_NAME}}</td>
+										<td style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">
+											<div uib-tooltip="{{row.CAMPAIGN_DESC}}" tooltip-placement="right-bottom">
+												{{row.CAMPAIGN_DESC.length > 4 ? (row.CAMPAIGN_DESC | limitTo: 4) + "..." : row.CAMPAIGN_DESC}}
+											</div>
+										</td>
+										<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.LEAD_TYPE | mapping:mappingSet['CAM.LEAD_TYPE']:'F3'}}</td>
+										<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.END_DATE | limitTo: 10}}</td>
+										<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.LEAD_COUNTS}}</td>
+										<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.LEAD_CLOSE}}</td>
+										<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{(row.LEAD_CLOSE / row.LEAD_COUNTS * 100 | number:2) + '%'}}</td>
+										<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">
+											<a href="#" onclick="return false" ng-click="clearList();goAction('tab5', row, 'tab98')" ng-hide="(row.LEAD_COUNTS - row.LEAD_CLOSE) == 0">{{row.LEAD_COUNTS - row.LEAD_CLOSE}}</a>
+											<div ng-show="(row.LEAD_COUNTS - row.LEAD_CLOSE) == 0">{{row.LEAD_COUNTS - row.LEAD_CLOSE}}</div>
+										</td>
+<!-- 										<td>{{row.INVS_BAL}}</td> -->
+<!-- 										<td>{{row.INSS_BAL}}</td> -->
+<!-- 										<td>{{row.CARD_SUM}}</td> -->
+<!-- 										<td>{{row.LOAN1_SUM}}</td> -->
+<!-- 										<td>{{row.LOAN2_SUM}}</td> -->
+					            	</tr>
+					            </tbody>
+				          	</table>
+			        	</div>
+					</div>
+				</uib-tab>
+				<uib-tab index="4" heading="自訂查詢" ng-click="initCustom();clearList();goAction('tab5', null, null);">
+					<div class="tab-pane fade {{tabType == 'tab5' ? 'in active' : ''}}" id="tab5">
+						<h4 class="h4-title">查詢條件</h4>
+		        		<div class="search_table search_box2 scroll_y">
+		          			<table>
+					            <tr>
+									<th style="width: 16.6%;">業務處：</th>
+									<td style="width: 16.6%;">
+										<e-combobox id="regionID" name="regionID"
+													ng-datasource="REGION_LIST"
+													ng-model="inputVO.regionID"
+													ng-validate="false" 
+													ng-disabled="AVAIL_REGION.length == 1"
+													ng-readonly="AVAIL_REGION.length == 1" 
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-change="ChangeRegion(region)"
+													style="line-height:20px;" />
+									</td>
+									<th style="width: 16.6%;">營運區：</th>
+									<td style="width: 16.6%;">
+										<e-combobox id="opID" name="opID"
+													ng-datasource="AREA_LIST"
+													ng-model="inputVO.opID"
+													ng-validate="false" 
+													ng-disabled="AVAIL_AREA.length == 1"
+													ng-readonly="AVAIL_AREA.length == 1" 
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-change="ChangeArea(region)"
+													style="line-height:20px;" />
+									</td>
+									<th style="width: 16.6%;">分行：</th>
+									<td style="width: 16.6%;">
+										<e-combobox id="branchID" name="branchID"
+													ng-datasource="BRANCH_LIST"
+													ng-model="inputVO.branchID"
+													ng-validate="false" 
+													ng-disabled="AVAIL_BRANCH.length == 1"
+													ng-readonly="AVAIL_BRANCH.length == 1" 
+													ng-editable="false"
+													ng-format="F1"
+													ng-required="false"
+													ng-change="ChangeBranch(region)"
+													style="line-height:20px;" />
+									</td>
+								</tr>
+					            <tr>
+					           		<th style="width:12%">客戶身份證字號：</th>
+					              	<td style="width:21%"><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" e-length-limit="16" ng-change="changeSearchFlag(false);"></td>
+					              	<th style="width:12%">客戶姓名：</th>
+					              	<td style="width:21%"><input type="text" class="form-control" placeholder="請輸入..." id="custName" name="custName" ng-model="inputVO.custName" e-length-limit="18" ng-change="changeSearchFlag(false);"></td>
+					              	<th style="width:12%">AO CODE：</th>
+					              	<td style="width:21%">
+					              		<e-combobox id="aoCode" name="aoCode"
+											ng-datasource="AO_LIST"
+											ng-model="inputVO.aoCode"
+											ng-validate="false"
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="false"
+											ng-change="ChangeAo_code(region)"
+											style="line-height:20px;" />
+<!-- 											ng-disabled="AVAIL_AO_CODE.length == 1" -->
+<!-- 											ng-readonly="AVAIL_AO_CODE.length == 1"  -->
+					              	</td>
+					            </tr>
+					            <tr>
+					           		<th style="width:12%">名單/代辦工作名稱：</th>
+					              	<td style="width:21%"><input type="text" class="form-control" placeholder="請輸入..." id="campName" name="campName" ng-model="inputVO.campName" e-length-limit="150" ng-change="changeSearchFlag(false);"></td>
+					              	<th style="width:12%">處理狀態：</th>
+					              	<td style="width:21%">
+					              		<e-combobox id="leadStatus" name="leadStatus" 
+													ng-paramtype="CAM.LEAD_STATUS"
+													ng-model="inputVO.leadStatus"
+													ng-validate="false" 
+													ng-readonly="false" 
+													ng-editable="false"
+													ng-change="changeSearchFlag(false);"
+													ng-format="F3"
+													width="150px"
+													style="line-height:20px;" />
+					              	</td>
+					              	<th style="width:12%">理財會員等級：</th>
+					              	<td style="width:21%">
+					              		<e-combobox id="vipDegree" name="vipDegree" 
+													ng-paramtype="CRM.VIP_DEGREE"
+													ng-model="inputVO.vipDegree"
+													ng-validate="false" 
+													ng-readonly="false" 
+													ng-editable="false"
+													ng-change="changeSearchFlag(false);"
+													ng-format="F3"
+													width="150px"
+													style="line-height:20px;" />
+					              	</td>
+					            </tr>
+					            <tr>
+					           		<th style="width:12%">名單到期日區間：</th>
+					              	<td style="width:21%">
+					              		<e-combobox id="leadDateRange" name="leadDateRange" 
+													ng-paramtype="CAM.LEAD_DATE_RANGE"
+													ng-model="inputVO.leadDateRange"
+													ng-validate="false" 
+													ng-readonly="false" 
+													ng-editable="false"
+													ng-change="changeSearchFlag(false);"
+													ng-format="F3"
+													width="150px"
+													style="line-height:20px;" />
+									</td>
+					              	<th style="width:12%">名單分類：</th>
+					              	<td style="width:21%">
+					              		<e-combobox id="leadType" name="leadType" 
+													ng-paramtype="CAM.LEAD_TYPE"
+													ng-model="inputVO.leadType"
+													ng-validate="false" 
+													ng-readonly="false" 
+													ng-editable="false"
+													ng-change="changeSearchFlag(false);"
+													ng-format="F3"
+													width="150px"
+													style="line-height:20px;" />
+					              	</td>
+					              	<th style="width:12%">貢獻度等級：</th>
+					              	<td style="width:21%">
+					              		<e-combobox id="conDegree" name="conDegree" 
+													ng-paramtype="CRM.CON_DEGREE"
+													ng-model="inputVO.conDegree"
+													ng-validate="false" 
+													ng-readonly="false" 
+													ng-editable="false"
+													ng-change="changeSearchFlag(false);"
+													ng-format="F3"
+													width="150px"
+													style="line-height:20px;" />
+					              	</td>
+					            </tr>
+			          		</table>
+		        		</div>
+		        		<div class="search_box_btn text-center">  
+			        		<button type="button" class="btn btn-info" ng-click="customQuery(customTabType);" function-type="query">查詢</button>
+			        		<button type="button" class="btn btn-info" ng-click="initCustom();">清除</button>
+			        		<button type="button" class="btn btn-info" ng-click="exportCustom()" function-type="export">匯出</button>
+			       		</div>
+		        		<h4 class="h4-title">查詢結果</h4>
+			        	<div ng-init="objForTab.secTab = (customTabType == 'tab97') ? 97 : (customTabType == 'tab98' ? 98 : 99)">
+			          		<uib-tabset active="objForTab.secTab" justified="true">
+								<uib-tab index="97" heading="待聯繫名單" ng-click="getList(searchFlag, 'tab97')">
+									<div id="tab97">
+										<e-jumping output="customVO" input="inputVO" query="getList(searchFlag, 'tab97')" list="customList" e-connect="GridTab51"></e-jumping>
+							        	<div class="gv_tab_sc scroll_y">
+							          		<table>
+								            	<thead>
+									            	<tr>
+									          	    	<th>聯絡</th>
+									              		<th>分行</th>
+									              		<th>AO CODE</th>
+									              		<th>理專姓名</th>
+									              		<th><e-sorter e-connect="GridTab51" e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="getList(searchFlag, 'tab97')">客戶身份證字號</e-sorter></th>
+									              		<th><e-sorter e-connect="GridTab51" e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="getList(searchFlag, 'tab97')">客戶姓名</e-sorter></th>
+									              		<th><e-sorter e-connect="GridTab51" e-input="inputVO" e-mode="auto" e-col="CAMPAIGN_NAME" e-query="getList(searchFlag, 'tab97')">名單/待辦工作名稱</e-sorter></th>
+									              		<th><e-sorter e-connect="GridTab51" e-input="inputVO" e-mode="auto" e-col="END_DATE" e-query="getList(searchFlag, 'tab97')">名單到期日</e-sorter></th>
+									              		<th>貢獻度等級</th>
+									            	</tr>
+									            </thead>
+									            <tbody class="repeat-row" align="center" ng-repeat="row in customList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									            	<tr>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}"><button type="button" class="btn btn-info" ng-click="custConnectData(row, 'tab1')">聯絡</button></td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.BRANCH_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.AO_CODE}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.EMP_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}"><a href="#" onclick="return false" ng-click="custDTL(row)">{{row.CUST_ID}}</a></td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CUST_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CAMPAIGN_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.END_DATE | limitTo: 10}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CON_DEGREE | mapping:mappingSet['CRM.CON_DEGREE']:'F3'}}</td>
+									            	</tr>
+									            </tbody>
+								          	</table>
+							        	</div>
+									</div>
+								</uib-tab>
+								<uib-tab index="98" heading="未結案已過期名單" ng-click="getList(searchFlag, 'tab98')">
+									<div id="tab98">
+										<e-jumping output="customVO" input="inputVO" query="getList(searchFlag, 'tab98')" list="customList" e-connect="GridTab52"></e-jumping>
+							        	<div class="gv_tab_sc scroll_y">
+							          		<table>
+								            	<thead>
+									            	<tr>
+									          	    	<th>聯絡</th>
+									              		<th>分行</th>
+									              		<th>AO CODE</th>
+									              		<th>理專姓名</th>
+									              		<th><e-sorter e-connect="GridTab52" e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="getList(searchFlag, 'tab98')">客戶身份證字號</e-sorter></th>
+									              		<th><e-sorter e-connect="GridTab52" e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="getList(searchFlag, 'tab98')">客戶姓名</e-sorter></th>
+									              		<th><e-sorter e-connect="GridTab52" e-input="inputVO" e-mode="auto" e-col="CAMPAIGN_NAME" e-query="getList(searchFlag, 'tab98')">名單/待辦工作名稱</e-sorter></th>
+									              		<th><e-sorter e-connect="GridTab52" e-input="inputVO" e-mode="auto" e-col="END_DATE" e-query="getList(searchFlag, 'tab98')">名單到期日</e-sorter></th>
+									              		<th>貢獻度等級</th>
+									            	</tr>
+									            </thead>
+									            <tbody class="repeat-row" align="center" ng-repeat="row in customList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									            	<tr>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}"><button type="button" class="btn btn-info" ng-click="custConnectData(row, 'tab2')">聯絡</button></td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.BRANCH_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.AO_CODE}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.EMP_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}"><a href="#" onclick="return false" ng-click="custDTL(row)">{{row.CUST_ID}}</a></td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CUST_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CAMPAIGN_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.END_DATE | limitTo: 10}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CON_DEGREE | mapping:mappingSet['CRM.CON_DEGREE']:'F3'}}</td>
+									            	</tr>
+									            </tbody>
+								          	</table>
+							        	</div>
+									</div>
+								</uib-tab>
+								<uib-tab index="99" heading="已結案名單" ng-click="getList(searchFlag, 'tab99')">
+									<div id="tab99">
+										<e-jumping output="customVO" input="inputVO" query="getList(searchFlag, 'tab99')" list="customList" e-connect="GridTab53"></e-jumping>
+							        	<div class="gv_tab_sc scroll_y">
+							          		<table>
+								            	<thead>
+									            	<tr>
+									          	    	<th>聯絡</th>
+									              		<th>分行</th>
+									              		<th>AO CODE</th>
+									              		<th>理專姓名</th>
+									              		<th><e-sorter e-connect="GridTab53" e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="getList(searchFlag, 'tab99')">客戶身份證字號</e-sorter></th>
+									              		<th><e-sorter e-connect="GridTab53" e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="getList(searchFlag, 'tab99')">客戶姓名</e-sorter></th>
+									              		<th><e-sorter e-connect="GridTab53" e-input="inputVO" e-mode="auto" e-col="CAMPAIGN_NAME" e-query="getList(searchFlag, 'tab99')">名單/待辦工作名稱</e-sorter></th>
+									              		<th><e-sorter e-connect="GridTab53" e-input="inputVO" e-mode="auto" e-col="END_DATE" e-query="getList(searchFlag, 'tab99')">名單到期日</e-sorter></th>
+									              		<th>貢獻度等級</th>
+									            	</tr>
+									            </thead>
+									            <tbody class="repeat-row" align="center" ng-repeat="row in customList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									            	<tr>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}"><button type="button" class="btn btn-info" ng-click="custConnectData(row, 'tab3')">聯絡</button></td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.BRANCH_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.AO_CODE}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.EMP_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}"><a href="#" onclick="return false" ng-click="custDTL(row)">{{row.CUST_ID}}</a></td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CUST_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CAMPAIGN_NAME}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.END_DATE | limitTo: 10}}</td>
+									            		<td ng-style="{'color': (row.LEAD_TYPE == '99' ? 'red' : 'block')}">{{row.CON_DEGREE | mapping:mappingSet['CRM.CON_DEGREE']:'F3'}}</td>
+									            	</tr>
+									            </tbody>
+								          	</table>
+							        	</div>
+									</div>
+								</uib-tab>
+							</uib-tabset>
+			        	</div>
+					</div>
+				</uib-tab>
+			</uib-tabset>
+		</div>
+	</div>
+</div>

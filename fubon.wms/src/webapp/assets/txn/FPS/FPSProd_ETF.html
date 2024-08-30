@@ -1,0 +1,248 @@
+<script type="text/javascript" src="assets/txn/FPS/FPSProd_ETF_Dialog.js"></script>
+<div ng-controller="FPSProdETFController">
+  <!-- query -->
+  <div class="block container"
+       ng-class="{'no-area': arrowUp}">
+    <!-- fake title -->
+    <div class="content-wrapper"
+         style="background-color:#bfe2f7;margin-top:-1px;">
+      <div class="content-title font-bold">商品清單</div>
+      <div class="content-body">
+        <div class="toggle-wrapper btn-fps"
+             ng-click="arrowUp=!arrowUp">
+          查詢條件
+          <img ng-src="{{arrowPath[arrowUp?'down':'up']}}"
+               class="icon">
+        </div>
+      </div>
+    </div>
+
+    <!-- fake body -->
+    <div class="content-wrapper product_query"
+         ng-show="!arrowUp">
+      <table>
+        <tbody>
+          <tr>
+            <th>ETF代碼：</th>
+            <td>
+              <!-- ng-blur="getName()" -->
+              <input type="text"
+                     class="form-control"
+                     style="text-transform: uppercase;"
+                     placeholder="請輸入..."
+                     ng-model="inputVO.etfID"
+                     ng-change="inputVO.etfID = inputVO.etfID.toUpperCase()"
+                     e-length-limit="16">
+            </td>
+            <th>ETF名稱：</th>
+            <td>
+              <input type="text"
+                     class="form-control"
+                     style="text-transform: uppercase;"
+                     placeholder="請輸入..."
+                     ng-model="inputVO.etfName"
+                     e-length-limit="255">
+            </td>
+          </tr>
+          <tr>
+            <th>投資類型選擇：</th>
+            <td>
+              <e-combobox ng-datasource="investList"
+                          ng-model="inputVO.invType"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+            <th>計價幣別：</th>
+            <td>
+              <e-combobox ng-paramtype="PRD.ETF_CURRENCY"
+                          ng-model="inputVO.currency"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+          </tr>
+          <tr>
+            <th>發行公司：</th>
+            <td>
+              <e-combobox id="company"
+                          ng-datasource="companyList"
+                          ng-model="inputVO.company"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+            <th>掛牌國家選擇：</th>
+            <td>
+              <e-combobox ng-datasource="countryList"
+                          ng-model="inputVO.country"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+          </tr>
+          <tr>
+            <th>操作策略選擇：</th>
+            <td>
+              <e-combobox ng-datasource="tacticsList"
+                          ng-model="inputVO.tactics"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+            <th>商品風險等級：</th>
+            <td>
+              <e-combobox ng-paramtype="FPS.PROD_RISK_LEVEL"
+                          ng-model="inputVO.riskLev"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180" />
+            </td>
+
+          </tr>
+          <tr>
+          <th>專案名稱：</th>
+          <td>
+              <e-combobox ng-datasource="ETF_PROJECT"
+                          ng-model="inputVO.etf_project"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180"
+                          multiple="true"
+                          separator=";"
+			  		      label-separator="；" />
+            </td>
+          <th>客群名稱：</th>
+            <td>
+              <e-combobox ng-datasource="ETF_CUSTOMER_LEVEL"
+                          ng-model="inputVO.etf_customer_level"
+                          ng-validate="false"
+                          ng-readonly="false"
+                          ng-editable="false"
+                          ng-format="F3"
+                          ng-required="false"
+                          width="180"
+                          multiple="true"
+                          separator=";"
+			  		      label-separator="；" />
+            </td>          
+          </tr>
+        </tbody>
+      </table>
+      <div class="search_box_btn text-center">
+        <button class="btn btn-info"
+                ng-click="inquire()">查詢</button>
+        <button class="btn btn-info"
+                ng-click="init()">清除</button>
+      </div>
+    </div>
+  </div>
+  <!-- !query -->
+  <!-- result -->
+  <div>
+    <e-jumping-once output="outputVO"
+                    list="paramList"
+                    totallist="prodList"></e-jumping-once>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="min-width:2em;"></th>
+        <th>推薦</th>
+        <th style="width:350px">商品</th>
+        <th>風險<br>等級</th>
+        <th>計價<br>幣別</th>
+        <th>報酬率及<br>年化波動率</th>
+        <th>短期<br>展望</th>
+        <th>市場概況</th>
+      </tr>
+      <!-- <tr>
+        <th>3M</th>
+        <th>6M</th>
+        <th>1Y</th>
+        <th>3Y</th>
+      </tr> -->
+    </thead>
+    <tbody>
+      <tr ng-repeat-start="row in paramList"
+          ng-show="row.action!='delete'"
+          class="repeat-row"
+          ng-class-odd="'rowOdd'"
+          ng-class-even="'rowEven'">
+        <td>
+          <input type="checkbox"
+                 ng-model="row.selected"
+                 ng-change="selected(row)">
+        </td>
+        <td>
+          <!-- 推薦 -->
+          <img src="assets/images/ic-crown.svg"
+               ng-if="row.PRD_RANK">
+        </td>
+        <td style="text-align:left;">
+          <a ng-show="isWeb" ng-href="https://www.fubon.com/banking/personal/fund_trust/ETF_search/ETF_search.htm?show=m5&Pram=$ETFWEB$HTML$ET011001]DJHTM#ETFID}{{row.PRD_ID}}"
+             target="_blank"
+             ng-bind="row.PRD_ID+' '+row.ETF_CNAME"></a>	
+          <a ng-hide="isWeb" ng-href=""
+             ng-click="openETFUrl(row.PRD_ID)"
+             ng-bind="row.PRD_ID+' '+row.ETF_CNAME"></a>
+          <!-- 代號商品 -->
+        </td>
+        <td ng-bind="row.RISKCATE_ID">
+          <!-- 風險等級 -->
+        </td>
+        <td ng-bind="row.CURRENCY_STD_ID">
+          <!-- 計價幣別 -->
+        </td>
+        <td>
+          <!-- 年度波動度-->
+          <a ng-href="https://www.fubon.com/banking/personal/fund_trust/ETF_search/ETF_search.htm?show=m5&Pram=$ETFWEB$HTML$ET011001]DJHTM#ETFID}{{row.PRD_ID}}"
+             target="_blank">連結</a>
+        </td>
+        <td>
+          <!-- 投資展望-->
+          <a>
+            <img ng-src="{{trendPath[row.CIS_3M]}}"
+                 alt="{{row.CIS_3M}}">
+          </a>
+          <span ng-if="!row.CIS_3M">--</span>
+        </td>
+        <td>
+          <!-- 本月市場概況-->
+          <a ng-click="row.showInfo = !row.showInfo">
+            <i class="fa fa-lg fa-info-circle"></i>
+          </a>
+        </td>
+      </tr>
+      <tr ng-repeat-end>
+        <td colspan="12"
+            style="text-align:left;
+                   padding-left:1em;"
+            ng-show="row.showInfo"
+            ng-bind="'市場概況: '+(row.OVERVIEW||'')"></td>
+      </tr>
+    </tbody>
+  </table>
+  <!-- !result -->
+</div>

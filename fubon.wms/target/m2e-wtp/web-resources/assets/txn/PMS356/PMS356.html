@@ -1,0 +1,453 @@
+<style>
+/* open dialog */
+.ngdialog.PMS356 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS356 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+/*
+.PMS356 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+*/
+.PMS356 table.little {
+	width: 89%;
+}
+/* change row */
+.PMS356.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+/* scroll && height */
+.scroll_PMS356_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+.toRight tr td{
+	text-align : right;
+}
+.toRight tr .toCenter{
+	text-align : center;
+}
+
+.rstable thead tr th {
+	vertical-align: middle;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/PMS356/PMS356.js"></script>
+<script type="text/javascript" src="assets/txn/PMS356/PMS356_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS356" ng-controller="PMS356Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab
+					style="width: 100%;">
+			<table>
+			   <tr>
+			      <th><font color="red">＊</font>資料月份：</th>
+			      <td>
+			         <e-combobox id="reportDate" name="reportDate"
+			            ng-datasource="mappingSet['timeE']" ng-required="true"
+			            ng-model="inputVO.reportDate" ng-validate="false"
+			            ng-readonly="false" ng-editable="false"
+			            ng-change="dataMonthChange()" ng-format="F3" width="200px"
+			            style="line-height:20px;" />
+			      </td>
+			   </tr>
+			   <tr>
+			      <th>業務處：</th>
+			      <td>
+			         <e-combobox id="region_center_id" name="region_center_id"
+			            ng-datasource="REGION_LIST"
+			            ng-model="inputVO.region_center_id"
+			            ng-validate="false" 
+			            ng-disabled="disableRegionCombo"
+			            ng-readonly="disableRegionCombo" 
+			            ng-editable="false"
+			            ng-format="F3"
+			            ng-required="false"
+			            ng-change="ChangeRegion()"
+			            width="200px"
+			            style="line-height:20px;" />
+			      </td>
+			      <th>營運區：</th>
+			      <td>
+			         <e-combobox id="branch_area_id" name="branch_area_id"
+			            ng-datasource="AREA_LIST"
+			            ng-model="inputVO.branch_area_id"
+			            ng-validate="false" 
+			            ng-disabled="disableAreaCombo"
+			            ng-readonly="disableAreaCombo" 
+			            ng-editable="false"
+			            ng-format="F3"
+			            ng-required="false"
+			            ng-change="ChangeArea()"
+			            width="200px"
+			            style="line-height:20px;" />
+			      </td>
+			      <th>分行別：</th>
+			      <td>
+			         <e-combobox id="branch_nbr" name="branch_nbr"
+			            ng-datasource="BRANCH_LIST"
+			            ng-model="inputVO.branch_nbr"
+			            ng-validate="false" 
+			            ng-disabled="disableBranchCombo"
+			            ng-readonly="disableBranchCombo" 
+			            ng-editable="false"
+			            ng-format="F1"
+			            ng-required="false"
+			            ng-change="ChangeBranch()"
+			            width="200px"
+			            style="line-height:20px;" />
+			      </td>
+					
+			   </tr>
+			</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()"
+					ng-disabled="paramList.length < 1">匯出</button>
+				
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<!-- <e-jumping output="outputVO" input="inputVO" query="query()"
+				list="paramList"></e-jumping> -->
+
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：<span align="left">每月</span></td>
+					</tr>
+					<tr>
+						<td>產出日：<span align="left" ng-show="paramList.length>0">{{toJsDate(paramList[0].CREATETIME) | date:'yyyy/MM/dd'}}</span></td>
+					</tr>
+				</table>
+			</div>
+			<div class="gv_tab_sc scroll_y">
+					<table class="table-bordered rstable">
+						<thead>
+							<tr class="middle">
+
+								<th rowspan="2">業務處</th>
+								<th rowspan="2">營運區</th>
+								<th rowspan="2">分行代號</th>
+								<th rowspan="2">分行名稱</th>
+								<th colspan="3">投資</th>
+								<th colspan="3">保險</th>
+								<th colspan="3">存投保</th>
+								<th colspan="3">存投保合計</th>
+								<th colspan="3">投資(YTD)</th>
+								<th colspan="3">保險(YTD)</th>
+								<th colspan="3">存款利差(YTD)</th>
+								<th colspan="3">存投保合計(YTD)</th>
+
+							</tr>
+
+							<tr class="middle">
+								<th>實際數</th>
+								<th>目標數</th>
+								<th>達成率</th>
+								<th>實際數</th>
+								<th>目標數</th>
+								<th>達成率</th>
+								<th>實際數</th>
+								<th>目標數</th>
+								<th>達成率</th>
+								<th>實際數</th>
+								<th>目標數</th>
+								<th>達成率</th>
+								<th>實際數</th>
+								<th>目標數</th>
+								<th>達成率</th>
+								<th>實際數</th>
+								<th>目標數</th>
+								<th>達成率</th>
+								<th>實際數</th>
+								<th>目標數</th>
+								<th>達成率</th>
+								<th>實際數</th>
+								<th>目標數</th>
+								<th>達成率</th>
+
+							</tr>
+						</thead>
+						<tbody class="toRight">
+
+							<tr
+								ng-repeat-start=" (a,dataA) in paramList | orderBy: 'REGION_CENTER_ID' | groupBy: 'REGION_CENTER_NAME' as resultA">
+								<td rowspan="{{ dataA.length + numGroups(resultB)*2 + 1}}">{{a}}</td>
+							</tr>
+							<tr
+								ng-repeat-start=" (b, dataB) in dataA | orderBy: 'BRANCH_AREA_NAME' | groupBy: 'BRANCH_AREA_NAME' as resultB">
+								<td rowspan="{{dataB.length + 1}}">{{b}}</td>
+							</tr>
+							<tr ng-repeat=" c in dataB">
+
+
+								<td class="toCenter">{{c.BRANCH_NBR }}</td>
+								<td>{{c.BRANCH_NAME }}</td>
+								<td>{{c.MTD_INV_AMT | currency:''}}</td>
+								<td>{{c.MTD_INV_TAR | currency:''}}</td>
+								<td>{{(c.MTD_INV_RATE | currency:'')||"00.0"}}%</td>
+								<td>{{c.MTD_INS_AMT | currency:''}}</td>
+								<td>{{c.MTD_INS_TAR | currency:''}}</td>
+								<td>{{(c.MTD_INS_RATE | currency:'')||"00.0"}}%</td>
+								<td>{{c.MTD_FTP_AMT | currency:''}}</td>
+								<td>{{c.MTD_FTP_TAR | currency:''}}</td>
+								<td>{{(c.MTD_FTP_RATE | currency:'')||"00.0"}}%</td>
+								<td>{{c.MTD_TOTAL_AMT | currency:''}}</td>
+								<td>{{c.MTD_TOTAL_TAR | currency:''}}</td>
+								<td>{{(c.MTD_TOTAL_RATE | currency:'')||"00.0"}}%</td>
+								<td>{{c.YTD_INV_AMT | currency:''}}</td>
+								<td>{{c.YTD_INV_TAR | currency:''}}</td>
+								<td>{{(c.YTD_INV_RATE | currency:'')||"00.0"}}%</td>
+								<td>{{c.YTD_INS_AMT | currency:''}}</td>
+								<td>{{c.YTD_INS_TAR | currency:''}}</td>
+								<td>{{(c.YTD_INS_RATE | currency:'')||"00.0"}}%</td>
+								<td>{{c.YTD_FTP_AMT | currency:''}}</td>
+								<td>{{c.YTD_FTP_TAR | currency:''}}</td>
+								<td>{{(c.YTD_FTP_RATE | currency:'')||"00.0"}}%</td>
+								<td>{{c.YTD_TOTAL_AMT | currency:''}}</td>
+								<td>{{c.YTD_TOTAL_TAR | currency:''}}</td>
+								<td>{{c.YTD_TOTAL_RATE | currency:''}}%</td>
+
+							</tr>
+							<tr  ng-repeat-end>
+								<td colspan="3" class="toCenter">{{b}} 合計</td>
+								<td>{{getSum(dataB, 'MTD_INV_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataB, 'MTD_INV_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataB, 'MTD_INV_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataB, 'MTD_INS_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataB, 'MTD_INS_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataB, 'MTD_INS_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataB, 'MTD_FTP_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataB, 'MTD_FTP_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataB, 'MTD_FTP_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataB, 'MTD_TOTAL_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataB, 'MTD_TOTAL_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataB, 'MTD_TOTAL_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataB, 'YTD_INV_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataB, 'YTD_INV_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataB, 'YTD_INV_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataB, 'YTD_INS_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataB, 'YTD_INS_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataB, 'YTD_INS_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataB, 'YTD_FTP_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataB, 'YTD_FTP_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataB, 'YTD_FTP_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataB, 'YTD_TOTAL_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataB, 'YTD_TOTAL_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataB, 'YTD_TOTAL_RATE') |
+									currency:'')||"00.0"}}%</td>
+							</tr>
+
+							<tr ng-repeat-end>
+								<td colspan="4"  class="toCenter">{{a}} 合計</td>
+
+								<td>{{getSum(dataA, 'MTD_INV_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataA, 'MTD_INV_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataA, 'MTD_INV_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataA, 'MTD_INS_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataA, 'MTD_INS_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataA, 'MTD_INS_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataA, 'MTD_FTP_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataA, 'MTD_FTP_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataA, 'MTD_FTP_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataA, 'MTD_TOTAL_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataA, 'MTD_TOTAL_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataA, 'MTD_TOTAL_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataA, 'YTD_INV_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataA, 'YTD_INV_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataA, 'YTD_INV_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataA, 'YTD_INS_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataA, 'YTD_INS_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataA, 'YTD_INS_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataA, 'YTD_FTP_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataA, 'YTD_FTP_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataA, 'YTD_FTP_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(dataA, 'YTD_TOTAL_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(dataA, 'YTD_TOTAL_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(dataA, 'YTD_TOTAL_RATE') |
+									currency:'')||"00.0"}}%</td>
+							</tr>
+							
+							<!-- 問題單號0001919 -->
+							<tr ng-show = "paramList != ''">
+								<td colspan="4"  class="toCenter">全行合計</td>
+								<td>{{getSum(paramList, 'MTD_INV_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(paramList, 'MTD_INV_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(paramList, 'MTD_INV_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(paramList, 'MTD_INS_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(paramList, 'MTD_INS_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(paramList, 'MTD_INS_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(paramList, 'MTD_FTP_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(paramList, 'MTD_FTP_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(paramList, 'MTD_FTP_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(paramList, 'MTD_TOTAL_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(paramList, 'MTD_TOTAL_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(paramList, 'MTD_TOTAL_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(paramList, 'YTD_INV_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(paramList, 'YTD_INV_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(paramList, 'YTD_INV_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(paramList, 'YTD_INS_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(paramList, 'YTD_INS_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(paramList, 'YTD_INS_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(paramList, 'YTD_FTP_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(paramList, 'YTD_FTP_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(paramList, 'YTD_FTP_RATE') |
+									currency:'')||"00.0"}}%</td>
+								<td>{{getSum(paramList, 'YTD_TOTAL_AMT') |
+									currency:''}}</td>
+								<td>{{getSum(paramList, 'YTD_TOTAL_TAR') |
+									currency:''}}</td>
+								<td>{{(getSum(paramList, 'YTD_TOTAL_RATE') |
+									currency:'')||"00.0"}}%</td>
+							</tr>
+						</tbody>
+					</table>
+			</div>
+					 <div algin="left">
+            		<table>
+		               <tr>
+		                <td>說明：<span align="left"></span></td>
+		               </tr>
+            	   </table>
+        			 </div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

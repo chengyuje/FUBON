@@ -1,0 +1,77 @@
+<style>
+.modal-dialog.PRD235_EDITUNIT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: 600px;
+}
+</style>
+<div ng-controller="PRD235_EDITUNITController" ng-cloak>
+	<div class="modal-dialog PRD235_EDITUNIT"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">贖回新單位數調整</h4>
+			</div>
+			<div class="modal-body">
+				<div><b>基金代碼/名稱：{{inputVO.PRD_ID}} / {{inputVO.PRD_NAME}}</b></div>
+				<div><b>年份/次別：{{inputVO.PRD_YEAR}} / {{inputVO.PRD_CATEGORY}}</b></div>
+				<div><b>總贖回單位數：{{inputVO.rdmTotalUnits | number:4}}</b></div>
+				<br/>
+				<div class="search_box_btn">
+					新單位數：<input type="text" class="form-control" style="width:auto;display:inline; text-align:right;" id="NEW_RDM_TOTAL_UNITS" name="NEW_RDM_TOTAL_UNITS" 
+								e-input-limit="NUU" nuu1="10" nuu2="4" ng-model="inputVO.NEW_RDM_TOTAL_UNITS" ng-blur="chkNewTotalUnits();" 
+								ng-disabled="!(isPMRole && (inputVO.STATUS == '1' || inputVO.STATUS == '3'))" required>
+					&nbsp;&nbsp;調整後總單位數：{{inputVO.adjTotalUnits | number:4}}
+					&nbsp;&nbsp;剩餘單位數：{{inputVO.leftAdjTotalUnits | number:4}}<br/><br/>
+					<button type="button" class="btn btn-info" ng-click="adjByOrgUnit();" ng-disabled="!(isPMRole && (inputVO.STATUS == '1' || inputVO.STATUS == '3'))">依原單位數調整</button>
+					<button type="button" class="btn btn-info" ng-click="adjByProportion();" ng-disabled="!(isPMRole && (inputVO.STATUS == '1' || inputVO.STATUS == '3'))">依比例調整</button> &nbsp;&nbsp;					
+				</div>
+				<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y" style="min-height:250px;white-space: nowrap;">
+					<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table class="table-bordered middle">
+						<thead>
+							<tr>
+<!-- 								<th>功能</th> -->
+								<th>原單位數</th>
+								<th>贖回單位數</th>
+								<th>贖回憑證編號</th>
+								<th>調整後單位數</th>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>贖回下單批號</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+<!-- 								<td></td> -->
+								<td align="right">{{row.RDM_UNIT | number:4}}</td>
+								<td align="right">{{row.UNIT_NUM | number:4}}</td>
+								<td align="center">{{row.CERTIFICATE_ID}}</td>
+								<td align="right">
+									<input type="text" class="form-control" style="width:auto;display:inline; text-align:right;" id="ADJ_UNIT_NUM" name="ADJ_UNIT_NUM" 
+										e-input-limit="NUU" nuu1="10" nuu2="4" ng-model="row.ADJ_UNIT_NUM" ng-blur="adjUnitNumChanged(row);" 
+										ng-disabled="!(isPMRole && (inputVO.STATUS == '1' || inputVO.STATUS == '3'))" required>
+ 								</td>
+								<td align="center">{{row.CUST_ID}}</td>
+								<td align="center">{{row.CUST_NAME}}</td>
+								<td align="center">{{row.BATCH_SEQ}}</td>
+							</tr>
+						</tbody>
+					</table>
+					</form>
+				</div>
+				<div class="search_box_btn text-center">
+<!-- 					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">儲存</button>&nbsp;&nbsp; -->
+					<button type="button" class="btn btn-info" ng-click="save('3')" ng-if="isPMRole && (inputVO.STATUS == '1' || inputVO.STATUS == '3')">送主管覆核</button> &nbsp;&nbsp;
+					<button type="button" class="btn btn-info" ng-click="save('4')" ng-if="isPMBossRole && (inputVO.STATUS == '2' || inputVO.STATUS == '5')">核可</button> &nbsp;&nbsp;
+					<button type="button" class="btn btn-info" ng-click="save('5')" ng-if="isPMBossRole && (inputVO.STATUS == '2' || inputVO.STATUS == '5')">退回</button> &nbsp;&nbsp;
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

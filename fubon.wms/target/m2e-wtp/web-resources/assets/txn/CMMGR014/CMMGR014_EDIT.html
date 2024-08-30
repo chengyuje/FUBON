@@ -1,0 +1,177 @@
+<style>
+</style>
+<div ng-controller="CMMGR014_EditController" ng-cloak>
+	<div class="modal-dialog CMMGR014">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.FTPSETTINGID == null ? '新增' : '編輯'}}FTP傳輸設定</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<div class="form-group">
+						<div class="col-xs-6">
+							<div class="dialog-error-message" align="center">{{errorMessage}}</div>
+						</div>
+					</div>
+					<table>
+
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">傳檔ID：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="tipFtpSettingId" name="tipFtpSettingId" ng-model="inputVO.tipFtpSettingId" maxlength="20" required autofocus ng-disabled="row.FTPSETTINGID != undefined"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.tipFtpSettingId.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入傳檔ID</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">來源檔目錄：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="tipSrcDirectory" name="tipSrcDirectory" ng-model="inputVO.tipSrcDirectory" maxlength="200"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">來源檔檔名：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="檔名輸入規則為: TEST{YYYYMMDD}.txt, TEST{yyMMdd, 1}.csv" id="tipSrcFileName" name="tipSrcFileName" ng-model="inputVO.tipSrcFileName" maxlength="100" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.tipSrcFileName.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入來源檔檔名。<br>{參數1, 參數2}，參數1:日期格式 YYYYMMDD / YYMMDD，參數2:正負n天。
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">目的檔目錄：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="tipDesDirectory" name="tipDesDirectory" ng-model="inputVO.tipDesDirectory" maxlength="200" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.tipDesDirectory.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入目的檔目錄</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">目的檔檔名：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="檔名輸入規則為: TEST{YYYYMMDD}.txt, TEST{yyMMdd, 1}.csv" id="tipDesFileName" name="tipDesFileName" ng-model="inputVO.tipDesFileName" maxlength="100" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.tipDesFileName.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入目的檔檔名。<br>{參數1, 參數2}，參數1:日期格式 YYYYMMDD / YYMMDD，參數2:正負n天。
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">FTP Server ID：</th>
+							<td class="col-md-7 tdpadding" required><e-combobox id="cmbHostId" name="cmbHostId" ng-disabled="eComboDisabled" ng-datasource="mappingSet['hostId']" ng-model="inputVO.cmbHostId" ng-validate="true" ng-readonly="false" ng-editable="false" ng-format="F2" ng-required="true" width="100%" /></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.cmbHostId.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入FTP Server ID</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">檢核檔名：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="tipCheckFile" name="tipCheckFile" ng-model="inputVO.tipCheckFile" maxlength="100"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">檢核檔重試次數：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="number" pattern="[0-9]*" placeholder="請輸入..." id="tipRepeat" name="tipRepeat" ng-model="inputVO.tipRepeat" name="quantity" min="0" step="1" max="9999" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.tipRepeat.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入檢核檔重試次數</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.tipRepeat.$error.max">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<th class="col-md-7 help-block with-errors">次數上限9999</th>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 paddingRight0 paddingLeft0">檢核檔重試間隔時間：</th>
+							<td class="col-md-7 tdpadding"><input class="form-control" type="number" pattern="[0-9]*" placeholder="單位:分鐘" id="tipRepeatInterval" name="tipRepeatInterval" ng-model="inputVO.tipRepeatInterval" name="quantity" min="0" max="9999" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.tipRepeatInterval.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入檢核檔重試間隔時間</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.tipRepeatInterval.$error.max">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<th class="col-md-7 help-block with-errors">時間上限9999分鐘</th>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 paddingRight0 paddingLeft0">是否刪除遠端檔案：</th>
+							<td class="col-md-7 tdpadding"><e-combobox srcDelete name="srcDelete" ng-disabled="eComboDisabled" ng-paramtype="COMMON.YES_NO" ng-model="inputVO.srcDelete" ng-validate="true" ng-readonly="false" ng-editable="false" ng-format="F1" ng-required="true" /></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 paddingRight0 paddingLeft0">是否為加密檔案：</th>
+							<td class="col-md-7 tdpadding"><input type="checkbox" ng-model="encryptAgree" ng-click="encryptChange(1)">是&nbsp;&nbsp;<input type="checkbox" ng-model="encryptReject" ng-click="encryptChange(2)">否</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 paddingRight0 paddingLeft0">選擇已有加密KEY值：</th>
+							<td class="col-md-7 tdpadding">
+							<e-combobox id="existEncryptKey"
+							ng-datasource="existEncryptKey"
+							ng-model="inputVO.encryptKey"
+							ng-validate="false" 
+							ng-disabled="!encryptAgree"
+							ng-readonly = "!encryptAgree"
+							ng-editable="false"
+							ng-format="F2"
+							ng-required="false"
+							width="180px"
+							style="line-height:20px;" />
+							
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3 paddingRight0 paddingLeft0">輸入加密KEY值：</th>
+							<td class="col-md-7 tdpadding"><input type="text" class="form-control" id="textencryptKey" name="textencryptKey" ng-model="inputVO.encryptKey" ng-disabled="!encryptAgree"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+				
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance">確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+				<span function-type="maintenance"><button type="button" class="btn btn-danger" ng-click="del()" confirm="確認是否要刪除?" confirm-settings="{size: 'sm'}" ng-if="isUpdate">刪除</button></span>
+			</div>
+		</div>
+	</div>
+</div>

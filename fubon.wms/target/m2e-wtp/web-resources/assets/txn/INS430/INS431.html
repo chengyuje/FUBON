@@ -1,0 +1,287 @@
+<style>
+  .bigspace {
+    margin-left: 50px !important;
+  }
+
+  .search_box td {
+    width: 5% !important;
+  }
+
+  .second_title {
+    font-weight: bold;
+  }
+
+  .textRight {
+    text-align: right;
+  }
+
+</style>
+<script type="text/javascript"
+        src="assets/txn/INS430/INS430.js"></script>
+<script type="text/javascript"
+        src="assets/txn/INS430/INS431.js"></script>
+<script type="text/javascript"
+        src="assets/txn/INS430/INS431_CHILDREN.js"></script>
+<div ng-controller="INS431Controller"
+     ng-cloak>
+  <h4>{{hisPlan}}</h4>
+  <div class="search_table ">
+    <table ng-show="hisPlan != '退休規劃'">
+      <tr>
+        <th colspan="2">1.請為此特定目的命名</th>
+      </tr>
+      <tr>
+        <td colspan="2"
+            style="text-align:right"
+            class="form-inline">
+          <input type="text"
+                 class="form-control"
+                 style="width:225px;text-align:right"
+                 ng-model="inputVO.sppName"
+                 placeholder="請輸入目標理財規劃名稱">
+        </td>
+      </tr>
+      <tr>
+        <th>2.要被保險人是否為同一人</th>
+        <td style="text-align:right"
+            class="form-inline">
+          <input type="radio"
+                 ng-change="insuredType()"
+                 ng-model="inputVO.insuredType"
+                 value="same"
+                 required>是
+          <span class="bigspace"></span>
+          <input type="radio"
+                 ng-change="insuredType()"
+                 ng-model="inputVO.insuredType"
+                 value="different"
+                 required>否
+        </td>
+      </tr>
+      <tr>
+        <th colspan="2">3.年齡</th>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <!-- 					<nvd3 class="nvdHeight" options="options_age" data="data_age"></nvd3> -->
+          <drag-bar percent="{{inputVO.age}}"
+                    options="ageDragOption">
+          </drag-bar>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2"
+            style="text-align:right"
+            class="form-inline">
+          <input type="text"
+                 class="form-control"
+                 style="width:225px"
+                 ng-model="inputVO.age"
+                 ng-disabled="inputVO.insuredType == 'same'"> 歲
+        </td>
+      </tr>
+      <tr>
+        <th>4.性別</th>
+        <td colspan="2"
+            style="text-align:right"
+            class="form-inline">
+          <input type="radio"
+                 ng-model="inputVO.gender"
+                 value="1"
+                 ng-disabled="inputVO.insuredType == 'same' && custData.GENDER != null"
+                 required>男
+          <span class="bigspace"></span>
+          <input type="radio"
+                 ng-model="inputVO.gender"
+                 value="2"
+                 ng-disabled="inputVO.insuredType == 'same' && custData.GENDER != null"
+                 required>女
+        </td>
+      </tr>
+      <tr>
+        <th colspan="2">5.規劃目標年期</th>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <drag-bar percent="{{yearsPct}}"
+                    tip="{{inputVO.years+'年'}}"
+                    options="targetDragOption">
+          </drag-bar>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2"
+            style="text-align:right"
+            class="form-inline">
+          <input type="number"
+                 class="form-control"
+                 style="width:225px"
+                 ng-model="inputVO.years"
+                 ng-change="changeYears()"
+                 ng-blur="blurYears()">年
+        </td>
+      </tr>
+      <tr>
+        <th colspan="2"
+            ng-show="hisPlan == '子女教育'">6.教育需求金額
+          <a href="#"
+             ng-click="TO_INS431_CHILDREN()"><i class="fa fa-question-circle fa-lg"
+               aria-hidden="true"></i></a>
+        </th>
+        <th colspan="2"
+            ng-show="hisPlan != '子女教育'">6.需求金額</th>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <drag-bar percent="{{amountPct}}"
+                    options="amtDragOption">
+          </drag-bar>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2"
+            style="text-align:right"
+            class="form-inline" ng-show="hisPlan == '子女教育'">
+         	{{inputVO.amount}}元
+         </td>
+        <td colspan="2"
+            style="text-align:right"
+            class="form-inline" ng-show="hisPlan != '子女教育'">
+          <input type="text"
+                 class="textRight form-control"
+                 style="width:225px"
+                 e-input-limit="NN"
+                 ng-model="inputVO.amount"
+                 ng-change="changeAmount()"
+                 ng-blur="blurAmount()">元
+        </td>
+      </tr>
+    </table>
+    <table ng-show="hisPlan == '退休規劃'">
+      <tr>
+        <th colspan="2">1.請為此特定目的命名</th>
+      </tr>
+      <tr>
+        <td colspan="2"
+            style="text-align:right"
+            class="form-inline">
+          <input type="text"
+                 class="form-control"
+                 style="width:225px"
+                 ng-model="inputVO.sppName"
+                 placeholder="請輸入特定目的名稱">
+        </td>
+      </tr>
+      <tr>
+        <th>2.要被保險人是否為同一人</th>
+        <td style="text-align:right"
+            class="form-inline">
+          <input type="radio"
+                 ng-change="insuredType()"
+                 ng-model="inputVO.insuredType"
+                 value="same"
+                 required>是
+          <span class="bigspace"></span>
+          <input type="radio"
+                 ng-change="insuredType()"
+                 ng-model="inputVO.insuredType"
+                 value="different"
+                 required>否
+        </td>
+      </tr>
+      <tr>
+        <th colspan="2">3.年齡</th>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <drag-bar percent="{{inputVO.age}}"
+                    options="ageDragOption">
+          </drag-bar>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2"
+            style="text-align:right"
+            class="form-inline">
+          <input type="number"
+                 class="form-control"
+                 style="width:225px"
+                 ng-model="inputVO.age"
+                 ng-disabled="inputVO.insuredType == 'same'"
+                 ng-blur="blurAge()">歲
+        </td>
+      </tr>
+      <tr>
+        <th>4.性別</th>
+        <td colspan="2"
+            style="text-align:right"
+            class="form-inline">
+          <input type="radio"
+                 ng-model="inputVO.gender"
+                 value="1"
+                 ng-disabled="inputVO.insuredType == 'same' && custData.GENDER != null"
+                 required>男
+          <span class="bigspace"></span>
+          <input type="radio"
+                 ng-model="inputVO.gender"
+                 value="2"
+                 ng-disabled="inputVO.insuredType == 'same' && custData.GENDER != null"
+                 required>女
+        </td>
+      </tr>
+      <tr>
+        <th colspan="2">5.預計退休年齡</th>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <drag-bar percent="{{retPct}}"
+                    tip="{{inputVO.retAge+'歲'}}"
+                    options="retireDragOption">
+          </drag-bar>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2"
+            style="text-align:right"
+            class="form-inline">
+          <input type="number"
+                 class="form-control"
+                 style="width:225px"
+                 ng-model="inputVO.retAge"
+                 ng-change="changeRetAge()"
+                 ng-blur="blurAge()">歲
+        </td>
+      </tr>
+      <tr>
+        <th colspan="2">6.每月所需生活費用</th>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <drag-bar percent="{{monPct}}"
+                    options="monthlyDragOption">
+          </drag-bar>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2"
+            style="text-align:right"
+            class="form-inline">
+          <input type="text"
+                 class="form-control"
+                 style="width:225px"
+                 e-input-limit="NN"
+                 ng-model="inputVO.monLivExp"
+                 ng-change="changeMonLivExp()"
+                 ng-blur="blurMonLivExp()"
+                 ng-disabled="!ageFlag">元
+        </td>
+      </tr>
+    </table>
+    <div class="search_box_btn text-center"
+         ng-show="hisPlan != '退休規劃'">
+      <button type="button"
+              class="btn btn-info"
+              ng-click="demand()">需求試算</button>
+    </div>
+  </div>
+</div>

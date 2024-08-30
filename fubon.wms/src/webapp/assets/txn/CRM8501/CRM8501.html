@@ -1,0 +1,125 @@
+<style>
+
+input:required:invalid{
+ 	border-color: red;
+
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM8501/CRM8501.js"></script>
+<div class="CRM8501" ng-controller="CRM8501Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >申請狀態查詢</div>			
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">		
+		<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<table>					
+				<tr>
+					<th width="10%"></th>
+					<th width="5%">客戶ID：</th>
+					<td width="5%"><input type="text" class="form-control" style="width: 200px; text-align: left; text-transform: uppercase;" maxlength="16" id="custID" name="custID" ng-blur="isHighAge()" ng-model="inputVO.custID" required></td>
+					<th width="5%"></th>
+					<th width="5%"></th>
+					<th width="10%"></th>
+					<th width="10%"></th>
+				</tr>
+				<!-- 0003831 理專#1 -->	
+				<tr>
+					<th width="15%"></th>
+					<th width="5%"></th>
+					<td>{{inputVO.assetPrintFlag==''?'':
+					        inputVO.assetPrintFlag=='A'?'已申請':inputVO.assetPrintFlag=='T'?'已取消':'首次'}}</td>
+				</tr>													
+			</table>
+		</form>				
+	</div>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >請勾選資況表列印明細</div>			
+	</div>
+	<div class="panel_content">
+		<table>
+			<tr>
+				<th width="5%"></th>
+				<th width="5%">
+				全選：<input class="uniform_on bLarger" type='checkbox' id="printAll" ng-model="inputVO.printAll" ng-true-value="'Y'" ng-false-value="'N'" ng-change = "select_all()" ng-disabled="show_hide_1">
+				</th>
+				<th width="5%"></th>
+				<th width="5%"></th>
+				<th width="5%"></th>
+			</tr>
+			<tr>
+				<th width="5%"></th>
+				<th>
+				存款：<input class="uniform_on bLarger" type='checkbox' id="printSav" ng-model="inputVO.printSav" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="show_hide_2">
+				</th>
+				<th>
+				投資：<input class="uniform_on bLarger" type='checkbox' id="printInv" ng-model="inputVO.printInv" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="show_hide_2">
+				</th>
+				<th>
+				保險：<input class="uniform_on bLarger" type='checkbox' id="printIns" ng-model="inputVO.printIns" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="show_hide_2">
+				</th>
+			</tr>
+			<tr>
+				<th width="5%"></th>
+				<th>
+				基金憑證排序：<input type="radio" name="fundSortPattern" ng-model="inputVO.fundSortType" value="byCERT_NBR">
+				</th>
+				<th>
+				基金名稱排序：<input type="radio" name="fundSortPattern" ng-model="inputVO.fundSortType" value="byFUND_CNAME_S">
+				</th>
+				<th>
+				</th>
+			</tr>
+		</table>
+	</div>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >請勾選資況表列印圖示</div>			
+	</div>
+	<div class="panel_content">
+		<table>
+			<tr>
+				<th width="5%"></th>
+				<th width="5%">
+				全選：<input class="uniform_on bLarger" type='checkbox' id="printAllChart" ng-model="inputVO.printAllChart" ng-true-value="'Y'" ng-false-value="'N'" ng-change = "select_all_chart()" ng-disabled="show_hide_1">
+				</th>
+				<th width="5%"></th>
+				<th width="5%"></th>
+				<th width="5%"></th>
+			</tr>
+			<tr>
+				<th width="5%"></th>
+				<th width="5%">
+				<input class="uniform_on bLarger" type='checkbox' id="printAUM" ng-model="inputVO.printAUM" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="show_hide_3">資產(AUM)趨勢圖
+				</th>
+				<th width="5%">
+				<input class="uniform_on bLarger" type='checkbox' id="printIIL" ng-model="inputVO.printIIL" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="show_hide_3">存投保分佈圖
+				</th>
+				<th width="5%">
+				<input class="uniform_on bLarger" type='checkbox' id="printCUR" ng-model="inputVO.printCUR" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="show_hide_3">總資產計價幣別圖
+				</th>
+				<th width="5%"></th>
+			</tr>
+			<tr>
+				<th width="5%"></th>
+				<th width="5%">
+				<input class="uniform_on bLarger" type='checkbox' id="printType" ng-model="inputVO.printType" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="show_hide_3">資產類別圖
+				</th>
+				<th width="5%">
+				<input class="uniform_on bLarger" type='checkbox' id="printFundMkt" ng-model="inputVO.printFundMkt" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="show_hide_3">基金投資區域圖
+				</th>
+				<th width="5%">
+				<input class="uniform_on bLarger" type='checkbox' id="printPortfolio" ng-model="inputVO.printPortfolio" ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="show_hide_3">投資組合分佈圖
+				</th>
+				<th width="5%"></th>
+			</tr>
+		</table>
+	</div>
+	
+	<!-- 0003831 理專#4 -->
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="applyPrint()" ng-disabled = "isScheduleUpdatedNotToday || ">資況表申請</button>
+	</div>			
+</div>

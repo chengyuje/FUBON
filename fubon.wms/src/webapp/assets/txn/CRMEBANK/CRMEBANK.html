@@ -1,0 +1,64 @@
+<style>
+.search_title_table td{
+	width: 200px;
+}
+input:required:invalid{
+	border-color: red;
+}
+.modal-dialog.KYC211 {
+	width: 80%;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRMEBANK/CRMEBANK.js"></script>
+<script type="text/javascript" src="assets/txn/CRMEBANK/CRMEBANK_INSERT.js"></script>
+<div class="CRMEBANK" ng-controller="CRMEBankController" ng-cloak>
+	<div >
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">網銀歡迎詞參數維護
+			</div>
+		</div>
+		<div class="panel_content">
+			<div class="gv_tab_sc scroll_y">
+				<td><button type="button" class="btn btn-info" ng-click="insert();">新增歡迎詞</button></td>
+				<table class="rstable middle">
+					<tbody class="repeat-row" ng-repeat="row in resultList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<form>
+							<tr>
+								<td align="center" valign="center">類型：</td>
+								<td colspan="3"><input id="param_code" name="param_code" type="text" ng-model="row.PARAM_CODE" class="form-control" ng-disabled="row.PARAM_ORDER=='1'" ng-readonly="row.PARAM_ORDER=='1'" ng-required="row.PARAM_CODE!=''" style="width:200px;text-transform: uppercase;"></td>
+							</tr>
+							<tr>
+								<td align="center" valign="center">備註：</td>
+								<td colspan="3"><input id="param_desc" name="param_desc" type="text" ng-model="row.PARAM_DESC" class="form-control" ng-required="row.PARAM_DESC!=''" style="width:200px;"></td>
+							</tr>
+							<tr>
+								<td align="center" valign="center">歡迎詞：</td>
+								<td colspan="3"><textarea id="param_name" name="param_name" type="text" ng-model="row.PARAM_NAME" class="form-control" ng-required="row.PARAM_NAME!=''" style="width: 600px; height: 100px"></textarea></td>
+							</tr>
+							<tr>
+								<td align="center" valign="center">建立時間：</td>
+								<td>{{row.CREATETIME}}</td>
+								<td align="center" valign="center">建立人：</td>
+								<td>{{row.CREATOR}}</td>
+							</tr>
+							<tr>
+								<td align="center" valign="center">修改時間：</td>
+								<td>{{row.LASTUPDATE}}</td>
+								<td align="center" valign="center">修改人：</td>
+								<td>{{row.MODIFIER}}</td>
+							</tr>
+						</form>
+						<tr>
+							<td colspan="4">
+								<button ng-click="updata(row)" class="btn btn-info">修改</button>
+								<button ng-click="delete(row)" ng-disabled="row.PARAM_ORDER=='1'" class="btn btn-info">刪除</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

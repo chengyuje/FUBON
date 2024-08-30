@@ -1,0 +1,134 @@
+<style>
+/* open dialog */
+.ngdialog.PRD160_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.PRD160_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+/* table size */
+.PRD160_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PRD160_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PRD160_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:150px !important;
+}
+.red{
+	color: red !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD160/PRD160_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD120/PRDDocument.js"></script>
+<div ng-controller="PRD160_DETAILController" ng-cloak>
+	<div class="modal-dialog PRD160_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.PRD_ID}} - {{row.INSPRD_NAME}}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="search_table search_box3">
+					<h4 class="h4-title">基本資料</h4>
+					<div class="gv_tab_sc scroll_y" style="min-height:235px;">
+						<table class="table-bordered">
+							<tr>
+								<th>繳費年期</th>
+								<td>{{insInfo.INSPRD_ANNUAL}}</td>
+								<th>險種類別</th>
+								<td>{{insInfo.INS_TYPE | mapping:INS_TYPE:'F3'}}</td>
+							</tr>
+							<tr>
+								<th>最低投保年齡</th>
+								<td>{{insInfo.MIN_AGE}}</td>
+								<th>最高投保年齡</th>
+								<td>{{insInfo.MAX_AGE}}</td>
+							</tr>
+							<tr>
+								<th>商品上市日</th>
+								<td>{{toJsDate(insInfo.SALE_SDATE) | date:'yyyy/MM/dd'}}</td>
+								<th>商品下市日</th>
+								<td>{{toJsDate(insInfo.SALE_EDATE) | date:'yyyy/MM/dd'}}</td>
+							</tr>
+							<tr>
+								<th>OIU商品</th>
+								<td>{{insInfo.OBU_BUY | mapping:COM_YN:'F3'}}</td>
+								<th>保障年期</th>
+								<td>{{insInfo.GUARANTEE_ANNUAL | mapping:GUARANTEE_ANNUAL:'F3'}}</td>
+							</tr>
+							<tr>
+								<th>壽險/年金</th>
+								<td>{{insInfo.IS_ANNUITY == 'Y' ? '年金' : '壽險'}}</td>
+								<th>增額型</th>
+								<td>{{insInfo.IS_INCREASING | mapping:COM_YN:'F3'}}</td>
+							</tr>
+							<tr>
+								<th>還本型</th>
+								<td>{{insInfo.IS_REPAY | mapping:COM_YN:'F3'}}</td>
+								<th>利變型</th>
+								<td>{{insInfo.IS_RATE_CHANGE | mapping:COM_YN:'F3'}}</td>
+							</tr>
+							<tr>
+								<th>幣別</th>
+								<td>{{insInfo.CURR_CD | mapping:INS_CURRENCY:'F3'}}</td>
+								<th>投資標的風險等級</th>
+								<td ng-if="insInfo.INS_TYPE == '2'"><a onclick="return false" ng-click="goRisk_level()">查詢</a></td>
+								<td ng-if="insInfo.INS_TYPE != '2'">無</td>
+							</tr>
+							<tr>
+								<th>主附約別</th>
+								<td>{{insInfo.MAIN_RIDER | mapping:MAIN_RIDER:'F3'}}</td>
+								<th></th>
+								<td></td>
+							</tr>
+						</table>
+					</div>
+					<h4 class="h4-title">商品特色</h4>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<p ng-if="feature.IS_RETIRED == 'Y'"><b>適合退休規劃</b></p>
+						<p ng-if="feature.IS_EDUCATION == 'Y'"><b>適合子女教育規劃</b></p>
+						<p ng-if="feature.IS_PURPOSE == 'Y'"><b>適合特定目的規劃</b></p>
+						<p ng-if="feature.IS_LIFE_INS == 'Y'"><b>適合壽險規劃</b></p>
+						<p ng-if="feature.IS_ACCIDENT == 'Y'"><b>適合意外規劃</b></p>
+						<p ng-if="feature.IS_MEDICAL == 'Y'"><b>適合醫療規劃</b></p>
+						<p ng-if="feature.IS_DISEASES == 'Y'"><b>適合重大疾病規劃</b></p>
+					</div>
+					<h4 class="h4-title">文件下載</h4>
+					<a onclick="return false" ng-click="goDownload()">輔銷文件(商品完整包)</a>
+				</div>
+			</div>
+			<div class="search_box_btn text-center" ng-hide="fromApp">
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確定</button>
+			</div>
+		</div>
+	</div>
+</div>

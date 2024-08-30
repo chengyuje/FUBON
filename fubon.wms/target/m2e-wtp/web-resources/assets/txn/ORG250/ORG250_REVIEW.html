@@ -1,0 +1,97 @@
+<style>
+/* open dialog */
+.ngdialog.ORG250_REVIEW {
+	
+}
+/* dialog panl */
+.modal-dialog.ORG250_REVIEW {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 950px;
+	height: auto;
+}
+/* table size */
+.ORG250_REVIEW table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.ORG250_REVIEW.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_ORG250_REVIEW_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<div>
+	<div ng-controller="ORG250_REVIEWController" ng-cloak>
+		<div class="modal-dialog ORG250_REVIEW">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">{{inputVO.EMP_ID}} &nbsp; {{inputVO.EMP_NAME}} 限定代理人異動歷程</h4>
+				</div>
+				<div class="modal-body">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table style="text-align:center;">
+							<thead>
+								<tr>
+									<th>業務處</th>
+									<th>營運區</th>
+									<th>分行</th>
+									<th>被代理人</th>
+									<th>代理人1</th>
+									<th>代理人2</th>
+									<th>代理人3</th>
+									<th>歷程註記</th>
+									<th>覆核狀態</th>
+									<th>異動人員</th>
+									<th>異動時間</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in alertLst track by $index">
+									<td>{{row.REGION_CENTER_NAME}}</td>
+									<td>{{row.BRANCH_AREA_NAME}}</td>
+									<td>{{row.BRANCH_NAME}}</td>
+									<td>{{row.EMP_ID}} &nbsp; {{row.EMP_NAME}}</td>
+									<td>{{row.AGENT_ID_1}} &nbsp; {{row.AGENT_NAME_1}}</td>
+									<td>{{row.AGENT_ID_2}} &nbsp; {{row.AGENT_NAME_2}}</td>
+									<td>{{row.AGENT_ID_3}} &nbsp; {{row.AGENT_NAME_3}}</td>
+									<td>{{row.ACT_TYPE |mapping:mappingSet['act_type']:F3}}</td>
+									<td>{{row.REVIEW_STATUS |mapping:mappingSet['review']:F3}}</td>
+									<td>{{row.CREATOR}}</td>
+									<td>{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

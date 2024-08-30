@@ -1,0 +1,33 @@
+
+<script type="text/javascript" src="assets/txn/CRM812/CRM812.js"></script>
+
+<div class="CRM812" ng-controller="CRM812Controller" ng-cloak>
+<h4>帳戶類別: 支存(台幣)</h4>
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+			<table>
+				<thead>
+					<tr>
+						<th>帳戶開戶行</th>
+						<th>帳號</th>
+						<th>開戶日期</th>
+						<th>帳戶餘額</th>
+						<th>可用餘額</th>
+						<th>退票記錄</th>
+						<th>異動日</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;">{{row.BRANCH_NBR | mapping:mappingSet['branchName']:'F1'}}</td>
+						<td style="text-align: left;">{{row.ACCT_NBR}}</td>
+						<td style="text-align: left;">{{row.ACCT_OPEN_DATE}}</td>
+						<td style="text-align: right;">{{row.CURRENT_AMT_BAL | number : 0}}</td>
+						<td style="text-align: right;">{{row.AVAILABLE_AMT_BAL | number : 0}}</td>
+						<td style="text-align: left;">{{row.REFUND_STS}}</td>
+						<td style="text-align: left;">{{row.ALTERATION}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+</div>

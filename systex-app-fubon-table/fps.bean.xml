@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+              xmlns:aop="http://www.springframework.org/schema/aop"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:jee="http://www.springframework.org/schema/jee"
+              xmlns:tx="http://www.springframework.org/schema/tx"
+              xmlns:util="http://www.springframework.org/schema/util"
+              xsi:schemaLocation="http://www.springframework.org/schema/beans
+                                  http://www.springframework.org/schema/beans/spring-beans.xsd
+                                  http://www.springframework.org/schema/jee
+                                  http://www.springframework.org/schema/jee/spring-jee.xsd
+                                  http://www.springframework.org/schema/tx
+                                  http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+                                  http://www.springframework.org/aop
+                                  http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+                                  http://www.springframework.org/schema/util
+                                  http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+       <!-- Declare Every  Datasource ID-->
+       <bean  id="WMSLOCALDS" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+           <property name="com.microsoft.sqlserver.jdbc.SQLServerDriver" value="net.sourceforge.jtds.jdbc.Driver" />
+           <property name="url" value="jdbc:sqlserver://localhost:1433/WMS" />
+           <property name="username" value="sa" />
+           <property name="password" value="[C@1202afe" />
+       </bean>  
+
+
+       <!--- DataSourceID And Table Mapping --->
+       <bean  id="defaultDS" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean" >
+           <property name="dataSource">
+               <ref local="WMSLOCALDS" />
+           </property>
+           <property name="mappingResources">
+               <list>
+                  <value>com/systex/jbranch/workflow/hibernate3/PropertySetItemImpl.hbm.xml</value>
+                  <value>com/systex/jbranch/app/common/fps/table/TBSFA_CUST_POTENTIAL.hbm.xml</value>
+               </list>
+           </property>
+           <property name="hibernateProperties">
+               <props>
+                  <prop key="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</prop>
+                  <prop key="hibernate.show_sql">true</prop>
+               </props>
+           </property>
+       </bean>
+
+	   <!-- <bean  id="defaultDS" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" >
+           <property name="dataSource">
+               <ref local="WMSLOCALDS" />
+           </property>
+           <property name="mappingResources">
+               <list>
+                  <value>com/systex/jbranch/workflow/hibernate4/PropertySetItemImpl.hbm.xml</value>
+                  <value>com/systex/jbranch/app/common/fps/table/TBSFA_CUST_POTENTIAL.hbm.xml</value>
+               </list>
+           </property>
+           <property name="hibernateProperties">
+               <props>
+                  <prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
+                  <prop key="hibernate.show_sql">true</prop>
+               </props>
+           </property>
+       </bean> -->
+
+<!--********************  JTA Transaction Setting ********************-->
+       <bean   id="transactionManager
+                    class="org.springframework.transaction.jta.JtaTransactionManager" />
+       <tx:annotation-driven transaction-manager="transactionManager" />
+       </bean>
+</beans>
+

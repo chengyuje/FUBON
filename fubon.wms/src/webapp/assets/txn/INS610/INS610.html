@@ -1,0 +1,226 @@
+<script type="text/javascript" src="assets/txn/INS610/INS610.js"></script>
+<script type="text/javascript" src="assets/txn/IOT910/IOT910.js"></script>
+<style>
+	.INS610 .datewidth{
+		width:200px !important;
+		float: left !important;
+	}
+	
+	.INS610 table>tr>td {
+		table-layout: fixed;
+		word-break: break-all;
+		word-wrap: break-word;
+	}
+	.INS610 input[type=text] {
+		width: 200px;
+	}
+	
+	.INS610 .ins_icon{
+		width:20px;
+		height:20px;
+		background-image: url("assets/images/magnifier.jpg");
+	}
+	
+</style>
+
+
+<div class="INS610" ng-controller="INS610Controller" ng-cloak>
+	
+	<!-- 查詢操作項 -->
+	<div class="search_table">
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<!-- 查詢條件 -->
+					<tr>
+						<th>*營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+								ng-datasource="AREA_LIST"
+								ng-model="inputVO.branchAreaId"
+								ng-validate="false" 
+								ng-disabled="AREA_LIST.length == 1" 
+								ng-readonly="AREA_LIST.length == 1" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								ng-change="ChangeArea(region)"
+								width="150px"
+								style="line-height:20px;" />
+						</td>
+						
+						<th>*分行：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+								ng-datasource="BRANCH_LIST"
+								ng-model="inputVO.branchId"
+								ng-validate="false" 
+								ng-disabled="BRANCH_LIST.length == 1"
+								ng-readonly="BRANCH_LIST.length == 1"
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								ng-change="ChangeBranch(region)"
+								width="150px"
+								style="line-height:20px;" />
+						</td>
+						
+						<th>狀態：</th>
+						<td>
+							<e-combobox id="status" ng-disabled="false" 
+								ng-paramtype="INS.STATUS"
+								ng-model="inputVO.status"
+								ng-validate="true" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3" 
+								width="150px"				
+							 />
+						</td>
+					</tr>
+					<tr>
+						<td>客戶ID：</td>
+						<td>
+							<input type="text" id="custId" name="custId"
+								class="form-control"
+								ng-blur="getCustName()" 
+								ng-model="inputVO.custId"
+								style="text-align: left; 
+								text-transform: uppercase;" 
+								maxlength="10">
+						</td>
+						<td>客戶姓名：</td>
+						<td>
+							<input type="text" id="custName" name="custId"
+								class="form-control"
+								ng-readonly="true" 
+								ng-disabled="true"
+								ng-model="inputVO.custName"
+								style="text-align: left; 
+								text-transform: uppercase;"
+								maxlength="10">
+						</td>
+						<td>理專員編：</td>
+						<td>
+							<input type="text" class="form-control" 
+								ng-readonly="isFC" 
+								ng-disabled="isFC"
+								ng-model="inputVO.empId"/>
+						</td>
+					</tr>
+					<tr>
+						<th>建立時間(起)：</th>
+						<td>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="sDate" name="sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.SD"
+									is-open="openSD"
+									ng-readonly="true"
+									ng-required="false"
+									datepicker-options="sDateOptions"
+									width="150px"
+									ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'openSD')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</td>
+						<th>建立時間(迄)：</th>
+						<td>
+							<div class="input-group datebox datewidth">
+								<input type="text" id="eDate" name="eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.ED"
+									is-open="openED"
+									ng-readonly="true"
+									datepicker-options="eDateOptions"
+									width="150px"
+									ng-change="limitDate()"/>
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'openED')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</td>
+						
+						<td>規劃險種：</td>
+						<td>
+							<input class="banner-input-1 form-control e_size ng-valid ng-dirty ng-valid-parse ng-empty ng-touched" 
+			    				type="text" 
+			    				style="width: 150px; text-transform: uppercase; display: inline;" 
+			      				id="insCode" name="insCode"  
+								ng-model="inputVO.insCode" 
+		   						ng-blur="checkCNCTData()">
+	 						<button class="banner-btn-1 btn btn-info btn-circle" ng-click="Ins_query()"><i class="glyphicon glyphicon-zoom-in"></i></button>
+	    				</td>
+					</tr>
+					<tr>
+						<td colspan="6" class="text-center">
+							<button type="button" class="btn btn-info" ng-click="query()" >查詢</button>
+							<button type="button" class="btn btn-info" ng-click="initial()" >清除</button>
+						</td>				
+					</tr>
+				</table>
+			</form>
+		</div>	
+	</div>	
+	
+	<!-- 列表呈現區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >{{planRatio || '列表呈現區'}}</div>
+		</div>
+		<div class="panel_content">
+			<!-- 查詢結果  -->
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>客戶編號</th>
+							<th>狀態</th>
+							<th>規劃名稱</th>
+							<th>規劃險種</th>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行/理專</th>
+							<th>前次修改時間【A】</th>
+							<th>建立時間【B】</th>
+							<th>進件時間【C】</th>
+							<th>保單號碼</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row text-center" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td ng-bind="row.CUST_ID" style="text-align: center;"><!-- 編號 --></td>
+							<td ng-bind="row.STATUS" style="text-align: center;"><!-- 狀態 --></td>
+							<td ng-bind="row.MAIN_NAME" style="text-align: center;"><!-- 規劃名稱 --></td>
+							<td ng-bind="row.INSPRD_ID" style="text-align: center;"><!-- 規劃險種 --></td>
+							<td ng-bind="row.REGION_CENTER_NAME" style="text-align: center;"><!-- 業務處 --></td>
+							<td ng-bind="row.BRANCH_AREA_NAME" style="text-align: center;"><!-- 營運區 --></td>
+							<td style="text-align: center;">{{row.BRANCH_NAME}}/{{row.EMP_NAME}}<!-- 分行/理專 --></td>
+							<td ng-bind="row.LASTUPDATE" style="text-align: center;"><!-- 前次修改時間【A】--></td>
+							<td ng-bind="row.CREATETIME" style="text-align: center;"><!-- 建立時間【B】--></td>
+							<td ng-bind="row.INCOMING_TIME" style="text-align: center;"><!-- 進件時間【C】--></td>
+							<td ng-bind="row.POLICY_NO" style="text-align: center;"><!-- 保單號碼 --></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>			
+</div>
+

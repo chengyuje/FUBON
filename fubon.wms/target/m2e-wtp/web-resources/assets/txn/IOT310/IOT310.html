@@ -1,0 +1,220 @@
+<style>
+.first_row {
+	widtd: 80px;
+}
+
+.text_row {
+	widtd: 100px;
+}
+
+input:required:invalid {
+	border-color: red;
+}
+
+.end_row {
+	widtd: 50px;
+}
+
+table {
+	font-size: small;
+	font-weight: bold;
+}
+
+.ins_icon {
+	widtd: 20px;
+	height: 20px;
+	background-image: url("assets/images/magnifier.jpg");
+}
+<!--
+input.bLarger{width: 20px; height: 20px;}
+-->
+</style>
+<script type="text/javascript" src="assets/txn/IOT310/IOT310.js"></script>
+
+<div ng-controller="IOT310Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">產險送件登錄
+		</div>
+	</div>
+	<div class="panel_content">
+		<div class="gv_tab_sc scroll_y">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+				data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<td class="first_row">保險文件編號:</td>
+						<td colspan="7">{{inputVO.INS_ID}}</td>
+					</tr>
+
+					<tr>
+						<td class="first_row">分行代碼:</td>
+						<td>{{inputVO.BRANCH_NBR}}</td>
+						<td class="first_row">鍵機日:</td>
+						<td colspan="5">{{inputVO.KEYIN_DATE| date:'yyyy/MM/dd'}}</td>
+					</tr>
+					<tr>
+						<td class="first_row">*被保險人ID:</td>
+
+						<td class="text_row"><input type="text" placeholder="請輸入..."
+							ng-blur="getInfo('INSURED')" required="required"
+							ng-model="inputVO.INSURED_ID" ng-disabled="in_OprStatus=='Read'" style="text-transform: uppercase;"/></td>
+						<td class="first_row">*被保險人姓名:</td>
+						<td class="text_row" colspan="5">
+							<input type="text" placeholder="請輸入..."
+							ng-disabled="in_OprStatus=='Read'"
+							ng-model="inputVO.INSURED_NAME" style="text-transform: uppercase;" required /></td>
+					</tr>
+					<tr>
+						<td class="first_row">*要保人ID:</td>
+						<td class="text_row"><input type="text" placeholder="請輸入..."
+							ng-disabled="in_OprStatus=='Read'"
+							ng-blur="getInfo('CUST')" ng-model="inputVO.CUST_ID"
+							required style="text-transform: uppercase;"/> <br /> <input type="checkbox" class="bLarger"
+							ng-model="inputVO.copys" ng-change="copys()" />同被保險人</td>
+						<td class="first_row">*要保人姓名:</td>
+						<td class="text_row" colspan="5"><input type="text" placeholder="請輸入..."
+							ng-disabled="in_OprStatus=='Read'"
+							ng-model="inputVO.PROPOSER_NAME" style="text-transform: uppercase;" required /></td>
+					</tr>
+
+					<tr>
+						<td class="first_row">未開戶註記:</td>
+						<td colspan="7">{{inputVO.UNOPEN_ACCT}}</td>
+					</tr>
+					<tr>
+						<td class="first_row">*招攬人員員編</td>
+						<td class="text_row"><input type="text"
+							ng-disabled="in_OprStatus=='Read'" ng-blur="getInfo('RECRUIT')"
+							placeholder="請輸入..." ng-model="inputVO.RECRUIT_ID" required /> <br />
+							<font style="color: red">*若實際招攬人員與系統帶出不同，請自行修改</font></td>
+						<td class="first_row">招攬人員姓名</td>
+						<td colspan="5">{{inputVO.RECRUIT_NAME}}</td>
+					</tr>
+
+
+					<tr>
+
+						<td class="first_row">*險種:</td>
+						<td colspan="7"><e-combobox ng-datasource="mappingSet['PPT_TYPE']" 
+								ng-disabled="in_OprStatus=='Read'" ng-model="inputVO.PPT_TYPE" ng-change="getInfo('RECRUIT')"
+								ng-validate="false" ng-readonly="false" ng-editable="false"
+								ng-format="F3" ng-required="true" widtd="70px" /></td>
+					</tr>
+					<tr>
+
+						<td class="first_row">*文件申請日:</td>
+						<td colspan="7" class="text_row">
+
+							<div class="input-group datebox datewidtd">
+								<input type="text" class="form-control"
+									ng-disabled="in_OprStatus=='Read'"
+									ng-disabled="in_OprStatus=='Read'"
+									uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.APPLY_DATE"
+									ng-required="true" is-open="model.b"
+									datepicker-options="bgn_sDateOptions" ng-readonly="true" />
+
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open_apply_date($event,'b')"
+										ng-disabled="noupdatedata">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="first_row">保險相關文件:</td>
+						<td colspan="7">
+							<div ng-repeat="cert in mappingSet['IOT.PPT_DOC_SEQ']　track by $index">
+								<input type="checkbox" name="selecteCert" 
+									ng-model="mappingSet[$index]"
+									ng-disabled="in_OprStatus=='Read'"  class="bLarger"
+									> {{cert.LABEL}}
+								&nbsp;&nbsp;
+							</div>
+								<input type="text" ng-if="mappingSet[5]==true"
+									ng-disabled="(in_OprStatus=='Read') || (!mappingSet[5])"
+									ng-model="inputVO.PPT_DOC_OTHER"
+									class="first_row" />
+						</td>
+					</tr>
+
+					<tr>
+						<td class="first_row">*總保費:</td>
+						<td><input type="text" placeholder="請輸入..."
+							ng-disabled="in_OprStatus=='Read'"
+							ng-model="inputVO.REAL_PREMIUM" e-input-limit="N" maxlength="12" 
+							style="" first_row": 150px;"  ng-keyup="chang_number(inputVO.REAL_PREMIUM,'realPremium')" ng-required="true"/></td>
+						<td class="first_row">轉介編號:</td>
+						<td><input type="text" placeholder="請輸入..." ng-blur="getInfo('REF_CON_ID')"
+							ng-disabled="in_OprStatus=='Read'"
+							ng-model="inputVO.REF_CON_ID"></td>
+						<td class="first_row">轉介員編:</td>
+						<td><input type="text" placeholder="請輸入..."
+							ng-disabled="in_OprStatus=='Read'" ng-model="inputVO.REF_CON_EMPID"></td>
+						<td colspan="2">{{inputVO.REF_CON_NAME}}</td>
+					</tr>
+					<tr>
+						<td colspan="8" style="color: red;text-shadow: black;padding-left: 1%;">註:*為必輸欄位</td>
+					</tr>
+					<tr>
+
+						<td style="background-color: #93C5E1;" colspan="8">
+							<div style="background-color: #93C5E1;">
+								<h4>
+									<font color=white>流程狀態</font>
+								</h4>
+						</td>
+					</tr>
+					<tr>
+						<td>目前狀態</td>
+						<td><font style="color: #125988">{{inputVO.STATUS |
+								mapping:mappingSet['IOT.MAIN_STATUS'] }}</font></td>
+						<td>批改申請人</td>
+						<td><font style="color: #125988">{{inputVO.RECRUIT_ID_SAVE}}</font></td>
+						<td>送件編號</td>
+						<td><font style="color: #125988">{{inputVO.OP_BATCH_NO}}</font></td>
+						<td></td>
+						<td></td>
+
+					</tr>
+					<tr>
+						<td>登錄人</td>
+						<td><font style="color: #125988">{{inputVO.CREATOR}}</font></td>
+						<td>登錄時間</td>
+						<td><font style="color: #125988">{{inputVO.CREATETIME |
+								date:'yyyy/MM/dd'}}</font></td>
+						<td>行政助理1</td>
+						<td><font style="color: #125988">{{inputVO.BEF_SIGN_OPRID}}</font></td>
+						<td>行政助理1簽收時間</td>
+						<td><font style="color: #125988">{{inputVO.BEF_SIGN_DATE |
+								date:'yyyy/MM/dd'}}</font></td>
+
+					</tr>
+					<tr>
+						<td>簽署人</td>
+						<td><font style="color: #125988">{{inputVO.SIGN_OPRID}}</font></td>
+						<td>簽署紀錄</td>
+						<td><font style="color: #125988">{{inputVO.SIGN_DATE |
+								date:'yyyy/MM/dd'}}</font></td>
+						<td>行政助理2</td>
+						<td><font style="color: #125988">{{inputVO.AFT_SIGN_OPRID}}</font></td>
+						<td>行政助理2簽收時間</td>
+						<td><font style="color: #125988">{{inputVO.AFT_SIGN_DATE |
+								date:'yyyy/MM/dd'}}</font></td>
+
+
+					</tr>
+				</table>
+			</form>
+		</div>
+	</div>
+	<div class="search_box_btn text-center">
+		<button ng-disabled="in_OprStatus=='Read'" ng-click="Submit()" class="btn btn-info">儲存</button>
+		<button ng-disabled="in_OprStatus=='NEW'" ng-click="back()" class="btn btn-info">回上一頁</button>
+	</div>
+</div>

@@ -1,0 +1,147 @@
+<style>
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS114/PMS114.js"></script>
+<div class="PMS114" ng-controller="PMS114Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3 scroll_y">
+			<table>
+				<tr>
+					<th><font color="red">*</font>名單建立年月：</th>
+	                <td>
+	                	<div style="float:left">
+		            		<e-combobox id="sDate" name="sDate"
+										ng-datasource="SDateList" 
+										ng-model="inputVO.sDate"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-change="getEDateList();cleanList();"
+										ng-format="F3"
+										width="100px"
+										ng-required="true" />
+						</div>
+						<div style="float:left">&nbsp; ～ &nbsp;</div>
+						<div style="float:left">
+							<e-combobox id="eDate" name="eDate"
+										ng-datasource="EDateList" 
+										ng-model="inputVO.eDate"
+										ng-validate="false" 
+										ng-disabled="EDateList.length <= 1"
+										ng-readonly="EDateList.length <= 1" 
+										ng-editable="false"
+										ng-format="F3"
+										width="100px"
+										ng-change="cleanList()"
+										ng-required="true" />	
+						</div>
+					</td>
+					<th></th>
+					<td></td>
+				</tr>
+				<tr>
+					<th>名單類型：</th>
+					<td>
+						<e-combobox id="leadType" name="leadType" 
+									ng-paramtype="PMS.PIPE_CONTENT_LEAD_TYPE"
+									ng-model="inputVO.leadType"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									ng-change="cleanList()"
+									style="line-height:20px;" />
+					</td>
+					<th></th>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="query()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()" >清除</button>
+			<button type="button" class="btn btn-info" ng-click="export()" onfunction-type="export" ng-disabled="qryList.length == 0">匯出</button>
+		</div>
+	</div>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>
+	<div class="panel_content">
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="qryList">
+				<thead>
+					<tr>
+						<th rowspan="2">名單建立日期</th>
+						<th rowspan="2">名單名稱(種類)</th>
+						<th rowspan="2">客戶ID</th>
+						<th rowspan="2">客戶名稱</th>
+						<th rowspan="2">方便往來分行</th>
+						<th rowspan="2">備註</th>
+						<th colspan="2">轉介人員</th>
+						<th colspan="6">分行業務處名單處理狀態</th>
+						<th colspan="6">Pipeline銷售計劃</th>
+					</tr>
+					<tr>
+						<th>姓名</th>
+						<th>員工編號</th>
+						
+						<th>業務員編</th>
+						<th>業務姓名</th>
+						<th>客戶回覆內容</th>
+						<th>名單回應選項</th>
+						<th>聯繫客戶時間</th>
+						<th>通知客戶內容</th>
+						
+						<th>面談結果</th>
+						<th>借款人身分證字號</th>
+						<th>案件進件編號</th>
+						<th>新個金徵審系統進度</th>
+						<th>撥款日期</th>
+						<th>撥款金額_百萬元</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in qryList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center">{{row.CREATETIME}}</td>
+						<td align="center">{{row.LEAD_TYPE_NAME}}</td>
+						<td align="center">{{row.CUST_ID}}</td>
+						<td align="center">{{row.CUST_NAME}}</td>
+						<td align="center">{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
+						<td align="left">
+							<div uib-tooltip="{{row.NOTE}}" tooltip-placement="auto right" tooltip-append-to-body="true" tooltip-class="CAM180ToolTip">
+								{{row.NOTE.length > 20 ? (row.NOTE | limitTo: 20) + "..." : row.NOTE}}
+							</div>
+						</td>
+						
+						<td align="center">{{row.REF_EMP}}</td>
+						<td align="center">{{row.REP_EMP_CID}}</td>
+						
+						<td align="center">{{row.EXEC_EMP_ID}}</td>
+						<td align="center">{{row.EXEC_EMP_NAME}}</td>
+						<td align="center">{{row.VISIT_CREPLY}}</td>
+						<td align="center">{{row.RESPONSE_NAME}}</td>
+						<td align="center">{{row.VISIT_DT}}</td>
+						<td align="center">{{row.VISIT_MEMO}}</td>
+						
+						<td align="center">{{row.MEETING_RESULT}}</td>
+						<td align="center">{{row.LOAN_CUST_ID}}</td>
+						<td align="center">{{row.CASE_NUM}}</td>
+						<td align="center">{{row.PIPELINE_STATUS}}</td>
+						<td align="center">{{row.APPROPRIATION_DATE}}</td>
+						<td align="center">{{row.APPROPRIATION_AMT}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	
+</div>

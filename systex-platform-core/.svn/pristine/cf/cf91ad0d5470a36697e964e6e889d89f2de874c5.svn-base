@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.systex.jbranch.platform.common.platformdao.table">
+    <class table="TBSYSDMUSER" name="com.systex.jbranch.platform.common.platformdao.table.TbsysdmuserVO">
+        <id name="wsID" column="WSID" type="string">
+            <generator class="foreign">
+                <param name="property">workstation</param>
+            </generator>
+        </id>
+
+        <property name="userID" column="USERID" type="string"/>
+        <property name="userName" column="USERNAME" type="string"/>
+        <property name="userAuth" column="USERAUTH" type="string"/>
+        <property name="status" column="STATUS" type="string"/>
+        <property name="errLevel" column="ERRLEVEL" type="string"/>
+        <property name="level" column="USERLEVEL" type="string"/>
+        <property name="proxiedUserID" column="PROXIEDUSERID" type="string"/>
+        <property name="proxiedUserAuth" column="PROXIEDUSERAUTH" type="string"/>
+        <map name="platformVars"
+             table="TBSYSDMUSERPLATFORMVARS" cascade="save-update,delete" fetch="join">
+            <key column="WSID"/>
+            <map-key column="VAR_ID" type="string"/>
+            <element column="VAR_VALUE" type="serializable"/>
+        </map>
+        <map name="bizlogicVars"
+             table="TBSYSDMUSERBIZLOGICVARS" cascade="save-update,delete" fetch="join">
+            <key column="WSID"/>
+            <map-key column="VAR_ID" type="string"/>
+            <element column="VAR_VALUE" type="serializable"/>
+        </map>
+        <one-to-one name="workstation" class="TbsysdmworkstationVO" constrained="true"/>
+    </class>
+</hibernate-mapping>

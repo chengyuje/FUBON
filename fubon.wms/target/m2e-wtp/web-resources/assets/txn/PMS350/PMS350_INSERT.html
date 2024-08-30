@@ -1,0 +1,131 @@
+<style>
+.modal-dialog.PMS350_INSERT {
+ 	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* .PMS350_INSERT input:required:invalid { */
+/*  	border-color: red; */
+/* } */
+</style>
+<script type="text/javascript" src="assets/txn/PMS350/PMS350_INSERT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS350/PMS350_INSLIST.js"></script>
+<div ng-controller="PMS350_INSERTController" ng-cloak>
+	<div class="modal-dialog PMS350_INSERT" resizable="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">報表資料{{row == null ? '新增' : '修改'}}</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table class="mainTB" border="1px" width="100%">
+						<tr>
+							<th nowrap>報表名稱</th>
+							<td align="left">
+								<input type="text" id="rptName" name="rptName" class="form-control" ng-model="inputVO.rptName" e-length-limit="70" required>
+							</td>
+						</tr>
+						<tr>
+						 	<th>報表提供單位</th>
+						  	<td align="left">
+								<e-combobox id="rpt_type1" name="rpt_type1"
+								ng-datasource="mappingSet['DEPT_NAME_1']"
+								ng-model="inputVO.RPT_DEPT_1"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								ng-change="DEPT_change('20')"
+								width="150px"
+								style="line-height:20px;" />
+								
+								<e-combobox id="rpt_type2" name="rpt_type2"
+								ng-datasource="mappingSet['DEPT_NAME_2']"
+								ng-model="inputVO.RPT_DEPT_2"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="!(inputVO.RPT_DEPT_1 == '' || mappingSet['DEPT_NAME_2'].length == 1)"
+								ng-change="DEPT_change('30');TYPE_CHANGES()"
+								ng-hide="inputVO.RPT_DEPT_1 == '' || mappingSet['DEPT_NAME_2'].length == 1"
+								width="150px"
+								style="line-height:20px;" />
+								
+								<e-combobox id="rpt_type3" name="rpt_type3"
+								ng-datasource="mappingSet['DEPT_NAME_3']"
+								ng-model="inputVO.RPT_DEPT"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="!(inputVO.RPT_DEPT_2 == '' || mappingSet['DEPT_NAME_3'].length == 1)"
+								ng-change="TYPE_CHANGES()"
+								ng-hide="inputVO.RPT_DEPT_2 == '' || mappingSet['DEPT_NAME_3'].length == 1"
+								width="150px"
+								style="line-height:20px;" />
+							</td>
+						</tr>
+						<tr>
+							<th>報表類型</th>
+						 	<td align="left">
+								<e-combobox id="rpt_type" name="rpt_type"
+								ng-datasource="mappingSet['RPT_TYPE']"
+								ng-model="inputVO.RPT_TYPE2"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-change = "TYPE_change()"
+								ng-required="true"
+								width="150px"
+								style="line-height:20px;" />
+								<input ng-disabled="type_lock" type="text" id="RPT_TYPE" name="RPT_TYPE" class="form-control" style="width:60%;display:inline;" ng-model="inputVO.RPT_TYPE" e-length-limit="40" required>
+						 	</td>
+						</tr>
+						<tr>
+							<th>可上傳角色資料</th>
+							<td>
+								<input type="image" src="assets/images/magnifier.jpg" ng-click="qu('uploader',inputVO.roleName_1)">
+								<br>
+								<span class="repeat-row" ng-repeat="row in chkCode track by $index">
+									{{row.NAME}}<br>
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<th>使用角色</th>
+							<td>
+								<input type="image" src="assets/images/magnifier.jpg" ng-click="qu('user',inputVO.roleName_2)">
+								<br>
+								<span class="repeat-row" ng-repeat="row2 in chkCode2 track by $index">
+									{{row2.NAME}}<br>
+								</span>
+								<span class="repeat-row" ng-repeat="row3 in chkCode3 track by $index">
+									{{row3.NAME}}(檢視所屬資料)<br>
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<th>無個資可提供匯出功能</th>
+							<td>
+								<input type="checkbox" ng-model="inputVO.EXPORT_YN"/>(勾選)
+							</td>
+						</tr>
+					</table>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="save()">儲存</button>
+					<button type="button" class="btn btn-primary" ng-click="clear()">清除</button>
+					<button type="button" class="btn btn-primary" ng-click="closeThisDialog('cancel')">取消</button>
+				</div>
+			</div>
+		</div>
+	</div> 
+</div>

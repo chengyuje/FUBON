@@ -1,0 +1,58 @@
+<style>
+/* open dialog */
+.ngdialog.CRM1242_CONFLICT {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM1242_CONFLICT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+
+</style>
+<div ng-controller="CRM1242_CONFLICTController" ng-cloak>
+	<div class="modal-dialog CRM1242_CONFLICT">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">原陪訪預約資訊</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc scroll_y" style="height:180px;">
+					<table>
+						<thead>
+							<tr>
+								<th>約訪時間</th>
+								<th>分行</th>
+								<th>理專</th>
+								<th>客戶姓名</th>
+								<th>FA/IA</th>
+								<th>駐點行</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row text-center" ng-repeat="row in resultList_conflict | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" ng-show="row.SEQ == inputVO.seq">
+								<td>{{toJsDate(row.AS_DATE) | date:"yyyy-MM-dd"}}<BR>{{row.AS_DATETIME_BGN_2}} - {{row.AS_DATETIME_END_2}}</td>
+								<td>{{row.AO_BRANCH_NAME_2}}</td>
+								<td>{{row.AO_EMP_NAME_2}}</td>
+								<td>{{row.CUST_NAME_2}}</td>
+								<td>{{row.AS_FAIA}}-{{row.EMP_NAME}}</td>
+								<td>{{row.ONSITE_NAME}}</td>
+							</tr>
+						</tbody>
+					</table>
+					
+					<div class="search_box_btn text-center">
+						<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">關閉</button>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

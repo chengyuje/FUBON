@@ -1,0 +1,144 @@
+<script type="text/javascript" src="assets/txn/INS132/INS132.js"></script>
+<div ng-controller="INS132Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">家庭財務安全試算結果
+		</div>
+	</div>
+	<div class="panel_content">
+			<h4 class="h4-title" style="text-align: center;">保險規畫建議<label style="float:right">單位:元</label></h4>
+		<!-- 			<div class="panel-body"> -->
+		<table class="table table-striped text-center table-bordered">
+			<tr>
+				<td><button type="button" class="btn btn-info" ng-click="To_INS200(0)" ng-disabled="callError">壽險</button></td>
+				<td>
+					<table>
+						<tr>
+							<td class ="text-left">您已經準備</td>
+							<td></td>
+							<td class ="text-right" ng-bind="inputVO.oldItemLife"></td>
+							<td></td>
+							<td>元</td>
+						</tr>
+						<tr>
+							<td class ="text-left">建議保障金額不低於</td>
+							<td></td>
+							<td class ="text-right" ng-bind="inputVO.insFamilyGap"></td>
+							<td></td>
+							<td>元</td>
+						</tr>
+					</table>
+				</td>
+				<td><button type="button" class="btn btn-info" ng-click="To_INS200(3)" ng-disabled="callError">重大疾病</button></td>
+				<td>
+					<table>
+						<tr>
+							<td class ="text-left">您已經準備</td>
+							<td></td>
+							<td class ="text-right" ng-bind="inputVO.oldItemDread"></td>
+							<td></td>
+							<td>元</td>
+						</tr>
+						<tr>
+							<td class ="text-left">建議保障金額不低於</td>
+							<td></td>
+							<td class ="text-right" ng-bind="inputVO.insDreadGap"></td>
+							<td></td>
+							<td>元</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td><button type="button" class="btn btn-info" ng-click="To_INS200(1)" ng-disabled="callError">意外險</button></td>
+				<td>
+					<table>
+						<tr>
+							<td class ="text-left">您已經準備</td>
+							<td></td>
+							<td class ="text-right" ng-bind="inputVO.oldItemAccident"></td>
+							<td></td>
+							<td>元</td>
+						</tr>
+						<tr>
+							<td class ="text-left">建議保障金額不低於</td>
+							<td></td>
+							<td class ="text-right" ng-bind="inputVO.insItemAccident"></td>
+							<td></td>
+							<td>元</td>
+						</tr>
+					</table>
+				</td>
+				<td><button type="button" class="btn btn-info" ng-click="To_INS200(2)" ng-disabled="callError">住院醫療</button></td>
+				<td>
+					<table>
+						<tr>
+							<td class ="text-left">您已經準備</td>
+							<td></td>
+							<td class ="text-right" ng-bind="inputVO.oldItemHealth"></td>
+							<td></td>
+							<td>元</td>
+						</tr>
+						<tr>
+							<td class ="text-left">建議保障金額不低於</td>
+							<td></td>
+							<td class ="text-right" ng-bind="inputVO.insItemHealth"></td>
+							<td></td>
+							<td>元</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<div style="margin-bottom: 32px">
+			<button type="button" class="btn btn-info" ng-click="toHealthCare()" style="margin-right: 32px">回保單健診首頁</button>
+			<button type="button" class="btn btn-info" ng-click="toHealthAndFamilyFin()">列印保單健診及家庭財務安全報告書</button>
+		</div>
+		<h4 class="h4-title">家庭財務安全試算結果<label style="float:right">單位:萬元</label></h4>
+		<div class="gv_tab_sc scroll_y">
+			<table class="table table-striped text-center table-bordered">
+				<thead>
+					<tr>
+						<th></th>
+						<th colspan="6">應備費用</th>
+						<th colspan="5">已備費用</th>
+						<th>應備 - 已備</th>
+					</tr>
+					<tr>
+						<th>年齡</th>
+						<th>生活費用</th>
+						<th>房貸費用</th>
+						<th>教育費用</th>
+						<th>其他費用</th>
+						<th>遺產稅準備</th>
+						<th>合計</th>
+						<th>配偶收入</th>
+						<th>房租收入</th>
+						<th>現有資產</th>
+						<th>壽險保障</th>
+						<th>合計</th>
+						<th>費用不足額</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row text-center" ng-repeat="row in inputVO.lstCashFlow | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td ng-bind="row.paramMap.AGE"></td>
+						<td ng-bind="row.paramMap.LIFE_FEE ? row.paramMap.LIFE_FEE : 0 | number"></td>
+						<td ng-bind="row.paramMap.HOUSE_FEE ? row.paramMap.HOUSE_FEE : 0 | number"></td>
+						<td ng-bind="row.paramMap.EDUCATION_FEE ? row.paramMap.EDUCATION_FEE : 0 | number"></td>
+						<td ng-bind="row.paramMap.OTHER_FEE ? row.paramMap.OTHER_FEE : 0 | number"></td>
+						<td ng-bind="row.paramMap.TAX_IN ? row.paramMap.TAX_IN : 0 | number"></td>
+						<td ng-bind="row.paramMap.FEE_SUM ? row.paramMap.FEE_SUM : 0 | number"></td>
+						<td ng-bind="row.paramMap.COU_INCOME ? row.paramMap.COU_INCOME : 0 | number"></td>
+						<td ng-bind="row.paramMap.FIN_INCOME ? row.paramMap.FIN_INCOME : 0 | number"></td>
+						<td ng-bind="row.paramMap.ALL_ASSET ? row.paramMap.ALL_ASSET : 0 | number"></td>
+						<td ng-bind="row.paramMap.INS_AMT ? row.paramMap.INS_AMT : 0 | number"></td>
+						<td ng-bind="row.paramMap.INCOME_ALL ? row.paramMap.INCOME_ALL : 0 | number"></td>
+						<td ng-bind="row.paramMap.GAP_AMT ? row.paramMap.GAP_AMT : 0 | number"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

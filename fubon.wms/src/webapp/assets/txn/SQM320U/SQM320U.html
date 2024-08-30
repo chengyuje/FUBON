@@ -1,0 +1,332 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+
+/* check box css */
+input.faChkRnd, input.faChkSqr {
+  visibility: hidden;
+}
+input.faChkRnd:checked:after, input.faChkRnd:after,
+input.faChkSqr:checked:after, input.faChkSqr:after {
+  visibility: visible;
+  font-family: FontAwesome;
+  font-size:25px;height: 17px; width: 17px;
+  position: relative;
+  top: -3px;
+  left: 0px;
+  background-color:#FFF;
+  display: inline-block;
+}
+
+input.faChkRnd:checked:after {
+  content: '\f058';
+}
+
+input.faChkRnd:after {
+  content: '\f10c';
+}
+
+input.faChkSqr:checked:after {
+  content: '\f14a';
+}
+
+input.faChkSqr:after {
+  content: '\f096';
+}
+
+/* check box css */
+
+</style>
+
+<script type="text/javascript" src="assets/txn/SQM320/SQM320.js"></script>
+<script type="text/javascript" src="assets/txn/SQM320U/SQM320U.js"></script>
+
+<script type="text/javascript" src="assets/txn/SQM320/SQM320_visitTotal.js"></script>
+<script type="text/javascript" src="assets/txn/SQM320U/SQM320U_visitTotal.js"></script>
+
+<script type="text/javascript" src="assets/txn/SQM320/SQM320_review.js"></script>
+<script type="text/javascript" src="assets/txn/SQM320U/SQM320U_review.js"></script>
+
+<script type="text/javascript" src="assets/txn/SQM320/SQM320_send.js"></script>
+<script type="text/javascript" src="assets/txn/SQM320U/SQM320U_send.js"></script>
+
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="SQM320U" ng-controller="SQM320UController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box">
+				<table>
+					<tr>
+						<th>*資料統計年季：</th>
+						<td>
+						<e-combobox id="dataMonth" 
+									name="dataMonth"
+									ng-datasource="mappingSet['timeE']" 
+									ng-model="inputVO.yearQtr"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-require="true"
+									ng-change="dateChangeU()"
+									ng-format="F3" 
+									width="150px"
+									style="line-height:20px;"></e-combobox>
+						</td>
+					</tr>											    
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="uhrmRCList"
+										ng-model="inputVO.uhrmRC"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>		
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="uhrmOPList"
+										ng-model="inputVO.uhrmOP"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
+						<th>員編：</th>
+						<td>
+							<e-combobox id="emp_id" name="emp_id"
+										ng-datasource="mappingSet['EmpName']""
+										ng-model="inputVO.emp_id"
+										ng-validate="false"
+										ng-readonly="disableEmpCombo" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-disabled="disableEmpCombo"
+										width="200px"
+										style="line-height:20px;"></e-combobox>
+						</td> 
+					</tr>
+					<tr>
+						<th>訪查狀態 : </th>
+						<td>
+							<e-combobox id="review_status" name="review_status"
+										ng-datasource="mappingSet['SQM.REVIEW_STATUS_LIST']"
+										ng-model="inputVO.review_status"
+									    ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										width="200px"
+										style="line-height:20px;"></e-combobox>
+						</td>
+						<th>身分別 : </th>
+						<td>
+							<e-combobox id="cust_status" name="cust_status"
+										ng-datasource="mappingSet['SQM.CUST_STATUS_LIST']"
+										ng-model="inputVO.cust_status"
+										ng-validate="false"
+										ng-readonly="false"
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										width="200px"
+										style="line-height:20px;"></e-combobox>
+						</td>
+					</tr>								
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()" ng-disabled="inputVO.yearQtr == undefined || inputVO.yearQtr == '' ">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit();init();">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPTNew()" ng-disabled="inputVO.yearQtr == undefined || inputVO.yearQtr == '' ">匯出</button>
+				<button type="button" class="btn btn-info" ng-click="openVisitTotal();" ng-disabled="inputVO.yearQtr == undefined || inputVO.yearQtr == '' ">各職級查核戶數</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="inputVO.yearQtr == undefined || inputVO.yearQtr == '' ">匯出舊報表</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">			    
+			<e-jumping-once output="outputVO" list="paramList" totallist="totalData"></e-jumping-once>
+			
+			<div class="gv_tab_sc scroll_y" style="min-height:335px;white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-left="8" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th style="width:50px;" ng-show = "isSupervisor == true">
+								<label>
+									<!-- 單號 : 5614 -->
+									<!-- role_id 為 A146 || A164 才可覆核 -->
+									<input type='checkbox'  ng-model="inputVO.select_all"  ng-change = "select_all()" >
+									全選
+								</label>
+							</th>
+							<th>訪查</th>
+							<th>分行名稱</th>
+							<th>個金RM</th>
+							<th>AO_CODE</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>貢獻度等級</th>
+							<th>年齡</th>
+							<th>特殊客戶註記</th>
+							<th>自取對帳單客戶</th>
+							<th>電訪記錄</th>
+							<th>E級客戶</th>
+							<th>季底庫存資產減損客戶</th>
+							<th>訪查狀態</th>
+							<th>訪查日期</th>
+							<th>訪查者</th>
+							<th>覆核者</th>
+							<th>覆核日期</th>			
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" align="center" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven' ">	
+							<!-- 單號 : 5614 -->
+							<!-- role_id 為 A146 || A164 才可覆核 -->
+							<td ng-show = "isSupervisor == true"  align="center">
+								<!-- 單號 : 5478 -->
+								<!-- 可覆核的條件 -->
+								<input 									
+									type= 'checkbox'  
+									ng-model='row.choice' 
+									ng-change= "select_false(row.choice)"
+									ng-show= "row.REVIEW_DATE == null && row.REVIEWER_FLAG == 'Y' && row.AUDITOR != loginID && row.AUDITED == 'Y' && isSupervisor == true" ></input>
+							</td>
+
+							<td style="vertical-align:middle;"  align="center" >
+								<button type="button" class="btn btn-warning btn-circle" ng-click="openReview('search' ,row)" ng-show ="row.REVIEW_DATE != null || isSupervisor == true" >
+									<i class="glyphicon glyphicon-search" title="檢視"></i>
+								</button>
+
+								<button type="button" class="btn btn-warning btn-circle" ng-click="openReview('audited',row)" ng-show ="row.REVIEW_DATE == null && isSupervisor == false ">
+									<i class="glyphicon glyphicon-pencil" title="訪查"></i>
+								</button>
+								
+								<button type="button" class="btn btn-danger btn-circle" ng-click="del(row)" ng-show ="row.REVIEW_DATE == null && isSupervisor == false && row.AUDITED == 'Y'">
+									<i class="glyphicon glyphicon-trash" title="刪除"></i>
+								</button>	
+								
+								<button type="button" class="btn btn-info" ng-click="del(row, 'R')" ng-show ="row.REVIEW_YN == 'Y'">
+				                    <i class="glyphicon glyphicon-refresh" title="清除"></i>
+				                </button>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.BRANCH_NBR}} - {{row.BRANCH_NAME}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.BRANCH_NBR}} - {{row.BRANCH_NAME}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.EMP_ID}} - {{row.EMP_NAME}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.EMP_ID}} - {{row.EMP_NAME}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.AO_CODE}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.AO_CODE}}</font>
+							
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'"><a href="#" onclick="return false" ng-click="custDTL(row)">{{row.CUST_ID}}</a></font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'"><a href="#" onclick="return false" ng-click="custDTL(row)">{{row.CUST_ID}}</a></font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.CUST_NAME}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.CUST_NAME}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.CON_DEGREE | mapping:CON_DEGREE:'F3'}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.CON_DEGREE | mapping:CON_DEGREE:'F3'}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.CUST_YEAR}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.CUST_YEAR}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.SP_CUST_YN}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.SP_CUST_YN}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.EBILL_PICK_YN}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.EBILL_PICK_YN}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.CMU_P_YN}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.CMU_P_YN}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.CUST_E_NOREC_FLAG}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.CUST_E_NOREC_FLAG}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.AST_LOSS_NOREC_FLAG}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.AST_LOSS_NOREC_FLAG}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">
+									<span ng-show="row.AUDITED == 'Y' && row.REVIEW_DATE != null">已覆核</span>
+									<span ng-show="row.AUDITED == 'Y' && row.REVIEW_DATE == null">已訪查</span>
+									<span ng-show="row.AUDITED != 'Y'">未訪查</span>
+								</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">
+									<span ng-show="row.AUDITED == 'Y' && row.REVIEW_DATE != null">已覆核</span>
+									<span ng-show="row.AUDITED == 'Y' && row.REVIEW_DATE == null">已訪查</span>
+									<span ng-show="row.AUDITED != 'Y'">未訪查</span>
+								</font>
+							</td>
+							<!-- 單號 : 5842 -->
+							<!-- 客戶服務定期查核訪查日期只顯示日期即可，時間部分隱藏不顯示	 -->
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{toJsDate(row.AUDIT_DATE) | date:"yyyy/MM/dd"}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{toJsDate(row.AUDIT_DATE) | date:"yyyy/MM/dd"}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.AUDITOR}} - {{row.EMP_AUDIT_NAME}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.AUDITOR}} - {{row.EMP_AUDIT_NAME}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.REVIEWER_EMP_ID}} - {{row.EMP_REVIEW_NAME}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{row.REVIEWER_EMP_ID}} - {{row.EMP_REVIEW_NAME}}</font>
+							</td>
+							<td>
+								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{toJsDate(row.REVIEW_DATE) | date:"yyyy/MM/dd"}}</font>
+								<font ng-show="row.HIGH_YEAR_YN == 'N'">{{toJsDate(row.REVIEW_DATE) | date:"yyyy/MM/dd"}}</font>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+					<!-- 單號 : 5614 -->
+					<!-- role_id 為 A146 || A164 才可覆核 -->
+					<button type="button" class="btn btn-primary" ng-click="review()" ng-show="REVIEW_FLAG == 'Y'" >覆核</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

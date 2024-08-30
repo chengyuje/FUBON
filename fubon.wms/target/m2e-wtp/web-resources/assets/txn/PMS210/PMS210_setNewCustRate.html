@@ -1,0 +1,85 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS210 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 70%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.table-border input {
+	width:150px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setNewCustRate.js"></script>
+<div ng-controller="PMS210_setNewCustRateController" ng-cloak>
+	<div class="modal-dialog PMS210">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+<!-- 				<div class="tfb_content_icon"></div> -->
+<!-- 				<div class="tfb_content_tit"> -->
+<!-- 					<img src="assets/images/icon/tfb_icon_a15.gif">請輸入當月新戶開發獎金 -->
+<!-- 				</div> -->
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請輸入當月新戶開發獎金</h4>
+
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form name="myForm">
+						<table class="table-bordered table-border">
+							<tr>
+								<th>AUM月均額(起)</th>
+								<th>AUM月均額(訖)</th>
+								<th>獎金</th>
+							</tr>
+							<tr>
+								<td align="center">
+									<input type="text" style="text-align: right" ng-model="AUM_INC_START" e-input-limit='ND' e-length-limit="16"/>
+								</td>
+								<td align="center">
+									<input type="text" style="text-align: right" ng-model="AUM_INC_END" e-input-limit='ND' e-length-limit="16"/>
+								</td>
+								<td align="center">
+									<input type="text" style="text-align: right" ng-model="BONUS" e-input-limit='ND' e-length-limit="16"/>
+								</td>
+								<td align="center" border="0">
+									<button type="button" class="btn btn-primary" ng-click="add()">加入</button>
+								</td>
+							</tr>
+						</table>
+						<br/><br/>
+						<table class="table-bordered table-border">
+							<tr>
+								<th style="width:80px;">刪除</th>
+								<th >AUM月均額(起)</th>
+								<th >AUM月均額(訖)</th>
+								<th >獎金</th>
+							</tr>
+							
+							<tr ng-repeat="y in newCustRateList">
+								<td align="center">
+									<button type="button" class="btn btn-primary" ng-click="del($index)"><i class="glyphicon glyphicon-trash"></i></button>
+								</td>
+								<td style="text-align:right;width:80px" > {{ y.AUM_INC_START }} </td>
+								<td style="text-align:right;width:80px" > {{ y.AUM_INC_END }} </td>
+								<td style="text-align:right;width:80px" > {{ y.BONUS }} </td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()">儲存</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div>
+</div>

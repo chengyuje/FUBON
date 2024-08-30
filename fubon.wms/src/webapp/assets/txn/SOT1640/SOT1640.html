@@ -1,0 +1,221 @@
+<style>
+/* table size */
+.SOT1640 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.SOT1640.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+.bigspace{
+	margin-left: 50px !important;
+}
+</style>
+<!-- SOT1640-動態鎖利轉換  -->
+<script type="text/javascript" src="assets/txn/SOT1640/SOT1640.js"></script>
+<script type="text/javascript" src="assets/txn/SOT1640/SOT1640_ROUTE.js"></script>
+<script type="text/javascript" src="assets/txn/SOT132/SOT132.js"></script>
+
+<div class="SOT1640" ng-controller="SOT1640Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >商品資料輸入及適配</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<h4 class="h4-title">交易資料輸入</h4>
+				<div ng-bind="jsLog" class="hidden"></div>
+				<div ng-bind="jsCustKycData"  class="hidden"></div>
+				<div ng-bind="jsLogCustFeePrdDueDate"  class="hidden"></div>
+				<div ng-bind="jsLogCustPLData"  class="hidden"></div>
+				<div ng-bind="jsLogCustAcctData"  class="hidden"></div>
+				<div ng-bind="jsLogCustInfoData"  class="hidden"></div>
+				<div ng-bind="jsLogPRD110Data"  class="hidden"></div>
+                
+				<table>
+					<tr>
+						<td colspan="5">
+							<table>
+								<tr>
+									<th colspan="2">
+										*客戶ID：
+										<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" ng-disabled="carList.length > 0" ng-blur="getSOTCustInfo(false,true);" e-length-limit="200" required >
+										&nbsp;&nbsp;&nbsp;{{inputVO.custName}}
+									</th>
+									<th colspan="2">KYC等級/效期：{{inputVO.kycLV}}/{{inputVO.kycDueDate | date:"yyyy-MM-dd"}}</th>
+								</tr>
+								<tr>
+									<th>&nbsp;客戶註記：{{inputVO.custRemarks | mapping:mappingSet['SOT.SPEC_CUSTOMER']:'F3'}}</th>
+									<th>OBU註記：{{inputVO.isOBU}}</th>
+									<th>同意投資商品諮詢服務：{{inputVO.isAgreeProdAdv}}</th>
+									<th>期間議價效期：{{inputVO.bargainDueDate | date:"yyyy-MM-dd"}}</th>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<br/>
+					<tr>
+						<td colspan="5">
+							<button type="button" class="btn btn-info" ng-disabled="!inputVO.custID" ng-click="goSOT132()" function-type="query">選擇庫存</button>
+						</td>
+					</tr>
+					<tr>
+						<th>&nbsp;母基金名稱：</th>
+						<td>{{inputVO.prodId}}&nbsp;{{inputVO.prodName}}</td>
+						<th>計價幣別：{{inputVO.prodCurr}}</th>
+						<th>產品風險等級：{{inputVO.prodRiskLv}}</th>
+						<td>信託金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmt | number:num}}</td>
+					</tr>
+					<tr>
+						<th>&nbsp;信託型態：</th>
+						<td colspan="4">動態鎖利</td>
+					</tr>
+					<tr>
+						<th>&nbsp;憑證編號：</th>
+						<td colspan="4">{{inputVO.certificateID}}</td>
+					</tr>
+					<tr>
+						<th>&nbsp;信託幣別：</th>
+						<td ng-if="(inputVO.prodFus20 == 'C')" colspan="4"><!-- 國內基金 -->
+							<label><input type="radio" name="type2" ng-change="currencyType()" ng-model="inputVO.trustCurrType" value="C" ng-disabled='true' required> 臺幣</label>
+							<span  ng-show="parameterTypeEditForm.trustCurrType.$error.required" class="with-errors" colspan="4">請輸入信託幣別</span>
+						</td>
+						<td ng-if="(inputVO.prodFus20 != 'C')" colspan="4"><!-- 不是國內基金 -->
+							<label><input type="radio" name="type2" ng-change="currencyType()" ng-model="inputVO.trustCurrType" value="N" ng-disabled='true' required> 臺幣</label>
+							<span class="bigspace"></span>
+							<label><input type="radio" name="type2" ng-change="currencyType()" ng-model="inputVO.trustCurrType" value="Y" ng-disabled='true' required> 外幣</label>
+							<input class="form-control" type="hidden" id="trustCurr" name="trustCurr" ng-model="inputVO.trustCurr" />
+							<span  ng-show="parameterTypeEditForm.trustCurrType.$error.required" class="with-errors" colspan="4">請輸入信託幣別</span>
+						</td>
+					</tr>
+					<tr>
+						<th>&nbsp;原單位數：</th>
+						<td>{{inputVO.numUnits | number:4}}</td>
+						<th colspan="3">&nbsp;參考現值：{{inputVO.trustCurr}}&nbsp;{{inputVO.presentVal | number:2}}</th>
+					</tr>
+					<tr>
+						<th>*轉換方式</th>
+						<td colspan="4">
+							<label ng-repeat="row in mappingSet['SOT.TRANSFER_TYPE_DYNA'] | limitTo:displayLimit track by $index">
+								<input type="radio" name="transferType" ng-model="inputVO.transferType" ng-value="row.DATA" ng-change="setTransferType()" required> {{row.LABEL}}
+								<span class="bigspace"></span>
+							</label>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="5">
+							<button type="button" class="btn btn-info" ng-disabled="!inputVO.custID || !inputVO.prodId || inputVO.transferType == '' || inputVO.transferType == '2'" 
+								ng-click="goPRD110In()" function-type="query">搜尋可轉換標的</button>
+						</td>
+					</tr>
+					<tr>
+						<th>*轉入母基金標的：</th>
+						<td>
+							<input type="text" class="form-control" style="width:80px;display:inline;" placeholder="請輸入..." id="inProdId" name="inProdId" 
+								ng-disabled="inputVO.transferType == '' || inputVO.transferType == '2'" ng-model="inputVO.inProdId" ng-blur="checkFundStatusIn()" e-length-limit="100">
+						</td>
+						<th>基金名稱：{{inputVO.inProdName}}</th>
+						<th>計價幣別：{{inputVO.inProdCurr}}</th>
+						<th>產品風險等級：{{inputVO.inProdRiskLv}}</th>
+					</tr>
+					<tr>
+						<th colspan="5">*子基金轉入母基金標的：</th>
+					</tr>
+					<tr>
+						<th>&nbsp;&nbsp;&nbsp;子基金1：</th>
+						<td><input type="checkbox" ng-model="inputVO.inProdC1YN" ng-false-value="'N'" ng-true-value="'Y'" 
+								ng-disabled="inputVO.transferType == '' || inputVO.transferType == '1'">&nbsp;{{inputVO.prodIdC1}}&nbsp;{{inputVO.prodNameC1}}</td>
+						<th>單位數：{{inputVO.numUnitsC1}}</th>
+						<th>產品風險等級：{{inputVO.prodRiskLvC1}}</th>
+						<th>轉換金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmtC1 | number: 2}}</th>
+					</tr>
+					<tr ng-if="inputVO.prodIdC2">
+						<th>&nbsp;&nbsp;&nbsp;子基金2：</th>
+						<td><input type="checkbox" ng-model="inputVO.inProdC2YN" ng-false-value="'N'" ng-true-value="'Y'" 
+								ng-disabled="inputVO.transferType == '' || inputVO.transferType == '1'">&nbsp;{{inputVO.prodIdC2}}&nbsp;{{inputVO.prodNameC2}}</td>
+						<th>單位數：{{inputVO.numUnitsC2}}</th>
+						<th>產品風險等級：{{inputVO.prodRiskLvC2}}</th>
+						<th>轉換金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmtC2 | number: 2}}</th>
+					</tr>
+					<tr ng-if="inputVO.prodIdC3">
+						<th>&nbsp;&nbsp;&nbsp;子基金3：</th>
+						<td><input type="checkbox" ng-model="inputVO.inProdC3YN" ng-false-value="'N'" ng-true-value="'Y'" 
+								ng-disabled="inputVO.transferType == '' || inputVO.transferType == '1'">&nbsp;{{inputVO.prodIdC3}}&nbsp;{{inputVO.prodNameC3}}</td>
+						<th>單位數：{{inputVO.numUnitsC3}}</th>
+						<th>產品風險等級：{{inputVO.prodRiskLvC3}}</th>
+						<th>轉換金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmtC3 | number: 2}}</th>
+					</tr>
+					<tr ng-if="inputVO.prodIdC4">
+						<th>&nbsp;&nbsp;&nbsp;子基金4：</th>
+						<td><input type="checkbox" ng-model="inputVO.inProdC4YN" ng-false-value="'N'" ng-true-value="'Y'" 
+								ng-disabled="inputVO.transferType == '' || inputVO.transferType == '1'">&nbsp;{{inputVO.prodIdC4}}&nbsp;{{inputVO.prodNameC4}}</td>
+						<th>單位數：{{inputVO.numUnitsC4}}</th>
+						<th>產品風險等級：{{inputVO.prodRiskLvC4}}</th>
+						<th>轉換金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmtC4 | number: 2}}</th>
+					</tr>
+					<tr ng-if="inputVO.prodIdC5">
+						<th>&nbsp;&nbsp;&nbsp;子基金5：</th>
+						<td><input type="checkbox" ng-model="inputVO.inProdC5YN" ng-false-value="'N'" ng-true-value="'Y'" 
+								ng-disabled="inputVO.transferType == '' || inputVO.transferType == '1'">&nbsp;{{inputVO.prodIdC5}}&nbsp;{{inputVO.prodNameC5}}</td>
+						<th>單位數：{{inputVO.numUnitsC5}}</th>
+						<th>產品風險等級：{{inputVO.prodRiskLvC5}}</th>
+						<th>轉換金額：{{inputVO.trustCurr}}&nbsp;{{inputVO.purchaseAmtC5 | number: 2}}</th>
+					</tr>
+					<tr>
+						<th>*取得公開說明書方式：</th>
+						<td colspan="4">
+							<e-combobox id="creditAcct" name="prospectusType" 
+										ng-datasource="mappingSet['SOT.PROSPECTUS_TYPE']"
+										ng-model="inputVO.prospectusType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-required="true"
+										ng-format="F3"
+										width="250px"
+										ng-disabled="inputVO.prospTypeDisabled"
+										style="line-height:20px;" required/> 
+						</td>
+					</tr>
+					<tr>
+						<th>*交易日期：</th>
+						<th colspan="4" id="tradeDateType">
+							<label ng-repeat="row in mappingSet['SOT.TRADE_DATE_TYPE'] | limitTo:displayLimit track by $index">
+								<input type="radio" 
+									   name="tradeDateType" id="tradeDateType{{row.DATA}}" 
+									   ng-model="inputVO.tradeDateType"
+									   ng-value="row.DATA" 
+									   ng-click="checkTradeDate(row.DATA)" 
+									   required> {{row.LABEL}}
+								<span class="bigspace"></span>
+							</label>
+						    <span>({{reserveTradeDay}}天內的營業日 {{toJsDate(inputVO.reservationTradeDate) | date:"yyyy-MM-dd"}})</span>
+						</th>
+					</tr>
+					<tr>
+						<th>*解說專員：</th>
+						<td colspan="4">
+							<input type="text" class="form-control" style="width:auto;display:inline;" id="narratorID" name="narratorID" ng-model="inputVO.narratorID" ng-blur="getSOTEmpInfo()" ng-disabled="narratorDisabled" e-length-limit="200" required>
+							<span class="bigspace"></span>
+							{{inputVO.narratorName}}
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<br>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="init();">清除</button>
+<!-- 			<button type="button" class="btn btn-info" ng-click="save('1');"  ng-hide="inputVO.bargainStatus != null">暫存</button> -->
+			<button type="button" class="btn btn-info" ng-click="save('2');" function-type="maintenance">下一步</button>
+			 
+		</div>
+	</div>
+</div>

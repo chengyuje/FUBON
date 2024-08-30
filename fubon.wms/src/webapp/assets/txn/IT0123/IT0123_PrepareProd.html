@@ -1,0 +1,125 @@
+<style>
+    .IT0123_PrepareProd .center {
+        text-align: center;
+    }
+
+    /* table size */
+    .IT0123_PrepareProd table {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .IT0123_PrepareProd.table > tbody > tr > td {
+        table-layout: fixed;
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+
+    .IT0123_PrepareProd .queryConditionRow {
+        display: none;
+        background-color: lightskyblue;
+    }
+
+</style>
+<div class="IT0123_PrepareProd" ng-controller="IT0123_PrepareProd_Controller">
+    <div class="panel_content" style="height:80vmin;min-height: 1000px;padding-top: 10px;">
+        <!-- 功能區 -->
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-default" ng-click="query()">
+                    <span class="glyphicon glyphicon-refresh"></span>重新整理
+                </button>
+                <button type="button" class="btn btn-warning" ng-click="edit()">
+                    <span class="glyphicon glyphicon-plus"></span>新增紀錄
+                </button>
+                <button type="button" class="btn btn-info" ng-click="downloadPrepareProdIntroDoc()">
+                    <span class="glyphicon glyphicon-info-sign"></span>下載說明文件
+                </button>
+                <button type="button" class="btn btn-primary" ng-click="togglefilter()">
+                    <span class="glyphicon glyphicon-filter"></span>
+                    <span ng-bind="filterMode? '關閉':'開啟'"></span>篩選功能
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="gv_tab_sc">
+                    <table class="table-bordered e-table-freeze" e-height="900px" e-mode="1" e-top="true"
+                           e-list="recordList">
+                        <thead>
+                        <tr>
+                            <th>功能</th>
+                            <th>資料日期</th>
+                            <th>Redmine<br/>單號（如有）</th>
+                            <th>負責人</th>
+                            <th>提出問題人</th>
+                            <th>類型</th>
+                            <th>配合事項與附件檔名</th>
+                            <th>簡述</th>
+                            <th>建立者</th>
+                            <th>建立時間</th>
+                            <th>修改者</th>
+                            <th>修改時間</th>
+                        </tr>
+                        <tr class="queryConditionRow">
+                            <th>
+                                <button type="button" class="btn btn-primary" ng-click="query()">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                                <button type="button" class="btn btn-info" ng-click="resetQueryVO();query()">
+                                    <span class="glyphicon glyphicon-erase"></span>
+                                </button>
+                            </th>
+                            <th><input class="form-control" type="text" ng-model="queryVO.SNAP_DATE"></th>
+                            <th><input class="form-control" type="text" ng-model="queryVO.REDMINE"></th>
+                            <th><input class="form-control" type="text" ng-model="queryVO.PRINCIPAL"></th>
+                            <th><input class="form-control" type="text" ng-model="queryVO.CLIENT"></th>
+                            <th><e-combobox ng-datasource="mappingSet['TYPE']"
+                                            ng-model="queryVO.TYPE"
+                                            ng-format="F3" width="100px"/></th>
+                            <th><input class="form-control" type="text" ng-model="queryVO.FILE_NAME"></th>
+                            <th><input class="form-control" type="text" ng-model="queryVO.MEMO"></th>
+                            <th><input class="form-control" type="text" ng-model="queryVO.CREATOR"></th>
+                            <th>
+                            </th>
+                            <th><input class="form-control" type="text" ng-model="queryVO.MODIFIER"></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="repeat-row" ng-repeat="each in recordList track by $index">
+                            <td width="150px">
+                                <button class="btn btn-success" title="下載檔案"
+                                        ng-click="downloadProdMustDoFile(each.FILE_NAME)">
+                                    <span class="glyphicon glyphicon-download"></span>
+                                </button>
+                                <button class="btn btn-warning" title="編輯紀錄" ng-click="edit(each)">
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </button>
+                                <button class="btn btn-danger" title="刪除紀錄"
+                                        ng-click="deleteProdMustDoRecord(each)">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </button>
+                            </td>
+                            <td class="center" ng-bind="each.SNAP_DATE"></td>
+                            <td class="center" width="5%"><a href="http://172.17.240.98/redmine/issues/{{each.REDMINE}}" target="_blank"><span ng-bind="each.REDMINE"></span></a></td>
+                            <td class="center" ng-bind="each.PRINCIPAL"></td>
+                            <td class="center" ng-bind="each.CLIENT"></td>
+                            <td class="center" ng-bind="each.TYPE"></td>
+                            <td class="center" ng-bind="each.FILE_NAME" ng-click="download(each.FILE_NAME)"></td>
+                            <td class="center" ng-bind="each.MEMO.length < 20? each.MEMO: (each.MEMO.substr(0, 20) + '...')" title="{{each.MEMO}}"></td>
+                            <td class="center" ng-bind="each.CREATOR"></td>
+                            <td class="center" ng-bind="each.CREATETIME"></td>
+                            <td class="center" ng-bind="each.MODIFIER"></td>
+                            <td class="center" ng-bind="each.LASTUPDATE"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                總筆數：<strong><span ng-bind="recordList.length"></span></strong>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,564 @@
+<style>
+    /* table size */
+    
+    .PMS344 table {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .PMS344 table.little {
+        width: 60%;
+    }
+    /* change row */
+    
+    .PMS344.table>tbody>tr>td {
+        table-layout: fixed;
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+
+    .tdpadding {
+        padding: 10px 5px 5px 5px;
+    }
+    
+    .alignleft {
+        text-align: left !important;
+    }
+    
+    .bigspace {
+        margin-left: 50px !important;
+    }
+    
+    .datewidth {
+        width: 180px !important;
+    }
+    
+    .search-table-outter {
+        overflow-x: scroll;
+    }
+    
+    .colwidth>thead>tr>th {
+        min-width: 150px;
+        white-space: nowrap;
+    }
+    
+    .red {
+        color: red;
+    }
+    .rstablecenter{
+    	valign:center;
+    }
+    
+</style>
+<script type="text/javascript" src="assets/txn/PMS344/PMS344.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS344" ng-controller="PMS344Controller" ng-cloak>
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit">
+                <img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+            </div>
+        </div>
+        <!--Content of the panel-->
+        <div class="panel_content">
+            <div class="search_table search_box3">
+                <form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+                    <table>
+                        <tr>
+                            <th>*比較日：</th>
+                            <td>
+                                <!--<div class="input-group datebox datewidth">
+                                     <input 	type="text" 
+                                    		id="sCreDate" 
+                                    		name="sCreDate" 
+                                    		class="form-control" 
+                                    		uib-datepicker-popup="yyyy/MM/dd" 
+                                    		ng-model="inputVO.sCreDate" 
+                                    		is-open="model.a" 
+                                    		ng-require="true" 
+                                    		width="220px" 
+                                    		datepicker-options="bgn_sDateOptions" 
+                                    		ng-readonly="true" 
+                                    		ng-change="limitDate();dateChange();dateChangeForTypeList()" /> 
+                                    <!-- 製作日曆button -->
+                                 <!--    <span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>																		
+									</span>
+                                </div> -->
+                                
+                                <e-combobox
+									ng-datasource="ymList"
+									ng-model="inputVO.datelist" ng-validate="false"				
+									ng-change="limitDate();dateChange();dateChangeForTypeList()"
+									ng-readonly="false" 
+									ng-editable="false" 
+									ng-format="F3"
+									width="220px"
+									ng-required="true" 
+									style="line-height:20px;" /> 
+                            </td>
+                            <th>業務處：</th>
+                            <td>
+                                <e-combobox 
+		                                id="region_center_id" 
+		                                name="region_center_id" 
+		                                ng-datasource="REGION_LIST" 
+		                                ng-model="inputVO.region_center_id" 
+		                                ng-validate="false" 
+		                                ng-disabled="disableRegionCombo" 
+		                                ng-readonly="disableRegionCombo" 
+		                                ng-editable="false" 
+		                                ng-format="F3" 
+		                                ng-required="false" 
+		                                ng-change="ChangeRegion()" 
+		                                width="200px" 
+		                                style="line-height:20px;" />
+                            </td>
+                            <th ng-hide="inputVO.branchd">分行別：</th>
+                            <td ng-hide="inputVO.branchd">
+                                <e-combobox 
+		                                id="branch_nbr" 
+		                                name="branch_nbr" 
+		                                ng-datasource="BRANCH_LIST" 
+		                                ng-model="inputVO.branch_nbr" 
+		                                ng-validate="false" 
+		                                ng-disabled="disableBranchCombo" 
+		                                ng-readonly="disableBranchCombo" 
+		                                ng-editable="false" 
+		                                ng-format="F1" 
+		                                ng-required="false" 
+		                                ng-change="ChangeBranch()" 
+		                                width="150px" style="line-height:20px;" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>*報表類型：</th>
+                            <td>
+                                <e-combobox ng-datasource="mappingSet['element']" ng-model="inputVO.element" ng-validate="false" ng-readonly="false" ng-editable="false" ng-change="chance();init2();" ng-format="F3" ng-required="true" width="220px" height="30px" style="line-height:20px;" />
+                            </td>
+                            <th ng-hide="inputVO.opd">營運區：</th>
+                            <td ng-hide="inputVO.opd">
+                                <e-combobox 
+                                		id="branch_area_id" 
+                                		name="branch_area_id" 
+                                		ng-datasource="AREA_LIST" 
+                                		ng-model="inputVO.branch_area_id" 
+                                		ng-validate="false" 
+                                		ng-disabled="disableAreaCombo" 
+                                		ng-readonly="disableAreaCombo" 
+                                		ng-editable="false" 
+                                		ng-format="F3" 
+                                		ng-required="false" 
+                                		ng-change="ChangeArea()" 
+                                		width="200px" 
+                                		style="line-height:20px;" />
+                            </td>
+                            <th ng-hide="inputVO.aocoded">理專：</th>
+                            <td ng-hide="inputVO.aocoded">
+                                <e-combobox 
+                                		id="ao_code" 
+                                		name="ao_code" 
+                                		ng-datasource="AO_LIST" 
+                                		ng-model="inputVO.ao_code" 
+                                		ng-validate="false" 
+                                		ng-disabled="disableAoCombo"
+							            ng-readonly="disableAoCombo" 
+                                		ng-editable="false" 
+                                		ng-format="F1" 
+                                		ng-required="false" 
+                                		ng-change="ChangeAo_code()" 
+                                		width="150px" 
+                                		style="line-height:20px;" />
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+            <div class="search_box_btn text-center">
+                <button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">查詢</button>
+                <button type="button" class="btn btn-info" ng-click="init()">清除</button>
+                <button type="button" class="btn btn-info" ng-click="export()" ng-disabled="paramList.length < 1">匯出</button>
+            </div>
+        </div>
+    </div>
+    <!-- 結果區 -->
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit">
+                <img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+            </div>
+        </div>
+        <!--Content of the panel-->
+        <div class="panel_content">
+            <!-- <e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList"></e-jumping> -->
+            <div class="gv_tab_sc scroll_y rstablecenter">
+                <table class="table-striped rstable rstablecenter e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.element=='TBPMS_TOP10_STOCK_AO'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>營運區</th>
+                            <th>分行代號</th>
+                            <th>分行名稱</th>
+                            <th>組別</th>
+                            <th>理專職級</th>
+                            <th>理專</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>投資成本(台幣)</th>
+                            <th>投資現值(台幣)</th>
+                            <th>成本與上週<br>差異(台幣)</th>
+                            <th>現值與上週<br>差異(台幣)</th>
+                            <!-- <th>排名</th> -->
+                            <th>報酬率(%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td  align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.BRANCH_AREA_NAME}}</td>
+                            <td align="center" >{{row.BRANCH_NBR}}</td>
+                            <td>{{row.BRANCH_NAME}}</td>
+                            <td align="center" >{{row.BRANCH_CLS}}</td>
+                            <td align="center" >{{row.AO_JOB_RANK}}</td>
+                            <td>{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.INV_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.INV_VALU_NTD | currency:''}}</td>
+                            <td align="right">{{row.DIFF_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.DIFF_VALU_NTD | currency:''}}</td>
+                           <!--  <td>{{row.SRANK}}</td> -->
+                           <!-- 項次改排名 -->
+                            <!-- <td align="center" >{{row.NUM}}</td> -->
+                            <td ng-if="row.ROR*100 < 0" class="with-errors" align="right">{{row.ROR*100 | number:0}}</td>
+                            <td ng-if="row.ROR*100 >= 0" align="right">{{row.ROR*100 | number:0}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table-striped rstable rstablecenter" ng-show="inputVO.element=='TBPMS_TOP10_STOCK_BR'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>營運區</th>
+                            <th>分行代號</th>
+                            <th>分行名稱</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>投資成本(台幣)</th>
+                            <th>投資現值(台幣)</th>
+                            <th>成本與上週<br>差異(台幣)</th>
+                            <th>現值與上週<br>差異(台幣)</th>
+                            <!-- <th>排名</th> -->
+                            <th>報酬率(%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.BRANCH_AREA_NAME}}</td>
+                            <td align="center" >{{row.BRANCH_NBR}}</td>
+                            <td>{{row.BRANCH_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.INV_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.INV_VALU_NTD | currency:''}}</td>
+                            <td align="right">{{row.DIFF_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.DIFF_VALU_NTD | currency:''}}</td>
+                            <!--  <td>{{row.SRANK}}</td> -->
+                            <!-- 項次改排名 -->
+                            <!-- <td align="center" >{{row.NUM}}</td> -->
+                            <td ng-if="row.ROR*100 < 0" class="with-errors" align="right">{{row.ROR*100 | number:0}}</td>
+                            <td ng-if="row.ROR*100 >= 0" align="right">{{row.ROR*100 | number:0}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table-striped rstable rstablecenter e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.element=='TBPMS_TOP10_STOCK_OP'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>營運區</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>投資成本(台幣)</th>
+                            <th>投資現值(台幣)</th>
+                            <th>成本與上週 <br>差異(台幣)</th>
+                            <th>現值與上週<br>差異(台幣)</th>
+                            <!-- <th>排名</th> -->
+                            <th>報酬率(%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.BRANCH_AREA_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.INV_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.INV_VALU_NTD | currency:''}}</td>
+                            <td align="right">{{row.DIFF_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.DIFF_VALU_NTD | currency:''}}</td>
+                            <!--  <td>{{row.SRANK}}</td> -->
+                            <!-- 項次改排名 -->
+                            <!-- <td align="center" >{{row.NUM}}</td> -->
+                            <td ng-if="row.ROR*100 < 0" class="with-errors" align="right">{{row.ROR*100 | number:0}}</td>
+                            <td ng-if="row.ROR*100 >= 0" align="right">{{row.ROR*100 | number:0}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table-striped rstable rstablecenter e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.element=='TBPMS_TOP10_STOCK_RC'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>投資成本(台幣)</th>
+                            <th>投資現值(台幣)</th>
+                            <th>成本與上週<br>差異(台幣)</th>
+                            <th>現值與上週<br>差異(台幣)</th>
+                            <!-- <th>排名</th> -->
+                            <th>報酬率(%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.INV_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.INV_VALU_NTD | currency:''}}</td>
+                            <td align="right">{{row.DIFF_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.DIFF_VALU_NTD | currency:''}}</td>
+                            <!--  <td>{{row.SRANK}}</td> -->
+                            <!-- 項次改排名 -->
+                            <!-- <td align="center" >{{row.NUM}}</td> -->
+                            <td ng-if="row.ROR*100 < 0" class="with-errors" align="right">{{row.ROR*100 | number:0}}</td>
+                            <td ng-if="row.ROR*100 >= 0" align="right">{{row.ROR*100 | number:0}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table-striped rstable rstablecenter e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.element=='TBPMS_TOP10_RDMP_AO'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>營運區</th>
+                            <th>分行代號</th>
+                            <th>分行名稱</th>
+                            <th>組別</th>
+                            <th>理專職級</th>
+                            <th>理專</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>贖回成本(台幣)</th>
+                            <th>贖回現值(台幣)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.BRANCH_AREA_NAME}}</td>
+                            <td align="center" >{{row.BRANCH_NBR}}</td>
+                            <td>{{row.BRANCH_NAME}}</td>
+                            <td align="center" >{{row.BRANCH_CLS}}</td>
+                            <td align="center" >{{row.AO_JOB_RANK}}</td>
+                            <td>{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.RDMP_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.RDMP_VALU_NTD | currency:''}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table-striped rstable rstablecenter e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.element=='TBPMS_TOP10_RDMP_BR'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>營運區</th>
+                            <th>分行代號</th>
+                            <th>分行名稱</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>贖回成本(台幣)</th>
+                            <th>贖回現值(台幣)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.BRANCH_AREA_NAME}}</td>
+                            <td align="center" >{{row.BRANCH_NBR}}</td>
+                            <td>{{row.BRANCH_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.RDMP_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.RDMP_VALU_NTD | currency:''}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table-striped rstable rstablecenter e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.element=='TBPMS_TOP10_RDMP_OP'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>營運區</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>贖回成本(台幣)</th>
+                            <th>贖回現值(台幣)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.BRANCH_AREA_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.RDMP_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.RDMP_VALU_NTD | currency:''}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table-striped rstable rstablecenter e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.element=='TBPMS_TOP10_RDMP_RC'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>贖回成本(台幣)</th>
+                            <th>贖回現值(台幣)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.RDMP_COST_NTD | currency:''}}</td>
+                            <td align="right">{{row.RDMP_VALU_NTD | currency:''}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table-striped rstable rstablecenter e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.element=='TBPMS_TOP10_SALE_AO'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>營運區</th>
+                            <th>分行代號</th>
+                            <th>分行名稱</th>
+                            <th>組別</th>
+                            <th>理專職級</th>
+                            <th>理專</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>投資金額(台幣)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.BRANCH_AREA_NAME}}</td>
+                            <td align="center" >{{row.BRANCH_NBR}}</td>
+                            <td>{{row.BRANCH_NAME}}</td>
+                            <td align="center" >{{row.BRANCH_CLS}}</td>
+                            <td align="center" >{{row.AO_JOB_RANK}}</td>
+                            <td>{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.INV_AMT_NTD | currency:''}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table-striped rstable rstablecenter e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.element=='TBPMS_TOP10_SALE_BR'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>營運區</th>
+                            <th>分行代號</th>
+                            <th>分行名稱</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>投資金額(台幣)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.BRANCH_AREA_NAME}}</td>
+                            <td align="center" >{{row.BRANCH_NBR}}</td>
+                            <td>{{row.BRANCH_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.INV_AMT_NTD | currency:''}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table-striped rstable rstablecenter e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.element=='TBPMS_TOP10_SALE_OP'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>營運區</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>投資金額(台幣)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.BRANCH_AREA_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.INV_AMT_NTD | currency:''}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table-striped rstable rstablecenter e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.element=='TBPMS_TOP10_SALE_RC'">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>業務處</th>
+                            <th>產品代號</th>
+                            <th>產品名稱</th>
+                            <th>投資金額(台幣)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td align="center" >{{row.NUM}}</td>
+                            <td>{{row.REGION_CENTER_NAME}}</td>
+                            <td>{{row.PRD_ID}}</td>
+                            <td>{{row.PRD_NAME}}</td>
+                            <td align="right">{{row.INV_AMT_NTD | currency:''}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- 結果區 -->
+    </div>

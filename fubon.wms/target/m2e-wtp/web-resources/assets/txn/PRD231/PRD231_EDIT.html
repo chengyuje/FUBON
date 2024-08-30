@@ -1,0 +1,130 @@
+<style>
+
+</style>
+<div ng-controller="PRD231_EDITController" ng-cloak>
+	<div class="modal-dialog PRD231">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.GLOBAL_ID == null ? '新增' : '編輯'}}投資對照表</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-5">*第一層：</th>
+							<td class="col-md-5 tdpadding">
+								<e-combobox id="mkt_tier1" name="mkt_tier1"
+								ng-paramtype="FPS.FUND_TYPE"
+								ng-model="inputVO.mkt_tier1"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="true"
+			  					ng-change="getArea()"
+			  					width="200px"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.mkt_tier1.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-5"></th>
+							<td class="col-md-5 help-block with-errors">請選擇第一層</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-5">*第二層(23類)：</th>
+							<td class="col-md-5 tdpadding">
+								<e-combobox id="mkt_tier2" name="mkt_tier2"
+								ng-datasource="mappingSet['INV_AREA']"
+								ng-model="inputVO.mkt_tier2"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="true"
+			  					ng-change="getTarget()"
+			  					width="200px"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.mkt_tier2.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-5"></th>
+							<td class="col-md-5 help-block with-errors">請選擇第二層</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-5">*第三層(45類)：</th>
+							<td class="col-md-5 tdpadding">
+								<e-combobox id="mkt_tier3" name="mkt_tier3"
+								ng-datasource="mappingSet['INV_TARGET']"
+								ng-model="inputVO.mkt_tier3"
+			  					ng-validate="false"
+			  					ng-readonly="false" 
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="true"
+			  					width="200px"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.mkt_tier3.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-5"></th>
+							<td class="col-md-5 help-block with-errors">請選擇第三層</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-5">*Lipper Global分類：</th>
+							<td class="col-md-5 tdpadding">
+								<e-combobox id="global_id" name="global_id"
+								ng-datasource="mappingSet['CID']"
+								ng-model="inputVO.global_id"
+			  					ng-validate="true"
+			  					ng-readonly="false" 
+			  					ng-editable="true"
+			  					ng-format="F3"
+			  					ng-required="true"
+			  					ng-change="getEID()"
+			  					width="200px"
+			  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.global_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-5"></th>
+							<td class="col-md-5 help-block with-errors">請選擇Lipper Global分類</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="ifExist">
+							<td class="col-xs-1"></td>
+							<th class="col-md-5"></th>
+							<td class="col-md-5 help-block with-errors">已經存在將會覆蓋</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-5">Lipper Global分類英文名稱：</th>
+							<td class="col-md-5 tdpadding">{{eid}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

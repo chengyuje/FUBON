@@ -1,0 +1,146 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS210 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 50%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setShortTran.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_UPLOAD.js"></script>
+<div ng-controller="PMS210_setShortTranController" ng-cloak>
+	<div class="modal-dialog PMS210">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+<!-- 				<div class="tfb_content_icon"></div> -->
+<!-- 				<div class="tfb_content_tit"> -->
+<!-- 					<img src="assets/images/icon/tfb_icon_a15.gif">請上傳非財務扣分明細 -->
+<!-- 				</div> -->
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請設定基金短Trade參數</h4>
+
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<!-- <div class="gv_tab_sc scroll_y" style="white-space: nowrap;"> -->
+				<div class="search_table search_box3">
+					<form>
+						<table>
+							<tr>
+								<td style="width: 200px;text-align: right">贖回分配日區間：</td>
+								<td align="left" style="width: 200px;">
+									<div class="input-group datebox datewidth">
+										<input type="text" class="form-control SDate"
+											uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.TSDate"
+											ng-change="limitDate()" is-open="model.a1"
+											datepicker-options="ivgStartDateOptions"
+											ng-datasource="mappingSet['SDate']"
+											placeholder="{{inputVO.SDate}}" ng-readonly="true"
+											width="100%" />
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default"
+												ng-click="open($event,'a1')">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+										</span>
+									</div>
+								</td>
+								<td style="width: 3px !important;">
+									～
+								</td>
+								<td style="width: 200px;">
+									<div class="input-group datebox datewidth">
+										<input type="text" class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.TEDate"
+											ng-change="limitDate()" placeholder="{{inputVO.EDate}}"
+											is-open="model.b1" datepicker-options="ivgEndDateOptions"
+											ng-datasource="mappingSet['EDate']" ng-readonly="true"
+											width="100%" />
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default"
+												ng-click="open($event,'b1')">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+										</span>
+									</div>
+								</td>
+								<td></td>
+						</tr>
+						<tr>
+							<td style="width: 200px;text-align: right">短線交易天數：</td>	
+							<td align="left" style="width: 200px;">
+								<input type="text" style="text-align:right" name="tradeS" ng-model="inputVO.tradeS" size="5" maxlength="2" e-input-limit='N'>
+								～
+								<input type="text" style="text-align:right" name="tradeE" ng-model="inputVO.tradeE" size="5" maxlength="2" e-input-limit='N'>
+							</td>	
+							<td style="width: 3px !important;">
+									
+							</td>
+							<td style="width: 200px;">
+								
+							</td>
+							<td></td>	
+						</tr>
+						<tr>
+								<td style="width: 200px;text-align: right">非常態交易區間：</td>
+								<td align="left" style="width: 200px;">
+									<div class="input-group datebox datewidth">
+										<input type="text" class="form-control SDate"
+											uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.NSDate"
+											ng-change="limitDate()" is-open="model.a2"
+											datepicker-options="ivgStartDateOptions"
+											ng-datasource="mappingSet['SDate']"
+											placeholder="{{inputVO.NSDate}}" ng-readonly="true"
+											width="100%" />
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default"
+												ng-click="open($event,'a2')">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+										</span>
+									</div>
+								</td>
+								<td style="width: 3px !important;">
+									～
+								</td>
+								<td style="width: 200px;">
+									<div class="input-group datebox datewidth">
+										<input type="text" class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.NEDate"
+											ng-change="limitDate()" placeholder="{{inputVO.NEDate}}"
+											is-open="model.b2" datepicker-options="ivgEndDateOptions"
+											ng-datasource="mappingSet['EDate']" ng-readonly="true"
+											width="100%" />
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default"
+												ng-click="open($event,'b2')">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+										</span>
+									</div>
+								</td>
+								<td><button type="button" class="btn btn-primary" ng-click="cleanNDate()">清除</button></td>
+						</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+			
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()">儲存</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div>
+</div>

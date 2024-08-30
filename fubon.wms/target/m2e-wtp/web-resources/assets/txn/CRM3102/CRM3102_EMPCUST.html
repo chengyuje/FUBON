@@ -1,0 +1,64 @@
+<style>
+.modal-dialog.CRM3102_EMPCUST {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM3102/CRM3102_EMPCUST.js"></script>
+<script type="text/javascript" src="assets/txn/CRM3102/CRM3102_ADDEMPCUST.js"></script>
+<div ng-controller="CRM3102_EMPCUSTController" ng-cloak>
+	<div class="modal-dialog CRM3102_EMPCUST"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">經營滿五年客戶名單(換手)</h4>
+			</div>
+			<div class="modal-body">
+				<div>
+					<table width="100%">
+						<tr width="100%">
+							<td width="50%"><b>分行：</b>&nbsp;{{inputVO.BRANCH_NBR}}-{{inputVO.BRANCH_NAME}}</td>
+							<td width="50%"><b>理專：</b>&nbsp;{{inputVO.EMP_ID}}-{{inputVO.EMP_NAME}}</td>
+						</tr>
+					</table>
+					<div class="search_box_btn text-center">
+						<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">結束</button>
+						<button type="button" class="btn btn-info" ng-show="inputVO.EDIT_YN == 'Y'" ng-click="showEmpCust5YR()">新增</button>
+					</div>			
+				</div>
+				
+ 				<e-jumping-once output="outputVO" list="cust5YRListdata" totallist="cust5YRList"></e-jumping-once>
+		  		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+		  			<table>
+						<thead>
+							<tr>
+								<th ng-show="inputVO.EDIT_YN == 'Y'">功能</th>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>經營滿五年理專</th>
+								<th>前一年度貢獻度等級</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in cust5YRListdata" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td ng-show="inputVO.EDIT_YN == 'Y'">
+									<button type="button" class="btn btn-info" ng-click="deleteCust(row);">刪除</button>
+					       		</td>
+								<td>{{row.CUST_ID}}</td>
+								<td>{{row.CUST_NAME}}</td>
+								<td ng-if="row.CON_DEGREE_YN != 'Y'">{{row.EMP_ID}}-{{row.EMP_NAME}}</td>
+								<td ng-if="row.CON_DEGREE_YN == 'Y'"></td>
+								<td align="center">{{row.PRFT_LAST_YEAR_NOTE}}</td>
+							</tr>
+						</tbody>
+					</table>
+		  		</div>
+			</div>
+		</div>
+	</div>
+</div>

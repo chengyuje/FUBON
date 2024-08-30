@@ -1,0 +1,257 @@
+<script type="text/javascript" src="assets/txn/SOT660/SOT660.js"></script>
+<div class="SOT620" ng-controller="SOT660Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >投組適配試算</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>
+						<th style="width:5%; text-align:right;">客戶ID：</th>
+						<td  style="width:35%; text-align:right;"><input type="text" class="form-control" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" ng-blur="getCustData();" e-length-limit="12" style="width: 200px;text-transform: uppercase;"></td>
+						<td style="text-align:left;">
+							<div style="text-align:left;">
+								<button type="button" class="btn btn-info" ng-click="getCustData();">查詢</button>
+								<button type="button" class="btn btn-info" ng-click="init();inquireInit();">清除</button>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center"></div>
+			<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th>客戶姓名：{{inputVO.fp032675Data.custName}}</th>
+					<th>風險屬性/效期：{{inputVO.custKYCData.kycLevel}}/<span style={{inputVO.kycDateColor}}>{{toJsDate(inputVO.custKYCData.kycDueDate) | date:"yyyy-MM-dd"}}</span></th>
+					<th>高資產客戶/效期/可提供高資產產品或服務：{{inputVO.hnwcData.validHnwcYN}}/<span style={{inputVO.hnwcDateColor}}>{{toJsDate(inputVO.hnwcData.dueDate) | date:"yyyy-MM-dd"}}</span>/{{inputVO.hnwcData.hnwcService}}</th>
+					<th>專業投資人/效期：{{inputVO.fp032675Data.custProFlag}}/<span style={{inputVO.proDateColor}}>{{toJsDate(inputVO.fp032675Data.custProDate) | date:"yyyy-MM-dd"}}</span></th> 
+				</tr>
+				<tr>
+					<th colspan="3">已越級投資比例：{{inputVO.wmshaiaData.RISK_SUM | number:2}}%&nbsp;(可越級投資比例上限：30%)</th>
+					<th>資料時間：{{inputVO.dataDate}}</th> 
+				</tr>
+			</table>
+			</div>
+			
+			<div class="gv_tab_sc" style="white-space: nowrap;">
+			<table class="rstable e-table-freeze" e-height="550px" e-mode="1" e-top="true" e-list="paramList">
+				<thead>
+					<tr>
+						<th rowspan="2">風險<br/>等級</th>
+						<th rowspan="2">投資<br/>餘額<br/>(新臺幣元)</th>
+						<th rowspan="2">投資<br/>比例 %</th>
+<!-- 						<th rowspan="2">風險<br/>權值<br/>(B)</th> -->
+<!-- 						<th rowspan="2">投資組合<br/>風險權值<br/>(A) x (B)</th> -->
+						<th rowspan="2" colspan="2">各風險等級<br/>最大可申購金額</th>
+						<th colspan="4">已承作之預約單/長效單交易</th>
+						<th colspan="4">投資試算</th>
+					</tr>
+					<tr>
+						<th colspan="2">申購金額</th>
+						<th colspan="2">贖回金額</th>
+						<th colspan="2">申購金額</th>
+						<th colspan="2">贖回金額</th>
+					</tr>
+				</thead>
+				<tbody>
+<!-- 					<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'"> -->
+					<tr>
+						<td align="center">P1</td>
+						<td align="right">{{inputVO.wmshaiaData.AMT_1 | number:0}}</td>
+						<td align="right">{{inputVO.wmshaiaData.AMT_1 / inputVO.wmshaiaData.DENO_AMT * 100 | number:2}}</td>
+<!-- 						<td align="right">{{inputVO.wmshaiaData.BASE_RISK_1 | number:2}}</td> -->
+<!-- 						<td align="right">{{inputVO.wmshaiaData.AMT_1 / inputVO.wmshaiaData.DENO_AMT * inputVO.wmshaiaData.BASE_RISK_1 | number:2}}</td> -->
+						<td align="right">
+<!-- 							<e-combobox id="CUR11" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-change="getCurAmt('1');" -->
+<!-- 									ng-model="inputVO.CUR11" ng-validate="false" ng-format="F3" width="80px" style="line-height:20px;" /> -->
+						</td>
+						<td align="right"></td>
+						<td align="right">
+							<e-combobox id="CUR12" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR12" ng-validate="false" ng-format="F3" width="80px" style="line-height:20px;" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT12" ng-model="inputVO.AMT12" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ></td>
+						<td align="right">
+							<e-combobox id="CUR13" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR13" ng-validate="false" ng-format="F3" width="80px" style="line-height:20px;" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT13" ng-model="inputVO.AMT13" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ></td>
+						<td align="right">
+							<e-combobox id="CUR14" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR14" ng-validate="false" ng-format="F3" width="80px" style="line-height:20px;" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT14" ng-model="inputVO.AMT14" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ></td>
+						<td align="right">
+							<e-combobox id="CUR15" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR15" ng-validate="false" ng-format="F3" width="80px" style="line-height:20px;" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT15" ng-model="inputVO.AMT15" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4"></td>
+					</tr>
+					<tr>
+						<td align="center">P2</td>
+						<td align="right">{{inputVO.wmshaiaData.AMT_2 | number:0}}</td>
+						<td align="right">{{inputVO.wmshaiaData.AMT_2 / inputVO.wmshaiaData.DENO_AMT * 100 | number:2}}</td>
+<!-- 						<td align="right">{{inputVO.wmshaiaData.BASE_RISK_2 | number:2}}</td> -->
+<!-- 						<td align="right">{{inputVO.wmshaiaData.AMT_2 / inputVO.wmshaiaData.DENO_AMT * inputVO.wmshaiaData.BASE_RISK_2 | number:2}}</td> -->
+						<td align="right">
+							<e-combobox id="CUR21" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-change="getCurAmt('2');"
+									ng-model="inputVO.CUR21" ng-validate="false" ng-format="F3" width="80px" style="line-height:20px;" 
+									ng-if="inputVO.currentRiskVal < 2 && inputVO.allowRiskVal >= 2"/>
+						</td>
+						<td align="right" ng-if="inputVO.currentRiskVal < 2 && inputVO.allowRiskVal >= 2">{{inputVO.AMT21 | number:2}}</td>
+						<td align="right" ng-if="!(inputVO.currentRiskVal < 2 && inputVO.allowRiskVal >= 2)"></td>
+						<td align="right">
+							<e-combobox id="CUR22" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR22" 
+							ng-format="F3" width="80px" style="line-height:20px;" ng-if="inputVO.allowRiskVal >= 2" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT22" ng-model="inputVO.AMT22" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ng-if="inputVO.allowRiskVal >= 2" ></td>
+						<td align="right">
+							<e-combobox id="CUR23" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR23" 
+							ng-format="F3" width="80px" style="line-height:20px;"  />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT23" ng-model="inputVO.AMT23" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ></td>
+						<td align="right">
+							<e-combobox id="CUR24" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR24" 
+							ng-format="F3" width="80px" style="line-height:20px;" ng-if="inputVO.allowRiskVal >= 2" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT24" ng-model="inputVO.AMT24" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ng-if="inputVO.allowRiskVal >= 2" ></td>
+						<td align="right">
+							<e-combobox id="CUR25" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR25" 
+							ng-format="F3" width="80px" style="line-height:20px;" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT25" ng-model="inputVO.AMT25" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ></td>
+					</tr>
+					<tr>
+						<td align="center">P3</td>
+						<td align="right">{{inputVO.wmshaiaData.AMT_3 | number:0}}</td>
+						<td align="right">{{inputVO.wmshaiaData.AMT_3 / inputVO.wmshaiaData.DENO_AMT * 100 | number:2}}</td>
+<!-- 						<td align="right">{{inputVO.wmshaiaData.BASE_RISK_3 | number:2}}</td> -->
+<!-- 						<td align="right">{{inputVO.wmshaiaData.AMT_3 / inputVO.wmshaiaData.DENO_AMT * inputVO.wmshaiaData.BASE_RISK_3 | number:2}}</td> -->
+						<td align="right">
+							<e-combobox id="CUR31" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-change="getCurAmt('3');"
+									ng-model="inputVO.CUR31" ng-validate="false" ng-format="F3" width="80px" style="line-height:20px;" 
+									ng-if="inputVO.currentRiskVal < 3 && inputVO.allowRiskVal >= 3"/>
+						</td>
+						<td align="right" ng-if="inputVO.currentRiskVal < 3 && inputVO.allowRiskVal >= 3">{{inputVO.AMT31 | number:2}}</td>
+						<td align="right" ng-if="!(inputVO.currentRiskVal < 3 && inputVO.allowRiskVal >= 3)"></td>
+						<td align="right">
+							<e-combobox id="CUR32" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR32" 
+							ng-format="F3" width="80px" style="line-height:20px;" ng-if="inputVO.allowRiskVal >= 3" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT32" ng-model="inputVO.AMT32" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ng-if="inputVO.allowRiskVal >= 3" ></td>
+						<td align="right">
+							<e-combobox id="CUR33" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR33" 
+							ng-format="F3" width="80px" style="line-height:20px;" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT33" ng-model="inputVO.AMT33" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ></td>
+						<td align="right">
+							<e-combobox id="CUR34" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR34" 
+							ng-format="F3" width="80px" style="line-height:20px;" ng-if="inputVO.allowRiskVal >= 3" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT34" ng-model="inputVO.AMT34" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ng-if="inputVO.allowRiskVal >= 3" ></td>
+						<td align="right">
+							<e-combobox id="CUR35" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR35" 
+							ng-format="F3" width="80px" style="line-height:20px;" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT35" ng-model="inputVO.AMT35" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ></td>
+					</tr>
+					<tr>
+						<td align="center">P4</td>
+						<td align="right">{{inputVO.wmshaiaData.AMT_4 | number:0}}</td>
+						<td align="right">{{inputVO.wmshaiaData.AMT_4 / inputVO.wmshaiaData.DENO_AMT * 100 | number:2}}</td>
+<!-- 						<td align="right">{{inputVO.wmshaiaData.BASE_RISK_4 | number:2}}</td> -->
+<!-- 						<td align="right">{{inputVO.wmshaiaData.AMT_4 / inputVO.wmshaiaData.DENO_AMT * inputVO.wmshaiaData.BASE_RISK_4 | number:2}}</td> -->
+						<td align="right">
+							<e-combobox id="CUR41" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-change="getCurAmt('4');"
+									ng-model="inputVO.CUR41" ng-validate="false" ng-format="F3" width="80px" style="line-height:20px;" 
+									ng-if="inputVO.currentRiskVal < 4 && inputVO.allowRiskVal >= 4"/>
+						</td>
+						<td align="right" ng-if="inputVO.currentRiskVal < 4 && inputVO.allowRiskVal >= 4">{{inputVO.AMT41 | number:2}}</td>
+						<td align="right" ng-if="!(inputVO.currentRiskVal < 4 && inputVO.allowRiskVal >= 4)"></td>
+						<td align="right">
+							<e-combobox id="CUR42" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR42" 
+							ng-format="F3" width="80px" style="line-height:20px;" ng-if="inputVO.allowRiskVal >= 4" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT42" ng-model="inputVO.AMT42" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ng-if="inputVO.allowRiskVal >= 4" ></td>
+						<td align="right">
+							<e-combobox id="CUR43" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR43" 
+							ng-format="F3" width="80px" style="line-height:20px;" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT43" ng-model="inputVO.AMT43" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ></td>
+						<td align="right">
+							<e-combobox id="CUR44" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR44" 
+							ng-format="F3" width="80px" style="line-height:20px;" ng-if="inputVO.allowRiskVal >= 4" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT44" ng-model="inputVO.AMT44" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ng-if="inputVO.allowRiskVal >= 4"></td>
+						<td align="right">
+							<e-combobox id="CUR45" ng-datasource="mappingSet['SOT.SOT660_CUR_TYPE']" ng-model="inputVO.CUR45" 
+							ng-format="F3" width="80px" style="line-height:20px;" />
+						</td>
+						<td align="right"><input type="text" class="form-control" style="width:120px; display:inline; text-align:right;" 
+											id="AMT45" ng-model="inputVO.AMT45" e-length-limit="14" e-input-limit="NUU" nuu1="12" nuu2="4" ></td>
+					</tr>
+					<tr>
+						<td align="center">Total</td>
+						<td align="right">{{inputVO.wmshaiaData.DENO_AMT | number:0}}</td>
+						<td align="right">{{inputVO.wmshaiaData.DENO_AMT ? (inputVO.wmshaiaData.DENO_AMT == 0 ? 0 : 100 | number:2) : ""}}</td>
+<!-- 						<td align="right"> - </td> -->
+<!-- 						<td align="right">{{inputVO.wmshaiaData.RISK_SUM | number:2}}</td> -->
+						<td colspan="6"></td>
+						<td colspan="4" align="right"><button type="button" class="btn btn-info" ng-click="trialCalculate();">進行投組適配試算</button></td>
+					</tr>
+				</tbody>
+			</table>
+			</div>
+		</div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >投組適配試算結果</div>
+		</div>
+		<div class="panel_content" aligh="center" >
+			<br><B>{{inputVO.trialData.MESSAGE1}}&nbsp;<span style="color:red">{{inputVO.trialData.RISK_SUM | number:2}}%</span>&nbsp;{{inputVO.trialData.MESSAGE}}</B>
+		</div>
+		
+		<div class="gv_tab_sc" style="white-space: nowrap;">
+			<table>
+				<tr>
+					<td style="border-style : hidden!important;">
+						<pre style="border-style : hidden!important;background-color: white;padding-top: 0;" >說明：
+1. 客戶僅限承作逾越其風險屬性一個等級之金融商品，且逾越其風險屬性之已持有及欲承作商品投資比例不得超過30%。
+2. 自然人客戶若為以下任一情況，不適用投組適配：(1)年齡70歲(含)以上。(2)教育程度為國中(含)以下。(3)有全民健康保險重大傷病證明。
+3. 各商品投資餘額項目如下，金錢信託如有多位委託人則以均分方式採計，另可輸入已承作之預約單/長效單交易納入投組適配試算。
+  (1) 信託平台海外債券：庫存投資本金(含贖回在途)+申購在途-贖回在途
+  (2) 金市自營平台外國債券：已交割有價證券庫存投資本金(計入客戶RP部位，不扣除賣出在途)+買入在途-賣出在途+已留買單金額
+  (3) 基金：基金庫存本金(不含在途)+申購在途本金(單筆、動鎖加碼、RSP)+轉換在途本金+贖回再申購在途本金
+  (4) 海外ETF/股票：庫存成本+買進委託尚未成交(委託價格X委託股數)+賣出委託尚未成交(庫存成本)
+  (5) 未具證投信基金性質境外基金：庫存成本(不含贖回在途)+申購在途
+  (6) 境外結構型商品(SN)/組合式商品(SI)：庫存投資本金(含贖回在途)+申購在途-贖回在途
+  (7) 外匯雙享利(DCI)：庫存投資本金+申購在途
+  (8) 投資型保險/外幣傳統型保險：累積已繳保費(不含在途)
+  (9) 奈米投：庫存成本+申購在途(申購、加碼)-贖回在途+變更投組在途(變更後成本)-變更投組在途(變更前成本)
+  (10)黃金存摺：平均買入成本X庫存公克數
+  (11)金錢信託：投資商品庫存本金(多委託人時，依委託人人數均分庫存本金)
+4. 投組適配試算結果僅供參考，客戶欲承作逾越其風險屬性之金融商品，應以承作時之投組適配結果為準。即使在客戶風險屬性、高資產客戶資格、
+   商品風險等級或投資組合部位皆不變之情況下，投組適配結果仍有可能因匯率波動而不同，建議除參考最大可申購金額外，應考量匯率波動影響。
+</pre>
+					</td>
+				</tr>
+			</table>
+			</div>
+	</div>
+	
+</div>

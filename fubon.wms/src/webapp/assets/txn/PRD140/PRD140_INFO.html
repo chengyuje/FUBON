@@ -1,0 +1,112 @@
+<div class="search_table search_box3">
+	<h4 class="h4-title">基本資料</h4>
+	<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+		<table class="table-bordered">
+			<tr>
+				<th>ISIN CODE</th>
+				<td>{{snInfo.ISIN_CODE}}</td>
+				<th>計價幣別</th>
+				<td>{{snInfo.CURRENCY_STD_ID | mapping:BOND_CURRENCY:'F1'}}</td>
+			</tr>
+			<tr>
+				<th>發行機構</th>
+				<td>{{snInfo.INSTITION_OF_FLOTATION}}</td>
+				<th>保證機構</th>
+				<td>{{snInfo.INSTITION_OF_AVOUCH}}</td>
+			</tr>
+			<tr>
+				<th style="vertical-align: middle;">發行機構評等<br>標普/穆迪/惠譽</th>
+				<td>
+					標普：{{snInfo.CREDIT_RATING_SP}}<br>
+					穆迪：{{snInfo.CREDIT_RATING_MODDY}}<br>
+					惠譽：{{snInfo.CREDIT_RATING_FITCH}}
+				</td>
+				<th style="vertical-align: middle;">保證機構評等<br>標普/穆迪/惠譽</th>
+				<td>
+					標普：{{snInfo.AVOUCH_CREDIT_RATING_SP}}<br>
+					穆迪：{{snInfo.AVOUCH_CREDIT_RATING_MODDY}}<br>
+					惠譽：{{snInfo.AVOUCH_CREDIT_RATING_FITCH}}
+				</td>
+			</tr>
+			<tr>
+				<th>交易日</th>
+				<td>{{toJsDate(snInfo.TRANS_DATE) | date:'yyyy-MM-dd'}}</td>
+				<th>發行日</th>
+				<td>{{toJsDate(snInfo.DATE_OF_FLOTATION) | date:'yyyy-MM-dd'}}</td>
+			</tr>
+			<tr>
+				<th>到期日</th>
+				<td>{{toJsDate(snInfo.DATE_OF_MATURITY) | date:'yyyy-MM-dd'}}</td>
+				<th>開始受理贖回日</th>
+				<td>{{toJsDate(snInfo.START_DATE_OF_BUYBACK) | date:'yyyy-MM-dd'}}</td>
+			</tr>
+			<tr>
+				<th>產品風險等級</th>
+				<td>{{snInfo.RISKCATE_ID | mapping:PROD_RISK_LEVEL:'F3'}}</td>
+				<th>到期保本率</th>
+				<td>{{snInfo.RATE_GUARANTEEPAY ? snInfo.RATE_GUARANTEEPAY + ' %' : '0 %'}}</td>
+			</tr>
+			<tr>
+				<th>最低申購金額</th>
+				<td>{{snInfo.BASE_AMT_OF_PURCHASE | currency:'':0}}</td>
+				<th>申購單位金額</th>
+				<td>{{snInfo.UNIT_AMT_OF_PURCHASE | currency:'':0}}</td>
+			</tr>
+			<tr>
+				<th>最低贖回金額</th>
+				<td>{{snInfo.BASE_AMT_OF_BUYBACK | currency:'':0}}</td>
+				<th>贖回單位金額</th>
+				<td>{{snInfo.UNIT_AMT_OF_BUYBACK | currency:'':0}}</td>
+			</tr>
+			<tr>
+				<th>配息頻率</th>
+				<td>{{snInfo.FREQUENCY_OF_INTEST_PAY | mapping:DIVIDEND_FREQ_BOND:'F3'}}</td>
+				<th>到期年限</th>
+				<td>{{snInfo.YEAR_OF_MATURITY}}</td>
+			</tr>
+			<tr>
+				<th>固定配息期間</th>
+				<td>{{snInfo.FIXED_RATE_DURATION}}</td>
+				<th>固定配息率</th>
+				<td>{{snInfo.FIXED_DIVIDEND_RATE ? snInfo.FIXED_DIVIDEND_RATE + ' %' : ''}}</td>
+			</tr>
+			<tr>
+				<th>幣轉</th>
+				<td>{{snInfo.CURRENCY_EXCHANGE}}</td>
+				<th>浮動配息率</th>
+				<td>{{snInfo.FLOATING_DIVIDEND_RATE ? snInfo.FLOATING_DIVIDEND_RATE + ' %' : ''}}</td>
+			</tr>
+			<tr ng-repeat="row in invest track by $index" ng-if="$index % 2 == 0">
+				<th>連結標的{{TwNum[$index]}}</th>
+				<td>{{invest[$index]}}</td>
+				<th>連結標的{{TwNum[$index + 1]}}</th>
+				<td>{{invest[$index + 1]}}</td>
+			</tr>
+			<tr>
+				<th>通路服務費率</th>
+				<td>{{snInfo.RATE_OF_CHANNEL ? (snInfo.RATE_OF_CHANNEL * 100) + ' %' : ''}}</td>
+				<th>專案名稱</th>
+				<td>{{snInfo.PROJECT | mapping:SN_PROJECT:'F3':'true'}}</td>
+<!-- 				<th>CNR分配率</th> -->
+<!-- 				<td>{{snInfo.CNR_YIELD ? (snInfo.CNR_YIELD * 100) + ' %' : ''}}</td> -->
+			</tr>
+			<tr>
+			    <th>客群名稱</th>
+			    <td>{{snInfo.CUSTOMER_LEVEL | mapping:SN_CUSTOMER_LEVEL:'F3':'true'}}</td>
+			    <th>剩餘年期</th>
+				<td>{{snInfo.SURPLUS}}</td>
+			</tr>
+		</table>
+	</div>
+	<h4 class="h4-title">銷售限制</h4>
+	<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+		<p ng-if="restriction.IS_SALE != 'Y' || restriction.IS_EXPIRED != 'Y'"><b>不可銷售</b></p>
+<!-- 		<p ng-if="restriction.W8BEN_MARK == 'Y'"><b>需W8-BEN</b></p> -->
+<!-- 		<p ng-if="restriction.RISK_CHECKLIST == 'Y'"><b>需填寫風險檢核表</b></p> -->
+		<p ng-if="restriction.PI_BUY == 'Y'"><b>限專投申購</b></p>
+		<p ng-if="restriction.OBU_BUY == 'Y'"><b>限OBU申購</b></p>
+		<p ng-if="restriction.HNWC_BUY == 'Y'"><b>限高資產客戶申購</b></p>
+	</div>
+	<h4 class="h4-title">文件下載</h4>
+	<a onclick="return false" ng-click="goDownload()">文件連結</a>
+</div>

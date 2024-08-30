@@ -1,0 +1,112 @@
+<style>
+/* dialog panl */
+.modal-dialog.ORG150MOD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<div>
+	<div ng-controller="ORG150_MODController" ng-cloak>
+		<div class="modal-dialog ORG150MOD">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">修改</h4>
+				</div>
+				<div class="modal-body">
+					<table width="100%">
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">業務處：</th>
+							<td class="col-md-7 tdpadding" colspan="3">{{modInputVO.REGION_CENTER_NAME}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">營運區：</th>
+							<td class="col-md-7 tdpadding" colspan="3">{{modInputVO.BRANCH_AREA_NAME}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">分行：</th>
+							<td class="col-md-7 tdpadding" colspan="3">{{modInputVO.BRANCH_NAME}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">員工編號：</th>
+							<td class="col-md-7 tdpadding" colspan="3">{{modInputVO.EMP_ID}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">員工姓名：</th>
+							<td class="col-md-7 tdpadding" colspan="3">{{modInputVO.EMP_NAME}}</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">離職原因：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="" 
+											ng-paramtype="ORG.RESIGN_REASON"
+											ng-model="modInputVO.RESIGN_REASON"
+						   					ng-validate="false" 
+						   					ng-readonly="false" 
+						   					ng-editable="false"
+						   					ng-format="F3"
+						   					ng-required="false" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">離職動向：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="" 
+											ng-paramtype="ORG.RESIGN_DESTINATION"
+											ng-model="modInputVO.RESIGN_DESTINATION"
+											ng-change="modInputVO.DESTINATION_BANK_ID = ''"
+						   					ng-validate="false" 
+						   					ng-readonly="false" 
+						   					ng-editable="false"
+						   					ng-format="F3"
+						   					ng-required="false"/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-if="modInputVO.RESIGN_DESTINATION == '01'">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">離職至同業：</th>
+							<td class="col-md-7 tdpadding" colspan="3">
+								<e-combobox id="" 
+											ng-paramtype="ORG.DESTINATION_BANK_ID"
+											ng-model="modInputVO.DESTINATION_BANK_ID"
+											ng-disabled="modInputVO.RESIGN_DESTINATION != '01'"
+						   					ng-validate="false" 
+						   					ng-readonly="false" 
+						   					ng-editable="false"
+						   					ng-format="F3"
+						   					ng-required="false"/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-primary" ng-click="updateResignMemo()" ng-disabled="modInputVO.RESIGN_REASON == '' || modInputVO.RESIGN_DESTINATION == '' || (modInputVO.RESIGN_DESTINATION == '01' && modInputVO.DESTINATION_BANK_ID == '')">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,170 @@
+<script type="text/javascript" src="assets/txn/SOT630/SOT630.js"></script>
+<div class="SOT630" ng-controller="SOT630Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table style="width: 50%; margin-left: 30%; margin-right: auto;">
+					<tr>
+						<th>客戶ID：</th>
+						<td style="width: 75%;">
+							<input type="text" class="form-control" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" ng-blur="toUppercase_data(inputVO.custID, 'custid')" e-length-limit="12" style="width: 30%;text-transform: uppercase;">
+						</td>
+					</tr>
+					<tr>
+						<th>授權種類：</th>
+						<td>
+							<e-combobox id="authType" name="authType" 
+										ng-paramtype="SOT.AUTH_TYPE"
+										ng-model="inputVO.authType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="initVal()"
+										width="75%"
+										style="line-height:20px;"/>
+						</td>
+					</tr>
+					<tr>
+						<th>商品種類：</th>
+						<td>
+							<e-combobox id="prodType" name="prodType" 
+										ng-paramtype="SOT.PROD_TYPE"
+										ng-model="inputVO.prodType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="getTradeType()"
+										width="75%"
+										style="line-height:20px;"/>
+						</td>
+					</tr>
+					<tr>
+						<th>交易種類：</th>
+						<td>
+							<e-combobox id="tradeType" name="tradeType" 
+										ng-datasource="mappingSet['SOT.TRADE_TYPE_COMBOBOX']"
+										ng-model="inputVO.tradeType"
+										ng-validate="false" 
+										ng-readonly="(inputVO.prodType == undefined || inputVO.prodType == '' || inputVO.prodType == null) || inputVO.authType == 'A'" 
+										ng-disabled="(inputVO.prodType == undefined || inputVO.prodType == '' || inputVO.prodType == null) || inputVO.authType == 'A'"
+										ng-editable="false"
+										ng-format="F3"
+										width="75%"
+										style="line-height:20px;"/>
+							<font color="red" ng-show="(inputVO.prodType == undefined || inputVO.prodType == '' || inputVO.prodType == null)">請選擇商品種類</span>
+						</td>
+					</tr>
+					
+					<tr>
+						<th>授權起迄日：</th>
+						<td class="form-inline">
+							<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="sDate" name="sDate"
+										   class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.sDate"
+											is-open="model.a"
+											datepicker-options="startDateOptions"
+											alt-input-formats="altInputFormats"
+											ng-readonly="true"
+											ng-change="limitDate()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')"><i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								~
+								<div class="input-group datebox datewidth">
+									<input type="text" id="sDate2" name="sDate2"
+										   class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.eDate"
+											is-open="model.c"
+											datepicker-options="startDateOptions2"
+											alt-input-formats="altInputFormats"
+											ng-readonly="true"
+											ng-change="limitDate()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')"><i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>信託交易類別：</th>
+						<td>
+							<e-combobox id="trustTradeType" name="trustTradeType" 
+										ng-datasource="mappingSet['SOT.TRUST_TRADE_TYPE']"
+										ng-model="inputVO.trustTradeType"
+										ng-validate="false" 
+										ng-readonly="(inputVO.authType == undefined || inputVO.authType == '' || inputVO.authType == null) || inputVO.authType == 'A'" 
+										ng-disabled="(inputVO.authType == undefined || inputVO.authType == '' || inputVO.authType == null) || inputVO.authType == 'A'"
+										ng-editable="false"
+										ng-format="F3"
+										width="75%"
+										style="line-height:20px;"/>
+							<font color="red" ng-hide="inputVO.authType != ''">請選擇授權種類</span>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit();init();">清除</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once input="inputVO" output="outputVO" list="data" totallist="tradeList" rowcountlimit="10"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data">
+					<thead>
+						<tr>
+							<th>信託交易類別</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>授權種類</th>
+							<th>商品種類</th>
+							<th>交易種類</th>
+							<th>高齡客戶<br>資訊觀察表填寫日</th>
+							<th>能力表現填答結果</th>
+							<th>金融認知填答結果</th>
+							<th>授權主管<br>員工編號</th>
+							<th>授權日期</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" align="center" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.TRUST_TRADE_TYPE | mapping:mappingSet['SOT.TRUST_TRADE_TYPE']:'F3'}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.AUTH_TYPE | mapping:mappingSet['SOT.AUTH_TYPE']:'F3'}}</td>
+							<td>{{row.PROD_TYPE | mapping:mappingSet['SOT.PROD_TYPE']:'F3'}}</td>
+							<td ng-if="row.PROD_TYPE == '1'">{{row.TRADE_TYPE | mapping:mappingSet['SOT.TRADE_TYPE']:'F3'}}</td>
+							<td ng-if="row.PROD_TYPE == '8'">{{row.TRADE_TYPE | mapping:mappingSet['SOT.TRADE_TYPE_DYNA']:'F3'}}</td>
+							<td ng-if="row.PROD_TYPE != '1' && row.PROD_TYPE != '8'">{{row.TRADE_TYPE | mapping:mappingSet['SOT.BUY_SELL_B']:'F3'}}</td>
+							<td>{{toJsDate(row.EVALUATE_VALID_DATE) | date:'yyyy/MM/dd'}}</td>
+							<td style="text-align:left;vertical-align:middle;"><div ng-repeat ="value in comma_split(row.ABILITY_RESULT)">{{value}}</div></td>
+							<td style="text-align:left;vertical-align:middle;"><div ng-repeat ="value in comma_split(row.FINACIAL_COGNITION_RESULT)">{{value}}</div></td>
+							<td>{{row.AUTH_DIRECTOR_EMP_ID}}</td>
+							<td>{{toJsDate(row.AUTH_DATE) | date:'yyyy/MM/dd HH:mm:ss'}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

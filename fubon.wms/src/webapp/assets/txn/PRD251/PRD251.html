@@ -1,0 +1,204 @@
+<style>
+/* open dialog */
+.ngdialog.PRD251 {
+	
+}
+/* dialog panl */
+.modal-dialog.PRD251 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 650px;
+	height: auto;
+}
+.modal-dialog.PRD251_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 300px;
+	height: auto;
+}
+/* table size */
+.PRD251 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.PRD251 table.little{
+	width: 60%;
+}
+/* change row */
+.PRD251.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PRD251_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD251/PRD251.js"></script>
+<script type="text/javascript" src="assets/txn/PRD251/PRD251_EDIT.js"></script>
+<div class="PRD251" ng-controller="PRD251Controller" ng-cloak>
+	<div class="search_table search_box3">
+		<table>
+			<tr>
+				<th>設定日起迄：</th>
+				<td colspan="3">
+					<div class="form-group">
+						<div class="input-group datebox datewidth">
+							<input type="text" id="last_sDate" name="last_sDate"
+							class="form-control"
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.last_sDate"
+							is-open="model.a"
+							datepicker-options="last_sDateOptions"
+							ng-readonly="true"
+							ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+								<i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</div>
+						<div style="float: left !important;">～</div>
+						<div class="input-group datebox datewidth">
+							<input type="text" id="last_eDate" name="last_eDate"
+							class="form-control"
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.last_eDate"
+							is-open="model.b"
+							datepicker-options="last_eDateOptions"
+							ng-readonly="true"
+							ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+								<i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>商品代碼：</th>
+				<td><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="prd_id" name="prd_id" ng-model="inputVO.prd_id" e-length-limit="16"></td>
+				<th>商品名稱：</th>
+				<td><input type="text" class="form-control" placeholder="請輸入..." id="cname" name="cname" ng-model="inputVO.cname" e-length-limit="255"></td>
+			</tr>
+			<tr>
+				<th>客戶ID：</th>
+				<td><input type="text" class="form-control" style="text-transform: uppercase;" placeholder="請輸入..." id="cust_id" name="cust_id" ng-model="inputVO.cust_id" e-length-limit="20"></td>
+				<th>狀態：</th>
+				<td>
+					<e-combobox id="status" 
+					ng-paramtype="PRD.STATUS"
+					ng-model="inputVO.status"
+   					ng-validate="false"
+   					ng-readonly="false" 
+   					ng-editable="false"
+   					ng-format="F3"
+   					ng-required="false"
+   					width="150px"
+   					style="line-height:20px;" />
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="search_box_btn text-center">
+		<div style="float: left">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="inquireInit();init()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="edit()" function-type="maintenance">新增</button>
+		</div>
+		<div style="float: right" ng-if="conDis">
+			<button type="button" class="btn btn-info" ng-click="review('Y')" function-type="confirm">核可</button>
+			<button type="button" class="btn btn-info" ng-click="review('N')" function-type="confirm">退回</button>
+		</div>
+		<div style="clear: both;"></div>
+	</div>
+	<!-- 結果區 -->
+	<h4 class="h4-title">查詢結果</h4>
+	<e-jumping-once output="outputVO" list="data" totallist="roleList"></e-jumping-once>
+	<div class="gv_tab_sc" style="white-space: nowrap;min-height:235px;overflow-x: auto;">
+		<table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data">
+			<thead>
+				<tr>
+					<th>
+						<label style="font-weight: initial;margin-bottom: 0px;" function-type="confirm">
+							<input type='checkbox' ng-model='checkVO.clickAll' ng-change='checkrow()' /> 本頁全選
+						</label>
+					</th>
+					<th>功能</th>
+					<th>序號</th>
+					<th>商品代碼</th>
+					<th>商品名稱</th>
+					<th>目前狀態</th>
+					<th>客戶ID</th>
+					<th>限價價格</th>
+					<th>通路服務費率</th>
+					<th>維護時間</th>
+				<!-- 	<th>狀態</th> -->
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="repeat-row" ng-repeat="row in data track by $index">
+					<td ng-if="row.REVIEW_STATUS == 'W' && row.CREATOR != currUser" class="td_center">
+						<label style="font-weight: initial;margin-bottom: 0px;" function-type="confirm">
+							<input type='checkbox' ng-model='row.SELECTED'>勾選
+						</label>
+					</td>
+					<td ng-if="!(row.REVIEW_STATUS == 'W' && row.CREATOR != currUser)"></td>
+					<td ng-if="row.REVIEW_STATUS == 'Y' && row.ACT_TYPE == 'D' ? true : row.REVIEW_STATUS == 'W' ? true : false"></td>
+					<td ng-if="row.REVIEW_STATUS == 'Y' && row.ACT_TYPE == 'D' ? false : row.REVIEW_STATUS == 'W' ? false : true">
+						<div function-type="maintenance">
+							<e-combobox id="cmbAction" name="cmbAction"
+							ng-datasource="row.set"
+							ng-model="row.cmbAction"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="action(row)"
+							width="100px"
+							style="line-height:20px;" />
+						</div>
+					</td>
+					<td>{{$index + 1}}</td>
+					<td>{{row.PRD_ID}}</td>
+					<td>{{row.BOND_CNAME_A}}</td>
+					<td>{{row.REVIEW_STATUS == 'Y' && row.ACT_TYPE == 'D' ? '已刪除' : row.REVIEW_STATUS == 'W' ? '覆核中' : '已覆核'}}</td>
+					<td>{{row.CUST_ID}}</td>
+					<td>{{row.LIMITED_PRICE}}</td>
+					<td>{{row.CHANNEL_FEE}}</td>
+					<td>{{toJsDate(row.LASTUPDATE) | date:'yyyy/MM/dd'}}</td>
+					<td ng-show="false">{{row.ACT_TYPE == 'A' ? '新增' : row.ACT_TYPE == 'M' ? '編輯' : '刪除'}}</td>
+					<td ng-show="false"></td> 
+					<!-- <td ng-if="row.REVIEW_STATUS == 'W'">{{row.ACT_TYPE == 'A' ? '新增' : row.ACT_TYPE == 'M' ? '編輯' : '刪除'}}</td>
+					<td ng-if="row.REVIEW_STATUS != 'W'"></td> -->
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

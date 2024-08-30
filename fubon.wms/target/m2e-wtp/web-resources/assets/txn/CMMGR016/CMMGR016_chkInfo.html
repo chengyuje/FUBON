@@ -1,0 +1,70 @@
+<form name="form.check" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+    <div class="form-group" style="padding-top: 20px;">
+        <label for="chkFileName">
+            <span ng-bind="'檔案名稱'"></span>
+            <i class="glyphicon glyphicon-info-sign" ng-click="openDateRuleUI()"></i>
+        </label>
+        <input id="chkFileName" ng-readonly="!isCreateOrUpdate" type="text"
+               class="form-control" ng-model="reportVO.chkFileName" placeholder="驗證檔名稱支援日期格式化！"
+               ng-disabled="isCreateOrUpdate && !needChk" ng-readonly="!isCreateOrUpdate" required/>
+    </div>
+
+    <div class="form-group">
+        <label ng-bind="'內容設定'" for="chkName"></label>
+    </div>
+
+    <div class="form-group">
+        <label class="sr-only" ng-bind="'內容設定'"></label>
+        <div class="col-sm-4">
+            <input id="chkName" type="text" class="form-control" placeholder="驗證名稱（右邊空白）"
+                   ng-model="reportVO.chkName" ng-readonly="!isCreateOrUpdate"
+                   ng-disabled="isCreateOrUpdate && !needChk" ng-readonly="!isCreateOrUpdate" required/>
+        </div>
+
+        <div class="col-sm-4">
+            <input type="text" class="form-control" placeholder="資料筆數（左邊補零）" readonly />
+        </div>
+
+        <div class="col-sm-4">
+            <input type="text" class="form-control" placeholder="日期格式支援日期格式化！"
+                   ng-model="reportVO.chkDateFormat" ng-readonly="!isCreateOrUpdate"
+                   ng-disabled="isCreateOrUpdate && !needChk" ng-readonly="!isCreateOrUpdate" required/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="sr-only" ng-bind="'內容寬度'"></label>
+        <div class="col-sm-4">
+            <input id="cWidth1" type="number" class="form-control" min="0" ng-readonly="!isCreateOrUpdate"
+                   ng-model="reportVO.cWidth1" placeholder="驗證名稱寬度"
+                   ng-disabled="isCreateOrUpdate && !needChk" ng-readonly="!isCreateOrUpdate" required/>
+        </div>
+        <div class="col-sm-4">
+            <input type="number" class="form-control" min="0" ng-readonly="!isCreateOrUpdate"
+                   ng-model="reportVO.cWidth2" placeholder="資料筆數寬度"
+                   ng-disabled="isCreateOrUpdate && !needChk" ng-readonly="!isCreateOrUpdate" required/>
+        </div>
+        <div class="col-sm-4">
+            <input type="number" class="form-control" min="0" ng-readonly="!isCreateOrUpdate"
+                   ng-model="reportVO.cWidth3" placeholder="日期格式寬度"
+                   ng-disabled="isCreateOrUpdate && !needChk" ng-readonly="!isCreateOrUpdate" required/>
+        </div>
+    </div>
+
+    <div ng-if="isCreateOrUpdate" class="text-center">
+        <button type="button" class="btn btn-success" ng-click="createOrUpdate()" data-toggle="tooltip" title="儲存設定～">
+            <span class="glyphicon glyphicon-floppy-disk"></span>
+            <span ng-bind="'儲存'"></span>
+        </button>
+        <button type="button" class="btn btn-default" ng-click="startChk()" data-toggle="tooltip" title="需要驗證檔～"
+                ng-show="!needChk">
+            <span class="glyphicon glyphicon-open"></span>
+            <span ng-bind="'需要'"></span>
+        </button>
+        <button type="button" class="btn btn-default" ng-click="clearChk()" data-toggle="tooltip" title="不需要驗證檔～"
+                ng-show="needChk">
+            <span class="glyphicon glyphicon-erase"></span>
+            <span ng-bind="'不需要'"></span>
+        </button>
+    </div>
+</form>

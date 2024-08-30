@@ -1,0 +1,98 @@
+<style>
+.modal-dialog.CRM3101_EXPORT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 700px;
+	height: auto;
+}
+/* table size */
+.CRM3101_EXPORT table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/CRM3101/CRM3101_EXPORT.js"></script>
+<div>
+	<div ng-controller="CRM3101_EXPORTController" ng-cloak>
+		<div class="modal-dialog CRM3101_EXPORT"> 
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">請上傳專案名單檔案</h4>
+				</div>
+	 			<div class="modal-body">
+	 				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+	 					<table>
+							<tr>
+	 							<td class="col-xs-1"></td>
+	 							<th class="col-md-3">專案名稱：</th>
+	 							<td class="col-md-7 tdpadding">
+	 								<e-combobox id="PRJ_ID" name="PRJ_ID"
+									ng-datasource="PROJNAME"
+									ng-model="inputVO.PRJ_ID"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									style="line-height:20px;" />
+	 							</td>
+	 							<td class="col-xs-1"></td>
+	 						</tr>
+	 						<tr ng-show="parameterTypeEditForm.PRJ_ID.$error.required">
+								<td class="col-xs-1"></td>
+								<th class="col-md-3"></th>
+								<th class="col-md-7 help-block with-errors">請選擇專案名稱</th>
+								<td class="col-xs-1"></td>
+							</tr>
+<!-- 							<tr ng-show="noEdit"> -->
+<!-- 								<td class="col-xs-1"></td> -->
+<!-- 								<th class="col-md-3"></th> -->
+<!-- 								<th class="col-md-7 help-block with-errors">{{STATUSMSG}}</th> -->
+<!-- 								<td class="col-xs-1"></td> -->
+<!-- 							</tr> -->
+	 						<tr>
+	 							<td class="col-xs-1"></td>
+	 							<th class="col-md-3">專案說明：</th>
+	 							<td class="col-md-7 tdpadding">
+	 								<textarea id="PRJ_NOTE" name="PRJ_NOTE" class="form-control" ng-model="inputVO.PRJ_NOTE" style="width: 100%; height: 100px" e-length-limit="500"></textarea>
+	 							</td>
+	 							<td class="col-xs-1"></td>
+	 						</tr>
+	 						<tr>
+	 							<td class="col-xs-1"></td>
+	 							<th class="col-md-3">選擇上傳檔案：</th>
+	 							<td class="col-md-7 tdpadding">
+	 								<e-upload id="csvUpload" success="uploadFinshed(name,rname)" text="上傳" accept=".csv"></e-upload>
+	 							</td>
+	 							<td class="col-xs-1"></td>
+	 						</tr>
+	 						<tr ng-show="!inputVO.fileName">
+								<td class="col-xs-1"></td>
+								<th class="col-md-3"></th>
+								<th class="col-md-7 help-block with-errors">請上傳檔案</th>
+								<td class="col-xs-1"></td>
+							</tr>
+	 					</table>
+	 				</form>
+ 				</div>
+ 					<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="insertExpt()">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+					<button type="button" class="btn btn-info" ng-click="getExample()">下載範例</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

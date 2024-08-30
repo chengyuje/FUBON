@@ -1,0 +1,156 @@
+<style>
+/* open dialog */
+.ngdialog.PMS306NOTE {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS306NOTE {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS306NOTE table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS306NOTE table.little {
+	width: 60%;
+}
+/* change row */
+.PMS306NOTE.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS306NOTE_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS306/PMS306NOTE.js"></script>
+
+
+<div class="PMS306NOTE" ng-controller="PMS306NOTEController" ng-cloak>
+	<div>
+
+		<!--Content of the panel-->
+
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">保險戰報註解 <a
+					onclick="return false" ng-click="insert()" style="text-decoration:none;"></a>
+			</div>
+		</div>
+		<!--Content of the panel-->
+
+		<div class="panel_content">
+			<table>
+				<tr>
+					<th >功能類別：</th>
+						<td>							
+							<input type="radio" ng-model="inputVO.sttType" value="note" ng-click="showType()"><label >保險戰報註解</label>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" ng-model="inputVO.sttType" value="discount" ng-click="showType()"><label>保險設定-折數</label>							
+						</td>
+				</tr>
+			</table>
+
+			<div ng-show = "inputVO.sttType == 'note'" style="height: AUTO; white-space: nowrap;">
+				<table>
+					<tr style="height: 90%">
+						<td><textarea  class="form-control" ng-model="inputVO.NOTE"
+								maxlength="1100" required style="height: 300px;"></textarea></td>
+					</tr>
+					<tr style="height: 10%">
+						<td align="center"><br />
+							<button type="button" class="btn btn-info" ng-click="save()">儲存</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+			
+			<div ng-show = "inputVO.sttType == 'discount'" style="height: AUTO; white-space: nowrap;">
+				<table>
+					<tr>
+						<th>修改日期:</th>
+						<td>
+							<div class="input-group datebox datewidth">
+								<input type="text" class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.UpDate"
+									is-open="model.a" datepicker-options="ivgStartDateOptions"
+									ng-readonly="true" ng-change="limitDate()" width="100%" />
+							<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</td>
+						<th>生效日期:</th>
+						<td>
+							{{inputVO.PARAM_ORDER}}
+						</td>
+						<th>銷量折數:</th>
+						<td>
+							<input type="text" ng-model="inputVO.DISCOUNTSALE" >
+						</td>
+						<th>手收折數:</th>
+						<td>
+							<input type="text" ng-model="inputVO.DISCOUNT" >
+						</td>
+					</tr>
+					<tr style="height: 10%">
+						<td align="center"><br />
+							<button type="button" class="btn btn-info" ng-click="saveDiscount()">儲存</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

@@ -1,0 +1,261 @@
+<style>
+/* open dialog */
+.ngdialog.PMS333 {
+
+}
+/* dialog panl */
+.modal-dialog.PMS333 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+
+
+.PMS333 table.little {
+	width: 60%;
+}
+/* change row */
+
+/* scroll && height */
+.scroll_PMS333_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS333/PMS333.js"></script>
+<script type="text/javascript" src="assets/txn/PMS333/PMS333_DETAIL.js"></script>
+<script type="text/javascript"
+	src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS333" ng-controller="PMS333Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<!-- <tr>
+
+							<th>*資料統計月份：</th>
+							<td><e-combobox id="dataMonth" name="dataMonth"
+									ng-datasource="mappingSet['timeE']" ng-model="inputVO.sCreDate"
+									ng-validate="false" ng-readonly="false" ng-required="true"
+									ng-editable="false" ng-change="limitDate();dateChange()"
+									ng-format="F3" width="150px" style="line-height:20px;" /></td>
+							<th></th>
+							<td></td>
+							<th></th>
+							<td></td>
+						</tr> -->
+						<tr>
+							<th>*業務處：</th>
+							<td><e-combobox id="region_center_id"
+									name="region_center_id" ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id" ng-validate="false"
+									ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-format="F3" ng-required="true"
+									ng-change="ChangeRegion();Region()" width="150px"
+									style="line-height:20px;" /></td>
+							<th>*營運區：</th>
+							<td><e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST" ng-model="inputVO.branch_area_id"
+									ng-validate="false" ng-disabled="disableRegionCombo"
+									ng-readonly="disableRegionCombo" ng-editable="false"
+									ng-format="F3" ng-required="true"
+									ng-change="ChangeArea();Area()" width="150px"
+									style="line-height:20px;" /></td>
+							<th>分行別：</th>
+							<td><e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr"
+									ng-validate="false"
+									ng-disabled="disableBranchCombo"
+							        ng-readonly="disableBranchCombo"
+									 ng-editable="false"
+									ng-format="F1" ng-required="true"
+									ng-change="ChangeBranch();Branch()" width="150px"
+									style="line-height:20px;" />
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()"
+					function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()"
+					ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<!-- <e-jumping output="outputVO" input="inputVO" query="inquire()"
+				list="paramList"></e-jumping> -->
+			<div algin="left">
+				<table>
+					<tr>
+						<td>產出頻率：</td>
+						<td>即時統計</td>
+					</tr>
+					<!-- <tr>
+						<td>產出日：</td>
+						<td>{{toJsDate(paramList[0].CDATE) | date:'yyyy/MM/dd'}}</td>
+
+					</tr> -->
+				</table>
+			</div>
+
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table class="e-table-freeze" e-top="true" e-height="500px" e-mode="1" e-list="paramList">
+					<thead>
+						<tr>
+							<TH rowspan="2">業務處</TH>
+							<TH rowspan="2">營運區</TH>
+							<TH rowspan="2">分行名稱</TH>
+							<!-- TH colspan="5">未掛code<br />客戶數
+							</TH> -->
+							<TH colspan="6">主管未派客戶數</TH>
+
+						</tr>
+						<tr>
+							<TH>客戶分級</TH>
+							<!-- <TH>私人銀行理財</TH>
+							<TH>白金理財</TH>
+							<TH>個人理財</TH> -->
+							<TH>恆富理財會員</TH>
+							<TH>智富理財會員</TH>
+							<TH>穩富理財會員</TH>
+							<TH>一般存戶-跨優</TH>
+							<TH>合計</TH>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							ng-repeat-start=" (a,dataA) in paramList | filter:filter2 | groupBy: 'REGION_CENTER_NAME' as resultA">
+							<td align="center" rowspan="{{  dataA.length + numGroups(resultB)*2 + 1 }}">{{ a }}</td>
+						</tr>
+						<tr
+							ng-repeat-start=" (b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+							<td align="center" rowspan="{{ dataB.length + 1 }}">{{b}}</td>
+						</tr>
+						<!-- <tr ng-repeat=" row in dataB">
+							<td align="center" ng-show="$index%6==0" rowspan="6">{{row.BRANCH_NAME}}</td>
+							<td align="center">{{row.CON_DEGREE}}</td>
+							<td align="right"><a href="#" onclick="return false"
+								ng-click="detail(1,row)">{{0+row.V_CNT |
+								number:0}}</a></td>
+							<td align="right"><a href="#" onclick="return false"
+								ng-click="detail(2,row)">{{0+row.A_CNT |
+								number:0}}</a></td>
+							<td align="right"><a href="#" onclick="return false"
+								ng-click="detail(3,row)">{{0+row.B_CNT |
+								number:0}}</a></td>
+							<td align="right"><a href="#" onclick="return false"
+								ng-click="detail(4,row)">{{0+row.V_CNT+row.A_CNT+row.B_CNT |
+								number:0}}</a></td>
+						</tr> -->
+						<tr ng-repeat=" row in dataB">
+							<td align="center" ng-show="$index%6==0" rowspan="6">{{row.BRANCH_NAME}}</td>
+							<td align="center">{{row.CON_DEGREE}}</td>
+							<td align="right"><a href="#" onclick="return false"
+								ng-click="detail(1,row)">{{0+row.H_CNT | number:0}}</a></td>
+							<td align="right"><a href="#" onclick="return false"
+								ng-click="detail(2,row)">{{0+row.T_CNT | number:0}}</a></td>
+							<td align="right"><a href="#" onclick="return false"
+								ng-click="detail(3,row)">{{0+row.K_CNT | number:0}}</a></td>
+							<td align="right"><a href="#" onclick="return false"
+								ng-click="detail(3,row)">{{0+row.C_CNT | number:0}}</a></td>
+							<td align="right"><a href="#" onclick="return false"
+								ng-click="detail(4,row)">{{0+row.H_CNT+row.T_CNT+row.K_CNT+row.C_CNT | number:0}}</a></td>
+						</tr>
+						<!-- <tr ng-repeat-end="" ng-hide="inputVO.branch_nbr!=''">
+								<td align="center" colspan="3" align="center">{{b}} 合計</td>
+								<td align="right">{{0 + getSum(dataB, 'V_CNT') | number:0}}</td>
+								<td align="right">{{0 + getSum(dataB, 'A_CNT') | number:0}}</td>
+								<td align="right">{{0 + getSum(dataB, 'B_CNT') | number:0}}</td>
+								<td align="right">{{0 + getSum(dataB, 'V_CNT') + getSum(dataB, 'A_CNT') + getSum(dataB, 'B_CNT') | number:0}}</td>
+						</tr> -->
+						<tr ng-repeat-end="" ng-hide="inputVO.branch_nbr!=''">
+								<td align="center" colspan="3" align="center">{{b}} 合計</td>
+								<td align="right">{{0 + getSum(dataB, 'H_CNT') | number:0}}</td>
+								<td align="right">{{0 + getSum(dataB, 'T_CNT') | number:0}}</td>
+								<td align="right">{{0 + getSum(dataB, 'C_CNT') | number:0}}</td>
+								<td align="right">{{0 + getSum(dataB, 'K_CNT') | number:0}}</td>
+								<td align="right">{{0 + getSum(dataB, 'H_CNT') + getSum(dataB, 'T_CNT') + getSum(dataB, 'C_CNT') + getSum(dataB, 'K_CNT') | number:0}}</td>
+						</tr>
+						<!-- <tr ng-repeat-end="" ng-hide="inputVO.branch_nbr!=''">
+								<td align="center" colspan="4" align="center">{{ a }} 總計</td>
+								<td align="right">{{0+getSum(dataA, 'V_CNT') | number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'A_CNT') | number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'B_CNT') | number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'V_CNT') + getSum(dataA, 'A_CNT') + getSum(dataA, 'B_CNT') | number:0}}</td>
+						</tr> -->
+						<tr ng-repeat-end="" ng-hide="inputVO.branch_nbr!=''">
+								<td align="center" colspan="4" align="center">{{ a }} 總計</td>
+								<td align="right">{{0+getSum(dataA, 'H_CNT') | number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'T_CNT') | number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'C_CNT') | number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'K_CNT') | number:0}}</td>
+								<td align="right">{{0+getSum(dataA, 'H_CNT') + getSum(dataA, 'T_CNT') + getSum(dataA, 'C_CNT') + getSum(dataA, 'K_CNT') | number:0}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div>
+				<table>
+					<tr>
+						<td>說明：</td>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

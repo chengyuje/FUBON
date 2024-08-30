@@ -1,0 +1,155 @@
+<style>
+
+/* dialog panl */
+.modal-dialog.CUS160 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1280px;
+	height: auto;
+}
+
+</style>
+<div ng-controller="CUS160_ADDController" ng-cloak>
+	<div class="modal-dialog CUS160">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">新增待辦事項</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table width="100%">
+						<tr>
+							<th class="col-md-2">客戶ID：</th>
+							<td class="col-md-4 tdpadding">
+								<input class="form-control" ng-disabled="custID != undefined" type="text" placeholder="請輸入..." 
+								id="custID" name="custID" 
+								style="text-transform:uppercase;width:150px"
+								ng-model="inputVO.custID" 
+								ng-blur="queryCustData()" 
+								e-length-limit="16" >
+							</td>
+							<th class="col-md-2">客戶姓名：</th>
+							<td class="col-md-4 tdpadding"><input class="form-control" type="text" placeholder="請輸入..." id="custName" name="custName" ng-model="inputVO.custName" e-length-limit="18" disabled></td>
+						</tr>
+						<tr>
+							<th class="col-md-2">提醒日期：</th>
+							<td class="col-md-4 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="sDate" name="sDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sDate"
+										is-open="model.a"
+										datepicker-options="startDateOptions"
+										ng-readonly="true" required/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<th class="col-md-2">提醒類別：</th>
+							<td class="col-md-4 tdpadding">
+								<e-combobox id="taskSource" name="taskSource" 
+								ng-datasource="mappingSet['CAM.TASK_SOURCE']"
+								ng-model="inputVO.taskSource"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="250px"
+								style="line-height:20px;"/>
+							</td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.sDate.$error.required || parameterTypeEditForm.taskSource.$error.required">
+							<th class="col-md-2"></th>
+							<td class="col-md-4 help-block with-errors"><div ng-show="parameterTypeEditForm.sDate.$error.required">請選擇提醒日期</div></td>
+							<th class="col-md-2"></th>
+							<td class="col-md-4 help-block with-errors"><div ng-show="parameterTypeEditForm.taskSource.$error.required">請選擇提醒類別</div></td>
+						</tr>
+						<tr>
+							<th class="col-md-2">提醒時間：</th>
+							<td class="col-md-10 tdpadding" colspan="3">
+								<e-combobox id="sHour" name="sHour"
+								ng-datasource="mappingSet['hour']"
+								ng-model="inputVO.sHour"
+		   						ng-validate="false" 
+		   						ng-readonly="false" 
+		   						ng-editable="false"
+		   						ng-format="F3"
+		   						ng-required="false"
+		   						width="100px"
+		   						height="30px"
+		   						style="line-height:20px;"/>
+						   		：
+						   		<e-combobox id="sMinute" name="sMinute"
+								ng-datasource="mappingSet['minute']"
+								ng-model="inputVO.sMinute"
+		   						ng-validate="false" 
+		   						ng-readonly="false" 
+		   						ng-editable="false"
+		   						ng-format="F3"
+		   						ng-required="false"
+		   						width="100px"
+		   						height="30px"
+		   						style="line-height:20px;"/>
+						   		~
+						   		<e-combobox id="eHour" name="eHour"
+								ng-datasource="mappingSet['hour']"
+								ng-model="inputVO.eHour"
+		   						ng-validate="false" 
+		   						ng-readonly="false" 
+		   						ng-editable="false"
+		   						ng-format="F3"
+		   						ng-required="false"
+		   						width="100px"
+		   						height="30px"
+		   						style="line-height:20px;"/>
+						   		：
+						   		<e-combobox id="eMinute" name="eMinute"
+								ng-datasource="mappingSet['minute']"
+								ng-model="inputVO.eMinute"
+		   						ng-validate="false" 
+		   						ng-readonly="false" 
+		   						ng-editable="false"
+		   						ng-format="F3"
+		   						ng-required="false"
+		   						width="100px"
+		   						height="30px"
+		   						style="line-height:20px;"/>
+							</td>
+						</tr>
+						<tr ng-show="inputVO.sHour > inputVO.eHour">
+							<th class="col-md-2"></th>
+							<td class="col-md-10 help-block with-errors" colspan="3">時間起迄有誤</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">名稱：</th>
+							<td class="col-md-10 tdpadding" colspan="3"><input class="form-control" type="text" placeholder="請輸入..." id="taskTitle" name="taskTitle" ng-model="inputVO.taskTitle" e-length-limit="150" required></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.taskTitle.$error.required">
+							<th class="col-md-2"></th>
+							<td class="col-md-10 help-block with-errors" colspan="3">請輸入名稱</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">內容：</th>
+							<td class="col-md-10 tdpadding" colspan="3">
+								<textarea id="taskMemo" name="taskMemo" class="form-control" ng-model="inputVO.taskMemo" style="width: 100%; height: 100px" e-length-limit="1000"></textarea>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="save()">確定</button>
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+		</div>
+	</div>
+</div>

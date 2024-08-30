@@ -1,0 +1,136 @@
+<style>
+/* dialog panl */
+.modal-dialog.MGM115_applyGift {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+
+.MGM115_applyGift .table tr th {
+	background: #efefef;
+	color: black;
+	font-weight: bold;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/MGM115/MGM115_applyGift.js"></script>
+<div ng-controller="MGM115_applyGiftController" ng-cloak>
+	<div class="modal-dialog MGM115_applyGift">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">禮贈品兌換申請</h4>
+			</div>
+			<div class="modal-body">
+				<table class="table table-bordered" style="margin-top: 20px">
+					<tr>
+						<th width="15%">活動名稱：</th>
+						<td colspan="5">{{act_name}}</td>
+					</tr>
+					<tr>
+						<th width="15%">分行代碼：</th>
+						<td>{{bra_nbr}}</td>
+						<th width="15%">AO Code：</th>
+						<td>{{ao_code}}</td>
+						<th width="15%">理專姓名：</th>
+						<td>{{emp_name}}</td>
+					</tr>
+					<tr>
+						<th>客戶ID：</th>
+						<td>{{inputVO.cust_id}}</td>
+						<th>客戶姓名：</th>
+						<td>{{cust_name}}</td>
+						<th ng-show="inputVO.act_type == 'M'">未兌換點數：</th>
+						<th ng-show="inputVO.act_type == 'V'">未兌換金額：</th>
+						<td>{{inputVO.remain | number:0}}</td>
+					</tr>
+					<tr>
+						<th>贈品性質：</th>
+						<td colspan="5">
+							<label ng-repeat="row in mappingSet['MGM.GIFT_KIND'] | limitTo:displayLimit track by $index">
+								<input class="bigspace;" type="radio" 
+									ng-model="inputVO.gift_kind" 
+									ng-value="row.DATA"
+									ng-change="changeGiftKind()">{{row.LABEL}} 
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							</label>
+						</td>
+					</tr>
+<!-- 					<tr> -->
+<!-- 						<th>收件人姓名：</th> -->
+<!-- 						<td colspan="5">{{inputVO.rec_name}}</td> -->
+<!-- 					</tr> -->
+<!-- 					<tr> -->
+<!-- 						<th>收件人電話：</th> -->
+<!-- 						<td colspan="5" ng-show="inputVO.gift_get_way != '1'">{{inputVO.rec_tel_no}}</td> -->
+<!-- 						<td colspan="5" ng-show="inputVO.gift_get_way == '1'"> -->
+<!-- 							<input style="width: 150px" type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.rec_tel_no"> -->
+<!-- 						</td> -->
+<!-- 					</tr> -->
+<!-- 					<tr> -->
+<!-- 						<th>收件人手機：</th> -->
+<!-- 						<td colspan="5" ng-show="inputVO.gift_get_way != '1'">{{inputVO.rec_mobile_no}}</td> -->
+<!-- 						<td colspan="5" ng-show="inputVO.gift_get_way == '1'"> -->
+<!-- 							<input style="width: 150px" type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.rec_mobile_no"> -->
+<!-- 						</td> -->
+<!-- 					</tr> -->
+<!-- 					<tr> -->
+<!-- 						<th>郵寄地址：</th> -->
+<!-- 						<td colspan="5">{{inputVO.address}}</td> -->
+<!-- 					</tr> -->
+					<tr style="border: 2px solid red;">
+						<th style="color: red;">贈品兌換<br/>注意事項：</th>
+						<td colspan="5" style="color: red; font-weight: bold;">
+							兌換贈品為「旺紅包」者，請務必確認推薦人已成功綁定 M+且能夠收受旺紅包，旺紅包一經發送則不可退回，理專兌換時請留意，以免損及客戶權益。
+						</td>
+					</tr>
+				</table>
+				
+				<div class="ejborder">
+					<e-jumping-once output="outputVO" list="data" totallist="giftList"></e-jumping-once>	
+				</div>					
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap; ">
+					<!-- MGM -->
+					<table>
+						<thead>
+							<tr>
+								<th>選取</th>
+								<th>贈品代碼</th>
+								<th>贈品名稱</th>
+								<th>贈品性質</th>
+								<th>贈品點數</th>
+<!-- 							<th ng-show="inputVO.act_type == 'V'">贈品兌換單位</th> -->
+								<th>庫存量</th>
+								<th>兌換數量</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in data">
+								<td align="center">
+									<input type="checkbox" ng-init="row.ADD = false" ng-model="row.ADD"/>
+								</td>
+								<td>{{row.GIFT_SEQ}}</td>
+								<td>{{row.GIFT_NAME}}</td>
+								<td>{{row.GIFT_KIND | mapping:mappingSet['MGM.GIFT_KIND']:'F3'}}</td>
+								<td align="right">{{row.GIFT_EXC_UNI}}</td>
+								<td align="right">{{row.GIFT_REMAINING}}</td>
+								<td class="col-xs-2"><input type="text" class="form-control" placeholder="請輸入..." e-input-limit="NN" ng-model="row.APPLY_NUMBER"></td>
+							</tr>
+						</tbody>
+					</table>
+					<br/>
+					<div class="search_box_btn text-center">
+		            	<button type="button" class="btn btn-info" ng-click="apply()">確認兌換</button>
+		            	<button type="button" class="btn btn-info" ng-click="init()">重新輸入</button>
+		                <button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">取消</button>
+		            </div>
+				</div>
+				
+	     	</div>
+		</div>
+	</div>
+</div>

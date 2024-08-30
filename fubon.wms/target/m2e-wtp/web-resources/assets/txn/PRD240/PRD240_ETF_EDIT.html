@@ -1,0 +1,178 @@
+<style>
+
+</style>
+<div ng-controller="PRD240_ETF_EDITController" ng-cloak>
+	<div class="modal-dialog PRD240_ETF">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.PRD_ID == null ? '新增' : '編輯'}}ETF</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*ETF代碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_id" name="prd_id" class="form-control" ng-model="inputVO.prd_id" ng-blur="checkID()" ng-disabled="row.PRD_ID != null" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.prd_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入ETF代碼</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="!canEdit">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">{{errMsg | i18n:[' ']}}</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">ETF名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="etf_name" name="etf_name" class="form-control" ng-model="inputVO.etf_name" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">CNR分配率：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="yield" name="yield" class="form-control" ng-model="inputVO.yield" e-length-limit="4" e-length-type="ND" e-input-limit="ND"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">CNR加減碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="cnr_mult" name="cnr_mult" class="form-control" ng-model="inputVO.cnr_mult" e-length-limit="4" e-length-type="ND" e-input-limit="ND"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">加碼區間起迄日：</th>
+							<td class="col-md-7 tdpadding">
+								<div class="input-group datebox datewidth">
+									<input type="text" id="multi_sDate" name="multi_sDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.multi_sDate"
+									is-open="model.a"
+									datepicker-options="multi_sDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input type="text" id="multi_eDate" name="multi_eDate"
+									class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.multi_eDate"
+									is-open="model.b"
+									datepicker-options="multi_eDateOptions"
+									ng-readonly="true"
+									ng-change="limitDate()"/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">投資標的(市場別)：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="inv_target" name="inv_target"
+								ng-datasource="MKT_TIER3"
+								ng-model="inputVO.inv_target"
+								ng-validate="false"
+								ng-disabled="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="false"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">*股債類型：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="stock_bond_type" name="stock_bond_type"
+								ng-paramtype="FPS.STOCK_BOND_TYPE"
+								ng-model="inputVO.stock_bond_type"
+			  					ng-validate="false"
+			  					ng-readonly="false"
+			  					ng-editable="false"
+			  					ng-format="F3"
+			  					ng-required="false"
+			  					style="line-height:20px;" 
+			  					required/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.stock_bond_type=='' || inputVO.stock_bond_type==undefined">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入股債類型</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">專案：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="project"
+					ng-paramtype="PRD.ETF_PROJECT"
+					ng-model="inputVO.etf_project"
+  					ng-validate="false"
+  					ng-readonly="false" 
+  					ng-editable="false"
+  					ng-format="F3"
+  					ng-required="false"
+  					width="150px"
+  					multiple="true"
+  					separator=";"
+			  		label-separator="；"
+  					style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">客群：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="customer_level"
+					ng-paramtype="PRD.ETF_CUSTOMER_LEVEL"
+					ng-model="inputVO.etf_customer_level"
+  					ng-validate="false"
+  					ng-readonly="false" 
+  					ng-editable="false"
+  					ng-format="F3"
+  					ng-required="false"
+  					width="150px"
+  					multiple="true"
+  					separator=";"
+			  		label-separator="；"
+  					style="line-height:20px;" />
+							</td>	
+							<td class="col-xs-1"></td>
+						</tr>
+
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

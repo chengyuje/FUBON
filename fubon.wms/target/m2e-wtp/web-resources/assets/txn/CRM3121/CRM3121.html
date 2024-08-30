@@ -1,0 +1,183 @@
+<style>
+
+.form-control-CRM3121 {
+    padding: 4px 10px;
+    font-size: 16px;
+    color: #666666;
+    background-color: #f4f4f4;
+    border: 1px solid #999999;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-transition: none;
+    -o-transition: none;
+    transition: none;
+	-webkit-border-radius: 0px;
+	-moz-border-radius:0px;
+	border-radius:0px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM3121/CRM3121.js"></script>
+<script type="text/javascript" src="assets/txn/CRM3121/CRM3121_DETAIL.js"></script>
+
+<div ng-controller="CRM3121Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >請輸入查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box">
+				<table>
+     				<tr>
+     					<th>業務處：</th>
+     					<td>
+     						<e-combobox id="region_center_id" name="region_center_id"
+							ng-datasource="REGION_LIST"
+							ng-model="inputVO.region_center_id"
+							ng-validate="false" 
+							ng-disabled="AVAIL_REGION.length == 1"
+							ng-readonly="AVAIL_REGION.length == 1" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="ChangeRegion(test)"
+							width="180px"
+							style="line-height:20px;" />
+     					</td>
+     					<th>營運區：</th>
+     					<td>
+     						<e-combobox id="branch_area_id" name="branch_area_id"
+							ng-datasource="AREA_LIST"
+							ng-model="inputVO.branch_area_id"
+							ng-validate="false" 
+							ng-disabled="AVAIL_AREA.length == 1"
+							ng-readonly="AVAIL_AREA.length == 1" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="ChangeArea(test)"
+							width="180px"
+							style="line-height:20px;" />
+     					</td>
+     					<th>分行：</th>
+     					<td>
+     						<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-disabled="AVAIL_BRANCH.length == 1"
+							ng-readonly="AVAIL_BRANCH.length == 1" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeBranch(test)"
+							width="180px"
+							style="line-height:20px;" />
+     					</td>
+     				</tr>
+     				<tr>
+     					<th>新理專：</th>
+     					<td>
+     						<e-combobox id="new_ao_code" name="new_ao_code"
+							ng-datasource="AO_LIST"
+							ng-model="inputVO.new_ao_code"
+							ng-validate="false"
+							ng-disabled="AVAIL_AO_CODE.length == 1"
+							ng-readonly="AVAIL_AO_CODE.length == 1" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeAo_code(test)"
+							width="180px"
+							style="line-height:20px;" />
+     					</td>
+     					<th>限辦日期起迄：</th>
+     					<td colspan ="2">
+     					<div>
+							<input type="text" id="limit_s_date" name="limit_s_date"
+							class="form-control-CRM3121" 
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.limit_s_date" 
+							is-open="model.a"
+							datepicker-options="limit_s_dateOptions" 
+							ng-readonly="true"
+							ng-change="limitDate()" 
+							size = "13"/>
+							<!-- 製作日曆button -->
+							<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+							<i class="glyphicon glyphicon-calendar"></i>
+							</button>
+					
+							<label>&nbsp ~ &nbsp</label>
+					
+							<input type="text" id="limit_e_date" name="limit_e_date"
+							class="form-control-CRM3121" 
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.limit_e_date" 
+							is-open="model.b"
+							datepicker-options="limit_e_dateOptions" 
+							ng-readonly="true"
+							ng-change="limitDate()" 
+							size = "13"/>
+							<!-- 製作日曆button -->
+							<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+							<i class="glyphicon glyphicon-calendar"></i>
+							</button>
+						</div>
+     					</td>
+     				</tr>
+				</table>
+			</div>
+
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();inquire();">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()" list="resultList"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>項次</th>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>分行名稱</th>
+							<th>新理專</th>
+							<th>未完成客戶數</th>
+							<th>E級完成率</th>
+							<th>I級完成率</th>
+							<th>P級完成率</th>
+							<th>O級完成率</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{$index+1}}</td>
+							<td>{{row.REGION_CENTER_NAME}}</td>
+							<td>{{row.BRANCH_AREA_NAME}}</td>
+							<td>{{row.BRANCH_NAME}}</td>
+							<td>{{row.NEW_AO_NAME}}</td>
+							<td><a ng-click="detail(row)">{{(row.E_TTL_CNT + row.I_TTL_CNT + row.P_TTL_CNT + row.O_TTL_CNT) - (row.E_CMP_CNT + row.I_CMP_CNT + row.O_CMP_CNT + row.P_CMP_CNT)}}</a></td>
+							<td>{{row.E_CMP_CNT / row.E_TTL_CNT * 100 || 0}}%</td>
+							<td>{{row.I_CMP_CNT / row.I_TTL_CNT * 100 || 0}}%</td>
+							<td>{{row.P_CMP_CNT / row.P_TTL_CNT * 100 || 0}}%</td>
+							<td>{{row.O_CMP_CNT / row.O_TTL_CNT * 100 || 0}}%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

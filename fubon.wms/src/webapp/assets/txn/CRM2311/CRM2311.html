@@ -1,0 +1,288 @@
+<style>
+.form-control-CRM2311 {
+    padding: 4px 10px;
+    font-size: 16px;
+    color: #666666;
+    background-color: #f4f4f4;
+    border: 1px solid #999999;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-transition: none;
+    -o-transition: none;
+    transition: none;
+	-webkit-border-radius: 0px;
+	-moz-border-radius:0px;
+	border-radius:0px;
+}
+.formatWidth{
+	width:150px !important;
+	float: left !important;
+}
+.datewidthByClass{
+	width:150px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM2311/CRM2311.js"></script>
+<script type="text/javascript" src="assets/txn/CRM230/CRM230.js"></script>
+<div ng-controller="CRM2311Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div ng-include="'assets/txn/CRM230/CRM230_COMMON.html'"></div>
+			<div class="search_table search_box3">
+				<hr>
+				<h4>消金商品</h4>
+				<table>
+     				<tr>
+     					<th width = "10%">負債類型：</th>
+     					<td width = "40%" >
+    						<e-combobox id="debit_type" 
+										ng-paramtype="CRM.DEBIT_TYPE"
+										ng-model="inputVO.debit_type"
+			   							ng-validate="false" 
+			   							ng-readonly="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
+     					</td>
+     					<th width="10%">幣別：</th>
+                        <td width="40%">
+                            <e-combobox id="currency_id" name="currency_id" 
+                            			ng-paramtype="FPS.CURRENCY" 
+                            			ng-model="inputVO.currency_id" 
+                            			ng-validate="false"
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3"
+                            			ng-required="false"
+                            			width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
+                        </td>
+                        <th></th>
+                        <td></td>
+  			  		</tr>
+	
+     				<tr>
+     					<th>原貸/訂約金額：</th>
+     					<td>
+     						<div class="form-group">
+			     				<div class="formatWidth">
+				     				<input 	type="text" class="form-control" 
+		     								placeholder="請輸入..."
+		     								e-input-limit="NUU" 
+		     								nuu1="10" 
+		     								nuu2="2" 
+		     								id="ori_amt_min" name="ori_amt_min" 
+		     								ng-model="inputVO.ori_amt_min" >
+			     				</div>
+			     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth">
+				     				<input 	type="text" class="form-control" 
+		     								placeholder="請輸入..."
+		     								e-input-limit="NUU" 
+		     								nuu1="10" 
+		     								nuu2="2" 
+		     								id="ori_amt_max" name="ori_amt_max" 
+		     								ng-model="inputVO.ori_amt_max">
+			     				</div>
+			     			</div>
+     					</td>
+     					<th>餘額/透支金額：</th>
+     					<td>
+     						<div class="form-group">
+			     				<div class="formatWidth">
+				     				<input 	type="text" class="form-control" 
+		     								placeholder="請輸入..."
+		     								e-input-limit="NUU" 
+		     								nuu1="10" 
+		     								nuu2="2" 
+		     								id="loan_bal_min" name="loan_bal_min" 
+		     								ng-model="inputVO.loan_bal_min" >
+			     				</div>
+			     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth">
+				     				<input 	type="text" class="form-control" 
+		     								placeholder="請輸入..."
+		     								e-input-limit="NUU" 
+		     								nuu1="10" 
+		     								nuu2="2" 
+		     								id="loan_bal_max" name="loan_bal_max" 
+		     								ng-model="inputVO.loan_bal_max">
+			     				</div>
+			     			</div>
+     					</td>
+     				</tr>	
+     				<tr>
+     					<th>適用利率：</th>
+     					<td>
+     						<div class="form-group">
+			     				<div class="formatWidth">
+				     				<input 	type="text" class="form-control" 
+		     								placeholder="請輸入..."
+		     								e-input-limit="NUU" 
+		     								nuu1="3" 
+		     								nuu2="2" 
+		     								id="int_rate_min" name="int_rate_min" 
+		     								ng-model="inputVO.int_rate_min" >	
+			     				</div>
+			     				<div style="float: left !important;">%&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth">
+				     				<input 	type="text" class="form-control" 
+		     								placeholder="請輸入..."
+		     								e-input-limit="NUU" 
+		     								nuu1="3" 
+		     								nuu2="2" 
+		     								id="int_rate_max" name="int_rate_max" 
+		     								ng-model="inputVO.int_rate_max">
+			     				</div>
+			     				<div style="float: left !important;">%</div>
+			     			</div>
+     					</td>
+     					<th>到期日：</th>
+    			 		<td>
+    			 			<div class="form-inline">
+		     					<div class="input-group datebox datewidthByClass">
+                                  	<input type="text" id="due_sDate" name="due_sDate"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.due_sDate"
+										   is-open="model.c"
+										   datepicker-options="due_sDateOptions"
+										   ng-readonly="true"								
+										   ng-change="limitDate()"/>
+                                   <span class="input-group-btn">
+                                       <button type="button" class="btn btn-default" ng-click="open($event,'c')">
+                                           <i class="glyphicon glyphicon-calendar"></i>
+                                       </button>
+                                   </span>
+                                </div>
+			     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+								<div class="input-group datebox datewidthByClass">
+                                    <input type="text" id="due_eDate" name="due_eDate"
+										   class="form-control"
+										   uib-datepicker-popup="yyyy/MM/dd"
+										   ng-model="inputVO.due_eDate"
+										   is-open="model.d"
+										   datepicker-options="due_eDateOptions"
+										   ng-readonly="true"								
+										   ng-change="limitDate()"/>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" ng-click="open($event,'d')">
+                                            <i class="glyphicon glyphicon-calendar"></i></button>
+                                    </span>
+                                </div>
+			     			</div>
+     					</td>
+     				</tr>
+     				<tr>
+     					<th>擔保維持率：</th>
+     					<td>
+     						<div class="form-group">
+			     				<div class="formatWidth">
+				     				<input 	type="text" class="form-control" 
+		     								placeholder="請輸入..."
+		     								e-input-limit="NUU" 
+		     								nuu1="3" 
+		     								nuu2="2" 
+		     								id="retention_rate_min" name="retention_rate_min" 
+		     								ng-model="inputVO.retention_rate_min" >
+			     				</div>
+			     				<div style="float: left !important;">%&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth">
+				     				<input 	type="text" class="form-control" 
+		     								placeholder="請輸入..."
+		     								e-input-limit="NUU" 
+		     								nuu1="3" 
+		     								nuu2="2" 
+		     								id="retention_rate_max" name="retention_rate_max" 
+		     								ng-model="inputVO.retention_rate_max">
+			     				</div>
+			     				<div style="float: left !important;">%</div>
+			     			</div>
+     					</td>
+     				</tr>
+				</table>
+			</div>
+
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit(); inquire();" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="clearAll();init();">清除</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<!-- 分頁 -->
+			<uib-tabset active="0" justified="true">
+			
+				<uib-tab index="0" heading="客戶資訊">
+					<!-- 新增待辦 -->
+					<div ng-include="'assets/txn/CRM230/CRM230_INVESTTAB.html'"></div>
+					<!-- 客戶資訊 -->
+					<div ng-include="'assets/txn/CRM230/CRM230_CUSTTAB.html'"></div>
+				</uib-tab>			
+			
+				<uib-tab index="1" heading="貸款資訊">
+					<e-jumping-once output="outputVO" list="resultListData" totallist="resultList"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table class="e-table-freeze" e-height="450px" e-left="3" e-list="resultListData" e-mode="1" e-top="true">
+							<thead>
+								<tr>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="DEBIT_TYPE" e-query="inquire()">負債類型</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="inquire()">客戶ID</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="inquire()">客戶姓名</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="LOAN_ACCT" e-query="inquire()">貸款帳號</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CURRENCY_ID" e-query="inquire()">幣別</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="ORI_AMT" e-query="inquire()">原貸金額/</br>訂約金額</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="LOAN_BAL" e-query="inquire()">貸款餘額/</br>已透支金額</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INT_RATE" e-query="inquire()">適用</br>利率(%)</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="DUE_DATE" e-query="inquire()">到期日</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CD_ACCT" e-query="inquire()">定存帳號</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CD_SLIP_NO" e-query="inquire()">存單</br>號碼</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="RETENTION_RATE" e-query="inquire()">擔保</br>維持率(%)</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="WITHHOLDING_ACCT" e-query="inquire()">自動扣</br>繳帳號</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="SEMESTER" e-query="inquire()">學期別</e-sorter></th>
+									<th><e-sorter e-input="inputVO" e-mode="auto" e-col="LIB_REMARK" e-query="inquire()">備註</e-sorter></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in resultListData | limitTo:displayLimit track by $index">
+									<td>{{row.DEBIT_TYPE | mapping:mappingSet['CRM.DEBIT_TYPE']:'F3'}}</td>  					<!-- 負債類型 -->
+									<td><a href="" onclick="return false" ng-click="goCRM610(row)" >{{row.CUST_ID}}</a></td>	<!-- 客戶ID -->
+									<td>{{row.CUST_NAME}}</td>  																<!-- 客戶姓名 -->
+									<td>{{row.LOAN_ACCT}}</td>   																<!-- 貸款帳號 -->
+									<td>{{row.CURRENCY_ID | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td> 						<!-- 幣別 -->
+									<td align = "right">{{row.ORI_AMT | number : 2}}</td>   									<!-- 原貸金額/訂約金額 -->
+									<td align = "right">{{row.LOAN_BAL | number : 2}}</td>   									<!-- 貸款餘額/已透支金額 -->
+									<td align = "right">{{row.INT_RATE}}</td>   												<!-- 適用利率 -->
+									<td>{{toJsDate(row.DUE_DATE) | date: "yyyy/MM/dd"}}</td>  									<!-- 到期日 -->
+									<td>{{row.CD_ACCT}}</td>   																	<!-- 定存帳號 -->
+									<td>{{row.CD_SLIP_NO}}</td>   																<!-- 存單號碼 -->
+									<td align = "right">{{row.RETENTION_RATE}}</td>   											<!-- 擔保維持率 -->
+									<td>{{row.WITHHOLDING_ACCT}}</td>   														<!-- 自動扣繳帳號 -->
+									<td>{{row.SEMESTER}}</td>   																<!-- 學期別 -->
+									<td>{{row.LIB_REMARK}}</td>   																<!-- 備註 -->
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</uib-tab>
+			</uib-tabset>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

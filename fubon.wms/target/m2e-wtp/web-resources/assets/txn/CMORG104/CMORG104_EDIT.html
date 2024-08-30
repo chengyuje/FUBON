@@ -1,0 +1,192 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<div>
+	<div ng-controller="CMORG104_EditController" ng-cloak>
+		<div class="modal-dialog CMORG104">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">{{isUpdate ? '編輯' : '新增'}}代理人</h4>
+					<div class="dialog-error-message" align="center">{{errorMessage}}</div>
+				</div>
+				<div class="modal-body">
+					<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+						<table>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-2">被代理人：</th>
+								<td class="col-md-8 tdpadding" colspan="2">
+									<b>區域：</b>
+									{{empData.AREA}}&nbsp;&nbsp;
+									<b>分行：</b>
+									{{empData.BRANCH_ID}} - {{empData.BRANCH_NAME}}&nbsp;&nbsp;
+									<b>員工姓名：</b>
+									{{empData.EMP_NAME}}
+								</td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-2">代理人：</th>
+								<td class="col-md-8 tdpadding" colspan="2"></td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-2"><input type="radio" ng-model="rdgType" value="1" ng-change="typeChange(rdgType)" ng-disabled="rdgDisabled" >組織選取：</th>
+								<td class="col-md-8 tdpadding" colspan="2">
+									區域：
+									<e-combobox id="cmbArea" name="cmbArea" ng-disabled="eComboDisabled" 
+									ng-datasource="mappingSet['areasDesc']"
+									ng-model="inputVO.cmbArea"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="genBranch();genEmp()"
+									width="100px"
+									style="line-height:20px;" />
+									分行：
+									<e-combobox id="cmbBranch" name="cmbBranch" ng-disabled="eComboDisabled" 
+									ng-datasource="mappingSet['branchsDesc']"
+									ng-model="inputVO.cmbBranch"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="genEmp()"
+									width="170px"
+									style="line-height:20px;" />
+									代理人：
+									<e-combobox id="cmbEmp" name="cmbEmp" ng-disabled="eComboDisabled" 
+									ng-datasource="mappingSet['empsDesc']"
+									ng-model="inputVO.cmbEmp"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									width="150px"
+									style="line-height:20px;" />
+								</td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-2"><input type="radio" ng-model="rdgType" value="2" ng-change="typeChange(rdgType)" ng-disabled="rdgDisabled" >員工編號：</th>
+								<td class="col-md-8 tdpadding" colspan="2"><input style="width:80%;display:inline;" class="form-control" type="text" placeholder="請輸入..." id="tipEmpID" name="tipEmpID" ng-blur="getName()" ng-model="inputVO.tipEmpID" ng-disabled="empIDDisabled" >&nbsp;&nbsp;{{empData2.EMP_NAME}}</td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-2">代理起始時間：</th>
+								<td class="col-md-3 tdpadding">
+									<div class="input-group datebox">
+										<input type="text" id="sDate" name="sDate"
+										class="form-control"
+										datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.sDate"
+										is-open="opened1"
+										min-date="minDate" max-date="startMaxDate"
+										date-disabled="disabled(date, mode)"
+										ng-readonly="true"
+										ng-disabled="disStartDt"
+										ng-change="limitDate()" required />
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default"
+											ng-click="open($event,1)"
+											ng-disabled="disStartDt">
+											<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+										</span>
+									</div>
+								</td>
+								<th class="col-md-5">
+									<e-combobox id="sTime" name="sTime"
+									ng-datasource="mappingSet['time']"
+									ng-model="inputVO.sTime"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									width="100px"
+									style="line-height:20px;" />
+								</th>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr ng-show="parameterTypeEditForm.sDate.$error.required || parameterTypeEditForm.sTime.$error.required">
+								<td class="col-xs-1"></td>
+								<td class="col-md-10 help-block with-errors" colspan="2">請選擇代理起始時間</td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-2">代理結束時間：</th>
+								<td class="col-md-3 tdpadding">
+									<div class="input-group datebox">
+										<input type="text" id="eDate" name="eDate"
+										class="form-control"
+										datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.eDate"
+										is-open="opened2"
+										min-date="endMinDate" max-date="maxDate"
+										date-disabled="disabled(date, mode)"
+										ng-readonly="true"
+										ng-disabled="disStartDt"
+										ng-change="limitDate()" required />
+										<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default"
+											ng-click="open($event,2)"
+											ng-disabled="disStartDt">
+											<i class="glyphicon glyphicon-calendar"></i>
+											</button>
+										</span>
+									</div>
+								</td>
+								<th class="col-md-5">
+									<e-combobox id="eTime" name="eTime" 
+									ng-datasource="mappingSet['timeE']"
+									ng-model="inputVO.eTime"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									width="100px"
+									height="30px"
+									style="line-height:20px;" />
+								</th>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr ng-show="parameterTypeEditForm.eDate.$error.required || parameterTypeEditForm.eTime.$error.required">
+								<td class="col-xs-1"></td>
+								<td class="col-md-10 help-block with-errors" colspan="2">請選擇代理結束時間</td>
+								<td class="col-xs-1"></td>
+							</tr>
+							<tr>
+								<td class="col-xs-1"></td>
+								<th class="col-md-2">備註</th>
+								<td class="col-md-8 tdpadding" colspan="2">
+									<textarea id="tarDesc" name="tarDesc" ng-model="inputVO.tarDesc" style="width: 100%; height: 100px" e-length-limit="200"></textarea>
+								</td>
+								<td class="col-xs-1"></td>
+							</tr>
+						</table>
+					</form>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="save()" function-type="maintenance" >確定</button>
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

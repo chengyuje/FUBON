@@ -1,0 +1,7 @@
+package com.systex.jbranch.app.common.fps.table;
+
+import com.systex.jbranch.platform.common.dataaccess.dao.impl.hibernate.DaoImpl;
+
+public class TBPMS_PRO_FUN_TR_PROD_INSHibernateDAO extends DaoImpl<TBPMS_PRO_FUN_TR_PROD_INSVO, TBPMS_PRO_FUN_TR_PROD_INSPK> implements TBPMS_PRO_FUN_TR_PROD_INSDaoIF {
+
+}

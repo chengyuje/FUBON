@@ -1,0 +1,69 @@
+<script type="text/javascript" src="assets/txn/ORG240/ORG240.js"></script>
+<script type="text/javascript" src="assets/txn/ORG240/ORG240CONFIRM.js"></script>
+<div ng-controller="ORG240Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3 scroll_y">
+			<table>
+				<tr>
+					<th width="50%">輔銷團隊：</th>
+					<td width="50%">
+						<e-combobox id="" 
+									ng-paramtype="ORG.SALES_SUPPORT_GROUP"
+									ng-model="inputVO.SUPT_SALES_TEAM_ID"
+									ng-change="querySuptSalesTeamLst()"
+				   					ng-validate="false" 
+				   					ng-readonly="false" 
+				   					ng-editable="false"
+				   					ng-format="F3"
+				   					ng-required="false"
+				   					style="line-height:20px;" />
+				   		
+	   				</td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<span id="csvBox" style="display: inline-block;vertical-align: middle;">
+				<e-upload id="csvUpload" success="uploadSuptSalesTeamLst(name,rname)" text="上傳" accept=".csv"></e-upload>
+			</span>
+			<button type="button" class="btn btn-info" ng-click="getSuptSalesTeamLst()" ng-disabled="inputVO.SUPT_SALES_TEAM_ID == ''">下載</button>
+		</div>
+	</div>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>
+	<div class="panel_content">
+		<e-jumping output="outputVO" input="inputVO" query="querySuptSalesTeamLst()" list="suptSalesTeamLst"></e-jumping>
+		<div class="gv_tab_sc slim-scroll" data-height="460">
+			<table class="tablesaw table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>輔銷團隊</th>
+						<th>員工編號</th>
+						<th>員工姓名</th>
+						<th>分行代碼</th>
+						<th>分行名稱</th>
+						<th>最後修改人</th>
+						<th>最後修改時間</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in suptSalesTeamLst | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td class='text-center'>{{row.SUPT_SALES_TEAM_ID}}</td>
+						<td class='text-center'>{{row.EMP_ID}}</td>
+						<td class='text-center'>{{row.EMP_NAME}}</td>
+						<td class='text-center'>{{row.BRANCH_NBR}}</td>
+						<td class='text-center'>{{row.DEPT_NAME}}</td>
+						<td class='text-center'>{{row.MODIFIER}}</td>
+						<td class='text-center'>{{row.LASTUPDATE}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

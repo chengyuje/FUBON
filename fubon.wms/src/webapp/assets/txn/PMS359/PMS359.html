@@ -1,0 +1,334 @@
+<style>
+/* open dialog */
+.ngdialog.PMS359 {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS359 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+/*
+.PMS359 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+*/
+.PMS359 table.little{
+	width: 89%;
+}
+/* change row */
+
+.PMS359.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+/* scroll && height */
+.scroll_PMS359_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS359/PMS359.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS359" ng-controller="PMS359Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>						
+						<th >*資料日期： </th>		
+							<td >
+								<e-combobox id="dataMonth" name="dataMonth" 
+									ng-datasource="mappingSet['timeE']"
+									ng-model="inputVO.sCreDate"
+									ng-validate="false" 
+									ng-required="true"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-change="limitDate();dateChange()"
+									ng-format="F3"
+									width="150px"
+									style="line-height:20px;" />
+							</td>	
+						
+						
+						
+						</tr>
+
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+							ng-datasource="REGION_LIST"
+							ng-model="inputVO.region_center_id"
+		     				ng-validate="false" 
+		     				ng-disabled="disableRegionCombo"
+							ng-readonly="disableRegionCombo" 
+							ng-editable="false"
+							ng-format="F3"
+		    				ng-required="false"
+							ng-change="ChangeRegion()"
+							width="150px"
+							style="line-height:20px;" />
+						</td>
+
+						<th>分行：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+	          			    ng-datasource="BRANCH_LIST"
+	          			    ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-disabled="disableBranchCombo"
+							ng-readonly="disableBranchCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="false"
+							ng-change="ChangeBranch()"
+							width="150px"
+							style="line-height:20px;" />
+						</td>
+											    												
+					</tr>
+					<tr>
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+			   				ng-datasource="AREA_LIST"
+			  				ng-model="inputVO.branch_area_id"
+			   				ng-validate="false" 
+			   				ng-disabled="disableAreaCombo"
+			   				ng-readonly="disableAreaCombo" 
+			   				ng-editable="false"
+			   				ng-format="F3"
+			   				ng-required="false"
+			   				ng-change="ChangeArea()"
+			   				width="150px"
+			   				style="line-height:20px;" />
+						</td>
+					
+						<th>理專：</th>
+						<td>
+							<e-combobox id="ao_code" name="ao_code"
+								ng-datasource="AO_LIST"
+							    ng-model="inputVO.ao_code"
+								ng-validate="false"
+								ng-disabled="disableAoCombo"
+								ng-readonly="disableAoCombo" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="false"
+								ng-change="ChangeAo_code()"
+								width="150px"
+								style="line-height:20px;" />
+						</td>
+
+					</tr>					
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    			
+			<div algin="left">
+				<table>
+			    	<tr>
+			    		<td align="right">資料產生日期：</td>
+			    		<td align="left">{{toJsDate(paramList[0].CREATETIME) | date:'yyyy/MM/dd'}}</td>
+			    	</tr>
+			    	<tr>
+			    		<td align="right">報表說明：</td>
+			    		<td align="left">通路業務周報</td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y" >
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-left="4" e-list="paramList">
+					<thead>
+						<tr>
+							<th>業務處</th>
+							<th>營運區</th>
+							<th>　分行名稱　</th>
+							<th>AO_CODE</th>
+							<th>理專職級</th>
+							<th>台存(百萬)</th>
+							<th>外存(百萬)</th>
+							<th>類存(百萬)</th>
+							<th>台投(百萬)</th>
+							<th>外投(百萬)</th>
+							<th>台保(百萬)</th>
+							<th>外保(百萬)</th>
+							<th>台定(百萬)_不計入AUM</th>
+							<th>黃金存摺(百萬)</th>
+							<th>台外幣總AUM(百萬)</th>
+							<th>投保AUM(百萬)</th>
+							<th>外幣佔比(%)</th>
+							<th>投保佔比(%)</th>
+							<th>總客戶數</th>
+							<th>投保客戶數</th>
+							<th>投保商品滲透率(%)</th>
+							<th>100萬到300萬客戶數</th>
+							<th>300萬到1500萬客戶數</th>
+							<th>1500萬以上客戶數</th>
+							<th>較上月底增減_總AUM(百萬)</th>
+							<th>較上月底增減_投保AUM(百萬)</th>
+							<th>較上月底增減_總客戶數</th>
+							<th>較上月底增減_投保客戶數</th>
+							<th>較上月底增減_100萬到300萬客戶</th>
+							<th>較上月底增減_300萬到1500萬客戶</th>
+							<th>較上月底增減_1500萬以上客戶</th>														
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat-start="(a, dataA) in paramList | orderBy: 'REGION_CENTER_ID' | groupBy: 'REGION_CENTER_NAME' as resultA">
+						 	<td rowspan="{{dataA.length + numGroups(resultB)*2+1}}">{{a}}</td>
+						 </tr>
+						 <tr ng-repeat-start="(b, dataB) in dataA | orderBy: 'BRANCH_AREA_ID' | groupBy: 'BRANCH_AREA_NAME' as resultB">
+						 	<td rowspan="{{dataB.length + 1}}">{{b}}</td>
+						 </tr>
+						 <tr ng-repeat="row in dataB">
+						 	<td>{{row.BRANCH_NBR}}{{row.BRANCH_NAME != null ? '-':''}}{{row.BRANCH_NAME}}</td>
+						 	<td>{{row.AO_CODE}}{{row.EMP_NAME != null ? '-':''}}{{row.EMP_NAME}}</td>
+						 	<td>{{row.AO_JOB_RANK}}</td>
+						 	<td align="right">{{row.DEP_T_AUM | currency:''}}</td>
+						 	<td align="right">{{row.DEP_F_AUM | currency:''}}</td>
+						 	<td align="right">{{row.INS_DEP_AUM | currency:''}}</td>
+						 	<td align="right">{{row.INV_T_AUM | currency:''}}</td>
+						 	<td align="right">{{row.INV_F_AUM | currency:''}}</td>
+							<td align="right">{{row.INS_T_AUM | currency:''}}</td>
+						 	<td align="right">{{row.INS_F_AUM | currency:''}}</td>
+						 	<td align="right">{{row.CT_T_AUM | currency:''}}</td>
+						 	<td align="right">{{row.OTHER_AUM | currency:''}}</td>
+						 	<td align="right">{{row.TOTAL_AUM | currency:''}}</td>		 	
+						 	<td align="right">{{row.VS_AUM | currency:''}}</td>
+						 	<td align="right">{{row.F_AUM_RATE | currency:''}}%</td>
+						 	<td align="right">{{(row.VS_AUM/row.TOTAL_AUM)*100 | currency:''}}%</td>
+						 	<td align="right">{{row.TOTAL_CUST_CNT | number:0}}</td>
+						 	<td align="right">{{row.VS_CUST_CNT | number:0}}</td>
+						 	<td align="right">{{row.VS_CUST_RATE}}%</td>
+						 	<td align="right">{{row.CUST_CNT_1 | number:0}}</td>
+						 	<td align="right">{{row.CUST_CNT_2 | number:0}}</td>
+						 	<td align="right">{{row.CUST_CNT_3 | number:0}}</td>
+						 	<td align="right">{{row.DIFF_TOTAL_AUM | currency:''}}</td>
+							<td align="right">{{row.DIFF_VS_AUM | currency:''}}</td>
+						 	<td align="right">{{row.DIFF_TOTAL_CUST_CNT | number:0}}</td>
+						 	<td align="right">{{row.DIFF_VS_CUST_CNT | number:0}}</td>
+						 	<td align="right">{{row.DIFF_CUST_CNT_1 | number:0}}</td>
+						 	<td align="right">{{row.DIFF_CUST_CNT_2 | number:0}}</td>
+						 	<td align="right">{{row.DIFF_CUST_CNT_3 | number:0}}</td>						 													 				
+						</tr>
+						
+				      	<tr ng-repeat-end>	
+				      	<td colspan = "4"  align="center">{{b}} 合計 </td>			      		
+				      		<td align="right">{{getSum(dataB, 'DEP_T_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'DEP_F_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'INS_DEP_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'INV_T_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'INV_F_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'INS_T_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'INS_F_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'CT_T_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'OTHER_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'TOTAL_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'VS_AUM') | currency:''}}</td>
+				      		<td align="right">{{(getSum(dataB, 'DEP_F_AUM')+getSum(dataB, 'INV_F_AUM')+getSum(dataB, 'INS_F_AUM'))/getSum(dataB, 'TOTAL_AUM')*100 | number:2}}%</td>
+				      		<td align="right">{{getSum(dataB, 'VS_AUM')/getSum(dataB, 'TOTAL_AUM')*100 | number:2}}%</td>
+				      		<td align="right">{{getSum(dataB, 'TOTAL_CUST_CNT') | number:0}}</td>
+				      		<td align="right">{{getSum(dataB, 'VS_CUST_CNT') | number:0}}</td>
+				      		<td align="right">{{getSum(dataB, 'VS_CUST_CNT')/getSum(dataB, 'TOTAL_CUST_CNT')*100 | number:2}}%</td>
+				      		<td align="right">{{getSum(dataB, 'CUST_CNT_1') | number:0}}</td>
+				      		<td align="right">{{getSum(dataB, 'CUST_CNT_2') | number:0}}</td>
+				      		<td align="right">{{getSum(dataB, 'CUST_CNT_3') | number:0}}</td>
+				      		<td align="right">{{getSum(dataB, 'DIFF_TOTAL_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'DIFF_VS_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataB, 'DIFF_TOTAL_CUST_CNT') | number:0}}</td>
+				      		<td align="right">{{getSum(dataB, 'DIFF_VS_CUST_CNT') | number:0}}</td>
+				      		<td align="right">{{getSum(dataB, 'DIFF_CUST_CNT_1') | number:0}}</td>
+				      		<td align="right">{{getSum(dataB, 'DIFF_CUST_CNT_2') | number:0}}</td>
+				      		<td align="right">{{getSum(dataB, 'DIFF_CUST_CNT_3') | number:0}}</td>
+				      	</tr>
+				      	<tr ng-repeat-end>
+				      		<td colspan = "5" align="center">{{a}} 合計 </td>				      		
+				      		<td align="right">{{getSum(dataA, 'DEP_T_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'DEP_F_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'INS_DEP_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'INV_T_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'INV_F_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'INS_T_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'INS_F_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'CT_T_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'OTHER_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'TOTAL_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'VS_AUM') | currency:''}}</td>
+				      		<td align="right">{{(getSum(dataA, 'DEP_F_AUM')+getSum(dataA, 'INV_F_AUM')+getSum(dataA, 'INS_F_AUM'))/getSum(dataA, 'TOTAL_AUM')*100 | number:2}}%</td>
+				      		<td align="right">{{getSum(dataA, 'VS_AUM')/getSum(dataA, 'TOTAL_AUM')*100 | number:2}}%</td>
+				      		<td align="right">{{getSum(dataA, 'TOTAL_CUST_CNT') | number:0}}</td>
+				      		<td align="right">{{getSum(dataA, 'VS_CUST_CNT') | number:0}}</td>
+				      		<td align="right">{{getSum(dataA, 'VS_CUST_CNT')/getSum(dataA, 'TOTAL_CUST_CNT')*100 | number:2}}%</td>
+				      		<td align="right">{{getSum(dataA, 'CUST_CNT_1') | number:0}}</td>
+				      		<td align="right">{{getSum(dataA, 'CUST_CNT_2') | number:0}}</td>
+				      		<td align="right">{{getSum(dataA, 'CUST_CNT_3') | number:0}}</td>
+				      		<td align="right">{{getSum(dataA, 'DIFF_TOTAL_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'DIFF_VS_AUM') | currency:''}}</td>
+				      		<td align="right">{{getSum(dataA, 'DIFF_TOTAL_CUST_CNT') | number:0}}</td>
+				      		<td align="right">{{getSum(dataA, 'DIFF_VS_CUST_CNT') | number:0}}</td>
+				      		<td align="right">{{getSum(dataA, 'DIFF_CUST_CNT_1') | number:0}}</td>
+				      		<td align="right">{{getSum(dataA, 'DIFF_CUST_CNT_2') | number:0}}</td>
+				      		<td align="right">{{getSum(dataA, 'DIFF_CUST_CNT_3') | number:0}}</td>
+				      	</tr>
+					</tbody>
+				</table>				
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

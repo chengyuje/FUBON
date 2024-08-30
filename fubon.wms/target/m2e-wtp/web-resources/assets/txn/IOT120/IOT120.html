@@ -1,0 +1,696 @@
+<style>
+.table_title{
+	font-size: medium;
+	font-style: normal;
+	
+}
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+table{
+	font-size: small;
+	font-weight: bold;
+}
+div{
+	font-size: small;
+	font-weight: bold;
+}
+input{
+	font-size: small;
+	font-weight: normal;
+}
+.ins_icon{
+width:20px;
+height:20px;
+background-image: url("assets/images/magnifier.jpg");
+}
+input:required:invalid{
+ 	border-color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT120/IOT120.js"></script>
+<script type="text/javascript" src="assets/txn/IOT910/IOT910.js"></script>
+<script type="text/javascript" src="assets/txn/IOT900/IOT900.js"></script>
+<div ng-controller="IOT120Controller" ng-cloak>
+	    <div class="tfb_content">
+      		<div class="tfb_content_icon"></div>
+     	 	<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >壽險新契約登錄作業 </div>
+    	</div>
+    	<div class="panel_content">
+    		<form>
+	    		<div class="gv_tab_sc scroll_y">
+	    			<div style="margin-top: 1%;margin-bottom: 1%; display: inline;">
+	    				*要保書類型:
+		    			<e-combobox id="reg_type" name="reg_type"
+		                	ng-paramtype="IOT.REG_TYPE12"
+		                	ng-model="inputVO.REG_TYPE"
+		                	ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							width="80%"
+							ng-change="show_write_reason()"
+							style="line-height:20px;"
+							ng-disabled="read"  />
+						(<a style="color: red;">*為必要輸入欄位</a>)
+	    			</div>
+	    			<table style="margin-top: 1%;">
+						<tr>
+    						<td>*適合度檢核編號:</td>
+		    				<td><input ng-blur="getPrematchData()" id="preamtchISeq" name="preamtchISeq" type="text" maxlength="10" placeholder="請輸入..." ng-model="inputVO.PREMATCH_SEQ" ng-disabled="read || noUpdate" required></td>
+		    				<td>*案件編號:</td>
+		    				<td><input ng-blur="CASEID()" ng-disabled="editCASEID || noUpdate" id="case_id" name="case_id" type="text" placeholder="請輸入..." ng-model="inputVO.CASE_ID" required="requiredCASEID"></td>
+		    				<td>*保險文件編號:</td>
+		    				<td><input ng-blur="INSID()" ng-disabled="editINSID || noUpdate" id="ins_id" name="ins_id" type="text" placeholder="請輸入..." ng-model="inputVO.INS_ID" ></td>
+		    				<td><button type="button" ng-click="Doc_print('Insurance')" class="btn btn-info" ng-if="yn_show_write != true" ng-disabled = "webservice.type == 'SoapWS'">檢視行動投保要保書</button></td>
+    					</tr>
+    					<tr>
+    						<td>*使用紙本要保書原因:</td>
+			    			<td>
+			    				<e-combobox id="write_reason" name="write_reason"
+				               		ng-paramtype="IOT.WRITE_REASON"
+				               		ng-model="inputVO.WRITE_REASON"
+				               		ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									style="line-height:20px;"
+									ng-disabled="read || !yn_show_write"  />
+								<input id="write_reason_oth" name="write_reason_oth" ng-show="inputVO.WRITE_REASON=='6'?true:false" type="text" placeholder="請輸入原因" ng-model="inputVO.WRITE_REASON_OTH"  ng-disabled="read" required>
+							</td>
+							<td>契撤案件:</td>
+		    				<td>
+		    					<input type="checkbox" ng-model="inputVO.CANCEL_CONTRACT_YN" ng-false-value="'N'" ng-true-value="'Y'" ng-disabled="true">
+		    				</td>
+							<td>*進件來源:</td>
+							<td colspan="2">
+    							<input type="radio" name="fbComYn" ng-model="inputVO.FB_COM_YN" value="Y" ng-disabled="true">&nbsp;富壽&nbsp;&nbsp;
+    							<input type="radio" name="fbComYn" ng-model="inputVO.FB_COM_YN" value="N" ng-disabled="true">&nbsp;非富壽
+    						</td>
+    					</tr>
+    				</table>
+	    			
+	    			<table style="margin-top: 1%;">
+						<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">一、要/被保人基本資訊</th>
+						</tr>
+    					<tr>
+    						<td style="width: 14%;">*被保人ID:</td>
+		    				<td>{{inputVO.INSURED_ID}}</td>
+		    				<td style="width: 14%;">*被保人姓名:</td>
+		    				<td>{{inputVO.INSURED_NAME}}</td>
+		    				<td style="width: 14%;">*被保人生日:</td>
+		    				<td>{{inputVO.INSURED_BIRTH | date:'yyyy-MM-dd'}}</td>
+    					</tr>
+    					<tr>
+		    				<td>*要保人ID:</td>
+		    				<td>{{inputVO.CUST_ID}}</td>
+		    				<td>*要保人姓名:</td>
+		    				<td>{{inputVO.PROPOSER_NAME}}</td>
+		    				<td style="width: 14%;">*要保人生日:</td>
+		    				<td>{{inputVO.PROPOSER_BIRTH | date:'yyyy-MM-dd'}}</td>
+		    			</tr>
+		    			<tr>
+		    				<td>法定代理人ID:</td>
+		    				<td>{{inputVO.REPRESET_ID}}</td>
+		    				<td>法定代理人姓名:</td>
+		    				<td>{{inputVO.REPRESET_NAME}}</td>
+		    				<td>與要保人關係:</td>
+		    				<td>{{inputVO.RLT_BT_PROREP | mapping:mappingSet['IOT.RELATED_WITH_PROPOSER']:F3}}</td>
+		    			</tr>
+		    			<tr>
+		    				<td>*繳款人ID:</td>
+		    				<td>{{inputVO.PAYER_ID}}</td>
+		    				<td>*繳款人姓名:</td>
+		    				<td>{{inputVO.PAYER_NAME}}</td>
+		    				<td style="width: 14%;">*繳款人生日:</td>
+		    				<td>{{inputVO.PAYER_BIRTH | date:'yyyy-MM-dd'}}</td>
+		    			</tr>
+		    			<tr>
+		    				<td>*繳款人與要保人關係:</td>
+		    				<td>{{inputVO.RLT_BT_PROPAY | mapping:mappingSet['IOT.PAYER_REL_PROPOSER']:F3}}</td>
+		    				<td colspan="2">要保人/法定代理人留存分行地址:</td>
+		    				<td colspan="2">{{COM_ADDRESS}}</td>
+		    			</tr>
+		    			<tr>
+		    				<td>被保人戶況檢核:</td>
+		    				<td>{{inputVO.INSURED_CM_FLAG | mapping:mappingSet['IOT.CM_FLAG']:F3}}</td>
+		    				<td>要保人戶況檢核:</td>
+		    				<td>{{inputVO.PROPOSER_CM_FLAG | mapping:mappingSet['IOT.CM_FLAG']:F3}}</td>
+		    				<td>法代戶況檢核:</td>
+		    				<td>{{inputVO.REPRESET_CM_FLAG | mapping:mappingSet['IOT.CM_FLAG']:F3}}</td>
+		    			</tr>
+		    			<tr>
+							<td>要保人KYC等級/效期:</td>
+		    				<td>{{inputVO.CUST_RISK}}/{{inputVO.KYC_DUE_DATE | date:"yyyy-MM-dd"}}</td>
+		    				<td>要保人AML風險等級:</td>
+		    				<td>{{inputVO.AML}}</td>
+		    				<td>要保人Pre-check等級:</td>
+		    				<td>{{inputVO.PRECHECK}}</td>
+		    			</tr>
+					</table>
+	    			<table>
+						<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">二、招攬人員資訊</th>
+						</tr>
+						<tr>
+							<td>鍵機日:</td>
+							<td>{{KEYIN_DATE}}</td>
+							<td>分行代碼:</td>
+		    				<td>{{branchID}}{{branchName}}</td>
+							<td>*員工件:</td>
+		    				<td>
+		    					<e-combobox id="is_emp" name="is_emp"
+		                		ng-paramtype="COMMON.YES_NO"
+		                		ng-model="inputVO.IS_EMP"
+		                		ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="30%"
+								ng-disabled="read"
+								  />
+		    				</td>
+						</tr>
+						<tr>
+							<td style="width:15%">*招攬人員員編:</td>
+							<td style="width:17%">{{inputVO.RECRUIT_ID}}</td>
+		    				<td style="width:15%">招攬人員姓名:</td>
+		    				<td style="font-weight: normal; width:17%;">{{EMP_NAME}}</td>
+		    				<td style="width:15%">AO_CODE:</td>
+		    				<td style="width:17%">{{inputVO.AO_CODE}}</td>
+						</tr>
+					</table>
+	    			<table>
+						<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">三、主約商品資訊</th>
+						</tr>
+						<tr>
+							<td>*要保書填寫申請日:</td>
+							<td>
+								<div class="input-group datebox datewidth" style="width: 90%;">
+									<input type="text" id="applyDate" name="applyDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.APPLY_DATE"
+											is-open="model.a"
+											datepicker-options="bgn_sDateOptions"
+											ng-readonly="true"
+											ng-blur="applyDateChg()"
+											ng-required="true"
+											ng-disabled="read" />
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open_apply_date($event,'a')" ng-disabled="noupdatedata">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+		    				<td>*公會通報日:</td>
+		    				<td colspan="3">
+		    					<div class="input-group datebox datewidth" style="width: 25%;">
+									<input type="text" id="guildRptDate" name="guildRptDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.GUILD_RPT_DATE"
+											is-open="model.b"
+											datepicker-options="bgn_sDateOptions"
+											ng-readonly="true"
+											ng-required="true"
+											ng-disabled="read"
+												/>
+									<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open_apply_date($event,'b')" ng-disabled="noupdatedata">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+		    				</td>
+						</tr>
+						<tr>
+							<td>*主約險種代號:</td>
+							<td>{{inputVO.INSPRD_ID}}</td>
+		    				<td>主約險種名稱:</td>
+		    				<td>{{inputVO.CNCT_NAME}}</td>
+		    				<td class="first_row">繳費年期:</td>
+		    				<td>{{inputVO.INSPRD_ANNUAL}}</td>
+						</tr>
+						<tr>
+							<td>*實收保費(原幣):</td>
+							<td>{{inputVO.REAL_PREMIUM}}</td>
+		    				<td>基本保費(原幣):</td>
+		    				<td>{{inputVO.BASE_PREMIUM}}</td>
+		    				<td>*首期保費繳費方式:</td>
+		    				<td>
+		    					<e-combobox id="first_pay_way" name="first_pay_way"
+		                		ng-paramtype="IOT.FIRST_PAY_WAY"
+		                		ng-model="inputVO.FIRST_PAY_WAY"
+		                		ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								width="40%"
+								ng-disabled="read"
+								  />
+							</td>
+						</tr>
+						<tr>
+							<td style="width:15%">*躉繳/分期繳:</td>
+							<td style="width:17%">{{inputVO.PAY_TYPE | mapping:mappingSet['IOT.PAY_TYPE']:F3}}</td>
+							<td style="width:15%"><span ng-show="inputVO.PAY_TYPE == '2' || inputVO.PAY_TYPE == '3'">*</span>分期繳繳別:</td>
+		    				<td style="width:17%">{{inputVO.MOP2 | mapping:mappingSet['IOT.MOP2']:F3}}</td>
+							<td style="width:15%">商品幣別:</td>
+		    				<td style="width:17%">{{inputVO.CURR_CD}}</td>
+						</tr>
+						<tr>
+		    				<td>特殊條件:</td>
+		    				<td>{{inputVO.SPECIAL_CONDITION}}</td>
+		    				<td>*產品類型:</td>
+		    				<td>
+		    					<e-combobox id="product_type" name="product_type"
+		                		ng-paramtype="IOT.PRODUCT_TYPE"
+		                		ng-model="inputVO.PRODUCT_TYPE"
+		                		ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="true"
+								ng-disabled="true"
+								ng-change="required_AB_TRANSSEQ()"
+								  />
+		    				</td>
+		    				<td>*房貸壽險商品:</td>
+		    				<td>{{inputVO.LOAN_PRD_YN}}</td>
+						</tr>
+					</table>
+	    			<table>
+	    				<tr>
+							<th colspan="6" style="text-align: left;" class="table_title">四、投資型商品連結標的資訊</th>
+						</tr>
+						<tr>
+							<td>人壽基金標的代號</td>
+							<td>基金標的名稱</td>
+							<td>配置比例</td>
+							<td>風險等級-銀行</td>
+							<td>客戶風險承受度</td>
+							<td>適配日</td>
+						</tr>
+						<tr ng-repeat="row in inputVO.INVESTList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.TARGET_ID}}</td>
+							<td style="width: 400px;">{{row.LINKED_NAME}}</td>
+							<td>{{row.ALLOCATION_RATIO}}</td>
+							<td>{{row.PRD_RISK}}</td>
+							<td>{{inputVO.PRD_RISK}}</td>
+							<td>{{MATCH_DATE | date:'yyyy-MM-dd'}}</td>
+						</tr>
+		    		</table>
+	    			<table style="text-align: center;">
+	    				<tr>
+							<th colspan="7" style="text-align: left;" class="table_title">五、附約商品資訊</th>
+						</tr>
+						<tr>
+							<td align="left" colspan="7">
+								<button type="button" class="btn btn-info" ng-click="addRow()" ng-disabled="read">新增附約</button>
+							</td>
+						</tr>
+	    				<tr>
+		    				<td>功能</td>
+		    				<td>附約險種代號</td>
+		    				<td>險種名稱</td>
+		    				<td>被保險人姓名</td>
+		    				<td>與主約被保人關係</td>
+		    				<td>繳費年期</td>
+		    				<td>保費</td>
+		    			</tr>
+		    			<tr ng-repeat="row in inputVO.INS_RIDER_DTLList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+		    				<td>
+		    					<button type="button" class="btn btn-info" ng-click="deleteRow($index,row)" ng-disabled="read">刪除</button>
+							</td>
+		    				<td>
+								<input id="dtl_insprd_id" name="dtl_insprd_id" type="text" placeholder="請輸入..." ng-model="row.DTL_INSPRD_ID" ng-blur="check_RIDER_INSPRD_ID(row)" style="width: 40%;text-transform: uppercase;"  ng-disabled="read" ng-required="requiredINS_RIDER_DTLList">
+		    					<button type="button" class="ins_icon" ng-click="Ins_dtl_query(row)" ng-disabled="read"></button>
+							</td>
+		    				<td>{{row.INSPRD_NAME}}</td>
+		    				<td>
+								<input id="dtl_insprd_insured_name" name="dtl_insprd_insured_name" type="text" placeholder="請輸入..." ng-model="row.INSURED_NAME" ng-disabled="read" ng-required="requiredINS_RIDER_DTLList">
+							</td>
+		    				<td>
+					    		<e-combobox id="rlt_with_insured" name="rlt_with_insured"
+					            	ng-paramtype="IOT.RLT_WITH_INSURED"
+					            	ng-model="row.RLT_WITH_INSURED"
+					            	ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									width="40%"
+									ng-disabled="read"
+									ng-required="requiredINS_RIDER_DTLList"
+								/>
+							</td>
+		    				<td>{{row.INSPRD_ANNUAL}}</td>
+		    				<td>
+								<input id="premium" name="premium" type="text" placeholder="請輸入..." ng-model="row.PREMIUM" maxlength="12" ng-disabled="read" e-input-limit="N" ng-blur="change_number_ins(row)" ng-required="requiredINS_RIDER_DTLList"> 
+		    				</td>
+		    			</tr>
+	    			</table>
+	    			<table>
+						<tr>
+							<th colspan="2" style="text-align: left;" class="table_title">六、檢附文件</th>
+						</tr>
+						<tr>
+		    				<td>分行留存文件檢核:
+		    					<button type="button" class="btn btn-info" ng-click="Doc_qc('in')" ng-disabled="in_outListbutton">留存文件確認</button>
+		    				</td>
+		    				<td>保險送件文件檢核:
+		    					<button type="button" class="btn btn-info" ng-click="Doc_qc('out')" ng-disabled="in_outListbutton">送件文件檢核</button>
+		    				</td>
+		    			</tr>
+					</table>
+					<table>
+						<tr>
+							<th colspan="3" style="text-align: left;" class="table_title">七、檢核項目</th>
+						</tr>
+						<tr>
+		    				<td style="width: 20%;">*檢查要保書所載地址與客戶於本行留存地址是否相同:</td>
+		    				<td colspan="2">
+		    					<e-combobox id="qc_add" name="qc_add"
+									ng-paramtype="COMMON.YES_NO"
+									ng-model="inputVO.QC_ADD"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									ng-change=""
+									width="30%"
+									style="line-height:20px;"
+									ng-disabled="read"
+									 />
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>*檢查進件文件有包含解約:</td>
+		    				<td colspan="2">
+		    					<e-combobox id="terminated_inc" name="terminated_inc"
+									ng-paramtype="COMMON.YES_NO"
+									ng-model="inputVO.TERMINATED_INC"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									ng-change=""
+									width="30%"
+									style="line-height:20px;"
+									ng-disabled="read"
+									 />
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>*檢查有使用可擦拭文具:</td>
+		    				<td colspan="2">
+		    					<e-combobox id="qc_eraser" name="qc_eraser"
+									ng-paramtype="COMMON.YES_NO"
+									ng-model="inputVO.QC_ERASER"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									ng-change=""
+									width="30%"
+									style="line-height:20px;"
+									ng-disabled="read"
+									 />
+		    				</td>
+		    			</tr>
+		    			<!-- <tr>
+		    				<td>*檢查要保文件有檢附保險通報單:</td>
+		    				<td colspan="2">
+		    					<e-combobox id="qc_anc_doc" name="qc_anc_doc"
+									ng-paramtype="COMMON.YES_NO"
+									ng-model="inputVO.QC_ANC_DOC"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									ng-change=""
+									width="30%"
+									style="line-height:20px;"
+									ng-disabled="read"
+									 />
+		    				</td>
+		    			</tr> -->
+		    			<tr>
+		    				<td>*檢查驗印結果是否符合規定:</td>
+		    				<td>
+		    					<e-combobox id="qc_stamp" name="qc_stamp"
+									ng-paramtype="COMMON.YES_NO"
+									ng-model="inputVO.QC_STAMP"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									ng-change="qc_stamp_check()"
+									width="30%"
+									style="line-height:20px;"
+									ng-disabled="read"
+									 />
+		    				</td>
+		    				<td>列印錄音照會單:
+		    					<button type="button" ng-click="Doc_print('Recording')" class="btn btn-info" ng-disabled="read">錄音照會單</button>
+		    				</td>
+		    			</tr>
+		    			<tr ng-show="inputVO.QC_STAMP == 'N'">
+		    				<td colspan="3">
+		    					<span style="color: red;font-size: 10px;">要保人驗印錄音序號與被保人驗印錄音序號必須擇一輸入</span>
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>要保人驗印錄音序號:</td>
+		    				<td>
+		    					<input id="proposer_transseq" name="proposer_transseq" type="text" placeholder="請輸入..." ng-model="inputVO.PROPOSER_TRANSSEQ" ng-required="check_QC_STAMP1" ng-disabled="read" maxlength="12" ng-change="check_TRANSSEQ()">
+		    				</td>
+		    				<td>被保人驗印錄音序號:
+		    					<input id="insured_transseq" name="insured_transseq" type="text" placeholder="請輸入..." ng-model="inputVO.INSURED_TRANSSEQ" ng-required="check_QC_STAMP2" ng-disabled="read" maxlength="12" ng-change="check_TRANSSEQ()">
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>非常態交易錄音序號:</td>
+		    				<td>
+		    					<input id="ab_transseq" name="ab_transseq" type="text" placeholder="請輸入..." ng-model="inputVO.AB_TRANSSEQ" maxlength="12" ng-disabled="read" ng-required="check_AB_TRANSSEQ">
+		    				</td>
+		    				<td>
+								<button type="button" ng-click="Doc_print ('NoteRecord')" class="btn btn-info" ng-disabled="read">非常態交易錄音照會</button>
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>*檢查有檢附立即投入批註書或新契約視訊簽單:</td>
+		    				<td colspan="2">
+		    					<e-combobox id="qc_immi" name="qc_immi"
+									ng-paramtype="COMMON.YES_NO"
+									ng-model="inputVO.QC_IMMI"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									width="30%"
+									style="line-height:20px;"
+									ng-disabled="read"
+									 />
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>*請檢視電子要保書所列示地址、電話、e-mail、手機與套印要保書是否相符:</td>
+		    				<td colspan="2">
+		    					<e-combobox id="qc_apec" name="qc_apec"
+									ng-paramtype="IOT.QC_APEC"
+									ng-model="inputVO.QC_APEC"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									ng-change=""
+									width="100%"
+									style="line-height:20px;"
+									ng-disabled="read"
+									 />
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>*請檢視業報書前3個月貸款/保單借款、業報書前3個月保單解約之勾選與要保人保險購買檢核報表相符:</td>
+		    				<td colspan="2">
+		    					<e-combobox id="qc_loan_chk" name="qc_loan_chk"
+									ng-paramtype="IOT.QC_LOAN_CHK"
+									ng-model="inputVO.QC_LOAN_CHK"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									ng-change=""
+									width="30%"
+									style="line-height:20px;"
+									ng-disabled="read"
+									 />
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>*請檢核要保書客戶與業務員之簽名欄位均有簽名:</td>
+		    				<td colspan="2">
+		    					<e-combobox id="qc_signature" name="qc_signature"
+									ng-paramtype="IOT.QC_SIGNATURE"
+									ng-model="inputVO.QC_SIGNATURE"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									ng-change=""
+									width="30%"
+									style="line-height:20px;"
+									ng-disabled="read"
+									 />
+		    				</td>
+		    			</tr>
+					</table>
+					<table>
+						<tr>
+		    				<td>*檢查業報書保費支出來源是否為貸款/保單借款:</td>
+		    				<td>{{inputVO.LOAN_SOURCE_YN}}</td>
+		    				<td>*檢查業報書保費支出來源是否為解約:</td>
+		    				<td>{{inputVO.LOAN_SOURCE2_YN}}</td>
+		    				<td colspan="2"></td>
+		    			</tr>
+		    			<tr>
+		    				<td>*業報書投保前三個月內有辦理解約:</td>
+		    				<td>{{inputVO.CONTRACT_END_YN == '1' ? 'Y' : 'N'}}</td>
+		    				<td>*業報書投保前三個月內有辦理貸款或保險單借款:</td>
+		    				<td>{{inputVO.S_INFITEM_LOAN_YN == '1' ? 'Y' : 'N'}}</td>
+		    				<td colspan="2"></td>
+		    			</tr>
+						<tr>
+							<td style="width:15%">*要保人工作年收入(業報):</td>
+							<td style="width:17%">{{inputVO.PROPOSER_INCOME1 | number :4}}</td>
+		    				<td style="width:15%">要保人行內KYC收入:</td>
+		    				<td style="width:17%">{{inputVO.C_KYC_INCOME}}</td>
+		    				<td style="width:15%">要保人工作年收入(行內):</td>
+		    				<td style="width:17%">{{inputVO.PROPOSER_INCOME3 | number :0}}</td>
+		    			</tr>
+		    			<tr>
+							<td>被保人工作年收入(業報):</td>
+							<td>{{inputVO.INSURED_INCOME1 | number :4}}</td>
+		    				<td>被保人行內KYC收入:</td>
+		    				<td>{{inputVO.I_KYC_INCOME}}</td>
+		    				<td>被保人工作年收入(行內):</td>
+		    				<td>{{inputVO.INSURED_INCOME3 | number :0}}</td>
+		    			</tr>
+		    		</table>
+		    		<table>
+		    			<tr>
+		    				<td colspan="8">要保人繳費來源檢核</td>
+		    			</tr>
+		    			<tr>
+							<td >保單貸款檢核:<br>(透過本行送件)</td>
+							<td>{{inputVO.C_LOAN_CHK1_YN}}</td>
+							<td>行內貸款檢核:</td>
+							<td>{{inputVO.C_LOAN_CHK2_YN}}</td>
+							<td>行內保單解約檢核:</td>
+							<td>{{inputVO.C_LOAN_CHK3_YN}}</td>
+							<td>定存不打折檢核:</td>
+							<td>{{inputVO.C_CD_CHK_YN}}</td>
+		    			</tr>
+		    			<tr>
+							<td >要保人行內貸款申請日:</td>
+							<td>{{inputVO.C_LOAN_APPLY_DATE | date:'yyyy-MM-dd'}}</td>
+							<td>要保人舊保單提領保額/保價日:</td>
+							<td>{{inputVO.C_PREM_DATE | date:'yyyy-MM-dd'}}</td>
+							<td>要保人工作內容:</td>
+							<td colspan="3">{{inputVO.PROPOSER_WORK}}</td>
+		    			</tr>
+		    			<tr>
+		    				<td colspan="8">被保人繳費來源檢核</td>
+		    			</tr>
+		    			<tr>
+							<td >保單貸款檢核:<br>(透過本行送件)</td>
+							<td>{{inputVO.I_LOAN_CHK1_YN}}</td>
+							<td>行內貸款檢核:</td>
+							<td>{{inputVO.I_LOAN_CHK2_YN}}</td>
+							<td>行內保單解約檢核:</td>
+							<td>{{inputVO.I_LOAN_CHK3_YN}}</td>
+							<td>定存不打折檢核:</td>
+							<td>{{inputVO.I_CD_CHK_YN}}</td>
+		    			</tr>
+		    			<tr>
+							<td >被保人行內貸款申請日:</td>
+							<td>{{inputVO.I_LOAN_APPLY_DATE | date:'yyyy-MM-dd'}}</td>
+							<td></td><td></td>
+							<td>被保人工作內容:</td>
+							<td colspan="3">{{inputVO.INSURED_WORK}}</td>
+		    			</tr>
+		    			<tr>
+		    				<td colspan="8">繳款人繳費來源檢核</td>
+		    			</tr>
+		    			<tr>
+							<td >保單貸款檢核:<br>(透過本行送件)</td>
+							<td>{{inputVO.LOAN_CHK1_YN}}</td>
+							<td>行內貸款檢核:</td>
+							<td>{{inputVO.LOAN_CHK2_YN}}</td>
+							<td>行內保單解約檢核:</td>
+							<td>{{inputVO.LOAN_CHK3_YN}}</td>
+							<td>定存不打折檢核:</td>
+							<td>{{inputVO.CD_CHK_YN}}</td>
+		    			</tr>
+		    			<tr>
+							<td >繳款人行內貸款申請日:</td>
+							<td colspan="7">{{inputVO.P_LOAN_APPLY_DATE | date:'yyyy-MM-dd'}}</td>
+		    			</tr>
+		    			<tr>
+							<td>要保人高齡銷售過程錄音序號:</td>
+							<td>{{inputVO.C_SALE_SENIOR_TRANSSEQ}}</td>
+							<td>被保人高齡銷售過程錄音序號:</td>
+							<td>{{inputVO.I_SALE_SENIOR_TRANSSEQ}}</td>
+							<td>繳款人高齡銷售過程錄音序號:</td>
+							<td>{{inputVO.P_SALE_SENIOR_TRANSSEQ}}</td>
+		    			</tr>
+		    			<tr>
+							<td>要保人高齡/保費來源錄音序號:</td>
+							<td>
+								<input id="premium_transseq" name="premium_transseq" type="text" placeholder="請輸入..." ng-model="inputVO.PREMIUM_TRANSSEQ" ng-disabled="true" maxlength="12" >
+							</td>
+							<td>被保人高齡/保費來源錄音序號:</td>
+							<td>
+								<input id="i_premium_transseq" name="i_premium_transseq" type="text" placeholder="請輸入..." ng-model="inputVO.I_PREMIUM_TRANSSEQ" ng-disabled="true" maxlength="12" >
+							</td>
+							<td>繳款人高齡/保費來源錄音序號:</td>
+							<td>
+								<input id="p_premium_transseq" name="p_premium_transseq" type="text" placeholder="請輸入..." ng-model="inputVO.P_PREMIUM_TRANSSEQ"  ng-disabled="true" maxlength="12" >
+							</td>
+		    			</tr>
+					</table>
+					
+	    	</div>
+	    	<div class="search_box_btn text-center">
+				<button ng-disabled="saveData" ng-click="Submit()" class="btn btn-info">儲存</button>
+				<button type="button" ng-disabled="nextData" ng-click="New_record()" class="btn btn-info">新增下一筆</button>
+				<button type="button" ng-disabled="backpage" ng-click="back_page_btn()" class="btn btn-info">回上一頁</button>
+			</div>	
+		</form>
+    </div>	
+</div>

@@ -1,0 +1,199 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/MGM610/MGM610.js"></script>
+<div ng-controller="MGM610Controller" ng-cloak>
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
+        </div>
+        <!--Content of the panel-->
+        <div class="panel_content">
+            <div class="search_table">
+                <table>
+                    <tr>
+                        <th><span style="color: red">*</span>活動代碼/名稱：</th>
+                        <td>
+                            <e-combobox id="act_seq" name="act_seq" 
+		                            	ng-datasource="mappingSet['ACT_SEQ']"
+		                            	ng-model="inputVO.act_seq" 
+		                            	ng-validate="false" 
+		                            	ng-readonly="false" 
+		                            	ng-editable="false" 
+		                            	ng-format="F1" 
+		                            	ng-required="true" 
+		                            	style="line-height:20px;" />
+                        </td>
+                        <th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeRegion(test)"
+										style="line-height:20px;" />
+						</td>
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										ng-change="ChangeArea(test)"
+										style="line-height:20px;" />
+						</td>
+                    </tr>
+                    <tr>
+						<th>分行：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_nbr"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeBranch(test)"
+										style="line-height:20px;" />
+						</td>
+						<th>案件年月：</th>
+						<td colspan="2">
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="case_start" name="case_start"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM"
+									   ng-model="inputVO.case_start"
+									   is-open="model.a"
+									   datepicker-options="case_startOptions"
+									   ng-readonly="true"
+									   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+							<div style="float: left">&nbsp;～&nbsp;</div>
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="case_end" name="case_end"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM"
+									   ng-model="inputVO.case_end"
+									   is-open="model.b"
+									   datepicker-options="case_endOptions"
+									   ng-readonly="true"
+									   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>	
+						</td>
+			   		</tr>
+                </table>
+            </div>
+            <div class="search_box_btn text-center">
+                <button type="button" 
+                		class="btn btn-info" 
+                		ng-click="inquire()" 
+                		ng-disabled="inputVO.act_seq == undefined || inputVO.act_seq == ''"
+                		function-type="query">查詢</button>
+                		
+                <button type="button" class="btn btn-info" ng-click="init()">清除</button>
+                <button type="button" class="btn btn-info" ng-click="download()" ng-disabled="resultList.length == 0">下載</button>
+            </div>
+        </div>
+    </div>
+    <!-- 結果區 -->
+    <div>
+        <div class="tfb_content">
+            <div class="tfb_content_icon"></div>
+            <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+        </div>
+        <!--Content of the panel-->
+        <div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>活動代碼</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DEFN.REGION_CENTER_ID" e-query="inquire()">業務處</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DEFN.BRANCH_AREA_ID" e-query="inquire()">營運區</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="DEFN.BRANCH_NBR" e-query="inquire()">分行</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="A.ACT_YEAR_MONTH" e-query="inquire()">案件年月</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="A.MGM_NBR" e-query="inquire()">鍵機</br>案件數</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="UN_APPR" e-query="inquire()">未核點</br>案件數</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="UN_ABLE_EXH" e-query="inquire()">未達門檻</br>案件數</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="ABLE_EXH" e-query="inquire()">已核點</br>案件數</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="TOTAL_POINTS" e-query="inquire()">可兌換</br>總點數</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="TOTAL_EXH" e-query="inquire()">已兌換</br>點數</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="UN_EXH" e-query="inquire()">未兌換</br>點數</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="PASS_RATE" e-query="inquire()">案件</br>合格率</e-sorter>
+							</th>
+							<th>
+								<e-sorter e-input="inputVO" e-mode="auto" e-col="EXH_RATE" e-query="inquire()">點數</br>兌換率</e-sorter>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td ng-bind="row.ACT_SEQ"></td>
+							<td ng-bind="row.REGION_CENTER_NAME"></td>
+							<td ng-bind="row.BRANCH_AREA_NAME"></td>
+							<td ng-bind="row.BRANCH_NAME"></td>
+							<td ng-bind="row.ACT_YEAR_MONTH"></td>
+							<td align="right" ng-bind="row.MGM_NBR | number:0"></td>
+							<td align="right" ng-bind="row.UN_APPR | number:0"></td>
+							<td align="right" ng-bind="row.UN_ABLE_EXH | number:0"></td>
+							<td align="right" ng-bind="row.ABLE_EXH | number:0"></td>
+							<td align="right" ng-bind="row.TOTAL_POINTS | number:0"></td>
+							<td align="right" ng-bind="row.TOTAL_EXH | number:0"></td>
+							<td align="right" ng-bind="row.UN_EXH | number:0"></td>
+							<td align="right" ng-bind="row.PASS_RATE + '%'"></td>
+							<td align="right" ng-bind="row.EXH_RATE + '%'"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>	
+        </div>
+    </div>
+    
+</div>

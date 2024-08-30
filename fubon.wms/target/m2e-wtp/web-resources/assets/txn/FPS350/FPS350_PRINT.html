@@ -1,0 +1,50 @@
+<style>
+    .ngdialog.FPS350Print .ngdialog-content {
+        margin-top: 100px;
+        background: transparent;
+        position: relative;
+    }
+
+</style>
+<div ng-controller="FPS350PrintController"
+     ng-cloak>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a href="#"
+                   class="close"
+                   data-dismiss="modal"
+                   aria-hidden="true"
+                   ng-click="closeThisDialog('cancel')">&times; </a>
+                <h4 id="myModalAlertLabel"
+                    class="modal-title">補印建議書</h4>
+            </div>
+            <div class="modal-body">
+                <div class="bootstrap-admin-panel-content search_box">
+                    <h4>【
+                        <span ng-bind="plan.SPP_TYPE|mapping: mapping.planning"></span>】</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>列印建議書日期時間</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in paramList">
+                                <td ng-bind="row.CREATETIME"></td>
+                                <td>
+                                    <button class="btn btn-info"
+                                            ng-click="print(row)">列印</button>
+                                    <button class="btn btn-info"
+                                            ng-if="checker>0"
+                                            ng-click="addShelf(row)">轉入行動書櫃</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,266 @@
+<style>
+/* scroll && height */
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS328/PMS328.js"></script>
+<script type="text/javascript" src="assets/txn/PMS328/PMS328_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<!-- a -->
+<div class="PMS328" ng-controller="PMS328Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢條件
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*資料起月：</th>
+							<td>
+								<e-combobox id="sTime"
+											ng-datasource="mappingSet['timeS']" ng-model="inputVO.sTime"
+											ng-validate="false" ng-readonly="false" ng-editable="false"
+											ng-change="chtimeS();limitDate();dateChange()" ng-format="F3"
+											ng-required="false" width="145px" height="30px"
+											style="line-height:20px;" />
+							</td>
+							<th>業務處：</th>
+							<td>
+								<e-combobox id="region_center_id"
+											name="region_center_id" ng-datasource="REGION_LIST"
+											ng-model="inputVO.region_center_id" ng-validate="false"
+											ng-disabled="disableRegionCombo"
+											ng-readonly="disableRegionCombo" ng-editable="false"
+											ng-format="F3" ng-required="false" ng-change="ChangeRegion()"
+											width="145px" style="line-height:20px;" />
+							</td>
+							<th>分行別：</th>
+							<td>
+								<e-combobox id="branch_nbr" name="branch_nbr"
+											ng-datasource="BRANCH_LIST" ng-model="inputVO.branch_nbr"
+											ng-validate="false" ng-disabled="disableBranchCombo"
+											ng-readonly="disableBranchCombo" ng-editable="false"
+											ng-format="F1" ng-required="false" ng-change="ChangeBranch()"
+											width="145px" style="line-height:20px;" />
+							</td>
+						</tr>
+						<tr>
+							<th>*資料訖月</th>
+							<td>
+								<e-combobox id="eTime"
+											ng-datasource="mappingSet['timeE']" ng-model="inputVO.eTime"
+											ng-validate="false" ng-readonly="false" ng-editable="false"
+											ng-format="F3" ng-required="false" width="145px" height="30px"
+											ng-change="chtimeE();limitDate();dateChange()"
+											style="line-height:20px;" />
+							</td>
+							<th>營運區：</th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="AREA_LIST" ng-model="inputVO.branch_area_id"
+										ng-validate="false" ng-disabled="disableAreaCombo"
+										ng-readonly="disableAreaCombo" ng-editable="false"
+										ng-format="F3" ng-required="false" ng-change="ChangeArea()"
+										width="145px" style="line-height:20px;" />
+							</td>
+							<th>員編：</th>
+						  	<td>
+							  	<e-combobox id="emp_id" name="emp_id"
+											ng-datasource="EMP_LIST"
+											ng-model="inputVO.emp_id"
+											ng-validate="false"
+											ng-readonly="disableEmpCombo" 
+											ng-readonly="disableEmpCombo" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											ng-disabled="disableEmpCombo"
+											ng-change="ChangeAo_code()"
+											width="145px"
+											style="line-height:20px;" />
+							</td> 
+						</tr>
+						<tr>						
+							<th>排除條件：</th>
+							<td>
+								<input type="checkbox" ng-model="inputVO.NOT_EXIST_UHRM" ng-true-value="'Y'" ng-false-value="'N'"> 高端RM
+							</td>
+							<th></th>
+							<td></td>
+							<th></th>
+							<td></td>
+							<th></th>
+							<td></td>
+						</tr>	
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="export()" ng-disabled="paramList2.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList2" rowCountLimit="20"></e-jumping>
+			<div align="left">
+				<div algin="left">
+					<table>
+						<tr>
+							<td>產出頻率：</td>
+							<td>每月</td>
+						</tr>
+						<tr>
+							<td>產出日：</td>
+							<td>{{curDate | date:'yyyy/MM'}}</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="width: 100%; white-space: nowrap; align: right;">
+				<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList2">
+					<thead>
+						<tr rowspan="2">
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">營運區</th>
+							<th rowspan="2">分行</th>
+							<th rowspan="2">AOCode</th>
+							<th rowspan="2">資料年月</th>
+							<th rowspan="2">總客戶數</th>
+							<th rowspan="1" colspan="5" ng-show="s_time < '2024/08'">客戶群權益等級</th>
+							<th rowspan="1" colspan="6" ng-hide="s_time < '2024/08'">客戶群權益等級</th>
+							<th rowspan="1" colspan="7">EIP客戶</th>
+							<th rowspan="1" colspan="5">投保客戶</th>
+							<th rowspan="1" colspan="3">客戶類型</th>
+						</tr>
+						<tr>
+							<th>{{s_time < '2024/08' ? '私人' : '恆富'}}</th>
+							<th>{{s_time < '2024/08' ? '白金' : '智富'}}</th>
+							<th>{{s_time < '2024/08' ? '個人' : '穩富'}}</th>
+							<th>{{s_time < '2024/08' ? 'MASS' : '一般存戶-跨優'}}</th>
+							<th ng-hide="s_time < '2024/08'">MASS</th>
+							<th>合計</th>
+							<th>E</th>
+							<th>I</th>
+							<th>P</th>
+							<th>O</th>
+							<th>S</th>
+							<th>MASS</th>
+							<th>合計</th>
+							<th>投資和保險</th>
+							<th>無投資和無保險</th>
+							<th>投資</th>
+							<th>保險</th>
+							<th>合計</th>
+							<th>自然人</th>
+							<th>法人</th>
+							<th>合計</th>
+						</tr>
+						<tr>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat-start="(a, dataA) in paramList2 | groupBy: 'REGION_CENTER_NAME' as resultA">
+							<td rowspan="{{(dataA.length + numGroups(resultB)) * 2 + 1}}" ng-show="cp != tp && !(a.indexOf('合計') > -1)">{{a}}</td>
+							<td rowspan="{{dataA.length + numGroups(resultB) * 2 + 2 + (numGroupsA(paramList2) > 1 ? 1 : 0 ) + (numGroupsA(paramList2) < 1 ? -1 : 0 )}} " ng-show="cp == tp && !(a.indexOf('合計') > -1)">{{a}}</td>
+							<td rowspan="{{dataA.length + numGroups(resultB) * 2 + 2 + (numGroupsA(paramList2) > 1 ? 1 : 0 ) + (numGroupsA(paramList2) < 1 ? -1 : 0 )}} " align="center" colspan="5" ng-show="(a.indexOf('合計') > -1)">{{a}}</td>
+						</tr>
+						<tr ng-repeat-start="(b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+							<td rowspan="{{dataB.length + numGroups(resultC) * 2 + 1}}" ng-show="b != 'REGION' && b != 'ALL' && cp != tp">{{b}}</td>
+							<td rowspan="{{dataB.length + numGroups(resultC) * 2 + (numGroups(resultC) > 2 ? 0 : 1) }}" ng-show="b != 'REGION' && b != 'ALL' && cp == tp">{{b}}</td>
+						</tr>
+						<tr ng-repeat-start="(c, dataC) in dataB | groupBy: 'BRANCH_NAME' as resultC">
+							<td rowspan="{{dataC.length + 1}}" ng-hide="c == 'REGION' || c == 'AREA' || c == 'ALL'">{{c}}</td>
+						</tr>
+						<tr ng-repeat="c1 in dataC">
+							<td colspan="4" align="center" ng-show="c1.AO_CODE == 'ZZZZZREGION'">{{c1.REGION_CENTER_NAME}} 合計</td>
+							<td colspan="3" align="center" ng-show="c1.AO_CODE == 'ZZZZZAREA'">{{c1.BRANCH_AREA_NAME}} 合計</td>
+							<td colspan="2" align="center" ng-show="c1.AO_CODE == 'ZZZZZBRANCH'">{{c1.BRANCH_NAME}} 合計</td>
+							<td ng-hide="c1.AO_CODE == 'ZZZZZREGION' || c1.AO_CODE == 'ZZZZZAREA' || c1.AO_CODE == 'ZZZZZBRANCH' || c1.AO_CODE == 'ZZZZZ'">{{c1.AO_CODE}}{{c1.AO_TYPE | mapping:mappingSet['AO_TYPE']:'F3'}}-{{c1.EMP_NAME}}</PS></td>
+							<td ng-hide="c1.AO_CODE == 'ZZZZZREGION' || c1.AO_CODE == 'ZZZZZAREA' || c1.AO_CODE == 'ZZZZZBRANCH' || c1.AO_CODE == 'ZZZZZ'">{{c1.YM}}</td>
+							<td align="right">{{0 + c1.TOTAL | currency:'':0}}</td>
+							<td align="right">{{0 + c1.CGPR_PRIVATE | currency:'':0}}</td>
+							<td align="right">{{0 + c1.CGPR_PLATINUM | currency:'':0}}</td>
+							<td align="right">{{0 + c1.CGPR_PERSON | currency:'':0}}</td>
+							<td align="right">{{0 + c1.CGPR_MASS   | currency:'':0}}</td>
+							<td ng-hide="s_time < '2024/08'">
+								{{0 + c1.CGPR_SUM-c1.CGPR_PRIVATE-c1.CGPR_PLATINUM-c1.CGPR_PERSON-c1.CGPR_MASS | currency:'':0}}
+							</td>
+							<td align="right">{{0 + c1.CGPR_SUM | currency:'':0}}</td>
+							<td align="right">{{0 + c1.EIP_E | currency:'':0}}</td>
+							<td align="right">{{0 + c1.EIP_I | currency:'':0}}</td>
+							<td align="right">{{0 + c1.EIP_P | currency:'':0}}</td>
+							<td align="right">{{0 + c1.EIP_O | currency:'':0}}</td>
+							<td align="right">{{0 + c1.EIP_S | currency:'':0}}</td>
+							<td align="right">{{0 + c1.EIP_Z | currency:'':0}}</td>
+							<td align="right">{{0 + c1.EIP_SUM | currency:'':0}}</td>
+							<td align="right">{{0 + c1.II_INV_INS | currency:'':0}}</td>
+							<td align="right">{{0 + c1.II_NON | currency:'':0}}</td>
+							<td align="right">{{0 + c1.II_INV | currency:'':0}}</td>
+							<td align="right">{{0 + c1.II_INS | currency:'':0}}</td>
+							<td align="right">{{0 + c1.II_SUM | currency:'':0}}</td>
+							<td align="right">{{0 + c1.CUST_TYPE_PERSON | currency:'':0}}</td>
+							<td align="right">{{0 + c1.CUST_TYPE_CORPOR | currency:'':0}}</td>
+							<td align="right">{{0 + c1.CUST_TYPE_SUM | currency:'':0}}</td>
+						</tr>
+						<tr ng-repeat-end ng-hide="true">
+						<tr ng-repeat-end ng-hide="true">
+						<tr ng-repeat-end ng-hide="true">
+					</tbody>
+				</table>
+			</div>
+			<div>
+				<table>
+					<tr>
+						<td>說明：EIP客戶數依客戶前一年度與近一年度貢獻度等級折優計算</td>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

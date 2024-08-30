@@ -1,0 +1,189 @@
+<style>
+/* open dialog */
+.ngdialog.SOT413 {
+	
+}
+/* dialog panl */
+.modal-dialog.SOT413 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.SOT413 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.SOT413 table.little{
+	width: 60%;
+}
+/* change row */
+.SOT413.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SOT413_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.th
+</style>
+<script type="text/javascript" src="assets/txn/PRD151/PRD151.js"></script>
+<script type="text/javascript" src="assets/txn/SOT413/SOT413.js"></script>
+<script type="text/javascript" src="assets/txn/SOT413/SOT413_ROUTE.js"></script>
+<div class="SOT413" ng-controller="SOT413Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >SI_FCI商品申購</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<h4 class="h4-title">申購資料輸入</h4>
+				<table>
+					<tr>
+						<th width="20%">客戶ID：</th>
+						<td>
+							<table>
+								<tr>
+									<td>
+										<input type="text" class="form-control" style="width:auto;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" ng-disabled="cartList.length > 0" ng-blur="getSOTCustInfo(true);" e-length-limit="16" required>
+									</td>
+									<td>{{inputVO.custName}}</td>
+									<td>KYC等級/效期：{{inputVO.kycLv}}/{{inputVO.kycDueDate | date:"yyyy-MM-dd"}}</td>
+								</tr>
+								<tr>
+									<td>客戶註記：{{inputVO.custRemarks | mapping:mappingSet['SOT.SPEC_CUSTOMER']:'F3'}}</td>
+									<td>OBU註記：{{inputVO.isOBU}}</td>
+									<td>專業投資人/效期：{{inputVO.profInvestorYN}}/{{inputVO.piDueDate | date:"yyyy-MM-dd"}}</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<button type="button" ng-disabled="disProdID" ng-click="goPRD151()" class="btn btn-info">報價查詢</button>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<table style="background-color:#eeeeee;" class="alignleft">
+								<tr>
+									<th><b>商品名稱：</b></th>
+									<td>{{inputVO.prodName}}</td>
+									<th><b>商品幣別：</b></th>
+									<td>{{inputVO.prodCurr | mapping:mappingSet['PRD.FCI_CURRENCY']:'F1'}}</td>
+									<th><b>連結標的：</b></th>
+									<td>{{inputVO.targetName}}</td>
+									<th><b>風險等級：</b></th>
+									<td>{{inputVO.prodRiskLv}}</td>
+								</tr>
+								<tr>
+									<th><b>申購日：</b></th>
+									<td>{{inputVO.tradeDate | date:"yyyy-MM-dd"}}</td>
+									<th><b>扣款(起息)日：</b></th>
+									<td>{{inputVO.valueDate | date:"yyyy-MM-dd"}}</td>
+									<th><b>比價日：</b></th>
+									<td>{{inputVO.spotDate | date:"yyyy-MM-dd"}}</td>
+									<th><b>到期(入帳)日：</b></th>
+									<td>{{inputVO.expireDate | date:"yyyy-MM-dd"}}</td>
+								</tr>
+								<tr>
+									<th><b>天期：</b></th>
+									<td>{{inputVO.monPeriod}}個月</td>
+									<th><b>計息天數：</b></th>
+									<td>{{inputVO.intDates}}</td>
+									<th><b>履約價：</b></th>
+									<td>{{inputVO.strikePrice | number:4}}</td>
+									<th><b></b></th>
+									<td></td>
+								</tr>
+								<tr>
+									<th><b>預估年化收益率：</b></th>
+									<td>{{inputVO.prdProfeeRate | number:2}}%</td>
+									<th colspan="4"><b>到期若比價匯率大於等於履約價</b></th>
+								</tr>
+									<th></th>
+									<td>{{inputVO.lessProfeeRate | number:2}}%</td>
+									<th colspan="4"><b>到期比價匯率小於履約價</b></th>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<th>申購金額：</th>
+						<td>
+							<input type="text" class="form-control" style="width:auto;display:inline;" id="purchaseAmt" name="purchaseAmt" ng-model="inputVO.purchaseAmt" ng-blur="checkUnitNum()" required>
+							最低申購金額：{{inputVO.prodMinBuyAmt | number:0}}&nbsp;&nbsp;&nbsp;累進申購金額：{{inputVO.prodMinGrdAmt | number:0}}
+						</td>
+					</tr>
+					<tr>
+						<th>到期若比價匯率大於等於履約價：</th>
+						<td>{{inputVO.prodCurr}} {{inputVO.prdProfeeAmt | number:2}} (預估收益金額)</td>
+					</tr>
+					<tr>
+						<th>到期比價匯率小於履約價：</th>
+						<td>{{inputVO.prodCurr}} {{inputVO.lessProfeeAmt | number:2}} (預估收益金額)</td>
+					</tr>
+					<tr>
+						<th>組合式商品帳號：</th>
+						<td>
+							<input type="text" class="form-control" style="width:auto;display:inline;" id="prodAcct" name="prodAcct" ng-model="inputVO.prodAcct" ng-readonly="true" required>
+						</td>
+					</tr>
+					<tr>
+						<th>扣款帳號：</th>
+						<td>
+							<e-combobox id="debitAcct" name="debitAcct" 
+										ng-datasource="mappingSet['SOT.DEBIT_ACCT_LIST#DSIPLAY']"
+										ng-model="inputVO.debitAcct"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-change="changeAcct('debit')"
+										style="line-height:20px;"
+										required
+										/>
+							{{showCurrency}} {{showAvbBalance | currency:''}}
+						</td>
+					</tr>
+					<tr>
+						<th>授權交易人員：</th>
+						<td><input type="text" class="form-control" style="width:auto;display:inline;" id="authID" name="authID" ng-model="inputVO.authID" e-length-limit="16" ng-blur="validateAuthID();" ng-disabled="inputVO.disableAuthId"></td>
+					</tr>
+					<tr>
+						<th>解說專員：</th>
+						<td><input type="text" class="form-control" style="width:auto;display:inline;" id="narratorID" name="narratorID" ng-model="inputVO.narratorID" e-length-limit="11" ng-blur="getTellerName('narratorID',inputVO.narratorID)">&nbsp;&nbsp;{{inputVO.narratorName}}</td>
+					</tr>
+					<tr>
+						<th>主管：</th>
+						<td><input type="text" class="form-control" style="width:auto;display:inline;" ng-blur="getTellerName('bossID',inputVO.bossID)" id="bossID" name="bossID" ng-model="inputVO.bossID" required>&nbsp;&nbsp;{{inputVO.bossName}}
+<!-- 							<span ng-show="parameterTypeEditForm.bossID.$error.required" class="with-errors" colspan="4">請輸入主管</span> -->
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="clearTradeSEQ();init()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="save()" ng-disabled="inputVO.prodCurr == ''">暫存</button>
+			<button type="button" class="btn btn-info" ng-click="next()" ng-disabled="inputVO.prodCurr == '' || inputVO.goNextDisabled">檢核及列印文件</button>
+		</div>
+	</div>
+</div>

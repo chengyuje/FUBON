@@ -1,0 +1,173 @@
+<!--
+   特殊 Style 定義
+-->
+<style>
+</style>
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+<script type="text/javascript" src="assets/txn/CMMGR009/CMMGR009.js"></script>
+<div class="container">
+	<div ng-controller="CMMGR009_Controller" ng-cloak>
+		<!-- left, vertical navbar & content -->
+		<div class="row">
+			<!-- left, vertical navbar -->
+			<!-- content -->
+			<div class="col-md-12">
+				<!-- InstanceBeginEditable name="Content" -->
+				<div class="row">
+					<div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<div class="text-muted bootstrap-admin-box-title"><i class="glyphicon glyphicon-th-large"></i>軌跡記錄查詢-參數異動</div>
+							</div>
+
+							<div class="bootstrap-admin-panel-content text-muted search_box">
+								<form>
+									<table>
+										<tr>
+											<th>分行別：</th>
+											<td><input type="text" class="form-control"
+												id="tipBranchId" name="tipBranchId"
+												ng-model="inputVO.tipBranchId" placeholder="分行別"
+												maxlength="10" autofocus></td>
+											<th>工作站代號：</th>
+											<td><input type="text" class="form-control"
+												id="tipWorkStationId" name="tipWorkStationId"
+												ng-model="inputVO.tipWorkStationId" placeholder="工作站代號"
+												maxlength="20"></td>
+										</tr>
+										<tr>
+											<th>CODE ID:</th>
+											<td><input type="text" class="form-control"
+												id="tipParamCode" name="tipParamCode"
+												ng-model="inputVO.tipParamCode" placeholder="CODE ID:"
+												maxlength="20"></td>
+											<th>櫃員代號：</th>
+											<td><input type="text" class="form-control"
+												id="tipTeller" name="tipTeller" ng-model="inputVO.tipTeller"
+												placeholder="櫃員代號" maxlength="10"></td>
+										</tr>
+										<tr>
+											<th>CODE 值：</th>
+											<td><input type="text" class="form-control"
+												id="tipParamName" name="tipParamName"
+												ng-model="inputVO.tipParamName" placeholder="CODE 值"
+												maxlength="20"></td>
+											<th>參數ID：</th>
+											<td><input type="text" class="form-control"
+												id="tipParamType" name="tipParamType"
+												ng-model="inputVO.tipParamType" placeholder="參數ID"
+												maxlength="50"></td>
+										</tr>
+										<tr>
+											<th for="dtfEffectDate">生效日：</th>
+											<td>
+												<div class="input-group">
+													<input type="text" class="form-control"
+														datepicker-popup="yyyy-MM-dd"
+														ng-model="inputVO.dtfEffectDate" is-open="opened1"
+														ng-required="false" ng-readonly="true" /> <span
+														class="input-group-btn">
+														<button type="button" class="btn btn-default"
+															ng-click="open($event,1)">
+															<i class="glyphicon glyphicon-calendar"></i>
+														</button>
+													</span>
+												</div>
+											</td>
+											<th>參數名稱：</th>
+											<td><input type="text" class="form-control"
+												id="tipPtypeName" name="tipPtypeName"
+												ng-model="inputVO.tipPtypeName" placeholder="參數名稱"
+												maxlength="100"></td>
+										</tr>
+										<tr>
+											<th for="dtfLastUpdate">最後變更日:</th>
+											<td>
+												<div class="input-group">
+													<input type="text" class="form-control"
+														datepicker-popup="yyyy-MM-dd"
+														ng-model="inputVO.dtfLastUpdate" is-open="opened2"
+														ng-required="false" ng-readonly="true" /> <span
+														class="input-group-btn">
+														<button type="button" class="btn btn-default"
+															ng-click="open($event,2)">
+															<i class="glyphicon glyphicon-calendar"></i>
+														</button>
+													</span>
+												</div>
+											</td>
+										</tr>
+
+
+									</table>
+									<div class="search_box_btn text-center">
+										<button type="button" class="btn btn-primary"
+											ng-click="inquireInit();inquire()" function-type="query" >查詢</button>
+										<button type="button" class="btn btn-default"
+											ng-click="init()">清除</button>
+										<button href="/export/{{paramCode}}" type="button"
+											class="btn btn-default" ng-click="exportData()"
+											ng-disabled="!paramList.length > 0" function-type="export" >匯出</button>
+									</div>
+								</form>
+
+							</div>
+
+							<div class="bootstrap-admin-panel-content"
+								style="position: relative;">
+								<!-- new table -->
+								<table class="tablesaw table table-striped table-bordered"
+									data-tablesaw-mode="swipe" data-tablesaw-sortable
+									data-tablesaw-minimap>
+									<thead>
+										<tr>
+											<th scope="col" data-tablesaw-sortable-col
+												data-tablesaw-priority="persist">分行別</th>
+											<th scope="col" data-tablesaw-sortable-col>工作站代號</th>
+											<th scope="col" data-tablesaw-sortable-col>櫃員代號</th>
+											<th scope="col" data-tablesaw-sortable-col>櫃員名稱</th>
+											<th scope="col" data-tablesaw-sortable-col>參數ID</th>
+											<th scope="col" data-tablesaw-sortable-col>參數名稱</th>
+											<th scope="col" data-tablesaw-sortable-col>CODE ID</th>
+											<th scope="col" data-tablesaw-sortable-col>CODE 值</th>
+											<th scope="col" data-tablesaw-sortable-col>生效日</th>
+											<th scope="col" data-tablesaw-sortable-col>最後變更日</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr
+											ng-repeat="row in results = (paramList | orderBy:predicate:reverse) | limitTo:displayLimit"
+											ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+											<td>{{row.BRANCHID}}</td>
+											<td>{{row.WORKSTATIONID}}</td>
+											<td>{{row.TELLER}}</td>
+											<td>{{row.TELLERNAME}}</td>
+											<td>{{row.DATA1}}</td>
+											<td>{{row.DATA2}}</td>
+											<td>{{row.DATA3}}</td>
+											<td>{{row.DATA4}}</td>
+											<td>{{row.DATA5}}</td>
+											<td>{{row.LASTUPDATE}}</td>
+										</tr>
+									</tbody>
+								</table>
+				          		<e-paging outputVO="outputVO"
+				          			inputVO="inputVO"
+					           		callQuery="inquire()"
+					           		displayLimit="displayLimit"
+					           		dataList="paramList"
+				           		>
+				          		</e-paging>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		
+	</script>

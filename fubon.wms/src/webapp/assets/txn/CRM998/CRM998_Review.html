@@ -1,0 +1,157 @@
+<script type="text/javascript" src="assets/txn/CRM998/CRM998_Review.js"></script>
+<script type="text/javascript" src="assets/txn/CRM210/CRM210.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PPAP.js"></script>
+
+<div ng-controller="CRM998_ReviewController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">客群身分例外開放覆核
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<div style="margin-left:40px">
+					<div class="form-group row">
+						<label class="col-md-1 col-form-label" for="custId">客戶ID</label>
+						<div class="col-md-2">
+							<input id="custId" class="form-control" type="text" placeholder="請輸入..." ng-model="inputVO.custId"
+								   e-length-limit="20" ng-change="inputVO.custId = inputVO.custId.toUpperCase()">
+						</div>
+						<div class="col-md-1"></div>
+						
+						<label class="col-md-1 col-form-label">審核狀態</label>
+						<div class="col-md-2">
+							<e-combobox ng-paramtype="CRM.APPROVAL_STATUS" ng-model="inputVO.apprStatus" 
+										ng-validate="false" ng-editable="false" ng-format="F3" ng-required="false" 
+										style="line-height:20px;" ng-change="statusChange()"/>
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<label class="col-md-1 col-form-label">業務處</label>
+						<div class="col-md-2">
+							<e-combobox ng-datasource="REGION_LIST" ng-model="inputVO.centerId" 
+										ng-validate="false" ng-disabled="AVAIL_REGION.length == 1" 
+										ng-readonly="AVAIL_REGION.length == 1" ng-editable="false" 
+										ng-format="F3" ng-required="false" ng-change="ChangeRegion(regionParams)"
+										style="line-height:20px;" />	
+						</div>
+						<div class="col-md-1"></div>
+						
+						<label class="col-md-1 col-form-label">營運區</label>
+						<div class="col-md-2">
+							<e-combobox ng-datasource="AREA_LIST" ng-model="inputVO.areaId"
+										ng-validate="false" ng-disabled="AREA_LIST.length == 1" 
+										ng-readonly="AREA_LIST.length == 1" ng-editable="false" 
+										ng-format="F3" ng-required="false" ng-change="ChangeArea(regionParams)" 
+										style="line-height:20px;" />
+						</div>
+						
+						<div class="col-md-1"></div>
+						
+						<label class="col-md-1 col-form-label">分行</label>
+						<div class="col-md-2">
+							<e-combobox ng-datasource="BRANCH_LIST" ng-model="inputVO.braNbr" 
+										ng-validate="false" ng-disabled="BRANCH_LIST.length == 1" 
+										ng-readonly="BRANCH_LIST.length == 1" ng-editable="false" 
+										ng-format="F1" ng-required="false" ng-change="ChangeBranch(regionParams)" 
+										style="line-height:20px;" />
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<label class="col-md-1 col-form-label">AO Code</label>
+						<div class="col-md-2">
+							<e-combobox ng-datasource="AO_LIST" ng-model="inputVO.aoCode" 
+										ng-validate="false" ng-editable="false" ng-format="F1" 
+										ng-required="false" ng-change="ChangeAo_code(regionParams)" 
+									    style="line-height:20px;" />
+						</div>
+						
+						<div class="col-md-1"></div>
+						
+						<label class="col-md-1 col-form-label">申請日期</label>
+						<div class="col-md-2">
+							<div class="input-group datebox datewidth">
+								<input type="text" class="form-control" uib-datepicker-popup="yyyy/MM/dd" 
+									   ng-model="inputVO.applDateStart" is-open="model.a" 
+									   datepicker-options="sDateOptions" ng-readonly="true" ng-change="limitDate()" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+						<div style="float: left !important">～</div>
+						<div class="col-md-2">
+							<div class="input-group datebox datewidth">
+								<input type="text" class="form-control" uib-datepicker-popup="yyyy/MM/dd" 
+									   ng-model="inputVO.applDateEnd" is-open="model.b" 
+									   datepicker-options="eDateOptions" ng-readonly="true" ng-change="limitDate()" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="clear(); getApprData();">查詢</button>
+				<button type="button" class="btn btn-default" ng-click="init(); clear();">清除</button>
+			</div>
+
+			<!-- 結果區 -->
+			<e-jumping-once output="outputVO" list="paramList" totallist="apprData"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="min-height: 235px; white-space: nowrap;">
+				<table class="tablesaw table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th function-type="confirm" ng-if="isApprMode">功能</th>
+							<th>覆核狀態</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>原等級</th>
+							<th>新等級</th>
+							<th>申請人ID</th>
+							<th>申請人姓名</th>
+							<th>申請時間</th>
+							<th ng-if="otherMode">覆核人ID</th>
+							<th ng-if="otherMode">覆核人姓名</th>
+							<th ng-if="otherMode">覆核時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center" function-type="confirm" ng-if="isApprMode">
+								<button type="button" class="btn btn-info" ng-click="execute(row, 'A');">同意</button>
+								<button type="button" class="btn btn-info" ng-click="execute(row, 'R');">退回</button>
+							</td>
+							<td align="center">{{row.APPR_STATUS | mapping:APPR_STATUS:"F3"}}</td>
+							<td align="center">{{row.CUST_ID}}</td>
+							<td align="center">{{row.CUST_NAME}}</td>
+							<td align="center">{{row.ORG_DEGREE | mapping:VIP_DEGREE:"F3"}}</td>
+							<td align="center">{{row.NEW_DEGREE | mapping:VIP_DEGREE:"F3"}}</td>
+							<td align="center">{{row.APPL_EMP_ID}}</td>
+							<td align="center">{{row.APPL_EMP_NAME}}</td>
+							<td align="center">{{row.APPL_DATE}}</td>
+							<td align="center" ng-if="otherMode">{{row.REVIEW_EMP_ID}}</td>
+							<td align="center" ng-if="otherMode">{{row.REVIEW_EMP_NAME}}</td>
+							<td align="center" ng-if="otherMode">{{row.REVIEW_DATE}}</td>
+
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

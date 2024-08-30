@@ -1,0 +1,221 @@
+<style>
+    .CMMGR006_EDIT .modal-dialog {
+        position: relative;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 1200px;
+        height: auto;
+    }
+
+    .CMMGR006_EDIT .helperCounts {
+        float: right;
+        margin-top: -3px;
+        opacity: 0.5;
+        color: rgb(45, 122, 168);
+        height: 0px;
+    }
+
+    .CMMGR006_EDIT .overLimit {
+        color: #c9302c;
+        font-weight: bold;
+    }
+
+
+    .CMMGR006_EDIT .btnCenter {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .CMMGR006_EDIT .center {
+        text-align: center;
+    }
+
+    .CMMGR006_EDIT .padding {
+        padding: 5px;
+    }
+
+    .CMMGR006_EDIT .insertRow {
+        background: #EEE !important;
+    }
+
+</style>
+<div class="CMMGR006_EDIT" ng-controller="CMMGR006_EditController">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" aria-hidden="false" ng-click="closeThisDialog('cancel')">&times;</button>
+                <h4 id="myModalAlertLabel" class="modal-title" ng-bind="'系統參數設定'"></h4>
+            </div>
+            <div class="modal-body">
+                <form name="paramtypeForm" class="form-horizontal"
+                      data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+                    <div class="row padding">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="input-group">
+                                <span class="input-group-addon" ng-bind="'參數種類（必填）'"></span>
+                                <input type="text" class="form-control" ng-model="inputVO.paramType"
+                                       placeholder="請輸入參數種類～"
+                                       ng-blur="checkParam()" ng-disabled="isUpdate" maxlength="50" autofocus required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row padding">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="input-group">
+                                <span class="input-group-addon" ng-bind="'參數名稱（必填）'"></span>
+                                <input type="text" class="form-control" ng-model="inputVO.ptypeName"
+                                       ng-change="countLength(inputVO, 'ptypeName', counter)" placeholder="請輸入參數名稱～"
+                                       required>
+                            </div>
+                            <div class="helperCounts">
+                                <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                                      title="限制字元數，中文字將會占用三字元，其餘一字元！"></span>
+                                <span ng-class="counter.ptypeName.invalid? 'overLimit': ''"
+                                      ng-bind="counter.ptypeName.curCnt"></span>
+                                <span ng-bind="'/' + counter.ptypeName.limit"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row padding">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="input-group">
+                                <span class="input-group-addon" ng-bind="'參數類型（必填）'"></span>
+                                <e-combobox ng-datasource="mappingSet['TBSYSPARAMTYPE_PTYPE_BUSS']"
+                                            ng-model="inputVO.ptypeBuss"
+                                            ng-format="F3"
+                                            required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row padding">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="input-group">
+                                <span class="input-group-addon" ng-bind="'參數說明'"></span>
+                                <textarea placeholder="來點說明嗎？" ng-model="inputVO.ptypeDesc" rows="3"
+                                          class="form-control"
+                                          ng-change="countLength(inputVO, 'ptypeDesc', counter)"></textarea>
+                            </div>
+                            <div class="helperCounts">
+                                <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                                      title="限制字元數，中文字將會占用三字元，其餘一字元！"></span>
+                                <span ng-class="counter.ptypeDesc.invalid? 'overLimit': ''"
+                                      ng-bind="counter.ptypeDesc.curCnt"></span>
+                                <span ng-bind="'/' + counter.ptypeDesc.limit"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="btnCenter">
+                    <button type="button" class="btn btn-success" ng-click="saveType()" function-type="maintenance"
+                            　data-toggle="tooltip" title="資料填妥了嗎？準備儲存！">
+                        <span class="glyphicon glyphicon-floppy-disk"></span>
+                        <span ng-bind="'儲存'"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')"
+                            　data-toggle="tooltip" title="關閉視窗！下次再來！">
+                        <span class="glyphicon glyphicon-remove"></span>
+                        <span ng-bind="'關閉'"></span>
+                    </button>
+
+                    <button type="button" class="btn btn-danger" ng-click="delType()" ng-if="isUpdate"
+                            function-type="maintenance" 　data-toggle="tooltip" title="謹慎小心，刪除此筆參數種類與編碼！">
+                        <span class="glyphicon glyphicon-trash"></span>
+                        <span ng-bind="'刪除'"></span>
+                    </button>
+                    <hr/>
+                </div>
+
+                <!-- 參數編碼區（TBSYSPARAMETER） -->
+                <div class="row padding" ng-if="isUpdate">
+                    <div class="col-lg-12 col-md-12">
+                        <div class="gv_tab_sc">
+                            <table class="table-bordered e-table-freeze" e-height="400px" e-mode="1" e-top="true"
+                                   e-list="codeData">
+                                <thead>
+                                <tr>
+                                    <th class="col-md-2" ng-bind="'功能'"></th>
+                                    <th class="col-md-1" ng-bind="'順序'"></th>
+                                    <th class="col-md-3" ng-bind="'參數編碼'"></th>
+                                    <th class="col-md-4" ng-bind="'參數值'"></th>
+                                    <th class="col-md-2" ng-bind="'參數說明'"></th>
+                                </tr>
+                                <tr class="insertRow">
+                                    <td class="center">
+                                        <button type="button" class="btn btn-primary" function-type="maintenance"
+                                                data-toggle="tooltip" title="新增一筆參數"
+                                                ng-click="insertCode()">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                            <span ng-bind="'新增'"></span>
+                                        </button>
+                                    </td>
+                                    <td class="center" ng-bind="(newVO.paramOrder = codeData.length)"></td>
+                                    <td class="center">
+                                        <input class="form-control" type="text" ng-model="newVO.paramCode"
+                                               ng-blur="existParamCode(newVO)"/>
+                                    </td>
+                                    <td>
+                                        <textarea class="form-control" type="text" ng-model="newVO.paramName"></textarea>
+                                    </td>
+                                    <td class="center">
+                                        <textarea class="form-control" type="text" ng-model="newVO.paramDesc"></textarea>
+                                    </td>
+                                </tr>
+                                </thead>
+                                <tbody ui-sortable="sortableOptions" ng-model="codeData">
+                                <tr class="repeat-row" ng-repeat="subCode in codeData track by $index">
+                                    <td class="center">
+                                        <button type="button" class="btn btn-success" function-type="maintenance"
+                                                data-toggle="tooltip" title="儲存【{{subCode.PARAM_CODE}}】"
+                                                ng-click="saveCode(subCode)" ng-if="subCode.isEdit">
+                                            <span class="glyphicon glyphicon-floppy-disk"></span>
+                                            <span ng-bind="'儲存'"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-warning" function-type="maintenance"
+                                                data-toggle="tooltip" title="編輯【{{subCode.PARAM_CODE}}】"
+                                                ng-click="editCode(subCode)" ng-if="!subCode.isEdit">
+                                            <span class="glyphicon glyphicon-pencil"></span>
+                                            <span ng-bind="'編輯'"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default" function-type="maintenance"
+                                                data-toggle="tooltip" title="取消編輯【{{subCode.PARAM_CODE}}】"
+                                                ng-click="cancelCode(subCode)" ng-if="subCode.isEdit">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                            <span ng-bind="'取消'"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-danger" function-type="maintenance"
+                                                data-toggle="tooltip" title="刪除【{{subCode.PARAM_CODE}}】"
+                                                ng-click="delCode(subCode)" ng-if="!subCode.isEdit">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                            <span ng-bind="'刪除'"></span>
+                                        </button>
+                                    </td>
+                                    <td class="center" ng-bind="subCode.PARAM_ORDER"></td>
+                                    <td class="center">
+                                        <span ng-show="!subCode.isEdit" ng-bind="subCode.PARAM_CODE"></span>
+                                        <input class="form-control" ng-show="subCode.isEdit" type="text"
+                                               ng-model="subCode.next.paramCode"
+                                               ng-blur="existParamCode(subCode.next)"/>
+                                    </td>
+                                    <td>
+                                        <span ng-show="!subCode.isEdit" ng-bind="subCode.PARAM_NAME"></span>
+                                        <textarea class="form-control" ng-show="subCode.isEdit" type="text"
+                                               ng-model="subCode.next.paramName"></textarea>
+                                    </td>
+                                    <td>
+                                        <span ng-show="!subCode.isEdit" ng-bind="subCode.PARAM_DESC"></span>
+                                        <textarea class="form-control" ng-show="subCode.isEdit" type="text"
+                                               ng-model="subCode.next.paramDesc"></textarea>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

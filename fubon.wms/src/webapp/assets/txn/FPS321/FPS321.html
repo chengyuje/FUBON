@@ -1,0 +1,266 @@
+<style>
+    .FPS321 .modal-content {
+        width: 60vw;
+        max-width: 750px;
+    	min-width: 750px;
+        max-height: 720px;
+        min-height: 720px;
+    }
+
+    .FPS321 .scrollable {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    .FPS321 .textRight {
+        text-align: right;
+    }
+
+    .FPS321 .inputSize.lg {
+        width: 180px;
+    }
+
+    .FPS321 .inputSize.sm {
+        width: 80px;
+    }
+
+</style>
+<div ng-controller="FPS321Controller"
+     class="FPS321 FPS"
+     ng-cloak>
+    <div class="modal-dialog ">
+        <div class="modal-content ">
+            <div class="modal-header">
+            	<button type="button"
+                        class="close"
+                        ng-click="closeThisDialog('cancel')">&times;</button>                
+                <h4 id="myModalAlertLabel"
+                    class="modal-title"
+                    align="center">
+                    <label>計算子女教育所需資金</label>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <!-- result -->
+                <div class="bootstrap-adng-min-panel-content ">
+                    <table class="table"
+                           border="0">
+                        <tbody>
+          					<tr>
+          						<div style="text-align: right; padding: .5em; border-bottom: 0.5px solid #e1e1e1;">單位:新台幣元</div> 
+          					</tr>          					         					
+                            <tr>
+                                <th style="border-bottom: 0px; width: 90px;">【大學】</th>
+                                <th class="form-inline" style="border-bottom: 0px; width: 100px;">
+                                    <input type="radio"
+                                           name="UNIVERSITY"
+                                           ng-change="getDefault('university_1')"
+                                           ng-model="inputVO.UNIVERSITY"
+                                           value="1"
+                                           style="top: -1px;"
+                                           class="radio">&nbsp;公立</th>
+                                <th class="form-inline" style="border-bottom: 0px; width: 100px;">
+                                    <input type="radio"
+                                           name="UNIVERSITY"
+                                           ng-change="getDefault('university_2')"
+                                           ng-model="inputVO.UNIVERSITY"
+                                           value="2"
+                                           style="top: -1px;"
+                                           class="radio">&nbsp;私立</th>
+                                <th class="form-inline" style="border-bottom: 0px; width: 100px;">
+                                    <input type="radio"
+                                           name="UNIVERSITY"
+                                           ng-change="getDefault('university_3')"
+                                           ng-model="inputVO.UNIVERSITY"
+                                           value="3"
+                                           style="top: -1px;"
+                                           class="radio">&nbsp;留學</th>
+                                <th style="border-bottom: 0px; width: 90px;">學費</th>
+                                <th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="text"
+                                           e-input-limit="NC"
+                                           name="UNIVERSITY_FEE_EDU"
+                                           class="inputSize lg textRight form-control"
+                                           placeholder="請輸入..."
+                                           ng-model="inputVO.UNIVERSITY_FEE_EDU"
+                                           ng-change="sum();inputVO.UNIVERSITY_FEE_EDU = inputVO.UNIVERSITY_FEE_EDU.replace('-' , '');"
+                                           ng-blur="chgMomey();"> 元/年</th>
+                            </tr>
+                            <tr>
+                            	<th colspan="4" style="border-bottom: 0px;"></th>
+                            	<th style="border-bottom: 0px;">生活費</th>
+                            	<th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="text"
+                                           e-input-limit="NC"
+                                           name="UNIVERSITY_FEE_LIFE"
+                                           class="inputSize lg textRight form-control"
+                                           placeholder="請輸入..."
+                                           ng-model="inputVO.UNIVERSITY_FEE_LIFE"
+                                           ng-change="sum();inputVO.UNIVERSITY_FEE_LIFE = inputVO.UNIVERSITY_FEE_LIFE.replace('-' , '');"
+                                           ng-blur="chgMomey();"> 元/年</th>
+                            </tr>
+                            <tr>
+                            	<th colspan="4"></th>
+                            	<th>年期</th>
+                            	<th class="form-inline">
+                                    <input type="text"
+                                           e-input-limit="NC"
+                                           name="UNIVERSITY_YEAR"
+                                           class="inputSize sm textRight form-control"
+                                           placeholder="請輸入..."
+                                           ng-model="inputVO.UNIVERSITY_YEAR"
+                                           ng-blur="chgMomey();"
+                                           ng-change="sum();inputVO.UNIVERSITY_YEAR = inputVO.UNIVERSITY_YEAR.replace('-' , '');"> 年</th>
+                            </tr>                            
+                            <tr>
+                                <th style="border-bottom: 0px;">【碩士】</th>
+                                <th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="radio"
+                                           name="MASTER"
+                                           ng-change="getDefault('graduate_1')"
+                                           ng-model="inputVO.MASTER"
+                                           value="1"
+                                           style="top: -1px;"
+                                           class="radio">&nbsp;公立</th>
+                                <th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="radio"
+                                           name="MASTER"
+                                           ng-change="getDefault('graduate_2')"
+                                           ng-model="inputVO.MASTER"
+                                           value="2"
+                                           style="top: -1px;"
+                                           class="radio">&nbsp;私立</th>
+                                <th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="radio"
+                                           name="MASTER"
+                                           ng-change="getDefault('graduate_3')"
+                                           ng-model="inputVO.MASTER"
+                                           value="3"
+                                           style="top: -1px;"
+                                           class="radio">&nbsp;留學</th>
+                                <th style="border-bottom: 0px;">學費</th>
+                                <th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="text"
+                                           e-input-limit="NC"
+                                           name="MASTER_FEE_EDU"
+                                           class="inputSize lg textRight form-control"
+                                           placeholder="請輸入..."
+                                           ng-model="inputVO.MASTER_FEE_EDU"
+                                           ng-change="sum();inputVO.MASTER_FEE_EDU = inputVO.MASTER_FEE_EDU.replace('-' , '');"
+                                           ng-blur="chgMomey();"> 元/年</th>                                                               
+                            </tr>
+                            <tr>
+                            	<th colspan="4" style="border-bottom: 0px;"></th>
+                            	<th style="border-bottom: 0px;">生活費</th>
+                            	<th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="text"
+                                           e-input-limit="NC"
+                                           name="MASTER_FEE_LIFE"
+                                           class="inputSize lg textRight form-control"
+                                           placeholder="請輸入..."
+                                           ng-model="inputVO.MASTER_FEE_LIFE"
+                                           ng-change="sum();inputVO.MASTER_FEE_LIFE = inputVO.MASTER_FEE_LIFE.replace('-' , '');"
+                                           ng-blur="chgMomey();"> 元/年</th>
+                            </tr>
+                            <tr>
+                            	<th colspan="4"></th>
+                            	<th>年期</th>
+                            	<th class="form-inline">
+                                    <input type="text"
+                                           e-input-limit="NC"
+                                           name="MASTER_YEAR"
+                                           class="inputSize sm textRight form-control"
+                                           placeholder="請輸入..."
+                                           ng-model="inputVO.MASTER_YEAR"
+                                           ng-blur="chgMomey();"
+                                           ng-change="sum();inputVO.MASTER_YEAR = inputVO.MASTER_YEAR.replace('-' , '');"> 年</th>
+                            </tr>
+                            <tr>
+                                <th style="border-bottom: 0px;">【博士】</th>
+                                <th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="radio"
+                                           name="PHD"
+                                           ng-change="getDefault('doctor_1')"
+                                           ng-model="inputVO.PHD"
+                                           value="1"
+                                           style="top: -1px;"
+                                           class="radio">&nbsp;公立</th>
+                                <th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="radio"
+                                           name="PHD"
+                                           ng-change="getDefault('doctor_2')"
+                                           ng-model="inputVO.PHD"
+                                           value="2"
+                                           style="top: -1px;"
+                                           class="radio">&nbsp;私立</th>
+                                <th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="radio"
+                                           name="PHD"
+                                           ng-change="getDefault('doctor_3')"
+                                           ng-model="inputVO.PHD"
+                                           value="3"
+                                           style="top: -1px;"
+                                           class="radio">&nbsp;留學</th>
+                                <th style="border-bottom: 0px;">學費</th>
+                                <th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="text"
+                                           e-input-limit="NC"
+                                           name="PHD_FEE_EDU"
+                                           class="inputSize lg textRight form-control"
+                                           placeholder="請輸入..."
+                                           ng-model="inputVO.PHD_FEE_EDU"
+                                           ng-change="sum();inputVO.PHD_FEE_EDU = inputVO.PHD_FEE_EDU.replace('-' , '');"
+                                           ng-blur="chgMomey();"> 元/年</th>
+                                
+                                
+                            </tr>
+                            <tr>
+                            	<th colspan="4" style="border-bottom: 0px;"></th>
+                            	<th style="border-bottom: 0px;">生活費</th>
+                            	<th class="form-inline" style="border-bottom: 0px;">
+                                    <input type="text"
+                                           e-input-limit="NC"
+                                           name="PHD_FEE_LIFE"
+                                           class="inputSize lg textRight form-control"
+                                           placeholder="請輸入..."
+                                           ng-model="inputVO.PHD_FEE_LIFE"
+                                           ng-change="sum();inputVO.PHD_FEE_LIFE = inputVO.PHD_FEE_LIFE.replace('-' , '');"
+                                           ng-blur="chgMomey();"> 元/年</th>
+                            </tr>
+                            <tr>
+                            	<th colspan="4"></th>
+                            	<th>年期</th>
+                            	<th class="form-inline">
+                                    <input type="text"
+                                           e-input-limit="NC"
+                                           name="PHD_YEAR"
+                                           class="inputSize sm textRight form-control"
+                                           placeholder="請輸入..."
+                                           ng-model="inputVO.PHD_YEAR"
+                                           ng-blur="chgMomey();"
+                                           ng-change="sum();inputVO.PHD_YEAR = inputVO.PHD_YEAR.replace('-' , '');"> 年</th>
+                            </tr>
+                            <tr style="background-color: #e5f3fc;">
+                            	<th colspan="4">子女教育所需資金：</th>
+                            	<th>共</th>
+                            	<th class="form-inline">
+		                            {{inputVO.total | number}} 元</th>
+                            </tr>                            
+                        </tbody>
+                    </table>
+                    <div class="text-center">
+                        <a type="button"
+                                class="btn-fps"
+                                ng-click="clear()">清空</a>
+                        <a type="button"
+                                class="btn-fps"
+                                ng-click="closeThisDialog('cancel')">取消</a>
+                        <a type="button"
+                                class="btn-fps"
+                                ng-click="backFPS320()">確認</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,188 @@
+<style>
+.modal-dialog.CRM3103_EDIT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 700px;
+	height: 300px;
+}
+</style>
+<div ng-controller="CRM3103_EDITController" ng-cloak>
+	<div class="modal-dialog CRM3103_EDIT"> 
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center" ng-if="!(inputVO.isHeadMgr && inputVO.addCustYN && inputVO.addCustYN == 'Y')">輪調名單明細編輯</h4>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center" ng-if="inputVO.isHeadMgr && inputVO.addCustYN && inputVO.addCustYN == 'Y'">輪調名單新增客戶</h4>
+			</div>
+			<!-- 分行主管編輯名單明細資料 -->
+			<div class="modal-body" ng-if="!inputVO.isHeadMgr">
+<!--  				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab> -->
+ 					<table>
+						<tr>
+	 						<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">錄音序號：</th>
+ 							<td class="col-md-9 tdpadding">
+ 								<input type="text" class="form-control" id="recSeq" name="recSeq" style="width:150px;" ng-model="inputVO.REC_SEQ" e-length-limit="12">
+ 							</td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>
+ 							<th class="col-md-1 tdpadding">錄音日期：</th>
+ 							<td class="col-md-9 tdpadding" colspan="5">
+ 								<div style="float:left" class="input-group datebox datewidth">
+								<input  type="text" 
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd" 
+										ng-model="inputVO.REC_DATE"
+										datepicker-options="rec_dateOptions" 
+										is-open="model.a" 
+										ng-required="true"
+										ng-readonly="true"
+										style="width:150px;" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" 
+										class="btn btn-default" 
+										ng-click="open($event, 'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+								</div>
+ 							</td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">選擇上傳檔案：</th>
+							<td class="col-md-7 tdpadding">
+								<e-upload success="uploadFinshed(name,rname)"></e-upload>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+ 					</table>
+<!--  				</form> -->
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="save('4')">儲存</button>
+					<button type="button" class="btn btn-info" ng-click="save('11')">送出覆核</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+			
+			<!-- 總行編輯名單明細資料 -->
+			<div class="modal-body" ng-if="inputVO.isHeadMgr && !(inputVO.addCustYN && inputVO.addCustYN == 'Y')">
+<!--  				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab> -->
+ 					<table>
+						<tr>
+	 						<td class="col-xs-1"></td>
+ 							<th class="col-md-4 tdpadding">
+ 								<input type="radio" name="headEditType" ng-model="inputVO.headEditType" ng-value="'1'" required>
+								調整核心客戶&nbsp;&nbsp;
+							</th>
+ 							<td class="col-md-9 tdpadding">
+ 								核心客戶&nbsp;&nbsp;<input type='checkbox' ng-model='inputVO.GO_CUST_YN' ng-true-value="'Y'" ng-false-value="'N'" ng-disabled="inputVO.headEditType != '1'">
+ 							</td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+ 						<tr>
+ 							<td class="col-xs-1"></td>
+ 							<th class="col-md-4 tdpadding">
+ 								<input type="radio" name="headEditType" ng-model="inputVO.headEditType" ng-value="'2'" required>
+								調整主副CODE資料&nbsp;&nbsp;
+							</th>
+ 							<td class="col-md-9 tdpadding" colspan="5">
+ 								<e-combobox id="aoCode" name="aoCode"
+									ng-datasource="inputVO.aoCodeList"
+									ng-model="inputVO.AO_CODE"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									width="200px" 
+									ng-change="getEditAoData();"
+									ng-disabled="inputVO.headEditType != '2'"/>
+ 							</td>
+ 							<td class="col-xs-1"></td>
+ 						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-4 tdpadding">
+ 								<input type="radio" name="headEditType" ng-model="inputVO.headEditType" ng-value="'3'" required>
+								調整名單狀態&nbsp;&nbsp;
+							</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="status" name="status"
+									ng-datasource="mappingSet['CRM.TRS_PRJ_ROT_STATUS_D']"
+									ng-model="inputVO.STATUS"
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									width="200px" 
+									ng-disabled="inputVO.headEditType != '3'"/>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+ 					</table>
+<!--  				</form> -->
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="save('13')">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+			
+			<!-- 總行新增客戶至名單中 -->
+			<div class="modal-body" ng-if="inputVO.isHeadMgr && inputVO.addCustYN && inputVO.addCustYN == 'Y'">
+				<div>
+					<table width="100%">
+						<tr width="100%">
+							<td width="50%"><b>&nbsp;&nbsp;專案名稱：</b>&nbsp;{{inputVO.PRJ_NAME}}</td>
+							<td width="25%"><b>分行：</b>&nbsp;{{inputVO.BRANCH_NBR}}-{{inputVO.BRANCH_NAME}}</td>
+						</tr>
+					</table>		
+				</div>
+				
+ 				<table>
+					<tr>
+	 					<td class="col-xs-1"></td>
+ 						<th class="col-md-4 tdpadding">
+ 							客戶ID
+						</th>
+ 						<td class="col-md-9 tdpadding">
+ 							<input type="text" class="form-control" id="newCustId" name="newCustId" style="width:150px;" ng-model="inputVO.NEW_CUST_ID" e-length-limit="12">
+ 						</td>
+ 						<td class="col-xs-1"></td>
+ 					</tr>
+ 					<tr>
+ 						<td class="col-xs-1"></td>
+ 						<th class="col-md-4 tdpadding">
+							理專
+						</th>
+ 						<td class="col-md-9 tdpadding" colspan="5">
+ 							<e-combobox id="newEmp" name="newEmp"
+								ng-datasource="inputVO.empList"
+								ng-model="inputVO.NEW_EMP"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								width="220px" 
+								ng-change="getNewEmpData();"/>
+ 						</td>
+ 						<td class="col-xs-1"></td>
+ 					</tr>
+ 				</table>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="save('14')">確定</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

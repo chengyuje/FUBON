@@ -1,0 +1,26 @@
+<div class="btn-group">
+  <!--button type="button" class="btn btn-default dropdown-toggle" ng-click="toggleSelect()" ng-disabled="disabled" ng-class="{'error': !valid()}" style="min-width:150px;">
+    {{header}} 
+  </button-->
+  <input style="padding-left:8px;margin-bottom:8px;height:24px;width:{{Width}};"
+    ng-click="toggleSelect()" 
+    ng-class="{'error': !valid()}" 
+    data-ng-model="header"/>
+  <span class="caret" style="margin:12px -15px 0 -15px;"></span>
+  <ul class="dropdown-menu">
+    <li>
+      <input class="form-control input-sm" type="text" ng-model="searchText.label" autofocus="autofocus" placeholder="Filter" />
+    </li>
+    <!--全選/全不選-->
+    <li ng-show="multiple" role="presentation" class="">
+      <button class="btn btn-link btn-xs" ng-click="checkAll()" type="button"><i class="glyphicon glyphicon-ok"></i> Check all</button>
+      <button class="btn btn-link btn-xs" ng-click="uncheckAll()" type="button"><i class="glyphicon glyphicon-remove"></i> Uncheck all</button>
+    </li>
+    <!--選擇區-->
+    <li ng-repeat="i in items | filter:searchText">
+      <a ng-click="select(i); focus()">
+        <i class='glyphicon' ng-class="{'glyphicon-ok': i.checked, 'empty': !i.checked}"></i> {{i.label}}
+      </a>
+    </li>
+  </ul>
+</div>

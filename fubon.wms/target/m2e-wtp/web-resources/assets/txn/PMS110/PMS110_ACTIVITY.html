@@ -1,0 +1,308 @@
+<style>
+
+    /* dialog panel */
+    .PMS110_ACTIVITY .modal-dialog {
+        position: relative;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 1200px;
+        height: auto;
+    }
+
+    /*table size*/
+    .PMS110_ACTIVITY table {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .PMS110_ACTIVITY .center {
+        text-align: center;
+    }
+
+    .PMS110_ACTIVITY .helperCounts {
+        float: right;
+        margin-top: -2px;
+        opacity: 0.5;
+        color: rgb(45, 122, 168);
+    }
+
+    .PMS110_ACTIVITY .overLimit {
+        color: #c9302c;
+        font-weight: bold;
+    }
+
+</style>
+<div class="PMS110_ACTIVITY" ng-controller="PMS110_ACTIVITYController">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        ng-click="closeThisDialog('cancel')">&times;
+                </button>
+                <h4 id="myModalAlertLabel" class="modal-title" align="left">Pipeline 銷售活動</h4>
+            </div>
+            <div class="modal-body scroll_y">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-addon" ng-bind="'開始日期'"></span>
+                            <div class="input-group datebox datewidth">
+                                <input type="text"
+                                       class="form-control"
+                                       uib-datepicker-popup="yyyy/MM/dd"
+                                       ng-model="inputVO.actStart"
+                                       datepicker-options="inputVO.sDateOptions"
+                                       is-open="activityModel.inputStart"
+                                       ng-readonly="true"
+                                       ng-change="limitDateForObj(inputVO)"/>
+                                <!-- 製作日曆button -->
+                                <span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+                                                ng-click="openActivityDate($event, 'inputStart')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-addon" ng-bind="'活動名稱'"></span>
+                            <input type="text" placeholder="請輸入關鍵字" class="form-control" ng-model="inputVO.actName"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-addon" ng-bind="'結束日期'"></span>
+                            <div class="input-group datebox datewidth">
+                                <input type="text"
+                                       class="form-control"
+                                       uib-datepicker-popup="yyyy/MM/dd"
+                                       ng-model="inputVO.actEnd"
+                                       datepicker-options="inputVO.eDateOptions"
+                                       is-open="activityModel.inputEnd"
+                                       ng-readonly="true"
+                                       ng-change="limitDateForObj(inputVO)"/>
+                                <!-- 製作日曆button -->
+                                <span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+                                                ng-click="openActivityDate($event, 'inputEnd')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-addon" ng-bind="'活動狀態'"></span>
+                            <e-combobox ng-datasource="mappingSet['PMS.PIPELINE_ACT_STATUS']"
+                                        ng-model="inputVO.actStatus"
+                                        ng-format="F3"
+                                        ng-required="true"
+                                        width="200px"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search_box_btn text-center">
+                    <button ng-click="qryActivity()" class="btn btn-primary" function-type="query">
+                        <span class="glyphicon glyphicon-search"></span>
+                        <span ng-bind="'查詢'"></span>
+                    </button>
+                    <button ng-click="init()" class="btn btn-info">
+                        <span class="glyphicon glyphicon-erase"></span>
+                        <span ng-bind="'清除'"></span>
+                    </button>
+                </div>
+
+                <e-jumping-once output="outputVO" list="subActList" totallist="actList"></e-jumping-once>
+
+                <div class="gv_tab_sc scroll_y">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th class="col-md-1" ng-bind="'功能'"></th>
+                            <th class="col-md-5" ng-bind="'活動名稱'"></th>
+                            <th class="col-md-2" ng-bind="'開始時間'"></th>
+                            <th class="col-md-2" ng-bind="'結束時間'"></th>
+                            <th class="col-md-2" ng-bind="'活動狀態'"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <button class="btn btn-primary" ng-click="addNewActivity()"
+                                        ng-show="!activity.insertFlag" function-type="maintenance">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    <span ng-bind="'新增'"></span>
+                                </button>
+                                <button class="btn btn-success" ng-click="saveNewActivity()"
+                                        ng-show="activity.insertFlag" function-type="maintenance">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span>
+                                    <span ng-bind="'儲存'"></span>
+                                </button>
+                                <button class="btn btn-danger" ng-click="cancelInsert()" ng-show="activity.insertFlag"
+                                        function-type="maintenance">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    <span ng-bind="'取消'"></span>
+                                </button>
+                            </td>
+                            <td>
+                                <input class="form-control" type="text" ng-model="activityVO.actName"
+                                       ng-disabled="!activity.insertFlag"
+                                       ng-change="countActivityName(activityVO, newActCounter)"/>
+                                <div class="helperCounts" ng-show="activity.insertFlag">
+                                    <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                                          title="限制字元數，中文字將會占用三字元，其餘一字元！"></span>
+                                    <span ng-class="newActCounter.curCnt > newActCounter.limit? 'overLimit': ''"
+                                          ng-bind="newActCounter.curCnt"></span>
+                                    <span ng-bind="'/' + newActCounter.limit"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group datebox datewidth">
+                                    <input type="text"
+                                           class="form-control"
+                                           uib-datepicker-popup="yyyy/MM/dd"
+                                           ng-model="activityVO.actStart"
+                                           datepicker-options="sDateOptions"
+                                           is-open="activityModel.start"
+                                           ng-disabled="!activity.insertFlag"
+                                           ng-readonly="true"
+                                           ng-change="limitDate()"/>
+                                    <!-- 製作日曆button -->
+                                    <span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+                                                ng-click="openActivityDate($event,'start')"
+                                                ng-disabled="!activity.insertFlag">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group datebox datewidth">
+                                    <input type="text"
+                                           class="form-control"
+                                           uib-datepicker-popup="yyyy/MM/dd"
+                                           ng-model="activityVO.actEnd"
+                                           datepicker-options="eDateOptions"
+                                           is-open="activityModel.end"
+                                           ng-disabled="!activity.insertFlag"
+                                           ng-readonly="true"
+                                           ng-change="limitDate()"/>
+                                    <!-- 製作日曆button -->
+                                    <span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+                                                ng-click="openActivityDate($event,'end')"
+                                                ng-disabled="!activity.insertFlag">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+                                </div>
+                            </td>
+                            <td>
+                                <e-combobox ng-datasource="mappingSet['PMS.PIPELINE_ACT_STATUS']"
+                                            ng-model="activityVO.actStatus"
+                                            ng-format="F3"
+                                            ng-disabled="!activity.insertFlag"
+                                            ng-readonly="!activity.insertFlag"/>
+                            </td>
+                        </tr>
+                        <tr class="repeat-row"
+                            ng-repeat="row in subActList | limitTo:displayLimit track by $index"
+                            ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                            <td>
+                                <button class="btn btn-warning" ng-click="editActivity(row)" ng-show="!row.editFlag"
+                                        function-type="maintenance">
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                    <span ng-bind="'修改'"></span>
+                                </button>
+                                <button class="btn btn-success" ng-click="saveActivityChange(row)"
+                                        ng-show="row.editFlag" function-type="maintenance">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span>
+                                    <span ng-bind="'儲存'"></span>
+                                </button>
+                                <button class="btn btn-danger" ng-click="cancelEdit(row)" ng-show="row.editFlag"
+                                        function-type="maintenance">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    <span ng-bind="'取消'"></span>
+                                </button>
+                            </td>
+                            <td class="center">
+                                <span ng-bind="row.NAME" ng-show="!row.editFlag"></span>
+                                <input class="form-control" type="text" ng-model="row.actName"
+                                       ng-show="row.editFlag" ng-change="countActivityName(row, row.counter)"/>
+                                <div class="helperCounts" ng-show="row.editFlag">
+                                    <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                                          title="限制字元數，中文字將會占用三字元，其餘一字元！"></span>
+                                    <span ng-class="row.counter.curCnt > row.counter.limit? 'overLimit': ''"
+                                          ng-bind="row.counter.curCnt"></span>
+                                    <span ng-bind="'/' + row.counter.limit"></span>
+                                </div>
+                            </td>
+                            <td class="center">
+                                <span ng-bind="row.START_DATE" ng-show="!row.editFlag"></span>
+                                <div class="input-group datebox datewidth" ng-show="row.editFlag">
+                                    <input type="text"
+                                           class="form-control"
+                                           uib-datepicker-popup="yyyy/MM/dd"
+                                           ng-model="row.actStart"
+                                           datepicker-options="row.sDateOptions"
+                                           is-open="activityModel[row.SEQ + 'start']"
+                                           ng-readonly="true"
+                                           ng-change="limitDateForObj(row)"/>
+                                    <!-- 製作日曆button -->
+                                    <span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+                                                ng-click="openActivityDate($event, row.SEQ + 'start')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+                                </div>
+                            </td>
+                            <td class="center">
+                                <span ng-bind="row.END_DATE" ng-show="!row.editFlag"></span>
+                                <div class="input-group datebox datewidth" ng-show="row.editFlag">
+                                    <input type="text"
+                                           class="form-control"
+                                           uib-datepicker-popup="yyyy/MM/dd"
+                                           ng-model="row.actEnd"
+                                           datepicker-options="row.eDateOptions"
+                                           is-open="activityModel[row.SEQ + 'end']"
+                                           ng-readonly="true"
+                                           ng-change="limitDateForObj(row)"/>
+                                    <!-- 製作日曆button -->
+                                    <span class="input-group-btn">
+										<button type="button" class="btn btn-default"
+                                                ng-click="openActivityDate($event, row.SEQ + 'end')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+                                </div>
+                            </td>
+                            <td class="center">
+                                <span ng-bind="row.STATUS | mapping : mappingSet['PMS.PIPELINE_ACT_STATUS'] : 'F3'"
+                                      ng-show="!row.editFlag"></span>
+                                <e-combobox ng-datasource="mappingSet['PMS.PIPELINE_ACT_STATUS']"
+                                            ng-model="row.actStatus"
+                                            ng-format="F3"
+                                            ng-show="row.editFlag"/>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

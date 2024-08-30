@@ -1,0 +1,292 @@
+<style>
+  /* ios btn style */
+
+  ul,
+  li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .tg-list {
+    text-align: center;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+  }
+
+  .tg-list-item {
+    margin: 0 2em;
+  }
+
+  h2 {
+    color: #777;
+  }
+
+  h4 {
+    color: #999;
+  }
+
+  .tgl {
+    display: none;
+  }
+
+  .tgl,
+  .tgl:after,
+  .tgl:before,
+  .tgl *,
+  .tgl *:after,
+  .tgl *:before,
+  .tgl+.tgl-btn {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
+  .tgl::-moz-selection,
+  .tgl:after::-moz-selection,
+  .tgl:before::-moz-selection,
+  .tgl *::-moz-selection,
+  .tgl *:after::-moz-selection,
+  .tgl *:before::-moz-selection,
+  .tgl+.tgl-btn::-moz-selection {
+    background: none;
+  }
+
+  .tgl::selection,
+  .tgl:after::selection,
+  .tgl:before::selection,
+  .tgl *::selection,
+  .tgl *:after::selection,
+  .tgl *:before::selection,
+  .tgl+.tgl-btn::selection {
+    background: none;
+  }
+
+  .tgl+.tgl-btn {
+    outline: 0;
+    display: block;
+    width: 4em;
+    height: 2em;
+    position: relative;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .tgl+.tgl-btn:after,
+  .tgl+.tgl-btn:before {
+    position: relative;
+    display: block;
+    content: "";
+    width: 50%;
+    height: 100%;
+  }
+
+  .tgl+.tgl-btn:after {
+    left: 0;
+  }
+
+  .tgl+.tgl-btn:before {
+    display: none;
+  }
+
+  .tgl:checked+.tgl-btn:after {
+    left: 50%;
+  }
+
+  .tgl-ios+.tgl-btn {
+    background: #fbfbfb;
+    border-radius: 2em;
+    padding: 2px;
+    -webkit-transition: all .4s ease;
+    transition: all .4s ease;
+    border: 1px solid #e8eae9;
+  }
+
+  .tgl-ios+.tgl-btn:after {
+    border-radius: 2em;
+    background: #fbfbfb;
+    -webkit-transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), padding 0.3s ease, margin 0.3s ease;
+    transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), padding 0.3s ease, margin 0.3s ease;
+    -webkit-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 4px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 4px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  .tgl-ios+.tgl-btn:hover:after {
+    will-change: padding;
+  }
+
+  .tgl-ios+.tgl-btn:active {
+    -webkit-box-shadow: inset 0 0 0 2em #e8eae9;
+    box-shadow: inset 0 0 0 2em #e8eae9;
+  }
+
+  .tgl-ios+.tgl-btn:active:after {
+    padding-right: .8em;
+  }
+
+  .tgl-ios:checked+.tgl-btn {
+    background: #86d993;
+  }
+
+  .tgl-ios:checked+.tgl-btn:active {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  .tgl-ios:checked+.tgl-btn:active:after {
+    margin-left: -.8em;
+  }
+
+</style>
+<script type="text/javascript"
+        src="assets/txn/FPS400/FPS400.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS400/FPS400_DETAIL.js"></script>
+<script type="text/javascript"
+        src="assets/txn/FPS400/FPS400_PREVIEW.js"></script>
+
+<div ng-controller="FPS400Controller"
+     ng-clock
+     style="padding-top: 20px;">
+  <!-- content -->
+  <div class="FPS">
+    <div class="bootstrap-admin-panel-content">
+      <div>
+        <div style="width: 80%;float: left;">
+          <e-jumping-once output="outputVO"
+                          list="data"
+                          totallist="paramList"></e-jumping-once>
+        </div>
+        <div style="width: 19%;float: right;text-align: right;">
+          <span>單位：新台幣元</span>
+        </div>
+      </div>
+      <table class="table table-striped"
+             style="margin-bottom: 0px;">
+        <thead>
+          <tr>
+<!--             <th style="padding: .7em 0;">波動率追蹤</th> -->
+            <th>績效追蹤</th>
+            <th>達成狀況</th>
+            <th>名稱</th>
+            <th>目標所需資金</th>
+            <th>目前投入金額</th>
+            <th>投組市值</th>
+            <th>含息報酬率</th>
+            <th>應達目標</th>
+            <th>達成率</th>
+            <th>轉寄</th>
+            <th>下載</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="row in data">
+            <!-- 波動率追蹤 -->
+<!--             <td> -->
+<!--               <div> -->
+<!--                 <input class="tgl tgl-ios" -->
+<!--                        id="{{'cb2-' + $index}}" -->
+<!--                        ng-model="row.tpFlag" -->
+<!--                        ng-change="changeFlag(row, 'tp')" -->
+<!--                        type="checkbox" /> -->
+<!--                 <label class="tgl-btn" -->
+<!--                        for="{{'cb2-' + $index}}" -->
+<!--                        style="display: inline-block;"></label> -->
+<!--               </div> -->
+<!--               <div ng-show="row.REVIEW_P_FLAG == 'P'"><span>取消追蹤待覆核</span></div> -->
+<!--               <div ng-show="row.REVIEW_P_FLAG == 'P'" -->
+<!--                    function-type="confirm"> -->
+<!--                 <button type="button" -->
+<!--                         class="btn btn-info" -->
+<!--                         ng-click="review(row, 'tp', 'A')">核可</button> -->
+<!--                 <button type="button" -->
+<!--                         class="btn btn-info" -->
+<!--                         ng-click="review(row, 'tp', 'R')">退回</button> -->
+<!--               </div> -->
+<!--             </td> -->
+            <!-- 績效追蹤 -->
+            <td>
+              <div>
+                <input class="tgl tgl-ios"
+                       id="{{'cb3-' + $index}}"
+                       ng-model="row.tvFlag"
+                       ng-change="changeFlag(row, 'tv')"
+                       type="checkbox" />
+                <label class="tgl-btn"
+                       for="{{'cb3-' + $index}}"
+                       style="display: inline-block;"></label>
+              </div>
+              <div ng-show="row.REVIEW_V_FLAG == 'P'"><span>取消追蹤待覆核</span></div>
+              <div ng-show="row.REVIEW_V_FLAG == 'P'"
+                   function-type="confirm">
+                <button type="button"
+                        class="btn btn-info"
+                        ng-click="review(row, 'tv', 'A')">核可</button>
+                <button type="button"
+                        class="btn btn-info"
+                        ng-click="review(row, 'tv', 'R')">退回</button>
+              </div>
+            </td>
+            <!-- 達成狀況 -->
+            <td>
+              <img style="width: 85px; height: 85px"
+                   ng-src="{{hitRateGuy[row.HIT_RATE_FLAG]}}"
+                   ng-alt="{{row.HIT_RATE_FLAG}}"
+                   class="ugly-guy">
+              <div ng-bind="row.HIT_RATE_DESC"
+                   ng-style="row.HIT_RATE_DESC == '落後' ? {'color':'red'} : (row.HIT_RATE_DESC == '微幅落後' ? {'color':'orange'}: '')"
+                   style="margin-top:-10px; color: #28a4c9; font-weight: bold;">
+              </div>
+            </td>
+            <!--名稱 -->
+            <td>
+              <a ng-id="$index"
+                 ng-click="goFPS410(row)">
+                <div ng-bind="row.SPP_TYPE|mapping: mapping.planning"></div>
+                <div ng-bind="row.INV_PLAN_NAME"></div>
+              </a>
+            </td>
+            <!--目標所需資金 -->
+            <td ng-bind="row.INV_AMT_TARGET | number:0"></td>
+            <!--目前投入金額 -->
+            <td ng-bind="row.INV_AMT_CURRENT | number:0"></td>
+            <!--投組市值 -->
+            <td ng-bind="row.MARKET_VALUE | number:0"></td>
+            <!--含息報酬率 -->
+            <td>
+              <span ng-bind="row.RETURN_RATE | number:2"></span>%
+            </td>
+            <!--應達目標 -->
+            <td ng-bind="row.AMT_TARGET | number:0"></td>
+            <!--達成率 -->
+            <td>
+              <span ng-bind="row.HIT_RATE | number:0"></span>%
+            </td>
+            <!-- 轉寄 -->
+            <td ng-click="row.IS_EMAIL>0?go('resend', row):''">
+              <i class="fa fa-envelope-o clickable"
+                 ng-class="{'important blue':row.IS_EMAIL>0}"></i>
+            </td>
+            <!-- 下載 -->
+            <td ng-click="row.IS_PRINT>0?go('download', row):''">
+              <i class="fa fa-download clickable"
+                 ng-class="{'important blue':row.IS_PRINT>0}"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="content-title"
+           style="text-align: left;margin-top: 8px">
+        <span>*折台匯率係採本行前一營業日台幣對外幣之匯率，金額欄位數字皆四捨五入計算至整數位。</span>
+        </br>
+        <span>*配息之計算僅包含基金配息金額，不包含連結全委帳戶之投資型保險配息金額。</span>
+      </div>
+    </div>
+  </div>
+</div>

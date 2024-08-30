@@ -1,0 +1,212 @@
+<style>
+
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS421U/PMS421U.js"></script>
+<script type="text/javascript" src="assets/txn/PMS421/PMS421.js"></script>
+<script type="text/javascript" src="assets/txn/PMS421/PMS421_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS421U" ng-controller="PMS421UController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>						
+							<th><font color=red>＊</font>資料統計日期：</th>
+							<td>							
+								<div class="input-group datebox datewidth" style="float:left">
+								<input type="text" id="sCreDate" name="sCreDate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.sCreDate"
+									   is-open="model.a"
+									   datepicker-options="bgn_sDateOptions"									
+									   ng-readonly="true" ng-required="true"		
+									   ng-change="limitDate(); dateChangeU();"
+									   style="width:150px;"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>				
+									</span>
+									
+								</div>		
+								<div style="float:left">&nbsp; ～ &nbsp;</div>
+								<div style="float:left" class="input-group datebox datewidth">
+									<input  type="text" 
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd" 
+											ng-model="inputVO.endDate"
+											is-open="model.b" 
+											datepicker-options="bgn_eDateOptions" 
+											ng-required="true"
+											ng-readonly="true" 
+											ng-change="limitDate()" 
+											style="width:150px;" />
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>	
+							<th>名單來源：</th>	
+							<td>
+								<e-combobox id="ebill_comfirm_sou" name="ebill_comfirm_sou"
+											ng-datasource="EBILL_COMFIRM_SOU" 
+											ng-model="inputVO.ebill_comfirm_sou"
+											ng-validate="false" 
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-require="true"
+											ng-format="F3" 
+											width="200px"
+											style="line-height:20px;" />
+							</td>											    												
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td>
+								<e-combobox id="region_center_id" name="region_center_id"
+											ng-datasource="uhrmRCList"
+											ng-model="inputVO.uhrmRC"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											style="line-height:20px;" />
+							</td>
+							<th>營運區：</th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+											ng-datasource="uhrmOPList"
+											ng-model="inputVO.uhrmOP"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											style="line-height:20px;" />
+							</td>
+							<th>員工姓名：</th>
+							<td>
+								<e-combobox id="aoCode" name="aoCode"
+											ng-datasource="mappingSet['EmpName']"
+											ng-model="inputVO.ao_code"
+											ng-validate="false"
+											ng-disabled="false"
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											style="line-height:20px;" />						 
+							</td>		
+						</tr>					
+					</table>
+				</form>			
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="inquireInit();query()"><span class="glyphicon glyphicon-search"></span>查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()"><span class="glyphicon glyphicon-erase"></span>清除</button>
+				<button type="button" class="btn btn-success" ng-click="exportData()"><span class="glyphicon glyphicon-save"></span>匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">		    
+			<e-jumping-once  output="outputVO" list="data" totallist="paramList"></e-jumping-once> 
+			<div class="gv_tab_sc scroll_y">
+				<table class="table-bordered td_center e-table-freeze" e-height="700px" e-mode="1" e-top="true" e-list="data" style="white-space:nowrap">
+					<thead>
+						<tr>
+							<th>私銀註記</th>
+							<th>業務處</th>
+							<th>區別</th>
+							<th>分行名稱</th>
+							<th>分行代碼</th>
+							<th>客戶姓名</th>
+							<th>身分證號</th>
+							<th>服務理專</th>
+							<th>AO CODE</th>
+							<th>名單來源</th>
+							<th>對帳單基準日</th>
+							<th>函證/簡訊<br>寄送日期</th>
+							<th>客戶回覆日期</th>
+							<th>聯繫內容</th>
+							<th>電訪錄音編號</th>
+							<th>對帳單內容是否符合</th>
+							<th>名單來源</th>
+							<th>首次建立時間</th>
+							<th>訪查人</th>
+							<th>最後異動時間</th>
+							<th>最後異動人員</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td align="center">{{row.RM_FLAG}}</td>
+						 	<td align="center">{{row.REGION_CENTER_NAME}}</td>
+						 	<td align="center">{{row.BRANCH_AREA_NAME}}</td>
+							<td align="center">{{row.BRANCH_NAME}}</td>
+							<td align="center">{{row.BRANCH_NBR}}</td>
+							<td align="center">{{row.CUST_NAME}}</td>
+							<td align="center"><a onclick="return false" ng-click="custDTL(row)">{{row.CUST_ID}}</td>
+							<td align="center">{{row.EMP_NAME}}</td>
+							<td align="center">{{row.AO_CODE}}</td>
+							<td align="center">{{row.DATA_SOURCE}}</td>
+							<td align="center">{{toJsDate(row.DATA_DATE) | date:"yyyy/MM/dd"}}</td>
+							<td align="center">{{row.SEND_DATE}}</td>
+							<td align="center">{{row.RECV_DATE}}</td>
+							<td align="center"><input type="text" class="form-control" style="width: 300px" ng-model="row.UPDATE_REMARK" e-length-limit="200" placeholder="請輸入備註..." ng-blur="updateFlag(row)"/></td>
+							<td>
+								<input 	type="text" class="form-control" style="width: 150px;display:inline;" 
+										e-length-limit="12" 
+										e-input-limit="ND"
+										ng-model="row.RECORD_SEQ" 
+										placeholder="請輸入電訪錄音編號..." 
+										ng-if="row.RECORD_YN == 'N'" 
+										ng-blur="updateFlag(row)"/>
+							</td>
+							<td align="center">
+		                        <label>是<input type="radio" value="Y" ng-change="updateFlag(row)" ng-model="row.EBILL_CONTENT_FLAG"/></label>&emsp;
+		                        <label>否<input type="radio" value="N" ng-change="updateFlag(row)" ng-model="row.EBILL_CONTENT_FLAG"/></label>
+							</td> 
+							<td align="center">{{row.EBILL_COMFIRM_SOU}}</td> 
+							<td align="center">{{toJsDate(row.FIRSTUPDATE_TIME) | date:"yyyy/MM/dd"}}</td>
+							<td align="center">{{row.FIRSTUPDATE_EMPID}}{{row.FIRSTUPDATE_EMPID == null ? '' : '-' + row.FIRSTUPDATE_EMPNAME}}</td>
+							<td align="center">{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd"}}</td>
+							<td align="center">{{row.MODIFIER}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<br>
+				<div align="center" ng-show="paramList.length > 0">
+	            	<button type="button" class="btn btn-success" ng-click="save()" function-type="maintenance">
+	                	<span class="glyphicon glyphicon-floppy-disk"></span>儲存
+	            	</button>
+		        </div>
+			</div>
+			<td align="left">說明：</td>
+		</div>
+	</div>
+</div>

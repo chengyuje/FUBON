@@ -1,0 +1,95 @@
+<style>
+  .modal-dialog {
+    min-width: 500px;
+    width: 50vw;
+    height: auto;
+  }
+
+  .FPS300 .scroll {
+    height: 300px;
+  }
+
+</style>
+
+<div ng-controller="FPSSearchController"
+     ng-cloak
+     class="FPS">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button"
+                class="close"
+                ng-click="closeThisDialog('cancel')">&times;</button>
+        <h4 id="myModalAlertLabel"
+            class="modal-title center">客戶快速查詢</h4>
+      </div>
+      <div class="modal-body">
+        <!-- search -->
+        <div class="search_table search_box3">
+          <table>
+            <tr>
+              <th>分行</th>
+              <td>
+                <e-combobox ng-datasource="BRANCH_LIST"
+                            ng-model="inputVO.branchID"
+                            ng-validate="false"
+                            ng-disabled="AVAIL_BRANCH.length == 1"
+                            ng-readonly="AVAIL_BRANCH.length == 1"
+                            ng-editable="false"
+                            ng-format="F1"
+                            ng-required="true"
+                            width="150px" />
+              </td>
+              <th>客戶ID</th>
+              <td>
+                <input type="text"
+                       ng-model="inputVO.custID"
+                       class="form-control">
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <a class="btn-fps"
+             ng-click="inquire()">查詢</a>
+          <a class="btn-fps"
+             ng-click="init()">清除</a>
+        </div>
+        <!-- !search -->
+
+        <!-- result -->
+        <div class="bootstrap-admin-panel-content">
+          <e-jumping input="inputVO"
+                     output="outputVO"
+                     list="paramList"
+                     query="inquire()">
+          </e-jumping>
+
+          <div class="e_scroll scroll">
+            <table class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>客戶ID</th>
+                  <th>客戶姓名</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="row in paramList">
+                  <td>
+                    <a ng-click="go('back',row)"
+                       ng-bind="row.CUST_ID">
+                    </a>
+                  </td>
+                  <td ng-bind="row.CUST_NAME">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- !result -->
+      </div>
+      <!-- !modal -->
+    </div>
+  </div>
+</div>

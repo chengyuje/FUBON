@@ -1,0 +1,77 @@
+<script type="text/javascript" src="assets/txn/PRD172/PRD172.js"></script>
+<script type="text/javascript" src="assets/txn/PRD172/PRD172_EDIT.js"></script>
+<div ng-controller="PRD172Controller" ng-cloak>
+	<!--Content of the panel-->
+	<div style="text-align: center;padding: 3%;" class="search_table">
+		
+		<div style="display: inline;">
+			文件種類
+			<e-combobox ng-paramtype="IOT.OTH_TYPE" ng-model="inputVO.OTH_TYPE"
+				ng-validate="false" ng-readonly="false" ng-editable="false"
+				ng-format="F3" ng-required="false" style="line-height:20px;" />
+		</div>
+		<div style="display: inline;">
+			*登錄種類
+			<e-combobox ng-paramtype="IOT.REG_TYPE34" ng-model="inputVO.REG_TYPE"
+					ng-validate="false" ng-readonly="false" ng-editable="false"
+					ng-format="F3" ng-required="false" style="line-height:20px;" />
+		</div>
+	</div>
+	<div style="color: red;text-shadow: black;padding-left: 1%;">註:*為必輸欄位</div>
+	<div class="search_box_btn text-center">
+		<button ng-click="queryData()" class="btn btn-info">查詢</button>
+		<button ng-click="btnClear()" class="btn btn-info">清除</button>
+		<button ng-click="addRow()" class="btn btn-info">新增</button>
+	</div>
+	<e-jumping output="outputVO" input="inputVO" query="queryData()"
+			list="ins_ancdoclist"></e-jumping>
+	<div class="text-right"></div>
+	<div class="gv_tab_sc scroll_y" style="white-space: nowrap; min-height:235px; overflow-x: auto;">
+		<table>
+		<thead>
+			<tr>
+				<th>功能</th>
+				<th>其他文件登錄<br>文件種類</th>
+				<th>登錄種類</th>
+				<th>文件名稱</th>
+				<th>顯示順序</th>
+				<th>分行留存文件<br/>(必備文件)</th>
+				<th>文件重要性</th>
+				<th>需簽署</th>
+				<th>建立時間</th>
+				<th>建立人員</th>
+				<th>異動時間</th>
+				<th>異動人</th>
+				<th>覆核人員</th>
+				<th>覆核時間</th>
+
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="row in ins_ancdoclist" ng-class-odd="'rowOdd'"
+				ng-class-even="'rowEven'">
+				<td><e-combobox ng-datasource="row.edit" ng-model="row.editto"
+						ng-validate="false" ng-readonly="false" ng-editable="false"
+						ng-format="F3" ng-required="false" ng-change="edit($index,row)"
+						ng-if="row.STATUS=='Y'?false:true" width="80px"
+						style="line-height:20px;" /></td>
+				<td>{{row.OTH_TYPE | mapping:mappingSet['IOT.OTH_TYPE']:F3}}</td>
+				<td>{{row.REG_TYPE | mapping:mappingSet['REG_TYPE_PRD172']:F2}}</td>
+				<td>{{row.DOC_NAME}}</td>
+				<td>{{row.DOC_SEQ}}</td>
+				<td>{{row.DOC_TYPE | mapping:mappingSet['PRD.DOC_TYPE']:'F3'}}</td>
+				<td>{{row.DOC_LEVEL |
+					mapping:mappingSet['IOT.DOC_CHK_LEVEL']:'F3'}}</td>
+				<td><y ng-if="row.SIGN_INC=='Y'">是</y> <n
+						ng-if="row.SIGN_INC=='N'">否</n></td>
+				<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd"}}</td>
+				<td>{{row.CREATOR }}</td>
+				<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd" }}</td>
+				<td>{{row.MODIFIER }}</td>
+				<td>{{row.APPROVER }}</td>
+				<td>{{toJsDate(row.APP_DATE) | date:"yyyy/MM/dd" }}</td>
+
+			</tr>
+		</tbody>
+		</table>
+	</div>

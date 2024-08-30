@@ -1,0 +1,63 @@
+<style>
+input:required:invalid{
+	border-color: red;
+}
+input{
+	width: 50px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/KYC215/KYC215.js"></script>
+<div ng-controller="KYC215Controller" ng-cloak>
+    <div class="modal-dialog" style="width: 1080px;">
+      <div class="modal-content">
+        <div class="modal-header"> 
+        	<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+          <h4 id="myModalAlertLabel" class="modal-title">風險承受能力設定</h4>
+        </div>
+        <form name="risk">
+        <div class="modal-body">
+	          <div class="search_table search_box1">
+	            <table style="white-space: nowrap;">
+	              <tr>
+	                <th>風險承受能力代號:</th>
+	                <td><input ng-disabled="true" class="form-control" type="text" ng-model="inputVO.RS_VERSION"></td>
+	              </tr>
+	            </table>
+	          </div>
+	          <div class="gv_tab_sc scroll_y">
+	            <table style="white-space: nowrap;" >
+	              <thead>
+					 <tr>
+						<th class="text-center" ng-repeat="n in [] | range : c">{{n == 0 ? '風險偏好分數(w) \\ 風險承受能力(c)' : ''}}
+							<input type="text" maxlength="4" ng-if="n!=0" style="color: black" ng-model="inputVO.C_VAL[n-1]" ng-blur="checkboundaries(n-1,'C')" ng-disabled="n==1" required>
+							<p ng-if="n!=0" style="display:inline;"> ≤ C <
+							</p><input type="text" maxlength="3" style="color: black" ng-if="n!=0" ng-model="inputVO.C_VAL[n]" ng-blur="checkboundaries(n,'C')" ng-disabled="$last" required>
+						</th>
+					 </tr>
+				  </thead>
+				  <tbody>
+				   <tr ng-repeat="n in [] | range : w"  ng-init="outerIndex = $index">
+					 	<td class="text-center" ng-repeat="n in [] | range : c" ng-if="n == 0" >
+					 		<input type="text" maxlength="4" ng-model="inputVO.W_VAL[outerIndex]" ng-blur="checkboundaries(outerIndex,'W')" ng-disabled="outerIndex == 0" required>
+					 		<p style="display:inline;">≤ W <</p>
+					 		<input type="text" maxlength="3" ng-model="inputVO.W_VAL[outerIndex+1]" ng-blur="checkboundaries(outerIndex+1,'W')" ng-disabled="(outerIndex+1) == w" required>
+					 	</td>
+						<td class="text-center" ng-repeat="n in [] | range : c" ng-if="n != 0">
+							<input style="text-transform: uppercase;" maxlength="2" ng-pattern="/[cC]\d/" ng-model="inputVO.CUST_RL_ID[outerIndex][n-1]" required>
+						</td>
+					 </tr> 				 
+				  </tbody>
+				</table>
+	          </div>
+	          <div style="text-align: center;" class="modal-footer">
+		        <button ng-click="saveData()" class="btn btn-info" data-dismiss="modal">確定</button> 
+		        <button ng-click="closeThisDialog('cancel')" type="button" class="btn btn-info"data-dismiss="modal">取消</button> 
+	        </div>
+        </div>
+        </form>
+      </div>
+    </div>
+
+
+
+</div>

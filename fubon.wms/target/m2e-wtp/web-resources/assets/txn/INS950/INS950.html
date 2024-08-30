@@ -1,0 +1,38 @@
+<style>
+.INS910 .title {
+ 	padding-left: 30px;
+ 	line-height: 50px;
+}
+.INS910ToolTip .tooltip-inner {
+	max-width: 350px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/INS950/INS950.js"></script>
+<div class="INS910" ng-controller="INS950Controller" ng-cloak>
+	<!-- 意外險保障規劃參數 -->
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+<!-- 		<div class="tfb_content_tit title">{{inputVO.ins_type | mapping:PLAN_TYPE:F3}}參數</div> -->
+		<div class="tfb_content_tit title">保單健診參數</div>
+	</div>
+	<div class="panel_content">
+		<div class="e_panel_table">
+<!-- 			<div>目前狀態：{{INIT_STATUS | mapping:PARA_HEADER_STATUS:F3}}</div> -->
+			<table class="table td_center">
+				<thead ng-model="reportList">
+					<tr ng-repeat="row in reportList track by $index">
+						<th width="15%">{{row.TYPE}}</th>
+						<td ng-show="false"><e-upload process="waitFile" success="finishUpload(name,rname)"  style="visibility:hidden;" allow="pdf"></e-upload></td>
+						<td>
+							{{row.FILE_NAME}}
+<!-- 							<button ng-if="inputVO.file_seq" class="btn btn-info" ng-click="downloadDoc()">查看</button> -->
+							<button class="btn btn-info" ng-click="downloadDoc(row)">查看</button>
+<!-- 							<button type="button" class="btn btn-info" ng-click="uploadT()" ng-if="!CanConfirm" function-type="maintenance">上傳圖檔</button> -->
+							<button type="button" class="btn btn-info" ng-click="uploadT(row)">上傳圖檔</button>
+						</td>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>

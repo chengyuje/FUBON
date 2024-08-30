@@ -1,0 +1,167 @@
+<script type="text/javascript" src="assets/txn/KYC220/KYC220_Check.js"></script>
+
+<div ng-controller="KYC220_CheckController" ng-cloak="ng-cloak">
+  <div class="modal-dialog" style="width: 70%;height:auto;">
+  	<div class="modal-content">
+  	
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+      <h4 id="myModalAlertLabel" align="center" class="modal-title">審核問卷</h4>
+    </div>
+    <div class="modal-body">
+    	<div class="search_table">
+	      <table>
+	        <tr>
+	          <th>問卷類別</th>
+	          <td>{{row.QUEST_TYPE | mapping:mappingSet['KYC.QUEST_TYPE']:F3}}</td>
+	          <th>問卷名稱</th>
+	          <td>{{row.EXAM_NAME}}</td>
+	        </tr>
+	        <tr>
+	          <th>版次</th>
+	          <td>{{row.EXAM_VERSION}}</td>
+	          <th>問卷啟用日期</th>
+	          <td>{{toJsDate(row.ACTIVE_DATE)|date:'yyyy/MM/dd'}}</td>
+	        </tr>
+	        <tr>
+	          <th>截距分</th>
+	          <td>{{row.INT_SCORE}}</td>
+	          <th></th>
+	          <td></td>
+	        </tr>
+	      </table>
+      </div>
+      <div style="color: gray;margin: 1% 0% 1% 0%;">問卷內容</div>
+      <div class="gv_tab_sc scroll_y">
+        <table>
+          <tr>
+            <th>題號</th>
+            <th>問題型態</th>
+            <th>問題描述</th>
+            <th>選項/ 權重</th>
+            <th>需註解</th>
+            <th>是否必須輸入</th>
+            <th>名目權重(%)</th>
+            <th>計分類別</th>
+          </tr>
+          <tr ng-repeat="row2 in checkParamList track by $index">
+            <td>{{row2.QST_NO}}</td>
+            <td>{{row2.QUESTION_TYPE}}</td>
+            <td>{{row2.QUESTION_DESC}}</td>
+            <td style="width: 40%;">
+              <table>
+                <tr ng-repeat="fraction in row2.FRACTIONS track by $index">
+                  <td>{{fraction.ANSWER_DESC}}/{{fraction.FRACTION}}分</td>
+                </tr>
+              </table>
+            </td>
+            <td>{{row2.ANS_MEMO_FLAG}}</td>
+            <td>{{row2.ESSENTIAL_FLAG}}</td>
+            <td>{{row2.QST_WEIGHT}}</td>
+            <td>{{row2.SCORE_TYPE}}</td>
+          </tr>
+        </table>
+      </div>
+      <br>
+      <table style="margin: 1% 1% 1% 1%;">
+        <tr>
+          <th style="color: gray;">風險級距編號: {{inputVO.rlVersion}}</th>
+        </tr>
+      </table>
+      <div class="gv_tab_sc scroll_y">
+        <table style="width: 60%;">
+          <tr>
+            <th>級距代碼</th>
+            <th>級距名稱</th>
+            <th>風險比例上限</th>
+            <th>商品風險上限</th>
+          </tr>
+          <tr ng-repeat="rlVersion in rlVersionList track by $index">
+            <td>{{rlVersion.CUST_RL_ID}}</td>
+            <td>{{rlVersion.RL_NAME}}</td>
+            <td>{{rlVersion.RL_UP_RATE}}</td>
+            <td>{{rlVersion.PROD_RL_UP_RATE}}</td>
+          </tr>
+        </table>
+      </div>
+      <br>
+		<table style="margin: 10px 10px 10px 10px;">
+          	<tr>
+          		<th style="color: gray;">可承受風險損失率: {{inputVO.rlrVersion}}</th>
+          	</tr>
+          </table>
+          <div class="gv_tab_sc scroll_y">
+	          <table style="width: 60%;">
+	          	<tr>
+	          		<th>級距代碼</th>
+	          		<th>級距名稱</th>
+	          		<th>風險比例上限</th>
+	          	</tr>
+	          	<tr ng-repeat="row in rlrVersionList track by $index">
+	          		<td>{{row.LRATE_CUST_RL_ID}}</td>
+	          		<td>{{row.LRATE_RL_NAME}}</td>
+	          		<td>{{row.LRATE_RL_UP_RATE}}</td>
+	          	</tr>
+	          </table>
+	       </div>
+	        <br>
+	        <table style="margin: 10px 10px 10px 10px;">
+          	<tr>
+          		<th style="color: gray;">風險承受能力: {{inputVO.rsVersion}}</th>
+          	</tr>
+          </table>
+          <div class="gv_tab_sc scroll_y">
+	          <table style="width: 80%;">
+	          	<thead>
+					 <tr>
+						<th class="text-center" ng-repeat="n in [] | range : (inputVO.C_VAL.length)">{{n == 0 ? '風險偏好分數(w) \\ 風險承受能力(c)' : ''}}
+							{{n != 0 ? inputVO.C_VAL[n-1] : ''}}{{n != 0 ? ' ≤ C < ' : '' }}{{n != 0 ? inputVO.C_VAL[n] : ''}}
+						</th>
+					 </tr>
+				  </thead>
+				  <tbody>
+				   <tr ng-repeat="n in [] | range : (inputVO.W_VAL.length-1)"  ng-init="outerIndex = $index">
+					 	<td class="text-center" ng-repeat="n in [] | range : (inputVO.C_VAL.length)" ng-if="n == 0">
+					 		{{inputVO.W_VAL[outerIndex]}}{{' ≤ W < '}}{{inputVO.W_VAL[outerIndex+1]}}
+					 	</td>
+						<td class="text-center" ng-repeat="n in [] | range : (inputVO.C_VAL.length)" ng-if="n != 0" style="text-transform: uppercase;">
+							{{inputVO.CUST_RL_ID[outerIndex][n-1]}}
+						</td>
+					 </tr> 				 
+				  </tbody>
+	          </table>
+	        </div>
+      <br>
+      <table style="margin: 1% 1% 1% 1%;">
+	   <tr>
+	      <th style="color: gray;">說明備註</th>
+	   </tr>
+      </table>
+      <div class="gv_tab_sc scroll_y">
+        <table style="width: 65%;">
+          <tr>
+            <th>簽核員工</th>
+            <th>簽核日期</th>
+            <th>簽核備註</th>
+          </tr>
+          <tr ng-repeat="flw in flwList track by $index">
+            <td>{{flw.SIGNOFF_NAME}}</td>
+            <td>{{toJsDate(flw.CREATETIME)|date:"yyyy-MM-dd"}}</td>
+            <td>	<font ng-show="flw.EMP_ID!=inputVO.empID" class="remark">{{flw.REMARK}}</font>
+              <input id="inputRemark" type="text" placeholder="請輸入..." name="remark" ng-model="flw.REMARK" e-length-limit="30" ng-show="flw.EMP_ID==inputVO.empID" class="remark"/>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="modal-footer" style="text-align: center;">
+        <button type="button" ng-click="reject();" class="btn btn-info">退回</button>
+        <button type="button" ng-disabled="notpass" ng-click="approve();" class="btn btn-info">放行</button>
+        <button type="button" ng-click="closeThisDialog('cancel');" class="btn btn-info">離開</button>
+      </div>
+    </div>
+    
+    
+    
+    </div>
+  </div>
+</div>

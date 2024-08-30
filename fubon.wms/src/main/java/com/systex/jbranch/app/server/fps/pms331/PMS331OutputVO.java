@@ -1,0 +1,26 @@
+package com.systex.jbranch.app.server.fps.pms331;
+
+import java.util.List;
+
+import com.systex.jbranch.platform.common.dataaccess.vo.PagingOutputVO;
+
+public class PMS331OutputVO extends PagingOutputVO {
+	private List resultList; // 查詢頁面LIST
+	private List totalList; // CSV LIST
+
+	public List getResultList() {
+		return resultList;
+	}
+
+	public void setResultList(List resultList) {
+		this.resultList = resultList;
+	}
+
+	public List getTotalList() {
+		return totalList;
+	}
+
+	public void setTotalList(List totalList) {
+		this.totalList = totalList;
+	}
+}

@@ -1,0 +1,131 @@
+<script type="text/javascript" src="assets/txn/ORG250/ORG250.js"></script>
+<script type="text/javascript" src="assets/txn/ORG250/ORG250_REVIEW.js"></script>
+<script type="text/javascript" src="assets/txn/ORG250/ORG250CONFIRM.js"></script>
+<div ng-controller="ORG250Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3 scroll_y">
+			<table style='width: 100%;'>
+				<tr>
+					<th width="16.6%">業務處：</th>
+					<td width="16.6%">
+						<e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="REGION_LIST"
+									ng-model="inputVO.region_center_id"
+									ng-validate="false" 
+									ng-disabled="AVAIL_REGION.length == 1"
+									ng-readonly="AVAIL_REGION.length == 1" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeRegion(region)"
+									style="line-height:20px;" />
+				   	</td>
+					<th width="16.6%">營運區：</th>
+					<td width="16.6%">
+						<e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="AREA_LIST"
+									ng-model="inputVO.branch_area_id"
+									ng-validate="false" 
+									ng-disabled="AVAIL_AREA.length == 1"
+									ng-readonly="AVAIL_AREA.length == 1" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									ng-change="ChangeArea(region)"
+									style="line-height:20px;" />
+				   	</td>
+					<th width="16.6%">分行：</th>
+					<td width="16.6%">
+						<e-combobox id="branch_nbr" name="branch_nbr"
+									ng-datasource="BRANCH_LIST"
+									ng-model="inputVO.branch_nbr"
+									ng-validate="false" 
+									ng-disabled="AVAIL_BRANCH.length == 1"
+									ng-readonly="AVAIL_BRANCH.length == 1" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="false"
+									ng-change="ChangeBranch(region)"
+									style="line-height:20px;" />
+			   		</td>
+				</tr>
+				<tr>
+					<th width="16.6%">員工編號：</th>
+					<td width="16.6%"><input class="form-control" type="text" placeholder="請輸入..." id="" name="" ng-model="inputVO.EMP_ID" maxlength="8"></td>
+					<th width="16.6%">員工姓名：</th>
+					<td width="16.6%"><input class="form-control" type="text" placeholder="請輸入..." id="" name="" ng-model="inputVO.EMP_NAME" maxlength="4"></td>
+					<th width="16.6%"></th>
+					<td width="16.6%"></td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="query()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()" >清除</button>
+			<button type="button" class="btn btn-info" ng-click="getExample()" function-type="export">下載範例</button>
+			<!-- <span id="csvBox" style="display: inline-block;vertical-align: middle;">
+    			<e-upload-only id="csvUpload" success="upload(name,rname)" text="上傳" accept=".csv" barshow="N"></e-upload-only>
+  		   	</span>-->
+			<span id="csvBox" style="display: inline-block;vertical-align: middle;" function-type="export">
+				<e-upload id="csvUpload" success="upload(name,rname)" text="上傳" accept=".csv" ></e-upload>
+			</span>
+			<button type="button" class="btn btn-default" ng-disabled="agentLst.length == 0" ng-click="export()" function-type="export">匯出</button>
+		</div>
+	</div>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>
+	<div class="panel_content">
+		<e-jumping-once output="outputVO" list="data" totallist="agentLst"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="tablesaw table table-striped table-bordered text-center">
+				<thead>
+					<tr>
+						<th>功能</th>
+						<th>業務處</th>
+						<th>營運區</th>
+						<th>分行</th>
+						<th>被代理人</th>
+						<th>代理人1</th>
+						<th>代理人2</th>
+						<th>代理人3</th>
+						<th>建立者</th>
+						<th>建立時間</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row  text-center" ng-repeat="row in data track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>
+							<div ng-show="row.REVIEW_STATUS == 'W' && row.SEQNO != 0 ">
+								<button type="button" class="btn btn-primary" ng-click="review(row)" function-type="confirm">核可</button>
+								<button type="button" class="btn btn-warning" ng-click="reback(row)" function-type="confirm">退回</button>
+								<button type="button" class="btn btn-default" ng-click="alert(row)" ng-hide="row.COUNTS == 0">異動歷程</button>
+							</div>
+							<div ng-show="row.REVIEW_STATUS == 'W' && row.SEQNO == 0" >
+								{{(row.REVIEW_STATUS | mapping:mappingSet['COMMON.REVIEW_STATUS']:'F3')}}
+							</div>
+							<div ng-show="row.REVIEW_STATUS == 'Y'">
+								<button type="button" class="btn btn-default" ng-click="delete(row)" function-type="maintenance">刪除</button>
+								<button type="button" class="btn btn-default" ng-click="alert(row)" ng-hide="row.COUNTS == 0">異動歷程</button>
+							</div>
+						</td>
+						<td>{{row.REGION_CENTER_NAME}}</td>
+						<td>{{row.BRANCH_AREA_NAME}}</td>
+						<td>{{row.BRANCH_NAME}}</td>
+						<td>{{row.EMP_ID}} &nbsp; {{row.EMP_NAME}}</td>
+						<td>{{row.AGENT_ID_1}} &nbsp; {{row.AGENT_NAME_1}}</td>
+						<td>{{row.AGENT_ID_2}} &nbsp; {{row.AGENT_NAME_2}}</td>
+						<td>{{row.AGENT_ID_3}} &nbsp; {{row.AGENT_NAME_3}}</td>
+						<td>{{row.CREATOR}}</td>
+						<td>{{row.CREATETIME}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

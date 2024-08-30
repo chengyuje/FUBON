@@ -1,0 +1,176 @@
+<style>
+/* open dialog */
+
+/* dialog panl */
+.modal-dialog.PMS110 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1500px;
+	height: auto;
+}
+/* table size */
+.PMS110 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS110.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 80px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.gv_tab_sc th {
+	text-align: left !important;
+	vertical-align: middle !important;
+}
+.modal-footer{
+    text-align: center;
+}
+
+a{
+width : 100px;
+}
+
+</style>
+<div ng-controller="PMS110_DETAILController" ng-cloak>
+	<div class="modal-dialog PMS110">
+		<div class="modal-content">
+			<div class="modal-header scroll_y">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="left">消金銷售計劃</h4>
+			</div>
+			<div class="modal-body gv_tab_sc scroll_y" style= "text-align: center;">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th width="12%">*消金銷售計劃月份：</th>
+							<td width="21%"><e-combobox ng-datasource="mappingSet['timeE']"
+									ng-model="inputVO.plan_yearmon" 
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="true" 
+									width="200px" 
+									height="30px"
+									style="line-height:20px;" 
+									ng-change="dateChange()" /></td>
+							<th width="12%">*預計承做商品：</th>
+							<td width="21%"><e-combobox 
+									ng-datasource="mappingSet['PRD_LIST']"
+									id="est_prd"
+									name="est_prd"
+									ng-model="inputVO.est_prd" 
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="false"
+									ng-disabled="paramList.length > 0"
+									width="200px" 
+									height="30px"
+									style="line-height:20px;" /></td>
+							<th width="12%">*案件編號：</th>
+							<td width="21%"><input class="form-control" 
+									name="case_num" 
+									id="case_num" 
+									type="text" 
+									ng-model="inputVO.case_num" 
+									ng-required="false"
+									ng-blur="case_change()"
+									ng-disabled="paramList.length > 0"
+									onkeyup="value=value.replace(/[\W]/g,'') " 
+									onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" 
+									style="width: 200px;"></td>
+						</tr>
+					</table>
+					<hr>
+					<button ng-click="query()" class="btn btn-primary">查詢</button>
+					<button ng-click="claen()" class="btn btn-primary">清除</button>
+					<hr>
+					<table>
+						<thead>
+							<tr>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>實際進件日期</th>
+								<th>預計進件日期</th>
+								<th>預計承作金額<br>(單位:元)</th>
+								<th>預計面談日期</th>
+								<th>實際面談日期</th>
+								<th>客戶來源</th>
+								<th>對保日期</th>
+								<th>預計撥款月份</th>
+								<th>借款用途</th>
+								<th>申請金額<br>撥款金額<br>(單位:元)</th>
+								<th>實際撥款日期</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- 房貸 -->
+							<tr class="repeat-row"
+								ng-repeat="row in paramList | limitTo:displayLimit track by $index"
+								ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row.CUST_ID}}</td>
+								<td>{{row.CUST_NAME}}</td>
+								<td>{{dateType(row.CASE_DATE)}}</td>
+								<td>{{inputVO.est_incom_date}}</td>
+								<td class="pos-to-right">
+									<input type="text"  e-input-limit="ND" e-length-limit="18" ng-model="row.EST_AMT" style="text-align: right;width: 100px;"  required>
+								</td>
+								<td class="pos-to-right">{{inputVO.est_meeting_date}}</td>
+								<td class="pos-to-right">{{inputVO.act_meeting_date}}</td>
+								<td class="pos-to-right">{{inputVO.cust_source | mapping:mappingSet['PMS.PROD.CUST_SOURCE']:'F3'}}</td>
+								<td>{{inputVO.pro_date}}</td>
+								<td>
+									<e-combobox 
+									ng-datasource="mappingSet['timeE']"
+									ng-model="row.EX_DATE" 
+									ng-validate="false"
+									ng-readonly="false" 
+									ng-editable="false" 
+									ng-format="F3"
+									ng-required="true" 
+									width="100px" 
+									height="30px"
+									style="line-height:20px;" />
+								</td>
+								<td>{{row.CASE_TYPE}}</td>
+								<td class="pos-to-right">{{row.APPLY_AMT | number:0}}<br>{{row.DRAW_AMT | number:0}}</td>
+								<td>{{dateType(row.DRAW_DATE)}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button ng-click="queryCaseNum()" ng-disabled="paramList.length == 0" class="btn btn-primary">儲存</button>
+				<button ng-click="cancel()" class="btn btn-primary">關閉</button>
+			</div>
+		</div>
+
+	</div>
+</div>

@@ -1,0 +1,105 @@
+<style>
+    .modal-content {
+        margin-top: 150px;
+        width: 80vw;
+        ng-min-height: 24vh;
+        max-height: 100vh;
+    }
+    .scrollable {
+        max-height: 615px;
+        overflow-y: auto;
+    }
+    .search_box th+td {
+        line-height: 15px;
+        width: 25%;
+        margin: 0 auto;
+    }
+    .deletePic {
+    	color: #2a8960;
+    	font-size: 25px;
+    }
+    .deletepic_box{
+        text-align: center;
+    }
+	.cmb {
+		width: 10px;
+	}
+
+</style>
+
+<div ng-controller="FPS324SUGController"
+     ng-cloak>
+    <div class="modal-dialog">
+        <div class="modal-content ">
+           <div class="modal-header">
+                <button type="button"
+                        class="close"
+                        ng-click="closeThisDialog('cancel')">&times;</button>
+                <h4 id="myModalAlertLabel"
+                    class="modal-title"
+                    align="left"><label>理財標的建議</label></h4>
+            </div>
+            <div class="bootstrap-admin-panel-content search_box_btn"  style="position:relative;">
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>刪除</th>
+					<th>商品類別</th>
+					<th>代號/商品</th>
+					<th>風險等級</th>
+					<th>計價幣別<br/>保單幣別</th>
+					<th>申購幣別</th>
+					<th>市場氣象台</th>
+					<th>原幣金額</th>
+					<th>原幣約當台幣</th>
+					<th>建議比例</th>
+					<th>原幣最低申購金額</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in paramList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					<th class="deletepic_box"><a type="button" class="deletePic" aria-label="Close" ng-click="deleteRow($index)">
+  								<span aria-hidden="true">&times;</span></a></th>
+					<th>{{row.PTYPE|mapping: mapping.pType}}</th>
+					<th>{{row.PRD_ID}}<br/>{{row.PRD_CNAME}}</th>
+					<th>{{row.RISK_TYPE}}</th>
+					<th>{{row.CURRENCY_TYPE}}</th>
+					<!-- 申購幣別 -->
+					<th><e-combobox 
+                       		id="cmbCur" 
+                       		name="cmbCur"
+							ng-datasource="mapping.cmbCur"
+							ng-model="row.cmbCur" 
+							ng-validate="true"
+							ng-readonly="false" 
+							ng-editable="false" 
+							ng-format="F3"
+							width="70" />
+					</th> 
+					<!-- 市場氣象台 -->
+					<th style="text-align:center;">
+						<img ng-if="row.CIS_3M == 'B'" src="assets/images/sunny.png" width="30" height="30" >
+						<img ng-if="row.CIS_3M == 'H'" src="assets/images/heavy-rain.png" width="30" height="30" >
+						<img ng-if="row.CIS_3M == 'S'" src="assets/images/thunder.png" width="30" height="30" >	
+					</th> 
+					<!-- 原幣金額 -->
+ 					<th>{{row.STORE_RAW}}</th>
+ 					<!-- 原幣約當台幣 --> 
+					<th>{{row.RAW_NTD}}</th> 
+					<!-- 建議比例 -->			
+					<th>{{row.INV_PERCENT}}%</th>
+					<!-- 原幣最低申購金額 -->		
+					<th>{{row.GEN_SUBS_MINI_AMT_FOR}}</th> 
+				</tr>
+			</tbody>
+		</table>
+            <div class="search_box_btn text-center">
+                <button class="btn btn-info"
+                        ng-click="closePop('success')">確認</button>
+                <button class="btn btn-info"
+                        ng-click="closePop()">取消</button>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>

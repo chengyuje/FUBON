@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+   		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd
+   		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+   		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+   		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+   		http://www.springframework.org/schema/mvc
+   		http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+    
+    <!-- 參數型態定義，用於request or response的參數物轉換 -->
+    <util:map id="EXT_SERV_ARGS_MAPPING" map-class="java.util.HashMap">
+		<entry key="MAP" value="java.util.HashMap"/>
+		<entry key="LinkedHashMap" value="java.util.LinkedHashMap"/>
+		<entry key="Integer" value="java.lang.Integer"/>
+		<entry key="String" value="java.lang.String"/>
+	</util:map>
+	
+	<!-- convert request json parameter format ,  and use Aes256 PKCS7Padding decrypt -->
+	<bean id="BEFORE_FORMAT" class="com.systex.jbranch.fubon.webservice.ws.callback.mobile.ExternalBeforeCallBack"/>
+	
+	<!-- convert response object to json format ,  and use Aes256 PKCS7Padding encrypt -->
+	<bean id="RETURN_FORMAT" class="com.systex.jbranch.fubon.webservice.ws.callback.mobile.ExternalCallBack"/>
+	
+	<!-- 抽向設定模型，用於給其他設定繼承用 start -->
+	<bean id="MODEL_1" class="com.systex.jbranch.ws.external.service.ExternalConfig"
+		  abstract="true"
+		  p:outputType="onlyHeaderBody"
+		  p:beforeFormat-ref="BEFORE_FORMAT"
+		  p:returnFormat-ref="RETURN_FORMAT"
+		  p:externalVoConfig-ref="EXT_SERV_ARGS_MAPPING"
+	/>
+	
+	<bean id="MODEL_2" abstract="true" parent="MODEL_1" p:inName="MAP" p:outName="MAP" />
+	<!-- 抽向設定模型，用於給其他設定繼承用 end -->
+	<bean id="MODEL_3" abstract="true" parent="MODEL_1" p:inName="LinkedHashMap" p:outName="LinkedHashMap" />
+</beans>

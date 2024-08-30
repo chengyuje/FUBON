@@ -1,0 +1,144 @@
+<style>
+.modal-dialog.CRM3B1_EDIT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM3B1/CRM3B1.js"></script>
+<script type="text/javascript" src="assets/txn/CRM3B1/CRM3B1_EDIT.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="CRM3B1" ng-controller="CRM3B1Controller" ng-cloak>
+<!-- 查詢條件 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>						
+						<th>客戶ID：</th>
+						<td><input type="text" class="form-control" style="width: 200px;" ng-model="inputVO.CUST_ID" /></td>
+						<th>是否已刪除：</th>
+						<td>
+							<e-combobox id="delYn" name="delYn"
+									ng-datasource="mappingSet['COMMON.YES_NO']" 
+									ng-model="inputVO.DEL_YN"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									width="200px" />
+						</td>								    												
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox ng-datasource="REGION_LIST"
+	                                    ng-model="inputVO.region_center_id"
+	                                    ng-disabled="disableRegionCombo"
+	                                    ng-readonly="disableRegionCombo"
+	                                    ng-format="F3"
+	                                    ng-change="ChangeRegion()"
+	                                    width="200px"/>
+						</td>						
+						<th>營運區：</th>
+						<td>
+							<e-combobox ng-datasource="AREA_LIST"
+	                                    ng-model="inputVO.branch_area_id"
+	                                    ng-disabled="disableAreaCombo"
+	                                    ng-readonly="disableAreaCombo"
+	                                    ng-format="F3"
+	                                    ng-change="ChangeArea()"
+	                                    width="200px"/>
+						</td>	
+					</tr>	
+					<tr>
+						<th>分行：</th>
+						<td>
+							<e-combobox ng-datasource="BRANCH_LIST"
+	                                    ng-model="inputVO.branch_nbr"
+	                                    ng-disabled="disableBranchCombo"
+	                                    ng-readonly="disableBranchCombo"
+	                                    ng-format="F1"
+	                                    ng-change="ChangeBranch()"
+	                                    width="200px"/>
+						</td>				
+						
+						<th>理專：</th>
+						<td>						
+							<e-combobox ng-datasource="AO_LIST"
+										ng-model="inputVO.ao_code"
+										ng-disabled="disableAoCombo"
+										ng-readonly="disableAoCombo" 
+										ng-format="F1"
+										ng-change="ChangeAo_code()"
+										width="200px"/>					 
+						</td>
+					</tr>				
+				</table>		
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="add()" function-type="maintenance">新增</button>
+			</div>
+		</div>
+	</div>
+	<!-- 查詢條件 -->
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+		<e-jumping-once  output="outputVO" list="data" totallist="paramList"></e-jumping-once> 
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;overflow-x: auto;">
+				<table>
+					<thead>
+						<tr>
+						    <th>功能</th>
+						    <th>客戶ID</th>
+						    <th>客戶姓名</th>
+						    <th>是否已刪除</th>
+						    <th>分行</th>
+						    <th>理專</th>
+						    <th>附件</th>
+						    <th>建立日期</th>
+						    <th>刪除日期</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td align="center" ng-if="row.DEL_YN=='N'"> 
+						 		<button type="button" class="btn btn-success" ng-click="deleteRow(row)" function-type="maintenance">刪除</button>
+							</td> 
+							<td align="center" ng-if="row.DEL_YN=='Y'"></td> 
+						 	<td align="center">{{row.CUST_ID}}</td>
+							<td align="center">{{row.CUST_NAME}}</td>
+							<td align="center">{{row.DEL_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+							<td align="center">{{row.BRA_NBR}} - {{row.BRANCH_NAME}}</td>
+							<td align="center">{{row.AO_CODE}} - {{row.EMP_NAME}}</td>
+							<td align="center"><button ng-if="row.ATTACH_YN == 'Y'" type="button" class="btn btn-info" ng-click="download(row)">申請書</button></td>
+							<td align="center">{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd"}}</td>
+							<td align="center" ng-if="row.DEL_YN=='Y'">{{toJsDate(row.LASTUPDATE) | date:"yyyy-MM-dd"}}</td>
+							<td align="center" ng-if="row.DEL_YN=='N'"></td>
+						</tr>
+					</tbody>
+				</table>
+				<br>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

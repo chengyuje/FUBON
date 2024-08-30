@@ -1,0 +1,97 @@
+<style>
+    /* dialog panel */
+    .modal-dialog.IOT150_notFbReviewForm {
+        position: relative;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        min-width: 70vw;
+        height: auto;
+    }
+
+    .modal-dialog.IOT150_notFbReviewForm .modal-body {
+        max-height: 20vh;
+    }
+
+    /* table size */
+    .IOT150_notFbReviewForm table {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* change row */
+    .IOT150_notFbReviewForm.table > tbody > tr > td {
+        table-layout: fixed;
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+
+    .IOT150_notFbReviewForm .datewidth {
+        width: 180px !important;
+        float: left;
+    }
+</style>
+<div ng-controller="IOT150_notFbReviewFormController" ng-cloak>
+    <form name="IOT150NotFbReviewForm" class="form-horizontal" data-toggle="validator" role="form"
+          autocomplete="off" enter-as-tab>
+        <div class="modal-dialog IOT150_notFbReviewForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+                    <h4 id="myModalAlertLabel" class="modal-title" align="center">
+                        產生保險公司簽收紀錄（非富壽）
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <!-- Inquire Zone -->
+                    <table style="width: 80%;margin-left: auto;margin-right: auto;">
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3">*保險公司簽收日期：</th>
+                            <td class="col-md-7 tdpadding">
+                                <div class="form-group">
+                                    <div class="input-group datebox datewidth">
+                                        <input type="text" id="notFbBatchDateStart" name="notFbSignDate"
+                                               class="form-control"
+                                               uib-datepicker-popup="yyyy/MM/dd"
+                                               ng-model="inputVO.notFbSignDate"
+                                               is-open="calendar.notFbSignDate"
+                                               datepicker-options="notFbSignDateObj.sDateOptions"
+                                               ng-readonly="true"
+                                               style="width:150px;"
+                                        />
+                                        <!-- 製作日曆button -->
+                                        <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default"
+                                                ng-click="openCalendar($event,'notFbSignDate')">
+                                        <i class="glyphicon glyphicon-calendar"></i></button>
+						            </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-1"></td>
+                            <th class="col-md-3">*保險公司簽收窗口：</th>
+                            <td class="col-md-7 tdpadding">
+                                <input type="text"
+                                       class="form-control"
+                                       name="notFbOpName"
+                                       ng-model="inputVO.notFbOpName"
+                                       required/>
+                            </td>
+                            <td class="col-xs-1"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="search_box_btn text-center">
+                    <button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance">儲存</button>
+                    <button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">關閉</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

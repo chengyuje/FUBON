@@ -1,0 +1,78 @@
+<style>
+.modal-dialog.CAM140_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 500px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM140/CAM140_SELECT.js"></script>
+<div ng-controller="CAM140_UPLOADController" ng-cloak>
+	<div class="modal-dialog CAM140_UPLOAD">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">上傳匯入檔案</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">上傳檔案</th>
+							<td class="col-md-7 tdpadding">
+								<e-upload success="uploadFinshed(name,rname)" model="inputVO.realfileName" allow-size="5"></e-upload>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">網址</th>
+							<td class="col-md-7 tdpadding">
+								<input class="form-control" type="text" placeholder="請輸入..." id="web" name="web" ng-model="inputVO.web" ng-enter="addWeb()" e-length-limit="255">
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">選擇輔銷文件</th>
+							<td class="col-md-7 tdpadding">
+								<button type="button" class="btn btn-info" ng-click="select()">選擇輔銷文件</button>
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+					</table>
+					<div class="gv_tab_sc" style="white-space: nowrap;">	
+						<table class="table-bordered">
+							<thead>
+								<tr>
+									<td class="col-xs-1" ng-hide="true"></td>
+									<th class="col-md-3">移除</th>
+									<th class="col-md-7 tdpadding">檔案名稱</th>
+									<td class="col-xs-1" ng-hide="true"></td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" ng-repeat="row in inputVO.finFileList track by $index">
+									<td class="col-xs-1" ng-hide="true"></td>
+									<td class="col-md-3" align="center">
+										<button type="button" class="btn btn-info" ng-click="removeUpload($index)" >X</button>
+									</td>
+									<td class="col-md-7 tdpadding">{{row.DOC_NAME}}</td>
+									<td class="col-xs-1" ng-hide="true"></td>
+								<tr>
+							</tbody>
+						</table>
+					</div>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

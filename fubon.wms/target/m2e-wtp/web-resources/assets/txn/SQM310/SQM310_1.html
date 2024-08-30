@@ -1,0 +1,102 @@
+<style>
+/* table size */
+.SQM310_1 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.SQM310_1 table.little{
+	width: 60%;
+}
+/* change row */
+.SQM310_1.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_SQM310_1_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<div class="SQM310_1" ng-controller="SQM310_1Controller" ng-cloak>
+	<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+		<div class="gv_tab_sc" style="white-space: nowrap;">
+			<table class="table table-bordered td_center e-table-freeze" e-top="true" e-mode="1" e-height="500px" e-list="inputVO.totalList">
+				<thead>
+					<tr>
+						<th width="5%">功能</th>
+						<th width="5%">必抽</th>
+						<th>角色職級</th>
+						<th>總抽查戶數</th>
+						<th>主管應查戶數</th>
+						<th>特定客戶最低比例</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in inputVO.totalList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td>
+							<button type="button" class="btn btn-warning btn-circle" ng-click="del($index)"><i class="glyphicon glyphicon-trash"></i></button>
+						</td>
+						<td><input name="{{row.ROLE_ID}}" type="checkbox" ng-model="row.PREQ" ng-false-value="0" ng-true-value="1"></td>
+						<td>
+							<e-combobox name="{{row.ROLE_ID}}"
+							ng-datasource="AO_JOB_RANK"
+							ng-model="row.ROLE_ID"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change="setRole_Name(row)"
+							style="line-height:20px;" />
+						</td>
+						<td><input type="text" name="{{row.ROLE_ID}}" class="form-control" style="width:150px;display:inline;" ng-model="row.SC_CNT_TOT" e-input-limit="N" e-length-limit="5" required></td>
+						<td><input type="text" name="{{row.ROLE_ID}}" class="form-control" style="width:150px;display:inline;" ng-model="row.SC_CNT_L" e-input-limit="N" e-length-limit="5" required></td>
+						<td><input type="text" name="{{row.ROLE_ID}}" class="form-control" style="width:150px;display:inline;" ng-model="row.SP_CUST_PC" e-input-limit="NUU" nuu1="3" nuu2="2" required></td>
+					</tr>
+					<tr>
+						<td>
+							<button type="button" class="btn btn-info btn-circle" ng-click="add()"><i class="glyphicon glyphicon-plus"></i></button>
+						</td>
+						<td><input name="preq" type="checkbox" ng-model="insertVO.preq" ng-false-value="0" ng-true-value="1"></td>
+						<td>
+							<e-combobox id="role_id" name="role_id"
+							ng-datasource="AO_JOB_RANK"
+							ng-model="insertVO.role_id"
+							ng-validate="false" 
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="setRole_Name()"
+							style="line-height:20px;" />
+						</td>
+						<td><input type="text" id="sc_cnt_t" name="sc_cnt_t" class="form-control" style="width:150px;display:inline;" ng-model="insertVO.sc_cnt_t" e-input-limit="N" e-length-limit="5"></td>
+						<td><input type="text" id="sc_cnt_l" name="sc_cnt_l" class="form-control" style="width:150px;display:inline;" ng-model="insertVO.sc_cnt_l" e-input-limit="N" e-length-limit="5"></td>
+						<td><input type="text" id="sp_cust_pc" name="sp_cust_pc" class="form-control" style="width:150px;display:inline;" ng-model="insertVO.sp_cust_pc" e-input-limit="NUU" nuu1="3" nuu2="2"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</form>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="save()" function-type="maintenance">確定儲存</button>
+		<button type="button" class="btn btn-info" ng-click="init()">重置</button>
+	</div>
+</div>

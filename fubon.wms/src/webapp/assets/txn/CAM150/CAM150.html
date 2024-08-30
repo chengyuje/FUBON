@@ -1,0 +1,218 @@
+<style>
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CAM150/CAM150.js"></script>
+<script type="text/javascript" src="assets/txn/CAM150/CAM150_SPR.js"></script>
+<div class="CAM150" ng-controller="CAM150Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+		    <div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table>
+					<tr>
+						<th>行銷活動代碼：</th>
+						<td><input type="text" class="form-control" placeholder="請輸入..." id="campID" name="campID" ng-model="inputVO.campID" e-length-limit="15"></td>
+						<th>行銷活動名稱：</th>
+						<td><input type="text" class="form-control" placeholder="請輸入..." id="campName" name="campName" ng-model="inputVO.campName" e-length-limit="150"></td>
+					</tr>
+					<tr>
+						<th>名單來源：</th>
+						<td>
+							<e-combobox id="source_id" name="source_id" 
+										ng-paramtype="CAM.LEAD_SOURCE"
+										ng-model="inputVO.source_id"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="150px"
+										style="line-height:20px;"/>
+						</td>
+						<th></th>
+						<td></td>
+					</tr>
+					<tr>
+						<th>使用部隊：</th>
+						<td>
+							<e-combobox id="channel" name="channel" 
+										ng-paramtype="CAM.CHANNEL_CODE"
+										ng-model="inputVO.channel"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="150px"
+										style="line-height:20px;"/>
+						</td>
+						<th>活動起始日：</th>
+						<td>
+							<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="sDate" name="sDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.sDate"
+											is-open="model.a"
+											datepicker-options="startDateOptions"
+											alt-input-formats="altInputFormats"
+											ng-readonly="true"
+											ng-change="limitDate()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="sDate2" name="sDate2"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.sDate2"
+											is-open="model.c"
+											datepicker-options="startDateOptions2"
+											alt-input-formats="altInputFormats"
+											ng-readonly="true"
+											ng-change="limitDate()"
+											ng-disabled="inputVO.sDate == undefined" 
+											ng-readonly="inputVO.sDate == undefined"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'c')" ng-disabled="inputVO.sDate == undefined" ng-readonly="inputVO.sDate == undefined">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>放行狀態：</th>
+						<td>
+							<e-combobox id="checkStatus" name="checkStatus"
+										ng-datasource="mappingSet['CAM.CHECK_STATUS']"
+										ng-model="inputVO.checkStatus"
+					   					ng-validate="false" 
+					   					ng-readonly="false" 
+					   					ng-editable="false"
+					   					ng-format="F3"
+					   					ng-required="false"
+					   					width="100px"
+					   					height="30px"
+					   					style="line-height:20px;" />
+						</td>
+						<th>活動終止日：</th>
+						<td>
+							<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="eDate" name="eDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.eDate"
+											is-open="model.b"
+											datepicker-options="endDateOptions"
+											alt-input-formats="altInputFormats"
+											ng-readonly="true"
+											ng-change="limitDate()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="eDate2" name="eDate2"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.eDate2"
+											is-open="model.d"
+											datepicker-options="endDateOptions2"
+											alt-input-formats="altInputFormats"
+											ng-readonly="true"
+											ng-change="limitDate()"
+											ng-disabled="inputVO.eDate == undefined" 
+											ng-readonly="inputVO.eDate == undefined"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'d')" ng-disabled="inputVO.eDate == undefined" ng-readonly="inputVO.eDate == undefined">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList"></e-jumping>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>功能</th>
+							<th>行銷活動代碼<br />行銷活動名稱</th>
+							<th>簡要說明</th>
+							<th>使用者ID</th>
+							<th>活動起始日</th>
+							<th>活動終止日</th>
+							<th>使用部隊</th>
+<!-- 							<th>第二使用通路</th> -->
+							<th>應匯入<br />名單總數</th>
+							<th>檔案名稱</th>
+							<th>狀態</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" align="center" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>
+								<e-combobox id="cmbAction" name="cmbAction"
+											ng-datasource="row.set"
+											ng-model="row.cmbAction"
+											ng-validate="false"
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											ng-change="action(row)"
+											width="100px"
+											style="line-height:20px;" />
+											{{row.cmbAction}}
+							</td>
+							<td>{{row.CAMPAIGN_ID}}<br /> <a href="#" ng-click="goDtl(row)">{{row.CAMPAIGN_NAME}}</a></td>
+							<td style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+								<div uib-tooltip="{{row.CAMPAIGN_DESC}}" tooltip-placement="right-bottom">
+									{{row.CAMPAIGN_DESC.length > 4 ? (row.CAMPAIGN_DESC | limitTo: 4) + "..." : row.CAMPAIGN_DESC}}
+								</div>
+							</td>
+							<td>{{row.CREATOR}}</td>
+							<td>{{row.START_DATE | limitTo: 10}}</td>
+							<td>{{row.END_DATE | limitTo: 10}}</td>
+							<td>{{row.FIRST_CHANNEL | mapping:mappingSet['CAM.CHANNEL_CODE']:'F3'}}</td>
+<!-- 							<td>{{row.SECOND_CHANNEL | mapping:mappingSet['CAM.CHANNEL_CODE']:'F3'}}</td> -->
+							<td align="right"><a href="#"  ng-click="openDtl(row, 'LE_TOTAL_CNT')">{{row.LE_TOTAL_CNT}}</a></td>
+							<td>{{row.DOC_NAME ? row.DOC_NAME : row.FILE_NAME}}</td>
+							<td>{{row.CHECK_STATUS | mapping:mappingSet['CAM.CHECK_STATUS']:'F3'}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

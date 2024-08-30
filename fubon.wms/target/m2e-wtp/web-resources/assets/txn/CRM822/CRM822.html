@@ -1,0 +1,188 @@
+<script type="text/javascript" src="assets/txn/CRM822/CRM822.js"></script>
+<script type="text/javascript" src="assets/txn/CRM822/CRM822_DETAIL.js"></script>
+<!-- <script type="text/javascript" src="assets/txn/CRM822/CRM822_OnTrade.js"></script> -->
+<script type="text/javascript" src="assets/txn/CRM822/CRM822_QueryHist.js"></script>
+<!-- <script type="text/javascript" src="assets/txn/CRM822/CRM822_OnTrade_DETAIL.js"></script> -->
+<script type="text/javascript" src="assets/txn/CRM822/CRM822_AccDetails.js"></script>
+<div class="CRM822" ng-controller="CRM822Controller" ng-cloak>
+	<!-- <div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >黃金存摺</div>
+	</div>-->
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr style="margin-left: 10px">
+					<th>參考總市值(約當新臺幣)：</th>
+					<!-- 參考總資產=庫存+在途款+賣出委託之庫存市值-已使用在途款-帳戶圈存金額+買進委託。 -->
+					<!-- 參考總資產= 0001 台幣市值 + 0009台幣數字 + 0004台幣市值 – 0006台幣數字 – 0007台幣數字 + 0008 台幣數字 -->
+					<td style="text-align: right;">{{TotalAssets | number :0}}</td>
+					<td></td>
+					<th>庫存投資報酬率(不含配息)：</th>
+					<td style="text-align: right;">{{Return | number :2}} {{Return != null ? '%' : ''}}</td>
+					<td></td>
+				</tr>
+				<tr style="margin-left: 10px">
+					<th>庫存總市值：</th>	<!-- 商品庫存市值加總 -->
+					<td style="text-align: right;">{{SUMCurBalNT | number :0}}</td>
+					<td></td>
+					<th>ETF：</th>
+					<td style="text-align: right;">{{AcctBal_E | number :0}}</td>
+					<td></td>
+				</tr>
+				<tr style="margin-left: 10px">
+					<th>庫存投資金額：</th>
+					<td style="text-align: right;">{{SUMCurBalCost | number :0}}</td>
+					<td></td>
+					<th>海外股票：</th>
+					<td style="text-align: right;">{{AcctBal_S | number :0}}</td>
+					<td></td>
+				</tr>
+				<tr style="margin-left: 10px">
+					<th>庫存投資損益金額：</th>
+					<td style="text-align: right;">{{SUMProfitAndLoss | number :0}}</td>
+					<td></td>
+					<th></th>
+					<td style="text-align: right;"></td>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+<!-- 		<button type="button" class="btn btn-info" ng-click="OnTrade()" function-type="maintenance">在途查詢</button> -->
+			<button type="button" class="btn btn-info" ng-click="QueryHist()" function-type="maintenance">歷史查詢</button>
+			<button type="button" class="btn btn-info" ng-click="AccDetails()" function-type="maintenance">帳戶每日入扣帳明細查詢</button>
+		</div>
+		
+		<h4 class="h4-title">海外ETF</h4>
+		<e-jumping-once output="outputVOe" list="datae" totallist="eList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th ng-if = "pri == '002' || pri == '003'">功能</th>
+						<th>信託帳號</th>
+						<th>商品名稱</th>
+						<th>股數</th>
+						<th>交易幣別</th>
+						<th>平均買進價格</th>
+						<th>參考收盤價</th>
+						<th>外幣參考市值</th>
+						<th>參考含息報酬率</th>	
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in datae | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td ng-if="!IsMobile && (pri == '002' || pri == '003')">
+							<e-combobox id="cmbAction" name="cmbAction"
+							ng-datasource="row.set"
+							ng-model="row.cmbAction"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="action(row)"
+							width="100px"
+							style="line-height:20px;" />
+						</td>
+						<td style="text-align: left;"><a href="#" onclick="return false" ng-click="detail(row)">{{row.TrustAcct}}</a></td>
+						<td style="text-align: left;">{{row.InsuranceNo == null ? '' : row.InsuranceNo + '- '}}{{row.ProductName}}</td>
+						<td style="text-align: right;">{{row.Number | number:0}}</td>
+						<td style="text-align: left;">{{row.EntrustCur}}</td>
+						<td style="text-align: right;">{{row.AvgBuyingPrice | number:6}}</td>
+						<td style="text-align: right;">{{row.CurAmt | number:6}}</td>
+						<td style="text-align: right;">{{row.ForCurBal | number:2}}</td>
+						<td style="text-align: right;">{{row.ReturnRateSign2 == '+' ? '' : '-'}}{{row.ReturnRate2 | number:2}}{{row.ReturnRate2 != null ? '%' : ''}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h4 class="h4-title">海外股票</h4>
+		<e-jumping-once output="outputVOs" list="datas" totallist="sList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th ng-if = "pri == '002' || pri == '003'">功能</th>
+						<th>信託帳號</th>
+						<th>商品名稱</th>
+						<th>股數</th>
+						<th>交易幣別</th>
+						<th>平均買進價格</th>
+						<th>參考收盤價</th>
+						<th>外幣參考市值</th>
+						<th>參考含息報酬率</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in datas | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td ng-if = "pri == '002' || pri == '003'">
+							<e-combobox id="cmbAction" name="cmbAction"
+							ng-datasource="row.set"
+							ng-model="row.cmbAction"
+							ng-validate="false"
+							ng-readonly="false" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="false"
+							ng-change="action(row)"
+							width="100px"
+							style="line-height:20px;" />
+						</td>
+						<td style="text-align: left;"><a href="#" onclick="return false" ng-click="detail(row)">{{row.TrustAcct}}</a></td>
+						<td style="text-align: left;">{{row.InsuranceNo == null ? '' : row.InsuranceNo + '- '}}{{row.ProductName}}</td>
+						<td style="text-align: right;">{{row.Number | number:0}}</td>
+						<td style="text-align: left;">{{row.EntrustCur}}</td>
+						<td style="text-align: right;">{{row.AvgBuyingPrice | number:6}}</td>
+						<td style="text-align: right;">{{row.CurAmt | number:6}}</td>
+						<td style="text-align: right;">{{row.ForCurBal | number:2}}</td>
+						<td style="text-align: right;">{{row.ReturnRateSign2 == '+' ? '' : '-'}}{{row.ReturnRate2 | number:2}}{{row.ReturnRate2 != null ? '%' : ''}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div style="text-align: left;">
+			注意事項：</br>
+			1.「參考總資產（約當新臺幣）」係依上述各商品庫存、在途款、賣出委託的資產折換為臺幣估算，若商品庫存含盤中成交之商品，將扣除盤中買進成交商品之已使用在途款及帳戶圈存金額；參考總資產=庫存+在途款+賣出委託之庫存市值-已使用在途款-帳戶圈存金額+買進委託。</br>
+			2.「庫存投資金額」為商品庫存之投資本金(不含包含費用)加總。</br>
+			3.「庫存投資損益金額」為商品庫存總市值減去庫存投資金額(不含包含費用)。
+		</div>
+		<h4 class="h4-title">委託賣出商品</h4>
+		<e-jumping-once output="outputVOonTrade" list="onTrades" totallist="onTradeList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+			<table class="table-bordered">
+				<thead>
+					<tr>
+						<th>信託帳號</th>
+						<th>商品名稱</th>
+						<th>股數</th>
+						<th>交易幣別</th>
+						<th>平均買進價格</th>
+						<th>參考收盤價</th>
+						<th>外幣參考市值</th>
+						<th>參考含息報酬率</th>
+						<th>賣出委託狀態</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in onTrades | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="text-align: left;">{{row.TrustAcct}}</a></td>
+						<td style="text-align: left;">{{row.InsuranceNo == null ? '' : row.InsuranceNo + '- '}}{{row.ProductName}}</td>
+						<td ng-if="row.assetType == '0003'"style="text-align: right;">{{row.TradeAmt}}</td>
+						<td ng-if="row.assetType == '0004'"style="text-align: right;">{{row.EntrustAmt}}</td>
+						<td style="text-align: left;">{{row.EntrustCur}}</td>
+						<td style="text-align: right;">--</td>
+						<td ng-if="row.assetType == '0003'" style="text-align: right;">{{row.TradePrice | number:6}} </br>(成交價格)</td>
+						<td ng-if="row.assetType == '0003'" style="text-align: right;">{{row.TradeCost | number:2}} </br>(成交金額)</td>
+						<td ng-if="row.assetType == '0004'" style="text-align: right;">{{row.CurAmt | number:6}}</td>
+						<td ng-if="row.assetType == '0004'" style="text-align: right;">{{row.ForCurBal | number:2}}</td>
+						<td style="text-align: right;">--</td>
+						<td style="text-align: center;">{{row.onTradeMemo}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

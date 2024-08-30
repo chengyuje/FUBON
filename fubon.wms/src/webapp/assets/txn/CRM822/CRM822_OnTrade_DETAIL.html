@@ -1,0 +1,115 @@
+<style>
+/* open dialog */
+.ngdialog.CRM822_OnTrade_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM822_OnTrade_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1100px;
+	height: auto;
+}
+/* table size */
+.CRM822_OnTrade_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM822_OnTrade_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM822_OnTrade_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<div ng-controller="CRM822_OnTrade_DETAILController" ng-cloak>
+	<div class="modal-dialog CRM822_OnTrade_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.assetType == '0002' ? '買入在途交易明細－' : '賣出在途交易明細－'}}{{row.InsuranceNo == null ? '' : row.InsuranceNo + '- '}}{{row.ProductName}}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="table-bordered">
+						<tr>
+							<th class="col-md-2">委託結果：</th>
+							<td class="col-md-2 tdpadding" ng-show="row.assetType == '0002'">{{row.Result | mapping:BUY_RESULT:'F3'}}</td>
+							<td class="col-md-2 tdpadding" ng-show="row.assetType == '0003'">{{row.Result | mapping:SELL_RESULT:'F3'}}</td>
+							<th class="col-md-2">商品幣別：</th>
+							<td class="col-md-2 tdpadding">{{row.CurCode}}</td>
+							<th class="col-md-2">委託股數：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.EntrustAmt | number:0}}</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">委託日期：</th>
+							<td class="col-md-2 tdpadding">{{toJsDate(row.EntrustDate) | date:"yyyy/MM/dd"}}</td>
+							<th class="col-md-2">信託種類：</th>
+							<td class="col-md-2 tdpadding">{{row.TrustType | mapping:TRUST_TYPE:'F3'}}</td>
+							<th class="col-md-2">委託價格：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.EntrustPrice | number:6}}</td>
+						</tr>
+						<tr>
+							<th class="col-md-2" ng-show="row.assetType == '0002'">成交日期：</th>
+							<th class="col-md-2" ng-show="row.assetType == '0003'">交易日期：</th>
+							<td class="col-md-2 tdpadding">{{toJsDate(row.TradeDate) | date:"yyyy/MM/dd"}}</td>
+							<th class="col-md-2">信託帳號：</th>
+							<td class="col-md-2 tdpadding">{{row.TrustAcct}}</td>
+							<th class="col-md-2">成交股數(A)：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.TradeAmt | number:0}}</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">交易指示到期日：</th>
+							<td class="col-md-2 tdpadding">{{toJsDate(row.TradeDateEnd) | date:"yyyy/MM/dd"}}</td>
+							<th class="col-md-2">交易幣別：</th>
+							<td class="col-md-2 tdpadding">{{row.EntrustCur}}</td>
+							<th class="col-md-2">成交報價(B)：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.TradePrice | number:6}}</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">商品類型：</th>
+							<td class="col-md-2 tdpadding">{{row.ProductType | mapping:PRD_TYPE:'F3'}}</td>
+							<th class="col-md-2">委託通路：</th>
+							<td class="col-md-2 tdpadding">{{row.ChannelType == null ? 'S' : row.ChannelType | mapping:ETF_CHANNEL_TYPE:'F3'}}</td>
+							<th class="col-md-2">成交金額(A*B)：</th>
+							<td class="col-md-2 tdpadding" style="text-align: right;">{{row.TradeCost | number:2}}</td>
+						</tr>
+						<tr>
+							<th class="col-md-2">交易市場(交易所)：</th>
+							<td class="col-md-2 tdpadding">{{row.TrxMarket}}</td>
+							<th class="col-md-2"></th>
+							<td class="col-md-2 tdpadding" style="text-align: right;"></td>
+							<th class="col-md-2"></th>
+							<td class="col-md-2 tdpadding" style="text-align: right;"></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >確定</button>
+			</div>
+		</div>
+	</div>
+</div>

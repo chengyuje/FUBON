@@ -1,0 +1,274 @@
+<style>
+  .FPS320 .modal-content {
+    width: 60vw;
+    max-width: 750px;
+    min-width: 680px;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    z-index: 1050;
+  }
+
+  .FPS320 .scrollable {
+    max-height: 250px;
+    overflow-y: auto;
+  }
+
+  .FPS320 table.search_box {
+    width: 100%;
+  }
+
+  .FPS320 .search_box td,
+  .FPS320 .search_box th {
+    padding: 5px;
+  }
+
+  .FPS320 .cust_box td,
+  .FPS320 .cust_box th {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .FPS320 .cust_box td>input {
+    display: inline-block;
+  }
+
+  .FPS320 .gradient {
+    height: 5px;
+    width: 750px;
+    background: -moz-linear-gradient(left, rgba(88, 221, 102, 1) 0%, rgba(252, 197, 47, 1) 49%, rgba(242, 2, 6, 1) 99%);
+    background: -webkit-linear-gradient(left, rgba(88, 221, 102, 1) 0%, rgba(252, 197, 47, 1) 49%, rgba(242, 2, 6, 1) 99%);
+    background: linear-gradient(to right, rgba(88, 221, 102, 1) 0%, rgba(252, 197, 47, 1) 49%, rgba(242, 2, 6, 1) 99%);
+  }
+
+  .FPS320 table.search_box input[type="text"] {
+    margin-right: .5em;
+  }
+
+  .FPS320 table.search_box tr td {
+    padding-left: 20vw;
+  }
+
+  /* new*/
+
+  .FPS320 .content-body.form-inline input[type="text"] {
+    margin-right: .5em;
+  }
+
+  .FPS320 .content-title {
+    padding-left: 2.5%;
+  }
+
+  .FPS320 .content-wrapper .content-body {
+    text-align: left;
+  }
+
+  .FPS320 .content-wrapper2 {
+    position: relative;
+    text-align: left;
+    top: -10px;
+  }
+
+  .FPS320 .content-wrapper2 .content-title {
+    text-align: left;
+    width: 59%;
+  }
+
+  .FPS320 .content-wrapper2 .content-body {
+    text-align: right;
+    width: 40%;
+  }
+
+  .FPS320 .content-wrapper2 .content-title,
+  .FPS320 .content-wrapper2 .content-body {
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  .FPS320 .content-title.content-title-sub {
+    padding-left: calc(2.5% + 1em);
+  }
+
+  .closed {
+    background: #EFEFEF;
+  }
+
+  .open {
+    background: #FFFFFF;
+  }
+
+</style>
+
+<div ng-controller="FPS320Controller"
+     class="FPS320 FPS"
+     ng-cloak>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button"
+                class="close"
+                ng-click="closeThisDialog('cancel')">&times;</button>
+        <h4 id="myModalAlertLabel"
+            class="modal-title"
+            align="center">
+          <label>目標設定</label>
+        </h4>
+      </div>
+      <div class="modal-body block container no-border"
+           style="border:0;
+                  overflow:auto;
+                  margin:0;
+                  width: 100%;">
+        <form name="fps320Form">
+          <div class="content-wrapper">
+            <div class="content-title"></div>
+            <div style="text-align: right;">單位:新台幣元</div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title"
+                 style="font-weight:bold;">目標理財規劃</div>
+            <div class="content-body"
+                 style="font-weight:bold;"
+                 ng-bind="recommendations.planningName"></div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title"
+                 style="font-weight:bold;">1.目標名稱</div>
+            <div class="content-body">
+              <input type="text"
+                     class="form-control"
+                     placeholder="請輸入..."
+                     ng-model="inputVO.PLANNAME"
+                     maxlength="15"
+                     ng-disabled="inputVO.beacon == 1"
+                     required>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title"
+                 style="font-weight:bold;">2.決定投資天期</div>
+            <div class="content-body form-inline">
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control text-right"
+                     placeholder="請輸入..."
+                     ng-model="inputVO.PLANHEAD"
+                     ng-blur="chgPlanhead()"
+                     ng-change="inputVO.PLANHEAD = inputVO.PLANHEAD.replace('-' , '');"
+                     required>年</div>
+          </div>
+          <div>
+            <div style="text-align: right; color: red;"
+                 ng-if="inputVO.isReb">成立日期:{{planDate}}&nbsp;&nbsp;&nbsp;&nbsp;預計到期日期:{{overDate}}&nbsp;&nbsp;</div>
+            <div style="text-align: right; color: red;"
+                 ng-if="!inputVO.isReb">規劃日期:{{planDate}}&nbsp;&nbsp;&nbsp;&nbsp;預計到期日期:{{overDate}}&nbsp;&nbsp;</div>
+          </div>
+          <div class="content-wrapper closed" ng-hide="inputVO.isReb">
+            <div class="content-title no-body"
+                 style="font-weight:bold;">3.決定投資方式與金額(下方投資方式可擇一填寫或全部填寫，填寫金額建議單筆大於NT$30萬，定額大於NT$1.2萬，以避免發生適配不足額情況。)</div>
+          </div>
+          <div class="content-wrapper" ng-hide="inputVO.isReb">
+            <div class="content-title content-title-sub"
+                 style="font-weight:bold;">期初單筆投資</div>
+            <div class="content-body form-inline">
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control text-right"
+                     ng-model="inputVO.ONETIME"
+                     ng-disabled="inputVO.isReb"
+                     ng-blur="chgMomey();"
+                     ng-change="inputVO.ONETIME = inputVO.ONETIME.replace('-' , '');">元</div>
+          </div>
+          <div class="content-wrapper" ng-hide="inputVO.isReb">
+            <div class="content-title content-title-sub"
+                 style="font-weight:bold;">每月定額投資</div>
+            <div class="content-body form-inline">
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control text-right"
+                     ng-model="inputVO.PERMONTH"
+                     ng-disabled="inputVO.isReb"
+                     ng-blur="chgMomey();"
+                     ng-change="inputVO.PERMONTH = inputVO.PERMONTH.replace('-' , '');">元</div>
+          </div>
+          <div class="content-wrapper" ng-hide="inputVO.isReb"
+               ng-if="estimateAmt()">
+            <div class="content-title content-title-sub"></div>
+            <div class="content-body"
+                 style="color: red;">
+              預計到期投入金額: <span ng-bind="estimateAmt()|number"></span> 元</div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title"
+                 style="font-weight:bold;">{{inputVO.isReb ? '3' : '4'}}.達成目標的金額
+              <a ng-click="goFPS321()"
+                 ng-if="inputVO.planningCode == 'EDUCATION' || inputVO.planningCode == 'RETIRE'">
+                <i class="fa fa-question-circle fa-lg"
+                   aria-hidden="true"></i>
+              </a>
+            </div>
+            <div class="content-body form-inline">
+              <input type="text"
+                     e-input-limit="NC"
+                     class="form-control text-right"
+                     placeholder="請輸入..."
+                     ng-model="inputVO.TARGET"
+                     ng-blur="helpFlag?chgHelp():chkTarget()"
+                     ng-change="inputVO.TARGET = inputVO.TARGET.replace('-' , '');"
+                     required>元</div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title no-body"
+                 style="font-weight:bold;">
+              {{inputVO.isReb ? '4' : '5'}}.客戶風險屬性{{custRiskAttr}}， 可接受的風險承受度級數為1~{{custRiskAttrNumber*2}}級， 欲選擇的風險承受度級數為:
+            </div>
+          </div>
+
+          <!-- 客戶風險屬性 -->
+          <table class="table text-center cust_box">
+            <thead>
+              <tr>
+                <th colspan="2">C1-保守型</th>
+                <th colspan="2">C2-穩健型</th>
+                <th colspan="2">C3-成長型</th>
+                <th colspan="2">C4-積極型</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td ng-repeat="row in ['1','2','3','4','5','6','7','8']"
+                    ng-class="{true : 'closed' , false : 'open' }[custRiskAttrNumber*2<row]">
+                  <span ng-bind="row"></span>
+                  <input type="radio"
+                         name="custRiskAtr"
+                         ng-value="row"
+                         ng-model="inputVO.CUST_RISK_ATTR"
+                         class="radio"
+                         ng-disabled="custRiskAttrNumber*2<row">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <drag-bar percent="{{inputVO.CUST_RISK_ATTR/8*100}}"
+                    options="dragOptions"></drag-bar>
+          <div class="content-wrapper2">
+            <div class="content-title"
+                 style="font-size: .9em; font-weight:bold; text-align: left;">低預期報酬</div>
+            <div class="content-body"
+                 style="font-size: .9em; font-weight:bold; text-align: right; padding-right: 1.5%;">高預期報酬</div>
+          </div>
+          <div class="text-center"
+               style="padding: 10px;">
+            <a type="button"
+               class="btn-fps"
+               ng-click="closeThisDialog('cancel')">取消</a>
+            <a type="button"
+               class="btn-fps"
+               ng-click="confirm()">確認</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

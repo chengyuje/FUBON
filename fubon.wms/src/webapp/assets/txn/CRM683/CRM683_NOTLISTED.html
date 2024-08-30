@@ -1,0 +1,57 @@
+<style>
+    /* open dialog */
+    .ngdialog.CRM683_NOTLISTED {
+
+    }
+
+</style>
+<script type="text/javascript" src="assets/txn/CRM683/CRM683.js"></script>
+<script type="text/javascript" src="assets/txn/CRM683/CRM683_NOTLISTED.js"></script>
+
+<div class="CRM683_NOTLISTED" ng-controller="CRM683_NOTLISTEDController" ng-cloak>
+    <h4 class="h4-title">未上市櫃股票</h4>    
+<!--     <div class="search_table search_box3"> -->
+<!--         <table> -->
+<!--             <tr> -->
+<!--                 <th colspan = "4">(約當臺幣)</th> -->
+<!--             </tr> -->
+<!--             <tr> -->
+<!--                 <th>信託本金總計：</th> -->
+<!--                 <td colspan = "3">{{SUMTrustAmt | currency:''}}</td> -->
+<!--             </tr> -->
+<!--             <tr> -->
+<!--                 <th>含息總報酬率：</th> -->
+<!--                 <td colspan = "3">{{Return | number :2}}%</td> -->
+<!--             </tr> -->
+<!--         </table>	 -->
+<!--     </div> -->
+    <e-jumping-once output="outputVO" list="data" totallist="stockList"></e-jumping-once>
+    <div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+        <table class="modal-body table-bordered">
+            <tr>
+            	<th>證券代號</th>
+            	<th>名稱</th>
+                <th>契約幣別</th>
+                <th>成本金額</th>
+                <th>無償配股股數</th>
+                <th>有償配股股數</th>
+                <th>庫存股數</th>
+                <th>參考收盤價日</th>
+                <th>參考收盤價</th>
+                <th>參考市值<br>(證券計價幣別)</th>
+            </tr>
+            <tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+                <td style="text-align: left;">{{row.STOCK_ID}}</td> 
+                <td style="text-align: left;">{{row.STOCK_NAME}}</td>
+                <td style="text-align: left;">{{row.CURRENCY}}</td>
+                <td style="text-align: left;">{{row.INV_AMT | currency:''}}</td>
+                <td style="text-align: right;">{{row.STOCK_NO1 | currency:''}}</td>
+                <td style="text-align: right;">{{row.STOCK_NO2 | currency:''}}</td>
+                <td style="text-align: right;">{{row.STOCK_TOTAL_NO | currency:''}}</td>
+                <td style="text-align: left;">{{toJsDate(row.REF_VAL_DATE) | date:'yyyy/MM/dd'}}</td>
+                <td style="text-align: right;">{{row.REF_VAL | currency:''}}</td>
+                <td style="text-align: right;">{{row.REF_MARKET_VAL | currency:''}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

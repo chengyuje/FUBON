@@ -1,0 +1,185 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .FPS .print .flex-block-wrapper .flex-block:nth-of-type(1) {
+    flex: 3;
+  }
+
+  .FPS .print .flex-block-wrapper .flex-block:nth-of-type(2) {
+    border-left: 1px solid #eee;
+    border-right: 0.5px solid #eee;
+    flex: 4;
+  }
+
+  .FPS .print .flex-block-wrapper .flex-block:nth-of-type(3) {
+    border-left: .5px solid #eee;
+    flex: 4;
+  }
+
+  table.conclusion>thead>tr th:nth-of-type(1) {
+    width: calc(100%/11*3);
+  }
+
+  table.conclusion>thead>tr th:nth-of-type(2),
+  table.conclusion>thead>tr th:nth-of-type(3) {
+    width: calc(100%/11*4);
+  }
+
+  /* table.conclusion>thead>tr th:nth-of-type(4) {
+    width: calc(100%/11*1);
+  } */
+
+</style>
+
+<!-- 有投保、有推介 -->
+<div class="print A4" ng-controller="FPSPrintController">
+
+  <!-- header -->
+  <section>
+    <img ng-src="{{path.header}}" class="wrapper" print="header">
+  </section>
+
+  <!-- title -->
+  <section print print-top-margin="-5" style="margin-bottom:2em;" class="wrapper">
+    <div ng-include="path.brief"></div>
+  </section>
+
+  <!-- image -->
+  <section>
+    <img ng-if="rptUrl"
+         data-ng-src="{{rptUrl}}"
+         alt="rptUrleName"
+         style="margin-bottom:5em; width:100%;"
+         print="image"
+         print-page="next"
+         print-scale-direction="vertical">
+  </section>
+
+  <!-- cust -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">1</span>基本資料
+    </div>
+    <div class="block container" style="border-radius: 1em;">
+      <div ng-include="path.custInfo" ng-init="isPrint=true"></div>
+    </div>
+  </section>
+
+  <!-- amt FPS210 -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">2</span>可供理財規劃金額
+    </div>
+    <div class="wrapper">
+      <p class="sub-title-p">您的資產扣除預期支付後，即為可供理財規劃金額。</p>
+      <div class="ps-wrapper" style="float:right;">單位: 新台幣 元</div>
+    </div>
+
+    <div ng-include="path.validAmount"></div>
+    <div ng-include="path.validAmount_ps"></div>
+  </section>
+
+  <!-- charts FPS220 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">3</span>配置比例與商品明細
+      </div>
+      <div class="wrapper">
+        <p class="sub-title-p">調整前與調整後之資產配置情況說明如下：</p>
+        <div class="ps-wrapper" style="float:right;">單位: 新台幣 元</div>
+      </div>
+    </div>
+
+    <!-- 有投保 -->
+    <!-- 圖表 (print inside) -->
+    <div ng-include="path.hasStockChart"></div>
+    <!-- 圖表結論  -->
+    <div ng-include="path.hasStockChartConclusion" print></div>
+
+    <div ng-include="path.allocationChart_ps" print></div>
+	<br/>
+
+    <!-- deposit fixed stock -->
+    <div ng-include="path.hasStockProduct"
+         ng-repeat="block in blockObjects"
+         ng-init="block=block; index=$index"
+         print>
+    </div>
+    
+    <div print>
+    	<ol class="ps-wrapper wrapper tiny-font">
+		  <li class="ps">類債券商品包含債券型基金、平衡型基金(投資債券占比較高者)、貨幣型基金、債券型ETF、海外債、組合式商品SI、境外結構型商品SN及奈米投(投資債券比例較高者)；類股票商品包含股票型基金、平衡型基金(投資股票占比較高)、股票型ETF及奈米投(投資股票比例較高者)，台北富邦商業銀行將不定期依標的投資比例變化，調整商品的股債分類。</li>
+		  <li class="ps">調整前及調整後比例皆以約當台幣金額計算占比。</li>
+		  <li class="ps">「市值」欄位依商品特性不同而有定義差異，海外債、組合式商品SI、境外結構型商品SN為參考贖回報價*庫存面額；基金、ETF及奈米投為參考市值。</li>
+		</ol>
+    </div>
+  </section>
+
+  <!-- history performance -->
+  <section ng-show="!notShow.historyPerformance">
+    <div print print-top-margin="5">
+      <div class="title-wrapper">
+        <span class="title-num">4</span>投資組合歷史績效
+      </div>
+      <div class="wrapper"><p class="sub-title-p">依前述投資組合中關於基金與ETF之歷史價格資料所計算之投資組合歷史報酬表現。</p></div>
+    </div>
+    <div ng-include="path.historyPerformance" print print-unique="true"></div>
+    <div ng-include="path.historyPerformance_ps" print></div>
+  </section>
+
+  <!-- product performance -->
+  <section ng-if="!notShow.productPerformance">
+    <div print print-top-margin="5">
+      <div class="title-wrapper">
+        <span class="title-num" ng-bind="5-notShow.historyPerformance"></span>商品歷史績效
+      </div>
+    </div>
+
+    <div ng-include="path.productPerformance" print></div>
+    <div ng-include="path.productPerformance_ps" print></div>
+  </section>
+
+  <!-- 您的待執行交易 -->
+  <section ng-if="!notShow.transaction">
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num" ng-bind="6-notShow.historyPerformance-notShow.productPerformance"></span>您的待執行交易
+      </div>
+      <div class="wrapper"><p class="sub-title-p">依據前述商品明細，本次理財規劃待執行交易臚列如下。因投資市場瞬息萬變，提醒您留意執行時效。</p></div>
+    </div>
+
+    <div ng-include="path.transaction" print></div>
+    
+    <div print>
+    	<ol class="ps-wrapper wrapper tiny-font">
+		  <li class="ps">基金幣別為申購幣別</li>
+		  <li class="ps">「申購/贖回金額」欄位依商品特性不同而有定義差異，舉例而言，如為ETF商品則表示為買進/賣出金額，依此類推。</li>
+		  <li class="ps">理財規劃金額採最近資產部位計算，會受到市場報價變化之影響，可能導致上述商品規劃申購及贖回之金額，於執行交易時會產生差異。</li>
+		</ol>
+    </div>
+  </section>
+
+  <!-- 使用指南 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num" ng-bind="7-notShow.historyPerformance-notShow.productPerformance-notShow.transaction"></span>規劃書使用指南
+      </div>
+    </div>
+
+    <div ng-include="path.manual" print></div>
+  </section>
+
+  <!-- 注意事項 -->
+  <section ng-if="transactionList.length>0">
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num" ng-bind="8-notShow.historyPerformance-notShow.productPerformance-notShow.transaction"></span>注意事項
+      </div>
+    </div>
+
+    <div ng-include="path.notice" print></div>
+  </section>
+  <div id="hiddendom"></div>
+</div>

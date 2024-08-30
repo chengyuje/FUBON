@@ -1,0 +1,106 @@
+<style>
+/* open dialog */
+.ngdialog.PMS337_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS337_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 750px;
+	height: auto;
+}
+/* table size */
+.PMS337_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS337_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS337_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<div ng-controller="PMS337_DETAILController" ng-cloak>
+	<div class="modal-dialog PMS337_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">客戶明細資料</h4>
+			</div>
+			<div class="modal-body">
+				<h4 class="text-center">AO_CODE：({{row.AO_CODE}})<span class="bigspace"></span>   理專姓名：{{row.EMP_NAME}}<span class="bigspace"></span></h4>
+				
+				
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table>
+						<thead>
+							<tr>
+								<th>
+									序號
+								</th>
+								<th>互動次數</th>
+								<th>客戶ID</th>
+								<th>客戶姓名</th>
+								<th>現在庫戶等級</th>
+								<th>製表時客戶等級</th>
+								<th>至表時最近3個<BR>月累計實際手收</th>
+								
+								
+								
+								
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="data in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{data.ROWNUM}}</td>
+								<td>{{data.CUST_ID}}</td>
+								<td>{{data.CUST_ID}}</td>
+								<td>{{data.CUST_NAME }}</td>
+								<td>{{data.CUR_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+								<td>{{data.TAB_DEGREE | mapping:mappingSet['CRM.VIP_DEGREE']:'F3'}}</td>
+								<td align="right">{{data.ACT_FEE | currency:''}}</td>
+								
+								
+								
+<!-- 								<td class="text-center"><a onclick="return false" ng-click="detail(row)"><span class="glyphicon glyphicon-zoom-in"></span></a></td> -->
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<e-paging outputVO="outputVO"
+				inputVO="inputVO"
+				callQuery="inquire()"
+				displayLimit="displayLimit"
+				dataList="paramList">
+				</e-paging>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確定</button>
+			</div>
+		</div>
+	</div>
+</div>

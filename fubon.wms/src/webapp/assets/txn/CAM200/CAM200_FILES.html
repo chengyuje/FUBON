@@ -1,0 +1,52 @@
+<style>
+/* dialog panl */
+.modal-dialog.CAM200_FILES {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<div>
+	<div ng-controller="CAM200_FILESController" ng-cloak>
+		<div class="modal-dialog CAM200_FILES">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+					<h4 id="myModalAlertLabel" class="modal-title" align="center">參考文件明細</h4>
+				</div>
+				<div class="modal-body">
+					<h4 class="h4-title">名單/待辦工作名稱：{{campName}}</h4>
+					<div class="gv_tab_sc scroll_y" style="height:235px">
+						<table>
+							<thead>
+								<tr>
+									<th>檔案名稱</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" align="center" ng-repeat="row in fileList track by $index">
+									<td ng-if="row.DOC_FILE_TYPE == 'D'">
+										<a onclick="return false" ng-click="downloadByteFile(row)">{{row.DOC_NAME}}</a>
+									</td>
+									<td ng-if="row.DOC_FILE_TYPE == 'U'">
+										<a ng-href="{{row.DOC_URL}}" target="_blank">{{row.DOC_NAME}}</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

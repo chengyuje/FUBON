@@ -1,0 +1,203 @@
+<style>
+/* open dialog */
+.ngdialog.CRM822_QueryHist {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM822_QueryHist {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1100px;
+	height: auto;
+}
+/* table size */
+.CRM822_QueryHist table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CRM822_QueryHist.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CRM822_QueryHist_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.table-bordered tr>th{
+	vertical-align: middle;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<div ng-controller="CRM822_QueryHistController" ng-cloak>
+	<div class="modal-dialog CRM822_QueryHist">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">海外ETF/海外股票歷史資訊</h4>
+			</div>
+			<div class="gv_tab_sc scroll_y" style="height:500px;white-space: nowrap;">			
+				<table class="table-bordered ">
+					<tr>
+						<th colspan="2">*帳號:</th>
+						<td>
+							<e-combobox id="account" name="account"
+								ng-datasource="mappingSet['account']"
+								ng-model="inputVO.CurAcc"
+				   				ng-validate="false" 
+				   				ng-readonly="false" 
+				   				ng-editable="false"
+				   				ng-format="F3"
+				   				width="360px"
+				   				style="line-height:20px;" 
+				   				required />
+						</td>			
+					</tr>		
+					
+					<tr>
+						<th rowspan ="2">查詢期間:</th>
+						<th>快速查詢:</th>
+						<td>
+							<table>
+								<tr>
+									<td><input type="radio" name="group" ng-model="inputVO.time" ng-click="getMonth(3); limitDate();"> 近三個月</td>
+									<td><input type="radio" name="group" ng-model="inputVO.time" ng-click="getMonth(6); limitDate();"> 近六個月</td>
+									<td><input type="radio" name="group" ng-model="inputVO.time" ng-click="getMonth(12); limitDate();"> 六個月前至近一年內</td>
+								</tr>
+								<tr>
+									<td><button type="button" class="btn btn-info" ng-click="getYear('beforeLastYear'); limitDate();">{{year3}}</button></td>
+									<td><button type="button" class="btn btn-info" ng-click="getYear('lastYear'); limitDate();">{{year2}}</button></td>
+									<td><button type="button" class="btn btn-info" ng-click="getYear('thisYear'); limitDate();">{{year1}}</button></td>
+								</tr>
+							</table>
+						</td>
+					</tr>					
+					<tr>							
+						<th>*自訂查詢:</th>
+						<td>
+							<div>
+								<div class="input-group datebox datewidth" style="float:left">
+									<input type="text" id="sCreDate" name="sCreDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.StartDt"
+										is-open="model.a"
+										datepicker-options="bgn_sDateOptions"								
+										ng-readonly="true"								
+										ng-change="limitDate();"
+										required/>
+										<!-- 製作日曆button -->
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+											<i class="glyphicon glyphicon-calendar"></i>
+										</button>																		
+									</span>
+								</div>																					
+								<div style="float:left">&nbsp; ～ &nbsp;</div>	
+									<div class="input-group datebox datewidth" style="float:left">
+										<input type="text" id="eCreDate" name="eCreDate"
+											class="form-control"
+											uib-datepicker-popup="yyyy/MM/dd"
+											ng-model="inputVO.EndDt"
+											is-open="model.b"
+											datepicker-options="bgn_eDateOptions"								
+											ng-readonly="true"								
+											ng-change="limitDate();"
+											required/>
+											<!-- 製作日曆button -->
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+												<i class="glyphicon glyphicon-calendar"></i>
+											</button>																		
+										</span>
+									</div>	
+								<label>&nbsp; &nbsp;&nbsp;</label>
+								<button type="button" class="btn btn-info" ng-click="inquire()" 
+									ng-disabled="inputVO.CurAcc == undefined || inputVO.CurAcc == '' ||
+												 inputVO.StartDt == undefined || inputVO.StartDt == '' ||
+												 inputVO.EndDt == undefined || inputVO.EndDt == '' " >開始查詢</button>
+								<button type="button" class="btn btn-info" ng-click="cancel()">清除</button>
+							</div>
+						</td>						
+					</tr>
+				</table>
+				</br></br>
+				<div class="tfb_content">
+					<div class="tfb_content_icon"></div>
+					<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+				</div>
+				<!--Content of the panel-->
+				<div class="panel_content">
+					<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+						<table>
+							<thead>
+								<tr>
+									<th>成交日期</th>
+									<th>實付扣款日/<br>實得入帳日</th>
+									<th>交易提示到期日</th>
+									<th>委託類別</th>
+									<th>商品名稱</th>
+<!-- 								<th>交要市場(交易所)</th> 刪除交易市場-->
+									<th>幣別</th>
+									<th>股數</th>
+									<th>成交單價</th>
+									<th>金額</th>	<!-- 實付金額、實收金額(同網行銀) -->
+									<th>含息參考報酬率</th>	<!-- 賣出新增報酬率欄位 -->
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" align="center" ng-repeat="row in data">
+									<td>{{row.TradeDate}}</td>
+									<td ng-show="row.TradeType == '買入'">{{row.PayDay}}</td>
+									<td ng-show="row.TradeType == '賣出'">{{row.SellPayDay}}</td>
+									<td ng-show="row.TradeType != '賣出' && row.TradeType != '買入' ">{{row.EntrustDate}}</td>
+									<td>{{row.TradeDateEnd}}</td>
+									<td>{{row.TradeType}}</td>
+									<td>
+										<a href="#" ng-click="detail(row)">
+											{{row.InsuranceNo == null ? '' : row.InsuranceNo + '- '}}{{row.ProductName}}
+										</a>
+									</td>
+<!-- 								<td>{{row.TrxMarket}}</td> -->
+									<td>{{row.CurCode}}</td>
+									<td align = "right" ng-show="row.EntrustStatus != 0">{{row.TradeAmt | number : 0}}</td>
+									<td align = "right" ng-show="row.EntrustStatus == 0">未成交</td>
+									<td align = "right" ng-show="row.EntrustStatus != 0">{{row.TradePrice | number : 6}}</td>
+									<td align = "right" ng-show="row.EntrustStatus == 0">未成交</td>
+									<td align = "right" ng-show="row.EntrustStatus != 0">{{row.TotalAmt | number : 2}}</td>
+									<td align = "right" ng-show="row.EntrustStatus == 0">未成交</td>
+									<td align = "right" ng-show="row.EntrustStatus != 0">{{row.ReturnRateSign == '+' ? '' : row.ReturnRateSign}}{{row.ReturnRate | number : 2}}</td>
+									<td align = "right" ng-show="row.EntrustStatus == 0"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<!-- 結果區 -->
+
+<!-- 			<div class="search_box_btn text-center"> -->
+<!-- 				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >確定</button> -->
+<!-- 			</div> -->
+		</div>
+	</div>
+</div>

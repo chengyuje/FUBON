@@ -1,0 +1,119 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS349_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1300px;
+	height: auto;
+}
+/* table size */
+.PMS349_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PMS349_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS349_DETAIL_dialog {
+	overflow: scroll;
+	width: 600px;
+	height: 480px;
+}
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+.alignleft {
+	text-align: left !important;
+}
+.alignright{
+	text-align: right !important;
+}
+.bigspace {
+	margin-left: 50px !important;
+}
+.datewidth {
+	width: 180px !important;
+}
+</style>
+<div ng-controller="PMS349_DETAILController" ng-cloak>
+	<div class="modal-dialog PMS349_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"	ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">客戶明細資料</h4>
+			</div>
+			<div class="modal-body">
+				<h4 class="text-center">
+					AO_CODE：({{row.AO_CODE}})<span class="bigspace"></span>
+					理專姓名：{{row.EMP_NAME}}<span class="bigspace"></span>
+				</h4>
+					<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList"></e-jumping>
+				<div class="gv_tab_sc scroll_y" style=" white-space: nowrap;">
+					<table  class="e-table-freeze" e-height="350px" e-mode="1" e-left="2" e-top="true" e-list="paramList">
+						<thead>
+							<tr rowspan="2">
+								<th rowspan="2" style="vertical-align: midddle" valign="center">客戶ID</th>
+								<th rowspan="2" style="vertical-align: midddle" valign="center">客戶姓名</th>
+								<th rowspan="2" style="vertical-align: midddle" valign="center">客戶分級</th>
+								<th class="css" rowspan="2" style="vertical-align: midddle"	valign="center">上一日<br>AUM餘額</th>
+								<th class="css" rowspan="2" style="vertical-align: midddle"	valign="center">未實現損益</th>
+								<th rowspan="2" style="vertical-align: midddle" valign="center">存款</th>
+								<th class="css" rowspan="1" colspan="7">投資報酬率/投資現值 </th>
+								<!-- Matis: 0006393 拿掉保險區塊 -->
+                                <!--<th class="css" rowspan="1" colspan="4">保險報酬率/保險現值 </th>-->
+                                <th rowspan="2" style="vertical-align: midddle" valign="center">總報酬</th>
+							</tr>
+							<tr>
+								<th>基金</th>
+								<th>海外股票</th>
+								<th>海外ETF</th>
+								<th>海外債</th>
+								<th>SI</th>
+								<th>SN</th>
+								<th>DCI</th>
+							    <!--<th>躉繳</th> -->
+							    <!--<th>短年期</th>-->
+							    <!--<th>長年期</th> -->
+								<!--<th>投資型</th>-->
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in paramList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.CUST_ID}}<br/></td>
+							<td>{{row.CUST_NAME}}<br/></td>
+							<td>{{row.CON_DEGREE | mapping:mappingSet['CRM.CON_DEGREE']:'F3'}}<br/></td>
+							<td class="alignright">{{0+row.AUM | currency:"":0}}<br/></td>
+							<td class="alignright" style="color: {{row.TTL_RTN_AMT<0?'red':'black'}}">{{0+row.TTL_RTN_AMT | currency:"":0}}<br/></td>
+							<td class="alignright">{{0+row.DEP | currency:"":0}}<br/></td>
+							<td class="alignright"><span style="color: {{(0+row.FUND_LOSS)<0?'red':'black'}}">{{0+row.FUND_LOSS | number:2}}%</span><div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>{{0+row.FUND_AMT | number:0}}</td>
+							<td class="alignright"><span style="color: {{(0+row.STK_LOSS)<0?'red':'black'}}">{{0+row.STK_LOSS | number:2}}%</span><div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>{{0+row.STK_AMT | number:0}}</td>
+							<td class="alignright"><span style="color: {{(0+row.ETF_LOSS)<0?'red':'black'}}">{{0+row.ETF_LOSS | number:2}}%</span><div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>{{0+row.ETF_AMT | number:0}}</td>
+							<td class="alignright"><span style="color: {{(0+row.BOND_LOSS)<0?'red':'black'}}">{{0+row.BOND_LOSS | number:2}}%</span><div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>{{0+row.BOND_AMT | number:0}}</td>
+							<td class="alignright"><span style="color: {{(0+row.SI_LOSS)<0?'red':'black'}}">{{0+row.SI_LOSS | number:2}}%</span><div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>{{0+row.SI_AMT | number:0}}</td>
+							<td class="alignright"><span style="color: {{(0+row.SN_LOSS)<0?'red':'black'}}">{{0+row.SN_LOSS | number:2}}%</span><div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>{{0+row.SN_AMT | number:0}}</td>
+							<td class="alignright"><span style="color: {{(0+row.DCI_LOSS)<0?'red':'black'}}">{{0+row.DCI_LOSS | number:2}}%</span><div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>{{0+row.DCI_AMT | number:0}}</td>
+							<!--<td class="alignright"><span style="color: {{(0+row.OT_LOSS)<0?'red':'black'}}">{{0+row.OT_LOSS | number:2}}%</span><div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>{{0+row.OT_AMT | number:0}}</td>-->
+							<!--<td class="alignright"><span style="color: {{(0+row.SY_LOSS)<0?'red':'black'}}">{{0+row.SY_LOSS | number:2}}%</span><div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>{{0+row.SY_AMT | number:0}}</td>-->
+							<!--<td class="alignright"><span style="color: {{(0+row.LY_LOSS)<0?'red':'black'}}">{{0+row.LY_LOSS | number:2}}%</span><div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>{{0+row.LY_AMT | number:0}}</td> -->
+							<!--<td class="alignright"><span style="color: {{(0+row.IV_LOSS)<0?'red':'black'}}">{{0+row.IV_LOSS | number:2}}%</span><div style="border-top:1px solid #cccccc;height:1px; overflow:hidden;"></div>{{0+row.IV_LOSS | number:0}}</td>-->
+							<td class="alignright"><span style="color: {{(0+row.IV_LOSS)<0?'red':'black'}}">{{0+row.ROR | number:2}}%</span><br/></td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">確定</button>
+				    <button type="button" class="btn btn-default" ng-click="export()">匯出</button>
+			    </div>
+			</div>			
+		</div>		
+	</div>
+</div>

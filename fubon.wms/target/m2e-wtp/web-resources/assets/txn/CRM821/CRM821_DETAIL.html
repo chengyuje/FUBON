@@ -1,0 +1,132 @@
+<style>
+/* open dialog */
+.ngdialog.CRM821_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM821_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+
+</style>
+<div class="CRM821_DETAIL" ng-controller="CRM821_DETAILController" ng-cloak>
+	<div class="modal-dialog CRM821_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">詳細資訊</h4>
+			</div>
+			<div class="modal-body">
+				<h4 class="h4-title">{{row.FundName}}</h4>
+				<div class="gv_tab_sc scroll_y">
+					<table class="table-bordered">
+						<tr>
+							<th width="10%">信託型態</th>
+							<td width="23%" style="text-align: right;">{{row.AssetType | mapping:mappingSet['AssetType']:'F3'}}</td>
+							<th width="10%">調整後<br>累積現金配息(C)</th>
+							<td width="23%" style="text-align: right;">
+								<span ng-if = "row.CurCode == 'TWD'">{{row.AccAllocateRew | number:0}}</span>
+								<span ng-if = "row.CurCode != 'TWD'">{{row.AccAllocateRew | number:2}}</span>
+							</td>
+							<th width="10%">信託帳號</th>
+							<td width="23%" style="text-align: right;">{{row.AcctId02}}</td>
+						</tr>
+						<tr>
+							<th width="10%">憑證註記</th>
+							<td width="23%" style="text-align: right;">{{row.DynamicType}}</td>
+							<th width="10%">累積現金配息</th>
+							<td width="23%" style="text-align: right;">
+								<span ng-if = "row.CurCode == 'TWD'">{{row.Increase | number:0}}</span>
+								<span ng-if = "row.CurCode != 'TWD'">{{row.Increase | number:2}}</span>
+							</td>
+							<th width="10%">憑證號碼</th>
+							<td width="23%" style="text-align: right;">{{row.EviNum}}</td>
+						</tr>
+						<tr>
+							<th width="10%">單位數</th>
+							<td width="23%" style="text-align: right;">{{row.CurUntNum | number:4}}</td>
+							<th width="10%">參考匯率</th>
+							<td width="23%" style="text-align: right;">{{cod | number:4}}</td>
+							<th width="10%">基金公司</th>
+							<td width="23%" style="text-align: right;">{{row.table[0].TRUST_COM}}</td>
+						</tr>
+						<tr>
+							<th width="10%">交易幣別</th>
+							<td width="23%" style="text-align: right;">{{row.CurCode}}</td>
+							<th width="10%">淨值</th>
+							<td width="23%" style="text-align: right;">{{row.NetValue | number:4}}</td>
+							<th width="10%">投資起日</th>
+							<td width="23%" style="text-align: right;">{{Strdate}}</td>
+						</tr>
+						<tr>
+							<th width="10%">投資金額(A)</th>
+							<td width="23%" style="text-align: right;">
+								<span ng-if = "row.CurCode == 'TWD'">{{row.CurAmt | number:0}}</span>
+								<span ng-if = "row.CurCode != 'TWD'">{{row.CurAmt | number:2}}</span>
+							</td>
+							<th width="10%">淨值日期</th>
+							<td width="23%" style="text-align: right;">{{NetValueDate}}</td>
+							<th width="10%">憑證狀態</th>
+							<td width="23%" style="text-align: right;">{{row.Status | mapping:mappingSet['Status']:'F3'}}</td>
+						</tr>
+						<tr>
+							<th width="10%">參考市值(B)</th>
+							<td width="23%" style="text-align: right;">
+								<span ng-if = "row.CurCode == 'TWD'">{{row.CurBal | number:0}}</span>
+								<span ng-if = "row.CurCode != 'TWD'">{{row.CurBal | number:2}}</span>
+							</td>
+							<th width="10%">參考報酬率<br>(不含配息)<br>[(B-A)/A]%</th>
+							<td width="23%" style="text-align: right;">{{row.Return | number : 2}}{{row.Return != null ? '%' : ''}} </td>
+							<th width="10%">參考報酬率<br>(含累積現金配息)<br>[(B-A+C)/A]%</th>
+							<td width="23%" style="text-align: right;">{{row.AccAllocateRewRate | number:2}}{{row.AccAllocateRewRate != null ? '%' : ''}} </td>							
+						</tr>
+						<tr>
+							<th width="10%">投資損益(B-A)</th>
+							<td width="23%" style="text-align: right;">
+								<span ng-if = "row.CurCode == 'TWD'">{{row.CurBal - row.CurAmt | number:0}}</span>
+								<span ng-if = "row.CurCode != 'TWD'">{{row.CurBal - row.CurAmt | number:2}}</span>
+							</td>
+							<th ng-if="!(row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2'))" width="10%">滿足/停損點</th>
+							<td ng-if="!(row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2'))" width="23%" style="text-align: right;">滿足點:{{row.SatisfiedSign == 'X' ? '未設定' : row.SatisfiedSign+row.Satisfied}}<br>
+																	   停損點:{{row.StoplossSign =='X' ? '未設定' : row.StoplossSign+row.Stoploss}}</td>
+							<th ng-if="row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2')" width="10%"></th>
+							<td ng-if="row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2')" width="23%" style="text-align: right;"></td>
+							<th width="10%"></th>
+							<td width="23%" style="text-align: right;"></td>
+						</tr>
+						<!-- 動態鎖利母子基金 -->
+						<tr ng-if="row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2')">
+							<th width="10%">母子基金累積報酬率</th>
+							<td width="23%" style="text-align: right;" ng-if="row.ComboReturn == 0">&nbsp;-&nbsp;</td>
+							<td width="23%" style="text-align: right;" ng-if="row.ComboReturn != 0">
+								<span ng-if = "row.ComboReturnSign == '-'">{{row.ComboReturnSign}}</span>{{row.ComboReturn | number:2}}%
+							</td>
+							<th width="10%">約定轉申購子基金日期</th>
+							<td width="23%" style="text-align: right;">{{row.SatelliteBuyDates}}</td>
+							<th width="10%">約定報酬率</th>
+							<td width="23%" style="text-align: right;">{{row.BenefitReturnRates}}</td>
+						</tr>
+						<!-- 動態鎖利子基金 -->
+						<tr ng-if="row.Dynamic && row.Dynamic == '2'">
+							<th width="10%">每次轉申購金額</th>
+							<td width="23%" style="text-align: right;">{{row.TransferAmt | number:0}}</td>
+							<th width="10%">目前狀態</th>
+							<td width="23%" style="text-align: right;">{{row.EviNumType == 'Y' ? '暫停轉申購' : '正常'}}</td>
+							<th width="10%"></th>
+							<td width="23%" style="text-align: right;"></td>
+						</tr>
+					</table>
+				</div>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')" >確定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

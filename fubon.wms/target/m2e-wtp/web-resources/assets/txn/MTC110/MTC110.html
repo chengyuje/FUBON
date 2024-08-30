@@ -1,0 +1,117 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/MTC110/MTC110.js"></script>
+<script type="text/javascript" src="assets/txn/MTC110/MTC110_MAINTAIN.js"></script>
+<div class="MTC110" ng-controller="MTC110Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a14.gif">金錢信託契約</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table style="width: 50%; margin-left: auto; margin-right: auto;">
+					<tr>
+						<th>委託人ID：</th>
+						<td><input type="text" class="form-control" placeholder="請輸入..." id="custId" name="cust_id" ng-model="inputVO.cust_id" e-length-limit="12" style="width:180px; text-transform: uppercase;"></td>
+					</tr>
+					<tr>
+						<th>區間：</th>
+						<td>
+						     <div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="period_s" name="period_s"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.period_s"
+									   is-open="model.a"
+									   datepicker-options="sDateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>	
+							<div style="float: left">&nbsp;~&nbsp;</div>
+							<div style="float: left" class="input-group datebox datewidth">
+								<input type="text" id="period_e" name="period_e"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.period_e"
+									   is-open="model.b"
+									   datepicker-options="eDateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate()"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>狀態：</th>
+						<td>
+							<label><input type="radio" ng-model="inputVO.CON_STATUS" value="A">全部&nbsp;&nbsp;</label>
+					    	<label><input type="radio" ng-model="inputVO.CON_STATUS" value="C">已確認&nbsp;&nbsp;</label>
+					    	<label><input type="radio" ng-model="inputVO.CON_STATUS" value="S">未確認&nbsp;&nbsp;</label>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="maintain('add')">新增契約</button>
+				<button type="button" class="btn btn-info" ng-click="query();">查詢</button>
+				<!-- <button type="button" class="btn btn-info" ng-click="init()">清除</button> -->
+			</div>
+		</div>
+		<div class="tfb_content">
+     		<div class="tfb_content_icon"></div>
+     		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+  			</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>	
+							<th>序號</th>
+							<th>委託人</th>
+							<th>契約種類</th>
+							<th>狀態</th>
+							<th>功能</th>
+							<th>到期日</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index">
+							<td>{{row.CON_NO}}</td>
+							<td align="center">{{row.CUST_NAME}}</td>
+							<td align="center">{{row.CON_CURR == 'T' ? '台幣' : '外幣'}}/{{row.CON_TYPE == 'S' ? '自益' : '他益'}}</td>
+							<td align="center">{{row.CON_STATUS == 'C' ? '已確認' : '未確認'}}</td>
+							<td align="center">
+								<button type="button" class="btn btn-info" ng-click="maintain('read', row)">查詢</button>
+								<button type="button" class="btn btn-primary" ng-click="maintain('copy', row)" ng-show="row.CON_STATUS == 'C'">複製</button>
+								<button type="button" class="btn btn-success" ng-click="print(row)" ng-show="row.CON_STATUS == 'C'">列印</button>
+								<button type="button" class="btn btn-warning" ng-click="maintain('modify', row)" ng-show="row.CON_STATUS == 'S'">編輯</button>
+								<button type="button" class="btn btn-danger" ng-click="delete(row)" ng-show="row.CON_STATUS == 'S'">刪除</button>
+							</td>
+							<td align="center">{{row.CON_STATUS == 'C' ? '' : (toJsDate(row.EXPIRY_DATE)| date:"yyyy/MM/dd")}}</td>
+							
+					</tbody>
+				</table>
+			</div></br>
+			<div>
+				<label style="color: red;">◎本查詢畫面僅供參考，需以實際成立之契約約定內容為主。</label></br>
+				<label style="color: red;">◎到期日前未確認送出，系統將自動刪除已儲存資料，無法再進行查詢、編輯功能。</label>
+			</div>
+		</div>
+	</div>
+</div>				

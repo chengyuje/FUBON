@@ -1,0 +1,57 @@
+<style>
+.modal-dialog.IOT900 {
+	width: 500px; 
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT900/IOT900.js"></script>
+<div ng-controller="IOT900Controller" ng-cloak>
+	<div class="modal-dialog IOT900">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">{{title}}</h4>
+			</div>
+			<div class="modal-body" style="overflow: scroll;">
+				<div class="gv_tab_sc">
+		 			<table ng-if="IN">
+		 				<tr>
+		 					<th>點選</th>
+		 					<th>分行留存文件名稱</th>
+		 					<th>文件重要性</th>
+		 				</tr>
+		 				<tr ng-repeat="row in inList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+		 					<td>
+		 						<input type="checkbox" ng-model="row.select" class="bLarger" ng-disabled="inputVO.OPR_STATUS=='Read'?true:false">
+		 					</td>
+		 					<td>{{row.DOC_NAME}}
+		 						<input ng-disabled="inputVO.OPR_STATUS=='Read'?true:false" id="other" name="other" type="text" maxlength="64" placeholder="請輸入..." ng-model="row.DOC_NAME_OTH" width="30%" ng-if="row.DOC_SEQ == '99'&&row.select==true?true:false">
+		 					</td>
+		 					<td>{{row.DOC_LEVEL|mapping:implist:F3}}</td>
+	
+		 				</tr>
+		 			</table>
+		 			<table ng-if="OUT">
+		 				<tr>
+		 					<th>點選</th>
+		 					<th>送件文件名稱</th>
+		 					<th>文件重要性</th>
+		 				</tr>
+		 				<tr ng-repeat="row in outList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+		 					<td>
+		 						<input type="checkbox" ng-model="row.select" class="bLarger" ng-disabled="inputVO.OPR_STATUS=='Read'?true:false">
+		 					</td>
+		 					<td>{{row.DOC_NAME}}
+		 						<input ng-disabled="inputVO.OPR_STATUS=='Read'?true:false" id="other" name="other" type="text" maxlength="64" placeholder="請輸入..." ng-model="row.DOC_NAME_OTH" width="30%" ng-if="row.DOC_SEQ == '99'&&row.select==true?true:false">
+		 					</td>
+		 					<td>{{row.DOC_LEVEL|mapping:implist:F3}}</td>
+		 				</tr>
+		 			</table>
+		 		</div>
+		 		<div class="modal-footer">
+			        <button ng-click="submit()" class="btn btn-info" data-dismiss="modal" ng-disabled="inputVO.OPR_STATUS=='Read'?true:false">確定</button> 
+			        <button ng-click="closeThisDialog('cancel')" class="btn btn-info"data-dismiss="modal">取消</button> 
+		        </div>
+			</div>
+		</div>
+	</div>
+</div>

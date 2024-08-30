@@ -1,0 +1,558 @@
+<style>
+  .FPS810 .custom-search-box td,
+  .FPS810 .custom-search-box th {
+    padding: 5px 10px;
+  }
+
+  .FPS810 .custom-search-box table {
+    padding: 10px;
+  }
+
+  .FPS810 .checkbox input[type=checkbox],
+  .FPS810 .checkbox-inline input[type=checkbox],
+  .FPS810 .radio input[type=radio],
+  .FPS810 .radio-inline input[type=radio] {
+    position: absolute;
+    margin-top: -4px;
+    margin-left: -20px;
+  }
+
+  /* section */
+
+  .FPS810 .inputStyle {
+    width: 50%;
+    display: inline-block;
+    text-align: right;
+  }
+
+  .FPS810 .left {
+    text-align: left;
+    float: left;
+  }
+
+  /*  */
+
+  .FPS810 .deletePic {
+    color: #2a8960;
+    font-size: 25px;
+  }
+
+  .FPS810 .section-wrapper {
+    text-align: center
+  }
+
+  .FPS810 section {
+    vertical-align: top;
+    margin: 1em auto;
+    width: 96%;
+    border-radius: 5px;
+    background-color: #ecf6fd;
+    display: inline-block;
+  }
+
+  .FPS810 section>h3 {
+    margin: 0;
+    padding: .5em 0;
+    text-align: center;
+    border: 0.5px solid #28a4c9;
+    background-color: #fff;
+    color: #28a4c9;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  .FPS810 section.tri {
+    width: 31.15%;
+    margin: .5em .5%;
+  }
+
+  .FPS810 section.dou {
+    width: 48%;
+    margin: .5em .5%;
+  }
+
+  .FPS810 p {
+    text-indent: 2em;
+  }
+
+  .FPS810 a:hover {
+    text-decoration: none !important;
+    cursor: pointer;
+  }
+
+  .FPS810 .section-body {
+    padding: .7em;
+    border-bottom: 0.5px solid #28a4c9;
+    border-left: 0.5px solid #28a4c9;
+    border-right: 0.5px solid #28a4c9;
+    border-top: 1px solid #ddd;
+    margin-top: -1px;
+    position: relative;
+  }
+
+  .FPS810 section .section-body:first-of-type {
+    border-top: 0px;
+    margin-top: 0px;
+  }
+
+  .FPS810 .section-body::after {
+    display: block;
+    content: '';
+    clear: both;
+  }
+
+  .FPS810 .color-block {
+    width: 1.5em;
+    height: 1.5em;
+    display: block;
+  }
+
+  .input-wrapper,
+  .FPS810 .more-wrapper {
+    text-align: right;
+    padding: 0em .5em;
+  }
+
+  .FPS810 .clear::after {
+    display: block;
+    content: '';
+    clear: both;
+  }
+
+  .FPS810 .more-wrapper {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+  }
+
+  .FPS810 .more {
+    font-size: .7em;
+    color: #28a4c9;
+  }
+
+  /* fps810 */
+
+  .FPS810 table.report.table {
+    border: 2px solid #fff;
+    background-color: #fff;
+  }
+
+  .FPS810 table.report.table>thead,
+  .FPS810 table.report.table>tbody tr th.fake-th {
+    background-color: #53b0c9;
+    color: #fff;
+  }
+
+  .FPS810 table.report.table>tbody tr:nth-of-type(1) {
+    background-color: #fff;
+  }
+
+  .FPS810 table.report.table>tbody tr:nth-of-type(2) {
+    background-color: #dbeef4;
+  }
+
+  .FPS810 table.report.table>tbody tr:nth-of-type(3) {
+    background-color: #b7dee8;
+  }
+
+  /* tmp */
+
+  .FPS810 table.report.table>tbody tr:nth-of-type(4) {
+    background-color: #a8e5f5;
+  }
+
+  .FPS810 table.report.table>thead>tr th,
+  .FPS810 table.report.table>thead>tr td,
+  .FPS810 table.report.table>tbody>tr th,
+  .FPS810 table.report.table>tbody>tr td {
+    vertical-align: middle;
+    text-align: center;
+    padding: .3em;
+    border: .5px solid #fff;
+  }
+
+  .FPS810 table.report.table thead th:first-of-type,
+  .FPS810 table.report.table tbody th {
+    border-right: 1px solid #fff;
+  }
+
+  .FPS810 .imp {
+    font-size: 1.5em;
+    color: #28a4c9;
+  }
+
+  .FPS810 section.no-body>h3 {
+    border-radius: 5px;
+  }
+
+  .FPS810 section>h3.title {
+    background-color: #28a4c9;
+    color: #fff;
+  }
+
+  /* hack */
+
+  table.report.table>tbody+tbody {
+    border-top: 2px solid #fff;
+  }
+
+</style>
+
+<!-- 
+    交易畫面
+    請修改 Controller 名稱，需符合 HTML 內定義
+-->
+
+<div class="FPS800 FPS810">
+  <div ng-controller="FPS810Controller"
+       ng-cloak>
+    <!-- content -->
+    <div class="bootstrap-admin-panel-content"
+         style="position:relative;">
+      <!-- label -->
+      <div class="section-wrapper">
+        <section class="dou no-body">
+          <h3 class="title">本月至今</h3>
+        </section>
+        <section class="dou no-body">
+          <h3 class="title">年初至今</h3>
+        </section>
+      </div>
+      <!-- EmpCnt -->
+      <div class="section-wrapper"
+           ng-if="roleType===2||roleType===3">
+        <!-- M empCnt -->
+        <section class="dou">
+          <h3>使用理財規劃功能理專數</h3>
+          <div class="section-body">
+            <h4>共
+              <span class="imp"
+                    ng-bind="total.M.empCnt|number"></span> 人
+            </h4>
+            <!-- result -->
+            <div>
+              <table class="table report">
+                <thead>
+                  <tr>
+                    <th ng-if="roleType===3"></th>
+                    <th ng-style="roleType===2&&{'width':'6em'}">理專分級</th>
+                    <th>FC1</th>
+                    <th>FC2</th>
+                    <th>FC3</th>
+                    <th>FC4</th>
+                    <th>FC5</th>
+                    <th>加總</th>
+                  </tr>
+                </thead>
+                <tbody ng-repeat="region in empCntM">
+                  <tr ng-repeat="row in region">
+                    <th ng-if="roleType===3&&$index%2==0"
+                        ng-bind="row.region"
+                        class="fake-th"
+                        rowspan="2"></th>
+                    <th ng-bind="row.title"></th>
+                    <td ng-bind="row.FC1+row.unit">
+                      <span ng-bind="row.FC1|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td ng-bind="row.FC2+row.unit">
+                      <span ng-bind="row.FC2|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td ng-bind="row.FC3+row.unit">
+                      <span ng-bind="row.FC3|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td ng-bind="row.FC4+row.unit">
+                      <span ng-bind="row.FC4|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td ng-bind="row.FC5+row.unit">
+                      <span ng-bind="row.FC5|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td ng-bind="row.total+row.unit">
+                      <span ng-bind="row.total|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- more -->
+            <div class="more-wrapper"
+                 ng-show="roleType!==3">
+              <a class="more"
+                 ng-click="go('empCntM', empCntM)">more</a>
+            </div>
+          </div>
+        </section>
+        <!-- Y empCnt -->
+        <section class="dou">
+          <h3>使用理財規劃功能理專數</h3>
+          <div class="section-body">
+            <h4>共
+              <span class="imp"
+                    ng-bind="total.Y.empCnt|number"></span> 人
+            </h4>
+            <!-- result -->
+            <div>
+              <table class="table report">
+                <thead>
+                  <tr>
+                    <th ng-if="roleType===3"></th>
+                    <th ng-style="roleType===2&&{'width':'6em'}">理專分級</th>
+                    <th>FC1</th>
+                    <th>FC2</th>
+                    <th>FC3</th>
+                    <th>FC4</th>
+                    <th>FC5</th>
+                    <th>加總</th>
+                  </tr>
+                </thead>
+                <tbody ng-repeat="region in empCntY">
+                  <tr ng-repeat="row in region">
+                    <th ng-if="roleType===3&&$index%2==0"
+                        ng-bind="row.region"
+                        class="fake-th"
+                        rowspan="2"></th>
+                    <th ng-bind="row.title"></th>
+                    <td>
+                      <span ng-bind="row.FC1|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td>
+                      <span ng-bind="row.FC2|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td>
+                      <span ng-bind="row.FC3|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td>
+                      <span ng-bind="row.FC4|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td>
+                      <span ng-bind="row.FC5|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td>
+                      <span ng-bind="row.total|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- more -->
+            <div class="more-wrapper"
+                 ng-show="roleType!==3">
+              <a class="more"
+                 ng-click="go('empCntY', empCntY)">more</a>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- CustCnt -->
+      <div class="section-wrapper">
+        <!-- M custCnt -->
+        <section class="dou">
+          <h3>使用理財規劃功能客戶數</h3>
+          <div class="section-body">
+            <h4>共
+              <span class="imp"
+                    ng-bind="total.M.custCnt|number"></span> 人
+            </h4>
+            <!-- result -->
+            <div>
+              <table class="table report">
+                <thead>
+                  <tr>
+                    <th ng-if="roleType===3"></th>
+                    <th ng-style="roleType===2 ? {'width':'6em'} : {'width':'45%'}"></th>
+                    <th>私人</th>
+                    <th>白金</th>
+                    <th>個人</th>
+                    <th>加總</th>
+                  </tr>
+                </thead>
+                <tbody ng-repeat="region in custCntM">
+                  <tr ng-repeat="row in region">
+                    <th ng-if="roleType===3&&$index%2==0"
+                        ng-bind="row.region"
+                        class="fake-th"
+                        rowspan="2"></th>
+                    <th ng-bind="row.title"></th>
+                    <td>
+                      <span ng-bind="row.CNT_V|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td>
+                      <span ng-bind="row.CNT_A|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td>
+                      <span ng-bind="row.CNT_B|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td>
+                      <span ng-bind="row.total|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- more -->
+            <div class="more-wrapper"
+                 ng-show="roleType!==3">
+              <a class="more"
+                 ng-click="go('custCntM', custCntM)">more</a>
+            </div>
+          </div>
+        </section>
+        <!-- Y custCnt -->
+        <section class="dou"
+                 ng-if="roleType!=-1">
+          <h3>使用理財規劃功能客戶數</h3>
+          <div class="section-body">
+            <h4>共
+              <span class="imp"
+                    ng-bind="total.Y.custCnt|number"></span> 人
+            </h4>
+            <!-- result -->
+            <div>
+              <table class="table report">
+                <thead>
+                  <tr>
+                    <th ng-if="roleType===3"></th>
+                    <th ng-style="roleType===2 ? {'width':'6em'} : {'width':'45%'}"></th>
+                    <th>私人</th>
+                    <th>白金</th>
+                    <th>個人</th>
+                    <th>加總</th>
+                  </tr>
+                </thead>
+                <tbody ng-repeat="region in custCntY">
+                  <tr ng-repeat="row in region">
+                    <th ng-if="roleType===3&&$index%2==0"
+                        ng-bind="row.region"
+                        class="fake-th"
+                        rowspan="2"></th>
+                    <th ng-bind="row.title"></th>
+                    <td>
+                      <span ng-bind="row.CNT_V|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td>
+                      <span ng-bind="row.CNT_A|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td>
+                      <span ng-bind="row.CNT_B|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                    <td>
+                      <span ng-bind="row.total|number"></span><span ng-bind="row.unit"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- more -->
+            <div class="more-wrapper"
+                 ng-show="roleType!==3">
+              <a class="more"
+                 ng-click="go('custCntY', custCntY)">more</a>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- AmountCnt -->
+      <div class="section-wrapper"
+           ng-if="roleType!=-1">
+        <!-- M amountCnt -->
+        <section class="dou">
+          <h3>理財規劃金額</h3>
+          <div class="section-body">
+            <h4>共
+              <span class="imp"
+                    ng-bind="total.M.amountCnt|number"></span> 千元
+            </h4>
+            <!-- result -->
+            <div>
+              <table class="table report">
+                <thead>
+                  <tr>
+                    <th ng-if="roleType===3"></th>
+                    <th width="30%"></th>
+                    <th>未下單</th>
+                    <th>已下單</th>
+                    <th>加總</th>
+                  </tr>
+                </thead>
+                <tbody ng-repeat="row in amountCntM">
+                  <tr>
+                    <th ng-if="roleType===3"
+                        ng-bind="row.region"
+                        class="fake-th"
+                        rowspan="2"></th>
+                    <th>金額</th>
+                    <td ng-bind="row.rN_PCH_AMOUNT|number"></td>
+                    <td ng-bind="row.rPCH_AMOUNT|number"></td>
+                    <td ng-bind="row.total|number"></td>
+                  </tr>
+                  <tr>
+                    <th>已下單手續費</th>
+                    <td>-</td>
+                    <td ng-bind="row.rPCH_FEE|number"></td>
+                    <td>-</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- more -->
+            <div class="more-wrapper"
+                 ng-show="roleType!==3">
+              <a class="more"
+                 ng-click="go('amountCntM', amountCntM)">more</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Y amountCnt -->
+        <section class="dou">
+          <h3>理財規劃金額</h3>
+          <div class="section-body">
+            <h4>共
+              <span class="imp"
+                    ng-bind="total.Y.amountCnt|number"></span> 千元
+            </h4>
+            <!-- result -->
+            <div>
+              <table class="table report">
+                <thead>
+                  <tr>
+                    <th ng-if="roleType===3"></th>
+                    <th width="30%"></th>
+                    <th>未下單</th>
+                    <th>已下單</th>
+                    <th>加總</th>
+                  </tr>
+                </thead>
+                <tbody ng-repeat="row in amountCntY">
+                  <tr>
+                    <th ng-if="roleType===3"
+                        ng-bind="row.region"
+                        class="fake-th"
+                        rowspan="2"></th>
+                    <th>金額</th>
+                    <td ng-bind="row.rN_PCH_AMOUNT|number"></td>
+                    <td ng-bind="row.rPCH_AMOUNT|number"></td>
+                    <td ng-bind="row.total|number"></td>
+                  </tr>
+                  <tr>
+                    <th>已下單手續費</th>
+                    <td>-</td>
+                    <td ng-bind="row.rPCH_FEE|number"></td>
+                    <td>-</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- more -->
+            <div class="more-wrapper"
+                 ng-show="roleType!==3">
+              <a class="more"
+                 ng-click="go('amountCntY', amountCntY)">more</a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,158 @@
+<script type="text/javascript" src="assets/txn/PMS433/PMS433.js"></script>
+<script type="text/javascript" src="assets/txn/PMS433/PMS433_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS433" ng-controller="PMS433Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr>
+						<th>*資料統計月份：</th>
+						<td>
+							<e-combobox id="dataMonth" name="dataMonth"
+								ng-datasource="mappingSet['date']" 
+								ng-model="inputVO.sCreDate"
+								ng-validate="false" 
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-require="true"
+								ng-format="F3" 
+								ng-change="dateChange"
+								width="200px"
+								style="line-height:20px;" />
+						</td>
+						<th>外撥結果：</th>
+						<td>
+							<e-combobox ng-datasource="mappingSet['PMS.HIGH_SOT_CALL_RESULT']"
+	                                    ng-model="inputVO.call_result"
+	                                    ng-format="F3"
+	                                    width="200px" />
+						</td>
+					</tr>
+					<tr>					
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+							ng-datasource="REGION_LIST"
+							ng-model="inputVO.region_center_id"
+							ng-validate="false" 
+							ng-disabled="disableRegionCombo"
+							ng-readonly="disableRegionCombo" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change="ChangeRegion()"
+							width="200px"
+							style="line-height:20px;" />
+						</td>
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+							ng-datasource="AREA_LIST"
+							ng-model="inputVO.branch_area_id"
+							ng-validate="false" 
+							ng-disabled="disableAreaCombo"
+							ng-readonly="disableAreaCombo" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							ng-change="ChangeArea()"
+							width="200px"
+							style="line-height:20px;" />
+						</td>
+						<th>歸屬行：</th>
+						<td>
+							<e-combobox id="branch_nbr" name="branch_nbr"
+							ng-datasource="BRANCH_LIST"
+							ng-model="inputVO.branch_nbr"
+							ng-validate="false" 
+							ng-disabled="disableBranchCombo"
+							ng-readonly="disableBranchCombo" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="true"
+							ng-change="ChangeBranch()"
+							width="200px"
+							style="line-height:20px;" />
+						</td>
+					</tr>	
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="inquirInit();query()"><span class="glyphicon glyphicon-search"></span>查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()"><span class="glyphicon glyphicon-erase"></span> 清除</button>
+				<button type="button" class="btn btn-warning" ng-click="export()"><span class="glyphicon glyphicon-download"></span> 匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>	
+			<button type="button" class="btn btn-primary" ng-click="save()"><span class="glyphicon glyphicon-search"></span>儲存修改</button>
+			<div class="gv_tab_sc scroll_y">
+				<table class="table-bordered td_center" e-height="700px" e-mode="1" e-top="true" e-list="data" style="white-space:nowrap">
+					<thead>
+						<tr>
+							<th>序號</th>
+							<th>客戶ID</th>
+							<th>姓名</th>
+							<th>年齡</th>
+							<th>歸屬行</th>
+							<th>分行名稱</th>
+							<th ng-show="role_id === 'B024' || role_id === 'B026'">高端客戶</th>
+							<th>外撥結果</th>
+							<th>電訪錄音編號</th>
+							<th>備註說明</th>
+							<th>首次建立時間</th>
+							<th>最新異動時間</th>
+							<th>最新異動人員</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td>{{row.SEQ}}</td>
+							<td><a ng-click="openDialog(row);">{{row.CUST_ID}}</a></td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.AGE}}</td>
+							<td>{{row.BRA_NBR}}</td>
+							<td>{{row.DEPT_NAME}}</td>
+							<td ng-show="role_id === 'B024' || role_id === 'B026'">{{row.ISUHRM}}</td>
+							<td><e-combobox ng-datasource="mappingSet['PMS.HIGH_SOT_CALL_RESULT']"
+	                                    ng-model="row.CALL_RESULT"
+	                                    ng-format="F3"
+	                                    ng-change="modifyResult(row);"
+	                                    width="200px" /></td>
+							<td><input type="text" 
+		                        	   class="form-control" 
+		                        	   style="width: 200px; height: 30px; display: inline;" 
+		                        	   ng-model="row.REC_SEQ" 
+		                        	   ng-change="modifyResult(row);"
+		                        	   e-length-limit="16"
+		                        	   /></td>
+							<td><input type="text" 
+		                        	   class="form-control" 
+		                        	   style="width: 300px; height: 30px; display: inline;" 
+		                        	   ng-model="row.MEMO" 
+		                        	   ng-change="modifyResult(row);"
+		                        	   e-length-limit="100"
+		                        	   /></td>
+							<td>{{row.CREATETIME}}</td>
+							<td>{{row.LASTUPDATE}}</td>
+							<td ng-if="row.MODIFIER">{{row.MODIFIER}}–{{row.EMP_NAME}}</td>
+							<td ng-if="!row.MODIFIER"></td>
+						</tr>
+					</tbody>
+				</table>
+				<br />
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,462 @@
+<style>
+.modal-dialog.CRM999_edit{
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 80%;
+	height: auto;
+}
+	
+</style>
+<script type="text/javascript"
+	src="assets/txn/CRM999/CRM999_edit.js"></script>
+<div ng-controller="CRM999editController" ng-cloak>
+	<div class="modal-dialog CRM999_edit">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">客訴管理</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					
+					<div class="row">
+						<div class="col-md-1">案件分流</div>
+						<div class="col-md-1">
+							<label><input type="radio" ng-model="inputVO.flowType"
+								ng-value="1" ng-disabled="!myCaseOtherFlag">理財客訴</label>
+						</div>
+						<div class="col-md-1">
+							<label><input type="radio" ng-model="inputVO.flowType" 
+								ng-value="2" ng-disabled="!myCaseOtherFlag">作業客訴</label>
+						</div>
+						<div class="col-md-1">
+							<label><input type="radio" ng-model="inputVO.flowType" 
+								ng-value="3" ng-disabled="!myCaseOtherFlag">消金客訴</label>
+						</div>
+						<div class="col-md-1">
+							<label><input type="radio" ng-model="inputVO.flowType" 
+								ng-value="4" ng-disabled="!myCaseOtherFlag">FCH客訴</label>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">分行別<span style="color:red;">*</span></div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="branchId"
+								name="branchId" ng-model="inputVO.branchId" e-input-limit="ND"
+								maxlength="10" size="10" />
+						</div>
+
+						<div class="col-md-1">發生日期</div>
+						<div class="col-md-3 tdpadding">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="fmt_create_date" name="fmt_create_date"
+									class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.fmt_create_date" is-open="model.a"
+									datepicker-options="sDateOptions" ng-readonly="true"
+									ng-change="limitDate()" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,'a')" ng-disabled="!myCaseFlag"> 
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+
+						<div class="col-md-1">結案日期</div>
+						<div class="col-md-3 tdpadding">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="fmt_end_date" name="fmt_end_date"
+									class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.fmt_end_date" is-open="model.b"
+									datepicker-options="eDateOptions" ng-change="limitDate()"
+									ng-readonly="true" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,'b')" ng-disabled="!myCaseFlag">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">等級<span style="color:red;">*</span></div>
+						<div class="col-md-3 tdpadding">
+							<e-combobox id="grade" ng-datasource="mappingSet['gradeSource']"
+								ng-model="inputVO.grade" ng-validate="false" ng-readonly="false"
+								ng-editable="false" ng-format="F3" ng-required="true" ng-disabled="!myCaseOtherFlag"
+								style="line-height:20px;" />
+						</div>
+
+						<div class="col-md-1">客訴來源<span style="color:red;">*</span></div>
+						<div class="col-md-3 tdpadding">
+							<e-combobox id="complainSource"
+								ng-datasource="mappingSet['complainSource']"
+								ng-model="inputVO.complainSource" ng-validate="false" ng-change="selcomplainSource()"
+								ng-readonly="false" ng-editable="false" ng-format="F3" ng-disabled="!myCaseOtherFlag"
+								ng-required="false" style="line-height:20px;" />
+						</div>
+
+						<div class="col-md-1">客訴類型<span style="color:red;">*</span></div>
+						<div class="col-md-3 tdpadding">
+							<e-combobox id="complainTypeSel"
+								ng-datasource="mappingSet['complainTypeSel']"
+								ng-model="inputVO.complainTypeSel" ng-validate="false"
+								ng-readonly="false" ng-editable="false" ng-format="F3" ng-disabled="!myCaseOtherFlag"
+								ng-required="false" style="line-height:20px;" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">客訴摘要<span style="color:red;">*</span></div>
+						<div class="col-md-3 tdpadding">
+							<textarea name="complainSummary" id="complainSummary"
+								placeholder="請輸入..." ng-model="inputVO.complainSummary" rows="5"
+								class="form-control" maxlength="150"
+								ng-change="checkLenght('complainSummary', 'lenght6', '150');"
+								ng-required>
+                    			</textarea>
+							<div style="float: left !important" ng-bind="'剩餘字數:' + lenght6">
+							</div>
+						</div>
+						<div class="col-md-1"></div>
+						<div class="col-md-3 tdpadding" ng-if="complainSourceFlag">
+							<input class="form-control" type="text" id="otherSource"
+								name="otherSource" ng-model="inputVO.otherSource" placeholder="其他客訴來源..." 
+								maxlength="10" size="10" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">客戶統編</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="custId" name="custId"
+								ng-model="inputVO.custId" maxlength="10"
+								size="10" ng-blur="showCustData(this)" />
+						</div>
+						<div class="col-md-1">客戶姓名<span style="color:red;">*</span></div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="custName"
+								name="custName" ng-model="inputVO.custName"
+								maxlength="10" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">出生年月日(西元)</div>
+						<div class="col-md-3">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="birthday" name="birthday"
+									class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.birthday" is-open="model.c"
+									datepicker-options="birthdayOptions" ng-readonly="true" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,'c')" ng-disabled="!myCaseFlag">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+
+						<div class="col-md-1">職業別</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="occup" name="occup"
+								ng-model="inputVO.occup" maxlength="16"
+								size="15" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">聯絡電話</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="phone" name="phone"
+								ng-model="inputVO.phone" e-input-limit="N" maxlength="20"
+								size="10" />
+						</div>
+						<!-- ng-keyup="this.value=this.value.replace(/[^0-9\.]/gi,'')" -->
+						<div class="col-md-1">學歷</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="education"
+								name="education" ng-model="inputVO.education"
+								maxlength="3" size="10" />
+						</div>
+
+						<div class="col-md-1">開戶日期</div>
+						<div class="col-md-3">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="sdate" name="sdate" class="form-control"
+									uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.openAccountDate" is-open="model.d"
+									datepicker-options="openAccountDateOptions" ng-readonly="true" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,'d')" ng-disabled="!myCaseFlag">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">總往來資產AUM</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="totalAsset"
+								name="totalAsset" ng-model="inputVO.totalAsset"
+								e-input-limit="N" maxlength="15" size="10" />
+						</div>
+						<!-- ng-keyup="this.value=this.value.replace(/[^0-9\.]/gi,'')" -->
+
+						<div class="col-md-1">是否寄送對帳單<span style="color:red;">*</span></div>
+						<div class="col-md-3 tdpadding">
+							<e-combobox id="checkSheet"
+								ng-datasource="mappingSet['checkSheet']"
+								ng-model="inputVO.checkSheet" ng-validate="false" ng-disabled="!myCaseOtherFlag"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								ng-required="false" style="line-height:20px;" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">專員員編</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="personId"
+								name="personId" ng-model="inputVO.personId"
+								maxlength="6" size="10" />
+						</div>
+						<!-- ng-keyup="this.value=this.value.replace(/[^0-9\.]/gi,'')" -->
+
+						<div class="col-md-1">專員姓名</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="personName"
+								name="personName" ng-model="inputVO.personName"
+								maxlength="20" size="10" />
+						</div>
+
+						<div class="col-md-1">AO Code</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="AOcode" name="AOcode"
+								ng-model="inputVO.AOcode" maxlength="3"
+								size="10" />
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col-md-1">是否在職</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="serviceStatus"
+								name="serviceStatus" ng-model="inputVO.serviceStatus"
+								maxlength="20" size="10" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">銀行往來商品項目</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="buyProductType"
+								name="buyProductType" ng-model="inputVO.buyProductType"
+								 maxlength="16" size="15" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-2">加附投資明細損益表 *.xls</div>
+						<div class="col-md-3 tdpadding">
+							<e-upload width="350px" id="xlsUpload" success="uploadFinshed(name,rname)" text="上傳" accept=".xls" ng-disabled="!myCaseOtherFlag"></e-upload>
+						</div>
+						<div class="col-md-1">
+							<button ng-if="inputVO.uploadFile" type="button" class="btn btn-default" ng-click="downloadFile()">下載檔案</button>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">客訴商品<span style="color:red;">*</span></div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text" id="complainProduct"
+								name="complainProduct" ng-model="inputVO.complainProduct"
+								 maxlength="33" size="15" />
+						</div>
+
+						<div class="col-md-1">客訴商品幣別</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text"
+								id="complainProductCurrency" name="complainProductCurrency"
+								ng-model="inputVO.complainProductCurrency"
+								maxlength="10" size="10" />
+						</div>
+
+						<div class="col-md-1">客訴商品金額</div>
+						<div class="col-md-3 tdpadding">
+							<input class="form-control" type="text"
+								id="complainProductAmount" name="complainProductAmount"
+								ng-model="inputVO.complainProductAmount"
+								e-input-limit="N" maxlength="20" size="10" />
+						</div>
+						<!-- ng-keyup="this.value=this.value.replace(/[^0-9\.]/gi,'')"  -->
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">申購日期</div>
+						<div class="col-md-3">
+							<div class="input-group datebox datewidth">
+								<input type="text" id="buyDate" name="buyDate"
+									class="form-control" uib-datepicker-popup="yyyy/MM/dd"
+									ng-model="inputVO.buyDate" is-open="model.e"
+									datepicker-options="buyDateOptions" ng-readonly="true" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open($event,'e')" ng-disabled="!myCaseFlag">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">問題實況<span style="color:red;">*</span></div>
+						<div class="col-md-11 tdpadding">
+							<textarea name="problemDescribe" id="problemDescribe"
+								placeholder="請輸入..." ng-model="inputVO.problemDescribe"
+								class="form-control" style="width: 100%;" maxlength="800"
+								rows="5"
+								ng-change="checkLenght('problemDescribe', 'lenght4', '800');"
+								ng-required>
+                    			</textarea>
+							<div style="float: left !important" ng-bind="'剩餘字數:' + lenght4">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">客戶訴求<span style="color:red;">*</span></div>
+						<div class="col-md-11 tdpadding">
+							<textarea name="custDescribe" id="custDescribe"
+								placeholder="請輸入..." ng-model="inputVO.custDescribe" rows="5"
+								class="form-control" maxlength="500"
+								ng-change="checkLenght('custDescribe', 'lenght5', '500');"
+								ng-required>
+                    			</textarea>
+							<div style="float: left !important" ng-bind="'剩餘字數:' + lenght5">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">第一級處理情形</div>
+						<div class="col-md-11 tdpadding">
+							<textarea name="handleCondition1" id="handleCondition1"
+								placeholder="請輸入..." ng-model="inputVO.handleCondition1"
+								rows="5" class="form-control" maxlength="800"
+								ng-change="checkLenght('handleCondition1', 'lenght1', '800');"
+								ng-required>
+                    			</textarea>
+							<div style="float: left !important" ng-bind="'剩餘字數:' + lenght1">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">第二級處理情形</div>
+						<div class="col-md-11 tdpadding">
+							<textarea name="handleCondition2" id="handleCondition2"
+								placeholder="請輸入..." ng-model="inputVO.handleCondition2"
+								rows="5" class="form-control" maxlength="500"
+								ng-change="checkLenght('handleCondition2', 'lenght2', '500');"
+								ng-required>
+                    			</textarea>
+							<div style="float: left !important" ng-bind="'剩餘字數:' + lenght2">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">第三級處理情形</div>
+						<div class="col-md-11 tdpadding">
+							<textarea name="handleCondition3" id="handleCondition3"
+								placeholder="請輸入..." ng-model="inputVO.handleCondition3"
+								maxlength="1500" style="width: 100%; height: 100px"
+								class="form-control"
+								ng-change="checkLenght('handleCondition3', 'lenght3', '1500');"
+								ng-required>
+                    			</textarea>
+							<div style="float: left !important" ng-bind="'剩餘字數:' + lenght3">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">客訴類型</div>
+						<div class="col-md-2 tdpadding">
+							<e-combobox id=complainType
+								ng-datasource="mappingSet['complainTypeList']"
+								ng-model="inputVO.complainType" ng-validate="false"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								ng-required="false" style="line-height:20px;" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">客訴型態</div>
+						<div class="col-md-2 tdpadding">
+							<e-combobox id="complainMode"
+								ng-datasource="mappingSet['complainModeList']"
+								ng-model="inputVO.complainMode" ng-validate="false"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								ng-required="false" style="line-height:20px;" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">摘要/訴求</div>
+						<div class="col-md-2 tdpadding">
+							<e-combobox id="complainRequest_Sel"
+								ng-datasource="mappingSet['complainRequestList']"
+								ng-model="inputVO.complainRequest" ng-validate="false"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								ng-required="false" style="line-height:20px;" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-1">處理情形</div>
+						<div class="col-md-2 tdpadding">
+							<e-combobox id="handleStatus_Sel"
+								ng-datasource="mappingSet['handleStatusList']"
+								ng-model="inputVO.handleStatus" ng-validate="false"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								ng-required="false" style="line-height:20px;" />
+						</div>
+					</div>
+
+
+				</form>
+				<div class="search_box_btn text-center">
+					<button ng-if="myCaseFlag && inputVO.handleStep != 'E'" type="button" class="btn btn-primary" ng-click="nextStep()" ng-disabled="nextStepDisabledFlag">儲存並送出</button>
+					<button ng-if="saveFlag" type="button" class="btn btn-default" ng-disabled="saveSubmitDisabledFlag"
+						ng-click="save()">儲存</button>
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+					<button ng-if="myCaseFlag" type="button" class="btn btn-default"
+						ng-click="backStep()">退件</button>
+					<button ng-if="inputVO.isA01 == 'Y'" type="button" class="btn btn-default"
+						ng-click="del()">刪除</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,40 @@
+<div ng-controller="ORG330_AGENTController" ng-cloak>
+	<div class="modal-dialog ORG330">  
+		<div class="modal-content">	
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeORG330AGENT()">&times;</button>
+				<h4 id="" class="modal-title" align="center">設定可代理{{agentVO.ROLE_ID + '-' + agentVO.ROLE_NAME}}的角色</h4>
+			</div>
+			<div class="modal-body">
+				<table width="100%">
+					<thead>
+						<tr>
+							<th class='text-center' ng-if="ACT == 'SELECT'">未代理角色</th>
+							<th class='text-center' ng-if="ACT == 'SELECT'" style='background-color: white;'></th>
+							<th class='text-center'>已代理角色</th>
+						</tr>
+					</thead>
+					<tbody>
+					<tr>
+				    	<td style="width: 49%" ng-if="ACT == 'SELECT'">
+							<select multiple class="form-control" size="15" ng-model="roleL.selected" ng-options="role as role.ROLE_NAME for role in lstRoleL" style="height:200px"></select>
+						</td>
+						<td style="width: 2%" ng-if="ACT == 'SELECT'"><br> <br> 
+							<a class="btn" ng-click="btnAddChange('roleL','lstRoleL','lstRoleR')" ><i class="glyphicon glyphicon-chevron-right" ></i></a>
+							<br> 
+							<a class="btn" ng-click="btnAddChange('roleR','lstRoleR','lstRoleL')" ><i class="glyphicon glyphicon-chevron-left" ></i></a>
+						</td>
+						<td style="width: 49%"> 
+							<select multiple class="form-control" size="15" ng-model="roleR.selected" ng-options="role as role.ROLE_NAME for role in lstRoleR" style="height:200px"></select>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-show="ACT == 'SELECT'" ng-click="modAgent()" function-type="maintenance">確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeORG330AGENT()" >{{(ACT == 'SELECT') ? "取消" : "關閉"}}</button>
+			</div>
+		</div>
+	</div>
+</div>

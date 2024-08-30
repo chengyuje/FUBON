@@ -1,0 +1,75 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS711 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS711/PMS711_houNewSetTS.js"></script>
+<script type="text/javascript" src="assets/txn/PMS711/PMS711_UPLOAD.js"></script>
+<div ng-controller="PMS711_houNewSetTSController" ng-cloak>
+	<div class="modal-dialog PMS711">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">請設定T/S</h4>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<form name="parameterTypeEditForm" class="form-horizontal" ng-if="subProjectSeqId=='25'"
+					data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<th>*請選擇T/S類型：</th>
+							<td><e-combobox id="eTime"
+									ng-datasource="mappingSet['TS']" ng-model="inputVO.tsType"
+									ng-change="TSChange()" ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-format="F3" ng-required="true" width="200px" height="30px"
+									style="line-height:20px;" /></td>
+					</table>
+				</form>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="uploadTS()">上傳資料</button>					
+					<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')">取消</button>
+					<button type="button" class="btn btn-primary" ng-click="checkNull()">儲存</button>
+				</div>
+				<e-jumping output="outputVO" input="inputVO" query="queryHouNewTS()"
+					list="showList"></e-jumping>
+				<div  class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<table class="table-bordered">
+						<thead>
+							<tr ng-if="subProjectSeqId=='12'">
+								<th>營運區代碼</th>
+								<th>營運區名稱</th>
+								<th>購屋T/S(單位：百萬)</th>
+							</tr>
+							<tr ng-if="subProjectSeqId=='25'">
+								<th>業務處代碼</th>
+								<th>業務處名稱</th>
+								<th ng-if="inputVO.tsType=='1'">非購屋T/S(單位：百萬)</th>
+								<th ng-if="inputVO.tsType=='2'">額度式T/S(單位：百萬)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="y in showList">
+								<td style="color:blue; text-align:center">{{y.ORG_ID}}</td>
+								<td style="color:blue; text-align:center">{{y.ORG_NAME}}</td>
+								<!-- <td style="color:blue; text-align:center">{{y.BUY_HOU_TS}}</td> -->
+								<td align="center">
+									<input style="width:100px;text-align:right" type="text" ng-model="y.BUY_HON_TS"/>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

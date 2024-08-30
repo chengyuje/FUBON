@@ -1,0 +1,87 @@
+<form name="form.mail" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+    <div class="form-group" style="padding-top: 20px;">
+        <label for="paramType" class="col-form-label col-sm-3" ng-bind="'參數種類（必填）'"></label>
+        <div class="col-sm-9">
+            <input id="paramType" class="form-control" type="text" ng-model="mailVO.paramType"
+                   placeholder="參數種類固定為 RPT.報表代號！"
+                   ng-disabled="isCreateOrUpdate && !needMail" maxlength="50" readonly required/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="ptypeName" class="col-form-label col-sm-3" ng-bind="'參數名稱（必填）'"></label>
+        <div class="col-sm-9">
+            <input id="ptypeName" class="form-control" type="text" ng-model="mailVO.ptypeName"
+                   placeholder="請輸入參數名稱（限 100 字元）～"
+                   ng-disabled="isCreateOrUpdate && !needMail" ng-readonly="!isCreateOrUpdate" maxlength="100" required/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-form-label col-sm-3" ng-bind="'參數類型（必選）'"></label>
+        <div class="col-sm-9">
+            <e-combobox ng-datasource="mappingSet['TBSYSPARAMTYPE_PTYPE_BUSS']" ng-model="mailVO.ptypeBuss"
+                        ng-disabled="isCreateOrUpdate && !needMail" ng-readonly="!isCreateOrUpdate" ng-format="F3"
+                        required/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label ng-bind="'參數說明'" class="col-form-label col-sm-3"></label>
+        <div class="col-sm-9">
+            <textarea class="form-control" ng-model="mailVO.ptypeDesc" rows="3" class="form-control" maxlength="300"
+                      placeholder="來點說明吧？（限 300 字元）"
+                      ng-disabled="isCreateOrUpdate && !needMail" ng-readonly="!isCreateOrUpdate"></textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <strong ng-bind="'※中文字將會占用三字元，其餘一字元！'"></strong>
+    </div>
+
+    <div class="gv_tab_sc">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th ng-bind="'編碼（code）'"></th>
+                <th ng-bind="'數值（value）'"></th>
+                <th ng-bind="'說明'"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="repeat-row" ng-repeat="each in mailVO.codeData track by $index">
+                <td ng-bind="each.paramCode"></td>
+                <td>
+                    <input class="form-control" type="text" ng-model="each.paramName" placeholder="{{each.tip}}"
+                           ng-disabled="isCreateOrUpdate && !needMail" ng-readonly="!isCreateOrUpdate"/>
+                </td>
+                <td>
+                    <input class="form-control" type="text" ng-model="each.paramDesc"
+                           ng-disabled="isCreateOrUpdate && !needMail" ng-readonly="!isCreateOrUpdate"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr/>
+
+    <div ng-if="isCreateOrUpdate" class="text-center">
+        <button type="button" class="btn btn-success" ng-click="createOrUpdate()" data-toggle="tooltip" title="儲存設定～">
+            <span class="glyphicon glyphicon-floppy-disk"></span>
+            <span ng-bind="'儲存'"></span>
+        </button>
+        <button type="button" class="btn btn-default" ng-click="startMail()" data-toggle="tooltip"
+                title="需要 Mail～"
+                ng-show="!needMail">
+            <span class="glyphicon glyphicon-open"></span>
+            <span ng-bind="'需要'"></span>
+        </button>
+        <button type="button" class="btn btn-default" ng-click="clearMail()" data-toggle="tooltip"
+                title="不需要 Mail～"
+                ng-show="needMail">
+            <span class="glyphicon glyphicon-erase"></span>
+            <span ng-bind="'不需要'"></span>
+        </button>
+    </div>
+</form>

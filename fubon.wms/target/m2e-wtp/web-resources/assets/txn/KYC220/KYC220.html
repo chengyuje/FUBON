@@ -1,0 +1,179 @@
+
+<style>
+  /* open dialog */
+  .ngdialog.KYC220 {
+  
+  }
+  /* dialog panl */
+  .modal-dialog.KYC220 {
+  	position: relative;
+  	top: 0;
+  	right: 0;
+  	bottom: 0;
+  	left: 0;
+  	width: 850px;
+  	height: auto;
+  }
+  /* table size */
+  .KYC220 .search_table.search_box{
+      margin: auto;
+  }
+  
+  .KYC220 .search_table td{
+  	padding: 6px 0px;
+  }
+  
+  .KYC220 table {
+  	width: 100%;
+  	margin-left: auto;
+  	margin-right: auto;
+  }
+  
+  .KYC220 table.little {
+  	width: 60%;
+  }
+  
+  .KYC220 table>tbody>tr>td input{
+    width: 80%;
+  }
+  
+  /* change row */
+  .KYC220.table>tbody>tr>td {
+  	table-layout: fixed;
+  	word-break: break-all;
+  	word-wrap: break-word;
+  }
+  /* scroll && height */
+  .scroll_KYC220_dialog {
+  	overflow: scroll;
+  	width: 400px;
+  	height: 300px;
+  }
+  
+  .tdpadding {
+  	padding: 10px 5px 5px 5px;
+  }
+  
+  .alignleft {
+  	text-align: left !important;
+  }
+  
+  .bigspace {
+  	margin-left: 50px !important;
+  }
+  
+  .datewidth {
+  	width: 180px !important;
+  	float: left !important;
+  }
+  
+  .test th{
+      text-align: center !important;
+      vertical-align: middle;
+  }
+  .middle {
+  
+  }
+  
+</style>
+<script type="text/javascript" src="assets/txn/KYC220/KYC220.js"></script>
+<script type="text/javascript" src="assets/txn/KYC220/KYC220_Check.js"></script>
+<div ng-controller="KYC220Controller" ng-cloak="ng-cloak" class="KYC220">
+  <div class="tfb_content">
+    <div class="tfb_content_icon"></div>
+    <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif"/>主管審核
+    </div>
+  </div>
+  <!-- Content of the panel-->
+  <div class="panel_content">
+    <div class="search_table search_box">
+      <table>
+        <tr>
+          <td colspan="6">
+            <table>
+              <tr>
+                <th style="padding-top: 17px;">主管簽核日期：</th>
+                <td>
+                  <div class="form-group first-half">
+                    <div class="input-group datebox datewidth">
+                      <input id="approveStartDate" type="text" name="approveStartDate" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.approveStartDate" is-open="model.a" datepicker-options="approveStartDateOptions" ng-readonly="true" ng-change="approveDate()" class="form-control"/><span class="input-group-btn">
+                        <button type="button" ng-click="open($event,'a')" class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button></span>
+                    </div>
+                    <div style="float: left !important;">&nbsp~&nbsp </div>
+                    <div class="input-group datebox datewidth">
+                      <input id="approveEndDate" type="text" name="approveEndDate" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.approveEndDate" is-open="model.b" datepicker-options="approveEndDateOptions" ng-readonly="true" ng-change="approveDate()" class="form-control"/><span class="input-group-btn">
+                        <button type="button" ng-click="open($event,'b')" class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button></span>
+                    </div>
+                  </div>
+                </td>
+                <th style="padding-top: 17px;">經辦提交日期：</th>
+                <td>
+                  <div class="form-group second-half">
+                    <div class="input-group datebox datewidth">
+                      <input id="submitStartDate" type="text" name="submitStartDate" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.submitStartDate" is-open="model.c" datepicker-options="submitStartDateOptions" ng-readonly="true" ng-change="submitDate()" class="form-control"/><span class="input-group-btn">
+                        <button type="button" ng-click="open($event,'c')" class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button></span>
+                    </div>
+                    <div style="float: left !important;">&nbsp~&nbsp</div>
+                    <div class="input-group datebox datewidth">
+                      <input id="submitEndDate" type="text" name="submitEndDate" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.submitEndDate" is-open="model.d" datepicker-options="submitEndDateOptions" ng-readonly="true" ng-change="submitDate()" class="form-control"/><span class="input-group-btn">
+                        <button type="button" ng-click="open($event,'d')" class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button></span>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <th>經辦員編：</th>
+          <td>
+            <input id="empId" type="text" placeholder="請輸入..." name="empId" ng-model="inputVO.aoCode" e-length-limit="12"/>
+          </td>
+          <th>問卷名稱：</th>
+          <td>
+            <input id="questionnaireName" type="text" placeholder="請輸入..." name="questionnaireName" ng-model="inputVO.quesName"/>
+          </td>
+          <th>簽核狀態：</th>
+          <td>
+            <e-combobox id="approveStatus" name="approveStatus" ng-disabled="eComboDisabled" ng-paramtype="KYC.QUEST_STAUS" ng-model="inputVO.approveStatus" ng-validate="true" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="100%"></e-combobox>
+          </td>
+        </tr>
+      </table>
+      <div class="search_box_btn text-center">
+        <button type="button" ng-click="inquireInit();inquire();" class="btn btn-info">查詢</button>
+        <button type="button" ng-click="clear()" class="btn btn-info">清除</button>
+      </div>
+    </div>
+    <e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList"></e-jumping>
+    <div style="height: 235px; white-space: nowrap;" class="gv_tab_sc scroll_y">
+      <table class="table-bordered">
+        <thead>
+          <tr>
+            <th>功能</th>
+            <th>問卷名稱</th>
+            <th>經辦員編/姓名</th>
+            <th>提交日期</th>
+            <th>啟用日期</th>
+            <th>簽核主管員編/姓名</th>
+            <th>簽核日期</th>
+            <th>簽核結果</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'" class="repeat-row">
+            <td>
+              <button type="button" ng-click="check(row)" ng-disabled="row.STATUS!='01'" class="btn btn-info">審核</button>
+            </td>
+            <td>{{row.EXAM_NAME}}</td>
+            <td>{{row.MODIFIER}}</td>
+            <td>{{toJsDate(row.LASTUPDATE)|date:'yyyy/MM/dd'}}</td>
+            <td>{{toJsDate(row.ACTIVE_DATE)|date:'yyyy/MM/dd'}}</td>
+            <td>							{{row.SIGNOFF}}</td>
+            <td>{{toJsDate(row.CREATETIME)|date:'yyyy/MM/dd'}}</td>
+            <td>{{row.STATUS | mapping:mappingSet['KYC.QUEST_STAUS']:'F3'}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

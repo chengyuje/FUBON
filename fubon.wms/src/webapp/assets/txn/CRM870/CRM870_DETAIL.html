@@ -1,0 +1,330 @@
+<script type="text/javascript" src="assets/txn/CRM870/CRM870_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/CRM870/CRM870_HIS.js"></script>
+
+<script type="text/javascript" src="assets/txn/CRM870/CRM870_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD312/PRD312_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD313/PRD313_DETAIL.js"></script>
+
+<div class="CRM870_DETAIL" ng-controller="CRM870_DETAILController" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >證券往來記錄</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<uib-tabset active="tabSheet" justified="true"> 
+			<uib-tab index="2" heading="海外股票" ng-click="pagechose(2)">
+				<div class="search_table search_box3">
+					<table>
+						<tr>
+							<th>投資總成本(約當臺幣)：</th>
+							<td>{{crm871INVEST_AUM | number:0}}</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>庫存總市值(約當臺幣)：</th>
+							<td>{{crm871AUM | number:0}}</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>報酬率：</th>
+							<td>{{(crm871BENEFIT_AMT1 / crm871INVEST_AUM) * 100 | number:0}} %</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th colspan="4">※報酬率公式＝損益金額／投資成本，損益金額不含息</th>
+						</tr>
+					</table>
+				</div>
+				<br />
+				<button type="button" class="btn btn-info" ng-click="goCRM870HIS()">往來交易記錄查詢</button>
+				<br />
+				<br />
+				<div class="tab-pane fade in active">
+					<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+						<table class="table-bordered">
+							<thead>
+								<tr>
+									<th>證券帳號</th>
+									<th>交易所</th>
+									<th>產品代碼</th>
+									<th>產品名稱</th>
+									<th>商品幣別</th>
+									<th>庫存股數</th>
+									<th>平均成本價</th>
+									<th>投資成本</th>
+									<th>參考收盤價</th>
+									<th>參考收盤日期</th>
+									<th>參考市值</th>
+									<th>損益金額</th>
+									<th>報酬率</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" align="center" ng-repeat="row in data">
+									<td>{{row.ACCT_NBR}}</td>
+									<td>{{row.EXCHANGE_CODE}}</td>
+									<td>{{row.PROD_ID}}</td>
+									<td>{{row.PROD_NAME}}</td>
+									<td>{{row.CURRENCY}}</td>
+									<td>{{row.QTY | number:0}}</td>
+									<td>{{row.AVG_COST_PRICE | number:2}}</td>
+									<td>{{row.INVEST_AMT_FC | number:2}}</td>
+									<td>{{row.UNIT_PRICE | number:2}}</td>
+									<td>{{toJsDate(row.PRICE_DATE) | date:'yyyy-MM-dd'}}</td>
+									<td>{{row.AUM_FC | number:2}}</td>
+									<td>{{row.BENEFIT_AMT1 | number:2}}</td>
+									<td>{{row.BENEFIT_RATE1 | number:2}} %</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				
+			</uib-tab> 
+			<uib-tab index="3" heading="海外債券" ng-click="pagechose(3)">
+				<div class="search_table search_box3">
+					<table>
+						<tr>
+							<th>投資總成本(約當臺幣)：</th>
+							<td>{{crm872INVEST_AUM | number:0}}</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>庫存總市值(約當臺幣)：</th>
+							<td>{{crm872AUM | number:0}}</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>報酬率：</th>
+							<td>{{(crm872BENEFIT_AMT2 / crm872INVEST_AUM) * 100 | number:0}} %</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th colspan="4">※報酬率公式＝含息損益／投資成本</th>
+						</tr>
+					</table>
+				</div>
+				<br />
+				<button type="button" class="btn btn-info" ng-click="goCRM870HIS()">往來交易記錄查詢</button>
+				<br />
+				<br />
+				<div class="tab-pane fade in active">
+					<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+						<table class="table-bordered">
+							<thead>
+								<tr>
+									<th rowspan="2">證券帳號</th>
+									<th rowspan="2">產品代碼</th>
+									<th rowspan="2">產品名稱</th>
+									<th rowspan="2">商品幣別</th>
+									<th rowspan="2">庫存面額</th>
+									<th rowspan="2">單位成本價格</th>
+									<th rowspan="2">總成本</th>
+									<th rowspan="2">參考報價</th>
+									<th rowspan="2">參考報價日期</th>
+									<th rowspan="2">庫存市值</th>
+									<th rowspan="2">累計配息</th>
+									<th rowspan="2">含息損益</th>
+									<th rowspan="2">含息報酬率</th>
+									<th rowspan="2">票面利率</th>
+									<th rowspan="2">到期日</th>
+									<th colspan="3">債券評等</th>
+									<th rowspan="2">發行人</th>
+								</tr>
+								<tr>
+									<th>穆迪</th>
+									<th>標普</th>
+									<th>惠譽</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" align="center" ng-repeat="row in data">
+									<td>{{row.ACCT_NBR}}</td>
+									<td>{{row.PROD_ID}}</td>
+									<td>{{row.PROD_NAME}}</td>
+									<td>{{row.CURRENCY}}</td>
+									<td>{{row.QTY | number:0}}</td>
+									<td>{{row.AVG_COST_PRICE | number:4}}</td>
+									<td>{{row.INVEST_AMT_FC | number:2}}</td>
+									<td>{{row.UNIT_PRICE | number:4}}</td>
+									<td>{{toJsDate(row.PRICE_DATE) | date:'yyyy-MM-dd'}}</td>
+									<td>{{row.AUM_FC | number:2}}</td>
+									<td>{{row.DIVIDENT_AMT_FC | number:2}}</td>
+									<td>{{row.BENEFIT_AMT2 | number:2}}</td>
+									<td>{{row.BENEFIT_RATE2 | number:2}} %</td>
+									<td>{{row.BOND_COUPON_RATE | number:4}} %</td>
+									<td>{{toJsDate(row.MATURITY_DATE) | date:'yyyy-MM-dd'}}</td>
+									<td>{{row.RANK_LEVEL_MOODYS}}</td>
+									<td>{{row.RANK_LEVEL_SP}}</td>
+									<td>{{row.RANK_LEVEL_FITCH}}</td>
+									<td>{{row.ISSUE_BROKER_NAME}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</uib-tab> 
+			<uib-tab index="4" heading="境外結構型商品" ng-click="pagechose(4)">
+				<div class="search_table search_box3">
+					<table>
+						<tr>
+							<th>投資總成本(約當臺幣)：</th>
+							<td>{{crm873INVEST_AUM | number:0}}</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>庫存總市值(約當臺幣)：</th>
+							<td>{{crm873AUM | number:0}}</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>報酬率：</th>
+							<td>{{(crm873BENEFIT_AMT2 / crm873INVEST_AUM) * 100 | number:0}} %</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th colspan="4">※報酬率公式＝含息損益／投資成本</th>
+						</tr>
+					</table>
+				</div>
+				<br />
+				<button type="button" class="btn btn-info" ng-click="goCRM870HIS()">往來交易記錄查詢</button>
+				<br />
+				<br />
+				<div class="tab-pane fade in active">
+					<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+						<table class="table-bordered">
+							<thead>
+								<tr>
+									<th>證券帳號</th>
+									<th>產品代碼</th>
+									<th>產品名稱</th>
+									<th>ISIN_CODE</th>
+									<th>商品幣別</th>
+									<th>投資成本</th>
+									<th>參考報價</th>
+									<th>參考報價日期</th>
+									<th>庫存市值</th>
+									<th>累計配息</th>
+									<th>含息損益</th>
+									<th>含息報酬率</th>
+									<th>到期日</th>
+									<th>發行人</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" align="center" ng-repeat="row in data">
+									<td>{{row.ACCT_NBR}}</td>
+									<td><a onclick="return false" ng-click="detail(4, row)">{{row.PROD_ID}}</a></td>
+									<td>{{row.PROD_NAME}}</td>
+									<td>{{row.ISIN_CODE}}</td>
+									<td>{{row.CURRENCY}}</td>
+									<td>{{row.INVEST_AMT_FC | number:2}}</td>
+									<td>{{row.UNIT_PRICE | number:4}}</td>
+									<td>{{toJsDate(row.PRICE_DATE) | date:'yyyy-MM-dd'}}</td>
+									<td>{{row.AUM_FC | number:2}}</td>
+									<td>{{row.DIVIDENT_AMT_FC | number:2}}</td>
+									<td>{{row.BENEFIT_AMT2 | number:2}}</td>
+									<td>{{row.BENEFIT_RATE2 | number:2}} %</td>
+									<td>{{toJsDate(row.MATURITY_DATE) | date:'yyyy-MM-dd'}}</td>
+									<td>{{row.ISSUE_BROKER_NAME}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</uib-tab> 
+			<uib-tab index="5" heading="境內結構型商品" ng-click="pagechose(5)">
+				<div class="search_table search_box3">
+					<table>
+						<tr>
+							<th>投資總成本(約當臺幣)：</th>
+							<td>{{crm874INVEST_AUM | number:0}}</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>庫存總市值(約當臺幣)：</th>
+							<td>{{crm874AUM | number:0}}</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>報酬率：</th>
+							<td>{{(crm874BENEFIT_AMT2 / crm874INVEST_AUM) * 100 | number:0}} %</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th colspan="4">※報酬率公式＝(帳面價值＋累計配息ー庫存成本)／庫存成本</th>
+						</tr>
+					</table>
+				</div>
+				<br />
+				<button type="button" class="btn btn-info" ng-click="goCRM870HIS()">往來交易記錄查詢</button>
+				<br />
+				<br />
+				<div class="tab-pane fade in active">
+					<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+					<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+						<table class="table-bordered">
+							<thead>
+								<tr>
+									<th>資料日期</th>
+									<th>境內衍商帳號</th>
+									<th>產品代碼</th>
+									<th>產品名稱</th>
+									<th>幣別</th>
+									<th>交易日</th>
+									<th>交割日</th>
+									<th>到期日</th>
+									<th>天期</th>
+									<th>標的</th>
+									<th>庫存名目本金</th>
+									<th>新作交易價格</th>
+									<th>庫存成本</th>
+									<th>累計配息</th>
+									<th>提解參考報價(%)</th>
+									<th>帳面價值</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="repeat-row" align="center" ng-repeat="row in data">
+									<td>{{toJsDate(row.SNAP_DATE) | date:'yyyy-MM-dd'}}</td>
+									<td>{{row.ACCT_NBR}}</td>
+									<td><a onclick="return false" ng-click="detail(5, row)">{{row.STOCK_CODE}}</a></td>
+									<td>{{row.STOCK_NAME}}</td>
+									<td>{{row.CURRENCY}}</td>
+									<td>{{toJsDate(row.TXN_DATE) | date:'yyyy-MM-dd'}}</td>
+									<td>{{toJsDate(row.SETTLE_DATE) | date:'yyyy-MM-dd'}}</td>
+									<td>{{toJsDate(row.MATURITY_DATE) | date:'yyyy-MM-dd'}}</td>
+									<td>{{row.DURATION}}</td>
+									<td>{{row.TARGET_CODE}} - {{row.TARGET_NAME_6}}</td>
+									<td>{{row.REM_FACE_VALUE | number:2}}</td>
+									<td>{{row.UNIT_PRICE | number:2}}</td>
+									<td>{{row.INVEST_COST | number:2}}</td>
+									<td>{{row.DIVIDEND_AMT | number:2}}</td>
+									<td>{{row.REFER_PRICE * 100 | number:2}}</td>
+									<td>{{row.AUM_TW | number:2}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</uib-tab> 
+		</uib-tabset>
+	</div>
+</div>

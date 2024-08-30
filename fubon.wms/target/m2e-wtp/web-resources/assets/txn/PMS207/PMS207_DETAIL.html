@@ -1,0 +1,184 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable th {
+	vertical-align:middle;
+}
+
+#rsTitle {
+	margin-left: 15px; 
+	margin-right: 15px;	
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/PMS207/PMS207_DETAIL.js"></script>
+<div class="PMS207" ng-controller="PMS207_DETAILController" ng-cloak>
+	<div>
+		
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">個人{{type}}客戶經營計劃表</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    				
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table table class="rstable">
+					<thead>
+						<tr>
+							<th colspan="5">預估</th>
+							<th colspan="5">實際</th>
+						</tr>
+						<tr>
+							<th>A/M日期</th>
+							<th>客戶姓名</th>
+							<th>產品類別</th>
+							<th>銷量</th>
+							<th>收益</th>
+							
+							<th>C日期</th>
+							<th>客戶姓名</th>
+							<th>產品類別</th>
+							<th>銷量</th>
+							<th>收益</th>							 
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-if="(row.AMT_E) || (row.ROI_E) || (row.AMT_A) || (row.ROI_A)" class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">						 							 	
+						 	<td align="center">
+						 		{{row.A_DATE}}<br>{{row.M_DATE}}
+						 	</td>
+						 	<td align="center">
+						 		{{row.CUST_NAME_E}}
+						 	</td>
+						 	<td align="center">
+						 		{{row.PRD_TYPE_E | mapping:mappingSet['PMS.SALE_PLAN_PRD_TYPE']:'F3'}}
+						 	</td>
+						 	<td align="right">
+						 		{{row.AMT_E | currency:''}}
+						 	</td>
+						 	<td align="right">
+						 		{{row.ROI_E | currency:''}}
+						 	</td>
+						 	
+						 	<td align="center">
+						 		{{row.C_DATE}}
+						 	</td>
+						 	<td align="center">
+						 		{{row.CUST_NAME_A}}
+						 	</td>
+						 	<td align="center">
+						 		{{row.PRD_TYPE_A | mapping:mappingSet['PMS.SALE_PLAN_PRD_TYPE']:'F3'}}
+						 	</td>
+						 	<td align="right">
+						 		{{row.AMT_A | currency:''}}
+						 	</td>
+						 	<td align="right">
+						 		{{row.ROI_A | currency:''}}
+						 	</td>						 							 							 	
+						</tr>
+					</tbody>
+				</table>				
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">
+			<font style="font-size:14px;">產品銷售計劃表預估與實際差異分析</font></div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    				
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table table class="rstable">
+					<thead>
+						<tr>
+							<th colspan="2"></th>
+							<th colspan="2">本週預估量</th>
+							<th colspan="2">本週實際達成</th>
+							<th colspan="2">本週GAP</th>										 
+						</tr>
+						<tr>
+							<th>產品別</th>
+							<th>產品</th>
+							<th>銷量</th>
+							<th>收益</th>
+							<th>銷量</th>
+							<th>收益</th>
+							<th>銷量</th>
+							<th>收益</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList1 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">						 							 	
+						 	<th rowspan="{{paramList1.length-1}}" ng-show="$index == 0">投資產品<br>收益</th>
+						 	<th ng-show="row.PRD_CATE == 01">基金</th>
+						 	<th ng-show="row.PRD_CATE == 02">ETF</th>
+						 	<th ng-show="row.PRD_CATE == 03">海外股票</th>
+						 	<th ng-show="row.PRD_CATE == 04">SI</th>
+						 	<th ng-show="row.PRD_CATE == 05">SN</th>
+						 	<th ng-show="row.PRD_CATE == 06">DCI</th>
+						 	<th ng-show="row.PRD_CATE == 07">海外債</th>
+						 	<th colspan="2" ng-show="row.PRD_CATE == 12">小計</th>
+						 	<td align="right">{{row.EST_AMT | currency:''}}</td>
+						 	<td align="right">{{row.EST_ROI | currency:''}}</td>
+						 	<td align="right">{{row.ACT_AMT | currency:''}}</td>
+						 	<td align="right">{{row.ACT_ROI | currency:''}}</td>
+						 	<td align="right">{{row.GAP_AMT | currency:''}}</td>
+						 	<td align="right">{{row.GAP_ROI | currency:''}}</td>
+						</tr>	
+						 	<!-- 
+						 	 -->
+						<tr class="repeat-row" ng-repeat="row in paramList2 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<th rowspan="{{paramList2.length-1}}" ng-show="$index == 0">保險產品<br>收益</th>
+						 	<th ng-show="row.PRD_CATE == 08">躉繳保險</th>
+						 	<th ng-show="row.PRD_CATE == 09">短年繳保險</th>
+						 	<th ng-show="row.PRD_CATE == 10">長年繳保險</th>
+						 	<th ng-show="row.PRD_CATE == 15">投資型保險</th>
+						 	<th colspan="2" ng-show="row.PRD_CATE == 13">小計</th>
+						 	<td align="right">{{row.EST_AMT | currency:''}}</td>
+						 	<td align="right">{{row.EST_ROI | currency:''}}</td>
+						 	<td align="right">{{row.ACT_AMT | currency:''}}</td>
+						 	<td align="right">{{row.ACT_ROI | currency:''}}</td>
+						 	<td align="right">{{row.GAP_AMT | currency:''}}</td>
+						 	<td align="right">{{row.GAP_ROI | currency:''}}</td>						 	
+						 </tr>
+						 	<!-- 
+						 	 -->
+						 <tr class="repeat-row" ng-repeat="row in paramList3 track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">	
+						 	<th ng-show="row.PRD_CATE == 11">其他收益</th>
+						 	<th ng-show="row.PRD_CATE == 11">換匯、信託、黃金存摺</th>
+						 	<th colspan="2" ng-show="row.PRD_CATE == 14">合計總收益</th>						 	
+						 	<td align="right">{{row.EST_AMT | currency:''}}</td>
+						 	<td align="right">{{row.EST_ROI | currency:''}}</td>
+						 	<td align="right">{{row.ACT_AMT | currency:''}}</td>
+						 	<td align="right">{{row.ACT_ROI | currency:''}}</td>
+						 	<td align="right">{{row.GAP_AMT | currency:''}}</td>
+						 	<td align="right">{{row.GAP_ROI | currency:''}}</td>
+						 </tr>							 			 							 							
+					</tbody>
+				</table>				
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

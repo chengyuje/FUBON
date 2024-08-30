@@ -1,0 +1,276 @@
+<style>
+/* open dialog */
+.ngdialog.CRM121 {}
+/* table size */
+.CRM121 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CRM121 table.little{
+	width: 30%;
+}
+/* change row */
+.CRM121.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+.CRM121 .menu{
+	margin: 0;
+	padding-left: 10px;
+}
+.CRM121 .typeP a{
+	color: purple !important;
+}
+.CRM121 .typeD a{
+	color: red !important;
+}
+.CRM121 .bigspace{
+	margin-left: 50px !important;
+}
+.CRM121 .datewidth{
+	width:180px !important;
+}
+.CRM121 .form-control-datePopup {
+ 	opacity: 0;
+    width: 0;
+    float: right;
+}
+.CRM121 .bubble
+{
+	position: relative;
+	width: 450px;
+	height: 40px;
+	padding: 5px;
+	background: #FDE7EF;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
+.CRM121 .bubble:after
+{
+	content: '';
+	position: absolute;
+	border-style: solid;
+	border-width: 15px 15px 15px 0;
+	border-color: transparent #FDE7EF;
+	display: block;
+	width: 0;
+	z-index: 1;
+	margin-top: -15px;
+	left: -15px;
+	top: 50%;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM121/CRM121.js"></script>
+<script type="text/javascript" src="assets/txn/CRM121/CRM121_INSERT.js"></script>
+<script type="text/javascript" src="assets/txn/CRM121/CRM121_MODIFY.js"></script>
+<script type="text/javascript" src="assets/txn/CRM121/CRM121_DIALOG.js"></script>
+<script type="text/javascript" src="assets/txn/CUS160/CUS160_ADD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PMS109.js"></script>
+<script type="text/javascript" src="assets/txn/PMS103/PMS103.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PPAP.js"></script>
+<script type="text/javascript" src="assets/txn/CRM210/CRM210.js"></script>
+<div class="CRM121" ng-controller="CRM121Controller">
+	<table>
+		<tr>
+			<td width="25%">
+				<div class="btn-group">
+					<button class="btn btn-default" mwl-date-modifier date="viewDate" decrement="calendarView" ng-click="init()">＜</button>
+					<button class="btn btn-default" mwl-date-modifier date="viewDate" set-to-today ng-click="init()">今天</button>
+					<button class="btn btn-default" mwl-date-modifier date="viewDate" increment="calendarView" ng-click="init()">＞</button>
+				</div>
+				<div class="btn-group">
+					<label class="btn btn-info" ng-click="changeView('year')">年曆</label>
+					<label class="btn btn-info" ng-click="changeView('month')">月曆</label>
+				</div>
+			</td>
+			<td width="50%">
+				<h2 class="text-center" ng-bind="viewDate  | date:'yyyy年MM月dd日EEEE'"></h2>
+			</td>
+			<td width="25%">
+				<div style="text-align:right;">
+					<button type="button" class="btn btn-info" ng-click="openCUS160_ADD()" ng-show="inputVO.privilege != '1'">新增</button>
+					<button type="button" class="btn btn-info" ng-click="insertTodo()" ng-show="inputVO.privilege == '1'">新增</button>
+					<button type="button" class="btn btn-info" ng-click= "modify(row,updateType)"
+						ng-disabled ="ans.length>1 || ans1.length>1  || ans.length == 0 && ans1.length == 0 ">編輯</button>
+					<input type="text" id="TASK_DATE" name="TASK_DATE" class="form-control form-control-datePopup"
+						uib-datepicker-popup="yyyy/MM/dd"
+						ng-model="inputVO.TASK_DATE"
+						is-open="model.t"
+						datepicker-options="startDateOptions"
+						alt-input-formats="altInputFormats"
+						ng-readonly="false"
+						ng-change="dateDate(inputVO.TASK_DATE)"
+					required />
+					<button type="button" class="btn btn-info" ng-click="open($event,'t')"
+						ng-disabled ="ans.length>1 || ans1.length>1  || ans.length == 0 && ans1.length == 0 || ans1.length >0">
+					<i class="glyphicon glyphicon-calendar"></i>變換日期</button>
+					<button type="button" class="btn btn-info" ng-click = "deleTack()" ng-disabled = "ans.length == 0 && ans1.length ==0">刪除</button>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<table>
+		<tr>
+			<td class="mwl-calendar-wrapper">
+				<mwl-calendar
+				events="events"
+				view="calendarView"
+				view-title="calendarTitle"
+				view-date="viewDate"
+				on-view-change-click="false"
+				on-timespan-click="dateClicked(calendarDate)"
+				cell-is-open="false"
+				cell-modifier="groupEvents(calendarCell)"
+				custom-template-urls="{calendarMonthCell: 'customMonthCell2.html'}"
+				cell-auto-open-disabled="true">
+				</mwl-calendar>
+			</td>
+			<!-- 理專行事曆 -->
+			<td class="mwl-calendar-neighbor" ng-show="inputVO.privilege == '1'||inputVO.privilege=='3'">
+				<!-- 2018/4/17 財神LUL START -->
+ 				<!-- <div style="display:inline;height:52px;">
+ 					<table>
+ 						<tr>
+ 							<td width="5%" style="vertical-align:middle">
+ 								<img src="assets/images/money_SVG/money_thumbup.svg" width="70" height="70"/>
+ 							</td>
+ 							<td width="2%"></td>
+ 							<td width="93%" style="font-size:20px;text-align:left;">
+ 								<div class="bubble">
+ 									<b>
+ 										&nbsp;待理財規劃客戶<a style="cursor:pointer" onclick="return false" ng-click="OPEN_FORTUNA('CUST')">{{FORTUNA_CUST_COUNT}}</a>人
+ 										，待執行交易客戶<a style="cursor:pointer" onclick="return false" ng-click="OPEN_FORTUNA('FUNC')">{{FORTUNA_FUNC_COUNT}}</a>人
+ 									</b>
+ 								</div>
+ 							</td>
+ 						</tr>
+ 					</table>
+ 				</div> -->
+				<!-- 2018/4/17 財神LUL END -->
+				<div style="margin-top: 0px;margin-bottom: 0px;">
+					<h3 style="display:inline;">
+						<img src="assets/images/icon/my_tit_a01.gif" width="37" height="37">{{nowDate.getTime() == viewDate1.getTime() ? '本日' : ''}}待辦事項  <span class="badge" ng-bind="MyTodoLst.length"></span>
+					</h3>
+				</div>
+				<!-- A/M/C -->
+				<div ng-show="inputVO.privilege != '3'" class="scroll_y" style="height:170px">
+					<ul ng-repeat="row1 in MyTodoLst">
+						<li class="checkbox">
+							<label>
+								<input type="checkbox"  ng-model='row1.SELECTED' ng-click= "toggleSelection(row1.SEQ_NO)" >
+								<div style = "margin: 7px 0 0;">
+									{{row1.CUST_ID}}-{{row1.CUST_NAME}}&nbsp;{{row1.TITLE}}&nbsp;({{row1.STATUS| mapping:mappingSet['CAM.TASK_STATUS']:'F3'}})
+								</div>
+							</label>
+						</li>
+					</ul>
+				</div>
+				<!-- no A/M/C -->
+				<div ng-show="inputVO.privilege == '3'" class="scroll_y" style="height:auto;min-height:170px;max-height:390px;">
+					<ul ng-repeat= "row1 in MyTodoLst" >
+						<li class="checkbox" >
+							<label>
+								<input type="checkbox"  ng-model='row1.SELECTED' ng-click= "toggleSelection(row1.SEQ_NO)" >
+								<div style = "margin: 7px 0 0;">
+									{{row1.CUST_ID}}-{{row1.CUST_NAME}}&nbsp;{{row1.TITLE}}&nbsp;({{row1.STATUS| mapping:mappingSet['CAM.TASK_STATUS']:'F3'}})
+								</div>
+							</label>
+						</li>
+					</ul>
+				</div>
+ 				<div class="my_tit" ng-show="inputVO.privilege != '3'" style="margin-top: 0px;margin-bottom: 0px;">
+ 					<h3>
+ 						<img src="assets/images/icon/my_tit_a02.gif" width="37" height="37">預計約訪事項 <span class="badge" ng-bind="MyAUMLst.length"></span>
+ 					</h3>
+ 				</div>
+ 				<div class="scroll_y" style="height: 170px" ng-show="inputVO.privilege != '3'">
+ 					<ul ng-repeat= "row in MyAUMLst" ng-show="inputVO.privilege != '3'">
+ 						<li class="checkbox">
+ 							<label>
+ 								<input type="checkbox"  ng-model='row.SELECTED' ng-click= "toggleSelection_1(row.SEQ,row.CUST_ID)">
+ 								<div style = "margin: 7px 0 0;">
+ 									{{row.CUST_ID}}-{{row.CUST_NAME}}&nbsp;
+ 									{{row.EST_PRD | mapping:mappingSet['PMS.SALE_PLAN_PRD_TYPE']:'F3'}}&nbsp;
+ 									({{row.STATUS | mapping:mappingSet['CAM.CAL_SALES_TASK_AMC_DESC']:'F3'}})
+ 									{{row.FAIA_STATUS}} 
+ 								</div>
+ 							</label>
+ 						</li>
+ 					</ul>
+ 				</div> 
+			</td>
+			<!-- 理專行事曆end -->
+			<!-- 輔銷行事曆 -->
+			<td class="mwl-calendar-neighbor" ng-if="inputVO.privilege=='0'">
+				<mwl-calendar
+					class="mwl-calendar-wrapper"
+					events="events1"
+					view="calendarView1"
+					view-title="calendarTitle"
+					on-event-click="eventClicked(calendarEvent.SEQ_NO)"
+					view-date="viewDate1"
+					day-view-start="08:00"
+   					day-view-end="17:00">
+				</mwl-calendar>
+				<button type="button" class="btn btn-primary" ng-click="insertTodo()" >新增</button>
+			</td>
+			<!-- 輔銷行事曆 end -->
+			<!-- 業務排程行事曆-主管 -->
+			<td class="mwl-calendar-neighbor" ng-if="inputVO.privilege=='2'">
+				<div class="my_tit" >
+					<h3>
+						<img src="assets/images/icon/my_tit_a01.gif" width="37" height="37">業務排程 <span class="badge" ng-bind="MyTodoLst.length"></span>
+					</h3>
+				</div>
+				<div class="scroll_y" style="height:170px">
+					<ul ng-repeat= "row in MyTodoLst" >
+						<li class="checkbox" ng-show = "row.TYPE == 'manager'">
+							<label style="cursor:default">
+								理專人員：
+								{{row.AO_CODE}}-{{row.EMP_NAME}}&nbsp;
+								{{row.TYPE == null ? &nbsp;'客戶：': ''}}&nbsp;
+								{{row.TYPE == null ? (row.CUST_ID +'-'+ row.CUST_NAME) :''}}
+							 	 內容：
+							 	{{row.TITLE}}&nbsp;
+								({{row.TYPE == null ?(row.STATUS | mapping:mappingSet['CAM.CAL_SALES_TASK_AMC_DESC']:'F3'):(row.STATUS | mapping:mappingSet['PMS.FIN_TYPE']:'F3')}})
+							</label>
+						</li>
+						<li class="checkbox"  ng-show = "row.TYPE == 'TASK'">
+							<label>
+								<input type="checkbox"  ng-model='row.SELECTED' ng-click= "toggleSelection(row.SEQ_NO)" >
+								<div style = "margin: 7px 0 0;">
+									{{row.CUST_ID}}-{{row.CUST_NAME}}&nbsp;{{row.TITLE}}&nbsp;({{row.STATUS| mapping:mappingSet['CAM.TASK_STATUS']:'F3'}})
+								</div>
+							</label>
+						</li>
+					</ul>
+				</div>
+<!-- 				<div class="my_tit"> -->
+<!-- 					<h3> -->
+<!-- 						<img src="assets/images/icon/my_tit_a02.gif" width="37" height="37">A/M/C <span class="badge" ng-bind="MyAUMLst.length"></span> -->
+<!-- 					</h3> -->
+<!-- 				</div> -->
+<!-- 				<div class="scroll_y" style="height: 170px"> -->
+<!-- 					<ul ng-repeat= "row in MyAUMLst"> -->
+<!-- 						<li class="checkbox"> -->
+<!-- 							<a ng-click="ppap(row.CUST_ID,'4','',row.SEQ);"> -->
+<!-- 								理專人員： -->
+<!-- 								{{row.AO_CODE}}-{{row.EMP_NAME}}&nbsp; -->
+<!-- 								客戶： -->
+<!-- 								{{row.CUST_ID}}-{{row.CUST_NAME}}&nbsp; -->
+<!-- 								內容: -->
+<!-- 								{{row.EST_PRD | mapping:mappingSet['PMS.SALE_PLAN_PRD_TYPE']:'F3'}}&nbsp; -->
+<!-- 								({{row.STATUS | mapping:mappingSet['CAM.CAL_SALES_TASK_AMC_DESC']:'F3'}}) -->
+<!-- 								{{row.FAIA_STATUS}} -->
+<!-- 							</a> -->
+<!-- 						</li> -->
+<!-- 					</ul> -->
+<!-- 				</div> -->
+			</td>
+			<!-- 業務排程行事曆-主管 END  -->
+		</tr>
+	</table>
+</div>

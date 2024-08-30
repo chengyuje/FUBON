@@ -1,0 +1,269 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+.rstable thead tr th {
+	vertical-align:middle;
+}
+.pointer {
+	cursor: pointer;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS363/PMS363.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS363" ng-controller="PMS363Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+			<table>
+			   <tr>
+			      <th><font color="red">＊</font> 資料統計日期： </th>
+				  <td>
+					  <e-combobox id="sTime"
+						ng-datasource="mappingSet['time']" 
+						ng-model="inputVO.sCreDate"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-change="dateChange()" 
+						ng-format="F3"
+						ng-required="false" 
+						width="145px" 
+						height="30px"
+						style="line-height:20px;" />
+				  </td>
+				  <th><font color="red">＊</font> 報表類型： </th>
+				  <td>
+					  <e-combobox 
+						ng-datasource="mappingSet['ReportType']" 
+						ng-model="inputVO.ReportType"
+						ng-validate="false" 
+						ng-readonly="false" 
+						ng-editable="false"
+						ng-format="F3"
+						ng-required="false" 
+						width="160px" 
+						height="30px"
+						style="line-height:20px;" />
+				  </td>
+			   </tr>
+			   <tr>
+			      <th>業務處：</th>
+			      <td>
+			         <e-combobox id="region_center_id" name="region_center_id"
+			            ng-datasource="REGION_LIST"
+			            ng-model="inputVO.region_center_id"
+			            ng-validate="false" 
+			            ng-disabled="disableRegionCombo"
+			            ng-readonly="disableRegionCombo" 
+			            ng-editable="false"
+			            ng-format="F3"
+			            ng-required="false"
+			            ng-change="ChangeRegion()"
+			            width="143px"
+			            style="line-height:20px;" />
+			      </td>
+			      <th>營運區：</th>
+			      <td>
+			         <e-combobox id="branch_area_id" name="branch_area_id"
+			            ng-datasource="AREA_LIST"
+			            ng-model="inputVO.branch_area_id"
+			            ng-validate="false" 
+			            ng-disabled="disableAreaCombo"
+			            ng-readonly="disableAreaCombo" 
+			            ng-editable="false"
+			            ng-format="F3"
+			            ng-required="false"
+			            ng-change="ChangeArea()"
+			            width="90px"
+			            style="line-height:20px;" />
+			      </td>
+			      <th>分行別：</th>
+			      <td>
+			         <e-combobox id="branch_nbr" name="branch_nbr"
+			            ng-datasource="BRANCH_LIST"
+			            ng-model="inputVO.branch_nbr"
+			            ng-validate="false" 
+			            ng-disabled="disableBranchCombo"
+			            ng-readonly="disableBranchCombo" 
+			            ng-editable="false"
+			            ng-format="F1"
+			            ng-required="false"
+			            ng-change="ChangeBranch()"
+			            width="155px"
+			            style="line-height:20px;" />
+			      </td>
+			      <th>員編：</th>
+				  <td>
+					  <e-combobox id="emp_id" name="emp_id"
+						ng-datasource="EMP_LIST"
+						ng-model="inputVO.emp_id"
+						ng-validate="false"
+						ng-readonly="disableEmpCombo" 
+						ng-readonly="disableEmpCombo" 
+						ng-editable="false"
+						ng-format="F1"
+						ng-required="true"
+						ng-disabled="disableEmpCombo"
+						ng-change="ChangeAo_code()"
+						width="110px"
+						style="line-height:20px;" />
+				  </td> 
+			   </tr>
+			</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-disabled="inputVO.ReportType == ''" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit();init()">清除</button>
+				<!--  
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button> -->
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">		    
+			<e-jumping-once output="outputVO" list="data" totallist="paramList"></e-jumping-once>
+			<div algin="left">
+				<table>
+			    	<tr>
+			    		<td>產出頻率：</td>
+			    		<td>每日</td>
+			    	</tr>
+			    	<tr>
+			    		<td>產出日：</td>
+			    		<td>{{toJsDate(paramList[0].LASTUPDATE) | date:'yyyy/MM/dd'}}</td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y" style="height:auto;white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.ReportType == '1'">
+					<thead>
+						<tr>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="YEARMON" e-query="query()">資料年月</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REGION_CENTER_NAME" e-query="query()">業務處</e-sorter></th>							
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_AREA_NAME" e-query="query()">營運區</e-sorter></th>							
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NBR" e-query="query()">分行代碼</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NAME" e-query="query()">分行名稱</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="EMP_ID" e-query="query()">員工編號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="EMP_NAME" e-query="query()">員工姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_CODE" e-query="query()">AO_CODE</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_JOB_RANK" e-query="query()">AO_LEVEL</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">客戶ID</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="query()">客戶姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CON_DEGREE" e-query="query()">貢獻度註記</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PRFT_LAST_11MONTH_FEE" e-query="query()">近11個月貢獻</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PRFT_LAST_11MONTH_FLG" e-query="query()">下個月可能降為OS</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PRFT_LAST_09MONTH_FEE" e-query="query()">近9個月貢獻</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PRFT_LAST_09MONTH_FLG" e-query="query()">3個月後可能降為OS</e-sorter></th>
+						</tr>					
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						 	<td align="center">{{row.YEARMON}}</td>
+						 	<td align="center">{{row.REGION_CENTER_NAME}}</td>
+						 	<td align="center">{{row.BRANCH_AREA_NAME}}</td>
+						 	<td align="center">{{row.BRANCH_NBR}}</td>
+						 	<td align="center">{{row.BRANCH_NAME}}</td>
+						 	<td align="center">{{row.EMP_ID}}</td>
+						 	<td align="center">{{row.EMP_NAME}}</td>
+						 	<td align="center">{{row.AO_CODE}}</td>
+						 	<td align="center">{{row.AO_JOB_RANK}}</td>
+						 	<td align="center">{{row.CUST_ID}}</td>
+						 	<td align="center">{{row.CUST_NAME}}</td>
+						 	<td align="center">{{row.CON_DEGREE}}</td>
+						 	<td align="center">{{row.PRFT_LAST_11MONTH_FEE | currency:""}}</td>
+						 	<td align="center">{{row.PRFT_LAST_11MONTH_FLG}}</td>
+						 	<td align="center">{{row.PRFT_LAST_09MONTH_FEE | currency:""}}</td>
+						 	<td align="center">{{row.PRFT_LAST_09MONTH_FLG}}</td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList" ng-show="inputVO.ReportType == '2'">
+					<thead>
+						<tr>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="YEARMON" e-query="query()">資料年月</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REGION_CENTER_NAME" e-query="query()">業務處</e-sorter></th>							
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_AREA_NAME" e-query="query()">營運區</e-sorter></th>							
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NBR" e-query="query()">分行代碼</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="BRANCH_NAME" e-query="query()">分行名稱</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="EMP_ID" e-query="query()">員工編號</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="EMP_NAME" e-query="query()">員工姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_CODE" e-query="query()">AO_CODE</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="AO_JOB_RANK" e-query="query()">AO_LEVEL</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">客戶ID</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="query()">客戶姓名</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="CON_DEGREE" e-query="query()">貢獻度註記</e-sorter></th>
+							<th><e-sorter e-input="inputVO" e-mode="auto" e-col="PRFT_LAST_06MONTH_FEE" e-query="query()">近6個月貢獻</e-sorter></th>
+						</tr>					
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">																		 						
+						 	<td align="center">{{row.YEARMON}}</td>
+						 	<td align="center">{{row.REGION_CENTER_NAME}}</td>
+						 	<td align="center">{{row.BRANCH_AREA_NAME}}</td>
+						 	<td align="center">{{row.BRANCH_NBR}}</td>
+						 	<td align="center">{{row.BRANCH_NAME}}</td>
+						 	<td align="center">{{row.EMP_ID}}</td>
+						 	<td align="center">{{row.EMP_NAME}}</td>
+						 	<td align="center">{{row.AO_CODE}}</td>
+						 	<td align="center">{{row.AO_JOB_RANK}}</td>
+						 	<td align="center">{{row.CUST_ID}}</td>
+						 	<td align="center">{{row.CUST_NAME}}</td>
+						 	<td align="center">{{row.CON_DEGREE}}</td>
+						 	<td align="center">{{row.PRFT_LAST_06MONTH_FEE | currency:""}}</td>
+						</tr>
+					</tbody>
+				</table>									
+			</div>
+			<div>
+				<table>								
+			  	 <tr>
+			    	<td align="left">說明：</td>
+			    	<td align="right" ng-show="showMemo">近11個月貢獻度資料區間：{{months_eleven}}至{{baseDate | date:'yyyyMM'}}</td>
+			     </tr>
+			  	 <tr ng-show="showMemo">
+			  	 	<td align="left"></td>
+			    	<td align="right">&nbsp;近9個月貢獻度資料區間：{{months_nine}}至{{baseDate | date:'yyyyMM'}}</td>
+			     </tr>
+			  	 <tr ng-show="showMemo">
+			  	 	<td align="left"></td>
+			    	<td align="right">&nbsp;近6個月貢獻度資料區間：{{months_six}}至{{baseDate | date:'yyyyMM'}}</td>
+			     </tr>
+			    </table>								
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+</div>

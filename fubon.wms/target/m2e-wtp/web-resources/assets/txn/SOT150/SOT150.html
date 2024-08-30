@@ -1,0 +1,406 @@
+<style>
+.rstable tr th {
+	vertical-align:middle;
+}
+.rstable tr td {
+	vertical-align:middle;
+	height: 50px;
+}
+.rstableDTL thead tr th {
+	vertical-align:middle;
+}
+.rstableDTL tbody tr td {
+	vertical-align:middle;
+	text-align:center;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD110/PRD110.js"></script>
+<script type="text/javascript" src="assets/txn/SOT150/SOT150.js"></script>
+<script type="text/javascript" src="assets/txn/SOT712/28Days_picker.js"></script>
+<script type="text/javascript" src="assets/txn/SOT150/SOT150_ROUTE.js"></script>
+<script type="text/javascript" src="assets/txn/SOT132/SOT132.js"></script>
+<script type="text/javascript" src="assets/txn/SOT712/FitnessMessageDialog.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100.js"></script>
+<script type="text/javascript" src="assets/txn/PRD100/PRD100_BOSS.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512.js"></script>
+<script type="text/javascript" src="assets/txn/CRM512/CRM512_DETAILS.js"></script>
+
+<div class="SOT150" ng-controller="SOT150Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >商品資料輸入及適配</div>
+	</div>
+	<!--Content of the panel-->
+	<div class="panel_content">
+		<div class="search_table">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<h4 class="h4-title">交易資料輸入</h4>
+				<table class="rstable">
+					<tr ng-hide='true'>
+						<th width="15%">來行人員：</th>
+						<td colspan="6">
+							<div ng-repeat="row in mappingSet['SOT.CUST_TYPE']" style="display:inline;">
+								<input type="radio" name="custType" ng-model="inputVO.custType" ng-value="row.DATA" ng-hide="row.DATA == 'AGENT'"><span ng-hide="row.DATA == 'AGENT'">&nbsp;{{row.LABEL}}&nbsp;&nbsp;</span></input>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th style="vertical-align:middle" rowspan="3">客戶資訊：</th>
+					</tr>
+					<tr>
+						<td width="20%">*客戶ID：<input type="text" class="form-control" style="width:auto;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" ng-disabled="cartList.length > 0" ng-blur="getSOTCustInfo(false,true)" e-length-limit="16" required></td>
+						<td width="10%">{{inputVO.custName}}</td>
+						<td style="text-align: right;">KYC等級/效期：</td>
+						<td style="text-align: left;" width="10%">{{inputVO.kycLV}}/{{inputVO.kycDueDate | date:"yyyy-MM-dd"}}</td>
+						<td style="text-align: right;">客戶註記：</td>
+						<td style="text-align: left;" width="10%">{{inputVO.custRemarks | mapping:mappingSet['SOT.SPEC_CUSTOMER']:'F3'}}</td>
+					</tr>
+					<tr>
+						<td>專業投資人/有效截止日期：</td>
+						<td width="10%">{{inputVO.profInvestorYN}}/{{inputVO.piDueDate | date:"yyyy-MM-dd"}}</td>
+						<td style="text-align: right;">OBU註記：</td>
+						<td style="text-align: left;" width="10%">{{inputVO.isOBU}}</td>
+						<td style="text-align: right;">同意投資商品諮詢服務：</td>
+						<td style="text-align: left;" width="10%">{{inputVO.isAgreeProdAdv}}</td>
+					</tr>
+					<!-- <tr>
+						<th>代理人：</th>
+						<td><input type="text" class="form-control" style="width:auto;display:inline;" id="proxyCustID" name="proxyCustID" ng-model="inputVO.proxyCustID" e-length-limit="11" disabled></td>
+						<td colspan="5"></td>
+					</tr> -->
+				</table>
+				<div style="margin-bottom: 10px;">
+					<button type="button" class="btn btn-info" ng-click="goSOT132()" function-type="query" ng-disabled="inputVO.custID == ''">選擇庫存</button>
+				</div>
+				<table class="rstable">
+					<tr style="text-align: left;">
+						<th width="10%">投資標的：</th>
+						<td width="20%">{{inputVO.bProdID}} {{inputVO.bProdName}}</td>
+						<td width="20%">計價幣別：{{inputVO.bProdCurr}}</td>					
+						<td width="20%" >產品風險等級：{{inputVO.bProdRiskLV}}</td>		
+						<td width="10%"></td>							
+						<td width="20%">信託金額：{{inputVO.bTrustCurr}} {{inputVO.bTrustAmt | number:filterNumber}}</td>										
+					</tr>
+					<tr>
+						<th width="10%">信託型態：</th>
+						<td>{{assetType | mapping:mappingSet['SOT.ASSET_TRADE_SUB_TYPE']:'F3'}}  {{txType}}</td>						
+						<td>扣款日期：{{inputVO.bChargeDateList}}</td>
+						<td ng-show="inputVO.tradeSubType=='2' || inputVO.tradeSubType=='4'"  colspan="2">扣款金額：{{inputVO.bTrustCurr}} {{inputVO.bPurchaseAmtL | number:filterNumber}}</td>
+						<td ng-show="inputVO.tradeSubType=='3' || inputVO.tradeSubType=='5'"  colspan="2">扣款金額(低/中/高)：{{inputVO.bTrustCurr}} {{inputVO.bPurchaseAmtL | number:filterNumber}}/{{inputVO.bPurchaseAmtM | number:filterNumber}}/{{inputVO.bPurchaseAmtH | number:filterNumber}}</td>
+						<td ng-show="inputVO.bStatus">憑證狀態：{{inputVO.bStatus | mapping:mappingSet['SOT.FUND_ASSET_STATUS']:'F3'}}</td>
+					</tr>
+					<tr>
+						<th width="10%">憑證編號：</th>
+						<td>{{inputVO.certificateID}}</td>						
+						<td>扣款帳號：{{inputVO.bDebitAcct}}</td>
+						<td colspan="2">收益入帳帳號：{{inputVO.bCreditAcct}}</td>
+						<td></td>
+					</tr>
+				</table>
+				<div style="margin-bottom: 10px;">
+					<button type="button" class="btn btn-info" ng-click="goPRD110('Y')" function-type="query" ng-disabled="inputVO.bProdID == ''">核心衛星基金</button>
+					<button type="button" class="btn btn-info" ng-click="goPRD110('')" function-type="query" ng-disabled="inputVO.bProdID == ''">搜尋基金</button>
+				</div>
+				<table class="rstable" ng-show="inputVO.tradeSubType != '1'">
+					<tr>
+						<th width="15%">變更投資標的：</th>
+						<td width="25%">基金代號：<input type="text" class="form-control" style="width:auto;display:inline;text-transform: uppercase;" placeholder="請輸入..." id="fProdID" name="fProdID" ng-model="inputVO.fProdID" ng-blur="checkFundStatus()" e-length-limit="16" ng-disabled="(inputVO.custID == '' || inputVO.bProdID=='')"></td>
+						<td colspan="2">{{inputVO.fProdName}}</td>
+						<td width="10%">計價幣別：</td>
+						<td width="10%">{{inputVO.fProdCurr}}</td>
+						<td width="10%">產品風險等級：</td>
+						<td width="10%">{{inputVO.fProdRiskLV}}</td>
+					</tr>
+					<tr>
+						<th width="15%" uib-tooltip="變更後產品信託幣別：{{inputVO.fTrustCurr}}"  tooltip-placement="right-bottom">信託幣別：</th>
+						<td colspan="7">
+						    {{inputVO.bTrustCurrType | mapping:mappingSet['SOT.TRUST_CURR_TYPE']:'F3'}}
+						</td>
+					</tr>
+					<tr ng-show="(canCmd.A7 && canCmd.X7)">
+						<th>每月扣款金額：</th>
+						<td colspan="7"  > 
+							<span ng-if="(inputVO.tradeSubType == '2') || (inputVO.tradeSubType == '4')">
+								<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..."  id="fPurchaseAmtL" name="fPurchaseAmtL" ng-model="inputVO.fPurchaseAmtL" ng-blur="checkPurchaseAmtLimit()" e-input-limit="NC"   uib-tooltip="庫存  {{inputVO.bPurchaseAmtL}} -> {{inputVO.bPurchaseAmtExchL}}"  tooltip-placement="right-bottom" />
+							</span>
+							<span ng-if="(inputVO.tradeSubType == '3') || (inputVO.tradeSubType == '5')">
+								低&nbsp; <input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fPurchaseAmtL" name="fPurchaseAmtL" ng-model="inputVO.fPurchaseAmtL" ng-blur="checkPurchaseAmtLimit()" e-input-limit="NC"   uib-tooltip="庫存  {{inputVO.bPurchaseAmtL}} -> {{inputVO.bPurchaseAmtExchL}}"  tooltip-placement="right-bottom" />
+								&nbsp;中&nbsp; <input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fPurchaseAmtM" name="fPurchaseAmtM" ng-model="inputVO.fPurchaseAmtM" ng-blur="checkPurchaseAmtLimit()" e-input-limit="NC"   uib-tooltip="庫存  {{inputVO.bPurchaseAmtM}} -> {{inputVO.bPurchaseAmtExchM}}"  tooltip-placement="right-bottom" />
+								&nbsp;高&nbsp; <input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入..." id="fPurchaseAmtH" name="fPurchaseAmtH" ng-model="inputVO.fPurchaseAmtH" ng-blur="checkPurchaseAmtLimit()" e-input-limit="NC"   uib-tooltip="庫存  {{inputVO.bPurchaseAmtH}} -> {{inputVO.bPurchaseAmtExchH}}"  tooltip-placement="right-bottom" />
+							</span>
+							
+							<span class="bigspace"></span>
+							最低申購金額：{{inputVO.BaseAmtOfSPurchaseCurr}}{{inputVO.prodMinBuyAmt | currency:'$'}}
+							<span ng-if="(inputVO.tradeSubType == '4') || (inputVO.tradeSubType == '5')">
+							&nbsp;&nbsp;最高申購金額：{{inputVO.MaxAmtOfSPurchaseCurr}}{{inputVO.MaxAmtOfSPurchase | currency:'$'}}
+							</span>
+						</td>
+					</tr>
+					<tr ng-show="(canCmd.A9==true)">
+						<th uib-tooltip="原每月扣款日期:{{inputVO.bChargeDateList}}" tooltip-placement="right-bottom">每月扣款日期：</th>
+						<td colspan="7">
+							<input type="text" class="form-control" style="width:auto;display:inline;" placeholder="請輸入...最多六筆" id="chargeDateList" name="chargeDateList" ng-model="inputVO.chargeDateList" e-length-limit="17" ng-disabled="true">
+							<!-- 製作28日曆button -->
+							<span class="input-group-btn" style="display:inline-block;">
+								<button type="button" class="btn btn-default" ng-click="calendar28Days_picker()">
+								<i class="glyphicon glyphicon-calendar"></i></button>
+							</span>
+						</td>
+					</tr>
+				</table>	
+				<table class="rstable"> 
+					<tr style="text-align: left;" ng-hide='true'>
+						<th  width="15%">信託帳號：</th>
+						<td>  
+							  {{inputVO.bTrustAcct}}			
+						</td>
+					</tr>
+					
+					<tr style="text-align: left;" ng-hide='true'>
+						<th  width="15%">原扣款帳號：</th>
+						<td>  
+							  {{inputVO.bDebitAcct}}			
+						</td>
+					</tr>
+					
+					<tr style="text-align: left;" ng-hide='true'>
+						<th  width="15%">原收益入帳帳號：</th>
+						<td>  
+							  {{inputVO.bCreditAcct}}			
+						</td>
+					</tr>
+					<tr style="text-align: left;" ng-show="inputVO.tradeSubType != '1'">
+						<th width="15%" uib-tooltip="信託帳號：{{inputVO.bTrustAcct}} 原扣款帳號:{{inputVO.bDebitAcct}}" tooltip-placement="right-bottom">
+						    <a ng-click="showAcctList()">*扣款帳號：</a>
+						</th>
+						<td>
+							<e-combobox id="debitAcct" name="debitAcct" 
+										ng-datasource="mappingSet['SOT.DEBIT_ACCT_LIST#DISPLAY']"
+										ng-model="inputVO.fDebitAcct"
+										ng-validate="false" 
+										ng-readonly="canCmd.A8==false" 
+										ng-editable="false"
+										ng-required="false"
+										ng-format="F3"
+										ng-change="changeAcct('debit')"
+										style="line-height:20px;"/>
+							{{avlCurrency}} {{inputVO.debitAvbBalance | currency:''}}			
+							  			
+							 			
+						</td>
+					</tr>
+					<tr style="text-align: left;">
+						<th uib-tooltip="原收益入帳帳號:{{inputVO.bCreditAcct}}" tooltip-placement="right-bottom">
+						*新收益入帳帳號：
+						</th>
+						<td colspan="7" >
+							<e-combobox id="creditAcct" name="creditAcct" 
+										ng-datasource="mappingSet['SOT.CREDIT_ACCT_LIST#DISPLAY']"
+										ng-model="inputVO.fCreditAcct"
+										ng-validate="false" 
+										ng-readonly="canCmd.A0==false" 
+										ng-editable="false"
+										ng-required="false"
+										ng-format="F3"
+										ng-change="changeAcct('credit')"
+										style="line-height:20px;"/>
+							 		
+						</td>
+					</tr>
+					
+					<tr ng-if="(inputVO.bProdID!=inputVO.fProdID && inputVO.fProdID)">
+						<th>*取得公開說明書方式：</th>
+						<td colspan="7">
+							<e-combobox id="creditAcct" name="prospectusType" 
+										ng-datasource="mappingSet['SOT.PROSPECTUS_TYPE']"
+										ng-model="inputVO.prospectusType"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-required="true"
+										ng-format="F3"
+										width="200px"
+										style="line-height:20px;" /> 
+							<span ng-show="parameterTypeEditForm.prospectusType.$error.required" class="with-errors" colspan="4">請輸入公開說明書</span>
+						</td>
+					</tr>
+					
+					<tr>
+						<th>*交易日期：</th>
+						<th>
+							<label ng-repeat="row in mappingSet['SOT.TRADE_DATE_TYPE'] | limitTo:displayLimit track by $index">
+								<input type="radio" name="tradeDateType" id="tradeDateType{{row.DATA}}" ng-model="inputVO.tradeDateType" ng-value="row.DATA" ng-click="getReserveTradeDate();checkTradeDateType();" required> {{row.LABEL}}
+								<span class="bigspace"></span>
+							</label>
+						    ({{reserveTradeDay}}天內的營業日 {{toJsDate(inputVO.reservationTradeDate) | date:"yyyy-MM-dd"}})
+							<div ng-show="parameterTypeEditForm.tradeDateType.$error.required" class="with-errors" colspan="4">請輸入交易日期</div>
+						</th>
+					</tr>
+					
+					<tr  ng-show="inputVO.tradeSubType != '1'" style="text-align: left;">
+						<th>憑證狀態：</th>
+						<td colspan="7" >
+							<table>
+								<tr ng-repeat="row in mappingSet['SOT.CERTIFICATE_STATUS']">
+									<td style="width:10%"> <!-- 0:正常 1:暫停   2:非主標的  3:終止-->
+										<input type="radio" name="certificateStatus" ng-model="inputVO.fCertificateStatus" ng-value="row.DATA"  ng-change="checkAfterStatus()" >&nbsp;{{row.LABEL}}&nbsp;&nbsp;
+									</td>
+									<td>
+										<div ng-if="row.DATA == '0' && inputVO.fCertificateStatus == '0'">
+										    <!-- 0:正常 -->
+											<div class="input-group datebox datewidth">
+												<input type="text" id="fResumeDate" name="fResumeDate"
+														class="form-control"
+														uib-datepicker-popup="yyyy/MM/dd"
+														ng-model="inputVO.fResumeDate"
+														is-open="model.d"
+														datepicker-options="fResumeDateOptions"
+														alt-input-formats="altInputFormats"
+														ng-readonly="true"
+														ng-change="limitDate()"
+														required
+														 />
+												<!-- 製作日曆button -->
+												<span class="input-group-btn">
+													<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+													<i class="glyphicon glyphicon-calendar"></i></button>
+												</span>
+											</div>
+										</div>
+										<div ng-if="row.DATA == '1' && inputVO.fCertificateStatus == '1'">
+										   <!-- 1:暫停 -->
+											<div class="form-group">
+												<div class="input-group datebox datewidth">
+													<input type="text" id="fHoldStartDate" name="fHoldStartDate"
+															class="form-control"
+															uib-datepicker-popup="yyyy/MM/dd"
+															ng-model="inputVO.fHoldStartDate"
+															is-open="model.a"
+															datepicker-options="fHoldStartDateOptions"
+															alt-input-formats="altInputFormats"
+															ng-readonly="true"
+															ng-change="limitDate1()"
+															required
+															 />
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+												<div style="float: left !important;">&nbsp;&nbsp;~&nbsp;&nbsp;</div>
+												<div class="input-group datebox datewidth">
+													<input type="text" id="fHoldEndDate" name="fHoldEndDate"
+															class="form-control"
+															uib-datepicker-popup="yyyy/MM/dd"
+															ng-model="inputVO.fHoldEndDate"
+															is-open="model.b"
+															datepicker-options="fHoldEndDateOptions"
+															alt-input-formats="altInputFormats"
+															ng-readonly="true"
+															ng-change="limitDate1()"
+															required
+															 />
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+														<i class="glyphicon glyphicon-calendar"></i></button>
+													</span>
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr style="text-align: left;">
+						<th>*解說專員：</th>
+						<td colspan="7"><input type="text" class="form-control" style="width:auto;display:inline;" id="narratorID" name="narratorID" ng-model="inputVO.narratorID" e-length-limit="11" ng-blur="getTellerName()" required ng-disabled="narratorDisabled">&nbsp;&nbsp;{{inputVO.narratorName}}</td>
+					</tr>
+				</table>
+
+				
+				<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;" ng-show="(isShowAcctList == true)">
+					<table class="table-bordered">
+						<thead>
+							<tr>
+								<th>扣款帳號</th>
+								 <th>幣別</th>
+								<th>帳戶餘額</th>
+								<th>可用餘額</th> 
+							</tr> 
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in mappingSet['SOT.DEBIT_ACCT_LIST'] track by $index" >
+								<td>{{row.LABEL}}</td>
+								<td>{{row.CURRENCY}}</td>
+								<td>{{row.ACCT_BALACNE | currency:''}}</td>
+								<td>{{row.AVB_BALANCE | currency:''}}</td> 
+							</tr>
+					  		<tr>
+								<th>收益入帳帳號</th>
+								<th>幣別</th> 
+								<th>帳戶餘額</th>
+								<th>可用餘額</th>
+								 
+							</tr>
+							<tr class="repeat-row" ng-repeat="row in mappingSet['SOT.CREDIT_ACCT_LIST'] track by $index" >
+								<td>{{row.LABEL}}</td>
+								<td>{{row.CURRENCY}}</td> 
+								<td>{{row.ACCT_BALACNE | currency:''}}</td>
+								<td>{{row.AVB_BALANCE | currency:''}}</td> 
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<div style="margin-bottom: 10px;">
+					<button type="button" class="btn btn-info" ng-click="validateSeniorCust();">加入購物車</button>
+				</div>
+								
+				<div class="gv_tab_sc scroll_y" style="min-height:235px; white-space: nowrap;">
+					<table class="table-bordered rstableDTL">
+						<thead>
+							<tr>
+								<th>功能</th>
+								<th>標的名稱</th>
+								<th>變更項目</th>
+								<th>變更前</th>
+								<th>變更後</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- new -->							
+							<tr ng-repeat-start="(a, dataA) in cartList | orderBy: 'SEQ_NO' | groupBy: 'SEQ_NO' as resultA">								
+								<!-- case:length>1 -->
+								<td ng-if="dataA.length>1" rowspan="{{dataA.length + numGroups(resultB)*3}}">
+									<button type="button" class="btn btn-info" ng-click="delCar(a)" ng-hide="cartList[$index]['BARGAIN_STATUS'] != null">移除</button>
+								</td>
+								<!-- case:length=1 -->
+								<td ng-if="dataA.length==1"><button type="button" class="btn btn-info" ng-click="delCar(a)" ng-hide="dataA[0].BARGAIN_STATUS != null">移除</button></td>
+								<td ng-if="dataA.length==1"><a ng-href="#" style="text-decoration:none;" ng-click="refresh(a)" ng-bind="dataA[0].PROD_INFO"></a></td>
+								<td ng-if="dataA.length==1">{{dataA[0].CHANGE_TYPE | mapping:mappingSet['SOT.NF_CHANGE_TYPE']:'F3'}}</td>
+								<td ng-if="dataA.length==1" align="left" style=" white-space: pre">{{dataA[0].BEFORE_DATA}}</td>
+								<td ng-if="dataA.length==1" align="left" style=" white-space: pre">{{dataA[0].AFTER_DATA}}</td>
+							</tr>
+							<!-- case:length>1 -->
+							<tr ng-if="dataA.length>1" ng-repeat-start="(b, dataB) in dataA | orderBy: 'PROD_INFO' | groupBy: 'PROD_INFO' as resultB">	
+								<td rowspan="{{dataB.length + 1}}"><a ng-href="#" style="text-decoration:none;" ng-click="refresh(a)">{{b}}</a></td>
+							</tr>
+							<tr ng-if="dataA.length>1" ng-repeat-end ng-repeat = "row in dataB">
+								<td>{{row.CHANGE_TYPE | mapping:mappingSet['SOT.NF_CHANGE_TYPE']:'F3'}}</td>
+								<td align="left" style=" white-space: pre">{{row.BEFORE_DATA}}</td>
+								<td align="left" style=" white-space: pre">{{row.AFTER_DATA}}</td>
+							</tr>
+							<tr ng-if="dataA.length>1" ng-repeat-end></tr>
+							
+						</tbody>
+					</table>
+				</div>
+			</form>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="clearTradeSEQ();init()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="next()" ng-disabled="cartList.length == 0" function-type="maintenance">下一步</button>
+		</div>
+	</div>
+</div>

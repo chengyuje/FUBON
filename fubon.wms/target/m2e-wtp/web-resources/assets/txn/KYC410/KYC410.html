@@ -1,0 +1,134 @@
+<script type="text/javascript" src="assets/txn/KYC410/KYC410.js"></script>
+<script type="text/javascript" src="assets/txn/KYC410/KYC410_edit.js"></script>
+<style>
+.search_table th{
+	text-align: center;
+	padding:20px 6px;
+}
+.search_table td{
+	padding:15px 6px;
+}
+</style>
+<div ng-controller="KYC410Controller" ng-cloak>
+    <div class="tfb_content">
+      <div class="tfb_content_icon"></div>
+      <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a16.gif" >資料查詢 </div>
+    </div>
+    <!--Content of the panel-->
+    <div class="panel_content">
+      <div class="search_table">
+        <table>
+          <tr>
+            <th>題庫題目：</th>
+            <td style="text-align: center;padding:15px 6px;"><input id="QUESTION_DESC" name="QUESTION_DESC" type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.QUESTION_DESC" e-length-limit="200"></td>
+            <th>建立日期：</th>
+            <td class="form-inline" style="padding:10px 6px;">
+	            <div class="form-group">
+					<div class="input-group datebox datewidth">
+						<input type="text" id="sDate" name="sDate"
+							class="form-control"
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.sDate"
+							is-open="model.a"
+							datepicker-options="bgn_sDateOptions"
+							ng-readonly="true"
+							ng-change="limitDate()"/>
+							<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+								<i class="glyphicon glyphicon-calendar"></i>
+							</button>
+						</span>
+					</div>
+					～
+					<div class="input-group datebox datewidth">
+						<input type="text" id="eDate" name="eDate"
+							class="form-control"
+							uib-datepicker-popup="yyyy/MM/dd"
+							ng-model="inputVO.eDate"
+							is-open="model.b"
+							datepicker-options="bgn_eDateOptions"
+							ng-readonly="true"
+							ng-change="limitDate()"/>
+					<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+								<i class="glyphicon glyphicon-calendar"></i>
+							</button>
+						</span>
+					</div>
+				</div>
+			</td>
+          </tr>
+        </table>
+      </div>
+      <div class="search_box_btn text-center">
+		<button ng-click="queryData()" class="btn btn-info">查詢</button>
+		<button ng-click="btnClear()" class="btn btn-info">清除</button>
+		<button ng-click="add(typelist)" class="btn btn-info">新增</button>
+	</div>
+      <div class="text-right">
+        <e-jumping-once ng-show="inputVO"
+					output="outputVO"
+					totallist="questionList"
+					list="data"
+					>
+		</e-jumping-once>
+      </div>
+      <div class="gv_tab_sc scroll_y">
+        <table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true">
+        <thead>
+          <tr>
+            <th>功能</th>
+            <th>題庫編號</th>
+            <th>題目</th>
+            <th>問卷類型</th>
+            <th>答案清單</th>
+<!--             <th>有其他<br>項目</th> -->
+<!--             <th>有補充<br>說明</th> -->
+            <th>建立人</th>
+            <th>建立日期</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+            <td>
+	            <e-combobox id="edit" name="edit"
+								ng-datasource="row.edit"
+								ng-model="row.editto"
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="edit(row)"
+								ng-if="row.STATUS=='Y'?false:true"
+								width="80px"
+								style="line-height:20px;" />
+            </td>
+            <td>{{row.QUESTION_VERSION}}</td>
+            <td style="width: 250px;">{{row.QUESTION_DESC}}</td>
+            <td align="left">{{row.QUESTION_TYPE|mapping:typelist:F3}}</td>
+            <td>
+	            <table>
+	            	<tr ng-repeat="row1 in row.Ans" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+	            		<td align="left">
+	            			{{row1.ANSWER_DESC}}
+	            		</td>
+	            	</tr>
+	            </table>
+            </td>
+<!--             <td align="center">{{row.ANS_OTHER_FLAG|mapping:ynlist:F3}}</td> -->
+<!--             <td align="center">{{row.ANS_MEMO_FLAG|mapping:ynlist:F3}}</td> -->
+            <td>{{row.CREATOR}}</td>
+            <td>{{row.CREATETIME}}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+
+
+</div>

@@ -1,0 +1,137 @@
+<style>
+
+</style>
+<div ng-controller="PRD260_EDITController" ng-cloak>
+	<div class="modal-dialog PRD260">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{row.PRD_ID == null ? '新增' : '編輯'}}客製化申購限制</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">商品代碼：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="prd_id" name="prd_id" class="form-control" ng-model="inputVO.prd_id" ng-blur="checkID()" ng-disabled="row.PRD_ID != null" e-length-limit="16" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.prd_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入商品代碼</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="!canEdit">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">{{errMsg | i18n:[errMsgList]}}</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">商品名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="cname" name="cname" class="form-control" ng-model="inputVO.cname" disabled></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">客戶ID：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="cust_id" name="cust_id" class="form-control" ng-model="inputVO.cust_id" ng-required="!inputVO.region" ng-blur="checkCUST();checkID('text')"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.cust_id.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入客戶ID</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr ng-show="ifCUST">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">{{'ehl_01_prd260_001' | i18n}}</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">業務處：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="region" name="region"
+								ng-datasource="REGION_LIST"
+								ng-model="inputVO.region"
+								ng-validate="false" 
+								ng-disabled="regionDisabled"
+								ng-readonly="regionDisabled" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="!inputVO.cust_id"
+								ng-change="getArea()"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.region.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇業務處</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">營運區：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="area" name="area"
+								ng-datasource="AREA_LIST"
+								ng-model="inputVO.area"
+								ng-validate="false" 
+								ng-disabled="areaDisabled"
+								ng-readonly="areaDisabled" 
+								ng-editable="false"
+								ng-format="F3"
+								ng-required="false"
+								ng-change="getBranch()"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+<!-- 						<tr ng-show="parameterTypeEditForm.area.$error.required"> -->
+<!-- 							<td class="col-xs-1"></td> -->
+<!-- 							<th class="col-md-3"></th> -->
+<!-- 							<td class="col-md-7 help-block with-errors">請選擇營運區</td> -->
+<!-- 							<td class="col-xs-1"></td> -->
+<!-- 						<tr> -->
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">分行：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="branch" name="branch"
+								ng-datasource="BRANCH_LIST"
+								ng-model="inputVO.branch"
+								ng-validate="false" 
+								ng-disabled="branchDisabled"
+								ng-readonly="branchDisabled" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="false"
+								ng-change="checkID('box')"
+								style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+<!-- 						<tr ng-show="parameterTypeEditForm.branch.$error.required"> -->
+<!-- 							<td class="col-xs-1"></td> -->
+<!-- 							<th class="col-md-3"></th> -->
+<!-- 							<td class="col-md-7 help-block with-errors">請選擇分行</td> -->
+<!-- 							<td class="col-xs-1"></td> -->
+<!-- 						<tr> -->
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

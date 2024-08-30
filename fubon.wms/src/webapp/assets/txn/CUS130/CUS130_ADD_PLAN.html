@@ -1,0 +1,116 @@
+<style>
+/* open dialog */
+.ngdialog.CUS130_ADD_PLAN {
+	
+}
+/* dialog panl */
+.modal-dialog.CUS130_ADD_PLAN {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+/* table size */
+.CUS130_ADD_PLAN table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CUS130_ADD_PLAN.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CUS130_ADD_PLAN_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.red{
+	color: red !important;
+}
+</style>
+<div ng-controller="CUS130_ADD_PLANController" ng-cloak>
+	<div class="modal-dialog CUS130_ADD_PLAN">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">回報內容</h4>
+			</div>
+			<div class="modal-body">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">回報欄位名稱：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="label" name="label" class="form-control" ng-model="inputVO.label" e-length-limit="60" required></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.label.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入回報欄位名稱</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">回報欄位型態：</th>
+							<td class="col-md-7 tdpadding">
+								<e-combobox id="type" name="type"
+									ng-paramtype="CUS.FIELD_TYPE"
+									ng-model="inputVO.type"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									width="150px"
+									style="line-height:20px;" />
+							</td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="parameterTypeEditForm.type.$error.required">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請選擇回報欄位型態</td>
+							<td class="col-xs-1"></td>
+						<tr>
+						<tr>
+							<td class="col-xs-1"></td>
+							<th class="col-md-3">下拉式選單內容：</th>
+							<td class="col-md-7 tdpadding"><input type="text" id="content" name="content" class="form-control" ng-disabled="inputVO.type != '5'" placeholder="下拉選單內容請以逗號隔開" ng-model="inputVO.content" e-length-limit="255"></td>
+							<td class="col-xs-1"></td>
+						</tr>
+						<tr ng-show="inputVO.type == '5' && !inputVO.content">
+							<td class="col-xs-1"></td>
+							<th class="col-md-3"></th>
+							<td class="col-md-7 help-block with-errors">請輸入下拉式選單內容</td>
+							<td class="col-xs-1"></td>
+						<tr>
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()" function-type="maintenance" >確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

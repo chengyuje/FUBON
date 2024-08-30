@@ -1,0 +1,672 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+  .important {
+    font-weight: 500;
+  }
+
+  .important.blue {
+    color: #28a4c9;
+  }
+
+  .important.orange {
+    color: #e96143;
+  }
+
+  .FPS table img {
+    vertical-align: middle;
+  }
+
+  .input-number {
+    text-align: right;
+    max-width: 130px;
+    margin: 0 auto;
+  }
+
+  .more-wrapper {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+  }
+
+  .more {
+    font-size: .7em;
+    color: #28a4c9;
+  }
+
+  .FPS table.table {
+    margin-bottom: 0;
+  }
+
+  .FPS .prod-detail .title.subtitle {
+    background-color: #89d4d7;
+  }
+
+  .FPS .btn-fps.btn-fps-brick {
+    height: auto;
+    line-height: initial;
+    min-width: auto;
+    padding: 0.5em 0.7em;
+  }
+
+  .FPS .title>.ps-wrapper {
+    font-weight: initial;
+  }
+
+  .FPS .warn-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .FPS .bubble {
+    position: absolute;
+    right: 0;
+    top: 0.4em;
+    background-color: #eee;
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: .75em;
+    line-height: 1.5em;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+</style>
+
+<script type="text/javascript" src="assets/txn/FPS230_DEMO/FPS240Confirm.js"></script>
+<script type="text/javascript" src="assets/txn/FPS230_DEMO/FPS240_print.js"></script>
+<script type="text/javascript" src="assets/txn/FPS230_DEMO/FPS240PrintPreview.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPS_SOT.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPS200Service.js"></script>
+<script type="text/javascript" src="assets/txn/FPS/FPSChartUtils.js"></script>
+
+<div ng-controller="FPS230_DEMOController"
+     ng-cloak
+     class="FPS">
+  <!-- tabs -->
+  <div ng-include="'assets/txn/FPS200_DEMO/FPS200_TAB_DEMO.html'"></div>
+  <div>
+    <!-- cust -->
+    <section class="block container">
+      <div class="title title-left">基本資料
+        <div class="ps-wrapper">
+          規劃日期:
+          <span ng-bind="planDate"></span>
+        </div>
+      </div>
+      <div ng-include="'assets/txn/FPS/FPS_CUST.template.html'"
+           ng-init="isPrint=true"></div>
+    </section>
+
+    <!-- amt FPS210 -->
+    <section class="block container">
+      <div class="title title-left">可供理財規劃金額
+        <div class="ps-wrapper">
+          單位: 新台幣 元
+        </div>
+      </div>
+      <div style="display:flex; justify-content: space-around; margin: 0 auto;">
+
+        <!-- 有投保 -->
+        <div class="block clear-space">
+          <div class="title subtitle title-left">投資資產</div>
+          <div class="content-wrapper">
+            <div class="content-title">A.帳上投資資產</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.liquidAmt|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">A1.存款</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.deposit|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">A2.基金</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.annuityProd|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">A3.ETF</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.fixedProd|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">A4.投資型保險</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.fundProd|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">A5.海外債</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.fundProdFB|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">A6.SN</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.fundProdSN|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">A7.SI</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.fundProdSI|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title">B.預計行外匯入金額</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.sowAmt|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper last prefix">
+            <div class="content-title">小計</div>
+            <div class="content-body">
+            </div>
+          </div>
+          <div class="content-wrapper last">
+            <div class="content-title">小計</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.price|number"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 支出 -->
+        <div class="block clear-space">
+          <div class="title subtitle title-left">支出及現金準備</div>
+          <div class="content-wrapper">
+            <div class="content-title">C.未來一年所需現金部位</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.cash|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">C1.生活必要支出</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.needExpenses|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">C2.貸款支出</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.loanExpenses|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">C3.其他支出</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.otherExpenses|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title">D.未來一年保險投保費用</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.ins|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">D1.保障型保費</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.insPolicyAmt|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title content-title-sub">D2.儲蓄型保費</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.insSavAmt|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper">
+            <div class="content-title">E.現金準備</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.cashPrepare|number"></span>
+            </div>
+          </div>
+          <div class="content-wrapper last prefix">
+            <div class="content-title">小計</div>
+            <div class="content-body">
+            </div>
+          </div>
+          <div class="content-wrapper last">
+            <div class="content-title">小計</div>
+            <div class="content-body">
+              <span ng-bind="STEP1VO.cost|number"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="block container no-area clear-space"
+           style="text-align: left;">
+        <div class="content-wrapper">
+          <div class="content-title">F.可供理財規劃金額</div>
+          <div class="content-body">
+            <span ng-bind="STEP1VO.total|number"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- charts FPS220 -->
+    <section class="block container">
+      <div class="title title-left">理財規劃配置
+        <div class="ps-wrapper clickable"
+             ng-if="warning.length>0">
+          <span class="bubble"
+                ng-bind="warning.length"></span>
+          <img src="./assets/images/money_SVG/money_beg.svg"
+               alt="提醒事項"
+               class="warn-icon"
+               ng-click="go('warning')">
+        </div>
+      </div>
+
+      <!-- 有投保 -->
+      <div style="display:flex; justify-content: space-around; margin: 0 auto;">
+        <div class="block clear-space">
+          <div class="title subtitle title-left">【調整前配置】</div>
+          <div class="content-wrapper no-border chart-wrapper">
+            <div class="chart-content">
+              <div id="beforeChart" class="chart" style="width:40%;float:left;margin-left:20px"></div>
+             	<div style="width:40%;float:right;margin-top:60px">
+             	<div ng-repeat="row in chartTables.afterChart" style="margin:8px;display:flex" ng-if="row.beforeValue">
+             		<div style="float:left;margin-right:5px">
+             			<div class="color-block" ng-style="{'background-color': row.color,'flaot':'left'}"></div>
+             		</div>
+             		<div style="width:150px;float:left">
+             			<span ng-bind="row.label"></span><br/>
+             			<label style="color:#a5a5a5;">(NT $<span ng-bind="row.beforeValue|number"></span>)</label>
+             		</div>
+             		<div style="width:50px;float:right"><span ng-bind="row.beforePct+' %'"></span></div>
+             	</div>
+             	</div>
+            </div>
+          </div>
+        </div>
+        <div class="block clear-space">
+          <div class="title subtitle title-left">【調整後配置】
+          </div>
+          <div class="content-wrapper no-border chart-wrapper">
+            <div class="chart-content">
+              <div id="afterChart" class="chart" style="width:40%;float:left;margin-left:20px"></div>
+             	<div  style="width:40%;float:right;margin-top:60px">
+             	<div ng-repeat="row in chartTables.afterChart" style="margin:8px;display:flex">
+             		<div style="float:left;margin-right:5px">
+             			<div class="color-block" ng-style="{'background-color': row.color,'flaot':'left'}"></div>
+             		</div>
+             		<div style="width:150px;float:left">
+             			<span ng-bind="row.label"></span><br/>
+             			<label style="color:#a5a5a5;">(NT $<span ng-bind="row.amt|number"></span>)</label>
+             		</div>
+             		<div style="width:50px;float:right"><span ng-bind="row.value"></span><span ng-show="row.value"> %</span></div>
+             	</div>
+             	</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="block clear-space container no-border" ng-show="arrowUp">
+       <table style="width:100%;">
+         <thead style="background-color:#eee">
+           <tr>
+             <th class="text-center">內容</th>
+             <th class="text-center">目前比例</th>
+             <th class="text-center">建議比例</th>
+             <th class="text-center">調整方向</th>
+             <th class="text-center">調整後比例</th>
+           </tr>
+         </thead>
+         <tbody class="content-wrapper" style="text-align:center;">
+           <tr ng-repeat="row in chartTables.afterChart" ng-if="row.beforeValue">
+             <td style="text-align:center;">
+             	<div style="display:inline-flex">
+	               <div style="display:inline-flex">
+		               <div class="color-block" ng-style="{'background-color': row.color}"></div>
+	               </div>
+	               <div  style="margin-left:10px">
+	               		<span ng-bind="row.label"></span>
+	               </div>
+               	</div>
+             </td>
+             <td>
+             	<div><label ng-bind="row.beforePct+' %'"></label></div>
+             	<div style="color:#a5a5a5;">(NT $<span ng-bind="row.beforeValue|number"></span>)</div>
+             </td>
+             <td ng-bind="row.advice"></td>
+             <td ng-bind="row.adviceMsg"></td>
+             <td>
+             	<div><label ng-bind="row.value+' %'"></label></div>
+             	<div style="color:#a5a5a5;">(NT $<span ng-bind="row.amt|number"></span>)</div>
+             </td>
+           </tr>
+         </tbody>
+       </table>
+     </div>
+    </section>
+
+    <!-- products FPS230 -->
+    <section class="block container prod-detail">
+      <div class="title title-left">產品明細</div>
+      <!-- fixed -->
+      <div class="block container clear-space">
+        <div class="title subtitle title-left"><b style="font-size: 1.1em;">類債券商品</b></div>
+
+        <!-- 有投保 -->
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>類別</th>
+              <th>推薦</th>
+              <th style="width:400px">商品</th>
+              <th>計價幣別</th>
+              <th>申購幣別</th>
+              <th>投資方式</th>
+              <th>短期展望</th>
+              <th>
+                <div>市值</div>
+                <div>約當台幣</div>
+              </th>
+              <th>
+                <div>調整後金額</div>
+                <div>約當台幣</div>
+              </th>
+              <th>比例</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="row in STEP2VO.fixedList">
+	          <!-- 類別 -->
+              <td ng-bind="row.PTYPE|mapping: mapping.prodType"></td>
+              <!-- 推薦 -->
+              <td>
+                <img src="assets/images/ic-refresh.svg" ng-if="row.MAIN_PRD == 'Y'&&row.PTYPE!='BND'">
+              </td>
+              <!-- 商品 -->
+              <td class="text-left">
+                <div ng-bind="row.PRD_ID+' '+row.PRD_CNAME"></div>
+              </td>
+              <!-- 計價幣別 -->
+              <td ng-bind="row.CURRENCY_TYPE"></td>
+              <!-- 申購幣別 -->
+              <td ng-bind="row.buyCur|mapping: mapping.buyCur"></td>
+              <!-- 投資方式 -->
+              <td>
+                <span ng-bind="row.INV_TYPE|mapping: mapping.invType"
+                      ng-show="row.PTYPE==='MFD' || (row.PTYPE !== 'SI' && row.PTYPE !== 'SN' && row.PTYPE !== 'BND')"></span>
+                <span ng-hide="row.PTYPE==='MFD' || (row.PTYPE !== 'SI' && row.PTYPE !== 'SN' && row.PTYPE !== 'BND')">--</span>
+              </td>
+              <!-- 短期展望 -->
+              <td ng-bind="row.RISK_TYPE"></td>
+              <!-- 調整前 -->
+              <td>
+                <div class="text-right">
+                  <span ng-if="row.NOW_AMT" ng-bind="row.NOW_AMT|number"></span>
+                  <span ng-if="!row.NOW_AMT">--</span>
+                </div>
+                <div class="text-right">
+                  <span ng-if="row.NOW_AMT_TWD" ng-bind="row.NOW_AMT_TWD|number"></span>
+                  <span ng-if="!row.NOW_AMT_TWD">--</span>
+                </div>
+              </td>
+              <!-- 調整後 -->
+              <td class="text-right">
+                <div ng-bind="row.PURCHASE_ORG_AMT|number"></div>
+                <div ng-bind="row.PURCHASE_TWD_AMT|number"></div>
+              </td>
+              <!-- 比例 -->
+              <td>
+                <span ng-bind="row.INV_PERCENT"></span>%
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div ng-if="fixedList.length<=0">
+          <img src="assets/images/money_SVG/money_beg.png"
+               class="money-svg">
+          <div class="money-svg-text">本次無配置比例與金額</div>
+        </div>
+      </div>
+
+      <!-- stock -->
+      <div class="block container clear-space">
+        <div class="title subtitle title-left" style="height: 2.6em;"><b style="font-size: 1.1em;">類股票商品</b></div>
+
+        <!-- 有投保 -->
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>類別</th>
+              <th>推薦</th>
+              <th style="width:400px">商品</th>
+              <th>
+                <div>計價幣別</div>
+                <div>保單幣別</div>
+              </th>
+              <th>申購幣別</th>
+              <th>投資方式</th>
+              <th>短期展望</th>
+              <th>
+                <div>市值/保單價值</div>
+                <div>約當台幣</div>
+              </th>
+              <th>
+                <div>調整後金額</div>
+                <div>約當台幣</div>
+              </th>
+              <th>比例</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="row in STEP2VO.stockList" ng-show="row.action!='delete'">
+              <!-- 類別 -->
+              <td ng-bind="row.PTYPE|mapping: mapping.prodType"></td>
+              <!-- 推薦 -->
+              <td>
+                <img src="assets/images/ic-crown.svg" ng-if="row.MAIN_PRD == 'Y'">
+              </td>
+              <!-- 商品 -->
+              <td ng-bind="row.PRD_ID+' '+row.PRD_CNAME" class="text-left" style="padding-left:12px;"></td>
+              <!-- 保單幣別 -->
+              <td ng-bind="row.CURRENCY_TYPE"></td>
+              <!-- 申購幣別 -->
+              <td ng-bind="row.buyCur|mapping: mapping.buyCur"></td>
+              <!-- 投資方式 -->
+              <td>
+                <span ng-bind="row.INV_TYPE|mapping: mapping.invType"
+                      ng-show="row.PTYPE==='MFD' || row.PTYPE === 'SI' || row.PTYPE === 'SN' || row.PTYPE === 'BND'"></span>
+                <span ng-hide="row.PTYPE==='MFD' || row.PTYPE === 'SI' || row.PTYPE === 'SN' || row.PTYPE === 'BND'">--</span>
+              </td>
+              <!-- 短期展望 -->
+              <td>
+                <img ng-src="{{mapping.trendPath[row.CIS_3M]}}" alt="{{row.CIS_3M}}">
+                <span ng-if="!row.CIS_3M||row.PTYPE==='INS'">--</span>
+              </td>
+              <!-- 調整前 -->
+              <td>
+                <div class="text-right">
+                  <span ng-if="row.NOW_AMT" ng-bind="(row.TRUST_CURR==='TWD'?row.NOW_AMT_TWD:row.NOW_AMT)|number"></span>
+                  <span ng-if="!row.NOW_AMT">--</span>
+                </div>
+                <div class="text-right">
+                  <span ng-if="row.NOW_AMT_TWD" ng-bind="row.NOW_AMT_TWD|number"></span>
+                  <span ng-if="!row.NOW_AMT_TWD">--</span>
+                </div>
+              </td>
+              <!-- 調整後 -->
+              <td class="text-right">
+                <div ng-bind="row.PURCHASE_ORG_AMT|number"></div>
+                <div ng-bind="row.PURCHASE_TWD_AMT|number"></div>
+              </td>
+              <!-- 比例 -->
+              <td>
+                <span ng-bind="row.INV_PERCENT"></span>%
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div ng-if="stockList.length<=0">
+          <img src="assets/images/money_SVG/money_beg.png"
+               class="money-svg">
+          <div class="money-svg-text">本次無配置比例與金額</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- transaction -->
+    <section class="block container">
+      <div class="title title-left">待執行交易</div>
+
+      <!-- 有投保 -->
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th></th>
+            <th>類別</th>
+            <th style="width:300px">代號商品</th>
+            <th>風險等級</th>
+            <th>
+              <div>計價幣別</div>
+              <div>保單幣別</div>
+            </th>
+            <th>申購幣別</th>
+            <th>投資方式</th>
+            <th>申購/贖回金額</th>
+            <th>約當台幣</th>
+            <th>交易指示</th>
+            <th>執行交易</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="row in transactionList">
+            <td>
+              <a ng-show="row.isStock&&row.PTYPE!='ETF'">
+                <span class="glyphicon glyphicon-info-sign"
+                      aria-hidden="true"
+                      uib-tooltip="{{row.tooltipInfo}}"
+                      tooltip-placement="auto right"
+                      tooltip-append-to-body="true"
+                      tooltip-class="FPSTooltip"></span>
+              </a>
+            </td>
+            <td ng-bind="row.PTYPE|mapping: mapping.prodType">
+              <!-- 類別 -->
+            </td>
+            <td ng-bind="row.PRD_ID+' '+row.PRD_CNAME"
+                style="padding-left:12px;
+                         text-align:left;">
+              <!-- 代號商品 -->
+            </td>
+            <td ng-bind="row.RISK_TYPE||'--'">
+              <!-- 風險等級 -->
+            </td>
+            <td ng-bind="row.CURRENCY_TYPE">
+              <!-- 保單幣別 -->
+            </td>
+            <td>
+              <span ng-bind="row.buyCur|mapping: mapping.buyCur"
+                    ng-if="row.INV_PRD_TYPE=='3'"></span>
+              <span ng-if="row.INV_PRD_TYPE!='3'">--</span>
+              <!-- 申購幣別 -->
+            </td>
+            <td>
+              <!-- 投資方式 -->
+              <span ng-bind="row.INV_TYPE|mapping: mapping.invType"
+                    ng-if="row.PTYPE==='MFD'"></span>
+              <span ng-if="row.PTYPE!=='MFD'">--</span>
+            </td>
+            <td ng-bind="row.TRANSACT_ORG_AMT|number"
+                class="text-right">
+              <!-- 調整後原幣金額 -->
+            </td>
+            <td ng-bind="row.TRANSACT_TWD_AMT|number"
+                class="text-right">
+              <!-- 約當台幣-->
+            </td>
+            <td>
+            	<span ng-bind="row.TXN_TYPE|mapping: row.txnTypeList"></span>
+            </td>
+            <td>
+              <!-- 執行交易 -->
+              <a type="button"
+                 class="btn-fps btn-fps-brick"
+                 ng-class="{'btn-fps-disabled':!row.transaction||(headList.PLAN_STATUS!='PLAN_STEP'&&headList.PLAN_STATUS!='PRINT_THINK')}"
+                 ng-click="(headList.PLAN_STATUS==='PLAN_STEP'||headList.PLAN_STATUS==='PRINT_THINK')&&row.transaction?chgUrl(row):''"
+                 ng-if="row.TXN_TYPE!=='F5'&&row.TXN_TYPE!=='I2'">
+                <img src="assets/images/ic-shoppingcart.svg"
+                     ng-alt="row.PTYPE==='MFD'?mapping.transactionBtn[row.TXN_TYPE]:mapping.transactionBtn[row.PTYPE]">
+              </a>
+              <span ng-if="row.TXN_TYPE==='F5'">--</span>
+              <span ng-if="row.TXN_TYPE==='I2'">變更契約</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div ng-if="transactionList.length<=0">
+        <div>無待執行之交易</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- btns -->
+  <div style="margin-bottom : 10px; text-align : right;">
+    <a type="button" class="btn-fps" ng-click="go('prev')">上一步</a>
+    <a type="button" class="btn-fps" ng-click="go('print')" style="margin-right:15px">產出規劃書</a>
+  </div>
+
+  <!-- 注意事項 -->
+  <section class="block container" ng-if="transactionList.length>0">
+    <div class="title title-left">注意事項</div>
+    <div class="block container clear-space"
+         ng-repeat="type in mapping.noticeTypes"
+         ng-show="mapping.noticeFlags[type]">
+      <div class="title subtitle title-left">
+        <span ng-bind="mapping.fullProdType[type]"></span>
+        <a style="float:right; margin-right:.5em" ng-click="mapping.noticeToggles[type]=!mapping.noticeToggles[type]">
+          <img ng-src="{{arrowPath[mapping.noticeToggles[type]?'down':'up']}}" class="icon">
+        </a>
+      </div>
+      <!-- notice -->
+      <div ng-show="mapping.noticeToggles[type]">
+        <!-- 基金顯示 -->
+        <div class="content-wrapper no-border no-padding" ng-if="type==='FUND'">
+          	提醒您投資人透過本行辦理『特定金錢信託投資國內外基金』業務應注意事項：
+        </div>
+        <div class="content-wrapper no-border no-padding" ng-repeat="notice in mapping.noticeList[type]">
+          <div class="notice-mark">* </div>
+          <div ng-bind="notice.WARNING" class="notice"
+               ng-style="{'color': notice.COLOR}"
+               ng-class="{'font-italic': notice.FONT==='3','font-bold':notice.FONT==='2'}"></div>
+        </div>
+
+        <!-- 投資型保險顯示 -->
+        <div class="content-wrapper no-border no-padding" ng-if="type==='INSI'">
+          	風險揭露：
+        </div>
+        <div class="content-wrapper no-border no-padding" ng-repeat="notice in mapping.noticeList[type+'1']">
+          <div class="notice-mark">* </div>
+          <div ng-bind="notice.WARNING" class="notice"
+               ng-style="{'color': notice.COLOR}"
+               ng-class="{'font-italic': notice.FONT==='3','font-bold':notice.FONT==='2'}"></div>
+        </div>
+        <div class="content-wrapper no-border no-padding" ng-if="type==='INSI'">
+          	注意事項：
+        </div>
+        <div class="content-wrapper no-border no-padding" ng-repeat="notice in mapping.noticeList[type+'2']">
+          <div class="notice-mark">* </div>
+          <div ng-bind="notice.WARNING" class="notice"
+               ng-style="{'color': notice.COLOR}"
+               ng-class="{'font-italic': notice.FONT==='3','font-bold':notice.FONT==='2'}"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

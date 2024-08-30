@@ -1,0 +1,55 @@
+<style>
+/* open dialog */
+.ngdialog.CRM230_COMPANY {
+	
+}
+/* dialog panl */
+.modal-dialog.CRM230_COMPANY {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 500px;
+	height: auto;
+}
+
+</style>
+
+
+
+<div ng-controller="CRM230_COMPANYController" ng-cloak>
+	<div class="modal-dialog CRM230_COMPANY">
+		<div class="modal-content">
+			
+			<!-- =====TITLE===== !-->
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">　　　薪轉公司查詢</h4>
+			</div>
+			<!-- =====TABLE===== !-->
+			<div class="modal-body search_table" style="text-align: center;">
+				關鍵字　:　<input type="text" size="35" id="keyWord" name="keyWord" ng-model="inputVO.keyWord" />
+			   	<div ng-show="inputVO.keyWord == ''" style="color:red">請輸入關鍵字，以減少搜尋結果的數目</div>
+			   	<hr/>
+			   	<div>
+			   		<button type="button" class="btn btn-info" ng-click="query()" ng-disabled="inputVO.keyWord == ''">查詢</button>
+			   		<button type="button" class="btn btn-info" ng-click="closeThisDialog()" >取消</button>
+			   	</div>
+			   	<hr/>
+			   	<e-jumping output="outputVO" input="inputVO" query="query()" list="com_list" e-connect="XXX"></e-jumping>
+				<div class="gv_tab_sc scroll_y" style="height:220px;white-space: nowrap;">
+				   	<table>	
+				   		<tr>
+				   			<th>薪轉公司名稱</th>
+				   		</tr>
+				   		<tr class="repeat-row" ng-repeat="row in com_list track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+				   			<td><a href="" ng-click="get(row.SAL_COMPANY)">{{row.SAL_COMPANY}}</a></td>
+				   		</tr>
+			   		</table>	
+		   		</div>
+		   	</div>
+		   	<!-- =====TABLE===== !-->	
+		</div>
+	</div>
+</div>

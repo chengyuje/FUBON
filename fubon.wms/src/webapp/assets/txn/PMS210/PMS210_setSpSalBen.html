@@ -1,0 +1,76 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS210_setSpSalBen {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 70%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_setSpSalBen.js"></script>
+<script type="text/javascript" src="assets/txn/PMS210/PMS210_UPLOAD.js"></script>
+<div ng-controller="PMS210_setSpSalBenController" ng-cloak>
+	<div class="modal-dialog PMS210_setSpSalBen">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+ 				<!-- <div class="tfb_content_icon"></div>
+ 				<div class="tfb_content_tit" style="font-size:large">
+ 					<img src="assets/images/icon/tfb_icon_a15.gif">請上傳本月本薪倍數/下載本薪*本薪倍數
+ 				</div> -->
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">本月掛GOAL專員本薪*本薪倍數</h4>
+
+			</div>
+			<div class="search_box_btn text-center">
+				<!-- <button type="button" class="btn btn-primary" ng-click="upload(inputVO.yearMon)">上傳本薪倍數</button> -->
+				<button type="button" class="btn btn-primary" ng-click="getData(1)">產生理專折數</button>&nbsp;&nbsp;&nbsp;
+				<button type="button" class="btn btn-primary" ng-click="getData(2)">取得計算後收益目標</button>&nbsp;&nbsp;&nbsp;
+				<button type="button" class="btn btn-primary" ng-click="exportData()">下載數據</button>
+			</div>
+
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<e-jumping output="outputVO" input="inputVO" query="select()"
+					list="spSalBenList"></e-jumping>
+				<div  class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						<table class="table-bordered">
+							<tr>
+								<th>資料年月</th>
+								<th>員工編號</th>
+								<th>員工姓名</th>
+								<th>理專職級</th>
+								<th>本薪倍數</th>
+								<th>專員目標折數</th>
+								<th>專員休假折數</th>
+								<th>專員新任折數</th>
+								<th>收益目標總折數</th>
+								<th>收益目標</th>
+							</tr>
+							<tr ng-repeat="row in spSalBenList">
+								<td style="text-align:center; color:blue">{{row.SNAP_YYYYMM}}</td>
+								<td style="text-align:center; color:blue">{{row.EMP_NO}}</td>
+								<td style="text-align:center; color:blue">{{row.EMP_NAME}}</td>
+								<td style="text-align:center; color:blue">{{row.AO_JOB_RANK}}</td>
+								<td style="text-align:center; color:blue">{{row.SAL_MULTIPLE}}</td>
+								<td style="text-align:center; color:blue">{{row.GOAL_DIS_RT}}</td>
+								<td style="text-align:center; color:blue">{{row.GOAL_REST_RT}}</td>
+								<td style="text-align:center; color:blue">{{row.GOAL_NEW_RT}}</td>
+								<td style="text-align:center; color:blue">{{row.GOAL_DIS_RT_FINAL}}</td>
+								<td style="text-align:center; color:blue">{{row.PROFIT_TGT}}</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div>
+</div>

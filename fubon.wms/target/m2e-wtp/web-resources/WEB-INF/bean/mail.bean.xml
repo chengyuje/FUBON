@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--<bean id="mailSession" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="mail/test"/>
+    </bean>-->
+
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <!--<property name="session" ref="mailSession"/>-->
+        
+        <!--富邦測試環境-->
+        <property name="host" value="10.204.241.226"/>
+        <property name="port" value="25"/>
+        <property name="username" value="wmsr_bank@fbt.com"/>
+        <property name="password" value="Aa87522899"/>              
+        
+        <property name="protocol" value="smtp"/>
+        
+        <property name="javaMailProperties">
+            <value>
+                mail.debug=true
+                mail.smtp.host=10.204.241.226
+				mail.smtp.port=25
+            </value>
+        </property>
+    </bean>
+
+    <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+        <property name="velocityProperties">
+        	<props>
+            	<prop key="resource.loader">file</prop>
+        		<prop key="file.resource.loader.class">org.apache.velocity.runtime.resource.loader.FileResourceLoader</prop>
+        		<prop key="file.resource.loader.path">#{dataManager.root}/Mail</prop>
+        	</props>
+        </property>
+    </bean>
+
+    <bean id="mailServiceFactory" class="com.systex.jbranch.platform.common.mail.MailServiceFactory">
+        <property name="services">
+            <map>
+                <entry key="sample" value-ref="sampleMailServiceFactory"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="sampleMailContent" parent="velocityMailContent"
+		  p:template="sample.vm" scope="prototype">
+	</bean>
+
+    <bean abstract="true" id="mailService" class="com.systex.jbranch.platform.common.mail.MailService"/>
+
+    <!-- sample mail service-->
+    <bean id="sampleMailServiceFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean"
+          p:singleton="false"
+          p:targetBeanName="sampleMailService"/>
+    <bean id="sampleMailService" parent="mailService" scope="prototype">
+        <property name="mailContent">
+            <bean parent="velocityMailContent"
+                  p:template="sample.vm"
+                  p:subject="中文測試"
+                  scope="prototype">
+                <!--<property name="headers">-->
+                    <!--<value>-->
+                        <!--X-Mailer=AAA-->
+                    <!--</value>-->
+                <!--</property>-->
+            </bean>
+        </property>
+        <property name="mailSender">
+            <bean parent="smtpMailSender" scope="prototype">
+                <property name="to">
+                    <!--<list>-->
+                    <bean parent="recipient" p:name="to" p:mail="xxx@gmail.com"/>
+                    <!--</list>-->
+                </property>
+                <property name="cc">
+                    <!--<list>-->
+                    <bean parent="recipient" p:name="cc" p:mail="xxx@gmail.com"/>
+                    <!--</list>-->
+                </property>
+                <property name="bcc">
+                    <!--<list>-->
+                    <bean parent="recipient" p:name="bcc" p:mail="xxx@gmail.com"/>
+                    <!--</list>-->
+                </property>
+            </bean>
+        </property>
+    </bean>
+    
+    <!-- billhunter mail service-->
+    <!--<bean id="billHunterMailService" parent="mailService" scope="prototype">
+        <property name="mailContent">
+            <bean parent="billHunterMailContent"
+                  p:template="1">
+            </bean>
+        </property>
+        <property name="mailSender">
+            <bean parent="smtpMailSender">
+                <property name="to">
+                    <bean parent="recipient" p:name="to" p:mail="xxx@gmail.com"/>
+                </property>
+            </bean>
+        </property>
+    </bean>-->
+
+
+    <bean name="recipient" abstract="true" class="com.systex.jbranch.platform.common.mail.Recipient"/>
+
+    <!-- abstract services -->
+
+    <!-- smtp mail services -->
+    <bean id="smtpMailSender" class="com.systex.jbranch.platform.common.mail.sender.impl.SmtpMailSender"
+          p:mailSender-ref="mailSender"
+          p:encdoing="UTF-8">
+          <!-- abstract="true"> -->
+    </bean>
+
+    <bean id="velocityMailContent" class="com.systex.jbranch.platform.common.mail.content.impl.TemplateMailContent"
+          p:velocityEngine-ref="velocityEngine"
+          p:encoding="Big5"
+          p:priority-ref="firstPriority"
+          p:importance-ref="highImportance"/>
+
+
+    <!-- billhunter mail services -->
+    <!--<bean id="billHunterMailSender" class="com.systex.jbranch.platform.common.mail.sender.impl.BillHunterMailSender"
+          p:projectClass="1"
+          p:apiStub-ref="apiStub"
+          abstract="true"
+          scope="prototype"/>-->
+
+    <!--<bean id="billHunterMailContent" class="com.systex.jbranch.platform.common.mail.content.impl.BillHunterMailContent"
+          p:priority-ref="firstPriority"
+          abstract="true"
+          scope="prototype"/>-->
+
+    <!--<bean id="apiStub" class="com.systex.esoaf.service.mail.APIStub" scope="prototype">
+        <constructor-arg type="org.apache.axis2.context.ConfigurationContext">
+            <bean class="org.apache.axis2.context.ConfigurationContextFactory" factory-bean="configuration" factory-method="getConfigurationContext"/>
+        </constructor-arg>
+        <constructor-arg type="java.lang.String" value="http://192.168.29.230/billhunter_api/BillHunterService.asmx"/>
+    </bean>-->
+
+    <!--<bean id="configuration" class="com.systex.jbranch.platform.common.mail.sender.impl.Configuration" init-method="init" depends-on="systemEnv">
+        <constructor-arg index="0">
+            <null/>
+        </constructor-arg>
+        <constructor-arg index="1" value="#{dataManager.root}/Config/axis2.xml"/>
+        <property name="headers">
+            <util:map>
+                <entry key-ref="httpHeaderCacheControl" value-ref="httpHeaderValueNoCache"/>
+                <entry key-ref="httpHeaderPragma" value-ref="httpHeaderValueNoCache"/>
+            </util:map>
+        </property>
+    </bean>-->
+    <!--<util:constant id="httpHeaderCacheControl" static-field="org.apache.axis2.transport.http.HTTPConstants.HEADER_CACHE_CONTROL"/>
+    <util:constant id="httpHeaderPragma" static-field="org.apache.axis2.transport.http.HTTPConstants.HEADER_PRAGMA"/>
+    <util:constant id="httpHeaderValueNoCache" static-field="org.apache.axis2.transport.http.HTTPConstants.HEADER_CACHE_CONTROL_NOCACHE"/>-->
+
+
+    <!-- priority -->
+    <bean id="firstPriority" class="com.systex.jbranch.platform.common.mail.MailContent$Priority" factory-method="valueOf">
+        <constructor-arg value="PRIORITY_1"/>
+    </bean>
+    <bean id="secondPriority" class="com.systex.jbranch.platform.common.mail.MailContent$Priority" factory-method="valueOf">
+        <constructor-arg value="PRIORITY_2"/>
+    </bean>
+    <bean id="thirdPriority" class="com.systex.jbranch.platform.common.mail.MailContent$Priority" factory-method="valueOf">
+        <constructor-arg value="PRIORITY_3"/>
+    </bean>
+    <bean id="fourthPriority" class="com.systex.jbranch.platform.common.mail.MailContent$Priority" factory-method="valueOf">
+        <constructor-arg value="PRIORITY_4"/>
+    </bean>
+    <bean id="fifthPriority" class="com.systex.jbranch.platform.common.mail.MailContent$Priority" factory-method="valueOf">
+        <constructor-arg value="PRIORITY_5"/>
+    </bean>
+
+    <!-- importance -->
+    <bean id="highImportance" class="com.systex.jbranch.platform.common.mail.MailContent$Importance" factory-method="valueOf">
+        <constructor-arg value="HIGH"/>
+    </bean>
+
+    <bean id="lowImportance" class="com.systex.jbranch.platform.common.mail.MailContent$Importance" factory-method="valueOf">
+        <constructor-arg value="LOW"/>
+    </bean>
+
+
+</beans>

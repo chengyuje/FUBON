@@ -1,0 +1,82 @@
+<style>
+/* open dialog */
+.ngdialog.MAO151 {
+	
+}
+/* dialog panl */
+.modal-dialog.MAO151 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.MAO151 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.MAO151 table.little{
+	width: 61%;
+}
+/* change row */
+.MAO151.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_MAO151_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/MAO151/MAO151.js"></script>
+<script type="text/javascript" src="assets/txn/CUS110/CUS110.js"></script>
+<div class="MAO151" ng-controller="MAO151Controller" ng-cloak>
+	<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >申請查詢</div>
+	</div>
+	<div class="panel_content">
+		<e-jumping output="outputVO" input="inputVO" query="inquire()" list="resultList"></e-jumping>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table>
+				<thead>
+					<tr>
+						<!-- th>簽核序號</th> -->
+						<th>覆核類別</th>
+						<th>表單名稱</th>
+						<th>申請人</th>
+						<th>申請時間</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in resultList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<!-- td align = "center">{{row.REVIEW_SEQ}}</td> -->
+							<td align = "center">{{row.REVIEW_CATEGORY}}</td>
+							<td><a onclick="return false" ng-click="detail(row)">{{row.REMIND_MSG}}</a></td>
+							<td align = "center">{{row.APPLIER}}_{{row.APPLIER_NAME}}</td>
+							<td align = "center">{{row.APPLIED_TIME}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+</div>

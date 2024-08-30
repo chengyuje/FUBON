@@ -1,0 +1,107 @@
+<style>
+/* open dialog */
+.ngdialog.MAO141_add {
+	
+}
+/* dialog panl */
+.modal-dialog.MAO141_add {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 400px;
+	height: auto;
+}
+
+</style>
+
+<div ng-controller="MAO141_addController" ng-cloak>
+	<div class="modal-dialog MAO141_add">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">新增行動載具</h4>
+			</div>
+			<div class="modal-body search_table">
+			<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table >
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="regionCenterId" name="regionCenterId"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.regionCenterId"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										required
+										ng-change="ChangeRegion(region)"
+										style="line-height:20px;" />
+					   	</td>
+					</tr>
+					<tr>
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="bra_areaID" name="bra_areaID"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.bra_areaID"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										required
+										ng-change="ChangeArea(region)"
+										style="line-height:20px;" />
+					   	</td>
+					</tr>
+					<tr>
+						<th>分行：</th>
+						<td>
+							<e-combobox id="branchNbr" name="branchNbr"
+										ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branchNbr"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1" 
+										ng-editable="false"
+										ng-format="F1"
+										required
+										ng-change="ChangeBranch(region)"
+										style="line-height:20px;" />
+				   		</td>
+					</tr>
+					<tr>
+						<th>設備編號</th>
+						<td>
+							<input type="text" class="form-control" id="dev_nbr" name="dev_nbr" ng-model="inputVO.dev_nbr" e-length-limit="30" required>
+						</td>
+					</tr>
+					<tr>
+						<th>使用地點 : </th>
+						<td>
+							<e-combobox id="dev_site_type"
+										ng-datasource="mappingSet['MAO.DEV_SITE_TYPE']" 
+										ng-model="inputVO.dev_site_type"
+			   							ng-validate="false" 
+			   							ng-readonly="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							required
+			   							style="line-height:20px;" />
+						</td>
+					</tr>
+				</table>
+				</form>
+			</div>
+
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="add()" ng-disabled="parameterTypeEditForm.$invalid">新增設備</button>
+				<button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">取消</button>
+			</div>
+		</div>
+	</div>
+</div>

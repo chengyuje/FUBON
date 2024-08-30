@@ -1,0 +1,38 @@
+<div ng-controller="ORG260_RESULTController" ng-cloak>
+	<div class="modal-dialog ORG260">  
+		<div class="modal-content">	
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeDialog();">&times;</button>
+				<h4 id="" class="modal-title" align="center">上傳結果</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc slim-scroll" data-height="460">
+					<table class="tablesaw table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>員編</th>
+								<th>客戶ID</th>
+								<th>類別</th>
+								<th>結果</th>
+								<th>失敗原因</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in resultList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td class='text-center'>{{$index + 1}}</td>
+								<td class='text-center'>{{row.NEW_UEMP_ID}}</td>
+								<td class='text-center'>{{row.CUST_ID}}</td>
+								<td class='text-center'>
+									<font color="red" ng-if="row.IMP_TYPE == 'ERR'">{{row.IMP_TYPE | mapping:impType:F3}}</font>
+									<font ng-if="row.IMP_TYPE != 'ERR'">{{row.IMP_TYPE | mapping:impType:F3}}</font></td>
+								<td class='text-center'>{{row.IMP_STATUS | mapping:impStatus:F3}}</td>
+								<td class='text-center'>{{row.IMP_STS_RES | mapping:impStsRes:F3}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

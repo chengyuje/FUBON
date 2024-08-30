@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.systex.jbranch.platform.common.platformdao.table">
+    <class table="TBSYSDMBRANCH" name="com.systex.jbranch.platform.common.platformdao.table.TbsysdmbranchVO" optimistic-lock="version">
+        <id name="brchID" column="BRCHID" type="string"/>
+        <version column="VERSION" generated="never" name="version" type="long"/>
+        <property name="name" column="NAME" type="string"/>
+        <property name="opDate" column="OPDATE" type="string"/>
+        <property name="txnFlag" column="TXNFLAG" type="string"/>
+        <set name="workstations" inverse="true">
+            <key column="BRCHID"/>
+            <one-to-many class="TbsysdmworkstationVO"/>
+        </set>
+        <map name="platformVars"
+             table="TBSYSDMBRANCHPLATFORMVARS" cascade="delete">
+            <key column="BRCHID"/>
+            <map-key column="VAR_ID" type="string"/>
+            <element column="VAR_VALUE" type="serializable"/>
+        </map>
+        <map name="bizlogicVars"
+             table="TBSYSDMBRANCHBIZLOGICVARS" cascade="delete">
+            <key column="BRCHID"/>
+            <map-key column="VAR_ID" type="string"/>
+            <element column="VAR_VALUE" type="serializable"/>
+        </map>
+    </class>
+</hibernate-mapping>

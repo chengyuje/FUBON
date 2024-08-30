@@ -1,0 +1,80 @@
+<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+<div class="gv_tab_sc scroll_y" style="height:235px;white-space: nowrap;">
+	<table>
+		<thead>
+			<tr>
+				<th>
+					<label>
+						<input type='checkbox' ng-model='obj.clickAll' ng-change='checkrow()' /> 全選
+					</label>
+				</th>
+				<th>自建待辦</th>
+				<th>名單與代辦工作</th>
+				<th>客戶ID</th>
+				<th>客戶姓名</th>
+				<th>信託產品名稱</th>
+				<th>投資幣別</th>
+				<th>原始投資本金</th>
+				<th>計價幣別</th>
+				<th>總累積單位數</th>
+				<th>原幣參考現值</th>
+				<th>台幣參考現值</th>
+				<th>原幣損益金額</th>
+				<th>台幣損益金額</th>
+				<th>參考匯率</th>
+				<th>報酬率(%)</th>
+				<th>客戶停利點(%)</th>
+				<th>客戶停損點(%)</th>
+				<th>銷售人員</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+				<td>
+					<label>
+						<input type='checkbox' ng-model='row.SELECTED' >勾選
+					</label>
+				</td>
+				<td align = "center"><a class="btn btn-info btn-circle" ng-click = "crm121(row)"><i class="glyphicon glyphicon-zoom-in"></i></a></td>
+				<td align = "center"><a class="btn btn-info btn-circle" ng-click = "cam200(row)"><i class="glyphicon glyphicon-zoom-in"></i></a></td>
+				<td><a onclick="return false" ng-click="goCRM610(row)" >{{row.CUST_ID}}</a></td>  <!--客戶ID -->
+				<td>{{row.CUST_NAME}}</td>  <!--客戶姓名 -->
+				<td>{{row.FUND_CNAME_A}}</td>  <!--信託產品名稱 -->
+				<td>{{row.INV_CRCY_TYPE | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>  <!--投資幣別 -->
+				<td>{{row.INV_AMT_ORGD}}</td>  <!--原始投資本金 -->
+				<td>{{row.VALU_CRCY_TYPE | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>  <!--計價幣別 -->
+				<td>{{row.TOTAL_ACUM_INV_UNIT}}</td>  <!--總累積單位數 -->
+				<td>{{row.REF_TOTAL_REAL_VALUE_ORGD}}</td>  <!--原幣參考現值 -->
+				<td>{{row.REF_TOTAL_REAL_VALUE_TWD}}</td>  <!--台幣參考現值 -->
+				<td>{{row.REF_TOTAL_PL_ORGD}}</td>  <!--原幣損益金額 -->
+				<td>{{row.REF_TOTAL_PL_TWD}}</td>  <!--台幣損益金額 -->
+				<td>{{row.REF_BUYIN_EXCH_RATE}}</td>  <!--參考匯率 -->
+				<td>{{row.REF_ABS_RET_RATE_TWD}}</td>  <!--報酬率 -->
+				<td>{{row.STOP_LOSS_PT}}</td>    <!--客戶停利點 -->
+				<td>{{row.TAKE_PRFT_PT}}</td>	<!--客戶停損點 -->
+				<td>{{row.AO_CODE | mapping:mappingSet['AO_CODE']:'F3'}}</td>	<!--銷售人員 -->
+			</tr>
+		</tbody>
+	</table>
+	<table align="left" style="width:30%">
+		<thead>
+		<h4>幣別合計</h4>
+			<tr>
+				<th>幣別</th>
+				<th>原始投資本金</th>
+				<th>原幣投資現值</th>
+				<th>折台現值</th>
+				<th>原幣損益金額</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="repeat-row" ng-repeat="(key, data) in resultList | groupBy: 'INV_CRCY_TYPE'">
+				<td>{{key}}</td>
+				<td>{{getSum(data, 'INV_AMT_ORGD')}}</td>
+				<td>{{getSum(data, 'REF_TOTAL_REAL_VALUE_ORGD')}}</td>
+				<td>{{getSum(data, 'REF_TOTAL_REAL_VALUE_TWD')}}</td>
+				<td>{{getSum(data, 'REF_TOTAL_PL_ORGD')}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

@@ -1,0 +1,61 @@
+<div print-wrapper>
+<div class="block container no-border"
+     style="border-color:#93c5e1;"
+     ng-repeat="type in mapping.noticeTypeAlls"
+     ng-if="mapping.noticeFlagAlls[type]">
+     
+  <div class="title subtitle"
+       print-once-ignore="1" print-cell>
+    <span ng-bind="mapping.fullProdType[type]"></span>
+  </div>
+  <!-- notice -->
+  <div class="tiny-font">
+    <!-- 基金顯示 -->
+    <div class="content-wrapper no-border no-padding"
+         ng-if="type==='FUND' || type==='MFD'"
+         print-cell>
+      提醒您投資人透過本行辦理『特定金錢信託投資國內外基金』業務應注意事項：
+    </div>
+    <div class="content-wrapper no-border no-padding"
+         ng-repeat="notice in mapping.noticeList[type]"
+         print-cell>
+      <div class="notice-mark">* </div>
+      <div ng-bind="notice.WARNING"
+           class="notice"
+           ng-style="{'color': notice.COLOR}"
+           ng-class="{'font-italic': notice.FONT==='3','font-bold':notice.FONT==='2'}"></div>
+    </div>
+
+    <!-- 投資型保險顯示 -->
+    <div class="content-wrapper no-border no-padding"
+         ng-if="type==='INSI'"
+         print-cell>
+      風險揭露：
+    </div>
+    <div class="content-wrapper no-border no-padding"
+         ng-repeat="notice in mapping.noticeList[type+'1']"
+         print-cell>
+      <div class="notice-mark">* </div>
+      <div ng-bind="notice.WARNING"
+           class="notice"
+           ng-style="{'color': notice.COLOR}"
+           ng-class="{'font-italic': notice.FONT==='3','font-bold':notice.FONT==='2'}"></div>
+    </div>
+
+    <div class="content-wrapper no-border no-padding"
+         ng-if="type==='INSI'"
+         print-cell>
+      注意事項：
+    </div>
+    <div class="content-wrapper no-border no-padding"
+         ng-repeat="notice in mapping.noticeList[type+'2']"
+         print-cell>
+      <div class="notice-mark">* </div>
+      <div ng-bind="notice.WARNING"
+           class="notice"
+           ng-style="{'color': notice.COLOR}"
+           ng-class="{'font-italic': notice.FONT==='3','font-bold':notice.FONT==='2'}"></div>
+    </div>
+  </div>
+</div>
+</div>

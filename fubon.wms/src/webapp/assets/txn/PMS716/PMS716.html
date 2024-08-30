@@ -1,0 +1,171 @@
+<style>
+/* open dialog */
+.ngdialog.PMS716 {
+	
+}
+/* dialog panl */
+#ejp>tbody {
+	width: 100% !important;
+}
+
+.modal-dialog.PMS716 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS716 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS716 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS716.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS716_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+.table-bordered tr {
+	width:50%;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.table-span2 {
+	background: #87CEFA;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS716/PMS716.js"></script>
+<script type="text/javascript" src="assets/txn/PMS716/PMS716_minEmp.js"></script>
+<script type="text/javascript" src="assets/txn/PMS716/PMS716_minBran.js"></script>
+<script type="text/javascript" src="assets/txn/PMS716/PMS716_dcEmp.js"></script>
+<script type="text/javascript" src="assets/txn/PMS716/PMS716_dcBran.js"></script>
+<script type="text/javascript" src="assets/txn/PMS716/PMS716_rests.js"></script>
+<script type="text/javascript" src="assets/txn/PMS716/PMS716_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PMS716/PMS716_insureDetail.js"></script>
+<script type="text/javascript" src="assets/txn/PMS716/PMS716_insureYe.js"></script>
+<div class="PMS716" ng-controller="PMS716Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">資料查詢
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<table style="width:50%;margin-left: 0;">
+					<tr>
+						<th style="text-align:right; width:15%"><span style="color: red;">*</span>資料月份</th>
+						<td style="text-align:center; width:15%">
+							<e-combobox ng-datasource="mappingSet['timeE']"
+								ng-model="inputVO.sTime" ng-validate="false" ng-readonly="false"
+								ng-editable="false" ng-format="F3" ng-required="true"
+								width="100px" height="30px" style="line-height:20px;" />
+						</td>
+						<td style="text-align:left; width:60%;padding-left: 25px;">
+							<button type="button" class="btn btn-info" ng-click="query()">查詢</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- 結果區 -->
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="gv_tab_sc scroll_y"	style="white-space: nowrap;">
+				<table class="table-bordered" style="width:800px;margin-left:10px" ng-show = "ifShow">
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">中小企業實績明細-專員</th>
+						<td style="text-align:center;width:400px;"><button class="btn btn-info" ng-click="setMinEmp(inputVO.sTime)">{{minorEntEmp}}</button></td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC; color:white;text-align:left">中小企業實績明細-分行</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setMinBran(inputVO.sTime)">{{minorEntBranch}}</button></td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">信用卡實績明細-專員</th>
+						<td style="text-align:center;"><button class="btn btn-info" ng-click="setDcEmp(inputVO.sTime)">{{dcEmp}}</button></td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC; color:white;text-align:left">信用卡實績明細-分行</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setDcBran(inputVO.sTime)">{{dcBranch}}</button></td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC; color:white;text-align:left">其他加扣分</th>
+						<td style="text-align:center"><button class="btn btn-info" ng-click="setRests(inputVO.sTime)">{{rests}}</button></td>
+					</tr>
+				</table>
+				<br>
+				<table class="table-bordered" style="width:800px;margin-left:10px">
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">保險產品明細表</th>
+						<td style="text-align:center;width:400px;"><button class="btn btn-info" ng-click="setInsureDetail()">
+						<span ng-if = "len1 == false">暫無資料</span>
+						<span ng-if = "len1 == true">{{flag1}}</span>
+						</button></td>
+					</tr>
+					<tr>
+						<th style="background-color:#3399CC;color:white; text-align:left">保險產品業況表</th>
+						<td style="text-align:center;width:400px;"><button class="btn btn-info" ng-click="setInsureYe()">
+						<span ng-if="len2 == false">暫無資料</span>
+						<span ng-if="len2 == true">{{flag2}}</span>
+						</button></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,278 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+    <bean id="configAdapter" class="com.systex.jbranch.platform.common.report.reportdata.DatamanagerConfigAdapter"
+          p:reportTemp="/temp/reports/"
+          p:transactionpath="/Transaction"
+          p:encryptReport="/Platform/Report/ReportFile/"
+          p:reportEngine="/Platform/Report/ReportEngine"
+          p:serverHome="#{dataManager.realPath}"
+          p:transaction="#{Path['OutputReport']}"
+          p:platformTemp="/Platform/temp/" 
+          p:root="#{dataManager.root}"/>
+          
+	<bean id="reportDispacther" class="com.systex.jbranch.platform.common.report.dispacther.DispactherFactory">
+       <property name="dispacthers">
+           <map>
+               <entry key-ref="key-localDispacther" value-ref="localDispacther"/>
+               <entry key-ref="key-reportServerDispacther" value-ref="reportServerDispacther"/>
+           </map>
+       </property>
+       <property name="defaultDispacther" ref="key-localDispacther"/>
+	</bean>
+	
+	<bean id="localDispacther" class="com.systex.jbranch.platform.common.report.dispacther.LocalDispacther"/>
+	<bean id="reportServerDispacther" class="com.systex.jbranch.platform.common.report.dispacther.ReportServerDispacther"/>
+
+    <bean id="reportEngineFactory" class="com.systex.jbranch.platform.common.report.factory.ReportEngineFactory">
+        <property name="engines">
+            <map>
+                <entry key-ref="reportEngineJasper" value-ref="jasperReportEngine"/>
+                <entry key-ref="reportEngineBirt" value-ref="birtReportEngine"/>
+                <entry key-ref="reportEngineMsword" value-ref="msOfficeReportEngine"/>
+                <entry key-ref="reportEngineLineMode" value-ref="lineModeReportEngine"/>
+            </map>
+        </property>
+        <property name="defaultEngine" ref="reportEngineBirt"/>
+    </bean>
+
+    <bean id="jasperReportEngine" class="com.systex.jbranch.platform.common.report.factory.ReportEngine">
+        <property name="generators">
+            <map>
+                <entry key-ref="reportFormatPdf" value-ref="jasperReportPdfGeneratorFactory"/>
+                <entry key-ref="reportFormatCsv" value-ref="jasperReportCsvGeneratorFactory"/>
+            </map>
+        </property>
+        <property name="defaultFormat" ref="reportFormatPdf"/>
+    </bean>
+
+    <bean id="birtReportEngine" class="com.systex.jbranch.platform.common.report.factory.ReportEngine">
+        <property name="generators">
+            <map>
+                <entry key-ref="reportFormatPdf" value-ref="birtReportPdfGeneratorFactory"/>
+                <entry key-ref="reportFormatCsv" value-ref="birtReportCsvGeneratorFactory"/>
+            </map>
+        </property>
+        <property name="defaultFormat" ref="reportFormatPdf"/>
+    </bean>
+    
+    <bean id="msOfficeReportEngine" class="com.systex.jbranch.platform.common.report.factory.ReportEngine">
+        <property name="generators">
+            <map>
+                <entry key-ref="reportFormatMswordWml" value-ref="mswordWmlReportGeneratorFactory"/>
+                <!--<entry key-ref="reportFormatMswordDocx" value-ref="mswordDocxReportGeneratorFactory"/>-->
+            </map>
+        </property>
+        <property name="defaultFormat" ref="reportFormatMswordWml"/>
+    </bean>
+    
+    <bean id="lineModeReportEngine" class="com.systex.jbranch.platform.common.report.factory.ReportEngine">
+        <property name="generators">
+            <map>
+                <entry key-ref="reportFormatLineMode" value-ref="lineModeReportGeneratorFactory"/>
+            </map>
+        </property>
+        <property name="defaultFormat" ref="reportFormatLineMode"/>
+    </bean>
+
+	<!-- report dispacther enum -->
+    <bean id="key-localDispacther" class="com.systex.jbranch.platform.common.report.dispacther.DispactherType"
+          factory-method="valueOf">
+        <constructor-arg value="LOCAL"/>
+    </bean>
+    <bean id="key-reportServerDispacther" class="com.systex.jbranch.platform.common.report.dispacther.DispactherType"
+          factory-method="valueOf">
+        <constructor-arg value="REPORT_SERVER"/>
+    </bean>
+
+    <!-- report engine enum -->
+    <bean id="reportEngineBirt" class="com.systex.jbranch.platform.common.report.factory.ReportEngineType"
+          factory-method="valueOf">
+        <constructor-arg value="BIRT"/>
+    </bean>
+    <bean id="reportEngineJasper" class="com.systex.jbranch.platform.common.report.factory.ReportEngineType"
+          factory-method="valueOf">
+        <constructor-arg value="JASPER"/>
+    </bean>
+    <bean id="reportEngineMsword" class="com.systex.jbranch.platform.common.report.factory.ReportEngineType"
+          factory-method="valueOf">
+        <constructor-arg value="MSWORD"/>
+    </bean>
+    <bean id="reportEngineLineMode" class="com.systex.jbranch.platform.common.report.factory.ReportEngineType"
+          factory-method="valueOf">
+        <constructor-arg value="LINE_MODE"/>
+    </bean>
+    
+    <!-- report format enum -->
+    <bean id="reportFormatPdf" class="com.systex.jbranch.platform.common.report.factory.ReportFormat"
+          factory-method="valueOf">
+        <constructor-arg value="PDF"/>
+    </bean>
+    <bean id="reportFormatCsv" class="com.systex.jbranch.platform.common.report.factory.ReportFormat"
+          factory-method="valueOf">
+        <constructor-arg value="CSV"/>
+    </bean>
+    <bean id="reportFormatMswordWml" class="com.systex.jbranch.platform.common.report.factory.ReportFormat"
+          factory-method="valueOf">
+        <constructor-arg value="MSWORD_WML"/>
+    </bean>
+    <bean id="reportFormatMswordDocx" class="com.systex.jbranch.platform.common.report.factory.ReportFormat"
+          factory-method="valueOf">
+        <constructor-arg value="MSWORD_DOCX"/>
+    </bean>
+		<bean id="reportFormatLineMode" class="com.systex.jbranch.platform.common.report.factory.ReportFormat"
+          factory-method="valueOf">
+        <constructor-arg value="LINE_MODE"/>
+    </bean>
+
+    <!-- ########################## JasperReport ########################## -->
+    <!-- report generator factory -->
+    <bean id="jasperReportPdfGeneratorFactory"
+          class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+        <property name="targetBeanName">
+            <idref bean="jasperReportPdfGenerator"/>
+        </property>
+    </bean>
+    <bean id="jasperReportCsvGeneratorFactory"
+          class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+        <property name="targetBeanName">
+            <idref bean="jasperReportCsvGenerator"/>
+        </property>
+    </bean>
+
+    <bean id="jasperReportGenerator" abstract="true"
+          class="com.systex.jbranch.platform.common.report.generator.jasperreport.JasperReportGenerator"
+          p:config-ref="configAdapter"
+          p:dataManager-ref="dataManager"
+          p:defaultReportId=""
+          init-method="init"
+          scope="prototype">
+        <property name="charSetMap">
+            <util:map>
+                <entry key="zh_TW" value="Big5"/>
+                <entry key="zh_CN" value="GBK"/>
+                <entry key="en_US" value="ISO8859-1"/>
+            </util:map>
+        </property>
+    </bean>
+
+    <!-- report genenrator -->
+    <bean id="jasperReportPdfGenerator" parent="jasperReportGenerator" p:format-ref="reportFormatPdf" scope="prototype">
+        <property name="exporter">
+            <bean class="net.sf.jasperreports.engine.export.JRPdfExporter"/>
+        </property>
+    </bean>
+    <bean id="jasperReportCsvGenerator" parent="jasperReportGenerator" p:format-ref="reportFormatCsv" scope="prototype">
+        <property name="exporter">
+            <bean class="net.sf.jasperreports.engine.export.JRCsvExporter"/>
+        </property>
+    </bean>
+
+    <!-- ########################## BirtReport ########################## -->
+    <bean id="birtReportService" class="com.systex.jbranch.platform.common.report.engine.BirtReportService"
+          init-method="initial"
+          p:path-ref="configAdapter" p:systemRoot="#{dataManager.root}"/>
+
+    <bean id="birtReportPdfGeneratorFactory"
+          class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+        <property name="targetBeanName">
+            <idref bean="birtReportPdfGenerator"/>
+        </property>
+    </bean>
+
+    <bean id="birtReportCsvGeneratorFactory"
+          class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+        <property name="targetBeanName">
+            <idref bean="birtReportCsvGenerator"/>
+        </property>
+    </bean>
+
+    <bean id="baseReportGenerator" abstract="true"
+          class="com.systex.jbranch.platform.common.report.generator.AbstractReportGenerator"
+          p:engine="#{birtReportService.engine}"
+          p:config-ref="configAdapter"
+          p:defaultReportId="R1"
+          init-method="init"
+          p:dataManager-ref="dataManager"/>
+
+    <bean id="birtReportGenerator" abstract="true"
+          class="com.systex.jbranch.platform.common.report.generator.birt.BirtReportGenerator"
+          p:engine="#{birtReportService.engine}"
+          p:config-ref="configAdapter"
+          p:defaultReportId="R1"
+          init-method="init"
+          p:dataManager-ref="dataManager"/>
+
+    <bean id="birtReportPdfGenerator" parent="birtReportGenerator" p:format-ref="reportFormatPdf" scope="prototype">
+        <property name="renderOption">
+            <bean class="org.eclipse.birt.report.engine.api.RenderOption"/>
+        </property>
+    </bean>
+
+    <bean id="birtReportCsvGenerator" parent="birtReportGenerator" p:format-ref="reportFormatCsv" scope="prototype">
+        <property name="renderOption">
+            <bean class="org.eclipse.birt.report.engine.emitter.csv.CSVRenderOption"/>
+        </property>
+    </bean>
+
+    <!-- ########################## MSWord ########################## -->
+
+
+    <bean id="mswordWmlReportGeneratorFactory"
+          class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+        <property name="targetBeanName">
+            <idref bean="mswordWmlReportGenerator"/>
+        </property>
+    </bean>
+
+    <bean id="mswordWmlBaseReportGenerator" abstract="true"
+          class="com.systex.jbranch.platform.common.report.generator.msoffice.MsWordWmlReportGenerator"
+          p:config-ref="configAdapter"
+          p:defaultReportId="R1"
+          init-method="init"
+          p:dataManager-ref="dataManager"/>
+
+    <bean id="mswordWmlReportGenerator" parent="mswordWmlBaseReportGenerator" p:format-ref="reportFormatMswordWml" scope="prototype"/>
+
+    <bean id="lineModeReportGeneratorFactory"
+          class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+        <property name="targetBeanName">
+            <idref bean="lineModeReportGenerator"/>
+        </property>
+    </bean>
+
+	<bean id="store" class="com.systex.jbranch.platform.common.report.generator.linemode.LineModeReportDetailStore" 
+	scope="prototype"
+	p:dataAccessManager-ref="dataAccessManager"
+	/>
+	<bean id="lineModeReportGenerator" parent="baseReportGenerator" class="com.systex.jbranch.platform.common.report.generator.linemode.LineModeReportGenerator"
+			scope="prototype"
+ 			p:store-ref="store"
+ 			p:format-ref="reportFormatLineMode"
+ 			p:axisXSalt="0.2"
+ 			p:axisYSalt="0.0571689915389893"
+ 			p:deviceId="D"
+ 			p:printPrompt="請放入紙張"
+ 			p:paperSize="A4"
+ 			p:cpi="12"
+ 			p:lpi="6"
+ 			p:formfeed="1"
+ 			>
+         <property name="renderOption">
+            <bean class="org.eclipse.birt.report.engine.api.RenderOption"/>
+        </property>
+    </bean>
+
+
+		<!-- ######################## csv ################################ -->
+
+    <bean id="csvUtil" class="com.systex.jbranch.platform.common.util.CSVUtil"
+          p:reportTemp="#{configAdapter.reportTemp}"
+          p:serverPath="#{configAdapter.serverHome}"
+          scope="prototype"/>
+
+</beans>

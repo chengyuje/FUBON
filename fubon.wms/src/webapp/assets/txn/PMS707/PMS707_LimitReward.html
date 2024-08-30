@@ -1,0 +1,112 @@
+<style>
+/* dialog panl */
+.modal-dialog.PMS707 {
+	position: relative;
+	top: 100px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 85%;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+
+</style>
+<script type="text/javascript" src="assets/txn/PMS707/PMS707_LimitReward.js"></script>
+<div ng-controller="PMS707_LimitRewardController" ng-cloak>
+	<div class="modal-dialog PMS707">
+		<div class="modal-content">
+			<div class="tfb_content modal-header">
+<!-- 				<div class="tfb_content_icon"></div> -->
+<!-- 				<div class="tfb_content_tit"> -->
+<!-- 					<img src="assets/images/icon/tfb_icon_a15.gif">撥款額度定額獎金表維護 -->
+<!-- 				</div> -->
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">撥款額度定額獎金表維護</h4>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<div  class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<form>
+						<table class="table-bordered">
+							<tr>
+								<th>案件來源</th>
+								<th>消金商品1</th>
+								<th>消金商品2</th>
+								<th>撥款額度級距(起)<br>單位：百萬</th>
+								<th>撥款額度級距(迄)<br>單位：百萬</th>
+								<th>撥款對應獎金</th>
+								<th>未以標準利率承作獎金折扣</th>								
+								<th>操作</th>								
+							</tr>
+							<tr><td style="width:12.5%; text-align:center">
+									<e-combobox ng-datasource="mappingSet['PMS.LOAN_CASE_SOURCE']" ng-model="CASE_SOURCE" ng-validate="false" ng-readonly="false" 
+										ng-editable="false" ng-format="F3" ng-required="true" width="160px" height="30px" style="line-height:20px;"/>
+								</td>
+								<td style="width:12.5%; text-align:center">
+									<e-combobox ng-datasource="mappingSet['PMS.LOAN_PROD_TYPE_1']" ng-model="PROD_TYPE_1" ng-validate="false" ng-readonly="false" 
+										ng-editable="false" ng-format="F3" ng-required="true" width="160px" height="30px" style="line-height:20px;"/>
+								</td>
+								<td style="width:12.5%; text-align:center">
+									<e-combobox ng-datasource="mappingSet['PMS.LOAN_PROD_TYPE_2']" ng-model="PROD_TYPE_2" ng-validate="false" ng-readonly="false" 
+										ng-editable="false" ng-format="F3" ng-required="true" width="160px" height="30px" style="line-height:20px;"/>
+								</td>
+								<td style="width:12.5%; text-align:center">
+									<input type="text" style="width=100%; text-align:right" ng-model="BEGIN_MON" e-input-limit='ND' e-length-limit="19" ng-required="true"/>
+								</td>
+								<td style="width:12.5%; text-align:center">
+									<input type="text" style="width=100%; text-align:right" ng-model="END_MON" e-input-limit='ND' e-length-limit="19" ng-required="true"/>
+								</td>
+								<td style="width:12.5%; text-align:center">
+									<input type="text" style="width=100%; text-align:right" ng-model="BONUS" e-input-limit='ND' e-length-limit="19" ng-required="true"/>
+								</td>
+								<td style="width:12.5%; text-align:center">
+									<input type="text" style="width=100%; text-align:right" ng-model="BONUS_DIS" e-input-limit='ND' e-length-limit="7" ng-required="true"/>
+								</td>
+								<td style="width:12.5%; text-align:center; border-right=0px">
+									<button type="button" class="btn btn-primary" ng-click="add()">新增</button>
+								</td>
+							</tr>
+						</table>
+					</form>
+					<br>
+					<form>
+						<!-- <e-jumping output="outputVO" input="inputVO" query="queryLimitReward"
+							list="resultList"></e-jumping> -->
+						<table class="table-bordered">
+							<tr>
+								<th>刪除</th>
+								<th>計績年月</th>
+								<th>案件來源</th>
+								<th>消金商品1</th>
+								<th>消金商品2</th>
+								<th>撥款額度級距(起)<br>單位：百萬</th>
+								<th>撥款額度級距(迄)<br>單位：百萬</th>
+								<th>撥款對應獎金</th>
+								<th>未以標準利率承作獎金折扣</th>
+							</tr>
+							<tr ng-repeat="y in resultList | limitTo:displayLimit track by $index">
+								<td align="center"><button type="button" class="btn btn-primary" ng-click="del($index)">
+										<i class="glyphicon glyphicon-trash"></i></button></td>
+								<td align="center">{{y.YEARMON}}</td>
+								<td align="center">{{y.CASE_SOURCE}}</td>
+								<td align="center">{{y.PROD_TYPE_1}}</td>
+								<td align="center">{{y.PROD_TYPE_2}}</td>
+								<td align="center">{{y.BEGIN_MON}}</td>
+								<td align="center">{{y.END_MON}}</td>
+								<td align="center">{{y.BONUS}}</td>
+								<td align="center">{{y.BONUS_DIS}}</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="save()">確定</button>
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>				
+			</div>
+		</div>
+	</div>
+</div>

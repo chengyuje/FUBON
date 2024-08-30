@@ -1,0 +1,243 @@
+<style>
+.first_row {
+	widtd: 80px;
+}
+
+input:required:invalid {
+	border-color: red;
+}
+
+.text_row {
+	widtd: 100px;
+}
+
+.end_row {
+	widtd: 50px;
+}
+
+table {
+	font-size: small;
+	font-weight: bold;
+}
+
+.ins_icon {
+	widtd: 20px;
+	height: 20px;
+	background-image: url("assets/images/magnifier.jpg");
+}
+</style>
+<script type="text/javascript" src="assets/txn/IOT320/IOT320.js"></script>
+<script type="text/javascript" src="assets/txn/IOT900/IOT900.js"></script>
+<div ng-controller="IOT320Controller" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit">
+			<img src="assets/images/icon/tfb_icon_a15.gif">產險其他登錄
+		</div>
+	</div>
+	<div class="panel_content">
+		<div class="gv_tab_sc scroll_y">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+				data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<td>保險文件編號:</td>
+						<td width="150px">{{inputVO.INS_ID}}</td>
+						<td></td>
+						<td width="150px"></td>
+						<td></td>
+						<td width="150px"></td>
+						<td></td>
+						<td width="150px"></td>
+
+
+					</tr>
+					<tr>
+						<td>保單號碼:</td>
+						<td><input type="text" ng-model="inputVO.POLICY_NO"
+							ng-disabled="in_OprStatus=='Read'" style="text-transform: uppercase;" maxlength="16" /></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>*要保人ID:</td>
+						<td><input type="text" placeholder="請輸入..."
+							ng-disabled="in_OprStatus=='Read'"
+							ng-blur="getInfo('CUST')" ng-model="inputVO.CUST_ID"
+							required style="text-transform: uppercase;" /></td>
+						<td>*要保人姓名:</td>
+						<td><input type="text" placeholder="請輸入..."
+							ng-disabled="in_OprStatus=='Read'"
+							ng-model="inputVO.PROPOSER_NAME" style="text-transform: uppercase;" required /></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+
+
+					</tr>
+					<tr>
+						<td>分行代碼:</td>
+						<td>{{inputVO.BRANCH_NBR}}</td>
+						<td>鍵機日:</ht>
+						<td>{{inputVO.KEYIN_DATE | date:'yyyy/MM/dd'}}</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+
+					</tr>
+
+
+
+					<tr>
+						<td>未開戶註記:</td>
+						<td>{{inputVO.UNOPEN_ACCT}}</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+
+					</tr>
+					<tr>
+						<td>*批改申請人員編</td>
+						<td><input type="text" ng-model="inputVO.RECRUIT_ID"
+							ng-blur="getInfo('RECRUIT')" ng-disabled="in_OprStatus=='Read'"
+							required /><br /> <font style="color: red">*若實際招攬人員與系統帶出不同，請自行修改</font></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+
+					</tr>
+					<tr>
+						<td>批改申請人</td>
+						<td>{{inputVO.RECRUIT_NAME}}</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+
+					</tr>
+
+
+					<tr>
+						<td>*險種:</td>
+						<td><e-combobox ng-datasource="mappingSet['PPT_TYPE']" ng-change="getInfo('RECRUIT')"
+								ng-required="true" ng-disabled="in_OprStatus=='Read'"
+								ng-model="inputVO.PPT_TYPE" ng-validate="false"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								ng-required="true" widtd="70px" /><br /> <font
+							style="color: red">*招攬人尚未登陸產險證照，須登錄完成後才能送件!!</font></td>
+
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+
+					</tr>
+
+
+
+
+
+
+					<tr>
+						<td>*契變/批改申請日:</td>
+						<td>
+							<div class="input-group datebox datewidtd">
+								<input type="text" class="form-control"
+									ng-disabled="in_OprStatus=='Read'" ng-required="true"
+									uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.APPLY_DATE"
+									is-open="model.b" datepicker-options="bgn_sDateOptions"
+									ng-readonly="true" />
+								<!-- 製作日曆button -->
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default"
+										ng-click="open_apply_date($event,'b')"
+										ng-disabled="noupdatedata">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</div>
+
+						</td>
+					</tr>
+					<tr>
+						<td style="color: red;font-size: small;text-shadow: black;padding-left: 1%;">註:*為必輸欄位</td>
+					</tr>
+					<tr>
+						<td style="background-color: #93C5E1;" colspan="8">
+							<div style="background-color: #93C5E1;">
+								<h4>
+									<font color=white>流程狀態</font>
+								</h4>
+						</td>
+
+
+
+					</tr>
+
+
+					<tr>
+						<td>目前狀態</td>
+						<td><font style="color: #125988">{{inputVO.STATUS |
+								mapping:mappingSet['IOT.MAIN_STATUS'] }}</font></td>
+						<td>批改申請人</td>
+						<td><font style="color: #125988">{{inputVO.RECRUIT_ID}}</font></td>
+						<td>送件編號</td>
+						<td><font style="color: #125988">{{inputVO.OP_BATCH_NO}}</font></td>
+						<td></td>
+						<td></td>
+
+					</tr>
+					<tr>
+						<td>登錄人</td>
+						<td><font style="color: #125988">{{inputVO.CREATOR}}</font></td>
+						<td>登錄時間</td>
+						<td><font style="color: #125988">{{inputVO.CREATETIME |
+								date:'yyyy/MM/dd'}}</font></td>
+						<td>行政助理1</td>
+						<td><font style="color: #125988">{{inputVO.BEF_SIGN_OPRID}}</font></td>
+						<td>行政助理1簽收時間</td>
+						<td><font style="color: #125988">{{inputVO.BEF_SIGN_DATE |
+								date:'yyyy/MM/dd'}}</font></td>
+
+					</tr>
+					<tr>
+						<td>簽署人</td>
+						<td><font style="color: #125988">{{inputVO.SIGN_OPRID}}</font></td>
+						<td>簽署紀錄</td>
+						<td><font style="color: #125988">{{inputVO.SIGN_DATE |
+								date:'yyyy/MM/dd'}}</font></td>
+						<td>行政助理2</td>
+						<td><font style="color: #125988">{{inputVO.AFT_SIGN_OPRID}}</font></td>
+						<td>行政助理2簽收時間</td>
+						<td><font style="color: #125988">{{inputVO.AFT_SIGN_DATE |
+								date:'yyyy/MM/dd'}}</font></td>
+
+
+					</tr>
+
+				</table>
+			</form>
+		</div>
+	</div>
+	<div class="search_box_btn text-center">
+		<button ng-disabled="in_OprStatus=='Read'" ng-click="Submit()" class="btn btn-info">儲存</button>
+		<button ng-disabled="in_OprStatus=='NEW'" ng-click="back()" class="btn btn-info">回上一頁</button>
+	</div>
+
+</div>

@@ -1,0 +1,107 @@
+<style>
+/* open dialog */
+.ngdialog.CUS130_TEMP {
+	
+}
+/* dialog panl */
+.modal-dialog.CUS130_TEMP {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 600px;
+	height: auto;
+}
+/* table size */
+.CUS130_TEMP table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.CUS130_TEMP.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_CUS130_TEMP_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.red{
+	color: red !important;
+}
+</style>
+<div ng-controller="CUS130_TEMPController" ng-cloak>
+	<div class="modal-dialog CUS130_TEMP">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">已上傳檔案</h4>
+			</div>
+			<div class="modal-body">
+				<e-jumping-once output="outputVO" list="dataList" totallist="totalList"></e-jumping-once>
+				<div class="gv_tab_sc">
+					<table ng-if="type == '1'" class="table-bordered">
+						<thead>
+							<tr>
+								<th>員工編號</th>
+								<th>備註內容</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="data in dataList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{data.EMP_ID}}</td>
+								<td>{{data.DESC}}</td>
+							</tr>
+						</tbody>
+					</table>
+					<table ng-if="type == '2'" class="table-bordered">
+						<thead>
+							<tr>
+								<th>員工編號</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="data in dataList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{data}}</td>
+							</tr>
+						</tbody>
+					</table>
+					<table ng-if="type == '3'" class="table-bordered">
+						<thead>
+							<tr>
+								<th>客戶ID</th>
+								<th>備註內容</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="data in dataList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{data.CUST_ID}}</td>
+								<td>{{data.DESC}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確定</button>
+			</div>
+		</div>
+	</div>
+</div>

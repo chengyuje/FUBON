@@ -1,0 +1,131 @@
+<style>
+/* dialog panl */
+.modal-dialog.SOT222 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1200px;
+	height: auto;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.alignright{
+	text-align: right !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/SOT222/SOT222.js"></script>
+<div ng-controller="SOT222Controller" ng-cloak>
+	<div class="modal-dialog SOT222">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">ETF/股票庫存</h4>
+			</div>
+			<div class="modal-body">
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<h4 class="h4-title">海外ETF</h4>
+					<table style="text-align:center;">
+						<thead>
+							<tr>
+								<th>信託帳號</th>
+								<th>商品名稱</th>
+								<th>股數</th>
+								<th>交易幣別</th>
+								<th>平均買進價格</th>
+								<th>參考收盤價</th>
+								<th>外幣參考市值</th>
+								<th>參考含息報酬率</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in etfList track by $index" ng-if="row.assetType =='0001'">
+								<td>{{row.TrustAcct}}</td>
+								<td class="alignleft"><a ng-href="#" style="text-decoration:none;" ng-click="choose(row,'ETF')">{{row.InsuranceNo}}&nbsp;{{row.ProductName}}</a></td>
+								<td class="alignright">{{row.Number | number}}</td>
+								<td>{{row.EntrustCur}}</td>
+								<td class="alignright">{{row.AvgBuyingPrice | number:6}}</td>
+								<td class="alignright">{{row.CurAmt | number:6}}</td>
+								<td class="alignright">{{row.ForCurBal | number:2}}</td>
+								<td style="text-align: right;">{{row.ReturnRateSign2 == '+' ? '' : '-'}}{{row.ReturnRate2 | number:2}}{{row.ReturnRate2 != null ? '%' : ''}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<br />
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<h4 class="h4-title">海外股票</h4>
+					<table style="text-align:center;">
+						<thead>
+							<tr>
+								<th>信託帳號</th>
+								<th>商品名稱</th>
+								<th>股數</th>
+								<th>交易幣別</th>
+								<th>平均買進價格</th>
+								<th>參考收盤價</th>
+								<th>外幣參考市值</th>
+								<th>參考含息報酬率</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in stockList track by $index"  ng-if="row.assetType =='0001'">
+								<td>{{row.TrustAcct}}</td>
+								<td class="alignleft"><a ng-href="#" style="text-decoration:none;" ng-click="choose(row,'STOCK')">{{row.InsuranceNo}}&nbsp;{{row.ProductName}}</a></td>
+								<td class="alignright">{{row.Number | number}}</td>
+								<td>{{row.EntrustCur}}</td>
+								<td class="alignright">{{row.AvgBuyingPrice | number:6}}</td>
+								<td class="alignright">{{row.CurAmt | number:6}}</td>
+								<td class="alignright">{{row.ForCurBal | number:2}}</td>
+								<td style="text-align: right;">{{row.ReturnRateSign2 == '+' ? '' : '-'}}{{row.ReturnRate2 | number:2}}{{row.ReturnRate2 != null ? '%' : ''}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<br />
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+					<h4 class="h4-title">委託賣出商品</h4>
+					<table style="text-align:center;">
+						<thead>
+							<tr>
+								<th>信託帳號</th>
+								<th>商品名稱</th>
+								<th>股數</th>
+								<th>交易幣別</th>
+								<th>平均買進價格</th>
+								<th>參考收盤價</th>
+								<th>外幣參考市值</th>
+								<th>參考含息報酬率</th>
+								<th>賣出委託狀態</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <tr class="repeat-row" ng-repeat="row in onTradeList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						        <td style="text-align: left;">{{row.TrustAcct}}</a></td>
+						        <td style="text-align: left;">{{row.InsuranceNo == null ? '' : row.InsuranceNo + '- '}}{{row.ProductName}}</td>
+						        <td ng-if="row.assetType == '0003'"style="text-align: right;">{{row.TradeAmt}}</td>
+						        <td ng-if="row.assetType == '0004'"style="text-align: right;">{{row.EntrustAmt}}</td>
+						        <td style="text-align: left;">{{row.EntrustCur}}</td>
+						        <td style="text-align: right;">--</td>
+						        <td ng-if="row.assetType == '0003'" style="text-align: right;">{{row.TradePrice | number:6}} </br>(成交價格)</td>
+						        <td ng-if="row.assetType == '0003'" style="text-align: right;">{{row.TradeCost | number:2}} </br>(成交金額)</td>
+						        <td ng-if="row.assetType == '0004'" style="text-align: right;">{{row.CurAmt | number:6}}</td>
+						        <td ng-if="row.assetType == '0004'" style="text-align: right;">{{row.ForCurBal | number:2}}</td>
+						        <td style="text-align: right;">--</td>
+						        <td style="text-align: center;">{{row.onTradeMemo}}</td>
+					        </tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >取消</button>
+			</div>
+		</div>
+	</div>
+</div>

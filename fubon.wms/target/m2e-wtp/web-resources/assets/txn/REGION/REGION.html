@@ -1,0 +1,181 @@
+<div ng-controller="TEST_REGIONController">
+	<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+		<table>
+	   		<tr>
+	   			<th>區域：</th>
+				<td>
+					<e-combobox id="region_center_id" name="region_center_id"
+								ng-datasource="REGION_LIST"
+								ng-model="inputVO.region_center_id"
+								ng-validate="false" 
+								ng-disabled="AVAIL_REGION.length == 1"
+								ng-readonly="AVAIL_REGION.length == 1" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="true"
+								ng-change="ChangeRegion(test)"
+								style="line-height:20px;" />
+				</td>
+				<th>營運區：</th>
+				<td>
+					<e-combobox id="branch_area_id" name="branch_area_id"
+								ng-datasource="AREA_LIST"
+								ng-model="inputVO.branch_area_id"
+								ng-validate="false" 
+								ng-disabled="AVAIL_AREA.length == 1"
+								ng-readonly="AVAIL_AREA.length == 1" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="true"
+								ng-change="ChangeArea(test)"
+								style="line-height:20px;" />
+				</td>
+	   		</tr>
+	   		<tr ng-show="parameterTypeEditForm.region_center_id.$error.required || parameterTypeEditForm.branch_area_id.$error.required">
+				<th></th>
+				<th class="with-errors"><span ng-if="parameterTypeEditForm.region_center_id.$error.required">請選擇區域</span></th>
+				<th></th>
+				<th class="with-errors"><span ng-if="parameterTypeEditForm.branch_area_id.$error.required">請選擇營運區</span></th>
+			</tr>
+	   		<tr>
+	   			<th>分行：</th>
+				<td>
+					<e-combobox id="branch_nbr" name="branch_nbr"
+								ng-datasource="BRANCH_LIST"
+								ng-model="inputVO.branch_nbr"
+								ng-validate="false" 
+								ng-disabled="AVAIL_BRANCH.length == 1"
+								ng-readonly="AVAIL_BRANCH.length == 1" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="true"
+								ng-change="ChangeBranch(test)"
+								style="line-height:20px;" />
+				</td>
+				<th>AO CODE：</th>
+				<td>
+					<e-combobox id="ao_code" name="ao_code"
+								ng-datasource="AO_LIST"
+								ng-model="inputVO.ao_code"
+								ng-validate="false"
+								ng-disabled="AVAIL_AO_CODE.length == 1"
+								ng-readonly="AVAIL_AO_CODE.length == 1" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="true"
+								ng-change="ChangeAo_code(test)"
+								style="line-height:20px;" />
+				</td>
+	   		</tr>
+	   		<tr ng-show="parameterTypeEditForm.branch_nbr.$error.required || parameterTypeEditForm.ao_code.$error.required">
+				<th></th>
+				<th class="with-errors"><span ng-if="parameterTypeEditForm.branch_nbr.$error.required">請選擇分行</span></th>
+				<th></th>
+				<th class="with-errors"><span ng-if="parameterTypeEditForm.ao_code.$error.required">請選擇AO CODE</span></th>
+			</tr>
+			<tr>
+	   			<th>EMP_ID：</th>
+				<td>
+					<e-combobox id="emp_id" name="emp_id"
+								ng-datasource="EMP_LIST"
+								ng-model="inputVO.emp_id"
+								ng-validate="false" 
+								ng-disabled="EMP_LIST.length == 2"
+								ng-readonly="EMP_LIST.length == 2" 
+								ng-editable="false"
+								ng-format="F1"
+								ng-required="true"
+								ng-change="ChangeEmp_id(test)"
+								style="line-height:20px;" />
+				</td>
+				<th></th>
+				<td></td>
+	   		</tr>
+	   		<tr ng-show="parameterTypeEditForm.emp_id.$error.required">
+				<th></th>
+				<th class="with-errors">請選擇EMP_ID</th>
+				<th></th>
+				<th></th>
+			</tr>
+<!-- 			<tr> -->
+<!-- 	   			<th>區域2：</th> -->
+<!-- 				<td> -->
+<!-- 					<e-combobox id="region_center_id2" name="region_center_id2" -->
+<!-- 					ng-datasource="REGION_LIST2" -->
+<!-- 					ng-model="inputVO.region_center_id2" -->
+<!-- 					ng-validate="false"  -->
+<!-- 					ng-disabled="AVAIL_REGION.length == 1" -->
+<!-- 					ng-readonly="AVAIL_REGION.length == 1"  -->
+<!-- 					ng-editable="false" -->
+<!-- 					ng-format="F3" -->
+<!-- 					ng-required="true" -->
+<!-- 					ng-change="ChangeRegion(test2)" -->
+<!-- 					width="150px" -->
+<!-- 					style="line-height:20px;" /> -->
+<!-- 				</td> -->
+<!-- 				<th>營運區2：</th> -->
+<!-- 				<td> -->
+<!-- 					<e-combobox id="branch_area_id2" name="branch_area_id2" -->
+<!-- 					ng-datasource="AREA_LIST2" -->
+<!-- 					ng-model="inputVO.branch_area_id2" -->
+<!-- 					ng-validate="false"  -->
+<!-- 					ng-disabled="AVAIL_AREA.length == 1" -->
+<!-- 					ng-readonly="AVAIL_AREA.length == 1"  -->
+<!-- 					ng-editable="false" -->
+<!-- 					ng-format="F3" -->
+<!-- 					ng-required="true" -->
+<!-- 					ng-change="ChangeArea(test2)" -->
+<!-- 					width="150px" -->
+<!-- 					style="line-height:20px;" /> -->
+<!-- 				</td> -->
+<!-- 	   		</tr> -->
+<!-- 	   		<tr ng-show="parameterTypeEditForm.region_center_id2.$error.required || parameterTypeEditForm.branch_area_id2.$error.required"> -->
+<!-- 				<th></th> -->
+<!-- 				<th class="with-errors"><span ng-if="parameterTypeEditForm.region_center_id2.$error.required">請選擇區域</span></th> -->
+<!-- 				<th></th> -->
+<!-- 				<th class="with-errors"><span ng-if="parameterTypeEditForm.branch_area_id2.$error.required">請選擇營運區</span></th> -->
+<!-- 			</tr> -->
+<!-- 	   		<tr> -->
+<!-- 	   			<th>分行2：</th> -->
+<!-- 				<td> -->
+<!-- 					<e-combobox id="branch_nbr2" name="branch_nbr2" -->
+<!-- 					ng-datasource="BRANCH_LIST2" -->
+<!-- 					ng-model="inputVO.branch_nbr2" -->
+<!-- 					ng-validate="false"  -->
+<!-- 					ng-disabled="AVAIL_BRANCH.length == 1" -->
+<!-- 					ng-readonly="AVAIL_BRANCH.length == 1"  -->
+<!-- 					ng-editable="false" -->
+<!-- 					ng-format="F1" -->
+<!-- 					ng-required="true" -->
+<!-- 					ng-change="ChangeBranch(test2)" -->
+<!-- 					width="150px" -->
+<!-- 					style="line-height:20px;" /> -->
+<!-- 				</td> -->
+<!-- 				<th>AO CODE2：</th> -->
+<!-- 				<td> -->
+<!-- 					<e-combobox id="ao_code2" name="ao_code2" -->
+<!-- 					ng-datasource="AO_LIST2" -->
+<!-- 					ng-model="inputVO.ao_code2" -->
+<!-- 					ng-validate="false" -->
+<!-- 					ng-disabled="AVAIL_AO_CODE.length == 1" -->
+<!-- 					ng-readonly="AVAIL_AO_CODE.length == 1"  -->
+<!-- 					ng-editable="false" -->
+<!-- 					ng-format="F1" -->
+<!-- 					ng-required="true" -->
+<!-- 					ng-change="ChangeAo_code(test2)" -->
+<!-- 					width="150px" -->
+<!-- 					style="line-height:20px;" /> -->
+<!-- 				</td> -->
+<!-- 	   		</tr> -->
+<!-- 	   		<tr ng-show="parameterTypeEditForm.branch_nbr2.$error.required || parameterTypeEditForm.ao_code2.$error.required"> -->
+<!-- 				<th></th> -->
+<!-- 				<th class="with-errors"><span ng-if="parameterTypeEditForm.branch_nbr2.$error.required">請選擇分行</span></th> -->
+<!-- 				<th></th> -->
+<!-- 				<th class="with-errors"><span ng-if="parameterTypeEditForm.ao_code2.$error.required">請選擇AO CODE</span></th> -->
+<!-- 			</tr> -->
+	   	</table>
+	</form>
+	<div class="search_box_btn text-center">
+		<button type="button" class="btn btn-info" ng-click="see()">看input</button>
+	</div>
+</div>

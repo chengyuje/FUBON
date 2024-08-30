@@ -1,0 +1,60 @@
+--**************************************************************************
+--PROJECT_CODE> TBIOT
+--DATE>2016/09/01
+--AUTHOR> Grace Liu
+--PURPOSE>ST Load
+--**************************************************************************
+
+--**************************************************************************
+--TARGET>TBCRM_NPAYN_SG
+--TRUNCATE_BEFORE_INSERT>Y
+--**************************************************************************
+--OPTIONS (ERRORS = 0)
+OPTIONS (direct=true)
+LOAD DATA
+--CHARACTERSET AL32UTF8
+TRUNCATE
+into table	TBCRM_NPAYN_SG
+--FIELDS TERMINATED BY X'09'
+FIELDS TERMINATED BY ',' --OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+POLICY_NO
+,POLICY_SEQ
+,ID_DUP "NVL(:ID_DUP,' ')"
+,RECEIPT_NO
+,INS_NO
+,DEPT_CODE
+,INS_NBR
+,ID_NO
+,PAY_TYPE
+,PAY_TIME
+,COST_TYPE
+,ACCU_CUR_PREM
+,POLICY_CUR
+,POLICY_STATUS
+,APPL_DATE "TO_DATE(:APPL_DATE,'YYYYMMDD')"
+,RECORDED_DATE "TO_DATE(:RECORDED_DATE,'YYYYMMDD')"
+,PRFM_DATE "TO_DATE(:PRFM_DATE,'YYYYMMDD')"
+,COMU_DATE "TO_DATE(:COMU_DATE,'YYYYMMDD')"
+,EFF_DATE "TO_DATE(:EFF_DATE,'YYYYMMDD')"
+,APPL_ID
+,INS_AGE
+,PAID_LOCAL_CUR
+,COMU_LOCAL_CUR
+,COMIS_TOTAL
+,EXCHANGE_RATE
+,RATE_DATE "TO_DATE(:RATE_DATE,'YYYYMMDD')"
+,RECRUIT_ID
+,BRANCH_NBR
+,PAY_WAY
+,PAYORS_ID
+,CREDIT_CARD_NUM
+,ORI_PREM
+,RECOMMEND_ID
+,COMU_PREM
+,VERSION "0"       
+,CREATETIME sysdate       
+,CREATOR constant "TBCRM_NPAYN_SG"       
+)
+       

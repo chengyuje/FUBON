@@ -1,0 +1,200 @@
+<style>
+/* open dialog */
+.ngdialog.PMS701 {
+	
+}
+/* dialog panl */
+#ejp>tbody {
+	width: 100% !important;
+}
+
+.modal-dialog.PMS701 {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 850px;
+	height: auto;
+}
+/* table size */
+.PMS701 table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.PMS701 table.little {
+	width: 60%;
+}
+/* change row */
+.PMS701.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS701_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+}
+
+.search-table-outter {
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.red {
+	color: red;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS701/PMS701.js"></script>
+<script type="text/javascript" src="assets/txn/PMS701/PMS701_UPLOAD.js"></script>
+<div class="PMS701" ng-controller="PMS701Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit">
+				<img src="assets/images/icon/tfb_icon_a15.gif">調整客戶名單
+			</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table style="width:900px;margin-left: 0">
+						<tr>
+							<th><span style="color: red;">*</span>計績年月：</th>
+							<td><e-combobox ng-datasource="mappingSet['timeE']" ng-model="inputVO.yearMon"
+									ng-validate="false" ng-readonly="false" ng-editable="false"
+									ng-format="F3" ng-required="true" width="180px" height="30px"
+									style="line-height:20px;" /></td>
+							<th><span style="color: red;">*</span>名單類型：</th>
+							<td>						
+								<e-combobox ng-datasource="mappingSet['ctype']"
+								ng-model="inputVO.cust_Type" ng-validate="false" ng-readonly="false" 
+								ng-editable="false" ng-format="F3" ng-required="true" width="180px" height="30px" 
+								ng-change="cleartype()" style="line-height:20px;" />						 
+							</td>	
+
+							<td><button type="button" class="btn btn-info" ng-click="query()">查詢</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<!-- <button type="button" class="btn btn-info" ng-click="init()">清除</button> -->
+								<button type="button" class="btn btn-info" ng-click="adddata(inputVO)">上傳</button></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+		
+	<!-- 結果區 -->
+		<div>
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a15.gif">查詢結果
+				</div>
+			</div>
+			<!--Content of the panel-->
+			<div class="panel_content">
+				<e-jumping output="outputVO" input="inputVO" query="query()"
+					list="largeAgrList"></e-jumping>
+				<div class="gv_tab_sc scroll_y"
+					style="height: 335px; white-space: nowrap;">
+					<table class="table-bordered" width="100%">
+						<thead ng-if="inputVO.cust_Type == '1'">
+							<tr>
+								<th rowspan="1">NO</th>
+								<th rowspan="1">計績年月</th>
+								<th rowspan="1">客戶ID</th>
+								<th rowspan="1">折數</th>
+							</tr>
+						</thead>
+						<thead ng-if="inputVO.cust_Type == '2'">
+							<tr>
+								<th rowspan="1">NO</th>
+								<th rowspan="1">計績年月</th>
+								<th rowspan="1">客戶ID</th>
+								<th rowspan="1">存款（不含台定）AUM 餘額</th>
+								<th rowspan="1">台定 AUM 餘額</th>
+								<th rowspan="1">存款利差</th>
+								<th rowspan="1">匯兌損益</th>
+							</tr>
+						</thead>
+						<thead ng-if="inputVO.cust_Type == '3'">
+							<tr>
+								<th rowspan="1">NO</th>
+								<th rowspan="1">計績年月</th>
+								<th rowspan="1">客戶ID</th>
+								<th rowspan="1">加/減碼收益</th>
+							</tr>
+						</thead>
+						<thead ng-if="inputVO.cust_Type == '4'">
+							<tr>
+								<th rowspan="1">NO</th>
+								<th rowspan="1">計績年月</th>
+								<th rowspan="1">客戶ID</th>
+							</tr>
+						</thead>
+						
+						<tbody style="text-align: center;" ng-if="inputVO.cust_Type == '1'">
+							<tr class="repeat-row" ng-repeat="row in largeAgrList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row.ROWNUM}}</td>
+								<td>{{row.YEARMON}}</td>
+								<td>{{row.CUST_ID}}</td>
+								<td>{{row.COL1}}</td>
+							</tr>
+						</tbody>
+						<tbody style="text-align: center;" ng-if="inputVO.cust_Type == '2'">
+							<tr class="repeat-row" ng-repeat="row in largeAgrList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row.ROWNUM}}</td>
+								<td>{{row.YEARMON}}</td>
+								<td>{{row.CUST_ID}}</td>
+								<td>{{row.COL1}}</td>
+								<td>{{row.COL2}}</td>
+								<td>{{row.COL3}}</td>
+								<td>{{row.COL4}}</td>								
+							</tr>
+						</tbody>
+						<tbody style="text-align: center;" ng-if="inputVO.cust_Type == '3'">
+							<tr class="repeat-row" ng-repeat="row in largeAgrList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row.ROWNUM}}</td>
+								<td>{{row.YEARMON}}</td>
+								<td>{{row.CUST_ID}}</td>
+								<td>{{row.COL1}}</td>
+							</tr>
+						</tbody>
+						<tbody style="text-align: center;" ng-if="inputVO.cust_Type == '4'">
+							<tr class="repeat-row" ng-repeat="row in largeAgrList | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td>{{row.ROWNUM}}</td>
+								<td>{{row.YEARMON}}</td>
+								<td>{{row.CUST_ID}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	<!-- 結果區 -->
+	</div>
+</div>

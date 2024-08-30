@@ -1,0 +1,510 @@
+<style>
+.modal-dialog.PRD171_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 300px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/COMMON/CommonUtil.js"></script>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171.js"></script>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_EDIT1.js"></script>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_EDIT2.js"></script>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_EDIT3.js"></script>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_ADD3.js"></script>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_EDIT4.js"></script>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_EDIT5.js"></script>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_EDIT6.js"></script>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_EDIT7.js"></script>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_EDIT8.js"></script>
+<script type="text/javascript" src="assets/txn/PRD171/PRD171_UPLOAD.js"></script>
+<div ng-controller="PRD171Controller" ng-cloak>
+	<div class="search_table">
+		<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal"
+				data-toggle="validator" role="form" autocomplete="off" enter-as-tab
+				style="width: 85vw;">
+				<table>
+					<!-- 基本設定、連結標的設定、佣金檔設定才需要的欄位 -->
+					<tr ng-show="'148'.contains(inputVO.P_TYPE)">
+						<th>保險公司：</th>
+						<td>
+							<input type="text"
+								   class="form-control"
+								   id="COMPANY_NAME"
+								   name="COMPANY_NAME"
+								   ng-model="inputVO.COMPANY_NAME"
+								   e-length-limit="50"
+							/>
+						</td>
+					</tr>
+					<tr>
+						<th>險種代號：</th>
+						<td><input type="text" class="form-control" style="width:200px;text-transform: uppercase;"  ng-model="inputVO.INSPRD_ID"/></td>
+						<th>產品類別：</th>
+						<td><e-combobox ng-paramtype="IOT.PRODUCT_TYPE"
+								ng-model="inputVO.INSPRD_TYPE" ng-validate="false"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								 ng-required="false" width="200px"
+								height="30px" style="line-height:20px;" />
+						</td>
+					</tr>
+					<tr>
+						<th>險種名稱：</th>
+						<td><input type="text" class="form-control" style="width:200px"  ng-model="inputVO.INSPRD_NAME"/></td>
+						<th>*參數設定：</th>
+						<td><e-combobox ng-paramtype="PRD.PARAMETER_TYPE"
+								ng-model="inputVO.P_TYPE" ng-validate="false"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								width="200px" ng-change="ins_ancdoclist=''"
+								height="30px" style="line-height:20px;" required/></td>
+					</tr>
+					<tr ng-show="Auth=='confirm'">
+						<th>覆核狀態：</th>
+						<td><e-combobox ng-datasource="mappingSet['APPROVER_REVIEW']"
+								ng-model="inputVO.APPROVER" ng-validate="false"
+								ng-readonly="false" ng-editable="false" ng-format="F3"
+								ng-required="false" width="200px"
+								height="30px" style="line-height:20px;" />
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="search_box_btn text-center">
+			<div style="text-align:left;color: red;">註:*為必輸欄位</div>
+			<button ng-click="inquireInit();queryData()" class="btn btn-info">查詢</button>
+			<button ng-click="inquireInit();init()" class="btn btn-info">清除</button>
+			<button ng-click="addRow()" class="btn btn-info">新增</button>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<button type="button" class="btn btn-info" ng-click="upload()" ng-disabled="!inputVO.P_TYPE" function-type="export">整批上傳</button>
+			<button type="button" class="btn btn-info" ng-disabled="ins_ancdoclist.length == 0" ng-click="download()" function-type="export">下載CSV</button>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<button type="button" class="btn btn-info" ng-click="review('Y')" function-type="confirm">核可</button>
+			<!-- <button type="button" class="btn btn-info" ng-click="review('N')" function-type="confirm">退回</button> -->
+		</div>
+		<e-jumping output="outputVO" input="inputVO" query="queryData()"
+			list="ins_ancdoclist"></e-jumping>
+		<div class="text-right"></div>
+		<div class="gv_tab_sc scroll_y"
+			style="white-space: nowrap; width: 85vw; overflow-x: auto;">
+			<table ng-if="inputVO.P_TYPE=='1'" class="e-table-freeze" e-height="500px" e-left="5" e-list="ins_ancdoclist" e-mode="3" e-top="false">
+			<thead>
+				<tr>
+					<th ng-show="Auth=='confirm'">
+						<input class="uniform_on bLarger" type='checkbox' id="select_all" ng-model="inputVO.select_all" ng-true-value="'Y'" ng-false-value="'N'" ng-change = "select_all()">
+						勾選
+					</th>
+					<th>功能</th>
+					<th>保險公司</th>
+					<th hidden>主鍵</th>
+					<th>險種代碼</th>
+					<th>產品類型</th>
+					<th>繳費年期</th>
+					<th>險種名稱</th>
+					<th>主/附約別</th>
+					<th>是否為分紅商品</th>
+					<th>繳別</th>
+					<th>幣別</th>
+					<th>保費類型</th>
+					<th>商品收益率</th>
+					<th>CNR收益率</th>
+					<th>倍數</th>
+					<th>是否需要適配</th>
+					<th>商品風險值</th>
+					<th>證照類型</th>
+					<th>教育訓練</th>
+<!-- 					<th>匯率</th> -->
+					<th>非常態交易參考匯率</th>
+					<th>四大分類</th>
+					<th>特殊條件</th>
+					<th>上市日期</th>
+					<th>下市日期</th>
+					<th>建立時間</th>
+					<th>建立人員</th>
+					<th>異動時間</th>
+					<th>異動人</th>
+					<th>覆核人員</th>
+					<th>覆核時間</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in ins_ancdoclist" ng-class-odd="'rowOdd'"
+					ng-class-even="'rowEven'">
+					<td ng-show="Auth=='confirm'"><input class="uniform_on bLarger" type='checkbox' id="choice"
+						name="choice" ng-model='row.choice' ng-true-value="'Y'"
+						ng-false-value="'N'" ng-change="select_false(row.choice)"/></td>
+					<td><e-combobox ng-datasource="row.edit" ng-model="row.editto"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="false" ng-change="edit($index,row)"
+							ng-if="row.STATUS=='Y'?false:true" width="80px"
+							style="line-height:20px;" /></td>
+					<td>{{row.COMPANY_NAME}}</td>
+					<TD hidden>{{row.INSPRD_KEYNO }}</td>
+					<TD>{{row.INSPRD_ID }}</td>
+					<TD>{{row.INSPRD_TYPE | mapping:mappingSet['IOT.PRODUCT_TYPE']:'F3'}}</td>
+					<TD>{{row.INSPRD_ANNUAL}}</td>
+					<TD>{{row.INSPRD_NAME }}</td>
+					<TD>{{row.MAIN_RIDER  | mapping:mappingSet['PRD.MAIN_RIDER']:'F3'}}</td>
+					<TD>{{row.DIVIDEND_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>
+					<TD>{{row.PAY_TYPE  | mapping:mappingSet['IOT.PAY_TYPE']:'F3'}}</td>
+					<TD>{{row.CURR_CD  | mapping:mappingSet['FPS.CURRENCY']:'F3'}}</td>
+					<td>{{row.FEE_STATE | mapping:mappingSet['PRD.FEE_STATE']:F3}}</td>
+					<TD>{{row.PRD_RATE }}</td>
+					<TD>{{row.CNR_RATE }}</td>
+					<TD>{{row.COEFFICIENT }}</td>
+					<TD>{{row.NEED_MATCH }}</td>
+					<TD>{{row.PRD_RISK }}</td>
+					<TD>{{row.CERT_TYPE | mapping:mappingSet['PRD.CERT_TYPE']:'F3'}}</td>
+					<TD>{{row.TRAINING_TYPE | mapping:mappingSet['PRD.TRAINING_TYPE']:'F3'}}</td>
+<!-- 					<TD>{{row.EXCH_RATE }}</td> -->
+					<TD>{{row.AB_EXCH_RATE }}</td>
+					<TD>{{row.INSPRD_CLASS | mapping:mappingSet['PRD.INS_CLASS']:'F3'}}</td>
+					<TD>{{row.SPECIAL_CONDITION }}</td>
+					<TD>{{toJsDate(row.EFFECT_DATE) | date:"yyyy/MM/dd" }}</td>
+					<TD>{{toJsDate(row.EXPIRY_DATE) | date:"yyyy/MM/dd"}}</td>
+					<TD>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd"}}</td>
+					<TD>{{row.CREATOR }}</td>
+					<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd" }}</td>
+					<TD>{{row.MODIFIER }}</td>
+					<TD>{{row.APPROVER }}</td>
+					<TD>{{row.APP_DATE }}</td>
+				</tr>
+			</tbody>
+			</table>
+
+			<table ng-if="inputVO.P_TYPE=='2'">
+			<thead>
+				<tr>
+
+					<th>功能</th>
+					<th hidden></th>
+					<th>險種代碼</th>
+					<th>產品類型</th>
+					<th>險種名稱</th>
+					<th>繳別</th>
+					<th>輸入特殊條件內容</th>
+					<th>順序</th>
+					<th>建立時間</th>
+					<th>建立人員</th>
+					<th>異動時間</th>
+					<th>異動人</th>
+					<th>覆核人員</th>
+					<th>覆核時間</th>
+
+
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in ins_ancdoclist" ng-class-odd="'rowOdd'"
+					ng-class-even="'rowEven'">
+					<td><e-combobox ng-datasource="row.edit" ng-model="row.editto"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="false" ng-change="edit($index,row)"
+							ng-if="row.STATUS=='Y'?false:true" width="80px"
+							style="line-height:20px;" /></td>
+					<td hidden>{{row.KEY_NO }}</td>
+					<td>{{row.INSPRD_ID }}</td>
+					<td>{{row.INSPRD_TYPE | mapping:mappingSet['IOT.PRODUCT_TYPE']:'F3'}}</td>
+					<td>{{row.INSPRD_NAME }}</td>
+					<td>{{row.PAY_TYPE  | mapping:mappingSet['IOT.PAY_TYPE']:'F3'}}</td>
+					<td>{{row.SPECIAL_CONDITION }}</td>
+					<td>{{row.SEQ }}</td>
+					<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd"  }}</td>
+					<td>{{row.CREATOR }}</td>
+					<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd" }}</td>
+					<td>{{row.MODIFIER }}</td>
+					<TD>{{row.APPROVER }}</td>
+					<TD>{{row.APP_DATE }}</td>
+
+				</tr>
+			</tbody>
+			</table>
+
+
+
+			<table ng-if="inputVO.P_TYPE=='4'">
+			<thead>
+				<tr>
+
+					<th>功能</th>
+					<th>保險公司</th>
+					<th hidden></th>
+					<th>險種代碼</th>
+					<th>人壽標的代號</th>
+					<th>銀行標的代號</th>
+					<th>Lipper標的代號</th>
+					<th>連結標的名稱</th>
+					<th>風險值</th>
+					<th>保險公司標的風險值</th>
+					<th>教育訓練</th>
+					<th>建立時間</th>
+					<th>建立人員</th>
+					<th>異動時間</th>
+					<th>異動人員</th>
+					<th>覆核人員</th>
+					<th>覆核時間</th>
+					<th>標的幣別</th>
+					<th>配息方式</th>
+					<th>是否可轉換 (V/X)</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in ins_ancdoclist" ng-class-odd="'rowOdd'"
+					ng-class-even="'rowEven'">
+					<td><e-combobox ng-datasource="row.edit" ng-model="row.editto"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="false" ng-change="edit($index,row)"
+							ng-if="row.STATUS=='Y'?false:true" width="80px"
+							style="line-height:20px;" /></td>
+					<td>{{row.COMPANY_NAME}}</td>
+					<td hidden>{{row.KEY_NO }}</td>
+					<td>{{row.INSPRD_ID }}</td>
+					<td>{{row.TARGET_ID }}</td>
+					<td>{{row.FUND_ID }}</td>
+					<td>{{row.LIPPER_ID }}</td>
+					<td>{{row.LINKED_NAME }}</td>
+					<td>{{row.PRD_RISK }}</td>
+					<td>{{row.COM_PRD_RISK }}</td>
+					<td>{{row.TRAINING_TYPE | mapping:mappingSet['PRD.TRAINING_TYPE']:'F3' }}</td>
+					<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd" }}</td>
+					<td>{{row.CREATOR }}</td>
+					<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd" }}</td>
+					<td>{{row.MODIFIER }}</td>
+					<TD>{{row.APPROVER }}</td>
+					<TD>{{row.APP_DATE }}</td>
+					<td>{{row.TARGET_CURR}}</td>
+					<td>{{row.INT_TYPE}}</td>
+					<td>{{row.TRANSFER_FLG}}</td>
+				</tr>
+			</tbody>
+			</table>
+
+			<table ng-if="inputVO.P_TYPE=='5'">
+			<thead>
+				<tr>
+
+					<th>功能</th>
+					<th hidden></th>
+					<th>專案期間</th>
+					<th>險種代碼</th>
+					<th>險種名稱</th>
+					<th>繳費年期</th>
+					<th>理專個獎獎金率</th>
+					<th>商品專案獎金率</th>
+					<th>海外高峰獎金率</th>
+					<th>高產能獎金率</th>
+					<th>年終獎金率</th>
+					<th>建立時間</th>
+					<th>建立人員</th>
+					<th>異動時間</th>
+					<th>異動人員</th>
+					<th>覆核人員</th>
+					<th>覆核時間</th>
+
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in ins_ancdoclist" ng-class-odd="'rowOdd'"
+					ng-class-even="'rowEven'">
+					<td><e-combobox ng-datasource="row.edit" ng-model="row.editto"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="false" ng-change="edit($index,row)"
+							ng-if="row.STATUS=='Y'?false:true" width="80px"
+							style="line-height:20px;" /></td>
+					<td hidden>{{row.KEY_NO }}</td>
+					<td>{{row.PERIOD }}</td>
+					<td>{{row.INSPRD_ID }}</td>
+					<td>{{row.INSPRD_NAME }}</td>
+					<td>{{row.INSPRD_ANNUAL }}</td>
+					<td>{{row.EMP_BONUS_RATE }}</td>
+					<td>{{row.PRD_BONUS_RATE }}</td>
+					<td>{{row.OSEA_BONUS_RATE }}</td>
+					<td>{{row.HIGH_CPCT_BONUS_RATE }}</td>
+					<td>{{row.YEAR_END_BONUS }}</td>
+					<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd" }}</td>
+					<td>{{row.CREATOR }}</td>
+					<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd" }}</td>
+					<td>{{row.MODIFIER }}</td>
+					<TD>{{row.APPROVER }}</td>
+					<TD>{{row.APP_DATE }}</td>
+
+				</tr>
+			</tbody>
+			</table>
+
+
+
+			<table ng-if="inputVO.P_TYPE=='3'">
+			<thead>
+				<tr>
+
+					<th>功能</th>
+					<th hidden></th>
+					<th>險種代碼</th>
+					<th>險種名稱</th>
+					<th>繳費年期</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in ins_ancdoclist" ng-class-odd="'rowOdd'"
+					ng-class-even="'rowEven'">
+					<td style="width: 5%;"><e-combobox ng-datasource="row.edit" ng-model="row.editto"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="false" ng-change="edit($index,row)"
+							ng-if="row.STATUS=='Y'?false:true" width="80px"
+							style="line-height:20px;" /></td>
+					<td hidden>{{row.KEY_NO }}</td>
+					<td style="text-align: center; width: 10%;">{{row.INSPRD_ID }}</td>
+					<td>{{row.INSPRD_NAME}}</td>
+					<td>{{row.INSPRD_ANNUAL }}</td>
+				</tr>
+			</tbody>
+			</table>
+
+
+			<table ng-if="inputVO.P_TYPE=='6'">
+			<thead>
+				<tr>
+					<th>功能</th>
+					<th hidden></th>
+					<th>險種代碼</th>
+					<th>文件名稱</th>
+					<th>文件重要性</th>
+					<th>顯示順序</th>
+					<th>建立時間</th>
+					<th>建立人員</th>
+					<th>異動時間</th>
+					<th>異動人員</th>
+					<th>覆核人員</th>
+					<th>覆核時間</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in ins_ancdoclist" ng-class-odd="'rowOdd'"
+					ng-class-even="'rowEven'">
+					<td><e-combobox ng-datasource="row.edit" ng-model="row.editto"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="false" ng-change="edit($index,row)"
+							ng-if="row.STATUS=='Y'?false:true" width="80px"
+							style="line-height:20px;" /></td>
+					<td hidden>{{row.KEY_NO }}</td>
+					<td>{{row.INSPRD_ID }}</td>
+					<td>{{row.DOC_NAME }}</td>
+					<td>{{row.DOC_LEVEL | mapping:mappingSet['IOT.DOC_CHK_LEVEL']:F3 }}</td>
+					<td>{{row.DOC_SEQ }}</td>
+					<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd" }}</td>
+					<td>{{row.CREATOR }}</td>
+					<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd" }}</td>
+					<td>{{row.MODIFIER }}</td>
+					<TD>{{row.APPROVER }}</td>
+					<TD>{{row.APP_DATE }}</td>
+
+				</tr>
+			</tbody>
+			</table>
+
+
+			<table ng-if="inputVO.P_TYPE=='7'">
+			<thead>
+				<tr>
+					<th>功能</th>
+					<th hidden></th>
+					<th>險種代碼</th>
+					<th>文件名稱</th>
+					<th>文件重要性</th>
+					<th>顯示順序</th>
+					<th>建立時間</th>
+					<th>建立人員</th>
+					<th>異動時間</th>
+					<th>異動人員</th>
+					<th>覆核人員</th>
+					<th>覆核時間</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in ins_ancdoclist" ng-class-odd="'rowOdd'"
+					ng-class-even="'rowEven'">
+					<td><e-combobox ng-datasource="row.edit" ng-model="row.editto"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="false" ng-change="edit($index,row)"
+							ng-if="row.STATUS=='Y'?false:true" width="80px"
+							style="line-height:20px;" /></td>
+					<td hidden>{{row.KEY_NO }}</td>
+					<td>{{row.INSPRD_ID }}</td>
+					<td>{{row.DOC_NAME }}</td>
+					<td>{{row.DOC_LEVEL  | mapping:mappingSet['IOT.DOC_CHK_LEVEL']:F3}}</td>
+					<td>{{row.DOC_SEQ }}</td>
+					<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd" }}</td>
+					<td>{{row.CREATOR }}</td>
+					<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd" }}</td>
+					<td>{{row.MODIFIER }}</td>
+					<TD>{{row.APPROVER }}</td>
+					<TD>{{row.APP_DATE }}</td>
+
+				</tr>
+			</tbody>
+			</table>
+
+
+			<table ng-if="inputVO.P_TYPE=='8'">
+			<thead>
+				<tr>
+					<th>功能</th>
+					<th>保險公司</th>
+					<th hidden></th>
+					<th>商品代號</th>
+					<th>繳費年期</th>
+					<th>保單年度</th>
+					<th>保費種類</th>
+					<th>險種名稱</th>
+					<th>商品收益率</th>
+					<th>CNR收益率</th>
+					<th>CNR分配率</th>
+					<th>CNR加減碼</th>
+					<th>CNR加碼區間起日</th>
+					<th>CNR加碼區間迄日</th>
+					<th>建立時間</th>
+					<th>建立人員</th>
+					<th>異動時間</th>
+					<th>異動人員</th>
+					<th>覆核人員</th>
+					<th>覆核時間</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in ins_ancdoclist" ng-class-odd="'rowOdd'"
+					ng-class-even="'rowEven'">
+					<td><e-combobox ng-datasource="row.edit" ng-model="row.editto"
+							ng-validate="false" ng-readonly="false" ng-editable="false"
+							ng-format="F3" ng-required="false" ng-change="edit($index,row)"
+							ng-if="row.STATUS=='Y'?false:true" width="80px"
+							style="line-height:20px;" /></td>
+					<td>{{row.COMPANY_NAME}}</td>
+					<td hidden>{{row.KEY_NO }}</td>
+					<td>{{row.INSPRD_ID }}</td>
+					<td>{{row.INSPRD_ANNUAL }}</td>
+					<td>{{row.ANNUAL }}</td>
+					<td>{{row.TYPE | mapping:mappingSet['PRD.FEE_STATE']}}</td>
+					<td>{{row.INSPRD_NAME }}</td>
+					<td>{{row.COMM_RATE }}</td>
+					<td>{{row.CNR_RATE}}</td>
+					<td>{{row.CNR_YIELD}}</td>
+					<td>{{row.CNR_MULTIPLE}}</td>
+					<td>{{toJsDate(row.MULTIPLE_SDATE) | date:"yyyy/MM/dd"}}</td>
+					<td>{{toJsDate(row.MULTIPLE_EDATE) | date:"yyyy/MM/dd"}}</td>
+					<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd" }}</td>
+					<td>{{row.CREATOR }}</td>
+					<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd" }}</td>
+					<td>{{row.MODIFIER }}</td>
+					<TD>{{row.APPROVER }}</td>
+					<TD>{{row.APP_DATE }}</td>
+				</tr>
+			</tbody>
+			</table>
+
+
+		</div>

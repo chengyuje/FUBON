@@ -1,0 +1,192 @@
+<style>
+/* open dialog */
+.ngdialog.PRD312_DETAIL {
+	
+}
+/* dialog panl */
+.modal-dialog.PRD312_DETAIL {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1000px;
+	height: auto;
+}
+/* table size */
+.PRD312_DETAIL table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* change row */
+.PRD312_DETAIL.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PRD312_DETAIL_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:150px !important;
+}
+.red{
+	color: red !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PRD312/PRD312_DETAIL.js"></script>
+<div ng-controller="PRD312_DETAILController" ng-cloak>
+	<div class="modal-dialog PRD312_DETAIL">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">{{insInfo.STOCK_CODE}} - {{insInfo.STOCK_NAME}}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="search_table search_box3">
+					<h4 class="h4-title">基本資料</h4>
+					<div class="gv_tab_sc scroll_y" style="min-height:235px;">
+						<table class="table-bordered">
+							<tr>
+								<th style="vertical-align:middle">商品代碼</th>
+								<td style="vertical-align:middle">{{insInfo.STOCK_CODE}}</td>
+								<th style="vertical-align:middle">ISIN_Code</th>
+								<td style="vertical-align:middle">{{insInfo.ISIN_CODE}}</td>
+								<th style="vertical-align:middle">TDCC_Code</th>
+								<td style="vertical-align:middle">{{insInfo.TDCC_CODE}}</td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">商品中文名稱</th>
+								<td style="vertical-align:middle">{{insInfo.STOCK_NAME}}</td>
+								<th style="vertical-align:middle">幣別</th>
+								<td style="vertical-align:middle">{{insInfo.CURRENCY}}</td>
+								<th style="vertical-align:middle">商品架構</th>
+								<td style="vertical-align:middle">{{insInfo.PRODUCT_STRUCTURE}}</td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">風險等級</th>
+								<td style="vertical-align:middle">{{insInfo.RISK_LEVEL_DESC}}</td>
+								<th style="vertical-align:middle">發行國別</th>
+								<td style="vertical-align:middle">{{insInfo.COUNTRY_NAME}}</td>
+								<th style="vertical-align:middle">上手名稱</th>
+								<td style="vertical-align:middle">{{insInfo.UPPER_COMPANY_NAME}}</td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">交易日</th>
+								<td style="vertical-align:middle">{{toJsDate(insInfo.TRADE_DATE) | date:'yyyy/MM/dd'}}</td>
+								<th style="vertical-align:middle">申購起日</th>
+								<td style="vertical-align:middle">{{toJsDate(insInfo.APPLY_START_DATE) | date:'yyyy/MM/dd'}}</td>
+								<th style="vertical-align:middle">贖回止日</th>
+								<td style="vertical-align:middle">{{toJsDate(insInfo.REDEEM_END_DATE) | date:'yyyy/MM/dd'}}</td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">申購票面金額</th>
+								<td style="vertical-align:middle">{{insInfo.APPLY_FACE_VALUE == null ? '' : insInfo.APPLY_FACE_VALUE | number:2}}</td>
+								<th style="vertical-align:middle">申購最低金額</th>
+								<td style="vertical-align:middle">{{insInfo.APPLY_MIN_AMT == null ? '' : insInfo.APPLY_MIN_AMT | number:2}}</td>
+								<th style="vertical-align:middle">贖回最低金額</th>
+								<td style="vertical-align:middle">{{insInfo.REDEEM_MIN_AMT == null ? '' : insInfo.REDEEM_MIN_AMT | number:2}}</td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">配息頻率</th>
+								<td style="vertical-align:middle">{{insInfo.DEVIDEND_FREQUENCY_DESC}}</td>
+								<th style="vertical-align:middle">年化配息率(%)</th>
+								<td style="vertical-align:middle">{{insInfo.YEAR_DIVIDEND_RATE}} %</td>
+								<th style="vertical-align:middle"></th>
+								<td style="vertical-align:middle"></td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">發行日</th>
+								<td style="vertical-align:middle">{{toJsDate(insInfo.ISSUE_DATE) | date:'yyyy/MM/dd'}}</td>
+								<th style="vertical-align:middle">到期日</th>
+								<td style="vertical-align:middle">{{toJsDate(insInfo.MATURITY_DATE) | date:'yyyy/MM/dd'}}</td>
+								<th style="vertical-align:middle">天期</th>
+								<td style="vertical-align:middle">{{insInfo.DAYS}}</td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">提前到期日</th>
+								<td style="vertical-align:middle">{{toJsDate(insInfo.ADVANCE_MATURITY_DATE) | date:'yyyy/MM/dd'}}</td>
+								<th style="vertical-align:middle">期初訂價日</th>
+								<td style="vertical-align:middle">{{toJsDate(insInfo.BEGIN_PRICE_DATE) | date:'yyyy/MM/dd'}}</td>
+								<th style="vertical-align:middle">最終評價日</th>
+								<td style="vertical-align:middle">{{toJsDate(insInfo.FINAL_EVALUATE_DATE) | date:'yyyy/MM/dd'}}</td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">商品報價</th>
+								<td style="vertical-align:middle">{{insInfo.UNIT_PRICE == null ? '' : insInfo.UNIT_PRICE | number:2}}</td>
+								<th style="vertical-align:middle">到期保本率</th>
+								<td style="vertical-align:middle">{{insInfo.MATURITY_GUAR_RATE == null ? '' : insInfo.MATURITY_GUAR_RATE | number:2}}</td>
+								<th style="vertical-align:middle">參與率</th>
+								<td style="vertical-align:middle">{{insInfo.INVOLVE_RATE == null ? '' : insInfo.INVOLVE_RATE | number:2}}</td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">執行價格(%)</th>
+								<td style="vertical-align:middle">{{insInfo.EXEC_PRICE == null ? '' : insInfo.EXEC_PRICE | number:2}} %</td>
+								<th style="vertical-align:middle">下限價(%)</th>
+								<td style="vertical-align:middle">{{insInfo.LOWER_LIMIT_PRICE == null ? '' : insInfo.LOWER_LIMIT_PRICE | number:2}} %</td>
+								<th style="vertical-align:middle">觸發價(KO)(%)</th>
+								<td style="vertical-align:middle">{{insInfo.TRIGGER_PRICE == null ? '' : insInfo.TRIGGER_PRICE | number:2}} %</td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">連動標的1</th>
+								<td style="vertical-align:middle">{{insInfo.LINK_STOCK1_CODE}}</td>
+								<th style="vertical-align:middle">連動標的1<br>期初進場價</th>
+								<td style="vertical-align:middle">{{insInfo.LINK_STOCK1_ENTRY_PRICE == null ? '' : insInfo.LINK_STOCK1_ENTRY_PRICE | number:4}}</td>
+								<th style="vertical-align:middle">進場價類型</th>
+								<td style="vertical-align:middle">{{insInfo.ENTRY_PRICE_TYPE}}</td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">連動標的2</th>
+								<td style="vertical-align:middle">{{insInfo.LINK_STOCK2_CODE}}</td>
+								<th style="vertical-align:middle">連動標的2<br>期初進場價</th>
+								<td style="vertical-align:middle">{{insInfo.LINK_STOCK2_ENTRY_PRICE == null ? '' : insInfo.LINK_STOCK2_ENTRY_PRICE | number:4}}</td>
+								<th style="vertical-align:middle"></th>
+								<td style="vertical-align:middle"></td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">連動標的3</th>
+								<td style="vertical-align:middle">{{insInfo.LINK_STOCK3_CODE}}</td>
+								<th style="vertical-align:middle">連動標的3<br>期初進場價</th>
+								<td style="vertical-align:middle">{{insInfo.LINK_STOCK3_ENTRY_PRICE == null ? '' : insInfo.LINK_STOCK3_ENTRY_PRICE | number:4}}</td>
+								<th style="vertical-align:middle"></th>
+								<td style="vertical-align:middle"></td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">連動標的4</th>
+								<td style="vertical-align:middle">{{insInfo.LINK_STOCK4_CODE}}</td>
+								<th style="vertical-align:middle">連動標的4<br>期初進場價</th>
+								<td style="vertical-align:middle">{{insInfo.LINK_STOCK4_ENTRY_PRICE == null ? '' : insInfo.LINK_STOCK4_ENTRY_PRICE | number:4}}</td>
+								<th style="vertical-align:middle"></th>
+								<td style="vertical-align:middle"></td>
+							</tr>
+							<tr>
+								<th style="vertical-align:middle">連動標的5</th>
+								<td style="vertical-align:middle">{{insInfo.LINK_STOCK5_CODE}}</td>
+								<th style="vertical-align:middle">連動標的5<br>期初進場價</th>
+								<td style="vertical-align:middle">{{insInfo.LINK_STOCK5_ENTRY_PRICE == null ? '' : insInfo.LINK_STOCK5_ENTRY_PRICE | number:4}}</td>
+								<th style="vertical-align:middle"></th>
+								<td style="vertical-align:middle"></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="search_box_btn text-center" ng-hide="fromApp">
+				<button type="button" class="btn btn-default" ng-click="closeThisDialog('cancel')" >確定</button>
+			</div>
+		</div>
+	</div>
+</div>

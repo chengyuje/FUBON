@@ -1,0 +1,240 @@
+<style>
+.modal-dialog.PMS432_UPLOAD {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 300px;
+	height: auto;
+}
+</style>
+
+<script type="text/javascript" src="assets/txn/PMS432/PMS432.js"></script>
+<script type="text/javascript" src="assets/txn/PMS432/PMS432_UPLOAD.js"></script>
+<div class="PMS432" ng-controller="PMS432Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3 scroll_y">
+				<table>
+					<tr>
+						<th>查核區間(批次執行月)：</th>
+						<td>
+							<e-combobox ng-datasource="checkIntervalList"
+	                                    ng-model="inputVO.checkInterval"
+	                                    ng-format="F3"
+	                                    width="200px" 
+	                                    ng-change="conditionReset();" />
+						</td>
+						<th>相似項目：</th>
+						<td>
+							<e-combobox ng-datasource="similarInfoList"
+	                                    ng-model="inputVO.similarInfo"
+	                                    ng-format="F3"
+	                                    width="200px" 
+	                                    ng-change="conditionReset();" />
+						</td>
+					</tr>
+					<tr>
+						<th>比對檔案來源：</th>
+						<td>
+							<e-combobox ng-datasource="compareSourceList"
+	                                    ng-model="inputVO.compareSource"
+	                                    ng-format="F3"
+	                                    width="200px" 
+	                                    ng-change="conditionReset();" />
+						</td>
+						<th>比對結果：</th>
+						<td>
+							<e-combobox ng-datasource="compareResultList"
+	                                    ng-model="inputVO.compareResult"
+	                                    ng-format="F3"
+	                                    width="200px"
+	                                    ng-change="conditionReset();inquireInit();" />
+						</td>
+					</tr>
+					<tr>
+						<th>客戶ID：</th>
+						<td>
+							<input class="form-control" 
+							       type="text"  
+							       style="width: 242px;" 
+							       ng-model="inputVO.custID" 
+							       ng-disabled="!(inputVO.checkInterval      != ''  
+							       				   && inputVO.similarInfo    != '' 
+							       				   && inputVO.compareSource  != '' 
+							       				   && inputVO.compareResult  != '' ) 
+							       			    &&
+							       			    !(inputVO.checkInterval      != '' 
+							       				   && inputVO.similarInfo    != '' 
+							       				   && inputVO.compareResult  == '2' )" />
+						</td>
+						<th>理專ID：</th>
+						<td>
+							<input class="form-control"
+							       type="text"  
+							       style="width: 242px;" 
+							       ng-model="inputVO.empCustID" 
+							       ng-disabled="!(inputVO.checkInterval      != ''  
+							       				   && inputVO.similarInfo    != '' 
+							       				   && inputVO.compareSource  != '' 
+							       				   && inputVO.compareResult  != '' ) 
+							       			    &&
+							       			    !(inputVO.checkInterval      != '' 
+							       				   && inputVO.similarInfo    != '' 
+							       				   && inputVO.compareResult  == '2' )" />
+						</td>
+					</tr>	
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-primary" ng-click="inquireInit();query()"><span class="glyphicon glyphicon-search"></span> 查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init()"><span class="glyphicon glyphicon-erase"></span> 清除</button>
+				<button type="button" class="btn btn-warning" ng-click="export()"><span class="glyphicon glyphicon-download"></span> 匯出</button>
+				<button type="button" class="btn btn-warning" ng-click="upload()"><span class="glyphicon glyphicon-upload"></span> 上傳檔案</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping id="eJumping" output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>	
+			<div>
+				相同項目:
+				<span ng-show="inputVO.similarInfo != ''">
+					 {{inputVO.similarInfo | mapping:similarInfoList:'F3'}}
+				<span>
+			</div>
+			<div>
+				<span ng-show="inputVO.compareResult != '2'">
+					比對檔案來源:
+					<span ng-repeat="type in sourceTypeList">
+						{{type | mapping:compareSourceList:'F3'}}{{$last ? '' : '、'}}
+					</span>
+				</span>
+				<span ng-show="inputVO.compareResult == '2'">
+					比對結果: 
+					{{inputVO.compareResult | mapping:compareResultList:'F3'}}
+				</span>
+			</div>
+			<div class="gv_tab_sc scroll_y">
+				<table class="table-bordered td_center" e-height="700px" e-mode="1" e-top="true" e-list="data" style="white-space:nowrap">
+					<thead>
+						<tr>
+							<th>勾選</th>
+							<th ng-show="inputVO.compareResult == '2'">小計筆數</th>
+							<th>保單號碼</th>
+							<th>客戶ID</th>
+							<th ng-show="inputVO.compareResult == '2'">被比對客戶ID</th>
+							<th>相似項目</th>
+							<th>相同內容</th>
+							<th ng-show="inputVO.compareResult != '2'">比對檔案來源</th>
+							<th ng-show="inputVO.compareResult == '2'">小計總數</th>
+							<th>相同聯絡資訊<br/>理專的ID/姓名/分行代號</th>
+							<th>關係戶</th>
+							<th>查核結果</th>
+							<th>關係說明</th>
+							<th>證明文件說明(保險文件編號)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<!-- 勾選 -->
+							<td>
+								<input type="checkbox" ng-model="row.SELECTED" ng-click="rowClicked(row)" ng-disabled="row.chkBoxDisbaled" />
+							</td>
+							<!-- 小計比數 -->
+							<td ng-show="inputVO.compareResult == '2'">
+								{{row.TOTAL_ROW_COUNT}}
+							</td> 
+							<!-- 保單號碼 -->
+							<td>
+								{{row.POLICY_NO}}
+							</td> 
+							<!-- 客戶ID -->			
+							<td>	
+								<span ng-show="inputVO.compareResult != '2'">
+									{{row.CUST_ID}}
+								</span>
+								<span ng-show="inputVO.compareResult == '2'">
+									{{row.CUST_ID_A}}
+								</span>
+							</td>				
+							<!-- 被比對客戶ID -->
+							<td ng-show="inputVO.compareResult == '2'"> 
+								{{row.CUST_ID_B}}
+							</td>
+							<!-- 相似項目 -->
+							<td>
+								{{row.CHK_TYPE | mapping:similarInfoList:'F3'}}
+							</td>	
+							<!-- 相同內容 -->
+							<td>
+								{{row.CHECK_SOURCE_CONTENT}}
+							</td>  
+							<!-- 比對檔案來源 -->
+							<td ng-show="inputVO.compareResult != '2'"> 
+								{{row.SOURCE_TYPE}}
+							</td>
+							<!-- 小計總數 -->
+							<td ng-show="inputVO.compareResult == '2'">
+								{{row.TOTAL}}
+							</td> 
+							<!-- 相同聯絡資訊理專的ID/姓名/分行代號 -->
+							<td>
+								{{row.EMP_CUST_ID}}/{{row.EMP_NAME}}/{{row.BRANCH_ID}}
+							</td> 
+							<!-- 關係戶 -->
+							<td>
+								{{row.MATCH_YN | mapping:relation_YN:'F3'}}
+							</td> 
+							<!-- 查核結果 -->
+							<td>
+								<e-combobox ng-datasource="checkResult_YN"
+		                                    ng-model="row.CHECKED_RESULT"
+		                                    ng-format="F3"
+		                                    ng-disabled="!row.SELECTED"
+		                                    ng-readonly="!row.SELECTED"
+		                                    ng-change="checkReset(row)"
+		                                    width="200px" />
+							</td>
+							<!-- 關係說明 -->
+							<td>
+								<e-combobox ng-datasource="relationList"
+		                                    ng-model="row.RELATION"
+		                                    ng-format="F3"
+		                                    ng-disabled="!row.SELECTED || row.CHECKED_RESULT == 'N'"
+		                                    ng-readonly="!row.SELECTED || row.CHECKED_RESULT == 'N'"
+		                                    ng-change="checkRelation(row)"
+		                                    width="200px" />
+		                        <input type="text" 
+		                        	   class="form-control" 
+		                        	   style="width: 100px; height: 30px; display: inline;" 
+		                        	   ng-model="row.OTHER_REL" 
+		                        	   placeholder="其他關係..." 
+		                        	   ng-disabled="row.RELATION != 9 || row.CHECKED_RESULT == 'N'" />
+							</td>
+							<!-- 證明文件說明(保險文件編號) -->
+							<td>
+								<input type="text" class="form-control" ng-model="row.INSURANCE_NO" placeholder="請輸入...限20個字..." maxlength="20" ng-disabled="!row.SELECTED || row.CHECKED_RESULT == 'N'" />
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<br />
+				<div align="center" ng-show="paramList.length > 0">
+		            <button type="button" class="btn btn-success" ng-click="save()">
+		                <span class="glyphicon glyphicon-save"></span> 儲存
+		            </button>
+		        </div>
+			</div>
+		</div>
+	</div>
+</div>

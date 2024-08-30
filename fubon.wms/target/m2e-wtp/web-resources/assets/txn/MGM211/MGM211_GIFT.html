@@ -1,0 +1,62 @@
+<style>
+/* dialog panl */
+.modal-dialog.MGM211_GIFT {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+
+.MGM211_GIFT .table tr th {
+	background: #efefef;
+	color: black;
+	font-weight: bold;
+}
+</style>
+<script type="text/javascript" src="assets/txn/MGM211/MGM211_GIFT.js"></script>
+<div ng-controller="MGM211_GIFTController" ng-cloak>
+	<div class="modal-dialog MGM211_GIFT">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">設定適用贈品</h4>
+			</div>
+			<div class="modal-body">
+				<div class="ejborder">
+					<e-jumping-once output="outputVO" list="data" totallist="giftList"></e-jumping-once>	
+				</div>					
+				<div class="gv_tab_sc scroll_y" style="white-space: nowrap; ">
+					<table>
+						<thead>
+							<tr class="gift">
+								<th width="10%">選取</th>
+								<th width="30%">贈品代碼</th>
+								<th width="40%">贈品名稱</th>
+<!-- 							<th width="20%" ng-show="act_type == 'V'">每單位回饋金</th> -->
+								<th width="20%" ng-show="act_type == 'M'">每單位贈品<br/>兌換點數</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in data">
+								<td align="center"><input type="checkbox" ng-model="row.ADD" ng-click=""/></td>
+								<td>{{row.GIFT_SEQ}}</td>
+								<td>{{row.GIFT_NAME}}</td>
+								<td>
+									<input type="text" class="form-control" placeholder="請輸入..." e-input-limit="NN" ng-model="row.EXCH_UNI">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>	
+				<div class="search_box_btn text-center">
+	            	<button type="button" class="btn btn-info" ng-click="saveGift()">儲存</button>
+	            	<button type="button" class="btn btn-info" ng-click="">清除</button>
+	                <button type="button" class="btn btn-info" ng-click="closeThisDialog('cancel')">取消</button>
+	            </div>
+	     	</div>
+		</div>
+	</div>
+</div>

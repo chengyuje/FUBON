@@ -1,0 +1,79 @@
+<form name="form.job" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+    <div class="form-group" style="padding-top: 20px">
+        <label class="col-form-label col-sm-2" ng-bind="'JOB 代號'"></label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" ng-model="jobVO.jobid" maxlength="20" placeholder="JOB 代號固定為 RPT.報表代號！"
+                   ng-disabled="isCreateOrUpdate && !needJob"  readonly required />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'JOB 名稱'" for="jobName"></label>
+        <div class="col-sm-10">
+            <input id="jobName" type="text" class="form-control" ng-model="jobVO.jobname" max="30" placeholder="請輸入 JOB 名稱～"
+                   ng-disabled="isCreateOrUpdate && !needJob" ng-readonly="!isCreateOrUpdate"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'JOB 說明'" for="jobDesc"></label>
+        <div class="col-sm-10">
+            <input id="jobDesc" type="text" class="form-control" ng-model="jobVO.description" maxlength="100" placeholder="請輸入 JOB 說明～"
+                   ng-disabled="isCreateOrUpdate && !needJob" ng-readonly="!isCreateOrUpdate"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'BeanId'" for="beanId"></label>
+        <div class="col-sm-10">
+            <input id="beanId" type="text" class="form-control" ng-model="jobVO.beanid" maxlength="30" placeholder="請輸入 BeanId～"
+                   ng-disabled="isCreateOrUpdate && !needJob" ng-readonly="!isCreateOrUpdate"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'Action'"></label>
+        <div class="col-sm-10">
+            <e-combobox width="100%" ng-datasource="mappingSet['jobAct']" ng-model="jobVO.action" ng-format="F3"
+                        ng-change="changeAction()"
+                        ng-disabled="isCreateOrUpdate && !needJob" ng-readonly="!isCreateOrUpdate" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'參數列'" for="jobParam"></label>
+        <div class="col-sm-10">
+            <input id="jobParam" type="text" class="form-control" ng-model="jobVO.parameters" maxlength="500" placeholder="請輸入參數～"
+                   ng-disabled="isCreateOrUpdate && !needJob" ng-readonly="!isCreateOrUpdate"/>
+            <span ng-show="jobVO.action == 'genRpt' && !needFtp && jobVO.parameters.contains('ftpPutCode=')" class="help-block with-errors" ng-bind="'請記得填寫 FTP 頁籤，如果不須放置報表，則將 ftpPutCode 此參數刪除！'"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'預先處理程序'" for="jobPre"></label>
+        <div class="col-sm-10">
+            <input id="jobPre" type="text" class="form-control" ng-model="jobVO.precondition" maxlength="100" placeholder="如有請輸入預先處理程序～"
+                   ng-disabled="isCreateOrUpdate && !needJob" ng-readonly="!isCreateOrUpdate"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-form-label col-sm-2" ng-bind="'置後處理程序'" for="jobPost"></label>
+        <div class="col-sm-10">
+            <input id="jobPost" type="text" class="form-control" ng-model="jobVO.postcondition" maxlength="100" placeholder="如有請輸入置後處理程序～"
+                   ng-disabled="isCreateOrUpdate && !needJob" ng-readonly="!isCreateOrUpdate"/>
+        </div>
+    </div>
+
+    <hr/>
+
+    <div ng-if="isCreateOrUpdate" class="text-center">
+        <button type="button" class="btn btn-success" ng-click="createOrUpdate()" data-toggle="tooltip" title="儲存設定～">
+            <span class="glyphicon glyphicon-floppy-disk"></span>
+            <span ng-bind="'儲存'"></span>
+        </button>
+        <button type="button" class="btn btn-default" ng-click="startJob()" data-toggle="tooltip" title="需要 Job～"
+                ng-show="!needJob">
+            <span class="glyphicon glyphicon-open"></span>
+            <span ng-bind="'需要'"></span>
+        </button>
+        <button type="button" class="btn btn-default" ng-click="clearJob()" data-toggle="tooltip" title="不需要 Job～"
+                ng-show="needJob">
+            <span class="glyphicon glyphicon-erase"></span>
+            <span ng-bind="'不需要'"></span>
+        </button>
+    </div>
+</form>

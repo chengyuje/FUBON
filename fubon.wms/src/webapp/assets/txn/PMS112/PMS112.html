@@ -1,0 +1,154 @@
+<style>
+.datewidth{
+	width:180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS112/PMS112.js"></script>
+<div class="PMS112" ng-controller="PMS112Controller" ng-cloak>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3 scroll_y">
+			<table>
+				<tr>
+					<th><font color="red">*</font>名單建立年月：</th>
+	                <td>
+	                	<div style="float:left">
+		            		<e-combobox id="sDate" name="sDate"
+										ng-datasource="SDateList" 
+										ng-model="inputVO.sDate"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-change="getEDateList();cleanList();"
+										ng-format="F3"
+										width="100px"
+										ng-required="true" />
+						</div>
+						<div style="float:left">&nbsp; ～ &nbsp;</div>
+						<div style="float:left">
+							<e-combobox id="eDate" name="eDate"
+										ng-datasource="EDateList" 
+										ng-model="inputVO.eDate"
+										ng-validate="false" 
+										ng-disabled="EDateList.length <= 1"
+										ng-readonly="EDateList.length <= 1" 
+										ng-editable="false"
+										ng-format="F3"
+										width="100px"
+										ng-change="cleanList()"
+										ng-required="true" />	
+						</div>
+					</td>
+					<th></th>
+					<td></td>
+				</tr>
+				<tr>
+					<th>名單類型：</th>
+					<td>
+						<e-combobox id="leadType" name="leadType" 
+									ng-paramtype="PMS.PIPE_CONTENT_LEAD_TYPE"
+									ng-model="inputVO.leadType"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="true"
+									ng-change="cleanList()"
+									style="line-height:20px;" />
+					</td>
+					<th></th>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="query()" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()" >清除</button>
+			<button type="button" class="btn btn-info" ng-click="export()" onfunction-type="export" ng-disabled="qryList.length == 0">匯出</button>
+		</div>
+	</div>
+	<div class="tfb_content">
+  		<div class="tfb_content_icon"></div>
+  		<div class="tfb_content_tit"> <img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>
+	<div class="panel_content">
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="rstable e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="qryList">
+				<thead>
+					<tr>
+						<th rowspan="2">業務處</th>
+						<th rowspan="2">營運區</th>
+						<th rowspan="2">分行別</th>
+						<th rowspan="2">分行名稱</th>
+						<th rowspan="2">組別</th>
+						<th rowspan="2">名單數</th>
+						<th rowspan="2">未處理</th>
+						<th rowspan="2">成功進件</th>
+						<th rowspan="2">約訪收件</th>
+						<th colspan="4">追蹤聯絡中</th>
+						<th colspan="10">未成功名單</th>
+					</tr>
+					<tr>
+						<th>第一次聯絡不上，再聯絡</th>
+						<th>第二次聯絡不上，再聯絡</th>
+						<th>處理中</th>
+						<th>合計</th>
+						
+						<th>連續三次聯絡不上</th>
+						<th>聯絡電話不完整/錯誤</th>
+						<th>非本行目標/可承作客群</th>
+						<th>利費率不符需求</th>
+						<th>貸款金額/擔保品初估額度不符需求</th>
+						<th>其他授信條件不符需求</th>
+						<th>擔保品屬本行不承作類型/區域</th>
+						<th>已有其他業務人員聯繫/名單重複</th>
+						<th>無資金需求</th>
+						<th>合計</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat-start="center in qryList">
+						<td align="center" rowspan="{{center.ROWSPAN}}" colspan="{{center.COLSPAN}}" ng-if="center.REGION_CENTER_NAME != null && !(center.REGION_CENTER_NAME).includes('合計')">{{center.REGION_CENTER_NAME}}</td>
+						<td align="center" rowspan="{{center.ROWSPAN}}" colspan="{{center.COLSPAN+1}}" ng-if="center.REGION_CENTER_NAME != null && (center.REGION_CENTER_NAME).includes('合計')">{{center.REGION_CENTER_NAME}}</td>
+					</tr>
+					<tr ng-repeat-start="branchArea in center.BRANCH_AREA">
+						<td align="center" rowspan="{{branchArea.ROWSPAN}}" colspan="{{branchArea.COLSPAN}}" ng-if="branchArea.BRANCH_AREA_NAME != null">{{branchArea.BRANCH_AREA_NAME}}</td>
+						<td align="center" rowspan="{{branchArea.ROWSPAN}}" ng-if="branchArea.BRANCH_AREA_NAME != null && (branchArea.BRANCH_AREA_NAME).includes('合計')">{{branchArea.BRANCH_AREA_GROUP}}</td>
+					</tr>
+					<tr ng-repeat-start="branch in branchArea.BRANCH">
+						<td align="center" rowspan="{{branch.ROWSPAN+1}}" ng-if="branch.BRANCH_NAME != null">{{branch.BRANCH_NBR}}</td>
+						<td align="center" rowspan="{{branch.ROWSPAN+1}}" ng-if="branch.BRANCH_NAME != null">{{branch.BRANCH_NAME}}</td>
+						<td align="center" rowspan="{{branch.ROWSPAN+1}}" ng-if="branch.BRANCH_NAME != null">{{branch.AREA_GROUP}}</td>
+					</tr>
+					<tr ng-repeat-end ng-repeat="role in branch.ROLE">
+						<td align="right">{{role.STATUS_ALL}}</td>
+						<td align="right">{{role.STATUS_01}}</td>
+						<td align="right">{{role.STATUS_99}}</td>
+						<td align="right">{{role.STATUS_03B}}</td>
+						<td align="right">{{role.STATUS_02A}}</td>
+						<td align="right">{{role.STATUS_02B}}</td>
+						<td align="right">{{role.STATUS_02}}</td>
+						<td align="right">{{role.STATUS_02ALL}}</td>
+						<td align="right">{{role.STATUS_03A}}</td>
+						<td align="right">{{role.STATUS_03D}}</td>
+						<td align="right">{{role.STATUS_03E}}</td>
+						<td align="right">{{role.STATUS_03F}}</td>
+						<td align="right">{{role.STATUS_03G}}</td>
+						<td align="right">{{role.STATUS_03H}}</td>
+						<td align="right">{{role.STATUS_03I}}</td>
+						<td align="right">{{role.STATUS_03J}}</td>
+						<td align="right">{{role.STATUS_03K}}</td>
+						<td align="right">{{role.STATUS_03ALL}}</td>
+					</tr>
+					<tr ng-repeat-end ng-hide="true"></tr>
+					<tr ng-repeat-end ng-hide="true"></tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	
+</div>

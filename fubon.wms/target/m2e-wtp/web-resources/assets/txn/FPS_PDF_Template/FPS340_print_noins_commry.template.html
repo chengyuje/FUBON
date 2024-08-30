@@ -1,0 +1,168 @@
+<!-- 交易畫面 -->
+<!-- 請修改 Controller 名稱，需符合 HTML內定義 -->
+<style>
+
+
+</style>
+
+<!-- 無投保、有推介 -->
+<div class="print A4"
+     ng-controller="FPSPrintController">
+
+  <!-- header -->
+  <section>
+    <img ng-src="{{path.header}}"
+         class="wrapper"
+         print="header">
+  </section>
+
+  <!-- title -->
+  <section print
+           print-top-margin="-5"
+           style="margin-bottom:2em;"
+           class="wrapper">
+    <div ng-include="path.brief"></div>
+  </section>
+
+  <!-- image -->
+  <section>
+    <img ng-if="rptUrl"
+         data-ng-src="{{rptUrl}}"
+         alt="rptUrleName"
+         style="margin-bottom:5em;
+                width:100%;"
+         print="image"
+         print-page="next"
+         print-scale-direction="vertical">
+  </section>
+
+  <!-- cust -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">1</span>基本資料
+    </div>
+    <div class="block container"
+         style="border-radius: 1em;">
+      <div ng-include="path.custInfo"
+           ng-init="isPrint=true"></div>
+    </div>
+  </section>
+
+  <!-- FPS320 -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">2</span>您的需求
+    </div>
+    <div class="block container"
+         style="border-radius: 1em;padding:5px">
+      <div ng-include="path.requirement"
+           ng-init="isPrint=true"></div>
+    </div>
+    <ol class="ps-wrapper wrapper tiny-font">
+		<li class="ps"
+	     	ng-bind="'本規劃書所載(包含以下之內容)，資料來源皆為台北富邦商業銀行，資料基準日皆截至' + fpsPrevBusiDay + '為止本行可取得之最新資料；如需計算折合台幣金額時，折算台幣匯率係採本行前一營業日台幣對外幣之匯率；金額欄位數字皆四捨五入計算至整數位。'"></li>
+	</ol>
+  </section>
+
+  <!-- charts -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num">3</span>投資組合規劃
+    </div>
+    <div class="wrapper">模擬配置如下：</div>
+
+    <div ng-include="path.firstPlanChart"></div>
+    <div ng-include="path.firstPlanChart_ps"></div>
+  </section>
+
+  <!-- products -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">4</span>商品明細
+      </div>
+      <div class="wrapper">根據前述配置規劃之投資組合標的如下：</div>
+    </div>
+    <div ng-include="path.firstPlanProduct"
+         print></div>
+    <div ng-include="path.firstPlanProduct_ps"
+         print></div>
+  </section>
+
+  <!-- charts FPS323 -->
+  <section ng-if="!showFPS323Error">
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num">5</span>績效模擬
+      </div>
+      <div class="wrapper">根據前述規劃之商品標的組合，使用其歷史價格資料並透過財務理論模型模擬出在較佳情境、一般情境，和較差情境下投資到期時的預期金額。
+      </div>
+    </div>
+    <div print
+         print-unique="true">
+      <div class="block container">
+        <div class="content-wrapper no-border">
+          <div ng-include="path.portRtnSim"></div>
+        </div>
+      </div>
+    </div>
+    <div ng-include="path.portRtnSim_ps"
+         print></div>
+  </section>
+
+  <!-- historyPerformance -->
+  <section ng-if="!showFPS330Error">
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num"
+              ng-bind="labelIndex - 1 - !!showFPS323Error"></span>歷史績效表現
+      </div>
+    </div>
+    <div ng-include="path.historyPerformance"
+         print
+         print-unique="true"></div>
+    <div ng-include="path.historyPerformance_ps"
+         print></div>
+  </section>
+
+  <!-- productPerformance -->
+  <section print>
+    <div class="title-wrapper">
+      <span class="title-num"
+            ng-bind="labelIndex - !!showFPS323Error - !!showFPS330Error"></span>基金商品績效
+    </div>
+    <div class="wrapper">商品明細中個別產品之近期績效如下：</div>
+
+    <div ng-include="path.productPerformance"></div>
+    <div ng-include="path.productPerformance_ps"></div>
+  </section>
+
+
+  <!-- 使用指南 -->
+  <section>
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num"
+              ng-bind="labelIndex + 1 - !!showFPS323Error - !!showFPS330Error"></span>規劃書使用指南
+      </div>
+    </div>
+
+    <div ng-include="path.manual"
+         print></div>
+  </section>
+
+  <!-- 注意事項 -->
+  <section ng-if="paramList.length>0">
+    <div print>
+      <div class="title-wrapper">
+        <span class="title-num"
+              ng-bind="labelIndex + 2 - !!showFPS323Error - !!showFPS330Error"></span>注意事項
+      </div>
+    </div>
+    <!-- <div>{{mapping.noticeTypeAlls}}</div>
+    <div>{{mapping.noticeFlagAlls}}</div> -->
+    <div ng-include="path.notice"
+         print></div>
+  </section>
+  <div id="hiddendom"></div>
+</div>

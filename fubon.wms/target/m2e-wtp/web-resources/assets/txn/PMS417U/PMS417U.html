@@ -1,0 +1,187 @@
+<style>
+.datewidth{ 
+	width:120px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS417/PMS417.js"></script>
+<script type="text/javascript" src="assets/txn/PMS417U/PMS417U.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS417U" ng-controller="PMS417UController" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>						
+					<th>*資料月份：</th>
+					<td class="form-inline" colspan="7">
+	                	<div class="form-group">
+							<div class="input-group datebox datewidth">
+								<input 	type="text" id="importSDate" name="importSDate"
+									   	class="form-control"
+										uib-datepicker-popup="yyyyMM"
+										ng-model="inputVO.importSDate"
+										is-open="model.e"
+										datepicker-options="importStartDateOptions"
+								   		datepicker-mode="'month'"
+										ng-readonly="true"
+										ng-change="limitDate();dateChangeU()"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+							<div style="float: left !important;">～</div>
+							<div class="input-group datebox datewidth">
+								<input 	type="text" id="importEDate" name="importEDate"
+									   	class="form-control"
+										uib-datepicker-popup="yyyyMM"
+										ng-model="inputVO.importEDate"
+										is-open="model.f"
+										datepicker-options="importEndDateOptions"
+								   		datepicker-mode="'month'"
+										ng-readonly="true"
+										ng-change="limitDate()" 
+										ng-disabled="inputVO.importSDate == undefined" />
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'f')" ng-disabled="inputVO.importSDate == undefined" ng-readonly="inputVO.importSDate == undefined">
+									<i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</div>
+					</td>
+				</tr>
+				<tr>								    												
+					<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-paramtype="PMS.UHRM_RC"
+										ng-model="inputVO.uhrmRC"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion()"
+										style="line-height:20px;" />
+						</td>	
+						<th>業務中心：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-paramtype="PMS.UHRM_OP"
+										ng-model="inputVO.uhrmOP"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea()"
+										style="line-height:20px;" />
+						</td>
+						<th>理專：</th>
+						<td>
+							<e-combobox id="aoCode" name="aoCode"
+										ng-datasource="mappingSet['EmpName']"
+										ng-model="inputVO.aoCode"
+										ng-validate="false"
+										ng-disabled="false"
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										style="line-height:20px;" />						 
+						</td>
+				</tr>					
+			</table>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+			<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1" function-type="export">匯出</button>
+		</div>
+	</div>
+	
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢結果</div>
+	</div>		
+	<div class="panel_content">
+		<e-jumping-once output="outputVO" list="paramList" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+			<table class="e-table-freeze" e-height="700px" e-mode="1" e-top="true" e-left="4" e-list="paramList">
+				<thead>
+					<tr>
+						<th>資料月份</th>
+						<th>業務處</th>
+						<th>區別</th>
+						<th>分行代號</th>
+						<th>分行名稱</th>
+						<th>申購日期</th>
+						<th>贖回日期</th>
+						<th>憑證號碼</th>
+						<th>基金編號</th>
+						<th>基金名稱</th>
+						<th>信託業務別</th>
+						<th>計價幣別</th>
+						<th>參考贖回金額</th>
+						<th>配息金額</th>
+						<th>投資金額</th>
+						<th>相關手續費 </th>
+						<th>報酬率</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="query()">客戶ID</e-sorter>
+						</th>
+						<th>客戶姓名</th>
+						<th>高齡客戶</th>
+						<th>客戶屬性</th>
+						<th>交易來源</th>
+						<th>
+							<e-sorter e-input="inputVO" e-mode="auto" e-col="EMP_ID" e-query="query()">員工編號</e-sorter>
+						</th>
+						<th>員工姓名</th>
+						<th>AO&nbsp;CODE</th>							
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					 	<td style="vertical-align:middle;" align="center">{{row.YEARMON}}</td>
+					 	<td style="vertical-align:middle;" align="center">{{row.REGION_CENTER_NAME}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.BRANCH_AREA_NAME}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.BRANCH_NBR}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.BRANCH_NAME}}</td>
+						<td style="vertical-align:middle;" align="center">{{toJsDate(row.INV_DATE) | date:'yyyy/MM/dd'}}</td>
+						<td style="vertical-align:middle;" align="center">{{toJsDate(row.REF_DATE) | date:'yyyy/MM/dd'}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.CERT_NBR}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.FUND_CODE}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.FUND_NAME}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.TRUST_TYPE}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.CUR_COD}}</td>
+						<td style="vertical-align:middle;" align="right">{{row.REF_AMT|number}}</td>
+						<td style="vertical-align:middle;" align="right">{{row.DIV_AMT|number}}</td>
+						<td style="vertical-align:middle;" align="right">{{row.INV_AMT|number}}</td>
+						<td style="vertical-align:middle;" align="right">{{row.TOT_FEE|number}}</td>
+						<td style="vertical-align:middle;" align="right"><span ng-show="row.REF_DATE != null">{{row.PROFIT_RATE|number:2}}</span></td>
+						<td style="vertical-align:middle;" align="center">{{row.CUST_ID}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.CUST_NAME}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.CUST_AGE}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.CUST_ATT}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.TRAN_SRC}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.EMP_ID}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.EMP_NAME}}</td>
+						<td style="vertical-align:middle;" align="center">{{row.AO_CODE}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<div>
+				相關手續費＝申購手續費＋信管費<br />
+				報酬率＝( 贖回金額＋相關配息－相關手續費－投資金額  )／投資金額<br />
+				交易來源：交易若已贖回顯示贖回途徑，若僅申購則顯示申購途徑
+			</div>
+		</div>
+	</div>
+</div>
