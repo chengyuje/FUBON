@@ -1001,6 +1001,18 @@ eSoafApp.controller('SOT110Controller',
 		    $scope.sendRecv("SOT110", "save", "com.systex.jbranch.app.server.fps.sot110.SOT110InputVO", $scope.inputVO,
 					function(tota, isError) {
 						if (!isError) {
+							debugger
+							if(tota[0].body.overCentRateResult == "N") {
+								//集中度超過上限
+								$scope.showErrorMsg("客戶高風險商品集中度比例已超過上限");
+								$scope.custClear();
+								$scope.prodClear(true);
+								$scope.refresh();
+								return;
+							} else if(tota[0].body.overCentRateResult == "W") {
+								//集中度超過通知門檻
+								$scope.showMsg("客戶高風險商品集中度已超過通知門檻比例，請取得客戶同意，若為弱勢客戶，須請處(副)主管核准");
+							}
 							if (tota[0].body.errorMsg != null) {
 								$scope.showErrorMsg(tota[0].body.errorMsg);
 								$scope.refresh();

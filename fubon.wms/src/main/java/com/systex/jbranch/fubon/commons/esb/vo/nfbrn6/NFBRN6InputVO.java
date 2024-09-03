@@ -39,6 +39,8 @@ public class NFBRN6InputVO {
 	private String AUTH_TIME;		//鍵機/覆核時間
 	@XmlElement
 	private String REMARKS;		//備註
+	@XmlElement
+	private String DYNAMIC_YN;		//Y:動態鎖利	空白:一般基金單次議價
 	
 	
 	public String getCONFIRM() {
@@ -120,8 +122,11 @@ public class NFBRN6InputVO {
 	public void setAUTH_TIME(String aUTH_TIME) {
 		AUTH_TIME = aUTH_TIME;
 	}
-	
-	
-	
+	public String getDYNAMIC_YN() {
+		return DYNAMIC_YN;
+	}
+	public void setDYNAMIC_YN(String dYNAMIC_YN) {
+		DYNAMIC_YN = dYNAMIC_YN;
+	}
 	
 }

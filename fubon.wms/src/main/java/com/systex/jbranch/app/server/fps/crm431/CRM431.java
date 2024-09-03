@@ -931,11 +931,11 @@ public class CRM431 extends FubonWmsBizLogic {
 		SOT712 sot712 = (SOT712) PlatformContext.getBean("sot712");
 		SOT712InputVO inputVO_712 = new SOT712InputVO();
 
-		if (StringUtils.equals("1", svo.getAPPLY_TYPE()) || StringUtils.equals("2", svo.getAPPLY_TYPE())) { //基金
+		if (StringUtils.equals("1", svo.getAPPLY_TYPE()) || StringUtils.equals("2", svo.getAPPLY_TYPE()) || StringUtils.equals("6", svo.getAPPLY_TYPE())) { //基金
 			inputVO_709.setCheckCode(checkCode);
 			inputVO_709.setApplySeq(svo.getAPPLY_SEQ());
 
-			if (StringUtil.isEqual(svo.getAPPLY_TYPE(), "1")) { //基金單筆申購
+			if (StringUtil.isEqual(svo.getAPPLY_TYPE(), "1") || StringUtil.isEqual(svo.getAPPLY_TYPE(), "6")) { //1:基金單筆申購 6:基金動態鎖利
 				outputVO_709 = sot709.singleBargainApply(inputVO_709);
 			} else if (StringUtil.isEqual(svo.getAPPLY_TYPE(), "2")) { //基金定期(不)定額申購
 				outputVO_709 = sot709.singleRegBargainApply(inputVO_709);
@@ -947,7 +947,8 @@ public class CRM431 extends FubonWmsBizLogic {
 			outputVO_710 = sot710.singleBargainApply(inputVO_710);
 		}
 
-		if (((StringUtils.equals("1", svo.getAPPLY_TYPE()) || StringUtils.equals("2", svo.getAPPLY_TYPE())) && StringUtils.isBlank(outputVO_709.getErrorMsg())) || (StringUtils.equals("4", svo.getAPPLY_TYPE()) && StringUtils.isBlank(outputVO_710.getErrorTxt()))) {
+		if (((StringUtils.equals("1", svo.getAPPLY_TYPE()) || StringUtils.equals("2", svo.getAPPLY_TYPE()) || StringUtils.equals("6", svo.getAPPLY_TYPE())) 
+				&& StringUtils.isBlank(outputVO_709.getErrorMsg())) || (StringUtils.equals("4", svo.getAPPLY_TYPE()) && StringUtils.isBlank(outputVO_710.getErrorTxt()))) {
 			if (StringUtils.equals("3", checkCode)) { //發覆核電文成功
 				svo.setAPPLY_STATUS(APPLY_STATUS_AUTH); //已授權
 				dam.update(svo);
@@ -983,7 +984,8 @@ public class CRM431 extends FubonWmsBizLogic {
 
 			}
 		} else {
-			if ((StringUtils.equals("1", svo.getAPPLY_TYPE()) || StringUtils.equals("2", svo.getAPPLY_TYPE())) && StringUtils.isNotBlank(outputVO_709.getErrorMsg())) {
+			if ((StringUtils.equals("1", svo.getAPPLY_TYPE()) || StringUtils.equals("2", svo.getAPPLY_TYPE()) || StringUtils.equals("6", svo.getAPPLY_TYPE())) 
+					&& StringUtils.isNotBlank(outputVO_709.getErrorMsg())) {
 				throw new APException(outputVO_709.getErrorMsg());
 			} else if (StringUtils.equals("4", svo.getAPPLY_TYPE()) && StringUtils.isNotBlank(outputVO_710.getErrorTxt())) {
 				throw new APException(outputVO_710.getErrorTxt());

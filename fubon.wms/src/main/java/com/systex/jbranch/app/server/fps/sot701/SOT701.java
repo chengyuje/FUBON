@@ -917,9 +917,10 @@ public class SOT701 extends EsbUtil {
 
 	/**
 	 * 查詢客戶W-8BEN和FATCA客戶註記檢核
-	 *
+	 * 
 	 * 使用電文: FC032275
 	 *
+	 *#1981 不合作例外帳戶例外管理 by SamTu 2024.05.03
 	 * @param body
 	 * @return W8BenDataVO
 	 */
@@ -927,6 +928,7 @@ public class SOT701 extends EsbUtil {
 		sot701InputVO = (SOT701InputVO) body;
 		String custID = sot701InputVO.getCustID();
 
+		String exceptionAcctFlag  = getExceptionAcctFlag(custID);
 		W8BenDataVO w8BenDataVO = new W8BenDataVO();
 		WMS032275OutputVO wms032275OutputVO = queryCustW8BenFATCA(custID);
 
@@ -986,7 +988,7 @@ public class SOT701 extends EsbUtil {
 			// 辨識完成
 			if ("Y".equals(idfS) && StringUtils.isNotBlank(idfN)) {
 				// 判斷身份
-				if (idfN.startsWith("12")) {
+				if (idfN.startsWith("12") && "N".equals(exceptionAcctFlag)) {
 					w8BenDataVO.setFatcaType("N"); // 不合作
 				} else if (idfN.matches("1301|1302|1303")) {
 					w8BenDataVO.setFatcaType("Y"); // 美國人
@@ -1028,12 +1030,15 @@ public class SOT701 extends EsbUtil {
 	 *
 	 * 使用電文: FC032275
 	 *
+	 *#1981 不合作例外帳戶例外管理 by SamTu 2024.05.03
 	 * @param body
 	 * @return FatcaDataVO
 	 */
 	public FatcaDataVO getFatcaData(Object body) throws Exception {
 		sot701InputVO = (SOT701InputVO) body;
 		String custID = sot701InputVO.getCustID();
+		
+		String exceptionAcctFlag  = getExceptionAcctFlag(custID);
 
 		WMS032275OutputVO wms032275OutputVO = queryCustW8BenFATCA(custID);
 
@@ -1052,7 +1057,15 @@ public class SOT701 extends EsbUtil {
 			fatcaDataVO.setIDF_S(idfS);
 
 			if (StringUtils.isNotBlank(idfN)) // 依照idfN去設置fatcaType
-				fatcaDataVO.setFatcaType(idfN);
+				if("N".equals(idfN)){
+					if("N".equals(exceptionAcctFlag)) {
+						fatcaDataVO.setFatcaType(idfN);
+					} else {
+						fatcaDataVO.setFatcaType(" ");
+					}
+				} else {
+					fatcaDataVO.setFatcaType(idfN);
+				}				
 		}
 		return fatcaDataVO;
 	}
@@ -3589,6 +3602,27 @@ public class SOT701 extends EsbUtil {
 		}
 		
 		return hnwcVO;
+	}
+ 	
+	/**
+	 * 取得不合作例外帳戶例外註記
+	 *
+	 * @param inputVO
+	 * @return true = 待確認
+	 * @throws Exception
+	 */
+	private String getExceptionAcctFlag(String custID) throws Exception {
+		String mark = "N";
+
+		if (StringUtils.isNotBlank(custID)) {
+			List<CBSUtilOutputVO> data = _067050_067115dao.search(custID, cbsservice.getCBSIDCode(custID));
+
+			try{
+				mark = data.get(0).getCbs067115OutputVO().getFinManInstrmt1().substring(35,36);
+			} catch (Exception e) {}
+		}
+
+		return StringUtils.equals(mark, "Y") ? "Y" : "N";
 	}
  		
  	

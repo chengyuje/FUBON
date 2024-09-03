@@ -81,8 +81,8 @@ eSoafApp.controller('CRM230Controller', function($rootScope, $scope, $controller
 				if (tota.length > 0) {
 					$scope.aolist = tota[0].body.resultList;
 					$scope.mappingSet['AO_CODE'] = [];
-//					$scope.mappingSet['NEW_AO_CODE'] = [];
-//					$scope.mappingSet['NEW_AO_CODE'].push({LABEL: '客戶所屬理專', DATA: 'OWN'});
+					$scope.mappingSet['NEW_AO_CODE'] = [];
+					$scope.mappingSet['NEW_AO_CODE'].push({LABEL: '客戶所屬理專', DATA: 'OWN'});
 					
 					/**#2107 客戶篩選需可篩選空code客戶角色**/
 					// 增加 FAIA 權限 5440
@@ -102,7 +102,7 @@ eSoafApp.controller('CRM230Controller', function($rootScope, $scope, $controller
             					angular.forEach($scope.ao_code, function(row2, index2, objs2){
             						if(row.AO_CODE == row2){
             							$scope.mappingSet['AO_CODE'].push({LABEL: row.EMP_NAME, DATA: row.AO_CODE});
-//            							$scope.mappingSet['NEW_AO_CODE'].push({LABEL: row.EMP_NAME, DATA: row.AO_CODE});
+            							$scope.mappingSet['NEW_AO_CODE'].push({LABEL: row.EMP_NAME, DATA: row.AO_CODE});
             							$scope.inputVO.aolist.push(row.AO_CODE);
             						}
             					});
@@ -110,7 +110,7 @@ eSoafApp.controller('CRM230Controller', function($rootScope, $scope, $controller
             			}else if($scope.ao_code.length == 1){		//只有一個AO_CODE的理專
                     		angular.forEach($scope.aolist, function(row, index, objs){
                 				$scope.mappingSet['AO_CODE'].push({LABEL: row.EMP_NAME, DATA: row.AO_CODE});
-//                				$scope.mappingSet['NEW_AO_CODE'].push({LABEL: row.EMP_NAME, DATA: row.AO_CODE});
+                				$scope.mappingSet['NEW_AO_CODE'].push({LABEL: row.EMP_NAME, DATA: row.AO_CODE});
                 				$scope.inputVO.aolist.push(row.AO_CODE);
                 			});
                     		$scope.inputVO.ao_code = String(sysInfoService.getAoCode());				//預設AO Code為理專自己
@@ -120,7 +120,7 @@ eSoafApp.controller('CRM230Controller', function($rootScope, $scope, $controller
         				// 無AO_CODE
         				angular.forEach($scope.aolist, function(row, index, objs){
         					$scope.mappingSet['AO_CODE'].push({LABEL: row.EMP_NAME, DATA: row.AO_CODE});
-//        					$scope.mappingSet['NEW_AO_CODE'].push({LABEL: row.EMP_NAME, DATA: row.AO_CODE});
+        					$scope.mappingSet['NEW_AO_CODE'].push({LABEL: row.EMP_NAME, DATA: row.AO_CODE});
         					$scope.inputVO.aolist.push(row.AO_CODE);
         				});
         			}

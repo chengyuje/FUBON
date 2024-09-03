@@ -48,7 +48,8 @@ public class VN085NOutputVODetailsVO {
 	private String AppMgr;//授權主管
 	@XmlElement
 	private String CrtTime;//鍵機時間
-	
+	@XmlElement
+    private String DynamicYN; //Y:動態鎖利 空白:一般基金單次議價
 	
 	public String getOccur() {
 		return Occur;
@@ -145,6 +146,12 @@ public class VN085NOutputVODetailsVO {
 	}
 	public void setCrtTime(String crtTime) {
 		CrtTime = crtTime;
+	}
+	public String getDynamicYN() {
+		return DynamicYN;
+	}
+	public void setDynamicYN(String dynamicYN) {
+		DynamicYN = dynamicYN;
 	}
 	
 }

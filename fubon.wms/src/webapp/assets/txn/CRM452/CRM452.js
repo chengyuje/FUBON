@@ -34,7 +34,7 @@ eSoafApp.controller('CRM452ListController',
 			$scope.inputVO.con_degree = $scope.con_degree;
 			$scope.inputVO.prod_type = "";
 			if (($scope.inputVO.apply_cat == '1' && $scope.inputVO.apply_type == '1') ||
-				($scope.inputVO.apply_cat == '2' && ($scope.inputVO.apply_type == '1' || $scope.inputVO.apply_type == '2'))	) { // 單筆 & 基金 or 期間 & 基金議價
+				($scope.inputVO.apply_cat == '2' && ($scope.inputVO.apply_type == '1' || $scope.inputVO.apply_type == '2' || $scope.inputVO.apply_type == '6'))	) { // 單筆 & 基金 or 期間 & 基金議價
 				$scope.inputVO.prod_type = 1;
 			} else {
 				$scope.inputVO.prod_type = 2;

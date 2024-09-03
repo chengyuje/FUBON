@@ -1707,8 +1707,8 @@ public class CRM421 extends FubonWmsBizLogic {
 		BigDecimal defaultFeeRate = null;
 		String errorMsg = "";
 
-		String a = "123";
-		String b = "45";
+		String a = "1236"; //基金
+		String b = "45"; //海外ETF/股票
 		if (a.contains(inputVO.getApply_type())) {
 			SOT709InputVO inputVO_709 = new SOT709InputVO();
 			SOT709OutputVO outputVO_709 = new SOT709OutputVO();
@@ -1724,6 +1724,8 @@ public class CRM421 extends FubonWmsBizLogic {
 				inputVO_709.setTradeSubType("1");
 			} else if (StringUtil.isEqual(inputVO.getApply_type(), "2")) {
 				inputVO_709.setTradeSubType("2");
+			} else if (StringUtil.isEqual(inputVO.getApply_type(), "6")) {
+				inputVO_709.setTradeSubType("6"); //基金動態鎖利
 			}
 
 			inputVO_709.setProdId(inputVO.getProd_id());
@@ -1805,7 +1807,7 @@ public class CRM421 extends FubonWmsBizLogic {
 		sb.append("FROM TBSYSPARAMETER ");
 		sb.append("WHERE PARAM_TYPE = 'SOT.FITNESS_YN' and PARAM_CODE = :prodType ");
 		queryCondition.setQueryString(sb.toString());
-		queryCondition.setObject("prodType", ("123".contains(applyType)) ? "NF" : "ETF");
+		queryCondition.setObject("prodType", ("1236".contains(applyType)) ? "NF" : "ETF");
 
 		List<Map<String, Object>> pList = dam.exeQuery(queryCondition);
 		if (pList.size() > 0) {
@@ -1841,7 +1843,7 @@ public class CRM421 extends FubonWmsBizLogic {
 
 		//		WorkStation ws = DataManager.getWorkStation(uuid);
 
-		String a = "123";
+		String a = "1236";
 		String b = "45";
 		//===檢核「利害關係人身份」  若客戶為利害關係人，若為利害關係人不得低於行員費率
 		//		FC032675DataVO outputVO_FC032675 = getFC032675Data(inputVO);
@@ -2002,7 +2004,7 @@ public class CRM421 extends FubonWmsBizLogic {
 			inputVO_709.setCheckCode("1");
 
 			SOT709 sot709 = (SOT709) PlatformContext.getBean("sot709");
-			if (StringUtil.isEqual(inputVO.getApply_type(), "1") || StringUtil.isEqual(inputVO.getApply_type(), "3")) {
+			if (StringUtil.isEqual(inputVO.getApply_type(), "1") || StringUtil.isEqual(inputVO.getApply_type(), "3") || StringUtil.isEqual(inputVO.getApply_type(), "6")) {
 				outputVO_709 = sot709.singleBargainApply(inputVO_709);
 			} else if (StringUtil.isEqual(inputVO.getApply_type(), "2")) {
 				outputVO_709 = sot709.singleRegBargainApply(inputVO_709);
@@ -2166,14 +2168,15 @@ public class CRM421 extends FubonWmsBizLogic {
 		boolean isMtrustReg = false;
 
 		for (Map<String, Object> data : inputVO.getList()) {
-			if (StringUtils.equals(data.get("APPLY_TYPE").toString(), "1") || StringUtils.equals(data.get("APPLY_TYPE").toString(), "2")) {
+			if (StringUtils.equals(data.get("APPLY_TYPE").toString(), "1") || StringUtils.equals(data.get("APPLY_TYPE").toString(), "2")
+					|| StringUtils.equals(data.get("APPLY_TYPE").toString(), "6")) {
 				SOT709InputVO inputVO_709 = new SOT709InputVO();
 				SOT709OutputVO outputVO_709 = new SOT709OutputVO();
 
 				inputVO_709.setApplySeq(data.get("APPLY_SEQ").toString());
 				inputVO_709.setCheckCode("2");
 				SOT709 sot709 = (SOT709) PlatformContext.getBean("sot709");
-				if (StringUtils.equals(data.get("APPLY_TYPE").toString(), "1")) {
+				if (StringUtils.equals(data.get("APPLY_TYPE").toString(), "1") || StringUtils.equals(data.get("APPLY_TYPE").toString(), "6")) {
 					outputVO_709 = sot709.singleBargainApply(inputVO_709);
 				} else if (StringUtils.equals(data.get("APPLY_TYPE").toString(), "2")) {
 					//金錢信託小額在這判斷真假議價以及後續是否要送M+
@@ -2324,12 +2327,13 @@ public class CRM421 extends FubonWmsBizLogic {
 					SOT709OutputVO outputVO_709 = new SOT709OutputVO();
 					SOT710InputVO inputVO_710 = new SOT710InputVO();
 					SOT710OutputVO outputVO_710 = new SOT710OutputVO();
-					if (StringUtils.equals("1", vo.getAPPLY_TYPE()) || StringUtils.equals("2", vo.getAPPLY_TYPE())) { //1：基金單筆申購 、2：基金定期(不)定額申購
+					if (StringUtils.equals("1", vo.getAPPLY_TYPE()) || StringUtils.equals("2", vo.getAPPLY_TYPE())
+							||  StringUtils.equals("6", vo.getAPPLY_TYPE())) { //1：基金單筆申購 、2：基金定期(不)定額申購 、6：基金動態鎖利
 						inputVO_709.setApplySeq(vo.getAPPLY_SEQ());
 						inputVO_709.setCheckCode(checkCode);
 
 						SOT709 sot709 = (SOT709) PlatformContext.getBean("sot709");
-						if (StringUtils.equals("1", vo.getAPPLY_TYPE())) {
+						if (StringUtils.equals("1", vo.getAPPLY_TYPE()) || StringUtils.equals("6", vo.getAPPLY_TYPE())) {
 							outputVO_709 = sot709.singleBargainApply(inputVO_709);
 						} else if (StringUtils.equals("2", vo.getAPPLY_TYPE())) {
 							outputVO_709 = sot709.singleRegBargainApply(inputVO_709);
@@ -2613,7 +2617,7 @@ public class CRM421 extends FubonWmsBizLogic {
 		TBCRM_BRG_APPLY_SINGLEVO vo = new TBCRM_BRG_APPLY_SINGLEVO();
 		vo = (TBCRM_BRG_APPLY_SINGLEVO) dam.findByPKey(TBCRM_BRG_APPLY_SINGLEVO.TABLE_UID, inputVO.getSeq());
 
-		String a = "123";
+		String a = "1236";
 		String b = "45";
 		if (vo != null) {
 			if (a.contains(inputVO.getApply_type())) {
@@ -2626,9 +2630,10 @@ public class CRM421 extends FubonWmsBizLogic {
 				inputVO_709.setPurchaseAmt(new BigDecimal(inputVO.getPurchase_amt()));
 				inputVO_709.setTrustCurr(inputVO.getTrust_curr());
 				inputVO_709.setFee_rate(inputVO.getFee_rate());
+				inputVO_709.setDynamicYN(StringUtils.equals("6", inputVO.getApply_type()) ? "Y" : "");
 
 				SOT709 sot709 = (SOT709) PlatformContext.getBean("sot709");
-				if (StringUtil.isEqual(inputVO.getApply_type(), "1") || StringUtil.isEqual(inputVO.getApply_type(), "3")) {
+				if (StringUtil.isEqual(inputVO.getApply_type(), "1") || StringUtil.isEqual(inputVO.getApply_type(), "3") || StringUtil.isEqual(inputVO.getApply_type(), "6")) {
 					outputVO_709 = sot709.singleBargainModify(inputVO_709);
 				} else if (StringUtil.isEqual(inputVO.getApply_type(), "2")) {
 					inputVO_709.setProCode(inputVO.getFee_discount().toString());
@@ -2741,7 +2746,7 @@ public class CRM421 extends FubonWmsBizLogic {
 
 		SOT701OutputVO outputVO_701 = getSOTCustInfo(inputVO);
 
-		String a = "123";
+		String a = "1236";
 		String b = "45";
 		if (a.contains(inputVO.getApply_type())) {
 			boolean SOT704Status = false;
@@ -2754,7 +2759,9 @@ public class CRM421 extends FubonWmsBizLogic {
 				prdInputVO.setCust_id(inputVO.getCust_id().toUpperCase());
 				prdInputVO.setType("4");
 				prdInputVO.setFund_id(inputVO.getProd_id());
-
+				//動態鎖利
+				if(StringUtils.equals("6", inputVO.getApply_type())) prdInputVO.setDynamicType("M");
+				
 				PRD110 prd110 = (PRD110) PlatformContext.getBean("prd110");
 				prdOutputVO = prd110.inquire(prdInputVO);
 
@@ -3066,7 +3073,7 @@ public class CRM421 extends FubonWmsBizLogic {
 		SOT701InputVO inputVO_701 = new SOT701InputVO();
 
 		inputVO_701.setCustID(inputVO.getCust_id());
-		inputVO_701.setProdType(("123".contains(inputVO.getApply_type())) ? "1" : "2");
+		inputVO_701.setProdType(("1236".contains(inputVO.getApply_type())) ? "1" : "2");
 		inputVO_701.setTradeType("1");
 
 		SOT701 sot701 = (SOT701) PlatformContext.getBean("sot701");

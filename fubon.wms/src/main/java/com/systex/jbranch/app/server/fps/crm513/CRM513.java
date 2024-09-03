@@ -90,6 +90,7 @@ public class CRM513 extends FubonWmsBizLogic {
 			throw new APException((String) list.get(0).get("EMSGTXT"));
 		} else {
 			sb = new StringBuffer();
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			sb.append("SELECT  BRANCH_NBR, BRANCH_NAME ");
 			sb.append("FROM VWORG_DEFN_INFO ");
 			sb.append("WHERE 1 = 1 ");
@@ -111,6 +112,7 @@ public class CRM513 extends FubonWmsBizLogic {
 			
 			for (Map<String, Object> map : list) {
 				sb = new StringBuffer();
+				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 				sb.append("SELECT CUST_ID, CUST_NAME ");
 				sb.append("FROM TBCRM_CUST_MAST ");
 				sb.append("WHERE 1 = 1 ");
@@ -123,7 +125,7 @@ public class CRM513 extends FubonWmsBizLogic {
 				
 				List<Map<String, Object>> custList = dam.exeQuery(queryCondition);
 				
-				map.put("CUST_NAME", custList.get(0).get("CUST_NAME"));
+				map.put("CUST_NAME", custList.size() > 0 ? custList.get(0).get("CUST_NAME") : "");
 			}
 			
 			outputVO.setTradeList(list);
@@ -149,7 +151,7 @@ public class CRM513 extends FubonWmsBizLogic {
 		String[] headerLine = { "客戶姓名", "ID/統編", 
 								"異動單位", "異動員編/姓名", "異動日期", 
 				                "類別", "項目", "選項", "評估結果"};
-		String[] mainLine   = { "CUST_NAME", "CUST_ID", 
+		String[] mainLine  = { "CUST_NAME", "CUST_ID", 
 								"CHG_DEPT_NAME", "CHG_CREATOR_NAME", "CHG_DATE", 
 								"QUESTION_CLASS_NAME", "QUESTION_NAME_NAME", "OPTION", "RESULT"};
 
@@ -244,7 +246,6 @@ public class CRM513 extends FubonWmsBizLogic {
 
 	// 檢查Map取出欄位是否為Null
 	private String checkIsNull(Map map, String key) {
-		
 		if (StringUtils.isNotBlank(String.valueOf(map.get(key))) && map.get(key) != null) {
 			if ("CUST_ID".equals(key)) {
 				return DataFormat.getCustIdMaskForHighRisk(String.valueOf(map.get(key)));

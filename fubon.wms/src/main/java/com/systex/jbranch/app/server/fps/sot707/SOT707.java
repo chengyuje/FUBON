@@ -1,6 +1,11 @@
 package com.systex.jbranch.app.server.fps.sot707;
 
 import static com.systex.jbranch.fubon.commons.esb.cons.EsbSotCons.AI_BANK_SEND_PURCHASE;
+import static com.systex.jbranch.fubon.commons.esb.cons.EsbSotCons.AJBRVA3;
+import static com.systex.jbranch.fubon.commons.esb.cons.EsbSotCons.AJBRVA9;
+import static com.systex.jbranch.fubon.commons.esb.cons.EsbSotCons.AJBRVB9;
+import static com.systex.jbranch.fubon.commons.esb.cons.EsbSotCons.AJBRVC9;
+import static com.systex.jbranch.fubon.commons.esb.cons.EsbSotCons.AJBRVD9;
 import static com.systex.jbranch.fubon.commons.esb.cons.EsbSotCons.BOND_GTC_DATA_DBU;
 import static com.systex.jbranch.fubon.commons.esb.cons.EsbSotCons.BOND_GTC_DATA_DETAIL_DBU;
 import static com.systex.jbranch.fubon.commons.esb.cons.EsbSotCons.BOND_GTC_DATA_DETAIL_OBU;
@@ -46,11 +51,20 @@ import com.systex.jbranch.fubon.commons.esb.EsbUtil;
 import com.systex.jbranch.fubon.commons.esb.vo.ESBUtilInputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.ESBUtilOutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.TxHeadVO;
+import com.systex.jbranch.fubon.commons.esb.vo.ajbrva3.AJBRVA3InputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.ajbrva3.AJBRVA3OutputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.ajbrva3.AJBRVA3OutputVODetails;
+import com.systex.jbranch.fubon.commons.esb.vo.ajbrva9.AJBRVA9InputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.ajbrva9.AJBRVA9OutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.ajbrvb1.AJBRVB1InputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.ajbrvb9.AJBRVB9InputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.ajbrvb9.AJBRVB9OutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.ajbrvc1.AJBRVC1InputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.ajbrvc2.AJBRVC2InputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.ajbrvc9.AJBRVC9InputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.ajbrvc9.AJBRVC9OutputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.ajbrvd9.AJBRVD9InputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.ajbrvd9.AJBRVD9OutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.ebpmn.EBPMN2InputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.ebpmn.EBPMN2OutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.ebpmn.EBPMNInputVO;
@@ -246,7 +260,7 @@ public class SOT707 extends EsbUtil {
 			sb.append("       D.GTC_YN, ");
 //			sb.append("       TO_CHAR(D.GTC_START_DATE, 'YYYYMMDD') AS GTC_START_DATE, ");
 //			sb.append("       TO_CHAR(D.GTC_END_DATE, 'YYYYMMDD') AS GTC_END_DATE, ");
-//			sb.append("       D.GTC_START_DATE, ");
+			sb.append("       D.GTC_START_DATE, ");
 			sb.append("       D.GTC_END_DATE, ");
 			sb.append("       M.TRUST_TRADE_TYPE, ");
 			sb.append("	      M.FLAG_NUMBER, ");
@@ -304,7 +318,7 @@ public class SOT707 extends EsbUtil {
 				mainVO.setGTC_FEE_RATE((BigDecimal) list.get(0).get("GTC_FEE_RATE"));
 				mainVO.setGTC_YN((String) list.get(0).get("GTC_YN"));
 				mainVO.setGTC_END_DATE((Date) list.get(0).get("GTC_END_DATE"));
-//				mainVO.setGTC_START_DATE((Date) list.get(0).get("GTC_START_DATE"));
+				mainVO.setGTC_START_DATE((Date) list.get(0).get("GTC_START_DATE"));
 				mainVO.setIS_WEB((String) list.get(0).get("IS_WEB"));
 			}
 
@@ -501,9 +515,9 @@ public class SOT707 extends EsbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-//	public void verifyESBPurchaseBN_OBU(Object body, IPrimitiveMap header) throws Exception {
-//		sendRtnObject(this.verifyESBPurchaseBN_OBU(body));
-//	}
+	public void verifyESBPurchaseBN_OBU(Object body, IPrimitiveMap header) throws Exception {
+		sendRtnObject(this.verifyESBPurchaseBN_OBU(body));
+	}
 	
 	/**
 	 * 海外債/SN申購檢核、確認
@@ -514,159 +528,159 @@ public class SOT707 extends EsbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-//	public SOT707OutputVO verifyESBPurchaseBN_OBU(Object body) throws Exception {
-//
-//		initUUID();
-//		
-//		XmlInfo xmlInfo = new XmlInfo();
-//		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
-//		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
-//		Map<String, String> trustTSMap = xmlInfo.doGetVariable("SOT.TRUST_TS", FormatHelper.FORMAT_3);
-//		
-//		dam = this.getDataAccessManager();
-//		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//
-//		sot707InputVO = (SOT707InputVO) body;
-//		sot707OutputVO = new SOT707OutputVO();
-//		
-//		String prodType = sot707InputVO.getProdType(); 		// 產品類別
-//		String tradeSeq = sot707InputVO.getTradeSeq(); 		// 交易序號
-//		String checkType = sot707InputVO.getCheckType(); 	// 電文確認碼
-//		
-//		// 欄位檢核
-//		if (StringUtils.isBlank(prodType) || StringUtils.isBlank(tradeSeq) || StringUtils.isBlank(checkType)) {
-//			throw new JBranchException("產品類別、交易序號或電文確認碼未輸入");
-//		}
-//		
-//		// 由產品類別與交易序號取得主檔資料作為電文上行
-//		MainInfoBean mainVO = mainInfo(prodType, tradeSeq);
-//		
-//		// init util
-//		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, AJBRVA9);
-//		esbUtilInputVO.setModule(thisClaz + new Object() {
-//		}.getClass().getEnclosingMethod().getName());
-//		
-//		// head
-//		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
-//		esbUtilInputVO.setTxHeadVO(txHead);
-//		txHead.setDefaultTxHead();
-//		
-//		// body
-//		AJBRVA9InputVO txBodyVO = new AJBRVA9InputVO();
-//		esbUtilInputVO.setAjbrva9InputVO(txBodyVO);
-//		txBodyVO.setCheckCode(checkType); // 確認碼
-//		txBodyVO.setApplyDate(this.toChineseYearMMdd(mainVO.getTRADE_DATE(), false)); // 申請日期
-//		// txBodyVO.setApplyDate("01071017"); //申請日期
-//		txBodyVO.setKeyinNo(StringUtils.equals(mainVO.getIS_WEB(), "Y") ? "" : mainVO.getBATCH_SEQ()); // 理專登錄編號//快速申購於風控頁檢核不須送批號
-//		txBodyVO.setType(mainVO.getMARKET_TYPE()); // 初級或次級
-//		txBodyVO.setCustNo(mainVO.getCUST_ID()); // 身份証號
-//		// 2020-01-15 modify by ocean : WMS-CR-20191009-01_金錢信託套表需求申請單, 交易類別為金錢信託時，CUST_ID傳送99331241
-//		txBodyVO.setCustNo((StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE()) ? mainVO.getCUST_ID() : trustTSMap.get("M_CUSTNO"))); //身份証號
-//		txBodyVO.setTrustType(mainVO.getTRUST_CURR_TYPE()); // 信託業務別
-//		txBodyVO.setTrustAcct(cbsservice.checkAcctLength(mainVO.getTRUST_ACCT())); // 信託帳號
-//		txBodyVO.setBondNo(mainVO.getPROD_ID()); // 債券代號
-//		txBodyVO.setBondVal(new EsbUtil().decimalPadding(mainVO.getBOND_VALUE(), 0)); // 票面價值
-//		txBodyVO.setTxAcct(cbsservice.checkAcctLength(mainVO.getDEBIT_ACCT())); // 扣款帳號
-//		txBodyVO.setRcvAcct(cbsservice.checkAcctLength(mainVO.getCREDIT_ACCT())); // 收益帳號
-//		
-//		// 20190617/mantis:6592/WMS-CR-20181113-01_個人高端客群處「業管系統_第一階段需求調整申請」_P5/modify by ocean/若組織為031，則帶715
-//		// 20200325/mantis:0561/WMS-CR-20210311-01_因應銀證組織調整商品議價及人員證照查詢功能/modify by ocean/若組織為175，則帶715
-//		String branchNbr = mainVO.getBRANCH_NBR();
-//		if (uhrmMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-//			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//			StringBuffer sb = new StringBuffer();
-//			
-//			sb.append("SELECT BRANCH_NBR ");
-//			sb.append("FROM TBORG_UHRM_BRH ");
-//			sb.append("WHERE EMP_ID = :loginID ");
-//
-//			queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
-//			queryCondition.setQueryString(sb.toString());
-//
-//			List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
-//			
-//			if (loginBreach.size() > 0) {
-//				branchNbr = (String) loginBreach.get(0).get("BRANCH_NBR");
-//			} else {
-//				throw new APException("人員無有效分行"); //顯示錯誤訊息
+	public SOT707OutputVO verifyESBPurchaseBN_OBU(Object body) throws Exception {
+
+		initUUID();
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
+		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
+		Map<String, String> trustTSMap = xmlInfo.doGetVariable("SOT.TRUST_TS", FormatHelper.FORMAT_3);
+		
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+
+		sot707InputVO = (SOT707InputVO) body;
+		sot707OutputVO = new SOT707OutputVO();
+		
+		String prodType = sot707InputVO.getProdType(); 		// 產品類別
+		String tradeSeq = sot707InputVO.getTradeSeq(); 		// 交易序號
+		String checkType = sot707InputVO.getCheckType(); 	// 電文確認碼
+		
+		// 欄位檢核
+		if (StringUtils.isBlank(prodType) || StringUtils.isBlank(tradeSeq) || StringUtils.isBlank(checkType)) {
+			throw new JBranchException("產品類別、交易序號或電文確認碼未輸入");
+		}
+		
+		// 由產品類別與交易序號取得主檔資料作為電文上行
+		MainInfoBean mainVO = mainInfo(prodType, tradeSeq);
+		
+		// init util
+		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, AJBRVA9);
+		esbUtilInputVO.setModule(thisClaz + new Object() {
+		}.getClass().getEnclosingMethod().getName());
+		
+		// head
+		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
+		esbUtilInputVO.setTxHeadVO(txHead);
+		txHead.setDefaultTxHead();
+		
+		// body
+		AJBRVA9InputVO txBodyVO = new AJBRVA9InputVO();
+		esbUtilInputVO.setAjbrva9InputVO(txBodyVO);
+		txBodyVO.setCheckCode(checkType); // 確認碼
+		txBodyVO.setApplyDate(this.toChineseYearMMdd(mainVO.getTRADE_DATE(), false)); // 申請日期
+		// txBodyVO.setApplyDate("01071017"); //申請日期
+		txBodyVO.setKeyinNo(StringUtils.equals(mainVO.getIS_WEB(), "Y") ? "" : mainVO.getBATCH_SEQ()); // 理專登錄編號//快速申購於風控頁檢核不須送批號
+		txBodyVO.setType(mainVO.getMARKET_TYPE()); // 初級或次級
+		txBodyVO.setCustNo(mainVO.getCUST_ID()); // 身份証號
+		// 2020-01-15 modify by ocean : WMS-CR-20191009-01_金錢信託套表需求申請單, 交易類別為金錢信託時，CUST_ID傳送99331241
+		txBodyVO.setCustNo((StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE()) ? mainVO.getCUST_ID() : trustTSMap.get("M_CUSTNO"))); //身份証號
+		txBodyVO.setTrustType(mainVO.getTRUST_CURR_TYPE()); // 信託業務別
+		txBodyVO.setTrustAcct(cbsservice.checkAcctLength(mainVO.getTRUST_ACCT())); // 信託帳號
+		txBodyVO.setBondNo(mainVO.getPROD_ID()); // 債券代號
+		txBodyVO.setBondVal(new EsbUtil().decimalPadding(mainVO.getBOND_VALUE(), 0)); // 票面價值
+		txBodyVO.setTxAcct(cbsservice.checkAcctLength(mainVO.getDEBIT_ACCT())); // 扣款帳號
+		txBodyVO.setRcvAcct(cbsservice.checkAcctLength(mainVO.getCREDIT_ACCT())); // 收益帳號
+		
+		// 20190617/mantis:6592/WMS-CR-20181113-01_個人高端客群處「業管系統_第一階段需求調整申請」_P5/modify by ocean/若組織為031，則帶715
+		// 20200325/mantis:0561/WMS-CR-20210311-01_因應銀證組織調整商品議價及人員證照查詢功能/modify by ocean/若組織為175，則帶715
+		String branchNbr = mainVO.getBRANCH_NBR();
+		if (uhrmMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			StringBuffer sb = new StringBuffer();
+			
+			sb.append("SELECT BRANCH_NBR ");
+			sb.append("FROM TBORG_UHRM_BRH ");
+			sb.append("WHERE EMP_ID = :loginID ");
+
+			queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
+			queryCondition.setQueryString(sb.toString());
+
+			List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
+			
+			if (loginBreach.size() > 0) {
+				branchNbr = (String) loginBreach.get(0).get("BRANCH_NBR");
+			} else {
+				throw new APException("人員無有效分行"); //顯示錯誤訊息
+			}
+		} else if (StringUtils.equals(branchNbr, branchChgMap.get("BS").toString())) {
+			branchNbr = branchChgMap.get("DEFAULT").toString();
+		}
+		txBodyVO.setBranchNo(branchNbr); // 受理分行
+		
+		txBodyVO.setKeyinId(mainVO.getMODIFIER()); // 鍵機櫃員
+		txBodyVO.setTxCur(mainVO.getPROD_CURR()); // 委託面額幣別
+		txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); // 委託面額
+		if (StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE())) {
+			txBodyVO.setTapeNo(mainVO.getREC_SEQ()); //錄音序號
+		}
+		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID()); // 解說專員
+		
+		if (StringUtils.equals("1", prodType)) { // SN
+			txBodyVO.setTxBoss(mainVO.getBOSS_ID()); // 主管
+//			if(StringUtils.equals("Y", mainVO.getHNWC_BUY())) { //商品限高資產申購註記
+			txBodyVO.setFiller(mainVO.getAUTH_ID()); //授權交易人員
+			if(StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE())) {
+				//#1695 貸轉投
+				String filler = cbsservice.padRight(txBodyVO.getFiller() == null ? "" : txBodyVO.getFiller(), 11, " ");
+				String flagNumber = mainVO.getFLAG_NUMBER() == null ? " " : mainVO.getFLAG_NUMBER();
+				txBodyVO.setFiller(filler + flagNumber);
+			}
 //			}
-//		} else if (StringUtils.equals(branchNbr, branchChgMap.get("BS").toString())) {
-//			branchNbr = branchChgMap.get("DEFAULT").toString();
-//		}
-//		txBodyVO.setBranchNo(branchNbr); // 受理分行
-//		
-//		txBodyVO.setKeyinId(mainVO.getMODIFIER()); // 鍵機櫃員
-//		txBodyVO.setTxCur(mainVO.getPROD_CURR()); // 委託面額幣別
-//		txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); // 委託面額
-//		if (StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE())) {
-//			txBodyVO.setTapeNo(mainVO.getREC_SEQ()); //錄音序號
-//		}
-//		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID()); // 解說專員
-//		
-//		if (StringUtils.equals("1", prodType)) { // SN
-//			txBodyVO.setTxBoss(mainVO.getBOSS_ID()); // 主管
-////			if(StringUtils.equals("Y", mainVO.getHNWC_BUY())) { //商品限高資產申購註記
-//			txBodyVO.setFiller(mainVO.getAUTH_ID()); //授權交易人員
-//			if(StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE())) {
-//				//#1695 貸轉投
-//				String filler = cbsservice.padRight(txBodyVO.getFiller() == null ? "" : txBodyVO.getFiller(), 11, " ");
-//				String flagNumber = mainVO.getFLAG_NUMBER() == null ? " " : mainVO.getFLAG_NUMBER();
-//				txBodyVO.setFiller(filler + flagNumber);
-//			}
-////			}
-//			txBodyVO.setTxType(mainVO.getENTRUST_TYPE()); // 限價方式
-//			txBodyVO.setTxFeeType("1"); // 手續費議價
-//			if(mainVO.getTRUST_TRADE_TYPE().equals("M")){
-//				txBodyVO.setTxFeeType(mainVO.getFEE_TYPE()); // 手續費議價
-//				txBodyVO.setTxFeeRate(new EsbUtil().decimalPadding(mainVO.getFEE_RATE(), 5)); // 手續費費率
-//				txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); // 委買單價
-//			}
-//			
-//		} else if (StringUtils.equals("2", prodType)) { // 海外債
-//			txBodyVO.setTxType(mainVO.getENTRUST_TYPE()); // 限價方式
-//			// 限價方式為1(限價)，才需要放值
-//			if (StringUtils.equals("1", mainVO.getENTRUST_TYPE())) {
-//				txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); // 委買單價
-//			}
-//			txBodyVO.setTxFeeType(mainVO.getFEE_TYPE()); // 手續費議價
-//			txBodyVO.setTxFeeRate(new EsbUtil().decimalPadding(mainVO.getFEE_RATE(), 5)); // 手續費費率
-//			if(StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE())) {
-//				//#1695 貸轉投
-//				String flagNumber = mainVO.getFLAG_NUMBER() == null ? " " : mainVO.getFLAG_NUMBER();
-//				txBodyVO.setFiller("           " + flagNumber);
-//			}
-//			
-//		}
-//		
-//		// 發送電文
-//		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
-//		
-//		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
-//			AJBRVA9OutputVO ajbrva9Output = esbUtilOutputVO.getAjbrva9OutputVO();
-//			
-//			// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
-//			Boolean isErr = checkError(ajbrva9Output);
-//			
-//			//回傳下行電文資料儲存DB
-//			//網行銀快速申購不須回寫AJBRVA9回傳資料
-//			if (!isErr && !StringUtils.equals(mainVO.getIS_WEB(), "Y")) {
-//				purchaseETFUpdateDB_OBU(prodType, tradeSeq, mainVO.getSEQ_NO(), ajbrva9Output, mainVO.getDEFAULT_FEE_RATE(), mainVO.getTRUST_AMT());
-//			}
-//			
-//			// 若有專業投資人提示訊息
-//			sot707OutputVO.setWarningCode(new ArrayList<String>());
-//			if (StringUtils.equals("Y", ajbrva9Output.getTxMsgCode())) {
-//				if (sot707InputVO.getPurchaseAmt().compareTo(new BigDecimal("3000000")) == -1) { // 當申購金額小於3000000時，需顯示提示訊息
-//					sot707OutputVO.getWarningCode().add("ehl_02_SOT_007");
-//				}
-//				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
-//			} else if (StringUtils.equals("A", ajbrva9Output.getTxMsgCode())) {
-//				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
-//			}
-//		}
-//		
-//		return sot707OutputVO;
-//	}
+			txBodyVO.setTxType(mainVO.getENTRUST_TYPE()); // 限價方式
+			txBodyVO.setTxFeeType("1"); // 手續費議價
+			if(mainVO.getTRUST_TRADE_TYPE().equals("M")){
+				txBodyVO.setTxFeeType(mainVO.getFEE_TYPE()); // 手續費議價
+				txBodyVO.setTxFeeRate(new EsbUtil().decimalPadding(mainVO.getFEE_RATE(), 5)); // 手續費費率
+				txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); // 委買單價
+			}
+			
+		} else if (StringUtils.equals("2", prodType)) { // 海外債
+			txBodyVO.setTxType(mainVO.getENTRUST_TYPE()); // 限價方式
+			// 限價方式為1(限價)，才需要放值
+			if (StringUtils.equals("1", mainVO.getENTRUST_TYPE())) {
+				txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); // 委買單價
+			}
+			txBodyVO.setTxFeeType(mainVO.getFEE_TYPE()); // 手續費議價
+			txBodyVO.setTxFeeRate(new EsbUtil().decimalPadding(mainVO.getFEE_RATE(), 5)); // 手續費費率
+			if(StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE())) {
+				//#1695 貸轉投
+				String flagNumber = mainVO.getFLAG_NUMBER() == null ? " " : mainVO.getFLAG_NUMBER();
+				txBodyVO.setFiller("           " + flagNumber);
+			}
+			
+		}
+		
+		// 發送電文
+		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
+		
+		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
+			AJBRVA9OutputVO ajbrva9Output = esbUtilOutputVO.getAjbrva9OutputVO();
+			
+			// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
+			Boolean isErr = checkError(ajbrva9Output);
+			
+			//回傳下行電文資料儲存DB
+			//網行銀快速申購不須回寫AJBRVA9回傳資料
+			if (!isErr && !StringUtils.equals(mainVO.getIS_WEB(), "Y")) {
+				purchaseETFUpdateDB_OBU(prodType, tradeSeq, mainVO.getSEQ_NO(), ajbrva9Output, mainVO.getDEFAULT_FEE_RATE(), mainVO.getTRUST_AMT());
+			}
+			
+			// 若有專業投資人提示訊息
+			sot707OutputVO.setWarningCode(new ArrayList<String>());
+			if (StringUtils.equals("Y", ajbrva9Output.getTxMsgCode())) {
+				if (sot707InputVO.getPurchaseAmt().compareTo(new BigDecimal("3000000")) == -1) { // 當申購金額小於3000000時，需顯示提示訊息
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_007");
+				}
+				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+			} else if (StringUtils.equals("A", ajbrva9Output.getTxMsgCode())) {
+				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+			}
+		}
+		
+		return sot707OutputVO;
+	}
 
 	/**
 	 * 海外債/SN申購檢核、確認下行電文回壓資料庫欄位
@@ -908,16 +922,32 @@ public class SOT707 extends EsbUtil {
 		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID()); 									// 解說專員
 		txBodyVO.setTxType(mainVO.getGTC_YN());
 		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false));
-		txBodyVO.setTxType(mainVO.getENTRUST_TYPE()); // 限價方式
-		txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); // 委買單價
-		txBodyVO.setTxFeeType(mainVO.getFEE_TYPE()); // 手續費議價
-		txBodyVO.setTxFeeRate(new EsbUtil().decimalPadding(mainVO.getGTC_FEE_RATE(), 5)); // 手續費費率
+		
+		// 選擇預約交易或長效單時，須傳送『市價』flag至AS400 (1.限價 2.市價)
+		String entrust_type = mainVO.getENTRUST_TYPE();
+		if (!mainVO.getGTC_YN().equals("N")) {
+			entrust_type = "2";
+		}
+		txBodyVO.setTxType(entrust_type); 													// 限價方式
+		
+		txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); 		// 委買單價
+		txBodyVO.setTxFeeType(mainVO.getFEE_TYPE()); 										// 手續費議價
+		txBodyVO.setTxFeeRate(new EsbUtil().decimalPadding(mainVO.getGTC_FEE_RATE(), 5));	// 手續費費率
 		
 		if(StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE())) {
-			//#1695: 貸轉投
-			txBodyVO.setFiller(mainVO.getFLAG_NUMBER() == null ? " " : mainVO.getFLAG_NUMBER());
+			/**
+			 * 第1位   ：客戶申貸紀錄			(Y/N/空白)
+			 * 第2位   ：長效單/預約單			(空白：長效單 1：預約單)
+			 * 第3-10位：預約單/長效單生效起日	9(08)
+			 * **/
+			String flagNumber = mainVO.getFLAG_NUMBER() == null ? " " : mainVO.getFLAG_NUMBER();	// #1695：貸轉投
+			String gtcYN = mainVO.getGTC_YN().equals("Y") ? " " : "1";
+			String gtcStartDate = mainVO.getGTC_START_DATE() == null ? "" : this.toChineseYearMMdd(mainVO.getGTC_START_DATE());
+			String filler = flagNumber + gtcYN + gtcStartDate;
+			
+			txBodyVO.setFiller(filler);
 		}
-		
+
 		// 發送電文
 		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
 
@@ -962,9 +992,9 @@ public class SOT707 extends EsbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-//	public void verifyESBPurchaseBN_GTC_OBU(Object body, IPrimitiveMap header) throws Exception {
-//		sendRtnObject(this.verifyESBPurchaseBN_GTC_OBU(body));
-//	}
+	public void verifyESBPurchaseBN_GTC_OBU(Object body, IPrimitiveMap header) throws Exception {
+		sendRtnObject(this.verifyESBPurchaseBN_GTC_OBU(body));
+	}
 	
 	/**
 	 * 海外債長效單申購檢核、確認_OBU
@@ -975,150 +1005,150 @@ public class SOT707 extends EsbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-//	public SOT707OutputVO verifyESBPurchaseBN_GTC_OBU(Object body) throws Exception {
-//
-//		initUUID();
-//		
-//		XmlInfo xmlInfo = new XmlInfo();
-//		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
-//		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
-//		
-//		dam = this.getDataAccessManager();
-//		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//		
-//		sot707InputVO = (SOT707InputVO) body;
-//		sot707OutputVO = new SOT707OutputVO();
-//		
-//		String prodType = sot707InputVO.getProdType(); 		// 產品類別
-//		String tradeSeq = sot707InputVO.getTradeSeq(); 		// 交易序號
-//		String checkType = sot707InputVO.getCheckType(); 	// 電文確認碼
-//		
-//		// 欄位檢核
-//		if (StringUtils.isBlank(prodType) || StringUtils.isBlank(tradeSeq) || StringUtils.isBlank(checkType)) {
-//			throw new JBranchException("產品類別、交易序號或電文確認碼未輸入");
-//		}
-//		
-//		// 由產品類別與交易序號取得主檔資料作為電文上行
-//		MainInfoBean mainVO = mainInfo(prodType, tradeSeq);
-//		
-//		// init util
-//		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, AJBRVC9);
-//		esbUtilInputVO.setModule(thisClaz + new Object() {
-//		}.getClass().getEnclosingMethod().getName());
-//		
-//		// head
-//		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
-//		esbUtilInputVO.setTxHeadVO(txHead);
-//		txHead.setDefaultTxHead();
-//		
-//		// body
-//		AJBRVC9InputVO txBodyVO = new AJBRVC9InputVO();
-//		esbUtilInputVO.setAjbrvc9InputVO(txBodyVO);
-//		txBodyVO.setCheckCode(checkType); // 確認碼
-//		txBodyVO.setApplyDate(this.toChineseYearMMdd(mainVO.getTRADE_DATE(), false)); // 申請日期
-//		txBodyVO.setKeyinNo(mainVO.getBATCH_SEQ()); // 理專登錄編號
-//		txBodyVO.setType(mainVO.getMARKET_TYPE()); // 初級或次級
-//		txBodyVO.setCustNo(mainVO.getCUST_ID()); // 身份証號
-//		txBodyVO.setTrustType(mainVO.getTRUST_CURR_TYPE()); // 信託業務別
-//		txBodyVO.setTrustAcct(mainVO.getTRUST_ACCT()); // 信託帳號
-//		txBodyVO.setBondNo(mainVO.getPROD_ID()); // 債券代號
-//		txBodyVO.setBondVal(new EsbUtil().decimalPadding(mainVO.getBOND_VALUE(), 0)); // 票面價值
-//		txBodyVO.setTxAcct(mainVO.getDEBIT_ACCT()); // 扣款帳號
-//		txBodyVO.setRcvAcct(mainVO.getCREDIT_ACCT()); // 收益帳號
-//		
-//		// 20190617/mantis:6592/WMS-CR-20181113-01_個人高端客群處「業管系統_第一階段需求調整申請」_P5/modify by ocean/若組織為031，則帶715
-//		// 20200325/mantis:0561/WMS-CR-20210311-01_因應銀證組織調整商品議價及人員證照查詢功能/modify by ocean/若組織為175，則帶715
-//		String branchNbr = mainVO.getBRANCH_NBR();
-//		if (uhrmMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-//			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//			StringBuffer sb = new StringBuffer();
-//			
-//			sb.append("SELECT BRANCH_NBR ");
-//			sb.append("FROM TBORG_UHRM_BRH ");
-//			sb.append("WHERE EMP_ID = :loginID ");
-//
-//			queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
-//			queryCondition.setQueryString(sb.toString());
-//
-//			List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
-//			
-//			if (loginBreach.size() > 0) {
-//				branchNbr = (String) loginBreach.get(0).get("BRANCH_NBR");
-//			} else {
-//				throw new APException("人員無有效分行"); //顯示錯誤訊息
-//			}
-//		} else if (StringUtils.equals(branchNbr, branchChgMap.get("BS").toString())) {
-//			branchNbr = branchChgMap.get("DEFAULT").toString();
-//		}
-//		txBodyVO.setBranchNo(branchNbr); 													// 受理分行
-////		txBodyVO.setBranchNo(mainVO.getBRANCH_NBR()); 										// 受理分行
-//		
-//		txBodyVO.setKeyinId(mainVO.getMODIFIER()); 											// 鍵機櫃員
-//		txBodyVO.setTxCur(mainVO.getPROD_CURR()); 											// 委託面額幣別
-//		txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); 		// 委託面額
-//		txBodyVO.setTapeNo(mainVO.getREC_SEQ()); 											// 錄音序號
-//		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID()); 									// 解說專員
-//		txBodyVO.setTxType(mainVO.getGTC_YN());
-//		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false));
-//		
-//		// 選擇預約交易或長效單時，須傳送『市價』flag至AS400 (1.限價 2.市價)
-//		String entrust_type = mainVO.getENTRUST_TYPE();
-//		if (!mainVO.getGTC_YN().equals("N")) {
-//			entrust_type = "2";
-//		}
-//		txBodyVO.setTxType(entrust_type); 													// 限價方式
-//		
-//		txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); 		// 委買單價
-//		txBodyVO.setTxFeeType(mainVO.getFEE_TYPE()); 										// 手續費議價
-//		txBodyVO.setTxFeeRate(new EsbUtil().decimalPadding(mainVO.getGTC_FEE_RATE(), 5));	// 手續費費率
-//		
-//		if(StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE())) {
-//			/**
-//			 * 第1位   ：客戶申貸紀錄			(Y/N/空白)
-//			 * 第2位   ：長效單/預約單			(空白：長效單 1：預約單)
-//			 * 第3-10位：預約單/長效單生效起日	9(08)
-//			 * **/
-//			String flagNumber = mainVO.getFLAG_NUMBER() == null ? " " : mainVO.getFLAG_NUMBER();	// #1695：貸轉投
-//			String gtcYN = mainVO.getGTC_YN().equals("Y") ? " " : "1";
-//			String gtcStartDate = mainVO.getGTC_START_DATE() == null ? "" : this.toChineseYearMMdd(mainVO.getGTC_START_DATE());
-//			String filler = flagNumber + gtcYN + gtcStartDate;
-//			
-//			txBodyVO.setFiller(filler);
-//		}
-//		
-//		// 發送電文
-//		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
-//		
-//		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
-//			AJBRVC9OutputVO ajbrvc9Output = esbUtilOutputVO.getAjbrvc9OutputVO();
-//			
-//			// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
-//			Boolean isErr = checkError(ajbrvc9Output);
-//			
-//			// 回傳下行電文資料儲存DB
-//			if (!isErr) {
-//				purchaseBondUpdateDB_GTC_OBU(prodType, tradeSeq, mainVO.getSEQ_NO(), ajbrvc9Output, mainVO.getDEFAULT_FEE_RATE());
-//			}
-//			
-//			// 若有專業投資人提示訊息
-//			sot707OutputVO.setWarningCode(new ArrayList<String>());
-//			if (StringUtils.equals("Y", ajbrvc9Output.getTxMsgCode())) {
-//				if (sot707InputVO.getPurchaseAmt().compareTo(new BigDecimal("3000000")) == -1) { // 當申購金額小於3000000時，需顯示提示訊息
-//					sot707OutputVO.getWarningCode().add("ehl_02_SOT_007");
-//				}
-//				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
-//			} else if (StringUtils.equals("A", ajbrvc9Output.getTxMsgCode())) {
-//				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
-//			}
-//			
-//			// 委買單價與最新報價不符合
-//			if (StringUtils.equals("Y", ajbrvc9Output.getTxMsgCode1())) {
-//				sot707OutputVO.getWarningCode().add("ehl_02_SOT_012");
-//			}
-//		}
-//		
-//		return sot707OutputVO;
-//	}
+	public SOT707OutputVO verifyESBPurchaseBN_GTC_OBU(Object body) throws Exception {
+
+		initUUID();
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
+		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
+		
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		
+		sot707InputVO = (SOT707InputVO) body;
+		sot707OutputVO = new SOT707OutputVO();
+		
+		String prodType = sot707InputVO.getProdType(); 		// 產品類別
+		String tradeSeq = sot707InputVO.getTradeSeq(); 		// 交易序號
+		String checkType = sot707InputVO.getCheckType(); 	// 電文確認碼
+		
+		// 欄位檢核
+		if (StringUtils.isBlank(prodType) || StringUtils.isBlank(tradeSeq) || StringUtils.isBlank(checkType)) {
+			throw new JBranchException("產品類別、交易序號或電文確認碼未輸入");
+		}
+		
+		// 由產品類別與交易序號取得主檔資料作為電文上行
+		MainInfoBean mainVO = mainInfo(prodType, tradeSeq);
+		
+		// init util
+		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, AJBRVC9);
+		esbUtilInputVO.setModule(thisClaz + new Object() {
+		}.getClass().getEnclosingMethod().getName());
+		
+		// head
+		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
+		esbUtilInputVO.setTxHeadVO(txHead);
+		txHead.setDefaultTxHead();
+		
+		// body
+		AJBRVC9InputVO txBodyVO = new AJBRVC9InputVO();
+		esbUtilInputVO.setAjbrvc9InputVO(txBodyVO);
+		txBodyVO.setCheckCode(checkType); // 確認碼
+		txBodyVO.setApplyDate(this.toChineseYearMMdd(mainVO.getTRADE_DATE(), false)); // 申請日期
+		txBodyVO.setKeyinNo(mainVO.getBATCH_SEQ()); // 理專登錄編號
+		txBodyVO.setType(mainVO.getMARKET_TYPE()); // 初級或次級
+		txBodyVO.setCustNo(mainVO.getCUST_ID()); // 身份証號
+		txBodyVO.setTrustType(mainVO.getTRUST_CURR_TYPE()); // 信託業務別
+		txBodyVO.setTrustAcct(mainVO.getTRUST_ACCT()); // 信託帳號
+		txBodyVO.setBondNo(mainVO.getPROD_ID()); // 債券代號
+		txBodyVO.setBondVal(new EsbUtil().decimalPadding(mainVO.getBOND_VALUE(), 0)); // 票面價值
+		txBodyVO.setTxAcct(mainVO.getDEBIT_ACCT()); // 扣款帳號
+		txBodyVO.setRcvAcct(mainVO.getCREDIT_ACCT()); // 收益帳號
+		
+		// 20190617/mantis:6592/WMS-CR-20181113-01_個人高端客群處「業管系統_第一階段需求調整申請」_P5/modify by ocean/若組織為031，則帶715
+		// 20200325/mantis:0561/WMS-CR-20210311-01_因應銀證組織調整商品議價及人員證照查詢功能/modify by ocean/若組織為175，則帶715
+		String branchNbr = mainVO.getBRANCH_NBR();
+		if (uhrmMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			StringBuffer sb = new StringBuffer();
+			
+			sb.append("SELECT BRANCH_NBR ");
+			sb.append("FROM TBORG_UHRM_BRH ");
+			sb.append("WHERE EMP_ID = :loginID ");
+
+			queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
+			queryCondition.setQueryString(sb.toString());
+
+			List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
+			
+			if (loginBreach.size() > 0) {
+				branchNbr = (String) loginBreach.get(0).get("BRANCH_NBR");
+			} else {
+				throw new APException("人員無有效分行"); //顯示錯誤訊息
+			}
+		} else if (StringUtils.equals(branchNbr, branchChgMap.get("BS").toString())) {
+			branchNbr = branchChgMap.get("DEFAULT").toString();
+		}
+		txBodyVO.setBranchNo(branchNbr); 													// 受理分行
+//		txBodyVO.setBranchNo(mainVO.getBRANCH_NBR()); 										// 受理分行
+		
+		txBodyVO.setKeyinId(mainVO.getMODIFIER()); 											// 鍵機櫃員
+		txBodyVO.setTxCur(mainVO.getPROD_CURR()); 											// 委託面額幣別
+		txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); 		// 委託面額
+		txBodyVO.setTapeNo(mainVO.getREC_SEQ()); 											// 錄音序號
+		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID()); 									// 解說專員
+		txBodyVO.setTxType(mainVO.getGTC_YN());
+		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false));
+		
+		// 選擇預約交易或長效單時，須傳送『市價』flag至AS400 (1.限價 2.市價)
+		String entrust_type = mainVO.getENTRUST_TYPE();
+		if (!mainVO.getGTC_YN().equals("N")) {
+			entrust_type = "2";
+		}
+		txBodyVO.setTxType(entrust_type); 													// 限價方式
+		
+		txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); 		// 委買單價
+		txBodyVO.setTxFeeType(mainVO.getFEE_TYPE()); 										// 手續費議價
+		txBodyVO.setTxFeeRate(new EsbUtil().decimalPadding(mainVO.getGTC_FEE_RATE(), 5));	// 手續費費率
+		
+		if(StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE())) {
+			/**
+			 * 第1位   ：客戶申貸紀錄			(Y/N/空白)
+			 * 第2位   ：長效單/預約單			(空白：長效單 1：預約單)
+			 * 第3-10位：預約單/長效單生效起日	9(08)
+			 * **/
+			String flagNumber = mainVO.getFLAG_NUMBER() == null ? " " : mainVO.getFLAG_NUMBER();	// #1695：貸轉投
+			String gtcYN = mainVO.getGTC_YN().equals("Y") ? " " : "1";
+			String gtcStartDate = mainVO.getGTC_START_DATE() == null ? "" : this.toChineseYearMMdd(mainVO.getGTC_START_DATE());
+			String filler = flagNumber + gtcYN + gtcStartDate;
+			
+			txBodyVO.setFiller(filler);
+		}
+		
+		// 發送電文
+		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
+		
+		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
+			AJBRVC9OutputVO ajbrvc9Output = esbUtilOutputVO.getAjbrvc9OutputVO();
+			
+			// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
+			Boolean isErr = checkError(ajbrvc9Output);
+			
+			// 回傳下行電文資料儲存DB
+			if (!isErr) {
+				purchaseBondUpdateDB_GTC_OBU(prodType, tradeSeq, mainVO.getSEQ_NO(), ajbrvc9Output, mainVO.getDEFAULT_FEE_RATE());
+			}
+			
+			// 若有專業投資人提示訊息
+			sot707OutputVO.setWarningCode(new ArrayList<String>());
+			if (StringUtils.equals("Y", ajbrvc9Output.getTxMsgCode())) {
+				if (sot707InputVO.getPurchaseAmt().compareTo(new BigDecimal("3000000")) == -1) { // 當申購金額小於3000000時，需顯示提示訊息
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_007");
+				}
+				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+			} else if (StringUtils.equals("A", ajbrvc9Output.getTxMsgCode())) {
+				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+			}
+			
+			// 委買單價與最新報價不符合
+			if (StringUtils.equals("Y", ajbrvc9Output.getTxMsgCode1())) {
+				sot707OutputVO.getWarningCode().add("ehl_02_SOT_012");
+			}
+		}
+		
+		return sot707OutputVO;
+	}
 
 	/**
 	 * 海外債長效單申購檢核、確認下行電文回壓資料庫欄位
@@ -1165,30 +1195,30 @@ public class SOT707 extends EsbUtil {
 	 * @param trustAmt
 	 * @throws JBranchException
 	 */
-//	private void purchaseBondUpdateDB_GTC_OBU(String prodType, String tradeSeq, BigDecimal seqNo, AJBRVC9OutputVO ajbrvc9Output, BigDecimal defaultFeeRate) throws JBranchException {
-//		dam = getDataAccessManager();
-//		
-//		TBSOT_BN_TRADE_DPK pk = new TBSOT_BN_TRADE_DPK();
-//		pk.setTRADE_SEQ(tradeSeq);
-//		pk.setSEQ_NO(seqNo);
-//		TBSOT_BN_TRADE_DVO vo = new TBSOT_BN_TRADE_DVO();
-//		
-//		// find data by pks
-//		vo = (TBSOT_BN_TRADE_DVO) dam.findByPKey(TBSOT_BN_TRADE_DVO.TABLE_UID, pk);
-//		
-//		BigDecimal feeRate = new EsbUtil().decimalPoint(ajbrvc9Output.getTxFeeRate(), 5);
-//		BigDecimal fee = new EsbUtil().decimalPoint(ajbrvc9Output.getTxFee1(), 2);
-//		
-//		vo.setFEE_RATE(feeRate);
-//		vo.setFEE(fee);
-//		vo.setFEE_DISCOUNT((defaultFeeRate != null && defaultFeeRate.compareTo(BigDecimal.ZERO) != 0) ? feeRate.divide(defaultFeeRate, 3, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.TEN) : null);
-//		double feeDiscount10 = 10.0;// 10折不寫入資料庫
-//		if (vo.getFEE_DISCOUNT() != null && vo.getFEE_DISCOUNT().doubleValue() == feeDiscount10) {
-//			vo.setFEE_DISCOUNT(null);
-//		}
-//		
-//		dam.update(vo);
-//	}
+	private void purchaseBondUpdateDB_GTC_OBU(String prodType, String tradeSeq, BigDecimal seqNo, AJBRVC9OutputVO ajbrvc9Output, BigDecimal defaultFeeRate) throws JBranchException {
+		dam = getDataAccessManager();
+		
+		TBSOT_BN_TRADE_DPK pk = new TBSOT_BN_TRADE_DPK();
+		pk.setTRADE_SEQ(tradeSeq);
+		pk.setSEQ_NO(seqNo);
+		TBSOT_BN_TRADE_DVO vo = new TBSOT_BN_TRADE_DVO();
+		
+		// find data by pks
+		vo = (TBSOT_BN_TRADE_DVO) dam.findByPKey(TBSOT_BN_TRADE_DVO.TABLE_UID, pk);
+		
+		BigDecimal feeRate = new EsbUtil().decimalPoint(ajbrvc9Output.getTxFeeRate(), 5);
+		BigDecimal fee = new EsbUtil().decimalPoint(ajbrvc9Output.getTxFee1(), 2);
+		
+		vo.setFEE_RATE(feeRate);
+		vo.setFEE(fee);
+		vo.setFEE_DISCOUNT((defaultFeeRate != null && defaultFeeRate.compareTo(BigDecimal.ZERO) != 0) ? feeRate.divide(defaultFeeRate, 3, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.TEN) : null);
+		double feeDiscount10 = 10.0;// 10折不寫入資料庫
+		if (vo.getFEE_DISCOUNT() != null && vo.getFEE_DISCOUNT().doubleValue() == feeDiscount10) {
+			vo.setFEE_DISCOUNT(null);
+		}
+		
+		dam.update(vo);
+	}
 
 	/**
 	 * 海外債金錢信託申購檢核、確認 for js client
@@ -1560,9 +1590,9 @@ public class SOT707 extends EsbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-//	public void verifyESBRedeemBN_OBU(Object body, IPrimitiveMap header) throws Exception {
-//		sendRtnObject(this.verifyESBRedeemBN_OBU(body));
-//	}
+	public void verifyESBRedeemBN_OBU(Object body, IPrimitiveMap header) throws Exception {
+		sendRtnObject(this.verifyESBRedeemBN_OBU(body));
+	}
 	
 	/**
 	 * 海外債/SN贖回檢核、確認
@@ -1573,129 +1603,129 @@ public class SOT707 extends EsbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-//	public SOT707OutputVO verifyESBRedeemBN_OBU(Object body) throws Exception {
-//
-//		initUUID();
-//		
-//		XmlInfo xmlInfo = new XmlInfo();
-//		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
-//		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
-//		Map<String, String> trustTSMap = xmlInfo.doGetVariable("SOT.TRUST_TS", FormatHelper.FORMAT_3);
-//		
-//		dam = this.getDataAccessManager();
-//		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//
-//		sot707InputVO = (SOT707InputVO) body;
-//		sot707OutputVO = new SOT707OutputVO();
-//		
-//		String prodType = sot707InputVO.getProdType(); // 產品類別
-//		String tradeSeq = sot707InputVO.getTradeSeq(); // 交易序號
-//		String checkType = sot707InputVO.getCheckType(); // 電文確認碼
-//		
-//		// 欄位檢核
-//		if (StringUtils.isBlank(prodType) || StringUtils.isBlank(tradeSeq) || StringUtils.isBlank(checkType)) {
-//			throw new JBranchException("產品類別、交易序號或電文確認碼未輸入");
-//		}
-//		
-//		// 由產品類別與交易序號取得主檔資料作為電文上行
-//		MainInfoBean mainVO = mainInfo(prodType, tradeSeq);
-//		
-//		// init util
-//		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, AJBRVB9);
-//		esbUtilInputVO.setModule(thisClaz + new Object() {
-//		}.getClass().getEnclosingMethod().getName());
-//		
-//		// head
-//		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
-//		esbUtilInputVO.setTxHeadVO(txHead);
-//		txHead.setDefaultTxHead();
-//		
-//		// body
-//		AJBRVB9InputVO txBodyVO = new AJBRVB9InputVO();
-//		esbUtilInputVO.setAjbrvb9InputVO(txBodyVO);
-//		txBodyVO.setCheckCode(checkType); // 確認碼
-//		txBodyVO.setApplyDate(this.toChineseYearMMdd(mainVO.getTRADE_DATE(), false)); // 申請日期
-//		txBodyVO.setKeyinNo(mainVO.getBATCH_SEQ());
-//		txBodyVO.setCustNo(mainVO.getCUST_ID()); // 身份証號
-//		// 2020-01-15 modify by ocean : WMS-CR-20191009-01_金錢信託套表需求申請單, 交易類別為金錢信託時，CUST_ID傳送99331241
-//		txBodyVO.setCustNo((StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE()) ? mainVO.getCUST_ID() : trustTSMap.get("M_CUSTNO"))); //身份証號
-//		txBodyVO.setTrustType(mainVO.getTRUST_CURR_TYPE()); // 信託業務別
-//		txBodyVO.setTrustAcct(cbsservice.checkAcctLength(mainVO.getTRUST_ACCT())); // 信託帳號
-//		txBodyVO.setBondNo(mainVO.getPROD_ID()); // 債券代號
-//		txBodyVO.setTrustNo(mainVO.getCERTIFICATE_ID()); // 憑証號碼
-//		txBodyVO.setTrustVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); // 庫存餘額
-//		txBodyVO.setBondVal(new EsbUtil().decimalPadding(mainVO.getBOND_VALUE(), 0)); // 贖回時信託本金欄位放票面價值資料
-//		txBodyVO.setUnit(mainVO.getTRUST_UNIT()); // 庫存張數
-//		txBodyVO.setRcvAcct(cbsservice.checkAcctLength(mainVO.getCREDIT_ACCT())); // 入帳帳號
-//		
-//		// 20190617/mantis:6592/WMS-CR-20181113-01_個人高端客群處「業管系統_第一階段需求調整申請」_P5/modify by ocean/若組織為031，則帶715
-//		// 20200325/mantis:0561/WMS-CR-20210311-01_因應銀證組織調整商品議價及人員證照查詢功能/modify by ocean/若組織為175，則帶715
-//		String branchNbr = mainVO.getBRANCH_NBR();
-//		if (uhrmMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-//			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//			StringBuffer sb = new StringBuffer();
-//			
-//			sb.append("SELECT BRANCH_NBR ");
-//			sb.append("FROM TBORG_UHRM_BRH ");
-//			sb.append("WHERE EMP_ID = :loginID ");
-//
-//			queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
-//			queryCondition.setQueryString(sb.toString());
-//
-//			List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
-//			
-//			if (loginBreach.size() > 0) {
-//				branchNbr = (String) loginBreach.get(0).get("BRANCH_NBR");
-//			} else {
-//				throw new APException("人員無有效分行"); //顯示錯誤訊息
-//			}
-//		} else if (StringUtils.equals(branchNbr, branchChgMap.get("BS").toString())) {
-//			branchNbr = branchChgMap.get("DEFAULT").toString();
-//		}
-//		txBodyVO.setBranchNo(branchNbr); // 受理分行
-//		
-//		txBodyVO.setKeyinId(mainVO.getMODIFIER()); // 鍵機櫃員
-//		txBodyVO.setTxCur(mainVO.getPROD_CURR()); // 委託面額幣別
-//		txBodyVO.setTxType(mainVO.getENTRUST_TYPE()); // 限價方式
-//		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID()); // 解說專員
-//		txBodyVO.setRefPrice(new EsbUtil().decimalPadding(mainVO.getREF_VAL(), 4)); // 參考報價
-//		txBodyVO.setRefPriceDate(this.toChineseYearMMdd(mainVO.getREF_VAL_DATE(), false)); // 參考報價日期
-//		
-//		// 限價方式為不為市價，才需要放值
-//		if (!StringUtils.equals("2", mainVO.getENTRUST_TYPE())) {
-//			txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); // 委賣單價
-//		}
-//		
-//		if (StringUtils.equals("1", prodType)) { // SN
-//			txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getREDEEM_AMT(), 0)); // 委託面額
-//		} else if (StringUtils.equals("2", prodType)) { // 海外債
-//			txBodyVO.setUnit(new EsbUtil().decimalPadding(mainVO.getTRUST_UNIT(), 0)); // 庫存張數
-//			txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); // 委託面額
-//		}
-//		
-//		// 發送電文
-//		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
-//		
-//		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
-//			AJBRVB9OutputVO ajbrvb9Output = esbUtilOutputVO.getAjbrvb9OutputVO();
-//			
-//			// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
-//			Boolean isErr = checkError(ajbrvb9Output);
-//			
-//			// 回傳下行電文資料儲存DB
-//			if (!isErr) {
-//				redeemBNUpdateDB_OBU(prodType, tradeSeq, ajbrvb9Output, mainVO);
-//				
-//				// 若信託帳號暫停交易，回傳警示訊息
-//				sot707OutputVO.setWarningCode(new ArrayList<String>());
-//				if (StringUtils.equals("Y", ajbrvb9Output.getType1())) {
-//					sot707OutputVO.getWarningCode().add("ehl_02_SOT_009");
-//				}
-//			}
-//		}
-//		
-//		return sot707OutputVO;
-//	}
+	public SOT707OutputVO verifyESBRedeemBN_OBU(Object body) throws Exception {
+
+		initUUID();
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
+		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
+		Map<String, String> trustTSMap = xmlInfo.doGetVariable("SOT.TRUST_TS", FormatHelper.FORMAT_3);
+		
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+
+		sot707InputVO = (SOT707InputVO) body;
+		sot707OutputVO = new SOT707OutputVO();
+		
+		String prodType = sot707InputVO.getProdType(); // 產品類別
+		String tradeSeq = sot707InputVO.getTradeSeq(); // 交易序號
+		String checkType = sot707InputVO.getCheckType(); // 電文確認碼
+		
+		// 欄位檢核
+		if (StringUtils.isBlank(prodType) || StringUtils.isBlank(tradeSeq) || StringUtils.isBlank(checkType)) {
+			throw new JBranchException("產品類別、交易序號或電文確認碼未輸入");
+		}
+		
+		// 由產品類別與交易序號取得主檔資料作為電文上行
+		MainInfoBean mainVO = mainInfo(prodType, tradeSeq);
+		
+		// init util
+		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, AJBRVB9);
+		esbUtilInputVO.setModule(thisClaz + new Object() {
+		}.getClass().getEnclosingMethod().getName());
+		
+		// head
+		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
+		esbUtilInputVO.setTxHeadVO(txHead);
+		txHead.setDefaultTxHead();
+		
+		// body
+		AJBRVB9InputVO txBodyVO = new AJBRVB9InputVO();
+		esbUtilInputVO.setAjbrvb9InputVO(txBodyVO);
+		txBodyVO.setCheckCode(checkType); // 確認碼
+		txBodyVO.setApplyDate(this.toChineseYearMMdd(mainVO.getTRADE_DATE(), false)); // 申請日期
+		txBodyVO.setKeyinNo(mainVO.getBATCH_SEQ());
+		txBodyVO.setCustNo(mainVO.getCUST_ID()); // 身份証號
+		// 2020-01-15 modify by ocean : WMS-CR-20191009-01_金錢信託套表需求申請單, 交易類別為金錢信託時，CUST_ID傳送99331241
+		txBodyVO.setCustNo((StringUtils.equals("S", mainVO.getTRUST_TRADE_TYPE()) ? mainVO.getCUST_ID() : trustTSMap.get("M_CUSTNO"))); //身份証號
+		txBodyVO.setTrustType(mainVO.getTRUST_CURR_TYPE()); // 信託業務別
+		txBodyVO.setTrustAcct(cbsservice.checkAcctLength(mainVO.getTRUST_ACCT())); // 信託帳號
+		txBodyVO.setBondNo(mainVO.getPROD_ID()); // 債券代號
+		txBodyVO.setTrustNo(mainVO.getCERTIFICATE_ID()); // 憑証號碼
+		txBodyVO.setTrustVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); // 庫存餘額
+		txBodyVO.setBondVal(new EsbUtil().decimalPadding(mainVO.getBOND_VALUE(), 0)); // 贖回時信託本金欄位放票面價值資料
+		txBodyVO.setUnit(mainVO.getTRUST_UNIT()); // 庫存張數
+		txBodyVO.setRcvAcct(cbsservice.checkAcctLength(mainVO.getCREDIT_ACCT())); // 入帳帳號
+		
+		// 20190617/mantis:6592/WMS-CR-20181113-01_個人高端客群處「業管系統_第一階段需求調整申請」_P5/modify by ocean/若組織為031，則帶715
+		// 20200325/mantis:0561/WMS-CR-20210311-01_因應銀證組織調整商品議價及人員證照查詢功能/modify by ocean/若組織為175，則帶715
+		String branchNbr = mainVO.getBRANCH_NBR();
+		if (uhrmMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			StringBuffer sb = new StringBuffer();
+			
+			sb.append("SELECT BRANCH_NBR ");
+			sb.append("FROM TBORG_UHRM_BRH ");
+			sb.append("WHERE EMP_ID = :loginID ");
+
+			queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
+			queryCondition.setQueryString(sb.toString());
+
+			List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
+			
+			if (loginBreach.size() > 0) {
+				branchNbr = (String) loginBreach.get(0).get("BRANCH_NBR");
+			} else {
+				throw new APException("人員無有效分行"); //顯示錯誤訊息
+			}
+		} else if (StringUtils.equals(branchNbr, branchChgMap.get("BS").toString())) {
+			branchNbr = branchChgMap.get("DEFAULT").toString();
+		}
+		txBodyVO.setBranchNo(branchNbr); // 受理分行
+		
+		txBodyVO.setKeyinId(mainVO.getMODIFIER()); // 鍵機櫃員
+		txBodyVO.setTxCur(mainVO.getPROD_CURR()); // 委託面額幣別
+		txBodyVO.setTxType(mainVO.getENTRUST_TYPE()); // 限價方式
+		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID()); // 解說專員
+		txBodyVO.setRefPrice(new EsbUtil().decimalPadding(mainVO.getREF_VAL(), 4)); // 參考報價
+		txBodyVO.setRefPriceDate(this.toChineseYearMMdd(mainVO.getREF_VAL_DATE(), false)); // 參考報價日期
+		
+		// 限價方式為不為市價，才需要放值
+		if (!StringUtils.equals("2", mainVO.getENTRUST_TYPE())) {
+			txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); // 委賣單價
+		}
+		
+		if (StringUtils.equals("1", prodType)) { // SN
+			txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getREDEEM_AMT(), 0)); // 委託面額
+		} else if (StringUtils.equals("2", prodType)) { // 海外債
+			txBodyVO.setUnit(new EsbUtil().decimalPadding(mainVO.getTRUST_UNIT(), 0)); // 庫存張數
+			txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); // 委託面額
+		}
+		
+		// 發送電文
+		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
+		
+		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
+			AJBRVB9OutputVO ajbrvb9Output = esbUtilOutputVO.getAjbrvb9OutputVO();
+			
+			// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
+			Boolean isErr = checkError(ajbrvb9Output);
+			
+			// 回傳下行電文資料儲存DB
+			if (!isErr) {
+				redeemBNUpdateDB_OBU(prodType, tradeSeq, ajbrvb9Output, mainVO);
+				
+				// 若信託帳號暫停交易，回傳警示訊息
+				sot707OutputVO.setWarningCode(new ArrayList<String>());
+				if (StringUtils.equals("Y", ajbrvb9Output.getType1())) {
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_009");
+				}
+			}
+		}
+		
+		return sot707OutputVO;
+	}
 
 	private void redeemBNUpdateDB(String prodType, String tradeSeq, NJBRVB9OutputVO njbrvb9Output, MainInfoBean mainVO) throws JBranchException {
 		dam = getDataAccessManager();
@@ -1856,6 +1886,16 @@ public class SOT707 extends EsbUtil {
 		txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); // 委託面額
 		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false)); // 長效單迄日
 
+		/**
+		 * Filler
+		 * 第1位  ：長效單/預約單			(空白：長效單 1：預約單)
+		 * 第2-9位：預約單/長效單生效起日	9(08)
+		 * **/
+		String gtcYN = mainVO.getGTC_YN().equals("Y") ? " " : "1";
+		String gtcStartDate = mainVO.getGTC_START_DATE() == null ? "" : this.toChineseYearMMdd(mainVO.getGTC_START_DATE());
+		String filler = gtcYN + gtcStartDate;
+		txBodyVO.setFiller(filler);
+		
 		// 發送電文
 		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
 
@@ -1890,9 +1930,9 @@ public class SOT707 extends EsbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-//	public void verifyESBRedeemBN_GTC_OBU(Object body, IPrimitiveMap header) throws Exception {
-//		sendRtnObject(this.verifyESBRedeemBN_GTC_OBU(body));
-//	}
+	public void verifyESBRedeemBN_GTC_OBU(Object body, IPrimitiveMap header) throws Exception {
+		sendRtnObject(this.verifyESBRedeemBN_GTC_OBU(body));
+	}
 	
 	/**
 	 * 海外債/SN長效單贖回檢核、確認_OBU
@@ -1903,124 +1943,124 @@ public class SOT707 extends EsbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-//	public SOT707OutputVO verifyESBRedeemBN_GTC_OBU(Object body) throws Exception {
-//
-//		initUUID();
-//		
-//		XmlInfo xmlInfo = new XmlInfo();
-//		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
-//		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
-//		
-//		dam = this.getDataAccessManager();
-//		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//
-//		sot707InputVO = (SOT707InputVO) body;
-//		sot707OutputVO = new SOT707OutputVO();
-//		
-//		String prodType = sot707InputVO.getProdType();		// 產品類別
-//		String tradeSeq = sot707InputVO.getTradeSeq(); 		// 交易序號
-//		String checkType = sot707InputVO.getCheckType(); 	// 電文確認碼
-//		
-//		// 欄位檢核
-//		if (StringUtils.isBlank(prodType) || StringUtils.isBlank(tradeSeq) || StringUtils.isBlank(checkType)) {
-//			throw new JBranchException("產品類別、交易序號或電文確認碼未輸入");
-//		}
-//		
-//		// 由產品類別與交易序號取得主檔資料作為電文上行
-//		MainInfoBean mainVO = mainInfo(prodType, tradeSeq);
-//		
-//		// init util
-//		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, AJBRVD9);
-//		esbUtilInputVO.setModule(thisClaz + new Object() {
-//		}.getClass().getEnclosingMethod().getName());
-//		
-//		// head
-//		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
-//		esbUtilInputVO.setTxHeadVO(txHead);
-//		txHead.setDefaultTxHead();
-//		
-//		// body
-//		AJBRVD9InputVO txBodyVO = new AJBRVD9InputVO();
-//		esbUtilInputVO.setAjbrvd9InputVO(txBodyVO);
-//		txBodyVO.setCheckCode(checkType);													// 確認碼
-//		txBodyVO.setApplyDate(this.toChineseYearMMdd(mainVO.getTRADE_DATE(), false));		// 申請日期
-//		txBodyVO.setKeyinNo(mainVO.getBATCH_SEQ());
-//		txBodyVO.setCustNo(mainVO.getCUST_ID());											// 身份証號
-//		txBodyVO.setTrustType(mainVO.getTRUST_CURR_TYPE());									// 信託業務別
-//		txBodyVO.setTrustAcct(mainVO.getTRUST_ACCT());										// 信託帳號
-//		txBodyVO.setBondNo(mainVO.getPROD_ID()); 											// 債券代號
-//		txBodyVO.setTrustNo(mainVO.getCERTIFICATE_ID()); 									// 憑証號碼
-//		txBodyVO.setTrustVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0));	// 庫存餘額
-//		txBodyVO.setBondVal(new EsbUtil().decimalPadding(mainVO.getBOND_VALUE(), 0)); 		// 贖回時信託本金欄位放票面價值資料
-//		txBodyVO.setRcvAcct(mainVO.getCREDIT_ACCT()); 										// 入帳帳號
-//		
-//		// 20190617/mantis:6592/WMS-CR-20181113-01_個人高端客群處「業管系統_第一階段需求調整申請」_P5/modify by ocean/若組織為031，則帶715
-//		// 20200325/mantis:0561/WMS-CR-20210311-01_因應銀證組織調整商品議價及人員證照查詢功能/modify by ocean/若組織為175，則帶715
-//		String branchNbr = mainVO.getBRANCH_NBR();
-//		if (uhrmMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-//			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//			StringBuffer sb = new StringBuffer();
-//			
-//			sb.append("SELECT BRANCH_NBR ");
-//			sb.append("FROM TBORG_UHRM_BRH ");
-//			sb.append("WHERE EMP_ID = :loginID ");
-//
-//			queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
-//			queryCondition.setQueryString(sb.toString());
-//
-//			List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
-//			
-//			if (loginBreach.size() > 0) {
-//				branchNbr = (String) loginBreach.get(0).get("BRANCH_NBR");
-//			} else {
-//				throw new APException("人員無有效分行"); //顯示錯誤訊息
-//			}
-//		} else if (StringUtils.equals(branchNbr, branchChgMap.get("BS").toString())) {
-//			branchNbr = branchChgMap.get("DEFAULT").toString();
-//		}
-//		txBodyVO.setBranchNo(branchNbr); 													// 受理分行
-//		
-//		txBodyVO.setKeyinId(mainVO.getMODIFIER());											// 鍵機櫃員
-//		txBodyVO.setTxCur(mainVO.getPROD_CURR());											// 委託面額幣別
-//		txBodyVO.setTxType(mainVO.getENTRUST_TYPE());										// 限價方式
-//		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID());									// 解說專員
-//		txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9));		// 委賣單價
-//		txBodyVO.setUnit(new EsbUtil().decimalPadding(mainVO.getTRUST_UNIT(), 0));			// 庫存張數
-//		txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); 		// 委託面額
-//		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false));	// 長效單迄日
-//		
-//		/**
-//		 * Filler
-//		 * 第1位  ：長效單/預約單			(空白：長效單 1：預約單)
-//		 * 第2-9位：預約單/長效單生效起日	9(08)
-//		 * **/
-//		String gtcYN = mainVO.getGTC_YN().equals("Y") ? " " : "1";
-//		String gtcStartDate = mainVO.getGTC_START_DATE() == null ? "" : this.toChineseYearMMdd(mainVO.getGTC_START_DATE());
-//		String filler = gtcYN + gtcStartDate;
-//		txBodyVO.setFiller(filler);
-//		
-//		// 發送電文
-//		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
-//		
-//		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
-//			AJBRVD9OutputVO ajbrvd9Output = esbUtilOutputVO.getAjbrvd9OutputVO();
-//			
-//			// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
-//			Boolean isErr = checkError(ajbrvd9Output);
-//			
-//			// 回傳下行電文資料儲存DB
-//			if (!isErr) {
-//				redeemBNUpdateDB_GTC_OBU(prodType, tradeSeq, ajbrvd9Output, mainVO);
-//				
-//				// 若信託帳號暫停交易，回傳警示訊息
-//				sot707OutputVO.setWarningCode(new ArrayList<String>());
-//				if (StringUtils.equals("Y", ajbrvd9Output.getType1())) {
-//					sot707OutputVO.getWarningCode().add("ehl_02_SOT_009");
-//				}
-//			}
-//		}
-//		return sot707OutputVO;
-//	}
+	public SOT707OutputVO verifyESBRedeemBN_GTC_OBU(Object body) throws Exception {
+
+		initUUID();
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
+		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
+		
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+
+		sot707InputVO = (SOT707InputVO) body;
+		sot707OutputVO = new SOT707OutputVO();
+		
+		String prodType = sot707InputVO.getProdType();		// 產品類別
+		String tradeSeq = sot707InputVO.getTradeSeq(); 		// 交易序號
+		String checkType = sot707InputVO.getCheckType(); 	// 電文確認碼
+		
+		// 欄位檢核
+		if (StringUtils.isBlank(prodType) || StringUtils.isBlank(tradeSeq) || StringUtils.isBlank(checkType)) {
+			throw new JBranchException("產品類別、交易序號或電文確認碼未輸入");
+		}
+		
+		// 由產品類別與交易序號取得主檔資料作為電文上行
+		MainInfoBean mainVO = mainInfo(prodType, tradeSeq);
+		
+		// init util
+		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, AJBRVD9);
+		esbUtilInputVO.setModule(thisClaz + new Object() {
+		}.getClass().getEnclosingMethod().getName());
+		
+		// head
+		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
+		esbUtilInputVO.setTxHeadVO(txHead);
+		txHead.setDefaultTxHead();
+		
+		// body
+		AJBRVD9InputVO txBodyVO = new AJBRVD9InputVO();
+		esbUtilInputVO.setAjbrvd9InputVO(txBodyVO);
+		txBodyVO.setCheckCode(checkType);													// 確認碼
+		txBodyVO.setApplyDate(this.toChineseYearMMdd(mainVO.getTRADE_DATE(), false));		// 申請日期
+		txBodyVO.setKeyinNo(mainVO.getBATCH_SEQ());
+		txBodyVO.setCustNo(mainVO.getCUST_ID());											// 身份証號
+		txBodyVO.setTrustType(mainVO.getTRUST_CURR_TYPE());									// 信託業務別
+		txBodyVO.setTrustAcct(mainVO.getTRUST_ACCT());										// 信託帳號
+		txBodyVO.setBondNo(mainVO.getPROD_ID()); 											// 債券代號
+		txBodyVO.setTrustNo(mainVO.getCERTIFICATE_ID()); 									// 憑証號碼
+		txBodyVO.setTrustVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0));	// 庫存餘額
+		txBodyVO.setBondVal(new EsbUtil().decimalPadding(mainVO.getBOND_VALUE(), 0)); 		// 贖回時信託本金欄位放票面價值資料
+		txBodyVO.setRcvAcct(mainVO.getCREDIT_ACCT()); 										// 入帳帳號
+		
+		// 20190617/mantis:6592/WMS-CR-20181113-01_個人高端客群處「業管系統_第一階段需求調整申請」_P5/modify by ocean/若組織為031，則帶715
+		// 20200325/mantis:0561/WMS-CR-20210311-01_因應銀證組織調整商品議價及人員證照查詢功能/modify by ocean/若組織為175，則帶715
+		String branchNbr = mainVO.getBRANCH_NBR();
+		if (uhrmMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			StringBuffer sb = new StringBuffer();
+			
+			sb.append("SELECT BRANCH_NBR ");
+			sb.append("FROM TBORG_UHRM_BRH ");
+			sb.append("WHERE EMP_ID = :loginID ");
+
+			queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
+			queryCondition.setQueryString(sb.toString());
+
+			List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
+			
+			if (loginBreach.size() > 0) {
+				branchNbr = (String) loginBreach.get(0).get("BRANCH_NBR");
+			} else {
+				throw new APException("人員無有效分行"); //顯示錯誤訊息
+			}
+		} else if (StringUtils.equals(branchNbr, branchChgMap.get("BS").toString())) {
+			branchNbr = branchChgMap.get("DEFAULT").toString();
+		}
+		txBodyVO.setBranchNo(branchNbr); 													// 受理分行
+		
+		txBodyVO.setKeyinId(mainVO.getMODIFIER());											// 鍵機櫃員
+		txBodyVO.setTxCur(mainVO.getPROD_CURR());											// 委託面額幣別
+		txBodyVO.setTxType(mainVO.getENTRUST_TYPE());										// 限價方式
+		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID());									// 解說專員
+		txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9));		// 委賣單價
+		txBodyVO.setUnit(new EsbUtil().decimalPadding(mainVO.getTRUST_UNIT(), 0));			// 庫存張數
+		txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); 		// 委託面額
+		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false));	// 長效單迄日
+		
+		/**
+		 * Filler
+		 * 第1位  ：長效單/預約單			(空白：長效單 1：預約單)
+		 * 第2-9位：預約單/長效單生效起日	9(08)
+		 * **/
+		String gtcYN = mainVO.getGTC_YN().equals("Y") ? " " : "1";
+		String gtcStartDate = mainVO.getGTC_START_DATE() == null ? "" : this.toChineseYearMMdd(mainVO.getGTC_START_DATE());
+		String filler = gtcYN + gtcStartDate;
+		txBodyVO.setFiller(filler);
+		
+		// 發送電文
+		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
+		
+		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
+			AJBRVD9OutputVO ajbrvd9Output = esbUtilOutputVO.getAjbrvd9OutputVO();
+			
+			// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
+			Boolean isErr = checkError(ajbrvd9Output);
+			
+			// 回傳下行電文資料儲存DB
+			if (!isErr) {
+				redeemBNUpdateDB_GTC_OBU(prodType, tradeSeq, ajbrvd9Output, mainVO);
+				
+				// 若信託帳號暫停交易，回傳警示訊息
+				sot707OutputVO.setWarningCode(new ArrayList<String>());
+				if (StringUtils.equals("Y", ajbrvd9Output.getType1())) {
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_009");
+				}
+			}
+		}
+		return sot707OutputVO;
+	}
 
 	private void redeemBNUpdateDB_GTC(String prodType, String tradeSeq, NJBRVD9OutputVO njbrvd9Output, MainInfoBean mainVO) throws Exception {
 		dam = getDataAccessManager();
@@ -2043,26 +2083,26 @@ public class SOT707 extends EsbUtil {
 		dam.update(vo);
 	}
 	
-//	private void redeemBNUpdateDB_GTC_OBU(String prodType, String tradeSeq, AJBRVD9OutputVO ajbrvd9Output, MainInfoBean mainVO) throws Exception {
-//		dam = getDataAccessManager();
-//		String sql = null;
-//		QueryConditionIF condition = null;
-//		
-//		TBSOT_BN_TRADE_DPK pk = new TBSOT_BN_TRADE_DPK();
-//		pk.setTRADE_SEQ(tradeSeq);
-//		pk.setSEQ_NO(mainVO.getSEQ_NO());
-//		TBSOT_BN_TRADE_DVO vo = new TBSOT_BN_TRADE_DVO();
-//		
-//		// find data by pks
-//		vo = (TBSOT_BN_TRADE_DVO) dam.findByPKey(TBSOT_BN_TRADE_DVO.TABLE_UID, pk);
-//		BigDecimal refVal = new EsbUtil().decimalPoint(ajbrvd9Output.getRefVal(), 9);
-//		Date refValDate = new EsbUtil().toAdYearMMdd(ajbrvd9Output.getRefValDate(), false);
-//		
-//		vo.setREF_VAL(refVal);
-//		vo.setREF_VAL_DATE(new Timestamp(refValDate.getTime()));
-//		
-//		dam.update(vo);
-//	}
+	private void redeemBNUpdateDB_GTC_OBU(String prodType, String tradeSeq, AJBRVD9OutputVO ajbrvd9Output, MainInfoBean mainVO) throws Exception {
+		dam = getDataAccessManager();
+		String sql = null;
+		QueryConditionIF condition = null;
+		
+		TBSOT_BN_TRADE_DPK pk = new TBSOT_BN_TRADE_DPK();
+		pk.setTRADE_SEQ(tradeSeq);
+		pk.setSEQ_NO(mainVO.getSEQ_NO());
+		TBSOT_BN_TRADE_DVO vo = new TBSOT_BN_TRADE_DVO();
+		
+		// find data by pks
+		vo = (TBSOT_BN_TRADE_DVO) dam.findByPKey(TBSOT_BN_TRADE_DVO.TABLE_UID, pk);
+		BigDecimal refVal = new EsbUtil().decimalPoint(ajbrvd9Output.getRefVal(), 9);
+		Date refValDate = new EsbUtil().toAdYearMMdd(ajbrvd9Output.getRefValDate(), false);
+		
+		vo.setREF_VAL(refVal);
+		vo.setREF_VAL_DATE(new Timestamp(refValDate.getTime()));
+		
+		dam.update(vo);
+	}
 
 	/**
 	 * 海外債金錢信託產品庫存資料查詢 for js client
@@ -2509,9 +2549,9 @@ public class SOT707 extends EsbUtil {
 	 * @param header
 	 * @throws Exception
 	 */
-//	public void getIsCustFirstTradeOBU(Object body, IPrimitiveMap header) throws Exception {
-//		sendRtnObject(this.getIsCustFirstTradeOBU(body));
-//	}
+	public void getIsCustFirstTradeOBU(Object body, IPrimitiveMap header) throws Exception {
+		sendRtnObject(this.getIsCustFirstTradeOBU(body));
+	}
 	
 	/**
 	 * 海外債/SN產品首購資料查詢_OBU
@@ -2521,54 +2561,54 @@ public class SOT707 extends EsbUtil {
 	 * @param body
 	 * @throws Exception
 	 */
-//	public Boolean getIsCustFirstTradeOBU(Object body) throws Exception {
-//		sot707InputVO = (SOT707InputVO) body;
-//		
-//		String custID = sot707InputVO.getCustId();
-//		String prodID = sot707InputVO.getProdId();
-//		
-//		// 欄位檢核
-//		if (StringUtils.isBlank(custID) || StringUtils.isBlank(prodID)) {
-//			throw new JBranchException("客戶ID或產品代碼未輸入");
-//		}
-//		
-//		// init util
-//		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, AJBRVA3);
-//		esbUtilInputVO.setModule(thisClaz + new Object() {
-//		}.getClass().getEnclosingMethod().getName());
-//		
-//		// head
-//		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
-//		esbUtilInputVO.setTxHeadVO(txHead);
-//		txHead.setDefaultTxHead();
-//		
-//		// body
-//		AJBRVA3InputVO txBodyVO = new AJBRVA3InputVO();
-//		esbUtilInputVO.setAjbrva3InputVO(txBodyVO);
-//		txBodyVO.setCustId(custID);
-//		txBodyVO.setBondNo(prodID);
-//		
-//		// 發送電文
-//		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
-//		
-//		Boolean isFirstTrade = Boolean.FALSE;
-//		
-//		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
-//			AJBRVA3OutputVO ajbrva3OutputVO = esbUtilOutputVO.getAjbrva3OutputVO();
-//			
-//			List<AJBRVA3OutputVODetails> details = ajbrva3OutputVO.getDetails();
-//			details = (CollectionUtils.isEmpty(details)) ? new ArrayList<AJBRVA3OutputVODetails>() : details;
-//			
-//			for (AJBRVA3OutputVODetails detail : details) {
-//				String haveTradeRec = detail.getHaveTradeRec();
-//				// String haveTradeRecTody = detail.getHaveTradeRecToday();
-//				
-//				isFirstTrade = (StringUtils.isNotBlank(haveTradeRec) && StringUtils.equals("Y", haveTradeRec)) ? Boolean.TRUE : Boolean.FALSE;
-//			}
-//		}
-//		
-//		return isFirstTrade;
-//	}
+	public Boolean getIsCustFirstTradeOBU(Object body) throws Exception {
+		sot707InputVO = (SOT707InputVO) body;
+		
+		String custID = sot707InputVO.getCustId();
+		String prodID = sot707InputVO.getProdId();
+		
+		// 欄位檢核
+		if (StringUtils.isBlank(custID) || StringUtils.isBlank(prodID)) {
+			throw new JBranchException("客戶ID或產品代碼未輸入");
+		}
+		
+		// init util
+		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, AJBRVA3);
+		esbUtilInputVO.setModule(thisClaz + new Object() {
+		}.getClass().getEnclosingMethod().getName());
+		
+		// head
+		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
+		esbUtilInputVO.setTxHeadVO(txHead);
+		txHead.setDefaultTxHead();
+		
+		// body
+		AJBRVA3InputVO txBodyVO = new AJBRVA3InputVO();
+		esbUtilInputVO.setAjbrva3InputVO(txBodyVO);
+		txBodyVO.setCustId(custID);
+		txBodyVO.setBondNo(prodID);
+		
+		// 發送電文
+		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
+		
+		Boolean isFirstTrade = Boolean.FALSE;
+		
+		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
+			AJBRVA3OutputVO ajbrva3OutputVO = esbUtilOutputVO.getAjbrva3OutputVO();
+			
+			List<AJBRVA3OutputVODetails> details = ajbrva3OutputVO.getDetails();
+			details = (CollectionUtils.isEmpty(details)) ? new ArrayList<AJBRVA3OutputVODetails>() : details;
+			
+			for (AJBRVA3OutputVODetails detail : details) {
+				String haveTradeRec = detail.getHaveTradeRec();
+				// String haveTradeRecTody = detail.getHaveTradeRecToday();
+				
+				isFirstTrade = (StringUtils.isNotBlank(haveTradeRec) && StringUtils.equals("Y", haveTradeRec)) ? Boolean.TRUE : Boolean.FALSE;
+			}
+		}
+		
+		return isFirstTrade;
+	}
 
 	/**
 	 * 海外債/SN產品庫存資料查詢 for js client

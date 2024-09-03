@@ -311,16 +311,15 @@ public class SOT510 extends FubonWmsBizLogic {
 		}
 		dam.update(mainVo);
 
-		// TODO 上[2080]退[2090]
-//		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
+		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-		SOT707OutputVO outputVO_707 = sot707.verifyESBPurchaseBN(input707);
-//		SOT707OutputVO outputVO_707 = new SOT707OutputVO();
-//		if (isOBU.equals("Y")) {
-//			outputVO_707 = sot707.verifyESBPurchaseBN_OBU(input707);
-//		} else {
-//			outputVO_707 = sot707.verifyESBPurchaseBN(input707);
-//		}
+//		SOT707OutputVO outputVO_707 = sot707.verifyESBPurchaseBN(input707);
+		SOT707OutputVO outputVO_707 = new SOT707OutputVO();
+		if (isOBU.equals("Y")) {
+			outputVO_707 = sot707.verifyESBPurchaseBN_OBU(input707);
+		} else {
+			outputVO_707 = sot707.verifyESBPurchaseBN(input707);
+		}
 		
 		String errorMsg = outputVO_707.getErrorMsg();
 		List<String> warningList = outputVO_707.getWarningCode();
@@ -386,8 +385,7 @@ public class SOT510 extends FubonWmsBizLogic {
 		SOT510InputVO inputVO = (SOT510InputVO) body;
 		SOT510OutputVO outputVO = new SOT510OutputVO();
 		
-		// TODO 上[2080]退[2090]
-//		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
+		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		
 		//#0564 金錢信託SN 發送A2電文
 		SOT711 sot711 = (SOT711) PlatformContext.getBean("sot711");
@@ -400,14 +398,13 @@ public class SOT510 extends FubonWmsBizLogic {
 		sot711InputVO.setTrustAcct(inputVO.getTrustAcct());
 		sot711InputVO.setTxFeeType("1");
 		
-		// TODO 上[2080]退[2090]
-		SOT711OutputVO sot711OutputVO = sot711.getDefaultFeeRateData(sot711InputVO);
-//		SOT711OutputVO sot711OutputVO = new SOT711OutputVO();
-//		if (isOBU.equals("Y")) {
-//			sot711OutputVO = sot711.getDefaultFeeRateDataOBU(sot711InputVO);
-//		} else {
-//			sot711OutputVO = sot711.getDefaultFeeRateData(sot711InputVO);
-//		}
+//		SOT711OutputVO sot711OutputVO = sot711.getDefaultFeeRateData(sot711InputVO);
+		SOT711OutputVO sot711OutputVO = new SOT711OutputVO();
+		if (isOBU.equals("Y")) {
+			sot711OutputVO = sot711.getDefaultFeeRateDataOBU(sot711InputVO);
+		} else {
+			sot711OutputVO = sot711.getDefaultFeeRateData(sot711InputVO);
+		}
 		
 		BigDecimal A2DefaultFeeRate = sot711OutputVO.getDefaultFeeRate();
 		BigDecimal A2BestFeeRate = sot711OutputVO.getBestFeeRate();
@@ -424,14 +421,13 @@ public class SOT510 extends FubonWmsBizLogic {
 		sot711InputVO2.setTrustAcct("for the pass");
 		sot711InputVO2.setTxFeeType("1");
 		
-		// TODO 上[2080]退[2090]
-		SOT711OutputVO sot711OutputVO2 = sot711.getDefaultFeeRateDataByTrust(sot711InputVO2);
-//		SOT711OutputVO sot711OutputVO2 = new SOT711OutputVO();
-//		if (isOBU.equals("Y")) {
-//			sot711OutputVO2 = sot711.getDefaultFeeRateDataOBU(sot711InputVO);
-//		} else {
-//			sot711OutputVO2 = sot711.getDefaultFeeRateData(sot711InputVO);
-//		}
+//		SOT711OutputVO sot711OutputVO2 = sot711.getDefaultFeeRateDataByTrust(sot711InputVO2);
+		SOT711OutputVO sot711OutputVO2 = new SOT711OutputVO();
+		if (isOBU.equals("Y")) {
+			sot711OutputVO2 = sot711.getDefaultFeeRateDataOBU(sot711InputVO);
+		} else {
+			sot711OutputVO2 = sot711.getDefaultFeeRateData(sot711InputVO);
+		}
 		
 		BigDecimal X1DefaultFeeRate = sot711OutputVO2.getDefaultFeeRate();
 		BigDecimal X1BestFeeRate = sot711OutputVO2.getBestFeeRate();
@@ -463,15 +459,14 @@ public class SOT510 extends FubonWmsBizLogic {
 			}
   		}
 	    
-		// TODO 上[2080]退[2027]
 		//高資產客戶購買高風險商品或不保本商品，檢核集中度
 		//#2027: WMS-CR-20240509-01_高資產集中度交易取消不保本境內外結構型商品檢核
-		if(StringUtils.equals("Y", inputVO.getHnwcYN()) && (StringUtils.equals("Y", inputVO.getHnwcBuy()) || !isRateGuaranteed(inputVO.getProdID()))) {
-			inputVO.setOverCentRateYN(getOverCentRateYN(inputVO, rate));
-			if(StringUtils.equals("Y", inputVO.getOverCentRateYN())) {
-				warningList.add("客戶高風險商品集中度已超過控管上限，請取得客戶同意及處主管核准");
-			}
-		}
+//		if(StringUtils.equals("Y", inputVO.getHnwcYN()) && (StringUtils.equals("Y", inputVO.getHnwcBuy()) || !isRateGuaranteed(inputVO.getProdID()))) {
+//			inputVO.setOverCentRateYN(getOverCentRateYN(inputVO, rate));
+//			if(StringUtils.equals("Y", inputVO.getOverCentRateYN())) {
+//				warningList.add("客戶高風險商品集中度已超過控管上限，請取得客戶同意及處主管核准");
+//			}
+//		}
 				
         add(dam, queryCondition, inputVO);
 
@@ -492,13 +487,12 @@ public class SOT510 extends FubonWmsBizLogic {
             outputVO_707_M = sot707.verifyESBPurchaseBN_TRUST(inputVO_707);
         }
         
-        // TODO 上[2080]退[2090]
-     	outputVO_707_S = sot707.verifyESBPurchaseBN(inputVO_707);
-//		if (isOBU.equals("Y")) {
-//			outputVO_707_S = sot707.verifyESBPurchaseBN_OBU(inputVO_707);
-//		} else {
-//			outputVO_707_S = sot707.verifyESBPurchaseBN(inputVO_707);
-//		}
+//      outputVO_707_S = sot707.verifyESBPurchaseBN(inputVO_707);
+		if (isOBU.equals("Y")) {
+			outputVO_707_S = sot707.verifyESBPurchaseBN_OBU(inputVO_707);
+		} else {
+			outputVO_707_S = sot707.verifyESBPurchaseBN(inputVO_707);
+		}
 
         // 金錢信託申請電文錯誤訊息
         if (StringUtils.equals("M", inputVO.getTrustTS())) {
@@ -597,15 +591,14 @@ public class SOT510 extends FubonWmsBizLogic {
 		inputVO_707.setCustId(inputVO.getCustID());
 		inputVO_707.setProdId(inputVO.getProdID());
 
-		// 上[2080]退[2090]
-//		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
+		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-		isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707);
-//		if (isOBU.equals("Y")) {
-//			isFirstTrade = sot707.getIsCustFirstTradeOBU(inputVO_707);
-//		} else {
-//			isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707);	
-//		}
+		
+		if (isOBU.equals("Y")) {
+			isFirstTrade = sot707.getIsCustFirstTradeOBU(inputVO_707);
+		} else {
+			isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707);	
+		}
 		outputVO.setIsFirstTrade((isFirstTrade) ? "Y" : "N");
 
 		this.sendRtnObject(outputVO);

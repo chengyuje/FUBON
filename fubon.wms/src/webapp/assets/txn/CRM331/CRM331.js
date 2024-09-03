@@ -39,6 +39,21 @@ eSoafApp.controller('CRM331Controller',
         else
         	$scope.mappingSet['process_mode'] = [{LABEL: '強制AO移轉', DATA: '2'}];
 		//
+        
+        // date picker
+        $scope.sDateOptions = {};
+		$scope.eDateOptions = {};
+		$scope.model = {};
+		$scope.open = function($event, elementOpened) {
+			$event.preventDefault();
+			$event.stopPropagation();
+			$scope.model[elementOpened] = !$scope.model[elementOpened];
+		};
+		$scope.limitDate = function() {
+			$scope.sDateOptions.maxDate = $scope.inputVO.eDate;
+			$scope.eDateOptions.minDate = $scope.inputVO.sDate;
+		};
+		// date picker end
 		
 		// init
 		$scope.init = function() {
@@ -205,18 +220,34 @@ eSoafApp.controller('CRM331Controller',
 				$scope.inputVO.re_ao_code = $scope.inputVO.re_ao_code.toUpperCase();
 
 			$scope.sendRecv("CRM331", "inquire", "com.systex.jbranch.app.server.fps.crm331.CRM331InputVO", $scope.inputVO,
-					function(tota, isError) {
-						if (!isError) {
-							if(tota[0].body.resultList.length == 0) {
-								$scope.showMsg("ehl_01_common_009");
-	                			return;
-	                		}
-							$scope.resultList = tota[0].body.resultList;
-							$scope.outputVO = tota[0].body;
-							return;
-						}
+			function(tota, isError) {
+				if (!isError) {
+					if(tota[0].body.resultList.length == 0) {
+						$scope.showMsg("ehl_01_common_009");
+            			return;
+            		}
+					$scope.resultList = tota[0].body.resultList;
+					$scope.outputVO = tota[0].body;
+					return;
+				}
 			});
 	    };
+	    
+	    $scope.$watch('EMP_LIST', function(newValue, oldValue) {
+	    	if ($scope.AO_LIST.length > 0 && $scope.EMP_LIST.length > 0) {
+	    		$scope.RM_LIST = [];
+//	    		$scope.rmList = [];
+	    		for (var i = 0; i < $scope.EMP_LIST.length; i++) {
+	    			if ($scope.EMP_LIST[i].AO_CODE != undefined) {
+	    				$scope.RM_LIST.push({LABEL: $scope.EMP_LIST[i].LABEL, DATA: $scope.EMP_LIST[i].EMP_ID});
+//	    				$scope.rmList.push($scope.EMP_LIST[i].EMP_ID);
+	    			}
+	    		}
+//	    		if ($scope.RM_LIST.includes(sysInfoService.getUserID())) {
+//	    			$scope.inputVO.rm_id = sysInfoService.getUserID();
+//	    		}
+	    	}
+		});
 	      
 	   
         //Confirm

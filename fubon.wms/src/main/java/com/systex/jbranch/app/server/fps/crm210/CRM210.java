@@ -88,11 +88,10 @@ public class CRM210 extends FubonWmsBizLogic {
 		sql.append("       V.AMT_16, "); 											// 全行黃金存摺
 		sql.append("       V.AMT_17, "); 											// 全行保險餘額
 		sql.append("       V.AMT_18, "); 											// 全行貸款餘額
-		// TODO 上2080 拆2017
-//		sql.append("       V.AMT_18_1, "); 											// 房屋貸款
-//		sql.append("       V.AMT_18_2, "); 											// 信用貸款
-//		sql.append("       V.AMT_18_3, "); 											// 留學貸款
-//		sql.append("       V.AMT_18_4, "); 											// 就學貸款
+		sql.append("       V.AMT_18_1, "); 											// 房屋貸款
+		sql.append("       V.AMT_18_2, "); 											// 信用貸款
+		sql.append("       V.AMT_18_3, "); 											// 留學貸款
+		sql.append("       V.AMT_18_4, "); 											// 就學貸款
 		sql.append("       V.AMT_19, "); 											// 前日大額100萬以上進出
 		sql.append("       V.AMT_11, "); 											// SN
 		
@@ -682,24 +681,23 @@ public class CRM210 extends FubonWmsBizLogic {
 					queryCondition.setObject("chg_frq", inputVO_CRM331.getChg_frq());
 				}
 				
-				// TODO 上2080 拆2073
-//				//RM理專
-//				if (!StringUtils.isBlank(inputVO_CRM331.getRm_id())) {
-//					sql.append("AND MEM.EMP_ID = :emp_id ");
-//					queryCondition.setObject("emp_id", inputVO_CRM331.getRm_id());
-//				}
-//				
-//				//AO CODE最新異動日期(起)
-//				if (null != inputVO_CRM331.getsDate()) {
-//					sql.append("AND TRUNC(CM.AO_LASTUPDATE) >= :sDate ");
-//					queryCondition.setObject("sDate", new Timestamp(inputVO_CRM331.getsDate().getTime()));
-//				}
-//
-//				//AO CODE最新異動日期(迄)
-//				if (null != inputVO_CRM331.geteDate()) {
-//					sql.append("AND TRUNC(CM.AO_LASTUPDATE) <= :eDate ");
-//					queryCondition.setObject("eDate", new Timestamp(inputVO_CRM331.geteDate().getTime()));
-//				}
+				//RM理專
+				if (!StringUtils.isBlank(inputVO_CRM331.getRm_id())) {
+					sql.append("AND MEM.EMP_ID = :emp_id ");
+					queryCondition.setObject("emp_id", inputVO_CRM331.getRm_id());
+				}
+				
+				//AO CODE最新異動日期(起)
+				if (null != inputVO_CRM331.getsDate()) {
+					sql.append("AND TRUNC(CM.AO_LASTUPDATE) >= :sDate ");
+					queryCondition.setObject("sDate", new Timestamp(inputVO_CRM331.getsDate().getTime()));
+				}
+
+				//AO CODE最新異動日期(迄)
+				if (null != inputVO_CRM331.geteDate()) {
+					sql.append("AND TRUNC(CM.AO_LASTUPDATE) <= :eDate ");
+					queryCondition.setObject("eDate", new Timestamp(inputVO_CRM331.geteDate().getTime()));
+				}
 				
 				//客戶在ON CODE排除名單不須顯示
 				sql.append("AND V.CUST_ID NOT IN (SELECT CUST_ID FROM TBCRM_TRS_CUST_EXCLUDE WHERE NVL(DEL_YN, 'N') = 'N') ");

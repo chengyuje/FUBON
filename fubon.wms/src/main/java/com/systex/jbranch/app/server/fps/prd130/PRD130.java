@@ -86,7 +86,7 @@ public class PRD130 extends FubonWmsBizLogic {
 //		Boolean isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707);
 		Boolean isFirstTrade = false;
 		if (sot701.isObu(inputVO.getCust_id())) {
-//			isFirstTrade = sot707.getIsCustFirstTradeOBU(inputVO_707);
+			isFirstTrade = sot707.getIsCustFirstTradeOBU(inputVO_707);
 		} else {
 			isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707);
 		}

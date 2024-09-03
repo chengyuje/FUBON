@@ -178,10 +178,7 @@ public class SOT320 extends FubonWmsBizLogic {
 		sb.append("		PROD_MIN_BUY_AMT, PROD_MIN_GRD_AMT, TRUST_CURR_TYPE, TRUST_CURR, TRUST_UNIT, MARKET_TYPE, REF_VAL, REF_VAL_DATE, ");
 		sb.append("		PURCHASE_AMT, ENTRUST_TYPE, ENTRUST_AMT, TRUST_AMT, DEFAULT_FEE_RATE, ADV_FEE_RATE, BARGAIN_APPLY_SEQ, FEE_RATE, ");
 		sb.append("		FEE, FEE_DISCOUNT, PAYABLE_FEE, TOT_AMT, DEBIT_ACCT, TRUST_ACCT, CREDIT_ACCT, TRADE_DATE, NARRATOR_ID, NARRATOR_NAME, ");
-		sb.append("		GTC_YN, ");
-		// TODO 上[2080]拆[2056]
-//		sb.append("		GTC_START_DATE, ");
-		sb.append("		GTC_END_DATE ");
+		sb.append("		GTC_YN, GTC_START_DATE, GTC_END_DATE ");
 		sb.append("FROM TBSOT_BN_TRADE_D ");
 		sb.append("WHERE TRADE_SEQ = :tradeSEQ ");
 		queryCondition.setObject("tradeSEQ", inputVO.getTradeSEQ());
@@ -348,8 +345,7 @@ public class SOT320 extends FubonWmsBizLogic {
 		dtlVO.setNARRATOR_NAME(inputVO.getNarratorName()); //解說專員姓名
 		dtlVO.setBOND_VALUE(inputVO.getBondVal());
 		dtlVO.setGTC_YN(inputVO.getGtcYN()); //長效單Y 當日單N
-		//TODO 上[2080]拆[2056]
-//		dtlVO.setGTC_START_DATE(null != inputVO.getGtcStartDate() ? new Timestamp(inputVO.getGtcStartDate().getTime()) : null); //長效單起日
+		dtlVO.setGTC_START_DATE(null != inputVO.getGtcStartDate() ? new Timestamp(inputVO.getGtcStartDate().getTime()) : null); //長效單起日
 		dtlVO.setGTC_END_DATE(null != inputVO.getGtcEndDate() ? new Timestamp(inputVO.getGtcEndDate().getTime()) : null); 		//長效單迄日
 		
 		//mantis #000104: WMS-CR-20191009-01_金錢信託套表需求申請單 2019-12-20 add by ocean
@@ -369,27 +365,24 @@ public class SOT320 extends FubonWmsBizLogic {
 		//
 
 		// 確認電文
-		// TODO 上[2080]拆[2090]
-//		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
+		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707InputVO inputVO_707 = new SOT707InputVO();
 		SOT707OutputVO outputVO_707 = new SOT707OutputVO();
 		inputVO_707.setProdType("2");
 		inputVO_707.setCheckType("2");
 		inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-		
-		// TODO 上[2080]拆[2090]
-//		if (isOBU.equals("Y")) {
-//			if ("Y".equals(inputVO.getGtcYN()))
-//				outputVO_707 = sot707.verifyESBRedeemBN_GTC_OBU(inputVO_707);	// 長效單
-//			else
-//				outputVO_707 = sot707.verifyESBRedeemBN_OBU(inputVO_707); 		// 當日單
-//		} else {
+		if (isOBU.equals("Y")) {
+			if ("Y".equals(inputVO.getGtcYN()))
+				outputVO_707 = sot707.verifyESBRedeemBN_GTC_OBU(inputVO_707);	// 長效單
+			else
+				outputVO_707 = sot707.verifyESBRedeemBN_OBU(inputVO_707); 		// 當日單
+		} else {
 			if ("Y".equals(inputVO.getGtcYN()))
 				outputVO_707 = sot707.verifyESBRedeemBN_GTC(inputVO_707);		// 長效單
 			else
 				outputVO_707 = sot707.verifyESBRedeemBN(inputVO_707);			// 當日單			
-//		}
+		}
 
 		String errorMsg = outputVO_707.getErrorMsg();
 		outputVO.setWarningCode(outputVO_707.getWarningCode());

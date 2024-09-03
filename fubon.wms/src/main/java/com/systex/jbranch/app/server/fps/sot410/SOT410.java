@@ -565,14 +565,13 @@ public class SOT410 extends FubonWmsBizLogic {
   		}
 		
 		//高資產客戶購買高風險商品或不保本商品，檢核集中度
-		// TODO 上[2080]拆[2027]
 		//#2027: WMS-CR-20240509-01_高資產集中度交易取消不保本境內外結構型商品檢核
-		if(StringUtils.equals("Y", inputVO.getHnwcYN()) && (StringUtils.equals("Y", inputVO.getHnwcBuy()) || !isRateGuaranteed(inputVO.getProdID()))) {
-			inputVO.setOverCentRateYN(getOverCentRateYN(inputVO, rate));
-			if(StringUtils.equals("Y", inputVO.getOverCentRateYN())) {
-				outputVO.setWarningMsg("客戶高風險商品集中度已超過控管上限，請取得客戶同意及處主管核准");
-			}
-		}
+//		if(StringUtils.equals("Y", inputVO.getHnwcYN()) && (StringUtils.equals("Y", inputVO.getHnwcBuy()) || !isRateGuaranteed(inputVO.getProdID()))) {
+//			inputVO.setOverCentRateYN(getOverCentRateYN(inputVO, rate));
+//			if(StringUtils.equals("Y", inputVO.getOverCentRateYN())) {
+//				outputVO.setWarningMsg("客戶高風險商品集中度已超過控管上限，請取得客戶同意及處主管核准");
+//			}
+//		}
 				
 		add(dam, queryCondition, inputVO);
 

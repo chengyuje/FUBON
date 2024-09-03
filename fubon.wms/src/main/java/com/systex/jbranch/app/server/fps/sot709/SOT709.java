@@ -410,6 +410,7 @@ public class SOT709 extends EsbUtil{
 					feeRate.setTellerld(detailVO.getTellerId());
 					feeRate.setAppMgr(detailVO.getAppMgr());
 					feeRate.setCrtTime(new BigDecimal(detailVO.getCrtTime()));
+					feeRate.setDynamicYN(detailVO.getDynamicYN());
 					feeRateList.add(feeRate);
 				}
 			}
@@ -471,9 +472,7 @@ public class SOT709 extends EsbUtil{
 	  * @param header
 	  */
 		public void singleBargainApply (Object body, IPrimitiveMap header) throws Exception {
-			sot709OutputVO = new SOT709OutputVO();
-			sot709OutputVO.setErrorCode(this.singleBargainApply(body).getErrorCode());
-			sot709OutputVO.setErrorMsg(this.singleBargainApply(body).getErrorMsg());
+			sot709OutputVO = this.singleBargainApply(body);
 			sendRtnObject(sot709OutputVO);
 		}
 	
@@ -581,6 +580,7 @@ public class SOT709 extends EsbUtil{
 			if(recSetList.get(0).get("BRG_REASON") != null){
 				nfbrn6InputVO.setREMARKS(recSetList.get(0).get("BRG_REASON").toString());				
 			}
+			nfbrn6InputVO.setDYNAMIC_YN(StringUtils.equals("6", recSetList.get(0).get("APPLY_TYPE").toString()) ? "Y" : "");
 		}else if("3".equals(sot709InputVO.getCheckCode().toString())){
 			nfbrn6InputVO.setAUTH_EMP_ID(null != recSetList.get(0).get("AUTH_EMP_ID") ? recSetList.get(0).get("AUTH_EMP_ID").toString() : (StringUtils.equals(recSetList.get(0).get("HIGHEST_AUTH_LV").toString(), "0") ? recSetList.get(0).get("CREATOR").toString() : null));
 			nfbrn6InputVO.setAUTH_DATE(null != recSetList.get(0).get("AUTH_DATE") ? this.toChineseYearMMdd(sdfdate.parse(recSetList.get(0).get("AUTH_DATE").toString())) : this.toChineseYearMMdd(new Date()));
@@ -588,6 +588,7 @@ public class SOT709 extends EsbUtil{
 			if(null != recSetList.get(0).get("BRG_REASON")){
 				nfbrn6InputVO.setREMARKS(recSetList.get(0).get("BRG_REASON").toString());				
 			}
+			nfbrn6InputVO.setDYNAMIC_YN(StringUtils.equals("6", recSetList.get(0).get("APPLY_TYPE").toString()) ? "Y" : "");
 		}
 		esbUtilInputVO.setNfbrn6InputVO(nfbrn6InputVO);
 		
@@ -1212,7 +1213,8 @@ public class SOT709 extends EsbUtil{
 		txBodyVO.setAUTH_DATE(sysdate);		//鍵機/覆核日期
 		txBodyVO.setAUTH_TIME(systime);		//鍵機/覆核時間
 		txBodyVO.setREMARKS("");			//備註
-
+		txBodyVO.setDYNAMIC_YN(sot709InputVO.getDynamicYN()); //動態鎖利註記
+		
 		//發送電文
 		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
 

@@ -82,6 +82,32 @@ public class CRM230 extends FubonWmsBizLogic {
 		return_VO.setResultList(list);
 		this.sendRtnObject(return_VO);
 	}
+	
+//	public void getRM(Object body, IPrimitiveMap header) throws JBranchException {
+//		CRM230OutputVO return_VO = new CRM230OutputVO();
+//		dam = this.getDataAccessManager();
+//		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+//		StringBuilder sql = new StringBuilder();
+//		
+//		sql.append(" SELECT EMP_ID || '_' || EMP_NAME AS LABEL, EMP_ID AS DATA, BRANCH_NBR ");
+//		sql.append(" FROM ( ");
+//		sql.append(" SELECT DISTINCT EMP_ID, EMP_NAME, BRANCH_NBR FROM VWORG_EMP_INFO ");
+//		sql.append(" WHERE AO_CODE IS NOT NULL ");
+//		sql.append(" AND BRANCH_NBR IS NOT NULL ");
+//		
+//		if (!"ALL".equals(getCommonVariable(FubonSystemVariableConsts.LOGINROLE).toString()) && 
+//			((List<String>) getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST)).size() > 0) {  
+//			// 判斷非總行人員再加條件
+//			sql.append("AND BRANCH_NBR IN (:brNbrList) ");
+//			queryCondition.setObject("brNbrList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
+//		}
+//		
+//		sql.append(" ) ORDER BY EMP_ID ");
+//		queryCondition.setQueryString(sql.toString());
+//		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+//		return_VO.setResultList(list);
+//		this.sendRtnObject(return_VO);
+//	}
 
 	public CRM230OutputVO inquire_common(Object body, String type) throws JBranchException {
 		
@@ -307,7 +333,11 @@ public class CRM230 extends FubonWmsBizLogic {
 		query.setObject("campaign_ao_code", campaign_ao_code);
 
 		List<Map<String, Object>> temp = dam.exeQueryWithoutSort(query);
-		String privilegeid = temp.get(0).get("PRIVILEGEID").toString();
+		
+		String privilegeid = "";
+		if (null != temp && temp.size() > 0 && null != temp.get(0).get("PRIVILEGEID")) {
+			privilegeid = temp.get(0).get("PRIVILEGEID").toString();			
+		}
 
 		//===查詢新指派理專為FC(002)還是FCH(003)--END
 
@@ -369,8 +399,8 @@ public class CRM230 extends FubonWmsBizLogic {
 			} else {
 				branchID = data.get("BRA_NBR");
 			}
-			//			String aoCode = data.get("AO_CODE");
-			String aoCode = inputVO.getCampaign_ao_code();
+//			String aoCode = data.get("AO_CODE");
+			String aoCode = inputVO.getCampaign_ao_code() != null && inputVO.getCampaign_ao_code().equals("OWN") ? null : inputVO.getCampaign_ao_code();
 			Date lead_startDate = new Timestamp(Calendar.getInstance().getTime().getTime());
 			Date lead_endDate = endDate;
 			String lead_leadType = "03";
@@ -931,7 +961,7 @@ public class CRM230 extends FubonWmsBizLogic {
         outSideJoinTable.append(" ) F ON M.FUND_CODE = F.PRD_ID ");
 
 		//2017-10-19 by Jacky 基金客戶查詢優化
-//		outSideJoinTable.append(" LEFT JOIN TBPMS_AC2FIL_DAY AC ON M.CUST_ID = TRIM(AC.AC203) AND TRIM(M.CERT_NBR) = TRIM(AC.AC201) ");
+//    	outSideJoinTable.append(" LEFT JOIN TBPMS_AC2FIL_DAY AC ON M.CUST_ID = TRIM(AC.AC203) AND TRIM(M.CERT_NBR) = TRIM(AC.AC201) ");
 
         //串IQ053匯率(前日匯率相關的資訊)
         outSideJoinTable.append(" LEFT JOIN ( SELECT CUR_COD, BUY_RATE FROM TBPMS_IQ053 WHERE MTN_DATE = (SELECT MAX(MTN_DATE) FROM TBPMS_IQ053) ) BR ");
@@ -1400,7 +1430,8 @@ public class CRM230 extends FubonWmsBizLogic {
 		outSideColumn.append(" M.INV_AMT_TWD, ");
 		outSideColumn.append(" M.REF_PRICE, ");
 		outSideColumn.append(" P.RISKCATE_ID, ");
-		outSideColumn.append(" PI.INSTITION_OF_FLOTATION ");
+		outSideColumn.append(" PI.INSTITION_OF_FLOTATION, ");
+		outSideColumn.append(" V.RTN_RATE_WD ");
 
 		//客戶資產-海外債日庫存檔
 		outSideJoinTable.append(" INNER JOIN TBCRM_AST_INV_FBOND M ON A.CUST_ID = M.CUST_ID ");
@@ -1408,6 +1439,11 @@ public class CRM230 extends FubonWmsBizLogic {
 		outSideJoinTable.append(" INNER JOIN TBPRD_BOND P ON M.BOND_NBR = P.PRD_ID ");
 		//海外債商品資訊檔
 		outSideJoinTable.append(" LEFT JOIN TBPRD_BONDINFO PI ON M.BOND_NBR = PI.PRD_ID ");
+		//for海外債投資報酬率
+		outSideJoinTable.append(" LEFT JOIN MVCRM_AST_ALLPRD_DETAIL V ON V.AST_TYPE = '10' ");
+		outSideJoinTable.append(" AND M.CUST_ID = V.CUST_ID ");
+		outSideJoinTable.append(" AND M.BOND_NBR = V.PROD_ID ");
+		outSideJoinTable.append(" AND M.CERT_NBR = V.CERT_NBR ");
 
 		//商品幣別
 		if (!StringUtils.isBlank(inputVO_CRM235.getCurrency_std_id())) {
@@ -1447,6 +1483,18 @@ public class CRM230 extends FubonWmsBizLogic {
 		if (!StringUtils.isBlank(inputVO_CRM235.getBond_cate_id())) {
 			outSideWhere.append(" AND P.BOND_CATE_ID = :bond_cate_id ");
 			queryCondition.setObject("bond_cate_id", inputVO_CRM235.getBond_cate_id());
+		}
+		
+		// 含息報酬率(%)(起)
+		if (!StringUtils.isBlank(inputVO_CRM235.getRtn_rate_wd_min())) {
+			outSideWhere.append(" AND V.RTN_RATE_WD >= :rtn_rate_wd_min ");
+			queryCondition.setObject("rtn_rate_wd_min", new BigDecimal(inputVO_CRM235.getRtn_rate_wd_min()));
+		}
+
+		// 含息報酬率(%)(迄)
+		if (!StringUtils.isBlank(inputVO_CRM235.getRtn_rate_wd_max())) {
+			outSideWhere.append(" AND V.RTN_RATE_WD <= :rtn_rate_wd_max ");
+			queryCondition.setObject("rtn_rate_wd_max", new BigDecimal(inputVO_CRM235.getRtn_rate_wd_max()));
 		}
 	}
 
@@ -1821,6 +1869,7 @@ public class CRM230 extends FubonWmsBizLogic {
 		inColumn.append(" M.SP_POLICY_NOTE ");
 
 		inJoinTable.append(" LEFT JOIN TBCRM_AST_INS_MAST M ON A.CUST_ID = M.CUST_ID ");
+		inJoinTable.append(" LEFT JOIN TBPRD_INSINFO I ON M.INS_TYPE = I.PRD_ID ");
 		//29190306, steven, 因標的代碼會有多筆，造成畫面上累計已繳保費加總錯誤,調整不用Join改至where條件。
 		//inJoinTable.append(" LEFT JOIN TBCRM_AST_INS_TARGET T ON M.ID_DUP = T.ID_DUP ");
 		//inJoinTable.append(" AND M.POLICY_NBR = T.POLICY_NO AND M.POLICY_SEQ = T.POLICY_SEQ ");
@@ -1828,9 +1877,8 @@ public class CRM230 extends FubonWmsBizLogic {
 		inJoinTable.append(" AND M.POLICY_SEQ = TN.POLICY_SEQ AND M.ID_DUP = TN.ID_DUP ");
 
 		inWhere.append(" AND TN.IS_CONSENT = 'Y' ");
-		inWhere.append(" AND TN.POLICY_STATUS NOT IN( ");
-		inWhere.append(" 	'06','11','12','13','14','15','17','20','21','22','23','24','25','26','27','28','29','30','31','32' ");
-		inWhere.append(" ) ");
+		inWhere.append(" AND TN.POLICY_STATUS NOT IN ( ");
+		inWhere.append(" '06','11','12','13','14','15','17','20','21','22','23','24','25','26','27','28','29','30','31','32') ");
 
 		//保險代碼
 		if (!StringUtils.isBlank(inputVO_CRM239.getPrd_id())) {
@@ -1878,6 +1926,12 @@ public class CRM230 extends FubonWmsBizLogic {
 		if (inputVO_CRM239.getPolicy_active_date_e() != null) {
 			inWhere.append(" AND TRUNC(M.POLICY_ACTIVE_DATE) <= :policy_active_date_e ");
 			queryCondition.setObject("policy_active_date_e", new Timestamp(inputVO_CRM239.getPolicy_active_date_e().getTime()));
+		}
+		
+		// 險種類別
+		if (!StringUtils.isBlank(inputVO_CRM239.getIns_type())) {
+			inWhere.append(" AND I.INS_TYPE = :ins_type ");
+			queryCondition.setObject("ins_type", inputVO_CRM239.getIns_type());
 		}
 	}
 	

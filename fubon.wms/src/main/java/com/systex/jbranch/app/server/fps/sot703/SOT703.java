@@ -86,6 +86,10 @@ import com.systex.jbranch.fubon.commons.esb.vo.nfbrn9.NFBRN9OutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.nfbrn9.NFBRN9OutputVODetailsVO;
 import com.systex.jbranch.fubon.commons.esb.vo.nfbrne.NFBRNEInputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.nfbrne.NFBRNEOutputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.nfbrnf.NFBRNFOutputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.nfbrng.NFBRNGOutputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.nfbrnh.NFBRNHOutputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.nfbrni.NFBRNIOutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.nfbrx9.NFBRX9InputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.vn067n.VN067NInputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.vn067n.VN067NOutputVO;
@@ -121,14 +125,14 @@ public class SOT703 extends EsbUtil {
 	private String thisClaz = this.getClass().getSimpleName() + ".";
 
 	private DataAccessManager dam;
-	private SOT703InputVO sot703InputVO;
-	private SOT703OutputVO sot703OutputVO;
+	protected SOT703InputVO sot703InputVO;
+	protected SOT703OutputVO sot703OutputVO;
 	private SOT712 sot712;
 
 	// @Deprecated use this.effDate private Date effDate; 改為前端UI設定 EFF DATE
 
 	/* const */
-	private String ESB_TYPE = EsbFmpJRunConfiguer.ESB_TYPE;
+	protected String ESB_TYPE = EsbFmpJRunConfiguer.ESB_TYPE;
 
 	@PostConstruct
 	public void SOT703() throws JBranchException {
@@ -157,7 +161,7 @@ public class SOT703 extends EsbUtil {
 	 * @return
 	 * @throws JBranchException
 	 */
-	private Boolean checkError(Object obj) throws JBranchException {
+	protected Boolean checkError(Object obj) throws JBranchException {
 		String errCode = null;
 		String errTxt = null;
 		String txFlag = "Y";
@@ -171,7 +175,7 @@ public class SOT703 extends EsbUtil {
 			errTxt = StringUtils.isNotBlank(vo.getERR_TXT()) ? vo.getERR_TXT() : StringUtils.isNotBlank(vo.getERR_TXT_1()) ? vo.getERR_TXT_1() : StringUtils.isNotBlank(vo.getERR_TXT_2()) ? vo.getERR_TXT_2() : StringUtils.isNotBlank(vo.getERR_TXT_3()) ? vo.getERR_TXT_3() : null;
 
 			txFlag = vo.getTX_FLG();
-		} else if (obj instanceof NFBRN2OutputVO) { // 轉換
+		} else if (obj instanceof NFBRN2OutputVO) { // 轉換 //動態鎖利轉換
 			NFBRN2OutputVO vo = (NFBRN2OutputVO) obj;
 
 			errCode = StringUtils.isNotBlank(vo.getERR_COD()) ? vo.getERR_COD() : StringUtils.isNotBlank(vo.getERR_COD_1()) ? vo.getERR_COD_1() : StringUtils.isNotBlank(vo.getERR_COD_2()) ? vo.getERR_COD_2() : null;
@@ -227,6 +231,22 @@ public class SOT703 extends EsbUtil {
 			sot703OutputVO.setErrorCode("ehl_01_sot705_001");
 			sot703OutputVO.setErrorMsg("此客戶不可承作此交易");
 			isErr = Boolean.TRUE;
+		} else if (obj instanceof NFBRNFOutputVO) { // 動態鎖利基金申購
+			NFBRNFOutputVO vo = (NFBRNFOutputVO) obj;
+			sot703OutputVO.setErrorCode(StringUtils.isNotBlank(vo.getERR_COD()) ? vo.getERR_COD() : null);
+			sot703OutputVO.setErrorMsg(StringUtils.isNotBlank(vo.getERR_TXT()) ? vo.getERR_TXT() : null);
+		} else if (obj instanceof NFBRNGOutputVO) { // 動態鎖利母基金加碼
+			NFBRNGOutputVO vo = (NFBRNGOutputVO) obj;
+			sot703OutputVO.setErrorCode(StringUtils.isNotBlank(vo.getERR_COD()) ? vo.getERR_COD() : null);
+			sot703OutputVO.setErrorMsg(StringUtils.isNotBlank(vo.getERR_TXT()) ? vo.getERR_TXT() : null);
+		} else if (obj instanceof NFBRNHOutputVO) { // 動態鎖利贖回
+			NFBRNHOutputVO vo = (NFBRNHOutputVO) obj;
+			sot703OutputVO.setErrorCode(StringUtils.isNotBlank(vo.getErrorCode()) ? vo.getErrorCode() : null);
+			sot703OutputVO.setErrorMsg(StringUtils.isNotBlank(vo.getErrorMsg()) ? vo.getErrorMsg() : null);
+		} else if (obj instanceof NFBRNIOutputVO) { // 動態鎖利事件變更
+			NFBRNIOutputVO vo = (NFBRNIOutputVO) obj;
+			sot703OutputVO.setErrorCode(StringUtils.isNotBlank(vo.getERR_COD()) ? vo.getERR_COD() : null);
+			sot703OutputVO.setErrorMsg(StringUtils.isNotBlank(vo.getERR_TXT()) ? vo.getERR_TXT() : null);
 		}
 
 		return isErr;
@@ -4511,6 +4531,7 @@ public class SOT703 extends EsbUtil {
 		String trustTS = sot703InputVO.getTrustTS();
 		String debitAcct = sot703InputVO.getDebitAcct();
 		Boolean isOBU = sot701.isObu(sot703InputVO.getCustId());
+		String returnNumZeroYN = sot703InputVO.getReturnNumZeroYN();
 		
 		// 欄位檢核
 		if (StringUtils.isBlank(custId)) {
@@ -4524,11 +4545,11 @@ public class SOT703 extends EsbUtil {
 		}
 		
 		if(StringUtils.equals(trustTS, "M")){
-			this.getCustAssetNFData(custId, debitAcct, total, "XF");
+			this.getCustAssetNFData(custId, debitAcct, total, "XF", returnNumZeroYN);
 		}else {
-			this.getCustAssetNFData(custId, debitAcct, total, "NF");
+			this.getCustAssetNFData(custId, debitAcct, total, "NF", returnNumZeroYN);
 			if(isOBU){
-				this.getCustAssetNFData(custId, debitAcct, total, "AF");
+				this.getCustAssetNFData(custId, debitAcct, total, "AF", returnNumZeroYN);
 			}
 		}
 				
@@ -4546,7 +4567,7 @@ public class SOT703 extends EsbUtil {
      * @throws Exception
      * @author SamTu
      */
-	private void getCustAssetNFData(String custId, String debitAcct, List<CustAssetFundVO> total, String mark) throws Exception {
+	private void getCustAssetNFData(String custId, String debitAcct, List<CustAssetFundVO> total, String mark, String returnNumZeroYN) throws Exception {
 		Boolean isAF = StringUtils.equals(mark, "AF");
 		Boolean isXF = StringUtils.equals(mark, "XF");
 				
@@ -4612,7 +4633,8 @@ public class SOT703 extends EsbUtil {
 				for (NFBRN9OutputVODetailsVO devo : outputVO.getDetails()) {
 					// 2017-01-18 by Jacky 判斷單位數 > 0 才回傳前端
 					// 動態鎖利母基金不需要判斷單位數>0，一律回傳前端
-					if (checkCustAssetFundVO(devo)) {
+					if ((StringUtils.equals("Y", returnNumZeroYN) && StringUtils.equals("1", ObjectUtils.toString(devo.getDynamic()))) || 	//動態鎖利母基金
+							checkCustAssetFundVO(devo)) {	//判斷單位數 > 0
 						CustAssetFundVO retVO = new CustAssetFundVO();
 						retVO.setAssetType(hfmtid); // 信託種類
 						retVO.setSPRefId(devo.getSPRefId());
@@ -5487,7 +5509,7 @@ public class SOT703 extends EsbUtil {
 	 * @return
 	 * @throws JBranchException
 	 */
-	private String isCustAgeLessThan18(String custID, String falseStr) throws JBranchException {
+	protected String isCustAgeLessThan18(String custID, String falseStr) throws JBranchException {
 		SOT712 sot712 = (SOT712) PlatformContext.getBean("sot712");
 		SOT712InputVO sot712InputVO = new SOT712InputVO();
 		sot712InputVO.setCustID(custID);
@@ -5509,7 +5531,7 @@ public class SOT703 extends EsbUtil {
 	//金錢信託單筆申購，若原客戶為薪轉戶，不可帶入優惠代號為TG
 	//但金錢信託小額，都會走議價，這欄位會給折數(ex: 90)
 	//用Interger.parse try catch決定送不送
-	private boolean checkInt(String str) {
+	protected boolean checkInt(String str) {
 		if (StringUtils.isBlank(str)) {
 			return true;
 		}

@@ -22,6 +22,7 @@ public class SingleFeeRateVO {
 	private String appMgr;//授權主管
 	private BigDecimal crtTime;//鍵機時間
 	private String groupCode;//團體代碼
+	private String dynamicYN;
 	
 	public BigDecimal getBeneDate() {
 		return beneDate;
@@ -119,14 +120,11 @@ public class SingleFeeRateVO {
 	public void setGroupCode(String groupCode) {
 		this.groupCode = groupCode;
 	}
-	
-	
-	
-	
-
-
-
-
-	
+	public String getDynamicYN() {
+		return dynamicYN;
+	}
+	public void setDynamicYN(String dynamicYN) {
+		this.dynamicYN = dynamicYN;
+	}
 	
 }

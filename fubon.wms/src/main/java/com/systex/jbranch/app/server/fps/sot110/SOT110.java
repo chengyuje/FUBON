@@ -424,6 +424,18 @@ public class SOT110 extends FubonWmsBizLogic {
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 
+		//高資產客戶購買高風險商品(境外私募基金)，檢核集中度
+		String overCentRateResult = "";
+		if(StringUtils.equals("Y", inputVO.getHnwcYN()) && StringUtils.equals("Y", inputVO.getOvsPrivateYN())) {
+			overCentRateResult = getOverCentRateYN(inputVO); //Y:可交易 W:超過通知門檻 N:不可交易
+			inputVO.setOverCentRateYN(overCentRateResult);
+			
+			if(StringUtils.equals("N", overCentRateResult)) {
+				throw new APException("客戶高風險商品集中度比例已超過上限");
+			}
+		}
+		outputVO.setOverCentRateResult(overCentRateResult);
+				
 		//高資產客戶投組風險權值檢核
 		//只限特金，客戶風險屬性非C4，有選擇越級商品
 		if(!StringUtils.equals("M", inputVO.getTrustTS()) && !StringUtils.equals("C4", inputVO.getKycLV())
@@ -432,7 +444,7 @@ public class SOT110 extends FubonWmsBizLogic {
 			String errorMsg = getHnwcRiskValue(inputVO);
 			if(StringUtils.isNotBlank(errorMsg)) {
 				throw new APException(errorMsg);
-			}			
+			}
 		}
 				
 		//若為申請議價，需先呼叫CRM421存檔並檢核
@@ -563,6 +575,7 @@ public class SOT110 extends FubonWmsBizLogic {
 			dam.update(vo);
 		}
 
+		//單筆申購明細資料
 		TBSOT_NF_PURCHASE_DPK dPK = new TBSOT_NF_PURCHASE_DPK();
 		dPK.setTRADE_SEQ(inputVO.getTradeSEQ());
 		dPK.setSEQ_NO(inputVO.getSeqNo());
@@ -665,6 +678,7 @@ public class SOT110 extends FubonWmsBizLogic {
 		//WMS-CR-20191009-01_金錢信託套表需求申請單 2020-2-10 add by Jacky
 		dtlVO.setCONTRACT_ID(inputVO.getContractID()); //契約編號
 		dtlVO.setTRUST_PEOP_NUM(StringUtils.isNotEmpty(inputVO.getTrustPeopNum()) ? inputVO.getTrustPeopNum() : "N");
+		dtlVO.setOVER_CENTRATE_YN(inputVO.getOverCentRateYN());
 		
 		dam.create(dtlVO);
 		this.logger.debug("save() tradeSEQ:" + dtlPK.getTRADE_SEQ() + " ,seqNo:" + dtlPK.getSEQ_NO());
@@ -732,12 +746,11 @@ public class SOT110 extends FubonWmsBizLogic {
             }else{
             	outputVO.setErrorMsg(errorMsg);
             }
-			
-		}
+		}		
 
 		this.sendRtnObject(outputVO);
 	}
-
+	
 	/**
 	 * 相當於議價的加入清單; 存檔並送單次議價檢核電文
 	 * 
@@ -825,14 +838,6 @@ public class SOT110 extends FubonWmsBizLogic {
 		SOT110InputVO inputVO = (SOT110InputVO) body;
 		SOT110OutputVO outputVO = new SOT110OutputVO();
 		List<String> warningList = new ArrayList<String>();
-		
-		//高資產客戶購買高風險商品，檢核集中度
-		if(StringUtils.equals("Y", inputVO.getHnwcYN()) && StringUtils.equals("Y", inputVO.getOvsPrivateYN())) {
-			inputVO.setOverCentRateYN(getOverCentRateYN(inputVO));
-			if(StringUtils.equals("Y", inputVO.getOverCentRateYN())) {
-				warningList.add("ehl_01_SOT310_001");
-			}
-		}
 				
 		//若有申請議價，則送出覆核
 		callCRM421ApplySingle(inputVO.getTradeSEQ());
@@ -859,10 +864,10 @@ public class SOT110 extends FubonWmsBizLogic {
 				outputVO.setWarningMsg(xmlInfo.getErrorMsg(msg) + "\n" + outputVO.getWarningMsg());
 			}
 		}
-				
+		
 		this.sendRtnObject(outputVO);
 	}
-
+	
 	/**
 	 * 議價鍵機，送出覆核
 	 * 
@@ -955,11 +960,9 @@ public class SOT110 extends FubonWmsBizLogic {
 		// 檢核電文
 		SOT703InputVO inputVO_703 = new SOT703InputVO();
 		SOT703OutputVO outputVO_703 = new SOT703OutputVO();
-
 		inputVO_703.setTradeSeq(inputVO.getTradeSEQ());
-
-		SOT703 sot703 = (SOT703) PlatformContext.getBean("sot703");
 		try {
+			SOT703 sot703 = (SOT703) PlatformContext.getBean("sot703");
 			sot703.confirmESBPurchaseNF(inputVO_703); //確認電文
 		} catch (Exception e) {
 			String errorMsg = e.getMessage();
@@ -968,14 +971,6 @@ public class SOT110 extends FubonWmsBizLogic {
 			logger.error(String.format("基金申購確認電文sot703.confirmESBPurchaseNF錯誤:%s", errorMsg), e);
 			throw new JBranchException(String.format("基金申購確認電文錯誤:%s", errorMsg), e);
 		}
-		/*Method說明	基金申購確認
-		發送電文NFBRN1
-		需傳入參數：tradeSeq
-		Method名稱	confirmESBPurchaseNF(SOT703InputVO inputVO) 
-		RETURN void
-		
-		TODO沒有回傳值outputVO_703?
-		*/
 
 		String errorMsg = outputVO_703.getErrorMsg();
 		if (!"".equals(errorMsg) && null != errorMsg) {
@@ -1107,7 +1102,7 @@ public class SOT110 extends FubonWmsBizLogic {
 			sot709InputVO.setCustId(inputVO.getCustID());
 			sot709InputVO.setBranchNbr(cbsservice.getAcctBra(inputVO.getCustID(), inputVO.getTrustAcct()));  //FOR CBS改帳號分行抓取範圍
 			sot709InputVO.setTrustCurrType(inputVO.getTrustCurrType());
-			sot709InputVO.setTradeSubType(tradeSubType); // 參考 SOT.CHANGE_TRADE_SUB_TYPE
+			sot709InputVO.setTradeSubType(StringUtils.equals("Y", inputVO.getDynamicYN()) ? "6" : tradeSubType); // 參考 SOT.CHANGE_TRADE_SUB_TYPE
 			sot709InputVO.setProdId(inputVO.getProdId());
 			if (tradeSubType != null && tradeSubType.matches("1")) {
 				sot709InputVO.setPurchaseAmtL(inputVO.getPurchaseAmt());
@@ -1258,18 +1253,21 @@ public class SOT110 extends FubonWmsBizLogic {
 			 */
 			for (SingleFeeRateVO rateVO : singleFeeRateList) {
 				if (inputVO.getProdId().equals(rateVO.getFundNo())) { //過濾相同的基金代號
-					Map sRate = new HashMap();
-					// 單次議價列表會列出〈代號+短名稱+折數〉。	
-					BigDecimal discount = defaultFeeRate != null ? (BigDecimalUtils.divide(rateVO.getFeeRate(), defaultFeeRate).multiply(new BigDecimal(10))).setScale(3, BigDecimal.ROUND_UP) : null;
-
-					sRate.put("LABEL", discount != null ? inputVO.getProdName() + "_" + discount + "折" : "事先議價" + discount + "折");
-					sRate.put("feeType", "D"); //D：單次議價
-					sRate.put("FeeRate", rateVO.getFeeRate());
-					sRate.put("EviNum", rateVO.getEviNum());
-					sRate.put("BeneCode", rateVO.getBeneCode()); //議價編號beneCode
-					sRate.put("InvestAmt", rateVO.getInvestAmt());//事先議價的申購金額，將來下單要可以事後 變更事先議價的申購金額
-					sRate.put("feeTypeIndex", "idx" + feeTypeIndex++);
-					feeTypeList.add(sRate);
+					if(((!StringUtils.equals("Y", inputVO.getDynamicYN()) && !StringUtils.equals("Y", rateVO.getDynamicYN()))) ||
+							((StringUtils.equals("Y", inputVO.getDynamicYN()) && StringUtils.equals("Y", rateVO.getDynamicYN())))) {
+						Map sRate = new HashMap();
+						// 單次議價列表會列出〈代號+短名稱+折數〉。	
+						BigDecimal discount = defaultFeeRate != null ? (BigDecimalUtils.divide(rateVO.getFeeRate(), defaultFeeRate).multiply(new BigDecimal(10))).setScale(3, BigDecimal.ROUND_UP) : null;
+	
+						sRate.put("LABEL", discount != null ? inputVO.getProdName() + "_" + discount + "折" : "事先議價" + discount + "折");
+						sRate.put("feeType", "D"); //D：單次議價
+						sRate.put("FeeRate", rateVO.getFeeRate());
+						sRate.put("EviNum", rateVO.getEviNum());
+						sRate.put("BeneCode", rateVO.getBeneCode()); //議價編號beneCode
+						sRate.put("InvestAmt", rateVO.getInvestAmt());//事先議價的申購金額，將來下單要可以事後 變更事先議價的申購金額
+						sRate.put("feeTypeIndex", "idx" + feeTypeIndex++);
+						feeTypeList.add(sRate);
+					}
 				}
 			}
 		}
@@ -1450,7 +1448,7 @@ public class SOT110 extends FubonWmsBizLogic {
 	 * @return
 	 * @throws JBranchException
 	 */
-	private SOT110InputVO cleanAcctCcy(SOT110InputVO inputVO) throws JBranchException {
+	public SOT110InputVO cleanAcctCcy(SOT110InputVO inputVO) throws JBranchException {
 		if (StringUtils.isNotBlank(inputVO.getDebitAcct()) && StringUtils.indexOf(inputVO.getDebitAcct(), "_") > 0)
 			inputVO.setDebitAcct(StringUtils.split(inputVO.getDebitAcct(), "_")[0]);
 		if (StringUtils.isNotBlank(inputVO.getCreditAcct()) && StringUtils.indexOf(inputVO.getCreditAcct(), "_") > 0)
@@ -1478,9 +1476,9 @@ public class SOT110 extends FubonWmsBizLogic {
 	}
 	
 	/***
-	 * 集中度是否超過上限
+	 * 集中度檢核結果
 	 * @param inputVO
-	 * @return Y:超過 N:沒超過
+	 * @return Y:可交易 W:超過通知門檻 N:不可交易
 	 * @throws Exception
 	 */
 	private String getOverCentRateYN(SOT110InputVO inputVO) throws Exception {
@@ -1510,7 +1508,7 @@ public class SOT110 extends FubonWmsBizLogic {
 				
 		//查詢客戶高資產集中度資料
 		WMSHACRDataVO cRateData = sot714.getCentRateData(inputVO714);
-		return StringUtils.equals("Y", cRateData.getVALIDATE_YN()) ? "N" : "Y"; //可交易=>沒超過上限; 不可交易=>超過上限
+		return cRateData.getVALIDATE_YN(); //Y:可交易 W:超過通知門檻 N:不可交易
 	}
 	
 	/***

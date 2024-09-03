@@ -73,6 +73,13 @@ public class ProdFitness extends FubonWmsBizLogic {
 	private String OVS_PRIVATE_YN;			//境外私募基金註記
 	private String prdID;					//商品代碼
 	private String trustTS;					//金錢信託下單
+	private String dynamicType;				//動態鎖利類別 M:母基金 C:子基金
+	private String dynamicM;				//動態鎖利母基金註記
+	private String dynamicC;				//動態鎖利子基金註記
+	private String prodCurr;				//商品計價幣別
+	private String dynamicProdCurrM; 		//動態鎖利母基金計價幣別
+	private String inProdIdM;				//動態鎖利轉入母基金ID(轉換)
+	private String fromPRD111YN; 				//從動態鎖利適配過來
 	
 	//回傳值
 	private ProdFitnessOutputVO outputVO = new ProdFitnessOutputVO();
@@ -347,6 +354,62 @@ public class ProdFitness extends FubonWmsBizLogic {
 		this.trustTS = trustTS;
 	}
 
+	public String getDynamicType() {
+		return dynamicType;
+	}
+
+	public void setDynamicType(String dynamicType) {
+		this.dynamicType = dynamicType;
+	}
+
+	public String getDynamicM() {
+		return dynamicM;
+	}
+
+	public void setDynamicM(String dynamicM) {
+		this.dynamicM = dynamicM;
+	}
+
+	public String getDynamicC() {
+		return dynamicC;
+	}
+
+	public void setDynamicC(String dynamicC) {
+		this.dynamicC = dynamicC;
+	}
+
+	public String getProdCurr() {
+		return prodCurr;
+	}
+
+	public void setProdCurr(String prodCurr) {
+		this.prodCurr = prodCurr;
+	}
+
+	public String getDynamicProdCurrM() {
+		return dynamicProdCurrM;
+	}
+
+	public void setDynamicProdCurrM(String dynamicProdCurrM) {
+		this.dynamicProdCurrM = dynamicProdCurrM;
+	}
+
+	public String getInProdIdM() {
+		return inProdIdM;
+	}
+
+	public void setInProdIdM(String inProdIdM) {
+		this.inProdIdM = inProdIdM;
+	}
+
+	public String getFromPRD111YN() {
+		return fromPRD111YN;
+	}
+
+	public void setFromPRD111YN(String fromPRD111YN) {
+		this.fromPRD111YN = fromPRD111YN;
+	}
+
 	/**
 	 * 基金、ETF/基金客戶資料適配檢核
 	 * validkCustRiskAttr：客戶風險屬性檢核
@@ -440,14 +503,21 @@ public class ProdFitness extends FubonWmsBizLogic {
 		this.setProdHighYield((String) product.get("HIGH_YIELD"));
 		this.setProdSugSelling((String) product.get("SELLING"));
 		this.setProdFus40((String) product.get("FUS40"));
+		this.setDynamicM((String) product.get("DYNAMIC_M"));
+		this.setDynamicC((String) product.get("DYNAMIC_C"));
 		this.setCustID(prd110InputVO.getCust_id());
 		this.setProdId(prd110InputVO.getFund_id());
 		this.setSameSerialProdId(prd110InputVO.getSameSerialProdId());
 		this.setSameSerialYN(prd110InputVO.getSameSerialYN());
 		this.setTrustTS(prd110InputVO.getTrustTS());
+		this.setDynamicType(prd110InputVO.getDynamicType());
 		this.setNFS100_YN(ObjectUtils.toString(product.get("NFS100_YN")));
 		this.setOVS_PRIVATE_YN(ObjectUtils.toString(product.get("OVS_PRIVATE_YN")));
 		this.setHNWC_BUY(this.getOVS_PRIVATE_YN());
+		this.setProdCurr((String) product.get("CURRENCY_STD_ID"));
+		this.setDynamicProdCurrM(prd110InputVO.getDynamicProdCurrM());
+		this.setInProdIdM(prd110InputVO.getInProdIdM());
+		this.setFromPRD111YN(prd110InputVO.getFromPRD111YN());
 		
 		if(BooleanUtils.isTrue(this.validOBUProd()) 
 				&& BooleanUtils.isTrue(this.validOBUBuy())
@@ -461,7 +531,8 @@ public class ProdFitness extends FubonWmsBizLogic {
 				&& BooleanUtils.isTrue(this.validProdQuotas())
 				&& BooleanUtils.isTrue(this.validNFS100())
 				&& BooleanUtils.isTrue(this.validOvsPrivate())
-				&& BooleanUtils.isTrue(this.validPrivatelyOfferedFund())) {
+				&& BooleanUtils.isTrue(this.validPrivatelyOfferedFund())
+				&& BooleanUtils.isTrue(this.validDynamic())) {
 			
 			if(BooleanUtils.isTrue(isChkPC)) {	
 				this.setTrustCurrType(prd110InputVO.getTrustType());
@@ -682,8 +753,8 @@ public class ProdFitness extends FubonWmsBizLogic {
 		if(!StringUtils.equals("M", this.getTrustTS()) && //非金錢信託下單
 				this.getCustVO().getHNWCDataVO() != null && 
 				this.getCustVO().getHNWCDataVO().getValidHnwcYN().matches("Y") && 
-				this.getCustVO().getHNWCDataVO().getHnwcService().matches("Y")) { //高資產客戶可越級適配
-			
+				this.getCustVO().getHNWCDataVO().getHnwcService().matches("Y") && //高資產客戶可越級適配
+				(StringUtils.isBlank(this.getDynamicType()) || StringUtils.equals("Y", this.getFromPRD111YN())) ) { //動態鎖利下單不可越級適配；動態鎖利適配可越級
 			hnwcCust = true; //高資產客戶
 			custRiskID = this.getCustVO().getRiskAtr(); 
 			
@@ -1155,11 +1226,31 @@ public class ProdFitness extends FubonWmsBizLogic {
 		if (StringUtils.isNotBlank(StringUtils.substring(this.getSameSerialProdId(), 0, 2))) {
 			sameSerialProdId = sameSerialProdId_map.get(StringUtils.substring(this.getSameSerialProdId(), 0, 2));//帶入轉出標的前兩碼
 		}		
-		if(StringUtils.equals("Y", this.getSameSerialYN()) 
-				&& !(StringUtils.equals(StringUtils.substring(this.getProdId(), 0, 2), StringUtils.substring(this.getSameSerialProdId(), 0, 2))
-				|| StringUtils.equals(StringUtils.substring(this.getProdId(), 0, 2), sameSerialProdId))) {
-			//轉換必需為同系列商品
-			outputVO.setErrorID("ehl_01_SOT702_018");
+		
+		if(StringUtils.isNotBlank(this.getDynamicType())) {
+			//動態鎖利
+			if(StringUtils.equals("Y", this.getSameSerialYN()) 
+					&& !(StringUtils.equals(StringUtils.substring(this.getProdId(), 0, 2), StringUtils.substring(this.getSameSerialProdId(), 0, 2))
+							|| StringUtils.equals(StringUtils.substring(this.getProdId(), 0, 2), sameSerialProdId))) {
+				//動態鎖利子基金須為母基金同系列商品
+				outputVO.setErrorID("動態鎖利子基金須為母基金同系列商品");
+			}
+			if(StringUtils.equals("C", this.getDynamicType()) && !StringUtils.equals(this.getProdCurr(), this.getDynamicProdCurrM())) {
+				//動態鎖利子基金須為母基金同計價幣別
+				outputVO.setErrorID("動態鎖利子基金須與母基金相同計價幣別");
+			}
+			if(StringUtils.isNotBlank(this.getInProdIdM()) && !StringUtils.equals(this.getProdCurr(), this.getDynamicProdCurrM())) {
+				//動態鎖利子基金須為母基金同計價幣別
+				outputVO.setErrorID("轉入母基金須與轉出母基金相同計價幣別");
+			}
+		} else {
+			//一般基金轉換
+			if(StringUtils.equals("Y", this.getSameSerialYN()) 
+					&& !(StringUtils.equals(StringUtils.substring(this.getProdId(), 0, 2), StringUtils.substring(this.getSameSerialProdId(), 0, 2))
+							|| StringUtils.equals(StringUtils.substring(this.getProdId(), 0, 2), sameSerialProdId))) {
+				//轉換必需為同系列商品
+				outputVO.setErrorID("ehl_01_SOT702_018");
+			}
 		}
 		
 		return (outputVO.getIsError() ? Boolean.FALSE : Boolean.TRUE);
@@ -1318,7 +1409,7 @@ public class ProdFitness extends FubonWmsBizLogic {
 	 * @throws Exception
 	 */
 	private Boolean validOvsPrivate() throws Exception  {
-		if(StringUtils.equals("Y", this.getOVS_PRIVATE_YN()) && !isInOvsPriDate(this.getPrdID())) {
+		if (StringUtils.equals("Y", this.getOVS_PRIVATE_YN()) && !isInOvsPriDate(this.getPrdID())) {
 			//境外私募基金不在可交易期間中
 			outputVO.setErrorID("境外私募基金不在可交易期間中");
 		}
@@ -1380,5 +1471,25 @@ public class ProdFitness extends FubonWmsBizLogic {
 			}
 		}
 		return (outputVO.getIsError() ? Boolean.FALSE : Boolean.TRUE);
+	} 
+	
+	/***
+	 * 動態鎖利母子基金檢核
+	 * @return
+	 * @throws Exception
+	 */
+	private Boolean validDynamic() throws Exception  {
+		if(StringUtils.isNotBlank(this.getDynamicType())) {
+			if(StringUtils.equals("M", this.getDynamicType()) && !StringUtils.equals("Y", this.getDynamicM())) {
+				//沒有動態鎖利母基金註記
+				outputVO.setErrorID("此基金非動態鎖利母基金");
+			} else if(StringUtils.equals("C", this.getDynamicType()) && !StringUtils.equals("Y", this.getDynamicC())) {
+				//沒有動態鎖利子基金註記
+				outputVO.setErrorID("此基金非動態鎖利子基金");
+			}
+		}
+		
+		return (outputVO.getIsError() ? Boolean.FALSE : Boolean.TRUE);
 	}
+	
 }

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,13 @@ import com.systex.jbranch.common.xmlInfo.XMLInfo;
 import com.systex.jbranch.fubon.commons.cbs.CBSService;
 import com.systex.jbranch.fubon.commons.esb.EsbFmpJRunConfiguer;
 import com.systex.jbranch.fubon.commons.esb.EsbUtil;
+import com.systex.jbranch.fubon.commons.esb.cons.EsbSotCons;
+import com.systex.jbranch.fubon.commons.esb.vo.ESBUtilInputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.ESBUtilOutputVO;
+import com.systex.jbranch.fubon.commons.esb.vo.TxHeadVO;
+import com.systex.jbranch.fubon.commons.esb.vo.njweea70.NJWEEA70;
+import com.systex.jbranch.fubon.commons.esb.vo.njweea70.NJWEEA70OutputDetailVO;
+import com.systex.jbranch.fubon.commons.esb.vo.njweea70.NJWEEA70OutputVO;
 import com.systex.jbranch.platform.common.dataManager.DataManager;
 import com.systex.jbranch.platform.common.dataManager.WorkStation;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
@@ -213,8 +221,14 @@ public class SOT310 extends EsbUtil {
 		inputVO_707.setCustId(inputVO.getCustID());
 		inputVO_707.setProdId(inputVO.getProdID());
 
+		String isOBU = StringUtils.isBlank(fp032675DataVO.getObuFlag()) ? "" : fp032675DataVO.getObuFlag();
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-		isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707);
+//		isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707);
+		if (isOBU.equals("Y")) {
+			isFirstTrade = sot707.getIsCustFirstTradeOBU(inputVO_707);
+		} else {
+			isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707);	
+		}
 		outputVO.setIsFirstTrade((isFirstTrade) ? "Y" : "N");
 
 		SOT712 sot712 = (SOT712) PlatformContext.getBean("sot712");
@@ -424,8 +438,13 @@ public class SOT310 extends EsbUtil {
 		SOT707OutputVO outputVO_707 = new SOT707OutputVO();
 		inputVO_707.setCustId(inputVO.getCustID());
 		inputVO_707.setProdId(inputVO.getProdID());
+		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-		isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707); //  海外債/SN產品首購資料查詢 使用電文: NJBRVA3
+		if (isOBU.equals("Y")) {
+			isFirstTrade = sot707.getIsCustFirstTradeOBU(inputVO_707); //  海外債/SN產品首購資料OBU查詢 使用電文: AJBRVA3
+		} else {
+			isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707); //  海外債/SN產品首購資料查詢 使用電文: NJBRVA3			
+		}
 
 		SOT712 sot712 = (SOT712) PlatformContext.getBean("sot712");
 		SOT712InputVO inputVO_712 = new SOT712InputVO();
@@ -601,8 +620,9 @@ public class SOT310 extends EsbUtil {
 		dtlVO.setNARRATOR_ID(inputVO.getNarratorID()); //解說專員員編
 		dtlVO.setNARRATOR_NAME(inputVO.getNarratorName()); //解說專員姓名
 
-		dtlVO.setGTC_YN(inputVO.getGtcYN()); //長效單Y 當日單N
-		dtlVO.setGTC_END_DATE(null != inputVO.getGtcEndDate() ? new Timestamp(inputVO.getGtcEndDate().getTime()) : null); //長效單迄日
+		dtlVO.setGTC_YN(inputVO.getGtcYN()); //長效單Y 當日單N	 預約單P
+		dtlVO.setGTC_START_DATE(null != inputVO.getGtcStartDate() ? new Timestamp(inputVO.getGtcStartDate().getTime()) : null); //長效單起日
+		dtlVO.setGTC_END_DATE(null != inputVO.getGtcEndDate() ? new Timestamp(inputVO.getGtcEndDate().getTime()) : null); 		//長效單迄日
 
 		//mantis #000104: WMS-CR-20191009-01_金錢信託套表需求申請單 2019-12-20 add by ocean
 		dtlVO.setCONTRACT_ID(inputVO.getContractID());
@@ -626,7 +646,7 @@ public class SOT310 extends EsbUtil {
 		sb.append("       BOND_VALUE,TRADE_SEQ, SEQ_NO, BATCH_SEQ, TRADE_SUB_TYPE, CERTIFICATE_ID, PROD_ID, PROD_NAME, PROD_CURR, PROD_RISK_LV, ");
 		sb.append("       PROD_MIN_BUY_AMT, PROD_MIN_GRD_AMT, TRUST_CURR_TYPE, TRUST_CURR, TRUST_UNIT, MARKET_TYPE, REF_VAL, REF_VAL_DATE, PURCHASE_AMT, ENTRUST_TYPE, ");
 		sb.append("       ENTRUST_AMT, TRUST_AMT, DEFAULT_FEE_RATE, ADV_FEE_RATE, BEST_FEE_RATE, BARGAIN_APPLY_SEQ, FEE_RATE, FEE, FEE_DISCOUNT, PAYABLE_FEE, ");
-		sb.append("       TOT_AMT, DEBIT_ACCT, TRUST_ACCT, CREDIT_ACCT, TRADE_DATE, NARRATOR_ID, NARRATOR_NAME, GTC_YN, GTC_END_DATE, OVER_CENTRATE_YN ");
+		sb.append("       TOT_AMT, DEBIT_ACCT, TRUST_ACCT, CREDIT_ACCT, TRADE_DATE, NARRATOR_ID, NARRATOR_NAME, GTC_YN, GTC_START_DATE, GTC_END_DATE, OVER_CENTRATE_YN ");
 		sb.append("FROM TBSOT_BN_TRADE_D ");
 		sb.append("WHERE TRADE_SEQ = :tradeSEQ ");
 		queryCondition.setObject("tradeSEQ", inputVO.getTradeSEQ());
@@ -679,16 +699,19 @@ public class SOT310 extends EsbUtil {
 		}
 		
 		//高資產客戶購買高風險商品，檢核集中度
+		String overCentRateResult = "";
 		if(StringUtils.equals("Y", inputVO.getHnwcYN()) && StringUtils.equals("Y", inputVO.getHnwcBuy())) {
 			//買匯匯率
 			SOT110 sot110 = (SOT110) PlatformContext.getBean("sot110");
 			BigDecimal rate = sot110.getBuyRate(inputVO.getProdCurr());
 			
-			inputVO.setOverCentRateYN(getOverCentRateYN(inputVO, rate));
-			if(StringUtils.equals("Y", inputVO.getOverCentRateYN())) {
+			overCentRateResult = getOverCentRateYN(inputVO, rate); //Y:可交易 W:超過通知門檻 N:不可交易
+			inputVO.setOverCentRateYN(overCentRateResult);
+			if(StringUtils.equals("W", inputVO.getOverCentRateYN())) {
 				warningList.add("ehl_01_SOT310_001");
 			}
 		}
+		outputVO.setOverCentRateResult(overCentRateResult); //集中度檢核結果
 				
 		add(dam, queryCondition, inputVO);
 
@@ -702,9 +725,14 @@ public class SOT310 extends EsbUtil {
 		inputVO_707.setPurchaseAmt(inputVO.getPurchaseAmt());//2017/11/06增加，之前有漏
 		inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
 
+		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-		if ("Y".equals(inputVO.getGtcYN())) {
-			outputVO_707_S = sot707.verifyESBPurchaseBN_GTC(inputVO_707); //長效單
+		if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN())) {
+			if (isOBU.equals("Y")) {
+				outputVO_707_S = sot707.verifyESBPurchaseBN_GTC_OBU(inputVO_707);	// 長效單、預約單
+			} else {
+				outputVO_707_S = sot707.verifyESBPurchaseBN_GTC(inputVO_707); 		// 長效單、預約單				
+			}
 		} else {
 			// 若為金錢信託，先 call NJBRVX2
 			if (StringUtils.equals("M", inputVO.getTrustTS())) {
@@ -713,7 +741,11 @@ public class SOT310 extends EsbUtil {
 				
 				// 債券申購電文 : 客戶ID=99331241 + 信託/扣款/收益入帳 = 原畫面值
 			}
-			outputVO_707_S = sot707.verifyESBPurchaseBN(inputVO_707); //當日單
+			if (isOBU.equals("Y")) {
+				outputVO_707_S = sot707.verifyESBPurchaseBN_OBU(inputVO_707); //當日單
+			} else {
+				outputVO_707_S = sot707.verifyESBPurchaseBN(inputVO_707); //當日單				
+			}
 		}
 		
 		// 金錢信託申請電文錯誤訊息
@@ -791,14 +823,19 @@ public class SOT310 extends EsbUtil {
 		inputVO_707.setCheckType("2");//電文確認碼 1:檢核  2:確認
 		inputVO_707.setPurchaseAmt(inputVO.getPurchaseAmt());
 		inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
-		
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-
-		if ("Y".equals(inputVO.getGtcYN()))
-			outputVO_707 = sot707.verifyESBPurchaseBN_GTC(inputVO_707); //長效單
-		else
-			outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707); //當日單
-
+		
+		if (isOBU.equals("Y")) {
+			if ("Y".equals(inputVO.getGtcYN()))
+				outputVO_707 = sot707.verifyESBPurchaseBN_GTC_OBU(inputVO_707);	// 長效單
+			else
+				outputVO_707 = sot707.verifyESBPurchaseBN_OBU(inputVO_707);		// 當日單
+		} else {
+			if ("Y".equals(inputVO.getGtcYN()))
+				outputVO_707 = sot707.verifyESBPurchaseBN_GTC(inputVO_707);		// 長效單
+			else
+				outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707);			// 當日單			
+		}
 
 		String errorMsg = outputVO_707.getErrorMsg();
 		List<String> warningList = outputVO_707.getWarningCode();
@@ -857,6 +894,7 @@ public class SOT310 extends EsbUtil {
 		dam.update(mainVo);
 
 		// 海外債檢核電文NJBRVA9
+		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707InputVO inputVO_707 = new SOT707InputVO();
 		SOT707OutputVO outputVO_707 = new SOT707OutputVO();
 
@@ -866,7 +904,12 @@ public class SOT310 extends EsbUtil {
 		inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
 
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-		outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707);
+//		outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707);
+		if (isOBU.equals("Y")) {
+			outputVO_707 = sot707.verifyESBPurchaseBN_OBU(inputVO_707);
+		} else {
+			outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707);
+		}
 		
 		if (StringUtils.isNotBlank(outputVO_707.getErrorMsg())) {
 			outputVO.setErrorMsg(outputVO_707.getErrorMsg());
@@ -962,41 +1005,80 @@ public class SOT310 extends EsbUtil {
 	 * @param header
 	 * @throws JBranchException
 	 */
-	public void getMaxGtcEndDate(Object body, IPrimitiveMap header) throws JBranchException {
+	public void getMaxGtcEndDate(Object body, IPrimitiveMap header) throws Exception {
+//		SOT310OutputVO outputVO = new SOT310OutputVO();
+//		String maxdays = "20"; //預設20個營業日
+//		dam = this.getDataAccessManager();
+//		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_SQL);
+//
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("SELECT PARAM_NAME FROM TBSYSPARAMETER ");
+//		sb.append("WHERE PARAM_CODE = '1' ");
+//		sb.append("AND PARAM_TYPE = 'SOT.BOND_MAX_GTC_DATE' ");
+//		queryCondition.setQueryString(sb.toString());
+//
+//		List<Map<String, Object>> days = dam.exeQuery(queryCondition);
+//		if (CollectionUtils.isNotEmpty(days))
+//			maxdays = days.get(0).get("PARAM_NAME").toString();
+//
+//		queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+//		sb = new StringBuilder();
+//		sb.append("SELECT PABTH_UTIL.FC_getBusiDay(SYSDATE, 'TWD', :days) AS BUSI_DAY FROM DUAL ");
+//		queryCondition.setObject("days", maxdays);
+//		queryCondition.setQueryString(sb.toString());
+//
+//		List<Map<String, Object>> tradeDateList = dam.exeQuery(queryCondition);
+//
+//		outputVO.setMaxGtcEndDate((Timestamp) tradeDateList.get(0).get("BUSI_DAY"));
+//
+//		this.sendRtnObject(outputVO);
+		
+		// 指定交易日限定為次營業日起的20個營業日內，AS400仍要檢核是否有遇到臺灣、美國或香港假日。
 		SOT310OutputVO outputVO = new SOT310OutputVO();
-		String maxdays = "20"; //預設20個營業日
-		dam = this.getDataAccessManager();
-		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_SQL);
-
-		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT PARAM_NAME FROM TBSYSPARAMETER ");
-		sb.append("WHERE PARAM_CODE = '1' ");
-		sb.append("AND PARAM_TYPE = 'SOT.BOND_MAX_GTC_DATE' ");
-		queryCondition.setQueryString(sb.toString());
-
-		List<Map<String, Object>> days = dam.exeQuery(queryCondition);
-		if (CollectionUtils.isNotEmpty(days))
-			maxdays = days.get(0).get("PARAM_NAME").toString();
-
-		queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		sb = new StringBuilder();
-		sb.append("SELECT PABTH_UTIL.FC_getBusiDay(SYSDATE, 'TWD', :days) AS BUSI_DAY FROM DUAL ");
-		queryCondition.setObject("days", maxdays);
-		queryCondition.setQueryString(sb.toString());
-
-		List<Map<String, Object>> tradeDateList = dam.exeQuery(queryCondition);
-
-		outputVO.setMaxGtcEndDate((Timestamp) tradeDateList.get(0).get("BUSI_DAY"));
-
+		String today = this.toChineseYearMMdd(new Date());	// 將系統日轉為民國年
+		Date startMinDate = null;
+		Date startMaxDate = null;
+		Date endMinDate = null;
+		Date endMaxDate = null;
+		List<NJWEEA70> njweea70List = this.getNJWEEA70();
+		int i = 0;
+		for (NJWEEA70 njweea70 : njweea70List) {
+			if (njweea70.getTxtCode().equals("Y")) {
+				if (startMinDate == null) {
+					String txtDt = njweea70.getTxtDt();
+					if (Integer.parseInt(txtDt) > Integer.parseInt(today)) {
+						startMinDate = this.toAdYearMMdd(njweea70.getTxtDt());
+						i++;
+					}
+				} else {
+					i++;					
+				}
+				if (i == 2) {
+					endMinDate = this.toAdYearMMdd(njweea70.getTxtDt());
+				}
+				if (i == 20) {
+					// 民國年轉換成西元年
+					startMaxDate = this.toAdYearMMdd(njweea70.getTxtDt());
+				}
+				if (i == 24) {
+					// 民國年轉換成西元年
+					endMaxDate = this.toAdYearMMdd(njweea70.getTxtDt());
+					break;
+				}
+			}
+		}
+		outputVO.setMinGtcStartDate(startMinDate);
+		outputVO.setMaxGtcStartDate(startMaxDate);
+		outputVO.setMinGtcEndDate(endMinDate);
+		outputVO.setMaxGtcEndDate(endMaxDate);
 		this.sendRtnObject(outputVO);
 
 	}
 		
 	/***
-	 * 集中度是否超過上限
-	 * Y:超過 N:沒超過
+	 * 集中度檢核結果
 	 * @param inputVO
-	 * @return
+	 * @return Y:可交易 W:超過通知門檻 N:不可交易
 	 * @throws Exception
 	 */
 	private String getOverCentRateYN(SOT310InputVO inputVO, BigDecimal rate) throws Exception {
@@ -1009,7 +1091,7 @@ public class SOT310 extends EsbUtil {
 				
 		//查詢客戶高資產集中度資料
 		WMSHACRDataVO cRateData = sot714.getCentRateData(inputVO714);
-		return StringUtils.equals("Y", cRateData.getVALIDATE_YN()) ? "N" : "Y"; //可交易=>沒超過上限; 不可交易=>超過上限
+		return cRateData.getVALIDATE_YN(); //Y:可交易 W:超過通知門檻 N:不可交易
 	}
 	
 	/***
@@ -1054,79 +1136,79 @@ public class SOT310 extends EsbUtil {
 	 * 1. 長效單、預約單：委託日期不可為 臺灣、香港、美國之假日(電文_NJWEEA70)
 	 * 2. 長效單：最短2個營業日、最長5個營業日（需排除美國、香港、台灣休假日）
 	 * **/
-//	public void checkGtcDate(Object body, IPrimitiveMap header) throws Exception {
-//		SOT310InputVO inputVO = (SOT310InputVO) body;
-//		SOT310OutputVO outputVO = new SOT310OutputVO();
-//		List<Map<String, Object>> resultList = new ArrayList<>();
-//		
-//		List<NJWEEA70> list = this.getNJWEEA70();
-//		
-//		Date gtcStartDate = null;
-//		Date gtcEndDate = null;
-//		if ("Y".equals(inputVO.getGtcYN())) {
-//			// 長效單需檢查起、迄日
-//			gtcStartDate = inputVO.getGtcStartDate();
-//			gtcEndDate = inputVO.getGtcEndDate();
-//		} else if ("P".equals(inputVO.getGtcYN())) {
-//			// 預約單需檢查起日
-//			gtcStartDate = inputVO.getGtcStartDate();
-//		}
-//		String sDateFlag = "N";
-//		String eDateFlag = "N";
-//		String sDate = "";
-//		String eDate = "";
-//		int dates = 0;
-//		if (gtcStartDate != null) {
-//			sDate = this.toChineseYearMMdd(gtcStartDate); // 西元轉民國 ex.01130720
-//			sDateFlag = this.gtcDateYN(list, sDate);
-//		}
-//		if (gtcEndDate != null) {
-//			eDate = this.toChineseYearMMdd(gtcEndDate);	 // 西元轉民國 ex.01130720
-//			eDateFlag = this.gtcDateYN(list, eDate);
-//		}
-//		if ("Y".equals(inputVO.getGtcYN())) {
-//			dates = this.countDates(list, sDate, eDate);
-//		}
-//		
-//		Map<String, Object> map = new HashMap<>();
-//		map.put("START_DATE_YN", sDateFlag);
-//		map.put("END_DATE_YN", eDateFlag);
-//		map.put("COUNT_DATES", dates);
-//		resultList.add(map);
-//		outputVO.setResultList(resultList);
-//		this.sendRtnObject(outputVO);
-//	}
+	public void checkGtcDate(Object body, IPrimitiveMap header) throws Exception {
+		SOT310InputVO inputVO = (SOT310InputVO) body;
+		SOT310OutputVO outputVO = new SOT310OutputVO();
+		List<Map<String, Object>> resultList = new ArrayList<>();
+		
+		List<NJWEEA70> list = this.getNJWEEA70();
+		
+		Date gtcStartDate = null;
+		Date gtcEndDate = null;
+		if ("Y".equals(inputVO.getGtcYN())) {
+			// 長效單需檢查起、迄日
+			gtcStartDate = inputVO.getGtcStartDate();
+			gtcEndDate = inputVO.getGtcEndDate();
+		} else if ("P".equals(inputVO.getGtcYN())) {
+			// 預約單需檢查起日
+			gtcStartDate = inputVO.getGtcStartDate();
+		}
+		String sDateFlag = "N";
+		String eDateFlag = "N";
+		String sDate = "";
+		String eDate = "";
+		int dates = 0;
+		if (gtcStartDate != null) {
+			sDate = this.toChineseYearMMdd(gtcStartDate); // 西元轉民國 ex.01130720
+			sDateFlag = this.gtcDateYN(list, sDate);
+		}
+		if (gtcEndDate != null) {
+			eDate = this.toChineseYearMMdd(gtcEndDate);	 // 西元轉民國 ex.01130720
+			eDateFlag = this.gtcDateYN(list, eDate);
+		}
+		if ("Y".equals(inputVO.getGtcYN())) {
+			dates = this.countDates(list, sDate, eDate);
+		}
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("START_DATE_YN", sDateFlag);
+		map.put("END_DATE_YN", eDateFlag);
+		map.put("COUNT_DATES", dates);
+		resultList.add(map);
+		outputVO.setResultList(resultList);
+		this.sendRtnObject(outputVO);
+	}
 	
-//	private int countDates(List<NJWEEA70> list, String sDate, String eDate) throws Exception {
-//		int i = 0;
-//		if (StringUtils.isNotBlank(sDate) && StringUtils.isNotBlank(eDate)) {
-//			boolean startCount = false;
-//			for (NJWEEA70 vo : list) {
-//				if (sDate.equals(vo.getTxtDt())) {
-//					startCount = true;
-//				}
-//				if (startCount && "Y".equals(vo.getTxtCode())) {
-//					i++;
-//				}
-//				if (eDate.equals(vo.getTxtDt())) {
-//					break;
-//				}
-//			}			
-//		}
-//		return i;
-//	}
+	private int countDates(List<NJWEEA70> list, String sDate, String eDate) throws Exception {
+		int i = 0;
+		if (StringUtils.isNotBlank(sDate) && StringUtils.isNotBlank(eDate)) {
+			boolean startCount = false;
+			for (NJWEEA70 vo : list) {
+				if (sDate.equals(vo.getTxtDt())) {
+					startCount = true;
+				}
+				if (startCount && "Y".equals(vo.getTxtCode())) {
+					i++;
+				}
+				if (eDate.equals(vo.getTxtDt())) {
+					break;
+				}
+			}			
+		}
+		return i;
+	}
 	
-//	private String gtcDateYN(List<NJWEEA70> list, String gtcDate) throws Exception {
-//		String flag = "N";
-//		for (NJWEEA70 vo : list) {
-//			if (gtcDate.equals(vo.getTxtDt())) {
-//				String txtCode = vo.getTxtCode();
-//				flag = txtCode.equals("Y") ? "Y" : "N";
-//				break;
-//			}
-//		}
-//		return flag;
-//	}
+	private String gtcDateYN(List<NJWEEA70> list, String gtcDate) throws Exception {
+		String flag = "N";
+		for (NJWEEA70 vo : list) {
+			if (gtcDate.equals(vo.getTxtDt())) {
+				String txtCode = vo.getTxtCode();
+				flag = txtCode.equals("Y") ? "Y" : "N";
+				break;
+			}
+		}
+		return flag;
+	}
 	
 	/**
 	 * NJWEEA70_債券預約單/長效單營業日註記
@@ -1134,282 +1216,282 @@ public class SOT310 extends EsbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-//	public List<NJWEEA70> getNJWEEA70() throws Exception {
-//		//init util
-//		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, EsbSotCons.NJWEEA70);
-//		esbUtilInputVO.setModule(thisClaz + new Object(){}.getClass().getEnclosingMethod().getName());
-//		
-//		//head
-//		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
-//		txHead.setDefaultTxHead();
-//		esbUtilInputVO.setTxHeadVO(txHead);
-//		
-//		//body
-////		NJWEEA70InputVO njweea70inputvo = new NJWEEA70InputVO();
-//		
-//		//發送電文
-//		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
-//		
-//		NJWEEA70OutputVO njweea70OutputVO = new NJWEEA70OutputVO();
+	public List<NJWEEA70> getNJWEEA70() throws Exception {
+		//init util
+		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, EsbSotCons.NJWEEA70);
+		esbUtilInputVO.setModule(thisClaz + new Object(){}.getClass().getEnclosingMethod().getName());
+		
+		//head
+		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
+		txHead.setDefaultTxHead();
+		esbUtilInputVO.setTxHeadVO(txHead);
+		
+		//body
+//		NJWEEA70InputVO njweea70inputvo = new NJWEEA70InputVO();
+		
+		//發送電文
+		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
+		
+		NJWEEA70OutputVO njweea70OutputVO = new NJWEEA70OutputVO();
+		List<NJWEEA70> results = new ArrayList<NJWEEA70>();
+		NJWEEA70 njweea70 = new NJWEEA70();
+		
+		for(ESBUtilOutputVO esbUtilOutputVO : vos) {
+			TxHeadVO headVO = esbUtilOutputVO.getTxHeadVO();
+			
+			String hfmtid = StringUtils.isBlank(headVO.getHFMTID()) ? "" : headVO.getHFMTID().trim();
+			
+			/**
+			 * 下行電文會有2個Format的格式
+			 * Header.‧HFMTID =0001：債券預約單/長效單營業日註記
+			 * Header.‧HFMTID =E001：錯誤訊息使用
+			 */
+			if("0001".equals(hfmtid)) {
+				njweea70OutputVO = esbUtilOutputVO.getNjweea70OutputVO();
+				for(NJWEEA70OutputDetailVO detail : njweea70OutputVO.getDetails()) {
+					njweea70.setTxtDt(detail.getTxtDt());		// 日期(民國年) ex.01130607
+					njweea70.setTxtCode(detail.getTxtCode());	// 營業日註記_空白：非營業日、Y：營業日
+
+					results.add(njweea70);
+					njweea70 = new NJWEEA70();
+				}
+			} else if("E001".equals(hfmtid)) {
+				if(StringUtils.isNotBlank(njweea70OutputVO.getMSGID())) {
+					throw new JBranchException(String.format("%s:%s", njweea70OutputVO.getMSGID(), njweea70OutputVO.getMSGTXT()));
+				} 
+			}
+		}
+		
+		return results;
+		
+		// for test
 //		List<NJWEEA70> results = new ArrayList<NJWEEA70>();
+//		//
 //		NJWEEA70 njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130703");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
 //		
-//		for(ESBUtilOutputVO esbUtilOutputVO : vos) {
-//			TxHeadVO headVO = esbUtilOutputVO.getTxHeadVO();
-//			
-//			String hfmtid = StringUtils.isBlank(headVO.getHFMTID()) ? "" : headVO.getHFMTID().trim();
-//			
-//			/**
-//			 * 下行電文會有2個Format的格式
-//			 * Header.‧HFMTID =0001：債券預約單/長效單營業日註記
-//			 * Header.‧HFMTID =E001：錯誤訊息使用
-//			 */
-//			if("0001".equals(hfmtid)) {
-//				njweea70OutputVO = esbUtilOutputVO.getNjweea70OutputVO();
-//				for(NJWEEA70OutputDetailVO detail : njweea70OutputVO.getDetails()) {
-//					njweea70.setTxtDt(detail.getTxtDt());		// 日期(民國年) ex.01130607
-//					njweea70.setTxtCode(detail.getTxtCode());	// 營業日註記_空白：非營業日、Y：營業日
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130704");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130705");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
 //
-//					results.add(njweea70);
-//					njweea70 = new NJWEEA70();
-//				}
-//			} else if("E001".equals(hfmtid)) {
-//				if(StringUtils.isNotBlank(njweea70OutputVO.getMSGID())) {
-//					throw new JBranchException(String.format("%s:%s", njweea70OutputVO.getMSGID(), njweea70OutputVO.getMSGTXT()));
-//				} 
-//			}
-//		}
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130706");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130707");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130708");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130709");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130710");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130711");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130712");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130713");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130714");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130715");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130716");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130717");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130718");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130719");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130720");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130721");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130722");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130723");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130724");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130725");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130726");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130727");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130728");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130729");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130730");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130731");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130801");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130802");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130803");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130804");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130805");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130806");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130807");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130808");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130809");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130810");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130811");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130812");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
 //		
 //		return results;
-//		
-//		// for test
-////		List<NJWEEA70> results = new ArrayList<NJWEEA70>();
-////		//
-////		NJWEEA70 njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130703");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130704");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130705");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130706");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130707");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130708");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130709");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130710");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130711");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130712");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130713");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130714");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130715");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130716");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130717");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130718");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130719");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130720");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130721");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130722");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130723");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130724");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130725");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130726");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130727");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130728");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130729");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130730");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130731");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130801");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130802");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130803");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130804");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130805");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130806");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130807");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130808");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130809");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130810");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130811");
-////		njweea70.setTxtCode("");
-////		results.add(njweea70);
-////		//
-////		njweea70 = new NJWEEA70();
-////		njweea70.setTxtDt("01130812");
-////		njweea70.setTxtCode("Y");
-////		results.add(njweea70);
-////		
-////		return results;
-//	}
+	}
 	
-//	public void checkTime(Object body, IPrimitiveMap header) throws Exception {
-//		SOT310OutputVO outputVO = new SOT310OutputVO();
-//		String sotYN = "Y";
-//		SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
-//		dam = this.getDataAccessManager();
-//		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//		StringBuffer sb = new StringBuffer();
-//		sb.append(" SELECT * FROM TBSYSPARAMETER WHERE PARAM_TYPE = 'SOT.RESERVE_DATE_TIMESTAMP_BND' ");
-//		qc.setQueryString(sb.toString());
-//		List<Map<String, Object>> list = dam.exeQuery(qc);
-//		Map<String, Object> map = list.get(0);
-//		String limitTime = map.get("PARAM_CODE") != null ? map.get("PARAM_CODE").toString() : "1500";
-//		String now = sdf.format(new Date());
-//		if (Integer.parseInt(now) > Integer.parseInt(limitTime)) {
-//			sotYN = "N";
-//		}
-//		outputVO.setSotYN(sotYN);
-//		this.sendRtnObject(outputVO);
-//	}
+	public void checkTime(Object body, IPrimitiveMap header) throws Exception {
+		SOT310OutputVO outputVO = new SOT310OutputVO();
+		String sotYN = "Y";
+		SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
+		dam = this.getDataAccessManager();
+		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT * FROM TBSYSPARAMETER WHERE PARAM_TYPE = 'SOT.RESERVE_DATE_TIMESTAMP_BND' ");
+		qc.setQueryString(sb.toString());
+		List<Map<String, Object>> list = dam.exeQuery(qc);
+		Map<String, Object> map = list.get(0);
+		String limitTime = map.get("PARAM_CODE") != null ? map.get("PARAM_CODE").toString() : "1500";
+		String now = sdf.format(new Date());
+		if (Integer.parseInt(now) > Integer.parseInt(limitTime)) {
+			sotYN = "N";
+		}
+		outputVO.setSotYN(sotYN);
+		this.sendRtnObject(outputVO);
+	}
 }

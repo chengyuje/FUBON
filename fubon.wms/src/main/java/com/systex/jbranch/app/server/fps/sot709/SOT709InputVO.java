@@ -31,6 +31,7 @@ public class SOT709InputVO extends PagingInputVO{
 	private String proCode; //專案碼
 	private String trustAcct; //信託帳號
 	private String trustTS;				//M:金錢信託 S:特金交易
+	private String dynamicYN; //動態鎖利 Y/N
 
 	private BigDecimal fee_rate;//手續費率
 
@@ -187,6 +188,12 @@ public class SOT709InputVO extends PagingInputVO{
 	}
 	public void setFee_rate(BigDecimal fee_rate) {
 		this.fee_rate = fee_rate;
+	}
+	public String getDynamicYN() {
+		return dynamicYN;
+	}
+	public void setDynamicYN(String dynamicYN) {
+		this.dynamicYN = dynamicYN;
 	}
 
 

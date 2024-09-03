@@ -477,7 +477,8 @@ public class BTCRM3502 extends BizLogic {
 		sql.append("          BR.TEL_NO_MAIN AS BRH_TEL, ");
 		sql.append("          CASE WHEN UHRM_BOSS.EMP_NAME IS NOT NULL THEN UHRM_BOSS.EMP_NAME ELSE BASE.EMP_NAME END AS EMP_NAME, ");
 		sql.append("          UHRM.AO_CODE AS UHRM_AO_CODE, ");
-		sql.append("          C.BRA_NBR AS CUST_BRA_NBR ");
+		sql.append("          C.BRA_NBR AS CUST_BRA_NBR, ");
+		sql.append("          IVW.TYPE AS NEW_AO_TYPE ");
 		sql.append("  FROM TBCRM_CUST_AOCODE_CHGLOG L ");
 		sql.append("  LEFT JOIN TBCRM_CUST_CONTACT_FOR3502 CT ON L.CUST_ID = CT.CUST_ID ");
 		sql.append("  LEFT JOIN TBCRM_CUST_MAST C ON L.CUST_ID = C.CUST_ID ");
@@ -554,7 +555,8 @@ public class BTCRM3502 extends BizLogic {
 		sql.append("            BR.ZIP_COD, BR.CHIN_ADDR, ");
 		sql.append("            BR.TEL_NO_MAIN AS BRH_TEL, ");
 		sql.append("            UHRM.AO_CODE AS UHRM_AO_CODE, ");
-		sql.append("            C.BRA_NBR AS CUST_BRA_NBR ");
+		sql.append("            C.BRA_NBR AS CUST_BRA_NBR, ");
+		sql.append("            IVW.TYPE AS NEW_AO_TYPE ");
 		sql.append("    FROM TBCRM_CUST_AOCODE_CHGLOG L ");
 		sql.append("    LEFT JOIN TBCRM_CUST_CONTACT_FOR3502 CT ON L.CUST_ID = CT.CUST_ID ");
 		sql.append("    LEFT JOIN TBCRM_CUST_MAST C ON L.CUST_ID=C.CUST_ID ");
@@ -671,18 +673,30 @@ public class BTCRM3502 extends BizLogic {
 		String oldAoCode = ObjectUtils.toString(compareMap.get("ORG_AO_CODE"));
 		String oldAoCodeEmp = ObjectUtils.toString(compareMap.get("OLD_AO_EMP_ID"));
 		String newAoCodeEmp = ObjectUtils.toString(compareMap.get("NEW_AO_EMP_ID"));
+		String newAoType = ObjectUtils.toString(compareMap.get("NEW_AO_TYPE"));
 
 		if (StringUtils.isEmpty(oldAoCode)) {
-			return true;
+			if(checkAOType(newAoType)) {
+				return true;
+			} else {
+				return false;
+			}		
 		} else {
 			if (newAoCodeEmp.equals(oldAoCodeEmp)) {
 				// 同的理專(人) 只是主 code 兼 code 互換 不用寄
 				return false;
 			} else {
-				return true;
+				if(checkAOType(newAoType)) {
+					return true;
+				} else {
+					return false;
+				}
 			}
 		}
 	}
+
+
+
 
 	/** 找出兩筆中最後要能寄的 Map **/
 	private Map<String, Object> needPrintMap(List<Map<String, Object>> compareList) throws DAOException, JBranchException {
@@ -693,9 +707,14 @@ public class BTCRM3502 extends BizLogic {
 		String newAoCode = ObjectUtils.toString(newMap.get("NEW_AO_CODE"));
 		String oldAoCodeEmp = ObjectUtils.toString(oldMap.get("OLD_AO_EMP_ID"));
 		String newAoCodeEmp = ObjectUtils.toString(newMap.get("NEW_AO_EMP_ID"));
+		String newAoType = ObjectUtils.toString(newMap.get("NEW_AO_TYPE"));
 
 		if (StringUtils.isEmpty(oldAoCode)) {
-			return newMap;
+			if(checkAOType(newAoType)) {
+				return newMap;
+			} else {
+				return null;
+			}		
 		} else {
 			if (newAoCode.equals(oldAoCode)) {
 				// A => B, B => A 不寄
@@ -705,7 +724,11 @@ public class BTCRM3502 extends BizLogic {
 					// 同的理專(人) 只是主 code 兼 code 互換 不用寄
 					return null;
 				} else {
-					return newMap;
+					if(checkAOType(newAoType)) {
+						return newMap;
+					} else {
+						return null;
+					}	
 				}
 			}
 		}
@@ -763,5 +786,13 @@ public class BTCRM3502 extends BizLogic {
 			StrLen = returnString.length();
 		
 		return returnString.substring(0, StrLen);
+	}
+	
+	private boolean checkAOType(String newAoType) {
+		if(StringUtils.equals("3", newAoType)) {
+			return false;
+		} else {
+			return true;
+		}	
 	}
 }

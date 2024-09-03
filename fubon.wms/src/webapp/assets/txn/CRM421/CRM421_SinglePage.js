@@ -167,6 +167,7 @@ eSoafApp.controller('CRM421_SinglePageController',
 	    	
 	    	switch ($scope.inputVO.apply_type) {
 		    	case '1':
+		    	case '6':
 		    		if ($scope.prod_id_1) {
 		    			$scope.inputVO.prod_id = $scope.prod_id_1.toUpperCase();
 		    		}
@@ -252,6 +253,7 @@ eSoafApp.controller('CRM421_SinglePageController',
 	    	
 	    	switch ($scope.inputVO.apply_type) {
 				case '1':
+				case '6':
 					$scope.discount_type_1 = undefined;
 					$scope.defaultFeeRate_1 = undefined;
 					$scope.fee_rate_1 = undefined;
@@ -310,7 +312,8 @@ eSoafApp.controller('CRM421_SinglePageController',
 				                		$scope.showErrorMsg(tota[0].body.errorMsg);
 				                	} else {
 				                		switch ($scope.inputVO.apply_type) {
-											case '1':
+											case '1': //基金單筆申購
+											case '6': //基金動態鎖利
 												$scope.defaultFeeRate_1 = tota[0].body.defaultFeeRate;
 												break;
 											case '2':
@@ -356,6 +359,7 @@ eSoafApp.controller('CRM421_SinglePageController',
 
 			switch ($scope.inputVO.apply_type) {
 				case '1':
+				case '6':
 					if($scope.prod_id_1 == "" || $scope.prod_id_1 == undefined){
 						$scope.clearNow();
 						return;
@@ -422,6 +426,7 @@ eSoafApp.controller('CRM421_SinglePageController',
 								if ($scope.prodList.length > 0) {
 									switch ($scope.inputVO.apply_type) {
 										case '1':
+										case '6':
 											$scope.prod_name_1 = $scope.prodList[0].FUND_CNAME;
 											$scope.trust_curr_1 = $scope.prodList[0].CURRENCY_STD_ID;
 											$scope.trustCurrType_1 = ($scope.prodList[0].TRUST_CURR_TYPE == "C") ? "C" : "N";
@@ -478,26 +483,32 @@ eSoafApp.controller('CRM421_SinglePageController',
 			var mainYN = main_prd;
 			var pt = prd_type;
 			var dialog = ngDialog.open({
-				template: (apply_type == '1' || apply_type == '2' ? 'assets/txn/CRM421/CRM421_PRD110_ROUTE.html' : 'assets/txn/CRM421/CRM421_PRD120_ROUTE.html'),
-				className: (apply_type == '1' || apply_type == '2' ? 'PRD110' : 'PRD120'),
+				template: (apply_type == '1' || apply_type == '2' || apply_type == '6' ? 'assets/txn/CRM421/CRM421_PRD110_ROUTE.html' : 'assets/txn/CRM421/CRM421_PRD120_ROUTE.html'),
+				className: (apply_type == '1' || apply_type == '2' || apply_type == '6' ? 'PRD110' : 'PRD120'),
 				showClose: false,
 				scope : $scope,
 				controller: ['$scope', function($scope) {
-					if(mainYN == 'Y'){
-						$scope.txnName = "本月主推";
-						$scope.main_prd = (mainYN == 'Y' ? mainYN : '');
-					}else{
-						$scope.txnName = (apply_type == '1' || apply_type == '2' ? "基金搜尋" : (pt == 'ETF') ? "ETF搜尋" : '股票搜尋');
+					if(apply_type == "6") {
+						$scope.txnName = "搜尋母基金";
+						$scope.dynamicType = "M"; //動態鎖利類別 M:母基金 C:子基金
+					} else {
+						if(mainYN == 'Y'){
+							$scope.txnName = "本月主推";
+							$scope.main_prd = (mainYN == 'Y' ? mainYN : '');
+						}else{
+							$scope.txnName = (apply_type == '1' || apply_type == '2' || apply_type == '6' ? "基金搜尋" : (pt == 'ETF') ? "ETF搜尋" : '股票搜尋');
+						}
 					}
 					$scope.txnId = "CRM";
 					$scope.isPop = true;
-	        		$scope.routeURL = (apply_type == '1' || apply_type == '2' ? 'assets/txn/PRD110/PRD110.html' : (pt == 'ETF') ? 'assets/txn/PRD120/PRD120_ETF.html' : 'assets/txn/PRD120/PRD120_STOCK.html');
-	        		$scope.tradeType = (apply_type == '1' ? '1' : (apply_type == '2' ? '5' : '1'));
+	        		$scope.routeURL = (apply_type == '1' || apply_type == '2' || apply_type == '6' ? 'assets/txn/PRD110/PRD110.html' : (pt == 'ETF') ? 'assets/txn/PRD120/PRD120_ETF.html' : 'assets/txn/PRD120/PRD120_STOCK.html');
+	        		$scope.tradeType = ((apply_type == '1' || apply_type == '6') ? '1' : (apply_type == '2' ? '5' : '1'));
 	        		$scope.cust_id = cust_id;
 	            }]
 			}).closePromise.then(function (data) {
 				switch ($scope.inputVO.apply_type) {
 					case '1':
+					case '6':
 						$scope.prod_id_1 = data.value.PRD_ID;
 						
 						break;
@@ -527,6 +538,7 @@ eSoafApp.controller('CRM421_SinglePageController',
 			
 			switch ($scope.inputVO.apply_type) {
 				case '1':
+				case '6':
 					if (type == 'rate' && ($scope.defaultFeeRate_1 != undefined && $scope.fee_rate_1 != undefined)) {
 						$scope.fee_discount_1 = (($scope.fee_rate_1 / $scope.defaultFeeRate_1) * 10).toFixed(2); //折數 = 手續費率(number) ÷ 表定手續費率 × 10
 					} else if ($scope.defaultFeeRate_1 != undefined && $scope.fee_discount_1 != undefined) {
@@ -596,11 +608,11 @@ eSoafApp.controller('CRM421_SinglePageController',
 					break;
 			}
 			
-			$scope.inputVO.prod_type = ($scope.inputVO.apply_type == '1' || $scope.inputVO.apply_type == '2' ? "1" : "2");
+			$scope.inputVO.prod_type = ($scope.inputVO.apply_type == '1' || $scope.inputVO.apply_type == '2' || $scope.inputVO.apply_type == '6' ? "1" : "2");
 			$scope.inputVO.con_degree = $scope.con_degree;
 			
 			//$scope.inputVO.highest_auth_lv ==> 此為"折扣數"
-			if ($scope.inputVO.apply_type == '1') {
+			if ($scope.inputVO.apply_type == '1' || $scope.inputVO.apply_type == '6') {
 				$scope.inputVO.highest_auth_lv = $scope.fee_discount_1;
 			} else if ($scope.inputVO.apply_type == '2') {
 				if (isNaN($scope.fee_discount_2) ||  $scope.fee_discount_2 == '') {
@@ -646,6 +658,7 @@ eSoafApp.controller('CRM421_SinglePageController',
 		$scope.clearNow = function() { 
 			switch ($scope.inputVO.apply_type) {
 				case '1':
+				case '6':
 					$scope.prod_id_1 = undefined;
 					$scope.prod_name_1 = undefined;
 					$scope.trust_curr_1 = undefined;
@@ -702,6 +715,7 @@ eSoafApp.controller('CRM421_SinglePageController',
 //                        		$scope.clearNow();
 	                        	switch ($scope.inputVO.apply_type) {
 	                				case '1':
+	                				case '6':
 	                					$scope.prod_id_1 = undefined;
 	                					$scope.prod_name_1 = undefined;
 	                					$scope.trust_curr_1 = undefined;
@@ -798,6 +812,7 @@ eSoafApp.controller('CRM421_SinglePageController',
 		    	//商品資訊
 		    	switch ($scope.inputVO.apply_type) {
 			    	case '1':
+			    	case '6':
 						$scope.prod_id_1 = $scope.singleDTL.PROD_ID;
 						
 						break;
@@ -815,8 +830,8 @@ eSoafApp.controller('CRM421_SinglePageController',
 		    	$scope.prod_inquire().then(function(data) {
 		    		//申請資訊
 			    	switch ($scope.inputVO.apply_type) {
-				    	case '1':
-				    		//基金單筆申購
+				    	case '1': //基金單筆申購
+				    	case '6': //基金動態鎖利				    		
 				    		$scope.trustCurrType_1 = $scope.singleDTL.TRUST_CURR_TYPE;
 				    		$scope.purchase_amt_1 = ($scope.singleDTL.INVEST_AMT == undefined ? parseFloat($scope.singleDTL.PURCHASE_AMT) : parseFloat($scope.singleDTL.INVEST_AMT));
 				    		$scope.discount_type_1 = $scope.singleDTL.DISCOUNT_TYPE;

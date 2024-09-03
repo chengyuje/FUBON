@@ -357,9 +357,8 @@ public class SOT520 extends FubonWmsBizLogic {
 			inputVO_712.setTradeSeq(inputVO.getTradeSEQ());
 			sot712.updateBatchSeq(inputVO_712);
 
-			// TODO 上[2080]拆[2090]
 			// 確認電文
-//			String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
+			String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 			SOT707InputVO inputVO_707 = new SOT707InputVO();
 			SOT707OutputVO outputVO_707 = new SOT707OutputVO();
 
@@ -368,13 +367,11 @@ public class SOT520 extends FubonWmsBizLogic {
 			inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
 
 			SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-			outputVO_707 = sot707.verifyESBRedeemBN(inputVO_707);
-			// TODO 上[2080]拆[2090]
-//			if (isOBU.equals("Y")) {
-//				outputVO_707 = sot707.verifyESBRedeemBN_OBU(inputVO_707);
-//			} else {
-//				outputVO_707 = sot707.verifyESBRedeemBN(inputVO_707);				
-//			}
+			if (isOBU.equals("Y")) {
+				outputVO_707 = sot707.verifyESBRedeemBN_OBU(inputVO_707);
+			} else {
+				outputVO_707 = sot707.verifyESBRedeemBN(inputVO_707);				
+			}
 
 			String errorMsg = outputVO_707.getErrorMsg();
 			outputVO.setWarningCode(outputVO_707.getWarningCode());

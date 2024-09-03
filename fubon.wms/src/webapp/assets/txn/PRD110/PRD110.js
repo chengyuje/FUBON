@@ -56,6 +56,7 @@ eSoafApp.controller('PRD110Controller',
 				$scope.inputVO.sameSerialYN = $scope.sameSerialYN;
 				$scope.inputVO.sameSerialProdId = $scope.sameSerialProdId;
 				$scope.inputVO.dynamicProdCurrM = $scope.dynamicProdCurrM;
+				$scope.inputVO.dynamicType = $scope.dynamicType;
 				if($scope.isBackend != undefined)
 					$scope.inputVO.isBackend = $scope.isBackend;
 			} else if($scope.is910){
@@ -71,7 +72,6 @@ eSoafApp.controller('PRD110Controller',
 			if($scope.fromSOTProdYN) {
 				$scope.inputVO.fromSOTProdYN = $scope.fromSOTProdYN;
 				$scope.inputVO.trustTS = $scope.trustTS;
-				$scope.inputVO.dynamicType = $scope.dynamicType;
 			} else {
 				$scope.inputVO.fromSOTProdYN = "N";
 			}

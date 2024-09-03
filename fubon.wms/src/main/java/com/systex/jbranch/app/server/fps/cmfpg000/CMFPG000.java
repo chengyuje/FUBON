@@ -1355,8 +1355,9 @@ public class CMFPG000 extends FubonWmsBizLogic {
 	 * @throws IOException
 	 */
 	public void mobAuthenticate(Object body, IPrimitiveMap<EnumTiaHeader> headers) throws JBranchException, Exception {
+		
+		dam = getDataAccessManager();
 		GenericMap inputGmap = new GenericMap((Map) body);
-
 		Exception ex = null;
 		//帳號
 		String loginId = inputGmap.getNotNullStr("account");
@@ -1393,7 +1394,8 @@ public class CMFPG000 extends FubonWmsBizLogic {
 	public void mobLogin(Object body, IPrimitiveMap<EnumTiaHeader> headers) throws JBranchException, Exception {
 		HttpServletRequest request = doGetHttpServletRequest();
 		GenericMap inputGmap = new GenericMap((Map) body);
-
+		dam = getDataAccessManager();
+		
 		String loginSourceToken = request.getAttribute("mobile") == null ? null : ObjectUtils.toString(request.getAttribute("mobile"));
 
 		sendRtnObject(doGetMobileLoginData(dam, setLoginInfoMap((String) inputGmap.get("empId"), (String) inputGmap.get("roleId"), (String) inputGmap.get("deptId"), (String) inputGmap.get("regionCenterId"), (String) inputGmap.get("regionCenterName"), (String) inputGmap.get("branchAreaId"), (String) inputGmap.get("branchAreaName"), (String) inputGmap.get("branchNbr"), (String) inputGmap.get("branchName"), (String) inputGmap.get("isPrimaryRole"), loginSourceToken, (String) inputGmap.get("currentUserId"))));
