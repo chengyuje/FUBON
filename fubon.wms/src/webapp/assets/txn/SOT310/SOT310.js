@@ -65,17 +65,17 @@ eSoafApp.controller('SOT310Controller',
 			var minEndDate   = $scope.inputVO.MIN_GTC_END_DATE;
 			var maxEndDate   = $scope.inputVO.MAX_GTC_END_DATE;
 			
-			var endDate = undefined;
-			if ($scope.inputVO.gtcYN != 'P' && $scope.inputVO.gtcEndDate != undefined) {
-				endDate = angular.copy($scope.inputVO.gtcEndDate);
-				endDate = endDate.setDate(endDate.getDate()-1);					
-				endDate = new Date(endDate);
-				if (endDate > maxEndDate) {
-					endDate = maxEndDate;
-				}
-			}
+//			var endDate = undefined;
+//			if ($scope.inputVO.gtcYN != 'P' && $scope.inputVO.gtcEndDate != undefined) {
+//				endDate = angular.copy($scope.inputVO.gtcEndDate);
+//				endDate = endDate.setDate(endDate.getDate()-1);					
+//				endDate = new Date(endDate);
+//				if (endDate > maxEndDate) {
+//					endDate = maxEndDate;
+//				}
+//			}
 			$scope.apply_gtcStartDateOptions.minDate = minStartDate;
-			$scope.apply_gtcStartDateOptions.maxDate = endDate || maxStartDate;
+			$scope.apply_gtcStartDateOptions.maxDate = maxStartDate;
 			
 			// 長效單起迄日邏輯：最短2日最長5日,要連續的日期區間
 			if ($scope.inputVO.gtcYN == 'Y') {

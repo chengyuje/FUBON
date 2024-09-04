@@ -108,7 +108,7 @@ public class PMS424 extends FubonWmsBizLogic {
 				sb.append("  AND RPT.BRANCH_NBR = :branchNbr ");
 				queryCondition.setObject("branchNbr", inputVO.getBranch_nbr());
 			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-				sb.append("  AND EXISTS (SELECT 1 FROM VWORG_DEFN_BRH BTHT WHERE DEPT_ID = :branchAreaID AND RPT.BRANCH_NBR = BRHT.BRANCH_NBR ) ");
+				sb.append("  AND EXISTS (SELECT 1 FROM VWORG_DEFN_BRH BRHT WHERE DEPT_ID = :branchAreaID AND RPT.BRANCH_NBR = BRHT.BRANCH_NBR ) ");
 				queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());				
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND EXISTS (SELECT 1 FROM VWORG_DEFN_BRH BRHT WHERE BRHT.DEPT_ID = :regionCenterID AND RPT.BRANCH_NBR = BRHT.BRANCH_NBR) ");

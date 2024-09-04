@@ -482,41 +482,6 @@ eSoafApp.controller('SOT1630Controller',
 				$scope.sendRecv("SOT110", "getSOTCustInfo", "com.systex.jbranch.app.server.fps.sot110.SOT110InputVO", {'custID':$scope.inputVO.custID, 'prodType':1, 'tradeType':1, 'trustTS':$scope.inputVO.trustTS},
 						function(tota, isError) {
 							if (!isError) { 
-									$scope.toDay = $filter('date')(new Date(),'yyyy-MM-dd 00:00:00');//取當日日期
-									//FOR CBS TEST日期
-//								    if ($scope.toJsDate(tota[0].body.kycDueDate) < $scope.toJsDate($scope.toDay)) { //若KYC過期，需有訊息提示客戶，並清空客戶ID。
-									if(tota[0].body.isKycDueDateUseful){
-										 var kycDueDate = $scope.toJsDate(tota[0].body.kycDueDate);
-										 var msgParam = "";
-										 if(kycDueDate==null) {
-											msgParam='未承作';
-										 }else{
-											msgParam = kycDueDate.getFullYear() + "/" +(kycDueDate.getMonth() + 1) + "/" + kycDueDate.getDate();
-										 }
-										 var txtMsg = $filter('i18n')('ehl_01_sot310_001') + "(" + msgParam + ")";
-										 $scope.showErrorMsg(txtMsg);
-										 $scope.custClear();
-										 $scope.inputVO.custID = "";
-										 return;
-									}
-								    if (tota[0].body.noSale == "Y") { //若為禁銷客戶，出現提示訊息禁止下單
-										$scope.showErrorMsg("ehl_01_sot310_003");
-										$scope.custClear();
-										$scope.inputVO.custID = "";
-										return;
-									}
-								    if (tota[0].body.rejectProdFlag == "Y") {	//拒銷(RS)註記Y 得拒絕申請人臨櫃進行非存款類之理財商品下單(轉換、變更投資標的不在此限)
-								    	$scope.showErrorMsg("ehl_01_SOT702_002");
-										$scope.custClear();
-										$scope.inputVO.custID = "";
-										return;
-								    }
-								    if ((tota[0].body.deathFlag == "Y" || tota[0].body.isInterdict == "Y") && $scope.inputVO.trustTS == 'M') { //FOR金錢信託 若為死亡戶/禁治產等狀況，不可下單。
-										$scope.showErrorMsg("ehl_01_sot310_004");
-										$scope.custClear();
-										$scope.inputVO.custID = "";
-										return;
-									}
 								    debugger
 								    //			console.log("SOTCustInfo:"+JSON.stringify(tota[0].body));
 									$scope.inputVO.custName = tota[0].body.custName;

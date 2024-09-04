@@ -553,8 +553,8 @@ public class CMFPG000 extends FubonWmsBizLogic {
 
 			}
 
-			String sysRole = (String) getSysRole(dam, roleId, loginOutputVO, userInfo).get("sysRole");
-			loginOutputVO.setMemLoginFlag((String) getSysRole(dam, roleId, loginOutputVO, userInfo).get("memLoginFlag"));
+			String sysRole = (String) getSysRole(dam, userId, roleId, loginOutputVO, userInfo).get("sysRole");
+			loginOutputVO.setMemLoginFlag((String) getSysRole(dam, userId, roleId, loginOutputVO, userInfo).get("memLoginFlag"));
 
 			loginInfoMap.put("memLoginFlag", loginOutputVO.getMemLoginFlag());
 
@@ -602,7 +602,7 @@ public class CMFPG000 extends FubonWmsBizLogic {
 	/*
 	 * 取得登入權限及註記 20201216 add by ocean
 	 */
-	public Map<String, Object> getSysRole(DataAccessManager dam, String roleId, LoginPageOutputVO loginOutputVO, Map<String, Object> userInfo) throws JBranchException {
+	public Map<String, Object> getSysRole(DataAccessManager dam, String loginID, String roleId, LoginPageOutputVO loginOutputVO, Map<String, Object> userInfo) throws JBranchException {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> brhChgMap_BS = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE_BS", FormatHelper.FORMAT_3);
@@ -617,7 +617,7 @@ public class CMFPG000 extends FubonWmsBizLogic {
 		sb.append("FROM TBORG_UHRM_BRH ");
 		sb.append("WHERE EMP_ID = :loginID ");
 
-		queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
+		queryCondition.setObject("loginID", loginID);
 		queryCondition.setQueryString(sb.toString());
 
 		List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
@@ -831,7 +831,38 @@ public class CMFPG000 extends FubonWmsBizLogic {
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> getUserInfo(String userId) throws JBranchException {
-		List<Map<String, Object>> result = exeQueryForQcf(genDefaultQueryConditionIF().setQueryString(new StringBuffer().append(" SELECT ").append("   DEPT_ID, ").append("   EMP_CELL_NUM, ").append("   EMP_DEPT_EXT, ").append("   EMP_FAX, ").append("   JOB_TITLE_NAME, ").append("   JOB_RANK, ").append("   EXPECTED_END_DATE, ").append("   GROUP_TYPE, ").append("   ONBOARD_DATE, ").append("   JOB_ONBOARD_DATE, ").append("   JOB_RESIGN_DATE, ").append("   SALES_SUP_EMP_ID, ").append("   EMP_MAIL_ADDRESS, ").append("   EMP_EMAIL_ADDRESS, ").append("   EMP_PHONE_NUM, ").append("   PERF_EFF_DATE, ").append("   HANDOVER_FLAG, ").append("   HANDOVER_DATE, ").append("   REMARK, ").append("   EMP_PHOTO, ").append("   SERVICE_FLAG, ").append("   CHANGE_FLAG, ").append("   REVIEW_STATUS, ").append("   JOB_POSITION, ").append("   JOB_GOAL_DATE, ").append("   VERSION, ").append("   CREATETIME, ").append("   CREATOR, ").append("   MODIFIER, ").append("   LASTUPDATE ").append(" FROM TBORG_MEMBER where EMP_ID = :empId ").toString()).setObject("empId", userId));
+		List<Map<String, Object>> result = exeQueryForQcf(genDefaultQueryConditionIF().setQueryString(new StringBuffer().append(" SELECT ").append("   DEPT_ID, ")
+																																		   .append("   EMP_CELL_NUM, ")
+																																		   .append("   EMP_DEPT_EXT, ")
+																																		   .append("   EMP_FAX, ")
+																																		   .append("   JOB_TITLE_NAME, ")
+																																		   .append("   JOB_RANK, ")
+																																		   .append("   EXPECTED_END_DATE, ")
+																																		   .append("   GROUP_TYPE, ")
+																																		   .append("   ONBOARD_DATE, ")
+																																		   .append("   JOB_ONBOARD_DATE, ")
+																																		   .append("   JOB_RESIGN_DATE, ")
+																																		   .append("   SALES_SUP_EMP_ID, ")
+																																		   .append("   EMP_MAIL_ADDRESS, ")
+																																		   .append("   EMP_EMAIL_ADDRESS, ")
+																																		   .append("   EMP_PHONE_NUM, ")
+																																		   .append("   PERF_EFF_DATE, ")
+																																		   .append("   HANDOVER_FLAG, ")
+																																		   .append("   HANDOVER_DATE, ")
+																																		   .append("   REMARK, ")
+																																		   .append("   EMP_PHOTO, ")
+																																		   .append("   SERVICE_FLAG, ")
+																																		   .append("   CHANGE_FLAG, ")
+																																		   .append("   REVIEW_STATUS, ")
+																																		   .append("   JOB_POSITION, ")
+																																		   .append("   JOB_GOAL_DATE, ")
+																																		   .append("   VERSION, ")
+																																		   .append("   CREATETIME, ")
+																																		   .append("   CREATOR, ")
+																																		   .append("   MODIFIER, ")
+																																		   .append("   LASTUPDATE ")
+																														.append(" FROM TBORG_MEMBER ")
+																														.append(" where EMP_ID = :empId ").toString()).setObject("empId", userId));
 
 		return CollectionUtils.isNotEmpty(result) ? result.get(0) : new HashMap<String, Object>();
 
@@ -1491,8 +1522,8 @@ public class CMFPG000 extends FubonWmsBizLogic {
 			}
 			String apServerName = recordLoginInfo(loginInfoMap, userId, userInfo, ws);
 
-			String sysRole = (String) getSysRole(dam, roleId, loginOutputVO, userInfo).get("sysRole");
-			loginOutputVO.setMemLoginFlag((String) getSysRole(dam, roleId, loginOutputVO, userInfo).get("memLoginFlag"));
+			String sysRole = (String) getSysRole(dam, userId, roleId, loginOutputVO, userInfo).get("sysRole");
+			loginOutputVO.setMemLoginFlag((String) getSysRole(dam, userId, roleId, loginOutputVO, userInfo).get("memLoginFlag"));
 
 			loginInfoMap.put("memLoginFlag", loginOutputVO.getMemLoginFlag());
 			loginInfoMap.put("roleName", getRoleName(roleId));

@@ -733,7 +733,7 @@ public class SOT703Dyna extends SOT703 {
 		txBodyVO.setPROSPECTUS_TYPE(ObjectUtils.toString(dynaData.get("PROSPECTUS_TYPE")));
 		txBodyVO.setCERTIFICATE_ID_1(ObjectUtils.toString(dynaData.get("CERTIFICATE_ID")));
 		txBodyVO.setTRUST_ACCT_1(ObjectUtils.toString(dynaData.get("TRUST_ACCT")));
-		txBodyVO.setTRANSFER_TYPE_1(ObjectUtils.toString(dynaData.get("TRANSFER_TYPE")));
+		txBodyVO.setTRANSFER_TYPE_1("1"); //動態鎖利轉換都是全部轉換
 		if(StringUtils.equals("1", ObjectUtils.toString(dynaData.get("TRANSFER_TYPE")))) {
 			//母基金轉換
 			txBodyVO.setOUT_PROD_ID_1(ObjectUtils.toString(dynaData.get("PROD_ID")));

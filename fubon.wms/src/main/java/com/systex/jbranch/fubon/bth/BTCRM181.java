@@ -123,7 +123,7 @@ public class BTCRM181 extends FubonWmsBizLogic {
 			
 			CMFPG000 cmfpg000 = (CMFPG000) PlatformContext.getBean("cmfpg000");
 			Map<String, Object> userInfo = cmfpg000.getUserInfo((String) map.get("E_EMP_ID"));
-			Map<String, Object> sysRole = cmfpg000.getSysRole(dam, (String) map.get("E_ROLE_ID"), null, userInfo);
+			Map<String, Object> sysRole = cmfpg000.getSysRole(dam, (String) map.get("E_EMP_ID"), (String) map.get("E_ROLE_ID"), null, userInfo);
 			
 			String loginBranch = "";
 			String loginArea = "";

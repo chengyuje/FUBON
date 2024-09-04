@@ -532,7 +532,7 @@ public class SOT1620 extends FubonWmsBizLogic {
 		CRM421InputVO crm421InputVO = new CRM421InputVO();
 
 		//initial data
-		crm421InputVO.setApply_type("1"); //基金單筆申購
+		crm421InputVO.setApply_type("6"); //基金動態鎖利
 		crm421InputVO.setProd_type("1"); //基金
 		crm421InputVO.setCust_id(inputVO.getCustID());
 		crm421InputVO.setProd_id(inputVO.getProdId());
