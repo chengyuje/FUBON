@@ -269,7 +269,7 @@ public class PMS433 extends FubonWmsBizLogic {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
 
-		sql.append(" select distinct YYYYMM FROM TBPMS_HIGH_SOT_M order by YYYYMM ");
+		sql.append(" select distinct YYYYMM FROM TBPMS_HIGH_SOT_M order by YYYYMM desc ");
 		queryCondition.setQueryString(sql.toString());
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		if(list.size() < 1) {

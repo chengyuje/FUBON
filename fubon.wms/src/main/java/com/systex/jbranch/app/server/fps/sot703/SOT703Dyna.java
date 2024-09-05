@@ -259,7 +259,7 @@ public class SOT703Dyna extends SOT703 {
 		dam = getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		
-		sb.append("select M.CUST_ID, M.IS_OBU, M.BRANCH_NBR, M.TRUST_TRADE_TYPE, M.TRADE_TYPE, M.FLAG_NUMBER, D.* ");
+		sb.append("select M.CUST_ID, M.IS_OBU, M.BRANCH_NBR, M.TRUST_TRADE_TYPE, M.TRADE_TYPE, M.FLAG_NUMBER, M.REC_SEQ, D.* ");
 		sb.append(" from TBSOT_TRADE_MAIN M ");
 		sb.append(" inner join TBSOT_NF_PURCHASE_DYNA D on D.TRADE_SEQ = M.TRADE_SEQ ");
 		sb.append(" where M.TRADE_SEQ = :TRADE_SEQ ");
@@ -456,7 +456,7 @@ public class SOT703Dyna extends SOT703 {
 		dam = getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		
-		sb.append("select M.CUST_ID, M.IS_OBU, M.BRANCH_NBR, M.TRUST_TRADE_TYPE, M.TRADE_TYPE, M.FLAG_NUMBER, D.* ");
+		sb.append("select M.CUST_ID, M.IS_OBU, M.BRANCH_NBR, M.TRUST_TRADE_TYPE, M.TRADE_TYPE, M.FLAG_NUMBER, M.REC_SEQ, D.* ");
 		sb.append(" from TBSOT_TRADE_MAIN M ");
 		sb.append(" inner join TBSOT_NF_RAISE_AMT_DYNA D on D.TRADE_SEQ = M.TRADE_SEQ ");
 		sb.append(" where M.TRADE_SEQ = :TRADE_SEQ ");
@@ -1034,7 +1034,7 @@ public class SOT703Dyna extends SOT703 {
 		dam = getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		
-		sb.append("select M.CUST_ID, M.IS_OBU, M.BRANCH_NBR, M.TRUST_TRADE_TYPE, M.TRADE_TYPE, M.FLAG_NUMBER, D.* ");
+		sb.append("select M.CUST_ID, M.IS_OBU, M.BRANCH_NBR, M.TRUST_TRADE_TYPE, M.TRADE_TYPE, M.FLAG_NUMBER, M.REC_SEQ, D.* ");
 		sb.append(" from TBSOT_TRADE_MAIN M ");
 		sb.append(" inner join TBSOT_NF_CHANGE_DYNA D on D.TRADE_SEQ = M.TRADE_SEQ ");
 		sb.append(" where M.TRADE_SEQ = :TRADE_SEQ ");

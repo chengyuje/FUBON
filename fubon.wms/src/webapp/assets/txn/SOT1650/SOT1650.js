@@ -1302,7 +1302,7 @@ eSoafApp.controller('SOT1650Controller',
 		//取得庫存中子基金最低申購金額&累進申購面額
 		$scope.findNfMinBuyAmt = function(type, idx){
 			var MIN_BUY_AMT = type == "M" ? "SOT.NF_MIN_BUY_AMT_DM" : "SOT.NF_MIN_BUY_AMT_DC";
-			var PARAM_CODE = $scope.inputVO.prodCurr; //產品計價幣別
+			var PARAM_CODE = $scope.inputVO.trustCurr; //信託幣別
 			
 			//最低申購金額
 	        var vo = {'param_type': MIN_BUY_AMT, 'desc': false};
@@ -1342,7 +1342,7 @@ eSoafApp.controller('SOT1650Controller',
 		//取得新增子基金最低申購金額&累進申購面額
 		$scope.findAddProdNfMinBuyAmt = function(type, idx){
 			var MIN_BUY_AMT = type == "M" ? "SOT.NF_MIN_BUY_AMT_DM" : "SOT.NF_MIN_BUY_AMT_DC";
-			var PARAM_CODE = $scope.inputVO.prodCurr; //產品計價幣別
+			var PARAM_CODE = $scope.inputVO.trustCurr; //信託幣別
 			
 			//最低申購金額
 	        var vo = {'param_type': MIN_BUY_AMT, 'desc': false};

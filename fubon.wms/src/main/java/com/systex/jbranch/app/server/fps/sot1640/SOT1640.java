@@ -242,17 +242,7 @@ public class SOT1640 extends FubonWmsBizLogic {
 			if (inputVO.getBargainDueDate() != null) mainVO.setBARGAIN_DUE_DATE(new Timestamp(inputVO.getBargainDueDate().getTime()));
 			mainVO.setTRADE_STATUS("1"); //1:暫存
 			mainVO.setIS_BARGAIN_NEEDED("N");
-			
-			SOT712 sot712 = (SOT712) PlatformContext.getBean("sot712");
-			SOT712InputVO inputVO_712 = new SOT712InputVO();
-			inputVO_712.setCustID(inputVO.getCustID());
-			inputVO_712.setProdID(null);
-			inputVO_712.setProdType("NF");
-			inputVO_712.setProfInvestorYN(StringUtils.isBlank(inputVO.getProfInvestorYN()) ? "N" : inputVO.getProfInvestorYN()); //是否為專業投資人
-			inputVO_712.setIsFirstTrade(inputVO.getIsFirstTrade()); //是否首購   
-			inputVO_712.setCustRemarks(inputVO.getCustRemarks());
-			inputVO_712.setCustProRemark(inputVO.getPiRemark());
-			mainVO.setIS_REC_NEEDED(sot712.getIsRecNeeded(inputVO_712) ? "Y" : "N"); //IS_REC_NEEDED是否需要錄音 (非常規交易)
+			mainVO.setIS_REC_NEEDED("N"); //不需檢核錄音
 			
 			mainVO.setREC_SEQ(null);
 			mainVO.setSEND_DATE(null);

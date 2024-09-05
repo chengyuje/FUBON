@@ -159,7 +159,7 @@ public class VPD00PSM extends BizLogic {
 		sb.append("           SELECT EMP_ID FROM TBORG_MEMBER_ROLE A ");
 		sb.append("           INNER JOIN TBSYSPARAMETER B ");
 		sb.append("             ON A.ROLE_ID = B.PARAM_CODE ");
-		sb.append("           WHERE B.PARAM_TYPE IN ('FUBONSYS.FC_ROLE','FUBONSYS.FCH_ROLE' ))) EMP ");
+		sb.append("           WHERE B.PARAM_TYPE IN ('FUBONSYS.FC_ROLE','FUBONSYS.FCH_ROLE','FUBONSYS.UHRM_ROLE'))) EMP ");
 		sb.append("       ON EMP.EMP_ID = AO.EMP_ID ");
 		sb.append("     LEFT JOIN ( SELECT DISTINCT CUST_ID, BRA_NBR FROM TBCRM_ACCT_MAST A ");
 		sb.append("                 WHERE EXISTS (SELECT 1 FROM TBCRM_CUST_MAST B WHERE B.AO_CODE IS NOT NULL AND A.CUST_ID=B.CUST_ID )) CIF ");

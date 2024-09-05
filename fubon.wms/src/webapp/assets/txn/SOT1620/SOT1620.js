@@ -1117,8 +1117,9 @@ eSoafApp.controller('SOT1620Controller',
 		};
 		
 		//取得最低申購金額&累進申購面額
+		//只有母基金
 		$scope.findNfMinBuyAmt = function(type, idx){
-			var MIN_BUY_AMT = type == "M" ? "SOT.NF_MIN_BUY_AMT_DM" : "SOT.NF_MIN_BUY_AMT_DC";
+			var MIN_BUY_AMT = "SOT.NF_MIN_BUY_AMT_DM_2";
 			var PARAM_CODE = $scope.inputVO.trustCurr; //產品信託幣別
 			
 			//最低申購金額
@@ -1131,10 +1132,6 @@ eSoafApp.controller('SOT1620Controller',
         	       			if(type == "M") {
         	       				$scope.inputVO.prodMinBuyAmt= row.LABEL;
         	       				$scope.inputVO.BaseAmtOfSPurchaseCurr = row.DATA.split("_")[0];
-        	       			} else {
-        	       				if(idx == "1") $scope.inputVO.prodMinBuyAmtC1 = row.LABEL;
-        						if(idx == "2") $scope.inputVO.prodMinBuyAmtC2 = row.LABEL;
-        						if(idx == "3") $scope.inputVO.prodMinBuyAmtC3 = row.LABEL;
         	       			}
         	       		}
         	       	});
@@ -1142,7 +1139,7 @@ eSoafApp.controller('SOT1620Controller',
 	        });
 	        	
 	        //累進申購面額
-	        var MIN_GRD_AMT = type == "M" ? "SOT.NF_MIN_GRD_AMT_DM" : "SOT.NF_MIN_GRD_AMT_DC";			
+	        var MIN_GRD_AMT = "SOT.NF_MIN_GRD_AMT_DM_2";			
 			var vog = {'param_type': MIN_GRD_AMT, 'desc': false};
 	        	$scope.requestComboBox(vog, function(totas) {
 	        		if (totas[totas.length - 1].body.result === 'success') {
@@ -1150,10 +1147,6 @@ eSoafApp.controller('SOT1620Controller',
         	        		if(row.DATA == PARAM_CODE){
         	        			if(type == "M") {
         	        				$scope.inputVO.prodMinGrdAmt= row.LABEL;
-        	        			} else {
-        	        				if(idx == "1") $scope.inputVO.prodMinGrdAmtC1 = row.LABEL;
-        							if(idx == "2") $scope.inputVO.prodMinGrdAmtC2 = row.LABEL;
-        							if(idx == "3") $scope.inputVO.prodMinGrdAmtC3 = row.LABEL;
         	        			}
         	        		}
         	        	});
@@ -1341,7 +1334,7 @@ eSoafApp.controller('SOT1620Controller',
 									}
 								}
 								
-								$scope.findNfMinBuyAmt(type, idx);  //最低申購金額
+//								$scope.findNfMinBuyAmt(type, idx);  //最低申購金額
 								
 								if(type == "M") { //母基金
 									if ($scope.brgApplySingle) {//事先議價

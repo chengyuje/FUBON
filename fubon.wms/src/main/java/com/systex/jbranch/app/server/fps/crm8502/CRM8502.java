@@ -866,14 +866,14 @@ public class CRM8502 extends EsbUtil {
                 List<Map<String,Object>> list = this.getQueryExecute(sb.toString(), custId);
 				result.addRecordList("CHART_AUM_LIST", list);
 			}
-
+			
 			//存投保分佈圖
 			if (printAllChart.equals("Y") || docVo.getPRINT_IIL().equals("Y")) {
 				List list = new ArrayList();
 				BigDecimal totalAsset = depositF.add(depositTwd)
-						 						.add(invFund).add(invSi).add(invSn).add(invFbond).add(invEtf).add(invGold).add(invVpbnd)
+						 						.add(invFund).add(invSi).add(invSn).add(invFbond).add(invEtf).add(invGold).add(invNano).add(invVpbnd)
 						 						.add(insTot);
-				BigDecimal inv = invFund.add(invFbond).add(invSi).add(invEtf).add(invSn).add(invGold).add(invVpbnd);
+				BigDecimal inv = invFund.add(invFbond).add(invSi).add(invEtf).add(invSn).add(invGold).add(invNano).add(invVpbnd);
 				BigDecimal invRatio = totalAsset.longValue()<=0?new BigDecimal(0):inv.divide(totalAsset,4,RoundingMode.HALF_UP).multiply(new BigDecimal(100));
 				BigDecimal insRatio = totalAsset.longValue()<=0?new BigDecimal(0):insTot.divide(totalAsset,4,RoundingMode.HALF_UP).multiply(new BigDecimal(100));
 				Map map = new HashMap();
