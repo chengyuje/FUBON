@@ -539,7 +539,7 @@ public class SOT1620 extends FubonWmsBizLogic {
 		crm421InputVO.setProd_name(inputVO.getProdName());
 		crm421InputVO.setTrustCurrType(inputVO.getTrustCurrType());
 		crm421InputVO.setTrust_curr(inputVO.getTrustCurr());
-		crm421InputVO.setPurchase_amt(inputVO.getPurchaseAmt().toString());
+		crm421InputVO.setPurchase_amt(inputVO.getRaiseAmt().toString());
 		crm421InputVO.setDefaultFeeRate(inputVO.getDefaultFeeRate());
 		crm421InputVO.setFee(inputVO.getFee().toString());
 		crm421InputVO.setFee_discount(inputVO.getFeeDiscount());

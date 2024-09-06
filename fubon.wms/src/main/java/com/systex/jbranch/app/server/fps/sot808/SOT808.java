@@ -203,20 +203,39 @@ public class SOT808 extends SotPdf {
 							if (data_map.get("GTC_YN") != null && StringUtils.equals("Y", data_map.get("GTC_YN").toString()))
 								data_map.put("TOT_AMT", "依成交當日為準");
 
-							//是否為長效單 Y:長效單 N:單日單
+							//是否為長效單 Y:長效單 N:單日單 P:預約單
+							String gtcYN = "";
 							if (data_map.get("GTC_YN") != null && StringUtils.isNotBlank(data_map.get("GTC_YN").toString())) {
+								gtcYN = data_map.get("GTC_YN").toString();
 								data_map.put("GTC_YN", data_map.get("GTC_YN").toString());
 							} else {
 								data_map.put("GTC_YN", "N");
 							}
 							
 							//長效單迄日
+							String buyTradeDate = "";
+							String gtcStartDate = "";
+							String gtcEndDate = "";
 							SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
 							if (data_map.get("GTC_END_DATE") == null || StringUtils.isBlank(data_map.get("GTC_END_DATE").toString())) {
 								data_map.put("GTC_END_DATE", "");
 							} else {
+								gtcEndDate = sdf.format(data_map.get("GTC_END_DATE"));
 								data_map.put("GTC_END_DATE", sdf.format(data_map.get("GTC_END_DATE")));
 							}
+							
+							if (data_map.get("GTC_START_DATE") != null && StringUtils.isNotBlank(data_map.get("GTC_START_DATE").toString())) {
+								gtcStartDate = sdf.format(data_map.get("GTC_START_DATE"));
+							}
+							
+							if (gtcYN.equals("Y")) {
+								// 長效單
+								buyTradeDate = gtcStartDate + " ～ " + gtcEndDate;
+							} else if (gtcYN.equals("P")) {
+								// 預約單
+								buyTradeDate = gtcStartDate;
+							}
+							data_map.put("BUY_TRADE_DATE", buyTradeDate);
 
 							data.addRecordList("BUY", list);
 						} else if (tradeSubTypeToString.equals("2")) {
@@ -234,20 +253,39 @@ public class SOT808 extends SotPdf {
 								data_map.put("ENTRUST_AMT", "");
 							}
 
-							//是否為長效單 Y:長效單 N:單日單
+							// 是否為長效單 Y:長效單 N:單日單 P:預約單
+							String gtcYN = "";
 							if (data_map.get("GTC_YN") != null && StringUtils.isNotBlank(data_map.get("GTC_YN").toString())) {
+								gtcYN = data_map.get("GTC_YN").toString();
 								data_map.put("GTC_YN", data_map.get("GTC_YN").toString());
 							} else {
 								data_map.put("GTC_YN", "N");
 							}
 							
 							//長效單迄日
+							String sellTradeDate = "";
+							String gtcStartDate = "";
+							String gtcEndDate = "";
 							SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
 							if (data_map.get("GTC_END_DATE") == null || StringUtils.isBlank(data_map.get("GTC_END_DATE").toString())) {
 								data_map.put("GTC_END_DATE", "");
 							} else {
+								gtcEndDate = sdf.format(data_map.get("GTC_END_DATE"));
 								data_map.put("GTC_END_DATE", sdf.format(data_map.get("GTC_END_DATE")));
 							}
+							
+							if (data_map.get("GTC_START_DATE") != null && StringUtils.isNotBlank(data_map.get("GTC_START_DATE").toString())) {
+								gtcStartDate = sdf.format(data_map.get("GTC_START_DATE"));
+							}
+							
+							if (gtcYN.equals("Y")) {
+								// 長效單
+								sellTradeDate = gtcStartDate + " ～ " + gtcEndDate;
+							} else if (gtcYN.equals("P")) {
+								// 預約單
+								sellTradeDate = gtcStartDate;
+							}
+							data_map.put("SELL_TRADE_DATE", sellTradeDate);
 							
 							//贖回面額
 							if (inputVO.getPrdType().equals("3")) {//海外債
@@ -263,6 +301,33 @@ public class SOT808 extends SotPdf {
 									data_map.put("PURCHASE_AMT", 0);
 								}
 							}
+							
+//							//長效單迄日
+//							String buyTradeDate = "";
+//							String gtcStartDate = "";
+//							String gtcEndDate = "";
+//							SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+//							if (data_map.get("GTC_END_DATE") == null || StringUtils.isBlank(data_map.get("GTC_END_DATE").toString())) {
+//								data_map.put("GTC_END_DATE", "");
+//							} else {
+//								gtcEndDate = sdf.format(data_map.get("GTC_END_DATE"));
+//								data_map.put("GTC_END_DATE", sdf.format(data_map.get("GTC_END_DATE")));
+//							}
+//							
+//							if (data_map.get("GTC_START_DATE") != null && StringUtils.isNotBlank(data_map.get("GTC_START_DATE").toString())) {
+//								gtcStartDate = sdf.format(data_map.get("GTC_START_DATE"));
+//							}
+//							
+//							if (gtcYN.equals("Y")) {
+//								// 長效單
+//								buyTradeDate = gtcStartDate + " ～ " + gtcEndDate;
+//							} else if (gtcYN.equals("P")) {
+//								// 預約單
+//								buyTradeDate = gtcStartDate;
+//							}
+//							data_map.put("BUY_TRADE_DATE", buyTradeDate);
+							
+							
 							data.addRecordList("SELL", list);
 						}
 					}

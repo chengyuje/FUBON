@@ -373,12 +373,12 @@ public class SOT320 extends FubonWmsBizLogic {
 		inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
 		if (isOBU.equals("Y")) {
-			if ("Y".equals(inputVO.getGtcYN()))
+			if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
 				outputVO_707 = sot707.verifyESBRedeemBN_GTC_OBU(inputVO_707);	// 長效單
 			else
 				outputVO_707 = sot707.verifyESBRedeemBN_OBU(inputVO_707); 		// 當日單
 		} else {
-			if ("Y".equals(inputVO.getGtcYN()))
+			if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
 				outputVO_707 = sot707.verifyESBRedeemBN_GTC(inputVO_707);		// 長效單
 			else
 				outputVO_707 = sot707.verifyESBRedeemBN(inputVO_707);			// 當日單			

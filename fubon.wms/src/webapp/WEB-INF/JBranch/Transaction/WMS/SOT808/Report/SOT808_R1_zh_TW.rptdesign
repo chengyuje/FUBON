@@ -189,6 +189,28 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="BUY_TRADE_DATE" id="5051">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="SELL_TRADE_DATE" id="5052">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sets>
         <script-data-set name="BUY" id="1080" extends="FPS.Script Mult Data Set">
@@ -926,7 +948,7 @@
                 <structure>
                     <property name="name">GTC_YN</property>
                     <text-property name="displayName">GTC</text-property>
-                    <expression name="expression" type="javascript">params["TRADE_SUB_TYPE"].value == 1 &amp;&amp; params["GTC_YN"].value == "Y"  ? '■' : '□'</expression>
+                    <expression name="expression" type="javascript">params["TRADE_SUB_TYPE"].value == 1 &amp;&amp; params["GTC_YN"].value != "N"  ? '■' : '□'</expression>
                     <property name="dataType">string</property>
                     <property name="allowExport">true</property>
                 </structure>
@@ -1015,18 +1037,17 @@
                     </text>
                 </cell>
                 <cell id="4613">
-                    <text id="5046">
+                    <data id="5053">
                         <property name="fontFamily">"標楷體"</property>
-                        <property name="fontSize">11pt</property>
-                        <property name="marginBottom">2pt</property>
-                        <property name="paddingTop">0pt</property>
-                        <property name="paddingLeft">0pt</property>
-                        <property name="paddingBottom">0pt</property>
-                        <property name="paddingRight">0pt</property>
-                        <property name="textAlign">center</property>
-                        <property name="contentType">auto</property>
-                        <text-property name="content"><![CDATA[   年   月   日 ～   年   月   日]]></text-property>
-                    </text>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">BUY_TRADE_DATE</property>
+                                <expression name="expression" type="javascript">params["BUY_TRADE_DATE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">BUY_TRADE_DATE</property>
+                    </data>
                 </cell>
             </row>
         </grid>
@@ -2158,7 +2179,7 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                 <structure>
                     <property name="name">Column Binding_1</property>
                     <text-property name="displayName">GTC</text-property>
-                    <expression name="expression" type="javascript">params["TRADE_SUB_TYPE"].value == 2 &amp;&amp; params["GTC_YN"].value == "Y"  ? '■' : '□'</expression>
+                    <expression name="expression" type="javascript">params["TRADE_SUB_TYPE"].value == 2 &amp;&amp; params["GTC_YN"].value != "N"  ? '■' : '□'</expression>
                     <property name="dataType">string</property>
                     <property name="allowExport">true</property>
                 </structure>
@@ -2241,18 +2262,17 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                     </text>
                 </cell>
                 <cell id="4621">
-                    <text id="5048">
+                    <data id="5054">
                         <property name="fontFamily">"標楷體"</property>
-                        <property name="fontSize">11pt</property>
-                        <property name="marginBottom">2pt</property>
-                        <property name="paddingTop">0pt</property>
-                        <property name="paddingLeft">0pt</property>
-                        <property name="paddingBottom">0pt</property>
-                        <property name="paddingRight">0pt</property>
-                        <property name="textAlign">center</property>
-                        <property name="contentType">auto</property>
-                        <text-property name="content"><![CDATA[   年   月   日 ～   年   月   日]]></text-property>
-                    </text>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">SELL_TRADE_DATE</property>
+                                <expression name="expression" type="javascript">params["SELL_TRADE_DATE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">SELL_TRADE_DATE</property>
+                    </data>
                 </cell>
             </row>
         </grid>

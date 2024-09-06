@@ -139,6 +139,8 @@ public class SOT814DYNA extends SotPdf {
 		data.addRecordList("Script Mult Data Set", listRecordList);
 		data.addParameter("CUST_ID", (String) listRecordList.get(0).get("CUST_ID"));
 		data.addParameter("CUST_NAME", (String) listRecordList.get(0).get("CUST_NAME"));
+		//母基金加碼，沒有子基金，需顯示簽名欄
+		data.addParameter("SHOW_SIGNATURE", (inputVO.getTradeType() == 1 ? "N" : "Y"));
 		
 		//費用率&報酬率
 		StringBuffer sql_fee = new StringBuffer();
