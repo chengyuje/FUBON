@@ -101,6 +101,13 @@ eSoafApp.controller('SOT310Controller',
 				$scope.apply_gtcEndDateOptions.minDate = minEndDate;
 				$scope.apply_gtcEndDateOptions.maxDate = maxEndDate;
 			}
+			
+			if ($scope.inputVO.gtcStartDate != undefined && $scope.inputVO.gtcEndDate != undefined) {
+				if ($scope.inputVO.gtcStartDate > $scope.inputVO.gtcEndDate) {
+					// 若起日大於迄日，則清空迄日
+					$scope.inputVO.gtcEndDate = undefined;
+				}
+			}
 		};
 
 		//信託業務別
@@ -937,8 +944,7 @@ eSoafApp.controller('SOT310Controller',
 			if($scope.inputVO.purchaseAmt != undefined){
 				$scope.inputVO.purchaseAmt = $scope.moneyUnFormat($scope.inputVO.purchaseAmt);
 			}
-			if (($scope.inputVO.purchaseAmt >= $scope.inputVO.prodMinBuyAmt) &&
-				($scope.inputVO.purchaseAmt % $scope.inputVO.prodMinGrdAmt == 0)) {
+			if (true) {
 				
 				if (flag) {
 					$scope.entrustAmtDisabled = false;
@@ -972,6 +978,7 @@ eSoafApp.controller('SOT310Controller',
 							
 						} else if($scope.inputVO.gtcYN == "P") {
 							// 預約單
+							$scope.inputVO.entrustType = "2";	// 市價
 							$scope.entrustDisabled = false;
 						}
 						

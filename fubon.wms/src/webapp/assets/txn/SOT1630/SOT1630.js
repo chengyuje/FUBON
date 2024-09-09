@@ -248,6 +248,7 @@ eSoafApp.controller('SOT1630Controller',
 			$scope.inputVO.trustCurrC1 = '';                //信託幣別
 			$scope.inputVO.purchaseAmtC1 = undefined;       //信託金額 
 			$scope.inputVO.BaseAmtOfSPurchaseCurrC1 ='';    //最低申購金額幣別
+			$scope.inputVO.rdmUnitC1 = undefined; 	//單位數
 		}
 		
 		//清空子基金2商品資料
@@ -269,6 +270,7 @@ eSoafApp.controller('SOT1630Controller',
 			$scope.inputVO.trustCurrC2 = '';                //信託幣別
 			$scope.inputVO.purchaseAmtC2 = undefined;       //信託金額 
 			$scope.inputVO.BaseAmtOfSPurchaseCurrC2 ='';    //最低申購金額幣別
+			$scope.inputVO.rdmUnitC2 = undefined; 	//單位數
 		}
 		
 		//清空子基金3商品資料
@@ -290,6 +292,7 @@ eSoafApp.controller('SOT1630Controller',
 			$scope.inputVO.trustCurrC3 = '';                //信託幣別
 			$scope.inputVO.purchaseAmtC3 = undefined;       //信託金額 
 			$scope.inputVO.BaseAmtOfSPurchaseCurrC3 ='';    //最低申購金額幣別
+			$scope.inputVO.rdmUnitC3 = undefined; 	//單位數
 		}
 		
 		//清空子基金4商品資料
@@ -311,6 +314,7 @@ eSoafApp.controller('SOT1630Controller',
 			$scope.inputVO.trustCurrC4 = '';                //信託幣別
 			$scope.inputVO.purchaseAmtC4 = undefined;       //信託金額 
 			$scope.inputVO.BaseAmtOfSPurchaseCurrC4 ='';    //最低申購金額幣別
+			$scope.inputVO.rdmUnitC4 = undefined; 	//單位數
 		}
 		
 		//清空子基金5商品資料
@@ -332,6 +336,7 @@ eSoafApp.controller('SOT1630Controller',
 			$scope.inputVO.trustCurrC5 = '';                //信託幣別
 			$scope.inputVO.purchaseAmtC5 = undefined;       //信託金額 
 			$scope.inputVO.BaseAmtOfSPurchaseCurrC5 ='';    //最低申購金額幣別
+			$scope.inputVO.rdmUnitC5 = undefined; 	//單位數
 		}
 		
 		//按[清除]鍵   清除序號
@@ -583,26 +588,31 @@ eSoafApp.controller('SOT1630Controller',
 			$scope.inputVO.prodNameC1 = row.PROD_NAME_C1;			//商品名稱
 			$scope.inputVO.prodRiskLvC1 = row.PROD_RISK_LV_C1;
 			$scope.inputVO.purchaseAmtC1 = row.PURCHASE_AMT_C1;     //申購金額 
+			$scope.inputVO.rdmUnitC1 = row.RDM_UNIT_C1;     //單位數
 			
 			$scope.inputVO.prodIdC2 = row.PROD_ID_C2;
 			$scope.inputVO.prodNameC2 = row.PROD_NAME_C2;			//商品名稱
 			$scope.inputVO.prodRiskLvC2 = row.PROD_RISK_LV_C2;
 			$scope.inputVO.purchaseAmtC2 = row.PURCHASE_AMT_C2;     //申購金額 
+			$scope.inputVO.rdmUnitC2 = row.RDM_UNIT_C2;     //單位數
 			
 			$scope.inputVO.prodIdC3 = row.PROD_ID_C3;
 			$scope.inputVO.prodNameC3 = row.PROD_NAME_C3;			//商品名稱
 			$scope.inputVO.prodRiskLvC3 = row.PROD_RISK_LV_C3;
 			$scope.inputVO.purchaseAmtC3 = row.PURCHASE_AMT_C3;     //申購金額 
+			$scope.inputVO.rdmUnitC3 = row.RDM_UNIT_C3;     //單位數
 			
 			$scope.inputVO.prodIdC4 = row.PROD_ID_C4;
 			$scope.inputVO.prodNameC4 = row.PROD_NAME_C4;			//商品名稱
 			$scope.inputVO.prodRiskLvC4 = row.PROD_RISK_LV_C4;
 			$scope.inputVO.purchaseAmtC4 = row.PURCHASE_AMT_C4;     //申購金額 
+			$scope.inputVO.rdmUnitC4 = row.RDM_UNIT_C4;     //單位數
 			
 			$scope.inputVO.prodIdC5 = row.PROD_ID_C5;
 			$scope.inputVO.prodNameC5 = row.PROD_NAME_C5;			//商品名稱
 			$scope.inputVO.prodRiskLvC5 = row.PROD_RISK_LV_C5;
 			$scope.inputVO.purchaseAmtC5 = row.PURCHASE_AMT_C5;     //申購金額 
+			$scope.inputVO.rdmUnitC5 = row.RDM_UNIT_C5;     //單位數
 			
 			$scope.inputVO.transDate = row.TRANSFER_DATE;
 			$scope.inputVO.engagedROI1 = row.ENGAGED_ROI1;
@@ -950,33 +960,39 @@ eSoafApp.controller('SOT1630Controller',
 			//取得母基金商品資料
 			$scope.getProdDTL("M", "");
 			//子基金
+			debugger
 			if(data.prodC1) {
 				$scope.inputVO.prodIdC1 = data.prodC1.FundNO; 
 				$scope.inputVO.purchaseAmtC1 = data.prodC1.CurAmt; //信託金額
+				$scope.inputVO.rdmUnitC1 = Number(data.prodC1.CurUntNum).toFixed(4); //原單位數
 				//取得子基金商品資料
 				$scope.getProdDTL("C", "1");
 			}
 			if(data.prodC2) {
 				$scope.inputVO.prodIdC2 = data.prodC2.FundNO;
 				$scope.inputVO.purchaseAmtC2 = data.prodC2.CurAmt; //信託金額
+				$scope.inputVO.rdmUnitC2 = Number(data.prodC2.CurUntNum).toFixed(4); //原單位數
 				//取得子基金商品資料
 				$scope.getProdDTL("C", "2");
 			}
 			if(data.prodC3) {
 				$scope.inputVO.prodIdC3 = data.prodC3.FundNO; 
 				$scope.inputVO.purchaseAmtC3 = data.prodC3.CurAmt; //信託金額
+				$scope.inputVO.rdmUnitC3 = Number(data.prodC3.CurUntNum).toFixed(4); //原單位數
 				//取得子基金商品資料
 				$scope.getProdDTL("C", "3");
 			}
 			if(data.prodC4) {
 				$scope.inputVO.prodIdC4 = data.prodC4.FundNO; 
 				$scope.inputVO.purchaseAmtC4 = data.prodC4.CurAmt; //信託金額
+				$scope.inputVO.rdmUnitC4 = Number(data.prodC4.CurUntNum).toFixed(4); //原單位數
 				//取得子基金商品資料
 				$scope.getProdDTL("C", "4");
 			}
 			if(data.prodC5) {
 				$scope.inputVO.prodIdC5 = data.prodC5.FundNO; 
 				$scope.inputVO.purchaseAmtC5 = data.prodC5.CurAmt; //信託金額
+				$scope.inputVO.rdmUnitC5 = Number(data.prodC5.CurUntNum).toFixed(4); //原單位數
 				//取得子基金商品資料
 				$scope.getProdDTL("C", "5");
 			}

@@ -171,8 +171,9 @@ eSoafApp.controller('SOT311Controller',
 							$scope.inputVO.trustAcct = tota[0].body.carList[0].TRUST_ACCT;						//信託帳號
 							$scope.inputVO.creditAcct = tota[0].body.carList[0].CREDIT_ACCT;					//收益入帳帳號
 							
-							$scope.inputVO.gtcYN = tota[0].body.carList[0].GTC_YN;								//當日單N, 長效單Y
-							$scope.inputVO.gtcEndDate = $scope.toJsDate(tota[0].body.carList[0].GTC_END_DATE);	//長效單迄日
+							$scope.inputVO.gtcYN = tota[0].body.carList[0].GTC_YN;									//當日單N, 長效單Y, 預約單P
+							$scope.inputVO.gtcStartDate = $scope.toJsDate(tota[0].body.carList[0].GTC_START_DATE);	//長效單起日
+							$scope.inputVO.gtcEndDate = $scope.toJsDate(tota[0].body.carList[0].GTC_END_DATE);		//長效單迄日
 							
 							$scope.inputVO.batchSeq = tota[0].body.carList[0].BATCH_SEQ; 						//批號
 							

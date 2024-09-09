@@ -697,7 +697,6 @@ public class SOT703Dyna extends SOT703 {
 		esbUtilInputVO.setNfbrn2InputVO(txBodyVO);
 		txBodyVO.setEFF_DATE(this.toChineseYearMMdd((Timestamp) dynaData.get("TRADE_DATE")));
 		txBodyVO.setTRADE_DATE(cbsservice.toChineseYearMMdd(cbsservice.getCBSTestDate())); //FOR CBS測試日期修改
-		txBodyVO.setBATCH_SEQ(ObjectUtils.toString(dynaData.get("BATCH_SEQ")));
 		txBodyVO.setCUST_ID(ObjectUtils.toString(dynaData.get("CUST_ID")));
 	
 		String branchNbr = ObjectUtils.toString(dynaData.get("BRANCH_NBR"));
@@ -736,6 +735,7 @@ public class SOT703Dyna extends SOT703 {
 		txBodyVO.setTRANSFER_TYPE_1("1"); //動態鎖利轉換都是全部轉換
 		if(StringUtils.equals("1", ObjectUtils.toString(dynaData.get("TRANSFER_TYPE")))) {
 			//母基金轉換
+			txBodyVO.setBATCH_SEQ(ObjectUtils.toString(dynaData.get("BATCH_SEQ"))); //批號
 			txBodyVO.setOUT_PROD_ID_1(ObjectUtils.toString(dynaData.get("PROD_ID")));
 			txBodyVO.setIN_PROD_ID_1_1(ObjectUtils.toString(dynaData.get("IN_PROD_ID")));
 			//全部轉換，轉出單位數=轉入單位數
@@ -752,6 +752,7 @@ public class SOT703Dyna extends SOT703 {
 			//每一檔子基金要轉回母基金都要發一次電文
 			for(int i = 1; i <= 5; i++) {
 				if(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("IN_PROD_C" + String.valueOf(i) + "_YN")))) {
+					txBodyVO.setBATCH_SEQ(ObjectUtils.toString(dynaData.get("BATCH_SEQ_C" + String.valueOf(i)))); //批號
 					txBodyVO.setOUT_PROD_ID_1(ObjectUtils.toString(dynaData.get("PROD_ID_C" + String.valueOf(i)))); //轉出子基金
 					txBodyVO.setIN_PROD_ID_1_1(ObjectUtils.toString(dynaData.get("PROD_ID"))); //轉入母基金
 					//全部轉換，轉出單位數=轉入單位數=轉出子基金單位數

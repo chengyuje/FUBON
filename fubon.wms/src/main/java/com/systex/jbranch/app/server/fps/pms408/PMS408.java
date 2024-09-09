@@ -419,8 +419,10 @@ public class PMS408 extends FubonWmsBizLogic {
 		}
 			
 		sql.append("FROM TBPMS_MONTHLY_KYC_RPT A ");
+		
 		sql.append("LEFT JOIN TBKYC_INVESTOREXAM_M_HIS B ON A.SEQ = B.SEQ ");
-		sql.append("LEFT JOIN TBPMS_EMPLOYEE_REC_N MEM ON MEM.EMP_ID = B.EMP_ID AND A.BRANCH_NBR = MEM.DEPT_ID AND A.CREATETIME BETWEEN MEM.START_TIME AND MEM.END_TIME ");
+		sql.append("LEFT JOIN TBPMS_SALES_AOCODE_REC AO ON B.AO_CODE = AO.AO_CODE AND A.CREATETIME BETWEEN AO.START_TIME AND AO.END_TIME ");
+		sql.append("LEFT JOIN TBPMS_EMPLOYEE_REC_N EMP ON AO.EMP_ID = EMP.EMP_ID AND A.BRANCH_NBR = EMP.DEPT_ID AND A.CREATETIME BETWEEN EMP.START_TIME AND EMP.END_TIME ");
 
 		sql.append("LEFT JOIN ARLIST ON A.BRANCH_NBR = ARLIST.BRANCH_NBR ");
 
@@ -434,7 +436,7 @@ public class PMS408 extends FubonWmsBizLogic {
 
 			default :
 				sql.append("LEFT JOIN TBKYC_COOLING_PERIOD COOL ON A.SEQ = COOL.SEQ ");
-				sql.append("LEFT JOIN TBPMS_EMPLOYEE_REC_N EMP ON B.CREATOR = EMP.EMP_ID AND LAST_DAY(TO_DATE(:yearmonand,'YYYYMM')) BETWEEN EMP.START_TIME AND EMP.END_TIME ");
+//				sql.append("LEFT JOIN TBPMS_EMPLOYEE_REC_N EMP ON B.CREATOR = EMP.EMP_ID AND LAST_DAY(TO_DATE(:yearmonand,'YYYYMM')) BETWEEN EMP.START_TIME AND EMP.END_TIME ");
 				sql.append("LEFT JOIN TBPMS_BRANCH_IP C ON B.INVEST_IP = C.IPADDRESS  AND C.COM_TYPE = '1' ");
 				sql.append("LEFT JOIN TBSYSPARAMETER PAR ON PAR.PARAM_TYPE = 'PMS.KYC_TYPE' AND PAR.PARAM_CODE = A.DATA_TYPE ");
 				
@@ -503,8 +505,8 @@ public class PMS408 extends FubonWmsBizLogic {
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {
 				sql.append("AND (");
-				sql.append("     EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE MEM.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :uhrmOP ) ");
-				sql.append("  OR MEM.E_DEPT_ID = :uhrmOP ");
+				sql.append("     EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE EMP.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :uhrmOP ) ");
+				sql.append("  OR EMP.E_DEPT_ID = :uhrmOP ");
 				sql.append(")");
 				condition.setObject("uhrmOP", inputVO.getUhrmOP());
 			}

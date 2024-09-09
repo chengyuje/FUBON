@@ -34,6 +34,11 @@ public class SOT1630InputVO extends SOT110InputVO {
 	private BigDecimal purchaseAmtC5; // 申購金額  
 	private String redeemType; // 贖回方式
 	private BigDecimal rdmUnit; // 原單位數
+	private BigDecimal rdmUnitC1; // 子基金原單位數1
+	private BigDecimal rdmUnitC2; // 子基金原單位數2
+	private BigDecimal rdmUnitC3; // 子基金原單位數3
+	private BigDecimal rdmUnitC4; // 子基金原單位數4
+	private BigDecimal rdmUnitC5; // 子基金原單位數5
 	private BigDecimal numUnits; // 贖回單位數
 	private BigDecimal presentVal; // 參考現值
 	private String certificateID; //憑證編號
@@ -182,6 +187,36 @@ public class SOT1630InputVO extends SOT110InputVO {
 	}
 	public void setRdmUnit(BigDecimal rdmUnit) {
 		this.rdmUnit = rdmUnit;
+	}
+	public BigDecimal getRdmUnitC1() {
+		return rdmUnitC1;
+	}
+	public void setRdmUnitC1(BigDecimal rdmUnitC1) {
+		this.rdmUnitC1 = rdmUnitC1;
+	}
+	public BigDecimal getRdmUnitC2() {
+		return rdmUnitC2;
+	}
+	public void setRdmUnitC2(BigDecimal rdmUnitC2) {
+		this.rdmUnitC2 = rdmUnitC2;
+	}
+	public BigDecimal getRdmUnitC3() {
+		return rdmUnitC3;
+	}
+	public void setRdmUnitC3(BigDecimal rdmUnitC3) {
+		this.rdmUnitC3 = rdmUnitC3;
+	}
+	public BigDecimal getRdmUnitC4() {
+		return rdmUnitC4;
+	}
+	public void setRdmUnitC4(BigDecimal rdmUnitC4) {
+		this.rdmUnitC4 = rdmUnitC4;
+	}
+	public BigDecimal getRdmUnitC5() {
+		return rdmUnitC5;
+	}
+	public void setRdmUnitC5(BigDecimal rdmUnitC5) {
+		this.rdmUnitC5 = rdmUnitC5;
 	}
 	public BigDecimal getNumUnits() {
 		return numUnits;

@@ -286,6 +286,11 @@ public class SOT1630 extends FubonWmsBizLogic {
 		dtlVO.setTRADE_DATE(new Timestamp(tradeDate.getTime())); //交易日期  Date
 		dtlVO.setCERTIFICATE_ID(inputVO.getCertificateID());
 		dtlVO.setRDM_UNIT(inputVO.getRdmUnit());
+		dtlVO.setRDM_UNIT_C1(inputVO.getRdmUnitC1());
+		dtlVO.setRDM_UNIT_C2(inputVO.getRdmUnitC2());
+		dtlVO.setRDM_UNIT_C3(inputVO.getRdmUnitC3());
+		dtlVO.setRDM_UNIT_C4(inputVO.getRdmUnitC4());
+		dtlVO.setRDM_UNIT_C5(inputVO.getRdmUnitC5());
 		dtlVO.setUNIT_NUM(inputVO.getNumUnits());
 		dtlVO.setREDEEM_TYPE(inputVO.getRedeemType());
 		dtlVO.setPRESENT_VAL(inputVO.getPresentVal());

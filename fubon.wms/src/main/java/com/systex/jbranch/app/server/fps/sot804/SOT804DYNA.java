@@ -12,6 +12,7 @@ import com.systex.jbranch.platform.common.report.generator.ReportGeneratorIF;
 import com.systex.jbranch.platform.common.report.reportdata.ReportData;
 import com.systex.jbranch.platform.common.report.reportdata.ReportDataIF;
 import com.systex.jbranch.platform.common.util.PlatformContext;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -78,6 +79,57 @@ public class SOT804DYNA extends SotPdf{
 		if(StringUtils.equals("1", data_map.get("REDEEM_TYPE").toString())) {
 			//全部贖回
 			data.addParameter("FUNC_CODE", "A");
+			//子基金1
+			if(StringUtils.isNotBlank(ObjectUtils.toString(data_map.get("PROD_ID_C1")))) {
+				data.addParameter("FUNC_CODE_C1", "A");
+				data.addParameter("CERTIFICATE_ID_C1", data_map.get("CERTIFICATE_ID").toString());
+				data.addParameter("PROD_ID_C1", (String)data_map.get("PROD_ID_C1") );
+				data.addParameter("PROD_NAME_C1", (String)data_map.get("PROD_NAME_C1"));
+				data.addParameter("TRUST_CURR_C1", data_map.get("TRUST_CURR").toString());
+				data.addParameter("AMT_TYPE_C1", "@");
+				data.addParameter("PURCHASE_AMT_C1", getBigDecimal(data_map.get("RDM_UNIT_C1")));
+			}
+			//子基金2
+			if(StringUtils.isNotBlank(ObjectUtils.toString(data_map.get("PROD_ID_C2")))) {
+				data.addParameter("FUNC_CODE_C2", "A");
+				data.addParameter("CERTIFICATE_ID_C2", data_map.get("CERTIFICATE_ID").toString());
+				data.addParameter("PROD_ID_C2", (String)data_map.get("PROD_ID_C2") );
+				data.addParameter("PROD_NAME_C2", (String)data_map.get("PROD_NAME_C2"));
+				data.addParameter("TRUST_CURR_C2", data_map.get("TRUST_CURR").toString());
+				data.addParameter("AMT_TYPE_C2", "@");
+				data.addParameter("PURCHASE_AMT_C2", getBigDecimal(data_map.get("RDM_UNIT_C2")));
+			}
+			//子基金3
+			if(StringUtils.isNotBlank(ObjectUtils.toString(data_map.get("PROD_ID_C3")))) {
+				data.addParameter("FUNC_CODE_C3", "A");
+				data.addParameter("CERTIFICATE_ID_C3", data_map.get("CERTIFICATE_ID").toString());
+				data.addParameter("PROD_ID_C3", (String)data_map.get("PROD_ID_C3") );
+				data.addParameter("PROD_NAME_C3", (String)data_map.get("PROD_NAME_C3"));
+				data.addParameter("TRUST_CURR_C3", data_map.get("TRUST_CURR").toString());
+				data.addParameter("AMT_TYPE_C3", "@");
+				data.addParameter("PURCHASE_AMT_C3", getBigDecimal(data_map.get("RDM_UNIT_C3")));
+			}
+			//子基金4
+			if(StringUtils.isNotBlank(ObjectUtils.toString(data_map.get("PROD_ID_C4")))) {
+				data.addParameter("FUNC_CODE_C4", "A");
+				data.addParameter("CERTIFICATE_ID_C4", data_map.get("CERTIFICATE_ID").toString());
+				data.addParameter("PROD_ID_C4", (String)data_map.get("PROD_ID_C4") );
+				data.addParameter("PROD_NAME_C4", (String)data_map.get("PROD_NAME_C4"));
+				data.addParameter("TRUST_CURR_C4", data_map.get("TRUST_CURR").toString());
+				data.addParameter("AMT_TYPE_C4", "@");
+				data.addParameter("PURCHASE_AMT_C4", getBigDecimal(data_map.get("RDM_UNIT_C4")));
+			}
+			//子基金5
+			if(StringUtils.isNotBlank(ObjectUtils.toString(data_map.get("PROD_ID_C5")))) {
+				data.addParameter("FUNC_CODE_C5", "A");
+				data.addParameter("CERTIFICATE_ID_C5", data_map.get("CERTIFICATE_ID").toString());
+				data.addParameter("PROD_ID_C5", (String)data_map.get("PROD_ID_C5") );
+				data.addParameter("PROD_NAME_C5", (String)data_map.get("PROD_NAME_C5"));
+				data.addParameter("TRUST_CURR_C5", data_map.get("TRUST_CURR").toString());
+				data.addParameter("AMT_TYPE_C5", "@");
+				data.addParameter("PURCHASE_AMT_C5", getBigDecimal(data_map.get("RDM_UNIT_C5")));
+			}
+			
 		} else {
 			//部分贖回
 			data.addParameter("FUNC_CODE", "B");

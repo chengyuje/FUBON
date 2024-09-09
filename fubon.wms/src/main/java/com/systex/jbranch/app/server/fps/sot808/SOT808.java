@@ -236,6 +236,7 @@ public class SOT808 extends SotPdf {
 								buyTradeDate = gtcStartDate;
 							}
 							data_map.put("BUY_TRADE_DATE", buyTradeDate);
+							data_map.put("SELL_TRADE_DATE", "");
 
 							data.addRecordList("BUY", list);
 						} else if (tradeSubTypeToString.equals("2")) {
@@ -285,6 +286,7 @@ public class SOT808 extends SotPdf {
 								// 預約單
 								sellTradeDate = gtcStartDate;
 							}
+							data_map.put("BUY_TRADE_DATE", "");
 							data_map.put("SELL_TRADE_DATE", sellTradeDate);
 							
 							//贖回面額
