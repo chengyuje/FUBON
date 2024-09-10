@@ -389,12 +389,15 @@ public class SOT710 extends EsbUtil {
 		sot710OutputVO = new SOT710OutputVO();
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("SELECT B.*, E.DEPT_ID, H.AUTH_DATE, H.AUTH_EMP_ID ");
-		sb.append(" FROM TBCRM_BRG_APPLY_PERIOD B ");
-		sb.append("   LEFT OUTER JOIN TBORG_MEMBER E ON E.EMP_ID = B.CREATOR ");
-		sb.append("   LEFT OUTER JOIN TBCRM_BRG_APPROVAL_HISTORY H ON H.APPLY_SEQ = B.APPLY_SEQ ");
-		sb.append("        AND H.APPROVAL_SEQ = (SELECT MAX(APPROVAL_SEQ) FROM TBCRM_BRG_APPROVAL_HISTORY WHERE APPLY_SEQ = :applySeq) ");
-		sb.append(" WHERE B.APPLY_SEQ = :applySeq ");
+		sb.append("SELECT B.*, ");
+		sb.append("       CASE WHEN UB.EMP_ID IS NOT NULL THEN UB.BRANCH_NBR ELSE E.DEPT_ID END AS DEPT_ID, ");
+		sb.append("       H.AUTH_DATE, ");
+		sb.append("       H.AUTH_EMP_ID ");
+		sb.append("FROM TBCRM_BRG_APPLY_PERIOD B ");
+		sb.append("LEFT OUTER JOIN TBORG_MEMBER E ON E.EMP_ID = B.CREATOR ");
+		sb.append("LEFT OUTER JOIN TBORG_UHRM_BRH UB ON E.EMP_ID = UB.EMP_ID ");
+		sb.append("LEFT OUTER JOIN TBCRM_BRG_APPROVAL_HISTORY H ON H.APPLY_SEQ = B.APPLY_SEQ AND H.APPROVAL_SEQ = (SELECT MAX(APPROVAL_SEQ) FROM TBCRM_BRG_APPROVAL_HISTORY WHERE APPLY_SEQ = :applySeq) ");
+		sb.append("WHERE B.APPLY_SEQ = :applySeq ");
 		queryCondition.setObject("applySeq", sot710InputVO.getApplySEQ());
 		queryCondition.setQueryString(sb.toString());
 
@@ -426,25 +429,7 @@ public class SOT710 extends EsbUtil {
 			// 20190617/mantis:6592/WMS-CR-20181113-01_個人高端客群處「業管系統_第一階段需求調整申請」_P5/modify by ocean/若組織為031，則帶715
 			// 20200325/mantis:0561/WMS-CR-20210311-01_因應銀證組織調整商品議價及人員證照查詢功能/modify by ocean/若組織為175，則帶715
 			String branchNbr = (String) list.get(0).get("DEPT_ID");
-			if (uhrmMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-				sb = new StringBuffer();
-				
-				sb.append("SELECT BRANCH_NBR ");
-				sb.append("FROM TBORG_UHRM_BRH ");
-				sb.append("WHERE EMP_ID = :loginID ");
-
-				queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
-				queryCondition.setQueryString(sb.toString());
-
-				List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
-				
-				if (loginBreach.size() > 0) {
-					branchNbr = (String) loginBreach.get(0).get("BRANCH_NBR");
-				} else {
-					throw new APException("人員無有效分行"); //顯示錯誤訊息
-				}
-			} else if (StringUtils.equals(branchNbr, branchChgMap.get("BS").toString())) {
+			if (StringUtils.equals(branchNbr, branchChgMap.get("BS").toString())) {
 				branchNbr = branchChgMap.get("DEFAULT").toString();
 			}
 			nrbrvc1InputVO.setBRANCH_NBR(branchNbr);
@@ -452,7 +437,7 @@ public class SOT710 extends EsbUtil {
 			nrbrvc1InputVO.setAUTH_EMP_ID((null != list.get(0).get("AUTH_EMP_ID") ? (String) list.get(0).get("AUTH_EMP_ID") : (((String) list.get(0).get("APPLE_SETUP_TYPE")).equals("9") ? (String) list.get(0).get("CREATOR") : null)));
 			nrbrvc1InputVO.setAUTH_DATE((null != list.get(0).get("AUTH_DATE") ? sdfYYYYMMDD.format((Timestamp) list.get(0).get("AUTH_DATE")) : (StringUtils.equals(list.get(0).get("HIGHEST_AUTH_LV").toString(), "0") ? this.toChineseYearMMdd(lastupdate) : null)));
 			nrbrvc1InputVO.setAUTH_TIME((null != list.get(0).get("AUTH_DATE") ? sdfHHMMSS.format((Timestamp) list.get(0).get("AUTH_DATE")) : (StringUtils.equals(list.get(0).get("HIGHEST_AUTH_LV").toString(), "0") ? lastupdate_time : null)));
-			;
+
 			nrbrvc1InputVO.setBRG_BEGIN_DATE((null != list.get(0).get("BRG_BEGIN_DATE") ? sdfYYYYMMDD.format((Timestamp) list.get(0).get("BRG_BEGIN_DATE")) : null));
 			nrbrvc1InputVO.setBRG_END_DATE((null != list.get(0).get("BRG_END_DATE") ? sdfYYYYMMDD.format((Timestamp) list.get(0).get("BRG_END_DATE")) : null));
 			nrbrvc1InputVO.setBRG_REASON((String) list.get(0).get("BRG_REASON"));

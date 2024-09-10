@@ -1895,8 +1895,9 @@ public class SOT712 extends FubonWmsBizLogic{
 				url_list.addAll(getPdfULst(inputVO, "sot814dyna"));
 			} else if(inputVO.getCaseCode() == 1) {
 				//動態鎖利下單
-				if (inputVO.getTradeType() == 1 || inputVO.getTradeType() == 5 || (inputVO.getTradeType() == 4 && StringUtils.isNotBlank(inputVO.getBatchSeq()))) {
-					//申購或母基金加碼或事件變更有增加子基金時
+				if (inputVO.getTradeType() == 1 || inputVO.getTradeType() == 5 || inputVO.getTradeType() == 3 
+						|| (inputVO.getTradeType() == 4 && StringUtils.isNotBlank(inputVO.getBatchSeq()))) {
+					//申購或母基金加碼或轉換或事件變更有增加子基金時
 					url_list.addAll(getPdfULst(inputVO, "sot814dyna"));
 				}
 			}

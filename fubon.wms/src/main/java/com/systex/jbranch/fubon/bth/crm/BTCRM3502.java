@@ -513,7 +513,7 @@ public class BTCRM3502 extends BizLogic {
 		sql.append("    WHERE PRIVILEGEID = 'UHRM012' ");
 		sql.append("  ) UHRM_BOSS ON UHRM.DEPT_ID = UHRM_BOSS.DEPT_ID "); // --高端主管
 		sql.append("  WHERE 1 = 1 ");
-		sql.append("  AND BASE.EMP_NAME IS NOT NULL ");
+		sql.append("  AND (BASE.EMP_NAME IS NOT NULL OR UHRM_BOSS.EMP_NAME IS NULL) ");
 		sql.append("  AND ((CHG_DATE IS NULL AND TRUNC(LETGO_DATETIME) BETWEEN TRUNC(CURRENT_DATE, 'D')-7 AND TRUNC (CURRENT_DATE, 'D')-1) OR (TRUNC(CHG_DATE) BETWEEN TRUNC(CURRENT_DATE, 'D')-7 AND TRUNC (CURRENT_DATE, 'D')-1)) ");
 		sql.append("  AND NOTE.DEATH_YN <> 'Y' "); // --排除死亡戶
 		sql.append("  ORDER BY L.LETGO_DATETIME ASC ");
@@ -591,7 +591,8 @@ public class BTCRM3502 extends BizLogic {
 		sql.append("      WHERE PRIVILEGEID = 'UHRM012' ");
 		sql.append("    ) UHRM_BOSS ON UHRM.DEPT_ID = UHRM_BOSS.DEPT_ID "); // --高端主管
 		sql.append("    WHERE 1 = 1 ");
-		sql.append("    AND (BASE.EMP_NAME IS NULL OR UHRM_BOSS.EMP_NAME IS NULL) ");
+		sql.append("    AND BASE.EMP_NAME IS NULL ");
+		sql.append("    AND UHRM_BOSS.EMP_NAME IS NULL ");
 		sql.append("    AND ((CHG_DATE IS NULL AND TRUNC(LETGO_DATETIME) BETWEEN TRUNC(CURRENT_DATE, 'D')-7 AND TRUNC (CURRENT_DATE, 'D')-1) OR ( TRUNC(CHG_DATE) BETWEEN TRUNC(CURRENT_DATE, 'D')-7 AND TRUNC (CURRENT_DATE, 'D')-1)) ");
 		sql.append("    AND NOTE.DEATH_YN <> 'Y' "); // --排除死亡戶
 		sql.append("    ORDER BY L.LETGO_DATETIME ASC ");

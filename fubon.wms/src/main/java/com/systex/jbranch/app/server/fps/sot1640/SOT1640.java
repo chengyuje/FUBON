@@ -27,8 +27,6 @@ import com.systex.jbranch.app.server.fps.sot701.CustHighNetWorthDataVO;
 import com.systex.jbranch.app.server.fps.sot703.SOT703Dyna;
 import com.systex.jbranch.app.server.fps.sot703.SOT703InputVO;
 import com.systex.jbranch.app.server.fps.sot703.SOT703OutputVO;
-import com.systex.jbranch.app.server.fps.sot712.SOT712;
-import com.systex.jbranch.app.server.fps.sot712.SOT712InputVO;
 import com.systex.jbranch.app.server.fps.sot714.SOT714;
 import com.systex.jbranch.app.server.fps.sot714.SOT714InputVO;
 import com.systex.jbranch.app.server.fps.sot714.WMSHAIADataVO;
@@ -411,9 +409,34 @@ public class SOT1640 extends FubonWmsBizLogic {
 		}
 
 		//檢核電文
-		inputVO.setConfirm("1"); 
-		String errMsg = dynamicESBValidate(inputVO);
+		String errMsg = "";
+		try {
+			inputVO.setConfirm("1"); 
+			errMsg = dynamicESBValidate(inputVO);
+		} catch(Exception e) {
+			errMsg = e.toString();
+		}
 		outputVO.setErrorMsg(errMsg);
+		
+		//有錯誤，刪除資料
+		if (StringUtils.isNotBlank(errMsg)) {
+			TBSOT_NF_TRANSFER_DYNAPK errPK = new TBSOT_NF_TRANSFER_DYNAPK();
+			errPK.setTRADE_SEQ(inputVO.getTradeSEQ());
+			errPK.setSEQ_NO(new BigDecimal(1));
+			TBSOT_NF_TRANSFER_DYNAVO errVO = new TBSOT_NF_TRANSFER_DYNAVO();
+			errVO.setcomp_id(errPK);
+			errVO = (TBSOT_NF_TRANSFER_DYNAVO) dam.findByPKey(TBSOT_NF_TRANSFER_DYNAVO.TABLE_UID, errVO.getcomp_id());
+
+			//刪除明細
+			if (null != errVO) {
+				dam.delete(errVO);
+			}
+
+			//===主檔也刪除
+			TBSOT_TRADE_MAINVO mVO = new TBSOT_TRADE_MAINVO();
+			mVO = (TBSOT_TRADE_MAINVO) dam.findByPKey(TBSOT_TRADE_MAINVO.TABLE_UID, inputVO.getTradeSEQ());
+			dam.delete(mVO);
+		}
 		
 		this.sendRtnObject(outputVO);
 	}

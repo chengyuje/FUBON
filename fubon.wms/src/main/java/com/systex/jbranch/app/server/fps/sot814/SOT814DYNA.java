@@ -58,15 +58,15 @@ public class SOT814DYNA extends SotPdf {
 				urlList.addAll(genReport_FIT(inputVO, "C", inputVO.getPrdIdC3(), true));
 			}
 		} else { //下單
-			if(inputVO.getTradeType() == 1 || inputVO.getTradeType() == 5) { 
+			if(inputVO.getTradeType() == 1 || inputVO.getTradeType() == 5 || inputVO.getTradeType() == 3) { 
 				//母基金通路報酬
-				//單筆申購或母基金加碼
+				//單筆申購或母基金加碼或轉換
 				urlList.addAll(genReportM(inputVO));
 			}
 			//子基金通路報酬
 			//單筆申購 & 事件變更有新增子基金
 			//母基金加碼沒有子基金，不需子基金通路報酬
-			if(inputVO.getTradeType() != 5) {
+			if(inputVO.getTradeType() == 1 || inputVO.getTradeType() == 4) {
 				urlList.addAll(genReportC(inputVO));
 			}
 		}
@@ -89,13 +89,19 @@ public class SOT814DYNA extends SotPdf {
 		ReportFactory factory = new ReportFactory();
 		ReportDataIF data = new ReportData();
 		ReportGeneratorIF gen = factory.getGenerator(); // 產出pdf
-		String tableName = (inputVO.getTradeType() == 1 ? "TBSOT_NF_PURCHASE_DYNA" : "TBSOT_NF_RAISE_AMT_DYNA"); //表格名稱
+		String tableName = (inputVO.getTradeType() == 3 ? "TBSOT_NF_TRANSFER_DYNA" : (inputVO.getTradeType() == 5 ? "TBSOT_NF_RAISE_AMT_DYNA" : "TBSOT_NF_PURCHASE_DYNA")); //表格名稱
+		
+		String prodIdPrefix = "";
+		if(inputVO.getTradeType() == 3) {
+			prodIdPrefix = getTransferPrefix(inputVO.getTradeSeq());
+		}
 		
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
 		//case1下單:申購母基金
-		sql.append("SELECT  M.CUST_ID, M.CUST_NAME, D.PROD_ID, D.PROD_NAME, D.PROD_CURR, F.*, N.WARNING, N.IS_BACKEND, ");
+		sql.append("SELECT  M.CUST_ID, M.CUST_NAME, F.*, N.WARNING, N.IS_BACKEND, ");
+		sql.append("	D." + prodIdPrefix + "PROD_ID AS PROD_ID, D." + prodIdPrefix + "PROD_NAME AS PROD_NAME, D." + prodIdPrefix + "PROD_CURR AS PROD_CURR, ");
 		sql.append(" 		CASE WHEN PARAM.PARAM_NAME IS NULL THEN N.TRUST_COM  ");
 		sql.append("			 WHEN SUBSTR(TRIM(N.TRUST_COM),-2,2) IN ('投信','投顧') ");
 		sql.append("			 THEN SUBSTR(TRIM(N.TRUST_COM), 1, LENGTH(TRIM(N.TRUST_COM))-2) || PARAM.PARAM_NAME ");
@@ -105,9 +111,9 @@ public class SOT814DYNA extends SotPdf {
 		sql.append(" 		WHEN PARAM.PARAM_NAME = '境外基金機構' THEN 'FRN' END AS TRUST_COM_TYPE ");
 		sql.append(" FROM " + tableName + " D ");
 		sql.append(" INNER JOIN TBSOT_TRADE_MAIN M on M.TRADE_SEQ = D.TRADE_SEQ ");
-		sql.append(" LEFT JOIN TBPRD_FUND_BONUSINFO F on F.PRD_ID = D.PROD_ID ");
-		sql.append(" LEFT JOIN TBPRD_FUND N on N.PRD_ID = D.PROD_ID ");
-		sql.append(" LEFT JOIN TBSYSPARAMETER PARAM on SUBSTR(D.PROD_ID,0,2) = PARAM.PARAM_CODE AND PARAM.PARAM_TYPE = 'PRD.FUND_COMPANY_TYPE' ");
+		sql.append(" LEFT JOIN TBPRD_FUND_BONUSINFO F on F.PRD_ID = D." + prodIdPrefix + "PROD_ID ");
+		sql.append(" LEFT JOIN TBPRD_FUND N on N.PRD_ID = D." + prodIdPrefix + "PROD_ID ");
+		sql.append(" LEFT JOIN TBSYSPARAMETER PARAM on SUBSTR(D." + prodIdPrefix + "PROD_ID,0,2) = PARAM.PARAM_CODE AND PARAM.PARAM_TYPE = 'PRD.FUND_COMPANY_TYPE' ");
 		sql.append(" WHERE D.TRADE_SEQ = :tradeSeq ");
 		queryCondition.setObject("tradeSeq",inputVO.getTradeSeq());
 		queryCondition.setQueryString(sql.toString());
@@ -152,7 +158,7 @@ public class SOT814DYNA extends SotPdf {
 		sql_fee.append(" LEFT JOIN TBPRD_FUND C on C.PRD_ID = A.PRD_ID ");
 		sql_fee.append(" LEFT JOIN TBPRD_NFS062_SG D on D.S6201 = A.PRD_ID ");
 		sql_fee.append(" WHERE A.PRD_ID IN (select S6201 from TBPRD_NFS062_SG where S6202 in (select S6202 from TBPRD_NFS062_SG where S6201 in ");
-		sql_fee.append("	 (SELECT PROD_ID FROM TBSOT_NF_PURCHASE_DYNA WHERE TRADE_SEQ = :tradeSeq))) ");
+		sql_fee.append("	 (SELECT " + prodIdPrefix + "PROD_ID FROM " + tableName + " WHERE TRADE_SEQ = :tradeSeq))) ");
 		sql_fee.append(" AND C.IS_SALE = 1 ");
 		sql_fee.append(" ORDER BY D.S6202, A.PRD_ID ");
 		queryCondition.setObject("tradeSeq", inputVO.getTradeSeq());
@@ -410,11 +416,10 @@ public class SOT814DYNA extends SotPdf {
 		sql_fee.append(" FROM TBPRD_FUND_BONUSINFO_RATES A ");
 		sql_fee.append(" LEFT JOIN TBPRD_FUND C on C.PRD_ID = A.PRD_ID ");
 		sql_fee.append(" LEFT JOIN TBPRD_NFS062_SG D on D.S6201 = A.PRD_ID ");
-		sql_fee.append(" WHERE A.PRD_ID IN (select S6201 from TBPRD_NFS062_SG where S6202 in (select S6202 from TBPRD_NFS062_SG where S6201 in ");
-		sql_fee.append("	 (SELECT PROD_ID FROM TBSOT_NF_PURCHASE_DYNA WHERE TRADE_SEQ = :tradeSeq))) ");
+		sql_fee.append(" WHERE A.PRD_ID IN (select S6201 from TBPRD_NFS062_SG where S6202 in (select S6202 from TBPRD_NFS062_SG where S6201 = :prodId)) ");
 		sql_fee.append(" AND C.IS_SALE = 1 ");
 		sql_fee.append(" ORDER BY D.S6202, A.PRD_ID ");
-		queryCondition.setObject("tradeSeq", inputVO.getTradeSeq());
+		queryCondition.setObject("prodId", prodId);
 		queryCondition.setQueryString(sql_fee.toString());
 		List<Map<String, Object>> feeList = dam.exeQuery(queryCondition);
 		
@@ -452,4 +457,26 @@ public class SOT814DYNA extends SotPdf {
 		
 		return urlList;
 	}
+	
+	/***
+	 * 轉換：母基金轉換，則取IN_PROD_ID
+	 * 其他都是PROD_ID
+	 * @param tradeSeq
+	 * @return
+	 * @throws DAOException
+	 * @throws JBranchException
+	 */
+	private String getTransferPrefix(String tradeSeq) throws DAOException, JBranchException {
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sql = new StringBuffer();
+		sql.append("SELECT TRANSFER_TYPE FROM TBSOT_NF_TRANSFER_DYNA ");
+		sql.append(" WHERE TRADE_SEQ = :tradeSeq ");
+		queryCondition.setObject("tradeSeq", tradeSeq);
+		queryCondition.setQueryString(sql.toString());
+		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+		
+		return CollectionUtils.isEmpty(list) ? "" : StringUtils.equals("1", list.get(0).get("TRANSFER_TYPE").toString()) ? "IN_" : "";
+	}
+	
 }

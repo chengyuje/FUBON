@@ -386,10 +386,35 @@ public class SOT1650 extends FubonWmsBizLogic {
 		}
 
 		//檢核電文
-		inputVO.setConfirm("1"); 
-		String errMsg = dynamicESBValidate(inputVO);
+		String errMsg = "";
+		try {
+			inputVO.setConfirm("1"); 
+			errMsg = dynamicESBValidate(inputVO);
+		} catch(Exception e) {
+			errMsg = e.toString();
+		}
 		outputVO.setErrorMsg(errMsg);
 		
+		//有錯誤，刪除資料
+		if (StringUtils.isNotBlank(errMsg)) {
+			TBSOT_NF_CHANGE_DYNAPK errPK = new TBSOT_NF_CHANGE_DYNAPK();
+			errPK.setTRADE_SEQ(inputVO.getTradeSEQ());
+			errPK.setSEQ_NO(new BigDecimal(1));
+			TBSOT_NF_CHANGE_DYNAVO errVO = new TBSOT_NF_CHANGE_DYNAVO();
+			errVO.setcomp_id(errPK);
+			errVO = (TBSOT_NF_CHANGE_DYNAVO) dam.findByPKey(TBSOT_NF_CHANGE_DYNAVO.TABLE_UID, errVO.getcomp_id());
+
+			//刪除明細
+			if (null != errVO) {
+				dam.delete(errVO);
+			}
+
+			//===主檔也刪除
+			TBSOT_TRADE_MAINVO mVO = new TBSOT_TRADE_MAINVO();
+			mVO = (TBSOT_TRADE_MAINVO) dam.findByPKey(TBSOT_TRADE_MAINVO.TABLE_UID, inputVO.getTradeSEQ());
+			dam.delete(mVO);
+		}
+				
 		this.sendRtnObject(outputVO);
 	}
 	
