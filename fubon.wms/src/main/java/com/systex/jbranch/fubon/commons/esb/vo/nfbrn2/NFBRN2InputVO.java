@@ -93,7 +93,8 @@ public class NFBRN2InputVO {
 	private String IN_UNIT_2_3;				//轉入單位數3
     @XmlElement
 	private String IN_PROD_RISK_LV_2_3;		//轉入基金3 風險等級
-    
+    @XmlElement
+	private String RECSEQ;					//錄音序號
     
 	public String getTRADE_DATE() {
 		return TRADE_DATE;
@@ -340,5 +341,11 @@ public class NFBRN2InputVO {
 	}
 	public void setIN_PROD_RISK_LV_2_3(String in_prod_risk_lv_2_3) {
 		IN_PROD_RISK_LV_2_3 = in_prod_risk_lv_2_3;
+	}
+	public String getRECSEQ() {
+		return RECSEQ;
+	}
+	public void setRECSEQ(String rECSEQ) {
+		RECSEQ = rECSEQ;
 	}
 }

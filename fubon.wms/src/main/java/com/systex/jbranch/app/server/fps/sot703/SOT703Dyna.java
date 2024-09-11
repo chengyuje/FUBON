@@ -732,6 +732,7 @@ public class SOT703Dyna extends SOT703 {
 		txBodyVO.setPROSPECTUS_TYPE(ObjectUtils.toString(dynaData.get("PROSPECTUS_TYPE")));
 		txBodyVO.setCERTIFICATE_ID_1(ObjectUtils.toString(dynaData.get("CERTIFICATE_ID")));
 		txBodyVO.setTRUST_ACCT_1(ObjectUtils.toString(dynaData.get("TRUST_ACCT")));
+		txBodyVO.setRECSEQ(ObjectUtils.toString(dynaData.get("REC_SEQ")));
 		txBodyVO.setTRANSFER_TYPE_1("1"); //動態鎖利轉換都是全部轉換
 		if(StringUtils.equals("1", ObjectUtils.toString(dynaData.get("TRANSFER_TYPE")))) {
 			//母基金轉換
@@ -803,7 +804,7 @@ public class SOT703Dyna extends SOT703 {
 		dam = getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		
-		sb.append("select M.CUST_ID, M.IS_OBU, M.BRANCH_NBR, M.TRUST_TRADE_TYPE, M.TRADE_TYPE, M.FLAG_NUMBER, D.* ");
+		sb.append("select M.CUST_ID, M.IS_OBU, M.BRANCH_NBR, M.TRUST_TRADE_TYPE, M.TRADE_TYPE, M.FLAG_NUMBER, M.REC_SEQ, D.* ");
 		sb.append(" from TBSOT_TRADE_MAIN M ");
 		sb.append(" inner join TBSOT_NF_TRANSFER_DYNA D on D.TRADE_SEQ = M.TRADE_SEQ ");
 		sb.append(" where M.TRADE_SEQ = :TRADE_SEQ ");

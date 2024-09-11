@@ -1698,10 +1698,10 @@ public class SOT712 extends FubonWmsBizLogic{
 							&& 1 == inputVO.getTradeSubType() && "Y".equals(inputVO.getIsPrintSOT819())) {
 						url_list.addAll(getPdfULst(inputVO, "sot819"));		
 						printRptIdList.add("SOT819");
-					} else if (StringUtils.equals(inputVO.getPrdType(), "8") && 1 == inputVO.getTradeType() 
+					} else if (StringUtils.equals(inputVO.getPrdType(), "8") && (1 == inputVO.getTradeType() || 5 == inputVO.getTradeType())
 							&& !(cbsService.getCBSIDCode(inputVO.getCustId()).matches("21|22|23|29|31|32|39"))
 							&& "Y".equals(inputVO.getIsPrintSOT819())) {
-						//動態鎖利
+						//動態鎖利申購或母基金加碼
 						url_list.addAll(getPdfULst(inputVO, "sot819"));
 						printRptIdList.add("SOT819");
 					}

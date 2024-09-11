@@ -978,7 +978,6 @@ eSoafApp.controller('SOT310Controller',
 							
 						} else if($scope.inputVO.gtcYN == "P") {
 							// 預約單
-							$scope.inputVO.entrustType = "2";	// 市價
 							$scope.entrustDisabled = false;
 						}
 						
@@ -1672,6 +1671,9 @@ eSoafApp.controller('SOT310Controller',
 			} else if ($scope.inputVO.gtcYN == "P") {
 				// 預約單
 				$scope.inputVO.gtcEndDate = $scope.inputVO.gtcStartDate;
+				
+				// 預約單：『委託價格』enable 及default為"市價"，價格可約定指定交易日當日市價或買進限價
+				$scope.inputVO.entrustType = "2";	// 市價
 			}
 			$scope.limitDate();
 

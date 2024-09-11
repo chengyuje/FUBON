@@ -815,7 +815,7 @@ eSoafApp.controller('SOT1630Controller',
 					return;
 				}
 				
-				if($scope.inputVO.numUnits > $scope.inputVO.rdmUnit) {
+				if(Number($scope.inputVO.numUnits) > Number($scope.inputVO.rdmUnit)) {
 					$scope.showErrorMsg("贖回單位數不可大於原單位數");
 		    		return;
 				}

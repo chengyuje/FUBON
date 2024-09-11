@@ -27,6 +27,8 @@ import com.systex.jbranch.app.server.fps.sot701.CustHighNetWorthDataVO;
 import com.systex.jbranch.app.server.fps.sot703.SOT703Dyna;
 import com.systex.jbranch.app.server.fps.sot703.SOT703InputVO;
 import com.systex.jbranch.app.server.fps.sot703.SOT703OutputVO;
+import com.systex.jbranch.app.server.fps.sot712.SOT712;
+import com.systex.jbranch.app.server.fps.sot712.SOT712InputVO;
 import com.systex.jbranch.app.server.fps.sot714.SOT714;
 import com.systex.jbranch.app.server.fps.sot714.SOT714InputVO;
 import com.systex.jbranch.app.server.fps.sot714.WMSHAIADataVO;
@@ -240,7 +242,17 @@ public class SOT1640 extends FubonWmsBizLogic {
 			if (inputVO.getBargainDueDate() != null) mainVO.setBARGAIN_DUE_DATE(new Timestamp(inputVO.getBargainDueDate().getTime()));
 			mainVO.setTRADE_STATUS("1"); //1:暫存
 			mainVO.setIS_BARGAIN_NEEDED("N");
-			mainVO.setIS_REC_NEEDED("N"); //不需檢核錄音
+			
+			SOT712 sot712 = (SOT712) PlatformContext.getBean("sot712");
+			SOT712InputVO inputVO_712 = new SOT712InputVO();
+			inputVO_712.setCustID(inputVO.getCustID());
+			inputVO_712.setProdID(null);
+			inputVO_712.setProdType("NF");
+			inputVO_712.setProfInvestorYN(StringUtils.isBlank(inputVO.getProfInvestorYN()) ? "N" : inputVO.getProfInvestorYN()); //是否為專業投資人
+			inputVO_712.setIsFirstTrade(inputVO.getIsFirstTrade()); //是否首購   
+			inputVO_712.setCustRemarks(inputVO.getCustRemarks());
+			inputVO_712.setCustProRemark(inputVO.getPiRemark());
+			mainVO.setIS_REC_NEEDED(sot712.getIsRecNeeded(inputVO_712) ? "Y" : "N"); //IS_REC_NEEDED是否需要錄音 (非常規交易)
 			
 			mainVO.setREC_SEQ(null);
 			mainVO.setSEND_DATE(null);
@@ -454,6 +466,14 @@ public class SOT1640 extends FubonWmsBizLogic {
 		SOT1640OutputVO outputVO = new SOT1640OutputVO();
 		dam = this.getDataAccessManager();
 
+		//更新錄音序號
+		TBSOT_TRADE_MAINVO mainVo = new TBSOT_TRADE_MAINVO();
+		mainVo = (TBSOT_TRADE_MAINVO) dam.findByPKey(TBSOT_TRADE_MAINVO.TABLE_UID, inputVO.getTradeSEQ());
+		if (StringUtils.isNotBlank(inputVO.getRecSEQ())) {
+			mainVo.setREC_SEQ(inputVO.getRecSEQ());//錄音序號
+		}
+		dam.update(mainVo);
+		
 		//確認電文
 		inputVO.setConfirm("2"); 
 		String errMsg = dynamicESBValidate(inputVO);
