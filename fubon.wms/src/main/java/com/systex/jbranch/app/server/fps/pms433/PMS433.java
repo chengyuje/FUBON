@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
+import com.systex.jbranch.fubon.jlb.DataFormat;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
 import com.systex.jbranch.platform.common.errHandle.APException;
@@ -162,11 +163,11 @@ public class PMS433 extends FubonWmsBizLogic {
 			for (Map<String, Object> map : list) {
 				String[] records = null;
 				if(roleID.matches("A150|ABRF|A157|R012")) {
-					records = new String[13];
+					records = new String[12];
 					int i = 0;
 					records[i] = checkIsNull(map, "SEQ"); 
-					records[++i] = checkIsNull(map, "CUST_ID");
-					records[++i] = checkIsNull(map, "CUST_NAME"); 
+					records[++i] = DataFormat.getCustIdMaskForHighRisk(checkIsNull(map, "CUST_ID"));
+					records[++i] = DataFormat.getNameForHighRisk(checkIsNull(map, "CUST_NAME"));
 					records[++i] = "=\"" + checkIsNull(map, "AGE") +"\"";
 					records[++i] = "=\"" + checkIsNull(map, "BRA_NBR") +"\""; 
 					records[++i] = checkIsNull(map, "DEPT_NAME");
@@ -181,8 +182,8 @@ public class PMS433 extends FubonWmsBizLogic {
 					records = new String[13];
 					int i = 0;
 					records[i] = checkIsNull(map, "SEQ"); 
-					records[++i] = checkIsNull(map, "CUST_ID");
-					records[++i] = checkIsNull(map, "CUST_NAME"); 
+					records[++i] = DataFormat.getCustIdMaskForHighRisk(checkIsNull(map, "CUST_ID"));
+					records[++i] = DataFormat.getNameForHighRisk(checkIsNull(map, "CUST_NAME"));
 					records[++i] = "=\"" + checkIsNull(map, "AGE") +"\"";
 					records[++i] = "=\"" + checkIsNull(map, "BRA_NBR") +"\""; 
 					records[++i] = checkIsNull(map, "DEPT_NAME");

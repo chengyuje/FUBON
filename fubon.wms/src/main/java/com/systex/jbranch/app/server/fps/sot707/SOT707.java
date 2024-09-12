@@ -920,17 +920,14 @@ public class SOT707 extends EsbUtil {
 		txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); 		// 委託面額
 		txBodyVO.setTapeNo(mainVO.getREC_SEQ()); 											// 錄音序號
 		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID()); 									// 解說專員
-		txBodyVO.setTxType(mainVO.getGTC_YN());
+		txBodyVO.setTxType("2");															// 限價方式：固定放 2.市價
 		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false));
 		
-		// 選擇預約交易或長效單時，須傳送『市價』flag至AS400 (1.限價 2.市價)
-		String entrust_type = mainVO.getENTRUST_TYPE();
-		if (!mainVO.getGTC_YN().equals("N")) {
-			entrust_type = "2";
+		// 限價方式為不為市價，才需要放值
+		if (!StringUtils.equals("2", mainVO.getENTRUST_TYPE())) {
+			txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9));	// 委買單價：『限價』需有價格、『市價』NULL
 		}
-		txBodyVO.setTxType(entrust_type); 													// 限價方式
 		
-		txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); 		// 委買單價
 		txBodyVO.setTxFeeType(mainVO.getFEE_TYPE()); 										// 手續費議價
 		txBodyVO.setTxFeeRate(new EsbUtil().decimalPadding(mainVO.getGTC_FEE_RATE(), 5));	// 手續費費率
 		
@@ -1090,15 +1087,13 @@ public class SOT707 extends EsbUtil {
 		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID()); 									// 解說專員
 		txBodyVO.setTxType(mainVO.getGTC_YN());
 		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false));
+		txBodyVO.setTxType("2");															// 限價方式：固定放 2.市價
 		
-		// 選擇預約交易或長效單時，須傳送『市價』flag至AS400 (1.限價 2.市價)
-		String entrust_type = mainVO.getENTRUST_TYPE();
-		if (!mainVO.getGTC_YN().equals("N")) {
-			entrust_type = "2";
+		// 限價方式為不為市價，才需要放值
+		if (!StringUtils.equals("2", mainVO.getENTRUST_TYPE())) {
+			txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9));	// 委買單價：『限價』需有價格、『市價』NULL
 		}
-		txBodyVO.setTxType(entrust_type); 													// 限價方式
 		
-		txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); 		// 委買單價
 		txBodyVO.setTxFeeType(mainVO.getFEE_TYPE()); 										// 手續費議價
 		txBodyVO.setTxFeeRate(new EsbUtil().decimalPadding(mainVO.getGTC_FEE_RATE(), 5));	// 手續費費率
 		

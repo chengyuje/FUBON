@@ -1106,9 +1106,9 @@ public class CRM8502 extends EsbUtil {
 		sb.append(" ELSE ROUND(NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0)) END), 0) AS INS_AMT_TWD ");
 		sb.append(" FROM TBCRM_NMS060_DAY E ");
 		sb.append(" INNER JOIN (SELECT DISTINCT TMB01, TMB02 FROM TBCRM_NMS020_DAY) A ON A.TMB01 = E.TMF01 ");
-		sb.append(" LEFT OUTER JOIN (SELECT T06301, SUM(ROUND(NVL(T06303, 0), 2) + ROUND(NVL(T06319, 0), 2) - ROUND(NVL(T06337, 0), 2)) as REF_AMT_SAV ");
+		sb.append(" LEFT OUTER JOIN (SELECT T06301, SUM(ROUND(NVL(T06303, 0), 0) + ROUND(NVL(T06319, 0), 0) - ROUND(NVL(T06337, 0), 0)) as REF_AMT_SAV ");
 		sb.append(" FROM TBCRM_NMS063 WHERE T06302 = (SELECT MAX(T06302) FROM TBCRM_NMS063) GROUP BY T06301) C on C.T06301 = A.TMB01 ");
-		sb.append(" LEFT OUTER JOIN (SELECT T03404, SUM(ROUND(NVL(T03419, 0) * NVL(T03448, 0), 2)) as REF_AMT_INV ");
+		sb.append(" LEFT OUTER JOIN (SELECT T03404, SUM(ROUND(NVL(T03419, 0) * NVL(T03448, 0), 0)) as REF_AMT_INV ");
 		sb.append(" FROM TBCRM_NMS034 WHERE T03402 = (SELECT MAX(T03402) FROM TBCRM_NMS034) GROUP BY T03404) D on D.T03404 = A.TMB01 ");
 		sb.append(" CROSS JOIN (SELECT * FROM TBPMS_IQ053 WHERE MTN_DATE = (SELECT MAX(MTN_DATE) FROM TBPMS_IQ053) AND CUR_COD = 'USD') IQ ");
 		sb.append(" WHERE A.TMB02 = :custID AND E.TMF10 IS NULL ");
@@ -1118,7 +1118,7 @@ public class CRM8502 extends EsbUtil {
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		
 		if(!list.isEmpty()){
-			nano = (BigDecimal)list.get(0).get("INS_AMT_TWD");	// 此為參考市值，因為不想異動Birt報表故用此命名代替
+			nano = (BigDecimal)list.get(0).get("INS_AMT_TWD");	// 此為參考市值(MARKET_VAL_TWD)，因為不想異動Birt報表故用此命名代替
 		}
 
 		data.put("NANO", nano);

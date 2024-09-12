@@ -919,12 +919,12 @@ public class SOT703Dyna extends SOT703 {
 			txBodyVO.setCHANGE_TYPE("E3");
 			txBodyVO.setBATCH_SEQ(ObjectUtils.toString(dynaData.get("BATCH_SEQ_TRANSDATE")));
 			
-			txBodyVO.setE3_TRANSFER_DATE1(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("TRANSFER_DATE_1"))) ? "V" : ""); //約定扣款日1
-			txBodyVO.setE3_TRANSFER_DATE11(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("TRANSFER_DATE_2"))) ? "V" : ""); //約定扣款日11
-			txBodyVO.setE3_TRANSFER_DATE21(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("TRANSFER_DATE_3"))) ? "V" : ""); //約定扣款日21
-			txBodyVO.setE3_TRANSFER_DATE6(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("TRANSFER_DATE_4"))) ? "V" : ""); //約定扣款日6
-			txBodyVO.setE3_TRANSFER_DATE16(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("TRANSFER_DATE_5"))) ? "V" : ""); //約定扣款日16
-			txBodyVO.setE3_TRANSFER_DATE26(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("TRANSFER_DATE_6"))) ? "V" : ""); //約定扣款日26
+			txBodyVO.setE3_TRANSFER_DATE1(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("F_TRANSFER_DATE_1"))) ? "V" : ""); //約定扣款日1
+			txBodyVO.setE3_TRANSFER_DATE11(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("F_TRANSFER_DATE_2"))) ? "V" : ""); //約定扣款日11
+			txBodyVO.setE3_TRANSFER_DATE21(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("F_TRANSFER_DATE_3"))) ? "V" : ""); //約定扣款日21
+			txBodyVO.setE3_TRANSFER_DATE6(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("F_TRANSFER_DATE_4"))) ? "V" : ""); //約定扣款日6
+			txBodyVO.setE3_TRANSFER_DATE16(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("F_TRANSFER_DATE_5"))) ? "V" : ""); //約定扣款日16
+			txBodyVO.setE3_TRANSFER_DATE26(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("F_TRANSFER_DATE_6"))) ? "V" : ""); //約定扣款日26
 			
 			// 發送電文
 			if(StringUtils.equals("Y", sendESBYN)) { //是否打電文，電文還沒好先用參數控

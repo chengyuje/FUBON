@@ -129,6 +129,7 @@ eSoafApp.controller('SOT321Controller',
 		};
 
 		$scope.init = function(){
+			$scope.disGtcRefVal = false;
 			$scope.checkTradeDateType();
 			$scope.mappingSet['SOT.DEBIT_ACCT_LIST']=[];
 			$scope.mappingSet['SOT.DEBIT_ACCT_LIST#DSIPLAY']=[];
@@ -468,6 +469,14 @@ eSoafApp.controller('SOT321Controller',
 		};
 
 		$scope.calculate = function () {
+			// 選限價1%、3%、5%時，下面的『委託贖回限價價格』欄位就要反灰不能填寫
+			if ($scope.inputVO.entrustType == "4" || $scope.inputVO.entrustType == "5" || $scope.inputVO.entrustType == "6") {
+				$scope.disGtcRefVal = true;
+				$scope.inputVO.gtcRefVal = undefined;
+			} else {
+				$scope.disGtcRefVal = false;
+			}
+			
 			var refVal = undefined;
 			if ($scope.inputVO.entrustType == "4") {
 				refVal = $scope.inputVO.refVal - 1;

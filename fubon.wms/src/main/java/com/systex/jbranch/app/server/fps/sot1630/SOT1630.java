@@ -327,7 +327,9 @@ public class SOT1630 extends FubonWmsBizLogic {
 			inputVO.setConfirm("1"); 
 			SOT703OutputVO outputVO703 = dynamicESBValidate(inputVO);
 			outputVO.setShortType(outputVO703.getShort_1());
-			errMsg = outputVO703.getErrorMsg();
+			if(StringUtils.isNotBlank(outputVO703.getErrorMsg())) {
+				errMsg = outputVO703.getErrorCode() + ":" + outputVO703.getErrorMsg();
+			}
 		} catch(Exception e) {
 			errMsg = e.toString();
 		}
@@ -376,7 +378,7 @@ public class SOT1630 extends FubonWmsBizLogic {
 		SOT703OutputVO outputVO703 = dynamicESBValidate(inputVO);
 		String errorMsg = outputVO703.getErrorMsg();
 		if (StringUtils.isNotBlank(errorMsg)) {
-			outputVO.setErrorMsg(errorMsg);
+			outputVO.setErrorMsg(outputVO703.getErrorCode() + ":" + errorMsg);
 		} else {
 			TBSOT_TRADE_MAINVO vo = new TBSOT_TRADE_MAINVO();
 			vo = (TBSOT_TRADE_MAINVO) dam.findByPKey(TBSOT_TRADE_MAINVO.TABLE_UID, inputVO.getTradeSEQ());

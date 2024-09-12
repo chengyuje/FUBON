@@ -303,33 +303,6 @@ public class SOT808 extends SotPdf {
 									data_map.put("PURCHASE_AMT", 0);
 								}
 							}
-							
-//							//長效單迄日
-//							String buyTradeDate = "";
-//							String gtcStartDate = "";
-//							String gtcEndDate = "";
-//							SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-//							if (data_map.get("GTC_END_DATE") == null || StringUtils.isBlank(data_map.get("GTC_END_DATE").toString())) {
-//								data_map.put("GTC_END_DATE", "");
-//							} else {
-//								gtcEndDate = sdf.format(data_map.get("GTC_END_DATE"));
-//								data_map.put("GTC_END_DATE", sdf.format(data_map.get("GTC_END_DATE")));
-//							}
-//							
-//							if (data_map.get("GTC_START_DATE") != null && StringUtils.isNotBlank(data_map.get("GTC_START_DATE").toString())) {
-//								gtcStartDate = sdf.format(data_map.get("GTC_START_DATE"));
-//							}
-//							
-//							if (gtcYN.equals("Y")) {
-//								// 長效單
-//								buyTradeDate = gtcStartDate + " ～ " + gtcEndDate;
-//							} else if (gtcYN.equals("P")) {
-//								// 預約單
-//								buyTradeDate = gtcStartDate;
-//							}
-//							data_map.put("BUY_TRADE_DATE", buyTradeDate);
-							
-							
 							data.addRecordList("SELL", list);
 						}
 					}
@@ -404,6 +377,15 @@ public class SOT808 extends SotPdf {
 
 					data.addParameter("GTC_YN", data_map.get("GTC_YN").toString());
 					data.addParameter("GTC_END_DATE", data_map.get("GTC_END_DATE").toString());
+					
+					if (data_map.get("BUY_TRADE_DATE") != null && StringUtils.isNotBlank(data_map.get("BUY_TRADE_DATE").toString())) {
+						data.addParameter("BUY_TRADE_DATE", data_map.get("BUY_TRADE_DATE").toString());
+					}
+					
+					if (data_map.get("SELL_TRADE_DATE") != null && StringUtils.isNotBlank(data_map.get("SELL_TRADE_DATE").toString())) {
+						data.addParameter("SELL_TRADE_DATE", data_map.get("SELL_TRADE_DATE").toString());
+					}
+					
 					data.addParameter("TRADE_TYPE", data_map.get("TRADE_TYPE").toString());
 					data.addParameter("ENTRUST_AMT", data_map.get("ENTRUST_AMT").toString());
 

@@ -12,9 +12,9 @@ eSoafApp.controller('CRM610_TABController',
 		$scope.resultList = [];
 //		$scope.inputVO.cust_id = $scope.connector('get','CRM110_CUST_ID');
 		$scope.inputVO.cust_id =  $scope.custVO.CUST_ID;
-		getParameter.XML(["CRM.VIP_DEGREE"], function(totas) {
+		getParameter.XML(["CRM.FAMILY_DEGREE"], function(totas) {
 			if (totas) {
-				$scope.mappingSet['CRM.VIP_DEGREE'] = totas.data[totas.key.indexOf('CRM.VIP_DEGREE')];
+				$scope.mappingSet['CRM.FAMILY_DEGREE'] = totas.data[totas.key.indexOf('CRM.FAMILY_DEGREE')];
 				
 			}
 		});
@@ -37,6 +37,7 @@ eSoafApp.controller('CRM610_TABController',
 							$scope.emp_name = $scope.resultList[0].EMP_NAME;
 							$scope.uemp_id = $scope.resultList[0].UEMP_ID;
 							$scope.uemp_name = $scope.resultList[0].UEMP_NAME;
+							$scope.family_degree = $scope.resultList[0].FAMILY_DEGREE;
                 		}
 					}
 			});

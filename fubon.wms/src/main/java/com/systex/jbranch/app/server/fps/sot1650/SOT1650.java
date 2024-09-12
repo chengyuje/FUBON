@@ -527,7 +527,7 @@ public class SOT1650 extends FubonWmsBizLogic {
 			}   
 		}
 		
-		return StringUtils.isNotBlank(errorMsg) ? errorMsg : "";  
+		return StringUtils.isNotBlank(errorMsg) ? outputVO703.getErrorCode() + ":" + errorMsg : "";  
 	}
 	
 	/***

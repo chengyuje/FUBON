@@ -70,13 +70,12 @@ public class CRM610 extends FubonWmsBizLogic{
 		sql = new StringBuffer();
 		sql.append(" SELECT PARAM.PARAM_NAME AS REL_TYPE_DESC ");
 		sql.append(" FROM (SELECT DISTINCT (CASE WHEN P.FAMILY_DEGREE IS NOT NULL THEN P.FAMILY_DEGREE  ");
-		sql.append(" 					  		 WHEN A.VIP_DEGREE='K' OR A.VIP_DEGREE='T' THEN A.VIP_DEGREE  ");
-//		sql.append(" 					  		 WHEN A.VIP_DEGREE='A' OR A.VIP_DEGREE='V' THEN A.VIP_DEGREE  ");
+		sql.append(" 					  		 WHEN A.VIP_DEGREE='A' OR A.VIP_DEGREE='V' THEN A.VIP_DEGREE  ");
 		sql.append(" 						ELSE '' END) AS FAMILY_DEGREE  ");
 		sql.append(" 		FROM TBCRM_CUST_MAST A  ");
 		sql.append(" 		left outer join TBCRM_CUST_PRV P ON CUST_ID_M = A.CUST_ID OR CUST_ID_S = A.CUST_ID   ");   
 		sql.append(" 		where A.CUST_ID = :cust_id) F ");
-		sql.append(" LEFT OUTER JOIN TBSYSPARAMETER PARAM ON PARAM.PARAM_CODE = F.FAMILY_DEGREE AND PARAM.PARAM_TYPE = 'CRM.VIP_DEGREE'  ");
+		sql.append(" LEFT OUTER JOIN TBSYSPARAMETER PARAM ON PARAM.PARAM_CODE = F.FAMILY_DEGREE AND PARAM.PARAM_TYPE = 'CRM.FAMILY_DEGREE'  ");
 		queryCondition2.setQueryString(sql.toString());
 		queryCondition2.setObject("cust_id", inputVO.getCust_id());
 		

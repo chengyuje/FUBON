@@ -233,6 +233,7 @@ eSoafApp.controller('SOT1650Controller',
 			$scope.inputVO.chgTransDateYN = "N";
 			$scope.inputVO.chgAmountYN = "N";
 			$scope.inputVO.chgAddProdYN = "N";
+			$scope.inputVO.transDate = "";
 			$scope.onChgStatusYN();
 			$scope.onChgTransDateYN();
 			$scope.onChgAmountYN();
@@ -894,6 +895,10 @@ eSoafApp.controller('SOT1650Controller',
 	    
 	    //儲存前欄位檢核
 	    $scope.validBeforeSave = function() {
+	    	if($scope.inputVO.prodId == undefined || $scope.inputVO.prodId == null || $scope.inputVO.prodId == "") {
+	    		$scope.showErrorMsg("請選擇庫存");
+	    		return false;
+	    	}
 	    	//檢查變更狀態
 		    if($scope.inputVO.chgStatusYN == "Y") {
 		    	if($scope.isEmpty($scope.inputVO.fProdStatusC1) && $scope.isEmpty($scope.inputVO.fProdStatusC2) && $scope.isEmpty($scope.inputVO.fProdStatusC3) &&
@@ -1839,6 +1844,8 @@ eSoafApp.controller('SOT1650Controller',
 			$scope.inputVO.chgTransDateYN = "N";
 			$scope.inputVO.chgAmountYN = "N";
 			$scope.inputVO.chgAddProdYN = "N";
+			$scope.inputVO.transDate = "";
+			$scope.inputVO.tradeDateType = "";
 			$scope.onChgStatusYN();
 			$scope.onChgTransDateYN();
 			$scope.onChgAmountYN();

@@ -2703,25 +2703,30 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                             <structure>
                                 <property name="name">ENTRUST_TYPE</property>
                                 <text-property name="displayName">ENTRUST_TYPE</text-property>
-                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"].value == "2" &amp;&amp; params["GTC_YN"].value == "Y") {&#13;
-"■海外債券預約/長效單賣出限價 : "+params["ENTRUST_AMT"].value+"% (註2)\n"+&#13;
-"□參考贖回報價減1%(含)以內□參考贖回報價減3%(含)以內\n"+&#13;
- "□參考贖回報價減5%(含)以內□發行機構或券商回覆之實際成交價格"&#13;
-}else if  (params["TRADE_SUB_TYPE"].value == "2" &amp;&amp; params["GTC_YN"].value == "N"){&#13;
-"□海外債券預約/長效單賣出限價 :				% (註2)\n"+&#13;
-(dataSetRow["ENTRUST_TYPE"]== "4"?"■":"□") &#13;
-+ "參考贖回報價減1%(含)以內"&#13;
-+(dataSetRow["ENTRUST_TYPE"]== "5"?"■":"□") &#13;
-+ "參考贖回報價減3%(含)以內\n"&#13;
-+ (dataSetRow["ENTRUST_TYPE"] == "6"?"■":"□") &#13;
-+ "參考贖回報價減5%(含)以內"&#13;
-+ ((dataSetRow["ENTRUST_TYPE"]=="2")?"■":"□") &#13;
-+ "發行機構或券商回覆之實際成交價格"&#13;
-}else if  (params["TRADE_SUB_TYPE"].value == "1"){&#13;
-"□海外債券預約/長效單賣出限價 :				% (註2)\n"+&#13;
-"□參考贖回報價減1%(含)以內□參考贖回報價減3%(含)以內\n"+&#13;
- "□參考贖回報價減5%(含)以內□發行機構或券商回覆之實際成交價格"&#13;
-}</expression>
+                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"].value == "2") {&#13;
+		if (params["GTC_YN"].value == "Y") {&#13;
+			"■海外債券預約/長效單賣出限價 : "+params["ENTRUST_AMT"].value+"% (註2)\n"+&#13;
+			"□參考贖回報價減1%(含)以內□參考贖回報價減3%(含)以內\n"+&#13;
+			"□參考贖回報價減5%(含)以內□發行機構或券商回覆之實際成交價格"&#13;
+		} else {&#13;
+			((params["ENTRUST_AMT"].value != null &amp;&amp; params["ENTRUST_AMT"].value != "")?"■":"□")&#13;
+			+ "海外債券預約/長效單賣出限價 : "&#13;
+			+((params["ENTRUST_AMT"].value != null &amp;&amp; params["ENTRUST_AMT"].value != "") ? params["ENTRUST_AMT"].value : "				")&#13;
+			+"% (註2)\n"+&#13;
+			(dataSetRow["ENTRUST_TYPE"]== "4"?"■":"□")&#13;
+			+ "參考贖回報價減1%(含)以內"&#13;
+			+(dataSetRow["ENTRUST_TYPE"]== "5"?"■":"□")&#13;
+			+ "參考贖回報價減3%(含)以內\n"&#13;
+			+ (dataSetRow["ENTRUST_TYPE"] == "6"?"■":"□")&#13;
+			+ "參考贖回報價減5%(含)以內"&#13;
+			+ ((dataSetRow["ENTRUST_TYPE"]=="2")?"■":"□")&#13;
+			+ "發行機構或券商回覆之實際成交價格"&#13;
+		}&#13;
+	} else if  (params["TRADE_SUB_TYPE"].value == "1"){&#13;
+		"□海外債券預約/長效單賣出限價 :				% (註2)\n"+&#13;
+		"□參考贖回報價減1%(含)以內□參考贖回報價減3%(含)以內\n"+&#13;
+		"□參考贖回報價減5%(含)以內□發行機構或券商回覆之實際成交價格"&#13;
+	}</expression>
                                 <property name="dataType">string</property>
                                 <property name="allowExport">true</property>
                             </structure>
