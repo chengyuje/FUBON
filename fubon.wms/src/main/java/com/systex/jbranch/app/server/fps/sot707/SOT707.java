@@ -1787,7 +1787,7 @@ public class SOT707 extends EsbUtil {
 	}
 
 	/**
-	 * 海外債/SN長效單贖回檢核、確認
+	 * 海外債長效單贖回檢核、確認
 	 *
 	 * 使用電文: NJBRVD9
 	 *
@@ -1874,9 +1874,18 @@ public class SOT707 extends EsbUtil {
 
 		txBodyVO.setKeyinId(mainVO.getMODIFIER()); // 鍵機櫃員
 		txBodyVO.setTxCur(mainVO.getPROD_CURR()); // 委託面額幣別
-		txBodyVO.setTxType(mainVO.getENTRUST_TYPE()); // 限價方式
+		
+		String entrustType = "";
+		if (mainVO.getENTRUST_TYPE().equals("7")) {
+			// 限價才需帶委賣單價
+			txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); // 委賣單價
+			entrustType = "2";	// 限價一樣帶"2"
+		} else {
+			entrustType = mainVO.getENTRUST_TYPE();
+		}
+		txBodyVO.setTxType(entrustType); // 限價方式
+		
 		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID()); // 解說專員
-		txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); // 委賣單價
 		txBodyVO.setUnit(new EsbUtil().decimalPadding(mainVO.getTRUST_UNIT(), 0)); // 庫存張數
 		txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); // 委託面額
 		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false)); // 長效單迄日
@@ -1930,7 +1939,7 @@ public class SOT707 extends EsbUtil {
 	}
 	
 	/**
-	 * 海外債/SN長效單贖回檢核、確認_OBU
+	 * 海外債長效單贖回檢核、確認_OBU
 	 *
 	 * 使用電文: AJBRVD9
 	 *
@@ -2017,12 +2026,22 @@ public class SOT707 extends EsbUtil {
 		
 		txBodyVO.setKeyinId(mainVO.getMODIFIER());											// 鍵機櫃員
 		txBodyVO.setTxCur(mainVO.getPROD_CURR());											// 委託面額幣別
-		txBodyVO.setTxType(mainVO.getENTRUST_TYPE());										// 限價方式
+//		txBodyVO.setTxType(mainVO.getENTRUST_TYPE());										// 限價方式
 		txBodyVO.setTxExTeller(mainVO.getNARRATOR_ID());									// 解說專員
-		txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9));		// 委賣單價
+//		txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9));		// 委賣單價
 		txBodyVO.setUnit(new EsbUtil().decimalPadding(mainVO.getTRUST_UNIT(), 0));			// 庫存張數
 		txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); 		// 委託面額
 		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false));	// 長效單迄日
+		
+		String entrustType = "";
+		if (mainVO.getENTRUST_TYPE().equals("7")) {
+			// 限價才需帶委賣單價
+			txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); 	// 委賣單價
+			entrustType = "2";	// 限價一樣帶"2"
+		} else {
+			entrustType = mainVO.getENTRUST_TYPE();
+		}
+		txBodyVO.setTxType(entrustType); // 限價方式
 		
 		/**
 		 * Filler

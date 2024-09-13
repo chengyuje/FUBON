@@ -1151,8 +1151,11 @@
                 <structure>
                     <property name="name">PAYABLE_FEE</property>
                     <text-property name="displayName">PAYABLE_FEE</text-property>
-                    <expression name="expression" type="javascript">dataSetRow["PAYABLE_FEE"]</expression>
+                    <expression name="expression" type="javascript">if (param["ENTRUST_TYPE"] != 2) {&#13;
+	 dataSetRow["PAYABLE_FEE"]&#13;
+}</expression>
                     <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">TOT_AMT</property>
@@ -2056,7 +2059,7 @@ dataSetRow["ENTRUST_AMT"]+"%";&#13;
                             <structure>
                                 <property name="name">FEE</property>
                                 <text-property name="displayName">FEE</text-property>
-                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1) {&#13;
+                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; param["ENTRUST_TYPE"] != 2) {&#13;
 Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
 }</expression>
                                 <property name="dataType">string</property>
@@ -2156,7 +2159,7 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                             <structure>
                                 <property name="name">TOT_AMT</property>
                                 <text-property name="displayName">TOT_AMT</text-property>
-                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1) {&#13;
+                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; param["ENTRUST_TYPE"] != 2) {&#13;
 	dataSetRow["TOT_AMT"] &#13;
 }</expression>
                                 <property name="dataType">string</property>

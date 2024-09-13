@@ -781,6 +781,7 @@ public class SOT120 extends FubonWmsBizLogic {
 			}
 
 			//===若無明細，則將主檔也刪除
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			StringBuffer sb = new StringBuffer();
 			sb.append("SELECT * ");
 			sb.append(String.format("FROM %s ", TBSOT_DETAIL));

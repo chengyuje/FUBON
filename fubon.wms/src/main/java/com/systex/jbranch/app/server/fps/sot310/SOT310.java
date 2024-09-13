@@ -1218,256 +1218,256 @@ public class SOT310 extends EsbUtil {
 	 */
 	public List<NJWEEA70> getNJWEEA70() throws Exception {
 		//init util
-//		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, EsbSotCons.NJWEEA70);
-//		esbUtilInputVO.setModule(thisClaz + new Object(){}.getClass().getEnclosingMethod().getName());
-//		
-//		//head
-//		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
-//		txHead.setDefaultTxHead();
-//		esbUtilInputVO.setTxHeadVO(txHead);
-//		
-//		//body
-////		NJWEEA70InputVO njweea70inputvo = new NJWEEA70InputVO();
-//		
-//		//發送電文
-//		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
-//		
-//		NJWEEA70OutputVO njweea70OutputVO = new NJWEEA70OutputVO();
-//		List<NJWEEA70> results = new ArrayList<NJWEEA70>();
-//		NJWEEA70 njweea70 = new NJWEEA70();
-//		
-//		for(ESBUtilOutputVO esbUtilOutputVO : vos) {
-//			TxHeadVO headVO = esbUtilOutputVO.getTxHeadVO();
-//			
-//			String hfmtid = StringUtils.isBlank(headVO.getHFMTID()) ? "" : headVO.getHFMTID().trim();
-//			
-//			/**
-//			 * 下行電文會有2個Format的格式
-//			 * Header.‧HFMTID =0001：債券預約單/長效單營業日註記
-//			 * Header.‧HFMTID =E001：錯誤訊息使用
-//			 */
-//			if("0001".equals(hfmtid)) {
-//				njweea70OutputVO = esbUtilOutputVO.getNjweea70OutputVO();
-//				for(NJWEEA70OutputDetailVO detail : njweea70OutputVO.getDetails()) {
-//					njweea70.setTxtDt(detail.getTxtDt());		// 日期(民國年) ex.01130607
-//					njweea70.setTxtCode(detail.getTxtCode());	// 營業日註記_空白：非營業日、Y：營業日
-//
-//					results.add(njweea70);
-//					njweea70 = new NJWEEA70();
-//				}
-//			} else if("E001".equals(hfmtid)) {
-//				if(StringUtils.isNotBlank(njweea70OutputVO.getMSGID())) {
-//					throw new JBranchException(String.format("%s:%s", njweea70OutputVO.getMSGID(), njweea70OutputVO.getMSGTXT()));
-//				} 
-//			}
-//		}
-//		
-//		return results;
+		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, EsbSotCons.NJWEEA70);
+		esbUtilInputVO.setModule(thisClaz + new Object(){}.getClass().getEnclosingMethod().getName());
 		
-		// for test
+		//head
+		TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
+		txHead.setDefaultTxHead();
+		esbUtilInputVO.setTxHeadVO(txHead);
+		
+		//body
+//		NJWEEA70InputVO njweea70inputvo = new NJWEEA70InputVO();
+		
+		//發送電文
+		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
+		
+		NJWEEA70OutputVO njweea70OutputVO = new NJWEEA70OutputVO();
 		List<NJWEEA70> results = new ArrayList<NJWEEA70>();
-		//
 		NJWEEA70 njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130903");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
 		
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130904");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130905");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
+		for(ESBUtilOutputVO esbUtilOutputVO : vos) {
+			TxHeadVO headVO = esbUtilOutputVO.getTxHeadVO();
+			
+			String hfmtid = StringUtils.isBlank(headVO.getHFMTID()) ? "" : headVO.getHFMTID().trim();
+			
+			/**
+			 * 下行電文會有2個Format的格式
+			 * Header.‧HFMTID =0001：債券預約單/長效單營業日註記
+			 * Header.‧HFMTID =E001：錯誤訊息使用
+			 */
+			if("0001".equals(hfmtid)) {
+				njweea70OutputVO = esbUtilOutputVO.getNjweea70OutputVO();
+				for(NJWEEA70OutputDetailVO detail : njweea70OutputVO.getDetails()) {
+					njweea70.setTxtDt(detail.getTxtDt());		// 日期(民國年) ex.01130607
+					njweea70.setTxtCode(detail.getTxtCode());	// 營業日註記_空白：非營業日、Y：營業日
 
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130906");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130907");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130908");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130909");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130910");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130911");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130912");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130913");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130914");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130915");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130916");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130917");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130918");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130919");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130920");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130921");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130922");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130923");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130924");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130925");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130926");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130927");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130928");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130929");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01130930");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131001");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131002");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131003");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131004");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131005");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131006");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131007");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131008");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131009");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
-		
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131010");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131011");
-		njweea70.setTxtCode("");
-		results.add(njweea70);
-		//
-		njweea70 = new NJWEEA70();
-		njweea70.setTxtDt("01131012");
-		njweea70.setTxtCode("Y");
-		results.add(njweea70);
+					results.add(njweea70);
+					njweea70 = new NJWEEA70();
+				}
+			} else if("E001".equals(hfmtid)) {
+				if(StringUtils.isNotBlank(njweea70OutputVO.getMSGID())) {
+					throw new JBranchException(String.format("%s:%s", njweea70OutputVO.getMSGID(), njweea70OutputVO.getMSGTXT()));
+				} 
+			}
+		}
 		
 		return results;
+		
+//		// for test
+//		List<NJWEEA70> results = new ArrayList<NJWEEA70>();
+//		//
+//		NJWEEA70 njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130903");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130904");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130905");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130906");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130907");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130908");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130909");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130910");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130911");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130912");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130913");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130914");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130915");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130916");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130917");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130918");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130919");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130920");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130921");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130922");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130923");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130924");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130925");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130926");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130927");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130928");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130929");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01130930");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131001");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131002");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131003");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131004");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131005");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131006");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131007");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131008");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131009");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131010");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131011");
+//		njweea70.setTxtCode("");
+//		results.add(njweea70);
+//		//
+//		njweea70 = new NJWEEA70();
+//		njweea70.setTxtDt("01131012");
+//		njweea70.setTxtCode("Y");
+//		results.add(njweea70);
+		
+//		return results;
 	}
 	
 	public void checkTime(Object body, IPrimitiveMap header) throws Exception {

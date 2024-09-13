@@ -546,8 +546,8 @@ public class CRM821 extends EsbUtil {
 
                 for(NFBRN9OutputVODetailsVO devo : outputVO.getDetails()) {
                 	//2017-01-18 by Jacky 判斷單位數 > 0 才回傳前端
-                	//動態鎖利母基金單位數為0也需顯示
-                	if(checkCustAssetFundVO(devo) || StringUtils.equals("1", ObjectUtils.toString(devo.getDynamic()))) {
+                	//動態鎖利單位數為0也需顯示
+                	if(checkCustAssetFundVO(devo) || StringUtils.isNotBlank(ObjectUtils.toString(devo.getDynamic()))) {
                 		CustAssetFundVO retVO = new CustAssetFundVO();
                         retVO.setAssetType(hfmtid); //信託種類
                         retVO.setSPRefId(devo.getSPRefId());

@@ -250,45 +250,77 @@ public class CRM8502 extends EsbUtil {
 		this.sendRtnObject(outputVO);
 	}
 	
-	public void getNanoAsset (Object body, IPrimitiveMap header) throws JBranchException {
-		CRM8502InputVO inputVO = (CRM8502InputVO) body;
-		CRM8502OutputVO outputVO = new CRM8502OutputVO();
+	private List<Map<String,Object>> getNanoAsset(String custID) throws JBranchException {
+		List<Map<String,Object>> nanoList = new ArrayList<>();
 		dam = this.getDataAccessManager();
-		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(" SELECT A.TMB01 as POT_ID, ");
-		sb.append(" K.TMF02K as PLAN_NAME, ");
-		sb.append(" B.INV_AMT as INCREASE_AMT_BAS, ");
-		sb.append(" CASE WHEN E.TMF25 = '88' THEN B.INV_AMT * NVL(IQ.BUY_RATE,1) ELSE B.INV_AMT END as INCREASE_AMT_TWD, ");
-		sb.append(" CASE WHEN E.TMF25 = '89' THEN ROUND(NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0)) ");
-		sb.append(" ELSE NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) END as MARKET_VAL_BAS, ");
-//		sb.append(" NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) as MARKET_VAL_BAS, ");
-		sb.append(" CASE WHEN E.TMF25 = '88' THEN (NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0)) * NVL(IQ.BUY_RATE, 1) ELSE (NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0)) END as MARKET_VAL_TWD, ");
-		sb.append(" NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0) as PROFIT_BAS, ");
-		sb.append(" CASE WHEN E.TMF25 = '88' THEN (NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0)) * NVL(IQ.BUY_RATE, 1) ELSE NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0) END as PROFIT_TWD, ");
-		sb.append(" CASE WHEN NVL(B.INV_AMT, 0) = 0 THEN 0 ELSE ROUND(((NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0)) / NVL(B.INV_AMT, 0)) * 100  , 2) END as PROFIT_RATE_BAS, ");
-		sb.append(" NVL(Y.DIV_AMT,0) as DIV_AMT, ");
-		sb.append(" CASE WHEN NVL(B.INV_AMT, 0) = 0 THEN 0 ELSE ROUND(((NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0) + NVL(Y.DIV_AMT,0)) / NVL(B.INV_AMT, 0)) * 100  , 2) END as PROFIT_RATE_DIV ");
+		// 88
+		sb.append(" SELECT A.TMB01 AS POT_ID, K.TMF02K AS PLAN_NAME, B.INV_AMT AS INCREASE_AMT_BAS, ");
+		sb.append(" ROUND(B.INV_AMT * NVL(IQ.BUY_RATE,1)) AS INCREASE_AMT_TWD, ");
+		sb.append(" NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) AS MARKET_VAL_BAS, ");
+		sb.append(" ROUND((NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0)) * NVL(IQ.BUY_RATE, 1)) AS MARKET_VAL_TWD, ");
+		sb.append(" NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0) AS PROFIT_BAS, ");
+		sb.append(" (NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0)) * NVL(IQ.BUY_RATE, 1) AS PROFIT_TWD, ");
+		sb.append(" CASE WHEN NVL(B.INV_AMT, 0) = 0 THEN 0 ELSE ROUND(((NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0)) / NVL(B.INV_AMT, 0)) * 100  , 2) END AS PROFIT_RATE_BAS, ");
+		sb.append(" NVL(Y.DIV_AMT,0) AS DIV_AMT, ");
+		sb.append(" CASE WHEN NVL(B.INV_AMT, 0) = 0 THEN 0 ELSE ROUND(((NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0) + NVL(Y.DIV_AMT,0)) / NVL(B.INV_AMT, 0)) * 100, 2) END AS PROFIT_RATE_DIV, ");
+		sb.append(" E.TMF25 ");
 		sb.append(" FROM TBCRM_NMS060_DAY E ");
 		sb.append(" LEFT JOIN TBCRM_NMS060K K ON E.TMF01 = K.TMF01K ");
-		sb.append(" LEFT JOIN (SELECT T54002, SUM(NVL(CASE WHEN T54005 = '3' THEN T54009 * 1 WHEN T54004 = '4' THEN T54009 * -1 ELSE 0 END, 0)) as INV_AMT ");
+		sb.append(" LEFT JOIN (SELECT T54002, SUM(NVL(CASE WHEN T54005 = '3' THEN T54009 * 1 WHEN T54005 = '4' THEN T54009 * -1 ELSE 0 END, 0)) AS INV_AMT ");
 		sb.append(" FROM TBCRM_NMS540 GROUP BY T54002) B ON E.TMF01 = B.T54002 ");
 		sb.append(" INNER JOIN (SELECT DISTINCT TMB01, TMB02 FROM TBCRM_NMS020_DAY) A ON A.TMB01 = E.TMF01 ");
-		sb.append(" LEFT OUTER JOIN (SELECT T06301, SUM(ROUND(NVL(T06303, 0), 0) + ROUND(NVL(T06319, 0), 0) - ROUND(NVL(T06337, 0), 0)) as REF_AMT_SAV ");
-//		sb.append(" LEFT OUTER JOIN (SELECT T06301, SUM(ROUND(NVL(T06303, 0), 2) + ROUND(NVL(T06319, 0), 2) - ROUND(NVL(T06337, 0), 2)) as REF_AMT_SAV ");
-		sb.append(" FROM TBCRM_NMS063 WHERE T06302 = (SELECT MAX(T06302) FROM TBCRM_NMS063) GROUP BY T06301) C on C.T06301 = A.TMB01 ");
-		sb.append(" LEFT OUTER JOIN (SELECT T03404, SUM(ROUND(NVL(T03419, 0) * NVL(T03448, 0), 0)) as REF_AMT_INV ");
-//		sb.append(" LEFT OUTER JOIN (SELECT T03404, SUM(ROUND(NVL(T03419, 0) * NVL(T03448, 0), 2)) as REF_AMT_INV ");
-		sb.append(" FROM TBCRM_NMS034 WHERE T03402 = (SELECT MAX(T03402) FROM TBCRM_NMS034) GROUP BY T03404) D on D.T03404 = A.TMB01 ");
-		sb.append(" LEFT OUTER JOIN (SELECT DISTINCT T8YF01,FIRST_VALUE(T8YF04) OVER(PARTITION BY T8YF01 ORDER BY T8YF02 DESC) as DIV_AMT FROM TBCRM_NMS8YF) Y on E.TMF01 = Y.T8YF01 ");
+		sb.append(" LEFT OUTER JOIN (SELECT T06301, SUM(ROUND(NVL(T06303, 0), 2) + ROUND(NVL(T06319, 0), 2) - ROUND(NVL(T06337, 0), 2)) AS REF_AMT_SAV ");
+		sb.append(" FROM TBCRM_NMS063 WHERE T06302 = (SELECT MAX(T06302) FROM TBCRM_NMS063) GROUP BY T06301) C ON C.T06301 = A.TMB01 ");
+		sb.append(" LEFT OUTER JOIN (SELECT T03404, SUM(ROUND(NVL(T03419, 0) * NVL(T03448, 0), 2)) AS REF_AMT_INV ");
+		sb.append(" FROM TBCRM_NMS034 WHERE T03402 = (SELECT MAX(T03402) FROM TBCRM_NMS034) GROUP BY T03404) D ON D.T03404 = A.TMB01 ");
+		sb.append(" LEFT OUTER JOIN (SELECT DISTINCT T8YF01,FIRST_VALUE(T8YF04) OVER(PARTITION BY T8YF01 ORDER BY T8YF02 DESC) AS DIV_AMT FROM TBCRM_NMS8YF) Y ON E.TMF01 = Y.T8YF01 ");
 		sb.append(" CROSS JOIN (SELECT * FROM TBPMS_IQ053 WHERE MTN_DATE = (SELECT MAX(MTN_DATE) FROM TBPMS_IQ053) AND CUR_COD = 'USD') IQ ");
-		sb.append(" WHERE A.TMB02 = :custID AND E.TMF10 IS NULL ");
+		sb.append(" WHERE E.TMF25 = '88' AND A.TMB02 = :custID AND E.TMF10 IS NULL ");
 		
-		queryCondition.setObject("custId", inputVO.getCustID());
-		queryCondition.setQueryString(sb.toString());
-		dam.exeQuery(queryCondition);
+		qc.setObject("custID", custID);
+		qc.setQueryString(sb.toString());
+		List<Map<String,Object>> list88 = dam.exeQuery(qc);
 		
+		// 89
+		qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		sb = new StringBuilder();
+		sb.append(" SELECT A.TMB01 AS POT_ID, K.TMF02K AS PLAN_NAME, B.INV_AMT AS INCREASE_AMT_BAS, ");
+		sb.append(" ROUND(B.INV_AMT) AS INCREASE_AMT_TWD, ");
+		sb.append(" NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) AS MARKET_VAL_BAS, ");
+		sb.append(" NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) AS MARKET_VAL_TWD, ");
+		sb.append(" NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0) AS PROFIT_BAS, ");
+		sb.append(" ROUND(NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0)) AS PROFIT_TWD, ");
+		sb.append(" CASE WHEN NVL(B.INV_AMT, 0) = 0 THEN 0 ELSE ROUND(((NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0)) / NVL(B.INV_AMT, 0)) * 100  , 2) END AS PROFIT_RATE_BAS, ");
+		sb.append(" NVL(Y.DIV_AMT,0) AS DIV_AMT, ");
+		sb.append(" CASE WHEN NVL(B.INV_AMT, 0) = 0 THEN 0 ELSE ROUND(((NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0) + NVL(Y.DIV_AMT,0)) / NVL(B.INV_AMT, 0)) * 100, 2) END AS PROFIT_RATE_DIV, ");
+		sb.append(" E.TMF25 ");
+		sb.append(" FROM TBCRM_NMS060_DAY E ");
+		sb.append(" LEFT JOIN TBCRM_NMS060K K ON E.TMF01 = K.TMF01K ");
+		sb.append(" LEFT JOIN (SELECT T54002, SUM(NVL(CASE WHEN T54005 = '3' THEN T54009 * 1 WHEN T54005 = '4' THEN T54009 * -1 ELSE 0 END, 0)) AS INV_AMT ");
+		sb.append(" FROM TBCRM_NMS540 GROUP BY T54002) B ON E.TMF01 = B.T54002 ");
+		sb.append(" INNER JOIN (SELECT DISTINCT TMB01, TMB02 FROM TBCRM_NMS020_DAY) A ON A.TMB01 = E.TMF01 ");
+		sb.append(" LEFT OUTER JOIN (SELECT T06301, SUM(ROUND(NVL(T06303, 0), 0) + ROUND(NVL(T06319, 0), 0) - ROUND(NVL(T06337, 0), 0)) AS REF_AMT_SAV ");
+		sb.append(" FROM TBCRM_NMS063 WHERE T06302 = (SELECT MAX(T06302) FROM TBCRM_NMS063) GROUP BY T06301) C ON C.T06301 = A.TMB01 ");
+		sb.append(" LEFT OUTER JOIN (SELECT T03404, SUM(ROUND(NVL(T03419, 0) * NVL(T03448, 0), 0)) AS REF_AMT_INV ");
+		sb.append(" FROM TBCRM_NMS034 WHERE T03402 = (SELECT MAX(T03402) FROM TBCRM_NMS034) GROUP BY T03404) D ON D.T03404 = A.TMB01 ");
+		sb.append(" LEFT OUTER JOIN (SELECT DISTINCT T8YF01,FIRST_VALUE(T8YF04) OVER(PARTITION BY T8YF01 ORDER BY T8YF02 DESC) AS DIV_AMT FROM TBCRM_NMS8YF) Y ON E.TMF01 = Y.T8YF01 ");
+		sb.append(" CROSS JOIN (SELECT * FROM TBPMS_IQ053 WHERE MTN_DATE = (SELECT MAX(MTN_DATE) FROM TBPMS_IQ053) AND CUR_COD = 'USD') IQ ");
+		sb.append(" WHERE E.TMF25 = '89' AND A.TMB02 = :custID AND E.TMF10 IS NULL ");
+		
+		qc.setObject("custID", custID);
+		qc.setQueryString(sb.toString());
+		List<Map<String,Object>> list89 = dam.exeQuery(qc);
+		
+		if (list88.size() > 0) {
+			nanoList.addAll(list88);						
+		}
+		if (list89.size() > 0) {
+			nanoList.addAll(list89);						
+		}
+		return nanoList;
 	}
 
 	public void printReport (Object body, IPrimitiveMap header) throws JBranchException {
@@ -793,40 +825,8 @@ public class CRM8502 extends EsbUtil {
 				
 				// 奈米投
 				try {
-					sb = new StringBuilder();
-					sb.append(" SELECT A.TMB01 as POT_ID, ");
-					sb.append(" K.TMF02K as PLAN_NAME, ");
-					sb.append(" B.INV_AMT as INCREASE_AMT_BAS, ");
-					sb.append(" CASE WHEN E.TMF25 = '88' THEN ROUND(B.INV_AMT * NVL(IQ.BUY_RATE,1)) ELSE ROUND(B.INV_AMT) END as INCREASE_AMT_TWD, ");
-					sb.append(" CASE WHEN E.TMF25 = '89' THEN ROUND(NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0)) ");
-					sb.append(" ELSE NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) END as MARKET_VAL_BAS, ");
-//					sb.append(" NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) as MARKET_VAL_BAS, ");
-					sb.append(" CASE WHEN E.TMF25 = '88' THEN ROUND((NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0)) * NVL(IQ.BUY_RATE, 1)) ");
-					sb.append(" ELSE ROUND(NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0)) END as MARKET_VAL_TWD, ");
-					sb.append(" NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0) as PROFIT_BAS, ");
-					sb.append(" CASE WHEN E.TMF25 = '88' THEN (NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0)) * NVL(IQ.BUY_RATE, 1) ");
-					sb.append(" ELSE ROUND(NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0)) END as PROFIT_TWD, ");
-					sb.append(" CASE WHEN NVL(B.INV_AMT, 0) = 0 THEN 0 ELSE ROUND(((NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0)) / NVL(B.INV_AMT, 0)) * 100  , 2) END as PROFIT_RATE_BAS, ");
-					sb.append(" NVL(Y.DIV_AMT,0) as DIV_AMT, ");
-					sb.append(" CASE WHEN NVL(B.INV_AMT, 0) = 0 THEN 0 ELSE ROUND(((NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0) - NVL(B.INV_AMT, 0) + NVL(Y.DIV_AMT,0)) / NVL(B.INV_AMT, 0)) * 100  , 2) END as PROFIT_RATE_DIV, ");
-					sb.append(" E.TMF25 ");
-					sb.append(" FROM TBCRM_NMS060_DAY E ");
-					sb.append(" LEFT JOIN TBCRM_NMS060K K ON E.TMF01 = K.TMF01K ");
-					sb.append(" LEFT JOIN (SELECT T54002, SUM(NVL(CASE WHEN T54005 = '3' THEN T54009 * 1 WHEN T54005 = '4' THEN T54009 * -1 ELSE 0 END, 0)) as INV_AMT ");
-					sb.append(" FROM TBCRM_NMS540 GROUP BY T54002) B ON E.TMF01 = B.T54002 ");
-					sb.append(" INNER JOIN (SELECT DISTINCT TMB01, TMB02 FROM TBCRM_NMS020_DAY) A ON A.TMB01 = E.TMF01 ");
-					sb.append(" LEFT OUTER JOIN (SELECT T06301, SUM(ROUND(NVL(T06303, 0), 0) + ROUND(NVL(T06319, 0), 0) - ROUND(NVL(T06337, 0), 0)) as REF_AMT_SAV ");
-//					sb.append(" LEFT OUTER JOIN (SELECT T06301, SUM(ROUND(NVL(T06303, 0), 2) + ROUND(NVL(T06319, 0), 2) - ROUND(NVL(T06337, 0), 2)) as REF_AMT_SAV ");
-					sb.append(" FROM TBCRM_NMS063 WHERE T06302 = (SELECT MAX(T06302) FROM TBCRM_NMS063) GROUP BY T06301) C on C.T06301 = A.TMB01 ");
-					sb.append(" LEFT OUTER JOIN (SELECT T03404, SUM(ROUND(NVL(T03419, 0) * NVL(T03448, 0), 0)) as REF_AMT_INV ");
-//					sb.append(" LEFT OUTER JOIN (SELECT T03404, SUM(ROUND(NVL(T03419, 0) * NVL(T03448, 0), 2)) as REF_AMT_INV ");
-					sb.append(" FROM TBCRM_NMS034 WHERE T03402 = (SELECT MAX(T03402) FROM TBCRM_NMS034) GROUP BY T03404) D on D.T03404 = A.TMB01 ");
-					sb.append(" LEFT OUTER JOIN (SELECT DISTINCT T8YF01,FIRST_VALUE(T8YF04) OVER(PARTITION BY T8YF01 ORDER BY T8YF02 DESC) as DIV_AMT FROM TBCRM_NMS8YF) Y on E.TMF01 = Y.T8YF01 ");
-					sb.append(" CROSS JOIN (SELECT * FROM TBPMS_IQ053 WHERE MTN_DATE = (SELECT MAX(MTN_DATE) FROM TBPMS_IQ053) AND CUR_COD = 'USD') IQ ");
-					sb.append(" WHERE A.TMB02 = :custId AND E.TMF10 IS NULL ");
-					
-					List<Map<String,Object>> list = this.getQueryExecute(sb.toString(), custId);
-					result.addRecordList("INV_NANO", list);
+					List<Map<String,Object>> nanoList = this.getNanoAsset(custId);
+					result.addRecordList("INV_NANO", nanoList);
 					
 				} catch (Exception e) {
 					logger.error("NANO error:"+e.getMessage());
@@ -1095,34 +1095,16 @@ public class CRM8502 extends EsbUtil {
 		return data;
 	}
 	
+	// 奈米投_參考市值(台幣)加總
 	private Map<String,Object> getNano(String custID) throws JBranchException {
-		dam = this.getDataAccessManager();
-		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		StringBuilder sb = new StringBuilder();
 		Map<String, Object> data = new HashMap<String,Object>();
-		BigDecimal nano = (BigDecimal) new BigDecimal(0);
+		BigDecimal nano = new BigDecimal(0);
+		List<Map<String, Object>> list = this.getNanoAsset(custID);
 		
-		sb.append(" SELECT NVL(SUM(CASE WHEN E.TMF25 = '88' THEN ROUND((NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0)) * NVL(IQ.BUY_RATE, 1)) ");
-		sb.append(" ELSE ROUND(NVL(C.REF_AMT_SAV, 0) + NVL(D.REF_AMT_INV, 0)) END), 0) AS INS_AMT_TWD ");
-		sb.append(" FROM TBCRM_NMS060_DAY E ");
-		sb.append(" INNER JOIN (SELECT DISTINCT TMB01, TMB02 FROM TBCRM_NMS020_DAY) A ON A.TMB01 = E.TMF01 ");
-		sb.append(" LEFT OUTER JOIN (SELECT T06301, SUM(ROUND(NVL(T06303, 0), 0) + ROUND(NVL(T06319, 0), 0) - ROUND(NVL(T06337, 0), 0)) as REF_AMT_SAV ");
-		sb.append(" FROM TBCRM_NMS063 WHERE T06302 = (SELECT MAX(T06302) FROM TBCRM_NMS063) GROUP BY T06301) C on C.T06301 = A.TMB01 ");
-		sb.append(" LEFT OUTER JOIN (SELECT T03404, SUM(ROUND(NVL(T03419, 0) * NVL(T03448, 0), 0)) as REF_AMT_INV ");
-		sb.append(" FROM TBCRM_NMS034 WHERE T03402 = (SELECT MAX(T03402) FROM TBCRM_NMS034) GROUP BY T03404) D on D.T03404 = A.TMB01 ");
-		sb.append(" CROSS JOIN (SELECT * FROM TBPMS_IQ053 WHERE MTN_DATE = (SELECT MAX(MTN_DATE) FROM TBPMS_IQ053) AND CUR_COD = 'USD') IQ ");
-		sb.append(" WHERE A.TMB02 = :custID AND E.TMF10 IS NULL ");
-		
-		queryCondition.setObject("custID", custID);
-		queryCondition.setQueryString(sb.toString());
-		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
-		
-		if(!list.isEmpty()){
-			nano = (BigDecimal)list.get(0).get("INS_AMT_TWD");	// 此為參考市值(MARKET_VAL_TWD)，因為不想異動Birt報表故用此命名代替
+		for (Map<String, Object> map : list) {
+			nano = nano.add(new BigDecimal(map.get("MARKET_VAL_TWD").toString()));
 		}
-
 		data.put("NANO", nano);
-		
 		return data;
 	}
 

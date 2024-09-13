@@ -1019,6 +1019,11 @@ eSoafApp.controller('SOT1640Controller',
 				$scope.inputVO.inProdC4YN = "N";
 				$scope.inputVO.inProdC5YN = "N";
 			} else if($scope.inputVO.transferType == '2') {	//子基金轉回母基金
+				if(!$scope.inputVO.prodIdC1) {
+					$scope.showErrorMsg("此庫存無子基金");
+					$scope.inputVO.transferType = "";
+        			return;
+				}
 				$scope.inputVO.inProdId = "";
 				$scope.inputVO.inProdName = "";
 				$scope.inputVO.inProdCurr = "";
@@ -1041,6 +1046,21 @@ eSoafApp.controller('SOT1640Controller',
 						}
 			});
 		};
+		
+		//選擇轉出子基金時，檢核單位數
+		$scope.checkUnitC = function(idx) {
+			var chkYN = eval("$scope.inputVO.inProdC" + idx + "YN");
+			var nUnit = eval("$scope.inputVO.numUnitsC" + idx);
+			if(chkYN == "Y" && (!nUnit || nUnit <= 0)) {
+				$scope.showMsg("子基金單位數為0，不可轉入母基金");
+				if(idx == "1") $scope.inputVO.inProdC1YN = "N";
+				if(idx == "2") $scope.inputVO.inProdC2YN = "N";
+				if(idx == "3") $scope.inputVO.inProdC3YN = "N";
+				if(idx == "4") $scope.inputVO.inProdC4YN = "N";
+				if(idx == "5") $scope.inputVO.inProdC5YN = "N";
+    			return;
+			}
+		}
 		
 		//確認基金註記 => 此交易檢查是否停止申購
 		$scope.checkFundStatusIn = () => $scope.sendRecv("SOT703", "qryFundMemo",

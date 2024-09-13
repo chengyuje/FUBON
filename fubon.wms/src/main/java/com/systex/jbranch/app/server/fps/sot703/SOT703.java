@@ -4631,10 +4631,8 @@ public class SOT703 extends EsbUtil {
 				}
 
 				for (NFBRN9OutputVODetailsVO devo : outputVO.getDetails()) {
-					// 2017-01-18 by Jacky 判斷單位數 > 0 才回傳前端
-					// 動態鎖利母基金不需要判斷單位數>0，一律回傳前端
-					if ((StringUtils.equals("Y", returnNumZeroYN) && StringUtils.equals("1", ObjectUtils.toString(devo.getDynamic()))) || 	//動態鎖利母基金
-							checkCustAssetFundVO(devo)) {	//判斷單位數 > 0
+					// 動態鎖利不需要判斷單位數>0，一律回傳前端
+					if (StringUtils.isNotBlank(ObjectUtils.toString(devo.getDynamic())) || checkCustAssetFundVO(devo)) {	//判斷單位數 > 0
 						CustAssetFundVO retVO = new CustAssetFundVO();
 						retVO.setAssetType(hfmtid); // 信託種類
 						retVO.setSPRefId(devo.getSPRefId());
@@ -5094,7 +5092,7 @@ public class SOT703 extends EsbUtil {
 
 				for (NFBRN9OutputVODetailsVO devo : outputVO.getDetails()) {
 					// 2017-01-18 by Jacky 判斷單位數 > 0 才回傳前端
-					if (checkCustAssetFundVO(devo)) {
+					if (checkCustAssetFundVO(devo) || StringUtils.isNotBlank(devo.getDynamic())) {
 						CustAssetFundVO retVO = new CustAssetFundVO();
 						retVO.setAssetType(hfmtid); // 信託種類
 						retVO.setSPRefId(devo.getSPRefId());

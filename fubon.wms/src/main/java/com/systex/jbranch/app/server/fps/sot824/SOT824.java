@@ -44,8 +44,8 @@ public class SOT824 extends SotPdf {
         if (inputVO.getHmshacrDataVO() != null) {
         	if(inputVO.getPrdType().matches("3")) { //特金海外債/金市海外債
         		data.addParameter("PROD_TYPE1", "□	不保本境內外結構型商品");
-        		data.addParameter("PROD_TYPE2", "■	BB-(含)以下信用評等債券(含無信用評等債券)");
-        		data.addParameter("PROD_TYPE3", "□	未具證投信基金性質境外基金");
+        		data.addParameter("PROD_TYPE2", "■	(1)BB-(含)以下信用評等債券(含無信用評等債券)");
+        		data.addParameter("PROD_TYPE3", "□	(2)未具證投信基金性質境外基金");
         		
         		data.addParameter("PROD_NAME1", "");
                 data.addParameter("PROD_ID1", "");
@@ -55,8 +55,8 @@ public class SOT824 extends SotPdf {
                 data.addParameter("PROD_ID3", "");
         	} else if (inputVO.getPrdType().matches("4|5")) { //SI/SN/DCI(SOT620過來)
         		data.addParameter("PROD_TYPE1", "■	不保本境內外結構型商品");
-        		data.addParameter("PROD_TYPE2", "□	BB-(含)以下信用評等債券(含無信用評等債券)");
-        		data.addParameter("PROD_TYPE3", "□	未具證投信基金性質境外基金");
+        		data.addParameter("PROD_TYPE2", "□	(1)BB-(含)以下信用評等債券(含無信用評等債券)");
+        		data.addParameter("PROD_TYPE3", "□	(2)未具證投信基金性質境外基金");
         		
         		data.addParameter("PROD_NAME1", inputVO.getPrdName());
                 data.addParameter("PROD_ID1", inputVO.getPrdId());
@@ -66,8 +66,8 @@ public class SOT824 extends SotPdf {
                 data.addParameter("PROD_ID3", "");
         	} else if (inputVO.getPrdType().matches("1")) { //境外私募基金
         		data.addParameter("PROD_TYPE1", "□	不保本境內外結構型商品");
-        		data.addParameter("PROD_TYPE2", "□	BB-(含)以下信用評等債券(含無信用評等債券)");
-        		data.addParameter("PROD_TYPE3", "■	未具證投信基金性質境外基金");
+        		data.addParameter("PROD_TYPE2", "□	(1)BB-(含)以下信用評等債券(含無信用評等債券)");
+        		data.addParameter("PROD_TYPE3", "■	(2)未具證投信基金性質境外基金");
         		
         		data.addParameter("PROD_NAME1", "");
                 data.addParameter("PROD_ID1", "");

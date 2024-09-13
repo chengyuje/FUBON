@@ -1051,7 +1051,7 @@ eSoafApp.controller('SOT310Controller',
 							}
 						});
 					}
-				} else if(!flag && $scope.inputVO.gtcYN == "Y") { //長效單，修改限價價格
+				} else if(!flag && $scope.inputVO.gtcYN != "N") { // 長效單/預約單，修改限價價格
 					//參數取得"限價超過參考報價的正負N"
 					var rangelist = $filter('filter')($scope.mappingSet["SOT.BN_GTC_LIMITPRICE_RANGE"], "1");
 					var range = 3;

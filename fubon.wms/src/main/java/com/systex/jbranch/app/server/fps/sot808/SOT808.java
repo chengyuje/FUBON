@@ -145,9 +145,9 @@ public class SOT808 extends SotPdf {
 							if (data_map.get("ENTRUST_AMT") != null && StringUtils.isNotBlank(data_map.get("ENTRUST_AMT").toString())) {
 								String EntrustType = (String) xmlInfo.getVariable("SOT.ENTRUST_TYPE_PURCHASE", data_map.get("ENTRUST_TYPE").toString(), "F3");
 								if (data_map.get("GTC_YN") != null && StringUtils.equals("Y", data_map.get("GTC_YN").toString()))
-									data_map.put("ENTRUST_AMT", "限價　" + data_map.get("ENTRUST_AMT").toString()); //長效單固定列印"限價"
+									data_map.put("ENTRUST_AMT", "■限價　" + data_map.get("ENTRUST_AMT").toString()); //長效單固定列印"限價"
 								else
-									data_map.put("ENTRUST_AMT", EntrustType + "　" + data_map.get("ENTRUST_AMT").toString());
+									data_map.put("ENTRUST_AMT", "■" + EntrustType);
 							}
 
 							if (data_map.get("FEE_RATE") != null && StringUtils.isNotBlank(data_map.get("FEE_RATE").toString())) {
@@ -387,6 +387,7 @@ public class SOT808 extends SotPdf {
 					}
 					
 					data.addParameter("TRADE_TYPE", data_map.get("TRADE_TYPE").toString());
+					data.addParameter("ENTRUST_TYPE", data_map.get("ENTRUST_TYPE").toString());
 					data.addParameter("ENTRUST_AMT", data_map.get("ENTRUST_AMT").toString());
 
 					if (data_map.get("BRA") != null && StringUtils.isNotBlank(data_map.get("BRA").toString())) {

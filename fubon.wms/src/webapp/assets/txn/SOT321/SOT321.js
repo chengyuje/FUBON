@@ -14,7 +14,10 @@ eSoafApp.controller('SOT321Controller',
 				$scope.mappingSet['SOT.CUST_TYPE'] = totas.data[totas.key.indexOf('SOT.CUST_TYPE')];
 				$scope.mappingSet['SOT.TRUST_CURR_TYPE'] = totas.data[totas.key.indexOf('SOT.TRUST_CURR_TYPE')];
 				$scope.mappingSet['SOT.MARKET_TYPE'] = totas.data[totas.key.indexOf('SOT.MARKET_TYPE')];
+				
 				$scope.mappingSet['SOT.ENTRUST_TYPE_REDEEM_SN'] = totas.data[totas.key.indexOf('SOT.ENTRUST_TYPE_REDEEM_SN')];
+				$scope.mappingSet['SOT.ENTRUST_TYPE_REDEEM_SN'].push({'LABEL':'自設', 'DATA':'7'});
+						
 		        $scope.mappingSet['SOT.SPEC_CUSTOMER'] = totas.data[totas.key.indexOf('SOT.SPEC_CUSTOMER')];//客戶註記
 		        $scope.mappingSet['SOT.BN_CUR_LIMIT_GTC'] = totas.data[totas.key.indexOf('SOT.BN_CUR_LIMIT_GTC')];
 				$scope.mappingSet['SOT.BN_GTC_LIMITPRICE_RANGE'] = totas.data[totas.key.indexOf('SOT.BN_GTC_LIMITPRICE_RANGE')];
@@ -470,11 +473,16 @@ eSoafApp.controller('SOT321Controller',
 
 		$scope.calculate = function () {
 			// 選限價1%、3%、5%時，下面的『委託贖回限價價格』欄位就要反灰不能填寫
-			if ($scope.inputVO.entrustType == "4" || $scope.inputVO.entrustType == "5" || $scope.inputVO.entrustType == "6") {
+			if ($scope.inputVO.entrustType != "7") {
 				$scope.disGtcRefVal = true;
 				$scope.inputVO.gtcRefVal = undefined;
 			} else {
 				$scope.disGtcRefVal = false;
+			}
+			
+			if ($scope.inputVO.gtcYN == 'N' && $scope.inputVO.entrustType == '7') {
+				$scope.inputVO.entrustType = '2';
+				$scope.showErrorMsg("當日單不可選自設");
 			}
 			
 			var refVal = undefined;
@@ -503,28 +511,27 @@ eSoafApp.controller('SOT321Controller',
 		}
 
 		$scope.gtcYN_Changed = function() {
-			if($scope.inputVO.gtcYN == "N") {
-				$scope.inputVO.gtcRefVal = undefined;
-			} else {
-				$scope.inputVO.gtcRefVal = $scope.inputVO.refVal;
-			}
-			
 			if ($scope.inputVO.gtcYN == "N") {
 				// 當日單
+				$scope.inputVO.entrustType = "2";
+				$scope.inputVO.gtcRefVal = undefined;
 				$scope.inputVO.gtcStartDate = undefined;
 				$scope.inputVO.gtcEndDate = undefined;	
 				
 			} else if ($scope.inputVO.gtcYN == "Y") {
 				// 長效單
+				$scope.inputVO.entrustType = "7";
+				$scope.inputVO.gtcRefVal = $scope.inputVO.refVal;
 				$scope.inputVO.gtcEndDate = undefined;
 				
 			} else if ($scope.inputVO.gtcYN == "P") {
 				// 預約單
+				$scope.inputVO.entrustType = "2";
+				$scope.inputVO.gtcRefVal = undefined;
 				$scope.inputVO.gtcEndDate = $scope.inputVO.gtcStartDate;
 			}
+			
 			$scope.limitDate();
-
-			$scope.inputVO.entrustType = "2";
 			$scope.calculate();
 		}
 
