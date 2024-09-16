@@ -433,9 +433,22 @@ public class SOT1650 extends FubonWmsBizLogic {
 		SOT110OutputVO outputVO = new SOT110OutputVO();
 		dam = this.getDataAccessManager();
 
+		//更新錄音序號
+		TBSOT_TRADE_MAINVO mainVo = new TBSOT_TRADE_MAINVO();
+		mainVo = (TBSOT_TRADE_MAINVO) dam.findByPKey(TBSOT_TRADE_MAINVO.TABLE_UID, inputVO.getTradeSEQ());
+		if (StringUtils.isNotBlank(inputVO.getRecSEQ())) {
+			mainVo.setREC_SEQ(inputVO.getRecSEQ());//錄音序號
+		}
+		dam.update(mainVo);
+				
 		//確認電文
-		inputVO.setConfirm("2"); 
-		String errMsg = dynamicESBValidate(inputVO);
+		String errMsg = "";
+		try {
+			inputVO.setConfirm("2"); 
+			errMsg = dynamicESBValidate(inputVO);
+		} catch(Exception e) {
+			errMsg = e.toString();
+		}
 		if (StringUtils.isNotBlank(errMsg)) {
 			outputVO.setErrorMsg(errMsg);
 		} else {

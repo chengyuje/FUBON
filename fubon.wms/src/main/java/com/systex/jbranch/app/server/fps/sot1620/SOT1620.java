@@ -448,8 +448,13 @@ public class SOT1620 extends FubonWmsBizLogic {
 		dam.update(mainVo);
 
 		//確認電文
-		inputVO.setConfirm(""); 
-		String errMsg = dynamicESBValidate(inputVO);
+		String errMsg = "";
+		try {
+			inputVO.setConfirm(""); 
+			errMsg = dynamicESBValidate(inputVO);
+		} catch(Exception e) {
+			errMsg = e.toString();
+		}
 		if (StringUtils.isNotBlank(errMsg)) {
 			outputVO.setErrorMsg(errMsg);
 		} else {

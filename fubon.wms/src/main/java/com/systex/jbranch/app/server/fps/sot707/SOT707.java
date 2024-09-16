@@ -923,7 +923,7 @@ public class SOT707 extends EsbUtil {
 		txBodyVO.setTxType("2");															// 限價方式：固定放 2.市價
 		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false));
 		
-		// 限價方式為不為市價，才需要放值
+		// 限價，才需要放值
 		if (!StringUtils.equals("2", mainVO.getENTRUST_TYPE())) {
 			txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9));	// 委買單價：『限價』需有價格、『市價』NULL
 		}
@@ -1089,7 +1089,7 @@ public class SOT707 extends EsbUtil {
 		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false));
 		txBodyVO.setTxType("2");															// 限價方式：固定放 2.市價
 		
-		// 限價方式為不為市價，才需要放值
+		// 限價，才需要放值
 		if (!StringUtils.equals("2", mainVO.getENTRUST_TYPE())) {
 			txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9));	// 委買單價：『限價』需有價格、『市價』NULL
 		}
@@ -1876,7 +1876,7 @@ public class SOT707 extends EsbUtil {
 		txBodyVO.setTxCur(mainVO.getPROD_CURR()); // 委託面額幣別
 		
 		String entrustType = "";
-		if (mainVO.getENTRUST_TYPE().equals("7")) {
+		if (mainVO.getENTRUST_TYPE().equals("1")) {
 			// 限價才需帶委賣單價
 			txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); // 委賣單價
 			entrustType = "2";	// 限價一樣帶"2"
@@ -2034,7 +2034,7 @@ public class SOT707 extends EsbUtil {
 		txBodyVO.setGtcEndDate(this.toChineseYearMMdd(mainVO.getGTC_END_DATE(), false));	// 長效單迄日
 		
 		String entrustType = "";
-		if (mainVO.getENTRUST_TYPE().equals("7")) {
+		if (mainVO.getENTRUST_TYPE().equals("1")) {
 			// 限價才需帶委賣單價
 			txBodyVO.setTxPrice(new EsbUtil().decimalPadding(mainVO.getENTRUST_AMT(), 9)); 	// 委賣單價
 			entrustType = "2";	// 限價一樣帶"2"

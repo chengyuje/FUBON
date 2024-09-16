@@ -10,6 +10,10 @@
             <property name="fileName">FPS.rptlibrary</property>
             <property name="namespace">FPS</property>
         </structure>
+        <structure>
+            <property name="fileName">src/webapp/WEB-INF/JBranch/Transaction/FPS.rptlibrary</property>
+            <property name="namespace">FPS2</property>
+        </structure>
     </list-property>
     <parameters>
         <scalar-parameter name="BATCH_SEQ" id="3854">
@@ -220,6 +224,9 @@
             </structure>
         </scalar-parameter>
     </parameters>
+    <data-sources>
+        <script-data-source name="Script Data Source" id="5055" extends="FPS2.Script Data Source"/>
+    </data-sources>
     <data-sets>
         <script-data-set name="BUY" id="1080" extends="FPS.Script Mult Data Set">
             <list-property name="resultSetHints">
@@ -293,6 +300,11 @@
                     <property name="name">TOT_AMT</property>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">ENTRUST_TYPE</property>
+                    <property name="dataType">string</property>
+                </structure>
             </list-property>
             <list-property name="columnHints">
                 <structure>
@@ -336,6 +348,10 @@
                 </structure>
                 <structure>
                     <property name="columnName">TOT_AMT</property>
+                </structure>
+                <structure>
+                    <property name="columnName">ENTRUST_TYPE</property>
+                    <text-property name="displayName">ENTRUST_TYPE</text-property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -408,10 +424,16 @@
                     <structure>
                         <property name="position">14</property>
                         <property name="name">TOT_AMT</property>
-                        <property name="dataType">float</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">ENTRUST_TYPE</property>
+                        <property name="dataType">string</property>
                     </structure>
                 </list-property>
             </structure>
+            <property name="dataSource">Script Data Source</property>
         </script-data-set>
         <script-data-set name="SELL" id="3872" extends="FPS.Script Mult Data Set">
             <list-property name="resultSetHints">
@@ -1151,8 +1173,8 @@
                 <structure>
                     <property name="name">PAYABLE_FEE</property>
                     <text-property name="displayName">PAYABLE_FEE</text-property>
-                    <expression name="expression" type="javascript">if (param["ENTRUST_TYPE"] != 2) {&#13;
-	 dataSetRow["PAYABLE_FEE"]&#13;
+                    <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; dataSetRow["ENTRUST_TYPE"] != "2") {&#13;
+	dataSetRow["PAYABLE_FEE"]&#13;
 }</expression>
                     <property name="dataType">string</property>
                     <property name="allowExport">true</property>
@@ -2059,7 +2081,7 @@ dataSetRow["ENTRUST_AMT"]+"%";&#13;
                             <structure>
                                 <property name="name">FEE</property>
                                 <text-property name="displayName">FEE</text-property>
-                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; param["ENTRUST_TYPE"] != 2) {&#13;
+                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; dataSetRow["ENTRUST_TYPE"] != "2") {&#13;
 Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
 }</expression>
                                 <property name="dataType">string</property>
@@ -2159,7 +2181,7 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                             <structure>
                                 <property name="name">TOT_AMT</property>
                                 <text-property name="displayName">TOT_AMT</text-property>
-                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; param["ENTRUST_TYPE"] != 2) {&#13;
+                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; dataSetRow["ENTRUST_TYPE"] != "2") {&#13;
 	dataSetRow["TOT_AMT"] &#13;
 }</expression>
                                 <property name="dataType">string</property>

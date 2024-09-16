@@ -112,6 +112,10 @@ public class SOT811DYNA extends SotPdf {
 					}
 				}
 			} else if(inputVO.getTradeType() == 4) { 
+				//事件變更，沒有轉換金額也沒有增加子基金，不用印自主聲明書
+				if(StringUtils.isBlank(ObjectUtils.toString(rMap.get("BATCH_SEQ_AMOUNT"))) && StringUtils.isBlank(ObjectUtils.toString(rMap.get("BATCH_SEQ_ADDPROD")))) {
+					return new ArrayList<String>();
+				}
 				//事件變更，有轉換金額或增加子基金，則列出這些子基金
 				if(StringUtils.isNotBlank(ObjectUtils.toString(rMap.get("BATCH_SEQ_AMOUNT")))){
 					//有子基金轉換金額

@@ -16,7 +16,7 @@ eSoafApp.controller('SOT321Controller',
 				$scope.mappingSet['SOT.MARKET_TYPE'] = totas.data[totas.key.indexOf('SOT.MARKET_TYPE')];
 				
 				$scope.mappingSet['SOT.ENTRUST_TYPE_REDEEM_SN'] = totas.data[totas.key.indexOf('SOT.ENTRUST_TYPE_REDEEM_SN')];
-				$scope.mappingSet['SOT.ENTRUST_TYPE_REDEEM_SN'].push({'LABEL':'自設', 'DATA':'7'});
+				$scope.mappingSet['SOT.ENTRUST_TYPE_REDEEM_SN'].push({'LABEL':'自設', 'DATA':'1'});
 						
 		        $scope.mappingSet['SOT.SPEC_CUSTOMER'] = totas.data[totas.key.indexOf('SOT.SPEC_CUSTOMER')];//客戶註記
 		        $scope.mappingSet['SOT.BN_CUR_LIMIT_GTC'] = totas.data[totas.key.indexOf('SOT.BN_CUR_LIMIT_GTC')];
@@ -473,14 +473,14 @@ eSoafApp.controller('SOT321Controller',
 
 		$scope.calculate = function () {
 			// 選限價1%、3%、5%時，下面的『委託贖回限價價格』欄位就要反灰不能填寫
-			if ($scope.inputVO.entrustType != "7") {
+			if ($scope.inputVO.entrustType != "1") {
 				$scope.disGtcRefVal = true;
 				$scope.inputVO.gtcRefVal = undefined;
 			} else {
 				$scope.disGtcRefVal = false;
 			}
 			
-			if ($scope.inputVO.gtcYN == 'N' && $scope.inputVO.entrustType == '7') {
+			if ($scope.inputVO.gtcYN == 'N' && $scope.inputVO.entrustType == '1') {
 				$scope.inputVO.entrustType = '2';
 				$scope.showErrorMsg("當日單不可選自設");
 			}
@@ -520,7 +520,7 @@ eSoafApp.controller('SOT321Controller',
 				
 			} else if ($scope.inputVO.gtcYN == "Y") {
 				// 長效單
-				$scope.inputVO.entrustType = "7";
+				$scope.inputVO.entrustType = "1";
 				$scope.inputVO.gtcRefVal = $scope.inputVO.refVal;
 				$scope.inputVO.gtcEndDate = undefined;
 				
@@ -536,6 +536,11 @@ eSoafApp.controller('SOT321Controller',
 		}
 
 		$scope.chkGtcRefVal = function() {
+			if ($scope.inputVO.gtcRefVal == 0) {
+				$scope.inputVO.gtcRefVal = undefined;
+				$scope.showErrorMsg("委託贖回限價價格不可為0");
+				return;
+			}
 			if($scope.inputVO.gtcYN == "Y") {
 				//參數取得"限價超過參考報價的正負N"
 				var rangelist = $filter('filter')($scope.mappingSet["SOT.BN_GTC_LIMITPRICE_RANGE"], "1");

@@ -1051,15 +1051,21 @@ eSoafApp.controller('SOT310Controller',
 							}
 						});
 					}
-				} else if(!flag && $scope.inputVO.gtcYN != "N") { // 長效單/預約單，修改限價價格
-					//參數取得"限價超過參考報價的正負N"
-					var rangelist = $filter('filter')($scope.mappingSet["SOT.BN_GTC_LIMITPRICE_RANGE"], "1");
+				} else if(!flag && $scope.inputVO.gtcYN != "N") { 
+					// 長效單/預約單，修改限價價格
+					if ($scope.inputVO.entrustAmt == 0) {
+						$scope.inputVO.entrustAmt = undefined;
+						$scope.showErrorMsg("限價價格不可為0");
+						return;
+					}
+					
+					var rangelist = $filter('filter')($scope.mappingSet["SOT.BN_GTC_LIMITPRICE_RANGE"], "1");	//參數取得"限價超過參考報價的正負N"
 					var range = 3;
 					//若無參數預設為3
 					if(range != undefined && range != null) range = rangelist[0].LABEL;
 
 					if(Math.abs($scope.inputVO.entrustAmt - $scope.inputVO.refVal) > range ) {
-						var txtMsg = $filter('i18n')('ehl_02_SOT_013');	//限價超過參考報價的正負3，請確認是否繼續下單。
+						var txtMsg = $filter('i18n')('ehl_02_SOT_013');		//限價超過參考報價的正負3，請確認是否繼續下單。
 						$scope.showWarningMsg(txtMsg, range);
 					}
 				}

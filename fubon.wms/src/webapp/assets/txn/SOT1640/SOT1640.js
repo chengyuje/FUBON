@@ -7,6 +7,8 @@ eSoafApp.controller('SOT1640Controller',
 	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, $filter, getParameter, $q, validateService, sotService) {
 		$controller('BaseController', {$scope: $scope});
 		$scope.controllerName = "SOT1640Controller";
+		//繼承PRD100高齡檢核
+		$controller('PRD100Controller', {$scope: $scope});
 		
 		debugger
         getParameter.XML(["SOT.CUST_TYPE", "SOT.TRADE_DATE_TYPE", "COMMON.YES_NO", "SOT.RESERVE_DATE_TIMESTAMP", "SOT.SPEC_CUSTOMER",'SOT.FUND_DECIMAL_POINT', "SOT.RESERVE_TRADE_DAYS","SOT.TRANSFER_TYPE_DYNA", "SOT.PROSPECTUS_TYPE"], function(totas) {
@@ -1094,33 +1096,11 @@ eSoafApp.controller('SOT1640Controller',
 			$scope.inputVO.hnwcServiceYN = ''; //可提供高資產商品或服務 Y/N 
 			$scope.inputVO.flagNumber = ''; //90天內是否有貸款紀錄 Y/N
 			$scope.inputVO.transferType = ""; //轉換方式
+			$scope.inputVO.otherWithCustId = false; //是否從資產總覽CRM821交易過來，帶CUSTID及庫存資料
 		};
 		$scope.init();
 		
-		$scope.query = function() {
-			debugger
-			$scope.carList = [];
-			//預設值
-			if ($scope.connector('get','SOTTradeSEQ')){
-				$scope.inputVO.tradeSEQ = $scope.connector('get','SOTTradeSEQ');
-				$scope.inputVO.seqNo = 1; //只有一筆，固定為1
-				$scope.connector('set', 'SOTTradeSEQ', null); //避免跨交易返回本頁殘值
-				$scope.connector('set', 'SOTCarSEQ', null);
-				$scope.noCallCustQuery().then(function(data) {
-					var loadEdit = true;
-					$scope.getSOTCustInfo(loadEdit,false);
-				});
-			} else {
-				// 取得新交易序號 
-				$scope.getTradeSEQ();
-			}
-		};
-		
-		if(!$scope.connector('get','SOTCustID')) {
-			//"不是"從資產總覽交易過來，維持原來
-			$scope.query();
-		} else {
-			//從資產總覽CRM821交易過來，帶CUSTID及庫存資料
+		$scope.inbyCRM821 = function() {
 			$scope.getTradeSEQ();
 		    $scope.inputVO.custID = $scope.connector('get','SOTCustID');
 		    $scope.connector('set','SOTCustID',null);
@@ -1144,4 +1124,64 @@ eSoafApp.controller('SOT1640Controller',
 				$scope.connector('set','SOTProdC5', null);
 			});
 		}
+	    
+		$scope.query = function() {
+			debugger
+			$scope.carList = [];
+			//預設值
+			if ($scope.connector('get','SOTTradeSEQ')){
+				$scope.inputVO.tradeSEQ = $scope.connector('get','SOTTradeSEQ');
+				$scope.inputVO.seqNo = 1; //只有一筆，固定為1
+				$scope.connector('set', 'SOTTradeSEQ', null); //避免跨交易返回本頁殘值
+				$scope.connector('set', 'SOTCarSEQ', null);
+				$scope.noCallCustQuery().then(function(data) {
+					var loadEdit = true;
+					$scope.getSOTCustInfo(loadEdit,false);
+				});
+			} else {
+				// 取得新交易序號 
+				$scope.getTradeSEQ();
+			}
+		};
+		
+		$scope.validateSeniorCust = function() {
+			if(!$scope.inputVO.custID) return;
+			
+			$scope.inputVO.prodType='8';  //8：基金動態鎖利
+        	$scope.inputVO.tradeType='3'; //3：轉換
+        	$scope.inputVO.seniorAuthType='S'; //高齡評估表授權種類(S:下單、A：適配)
+        	$scope.inputVO.trustTS = 'S';  //S:特金交易
+			$scope.inputVO.type = "1";
+			$scope.inputVO.cust_id = $scope.inputVO.custID;
+			$scope.validSeniorCustEval(); //PRD100.validSeniorCustEval高齡檢核
+		}
+		
+		//PRD100.validSeniorCustEval高齡檢核不通過清空客戶ID
+		$scope.clearCustInfo = function() {
+			$scope.inputVO.custID = "";
+			$scope.connector('set','SOTCustID',null);
+			$scope.custClear();
+		};
+		
+		//PRD100.validSeniorCustEval高齡檢核通過後查詢
+		$scope.reallyInquire = function() {
+			if($scope.inputVO.otherWithCustId) { //從資產總覽CRM821交易過來，帶CUSTID及庫存資料
+				$scope.inbyCRM821();
+			} else {
+				$scope.getSOTCustInfo(false,true);
+			}
+			$scope.connector('set','SOTCustID',null);
+		};
+		
+		if(!$scope.connector('get','SOTCustID')) {
+			//"不是"從資產總覽交易過來，維持原來
+			$scope.query();
+		} else {
+			//從資產總覽CRM821交易過來，帶CUSTID及庫存資料
+			$scope.inputVO.otherWithCustId = true;
+			$scope.inputVO.custID = $scope.connector('get','SOTCustID');
+			$scope.validateSeniorCust();
+		}
+		
+		
 });
