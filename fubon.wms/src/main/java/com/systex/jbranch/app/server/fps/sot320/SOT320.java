@@ -327,7 +327,7 @@ public class SOT320 extends FubonWmsBizLogic {
 		dtlVO.setREF_VAL_DATE(null != inputVO.getRefValDate() ? new Timestamp(inputVO.getRefValDate().getTime()) : null); //參考報價日期
 		dtlVO.setPURCHASE_AMT(inputVO.getPurchaseAmt()); //申購金額/庫存面額
 		dtlVO.setENTRUST_TYPE(inputVO.getEntrustType()); //委託價格類型/贖回方式
-		dtlVO.setENTRUST_AMT(StringUtils.equals("Y", inputVO.getGtcYN()) ? inputVO.getGtcRefVal() : inputVO.getEntrustAmt()); //長效單委託價格/當日單委託價格
+		dtlVO.setENTRUST_AMT(StringUtils.equals("1", inputVO.getEntrustType()) ? inputVO.getGtcRefVal() : inputVO.getEntrustAmt()); // 長效單or預約單委託價格/當日單or預約單委託價格
 		dtlVO.setTRUST_AMT(inputVO.getTrustAmt()); //信託本金
 		dtlVO.setDEFAULT_FEE_RATE(inputVO.getDefaultFeeRate()); //表定手續費率
 		dtlVO.setADV_FEE_RATE(null); //事先申請手續費率

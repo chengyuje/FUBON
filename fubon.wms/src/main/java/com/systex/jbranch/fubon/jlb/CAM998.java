@@ -868,9 +868,16 @@ public class CAM998 extends BizLogic {
 		sb.append("  FROM TBSYSPARAMETER ");
 		sb.append("  WHERE PARAM_TYPE = 'CAM.MAX_CONTACT' ");
 		sb.append("), EMP AS ( ");
-		sb.append("  SELECT MEM.EMP_ID, AO.AO_CODE, AO.TYPE AS AO_TYPE, MEM.EMP_NAME, MR.ROLE_ID, R.ROLE_NAME, MEM.DEPT_ID AS BRANCH_ID ");
+		sb.append("  SELECT MEM.EMP_ID, ");
+		sb.append("         AO.AO_CODE, ");
+		sb.append("         AO.TYPE AS AO_TYPE, ");
+		sb.append("         MEM.EMP_NAME, ");
+		sb.append("         MR.ROLE_ID, ");
+		sb.append("         R.ROLE_NAME, ");
+		sb.append("         CASE WHEN UB.EMP_ID IS NOT NULL THEN UB.BRANCH_NBR ELSE MEM.DEPT_ID END AS BRANCH_ID ");
 		sb.append("  FROM TBORG_MEMBER_ROLE MR, TBORG_ROLE R, TBORG_DEFN DEFN, TBORG_MEMBER MEM ");
 		sb.append("  LEFT JOIN TBORG_SALES_AOCODE AO ON MEM.EMP_ID = AO.EMP_ID ");
+		sb.append("  LEFT JOIN TBORG_UHRM_BRH UB ON MEM.EMP_ID = UB.EMP_ID ");
 		sb.append("  WHERE 1 = 1 ");
 		sb.append("  AND MEM.JOB_TITLE_NAME = R.JOB_TITLE_NAME ");
 		sb.append("  AND MR.ROLE_ID = R.ROLE_ID ");
@@ -882,15 +889,26 @@ public class CAM998 extends BizLogic {
 		}
 		
 		sb.append("  AND MR.IS_PRIMARY_ROLE = 'Y' ");
-		sb.append("  AND DEFN.ORG_TYPE = '50' ");
+		sb.append("  AND ( ");
+		sb.append("    CASE WHEN UB.EMP_ID IS NOT NULL THEN 'Y' ");
+		sb.append("         WHEN DEFN.ORG_TYPE = '50' THEN 'Y' ");
+		sb.append("    ELSE 'N' END ");
+		sb.append("  ) = 'Y' ");
 		sb.append("  AND MEM.SERVICE_FLAG = 'A' ");
 		sb.append("  AND MEM.CHANGE_FLAG IN ('A', 'M', 'P') ");
 				  
 		sb.append("  UNION ");
 		  
-		sb.append("  SELECT MEM.EMP_ID, AO.AO_CODE, AO.TYPE AS AO_TYPE, MEM.EMP_NAME, MR.ROLE_ID, R.ROLE_NAME, PLUR.DEPT_ID AS BRANCH_ID ");
+		sb.append("  SELECT MEM.EMP_ID, ");
+		sb.append("         AO.AO_CODE, ");
+		sb.append("         AO.TYPE AS AO_TYPE, ");
+		sb.append("         MEM.EMP_NAME, ");
+		sb.append("         MR.ROLE_ID, ");
+		sb.append("         R.ROLE_NAME, ");
+		sb.append("         CASE WHEN UB.EMP_ID IS NOT NULL THEN UB.BRANCH_NBR ELSE PLUR.DEPT_ID END AS BRANCH_ID ");
 		sb.append("  FROM TBORG_MEMBER_ROLE MR, TBORG_ROLE R, TBORG_DEFN DEFN, TBORG_MEMBER MEM, TBORG_MEMBER_PLURALISM PLUR ");
 		sb.append("  LEFT JOIN TBORG_SALES_AOCODE AO ON PLUR.EMP_ID = AO.EMP_ID ");
+		sb.append("  LEFT JOIN TBORG_UHRM_BRH UB ON PLUR.EMP_ID = UB.EMP_ID ");
 		sb.append("  WHERE 1 = 1 ");
 		sb.append("  AND PLUR.JOB_TITLE_NAME = R.JOB_TITLE_NAME ");
 		sb.append("  AND MR.ROLE_ID = R.ROLE_ID ");
@@ -903,7 +921,11 @@ public class CAM998 extends BizLogic {
 		}
 		
 		sb.append("  AND MR.IS_PRIMARY_ROLE = 'N' ");
-		sb.append("  AND DEFN.ORG_TYPE = '50' ");
+		sb.append("  AND ( ");
+		sb.append("    CASE WHEN UB.EMP_ID IS NOT NULL THEN 'Y' ");
+		sb.append("         WHEN DEFN.ORG_TYPE = '50' THEN 'Y' ");
+		sb.append("    ELSE 'N' END ");
+		sb.append("  ) = 'Y' ");
 		sb.append("  AND (TRUNC(PLUR.TERDTE) >= TRUNC(SYSDATE) OR PLUR.TERDTE IS NULL) ");
 		sb.append("  AND PLUR.ACTION <> 'D' ");
 		sb.append(") ");

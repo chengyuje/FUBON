@@ -683,8 +683,11 @@ public class PMS328 extends FubonWmsBizLogic {
 				}
 
 				CSVUtil csv = new CSVUtil();
-				
-				csv.setHeader(csvHeader); // 設定標頭
+				if (return_VO.getS_time().compareTo("2024/08") >= 0) {
+					csv.setHeader(csvHeaderNew); // 設定標頭
+				} else {
+					csv.setHeader(csvHeader); // 設定標頭
+				}
 				csv.addRecordList(listCSV); // 設定內容
 				
 				String url = csv.generateCSV();

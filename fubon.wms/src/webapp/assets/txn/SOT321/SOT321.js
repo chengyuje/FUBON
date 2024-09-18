@@ -541,7 +541,7 @@ eSoafApp.controller('SOT321Controller',
 				$scope.showErrorMsg("委託贖回限價價格不可為0");
 				return;
 			}
-			if($scope.inputVO.gtcYN == "Y") {
+			if($scope.inputVO.gtcYN != "N") {
 				//參數取得"限價超過參考報價的正負N"
 				var rangelist = $filter('filter')($scope.mappingSet["SOT.BN_GTC_LIMITPRICE_RANGE"], "1");
 				var range = 3;
@@ -684,7 +684,13 @@ eSoafApp.controller('SOT321Controller',
 			
 			// 長效單：未輸入限價價格，顯示錯誤訊息「請輸入參考委託贖回價格」(長效單只有限價，無市價選項) 
 			if ($scope.inputVO.gtcYN == "Y" && ($scope.inputVO.gtcRefVal == undefined || $scope.inputVO.gtcRefVal == '') ) {
-				$scope.showErrorMsg("請輸入參考委託贖回價格");
+				$scope.showErrorMsg("請輸入委託贖回限價價格");
+				return;
+			}
+			
+			// 預約單＋自設限價：未輸入限價價格，顯示錯誤訊息「請輸入參考委託贖回價格」
+			if ($scope.inputVO.gtcYN == "P" && $scope.inputVO.entrustType == '1' ) {
+				$scope.showErrorMsg("請輸入委託贖回限價價格");
 				return;
 			}
 			
