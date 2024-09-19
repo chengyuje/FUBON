@@ -1576,10 +1576,13 @@ public class SOT712 extends FubonWmsBizLogic{
 				}
 				
 				// SI 不保本聲明書套表
+				//#2134:申購印，贖回不印
+				if(inputVO.getTradeSubType() == 1) {
 					List sot821pdf = getPdfULst(inputVO, "sot821");
 					if (sot821pdf != null) {
 						url_list.addAll(sot821pdf);
 					}
+				}
 			} else if(StringUtils.equals(inputVO.getPrdType(), "FCI")) {
 				//FCI申購商品契約書
 				url_list.addAll(getPdfULst(inputVO, "sot809FCI"));
@@ -1748,7 +1751,8 @@ public class SOT712 extends FubonWmsBizLogic{
 					}
 					
 					// SN 不保本聲明書套表
-					if ("5".equals(inputVO.getPrdType())) {
+					//#2134:申購印，贖回不印
+					if ("5".equals(inputVO.getPrdType()) && inputVO.getTradeSubType() == 1) {
 						List sot821pdf = getPdfULst(inputVO, "sot821");
 						if (sot821pdf != null) {
 							url_list.addAll(sot821pdf);

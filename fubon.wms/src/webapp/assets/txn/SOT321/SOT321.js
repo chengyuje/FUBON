@@ -689,7 +689,7 @@ eSoafApp.controller('SOT321Controller',
 			}
 			
 			// 預約單＋自設限價：未輸入限價價格，顯示錯誤訊息「請輸入參考委託贖回價格」
-			if ($scope.inputVO.gtcYN == "P" && $scope.inputVO.entrustType == '1' ) {
+			if ($scope.inputVO.gtcYN == "P" && $scope.inputVO.entrustType == '1' && ($scope.inputVO.gtcRefVal == undefined || $scope.inputVO.gtcRefVal == '') ) {
 				$scope.showErrorMsg("請輸入委託贖回限價價格");
 				return;
 			}
