@@ -215,6 +215,7 @@ eSoafApp.controller('SOT1640Controller',
 			$scope.inputVO.numUnits = undefined; 	//單位數
 			$scope.inputVO.presentVal = undefined; 	//參考現值
 			$scope.presentVal = undefined; 	//參考現值
+			$scope.inputVO.prospectusType = undefined;    	//公開說明書
 			$scope.inputVO.inProdId = '';     //轉入基金代碼
 			$scope.inputVO.inProdName = '';     //轉入基金名稱
 			$scope.inputVO.inProdCurr = '';     //轉入計價幣別

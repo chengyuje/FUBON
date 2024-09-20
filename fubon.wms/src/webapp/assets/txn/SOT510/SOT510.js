@@ -472,9 +472,9 @@ eSoafApp.controller('SOT510Controller',
 			$scope.inputVO.disableAuthId = $scope.inputVO.custID.length >= 10 ? true : false;
 			$scope.inputVO.flagNumber = body.flagNumber;														//90天內是否有貸款紀錄 Y/N
 			
-			if($scope.inputVO.hnwcYN === "Y") {
-				$scope.showMsg("ehl_01_sot510_002");
-			}
+//			if($scope.inputVO.hnwcYN === "Y") {
+//				$scope.showMsg("ehl_01_sot510_002");
+//			}
 		}
 		
 		// 取得商品資訊
