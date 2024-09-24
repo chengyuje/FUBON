@@ -1,8 +1,8 @@
 
 'use strict';
-eSoafApp.controller('PMS432_UPLOADController', function($scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter, getParameter, sysInfoService) {
+eSoafApp.controller('PMS434_UPLOADController', function($scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter, getParameter, sysInfoService) {
 	$controller('BaseController', { $scope: $scope });
-	$scope.controllerName = "PMS432_UPLOADController";
+	$scope.controllerName = "PMS434_UPLOADController";
 
 	$scope.inputVO = {
 		fileName: "", fileRealName: "", compareType: "1"
@@ -14,7 +14,7 @@ eSoafApp.controller('PMS432_UPLOADController', function($scope, $controller, soc
 	};
 
 	$scope.downloadSimple = function() {
-		$scope.sendRecv("PMS432", "downloadSimple", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", { compareType: $scope.inputVO.compareType },
+		$scope.sendRecv("PMS434", "downloadSimple", "com.systex.jbranch.app.server.fps.pms434.PMS434InputVO", {compareType: $scope.inputVO.compareType},
 			function(tota, isError) {
 				if (!isError) {
 					return;
@@ -23,7 +23,7 @@ eSoafApp.controller('PMS432_UPLOADController', function($scope, $controller, soc
 	};
 
 	$scope.save = function() {
-		$scope.sendRecv("PMS432", "upload", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", $scope.inputVO,
+		$scope.sendRecv("PMS434", "upload", "com.systex.jbranch.app.server.fps.pms434.PMS434InputVO", $scope.inputVO,
 			function(tota, isError) {
 				if (!isError) {
 					var obj = { resultList: tota[0].body.resultList, compareType: $scope.inputVO.compareType };

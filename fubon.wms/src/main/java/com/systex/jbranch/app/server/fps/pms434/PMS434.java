@@ -1,4 +1,4 @@
-package com.systex.jbranch.app.server.fps.pms432;
+package com.systex.jbranch.app.server.fps.pms434;
 
 import java.io.FileOutputStream;
 import java.text.ParseException;
@@ -38,29 +38,29 @@ import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
 /**
- * PMS432
+ * PMS434
  * 
  * @author Jeff Cheng
  * @date 2023/11/30
  * @spec null
  */
-@Component("pms432")
+@Component("pms434")
 @Scope("request")
-public class PMS432 extends FubonWmsBizLogic {
+public class PMS434 extends FubonWmsBizLogic {
 
-	private Logger logger = LoggerFactory.getLogger(PMS432.class);
+	private Logger logger = LoggerFactory.getLogger(PMS434.class);
 
 	private DataAccessManager dam = null;
 
 	// 初始化查核區間
 	public void initCheckInterval(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
-		PMS432OutputVO outputVO = new PMS432OutputVO();
+		PMS434OutputVO outputVO = new PMS434OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_SQL);
 
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT DISTINCT YYYYMM AS LABEL, YYYYMM AS DATA ");
-		sql.append("FROM TBIOT_ADDRTELMAIL_CHK ");
+		sql.append("FROM TBJSB_ADDRTELMAIL_CHK ");
 		sql.append("ORDER BY YYYYMM DESC");
 
 		condition.setQueryString(sql.toString());
@@ -70,8 +70,8 @@ public class PMS432 extends FubonWmsBizLogic {
 	}
 
 	public void query(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
-		PMS432InputVO inputVO = (PMS432InputVO) body;
-		PMS432OutputVO outputVO = null;
+		PMS434InputVO inputVO = (PMS434InputVO) body;
+		PMS434OutputVO outputVO = null;
 
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -88,14 +88,14 @@ public class PMS432 extends FubonWmsBizLogic {
 	}
 
 	// 相符查詢
-	private PMS432OutputVO query_0(PMS432InputVO inputVO, QueryConditionIF condition) throws JBranchException {
-		PMS432OutputVO outputVO = new PMS432OutputVO();
+	private PMS434OutputVO query_0(PMS434InputVO inputVO, QueryConditionIF condition) throws JBranchException {
+		PMS434OutputVO outputVO = new PMS434OutputVO();
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ");
 		sql.append("CHK.SEQ, CHK.POLICY_NO, CHK.CUST_ID, CHK.CHK_TYPE, CHK.CHECK_SOURCE_CONTENT, CHK.SOURCE_TYPE, ");
 		sql.append("CHK.EMP_CUST_ID, CHK.EMP_NAME, CHK.BRANCH_ID, CHK.MATCH_YN, CHK.CHECKED_RESULT, ");
 		sql.append("REL.RELATION, REL.OTHER_REL, REL.INSURANCE_NO ");
-		sql.append("FROM TBIOT_ADDRTELMAIL_CHK CHK ");
+		sql.append("FROM TBJSB_ADDRTELMAIL_CHK CHK ");
 		sql.append("LEFT JOIN TBCUST_EMP_REL REL ");
 		sql.append("ON CHK.CUST_ID = REL.CUST_ID AND CHK.EMP_CUST_ID = REL.EMP_CUST_ID ");
 		sql.append("WHERE 1 = 1 ");
@@ -146,8 +146,8 @@ public class PMS432 extends FubonWmsBizLogic {
 	}
 
 	// 集中度查詢
-	private PMS432OutputVO query_2(PMS432InputVO inputVO, QueryConditionIF condition) throws JBranchException {
-		PMS432OutputVO outputVO = new PMS432OutputVO();
+	private PMS434OutputVO query_2(PMS434InputVO inputVO, QueryConditionIF condition) throws JBranchException {
+		PMS434OutputVO outputVO = new PMS434OutputVO();
 		StringBuilder sql = new StringBuilder();
 		sql.append("WITH A AS ( ");
 		sql.append("SELECT ");
@@ -155,7 +155,7 @@ public class PMS432 extends FubonWmsBizLogic {
 		sql.append("  REL.RELATION, REL.OTHER_REL, REL.INSURANCE_NO, ");
 		sql.append("  CHK.EMP_CUST_ID, CHK.EMP_NAME, CHK.BRANCH_ID, CHK.MATCH_YN, CHK.CHECKED_RESULT ");
 		sql.append("FROM ");
-		sql.append("  TBIOT_ADDRTELMAIL_CON_CHK CHK ");
+		sql.append("  TBJSB_ADDRTELMAIL_CON_CHK CHK ");
 		sql.append("LEFT JOIN ");
 		sql.append("  TBCUST_EMP_REL REL ");
 		sql.append("ON CHK.CUST_ID_A = REL.CUST_ID AND CHK.CUST_ID_B = REL.EMP_CUST_ID ");
@@ -164,7 +164,7 @@ public class PMS432 extends FubonWmsBizLogic {
 		sql.append("SELECT ");
 		sql.append("  YYYYMM, CHK_TYPE, CHECK_SOURCE_CONTENT, COUNT(CHECK_SOURCE_CONTENT) TOTAL ");
 		sql.append("FROM ");
-		sql.append("  TBIOT_ADDRTELMAIL_CON_CHK ");
+		sql.append("  TBJSB_ADDRTELMAIL_CON_CHK ");
 		sql.append("GROUP BY YYYYMM, CHK_TYPE, CHECK_SOURCE_CONTENT ");
 		sql.append(") ");
 		sql.append("SELECT ");
@@ -313,12 +313,12 @@ public class PMS432 extends FubonWmsBizLogic {
 
 	// 重新比對
 	public void reCompare(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
-		PMS432InputVO inputVO = (PMS432InputVO) body;
+		PMS434InputVO inputVO = (PMS434InputVO) body;
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_SQL);
 
 		StringBuffer sql = new StringBuffer();
-		sql.append("UPDATE TBIOT_ADDRTELMAIL_CHK CHK ");
+		sql.append("UPDATE TBJSB_ADDRTELMAIL_CHK CHK ");
 		sql.append("SET (CHECKED_RESULT) = (");
 		sql.append("SELECT 'Y' FROM TBCUST_EMP_REL REL WHERE REL.CUST_ID = CHK.CUST_ID  ");
 		sql.append("AND REL.EMP_CUST_ID = CHK.EMP_CUST_ID) ");
@@ -333,7 +333,7 @@ public class PMS432 extends FubonWmsBizLogic {
 
 	// 檢查TBCUST_EMP_REL，存在 => 覆蓋 不存在 => 新增
 	public void checkUpdateInsert(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
-		PMS432InputVO inputVO = (PMS432InputVO) body;
+		PMS434InputVO inputVO = (PMS434InputVO) body;
 		dam = this.getDataAccessManager();
 		
 		Map<String, Object> updateMap = new HashMap<>();
@@ -402,7 +402,7 @@ public class PMS432 extends FubonWmsBizLogic {
 		sendRtnObject(null);
 	}
 
-	private int updateRel(PMS432InputVO inputVO, Map<String, Object> map, QueryConditionIF condition)
+	private int updateRel(PMS434InputVO inputVO, Map<String, Object> map, QueryConditionIF condition)
 			throws JBranchException, ParseException {
 		int updateRel_Row = 0;
 		StringBuffer sql = new StringBuffer();
@@ -430,7 +430,7 @@ public class PMS432 extends FubonWmsBizLogic {
 		return updateRel_Row;
 	}
 
-	private int insertRel(PMS432InputVO inputVO, Map<String, Object> map, QueryConditionIF condition)
+	private int insertRel(PMS434InputVO inputVO, Map<String, Object> map, QueryConditionIF condition)
 			throws JBranchException, ParseException {
 		int insertRel_Row = 0;
 		StringBuffer sql = new StringBuffer();
@@ -463,7 +463,7 @@ public class PMS432 extends FubonWmsBizLogic {
 		return insertRel_Row;
 	}
 
-	private int deleteRel(PMS432InputVO inputVO, Map<String, Object> map, QueryConditionIF condition)
+	private int deleteRel(PMS434InputVO inputVO, Map<String, Object> map, QueryConditionIF condition)
 			throws JBranchException, ParseException {
 		int deleteRel_Row = 0;
 		StringBuffer sql = new StringBuffer();
@@ -482,11 +482,11 @@ public class PMS432 extends FubonWmsBizLogic {
 		return deleteRel_Row;
 	}
 
-	private void updateChk(PMS432InputVO inputVO, QueryConditionIF condition) throws JBranchException, ParseException {
+	private void updateChk(PMS434InputVO inputVO, QueryConditionIF condition) throws JBranchException, ParseException {
 		String loginID = (String) getCommonVariable(SystemVariableConsts.LOGINID);
 		for (Map<String, Object> map : inputVO.getList()) {
 			StringBuffer sql = new StringBuffer();
-			sql.append("UPDATE TBIOT_ADDRTELMAIL_CHK SET ");
+			sql.append("UPDATE TBJSB_ADDRTELMAIL_CHK SET ");
 			sql.append("CHECKED_RESULT = :chkResult, MODIFIER = :modifier, LASTUPDATE = SYSDATE ");
 			if (!inputVO.getUploadMark()) {
 //				sql.append("WHERE SEQ = :seq");
@@ -507,12 +507,12 @@ public class PMS432 extends FubonWmsBizLogic {
 		}
 	}
 
-	private void updateConChk(PMS432InputVO inputVO, QueryConditionIF condition)
+	private void updateConChk(PMS434InputVO inputVO, QueryConditionIF condition)
 			throws JBranchException, ParseException {
 		String loginID = (String) getCommonVariable(SystemVariableConsts.LOGINID);
 		for (Map<String, Object> map : inputVO.getList()) {
 			StringBuffer sql = new StringBuffer();
-			sql.append("UPDATE TBIOT_ADDRTELMAIL_CON_CHK SET ");
+			sql.append("UPDATE TBJSB_ADDRTELMAIL_CON_CHK SET ");
 			sql.append("CHECKED_RESULT = :chkResult, MODIFIER = :modifier, LASTUPDATE = SYSDATE ");
 			sql.append("WHERE CUST_ID_A = :custIdA and CUST_ID_B = :custIdB ");
 
@@ -533,7 +533,7 @@ public class PMS432 extends FubonWmsBizLogic {
 
 	// 下載範例檔
 	public void downloadSimple(Object body, IPrimitiveMap header) throws Exception {
-		PMS432InputVO inputVO = (PMS432InputVO) body;
+		PMS434InputVO inputVO = (PMS434InputVO) body;
 		if (!"2".equals(inputVO.getCompareType())) {
 			this.notifyClientToDownloadFile("doc//PMS//PMS432_EXAMPLE.csv", "查核結果上傳範本.csv");
 		} else {
@@ -544,8 +544,8 @@ public class PMS432 extends FubonWmsBizLogic {
 	
 	// 上傳檔案
 	public void upload(Object body, IPrimitiveMap header) throws Exception {
-		PMS432InputVO inputVO = (PMS432InputVO) body;
-		PMS432OutputVO outputVO = new PMS432OutputVO();
+		PMS434InputVO inputVO = (PMS434InputVO) body;
+		PMS434OutputVO outputVO = new PMS434OutputVO();
 		XmlInfo xmlInfo = new XmlInfo();
 		dam = this.getDataAccessManager();
 
@@ -664,7 +664,7 @@ public class PMS432 extends FubonWmsBizLogic {
 	// 匯出 Excel
 	public void export(Object body, IPrimitiveMap header) throws Exception {
 
-		PMS432InputVO inputVO = (PMS432InputVO) body;
+		PMS434InputVO inputVO = (PMS434InputVO) body;
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		String fileName = "保單聯絡資訊與理專疑似相同查核報表_" + sdf.format(new Date()) + ".xlsx";
@@ -680,7 +680,7 @@ public class PMS432 extends FubonWmsBizLogic {
 		String[] xlsxMain = null;
 
 		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> SIMILAR_INFO = xmlInfo.doGetVariable("PMS.SIMILAR_INFO", FormatHelper.FORMAT_3);
+		Map<String, String> SIMILAR_INFO = xmlInfo.doGetVariable("JSB.SIMILAR_INFO", FormatHelper.FORMAT_3);
 		Map<String, String> RELATION = xmlInfo.doGetVariable("PMS.RELATION", FormatHelper.FORMAT_3);
 		Map<String, String> RELATION_YN = xmlInfo.doGetVariable("PMS.RELATION_YN", FormatHelper.FORMAT_3);
 		Map<String, String> CHECK_RESULT_YN = xmlInfo.doGetVariable("PMS.CHECK_RESULT_YN", FormatHelper.FORMAT_3);

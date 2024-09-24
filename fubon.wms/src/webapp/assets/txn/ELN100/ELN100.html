@@ -1,0 +1,205 @@
+<script type="text/javascript" src="assets/txn/ELN100/ELN100.js"></script>
+<div ng-controller="ELN100Controller" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">ELN_每日詢價明細</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th>*詢價起迄日：</th>
+						<td colspan="6">
+     						<div style="float: left; width: 220px;" class="input-group datebox datewidth">
+								<input type="text" id="req_time_s" name="req_time_s"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.req_time_s"
+									   datepicker-options="sDateOptions"
+									   is-open="model.a"
+									   ng-readonly="true"
+									   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>																		
+								</span>
+							</div>
+							<div style="float: left">&nbsp;～&nbsp;</div>
+     						<div style="float: left; width: 220px;" class="input-group datebox datewidth">
+								<input type="text" id="req_time_e" name="req_time_e"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.req_time_e"
+									   datepicker-options="eDateOptions"
+									   is-open="model.b"
+									   ng-readonly="true"
+									   ng-change="limitDate()"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>																		
+								</span>
+							</div>
+							<div style="float: left; color: #b3b3b3;">&nbsp;查詢區間：限連續3日(含當日)</div>
+     					</td>
+					</tr>
+     				<tr>
+     					<th>標的1：</th>
+     					<td>
+     						<e-combobox id="link_prod_1"
+										ng-datasource=""
+										ng-model="inputVO.link_prod_1"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="180px"
+			   							style="line-height:20px;" />
+     					</td>
+     					<th>標的2：</th>
+     					<td>
+     						<e-combobox id="link_prod_2"
+										ng-datasource=""
+										ng-model="inputVO.link_prod_2"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="180px"
+			   							style="line-height:20px;" />
+     					</td>
+     					<th>標的3：</th>
+     					<td>
+     						<e-combobox id="link_prod_3"
+										ng-datasource=""
+										ng-model="inputVO.link_prod_3"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="180px"
+			   							style="line-height:20px;" />
+     					</td>
+  			  		</tr>
+     				<tr>
+     					<th>計價幣別：</th>
+     					<td>
+     						<e-combobox id="currency"
+										ng-datasource="mappingSet['ELN.CURRENCY']"
+										ng-model="inputVO.currency"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="180px"
+			   							style="line-height:20px;" />
+     					</td>
+     					<th>承作天期：</th>
+     					<td>
+     						<e-combobox id="duration"
+										ng-datasource="mappingSet['ELN.DURATION']"
+										ng-model="inputVO.duration"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="180px"
+			   							style="line-height:20px;" />
+     					</td>
+  			  		</tr>
+     				<tr>
+     					<th>KO 類型：</th>
+     					<td>
+     						<e-combobox id="ko_type"
+										ng-datasource="mappingSet['ELN.KO_TYPE']"
+										ng-model="inputVO.ko_type"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="180px"
+			   							style="line-height:20px;" />
+     					</td>
+     					<th>KI 類型：</th>
+     					<td>
+     						<e-combobox id="ki_type"
+										ng-datasource="mappingSet['ELN.KI_TYPE']"
+										ng-model="inputVO.ki_type"
+			   							ng-validate="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="180px"
+			   							style="line-height:20px;" />
+     					</td>
+  			  		</tr>
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquire()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="inquireInit()">清除</button>
+			</div>
+		</div>
+		
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
+				<table>
+					<thead>
+						<tr>
+							<th>詢價日</th>
+							<th>商品類型</th>
+							<th>天期(月)</th>
+							<th>幣別</th>
+							<th>標的1</th>
+							<th>標的2</th>
+							<th>標的3</th>
+							<th>標的4</th>
+							<th>標的5</th>
+							<th>收益率(年化%)</th>
+							<th>執行價格(%)</th>
+							<th>KO 價格(%)</br>[首月結束目開始]</th>
+							<th>KO 類型</th>
+							<th>KI 價格(%)</th>
+							<th>KI 類型</th>
+							<th>UF(%)</th>
+							<th>詢價人</th>
+							<th>問價編號</th>
+							<th>詢價編號</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>	
+		</div>
+	</div>
+</div>

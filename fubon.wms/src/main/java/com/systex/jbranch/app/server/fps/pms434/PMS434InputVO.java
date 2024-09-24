@@ -1,11 +1,11 @@
-package com.systex.jbranch.app.server.fps.pms432;
+package com.systex.jbranch.app.server.fps.pms434;
 
 import java.util.List;
 import java.util.Map;
 
 import com.systex.jbranch.platform.common.dataaccess.vo.PagingInputVO;
 
-public class PMS432InputVO extends PagingInputVO {
+public class PMS434InputVO extends PagingInputVO {
 
 	private String checkInterval; // 查核區間
 	private String similarInfo;   // 相似項目

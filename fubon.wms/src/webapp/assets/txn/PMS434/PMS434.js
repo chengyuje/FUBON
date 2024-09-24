@@ -1,8 +1,8 @@
 
 'use strict';
-eSoafApp.controller('PMS432Controller', function($scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter, getParameter, sysInfoService) {
+eSoafApp.controller('PMS434Controller', function($scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter, getParameter, sysInfoService) {
 	$controller('BaseController', { $scope: $scope });
-	$scope.controllerName = "PMS432Controller";
+	$scope.controllerName = "PMS434Controller";
 	
 	// 修改頁籤寬度
 	$("#eJumping select").css({
@@ -12,11 +12,11 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 		"display":    "inline",
 	});
 
-	getParameter.XML(["PMS.SIMILAR_INFO", "PMS.COMPARE_SOURCE", "PMS.COMPARE_RESULT", "PMS.CHECK_RESULT_YN", "PMS.RELATION_YN", "PMS.RELATION"], function(totas) {
+	getParameter.XML(["JSB.SIMILAR_INFO", "PMS.COMPARE_SOURCE", "PMS.COMPARE_RESULT", "PMS.CHECK_RESULT_YN", "PMS.RELATION_YN", "PMS.RELATION"], function(totas) {
 		if (totas) {
-			$scope.similarInfoList = totas.data[totas.key.indexOf("PMS.SIMILAR_INFO")];
+			$scope.similarInfoList = totas.data[totas.key.indexOf("JSB.SIMILAR_INFO")];
 			$scope.compareSourceList = totas.data[totas.key.indexOf("PMS.COMPARE_SOURCE")];
-			$scope.compareResultList = totas.data[totas.key.indexOf("PMS.COMPARE_RESULT")];
+			$scope.compareResultList = totas.data[totas.key.indexOf("PMS.COMPARE_RESULT")].filter(data => data.DATA !== "1");
 			$scope.checkResult_YN = totas.data[totas.key.indexOf("PMS.CHECK_RESULT_YN")];
 			$scope.relationList = totas.data[totas.key.indexOf("PMS.RELATION")];
 			$scope.relation_YN = totas.data[totas.key.indexOf("PMS.RELATION_YN")];
@@ -57,7 +57,7 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 	//查核區間初始化
 	$scope.initCheckInterval = function() {
 		$scope.checkIntervalList = [];
-		$scope.sendRecv("PMS432", "initCheckInterval", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", $scope.inputVO,
+		$scope.sendRecv("PMS434", "initCheckInterval", "com.systex.jbranch.app.server.fps.pms434.PMS434InputVO", $scope.inputVO,
 			function(tota, isError) {
 				if (!isError) {
 					$scope.checkIntervalList = tota[0].body.resultList;
@@ -156,7 +156,7 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 		}
 
 		if ($scope.inputVO.compareResult != 1) {
-			$scope.sendRecv("PMS432", "query", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", $scope.inputVO,
+			$scope.sendRecv("PMS434", "query", "com.systex.jbranch.app.server.fps.pms434.PMS434InputVO", $scope.inputVO,
 				function(tota, isError) {
 					if (!isError) {
 						const { resultList } = tota[0].body;
@@ -253,7 +253,7 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 		}
 		if (updateList.length > 0) {
 			$scope.inputVO.list = updateList;
-			$scope.sendRecv("PMS432", "checkUpdateInsert", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", $scope.inputVO,
+			$scope.sendRecv("PMS434", "checkUpdateInsert", "com.systex.jbranch.app.server.fps.pms434.PMS434InputVO", $scope.inputVO,
 				function(tota, isError) {
 					if (!isError) {
 						$scope.showSuccessMsg('ehl_01_common_025');
@@ -271,7 +271,7 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 	$scope.export = function() {
 		if ($scope.exportList.length > 0) {
 			$scope.inputVO.list = $scope.exportList;
-			$scope.sendRecv("PMS432", "export", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", $scope.inputVO,
+			$scope.sendRecv("PMS434", "export", "com.systex.jbranch.app.server.fps.pms434.PMS434InputVO", $scope.inputVO,
 				function(tota, isError) {
 					if (!isError) {
 						$scope.showSuccessMsg("資料匯出成功!");
@@ -286,8 +286,8 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 	$scope.upload = function() {
 		$scope.inputVO.uploadMark = true;
 		var dialog = ngDialog.open({
-			template: 'assets/txn/PMS432/PMS432_UPLOAD.html',
-			className: 'PMS432',
+			template: 'assets/txn/PMS434/PMS434_UPLOAD.html',
+			className: 'PMS434',
 			showClose: false,
 			controller: ['$scope', function($scope) {
 				
@@ -302,7 +302,7 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 					row = {...row, CHECKED_RESULT: "Y"};
 					list.push(row);
 				});
-				$scope.sendRecv("PMS432", "checkUpdateInsert", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", { ...$scope.inputVO, list: list, compareResult: data.value.compareResult },
+				$scope.sendRecv("PMS434", "checkUpdateInsert", "com.systex.jbranch.app.server.fps.pms434.PMS434InputVO", { ...$scope.inputVO, list: list, compareResult: data.value.compareResult },
 					function(tota, isError) {
 						if (!isError) {
 							$scope.showSuccessMsg("資料上傳成功!");
