@@ -421,15 +421,20 @@ public class SOT1640 extends FubonWmsBizLogic {
 		}
 
 		//檢核電文
+		SOT703OutputVO outputVO703 = new SOT703OutputVO();
 		String errMsg = "";
 		try {
 			inputVO.setConfirm("1"); 
-			errMsg = dynamicESBValidate(inputVO);
+			outputVO703 = dynamicESBValidate(inputVO);
+			errMsg = StringUtils.isNotBlank(outputVO703.getErrorMsg()) ? outputVO703.getErrorCode() + ":" + outputVO703.getErrorMsg() : "";
 		} catch(Exception e) {
 			errMsg = e.toString();
 		}
 		outputVO.setErrorMsg(errMsg);
 		
+		//取得判斷是否為短期交易或何種類型的值
+		outputVO.setSHORT_1(outputVO703.getSHORT_1());
+				
 		//有錯誤，刪除資料
 		if (StringUtils.isNotBlank(errMsg)) {
 			TBSOT_NF_TRANSFER_DYNAPK errPK = new TBSOT_NF_TRANSFER_DYNAPK();
@@ -478,10 +483,12 @@ public class SOT1640 extends FubonWmsBizLogic {
 		String errMsg = "";
 		try {
 			inputVO.setConfirm("2"); 
-			errMsg = dynamicESBValidate(inputVO);
+			SOT703OutputVO outputVO703 = dynamicESBValidate(inputVO);
+			errMsg = StringUtils.isNotBlank(outputVO703.getErrorMsg()) ? outputVO703.getErrorCode() + ":" + outputVO703.getErrorMsg() : "";
 		} catch(Exception e) {
 			errMsg = e.toString();
 		}
+		
 		if (StringUtils.isNotBlank(errMsg)) {
 			outputVO.setErrorMsg(errMsg);
 		} else {
@@ -531,7 +538,7 @@ public class SOT1640 extends FubonWmsBizLogic {
 	 * @return
 	 * @throws Exception 
 	 */
-	public String dynamicESBValidate(SOT1640InputVO inputVO) throws Exception {
+	public SOT703OutputVO dynamicESBValidate(SOT1640InputVO inputVO) throws Exception {
 		SOT703InputVO inputVO703 = new SOT703InputVO();
 		SOT703OutputVO outputVO703 = new SOT703OutputVO();
 		dam = this.getDataAccessManager();
@@ -574,7 +581,7 @@ public class SOT1640 extends FubonWmsBizLogic {
 			}   
 		}
 		
-		return StringUtils.isNotBlank(errorMsg) ? outputVO703.getErrorCode() + ":" + errorMsg : "";  
+		return outputVO703;
 	}
 	
 	/***

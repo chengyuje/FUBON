@@ -734,7 +734,7 @@ eSoafApp.controller('SOT130Controller',
 					
 					//動態鎖利不可贖回
 					if (data.value.Dynamic && (data.value.Dynamic == '1' || data.value.Dynamic == '2')) {
-						$scope.showErrorMsg("動態鎖利母/子基金不可贖回");
+						$scope.showErrorMsg("請至動態鎖利專區進行交易");
 						$scope.clearProd();
 						return;
 					}

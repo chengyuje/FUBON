@@ -107,8 +107,6 @@ public class IOT111 extends FubonWmsBizLogic {
 		sql.append(" LEFT OUTER JOIN TBJSB_INS_PROD_MAIN J ON J.PRODUCTSERIALNUM = A.INSPRD_KEYNO ");	// 非富壽商品
 		sql.append(" LEFT OUTER JOIN TBCRM_CUST_MAST E ON A.CUST_ID = E.CUST_ID ");
 		sql.append(" LEFT OUTER JOIN (SELECT DISTINCT EMP_ID, DEPT_ID FROM VWORG_EMP_UHRM_INFO) F ON F.EMP_ID = A.CREATOR "); //UHRM人員鍵機或UHRM為招攬人員的案件
-		sql.append(" LEFT OUTER JOIN (SELECT DISTINCT EMP_ID, DEPT_ID FROM VWORG_EMP_UHRM_INFO) G ON G.EMP_ID = A.MODIFIER "); //UHRM人員鍵機或UHRM為招攬人員的案件
-		sql.append(" LEFT OUTER JOIN (SELECT DISTINCT EMP_ID, DEPT_ID FROM VWORG_EMP_UHRM_INFO) H ON H.EMP_ID = A.RECRUIT_ID "); //UHRM人員鍵機或UHRM為招攬人員的案件
 		sql.append(" LEFT JOIN TBIOT_CALLOUT I ON A.PREMATCH_SEQ = I.PREMATCH_SEQ ");
 		sql.append(" LEFT JOIN TBORG_DEFN K ON B.DEPT_ID = K.DEPT_ID ");
 		sql.append(" WHERE 1 = 1 ");
@@ -119,18 +117,15 @@ public class IOT111 extends FubonWmsBizLogic {
 				//有UHRM權限人員只能查詢UHRM人員鍵機或UHRM為招攬人員的案件
 				sql.append("AND ( ");
 				sql.append("     (F.EMP_ID IS NOT NULL AND EXISTS (SELECT 1 FROM TBORG_MEMBER MT WHERE F.DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID)) ");
-				sql.append("  OR (G.EMP_ID IS NOT NULL AND EXISTS (SELECT 1 FROM TBORG_MEMBER MT WHERE G.DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID)) ");
-				sql.append("  OR (H.EMP_ID IS NOT NULL AND EXISTS (SELECT 1 FROM TBORG_MEMBER MT WHERE H.DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID)) ");
 				sql.append(") ");
 				
 				queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
-				
-//				sql.append(" AND (F.EMP_ID IS NOT NULL OR G.EMP_ID IS NOT NULL OR H.EMP_ID IS NOT NULL) ");
 				break;
 			default:
 				//非總行人員需檢查可視分行，只能查詢有鍵機行權限的資料，且非UHRM人員鍵機或UHRM為招攬人員的案件
 				if(!headmgrMap.containsKey(roleID)) {
-					sql.append(" AND A.BRANCH_NBR IN ( :branchList ) AND F.EMP_ID IS NULL AND G.EMP_ID IS NULL AND H.EMP_ID IS NULL ");
+					sql.append(" AND A.BRANCH_NBR IN ( :branchList ) ");
+					sql.append(" AND F.EMP_ID IS NULL ");
 					queryCondition.setObject("branchList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
 				}
 				break;

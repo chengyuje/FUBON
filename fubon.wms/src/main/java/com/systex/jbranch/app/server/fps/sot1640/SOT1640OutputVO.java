@@ -60,6 +60,8 @@ public class SOT1640OutputVO extends PagingOutputVO {
 	
 	private String deathFlag;	//死亡戶
 	private String isInterdict;	//禁治產
+	//判斷是否為短期交易
+	private String SHORT_1; 
 	
 	public boolean isKycDueDateUseful() {
 		return isKycDueDateUseful;
@@ -359,6 +361,14 @@ public class SOT1640OutputVO extends PagingOutputVO {
 
 	public void setFlagNumber(String flagNumber) {
 		this.flagNumber = flagNumber;
+	}
+
+	public String getSHORT_1() {
+		return SHORT_1;
+	}
+
+	public void setSHORT_1(String sHORT_1) {
+		SHORT_1 = sHORT_1;
 	}
 	
 }

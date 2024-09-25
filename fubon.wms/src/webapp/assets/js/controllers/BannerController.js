@@ -16,7 +16,7 @@ eSoafApp.controller("BannerController", ['$rootScope', '$scope', '$controller', 
 					}
 					
 					// 讀取參數檔
-					getParameter.XML(['SYS.AAS_SSO_ACC_PW'],function(tota){
+					getParameter.XML(['SYS.AAS_SSO_ACC_PW', 'FMA.URL'],function(tota){
 						debugger
 						if(tota){
 							var AAS_SSO_ACC_PW = tota.data[tota.key.indexOf('SYS.AAS_SSO_ACC_PW')];
@@ -24,7 +24,9 @@ eSoafApp.controller("BannerController", ['$rootScope', '$scope', '$controller', 
 							angular.forEach(AAS_SSO_ACC_PW, function(row, index) {
 								if(row.DATA == 'ENABLED') 
 									$scope.AAS_SSO_ACC_PW_ENABLED = row.LABEL == 'Y' 
-							})
+							});
+							//#2138_財管行銷助理網址連結
+							$scope.fmaUrl = tota.data[tota.key.indexOf('FMA.URL')][0].LABEL;
 						}
 					});
 					

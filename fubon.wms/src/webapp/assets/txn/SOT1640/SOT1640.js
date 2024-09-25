@@ -857,11 +857,37 @@ eSoafApp.controller('SOT1640Controller',
 												$scope.showErrorMsg(tota[0].body.errorMsg);								
 												return;
 											}
-											
-											$scope.connector('set','SOTTradeSEQ', $scope.inputVO.tradeSEQ);
-											$scope.connector('set','SOTCarSEQ', null);
-											$rootScope.menuItemInfo.url = "assets/txn/SOT1641/SOT1641.html";							
-											return;
+											//短線交易檢核
+											if(tota[0].body.SHORT_1 != null && tota[0].body.SHORT_1 != undefined && tota[0].body.SHORT_1 != '') {
+												var txtMsg = "";
+												if(tota[0].body.SHORT_1 == "1"){
+													txtMsg = $filter('i18n')('ehl_01_SOT_015');
+												}
+												if(tota[0].body.SHORT_1 == "2"){
+													txtMsg = $filter('i18n')('ehl_01_SOT_016');
+												}
+												var dialog = ngDialog.open({
+													template: 'assets/txn/CONFIRM/CONFIRM.html',
+													className: 'CONFIRM',
+													showClose: false,
+													scope : $scope,
+													controller: ['$scope', function($scope) {
+														$scope.dialogLabel = txtMsg + "\n是否繼續";
+										            }]
+												}).closePromise.then(function (data) {
+													if (data.value === 'successful') {
+														$scope.connector('set','SOTTradeSEQ', $scope.inputVO.tradeSEQ);
+														$scope.connector('set','SOTCarSEQ', null);
+														$rootScope.menuItemInfo.url = "assets/txn/SOT1641/SOT1641.html";							
+														return;
+													}
+												});
+											} else {
+												$scope.connector('set','SOTTradeSEQ', $scope.inputVO.tradeSEQ);
+												$scope.connector('set','SOTCarSEQ', null);
+												$rootScope.menuItemInfo.url = "assets/txn/SOT1641/SOT1641.html";							
+												return;
+											}
 										}
 							});	
 						}

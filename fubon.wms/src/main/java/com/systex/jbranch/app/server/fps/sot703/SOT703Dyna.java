@@ -783,7 +783,9 @@ public class SOT703Dyna extends SOT703 {
 			} else {
 				nfbrn2OutputVO = esbUtilOutputVO.getNfbrn2OutputVO(); //DBU交易
 			}
-
+			//短線交易檢核
+			if(StringUtils.isNotBlank(nfbrn2OutputVO.getSHORT_1())) sot703OutputVO.setSHORT_1(nfbrn2OutputVO.getSHORT_1());
+			
 			// 確認是否回傳錯誤訊息,若未發生錯誤則將回傳下行電文資料儲存DB
 			if (!checkError(nfbrn2OutputVO)) {
 				
