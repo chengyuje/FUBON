@@ -53,7 +53,7 @@ public class WMSHA001Service extends FubonWmsBizLogic {
 			BigDecimal sum = new BigDecimal("0");
 			BigDecimal temp = new BigDecimal("0");
 			String[] array = {"1", "2", "3"};
-			List<WMS032675OutputVO> wms032675Data = wms032675Service.searchAcct(custID);
+			List<WMS032675OutputVO> wms032675Data = wms032675Service.searchAcctForWMSHA001(custID);
 
 			for (WMS032675OutputVO wms032675OutputVO : wms032675Data) {
 				List<WMS032675OutputDetailsVO> details = wms032675OutputVO.getDetails();

@@ -124,7 +124,7 @@ public class IOT110 extends FubonWmsBizLogic {
 			List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 			return_VO.setResultList(list);
 			
-			if(CollectionUtils.isNotEmpty(list)) {
+			if(CollectionUtils.isNotEmpty(list) && StringUtils.equals("1", ObjectUtils.toString(list.get(0).get("REG_TYPE")))) { //只有新契約需取得要保人高資產註記
 				//取得要保人高資產註記
 				SOT714 sot714 = (SOT714) PlatformContext.getBean("sot714");
 				CustHighNetWorthDataVO hnwcData = sot714.getHNWCData(ObjectUtils.toString(list.get(0).get("CUST_ID")));

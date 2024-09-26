@@ -10,10 +10,6 @@
             <property name="fileName">FPS.rptlibrary</property>
             <property name="namespace">FPS</property>
         </structure>
-        <structure>
-            <property name="fileName">src/webapp/WEB-INF/JBranch/Transaction/FPS.rptlibrary</property>
-            <property name="namespace">FPS2</property>
-        </structure>
     </list-property>
     <parameters>
         <scalar-parameter name="BATCH_SEQ" id="3854">
@@ -74,6 +70,21 @@
             </structure>
         </scalar-parameter>
         <scalar-parameter name="TRADE_SUB_TYPE" id="3858">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="TRADE_TYPE" id="5058">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
@@ -209,6 +220,111 @@
             </structure>
         </scalar-parameter>
         <scalar-parameter name="SELL_TRADE_DATE" id="5052">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="GTC_YN" id="5056">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="ENTRUST_AMT" id="5057">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="BI_BUY" id="5059">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="ADULT" id="5060">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="GUARDIANSHIP_FLAG" id="5061">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="TRUSTTS" id="5062">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="BRA" id="5063">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
@@ -991,7 +1107,7 @@
                 <structure>
                     <property name="name">Column Binding</property>
                     <text-property name="displayName">TYPE</text-property>
-                    <expression name="expression" type="javascript">params["TRADE_SUB_TYPE"].value == 1 &amp;&amp; params["GTC_YN"].value != "Y" ? '■ 買進		' : '□ 買進		'</expression>
+                    <expression name="expression" type="javascript">params["TRADE_SUB_TYPE"].value == 1 &amp;&amp; params["GTC_YN"].value == "N" ? '■ 買進		' : '□ 買進		'</expression>
                     <property name="dataType">string</property>
                     <property name="allowExport">true</property>
                 </structure>
@@ -1171,19 +1287,16 @@
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
-                    <property name="name">PAYABLE_FEE</property>
-                    <text-property name="displayName">PAYABLE_FEE</text-property>
-                    <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; dataSetRow["ENTRUST_TYPE"] != "2") {&#13;
-	dataSetRow["PAYABLE_FEE"]&#13;
-}</expression>
-                    <property name="dataType">string</property>
-                    <property name="allowExport">true</property>
-                </structure>
-                <structure>
                     <property name="name">TOT_AMT</property>
                     <text-property name="displayName">TOT_AMT</text-property>
                     <expression name="expression" type="javascript">dataSetRow["TOT_AMT"]</expression>
                     <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">PAYABLE_FEE</property>
+                    <text-property name="displayName">PAYABLE_FEE</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["PAYABLE_FEE"]</expression>
+                    <property name="dataType">string</property>
                 </structure>
             </list-property>
             <column id="137">
@@ -1261,6 +1374,7 @@
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="4534">
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">TRADE_TYPE</property>
@@ -1321,6 +1435,7 @@
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="4317">
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">TRUST_CURR_TYPE</property>
@@ -1373,6 +1488,7 @@
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3861">
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">PROD_NAME</property>
@@ -1426,6 +1542,7 @@
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3862">
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">DEBIT_ACCT</property>
@@ -1481,6 +1598,7 @@
                     <property name="paddingRight">0pt</property>
                     <data id="3863">
                         <property name="fontSize">10pt</property>
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">PROD_ID</property>
@@ -1518,6 +1636,7 @@
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="4215">
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">PROD_RISK_LV</property>
@@ -1572,6 +1691,7 @@
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3864">
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">CREDIT_ACCT</property>
@@ -1631,6 +1751,7 @@
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3865">
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">PROD_CURR</property>
@@ -1684,6 +1805,7 @@
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3866">
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">PURCHASE_AMT</property>
@@ -1802,7 +1924,8 @@
                         <property name="borderLeftStyle">none</property>
                         <property name="borderRightStyle">none</property>
                         <property name="borderTopStyle">none</property>
-                        <property name="textAlign">center</property>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">ENTRUSTAMT</property>
@@ -1858,6 +1981,7 @@ dataSetRow["ENTRUST_AMT"]+"%";&#13;
                     <property name="paddingRight">0pt</property>
                     <data id="4312">
                         <property name="textAlign">left</property>
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">FEERATE</property>
@@ -2001,6 +2125,7 @@ dataSetRow["ENTRUST_AMT"]+"%";&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="4659">
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">ENTRUSTAMT</property>
@@ -2077,11 +2202,12 @@ dataSetRow["ENTRUST_AMT"]+"%";&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3869">
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">FEE</property>
                                 <text-property name="displayName">FEE</text-property>
-                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; dataSetRow["ENTRUST_TYPE"] != "2") {&#13;
+                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; (params["GTC_YN"].value == 'N'  || (params["GTC_YN"].value != 'N' &amp;&amp; dataSetRow["ENTRUST_TYPE"] != "2"))) {&#13;
 Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
 }</expression>
                                 <property name="dataType">string</property>
@@ -2134,7 +2260,19 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                     <property name="paddingLeft">0pt</property>
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
-                    <data id="3870">
+                    <data id="5084">
+                        <property name="dataSet">BUY</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">PAYABLE_FEE</property>
+                                <text-property name="displayName">PAYABLE_FEE</text-property>
+                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; (params["GTC_YN"].value == 'N'  || (params["GTC_YN"].value != 'N' &amp;&amp; dataSetRow["ENTRUST_TYPE"] != "2"))) {&#13;
+    dataSetRow["PAYABLE_FEE"]&#13;
+}</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
                         <property name="resultSetColumn">PAYABLE_FEE</property>
                     </data>
                 </cell>
@@ -2177,11 +2315,12 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3871">
+                        <property name="dataSet">BUY</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">TOT_AMT</property>
                                 <text-property name="displayName">TOT_AMT</text-property>
-                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; dataSetRow["ENTRUST_TYPE"] != "2") {&#13;
+                                <expression name="expression" type="javascript">if (params["TRADE_SUB_TYPE"]== 1 &amp;&amp; (params["GTC_YN"].value == 'N'  || (params["GTC_YN"].value != 'N' &amp;&amp; dataSetRow["ENTRUST_TYPE"] != "2"))) {&#13;
 	dataSetRow["TOT_AMT"] &#13;
 }</expression>
                                 <property name="dataType">string</property>
@@ -2443,6 +2582,7 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="4320">
+                        <property name="dataSet">SELL</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">TRADE_TYPE</property>
@@ -2500,6 +2640,7 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3874">
+                        <property name="dataSet">SELL</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">CERTIFICATE_ID</property>
@@ -2545,6 +2686,7 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3875">
+                        <property name="dataSet">SELL</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">PROD_NAME</property>
@@ -2591,6 +2733,7 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3876">
+                        <property name="dataSet">SELL</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">PROD_ID</property>
@@ -2633,6 +2776,7 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3877">
+                        <property name="dataSet">SELL</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">PURCHASE_AMT</property>
@@ -2679,6 +2823,7 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="3878">
+                        <property name="dataSet">SELL</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">CREDIT_ACCT</property>
@@ -2724,6 +2869,7 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="4664">
+                        <property name="dataSet">SELL</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">ENTRUST_TYPE</property>
@@ -2734,9 +2880,9 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
 			"□參考贖回報價減1%(含)以內□參考贖回報價減3%(含)以內\n"+&#13;
 			"□參考贖回報價減5%(含)以內□發行機構或券商回覆之實際成交價格"&#13;
 		} else {&#13;
-			(dataSetRow["ENTRUST_TYPE"]== "1"?"■":"□")&#13;
+		    (dataSetRow["ENTRUST_TYPE"]== "1"?"■":"□")&#13;
 			+ "海外債券預約/長效單賣出限價 : "&#13;
-			+(dataSetRow["ENTRUST_TYPE"]== "1"? params["ENTRUST_AMT"].value : "			")&#13;
+			+(dataSetRow["ENTRUST_TYPE"]== "1" ? params["ENTRUST_AMT"].value : "            ")&#13;
 			+"% (註2)\n"+&#13;
 			(dataSetRow["ENTRUST_TYPE"]== "4"?"■":"□")&#13;
 			+ "參考贖回報價減1%(含)以內"&#13;
@@ -2787,6 +2933,7 @@ Formatter.format(dataSetRow["FEE"],"#,##0.00")&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="4251">
+                        <property name="dataSet">SELL</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">REF_VAL</property>
@@ -2834,6 +2981,7 @@ dataSetRow["REF_VAL"]+"%";&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="4321">
+                        <property name="dataSet">SELL</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">REFVALDATE</property>
@@ -2908,6 +3056,7 @@ dataSetRow["REF_VAL"]+"%";&#13;
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <data id="4253">
+                        <property name="dataSet">SELL</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">ENTRUST_AMT</property>

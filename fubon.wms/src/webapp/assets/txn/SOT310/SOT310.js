@@ -981,12 +981,16 @@ eSoafApp.controller('SOT310Controller',
 							$scope.entrustDisabled = false;
 						}
 						
-						//不可議價
-						$scope.changeFee = undefined;
-						$scope.changeFeeDisabled = true;
+						$scope.changeFeeDisabled = false;
 						$scope.getDefaultFeeRateData().then(function(data) {
 							$scope.getFee('rate');
 						});
+//						//不可議價
+//						$scope.changeFee = undefined;
+//						$scope.changeFeeDisabled = true;
+//						$scope.getDefaultFeeRateData().then(function(data) {
+//							$scope.getFee('rate');
+//						});
 					} else { //當日單
 						$scope.changeFeeDisabled = false;
 

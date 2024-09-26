@@ -44,6 +44,20 @@ public class WMS032675Service {
 		}
 		return result;
 	}
+	
+	/**
+	 * 10: 撈出所有客戶符合條件的帳號
+	 *
+	 * @param custId
+	 *            客戶 Id
+	 */
+	public List<WMS032675OutputVO> searchAcctForWMSHA001(String custId) throws Exception {
+		List<WMS032675OutputVO> result = new ArrayList();
+		for (CBSUtilOutputVO each : _085081_085105dao.search(custId, cbsService.getCBSIDCode(custId))) {
+			gatherToWMS032675ForWMSHA001(result, each);
+		}
+		return result;
+	}
 
 	/**
 	 * 10: 撈出所有客戶符合條件的帳號
@@ -69,7 +83,59 @@ public class WMS032675Service {
 		esbVO.setDetails(details);
 		result.add(esbVO);
 	}
+	
+	private void gatherToWMS032675ForWMSHA001(List<WMS032675OutputVO> result, CBSUtilOutputVO each) {
+		WMS032675OutputVO esbVO = new WMS032675OutputVO();
+		List details = new ArrayList();
+		for (CBS085105OutputDetailsVO cbsDtl : each.getCbs085105OutputVO().getDetails()) {
+			if (!cbsDtl.getWA_X_CURR().trim().equals("XXX") && isNotBlank(cbsDtl.getWA_X_CURR().trim()) ) {
+				WMS032675OutputDetailsVO esbDtl = _085081_085105AcctTransferForWMSHA001(cbsDtl);
+				if (isNotBlank(esbDtl.getBUSINESS_CODE()))
+					details.add(esbDtl);
+			}
+		}
+		esbVO.setDetails(details);
+		result.add(esbVO);
+	}
 
+	/**
+	 * 主要是AVAILABLE_AMT_BAL有新邏輯
+	 */
+	private WMS032675OutputDetailsVO _085081_085105AcctTransferForWMSHA001(CBS085105OutputDetailsVO cbsDtl) {
+		WMS032675OutputDetailsVO esbDtl = new WMS032675OutputDetailsVO();
+
+		esbDtl.setACT_NO(cbsService.checkAcctLength(cbsDtl.getWA_X_ACCTNO()));
+		esbDtl.setOPEN_DATE(cbsDtl.getWA_X_DATE_OPEN());
+
+		esbDtl.setBUSINESS_CODE(getBusinessCode(cbsDtl));
+		esbDtl.setCURRENCY(cbsDtl.getWA_X_CURR());	
+//		esbDtl.setAVAILABLE_AMT_BAL(substring(cbsDtl.getWA_X_CURR_BALANCE(), 17, 18) + substring(cbsDtl.getWA_X_CURR_BALANCE(), 0, 17)); //可用餘額
+
+		if(esbDtl.getCURRENCY().equals("TWD") && esbDtl.getBUSINESS_CODE().equals("1")){ //台活
+			esbDtl.setAVAILABLE_AMT_BAL(substring(cbsDtl.getOthers(), 51, 52) + substring(cbsDtl.getOthers(), 34, 51));
+		}else if (!esbDtl.getCURRENCY().equals("TWD") && esbDtl.getBUSINESS_CODE().equals("1")){ //外活
+			esbDtl.setAVAILABLE_AMT_BAL(substring(cbsDtl.getOthers(), 33, 34) + substring(cbsDtl.getOthers(), 16, 33));
+		}else if (esbDtl.getCURRENCY().equals("TWD") && esbDtl.getBUSINESS_CODE().equals("2")){ //台支
+			esbDtl.setAVAILABLE_AMT_BAL(substring(cbsDtl.getOthers(), 51, 52) + substring(cbsDtl.getOthers(), 34, 51));
+		}else if (esbDtl.getCURRENCY().equals("TWD") && esbDtl.getBUSINESS_CODE().equals("3")){ //台定
+			esbDtl.setAVAILABLE_AMT_BAL(substring(cbsDtl.getOthers(), 239, 256));
+		}else if (!esbDtl.getCURRENCY().equals("TWD") && esbDtl.getBUSINESS_CODE().equals("3")){ //外定
+			esbDtl.setAVAILABLE_AMT_BAL(substring(cbsDtl.getOthers(), 239, 256));
+		}
+		
+		if(esbDtl.getCURRENCY().equals("TWD") && esbDtl.getBUSINESS_CODE().equals("1")){ //台活帳戶餘額
+			esbDtl.setTOTAL_SUM(substring(cbsDtl.getOthers(), 51, 52) + substring(cbsDtl.getOthers(), 34, 51)); // 帳戶餘額
+		}else if (!esbDtl.getCURRENCY().equals("TWD") && esbDtl.getBUSINESS_CODE().equals("1")){ //外活帳戶餘額
+			esbDtl.setTOTAL_SUM(substring(cbsDtl.getOthers(), 33, 34) + substring(cbsDtl.getOthers(), 16, 33));
+		}else if (esbDtl.getCURRENCY().equals("TWD") && esbDtl.getBUSINESS_CODE().equals("2")){
+			esbDtl.setTOTAL_SUM(substring(cbsDtl.getWA_X_CURR_BALANCE(), 17) + substring(cbsDtl.getWA_X_CURR_BALANCE(), 0, 17));
+		}
+		
+		//#0695
+		esbDtl.setDIGIT_TYPE(substring(cbsDtl.getOthers(), 144, 145));
+		return esbDtl;
+	}
+	
 	/**
 	 * 規格書轉換（所有客戶符合條件的帳號） _085081_085105 Detail to WMS032675 Detail
 	 * 20200303_CBS_#79006_基金單筆申購透支帳戶餘額與實際數不符 加入外幣餘額判斷

@@ -1,5 +1,21 @@
 package com.systex.jbranch.app.server.fps.sot808;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import com.ibm.icu.text.DecimalFormat;
 import com.systex.jbranch.app.server.fps.sot712.PRDFitInputVO;
 import com.systex.jbranch.app.server.fps.sot712.SOT712;
@@ -19,22 +35,6 @@ import com.systex.jbranch.platform.common.util.PlatformContext;
 import com.systex.jbranch.platform.common.util.StringUtil;
 import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.XmlInfo;
-
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * MENU
@@ -152,8 +152,15 @@ public class SOT808 extends SotPdf {
 									if (data_map.get("ENTRUST_TYPE") != null) {
 										String entrust_type = data_map.get("ENTRUST_TYPE").toString();
 										if (entrust_type.equals("2")) {
-											// 市價
-											data_map.put("ENTRUST_AMT", "■ 市價　");
+											// 市價：單日單要帶金額、長效/預約單不帶金額
+											if (data_map.get("GTC_YN") != null && StringUtils.equals("N", data_map.get("GTC_YN").toString())) {
+												// 當日單
+												data_map.put("ENTRUST_AMT", "■ 市價　" + data_map.get("ENTRUST_AMT").toString());											
+											} else {
+												// 長效/預約單
+												data_map.put("ENTRUST_AMT", "■ 市價　");
+											}
+												
 										} else {
 											// 限價
 											data_map.put("ENTRUST_AMT", "■ 限價　" + data_map.get("ENTRUST_AMT").toString());
