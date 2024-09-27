@@ -322,12 +322,12 @@ public class CRM661 extends FubonWmsBizLogic {
 		sql.append(" AND NOT EXISTS (SELECT 1 FROM TBCRM_CUST_REL WHERE CUST_ID_M = A.CUST_ID AND CUST_ID_S = :cust_id_m ) ");
 
 		if (StringUtils.isNotBlank(inputVO.getCust_id())) {
-			sql.append("AND A.CUST_ID LIKE :cust_id ");
-			queryCondition.setObject("cust_id", inputVO.getCust_id() + "%");
+			sql.append("AND A.CUST_ID = :cust_id ");
+			queryCondition.setObject("cust_id", inputVO.getCust_id());
 		}
 		if (StringUtils.isNotBlank(inputVO.getCust_name())) {
-			sql.append("AND A.CUST_NAME LIKE :cust_name ");
-			queryCondition.setObject("cust_name", "%" + inputVO.getCust_name() + "%");
+			sql.append("AND A.CUST_NAME = :cust_name ");
+			queryCondition.setObject("cust_name", inputVO.getCust_name());
 		}
 
 		queryCondition.setObject("cust_id_m", inputVO.getCust_id_m());

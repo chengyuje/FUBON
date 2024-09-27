@@ -43,7 +43,7 @@ eSoafApp.controller('CRM662_prv_addController',
 		//查詢轄下客戶
 		$scope.queryCustomer = function(){
 			//檢核
-			if($scope.inputVO.cust_id == '' && $scope.inputVO.cust_name == ''){
+			if($scope.inputVO.cust_id == ''){
 				$scope.showErrorMsgInDialog("請輸入查詢條件")
 				return;
 			}

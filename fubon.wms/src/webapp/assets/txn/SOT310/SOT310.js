@@ -1527,6 +1527,7 @@ eSoafApp.controller('SOT310Controller',
 									//集中度超過上限
 									$scope.showErrorMsg("客戶高風險商品集中度比例已超過上限");
 									$scope.custClear();
+									$scope.inputVO.custID = "";
 									$scope.prodClear();
 									$scope.inputVO.prodID = "";
 									return;

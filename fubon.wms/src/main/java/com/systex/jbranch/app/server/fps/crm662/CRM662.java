@@ -343,12 +343,12 @@ public class CRM662 extends FubonWmsBizLogic {
 		sql.append("  AND A.CUST_ID NOT IN (SELECT distinct CUST_ID_M FROM TBCRM_CUST_PRV WHERE CUST_ID_M <> CUST_ID_S) ");
 
 		if (StringUtils.isNotBlank(inputVO.getCust_id()) || StringUtils.isNotBlank(inputVO.getCust_id_m_dc())) {
-			sql.append("  AND A.CUST_ID LIKE :cust_id ");
+			sql.append("  AND A.CUST_ID = :cust_id ");
 		}
 		
-		if (StringUtils.isNotBlank(inputVO.getCust_name())) {
-			sql.append("  AND A.CUST_NAME LIKE :cust_name ");
-		}
+//		if (StringUtils.isNotBlank(inputVO.getCust_name())) {
+//			sql.append("  AND A.CUST_NAME LIKE :cust_name ");
+//		}
 
 		sql.append(") ");
 		
@@ -359,7 +359,7 @@ public class CRM662 extends FubonWmsBizLogic {
 		sql.append("LEFT JOIN ( ");
 		sql.append("  SELECT CUST_ID, MIN(AVG_AUM_AMT) as AVG_AUM_AMT ");
 		sql.append("  FROM TBCRM_CUST_AUM_WK_CAL_DEGREE ");
-		sql.append("  WHERE CUST_ID IN (SELECT CUST_ID FROM BASE) ");
+		sql.append("  WHERE CUST_ID = (SELECT CUST_ID FROM BASE) ");
 		sql.append("  and to_date(DATA_DAY, 'yyyyMMdd') > sysdate - (12*7) ");
 //		sql.append("  and to_date(DATA_DAY, 'yyyyMMdd') > sysdate - (6*7) ");
 		sql.append("  GROUP BY CUST_ID ");
@@ -381,12 +381,12 @@ public class CRM662 extends FubonWmsBizLogic {
 		sql = getCustomerSQL(sql, inputVO);
 		
 		if (StringUtils.isNotBlank(inputVO.getCust_id())) {
-			queryCondition.setObject("cust_id", inputVO.getCust_id() + "%");
+			queryCondition.setObject("cust_id", inputVO.getCust_id());
 		}
 		
-		if (StringUtils.isNotBlank(inputVO.getCust_name())) {
-			queryCondition.setObject("cust_name", "%" + inputVO.getCust_name() + "%");
-		}
+//		if (StringUtils.isNotBlank(inputVO.getCust_name())) {
+//			queryCondition.setObject("cust_name", "%" + inputVO.getCust_name() + "%");
+//		}
 		
 		queryCondition.setQueryString(sql.toString().replaceAll("\\s+", " "));
 

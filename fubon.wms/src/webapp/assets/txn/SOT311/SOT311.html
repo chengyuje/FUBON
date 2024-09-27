@@ -104,7 +104,10 @@
 										<span ng-hide="row.DATA != inputVO.entrustType">{{row.LABEL}}</input>
 									</div>
 								</td>
-								<td>{{inputVO.entrustAmt | currency:''}}&nbsp;%</td>
+								<td>
+									<span ng-show="inputVO.gtcYN == 'N'">{{inputVO.entrustAmt | currency:''}}&nbsp;%</span>
+									<span ng-show="inputVO.gtcYN != 'N' && inputVO.entrustType == '1'">{{inputVO.entrustAmt | currency:''}}&nbsp;%</span>
+								</td>
 								<td></td>
 								<td></td>
 								<td></td>
@@ -112,21 +115,33 @@
 							</tr>
 							<tr>
 								<th>信託本金：</th>
-								<td colspan="6"><span ng-show="inputVO.gtcYN == 'Y'">預估 </span>{{inputVO.trustAmt | currency:''}}<span ng-show="inputVO.gtcYN == 'Y'">，實際信託本金仍依成交當時價格為準</span></td>
+								<td colspan="6">
+									<span ng-show="inputVO.gtcYN == 'N'">{{inputVO.trustAmt | currency:''}}</span>
+									<span ng-show="inputVO.gtcYN != 'N'">
+										<span ng-show="inputVO.entrustType == '1'">預估 {{inputVO.trustAmt | currency:''}}，實際信託本金仍依成交當時價格為準</span>
+										<span ng-show="inputVO.entrustType == '2'">實際信託本金仍依成交當時價格為準</span>
+									</span>
+								</td>
 							</tr>
 							<tr>
 								<th>手續費：</th>
-								<td colspan="6"><span ng-show="inputVO.gtcYN == 'Y'">預估 </span>{{inputVO.fee | currency:''}}<span ng-show="inputVO.gtcYN == 'Y'">，實際手續費仍依實際信託本金乘上手續費率為準</span></td>
+								<td colspan="6">
+									<span ng-show="inputVO.gtcYN == 'N'">{{inputVO.fee | currency:''}}</span>
+									<span ng-show="inputVO.gtcYN != 'N'">
+										<span ng-show="inputVO.entrustType == '1'">預估 {{inputVO.fee | currency:''}}，實際信託本金仍依成交當時價格為準</span>
+										<span ng-show="inputVO.entrustType == '2'">實際信託本金仍依成交當時價格為準</span>
+									</span>
+								</td>
 							</tr>
 							<tr>
 								<th>應付前手息：</th>
 								<td colspan="6" ng-show="inputVO.gtcYN == 'N'">{{inputVO.payableFee | currency:''}}</td>
-								<td colspan="6" ng-show="inputVO.gtcYN == 'Y'">實際前手息仍依實際成交日當日前手息為準</td>
+								<td colspan="6" ng-show="inputVO.gtcYN != 'N'">實際前手息仍依實際成交日當日前手息為準</td>
 							</tr>
 							<tr>
 								<th>總扣款金額：</th>
 								<td colspan="6" ng-show="inputVO.gtcYN == 'N'">{{inputVO.totAmt | currency:''}}</td>
-								<td colspan="6" ng-show="inputVO.gtcYN == 'Y'">實際扣款金額為實際信託本金加上實際手續費再加上實際前手息</td>
+								<td colspan="6" ng-show="inputVO.gtcYN != 'N'">實際扣款金額為實際信託本金加上實際手續費再加上實際前手息</td>
 							</tr>
 							<tr>
 								<th>信託帳號：</th>

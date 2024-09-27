@@ -201,8 +201,8 @@ public class SOT808 extends SotPdf {
 								data_map.put("PAYABLE_FEE", "0.00");
 							}
 							
-							//長效單：預估應付海外債券前手息為"依成交當日為準"
-							if (data_map.get("GTC_YN") != null && StringUtils.equals("Y", data_map.get("GTC_YN").toString()))
+							//長效單/預約單：預估應付海外債券前手息為"依成交當日為準"
+							if (data_map.get("GTC_YN") != null && !StringUtils.equals("N", data_map.get("GTC_YN").toString()))
 								data_map.put("PAYABLE_FEE", "依成交當日為準");
 
 							//合計金額
@@ -218,8 +218,8 @@ public class SOT808 extends SotPdf {
 							}
 							total_twd = new BigDecimal(deleteComma(data_map.get("TOT_AMT").toString())).multiply(ex_map.get(data_map.get("PROD_CURR").toString()));
 							
-							//長效單：合計金額為"依成交當日為準"
-							if (data_map.get("GTC_YN") != null && StringUtils.equals("Y", data_map.get("GTC_YN").toString()))
+							//長效單/預約單：合計金額為"依成交當日為準"
+							if (data_map.get("GTC_YN") != null && !StringUtils.equals("N", data_map.get("GTC_YN").toString()))
 								data_map.put("TOT_AMT", "依成交當日為準");
 
 							//是否為長效單 Y:長效單 N:單日單 P:預約單
