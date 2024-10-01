@@ -111,21 +111,22 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 		return list;
 	};
 	
-	//不存在在tmpList裡的object => push，反之不push
+	//tmpList obj 不存在 => push，已存在 => 取代
 	function dealTmpList() {
 		angular.forEach($scope.paramList, function(data, idx) {
 			if ($scope.tmpList.length == 0) {
 				$scope.tmpList.push(data);
 			} else {
 				var needPush = true;
-				angular.forEach($scope.tmpList, function(tmpData, tmpIdx) {
+				for(var tmpIdx = 0; tmpIdx < $scope.tmpList.length; tmpIdx++) {
+					var tmpData = $scope.tmpList[tmpIdx];
 					if (data.SEQ === tmpData.SEQ) {
-						//取代原有物件，使分頁資料與tmpList記憶體一致
+						//取代
 						$scope.tmpList.splice(tmpIdx, 1, data);
 						needPush = false;
-//						return;
+						break;
 					}
-				});
+				}
 				if (needPush) {
 					$scope.tmpList.push(data);
 				}
@@ -181,7 +182,6 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 						}
 
 					}
-
 				});
 		}
 	};

@@ -75,7 +75,8 @@ public class CRM611 extends EsbUtil {
 		sql.append(" 	   TCM.VIP_DEGREE, ");
 		sql.append(" 	   TCM.AO_CODE, ");
 		
-		sql.append("	   CASE WHEN AO.TYPE = '1' THEN '(主)' "); 		// AO CODE類型：1主 2副 3維護
+		/** AO CODE類型：1主 2副 3維護 **/
+		sql.append("	   CASE WHEN AO.TYPE = '1' THEN '(主)' "); 		
 		sql.append("	        WHEN AO.TYPE = '2' THEN '(副)' "); 										
 		sql.append("	        WHEN AO.TYPE = '3' THEN '(維護)'"); 										
 		sql.append("	   ELSE '' END AS C_TYPE_NAME , ");
@@ -95,7 +96,8 @@ public class CRM611 extends EsbUtil {
 		sql.append(" 	   TCN.COMM_RS_YN, ");
 		sql.append(" 	   TCN.COMPLAIN_YN, ");
 		sql.append(" 	   TCN.SP_CUST_YN, ");
-		sql.append(" 	   (CASE WHEN TCN.COMM_NS_YN = 'Y' THEN 'NS' WHEN TCN.COMM_RS_YN = 'Y' THEN 'RS' WHEN TCN.SP_CUST_YN = 'Y' THEN '特定註記' END) AS CUST_NOTE,TCM.AUM_AMT, ");
+		sql.append(" 	   (CASE WHEN TCN.COMM_NS_YN = 'Y' THEN 'NS' WHEN TCN.COMM_RS_YN = 'Y' THEN 'RS' WHEN TCN.SP_CUST_YN = 'Y' THEN '特定註記' END) AS CUST_NOTE, ");
+		sql.append(" 	   TCM.AUM_AMT, ");
 		sql.append(" 	   TCN.INV_TRST_YN, ");
 		
 		/** KYC **/
@@ -108,25 +110,25 @@ public class CRM611 extends EsbUtil {
 		sql.append(" 	   TCM.ANNUAL_INCOME_AMT, ");
 		
 		/** UHRM **/
-		sql.append("	   UHRM.EMP_ID AS UEMP_ID, ");
-		sql.append(" 	   UHRM.EMP_NAME || CASE WHEN UHRM.CODE_TYPE = '1' THEN '(計績)' WHEN UHRM.CODE_TYPE = '3' THEN '(維護)' ELSE '' END AS UEMP_NAME, "); 
+		sql.append("	   CASE WHEN UHRM.EMP_ID IS NOT NULL THEN UHRM.EMP_ID ELSE NULL END AS UEMP_ID, ");
+		sql.append(" 	   CASE WHEN UHRM.EMP_ID IS NOT NULL THEN AO.EMP_NAME || (CASE WHEN AO.TYPE = '1' THEN '(計績)' WHEN AO.TYPE = '3' THEN '(維護)' ELSE '' END) ELSE NULL END AS UEMP_NAME, "); 
 		
-//		/** 投資比重與KYC資產配直佔比(Y:超過/N:未超過) **/
+		/** 投資比重與KYC資產配直佔比(Y:超過/N:未超過) **/
 		sql.append("	   AMT_KYC.AMT_KYC_FLAG, ");
 		
-		// 授信異常註記
+		/** 授信異常註記 **/
 		sql.append("	   TCN.CREDIT_ABNORMAL ");
 		
 		sql.append("FROM TBCRM_CUST_MAST TCM ");
-		sql.append("LEFT JOIN VWORG_EMP_UHRM_INFO UHRM ON UHRM.UHRM_CODE = TCM.AO_CODE ");
 		sql.append("LEFT JOIN VWORG_AO_INFO AO ON TCM.AO_CODE = AO.AO_CODE ");
+		sql.append("LEFT JOIN TBORG_UHRM_BRH UHRM ON AO.EMP_ID = UHRM.EMP_ID ");
 		sql.append("LEFT JOIN VWORG_DEFN_INFO INFO ON TCM.BRA_NBR = INFO.BRANCH_NBR ");
 		sql.append("LEFT JOIN TBORG_DEFN DEFN ON DEFN.DEPT_ID = TCM.BRA_NBR ");
 		sql.append("LEFT JOIN TBCRM_CUST_NOTE TCN ON TCN.CUST_ID = TCM.CUST_ID ");
 		sql.append("LEFT JOIN TBSYSPARAMETER para1 ON TCM.COUNTRY_NBR = para1.PARAM_CODE and para1.PARAM_TYPE = 'CRM.COUNTRY_MAP' ");
 		sql.append("LEFT JOIN (SELECT * FROM TBKYC_INVESTOREXAM_M_HIS WHERE CUST_ID = :cust_id AND STATUS = '03' ORDER BY CREATE_DATE DESC FETCH FIRST 1 ROWS ONLY) EXAM on EXAM.CUST_ID = TCM.CUST_ID ");
 		
-		// 高齡客戶之投資比重
+		/** 高齡客戶之投資比重 **/
 		sql.append("LEFT JOIN ( ");
 		sql.append("  SELECT AMT_BASE.CUST_ID, ");
 		sql.append("         AMT_BASE.AUM_SEC_TOTAL, ");

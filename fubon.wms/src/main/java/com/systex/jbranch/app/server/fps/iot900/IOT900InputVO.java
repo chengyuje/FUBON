@@ -16,6 +16,8 @@ public class IOT900InputVO extends PagingInputVO{
 	private String INSPRD_ID;
 	private List<Map<String, Object>> inList;
 	private List<Map<String, Object>> outList;
+	private String REG_TYPE;
+	private String CASE_ID;
 	
 	
 	public String getINSPRD_ID() {
@@ -71,6 +73,18 @@ public class IOT900InputVO extends PagingInputVO{
 	}
 	public void setOPR_STATUS(String oPR_STATUS) {
 		OPR_STATUS = oPR_STATUS;
+	}
+	public String getREG_TYPE() {
+		return REG_TYPE;
+	}
+	public void setREG_TYPE(String rEG_TYPE) {
+		REG_TYPE = rEG_TYPE;
+	}
+	public String getCASE_ID() {
+		return CASE_ID;
+	}
+	public void setCASE_ID(String cASE_ID) {
+		CASE_ID = cASE_ID;
 	}
 	
 	

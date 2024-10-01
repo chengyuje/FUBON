@@ -1,2 +1,79 @@
 <script src="assets/txn/HOME/HOME.js" type="text/javascript"></script>
+<div class="HOME container-fluid" ng-controller="HOMEController">
 
+	<!-- 金流專區 cash cash_no =金流專區不加縮排
+	<div>
+		<div ng-include="'assets/txn/CRM171/CRM171.html'"></div>
+	</div>
+	 -->
+	<div class="row">
+		<!-- zoom:1 -->
+		<div class="container-home-box home-box-border col-md-12" ng-cloak  ng-if="pri != '058' && pri != '059'"> <!-- 企金主管 & 企金OP 不需顯示 -->
+			<div class="tfb_content">
+				<div class="tfb_content_icon"></div>
+				<div class="tfb_content_tit">
+					<img src="assets/images/icon/tfb_icon_a01.gif"><!-- 我的行事曆  "問題單:0003411"-->  <div ng-if="!IsMobile" function-type="query" ng-include="'assets/txn/CRM171/CRM171.html'"></div>
+				</div>
+			</div>
+			<!--Content of the panel -->
+			<div class="panel_content">
+				<uib-tabset active="0" justified="true">
+				
+					<!-- index0:理專 1:待辦事項  -->
+					<uib-tab index="0" ng-if="pri!='014'&&pri!='015'&&pri!='023'&&pri!='024'">
+						<uib-tab-heading ng-bind="pri>='009'&&pri <='013'?'業務排程':'待辦事項'"></uib-tab-heading>				
+						<div ng-include="'assets/txn/CRM121/CRM121.html'"></div>						
+					</uib-tab>
+					
+					<!-- index0:輔銷1:輔銷陪訪及待辦事項 -->
+					<uib-tab index="0" heading="輔銷陪訪及待辦事項" ng-if="pri =='014'||pri =='015'||pri=='023'||pri=='024'" >
+						<div ng-include="'assets/txn/CRM124/CRM124.html'"></div>						
+					</uib-tab>
+					
+					<!-- index1:主管1:理專 -->
+					<uib-tab index="1" heading="理專" ng-if="pri>='009'&&pri<='013'">
+						<div ng-include="'assets/txn/CRM122/CRM122.html'"></div>
+					</uib-tab>
+					
+					<!-- index2:ALL:商品 -->
+					<uib-tab index="2" heading="商品" select="CRM123_init()">
+						<div ng-include="'assets/txn/CRM123/CRM123.html'"></div>
+					</uib-tab>
+					
+					<!-- index3:輔銷1:輔銷駐點 -->
+					<uib-tab index="3" heading="輔銷駐點" ng-if="pri!='014'&&pri!='015'&&pri!='023'&&pri!='024'" >
+						<div ng-include="'assets/txn/CRM124/CRM124.html'"></div>						
+					</uib-tab>			
+										
+					<!-- index5:輔銷:駐點分行 -->
+					<uib-tab index="5" heading="駐點分行" ng-if="pri=='014'||pri=='015' || pri =='023' || pri =='024'">
+						<div ng-include="'assets/txn/CRM1241/CRM1241.html'"></div>
+					</uib-tab>
+					
+				</uib-tabset>
+			</div>
+		</div>
+	</div>
+		
+	<div class="row"  ng-if="pri != '058' && pri != '059'"> <!-- 企金主管 & 企金OP 不需顯示 -->
+		<!-- zoom:2 -->
+		<!-- ocean mobile no see --><!-- 這些角色不顯示: AS , B021 , B022, B023, QC , RM , RM9 , 065 , 066 -->
+		<div class="container-home-box home-box-border col-md-6" ng-if="!IsMobile && !isNoShowCrm131" ng-include="'assets/txn/CRM131/CRM131.html'" ng-cloak></div>	
+		
+		<!-- zoom:3 -->
+		<!--業績達成狀況(CRM151):	Y:顯示	N:不顯示並將181移至151的位置	 -->
+		<div class="container-home-box home-box-border col-md-6" ng-if="check151 =='Y'" ng-include="'assets/txn/CRM151/CRM151.html'" ng-cloak></div>
+		<div class="container-home-box home-box-border col-md-6" ng-if="check151 !='Y'" ng-include="'assets/txn/CRM181/CRM181.html'" ng-cloak></div>	
+		
+	</div>
+	
+	<div class="row"  ng-if="pri != '058' && pri != '059'"> <!-- 企金主管 & 企金OP 不需顯示 -->
+		<!-- zoom:4 -->
+		<div class="container-home-box home-box-border col-md-6" ng-include="'assets/txn/CRM160/CRM160.html'" ng-cloak></div>	
+		<div class="container-home-box home-box-border col-md-6" ng-if="check151 =='Y'"  ng-include="'assets/txn/CRM181/CRM181.html'" ng-cloak></div>	
+		
+		<!-- zoom:5 -->
+		<div class="container-home-box home-box-border col-md-6" ng-if="(!IsMobile && !isNoShowCrm132) || !(inputVO.pri == '015' || inputVO.pri == '024')" ng-include="'assets/txn/CRM132/CRM132.html'" ng-cloak></div>
+	</div>
+
+</div>

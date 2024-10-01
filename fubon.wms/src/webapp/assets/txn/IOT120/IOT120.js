@@ -1123,7 +1123,9 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 				INS_KEYNO:$scope.inputVO.INS_KEYNO,
 				OPR_STATUS:$scope.OPR_STATUS,
 				in_REGTYPE:'1',
-				INSPRD_ID:$scope.inputVO.INSPRD_ID
+				INSPRD_ID:$scope.inputVO.INSPRD_ID,
+				REG_TYPE:$scope.inputVO.REG_TYPE,
+				CASE_ID:$scope.inputVO.CASE_ID
 		}
 		if($scope.OPR_STATUS != 'Read'){
 			if($scope.inputVO.BEFORE_INSPRD_ID != $scope.inputVO.INSPRD_ID){

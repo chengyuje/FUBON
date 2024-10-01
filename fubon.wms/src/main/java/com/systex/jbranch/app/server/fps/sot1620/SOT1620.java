@@ -635,7 +635,7 @@ public class SOT1620 extends FubonWmsBizLogic {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("SELECT '1' as APPLY_TYPE, PROD_NAME, BARGAIN_APPLY_SEQ as APPLY_SEQ ");
+		sb.append("SELECT '6' as APPLY_TYPE, PROD_NAME, BARGAIN_APPLY_SEQ as APPLY_SEQ ");
 		sb.append("FROM TBSOT_NF_RAISE_AMT_DYNA WHERE TRADE_SEQ = :tradeSEQ and FEE_TYPE = 'A' ");
 		queryCondition.setObject("tradeSEQ", tradeSeq);
 		queryCondition.setQueryString(sb.toString());

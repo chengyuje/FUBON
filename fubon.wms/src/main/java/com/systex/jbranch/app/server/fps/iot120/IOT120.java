@@ -709,7 +709,8 @@ public class IOT120 extends FubonWmsBizLogic {
 				if (inputVO.getInList() != null) {
 					Edit_INSPRD_ID(inputVO.getInList(), keyno_change, "1");
 					for (Map<String, Object> INitem : inputVO.getInList()) {
-						if ("1".equals(INitem.get("DOC_LEVEL")) && "N".equals(INitem.get("DOC_CHK"))) {
+						//1:紙本必檢附 3:APP必檢附，列表中只會取其一
+						if (("1".equals(INitem.get("DOC_LEVEL")) || "3".equals(INitem.get("DOC_LEVEL"))) && "N".equals(INitem.get("DOC_CHK"))) {
 							inputVO.setSTATUS("10");
 							in_DOC_N++;
 						}
@@ -723,7 +724,8 @@ public class IOT120 extends FubonWmsBizLogic {
 					Edit_INSPRD_ID(inputVO.getOutList(), keyno_change, "2");
 
 					for (Map<String, Object> OUTitem : inputVO.getOutList()) {
-						if ("1".equals(OUTitem.get("DOC_LEVEL")) && "N".equals(OUTitem.get("DOC_CHK"))) {
+						//1:紙本必檢附 3:APP必檢附，列表中只會取其一
+						if (("1".equals(OUTitem.get("DOC_LEVEL")) || "3".equals(OUTitem.get("DOC_LEVEL"))) && "N".equals(OUTitem.get("DOC_CHK"))) {
 							inputVO.setSTATUS("10");
 							out_DOC_N++;
 						}
@@ -1048,7 +1050,8 @@ public class IOT120 extends FubonWmsBizLogic {
 				}
 
 				for (Map<String, Object> INitem : inputVO.getInList()) {
-					if ("1".equals(INitem.get("DOC_LEVEL"))
+					//1:紙本必檢附 3:APP必檢附，列表中只會取其一
+					if (("1".equals(INitem.get("DOC_LEVEL")) || "3".equals(INitem.get("DOC_LEVEL")))
 							&& "N".equals(INitem.get("DOC_CHK"))) {
 						inputVO.setSTATUS("10");
 						in_DOC_N++;
@@ -1067,7 +1070,7 @@ public class IOT120 extends FubonWmsBizLogic {
 				}
 
 				for (Map<String, Object> OUTitem : inputVO.getOutList()) {
-					if ("1".equals(OUTitem.get("DOC_LEVEL"))
+					if (("1".equals(OUTitem.get("DOC_LEVEL")) || "3".equals(OUTitem.get("DOC_LEVEL")))
 							&& "N".equals(OUTitem.get("DOC_CHK"))) {
 						inputVO.setSTATUS("10");
 						out_DOC_N++;

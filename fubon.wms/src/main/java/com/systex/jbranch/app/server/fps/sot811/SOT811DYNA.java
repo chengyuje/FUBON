@@ -181,12 +181,14 @@ public class SOT811DYNA extends SotPdf {
 			addMap.put("CUST_ID", inputVO.getCustId());
 			totalList.add(addMap);
 			//子基金1
+			addMap = new HashMap<String, Object>();
 			addMap.put("PROD_ID", inputVO.getPrdIdC1());
 			addMap.put("PROD_NAME", inputVO.getPrdNameC1());
 			addMap.put("CUST_ID", inputVO.getCustId());
 			totalList.add(addMap);
 			//子基金2
 			if(StringUtils.isNotBlank(inputVO.getPrdIdC2())) {
+				addMap = new HashMap<String, Object>();
 				addMap.put("PROD_ID", inputVO.getPrdIdC2());
 				addMap.put("PROD_NAME", inputVO.getPrdNameC2());
 				addMap.put("CUST_ID", inputVO.getCustId());
@@ -194,6 +196,7 @@ public class SOT811DYNA extends SotPdf {
 			}
 			//子基金3
 			if(StringUtils.isNotBlank(inputVO.getPrdIdC3())) {
+				addMap = new HashMap<String, Object>();
 				addMap.put("PROD_ID", inputVO.getPrdIdC3());
 				addMap.put("PROD_NAME", inputVO.getPrdNameC3());
 				addMap.put("CUST_ID", inputVO.getCustId());

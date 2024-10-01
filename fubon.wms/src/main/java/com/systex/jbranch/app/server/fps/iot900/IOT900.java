@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -81,6 +82,14 @@ public class IOT900 extends FubonWmsBizLogic{
 						sb.append(" and INSPRD_ID = :IN_INSPRDID  ");
 						qc.setObject("IN_INSPRDID", inputVO.getINSPRD_ID());
 					}
+					if(StringUtils.equals("1", inputVO.getREG_TYPE()) &&
+							StringUtils.isNotBlank(inputVO.getCASE_ID()) && !StringUtils.equals("J999", inputVO.getCASE_ID().substring(0, 4))) {
+						//新契約電子要保書：要保書案件編號不為J999或空白，則一險種帶出重要性2(檢附), 3(APP必備)資料
+						sb.append(" AND DOC_LEVEL IN ('2', '3') ");
+					} else {
+						//其他都不需列出3(APP必備)資料
+						sb.append(" AND DOC_LEVEL <> '3' ");
+					}
 					sb.append(" And doc_type = :IN_DOCTYPE Order by doc_seq ");
 					qc.setObject("in_REGTYPE", inputVO.getIn_REGTYPE());
 					qc.setObject("IN_DOCTYPE", inputVO.getIN_TYPE());
@@ -100,6 +109,14 @@ public class IOT900 extends FubonWmsBizLogic{
 					if("1".equals(inputVO.getIn_REGTYPE())){
 						sb.append(" and INSPRD_ID = :IN_INSPRDID  ");
 						qc.setObject("IN_INSPRDID", inputVO.getINSPRD_ID());
+					}
+					if(StringUtils.equals("1", inputVO.getREG_TYPE()) &&
+							StringUtils.isNotBlank(inputVO.getCASE_ID()) && !StringUtils.equals("J999", inputVO.getCASE_ID().substring(0, 4))) {
+						//新契約電子要保書：要保書案件編號不為J999或空白，則一險種帶出重要性2(檢附), 3(APP必備)資料
+						sb.append(" AND DOC_LEVEL IN ('2', '3') ");
+					} else {
+						//其他都不需列出3(APP必備)資料
+						sb.append(" AND DOC_LEVEL <> '3' ");
 					}
 					sb.append(" And doc_type = :IN_DOCTYPE Order by doc_seq ");
 					qc.setObject("in_REGTYPE", inputVO.getIn_REGTYPE());

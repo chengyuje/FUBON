@@ -947,19 +947,7 @@ public class CRM230 extends FubonWmsBizLogic {
 		//outSideColumn.append(" M.REF_TOTAL_PL_TWD, ");
 
 		outSideJoinTable.append(" INNER JOIN VWCRM_AST_INV_FUND M ON A.CUST_ID = M.CUST_ID ");
-		outSideJoinTable.append(" LEFT JOIN (SELECT * FROM TBPRD_FUND TB WHERE 1=1 ");
-        //基金名稱
-        if (!StringUtils.isBlank(inputVO_CRM232.getFundcname_a())) {
-        	outSideJoinTable.append(" AND TB.FUND_CNAME_A LIKE :fundcname_a ");
-        	queryCondition.setObject("fundcname_a", "%" + inputVO_CRM232.getFundcname_a() + "%");
-        }
-        //基金代碼
-        if (!StringUtils.isBlank(inputVO_CRM232.getFund_code())) {
-        	outSideJoinTable.append(" AND SUBSTR(TB.PRD_ID, 1, length(:fund_code)) = :fund_code ");
-        	queryCondition.setObject("fund_code", inputVO_CRM232.getFund_code());
-        }
-        outSideJoinTable.append(" ) F ON M.FUND_CODE = F.PRD_ID ");
-
+		outSideJoinTable.append(" LEFT JOIN TBPRD_FUND F ON M.FUND_CODE = F.PRD_ID ");
 		//2017-10-19 by Jacky 基金客戶查詢優化
 //    	outSideJoinTable.append(" LEFT JOIN TBPMS_AC2FIL_DAY AC ON M.CUST_ID = TRIM(AC.AC203) AND TRIM(M.CERT_NBR) = TRIM(AC.AC201) ");
 
@@ -1039,10 +1027,10 @@ public class CRM230 extends FubonWmsBizLogic {
 		}
 
 //		//基金名稱
-//		if (!StringUtils.isBlank(inputVO_CRM232.getFundcname_a())) {
-//			outSideWhere.append(" AND F.FUND_CNAME_A LIKE :fundcname_a ");
-//			queryCondition.setObject("fundcname_a", "%" + inputVO_CRM232.getFundcname_a() + "%");
-//		}
+		if (!StringUtils.isBlank(inputVO_CRM232.getFundcname_a())) {
+			outSideWhere.append(" AND F.FUND_CNAME_A LIKE :fundcname_a ");
+			queryCondition.setObject("fundcname_a", "%" + inputVO_CRM232.getFundcname_a() + "%");
+		}
 
 		//客戶停損點-最小值
 		if (!StringUtils.isBlank(inputVO_CRM232.getStop_loss_pt_min())) {
@@ -1057,11 +1045,11 @@ public class CRM230 extends FubonWmsBizLogic {
 		}
 
 //		//基金代碼
-//		if (!StringUtils.isBlank(inputVO_CRM232.getFund_code())) {
-//			//outSideWhere.append(" AND M.FUND_CODE LIKE '" + inputVO_CRM232.getFund_code() + "%'");
-//			outSideWhere.append(" AND SUBSTR(M.FUND_CODE, 1, length(:fund_code)) = :fund_code ");
-//			queryCondition.setObject("fund_code", inputVO_CRM232.getFund_code());
-//		}
+		if (!StringUtils.isBlank(inputVO_CRM232.getFund_code())) {
+			//outSideWhere.append(" AND M.FUND_CODE LIKE '" + inputVO_CRM232.getFund_code() + "%'");
+			outSideWhere.append(" AND SUBSTR(M.FUND_CODE, 1, length(:fund_code)) = :fund_code ");
+			queryCondition.setObject("fund_code", inputVO_CRM232.getFund_code());
+		}
 
 		//客戶停利點-最小值
 		if (!StringUtils.isBlank(inputVO_CRM232.getTake_prft_pt_min())) {

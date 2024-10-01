@@ -41,7 +41,7 @@ import com.systex.jbranch.platform.util.IPrimitiveMap;
  * PMS434
  * 
  * @author Jeff Cheng
- * @date 2023/11/30
+ * @date 2024/09/23
  * @spec null
  */
 @Component("pms434")
@@ -59,9 +59,10 @@ public class PMS434 extends FubonWmsBizLogic {
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_SQL);
 
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT DISTINCT YYYYMM AS LABEL, YYYYMM AS DATA ");
-		sql.append("FROM TBJSB_ADDRTELMAIL_CHK ");
-		sql.append("ORDER BY YYYYMM DESC");
+		sql.append("SELECT YYYYMM AS LABEL, YYYYMM AS DATA FROM TBJSB_ADDRTELMAIL_CHK ");
+		sql.append("UNION ");
+		sql.append("SELECT YYYYMM AS LABEL, YYYYMM AS DATA FROM TBJSB_ADDRTELMAIL_CON_CHK ");
+		sql.append("ORDER BY LABEL DESC");
 
 		condition.setQueryString(sql.toString());
 		outputVO.setResultList(dam.exeQuery(condition));
@@ -172,7 +173,7 @@ public class PMS434 extends FubonWmsBizLogic {
 		sql.append("  RANK()OVER(PARTITION BY A.YYYYMM, A.CHK_TYPE, A.CHECK_SOURCE_CONTENT ORDER BY A.SEQ) TOTAL_ROW_COUNT, ");
 		sql.append("  B.TOTAL, A.* ");
 		sql.append("FROM ");
-		sql.append(" A JOIN B on A.CHECK_SOURCE_CONTENT = B.CHECK_SOURCE_CONTENT ");
+		sql.append(" A JOIN B ON A.CHECK_SOURCE_CONTENT = B.CHECK_SOURCE_CONTENT ");
 		sql.append(" AND A.CHK_TYPE = B.CHK_TYPE AND A.YYYYMM = B.YYYYMM ");
 		sql.append("WHERE B.TOTAL > 3 ");
 
@@ -309,26 +310,6 @@ public class PMS434 extends FubonWmsBizLogic {
 			}
 		}
 		return returnList;
-	}
-
-	// 重新比對
-	public void reCompare(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
-		PMS434InputVO inputVO = (PMS434InputVO) body;
-		dam = this.getDataAccessManager();
-		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_SQL);
-
-		StringBuffer sql = new StringBuffer();
-		sql.append("UPDATE TBJSB_ADDRTELMAIL_CHK CHK ");
-		sql.append("SET (CHECKED_RESULT) = (");
-		sql.append("SELECT 'Y' FROM TBCUST_EMP_REL REL WHERE REL.CUST_ID = CHK.CUST_ID  ");
-		sql.append("AND REL.EMP_CUST_ID = CHK.EMP_CUST_ID) ");
-		sql.append("WHERE CHK.YYYYMM = :YYYYMM ");
-//		sql.append("AND (CHK.CHECKED_RESULT <> 'N' OR CHK.CHECKED_RESULT IS NULL) ");
-		condition.setObject("YYYYMM", inputVO.getCheckInterval());
-		condition.setQueryString(sql.toString());
-		dam.exeUpdate(condition);
-
-		this.sendRtnObject(null);
 	}
 
 	// 檢查TBCUST_EMP_REL，存在 => 覆蓋 不存在 => 新增

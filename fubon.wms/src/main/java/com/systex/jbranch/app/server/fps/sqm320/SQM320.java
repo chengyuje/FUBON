@@ -409,7 +409,7 @@ public class SQM320 extends FubonWmsBizLogic {
 		sql.append("  LEFT JOIN TBORG_ROLE R ON R.ROLE_ID = A.ROLE_ID  ");
 		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N E ON A.EMP_ID = E.EMP_ID AND LAST_DAY(TO_DATE(A.YEARQTR || '01', 'YYYYMMDD')) BETWEEN E.START_TIME AND E.END_TIME ");
 		sql.append("  LEFT JOIN VWORG_EMP_UHRM_INFO U ON A.EMP_ID = U.EMP_ID ");
-		sql.append("  WHERE YEARQTR = :yearQtr ");
+		sql.append("  WHERE A.YEARQTR = :yearQtr ");
 		
 		// #0544:WMS-CR-20210303-01_客戶服務定期查核新增高端二階主管放行權限
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") >= 0) {
@@ -447,15 +447,15 @@ public class SQM320 extends FubonWmsBizLogic {
 		
 		// **** 已訪查尚未覆核筆數(一般+特殊)及已訪查尚未覆核筆數(特殊)及該季總客戶數(一般+特殊)，不含刪除 
 		sql.append("LEFT JOIN (  ");
-		sql.append("  SELECT EMP_ID, ");
-		sql.append("         SUM( CASE WHEN NVL(AUDITED, ' ') = 'Y' THEN 1 ELSE 0 END ) AS SC_CNT_AUDITED ,  "); //已訪查筆數(一般+特殊) 
-		sql.append("         SUM( CASE WHEN NVL(AUDITED, ' ') = 'Y' AND SP_CUST_YN = 'Y' THEN 1 ELSE 0 END ) AS SP_CNT_AUDITED ,  "); //已訪查筆數(特殊) 
-		sql.append("         SUM( CASE WHEN NVL(AUDITED, ' ') <>'D' THEN 1 ELSE 0 END ) AS Q_CNT_TOT,  "); //該季總客戶數(一般+特殊)，不含刪除
-		sql.append("         SUM( CASE WHEN NVL(AUDITED, ' ') = 'Y' AND REVIEW_DATE IS NOT NULL THEN 1 ELSE 0 END ) AS REVIEW_CNT "); //已覆核客戶數
+		sql.append("  SELECT A.EMP_ID, ");
+		sql.append("         SUM( CASE WHEN NVL(A.AUDITED, ' ') = 'Y' THEN 1 ELSE 0 END ) AS SC_CNT_AUDITED ,  "); //已訪查筆數(一般+特殊) 
+		sql.append("         SUM( CASE WHEN NVL(A.AUDITED, ' ') = 'Y' AND A.SP_CUST_YN = 'Y' THEN 1 ELSE 0 END ) AS SP_CNT_AUDITED ,  "); //已訪查筆數(特殊) 
+		sql.append("         SUM( CASE WHEN NVL(A.AUDITED, ' ') <>'D' THEN 1 ELSE 0 END ) AS Q_CNT_TOT,  "); //該季總客戶數(一般+特殊)，不含刪除
+		sql.append("         SUM( CASE WHEN NVL(A.AUDITED, ' ') = 'Y' AND A.REVIEW_DATE IS NOT NULL THEN 1 ELSE 0 END ) AS REVIEW_CNT "); //已覆核客戶數
 		sql.append("  FROM TBSQM_RSA_MAST A ");
 		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N E ON A.EMP_ID = E.EMP_ID AND LAST_DAY(TO_DATE(A.YEARQTR || '01', 'YYYYMMDD')) BETWEEN E.START_TIME AND E.END_TIME ");
-		sql.append("  WHERE YEARQTR = :yearQtr ");
-		sql.append("  AND AUDIT_TYPE = '1' ");
+		sql.append("  WHERE A.YEARQTR = :yearQtr ");
+		sql.append("  AND A.AUDIT_TYPE = '1' ");
 		
 		// #0544:WMS-CR-20210303-01_客戶服務定期查核新增高端二階主管放行權限
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") >= 0) {
@@ -489,18 +489,18 @@ public class SQM320 extends FubonWmsBizLogic {
 			}
 		}
 		
-		sql.append("  GROUP BY EMP_ID ");
+		sql.append("  GROUP BY A.EMP_ID ");
 		sql.append(") OP_CNT ON RTN_DAT.EMP_ID = OP_CNT.EMP_ID ");
 		
 		// **** 符合電話行銷筆數
 		sql.append("LEFT JOIN ( ");
 		sql.append("  SELECT MAST_A.EMP_ID, COUNT(*) AS TM_CNT ");
 		sql.append("  FROM ( ");
-		sql.append("    SELECT DISTINCT EMP_ID, CUST_ID ");
+		sql.append("    SELECT DISTINCT A.EMP_ID, A.CUST_ID ");
 		sql.append("    FROM TBSQM_RSA_MAST A ");
 		sql.append("    LEFT JOIN TBPMS_EMPLOYEE_REC_N E ON A.EMP_ID = E.EMP_ID AND LAST_DAY(TO_DATE(A.YEARQTR || '01', 'YYYYMMDD')) BETWEEN E.START_TIME AND E.END_TIME ");
-		sql.append("    WHERE YEARQTR = :yearQtr ");
-		sql.append("    AND AUDIT_TYPE = '1' ");
+		sql.append("    WHERE A.YEARQTR = :yearQtr ");
+		sql.append("    AND A.AUDIT_TYPE = '1' ");
 		
 		// #0544:WMS-CR-20210303-01_客戶服務定期查核新增高端二階主管放行權限
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") >= 0) {
@@ -534,7 +534,7 @@ public class SQM320 extends FubonWmsBizLogic {
 			}
 		}
 		
-		sql.append("    AND NVL(AUDITED, ' ') = 'Y' ");
+		sql.append("    AND NVL(A.AUDITED, ' ') = 'Y' ");
 		sql.append("  ) MAST_A ");
 		sql.append("  INNER JOIN ( ");
 		sql.append("    SELECT DISTINCT CUST_ID ");
@@ -547,12 +547,12 @@ public class SQM320 extends FubonWmsBizLogic {
 		
 		// **** 自取對帳單客戶名單
 		sql.append("LEFT JOIN (  ");
-		sql.append("  SELECT EMP_ID, COUNT(*) AS EBPICK_ALL_CNT,  "); //自取對帳單客戶名單所有筆數
-		sql.append("         SUM( CASE WHEN AUDITED = 'Y' THEN 1 ELSE 0 END) AS EBPICK_AUDIT_CNT  "); //自取對帳單客戶名單已訪查筆數
+		sql.append("  SELECT A.EMP_ID, COUNT(*) AS EBPICK_ALL_CNT,  "); //自取對帳單客戶名單所有筆數
+		sql.append("         SUM( CASE WHEN A.AUDITED = 'Y' THEN 1 ELSE 0 END) AS EBPICK_AUDIT_CNT  "); //自取對帳單客戶名單已訪查筆數
 		sql.append("  FROM TBSQM_RSA_MAST A ");
 		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N E ON A.EMP_ID = E.EMP_ID AND LAST_DAY(TO_DATE(A.YEARQTR || '01', 'YYYYMMDD')) BETWEEN E.START_TIME AND E.END_TIME ");
-		sql.append("  WHERE YEARQTR = :yearQtr ");
-		sql.append("  AND AUDIT_TYPE = '1' ");
+		sql.append("  WHERE A.YEARQTR = :yearQtr ");
+		sql.append("  AND A.AUDIT_TYPE = '1' ");
 		
 		// #0544:WMS-CR-20210303-01_客戶服務定期查核新增高端二階主管放行權限
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") >= 0) {
@@ -586,19 +586,19 @@ public class SQM320 extends FubonWmsBizLogic {
 			}
 		}
 		
-		sql.append("  AND AUDITED <>'D' ");
-		sql.append("  AND EBILL_PICK_YN = 'Y' ");
-		sql.append("  GROUP BY EMP_ID ");
+		sql.append("  AND A.AUDITED <>'D' ");
+		sql.append("  AND A.EBILL_PICK_YN = 'Y' ");
+		sql.append("  GROUP BY A.EMP_ID ");
 		sql.append(") EB_DAT ON RTN_DAT.EMP_ID = EB_DAT.EMP_ID ");
 		
 		// 當季底E級客戶訪查名單(當季無訪訪記錄者)
 		sql.append("LEFT JOIN ( ");
-		sql.append("  SELECT EMP_ID, COUNT(*) AS CUST_E_NOREC_ALL_CNT, "); //符合當季底E級客戶訪查名單的筆數
-		sql.append("         SUM( CASE WHEN AUDITED = 'Y' THEN 1 ELSE 0 END) AS CUST_E_NOREC_AUDIT_CNT "); //已訪查當季底E級客戶訪查名單的筆數
+		sql.append("  SELECT A.EMP_ID, COUNT(*) AS CUST_E_NOREC_ALL_CNT, "); //符合當季底E級客戶訪查名單的筆數
+		sql.append("         SUM( CASE WHEN A.AUDITED = 'Y' THEN 1 ELSE 0 END) AS CUST_E_NOREC_AUDIT_CNT "); //已訪查當季底E級客戶訪查名單的筆數
 		sql.append("  FROM TBSQM_RSA_MAST A ");
-		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N E ON AND A.EMP_ID = E.EMP_ID AND LAST_DAY(TO_DATE(A.YEARQTR || '01', 'YYYYMMDD')) BETWEEN E.START_TIME AND E.END_TIME ");
-		sql.append("  WHERE YEARQTR = :yearQtr ");
-		sql.append("  AND AUDIT_TYPE = '1' ");
+		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N E ON A.EMP_ID = E.EMP_ID AND LAST_DAY(TO_DATE(A.YEARQTR || '01', 'YYYYMMDD')) BETWEEN E.START_TIME AND E.END_TIME ");
+		sql.append("  WHERE A.YEARQTR = :yearQtr ");
+		sql.append("  AND A.AUDIT_TYPE = '1' ");
 		
 		// #0544:WMS-CR-20210303-01_客戶服務定期查核新增高端二階主管放行權限
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") >= 0) {
@@ -632,19 +632,19 @@ public class SQM320 extends FubonWmsBizLogic {
 			}
 		}
 		
-		sql.append("  AND AUDITED <> 'D' ");
-		sql.append("  AND CUST_E_NOREC_FLAG = 'Y' ");
-		sql.append("  GROUP BY EMP_ID ");
+		sql.append("  AND A.AUDITED <> 'D' ");
+		sql.append("  AND A.CUST_E_NOREC_FLAG = 'Y' ");
+		sql.append("  GROUP BY A.EMP_ID ");
 		sql.append(") CUSTE_DAT ON RTN_DAT.EMP_ID = CUSTE_DAT.EMP_ID ");
 		
 		//新增季底庫存資產減損>=等值新台幣100萬元之客戶訪查名單(當季無訪訪記錄者)
 		sql.append("LEFT JOIN ( ");
-		sql.append("  SELECT EMP_ID, COUNT(*) AS AST_LOSS_NOREC_ALL_CNT ,  "); //符合當季底E級客戶訪查名單的筆數
-		sql.append("         SUM( CASE WHEN AUDITED = 'Y' THEN 1 ELSE 0 END) AS AST_LOSS_NOREC_AUDIT_CNT  "); //已訪查當季底E級客戶訪查名單的筆數
+		sql.append("  SELECT A.EMP_ID, COUNT(*) AS AST_LOSS_NOREC_ALL_CNT ,  "); //符合當季底E級客戶訪查名單的筆數
+		sql.append("         SUM( CASE WHEN A.AUDITED = 'Y' THEN 1 ELSE 0 END) AS AST_LOSS_NOREC_AUDIT_CNT  "); //已訪查當季底E級客戶訪查名單的筆數
 		sql.append("  FROM TBSQM_RSA_MAST A ");
-		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N E ON AND A.EMP_ID = E.EMP_ID AND LAST_DAY(TO_DATE(A.YEARQTR || '01', 'YYYYMMDD')) BETWEEN E.START_TIME AND E.END_TIME ");
-		sql.append("  WHERE YEARQTR = :yearQtr ");
-		sql.append("  AND AUDIT_TYPE = '1' ");
+		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N E ON A.EMP_ID = E.EMP_ID AND LAST_DAY(TO_DATE(A.YEARQTR || '01', 'YYYYMMDD')) BETWEEN E.START_TIME AND E.END_TIME ");
+		sql.append("  WHERE A.YEARQTR = :yearQtr ");
+		sql.append("  AND A.AUDIT_TYPE = '1' ");
 		
 		// #0544:WMS-CR-20210303-01_客戶服務定期查核新增高端二階主管放行權限
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") >= 0) {
@@ -678,9 +678,9 @@ public class SQM320 extends FubonWmsBizLogic {
 			}
 		}
 		
-		sql.append("  AND AUDITED <> 'D' ");
-		sql.append("  AND AST_LOSS_NOREC_FLAG = 'Y' ");
-		sql.append("  GROUP BY EMP_ID ");
+		sql.append("  AND A.AUDITED <> 'D' ");
+		sql.append("  AND A.AST_LOSS_NOREC_FLAG = 'Y' ");
+		sql.append("  GROUP BY A.EMP_ID ");
 		sql.append(") ASTLOSS_DAT ON RTN_DAT.EMP_ID = ASTLOSS_DAT.EMP_ID ");
 
 		// #1460_WMS-CR-20230417-03_為提升定期查核作業效率擬新增修改部份系統功能(其它) : 若當季個金客戶關係經理名下無客戶可查，則不會出現在「各職級查核戶數全行版」報表中
