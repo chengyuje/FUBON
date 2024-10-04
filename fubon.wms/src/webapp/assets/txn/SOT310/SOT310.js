@@ -1523,15 +1523,15 @@ eSoafApp.controller('SOT310Controller',
 						$scope.sendRecv("SOT310", "next", "com.systex.jbranch.app.server.fps.sot310.SOT310InputVO", $scope.inputVO,
 						function(tota, isError) {
 							if (!isError) {
-								if(tota[0].body.overCentRateResult == "N") {
-									//集中度超過上限
-									$scope.showErrorMsg("客戶高風險商品集中度比例已超過上限");
-									$scope.custClear();
-									$scope.inputVO.custID = "";
-									$scope.prodClear();
-									$scope.inputVO.prodID = "";
-									return;
-								}
+//								if(tota[0].body.overCentRateResult == "N") {
+//									//集中度超過上限
+//									$scope.showErrorMsg("客戶高風險商品集中度比例已超過上限");
+//									$scope.custClear();
+//									$scope.inputVO.custID = "";
+//									$scope.prodClear();
+//									$scope.inputVO.prodID = "";
+//									return;
+//								}
 								if (tota[0].body.errorMsg != null) {
 									$scope.showErrorMsg(tota[0].body.errorMsg);
 									return;

@@ -221,14 +221,8 @@ public class SOT310 extends EsbUtil {
 		inputVO_707.setCustId(inputVO.getCustID());
 		inputVO_707.setProdId(inputVO.getProdID());
 
-		String isOBU = StringUtils.isBlank(fp032675DataVO.getObuFlag()) ? "" : fp032675DataVO.getObuFlag();
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-//		isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707);
-		if (isOBU.equals("Y")) {
-			isFirstTrade = sot707.getIsCustFirstTradeOBU(inputVO_707);
-		} else {
-			isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707);	
-		}
+		isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707);
 		outputVO.setIsFirstTrade((isFirstTrade) ? "Y" : "N");
 
 		SOT712 sot712 = (SOT712) PlatformContext.getBean("sot712");
@@ -438,13 +432,8 @@ public class SOT310 extends EsbUtil {
 		SOT707OutputVO outputVO_707 = new SOT707OutputVO();
 		inputVO_707.setCustId(inputVO.getCustID());
 		inputVO_707.setProdId(inputVO.getProdID());
-		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-		if (isOBU.equals("Y")) {
-			isFirstTrade = sot707.getIsCustFirstTradeOBU(inputVO_707); //  海外債/SN產品首購資料OBU查詢 使用電文: AJBRVA3
-		} else {
-			isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707); //  海外債/SN產品首購資料查詢 使用電文: NJBRVA3			
-		}
+		isFirstTrade = sot707.getIsCustFirstTrade(inputVO_707); //  海外債/SN產品首購資料查詢 使用電文: NJBRVA3
 
 		SOT712 sot712 = (SOT712) PlatformContext.getBean("sot712");
 		SOT712InputVO inputVO_712 = new SOT712InputVO();
@@ -699,19 +688,19 @@ public class SOT310 extends EsbUtil {
 		}
 		
 		//高資產客戶購買高風險商品，檢核集中度
-		String overCentRateResult = "";
+//		String overCentRateResult = "";
 		if(StringUtils.equals("Y", inputVO.getHnwcYN()) && StringUtils.equals("Y", inputVO.getHnwcBuy())) {
 			//買匯匯率
 			SOT110 sot110 = (SOT110) PlatformContext.getBean("sot110");
 			BigDecimal rate = sot110.getBuyRate(inputVO.getProdCurr());
 			
-			overCentRateResult = getOverCentRateYN(inputVO, rate); //Y:可交易 W:超過通知門檻 N:不可交易
-			inputVO.setOverCentRateYN(overCentRateResult);
-			if(StringUtils.equals("W", inputVO.getOverCentRateYN())) {
+//			overCentRateResult = getOverCentRateYN(inputVO, rate); //Y:可交易 W:超過通知門檻 N:不可交易
+			inputVO.setOverCentRateYN(getOverCentRateYN(inputVO, rate));
+			if(StringUtils.equals("Y", inputVO.getOverCentRateYN())) {
 				warningList.add("ehl_01_SOT310_001");
 			}
 		}
-		outputVO.setOverCentRateResult(overCentRateResult); //集中度檢核結果
+//		outputVO.setOverCentRateResult(overCentRateResult); //集中度檢核結果
 				
 		add(dam, queryCondition, inputVO);
 
@@ -725,14 +714,10 @@ public class SOT310 extends EsbUtil {
 		inputVO_707.setPurchaseAmt(inputVO.getPurchaseAmt());//2017/11/06增加，之前有漏
 		inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
 
-		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
+
 		if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN())) {
-			if (isOBU.equals("Y")) {
-				outputVO_707_S = sot707.verifyESBPurchaseBN_GTC_OBU(inputVO_707);	// 長效單、預約單
-			} else {
-				outputVO_707_S = sot707.verifyESBPurchaseBN_GTC(inputVO_707); 		// 長效單、預約單				
-			}
+			outputVO_707_S = sot707.verifyESBPurchaseBN_GTC(inputVO_707); //長效單、預約單
 		} else {
 			// 若為金錢信託，先 call NJBRVX2
 			if (StringUtils.equals("M", inputVO.getTrustTS())) {
@@ -741,11 +726,7 @@ public class SOT310 extends EsbUtil {
 				
 				// 債券申購電文 : 客戶ID=99331241 + 信託/扣款/收益入帳 = 原畫面值
 			}
-			if (isOBU.equals("Y")) {
-				outputVO_707_S = sot707.verifyESBPurchaseBN_OBU(inputVO_707); //當日單
-			} else {
-				outputVO_707_S = sot707.verifyESBPurchaseBN(inputVO_707); //當日單				
-			}
+			outputVO_707_S = sot707.verifyESBPurchaseBN(inputVO_707); //當日單
 		}
 		
 		// 金錢信託申請電文錯誤訊息
@@ -816,26 +797,20 @@ public class SOT310 extends EsbUtil {
 		dam.update(mainVo);
 
 		// 檢核電文
-		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707InputVO inputVO_707 = new SOT707InputVO();
 		SOT707OutputVO outputVO_707 = new SOT707OutputVO();
+
 		inputVO_707.setProdType("2");//產品類別  1：SN 2：海外債
 		inputVO_707.setCheckType("2");//電文確認碼 1:檢核  2:確認
 		inputVO_707.setPurchaseAmt(inputVO.getPurchaseAmt());
 		inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
+
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-		
-		if (isOBU.equals("Y")) {
-			if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
-				outputVO_707 = sot707.verifyESBPurchaseBN_GTC_OBU(inputVO_707);	// 長效單
-			else
-				outputVO_707 = sot707.verifyESBPurchaseBN_OBU(inputVO_707);		// 當日單
-		} else {
-			if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
-				outputVO_707 = sot707.verifyESBPurchaseBN_GTC(inputVO_707);		// 長效單
-			else
-				outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707);			// 當日單			
-		}
+
+		if ("Y".equals(inputVO.getGtcYN()))
+			outputVO_707 = sot707.verifyESBPurchaseBN_GTC(inputVO_707); //長效單
+		else
+			outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707); //當日單
 
 		String errorMsg = outputVO_707.getErrorMsg();
 		List<String> warningList = outputVO_707.getWarningCode();
@@ -894,7 +869,6 @@ public class SOT310 extends EsbUtil {
 		dam.update(mainVo);
 
 		// 海外債檢核電文NJBRVA9
-		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707InputVO inputVO_707 = new SOT707InputVO();
 		SOT707OutputVO outputVO_707 = new SOT707OutputVO();
 
@@ -904,12 +878,7 @@ public class SOT310 extends EsbUtil {
 		inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
 
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-//		outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707);
-		if (isOBU.equals("Y")) {
-			outputVO_707 = sot707.verifyESBPurchaseBN_OBU(inputVO_707);
-		} else {
-			outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707);
-		}
+		outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707);
 		
 		if (StringUtils.isNotBlank(outputVO_707.getErrorMsg())) {
 			outputVO.setErrorMsg(outputVO_707.getErrorMsg());
@@ -1091,7 +1060,8 @@ public class SOT310 extends EsbUtil {
 				
 		//查詢客戶高資產集中度資料
 		WMSHACRDataVO cRateData = sot714.getCentRateData(inputVO714);
-		return cRateData.getVALIDATE_YN(); //Y:可交易 W:超過通知門檻 N:不可交易
+//		return cRateData.getVALIDATE_YN(); //Y:可交易 W:超過通知門檻 N:不可交易
+		return StringUtils.equals("Y", cRateData.getVALIDATE_YN()) ? "N" : "Y"; //可交易=>沒超過上限; 不可交易=>超過上限
 	}
 	
 	/***
@@ -1261,213 +1231,7 @@ public class SOT310 extends EsbUtil {
 				} 
 			}
 		}
-		
 		return results;
-		
-//		// for test
-//		List<NJWEEA70> results = new ArrayList<NJWEEA70>();
-//		//
-//		NJWEEA70 njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130903");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130904");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130905");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130906");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130907");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130908");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130909");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130910");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130911");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130912");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130913");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130914");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130915");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130916");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130917");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130918");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130919");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130920");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130921");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130922");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130923");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130924");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130925");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130926");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130927");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130928");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130929");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01130930");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131001");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131002");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131003");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131004");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131005");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131006");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131007");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131008");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131009");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-//		
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131010");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131011");
-//		njweea70.setTxtCode("");
-//		results.add(njweea70);
-//		//
-//		njweea70 = new NJWEEA70();
-//		njweea70.setTxtDt("01131012");
-//		njweea70.setTxtCode("Y");
-//		results.add(njweea70);
-		
-//		return results;
 	}
 	
 	public void checkTime(Object body, IPrimitiveMap header) throws Exception {

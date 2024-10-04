@@ -149,32 +149,32 @@ public class PRD111 extends FubonWmsBizLogic {
 		SOT712 sot712 = (SOT712) PlatformContext.getBean("sot712");
 		PRDFitInputVO fitVO = new PRDFitInputVO(); 
 		fitVO = getFitInputVO(inputVO, "M");//母基金
-//		String msg = sot712.saveFitInfo(fitVO);
-//		if(StringUtils.isNotBlank(msg)) {
-//			throw new JBranchException(msg);
-//		}
-//		
-//		fitVO = getFitInputVO(inputVO, "C1"); //子基金1
-//		msg = sot712.saveFitInfo(fitVO);
-//		if(StringUtils.isNotBlank(msg)) {
-//			throw new JBranchException(msg);
-//		}
-//		
-//		if(StringUtils.isNotBlank(inputVO.getProdIdC2())) {
-//			fitVO = getFitInputVO(inputVO, "C2"); //子基金2
-//			msg = sot712.saveFitInfo(fitVO);
-//			if(StringUtils.isNotBlank(msg)) {
-//				throw new JBranchException(msg);
-//			}
-//		}
-//		
-//		if(StringUtils.isNotBlank(inputVO.getProdIdC3())) {
-//			fitVO = getFitInputVO(inputVO, "C3"); //子基金3
-//			msg = sot712.saveFitInfo(fitVO);
-//			if(StringUtils.isNotBlank(msg)) {
-//				throw new JBranchException(msg);
-//			}
-//		}
+		String msg = sot712.saveFitInfo(fitVO);
+		if(StringUtils.isNotBlank(msg)) {
+			throw new JBranchException(msg);
+		}
+		
+		fitVO = getFitInputVO(inputVO, "C1"); //子基金1
+		msg = sot712.saveFitInfo(fitVO);
+		if(StringUtils.isNotBlank(msg)) {
+			throw new JBranchException(msg);
+		}
+		
+		if(StringUtils.isNotBlank(inputVO.getProdIdC2())) {
+			fitVO = getFitInputVO(inputVO, "C2"); //子基金2
+			msg = sot712.saveFitInfo(fitVO);
+			if(StringUtils.isNotBlank(msg)) {
+				throw new JBranchException(msg);
+			}
+		}
+		
+		if(StringUtils.isNotBlank(inputVO.getProdIdC3())) {
+			fitVO = getFitInputVO(inputVO, "C3"); //子基金3
+			msg = sot712.saveFitInfo(fitVO);
+			if(StringUtils.isNotBlank(msg)) {
+				throw new JBranchException(msg);
+			}
+		}
 		
 		this.sendRtnObject(outputVO);
 	}

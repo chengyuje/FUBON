@@ -321,7 +321,6 @@ public class SOT712 extends FubonWmsBizLogic{
 
 		StringBuffer sb = new StringBuffer();
 		if ("NF".equals(inputVO.getProdType())) { //基金
-
 			// 從下單交易主檔取得客戶 OBU 註記，判斷是否為 OBU 客戶
 			TBSOT_TRADE_MAINVO mainVO = (TBSOT_TRADE_MAINVO) dam.findByPKey(TBSOT_TRADE_MAINVO.TABLE_UID, inputVO.getTradeSeq());
 			boolean isObu = mainVO != null && "Y".equals(mainVO.getIS_OBU());
@@ -758,6 +757,114 @@ public class SOT712 extends FubonWmsBizLogic{
 
 				dam.exeUpdate(queryCondition);
 			}
+		} else if ("8".equals(inputVO.getProdType())) { //基金動態鎖利
+			sb = new StringBuffer();
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			
+			if(inputVO.getTradeType().matches("1|5|2")) {
+				String tableName = "";
+				if("1".equals(inputVO.getTradeType())) tableName = "TBSOT_NF_PURCHASE_DYNA"; //單筆申購
+				if("5".equals(inputVO.getTradeType())) tableName = "TBSOT_NF_RAISE_AMT_DYNA"; //母基金加碼
+				if("2".equals(inputVO.getTradeType())) tableName = "TBSOT_NF_REDEEM_DYNA"; //贖回
+				
+				queryCondition.setQueryString("SELECT BATCH_SEQ FROM " + tableName + " WHERE TRADE_SEQ = :tradeSEQ ");
+				queryCondition.setObject("tradeSEQ", inputVO.getTradeSeq());
+				List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+				if (StringUtils.isNotBlank(ObjectUtils.toString(list.get(0).get("BATCH_SEQ")))) {
+					throw new JBranchException("ehl_01_SOT_013");
+				} else {
+					sb = new StringBuffer();
+					sb.append("UPDATE " + tableName + " ");
+					sb.append("SET BATCH_SEQ = :batchSEQ, MODIFIER=:MODIFIER, LASTUPDATE=SYSDATE ");
+					sb.append("WHERE TRADE_SEQ = :tradeSEQ ");
+					queryCondition.setObject("MODIFIER", modifier);
+					queryCondition.setObject("batchSEQ", getSeq());
+					queryCondition.setObject("tradeSEQ", inputVO.getTradeSeq());
+					queryCondition.setQueryString(sb.toString());
+	
+					dam.exeUpdate(queryCondition);
+				}
+			} else if(inputVO.getTradeType().matches("3")) { //基金動態鎖利轉換
+				queryCondition.setQueryString("SELECT * FROM TBSOT_NF_TRANSFER_DYNA WHERE TRADE_SEQ = :tradeSEQ ");
+				queryCondition.setObject("tradeSEQ", inputVO.getTradeSeq());
+				List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+				if(StringUtils.equals("1", ObjectUtils.toString(list.get(0).get("TRANSFER_TYPE")))) {
+					//母基金轉換
+					if(StringUtils.isNotBlank(ObjectUtils.toString(list.get(0).get("BATCH_SEQ")))) {
+						//若已有批號丟錯誤訊息
+						throw new JBranchException("ehl_01_SOT_013");
+					} else {
+						sb = new StringBuffer();
+						sb.append("UPDATE TBSOT_NF_TRANSFER_DYNA ");
+						sb.append("SET BATCH_SEQ = :batchSEQ, MODIFIER=:MODIFIER, LASTUPDATE=SYSDATE ");
+						sb.append("WHERE TRADE_SEQ = :tradeSEQ ");
+						queryCondition.setObject("MODIFIER", modifier);
+						queryCondition.setObject("batchSEQ", getSeq());
+						queryCondition.setObject("tradeSEQ", inputVO.getTradeSeq());
+						queryCondition.setQueryString(sb.toString());
+		
+						dam.exeUpdate(queryCondition);
+					}
+				} else {
+					//子基金轉回母基金
+					for(int i=1; i<=5; i++) {
+						String cName = "_C" + Integer.toString(i);
+						String inProdCYN = ObjectUtils.toString(list.get(0).get("IN_PROD" + cName + "_YN")); //轉入子基金
+						String batchSeqC = ObjectUtils.toString(list.get(0).get("BATCH_SEQ" + cName)); //子基金批號
+						if(StringUtils.equals("Y", inProdCYN)) { //有轉入子基金
+							if(StringUtils.isNotBlank(batchSeqC)) {
+								//若已有批號丟錯誤訊息
+								throw new JBranchException("ehl_01_SOT_013");
+							} else {
+								sb = new StringBuffer();
+								queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+								sb.append("UPDATE TBSOT_NF_TRANSFER_DYNA ");
+								sb.append("SET BATCH_SEQ" + cName + " = :batchSEQ, MODIFIER=:MODIFIER, LASTUPDATE=SYSDATE ");
+								sb.append("WHERE TRADE_SEQ = :tradeSEQ ");
+								queryCondition.setObject("MODIFIER", modifier);
+								queryCondition.setObject("batchSEQ", getSeq());
+								queryCondition.setObject("tradeSEQ", inputVO.getTradeSeq());
+								queryCondition.setQueryString(sb.toString());
+				
+								dam.exeUpdate(queryCondition);
+							}
+						}
+					}
+				}
+			} else if(inputVO.getTradeType().matches("4")) { //基金動態鎖利事件變更
+				queryCondition.setQueryString("SELECT * FROM TBSOT_NF_CHANGE_DYNA WHERE TRADE_SEQ = :tradeSEQ ");
+				queryCondition.setObject("tradeSEQ", inputVO.getTradeSeq());
+				List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+				if(StringUtils.isNotBlank(ObjectUtils.toString(list.get(0).get("BATCH_SEQ_STATUS"))) ||
+						StringUtils.isNotBlank(ObjectUtils.toString(list.get(0).get("BATCH_SEQ_AMOUNT"))) ||
+						StringUtils.isNotBlank(ObjectUtils.toString(list.get(0).get("BATCH_SEQ_TRANSDATE"))) ||
+						StringUtils.isNotBlank(ObjectUtils.toString(list.get(0).get("BATCH_SEQ_ADDPROD")))) {
+					//若已有批號丟錯誤訊息
+					throw new JBranchException("ehl_01_SOT_013");
+				}
+				//各變更事項為一批號
+				for(int i=1; i<=4; i++) {
+					String batchSeqName = "";
+					if(i == 1 && StringUtils.equals("Y", ObjectUtils.toString(list.get(0).get("CHG_STATUS_YN")))) batchSeqName = "BATCH_SEQ_STATUS"; //變更事項_子基金扣款狀態
+					if(i == 2 && StringUtils.equals("Y", ObjectUtils.toString(list.get(0).get("CHG_AMOUNT_YN")))) batchSeqName = "BATCH_SEQ_AMOUNT"; //變更事項_子基金轉換金額
+					if(i == 3 && StringUtils.equals("Y", ObjectUtils.toString(list.get(0).get("CHG_TRANSDATE_YN")))) batchSeqName = "BATCH_SEQ_TRANSDATE"; //變更事項_每月扣款日期
+					if(i == 4 && StringUtils.equals("Y", ObjectUtils.toString(list.get(0).get("CHG_ADDPROD_YN")))) batchSeqName = "BATCH_SEQ_ADDPROD"; //變更事項_新增子基金
+					
+					if(StringUtils.isNotBlank(batchSeqName)) {
+						sb = new StringBuffer();
+						queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+						sb.append("UPDATE TBSOT_NF_CHANGE_DYNA ");
+						sb.append("SET " + batchSeqName + " = :batchSEQ, MODIFIER=:MODIFIER, LASTUPDATE=SYSDATE ");
+						sb.append("WHERE TRADE_SEQ = :tradeSEQ ");
+						queryCondition.setObject("MODIFIER", modifier);
+						queryCondition.setObject("batchSEQ", getSeq());
+						queryCondition.setObject("tradeSEQ", inputVO.getTradeSeq());
+						queryCondition.setQueryString(sb.toString());
+		
+						dam.exeUpdate(queryCondition);
+					}
+				}
+			}
 		}
 
 		return null;
@@ -1193,10 +1300,9 @@ public class SOT712 extends FubonWmsBizLogic{
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 
-		StringBuilder sb = new StringBuilder();
-
 		try {
 			//基金申購
+			StringBuilder sb = new StringBuilder();
 			sb.append(" update TBSOT_NF_PURCHASE_D set BARGAIN_STATUS = :bargain_status ");
 			sb.append(" where BARGAIN_APPLY_SEQ = :applySeq and FEE_TYPE = 'A' ");
 			queryCondition.setObject("applySeq", inputVO.getBargainApplySeq());
@@ -1222,6 +1328,24 @@ public class SOT712 extends FubonWmsBizLogic{
 			queryCondition.setQueryString(sb.toString());
 			dam.exeUpdate(queryCondition);
 
+			//基金動態鎖利申購
+			sb = new StringBuilder();
+			sb.append(" update TBSOT_NF_PURCHASE_DYNA set BARGAIN_STATUS = :bargain_status ");
+			sb.append(" where BARGAIN_APPLY_SEQ = :applySeq and FEE_TYPE = 'A' ");
+			queryCondition.setObject("applySeq", inputVO.getBargainApplySeq());
+			queryCondition.setObject("bargain_status", inputVO.getBargainStatus());
+			queryCondition.setQueryString(sb.toString());
+			dam.exeUpdate(queryCondition);
+
+			//基金動態鎖利母基金加碼
+			sb = new StringBuilder();
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			sb.append(" update TBSOT_NF_RAISE_AMT_DYNA set BARGAIN_STATUS = '2' ");
+			sb.append(" where BARGAIN_APPLY_SEQ = :applySeq and FEE_TYPE = 'A' ");
+			queryCondition.setObject("applySeq", inputVO.getBargainApplySeq());
+			queryCondition.setQueryString(sb.toString());
+			dam.exeUpdate(queryCondition);
+			
 			//取得傳入議價編號的所有下單交易序號
 			List<Map<String, Object>> seqList = new ArrayList<Map<String,Object>>();
 			sb = new StringBuilder();
@@ -1237,9 +1361,18 @@ public class SOT712 extends FubonWmsBizLogic{
 			sb.append(" select distinct 'E' as TYPE, TRADE_SEQ from TBSOT_ETF_TRADE_D ");
 			sb.append(" where BARGAIN_APPLY_SEQ = :applySeq3 and FEE_TYPE = 'A' ");
 			queryCondition.setObject("applySeq3", inputVO.getBargainApplySeq());
+			sb.append(" UNION ");
+			sb.append(" select distinct 'DP' as TYPE, TRADE_SEQ from TBSOT_NF_PURCHASE_DYNA ");//基金動態鎖利申購
+			sb.append(" where BARGAIN_APPLY_SEQ = :applySeq4 and FEE_TYPE = 'A' ");
+			queryCondition.setObject("applySeq4", inputVO.getBargainApplySeq());
+			sb.append(" UNION ");
+			sb.append(" select distinct 'DR' as TYPE, TRADE_SEQ from TBSOT_NF_RAISE_AMT_DYNA ");//基金動態鎖利母基金加碼
+			sb.append(" where BARGAIN_APPLY_SEQ = :applySeq5 and FEE_TYPE = 'A' ");
+			queryCondition.setObject("applySeq5", inputVO.getBargainApplySeq());
 			queryCondition.setQueryString(sb.toString());
 			seqList = dam.exeQuery(queryCondition);
 
+			//明細檔資料都議價完成，將主檔議價狀態資料壓為：2：議價完成
 			if(seqList.size()>0){
 				for(int idx = 0;idx<seqList.size();idx++){
 					if("P".equals(seqList.get(idx).get("TYPE").toString())){
@@ -1277,6 +1410,16 @@ public class SOT712 extends FubonWmsBizLogic{
 						sb.append(" and not exists (select 1 from TBSOT_ETF_TRADE_D ");
 						sb.append(" where TRADE_SEQ = :TRADE_SEQ2 and FEE_TYPE = 'A' and BARGAIN_STATUS <> '2') ");
 						queryCondition.setObject("TRADE_SEQ2", seqList.get(idx).get("TRADE_SEQ").toString());
+						queryCondition.setQueryString(sb.toString());
+						dam.exeUpdate(queryCondition);
+					}
+					
+					if(ObjectUtils.toString(seqList.get(idx).get("TYPE")).matches("DP|DR")){ //基金動態鎖利明細檔都只有一筆資料
+						sb = new StringBuilder();
+						queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+						sb.append(" update TBSOT_TRADE_MAIN set BARGAIN_FEE_FLAG = '2' ");
+						sb.append(" where TRADE_SEQ = :TRADE_SEQ1 ");
+						queryCondition.setObject("TRADE_SEQ1", seqList.get(idx).get("TRADE_SEQ").toString());
 						queryCondition.setQueryString(sb.toString());
 						dam.exeUpdate(queryCondition);
 					}
@@ -1339,10 +1482,9 @@ public class SOT712 extends FubonWmsBizLogic{
 		int custAge = sot701.getCustAge(inputVO.getCustId());				//客戶年齡
 		boolean custCheck = false;
 		if (inputVO.getCaseCode() == 1) { //Case1 下單
-			if (StringUtils.equals(inputVO.getPrdType(), "1")) {
-				//商品類別為基金，有印自主聲明書與推介同意書需求
+			if (inputVO.getPrdType().matches("1|8")) {
+				//商品類別為基金/動態鎖利，有印自主聲明書與推介同意書需求
 				custCheck = true;
-
 			} else if (StringUtils.equals(inputVO.getPrdType(), "2")
 				|| StringUtils.equals(inputVO.getPrdType(), "3")
 				|| StringUtils.equals(inputVO.getPrdType(), "5")) {
@@ -1490,6 +1632,29 @@ public class SOT712 extends FubonWmsBizLogic{
 						if (StringUtils.equals(map.get("TRADE_DATE_TYPE").toString(), "2")) {
 							url_list.addAll(getPdfULst(inputVO, "sot812"));
 						}
+					} else if(StringUtils.equals(inputVO.getPrdType(), "8")) {
+						//動態鎖利
+						//基金種類商品判斷tradeType，印出相關報表
+						switch(inputVO.getTradeType()) {
+							case 1 ://單筆申購
+								url_list.addAll(getPdfULst(inputVO, "sot801dyna"));
+								break;
+							case 2 ://贖回
+								url_list.addAll(getPdfULst(inputVO, "sot804dyna"));
+								break;
+							case 3 ://轉換
+								url_list.addAll(getPdfULst(inputVO, "sot805dyna"));
+								break;
+							case 4 ://變更
+								url_list.addAll(getPdfULst(inputVO, "sot806dyna"));
+								break;
+							case 5 ://母基金加碼
+								url_list.addAll(getPdfULst(inputVO, "sot802dyna"));
+						}
+						//基金動態鎖利交易日期類別為"預約"，則列印報表
+						if (StringUtils.equals(map.get("TRADE_DATE_TYPE").toString(), "2")) {
+							url_list.addAll(getPdfULst(inputVO, "sot812dyna"));
+						}
 					} else if (StringUtils.equals(inputVO.getPrdType(), "2")) {
 						//海外ETF/股票
 						url_list.addAll(getPdfULst(inputVO, "sot807"));
@@ -1524,6 +1689,7 @@ public class SOT712 extends FubonWmsBizLogic{
 					//列印風險預告書
 					//基金 && 單筆申購 && 不是法人 && (要印貸款風險預告書 || (是金錢信託 && 是預約交易))
 					//(海外ETF/股票 || 海外債 || SN) && 申購 && 不是法人&& 要印貸款風險預告書
+					//動態鎖利 && 單筆申購 && 不是法人 && 要印貸款風險預告書 
 					if (StringUtils.equals(inputVO.getPrdType(), "1") && 1 == inputVO.getTradeType() 
 							&& !(cbsService.getCBSIDCode(inputVO.getCustId()).matches("21|22|23|29|31|32|39"))
 							&& ("Y".equals(inputVO.getIsPrintSOT819()) || (isMonTrust(inputVO.getTradeSeq()) && StringUtils.equals(map.get("TRADE_DATE_TYPE").toString(), "2")))
@@ -1534,6 +1700,12 @@ public class SOT712 extends FubonWmsBizLogic{
 							&& !(cbsService.getCBSIDCode(inputVO.getCustId()).matches("21|22|23|29|31|32|39"))
 							&& 1 == inputVO.getTradeSubType() && "Y".equals(inputVO.getIsPrintSOT819())) {
 						url_list.addAll(getPdfULst(inputVO, "sot819"));		
+						printRptIdList.add("SOT819");
+					} else if (StringUtils.equals(inputVO.getPrdType(), "8") && (1 == inputVO.getTradeType() || 5 == inputVO.getTradeType())
+							&& !(cbsService.getCBSIDCode(inputVO.getCustId()).matches("21|22|23|29|31|32|39"))
+							&& "Y".equals(inputVO.getIsPrintSOT819())) {
+						//動態鎖利申購或母基金加碼
+						url_list.addAll(getPdfULst(inputVO, "sot819"));
 						printRptIdList.add("SOT819");
 					}
 
@@ -1547,7 +1719,14 @@ public class SOT712 extends FubonWmsBizLogic{
 									//基金贖回沒有再申購，"不"須列印自主聲明書
 								} else {
 									//當caseCode=1(下單時)，基金贖回有再申購時才需列印自主聲明書
-									url_list.addAll(getPdfULst(inputVO, "sot811"));
+									if(StringUtils.equals(inputVO.getPrdType(), "8")) {
+										//動態鎖利非贖回才需要
+										if(inputVO.getTradeType() != 2) {
+											url_list.addAll(getPdfULst(inputVO, "sot811dyna"));
+										}
+									} else {
+										url_list.addAll(getPdfULst(inputVO, "sot811"));
+									}
 								}
 								if(!StringUtils.equals(custRemark, "Y")) { //非特定客戶才印推介同意書
 									url_list.addAll(getPdfULst(inputVO, "sot813"));
@@ -1558,7 +1737,14 @@ public class SOT712 extends FubonWmsBizLogic{
 									//基金贖回沒有再申購，"不"須列印自主聲明書
 								} else {
 									//當caseCode=1(下單時)，基金贖回有再申購時才需列印自主聲明書
-									url_list.addAll(getPdfULst(inputVO, "sot811"));
+									if(StringUtils.equals(inputVO.getPrdType(), "8")) {
+										//動態鎖利非贖回才需要
+										if(inputVO.getTradeType() != 2) {
+											url_list.addAll(getPdfULst(inputVO, "sot811dyna"));
+										}
+									} else {
+										url_list.addAll(getPdfULst(inputVO, "sot811"));
+									}
 								}
 							}
 						}
@@ -1589,9 +1775,9 @@ public class SOT712 extends FubonWmsBizLogic{
 				}
 			}
 			
-			//高風險商品，集中度超過規定
+			//高風險商品，集中度超過通知門檻
 			//列印高資產客戶投資產品集中度聲明書
-			if(StringUtils.equals("Y", inputVO.getOverCentRateYN())) {
+			if(StringUtils.equals("W", inputVO.getOverCentRateYN())) {
 				BigDecimal amtTWD = getPurchseAmtTWD(inputVO); //取得台幣申購金額
 				WMSHACRDataVO hmshacrDataVO = getCentRateData(inputVO, amtTWD); //集中度資訊
 				inputVO.setHmshacrDataVO(hmshacrDataVO);
@@ -1614,16 +1800,10 @@ public class SOT712 extends FubonWmsBizLogic{
 				}
 			}
 			
-			CustHighNetWorthDataVO hnwcData = getHNWCData(inputVO.getCustId()); //客戶高資產註記資料
-			WMSHACRDataVO hmshacrDataVO = null; //集中度資訊
-			//高資產客戶，購買高風險商品或SI/SN不保本商品，檢核集中度
-			if(StringUtils.equals("Y", hnwcData.getValidHnwcYN()) && (StringUtils.equals("Y", inputVO.getHnwcBuy()) || !isRateGuaranteed(inputVO))) {
-				hmshacrDataVO = getCentRateData(inputVO, BigDecimal.ZERO);
-			}
-			if(hmshacrDataVO != null && !StringUtils.equals("Y", hmshacrDataVO.getVALIDATE_YN())) {
-				//高風險商品或不保本商品，集中度超過規定
+			CustHighNetWorthDataVO hnwcData = getHNWCData(inputVO.getCustId()); //客戶高資產註記資料			
+			if(inputVO.getHmshacrDataVO() != null && StringUtils.equals("W", inputVO.getHmshacrDataVO().getVALIDATE_YN())) {
+				//高風險商品，集中度超過通知門檻
 				//列印高資產客戶投資產品集中度聲明書
-				inputVO.setHmshacrDataVO(hmshacrDataVO);
 				url_list.addAll(getPdfULst(inputVO, "sot824"));
 			} else {
 				//有列印集中度聲明書的，就不用再檢核推介同意書&自主聲明書
@@ -1632,13 +1812,21 @@ public class SOT712 extends FubonWmsBizLogic{
 					if (!StringUtils.equals(proFlag, "Y") && !StringUtils.equals("Y", hnwcData.getValidHnwcYN())) {
 						if (StringUtils.equals(remark, "N")){
 							//非專投&&未簽推介同意，列印自主聲明書+推介同意書
-							url_list.addAll(getPdfULst(inputVO, "sot811"));
+							if(StringUtils.equals(inputVO.getPrdType(), "8")) {
+								url_list.addAll(getPdfULst(inputVO, "sot811dyna")); //動態鎖利
+							} else {
+								url_list.addAll(getPdfULst(inputVO, "sot811"));
+							}
 							if(!StringUtils.equals(custRemark, "Y")) { //非特定客戶才印推介同意書
 								url_list.addAll(getPdfULst(inputVO, "sot813"));
 							}
 						} else if (custAge >= 70 && (StringUtils.isBlank(remark) || StringUtils.equals(custRemark, "Y") || StringUtils.equals(remark, "X"))) {
 							//非專投&&有簽推介同意&&年齡>=70歲&&特定客戶，印自主聲明書
-							url_list.addAll(getPdfULst(inputVO, "sot811"));
+							if(StringUtils.equals(inputVO.getPrdType(), "8")) {
+								url_list.addAll(getPdfULst(inputVO, "sot811dyna")); //動態鎖利
+							} else {
+								url_list.addAll(getPdfULst(inputVO, "sot811"));
+							}
 						}
 					}
 				}
@@ -1704,6 +1892,18 @@ public class SOT712 extends FubonWmsBizLogic{
 
 			if (mfdCheck) {
 				url_list.addAll(getPdfULst(inputVO, "sot814"));
+			}
+		} else if (StringUtils.equals(inputVO.getPrdType(), "8")) {
+			if(inputVO.getCaseCode() == 2) {
+				//動態鎖利適配
+				url_list.addAll(getPdfULst(inputVO, "sot814dyna"));
+			} else if(inputVO.getCaseCode() == 1) {
+				//動態鎖利下單
+				if (inputVO.getTradeType() == 1 || inputVO.getTradeType() == 5 || inputVO.getTradeType() == 3 
+						|| (inputVO.getTradeType() == 4 && StringUtils.isNotBlank(inputVO.getBatchSeq()))) {
+					//申購或母基金加碼或轉換或事件變更有增加子基金時
+					url_list.addAll(getPdfULst(inputVO, "sot814dyna"));
+				}
 			}
 		}
 
@@ -2296,7 +2496,30 @@ public class SOT712 extends FubonWmsBizLogic{
 				sql.append("group by B.BATCH_SEQ, D.TRADE_DATE_TYPE ");
 				sql.append("order by B.BATCH_SEQ ");
 			}
+		} else if (StringUtils.equals(inputVO.getPrdType(), "8")) { //基金動態鎖利商品
+			if (inputVO.getTradeType() != 4) {
+				switch(inputVO.getTradeType()) {
+					case 1 ://動態鎖利單筆申購
+						tableName = "TBSOT_NF_PURCHASE_DYNA";
+						break;
+					case 2 ://動態鎖利贖回
+						tableName = "TBSOT_NF_REDEEM_DYNA";
+						break;
+					case 3 ://動態鎖利轉換
+						tableName = "TBSOT_NF_TRANSFER_DYNA";
+						break;
+					case 5 ://動態鎖利母基金加碼
+						tableName = "TBSOT_NF_RAISE_AMT_DYNA";
+						break;
+				}
 
+				sql.append("select BATCH_SEQ, TRADE_DATE_TYPE from " + tableName + " ");
+				sql.append("where TRADE_SEQ = :trade_seq group by BATCH_SEQ, TRADE_DATE_TYPE order by BATCH_SEQ");
+
+			} else if (inputVO.getTradeType() == 4) { //動態鎖利事件變更
+				sql.append("select BATCH_SEQ_ADDPROD AS BATCH_SEQ, TRADE_DATE_TYPE from TBSOT_NF_CHANGE_DYNA ");
+				sql.append(" where TRADE_SEQ = :trade_seq ");
+			}
 		} else if (!StringUtils.equals(inputVO.getPrdType(), "1") && !StringUtils.equals(inputVO.getPrdType(), "4")) { //非基金與SI
 			switch(inputVO.getPrdType()) {
 				case "2": //海外ETF/股票
@@ -2309,18 +2532,13 @@ public class SOT712 extends FubonWmsBizLogic{
 					tableName = "TBSOT_SN_TRADE_D";
 					break;
 			}
-
-
 			if(StringUtils.equals(inputVO.getPrdType(), "5")){
 				sql.append("select BATCH_SEQ, PROD_ID from " + tableName + " ");
 				sql.append("where TRADE_SEQ = :trade_seq group by BATCH_SEQ, PROD_ID order by BATCH_SEQ");
 			} else {
 				sql.append("select BATCH_SEQ from " + tableName + " ");
 				sql.append("where TRADE_SEQ = :trade_seq group by BATCH_SEQ order by BATCH_SEQ");
-
 			}
-
-
 		}
 		queryCondition.setQueryString(sql.toString());
 		queryCondition.setObject("trade_seq", inputVO.getTradeSeq());
@@ -2371,8 +2589,12 @@ public class SOT712 extends FubonWmsBizLogic{
 	 * @see SOT712#validateFit(PRDFitInputVO)
 	 */
 	public void saveFitInfo(Object body, IPrimitiveMap<?> header) throws JBranchException {
-		dam = this.getDataAccessManager();
 		PRDFitInputVO inputVO = (PRDFitInputVO) body;
+		this.sendRtnObject(saveFitInfo(inputVO));
+	}
+	
+	public String saveFitInfo(PRDFitInputVO inputVO) throws JBranchException {
+		dam = this.getDataAccessManager();
 		String rtnMsg = null; //儲存錯誤訊息
 
 		try{
@@ -2428,7 +2650,8 @@ public class SOT712 extends FubonWmsBizLogic{
 			logger.debug(String.format("發生錯誤:%s",StringUtil.getStackTraceAsString(e)));
 			rtnMsg = "系統發生錯誤請洽系統管理員！";
 		}
-		this.sendRtnObject(rtnMsg);
+
+		return rtnMsg;
 	}
 
 	/**
@@ -2555,6 +2778,28 @@ public class SOT712 extends FubonWmsBizLogic{
 	}
 	
 	/***
+	 * 適配：取得客戶集中度資訊
+	 * @param body
+	 * @param header
+	 * @throws Exception
+	 */
+	public void getCentRateData(Object body, IPrimitiveMap<?> header) throws Exception {
+		PRDFitInputVO inputVO = (PRDFitInputVO) body;
+		SOT712OutputVO outputVO = new SOT712OutputVO();
+		
+		CustHighNetWorthDataVO hnwcData = getHNWCData(inputVO.getCustId()); //客戶高資產註記資料
+		WMSHACRDataVO hmshacrDataVO = null; //集中度資訊
+		//高資產客戶，購買高風險商品(境外私募基金&海外債)，檢核集中度
+		if(inputVO.getPrdType().matches("1|3") && //境外私募基金&海外債
+				(StringUtils.equals("Y", hnwcData.getValidHnwcYN()) && StringUtils.equals("Y", inputVO.getHnwcBuy()))) {
+			hmshacrDataVO = getCentRateData(inputVO, BigDecimal.ZERO);
+		}
+		outputVO.setHmshacrDataVO(hmshacrDataVO);
+		
+		sendRtnObject(outputVO);
+	}
+	
+	/***
 	 * 取得客戶集中度資訊
 	 * @param inputVO
 	 * @return
@@ -2570,6 +2815,7 @@ public class SOT712 extends FubonWmsBizLogic{
 		if(StringUtils.equals(inputVO.getPrdType(), "3")) inputVO714.setProdType("4"); 			//海外債
 		else if (StringUtils.equals(inputVO.getPrdType(), "4")) inputVO714.setProdType("1"); 	//SI 
 		else if (StringUtils.equals(inputVO.getPrdType(), "5")) inputVO714.setProdType("2"); 	//SN
+		else if (StringUtils.equals(inputVO.getPrdType(), "1")) inputVO714.setProdType("6"); 	//境外私募基金
 		
 		hmshacrDataVO = sot714.getCentRateData(inputVO714);
 		
@@ -2587,7 +2833,13 @@ public class SOT712 extends FubonWmsBizLogic{
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
 				
-		if(StringUtils.equals("3", inputVO.getPrdType())) {
+		if(StringUtils.equals("1", inputVO.getPrdType())) {
+			//基金(境外私募基金) (只會有一筆)
+			sb.append("select (NVL(A.PURCHASE_AMT, 0) * NVL(B.BUY_RATE, 1)) AS AMT ");
+			sb.append(" FROM TBSOT_NF_PURCHASE_D A ");
+			sb.append(" LEFT JOIN TBPMS_IQ053 B ON B.CUR_COD = A.PROD_CURR AND B.MTN_DATE = (SELECT MAX(MTN_DATE) FROM TBPMS_IQ053) ");
+			sb.append(" where A.TRADE_SEQ = :tradeSeq ");
+		} else if(StringUtils.equals("3", inputVO.getPrdType())) {
 			//海外債
 			sb.append("select (NVL(A.TRUST_AMT, 0) * NVL(B.BUY_RATE, 1)) AS AMT ");
 			sb.append(" FROM TBSOT_BN_TRADE_D A ");
