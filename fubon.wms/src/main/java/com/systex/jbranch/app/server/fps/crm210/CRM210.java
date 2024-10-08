@@ -331,7 +331,8 @@ public class CRM210 extends FubonWmsBizLogic {
 	
 				//客戶姓名
 				if (!StringUtils.isBlank(inputVO_CRM211.getCust_name())) {
-					sql.append("AND V.CUST_NAME LIKE '%" + inputVO_CRM211.getCust_name() + "%' ");
+					sql.append("AND V.CUST_NAME = :cust_name ");
+					queryCondition.setObject("cust_name", inputVO_CRM211.getCust_name());
 				}
 	
 				//判斷行動載具登入，查詢條件需檢核申請許可時間段的客戶清單
@@ -364,13 +365,15 @@ public class CRM210 extends FubonWmsBizLogic {
 						queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
 					}
 				} else {
-					String[] uEmpDtl = inputVO_CRM221.getuEmpID().split(",");
-					if (uEmpDtl.length >= 2) { //有輸入
-						sql.append("AND V.UEMP_ID = :uEmpID ");
-						sql.append("AND V.UEMP_AO_TYPE = :uEmpAoType ");
-
-						queryCondition.setObject("uEmpID", uEmpDtl[0]);
-						queryCondition.setObject("uEmpAoType", uEmpDtl[1]);
+					if(inputVO_CRM221.getuEmpID() != null) {
+						String[] uEmpDtl = inputVO_CRM221.getuEmpID().split(",");
+						if (uEmpDtl.length >= 2) { //有輸入
+							sql.append("AND V.UEMP_ID = :uEmpID ");
+							sql.append("AND V.UEMP_AO_TYPE = :uEmpAoType ");
+	
+							queryCondition.setObject("uEmpID", uEmpDtl[0]);
+							queryCondition.setObject("uEmpAoType", uEmpDtl[1]);
+						}
 					}
 					
 					if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("bs") >= 0 &&
@@ -383,7 +386,12 @@ public class CRM210 extends FubonWmsBizLogic {
 							sql.append("AND EXISTS (SELECT 'X' FROM VWORG_EMP_BS_INFO BS WHERE BS.BS_CODE = V.AO_CODE) ");
 						}
 					}
-					
+					//有選取分行
+					if (StringUtils.isNotBlank(inputVO_CRM221.getAo_05())) {
+						sql.append("AND V.BRA_NBR = :branchNbr ");
+						queryCondition.setObject("branchNbr", inputVO_CRM221.getAo_05());
+					}
+							
 					//mantis 0004529: 理專調分行,原分行客戶可被新分行主管移轉 sen 2018/04/10
 					if (StringUtils.isNotBlank(inputVO_CRM221.getAo_code()) && !"0".equals(inputVO_CRM221.getAo_code())) {
 						sql.append("AND EXISTS (SELECT 'X' FROM TBCRM_CUST_MAST A WHERE V.CUST_ID = A.CUST_ID AND A.AO_CODE = :ao_code AND A.BRA_NBR IN (:brNbrList)) ");
@@ -517,7 +525,8 @@ public class CRM210 extends FubonWmsBizLogic {
 	
 				//客戶姓名
 				if (!StringUtils.isBlank(inputVO_CRM221.getCust_name())) {
-					sql.append("AND V.CUST_NAME LIKE '%" + inputVO_CRM221.getCust_name() + "%' ");
+					sql.append("AND V.CUST_NAME = :cust_name ");
+					queryCondition.setObject("cust_name", inputVO_CRM221.getCust_name());
 				}
 
 				break;
@@ -667,8 +676,8 @@ public class CRM210 extends FubonWmsBizLogic {
 				
 				//客戶姓名
 				if (!StringUtils.isBlank(inputVO_CRM331.getCust_name())) {
-					sql.append("AND V.CUST_NAME like :cust_name ");
-					queryCondition.setObject("cust_name", "%" + inputVO_CRM331.getCust_name() + "%");
+					sql.append("AND V.CUST_NAME = :cust_name ");
+					queryCondition.setObject("cust_name", inputVO_CRM331.getCust_name());
 				}
 				
 				//最近異動頻率

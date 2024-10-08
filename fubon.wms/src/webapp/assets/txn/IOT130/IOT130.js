@@ -523,6 +523,7 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 			$scope.notCNCT = false;
 		}
 		if($scope.inputVO.OTH_TYPE == '2'){
+			//契變-解約/縮小保額/部分提領(終止)
 			$scope.inputVO.TERMINATED_INC = 'Y';
 			$scope.inputVO.REVISE_CONFIRM_YN = "N";
 			$scope.inputVO.notOthType2 = false;
@@ -530,6 +531,15 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 			$scope.inputVO.TERMINATED_INC = 'N';
 			$scope.inputVO.REVISE_CONFIRM_YN = "N";
 			$scope.inputVO.notOthType2 = true;
+			//非2，清空資金用途欄位
+			$scope.inputVO.OTH_FUND_PURPOSE_1 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_2 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_3 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_4 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_5 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_6 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_RMK_1 = "";
+			$scope.inputVO.OTH_FUND_PURPOSE_RMK_2 = "";
 		}
 
 		$scope.premiumUsageChange();
@@ -795,6 +805,19 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 						}
 						if($scope.inputVO.INSPRD_ID != "" && $scope.inputVO.INSPRD_KEYNO != ''){
 							$scope.checkData();
+						}
+						if($scope.inputVO.OTH_TYPE == '2') { //契變-解約/縮小保額/部分提領(終止)
+							if($scope.inputVO.OTH_FUND_PURPOSE_1 == "N" && $scope.inputVO.OTH_FUND_PURPOSE_2 == "N" &&
+									$scope.inputVO.OTH_FUND_PURPOSE_3 == "N" && $scope.inputVO.OTH_FUND_PURPOSE_4 == "N" &&
+									$scope.inputVO.OTH_FUND_PURPOSE_5 == "N" && $scope.inputVO.OTH_FUND_PURPOSE_6 == "N") {
+								$scope.showErrorMsg("*為必要輸入欄位，請輸入後重試");
+								return;
+							}
+							if(($scope.inputVO.OTH_FUND_PURPOSE_5 == "Y" && $scope.inputVO.OTH_FUND_PURPOSE_RMK_1 == "") || 
+									($scope.inputVO.OTH_FUND_PURPOSE_6 == "Y" && $scope.inputVO.OTH_FUND_PURPOSE_RMK_2 == "")) {
+								$scope.showErrorMsg("資金用途為其他，請說明");
+								return;
+							}
 						}
 						$scope.inputVO.OPR_STATUS = $scope.OPR_STATUS;
 						$scope.sendRecv("IOT130","submit","com.systex.jbranch.app.server.fps.iot130.IOT130InputVO",$scope.inputVO,
@@ -1115,7 +1138,15 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 					INVESTList:[],
 					COMPANY_NUM:'82',
 					REVISE_CONFIRM_YN: "N",
-					notOthType2: true
+					notOthType2: true,
+					OTH_FUND_PURPOSE_1: "N",
+					OTH_FUND_PURPOSE_2: "N",
+					OTH_FUND_PURPOSE_3: "N",
+					OTH_FUND_PURPOSE_4: "N",
+					OTH_FUND_PURPOSE_5: "N",
+					OTH_FUND_PURPOSE_6: "N",
+					OTH_FUND_PURPOSE_RMK_1: "",
+					OTH_FUND_PURPOSE_RMK_2: ""
 			}
 			$scope.initCheckItems();
 			$timeout(function(){$scope.inquireCompanyFB();},700);

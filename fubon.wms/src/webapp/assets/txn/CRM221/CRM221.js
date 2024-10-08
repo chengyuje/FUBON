@@ -96,6 +96,12 @@ eSoafApp.controller('CRM221Controller',
 					return;
 				}
 			}
+			//分行為必輸欄位
+			if($scope.inputVO.ao_05 == undefined || $scope.inputVO.ao_05 == null || $scope.inputVO.ao_05 == "") {
+				$scope.showErrorMsg("請輸入分行查詢");
+				return;
+			}
+			
 			$scope.inputVO.aolist = $scope.AO_LIST;
 			$scope.inputVO.branch_list = [];
 			angular.forEach($scope.BRANCH_LIST, function(row, index, objs){

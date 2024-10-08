@@ -252,17 +252,18 @@ public class BTCRM3502 extends BizLogic {
 		List<Map> list = dam.exeQuery(queryCondition);
 		
 		for (Map<String, Object> data : afterPrepareList) {
-			if (StringUtils.isNotBlank(ObjectUtils.toString(data.get("UHRM_AO_CODE"))) && StringUtils.equals("715", ObjectUtils.toString(data.get("CUST_BRA_NBR")))) {
-				HashMap<String, Object> newMap = new HashMap<>();
-				newMap.putAll(data);
-				newMap.put("SIMP_NAME", list.get(0).get("PARAM_NAME").toString());
-				newMap.put("EMP_NAME", list.get(1).get("PARAM_NAME").toString());
-				//newMap.put("NEW_AO_NAME", list.get(2).get("PARAM_NAME").toString());
-				newMap.put("BRH_TEL", list.get(3).get("PARAM_NAME").toString());
-				tempAfterPrepareList.add(newMap);
-			} else {
+//			if (StringUtils.isNotBlank(ObjectUtils.toString(data.get("UHRM_AO_CODE"))) && 
+//				StringUtils.equals("715", ObjectUtils.toString(data.get("CUST_BRA_NBR")))) {
+//				HashMap<String, Object> newMap = new HashMap<>();
+//				newMap.putAll(data);
+//				newMap.put("SIMP_NAME", list.get(0).get("PARAM_NAME").toString());
+//				newMap.put("EMP_NAME", list.get(1).get("PARAM_NAME").toString());
+//				//newMap.put("NEW_AO_NAME", list.get(2).get("PARAM_NAME").toString());
+//				newMap.put("BRH_TEL", list.get(3).get("PARAM_NAME").toString());
+//				tempAfterPrepareList.add(newMap);
+//			} else {
 				tempAfterPrepareList.add(data);
-			}
+//			}
 		}
 		
 		afterPrepareList.clear();

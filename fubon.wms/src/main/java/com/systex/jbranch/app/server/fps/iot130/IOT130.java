@@ -83,7 +83,9 @@ public class IOT130 extends FubonWmsBizLogic{
 			sb.append(" A.LOAN_PRD_YN, A.QC_IMMI, A.PREMATCH_SEQ, A.GUILD_RPT_DATE, A.NOT_PASS_REASON, A.PREMIUM_TRANSSEQ, A.QC_PROPOSER_CHG, ");
 			sb.append(" A.PREMIUM_USAGE, A.PAY_WAY, A.PAYER_ID, A.RLT_BT_PROPAY, A.LOAN_SOURCE_YN, A.DOC_KEYIN_DATE, P.AML, P.PRECHECK, ");
 			sb.append(" A.VALID_CHG_CUST_YN, P.CHG_CUST_ID, P.C_SENIOR_PVAL, B.CNAME AS INS_COM_NAME, ");
-			sb.append(" A.FB_COM_YN, A.COMPANY_NUM, A.REVISE_CONFIRM_YN ");
+			sb.append(" A.FB_COM_YN, A.COMPANY_NUM, A.REVISE_CONFIRM_YN, ");
+			sb.append(" A.OTH_FUND_PURPOSE_1, A.OTH_FUND_PURPOSE_2, A.OTH_FUND_PURPOSE_3, A.OTH_FUND_PURPOSE_4, A.OTH_FUND_PURPOSE_5, A.OTH_FUND_PURPOSE_6, ");
+			sb.append(" A.OTH_FUND_PURPOSE_RMK_1, A.OTH_FUND_PURPOSE_RMK_2 ");
 			sb.append(" From TBIOT_MAIN A ");
 			sb.append(" LEFT JOIN TBPRD_INS_MAIN PRD ON A.INSPRD_KEYNO = PRD.INSPRD_KEYNO ");
 			sb.append(" LEFT JOIN TBIOT_PREMATCH P ON P.PREMATCH_SEQ = A.PREMATCH_SEQ ");
@@ -430,7 +432,15 @@ public class IOT130 extends FubonWmsBizLogic{
 				tmvo.setFB_COM_YN(inputVO.getFB_COM_YN());
 				tmvo.setCOMPANY_NUM(inputVO.getCOMPANY_NUM());
 				tmvo.setREVISE_CONFIRM_YN(inputVO.getREVISE_CONFIRM_YN());
-
+				tmvo.setOTH_FUND_PURPOSE_1(inputVO.getOTH_FUND_PURPOSE_1());
+				tmvo.setOTH_FUND_PURPOSE_2(inputVO.getOTH_FUND_PURPOSE_2());
+				tmvo.setOTH_FUND_PURPOSE_3(inputVO.getOTH_FUND_PURPOSE_3());
+				tmvo.setOTH_FUND_PURPOSE_4(inputVO.getOTH_FUND_PURPOSE_4());
+				tmvo.setOTH_FUND_PURPOSE_5(inputVO.getOTH_FUND_PURPOSE_5());
+				tmvo.setOTH_FUND_PURPOSE_6(inputVO.getOTH_FUND_PURPOSE_6());
+				tmvo.setOTH_FUND_PURPOSE_RMK_1(inputVO.getOTH_FUND_PURPOSE_RMK_1());
+				tmvo.setOTH_FUND_PURPOSE_RMK_2(inputVO.getOTH_FUND_PURPOSE_RMK_2());
+				
 				dam_obj.create(tmvo);
 
 				outputVO.setINS_ID(INS_ID);
@@ -642,7 +652,15 @@ public class IOT130 extends FubonWmsBizLogic{
 				tmvo.setFB_COM_YN(inputVO.getFB_COM_YN());
 				tmvo.setCOMPANY_NUM(inputVO.getCOMPANY_NUM());
 				tmvo.setREVISE_CONFIRM_YN(inputVO.getREVISE_CONFIRM_YN());
-
+				tmvo.setOTH_FUND_PURPOSE_1(inputVO.getOTH_FUND_PURPOSE_1());
+				tmvo.setOTH_FUND_PURPOSE_2(inputVO.getOTH_FUND_PURPOSE_2());
+				tmvo.setOTH_FUND_PURPOSE_3(inputVO.getOTH_FUND_PURPOSE_3());
+				tmvo.setOTH_FUND_PURPOSE_4(inputVO.getOTH_FUND_PURPOSE_4());
+				tmvo.setOTH_FUND_PURPOSE_5(inputVO.getOTH_FUND_PURPOSE_5());
+				tmvo.setOTH_FUND_PURPOSE_6(inputVO.getOTH_FUND_PURPOSE_6());
+				tmvo.setOTH_FUND_PURPOSE_RMK_1(inputVO.getOTH_FUND_PURPOSE_RMK_1());
+				tmvo.setOTH_FUND_PURPOSE_RMK_2(inputVO.getOTH_FUND_PURPOSE_RMK_2());
+				
 				dam_obj.update(tmvo);
 
 				sendRtnObject(null);

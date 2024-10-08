@@ -259,11 +259,40 @@ eSoafApp.controller('IOT190Controller',
     				  if(tota[0].body.resultList.length == 0) {
     					  $scope.showMsg("ehl_01_common_009");
     					  return;
-    				  }							
+    				  }	
+    				  
+    				  //資金用途資料處理
+    				  angular.forEach(tota[0].body.resultList, function(row, index, objs) {
+    					  debugger
+    					  var purpose = "";
+    					  if(row.OTH_FUND_PURPOSE_1 == "Y") purpose = "保險費";
+    					  if(row.OTH_FUND_PURPOSE_2 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "存款";
+    					  if(row.OTH_FUND_PURPOSE_3 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "投資";
+    					  if(row.OTH_FUND_PURPOSE_4 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "房信貸還款";
+    					  if(row.OTH_FUND_PURPOSE_5 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "其他資金用途:" + row.OTH_FUND_PURPOSE_RMK_1;
+    					  row.OTH_FUND_PURPOSE_IN = purpose;
+    					  
+    					  if(row.OTH_FUND_PURPOSE_6 == "Y") var purpose1 = "非本行之其他資金用途：" + row.OTH_FUND_PURPOSE_RMK_2;
+    					  row.OTH_FUND_PURPOSE_OUT = purpose1;
+    				  });
+    				  angular.forEach(tota[0].body.list, function(row, index, objs) {
+    					  debugger
+    					  var purpose = "";
+    					  if(row.OTH_FUND_PURPOSE_1 == "Y") purpose = "保險費";
+    					  if(row.OTH_FUND_PURPOSE_2 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "存款";
+    					  if(row.OTH_FUND_PURPOSE_3 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "投資";
+    					  if(row.OTH_FUND_PURPOSE_4 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "房信貸還款";
+    					  if(row.OTH_FUND_PURPOSE_5 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "其他資金用途:" + row.OTH_FUND_PURPOSE_RMK_1;
+    					  row.OTH_FUND_PURPOSE_IN = purpose;
+    					  
+    					  var purpose1 = "";
+    					  if(row.OTH_FUND_PURPOSE_6 == "Y") var purpose1 = "非本行之其他資金用途：" + row.OTH_FUND_PURPOSE_RMK_2;
+    					  row.OTH_FUND_PURPOSE_OUT = purpose1;
+    				  });
     				  $scope.paramList = tota[0].body.resultList;	
     				  $scope.printList = tota[0].body.list;
     				  $scope.outputVO = tota[0].body;			
-								
+    				  debugger	
     				  return;
     			  }					
     		  });

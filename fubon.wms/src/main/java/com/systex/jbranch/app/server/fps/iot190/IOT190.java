@@ -59,7 +59,9 @@ public class IOT190 extends FubonWmsBizLogic {
 			sb.append("       (CASE WHEN P.STATUS = '3' THEN 'Y' ELSE 'N' END) AS AUTH_YN, ");
 			sb.append("		  A.COMPANY_NUM, E.CNAME AS INS_COM_NAME, CASE WHEN A.FB_COM_YN = 'Y' THEN '富壽' ELSE '非富壽' END AS INS_SOURCE, ");
 			sb.append("		  (CASE WHEN A.FB_COM_YN = 'Y' THEN A.INS_RCV_OPRID ELSE A.NOT_FB_OP_NAME END) AS INS_RCV_OPRID, ");
-			sb.append("		  (CASE WHEN A.FB_COM_YN = 'Y' THEN A.INS_RCV_DATE ELSE A.NOT_FB_BATCH_DATE END) AS INS_RCV_DATE ");
+			sb.append("		  (CASE WHEN A.FB_COM_YN = 'Y' THEN A.INS_RCV_DATE ELSE A.NOT_FB_BATCH_DATE END) AS INS_RCV_DATE, ");
+			sb.append(" 	  A.OTH_FUND_PURPOSE_1, A.OTH_FUND_PURPOSE_2, A.OTH_FUND_PURPOSE_3, A.OTH_FUND_PURPOSE_4, A.OTH_FUND_PURPOSE_5, A.OTH_FUND_PURPOSE_6, ");
+			sb.append(" 	  A.OTH_FUND_PURPOSE_RMK_1, A.OTH_FUND_PURPOSE_RMK_2 ");
 			sb.append("FROM VWIOT_MAIN A ");
 			sb.append("LEFT OUTER JOIN (SELECT PREMATCH_SEQ, STATUS FROM TBIOT_PREMATCH) P ON P.PREMATCH_SEQ = A.PREMATCH_SEQ ");
 			sb.append("LEFT JOIN TBJSB_INS_PROD_COMPANY E ON E.SERIALNUM = A.COMPANY_NUM ");	
@@ -198,7 +200,7 @@ public class IOT190 extends FubonWmsBizLogic {
 				List listCSV = new ArrayList();
 				for (Map<String, Object> map : list) {
 					// 21 column
-					String[] records = new String[44];
+					String[] records = new String[46];
 					int i = 0;
 					records[i] = checkIsNull(map, "STATUS"); // 文件簽收狀態
 					records[++i] = checkIsNull(map, "CREATETIME"); // 鍵機日
@@ -269,10 +271,12 @@ public class IOT190 extends FubonWmsBizLogic {
 					records[++i] = checkIsNull(map, "PREMIUM_TRANSSEQ"); // 保費來源錄音序號
 					records[++i] = checkIsNull(map, "INS_SOURCE"); // 保單來源
 					records[++i] = checkIsNull(map, "INS_COM_NAME"); // 保險公司
+					records[++i] = checkIsNull(map, "OTH_FUND_PURPOSE_IN"); //辦理契約變更資金用途-本行
+					records[++i] = checkIsNull(map, "OTH_FUND_PURPOSE_OUT"); //辦理契約變更資金用途-其他
 					listCSV.add(records);
 				}
 				// header
-				String[] csvHeader = new String[44];
+				String[] csvHeader = new String[46];
 				int j = 0;
 				csvHeader[j] = "文件簽收狀態";
 				csvHeader[++j] = "鍵機日";
@@ -318,6 +322,8 @@ public class IOT190 extends FubonWmsBizLogic {
 				csvHeader[++j] = "保費來源錄音序號";
 				csvHeader[++j] = "進件來源";
 				csvHeader[++j] = "保險公司";
+				csvHeader[++j] = "辦理契約變更資金用途-本行";
+				csvHeader[++j] = "辦理契約變更資金用途-其他";
 
 				CSVUtil csv = new CSVUtil();
 				csv.setHeader(csvHeader); // 設定標頭

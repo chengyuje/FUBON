@@ -64,6 +64,14 @@ public class IOT130InputVO extends PagingInputVO{
 	private String FB_COM_YN;
 	private BigDecimal COMPANY_NUM;
 	private String REVISE_CONFIRM_YN;
+	private String OTH_FUND_PURPOSE_1;
+	private String OTH_FUND_PURPOSE_2;
+	private String OTH_FUND_PURPOSE_3;
+	private String OTH_FUND_PURPOSE_4;
+	private String OTH_FUND_PURPOSE_5;
+	private String OTH_FUND_PURPOSE_6;
+	private String OTH_FUND_PURPOSE_RMK_1;
+	private String OTH_FUND_PURPOSE_RMK_2;
 	
 	public boolean isEditOTH_TYPE() {
 		return editOTH_TYPE;
@@ -431,5 +439,69 @@ public class IOT130InputVO extends PagingInputVO{
 	public void setREVISE_CONFIRM_YN(String rEVISE_CONFIRM_YN) {
 		REVISE_CONFIRM_YN = rEVISE_CONFIRM_YN;
 	}
-		
+
+	public String getOTH_FUND_PURPOSE_1() {
+		return OTH_FUND_PURPOSE_1;
+	}
+
+	public void setOTH_FUND_PURPOSE_1(String oTH_FUND_PURPOSE_1) {
+		OTH_FUND_PURPOSE_1 = oTH_FUND_PURPOSE_1;
+	}
+
+	public String getOTH_FUND_PURPOSE_2() {
+		return OTH_FUND_PURPOSE_2;
+	}
+
+	public void setOTH_FUND_PURPOSE_2(String oTH_FUND_PURPOSE_2) {
+		OTH_FUND_PURPOSE_2 = oTH_FUND_PURPOSE_2;
+	}
+
+	public String getOTH_FUND_PURPOSE_3() {
+		return OTH_FUND_PURPOSE_3;
+	}
+
+	public void setOTH_FUND_PURPOSE_3(String oTH_FUND_PURPOSE_3) {
+		OTH_FUND_PURPOSE_3 = oTH_FUND_PURPOSE_3;
+	}
+
+	public String getOTH_FUND_PURPOSE_4() {
+		return OTH_FUND_PURPOSE_4;
+	}
+
+	public void setOTH_FUND_PURPOSE_4(String oTH_FUND_PURPOSE_4) {
+		OTH_FUND_PURPOSE_4 = oTH_FUND_PURPOSE_4;
+	}
+
+	public String getOTH_FUND_PURPOSE_5() {
+		return OTH_FUND_PURPOSE_5;
+	}
+
+	public void setOTH_FUND_PURPOSE_5(String oTH_FUND_PURPOSE_5) {
+		OTH_FUND_PURPOSE_5 = oTH_FUND_PURPOSE_5;
+	}
+
+	public String getOTH_FUND_PURPOSE_6() {
+		return OTH_FUND_PURPOSE_6;
+	}
+
+	public void setOTH_FUND_PURPOSE_6(String oTH_FUND_PURPOSE_6) {
+		OTH_FUND_PURPOSE_6 = oTH_FUND_PURPOSE_6;
+	}
+
+	public String getOTH_FUND_PURPOSE_RMK_1() {
+		return OTH_FUND_PURPOSE_RMK_1;
+	}
+
+	public void setOTH_FUND_PURPOSE_RMK_1(String oTH_FUND_PURPOSE_RMK_1) {
+		OTH_FUND_PURPOSE_RMK_1 = oTH_FUND_PURPOSE_RMK_1;
+	}
+
+	public String getOTH_FUND_PURPOSE_RMK_2() {
+		return OTH_FUND_PURPOSE_RMK_2;
+	}
+
+	public void setOTH_FUND_PURPOSE_RMK_2(String oTH_FUND_PURPOSE_RMK_2) {
+		OTH_FUND_PURPOSE_RMK_2 = oTH_FUND_PURPOSE_RMK_2;
+	}
+	
 }
