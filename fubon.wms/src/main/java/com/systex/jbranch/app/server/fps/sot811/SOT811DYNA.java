@@ -121,7 +121,7 @@ public class SOT811DYNA extends SotPdf {
 					//有子基金轉換金額
 					for(int rIdx = 1; rIdx <= 5; rIdx++) {
 						String rType = "_C" + Integer.toString(rIdx);
-						if(rMap.get("F_PURCHASE_AMT" + rType) != null) {
+						if(rMap.get("F_PURCHASE_AMT" + rType) != null && StringUtils.isNotBlank(ObjectUtils.toString(rMap.get("PROD_ID" + rType)))) {
 							HashMap<String, Object> addMap = new HashMap<String, Object>();
 							addMap.put("PROD_ID", ObjectUtils.toString(rMap.get("PROD_ID" + rType)));
 							addMap.put("PROD_NAME",  ObjectUtils.toString(rMap.get("PROD_NAME" + rType)));
@@ -130,14 +130,15 @@ public class SOT811DYNA extends SotPdf {
 							totalProdLine++;
 						}
 					}
-				} else if(StringUtils.isNotBlank(ObjectUtils.toString(rMap.get("BATCH_SEQ_ADDPROD")))){
+				}
+				if(StringUtils.isNotBlank(ObjectUtils.toString(rMap.get("BATCH_SEQ_ADDPROD")))){
 					//有新增子基金
 					for(int rIdx = 1; rIdx <= 5; rIdx++) {
 						String rType = "_C" + Integer.toString(rIdx);
 						if(StringUtils.isNotBlank(ObjectUtils.toString(rMap.get("F_PROD_ID" + rType)))) {
 							HashMap<String, Object> addMap = new HashMap<String, Object>();
 							addMap.put("PROD_ID", ObjectUtils.toString(rMap.get("F_PROD_ID" + rType)));
-							addMap.put("PROD_NAME",  ObjectUtils.toString(rMap.get("F_PROD_ID" + rType)));
+							addMap.put("PROD_NAME",  ObjectUtils.toString(rMap.get("F_PROD_NAME" + rType)));
 							addMap.put("CUST_ID", ObjectUtils.toString(rMap.get("CUST_ID")));
 							totalList.add(addMap);
 							totalProdLine++;

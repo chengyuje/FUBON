@@ -85,7 +85,6 @@ public class SOT703Dyna extends SOT703 {
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
 		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
-		String sendESBYN = ObjectUtils.toString(xmlInfo.getVariable("SOT.SEND_DYNA_ESB_YN", "1", "F3"));
 
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -187,23 +186,21 @@ public class SOT703Dyna extends SOT703 {
 			txBodyVO.setBARGAIN_APPLY_SEQ(ObjectUtils.toString(dynaData.get("BARGAIN_APPLY_SEQ")));
 		}
 		txBodyVO.setFLAG_NUMBER(ObjectUtils.toString(dynaData.get("FLAG_NUMBER")));
-
+		
 		// 發送電文
-		if(StringUtils.equals("Y", sendESBYN)) { //是否打電文，電文還沒好先用參數控
-			List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
+		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
 
-			for (ESBUtilOutputVO esbUtilOutputVO : vos) {
-				NFBRNFOutputVO nfbrnfOutputVO;
-				if (isOBU) {
-					nfbrnfOutputVO = esbUtilOutputVO.getAfbrnfOutputVO(); //OBU交易
-				} else {
-					nfbrnfOutputVO = esbUtilOutputVO.getNfbrnfOutputVO(); //DBU交易
-				}
+		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
+			NFBRNFOutputVO nfbrnfOutputVO;
+			if (isOBU) {
+				nfbrnfOutputVO = esbUtilOutputVO.getAfbrnfOutputVO(); //OBU交易
+			} else {
+				nfbrnfOutputVO = esbUtilOutputVO.getNfbrnfOutputVO(); //DBU交易
+			}
 
-				// 確認是否回傳錯誤訊息,若未發生錯誤則將回傳下行電文資料儲存DB
-				if (!checkError(nfbrnfOutputVO)) {
-					updateESBPurchaseNFDynaDB(tradeSeq, nfbrnfOutputVO, (BigDecimal) dynaData.get("DEFAULT_FEE_RATE"));
-				}
+			// 確認是否回傳錯誤訊息,若未發生錯誤則將回傳下行電文資料儲存DB
+			if (!checkError(nfbrnfOutputVO)) {
+				updateESBPurchaseNFDynaDB(tradeSeq, nfbrnfOutputVO, (BigDecimal) dynaData.get("DEFAULT_FEE_RATE"));
 			}
 		}
 
@@ -296,7 +293,6 @@ public class SOT703Dyna extends SOT703 {
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
 		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
-		String sendESBYN = ObjectUtils.toString(xmlInfo.getVariable("SOT.SEND_DYNA_ESB_YN", "1", "F3"));
 
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -386,21 +382,19 @@ public class SOT703Dyna extends SOT703 {
 		txBodyVO.setFLAG_NUMBER(ObjectUtils.toString(dynaData.get("FLAG_NUMBER")));
 
 		// 發送電文
-		if(StringUtils.equals("Y", sendESBYN)) { //是否打電文，電文還沒好先用參數控
-			List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
+		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
 
-			for (ESBUtilOutputVO esbUtilOutputVO : vos) {
-				NFBRNGOutputVO nfbrngOutputVO;
-				if (isOBU) {
-					nfbrngOutputVO = esbUtilOutputVO.getAfbrngOutputVO(); //OBU交易
-				} else {
-					nfbrngOutputVO = esbUtilOutputVO.getNfbrngOutputVO(); //DBU交易
-				}
+		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
+			NFBRNGOutputVO nfbrngOutputVO;
+			if (isOBU) {
+				nfbrngOutputVO = esbUtilOutputVO.getAfbrngOutputVO(); //OBU交易
+			} else {
+				nfbrngOutputVO = esbUtilOutputVO.getNfbrngOutputVO(); //DBU交易
+			}
 
-				// 確認是否回傳錯誤訊息,若未發生錯誤則將回傳下行電文資料儲存DB
-				if (!checkError(nfbrngOutputVO)) {
-					updateESBRaiseAmtNFDynaDB(tradeSeq, nfbrngOutputVO, (BigDecimal) dynaData.get("DEFAULT_FEE_RATE"));
-				}
+			// 確認是否回傳錯誤訊息,若未發生錯誤則將回傳下行電文資料儲存DB
+			if (!checkError(nfbrngOutputVO)) {
+				updateESBRaiseAmtNFDynaDB(tradeSeq, nfbrngOutputVO, (BigDecimal) dynaData.get("DEFAULT_FEE_RATE"));
 			}
 		}
 
@@ -493,7 +487,6 @@ public class SOT703Dyna extends SOT703 {
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
 		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
-		String sendESBYN = ObjectUtils.toString(xmlInfo.getVariable("SOT.SEND_DYNA_ESB_YN", "1", "F3"));
 
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -568,22 +561,20 @@ public class SOT703Dyna extends SOT703 {
 		txBodyVO.setBackType(ObjectUtils.toString(dynaData.get("REDEEM_TYPE"))); //贖回類別 1全部贖回2部分贖回
 
 		// 發送電文
-		if(StringUtils.equals("Y", sendESBYN)) { //是否打電文，電文還沒好先用參數控
-			List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
+		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
 
-			for (ESBUtilOutputVO esbUtilOutputVO : vos) {
-				NFBRNHOutputVO nfbrnhOutputVO;
-				if (isOBU) {
-					nfbrnhOutputVO = esbUtilOutputVO.getAfbrnhOutputVO(); //OBU交易
-				} else {
-					nfbrnhOutputVO = esbUtilOutputVO.getNfbrnhOutputVO(); //DBU交易
-				}
-				
-				sot703OutputVO.setShort_1(nfbrnhOutputVO.getShort()); //短線交易類別
-				// 確認是否回傳錯誤訊息,若未發生錯誤則將回傳下行電文資料儲存DB
-				if (!checkError(nfbrnhOutputVO)) {
-					updateESBRedeemNFDynaDB(tradeSeq, nfbrnhOutputVO);
-				}
+		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
+			NFBRNHOutputVO nfbrnhOutputVO;
+			if (isOBU) {
+				nfbrnhOutputVO = esbUtilOutputVO.getAfbrnhOutputVO(); //OBU交易
+			} else {
+				nfbrnhOutputVO = esbUtilOutputVO.getNfbrnhOutputVO(); //DBU交易
+			}
+			
+			sot703OutputVO.setShort_1(nfbrnhOutputVO.getShort()); //短線交易類別
+			// 確認是否回傳錯誤訊息,若未發生錯誤則將回傳下行電文資料儲存DB
+			if (!checkError(nfbrnhOutputVO)) {
+				updateESBRedeemNFDynaDB(tradeSeq, nfbrnhOutputVO);
 			}
 		}
 
@@ -659,7 +650,6 @@ public class SOT703Dyna extends SOT703 {
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
 		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
-		String sendESBYN = ObjectUtils.toString(xmlInfo.getVariable("SOT.SEND_DYNA_ESB_YN", "1", "F3"));
 
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -745,9 +735,7 @@ public class SOT703Dyna extends SOT703 {
 			txBodyVO.setIN_PROD_RISK_LV_1_1(ObjectUtils.toString(dynaData.get("IN_PROD_RISK_LV")));
 			
 			// 發送電文
-			if(StringUtils.equals("Y", sendESBYN)) { //是否打電文，電文還沒好先用參數控
-				sendTransferTo400(esbUtilInputVO, isOBU);
-			}
+			sendTransferTo400(esbUtilInputVO, isOBU);
 		} else {
 			//子基金轉回母基金
 			//每一檔子基金要轉回母基金都要發一次電文
@@ -762,9 +750,7 @@ public class SOT703Dyna extends SOT703 {
 					txBodyVO.setIN_PROD_RISK_LV_1_1(ObjectUtils.toString(dynaData.get("PROD_RISK_LV")));
 					
 					// 發送電文
-					if(StringUtils.equals("Y", sendESBYN)) { //是否打電文，電文還沒好先用參數控
-						sendTransferTo400(esbUtilInputVO, isOBU);
-					}
+					sendTransferTo400(esbUtilInputVO, isOBU);
 				}
 			}
 		}
@@ -843,7 +829,6 @@ public class SOT703Dyna extends SOT703 {
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
 		Map<String, String> branchChgMap = xmlInfo.doGetVariable("SOT.BRANCH_CHANGE", FormatHelper.FORMAT_3);
-		String sendESBYN = ObjectUtils.toString(xmlInfo.getVariable("SOT.SEND_DYNA_ESB_YN", "1", "F3"));
 
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -929,9 +914,7 @@ public class SOT703Dyna extends SOT703 {
 			txBodyVO.setE3_TRANSFER_DATE26(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("F_TRANSFER_DATE_6"))) ? "V" : ""); //約定扣款日26
 			
 			// 發送電文
-			if(StringUtils.equals("Y", sendESBYN)) { //是否打電文，電文還沒好先用參數控
-				sendChangeTo400(esbUtilInputVO, isOBU);
-			}
+			sendChangeTo400(esbUtilInputVO, isOBU);
 		}
 		//變更子基金轉換金額
 		if(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("CHG_AMOUNT_YN")))) {
@@ -960,9 +943,7 @@ public class SOT703Dyna extends SOT703 {
 			}
 			
 			// 發送電文
-			if(StringUtils.equals("Y", sendESBYN)) { //是否打電文，電文還沒好先用參數控
-				sendChangeTo400(esbUtilInputVO, isOBU);
-			}
+			sendChangeTo400(esbUtilInputVO, isOBU);
 		}
 		//變更子基金扣款狀態
 		if(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("CHG_STATUS_YN")))) {
@@ -991,9 +972,7 @@ public class SOT703Dyna extends SOT703 {
 			}
 			
 			// 發送電文
-			if(StringUtils.equals("Y", sendESBYN)) { //是否打電文，電文還沒好先用參數控
-				sendChangeTo400(esbUtilInputVO, isOBU);
-			}
+			sendChangeTo400(esbUtilInputVO, isOBU);
 		}
 		//變更事項_新增子基金
 		if(StringUtils.equals("Y", ObjectUtils.toString(dynaData.get("CHG_ADDPROD_YN")))) {
@@ -1018,9 +997,7 @@ public class SOT703Dyna extends SOT703 {
 			}
 			
 			// 發送電文
-			if(StringUtils.equals("Y", sendESBYN)) { //是否打電文，電文還沒好先用參數控
-				sendChangeTo400(esbUtilInputVO, isOBU);
-			}
+			sendChangeTo400(esbUtilInputVO, isOBU);
 		}
 		return sot703OutputVO;
 	}

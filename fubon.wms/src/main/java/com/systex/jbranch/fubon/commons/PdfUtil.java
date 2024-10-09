@@ -275,7 +275,7 @@ public class PdfUtil {
 	}
 
 	private static void deleteFiles(Collection<String> deletedList) throws JBranchException {
-		if (deletedList.isEmpty()) return;
+		if (!deletedList.isEmpty()) return;		// #2178 取消PdfUtil砍pdf檔功能
 
 		String serverPath = (String) SysInfo.getInfoValue(SystemVariableConsts.SERVER_PATH);
 		for(String url : deletedList){

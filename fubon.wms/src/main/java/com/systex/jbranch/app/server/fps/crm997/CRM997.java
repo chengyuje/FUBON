@@ -130,6 +130,10 @@ public class CRM997 extends FubonWmsBizLogic {
 
 	                //檢查匯入欄位資料，空白資料不進行匯入
 	                if(str.length == 2 && StringUtils.isNotBlank(str[0]) && StringUtils.isNotBlank(str[1])) {
+						//#2177
+	                	if (!str[1].matches("D|H|T|K|C")) {
+							throw new JBranchException("潛力等級請輸入D、H、T、K、C");
+						}
 	                	//新增資料至TBCRM_CUST_XP_DEGREE_SG
 	                    StringBuffer sb = new StringBuffer();
 	                    try {

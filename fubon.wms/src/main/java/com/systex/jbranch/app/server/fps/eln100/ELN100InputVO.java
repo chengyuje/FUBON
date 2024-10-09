@@ -1,61 +1,58 @@
 package com.systex.jbranch.app.server.fps.eln100;
 
+import java.sql.Date;
+
 import com.systex.jbranch.platform.common.dataaccess.vo.PagingInputVO;
 
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.util.List;
-import java.util.Map;
-
 public class ELN100InputVO extends PagingInputVO {
-	private Date req_time_s;
-	private Date req_time_e;
-	private String link_prod_1;
-	private String link_prod_2;
-	private String link_prod_3;
+	private Date query_date_s;
+	private Date query_date_e;
+	private String bbg_code1;
+	private String bbg_code2;
+	private String bbg_code3;
 	private String currency;
-	private int duration;
+	private Integer tenor;
 	private String ko_type;
 	private String ki_type;
 
-	public Date getReq_time_s() {
-		return req_time_s;
+	public Date getQuery_date_s() {
+		return query_date_s;
 	}
 
-	public void setReq_time_s(Date req_time_s) {
-		this.req_time_s = req_time_s;
+	public void setQuery_date_s(Date query_date_s) {
+		this.query_date_s = query_date_s;
 	}
 
-	public Date getReq_time_e() {
-		return req_time_e;
+	public Date getQuery_date_e() {
+		return query_date_e;
 	}
 
-	public void setReq_time_e(Date req_time_e) {
-		this.req_time_e = req_time_e;
+	public void setQuery_date_e(Date query_date_e) {
+		this.query_date_e = query_date_e;
 	}
 
-	public String getLink_prod_1() {
-		return link_prod_1;
+	public String getBbg_code1() {
+		return bbg_code1;
 	}
 
-	public void setLink_prod_1(String link_prod_1) {
-		this.link_prod_1 = link_prod_1;
+	public void setBbg_code1(String bbg_code1) {
+		this.bbg_code1 = bbg_code1;
 	}
 
-	public String getLink_prod_2() {
-		return link_prod_2;
+	public String getBbg_code2() {
+		return bbg_code2;
 	}
 
-	public void setLink_prod_2(String link_prod_2) {
-		this.link_prod_2 = link_prod_2;
+	public void setBbg_code2(String bbg_code2) {
+		this.bbg_code2 = bbg_code2;
 	}
 
-	public String getLink_prod_3() {
-		return link_prod_3;
+	public String getBbg_code3() {
+		return bbg_code3;
 	}
 
-	public void setLink_prod_3(String link_prod_3) {
-		this.link_prod_3 = link_prod_3;
+	public void setBbg_code3(String bbg_code3) {
+		this.bbg_code3 = bbg_code3;
 	}
 
 	public String getCurrency() {
@@ -66,12 +63,12 @@ public class ELN100InputVO extends PagingInputVO {
 		this.currency = currency;
 	}
 
-	public int getDuration() {
-		return duration;
+	public Integer getTenor() {
+		return tenor;
 	}
 
-	public void setDuration(int duration) {
-		this.duration = duration;
+	public void setTenor(Integer tenor) {
+		this.tenor = tenor;
 	}
 
 	public String getKo_type() {

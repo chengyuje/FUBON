@@ -10,7 +10,7 @@
 --TRUNCATE_BEFORE_INSERT>N
 --**************************************************************************
 --OPTIONS (ERRORS = 0)
-OPTIONS (direct=true,skip=1)
+OPTIONS (direct=true,skip=0)
 LOAD DATA
 --TRUNCATE
 into table TBPRD_ELN_LINK_PROD
