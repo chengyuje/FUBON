@@ -270,60 +270,6 @@ eSoafApp.controller('PRD110Controller',
 		};
 		
 		$scope.save = function(row) {
-			debugger
-			//適配資訊
-			var fitVO = {
-				caseCode  : 2, 					     //case2 適配
-				custId    : $scope.inputVO.cust_id,  //客戶ID
-				prdId     : row.PRD_ID,              //商品代碼
-				riskLevel : row.RISKCATE_ID,	     //商品P值
-				prdType	  : "1",                     //商品類別 : 1:基金
-				prdName	  : row.BOND_CNAME,			 //商品名稱
-				hnwcBuy	  : row.OVS_PRIVATE_YN,		 //境外私募基金註記
-				isPrintSOT819   	: $scope.isPrintSOT819  //印貸款風險預告書
-			}
-			
-			$scope.inputVO.hmshacrDataVO = null;
-			if(row.OVS_PRIVATE_YN == "Y") { //境外私募基金註記
-				//先檢核集中度
-				$scope.sendRecv("SOT712", "getCentRateData", "com.systex.jbranch.app.server.fps.sot712.PRDFitInputVO", fitVO,
-					function(totas, isError) {
-						if (!isError) {
-							debugger
-							if(totas[0].body.hmshacrDataVO) {
-								$scope.inputVO.hmshacrDataVO = totas[0].body.hmshacrDataVO;
-								
-								if(totas[0].body.hmshacrDataVO.VALIDATE_YN == "N") {
-									$scope.showErrorMsg("客戶高風險商品集中度比例已超過上限");
-									return;
-								} else if(totas[0].body.hmshacrDataVO.VALIDATE_YN == "W") {
-									var dialog = ngDialog.open({
-										template: 'assets/txn/CONFIRM/CONFIRM.html',
-										className: 'CONFIRM',
-										showClose: false,
-										scope : $scope,
-										controller: ['$scope', function($scope) {
-											$scope.dialogLabel = "客戶高風險商品集中度已超過通知門檻比例，請取得客戶同意，若為弱勢客戶，須請處(副)主管核准\n\n是否繼續";
-							            }]
-									}).closePromise.then(function (data) {
-										if (data.value === 'successful') {
-											$scope.doSave(row);
-										}
-									});
-								} else { //totas[0].body.hmshacrDataVO.VALIDATE_YN == "Y"
-									$scope.doSave(row);
-								}
-							} else {
-								$scope.doSave(row);
-							}
-						}
-				});
-			} else { //商品沒有境外私募基金註記
-				$scope.doSave(row);
-			}
-		}
-		
-		$scope.doSave = function(row) {
 			$scope.isPrintSOT819 = 'Y';
 			if($scope.cust_id && $scope.cust_id.length >= 8 && $scope.cust_id.length < 10) {
 				$scope.isPrintSOT819 = 'N';
@@ -337,9 +283,7 @@ eSoafApp.controller('PRD110Controller',
 				prdType  	: 'MFD',   				   //商品類型 : MFD
 				prdName  	: row.FUND_CNAME,		   //商品名稱
 				currency   	: $scope.CURRENCY.filter((e)=>e.DATA == row.CURRENCY_STD_ID)[0].DATA,  //幣別
-				isPrintSOT819   	: $scope.isPrintSOT819,  //印貸款風險預告書
-				hnwcBuy	  : row.OVS_PRIVATE_YN,		 //境外私募基金註記
-				hmshacrDataVO : $scope.inputVO.hmshacrDataVO, //集中度資訊
+				isPrintSOT819   	: $scope.isPrintSOT819  //印貸款風險預告書
 			}
 			
 			$scope.getCustInfo(row.PRD_ID).then(function() {

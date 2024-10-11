@@ -26,14 +26,23 @@ public class MAO221 extends FubonWmsBizLogic {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
 		
-		sql.append("SELECT P.SEQ, E.EMP_NAME, P.USE_DATE, P.VISIT_CUST_LIST, P.USE_PERIOD, P.DEV_NBR, P.DEV_STATUS, P.APL_EMP_ID, ");
-		sql.append("       P.DEV_TAKE_EMP_ID, P.DEV_TAKE_DATETIME, P.DEV_RETURN_EMP_ID, P.DEV_RETURN_DATETIME, ");
+		sql.append("SELECT P.SEQ, E.EMP_NAME, ");
+		sql.append("       P.USE_DATE, ");
+		sql.append("       P.VISIT_CUST_LIST, ");
+		sql.append("       P.USE_PERIOD, ");
+		sql.append("       P.DEV_NBR, ");
+		sql.append("       P.DEV_STATUS, ");
+		sql.append("       P.APL_EMP_ID, ");
+		sql.append("       P.DEV_TAKE_EMP_ID, ");
+		sql.append("       P.DEV_TAKE_DATETIME, ");
+		sql.append("       P.DEV_RETURN_EMP_ID, ");
+		sql.append("       P.DEV_RETURN_DATETIME, ");
 		sql.append("       SUBSTR(P.USE_PERIOD_S_TIME, 1, 2) || ':00' AS START_TIME, ");
 		sql.append("       SUBSTR(P.USE_PERIOD_E_TIME, 1, 2) || ':00' AS END_TIME ");
 		sql.append("FROM TBMAO_DEV_APL_PLIST P ");
 		sql.append("LEFT JOIN TBORG_MEMBER E ON P.APL_EMP_ID = E.EMP_ID ");
 		sql.append("WHERE 1 = 1 ");
-        sql.append("AND EXISTS (SELECT DISTINCT EMP_ID FROM VWORG_EMP_INFO UP WHERE UP.EMP_DEPT_ID = '031' AND P.APL_EMP_ID = UP.EMP_ID) ");
+        sql.append("AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UP WHERE UP.DEPT_ID = E.DEPT_ID AND P.APL_EMP_ID = UP.EMP_ID) ");
 
 		if (!StringUtils.isBlank(inputVO.getEmp_id())) {
 			sql.append("AND P.APL_EMP_ID like :emp_id ");
@@ -49,6 +58,7 @@ public class MAO221 extends FubonWmsBizLogic {
 			sql.append("AND TRUNC(P.USE_DATE) <= TRUNC(:end) ");
 			queryCondition.setObject("end", new Timestamp(inputVO.getUse_date_end().getTime()));
 		}
+		
 		sql.append("ORDER BY P.DEV_TAKE_DATETIME DESC, P.DEV_RETURN_DATETIME DESC ");
 		
 		queryCondition.setQueryString(sql.toString());

@@ -29,7 +29,7 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
     });
 	
 	// filter
-	getParameter.XML(["CRM.CON_DEGREE", "CRM.VIP_DEGREE", "CRM.FAMILY_DEGREE", "TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN", "CRM.ACT_PRD_NUMS", "CRM.NONSEARCH_ID"], function(totas) {
+	getParameter.XML(["CRM.CON_DEGREE", "CRM.VIP_DEGREE", "CRM.FAMILY_DEGREE", "TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN", "CRM.ACT_PRD_NUMS", "CRM.NONSEARCH_ID", "CRM.EXPERIENCE_LEVEL"], function(totas) {
 		if (totas) {
 			$scope.mappingSet['CRM.CON_DEGREE'] = totas.data[totas.key.indexOf('CRM.CON_DEGREE')];											/** 貢獻度等級 **/
 			$scope.mappingSet['CRM.VIP_DEGREE'] = totas.data[totas.key.indexOf('CRM.VIP_DEGREE')];											/** 理財會員等級 **/
@@ -37,6 +37,7 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
 			$scope.mappingSet['TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN'] = totas.data[totas.key.indexOf('TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN')];	/** 經營頻次符合度 **/
 			$scope.mappingSet['CRM.ACT_PRD_NUMS'] = totas.data[totas.key.indexOf('CRM.ACT_PRD_NUMS')];										/** 客戶活躍度1~9 **/
 			$scope.mappingSet['CRM.NONSEARCH_ID'] = totas.data[totas.key.indexOf("CRM.NONSEARCH_ID")];
+			$scope.mappingSet['CRM.EXPERIENCE_LEVEL'] = totas.data[totas.key.indexOf('CRM.EXPERIENCE_LEVEL')];
 		}
 	});
     //

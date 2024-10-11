@@ -113,13 +113,20 @@ public class IOT111 extends FubonWmsBizLogic {
 		
 		switch (getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG).toString()) {
 			case "UHRM":
+				//有UHRM權限人員只能查詢UHRM人員鍵機或UHRM為招攬人員的案件
+				sql.append("AND F.EMP_ID = :loginID ");
+				
+				queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
+				break;
 			case "uhrmMGR":
 				//有UHRM權限人員只能查詢UHRM人員鍵機或UHRM為招攬人員的案件
 				sql.append("AND ( ");
-				sql.append("     (F.EMP_ID IS NOT NULL AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE F.DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID)) ");
+				sql.append("         F.EMP_ID IS NOT NULL ");
+				sql.append("     AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE F.DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID AND MT.DEPT_ID = :loginArea) ");
 				sql.append(") ");
 				
 				queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
+				queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
 				break;
 			default:
 				//非總行人員需檢查可視分行，只能查詢有鍵機行權限的資料，且非UHRM人員鍵機或UHRM為招攬人員的案件

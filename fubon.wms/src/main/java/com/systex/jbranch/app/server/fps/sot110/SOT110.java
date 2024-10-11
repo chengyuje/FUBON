@@ -423,18 +423,6 @@ public class SOT110 extends FubonWmsBizLogic {
 		
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-
-		//高資產客戶購買高風險商品(境外私募基金)，檢核集中度
-		String overCentRateResult = "";
-		if(StringUtils.equals("Y", inputVO.getHnwcYN()) && StringUtils.equals("Y", inputVO.getOvsPrivateYN())) {
-			overCentRateResult = getOverCentRateYN(inputVO); //Y:可交易 W:超過通知門檻 N:不可交易
-			inputVO.setOverCentRateYN(overCentRateResult);
-			
-			if(StringUtils.equals("N", overCentRateResult)) {
-				throw new APException("客戶高風險商品集中度比例已超過上限");
-			}
-		}
-		outputVO.setOverCentRateResult(overCentRateResult);
 				
 		//高資產客戶投組風險權值檢核
 		//只限特金，客戶風險屬性非C4，有選擇越級商品
@@ -678,7 +666,6 @@ public class SOT110 extends FubonWmsBizLogic {
 		//WMS-CR-20191009-01_金錢信託套表需求申請單 2020-2-10 add by Jacky
 		dtlVO.setCONTRACT_ID(inputVO.getContractID()); //契約編號
 		dtlVO.setTRUST_PEOP_NUM(StringUtils.isNotEmpty(inputVO.getTrustPeopNum()) ? inputVO.getTrustPeopNum() : "N");
-		dtlVO.setOVER_CENTRATE_YN(inputVO.getOverCentRateYN());
 		
 		dam.create(dtlVO);
 		this.logger.debug("save() tradeSEQ:" + dtlPK.getTRADE_SEQ() + " ,seqNo:" + dtlPK.getSEQ_NO());
@@ -839,6 +826,14 @@ public class SOT110 extends FubonWmsBizLogic {
 		SOT110InputVO inputVO = (SOT110InputVO) body;
 		SOT110OutputVO outputVO = new SOT110OutputVO();
 		List<String> warningList = new ArrayList<String>();
+		
+		//高資產客戶購買高風險商品，檢核集中度
+		if(StringUtils.equals("Y", inputVO.getHnwcYN()) && StringUtils.equals("Y", inputVO.getOvsPrivateYN())) {
+			inputVO.setOverCentRateYN(getOverCentRateYN(inputVO));
+			if(StringUtils.equals("Y", inputVO.getOverCentRateYN())) {
+				warningList.add("ehl_01_SOT310_001");
+			}
+		}			
 				
 		//若有申請議價，則送出覆核
 		callCRM421ApplySingle(inputVO.getTradeSEQ());
@@ -1477,9 +1472,9 @@ public class SOT110 extends FubonWmsBizLogic {
 	}
 	
 	/***
-	 * 集中度檢核結果
+	 * 集中度是否超過上限
 	 * @param inputVO
-	 * @return Y:可交易 W:超過通知門檻 N:不可交易
+	 * @return Y:超過 N:沒超過
 	 * @throws Exception
 	 */
 	private String getOverCentRateYN(SOT110InputVO inputVO) throws Exception {
@@ -1509,7 +1504,7 @@ public class SOT110 extends FubonWmsBizLogic {
 				
 		//查詢客戶高資產集中度資料
 		WMSHACRDataVO cRateData = sot714.getCentRateData(inputVO714);
-		return cRateData.getVALIDATE_YN(); //Y:可交易 W:超過通知門檻 N:不可交易
+		return StringUtils.equals("Y", cRateData.getVALIDATE_YN()) ? "N" : "Y"; //可交易=>沒超過上限; 不可交易=>超過上限
 	}
 	
 	/***

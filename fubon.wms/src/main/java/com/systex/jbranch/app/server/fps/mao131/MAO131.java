@@ -82,25 +82,15 @@ public class MAO131 extends FubonWmsBizLogic {
         sql.append("AND P.DEV_STATUS IN ('B04') ");
         sql.append("AND NOT EXISTS (SELECT DISTINCT UEMP_ID FROM TBORG_CUST_UHRM_PLIST UP WHERE P.APL_EMP_ID = UP.UEMP_ID) ");
 
-        if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getBranch_area_id())) {
-            sql.append("AND E.REGION_CENTER_ID = :regionCenterID "); // 區域代碼
-            queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
-        } else {
-            sql.append("AND E.REGION_CENTER_ID IN (:regionCenterIDList) ");
-            queryCondition.setObject("regionCenterIDList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
-        }
-
-        if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
-            sql.append("AND E.BRANCH_AREA_ID = :branchAreaID "); // 營運區代碼
-            queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
-        } else {
-            sql.append("AND E.BRANCH_AREA_ID IN (:branchAreaIDList) ");
-            queryCondition.setObject("branchAreaIDList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
-        }
-
-        if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && Integer.valueOf(inputVO.getBranch_nbr()) > 0) {
+        if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && !"null".equals(inputVO.getBranch_nbr())) {
             sql.append("AND E.BRANCH_NBR = :branchID "); // 分行代碼
             queryCondition.setObject("branchID", inputVO.getBranch_nbr());
+        } else if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
+            sql.append("AND E.BRANCH_AREA_ID = :branchAreaID "); // 營運區代碼
+            queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
+        } else if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getBranch_area_id())) {
+            sql.append("AND E.REGION_CENTER_ID = :regionCenterID "); // 區域代碼
+            queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
         } else {
             sql.append("AND E.BRANCH_NBR IN (:branchIDList) ");
             queryCondition.setObject("branchIDList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
@@ -206,7 +196,6 @@ public class MAO131 extends FubonWmsBizLogic {
 
             this.sendRtnObject(null);
         }
-
     }
 
     // 信箱Email格式檢查

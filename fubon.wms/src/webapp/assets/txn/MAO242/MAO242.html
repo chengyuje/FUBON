@@ -1,15 +1,20 @@
 <style>
-.datewidth{
-	width:180px !important;
-}
-.MAO221 table {
+/* table size */
+.MAO242 table {
 	width: 100%;
 	margin-left: auto;
 	margin-right: auto;
 }
+.datewidth{
+	width:180px !important;
+}
+.alarm{
+color: red;
+}
 </style>
-<script type="text/javascript" src="assets/txn/MAO221/MAO221.js"></script>
-<div class="MAO221" ng-controller="MAO221Controller" ng-cloak>
+<script type="text/javascript" src="assets/txn/MAO242/MAO242.js"></script>
+
+<div class="MAO242" ng-controller="MAO242Controller" ng-cloak>
 	<div>
 		<div class="tfb_content">
 			<div class="tfb_content_icon"></div>
@@ -19,11 +24,12 @@
 			<div class="search_table search_box3">
 				<table>
 					<tr>
+						<tr>
 						<th>業務處：</th>
 						<td>
 							<e-combobox id="region_center_id" name="region_center_id"
 										ng-datasource="uhrmRCList"
-										ng-model="inputVO.region_center_id"
+										ng-model="inputVO.regionCenterId"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
@@ -36,7 +42,7 @@
 						<td>
 							<e-combobox id="branch_area_id" name="branch_area_id"
 										ng-datasource="uhrmOPList"
-										ng-model="inputVO.branch_area_id"
+										ng-model="inputVO.bra_areaID"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
@@ -48,29 +54,21 @@
 						<th></th>
 						<td></td>
 					</tr>
-					<tr>
-						<th>申請人：</th>
-						<td>
-							<e-combobox id="emp_id" name="emp_id"
-										ng-datasource="mappingSet['UHRM_LIST']"
-										ng-model="inputVO.emp_id"
-										ng-validate="false" 
-										ng-disabled="mappingSet['UHRM_LIST'].length == 2"
-										ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
-										ng-editable="false"
-										ng-format="F1"
-										ng-required="true"
-										style="line-height:20px;" />
-	   					</td>
-	   					<th></th>
-						<td></td>
-						<th></th>
-						<td></td>
-						<th></th>
-						<td></td>
 					</tr>
 					<tr>
-						<th>使用日期：</th>
+						<th>狀態：</th>
+						<td>
+							<e-combobox id="dev_status"
+										ng-datasource="mappingSet['MAO.DEV_STATUS_CODI']" 
+										ng-model="inputVO.dev_status"
+			   							ng-validate="false" 
+			   							ng-readonly="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							style="line-height:20px;" />
+						</td>
+						<th>日期：</th>
 						<td colspan="2">
 							<div style="float: left" class="input-group datebox datewidth">
 								<input type="text" id="use_date_bgn" name="use_date_bgn"
@@ -104,13 +102,14 @@
          				</td>
 					</tr>
 				</table>
-			</div>
-			<div class="search_box_btn text-center">
-				<button type="button" class="btn btn-info" ng-click="inquireInit();inquire();">查詢</button>
-				<button type="button" class="btn btn-info" ng-click="inquireInit();init();">清除</button>
+				<div class="search_box_btn text-center">
+					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire();">查詢</button>
+					<button type="button" class="btn btn-info" ng-click="inquireInit();init();">清除</button>
+				</div>
 			</div>
 		</div>
 	</div>
+	<!-- 結果區 -->
 	<div>
 		<div class="tfb_content">
 			<div class="tfb_content_icon"></div>
@@ -118,38 +117,37 @@
 		</div>
 		<!--Content of the panel-->
 		<div class="panel_content">
-			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+			<e-jumping output="outputVO" input="inputVO" query="inquire()" list="resultList"></e-jumping>
 			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
-				<table class="table e-table-freeze td_center" e-height="500px" e-mode="1" e-top="true" e-list="data">
+				<table class="table e-table-freeze td_center" e-height="500px" e-mode="1" e-top="true" e-list="resultList">
 					<thead>
 						<tr>
+							<th>分行</th>
 							<th>申請人</th>
-							<th>員編</th>
-							<th>使用日期</th>
-							<th>客戶</th>
-							<th>使用時段/設備編號</th>
-							<th>狀態</th>
+							<th>使用時間</th>
+							<th>設備編號</th>
 							<th>保管人</th>
 							<th>領用時間</th>
-							<th>保管人</th>
-							<th>歸還時間</th>
+							<th>狀態</th>
 							<th>操作</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr class="repeat-row" ng-repeat="row in data track by $index">
-							<td>{{row.EMP_NAME}}</td>
-							<td>{{row.APL_EMP_ID}}</td>
-							<td>{{toJsDate(row.USE_DATE) | date: "yyyy-MM-dd"}}</td>
-							<td><div ng-repeat ="value in comma_split(row.VISIT_CUST_LIST) track by $index"><a onclick="return false" ng-click="custDTL(value)">{{value}}</a></div></td>
-							<td>{{row.START_TIME}}~{{row.END_TIME}}/{{row.DEV_NBR}}</td>
-							<td>{{row.DEV_STATUS | mapping:mappingSet['MAO.DEV_STATUS_AO']:'F3'}}</td>
-							<td>{{row.DEV_TAKE_EMP_ID}}</td>
-							<td>{{row.DEV_TAKE_DATETIME}}</td>
-							<td>{{row.DEV_RETURN_EMP_ID}}</td>
-	      					<td>{{row.DEV_RETURN_DATETIME}}</td>
-	      					<td align="center">
-								<button type="button" class="btn btn-danger" ng-show="row.DEV_STATUS == 'D06'" ng-click="reply(row, 'X')">註銷</button><!-- function-type="confirm" -->
+						<tr class="repeat-row" ng-repeat="row in resultList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+							<td style="vertical-align:middle;">{{row.BRANCH_NBR | mapping:mappingSet['branch_nbr_all']:'F3'}}</td>
+							<td style="vertical-align:middle;">{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+							<td style="vertical-align:middle;">
+								<div ng-class="{'alarm': timer(row)}">{{toJsDate(row.USE_DATE) | date: "yyyy-MM-dd"}}</div>
+								<div ng-class="{'alarm': timer(row)}">{{row.START_TIME}}~{{row.END_TIME}}<span ng-show="timer(row) == true">(逾時)</span></div>
+							</td>
+							<td style="vertical-align:middle;">{{row.DEV_NBR}}</td>
+							<td style="vertical-align:middle;">{{row.DEV_TAKE_EMP_ID}}</td>
+							<td style="vertical-align:middle;">{{row.DEV_TAKE_DATETIME}}</td>
+							<td style="vertical-align:middle;">{{row.DEV_STATUS | mapping:mappingSet['MAO.DEV_STATUS_MG']:'F3'}}</td>
+							<td style="vertical-align:middle;">
+								<button type="button" class="btn btn-info" ng-click="reply(row,'T')" ng-disabled = "row.GIVE_YN == 'N' || row.DEV_STATUS == 'A03'">領用</button> <!-- before one hour -->
+								<button type="button" class="btn btn-info" ng-click="reply(row,'B')" ng-disabled = "!(row.DEV_STATUS == 'D06' || row.DEV_STATUS == 'E07')">歸還</button>
+								<button type="button" class="btn btn-info" ng-click="reply(row,'X')" ng-disabled = "row.DEV_STATUS == 'D06' || row.DEV_STATUS == 'E07' || row.DEV_STATUS == 'A03'">註銷</button>
 							</td>
 						</tr>
 					</tbody>

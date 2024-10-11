@@ -761,7 +761,7 @@ public class SQM320 extends FubonWmsBizLogic {
 		//-- 已訪查尚未覆核筆數(一般+特殊)及已訪查尚未覆核筆數(特殊)及該季總客戶數(一般+特殊)，不含刪除 
 		sql.append("LEFT JOIN ( ");
 		sql.append("  SELECT EMP_ID, SC_CNT_AUDITED, SP_CNT_AUDITED, Q_CNT_TOT, REVIEW_CNT, ");
-		sql.append("        CASE WHEN NVL(SC_CNT_AUDITED, 0) > 0 AND NVL(REVIEW_CNT, 0) = NVL(SC_CNT_AUDISZTED, 0) THEN 'Y' ELSE 'N' END AS REVIEW_STATUS ");
+		sql.append("        CASE WHEN NVL(SC_CNT_AUDITED, 0) > 0 AND NVL(REVIEW_CNT, 0) = NVL(SC_CNT_AUDITED, 0) THEN 'Y' ELSE 'N' END AS REVIEW_STATUS ");
 		sql.append("  FROM ( ");
 		sql.append("    SELECT EMP_ID, ");
 		sql.append("           SUM( CASE WHEN NVL(AUDITED, ' ') = 'Y' THEN 1 ELSE 0 END ) AS SC_CNT_AUDITED, "); //--已訪查筆數(一般+特殊) 
@@ -1813,7 +1813,7 @@ public class SQM320 extends FubonWmsBizLogic {
 		sql.append("LEFT JOIN ( ");
 		sql.append("  SELECT MAST.EMP_ID, COUNT(*) AS CNT ");
 		sql.append("  FROM TBSQM_RSA_MAST MAST ");
-		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N E ON A.ROLE_ID = E.ROLE_ID AND A.EMP_ID = E.EMP_ID AND LAST_DAY(TO_DATE(A.YEARQTR || '01', 'YYYYMMDD')) BETWEEN E.START_TIME AND E.END_TIME ");
+		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N E ON MAST.EMP_ID = E.EMP_ID AND LAST_DAY(TO_DATE(MAST.YEARQTR || '01', 'YYYYMMDD')) BETWEEN E.START_TIME AND E.END_TIME ");
 		sql.append("  LEFT JOIN TBSQM_RSA_DTL DTL ON  MAST.CUST_ID = DTL.CUST_ID AND MAST.AUDIT_TYPE = DTL.AUDIT_TYPE AND MAST.YEARQTR = DTL.YEARQTR ");
 		sql.append("  WHERE 1 = 1 ");
 		

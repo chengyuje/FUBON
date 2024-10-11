@@ -287,6 +287,14 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 							$scope.inputVO.CHG_CUST_ID = $scope.INS_INFORMATION[0].CHG_CUST_ID;
 							$scope.inputVO.INVESTList = tota[0].body.INVESTList;
 							$scope.inputVO.REVISE_CONFIRM_YN = $scope.INS_INFORMATION[0].REVISE_CONFIRM_YN;
+							$scope.inputVO.OTH_FUND_PURPOSE_1 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_1;
+							$scope.inputVO.OTH_FUND_PURPOSE_2 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_2;
+							$scope.inputVO.OTH_FUND_PURPOSE_3 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_3;
+							$scope.inputVO.OTH_FUND_PURPOSE_4 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_4;
+							$scope.inputVO.OTH_FUND_PURPOSE_5 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_5;
+							$scope.inputVO.OTH_FUND_PURPOSE_6 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_6;
+							$scope.inputVO.OTH_FUND_PURPOSE_RMK_1 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_RMK_1;
+							$scope.inputVO.OTH_FUND_PURPOSE_RMK_2 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_RMK_2;
 
 							if($scope.INS_INFORMATION[0].INSPRD_TYPE != 1){
 								$scope.MatchButton=false;
@@ -359,6 +367,15 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 		$scope.inputVO.temp_OTH_TYPE = undefined;
 		$scope.inputVO.tempFX_PROD = undefined;
 		$scope.inputVO.FB_COM_YN = 'Y';
+		$scope.inputVO.REVISE_CONFIRM_YN = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_1 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_2 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_3 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_4 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_5 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_6 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_RMK_1 = '';
+		$scope.inputVO.OTH_FUND_PURPOSE_RMK_2 = '';
 
 //		$scope.initCheckItems();
 	}
@@ -807,14 +824,17 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 							$scope.checkData();
 						}
 						if($scope.inputVO.OTH_TYPE == '2') { //契變-解約/縮小保額/部分提領(終止)
-							if($scope.inputVO.OTH_FUND_PURPOSE_1 == "N" && $scope.inputVO.OTH_FUND_PURPOSE_2 == "N" &&
-									$scope.inputVO.OTH_FUND_PURPOSE_3 == "N" && $scope.inputVO.OTH_FUND_PURPOSE_4 == "N" &&
-									$scope.inputVO.OTH_FUND_PURPOSE_5 == "N" && $scope.inputVO.OTH_FUND_PURPOSE_6 == "N") {
+							if(($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_1) || $scope.inputVO.OTH_FUND_PURPOSE_1 =="N") && 
+									($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_2) || $scope.inputVO.OTH_FUND_PURPOSE_2 =="N") &&
+									($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_3) || $scope.inputVO.OTH_FUND_PURPOSE_3 =="N") && 
+									($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_4) || $scope.inputVO.OTH_FUND_PURPOSE_4 =="N") &&
+									($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_5) || $scope.inputVO.OTH_FUND_PURPOSE_5 =="N") && 
+									($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_6) || $scope.inputVO.OTH_FUND_PURPOSE_6 =="N")) {
 								$scope.showErrorMsg("*為必要輸入欄位，請輸入後重試");
 								return;
 							}
-							if(($scope.inputVO.OTH_FUND_PURPOSE_5 == "Y" && $scope.inputVO.OTH_FUND_PURPOSE_RMK_1 == "") || 
-									($scope.inputVO.OTH_FUND_PURPOSE_6 == "Y" && $scope.inputVO.OTH_FUND_PURPOSE_RMK_2 == "")) {
+							if(($scope.inputVO.OTH_FUND_PURPOSE_5 == "Y" && ($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_RMK_1))) || 
+									($scope.inputVO.OTH_FUND_PURPOSE_6 == "Y" && ($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_RMK_2)))) {
 								$scope.showErrorMsg("資金用途為其他，請說明");
 								return;
 							}
@@ -1002,6 +1022,25 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 		}
 	}
 
+	$scope.onfundpurposeChg = function(idx) {
+		debugger
+		if(idx == "5") {
+			//其他資金用途
+			if($scope.inputVO.OTH_FUND_PURPOSE_5 == "N") $scope.inputVO.OTH_FUND_PURPOSE_RMK_1 = "";
+		} else if(idx == "6") {
+			//非運用於本行之其他資金用途
+			if($scope.inputVO.OTH_FUND_PURPOSE_6 == "N") $scope.inputVO.OTH_FUND_PURPOSE_RMK_2 = "";
+		}
+	}
+		
+	$scope.isEmpty = function(val) {
+		if(val == undefined || val == null || val == "") {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	$scope.initCheckItems = function() {
 		$scope.inputVO.PREMATCH_SEQ = '';
 		$scope.inputVO.AML = '';

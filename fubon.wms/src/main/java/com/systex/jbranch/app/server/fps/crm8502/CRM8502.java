@@ -468,7 +468,7 @@ public class CRM8502 extends EsbUtil {
 			BigDecimal subFbond = (BigDecimal)dataMap.get("SUB_FBOND");
 			BigDecimal subSn = (BigDecimal)dataMap.get("SUB_SN");
 			BigDecimal subDsn = (BigDecimal)dataMap.get("SUB_DSN");
-			BigDecimal subTot = (BigDecimal)dataMap.get("SUB_TOT");
+			BigDecimal subTot = (BigDecimal)dataMap.get("TOT_SUB");
 			
 
 			//存款
@@ -869,10 +869,10 @@ public class CRM8502 extends EsbUtil {
 			}
 			
 			//證券複委託
-			if(subTot.compareTo(BigDecimal.ZERO) != 0){
+			if(subTot != null && subTot.compareTo(BigDecimal.ZERO) != 0){
 				
 				//海外股票-證券複委託
-				if(subFstock.compareTo(BigDecimal.ZERO) != 0){
+				if(subFstock != null  && subFstock.compareTo(BigDecimal.ZERO) != 0){
 					try{
 						sb = new StringBuilder();
 						sb.append(" SELECT ACCT_NBR, PROD_ID, PROD_NAME, AVG_COST_PRICE, SUM(NVL(QTY, 0)) AS QTY, ");
@@ -891,7 +891,7 @@ public class CRM8502 extends EsbUtil {
 				}
 				
 				//海外債券-證券複委託
-				if(subFbond.compareTo(BigDecimal.ZERO) != 0){
+				if(subFbond != null  && subFbond.compareTo(BigDecimal.ZERO) != 0){
 					try{
 						sb = new StringBuilder();
 						sb.append(" SELECT ACCT_NBR, PROD_ID, PROD_NAME, ISSUE_BROKER_NAME, ");
@@ -913,7 +913,7 @@ public class CRM8502 extends EsbUtil {
 					}
 				}
 				//境外結構型商品-證券複委託
-				if(subSn.compareTo(BigDecimal.ZERO) != 0){
+				if(subSn != null  && subSn.compareTo(BigDecimal.ZERO) != 0){
 					try{
 						sb = new StringBuilder();
 						sb.append(" SELECT CRMSN.ACCT_NBR, CRMSN.PROD_ID, CRMSN.PROD_NAME, TFBSN.APPLY_START_DATE, ");
@@ -938,7 +938,7 @@ public class CRM8502 extends EsbUtil {
 					}
 				}
 				//境內結構型商品-證券複委託
-				if(subDsn.compareTo(BigDecimal.ZERO) != 0){
+				if(subDsn != null  && subDsn.compareTo(BigDecimal.ZERO) != 0){
 					try{
 						sb = new StringBuilder();
 						sb.append(" SELECT ACCT_NBR, STOCK_CODE, STOCK_NAME, TXN_DATE, ");
@@ -1167,7 +1167,7 @@ public class CRM8502 extends EsbUtil {
 			
 			sb = new StringBuilder();
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-			sb.append(" SELECT CUST_ID,SUM(NVL(AUM_TW, 0)) AS AUM_TW ");
+			sb.append(" SELECT SUM(NVL(AUM_TW, 0)) AS AUM_TW ");
 			sb.append(" FROM  TBCRM_AST_INV_SEC_STOCK ");
 			sb.append(" WHERE CUST_ID =:custId ");
 			sb.append(" GROUP BY cust_id ");
@@ -1250,7 +1250,10 @@ public class CRM8502 extends EsbUtil {
 			insTot = (BigDecimal)insMap.get("tot");
 			BigDecimal insTotJSB = (BigDecimal) insMapJSB.get("totJSB");
 			data.put("TOT_INS", insTot.add(insTotJSB)); //保險商品（富邦 + 日盛）
-			data.put("TOT_SUB", subTot.add(subFstock).add(subFbond).add(subSn).add(subDsn)); //證券複委託加總
+			
+			//證券複委託總金額
+			subTot = subTot.add(subFstock).add(subFbond).add(subSn).add(subDsn); 
+			data.put("TOT_SUB", subTot); //證券複委託加總
 			data.put("TOT_ASSET", totDep.add(totInv).add(insTot).add(insTotJSB).add(subTot)); //總資產
 
 		} catch (Exception e) {

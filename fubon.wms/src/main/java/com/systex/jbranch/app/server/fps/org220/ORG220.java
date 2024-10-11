@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.systex.jbranch.app.common.fps.table.TBORG_AGENTVO;
-import com.systex.jbranch.app.server.fps.org260.ORG260OutputVO;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
 import com.systex.jbranch.platform.common.dataManager.DataManager;
 import com.systex.jbranch.platform.common.dataManager.WorkStation;
@@ -743,10 +742,6 @@ public class ORG220 extends FubonWmsBizLogic {
 		sb.append("LEFT JOIN TBORG_ROLE ROL ON PRIASS.ROLEID = ROL.ROLE_ID AND ROL.JOB_TITLE_NAME IS NOT NULL ");
 		sb.append("WHERE PRIASS.ROLEID = :roleID ");
 
-//		sb.append("SELECT PRIASS.PRIVILEGEID, PRIASS.ROLEID, CASE WHEN PRIASS.PRIVILEGEID IN ('010', '011', '012', '013', '006', '009') THEN 'BOSS' WHEN ROL.JOB_TITLE_NAME IS NULL THEN 'ALL' ELSE 'MEMBER' END AS MEM_TYPE ");
-//		sb.append("FROM TBSYSSECUROLPRIASS PRIASS ");
-//		sb.append("LEFT JOIN TBORG_ROLE ROL ON PRIASS.ROLEID = ROL.ROLE_ID AND ROL.JOB_TITLE_NAME IS NOT NULL ");
-//		sb.append("WHERE PRIASS.ROLEID = :roleID ");
 		queryCondition.setQueryString(sb.toString());
 		queryCondition.setObject("roleID", getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
@@ -851,7 +846,7 @@ public class ORG220 extends FubonWmsBizLogic {
 				queryCondition.setObject("opIdList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
 			}
 		
-			if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && Integer.valueOf(inputVO.getBranch_nbr()) > 0) {
+			if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && !"null".equals(inputVO.getBranch_nbr())) {
 				sb.append(" AND INFO1.BRANCH_NBR = :brNbr ");
 				queryCondition.setObject("brNbr", inputVO.getBranch_nbr());
 			} else if (list.size() > 0 && StringUtils.equals("ALL", (String) list.get(0).get("MEM_TYPE"))) {

@@ -4,17 +4,14 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.systex.jbranch.app.common.fps.table.TBMAO_DEVICE_GPSVO;
 import com.systex.jbranch.app.common.fps.table.TBMAO_DEV_MASTVO;
 import com.systex.jbranch.app.common.fps.table.TBMAO_DEV_MGMT_LOGVO;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
@@ -45,9 +42,28 @@ public class MAO241 extends FubonWmsBizLogic {
 		StringBuffer sql = new StringBuffer();
 
 		sql.append("WITH BASE AS ( ");
-		sql.append("  SELECT A.FLAG, A.SEQ, A.DEV_NBR, B.LATITUDE AS POS_LONG, B.LONGITUDE AS POS_LATI, A.DEV_STATUS, B.VERSION, A.CREATOR, B.CREATETIME, B.MODIFIER, B.LASTUPDATE, A.DEV_SITE_TYPE, A.DEV_TAKE_EMP ");
+		sql.append("  SELECT A.FLAG, ");
+		sql.append("         A.SEQ, ");
+		sql.append("         A.DEV_NBR, ");
+		sql.append("         B.LATITUDE AS POS_LONG, ");
+		sql.append("         B.LONGITUDE AS POS_LATI, ");
+		sql.append("         A.DEV_STATUS, ");
+		sql.append("         B.VERSION, ");
+		sql.append("         A.CREATOR, ");
+		sql.append("         B.CREATETIME, ");
+		sql.append("         B.MODIFIER, ");
+		sql.append("         B.LASTUPDATE, ");
+		sql.append("         A.DEV_SITE_TYPE, ");
+		sql.append("         A.DEV_TAKE_EMP ");
 		sql.append("  FROM ( ");
-		sql.append("    SELECT SEQ, DEV_NBR, DEV_STATUS, CREATOR, MAX(LASTUPDATE) AS LASTUPDATE, DEV_SITE_TYPE, DEV_TAKE_EMP, FLAG ");
+		sql.append("    SELECT SEQ, ");
+		sql.append("           DEV_NBR, ");
+		sql.append("           DEV_STATUS, ");
+		sql.append("           CREATOR, ");
+		sql.append("           MAX(LASTUPDATE) AS LASTUPDATE, ");
+		sql.append("           DEV_SITE_TYPE, ");
+		sql.append("           DEV_TAKE_EMP, ");
+		sql.append("           FLAG ");
 		sql.append("    FROM TBMAO_DEV_MAST ");
 		sql.append("    WHERE 1 = 1 ");
 		if (!StringUtils.isBlank(inputVO.getDev_status())) {
@@ -61,7 +77,11 @@ public class MAO241 extends FubonWmsBizLogic {
 		sql.append("    GROUP BY SEQ, DEV_NBR, DEV_NBR, DEV_STATUS, CREATOR, DEV_SITE_TYPE, DEV_TAKE_EMP, FLAG ");
 		sql.append("  ) A ");
 		sql.append("  LEFT JOIN ( ");
-		sql.append("    SELECT DEVICE_ID, LATITUDE, LONGITUDE, MODILE_FLAG, VERSION, CREATETIME, CREATOR, MODIFIER, LASTUPDATE ");
+		sql.append("    SELECT DEVICE_ID, ");
+		sql.append("           LATITUDE, ");
+		sql.append("           LONGITUDE, ");
+		sql.append("           MODILE_FLAG, ");
+		sql.append("           VERSION, CREATETIME, CREATOR, MODIFIER, LASTUPDATE ");
 		sql.append("    FROM TBMAO_DEVICE_GPS ");
 		sql.append("    WHERE (DEVICE_ID, SEQNO) IN ( ");
 		sql.append("      SELECT DEVICE_ID, MAX(SEQNO) AS SEQNO ");
@@ -73,7 +93,19 @@ public class MAO241 extends FubonWmsBizLogic {
 		sql.append("  ) B ON A.DEV_NBR = B.DEVICE_ID ");
 		sql.append(") ");
 
-		sql.append("SELECT M.SEQ, P.APL_EMP_ID, E.EMP_NAME, E.EMP_ID, M.CREATOR, M.DEV_NBR, M.POS_LONG, M.POS_LATI, M.LASTUPDATE, M.DEV_STATUS, M.DEV_SITE_TYPE, M.DEV_TAKE_EMP, F.EMP_NAME AS KEEPER_NAME ");
+		sql.append("SELECT M.SEQ, ");
+		sql.append("       P.APL_EMP_ID, ");
+		sql.append("       E.EMP_NAME, ");
+		sql.append("       E.EMP_ID, ");
+		sql.append("       M.CREATOR, ");
+		sql.append("       M.DEV_NBR, ");
+		sql.append("       M.POS_LONG, ");
+		sql.append("       M.POS_LATI, ");
+		sql.append("       M.LASTUPDATE, ");
+		sql.append("       M.DEV_STATUS, ");
+		sql.append("       M.DEV_SITE_TYPE, ");
+		sql.append("       M.DEV_TAKE_EMP, ");
+		sql.append("       F.EMP_NAME AS KEEPER_NAME ");
 		sql.append("FROM BASE M ");
 		sql.append("LEFT JOIN ( ");
 		sql.append("  SELECT DEV_NBR, DEV_STATUS, APL_EMP_ID,  ");
@@ -82,7 +114,7 @@ public class MAO241 extends FubonWmsBizLogic {
 		sql.append("		 ELSE RPAD(TO_CHAR(USE_DATE, 'yyyyMMdd')  || USE_PERIOD_E_TIME || '00', 14, '0') END AS END_DATETIME ");
 		sql.append("  FROM TBMAO_DEV_APL_PLIST ");
 		sql.append(") P ON M.DEV_NBR = P.DEV_NBR ");
-		sql.append("AND TO_CHAR(CURRENT_TIMESTAMP,'yyyyMMddHH24MISS') BETWEEN P.START_DATETIME AND P.END_DATETIME ");
+		sql.append("AND TO_CHAR(CURRENT_TIMESTAMP, 'yyyyMMddHH24MISS') BETWEEN P.START_DATETIME AND P.END_DATETIME ");
 		sql.append("AND P.DEV_STATUS IN ('D06', 'E07', 'C05')  ");
 		sql.append("LEFT JOIN VWORG_BRANCH_EMP_DETAIL_INFO E ON P.APL_EMP_ID = E.EMP_ID ");
 		sql.append("LEFT JOIN VWORG_BRANCH_EMP_DETAIL_INFO F ON M.DEV_TAKE_EMP = F.EMP_ID ");
@@ -107,10 +139,12 @@ public class MAO241 extends FubonWmsBizLogic {
 		MAO241InputVO inputVO = (MAO241InputVO) body;
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		
 		StringBuffer sb = new StringBuffer();
+		
 		sb.append("SELECT COUNT(SEQ) AS COUNTS FROM TBMAO_DEV_MAST WHERE DEV_NBR = :devNbr ");
+		
 		queryCondition.setObject("devNbr", inputVO.getDev_nbr());
+		
 		queryCondition.setQueryString(sb.toString());
 		
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
@@ -226,6 +260,7 @@ public class MAO241 extends FubonWmsBizLogic {
 	}
 
 	public void showName (Object body, IPrimitiveMap header) throws JBranchException {
+		
 		MAO241InputVO inputVO = (MAO241InputVO) body;
 		dam = this.getDataAccessManager();
 
@@ -276,62 +311,6 @@ public class MAO241 extends FubonWmsBizLogic {
 		this.sendRtnObject(null);
 	}
 
-	public void checkAuthForSave(Object body, IPrimitiveMap header) throws JBranchException {
-		
-		dam = this.getDataAccessManager();
-		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		
-		StringBuffer sb = new StringBuffer();
-		
-		sb.append("SELECT COUNT(1) AS CNT FROM TBORG_MEMBER_ROLE ");
-		sb.append("WHERE 1 = 1 ");
-		sb.append("AND EMP_ID = :empId ");
-		sb.append("AND ROLE_ID IN ( SELECT ROLEID FROM TBSYSSECUROLPRIASS WHERE PRIVILEGEID LIKE 'UHRM04%') ");
-		
-		queryCondition.setObject("empId", (String) getCommonVariable(SystemVariableConsts.LOGINID));
-		queryCondition.setQueryString(sb.toString());
-		
-		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
-		
-		this.sendRtnObject((BigDecimal) list.get(0).get("CNT"));
-
-	}
-
-	public Boolean insertDeviceGPS(Map<String, String> map) throws JBranchException {
-		dam = this.getDataAccessManager();
-
-		// get seqNO
-		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		String qrySeq = "SELECT SQ_TBMAO_DEVICE_GPS.nextval AS SEQNO FROM DUAL";
-		condition.setQueryString(qrySeq);
-		List<Map<String, Object>> list = dam.exeQuery(condition);
-		BigDecimal seqNo = (BigDecimal) list.get(0).get("SEQNO");
-
-		TBMAO_DEVICE_GPSVO vo = new TBMAO_DEVICE_GPSVO();
-		vo.setSEQNO(seqNo);
-		vo.setDEVICE_ID(map.get("deviceID"));
-		vo.setLATITUDE(map.get("latitude"));
-		vo.setLONGITUDE(map.get("longitude"));
-		vo.setMODILE_FLAG(map.get("mobileFlag"));
-		dam.create(vo);
-
-		// 2017/8/25
-		Set<String> mobileList = new HashSet<String>();
-		condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		condition.setQueryString("SELECT P.USE_DATE, P.USE_PERIOD, P.DEV_NBR, P.DEV_STATUS FROM TBMAO_DEV_APL_PLIST P WHERE 1 = 1 AND TRUNC(P.USE_DATE) = TRUNC(SYSDATE) AND P.DEV_STATUS = 'A01'");
-		List<Map<String, Object>> do_list = dam.exeQuery(condition);
-		for (Map<String, Object> romap : do_list) {
-			mobileList.add(ObjectUtils.toString(romap.get("DEV_NBR")));
-		}
-		Boolean ans;
-		if (mobileList.contains(ObjectUtils.toString(map.get("deviceID"))))
-			ans = true;
-		else
-			ans = false;
-
-		return ans;
-	}
-
 	private String checkIsNull(Map map, String key) {
 		if (null != map.get(key) && StringUtils.isNotBlank(String.valueOf(map.get(key)))) {
 			return String.valueOf(map.get(key));
@@ -341,6 +320,7 @@ public class MAO241 extends FubonWmsBizLogic {
 	}
 
 	private String getSEQ() throws JBranchException {
+		
 		SerialNumberUtil sn = new SerialNumberUtil();
 		String seqNum = "";
 		try {
@@ -353,6 +333,7 @@ public class MAO241 extends FubonWmsBizLogic {
 	}
 
 	private String getSEQ_LOG() throws JBranchException {
+		
 		SerialNumberUtil sn = new SerialNumberUtil();
 		String seqNum = "";
 		try {
@@ -364,4 +345,27 @@ public class MAO241 extends FubonWmsBizLogic {
 		return seqNum;
 	}
 
+	public void checkAuthForSave(Object body, IPrimitiveMap header) throws JBranchException {
+		
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("SELECT COUNT(1) AS CNT ");
+		sb.append("FROM TBORG_MEMBER_ROLE ");
+		sb.append("WHERE 1 = 1 ");
+		sb.append("AND EMP_ID = :empId ");
+		sb.append("AND ROLE_ID IN ( ");
+		sb.append("  SELECT ROLEID FROM TBSYSSECUROLPRIASS WHERE PRIVILEGEID IN ('045', '046', '061')");
+		sb.append(")");
+		
+		queryCondition.setObject("empId", (String) getCommonVariable(SystemVariableConsts.LOGINID));
+		
+		queryCondition.setQueryString(sb.toString());
+		
+		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+		
+		this.sendRtnObject((BigDecimal)list.get(0).get("CNT"));
+
+	}
 }
