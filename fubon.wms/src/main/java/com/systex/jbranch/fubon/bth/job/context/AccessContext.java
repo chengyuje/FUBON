@@ -206,7 +206,7 @@ public class AccessContext extends FubonWmsBizLogic {
         while (inputStrLen > index) {
             //判斷該字元是否為雙位元資料
             if (Integer.parseInt(Integer.toString(inputStr.charAt(index), 16), 16) >= 128) {
-                if ((strLen - lenCtrl - 1) >= 2) {
+                if ((strLen - lenCtrl) >= 2) {
                     returnString += inputStr.substring(index, index + 1);
                     lenCtrl += 2;
                 }

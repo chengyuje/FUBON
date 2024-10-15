@@ -23,16 +23,16 @@ eSoafApp.controller('MAO121Controller', function($rootScope, $scope, $controller
 	 */
 	$scope.getUHRMList = function() {
 		$scope.sendRecv("ORG260", "getUHRMList", "com.systex.jbranch.app.server.fps.org260.ORG260InputVO", $scope.inputVO, function(tota, isError) {
-			if (!isError) { 
-				if (null != tota[0].body.uhrmList) {
-					$scope.mappingSet['UHRM_LIST'] = tota[0].body.uhrmList;
-				} else {
-					$scope.mappingSet['UHRM_LIST'] = [];
-				}
-			} 
+			if (isError) {
+				return;
+			}
+			if (tota.length > 0) {
+				$scope.mappingSet['UHRM_LIST'] = tota[0].body.uhrmList;
+				if ($scope.memLoginFlag == "UHRM")
+					$scope.inputVO.emp_id = tota[0].body.uhrmList[0].DATA;
+			}
 		});
 	};
-	$scope.getUHRMList();
 	
 	// datepicker
 	$scope.use_date_bgnOptions = {
@@ -98,6 +98,8 @@ eSoafApp.controller('MAO121Controller', function($rootScope, $scope, $controller
 		        }
 			}						
 		});
+        
+    	$scope.getUHRMList();
 	}
 	
 	$timeout(function(){$scope.init();},500);

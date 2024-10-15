@@ -88,6 +88,10 @@ public class CRM210 extends FubonWmsBizLogic {
 		sql.append("       V.AMT_16, "); 											// 全行黃金存摺
 		sql.append("       V.AMT_17, "); 											// 全行保險餘額
 		sql.append("       V.AMT_18, "); 											// 全行貸款餘額
+		sql.append("       V.AMT_18_1, "); 											// 房屋貸款
+		sql.append("       V.AMT_18_2, "); 											// 信用貸款
+		sql.append("       V.AMT_18_3, "); 											// 留學貸款
+		sql.append("       V.AMT_18_4, "); 											// 就學貸款
 		sql.append("       V.AMT_19, "); 											// 前日大額100萬以上進出
 		sql.append("       V.AMT_11, "); 											// SN
 		

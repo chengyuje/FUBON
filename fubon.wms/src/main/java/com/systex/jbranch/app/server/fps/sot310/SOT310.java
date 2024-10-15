@@ -807,7 +807,7 @@ public class SOT310 extends EsbUtil {
 
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
 
-		if ("Y".equals(inputVO.getGtcYN()))
+		if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
 			outputVO_707 = sot707.verifyESBPurchaseBN_GTC(inputVO_707); //長效單
 		else
 			outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707); //當日單

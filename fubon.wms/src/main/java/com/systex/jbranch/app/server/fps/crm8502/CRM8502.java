@@ -875,14 +875,27 @@ public class CRM8502 extends EsbUtil {
 				if(subFstock != null  && subFstock.compareTo(BigDecimal.ZERO) != 0){
 					try{
 						sb = new StringBuilder();
-						sb.append(" SELECT ACCT_NBR, PROD_ID, PROD_NAME, AVG_COST_PRICE, SUM(NVL(QTY, 0)) AS QTY, ");
-						sb.append(" UNIT_PRICE, PRICE_DATE, SUM(NVL(AUM_FC, 0)) AS AUM_FC, ");
-						sb.append(" SUM(NVL(BENEFIT_AMT1, 0)) AS BENEFIT_AMT1, ");
-						sb.append(" AVG(BENEFIT_RATE1) AS BENEFIT_RATE1, CURRENCY, SUM(NVL(AUM_TW, 0)) AS AUM_TW ");
-						sb.append(" FROM TBCRM_AST_INV_SEC_STOCK ");
-						sb.append(" WHERE CUST_ID = :custId ");
-						sb.append(" GROUP BY ACCT_NBR, PROD_ID, PROD_NAME, AVG_COST_PRICE, UNIT_PRICE, ");
-						sb.append(" PRICE_DATE, CURRENCY ");
+						sb.append(" SELECT ACCT_NBR, PROD_ID, PROD_NAME, AVG_COST_PRICE, QTY, UNIT_PRICE, ");
+					    sb.append("PRICE_DATE, AUM_FC, BENEFIT_AMT1, BENEFIT_RATE1, ");
+					    sb.append(" ROUND(AUM_FC * NVL(BUY_RATE, 1), 2) AS AUM_TW, CURRENCY ");
+						sb.append(" FROM ( ");
+					    sb.append(" SELECT ACCT_NBR, PROD_ID, PROD_NAME, AVG_COST_PRICE, SUM(NVL(QTY, 0)) AS QTY, ");
+					    sb.append(" UNIT_PRICE, PRICE_DATE, SUM(NVL(AUM_FC, 0)) AS AUM_FC, ");
+					    sb.append(" SUM(NVL(BENEFIT_AMT1, 0)) AS BENEFIT_AMT1, AVG(BENEFIT_RATE1) AS BENEFIT_RATE1, ");
+					    sb.append(" TBCRM_AST_INV_SEC_STOCK.CURRENCY, TBPMS_IQ053.BUY_RATE ");
+					    sb.append(" FROM TBCRM_AST_INV_SEC_STOCK ");
+					    sb.append(" LEFT JOIN ( SELECT CUR_COD, BUY_RATE, MTN_DATE, ");
+					    sb.append(" ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+					    sb.append(" FROM TBPMS_IQ053 ");
+					    sb.append(" ) TBPMS_IQ053 ");
+					    sb.append(" ON TBCRM_AST_INV_SEC_STOCK.CURRENCY = TBPMS_IQ053.CUR_COD ");
+					    sb.append(" AND TBPMS_IQ053.RN = 1 ");
+					    sb.append(" WHERE CUST_ID = :custId ");
+					    sb.append(" AND DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_STOCK) ");
+					    sb.append(" GROUP BY ACCT_NBR, PROD_ID, PROD_NAME, AVG_COST_PRICE, UNIT_PRICE, ");
+					    sb.append(" PRICE_DATE, TBCRM_AST_INV_SEC_STOCK.CURRENCY, TBPMS_IQ053.BUY_RATE ");
+						sb.append(" ) T "); 
+					
 						List<Map<String,Object>> list = this.getQueryExecute(sb.toString(), custId);
 						result.addRecordList("SUB_FSTOCK", list);
 					}catch(Exception e){
@@ -895,17 +908,34 @@ public class CRM8502 extends EsbUtil {
 					try{
 						sb = new StringBuilder();
 						sb.append(" SELECT ACCT_NBR, PROD_ID, PROD_NAME, ISSUE_BROKER_NAME, ");
-						sb.append(" RANK_LEVEL_MOODYS, RANK_LEVEL_SP, RANK_LEVEL_FITCH, ");
-						sb.append(" MATURITY_DATE, SUM(NVL(INVEST_AMT_FC, 0)) AS INVEST_AMT_FC, SUM(NVL(QTY, 0)) AS QTY, UNIT_PRICE, ");
-						sb.append(" PRICE_DATE, SUM(NVL(AUM_FC, 0)) AS AUM_FC, SUM(NVL(BENEFIT_AMT2, 0)) AS BENEFIT_AMT2,");
-						sb.append(" DIVIDENT_AMT_FC, AVG(BENEFIT_RATE2) AS BENEFIT_RATE2, CURRENCY,");
-						sb.append(" SUM(NVL(AUM_TW, 0)) AS AUM_TW ");
-						sb.append(" FROM TBCRM_AST_INV_SEC_BOND ");
-						sb.append(" WHERE CUST_ID = :custId ");
-						sb.append(" GROUP BY ACCT_NBR, PROD_ID, PROD_NAME, ISSUE_BROKER_NAME, ");
-						sb.append(" RANK_LEVEL_MOODYS, RANK_LEVEL_SP, RANK_LEVEL_FITCH, ");
-						sb.append(" MATURITY_DATE, UNIT_PRICE, ");
-						sb.append(" PRICE_DATE, DIVIDENT_AMT_FC, CURRENCY ");
+					    sb.append(" RANK_LEVEL_MOODYS, RANK_LEVEL_SP, RANK_LEVEL_FITCH, ");
+					    sb.append(" MATURITY_DATE, INVEST_AMT_FC, QTY, UNIT_PRICE, ");
+					    sb.append(" PRICE_DATE, AUM_FC, BENEFIT_AMT2, ");
+					    sb.append(" DIVIDENT_AMT_FC, BENEFIT_RATE2, CURRENCY, ROUND(AUM_FC * NVL(BUY_RATE, 1), 2) AS AUM_TW ");
+						sb.append(" FROM ( ");
+					    sb.append(" SELECT ACCT_NBR, PROD_ID, PROD_NAME, ISSUE_BROKER_NAME, ");
+					    sb.append(" RANK_LEVEL_MOODYS, RANK_LEVEL_SP, RANK_LEVEL_FITCH, ");
+					    sb.append(" MATURITY_DATE, SUM(NVL(INVEST_AMT_FC, 0)) AS INVEST_AMT_FC, ");
+					    sb.append(" SUM(NVL(QTY, 0)) AS QTY, UNIT_PRICE, ");
+					    sb.append(" PRICE_DATE, SUM(NVL(AUM_FC, 0)) AS AUM_FC, ");
+					    sb.append(" SUM(NVL(BENEFIT_AMT2, 0)) AS BENEFIT_AMT2, ");
+					    sb.append(" DIVIDENT_AMT_FC, AVG(BENEFIT_RATE2) AS BENEFIT_RATE2, ");
+					    sb.append(" TBCRM_AST_INV_SEC_BOND.CURRENCY, TBPMS_IQ053.BUY_RATE ");
+					    sb.append(" FROM TBCRM_AST_INV_SEC_BOND ");
+					    sb.append(" LEFT JOIN ( SELECT CUR_COD, BUY_RATE, MTN_DATE, ");
+					    sb.append(" ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+					    sb.append(" FROM TBPMS_IQ053 ");
+					    sb.append(" ) TBPMS_IQ053 ");
+					    sb.append(" ON TBCRM_AST_INV_SEC_BOND.CURRENCY = TBPMS_IQ053.CUR_COD ");
+					    sb.append(" WHERE CUST_ID = :custId ");
+					    sb.append(" AND TBPMS_IQ053.RN = 1 ");
+					    sb.append(" AND DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_BOND) ");
+					    sb.append(" GROUP BY ACCT_NBR, PROD_ID, PROD_NAME, ISSUE_BROKER_NAME, ");
+					    sb.append(" RANK_LEVEL_MOODYS, RANK_LEVEL_SP, RANK_LEVEL_FITCH, ");
+					    sb.append(" MATURITY_DATE, UNIT_PRICE, PRICE_DATE, ");
+					    sb.append(" DIVIDENT_AMT_FC, TBCRM_AST_INV_SEC_BOND.CURRENCY, TBPMS_IQ053.BUY_RATE ");
+						sb.append(" ) T ");
+						
 						List<Map<String,Object>> list = this.getQueryExecute(sb.toString(), custId);
 						result.addRecordList("SUB_FBOND", list);
 					}catch(Exception e){
@@ -916,21 +946,33 @@ public class CRM8502 extends EsbUtil {
 				if(subSn != null  && subSn.compareTo(BigDecimal.ZERO) != 0){
 					try{
 						sb = new StringBuilder();
-						sb.append(" SELECT CRMSN.ACCT_NBR, CRMSN.PROD_ID, CRMSN.PROD_NAME, TFBSN.APPLY_START_DATE, ");
-						sb.append(" CRMSN.MATURITY_DATE, SUM(NVL(CRMSN.INVEST_AMT_FC, 0)) AS INVEST_AMT_FC, ");
-						sb.append(" SUM(NVL(CRMSN.DIVIDENT_AMT_FC, 0)) AS DIVIDENT_AMT_FC, CRMSN.UNIT_PRICE, ");
-						sb.append(" CRMSN.PRICE_DATE, SUM(NVL(CRMSN.AUM_FC, 0)) AS AUM_FC,");
-						sb.append(" SUM(NVL(CRMSN.BENEFIT_AMT2, 0)) AS BENEFIT_AMT2,");
-						sb.append(" AVG(CRMSN.BENEFIT_RATE2) AS BENEFIT_RATE2,");
-						sb.append(" CRMSN.CURRENCY, SUM(NVL(CRMSN.AUM_TW, 0)) AS AUM_TW ");
-						sb.append(" FROM TBCRM_AST_INV_SEC_SN CRMSN ");
-						sb.append(" LEFT JOIN TBPRD_TFB_FOREIGN_SN TFBSN ");
-				        sb.append(" ON CRMSN.PROD_ID = TFBSN.STOCK_CODE ");
-				        sb.append(" WHERE CUST_ID = :custId ");
-				        sb.append(" GROUP BY CRMSN.ACCT_NBR, CRMSN.PROD_ID, CRMSN.PROD_NAME, ");
-				        sb.append(" TFBSN.APPLY_START_DATE, ");
-						sb.append(" CRMSN.MATURITY_DATE, CRMSN.UNIT_PRICE, ");
-						sb.append(" CRMSN.PRICE_DATE, CRMSN.CURRENCY ");
+						sb.append(" SELECT ACCT_NBR, PROD_ID, PROD_NAME, APPLY_START_DATE, ");
+					    sb.append(" MATURITY_DATE, INVEST_AMT_FC, DIVIDENT_AMT_FC, UNIT_PRICE, ");
+					    sb.append(" PRICE_DATE, AUM_FC, BENEFIT_AMT2, BENEFIT_RATE2, CURRENCY, ");
+					    sb.append(" ROUND(AUM_FC * NVL(BUY_RATE, 1), 2) AS AUM_TW ");
+						sb.append("	FROM ( ");
+					    sb.append(" SELECT CRMSN.ACCT_NBR, CRMSN.PROD_ID, CRMSN.PROD_NAME, TFBSN.APPLY_START_DATE,");
+					    sb.append(" CRMSN.MATURITY_DATE, SUM(NVL(CRMSN.INVEST_AMT_FC, 0)) AS INVEST_AMT_FC,");
+					    sb.append(" SUM(NVL(CRMSN.DIVIDENT_AMT_FC, 0)) AS DIVIDENT_AMT_FC, CRMSN.UNIT_PRICE, ");
+					    sb.append(" CRMSN.PRICE_DATE, SUM(NVL(CRMSN.AUM_FC, 0)) AS AUM_FC, ");
+					    sb.append(" SUM(NVL(CRMSN.BENEFIT_AMT2, 0)) AS BENEFIT_AMT2, ");
+					    sb.append(" AVG(CRMSN.BENEFIT_RATE2) AS BENEFIT_RATE2, ");
+					    sb.append(" CRMSN.CURRENCY, TBPMS_IQ053.BUY_RATE ");
+					    sb.append(" FROM TBCRM_AST_INV_SEC_SN CRMSN ");
+					    sb.append(" LEFT JOIN TBPRD_TFB_FOREIGN_SN TFBSN ");
+					    sb.append(" ON CRMSN.PROD_ID = TFBSN.STOCK_CODE ");
+					    sb.append(" LEFT JOIN ( SELECT CUR_COD, BUY_RATE, MTN_DATE, ");
+					    sb.append(" ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+					    sb.append(" FROM TBPMS_IQ053 ");
+					    sb.append(" ) TBPMS_IQ053 ");
+					    sb.append(" ON CRMSN.CURRENCY = TBPMS_IQ053.CUR_COD ");
+					    sb.append(" AND TBPMS_IQ053.RN = 1 ");
+					    sb.append(" WHERE CRMSN.CUST_ID = :custId ");
+					    sb.append(" AND CRMSN.DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_SN) ");
+					    sb.append(" GROUP BY CRMSN.ACCT_NBR, CRMSN.PROD_ID, CRMSN.PROD_NAME, TFBSN.APPLY_START_DATE, ");
+					    sb.append(" CRMSN.MATURITY_DATE, CRMSN.UNIT_PRICE, CRMSN.PRICE_DATE, CRMSN.CURRENCY, TBPMS_IQ053.BUY_RATE ");
+						sb.append(" ) T ");
+						
 						List<Map<String,Object>> list = this.getQueryExecute(sb.toString(), custId);
 						result.addRecordList("SUB_SN", list);
 					}catch(Exception e){
@@ -944,12 +986,19 @@ public class CRM8502 extends EsbUtil {
 						sb.append(" SELECT ACCT_NBR, STOCK_CODE, STOCK_NAME, TXN_DATE, ");
 						sb.append(" SETTLE_DATE,SUM(NVL(INVEST_COST, 0)) AS INVEST_COST, ");
 						sb.append(" SUM(NVL(DIVIDEND_AMT, 0)) AS DIVIDEND_AMT, REFER_PRICE, ");
-						sb.append(" SNAP_DATE, SUM(NVL(AUM_TW, 0)) AS AUM_TW, CURRENCY ");
+						sb.append(" SNAP_DATE, NVL(SUM(AUM_TW * NVL(BUY_RATE, 1)), 0) AS AUM_TW, CURRENCY ");
 						sb.append(" FROM TBCRM_AST_INV_SEC_DSN	");
-						sb.append(" WHERE CUSTOMER_ID = :custId ");
+						sb.append(" LEFT JOIN ( SELECT CUR_COD, BUY_RATE, MTN_DATE, ");
+					    sb.append(" ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+					    sb.append(" FROM TBPMS_IQ053 ");
+					    sb.append(" ) TBPMS_IQ053 ");
+					    sb.append(" ON TBCRM_AST_INV_SEC_DSN.CURRENCY = TBPMS_IQ053.CUR_COD ");
+						sb.append(" WHERE CUSTOMER_ID = :custId AND INS_DATE = (SELECT MAX(INS_DATE) FROM TBCRM_AST_INV_SEC_DSN) ");
+						sb.append(" AND TBPMS_IQ053.RN = 1 ");
 						sb.append(" GROUP BY ACCT_NBR, STOCK_CODE, ");
 						sb.append(" STOCK_NAME, TXN_DATE, SETTLE_DATE, REFER_PRICE, ");
 						sb.append(" SNAP_DATE, CURRENCY ");
+						
 						List<Map<String,Object>> list = this.getQueryExecute(sb.toString(), custId);
 						result.addRecordList("SUB_DSN", list);
 					}catch(Exception e){
@@ -1167,55 +1216,74 @@ public class CRM8502 extends EsbUtil {
 			
 			sb = new StringBuilder();
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-			sb.append(" SELECT SUM(NVL(AUM_TW, 0)) AS AUM_TW ");
+			sb.append(" SELECT NVL(SUM(NVL(AUM_FC, 0) * NVL(BUY_RATE, 1)), 0) AS AUM ");
 			sb.append(" FROM  TBCRM_AST_INV_SEC_STOCK ");
+			sb.append(" LEFT JOIN (SELECT CUR_COD, BUY_RATE, MTN_DATE,  ");
+			sb.append(" ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+			sb.append(" FROM TBPMS_IQ053 ) TBPMS_IQ053 ");
+			sb.append(" ON TBCRM_AST_INV_SEC_STOCK.CURRENCY = TBPMS_IQ053.CUR_COD ");
 			sb.append(" WHERE CUST_ID =:custId ");
-			sb.append(" GROUP BY cust_id ");
+			sb.append(" AND TBPMS_IQ053.RN = 1 ");
+			sb.append(" AND DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_STOCK) ");
 		
 			queryCondition.setObject("custId", custID);
 			queryCondition.setQueryString(sb.toString());
 			list = dam.exeQuery(queryCondition);
 			if(!list.isEmpty()){
-				subFstock = (BigDecimal)list.get(0).get("AUM_TW"); //海外股票-證券複委託
+				subFstock = (BigDecimal)list.get(0).get("AUM"); //海外股票-證券複委託
 			}
 			
 			sb = new StringBuilder();
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-			sb.append(" SELECT SUM(NVL(AUM_TW, 0)) AS AUM_TW ");
+			sb.append(" SELECT NVL(SUM(NVL(AUM_FC, 0) * NVL(BUY_RATE, 1)), 0) AS AUM ");
 			sb.append(" FROM  TBCRM_AST_INV_SEC_BOND ");
+			sb.append(" LEFT JOIN (SELECT CUR_COD, BUY_RATE, MTN_DATE,  ");
+			sb.append(" ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+			sb.append(" FROM TBPMS_IQ053 ) TBPMS_IQ053 ");
+			sb.append(" ON TBCRM_AST_INV_SEC_BOND.CURRENCY = TBPMS_IQ053.CUR_COD ");
 			sb.append(" WHERE CUST_ID =:custId ");
-			sb.append(" GROUP BY cust_id ");
+			sb.append(" AND TBPMS_IQ053.RN = 1 ");
+			sb.append(" AND DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_BOND) ");
 			queryCondition.setObject("custId", custID);
 			queryCondition.setQueryString(sb.toString());
 			list = dam.exeQuery(queryCondition);
 			if(!list.isEmpty()){
-				subFbond = (BigDecimal)list.get(0).get("AUM_TW"); //海外債券-證券複委託
+				subFbond = (BigDecimal)list.get(0).get("AUM"); //海外債券-證券複委託
 			}
 			
 			sb = new StringBuilder();
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-			sb.append(" SELECT SUM(NVL(AUM_TW, 0)) AS AUM_TW ");
+			sb.append(" SELECT NVL(SUM(NVL(AUM_FC, 0) * NVL(BUY_RATE, 1)), 0) AS AUM ");
 			sb.append(" FROM  TBCRM_AST_INV_SEC_SN ");
+			sb.append(" LEFT JOIN (SELECT CUR_COD, BUY_RATE, MTN_DATE,  ");
+			sb.append(" ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+			sb.append(" FROM TBPMS_IQ053 ) TBPMS_IQ053 ");
+			sb.append(" ON TBCRM_AST_INV_SEC_SN.CURRENCY = TBPMS_IQ053.CUR_COD ");
 			sb.append(" WHERE CUST_ID =:custId ");
-			sb.append(" GROUP BY cust_id ");
+			sb.append(" AND DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_SN) ");
 			queryCondition.setObject("custId", custID);
 			queryCondition.setQueryString(sb.toString());
 			list = dam.exeQuery(queryCondition);
 			if(!list.isEmpty()){
-				subSn = (BigDecimal)list.get(0).get("AUM_TW"); //境外結構型商品-證券複委託
+				subSn = (BigDecimal)list.get(0).get("AUM"); //境外結構型商品-證券複委託
 			}
 			
 			sb = new StringBuilder();
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-			sb.append(" SELECT SUM(NVL(AUM_TW, 0)) AS AUM_TW ");
+			sb.append(" SELECT NVL(SUM(NVL(AUM_TW, 0) * NVL(BUY_RATE, 1)), 0) AS AUM ");
 			sb.append(" FROM  TBCRM_AST_INV_SEC_DSN ");
+			sb.append(" LEFT JOIN (SELECT CUR_COD, BUY_RATE, MTN_DATE,  ");
+			sb.append(" ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+			sb.append(" FROM TBPMS_IQ053 ) TBPMS_IQ053 ");
+			sb.append(" ON TBCRM_AST_INV_SEC_DSN.CURRENCY = TBPMS_IQ053.CUR_COD ");
 			sb.append(" WHERE CUSTOMER_ID =:custId ");
+			sb.append(" AND INS_DATE = (SELECT MAX(INS_DATE) FROM TBCRM_AST_INV_SEC_DSN) ");
 			sb.append(" GROUP BY CUSTOMER_ID ");
 			queryCondition.setObject("custId", custID);
 			queryCondition.setQueryString(sb.toString());
 			list = dam.exeQuery(queryCondition);
 			if(!list.isEmpty()){
-				subDsn = (BigDecimal)list.get(0).get("AUM_TW"); //境內結構型商品-證券複委託
+				subDsn = (BigDecimal)list.get(0).get("AUM"); //境內結構型商品-證券複委託
 			}
 			
 			data.put("DEPOSIT_TWD", depositTwd);  					// 台幣存款

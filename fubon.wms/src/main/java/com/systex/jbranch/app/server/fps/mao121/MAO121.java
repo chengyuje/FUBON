@@ -1,19 +1,15 @@
 package com.systex.jbranch.app.server.fps.mao121;
 
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
-import com.systex.jbranch.platform.common.dataaccess.query.ResultIF;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
@@ -30,7 +26,6 @@ import com.systex.jbranch.platform.util.IPrimitiveMap;
 public class MAO121 extends FubonWmsBizLogic {
 	
 	private DataAccessManager dam = null;
-	private Logger logger = LoggerFactory.getLogger(MAO121.class);
 	
 	public void inquire(Object body, IPrimitiveMap header) throws JBranchException {
 		

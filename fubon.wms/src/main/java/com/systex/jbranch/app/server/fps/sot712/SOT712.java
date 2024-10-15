@@ -1775,9 +1775,9 @@ public class SOT712 extends FubonWmsBizLogic{
 				}
 			}
 			
-			//高風險商品，集中度超過規定
+			//高風險商品，集中度超過通知門檻
 			//列印高資產客戶投資產品集中度聲明書
-			if(StringUtils.equals("Y", inputVO.getOverCentRateYN())) {
+			if(StringUtils.equals("W", inputVO.getOverCentRateYN())) {
 				BigDecimal amtTWD = getPurchseAmtTWD(inputVO); //取得台幣申購金額
 				WMSHACRDataVO hmshacrDataVO = getCentRateData(inputVO, amtTWD); //集中度資訊
 				inputVO.setHmshacrDataVO(hmshacrDataVO);
@@ -1800,16 +1800,10 @@ public class SOT712 extends FubonWmsBizLogic{
 				}
 			}
 			
-			CustHighNetWorthDataVO hnwcData = getHNWCData(inputVO.getCustId()); //客戶高資產註記資料
-			WMSHACRDataVO hmshacrDataVO = null; //集中度資訊
-			//高資產客戶，購買高風險商品或SI/SN不保本商品，檢核集中度
-			if(StringUtils.equals("Y", hnwcData.getValidHnwcYN()) && (StringUtils.equals("Y", inputVO.getHnwcBuy()) || !isRateGuaranteed(inputVO))) {
-				hmshacrDataVO = getCentRateData(inputVO, BigDecimal.ZERO);
-			}
-			if(hmshacrDataVO != null && !StringUtils.equals("Y", hmshacrDataVO.getVALIDATE_YN())) {
-				//高風險商品或不保本商品，集中度超過規定
+			CustHighNetWorthDataVO hnwcData = getHNWCData(inputVO.getCustId()); //客戶高資產註記資料			
+			if(inputVO.getHmshacrDataVO() != null && StringUtils.equals("W", inputVO.getHmshacrDataVO().getVALIDATE_YN())) {
+				//高風險商品，集中度超過通知門檻
 				//列印高資產客戶投資產品集中度聲明書
-				inputVO.setHmshacrDataVO(hmshacrDataVO);
 				url_list.addAll(getPdfULst(inputVO, "sot824"));
 			} else {
 				//有列印集中度聲明書的，就不用再檢核推介同意書&自主聲明書
@@ -2784,6 +2778,28 @@ public class SOT712 extends FubonWmsBizLogic{
 	}
 	
 	/***
+	 * 適配：取得客戶集中度資訊
+	 * @param body
+	 * @param header
+	 * @throws Exception
+	 */
+	public void getCentRateData(Object body, IPrimitiveMap<?> header) throws Exception {
+		PRDFitInputVO inputVO = (PRDFitInputVO) body;
+		SOT712OutputVO outputVO = new SOT712OutputVO();
+		
+		CustHighNetWorthDataVO hnwcData = getHNWCData(inputVO.getCustId()); //客戶高資產註記資料
+		WMSHACRDataVO hmshacrDataVO = null; //集中度資訊
+		//高資產客戶，購買高風險商品(境外私募基金&海外債)，檢核集中度
+		if(inputVO.getPrdType().matches("1|3") && //境外私募基金&海外債
+				(StringUtils.equals("Y", hnwcData.getValidHnwcYN()) && StringUtils.equals("Y", inputVO.getHnwcBuy()))) {
+			hmshacrDataVO = getCentRateData(inputVO, BigDecimal.ZERO);
+		}
+		outputVO.setHmshacrDataVO(hmshacrDataVO);
+		
+		sendRtnObject(outputVO);
+	}
+	
+	/***
 	 * 取得客戶集中度資訊
 	 * @param inputVO
 	 * @return
@@ -2799,6 +2815,7 @@ public class SOT712 extends FubonWmsBizLogic{
 		if(StringUtils.equals(inputVO.getPrdType(), "3")) inputVO714.setProdType("4"); 			//海外債
 		else if (StringUtils.equals(inputVO.getPrdType(), "4")) inputVO714.setProdType("1"); 	//SI 
 		else if (StringUtils.equals(inputVO.getPrdType(), "5")) inputVO714.setProdType("2"); 	//SN
+		else if (StringUtils.equals(inputVO.getPrdType(), "1")) inputVO714.setProdType("6"); 	//境外私募基金
 		
 		hmshacrDataVO = sot714.getCentRateData(inputVO714);
 		
@@ -2816,7 +2833,13 @@ public class SOT712 extends FubonWmsBizLogic{
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
 				
-		if(StringUtils.equals("3", inputVO.getPrdType())) {
+		if(StringUtils.equals("1", inputVO.getPrdType())) {
+			//基金(境外私募基金) (只會有一筆)
+			sb.append("select (NVL(A.PURCHASE_AMT, 0) * NVL(B.BUY_RATE, 1)) AS AMT ");
+			sb.append(" FROM TBSOT_NF_PURCHASE_D A ");
+			sb.append(" LEFT JOIN TBPMS_IQ053 B ON B.CUR_COD = A.PROD_CURR AND B.MTN_DATE = (SELECT MAX(MTN_DATE) FROM TBPMS_IQ053) ");
+			sb.append(" where A.TRADE_SEQ = :tradeSeq ");
+		} else if(StringUtils.equals("3", inputVO.getPrdType())) {
 			//海外債
 			sb.append("select (NVL(A.TRUST_AMT, 0) * NVL(B.BUY_RATE, 1)) AS AMT ");
 			sb.append(" FROM TBSOT_BN_TRADE_D A ");

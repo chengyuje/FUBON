@@ -295,7 +295,8 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 							$scope.inputVO.OTH_FUND_PURPOSE_6 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_6;
 							$scope.inputVO.OTH_FUND_PURPOSE_RMK_1 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_RMK_1;
 							$scope.inputVO.OTH_FUND_PURPOSE_RMK_2 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_RMK_2;
-
+							$scope.inputVO.AUTH_YN = $scope.INS_INFORMATION[0].AUTH_YN;
+							
 							if($scope.INS_INFORMATION[0].INSPRD_TYPE != 1){
 								$scope.MatchButton=false;
 							}
@@ -544,6 +545,8 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 			$scope.inputVO.TERMINATED_INC = 'Y';
 			$scope.inputVO.REVISE_CONFIRM_YN = "N";
 			$scope.inputVO.notOthType2 = false;
+			$scope.inputVO.othFundRmkDisabled1 = true;
+			$scope.inputVO.othFundRmkDisabled2 = true;
 		}else{
 			$scope.inputVO.TERMINATED_INC = 'N';
 			$scope.inputVO.REVISE_CONFIRM_YN = "N";
@@ -1026,10 +1029,20 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 		debugger
 		if(idx == "5") {
 			//其他資金用途
-			if($scope.inputVO.OTH_FUND_PURPOSE_5 == "N") $scope.inputVO.OTH_FUND_PURPOSE_RMK_1 = "";
+			if($scope.inputVO.OTH_FUND_PURPOSE_5 == "N") {
+				$scope.inputVO.OTH_FUND_PURPOSE_RMK_1 = "";
+				$scope.inputVO.othFundRmkDisabled1 = true;
+			} else {
+				$scope.inputVO.othFundRmkDisabled1 = false;
+			}
 		} else if(idx == "6") {
 			//非運用於本行之其他資金用途
-			if($scope.inputVO.OTH_FUND_PURPOSE_6 == "N") $scope.inputVO.OTH_FUND_PURPOSE_RMK_2 = "";
+			if($scope.inputVO.OTH_FUND_PURPOSE_6 == "N") {
+				$scope.inputVO.OTH_FUND_PURPOSE_RMK_2 = "";
+				$scope.inputVO.othFundRmkDisabled2 = true;
+			} else {
+				$scope.inputVO.othFundRmkDisabled2 = false;
+			}
 		}
 	}
 		
@@ -1061,6 +1074,8 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 		$scope.inputVO.QC_PROPOSER_CHG = '';
 		$scope.inputVO.CHG_CUST_ID = '';
 		$scope.inputVO.VALID_CHG_CUST_YN = 'N';
+		$scope.inputVO.othFundRmkDisabled1 = true;
+		$scope.inputVO.othFundRmkDisabled2 = true;
 
 		$scope.premiumUsageChange();
 	}
