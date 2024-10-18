@@ -22,6 +22,8 @@ import com.systex.jbranch.app.common.fps.table.TBSYS_FILE_DETAILVO;
 import com.systex.jbranch.app.common.fps.table.TBSYS_FILE_MAINVO;
 import com.systex.jbranch.app.common.fps.table.TBSYS_QST_ANSWERPK;
 import com.systex.jbranch.app.common.fps.table.TBSYS_QST_ANSWERVO;
+import com.systex.jbranch.app.common.fps.table.TBSYS_QST_ANSWER_COMPPK;
+import com.systex.jbranch.app.common.fps.table.TBSYS_QST_ANSWER_COMPVO;
 import com.systex.jbranch.app.common.fps.table.TBSYS_QST_QUESTIONVO;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
@@ -130,8 +132,7 @@ public class KYC111 extends FubonWmsBizLogic{
 				dvo.setDOC_FILE(ObjectUtil.byteArrToBlob(data));
 				getDataAccessManager().create(dvo);
 			}
-			
-			
+			//KYC問題答案選項
 			if(inputVO.getANSWER_DESC().size()>0){
 				for(Map<String, Object> map:inputVO.getANSWER_DESC()){
 					if(map.get("ANS_DESC") != null){
@@ -149,6 +150,24 @@ public class KYC111 extends FubonWmsBizLogic{
 					}
 				}
 			}
+			//KYC差異表答案選項
+			if(inputVO.getANSWER_DESC_COMP().size()>0){
+				for(Map<String, Object> map:inputVO.getANSWER_DESC_COMP()){
+					if(map.get("ANS_DESC") != null){
+						Object answer_seq = map.get("Display_order");
+						
+						TBSYS_QST_ANSWER_COMPPK tqa_pk = new TBSYS_QST_ANSWER_COMPPK();
+						tqa_pk.setANSWER_SEQ(new BigDecimal(answer_seq.toString()));
+						tqa_pk.setQUESTION_VERSION(QUESTION_VERSION);
+						TBSYS_QST_ANSWER_COMPVO tqa_vo = new TBSYS_QST_ANSWER_COMPVO();
+						tqa_vo.setcomp_id(tqa_pk);
+						tqa_vo.setANSWER_DESC(ObjectUtils.toString(map.get("ANS_DESC")));
+						getDataAccessManager().create(tqa_vo);
+
+					}
+				}
+			}
+			
 			sendRtnObject(null);
 //		} catch (Exception e) {
 //			throw new APException("系統發生錯誤請洽系統管理員");
@@ -216,7 +235,7 @@ public class KYC111 extends FubonWmsBizLogic{
 					getDataAccessManager().create(dvo);
 				}
 			}
-
+			//KYC問題答案選項
 			if(inputVO.getDEL_ANSWER_DESC().size()>0){
 				for(Object answer_seq:inputVO.getDEL_ANSWER_DESC()){
 					TBSYS_QST_ANSWERPK tqa_pk = new TBSYS_QST_ANSWERPK();
@@ -267,7 +286,7 @@ public class KYC111 extends FubonWmsBizLogic{
 					}
 					getDataAccessManager().create(tqa_vo);
 				}
-			}else{
+			} else {
 				for(Map<String, Object> ans_desc: inputVO.getANSWER_DESC()){
 					if(ans_desc.get("ANS_DESC")!=null){
 						Object answer_seq = ans_desc.get("Display_order");
@@ -282,6 +301,67 @@ public class KYC111 extends FubonWmsBizLogic{
 					}
 				}
 			}
+			//KYC差異表答案選項
+			if(inputVO.getDEL_ANSWER_DESC_COMP().size()>0){
+				for(Object answer_seq:inputVO.getDEL_ANSWER_DESC_COMP()){
+					TBSYS_QST_ANSWER_COMPPK tqa_pk = new TBSYS_QST_ANSWER_COMPPK();
+					tqa_pk.setANSWER_SEQ(new BigDecimal(answer_seq.toString()));
+					tqa_pk.setQUESTION_VERSION(inputVO.getQUESTION_VERSION());
+					TBSYS_QST_ANSWER_COMPVO tqa_vo = new TBSYS_QST_ANSWER_COMPVO();
+					tqa_vo = (TBSYS_QST_ANSWER_COMPVO) getDataAccessManager().findByPKey(TBSYS_QST_ANSWER_COMPVO.TABLE_UID, tqa_pk);
+					if(tqa_vo != null){
+						getDataAccessManager().delete(tqa_vo);
+					}else{
+						errorMsg = "ehl_01_common_009";
+						throw new APException(errorMsg);
+					}
+				}
+				for(Map<String, Object> ans_desc: inputVO.getANSWER_DESC_COMP()){
+					if(ans_desc.get("ANS_DESC")==null){
+						TBSYS_QST_ANSWER_COMPPK tqa_pk = new TBSYS_QST_ANSWER_COMPPK();
+						tqa_pk.setANSWER_SEQ(new BigDecimal(ans_desc.get("ANSWER_SEQ").toString()));
+						tqa_pk.setQUESTION_VERSION(inputVO.getQUESTION_VERSION());
+						TBSYS_QST_ANSWER_COMPVO tqa_vo = new TBSYS_QST_ANSWER_COMPVO();
+						tqa_vo = (TBSYS_QST_ANSWER_COMPVO) getDataAccessManager().findByPKey(TBSYS_QST_ANSWER_COMPVO.TABLE_UID, tqa_pk);
+						if(tqa_vo != null){
+							getDataAccessManager().delete(tqa_vo);
+						}else{
+							errorMsg = "ehl_01_common_009";
+							throw new APException(errorMsg);
+						}
+					}
+				}
+				for(Map<String, Object> ans_desc: inputVO.getANSWER_DESC()){
+					TBSYS_QST_ANSWER_COMPPK tqa_pk = new TBSYS_QST_ANSWER_COMPPK();
+					TBSYS_QST_ANSWER_COMPVO tqa_vo = new TBSYS_QST_ANSWER_COMPVO();
+					Object answer_seq = ans_desc.get("Display_order");
+					tqa_pk = new TBSYS_QST_ANSWER_COMPPK();
+					tqa_pk.setANSWER_SEQ(new BigDecimal(answer_seq.toString()));
+					tqa_pk.setQUESTION_VERSION(inputVO.getQUESTION_VERSION());
+					tqa_vo = new TBSYS_QST_ANSWER_COMPVO();
+					tqa_vo.setcomp_id(tqa_pk);
+					if(ans_desc.get("ANS_DESC") != null){
+						tqa_vo.setANSWER_DESC(ObjectUtils.toString(ans_desc.get("ANS_DESC")));
+					}else{
+						tqa_vo.setANSWER_DESC(ObjectUtils.toString(ans_desc.get("ANSWER_DESC")));
+					}
+					getDataAccessManager().create(tqa_vo);
+				}
+			} else {
+				for(Map<String, Object> ans_desc: inputVO.getANSWER_DESC_COMP()){
+					if(ans_desc.get("ANS_DESC")!=null){
+						Object answer_seq = ans_desc.get("Display_order");
+						TBSYS_QST_ANSWER_COMPPK tqa_pk = new TBSYS_QST_ANSWER_COMPPK();
+						tqa_pk.setANSWER_SEQ(new BigDecimal(answer_seq.toString()));
+						tqa_pk.setQUESTION_VERSION(inputVO.getQUESTION_VERSION());
+						TBSYS_QST_ANSWER_COMPVO tqa_vo = new TBSYS_QST_ANSWER_COMPVO();
+						tqa_vo.setcomp_id(tqa_pk);
+						tqa_vo.setANSWER_DESC(ObjectUtils.toString(ans_desc.get("ANS_DESC")));
+						getDataAccessManager().create(tqa_vo);
+					}
+				}
+			}
+			
 			sendRtnObject(null);
 		} catch (Exception e) {
 			if(errorMsg.length()>0){

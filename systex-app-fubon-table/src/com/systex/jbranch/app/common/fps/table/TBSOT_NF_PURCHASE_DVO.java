@@ -181,9 +181,9 @@ public class TBSOT_NF_PURCHASE_DVO extends VOBase {
 	private String CONTRACT_ID;
 	
 	private String TRUST_PEOP_NUM;
-	
-	private String OVER_CENTRATE_YN;
 
+	private String OVER_CENTRATE_YN;
+	
 	public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBSOT_NF_PURCHASE_D";
 
 	public String getTableuid() {

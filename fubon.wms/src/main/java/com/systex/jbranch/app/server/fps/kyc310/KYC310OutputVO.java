@@ -1,5 +1,6 @@
 package com.systex.jbranch.app.server.fps.kyc310;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,9 @@ public class KYC310OutputVO extends PagingOutputVO{
 	private boolean haveSameEmail;
 	private List<Map<String, Object>> sameEmailData;
 	private String legalRegKycLevel; //法定代理人1&2風險屬性取孰低(已過期表示沒有風險屬性，都沒有則為空值)
+	
+	private Map<String, Object> lastKYCComparisonData;
+	private BigDecimal incomeFromCBS;
 	
 	public String getQ3ProdDecrease() {
 		return Q3ProdDecrease;
@@ -368,6 +372,22 @@ public class KYC310OutputVO extends PagingOutputVO{
 
 	public void setLegalRegKycLevel(String legalRegKycLevel) {
 		this.legalRegKycLevel = legalRegKycLevel;
+	}
+
+	public Map<String, Object> getLastKYCComparisonData() {
+		return lastKYCComparisonData;
+	}
+
+	public void setLastKYCComparisonData(Map<String, Object> lastKYCComparisonData) {
+		this.lastKYCComparisonData = lastKYCComparisonData;
+	}
+
+	public BigDecimal getIncomeFromCBS() {
+		return incomeFromCBS;
+	}
+
+	public void setIncomeFromCBS(BigDecimal incomeFromCBS) {
+		this.incomeFromCBS = incomeFromCBS;
 	}
 
 }

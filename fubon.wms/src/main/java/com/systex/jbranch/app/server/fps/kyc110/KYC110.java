@@ -67,6 +67,13 @@ public class KYC110 extends FubonWmsBizLogic {
 				qc.setQueryString(sb.toString());
 				map.put("Ans", getDataAccessManager().exeQuery(qc));
 				
+				sb = new StringBuilder();
+				qc = getDataAccessManager().getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+				sb.append(" SELECT QUESTION_VERSION, ANSWER_DESC, ANSWER_DESC_ENG, ANSWER_SEQ FROM TBSYS_QST_ANSWER_COMP WHERE QUESTION_VERSION = :question_version ");
+				qc.setObject("question_version", map.get("QUESTION_VERSION"));
+				qc.setQueryString(sb.toString());
+				map.put("AnsComp", getDataAccessManager().exeQuery(qc));
+				
 				List<Map<String,Object>> picture_list = new ArrayList<Map<String,Object>>(); 
 				sb = new StringBuilder();
 				qc = getDataAccessManager().getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -102,6 +109,14 @@ public class KYC110 extends FubonWmsBizLogic {
 		qc.setObject("question_version", inputVO.getQUESTION_VERSION());
 		qc.setQueryString(sb.toString());
 		getDataAccessManager().exeUpdate(qc);
+		
+		qc = getDataAccessManager().getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		sb = new StringBuilder();
+		sb.append(" DELETE FROM TBSYS_QST_ANSWER_COMP WHERE QUESTION_VERSION = :question_version");
+		qc.setObject("question_version", inputVO.getQUESTION_VERSION());
+		qc.setQueryString(sb.toString());
+		getDataAccessManager().exeUpdate(qc);
+		
 		qc = getDataAccessManager().getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		sb = new StringBuilder();
 		sb.append(" DELETE FROM TBSYS_QST_QUESTION WHERE QUESTION_VERSION = :question_version");

@@ -865,7 +865,8 @@ eSoafApp.controller('SOT310Controller',
 																															'purchaseAmt': $scope.inputVO.purchaseAmt,
 																															'txFeeType': '1',
 																															'trustAcct': $scope.inputVO.trustAcct,
-																															'debitAcct': debitAccount},
+																															'debitAcct': debitAccount,
+																															'isOBU':$scope.inputVO.isOBU},
 				function(tota1, isError) {
 					if (!isError) {
 						$scope.inputVO.payableFeeRate = tota1[0].body.payableFeeRate;

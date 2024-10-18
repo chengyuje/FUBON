@@ -124,6 +124,21 @@ public class TBSOT_NF_REDEEM_DYNAVO extends VOBase {
 	private BigDecimal RDM_UNIT;
 	
 	/** nullable persistent field */
+	private BigDecimal RDM_UNIT_C1;
+	
+	/** nullable persistent field */
+	private BigDecimal RDM_UNIT_C2;
+	
+	/** nullable persistent field */
+	private BigDecimal RDM_UNIT_C3;
+	
+	/** nullable persistent field */
+	private BigDecimal RDM_UNIT_C4;
+	
+	/** nullable persistent field */
+	private BigDecimal RDM_UNIT_C5;
+	
+	/** nullable persistent field */
 	private String REDEEM_TYPE;
 	
 	/** nullable persistent field */
@@ -138,6 +153,7 @@ public class TBSOT_NF_REDEEM_DYNAVO extends VOBase {
 	/** nullable persistent field */
 	private String NARRATOR_NAME;
 	
+	/** nullable persistent field */
 	private String SHORT_TYPE;
 	
 	public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBSOT_NF_REDEEM_DYNA";
@@ -451,6 +467,46 @@ public class TBSOT_NF_REDEEM_DYNAVO extends VOBase {
 		RDM_UNIT = rDM_UNIT;
 	}
 
+	public BigDecimal getRDM_UNIT_C1() {
+		return RDM_UNIT_C1;
+	}
+
+	public void setRDM_UNIT_C1(BigDecimal rDM_UNIT_C1) {
+		RDM_UNIT_C1 = rDM_UNIT_C1;
+	}
+
+	public BigDecimal getRDM_UNIT_C2() {
+		return RDM_UNIT_C2;
+	}
+
+	public void setRDM_UNIT_C2(BigDecimal rDM_UNIT_C2) {
+		RDM_UNIT_C2 = rDM_UNIT_C2;
+	}
+
+	public BigDecimal getRDM_UNIT_C3() {
+		return RDM_UNIT_C3;
+	}
+
+	public void setRDM_UNIT_C3(BigDecimal rDM_UNIT_C3) {
+		RDM_UNIT_C3 = rDM_UNIT_C3;
+	}
+
+	public BigDecimal getRDM_UNIT_C4() {
+		return RDM_UNIT_C4;
+	}
+
+	public void setRDM_UNIT_C4(BigDecimal rDM_UNIT_C4) {
+		RDM_UNIT_C4 = rDM_UNIT_C4;
+	}
+
+	public BigDecimal getRDM_UNIT_C5() {
+		return RDM_UNIT_C5;
+	}
+
+	public void setRDM_UNIT_C5(BigDecimal rDM_UNIT_C5) {
+		RDM_UNIT_C5 = rDM_UNIT_C5;
+	}
+
 	public String getREDEEM_TYPE() {
 		return REDEEM_TYPE;
 	}
@@ -490,7 +546,7 @@ public class TBSOT_NF_REDEEM_DYNAVO extends VOBase {
 	public void setNARRATOR_NAME(String nARRATOR_NAME) {
 		NARRATOR_NAME = nARRATOR_NAME;
 	}
-	
+
 	public String getSHORT_TYPE() {
 		return SHORT_TYPE;
 	}

@@ -230,7 +230,7 @@ eSoafApp.controller('KYC310Controller', function(
     $scope.queryData = function(){
     	$scope.inipersional();
     	$scope.inquireInit();
-    	debugger;
+    	
     	if($scope.inputVO.CUST_ID ==''){
     		//無客戶ID但必須輸入解說人員
     		if($scope.inputVO.COMMENTARY_STAFF == ''){
@@ -321,7 +321,9 @@ eSoafApp.controller('KYC310Controller', function(
 						
 						//未滿18歲法代風險屬性
 						$scope.inputVO.legalRegKycLevel = tota[0].body.legalRegKycLevel;
-							
+						//端末年收入
+						$scope.inputVO.incomeFromCBS = tota[0].body.incomeFromCBS;
+						
 						if($scope.quest_list != null && $scope.inputVO.CUST_ID.length>=10){
     						$scope.temp_QNineAns = angular.copy($scope.quest_list[8].ANSWER_LIST);
 						}
@@ -970,6 +972,7 @@ eSoafApp.controller('KYC310Controller', function(
     					var Q3ProdExpChg = undefined;
 		        		var Q3ProdDecrease = undefined;
 		        		var Q10Q11Check = undefined;
+		        		var Q2IncomeCheck = undefined;
 
 		        		//未滿18歲客戶，學歷填寫高中職以上且無"高中職以上學歷註記"，不可填答
 						if(age < 18 && $scope.custEduHighSchool == 'N' && 
@@ -1049,9 +1052,15 @@ eSoafApp.controller('KYC310Controller', function(
     			        		$scope.showErrorMsg('ehl_01_KYC310_046');
     			        		return;
     			        	}
-			        		
-			        	   	//12歲以下檢核
-							if(age <= 12 && $scope.underTwele_choic()) {
+    			        	
+    			        	//Q2年收入檢核
+    			        	//KYC收入與端末收入不符
+    			        	if(tota[0].body.Comparison.INCOME_CBS && tota[0].body.Comparison.INCOME_CBS.INCOMECBS_CHK == "N") {
+    			        		Q2IncomeCheck = "客戶於本行留存年收入為【" + tota[0].body.Comparison.INCOME_CBS.INCOME_CBS + "】萬元，本次更新為【" + tota[0].body.Comparison.INCOME_CBS.Q2ANS_DESC + "】，請同步更新客戶端末系統96700000年收入欄位\n";
+    			        	}
+    			        	
+			        	   	//未滿18歲檢核
+							if(age < 18) {
 								var ANSList = $scope.inputVO.quest_list[0].ANSWER_LIST;
 					        	var Income = '';
 					        	var EDUCTION_12 = undefined;
@@ -1067,34 +1076,55 @@ eSoafApp.controller('KYC310Controller', function(
 					            		}
 					            	}
 					        	}
+					        	//未滿12歲
+					        	if(age < 12) {
+						        	//未滿12歲且子女人數為【{0}】，請再次向客戶確認
+						        	if($scope.inputVO.CHILD_NO != '0'){
+						        		CHILD_NO_12 = $filter('i18n')('ehl_01_KYC310_012',[getLabel('CHILD_NO', $scope.inputVO.CHILD_NO)]);
+						        	}
+					        	}
+					        	//未滿15 歲
+								if(age < 15) {
+									//未滿15 歲且職業為【 {0} 】，請再次向客戶確認
+									if($scope.inputVO.CAREER != '12' && $scope.inputVO.CAREER != '19' && $scope.inputVO.CAREER != '22'){
+						        		CAREER_12 = $filter('i18n')('ehl_01_KYC310_025',[getLabel('CAREER', $scope.inputVO.CAREER)]);
+						        	}
+									//未滿15歲且收入來源為【{0}】，請再次向客戶確認
+						        	if(Income != ''){
+						        		INCOME_12 = $filter('i18n')('ehl_01_KYC310_014',[Income.substr(0,Income.length-1)]);
+						        	}
+								} else {
+									//15 歲(含)以上
+									if(($scope.inputVO.CAREER == '21' || $scope.inputVO.CAREER == '17' || $scope.inputVO.CAREER == '22') 
+											&& ($scope.underTwele_QOne())) {
+										var Income = '';
+										if(ANSList != undefined){
+							            	for(var i=0;i<3;i++){
+							            		if(ANSList[i].select == true){
+							            			Income = Income+ANSList[i].ANSWER_DESC+'、';
+							            		}
+							            	}
+							        	}
+										//職業為【{0}】，收入來源為【{1}】，請再次向客戶確認
+						        		CAREER_12 = $filter('i18n')('ehl_01_KYC310_050',[getLabel('CAREER', $scope.inputVO.CAREER), Income.substr(0,Income.length-1)]);
+						        	}
+								}
+								//未滿18 歲
+								if(age < 18) {
+									//未滿18 歲且婚姻狀態為【{0}】，請再次向客戶確認
+									if($scope.inputVO.MARRAGE == '2'){
+						        		MARRIAGE_12 = $filter('i18n')('ehl_01_KYC310_013',[getLabel('MARRAGE', $scope.inputVO.MARRAGE)]);
+						        	}
+								}
 								
-//					        	if($scope.inputVO.EDUCATION != '8' && $scope.inputVO.EDUCATION != '6' && $scope.inputVO.EDUCATION != '5'){
-//					        		EDUCTION_12 = $filter('i18n')('ehl_01_KYC310_011',[getLabel('EDUCATION', $scope.inputVO.EDUCATION)]);
-//					        	}
-					        	
-					        	if($scope.inputVO.CHILD_NO != '0'){
-					        		CHILD_NO_12 = $filter('i18n')('ehl_01_KYC310_012',[getLabel('CHILD_NO', $scope.inputVO.CHILD_NO)]);
-					        	}
-					        	
-					        	if($scope.inputVO.MARRAGE == '2'){
-					        		MARRIAGE_12 = $filter('i18n')('ehl_01_KYC310_013',[getLabel('MARRAGE', $scope.inputVO.MARRAGE)]);
-					        	}
-					        	
-					        	if($scope.inputVO.CAREER != '12' && $scope.inputVO.CAREER != '19' && $scope.inputVO.CAREER != '22'){
-					        		CAREER_12 = $filter('i18n')('ehl_01_KYC310_025',[getLabel('CAREER', $scope.inputVO.CAREER)]);
-					        	}
-					        	
-					        	if(Income != ''){
-					        		INCOME_12 = $filter('i18n')('ehl_01_KYC310_014',[Income.substr(0,Income.length-1)]);
-					        	}
 					        	debugger;
 					        	//將異動結果傳入提醒視窗
 	    	    				var parameter = {        	    						
-	    	    						text:EDUCTION_12,
+	    	    						text:CHILD_NO_12,
 	    								text1:CAREER_12,
-	    								text2:MARRIAGE_12,
-	    								text3:CHILD_NO_12,
-	    								text4:INCOME_12,
+	    								text2:INCOME_12,
+	    								text3:EDUCTION_12,
+	    								text4:MARRIAGE_12,
 	    								text5:EDUCTION,
 	                					text6:CAREER,
 	                					text7:MARRIAGE,
@@ -1103,6 +1133,7 @@ eSoafApp.controller('KYC310Controller', function(
 	                					text10:Q3ProdExpChg,
 	                					text11:Q3ProdDecrease,
 	                					text14:Q10Q11Check,
+	                					text15:Q2IncomeCheck,
 	                					INVESTOREXAM_M:tota[0].body.Comparison.INVESTOREXAM_M,
 	                					text16:EMAIL,
 	                					text17:EMAIL2
@@ -1126,7 +1157,7 @@ eSoafApp.controller('KYC310Controller', function(
 	    			        	}
 							} else if(EDUCTION != undefined || CAREER != undefined || MARRIAGE != undefined || 
 									 CHILDREN != undefined || HEALTH != undefined || Q3ProdExpChg != undefined || Q3ProdDecrease != undefined ||
-									 Q10Q11Check != undefined || EMAIL != undefined) {
+									 Q10Q11Check != undefined || EMAIL != undefined || Q2IncomeCheck != undefined) {
 								debugger;
 								//將異動結果傳入提醒視窗
 	    	    				var parameter = {    	    					
@@ -1138,12 +1169,12 @@ eSoafApp.controller('KYC310Controller', function(
 	                					text5:Q3ProdExpChg,
 	                					text6:Q3ProdDecrease,
 	                					text7:Q10Q11Check,
+	                					text11:Q2IncomeCheck,
 	                					INVESTOREXAM_M:tota[0].body.Comparison.INVESTOREXAM_M,
 	                					text16:EMAIL,
 	                					text17:EMAIL2
 	    	    				};
 								debugger;
-								
 								//18歲(含)以上客戶，學歷由國中以下異動為高中職以上，需留存學校名稱及原因
 								if(age >= 18) {
 									if(($scope.EDUCATIONforCheck == '' || $scope.EDUCATIONforCheck == '8' || $scope.EDUCATIONforCheck == '6' || $scope.EDUCATIONforCheck == '7') &&
@@ -1648,37 +1679,74 @@ eSoafApp.controller('KYC310Controller', function(
     		//add by Brian
     		$scope.basic_information = angular.copy($scope.inputVO)
     		$scope.inputVO.basic_information = $scope.basic_information;
-			$scope.sendRecv("KYC310" , "submit" , $scope.kyc310inputvo , $scope.inputVO , function(tota,isError){
-            	if (isError) {
-            		$scope.showErrorMsg(tota[0].body.msgData);
+    		//檢核是否需要填寫差異說明表
+    		$scope.sendRecv("KYC310" , "getLastKYCComparisonData" , $scope.kyc310inputvo , $scope.inputVO , function(tota,isError) {
+    			debugger
+    			if (!isError) {
+    				$scope.inputVO.NEED_COMPARISON_YN = "N";
+            		if(tota[0].body.lastKYCComparisonData && tota[0].body.lastKYCComparisonData.NEED_COMPARISON_YN == "Y") { //需填寫差異表
+    					$scope.inputVO.NEED_COMPARISON_YN = tota[0].body.lastKYCComparisonData.NEED_COMPARISON_YN; //是否需填寫差異表問卷
+    					$scope.inputVO.COMP_QUES = tota[0].body.lastKYCComparisonData.COMP_QUES; //差異表問卷內容
+    					$scope.inputVO.LAST_SEQ = tota[0].body.lastKYCComparisonData.LAST_SEQ; //比較差異的(前次)客戶風險評估問卷主鍵
+    					$scope.inputVO.LAST_ANSWER_2 = tota[0].body.lastKYCComparisonData.LAST_ANSWER_2; //比較差異的(前次)問卷答案選項
+    					
+            			var inputVO = $scope.inputVO;
+            			var dialog = ngDialog.open({
+            				template: 'assets/txn/KYC310/KYC310_COMPARISON.html',
+            				className: 'KYC310_COMPARISON',
+            				controller:['$scope',function($scope){
+            					$scope.inputVO = inputVO;
+            				}]
+            			});
+            			dialog.closePromise.then(function(data){
+            				debugger
+            				if(data.value != undefined && data.value != 'cancel') {
+            					//差異表填答答案內容
+            					$scope.inputVO.ANSWER_COMP = data.value;
+            					//存檔
+            					$scope.doSubmit(); 
+            				}
+            			});
+            		} else {
+            			//不需填寫差異表，直接存檔
+            			$scope.doSubmit(); 
+            		}
             	}
-            	
-            	if (tota.length > 0) {
-            		if($scope.inputVO.gender_M==true){
-            			$scope.inputVO.GENDER ='男';
-					}
-            		if($scope.inputVO.gender_W==true){
-						$scope.inputVO.GENDER ='女'
-					}
-            		$scope.inputVO.EXPIRY_DATE = tota[0].body.EXPIRY_DATE;
-            		$scope.inputVO.seq = tota[0].body.seq;
-            		$scope.showSuccessMsg('ehl_01_common_001');
-            		$scope.connector('set','KYC310Question',$scope.quest_list);
-            		$scope.connector('set','KYC310', $scope.inputVO);
-            		$rootScope.menuItemInfo.url = "assets/txn/KYC311/KYC311.html";
-            	};
-			});
-    	}
-    	else{
+    		});
+    	} else {
     		$scope.showErrorMsg('行動必須09開頭');
     	}
     }
    
+    $scope.doSubmit = function() {
+    	$scope.sendRecv("KYC310" , "submit" , $scope.kyc310inputvo , $scope.inputVO , function(tota,isError){
+        	if (isError) {
+        		$scope.showErrorMsg(tota[0].body.msgData);
+        	}
+        	
+        	if (tota.length > 0) {
+        		if($scope.inputVO.gender_M==true){
+        			$scope.inputVO.GENDER ='男';
+				}
+        		if($scope.inputVO.gender_W==true){
+					$scope.inputVO.GENDER ='女'
+				}
+        		$scope.inputVO.EXPIRY_DATE = tota[0].body.EXPIRY_DATE;
+        		$scope.inputVO.seq = tota[0].body.seq;
+        		$scope.showSuccessMsg('ehl_01_common_001');
+        		$scope.connector('set','KYC310Question',$scope.quest_list);
+        		$scope.connector('set','KYC310', $scope.inputVO);
+        		$rootScope.menuItemInfo.url = "assets/txn/KYC311/KYC311.html";
+        	};
+		});
+    }
+    
     $scope.dobouledo = function(){
     	$scope.inputVO.seq = $scope.persional[0].SEQ;
     	$scope.inputVO.CUST_RISK_AFR = $scope.persional[0].CUST_RISK_AFR;
     	$scope.inputVO.EXAM_VERSION = $scope.persional[0].EXAM_VERSION;
     	$scope.inputVO.EXPIRY_DATE = $scope.persional[0].EXPIRY_DATE;
+    	$scope.inputVO.NEED_COMPARISON_YN = $scope.persional[0].NEED_COMPARISON_YN;
 		$scope.connector('set','KYC310Question',$scope.quest_list);
 		$scope.connector('set','KYC310', $scope.inputVO);
 		$rootScope.menuItemInfo.url = "assets/txn/KYC311/KYC311.html";
@@ -1942,6 +2010,7 @@ eSoafApp.controller('KYC310Controller', function(
             text8:data.text8,
             text9:data.text16,
 			text10:data.text17,
+			text11:data.text11,
             ok: "確定送出",
             cancel: "修改資料"
 		})

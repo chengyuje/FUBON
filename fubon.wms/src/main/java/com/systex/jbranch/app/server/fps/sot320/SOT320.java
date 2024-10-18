@@ -365,19 +365,24 @@ public class SOT320 extends FubonWmsBizLogic {
 		//
 
 		// 確認電文
+		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707InputVO inputVO_707 = new SOT707InputVO();
 		SOT707OutputVO outputVO_707 = new SOT707OutputVO();
-
 		inputVO_707.setProdType("2");
 		inputVO_707.setCheckType("2");
 		inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
-
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-		
-		if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
-			outputVO_707 = sot707.verifyESBRedeemBN_GTC(inputVO_707); //長效單
-		else
-			outputVO_707 = sot707.verifyESBRedeemBN(inputVO_707); //當日單
+		if (isOBU.equals("Y")) {
+			if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
+				outputVO_707 = sot707.verifyESBRedeemBN_GTC_OBU(inputVO_707);	// 長效單
+			else
+				outputVO_707 = sot707.verifyESBRedeemBN_OBU(inputVO_707); 		// 當日單
+		} else {
+			if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
+				outputVO_707 = sot707.verifyESBRedeemBN_GTC(inputVO_707);		// 長效單
+			else
+				outputVO_707 = sot707.verifyESBRedeemBN(inputVO_707);			// 當日單			
+		}
 
 		String errorMsg = outputVO_707.getErrorMsg();
 		outputVO.setWarningCode(outputVO_707.getWarningCode());

@@ -121,7 +121,9 @@ public class TBKYC_INVESTOREXAM_MVO extends VOBase {
     /** nullable persistent field */
     private BigDecimal SCORE_ORI_TOT;
 
-
+    /** nullable persistent field */
+    private String NEED_COMPARISON_YN;
+    
 	public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBKYC_INVESTOREXAM_M";
 	
 	
@@ -478,6 +480,14 @@ public class TBKYC_INVESTOREXAM_MVO extends VOBase {
 
 	public void setSCORE_ORI_TOT(BigDecimal sCORE_ORI_TOT) {
 		SCORE_ORI_TOT = sCORE_ORI_TOT;
+	}
+
+	public String getNEED_COMPARISON_YN() {
+		return NEED_COMPARISON_YN;
+	}
+
+	public void setNEED_COMPARISON_YN(String nEED_COMPARISON_YN) {
+		NEED_COMPARISON_YN = nEED_COMPARISON_YN;
 	}
 
 	public void checkDefaultValue() {

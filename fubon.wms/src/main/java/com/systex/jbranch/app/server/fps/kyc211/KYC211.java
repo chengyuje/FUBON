@@ -98,6 +98,16 @@ public class KYC211 extends FubonWmsBizLogic{
 				qc.setObject("exam_version", exam_version);
 				qc.setQueryString(sb.toString());
 				questionS.put("answer", getDataAccessManager().exeQuery(qc));
+				//取得差異表選項
+				qc = getDataAccessManager().getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+				sb = new StringBuilder();
+				sb.append(" select a.question_version,a.answer_seq,a.answer_desc,a.answer_desc_eng " );
+				sb.append(" from tbsys_qst_answer_comp a ");
+				sb.append(" where a.question_version = :question_version ");
+				sb.append(" order by a.answer_seq ");
+				qc.setObject("question_version", question_version);
+				qc.setQueryString(sb.toString());
+				questionS.put("answerComp", getDataAccessManager().exeQuery(qc));
 				//取得風險級距
 				String rl_version = (String) questionS.get("RL_VERSION");
 				if(rl_version!=null){

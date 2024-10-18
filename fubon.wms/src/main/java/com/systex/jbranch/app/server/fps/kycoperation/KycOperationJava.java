@@ -542,6 +542,20 @@ public class KycOperationJava extends FubonWmsBizLogic {
 
 		tbkycLog.setPopup(resultMap.get("CDATA_UP").toString());
 
+		//是否需填寫差異表 & 前一次KYC答案選項
+		KYC310InputVO inputVO310 = new KYC310InputVO();
+		inputVO310.setCUST_ID(inputVO.getCustID());
+		inputVO310.setCUST_RISK_AFR(riskAfr);
+		inputVO310.setFromWebYN("Y");
+		Map<String, Object> compData = kyc310.getLastKYCComparisonData(inputVO310);
+		//回傳差異表資料
+		resultMap.put("NEED_COMPARISON_YN", ObjectUtils.toString(compData.get("NEED_COMPARISON_YN"))); //是否需填寫差異表
+		resultMap.put("LAST_ANSWER_2", ObjectUtils.toString(compData.get("LAST_ANSWER_2"))); //放入前次KYC填答答案
+		//寫Log訊息
+		tbkycLog.setNEED_COMPARISON_YN(ObjectUtils.toString(compData.get("NEED_COMPARISON_YN")));
+		tbkycLog.setLAST_ANSWER_2(ObjectUtils.toString(compData.get("LAST_ANSWER_2")));
+		tbkycLog.setLAST_SEQ(ObjectUtils.toString(compData.get("LAST_SEQ"))); //比較差異的(上次)客戶風險評估問卷主鍵
+		
 		return resultMap;
 	}
 
@@ -1256,10 +1270,7 @@ public class KycOperationJava extends FubonWmsBizLogic {
 		
 		//非高資產客戶且為弱勢客戶且非65~70歲非弱勢專投
 		if(!StringUtils.equals("Y", hnwcYN) && //非高資產客戶
-				!(StringUtils.equals("Y", txFlag) 
-						&& age >= 65 && age < 70 
-						&& !chkNoSpecialSigningReduceLevel(40, sicktype, eduction)
-				 ) && //非65~70歲非弱勢專投
+				!(StringUtils.equals("Y", txFlag) && age >= 65 && age < 70 && !chkNoSpecialSigningReduceLevel(40, sicktype, eduction)) && //非65~70歲非弱勢專投
 				(chkNoSpecialSigningReduceLevel(age, sicktype, eduction) || StringUtils.equals("Y", vul_flag))) { //弱勢客戶
 			if (StringUtils.equals("Y", degrade) && !degrade_end) {
 				//有免降等註記且未到期 ==> 不降等

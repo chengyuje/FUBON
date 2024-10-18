@@ -40,12 +40,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.systex.jbranch.app.common.fps.table.TBCRM_CUST_MASTVO;
 import com.systex.jbranch.app.common.fps.table.TBCRM_CUST_NOTEVO;
+import com.systex.jbranch.app.common.fps.table.TBKYC_INVESTOREXAM_COMPVO;
 import com.systex.jbranch.app.common.fps.table.TBKYC_INVESTOREXAM_DVO;
 import com.systex.jbranch.app.common.fps.table.TBKYC_INVESTOREXAM_MVO;
 import com.systex.jbranch.app.common.fps.table.TBKYC_REPORTVO;
 import com.systex.jbranch.app.common.fps.table.TBORG_MEMBERVO;
 import com.systex.jbranch.app.server.fps.kyc.chk.KYCCheckIdentityWeights;
 import com.systex.jbranch.app.server.fps.kyc311.KYC311InputVO;
+import com.systex.jbranch.app.server.fps.kycoperation.KycOperationDao;
 import com.systex.jbranch.app.server.fps.sot701.CustHighNetWorthDataVO;
 import com.systex.jbranch.app.server.fps.sot701.CustKYCDataVO;
 import com.systex.jbranch.app.server.fps.sot701.FP032675DataVO;
@@ -65,7 +67,6 @@ import com.systex.jbranch.fubon.commons.cbs.dao._067050_067101DAO;
 import com.systex.jbranch.fubon.commons.cbs.vo._060503_060503.CBS060503OutputDetailsVO;
 import com.systex.jbranch.fubon.commons.cbs.vo._060503_060503.CBS060503OutputVO;
 import com.systex.jbranch.fubon.commons.cbs.vo._067050_067115.CBS067101OutputVO;
-import com.systex.jbranch.fubon.commons.cbs.vo._067157_067157.CBS067157OutputVO;
 import com.systex.jbranch.fubon.commons.cbs.vo.basic.CBSUtilOutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.fp032151.FP032151OutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.fp032675.FP032675OutputVO;
@@ -112,6 +113,10 @@ public class KYC310 extends FubonWmsBizLogic{
     private _060503_060503DAO _060503_060503dao;
 	@Autowired
 	private _067050_067101DAO _067050_067101dao;
+	
+	@Autowired
+	@Qualifier("KycOperationDao")
+	private KycOperationDao kycOperationDao;
 	
 	@SuppressWarnings("unchecked")
 	public void chkTimes(Object body, IPrimitiveMap<Object> header) throws Exception{
@@ -161,8 +166,8 @@ public class KYC310 extends FubonWmsBizLogic{
 			outputVO.setDoneKYC(outputVO_712.getKYCResult());
 			
 			//非網銀或承作分行為999但網銀有帶IP資訊
-//			if(checkDoubleDo_int >= 1)
-//				throw new APException(errorMsg = "ehl_01_KYC310_017");
+			if(checkDoubleDo_int >= 1)
+				throw new APException(errorMsg = "ehl_01_KYC310_017");
 		
 			qc = getDataAccessManager().getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			qc.setQueryString(" Select count(*) from TBKYC_INVESTOREXAM_M where CUST_ID = :cust_id and STATUS = '01' ");
@@ -203,7 +208,7 @@ public class KYC310 extends FubonWmsBizLogic{
 				sb.append(" 	b.CUST_HEALTH_AFTER as SICK_TYPE,b.ANSWER_2,a.CUST_RISK_AFR,c.BRA_NBR,c.RPRS_NAME,c.RPRS_ID, ");
 				sb.append(" 	b.CUST_TEL,b.CUST_EMAIL as EMAIL_ADDR, b.CUST_EMAIL_BEFORE as EMAIL_BEFORE, b.CUST_ADDRESS as CUST_ADDR_1,b.UPDATE_YN, a.REC_SEQ, ");//電話、EMAIL、地址、是否更新
 				sb.append("		TRIM(b.CUST_SCHOOL) AS CUST_SCHOOL, TRIM(b.CUST_EDU_CHANGE) AS CUST_EDU_CHANGE, ");
-				sb.append("		b.CUST_EMAIL_BEFORE, b.SAMEEMAIL_REASON, b.SAMEEMAIL_CHOOSE ");
+				sb.append("		b.CUST_EMAIL_BEFORE, b.SAMEEMAIL_REASON, b.SAMEEMAIL_CHOOSE, a.NEED_COMPARISON_YN ");
 				sb.append(" from TBKYC_INVESTOREXAM_M a,TBKYC_INVESTOREXAM_D b,TBCRM_CUST_MAST c ");
 				sb.append(" where a.SEQ=b.SEQ and a.CUST_ID = b.CUST_ID and a.CUST_ID = c.CUST_ID ");
 				sb.append(" and a.CUST_ID = :cust_id and a.STATUS = '01' ");
@@ -361,7 +366,7 @@ public class KYC310 extends FubonWmsBizLogic{
 				
 				//設定要輸出的待審核資料
 				outputVO.setPersonalIformationList(personalIformation);
-				
+				//
 				//分割答案(依照題目來分割)
 				String[] ansList = ObjectUtils.toString(outputVO.getPersonalIformationList().get(0).get("ANSWER_2")).split(";");
 				//依類型找題目
@@ -390,7 +395,11 @@ public class KYC310 extends FubonWmsBizLogic{
 						}
 						//設定該題的檔案
 						questList.get(questIdx).put("ANSWER_LIST", ansMapList);
-
+						//依照題目找出差異表答案
+						//第三題差異表答案，再開啟差異表頁面時再依商品取一次
+						List<Map<String, Object>> ansCompMapList = queryAnswerComp(question_version);
+						questList.get(questIdx).put("ANSWER_LIST_COMP", ansCompMapList);
+						
 						//依照風險級距版號取風險屬性設定
 						qc = getDataAccessManager().getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 						sb = new StringBuilder();
@@ -634,10 +643,21 @@ public class KYC310 extends FubonWmsBizLogic{
 					outputVO.setCustEduHighSchool(sot701.getCustEduHighSchool(sot701vo));
 				}
 				
+				//取得法代與年收入資料
+				Map<String, String> legalRegMap = getData067050ByType(inputVO.getCUST_ID()); 
+				//年收入
+				BigDecimal yearIncome = BigDecimal.ZERO;
+				if(StringUtils.isNotBlank(legalRegMap.get("INCOME_FROM_CBS"))) {
+					try {
+						yearIncome = new BigDecimal(legalRegMap.get("INCOME_FROM_CBS"));
+					} catch(Exception e) {
+						yearIncome = BigDecimal.ZERO;
+					}
+				}
+				outputVO.setIncomeFromCBS(yearIncome); //端末系統留存的年收入
 				//未滿18歲自然人，取得法定代理人KYC
 				if(inputVO.getCUST_ID().length() >= 10 && age < 18) {
 					//取得法代資料
-					Map<String, String> legalRegMap = getData067050ByType(inputVO.getCUST_ID()); 
 					if(StringUtils.isNotBlank(legalRegMap.get("REP_RISK_1")) && StringUtils.isBlank(legalRegMap.get("REP_RISK_2"))) {
 						//法代1有風險屬性，法代2沒有；取法代1風險屬性
 						outputVO.setLegalRegKycLevel(legalRegMap.get("REP_RISK_1"));
@@ -653,7 +673,6 @@ public class KYC310 extends FubonWmsBizLogic{
 						}
 					}
 				}
-				
 				
 				//依照類型取題目(法人、自然人)
 				List<Map<String, Object>> questList = queryQuestion(inputVO.getQUESTION_TYPE());//找題目
@@ -711,10 +730,13 @@ public class KYC310 extends FubonWmsBizLogic{
 								}
 							}
 						}
-						
 						//將選項埋回問題中
 						map.put("ANSWER_LIST", ansList);
-
+						//依照題目找出差異表答案
+						//第三題差異表答案，再開啟差異表頁面時再依商品取一次
+						List<Map<String, Object>> ansCompMapList = queryAnswerComp(question_version);
+						map.put("ANSWER_LIST_COMP", ansCompMapList);
+						
 						//risk
 						qc = getDataAccessManager().getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 						sb = new StringBuilder();
@@ -800,8 +822,7 @@ public class KYC310 extends FubonWmsBizLogic{
 				}
 			}//客戶基本資料end	
 			//已做KYC未覆核
-		}
-		catch(APException ape){
+		} catch(APException ape){
 			if(errorMsg.length() > 0){
 				throw new APException(errorMsg);
 			}else if(ape.getMessage().contains("共同行銷註記查無資料")){
@@ -811,8 +832,7 @@ public class KYC310 extends FubonWmsBizLogic{
 			}else{
 				throw new APException(errorMsg = "ehl_01_common_029");
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.error(String.format("發生錯誤:%s", StringUtil.getStackTraceAsString(e)));
 			throw new APException(e.getMessage());
 		}
@@ -896,6 +916,7 @@ public class KYC310 extends FubonWmsBizLogic{
 				sb.append(" FROM TBSYS_QST_ANSWER A,TBKYC_QUESTIONNAIRE_ANS_WEIGHT W ");//題目答案列表檔、答案權重檔
 				sb.append(" WHERE A.QUESTION_VERSION = W.QUESTION_VERSION and A.ANSWER_SEQ = W.ANSWER_SEQ ");
 				sb.append("  AND W.EXAM_VERSION = :exam_version AND A.QUESTION_VERSION = :question_version ");
+				sb.append(" ORDER BY A.ANSWER_SEQ ");
 				qc.setObject("exam_version", exam_version);
 				qc.setObject("question_version", question_version);
 				qc.setQueryString(sb.toString());
@@ -909,6 +930,26 @@ public class KYC310 extends FubonWmsBizLogic{
 		return ansList;
 	}
 	
+	//取得差異表答案選項
+	public List<Map<String, Object>> queryAnswerComp(String question_version) throws DAOException, JBranchException{
+		
+		List<Map<String, Object>> ansList = new ArrayList<Map<String,Object>>();
+		
+		if(StringUtils.isNotBlank(question_version)){
+			QueryConditionIF qc = getDataAccessManager().getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			StringBuilder sb = new StringBuilder();
+			//answer
+			sb.append(" SELECT A.QUESTION_VERSION,A.ANSWER_SEQ,A.ANSWER_DESC,A.ANSWER_DESC_ENG ");
+			sb.append(" FROM TBSYS_QST_ANSWER_COMP A ");//題目差異表答案列表檔
+			sb.append(" WHERE A.QUESTION_VERSION = :question_version ");
+			sb.append(" ORDER BY A.ANSWER_SEQ ");
+			qc.setObject("question_version", question_version);
+			qc.setQueryString(sb.toString());
+			ansList = getDataAccessManager().exeQueryWithoutSort(qc);
+		}
+		return ansList;
+	}
+
 	//只查問卷
 	public void NonCustID(Object body, IPrimitiveMap<Object> header) throws Exception{
 		
@@ -934,6 +975,10 @@ public class KYC310 extends FubonWmsBizLogic{
 				//答案
 				List<Map<String, Object>> ansList = queryAnswer(exam_version, question_version);				
 				map.put("ANSWER_LIST", ansList);
+				//依照題目找出差異表答案
+				//第三題差異表答案，再開啟差異表頁面時再依商品取一次
+				List<Map<String, Object>> ansCompMapList = queryAnswerComp(question_version);
+				map.put("ANSWER_LIST_COMP", ansCompMapList);
 			}
 		}
 		
@@ -1368,37 +1413,60 @@ public class KYC310 extends FubonWmsBizLogic{
 				.setObject("custid", inputVO.getCUST_ID().toUpperCase()));
 			
 			Map<String, Map<String, Object>> map2 = new HashMap<String, Map<String,Object>>();
-				if(!EDUCATION.equals(inputVO.getEDUCATION())){
-					Map<String, Object> check = new HashMap<String, Object>();
-					check.put("beforEDUCTION", EDUCATION);
-					check.put("afterEDUCTION", inputVO.getEDUCATION());
-					map2.put("EDUCTION", check);
+			if(!EDUCATION.equals(inputVO.getEDUCATION())){
+				Map<String, Object> check = new HashMap<String, Object>();
+				check.put("beforEDUCTION", EDUCATION);
+				check.put("afterEDUCTION", inputVO.getEDUCATION());
+				map2.put("EDUCTION", check);
+			}
+			if(!CAREER.equals(inputVO.getCAREER())){
+				Map<String, Object> check = new HashMap<String, Object>();
+				check.put("beforCAREER", CAREER);
+				check.put("afterCAREER", inputVO.getCAREER());
+				map2.put("CAREER", check);
+			}
+			if(!MARRAGE.equals(inputVO.getMARRAGE())){
+				Map<String, Object> check = new HashMap<String, Object>();
+				check.put("beforMARRIAGE", MARRAGE);
+				check.put("afterMARRIAGE", inputVO.getMARRAGE());
+				map2.put("MARRIAGE", check);
+			}
+			if(!CHILD_NO.equals(inputVO.getCHILD_NO())){
+				Map<String, Object> check = new HashMap<String, Object>();
+				check.put("beforCHILDREN", CHILD_NO);
+				check.put("afterCHILDREN", inputVO.getCHILD_NO());
+				map2.put("CHILDREN", check);
+			}
+			if(!SICK_TYPE.equals(inputVO.getSICK_TYPE())){
+				Map<String, Object> check = new HashMap<String, Object>();
+				check.put("beforHEALTH", SICK_TYPE);
+				check.put("afterHEALTH", inputVO.getSICK_TYPE());
+				map2.put("HEALTH", check);
+			}				
+			//年收入比較
+			//第2題年收入勾選與端末系統留存年收入比較
+			boolean incomeChk = false;
+			String Q2AnsDesc = "";
+			if(CollectionUtils.isNotEmpty(questList)) {
+				List<Map<String, Object>> quest2 = (List<Map<String, Object>>) questList.get(1).get("ANSWER_LIST");
+				for(Map<String, Object> ans : quest2) {	//第2題答案
+					if(ans.get("select") != null && (boolean) ans.get("select")) {
+						String q2Ans = ans.get("ANSWER_SEQ").toString().trim().substring(0, 1);
+						Q2AnsDesc = ans.get("ANSWER_DESC").toString().trim();
+						incomeChk = getIncomeCBSChk(q2Ans, inputVO.getIncomeFromCBS());
+					}
 				}
-				if(!CAREER.equals(inputVO.getCAREER())){
-					Map<String, Object> check = new HashMap<String, Object>();
-					check.put("beforCAREER", CAREER);
-					check.put("afterCAREER", inputVO.getCAREER());
-					map2.put("CAREER", check);
-				}
-				if(!MARRAGE.equals(inputVO.getMARRAGE())){
-					Map<String, Object> check = new HashMap<String, Object>();
-					check.put("beforMARRIAGE", MARRAGE);
-					check.put("afterMARRIAGE", inputVO.getMARRAGE());
-					map2.put("MARRIAGE", check);
-				}
-				if(!CHILD_NO.equals(inputVO.getCHILD_NO())){
-					Map<String, Object> check = new HashMap<String, Object>();
-					check.put("beforCHILDREN", CHILD_NO);
-					check.put("afterCHILDREN", inputVO.getCHILD_NO());
-					map2.put("CHILDREN", check);
-				}
-				if(!SICK_TYPE.equals(inputVO.getSICK_TYPE())){
-					Map<String, Object> check = new HashMap<String, Object>();
-					check.put("beforHEALTH", SICK_TYPE);
-					check.put("afterHEALTH", inputVO.getSICK_TYPE());
-					map2.put("HEALTH", check);
-				}
-								
+			}
+			Map<String, Object> incomeMap = new HashMap<String, Object>();
+			if(incomeChk) {
+				incomeMap.put("INCOMECBS_CHK", "Y");//檢核通過
+			} else {
+				incomeMap.put("INCOMECBS_CHK", "N");//KYC收入與端末收入不符
+				incomeMap.put("Q2ANS_DESC", Q2AnsDesc);
+				incomeMap.put("INCOME_CBS", ObjectUtils.toString((inputVO.getIncomeFromCBS().divide(new BigDecimal(10000))).intValue()));
+			}
+			map2.put("INCOME_CBS", incomeMap);
+			
 			for(Map<String, Object> map3:beforeData2){
 				Map<String, Object> check2 = new HashMap<String, Object>();
 				check2.put("TEST_BEF_DATE", map3.get("CREATE_DATE"));
@@ -1409,7 +1477,7 @@ public class KYC310 extends FubonWmsBizLogic{
 			sendRtnObject(outputVO);
 		} catch (Exception e) {
 			logger.error(String.format("發生錯誤:%s", StringUtil.getStackTraceAsString(e)));
-			throw new APException("系統發生錯誤請洽系統管理員");
+			throw new APException(e.getMessage());
 		}
 		
 	}
@@ -1420,7 +1488,7 @@ public class KYC310 extends FubonWmsBizLogic{
 	
 	
 	@Transactional(propagation = Propagation.REQUIRED , rollbackFor = {APException.class , JBranchException.class , Exception.class})
-	public void submit(Object body, IPrimitiveMap<Object> header) throws JBranchException{
+	public void submit(Object body, IPrimitiveMap<Object> header) throws Exception{
 		KYC310InputVO inputVO = (KYC310InputVO) body;	
 		KYC310OutputVO outputVO = new KYC310OutputVO();
 		
@@ -1431,8 +1499,14 @@ public class KYC310 extends FubonWmsBizLogic{
 			dam.create(mvo);//新增客戶於投資人KYC測驗記錄主檔
 			dam.create(inputVoToKycDetailVo(inputVO , seq));//新增客戶於投資人KYC測驗記錄明細
 			createTbkycDetailExp(inputVO);//將kyc相關資料搬到TBKYC_INVESTOREXAM_D_EXP
-			dam.create(inputVoToKycReportvo(inputVO , seq));//產生表單並存於blob
+			dam.create(inputVoToKycReportvo(inputVO , seq));//產生KYC表單並存於blob
 			
+			//若需填寫差異表，寫入差異表資料
+			if(StringUtils.equals("Y", inputVO.getNEED_COMPARISON_YN())) {
+				dam.create(inputVoToKycCompVo(inputVO , seq));//新增差異表資料
+				dam.update(genCompRpt(inputVO, seq));//產生差異表表單並存於blob
+//				printCompRpt(inputVO, seq); //測試時印出
+			}
 			//設定查詢參數
 			String loginID = (String) getCommonVariable(SystemVariableConsts.LOGINID);
 			Map<String , Object> param = new Hashtable<String , Object>();
@@ -1450,10 +1524,9 @@ public class KYC310 extends FubonWmsBizLogic{
 			outputVO.setEXPIRY_DATE(mvo.getEXPIRY_DATE());
 			
 			sendRtnObject(outputVO);
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.error(String.format("發生錯誤:%s", StringUtil.getStackTraceAsString(e)));
-			throw new APException("系統發生錯誤請洽系統管理員");
+			throw new APException(e.getMessage());
 		}
 	}
 	
@@ -1600,7 +1673,9 @@ public class KYC310 extends FubonWmsBizLogic{
 			cal.add(cal.YEAR, 1);
 			cal.add(cal.DATE, -1);
 			Date storeDate = cal.getTime();
-			tim.setEXPIRY_DATE(new Timestamp(storeDate.getTime()));//KYC截止日(加十二個月減一天)			
+			Timestamp expiryDate = new Timestamp(storeDate.getTime());
+			tim.setEXPIRY_DATE(expiryDate);//KYC截止日(加十二個月減一天)		
+			inputVO.setEXPIRY_DATE(expiryDate);
 		}
 		
 		tim.setCRR_ORI(inputVO.getCRR_ORI());//原始總分取得的風險屬性
@@ -1611,6 +1686,7 @@ public class KYC310 extends FubonWmsBizLogic{
 		tim.setSCORE_CW_TOT(inputVO.getSCORE_CW_TOT());//降等機制矩陣總分
 		tim.setRISK_LOSS_RATE(inputVO.getRISK_LOSS_RATE());//可承受風險損失率(%)
 		tim.setRISK_LOSS_LEVEL(inputVO.getRISK_LOSS_LEVEL());//可承受風險損失率C值
+		tim.setNEED_COMPARISON_YN(inputVO.getNEED_COMPARISON_YN()); //是否需填寫差異表
 		
 		return tim;
 	}
@@ -1907,7 +1983,7 @@ public class KYC310 extends FubonWmsBizLogic{
 		} 
 		catch (Exception e) {
 			logger.error(String.format("發生錯誤:%s", StringUtil.getStackTraceAsString(e)));
-			throw new APException("系統發生錯誤請洽系統管理員");
+			throw new APException(e.getMessage());
 		}
 		
 		KYC311InputVO kyc311InputVO = new KYC311InputVO();
@@ -2398,7 +2474,383 @@ public class KYC310 extends FubonWmsBizLogic{
 			}
 		}
 		
+		//年收入
+		rtnMap.put("INCOME_FROM_CBS", outputVO67101.getSigned01());
+		
 		return rtnMap;
 	}
 	
+	/***
+	 * 是否需填寫差異說明表：客戶是否於6個月內提高KYC邏輯檢核
+	 * 如果KYC的C值做起來會進入冷靜期，是以還未進入冷靜期的C值與前一次C值做比較
+	 * KYC鍵機：自然人 & 法人
+	 * 若需填寫差異說明表，回傳上次KYC填答內容
+	 */
+	public void getLastKYCComparisonData(Object body, IPrimitiveMap<Object> header) throws JBranchException {
+		KYC310InputVO inputVO = (KYC310InputVO) body;
+		KYC310OutputVO outputVO = new KYC310OutputVO();	
+		
+		outputVO.setLastKYCComparisonData(getLastKYCComparisonData(inputVO));
+		sendRtnObject(outputVO);
+	}
+	
+	/***
+	 * 是否需填寫差異說明表：客戶是否於6個月內提高KYC邏輯檢核
+	 * 如果KYC的C值做起來會進入冷靜期，是以還未進入冷靜期的C值與前一次C值做比較
+	 * KYC鍵機：自然人 & 法人
+	 * 若需填寫差異說明表，回傳上次KYC填答內容
+	 * 
+	 * 情境說明
+	 * 1. 首次做KYC ==> 不須產出表單
+	 * 2. C值結果跟前一次「相同」 ==> 不須產出表單
+	 * 3. C值結果比前一次「低」 ==> 不須產出表單
+	 * 4. 前次已超過6個月(不含)，C值結果比前一次「高」一個等級(含)以上 ==> 進入冷靜期，不須產出表單
+	 * 5. 距前次未超過6個月(不含)，C值結果比前一次「高」一個等級(含)以上 ==> 進入冷靜期，須產出表單
+	 * 6. 距前次未超過6個月(不含)，C值結果比前一次「高」一個等級(含)以上，隔天又重做KYC，C值結果跟前一日「相同」 ==> 進入冷靜期，須產出表單
+	 *		[舉例]
+	 *		前一次KYC：2024/02/28 C2
+	 *		重新做KYC：2024/03/17 C3 ->進入冷靜期、須產出表單
+	 *		重新做KYC：2024/03/18 C3 -> 03/17 C3進入冷靜期，C3尚未生效，C值與02/28 C2比較 ==> 須產出表單
+	 *		差異是與前一次KYC：2024/02/28 C2做比較
+	 * 7. 距前次未超過6個月(不含)，C值結果比前一次「高」一個等級(含)以上，隔天又重做KYC，C值結果跟前一日「高」一個等級(含)以上 ==> 進入冷靜期，須產出表單
+	 * 		[舉例]
+	 * 		前一次KYC：2024/02/28 C2
+	 * 		重新做KYC：2024/03/17 C3 ->進入冷靜期、須產出表單
+	 * 		重新做KYC：2024/03/18 C4 -> 03/17 C3尚未生效，C值與02/28 C2比較 ==> 須產出表單，冷靜期自03/18重新起算
+	 * 		差異是與前一次KYC：2024/02/28 C2做比較
+	 * 8. 距前次未超過6個月(不含)，C值結果比前一次「高」一個等級(含)以上，隔天又重做KYC，C值結果比前一日「低」 ==> 不須產出表單，無冷靜期
+	 * 		[舉例]
+	 * 		前一次KYC：2024/02/28 C2
+	 * 		重新做KYC：2024/03/17 C3 ->須產出表單
+	 * 		重新做KYC：2024/03/18 C2 -> 03/17 C3尚未生效，C值與02/28 C2比較 ==> 不須產出表單、C2立即生效，無冷靜期
+	 * 
+	 * @param inputVO
+	 * @return Map<String, String> 
+	 * 			NEED_COMPARISON_YN = "Y" => 須顯示差異表
+	 * 			LAST_ANSWER ==> 上次KYC填答內容
+	 * @throws DAOException
+	 * @throws JBranchException
+	 */
+	public Map<String, Object> getLastKYCComparisonData(KYC310InputVO inputVO) throws DAOException, JBranchException {
+		DataAccessManager dam = getDataAccessManager();
+		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		Map<String, Object> rtnMap = new HashMap<String, Object>();
+				
+		String lastCustRisk = "";
+		String lastSeq = "";
+		Date lastTestDateAdd6M = null;
+		Date today = new Date();
+		//取上一次的風險屬性
+		List<Map<String, Object>> lastMasHis03List = kycOperationDao.queryLastMastHisForStatus03(inputVO.getCUST_ID());
+		if (CollectionUtils.isNotEmpty(lastMasHis03List)) {
+			lastCustRisk = (String) lastMasHis03List.get(0).get("CUST_RISK_AFR"); //上次測驗的風險屬性
+			lastTestDateAdd6M = (Date) lastMasHis03List.get(0).get("TESTDATE_ADD6MON"); //上次測驗的日期+6個月
+			lastSeq = (String) lastMasHis03List.get(0).get("SEQ"); //上次測驗的客戶風險評估問卷主鍵
+		}		
+		//若前次C值為C5，則同現行最高C4
+		if(StringUtils.equals(lastCustRisk, "C5")) lastCustRisk = "C4";
+		
+		//1.若沒有之前KYC評估資料，為當天第一次做KYC，不須顯示差異表
+		//2.前一次承作KYC日期超過6個月，不須顯示差異表
+		//3.這次C值結果沒有比前一次「高」一個等級(含)以上，不須顯示差異表
+		//  若仍在冷靜期中，新C值尚未生效，HIS裡面的是進入冷靜期前的C值
+		if(StringUtils.isBlank(lastCustRisk) 
+				|| (lastTestDateAdd6M != null && today.after(lastTestDateAdd6M))
+				|| (Integer.parseInt(inputVO.getCUST_RISK_AFR().substring(1)) <= Integer.parseInt(lastCustRisk.substring(1)))) {
+			rtnMap.put("NEED_COMPARISON_YN", "N"); //不須顯示差異表
+			rtnMap.put("COMP_QUES", null); //差異表問卷內容
+			rtnMap.put("LAST_SEQ", "");//放入前次問卷序號
+			rtnMap.put("LAST_ANSWER_2", "");//放入前次填答答案
+		} else {
+			//需顯示差異表
+			rtnMap.put("NEED_COMPARISON_YN", "Y"); //顯示差異表
+			
+			//檢查現在是否仍在冷靜期中
+			qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			qc.setQueryString("SELECT SEQ, CUST_RISK_BEF, CUST_RISK_AFR FROM TBKYC_COOLING_PERIOD WHERE CUST_ID = :custId AND STATUS = 'C' ");
+			qc.setObject("custId", inputVO.getCUST_ID());
+			List<Map<String, Object>> mlist = dam.exeQuery(qc);
+
+			if (CollectionUtils.isNotEmpty(mlist)) { 
+				//現仍在冷靜期中，取進入冷靜期前的KYC填答內容
+				StringBuilder sb = new StringBuilder();
+				qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+				sb.append("SELECT A.SEQ, A.ANSWER_2 FROM TBKYC_INVESTOREXAM_D_HIS A ");
+				sb.append(" INNER JOIN (SELECT SEQ FROM TBKYC_INVESTOREXAM_M_HIS WHERE CUST_ID = :custId and STATUS = '03' AND SEQ <> :seq ");
+				sb.append(" 			 ORDER BY CREATE_DATE DESC FETCH FIRST 1 ROWS ONLY) B ON B.SEQ = A.SEQ ");
+				qc.setQueryString(sb.toString());
+				qc.setObject("custId", inputVO.getCUST_ID());
+				qc.setObject("seq", lastSeq);
+			} else { 
+				//目前不在冷靜期中，取得前一次KYC評估結果填答內容
+				qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+				qc.setQueryString("SELECT SEQ, ANSWER_2 FROM TBKYC_INVESTOREXAM_D_HIS WHERE SEQ = :seq ");
+//				lastSeq = "KYC2024081340821"; //測試自然人
+//				lastSeq = "KYC2024080840718"; //測試法人
+				qc.setObject("seq", lastSeq);
+			}
+			//上次KYC填答內容
+			List<Map<String, Object>> alist = dam.exeQuery(qc);
+			//冷靜期中，抓冷靜期前的問卷編號以及填答；不在冷靜期中，就是上一次的問卷
+			lastSeq = ObjectUtils.toString(alist.get(0).get("SEQ"));
+			//前次填答答案
+			String lastAnswer2 = ObjectUtils.toString(alist.get(0).get("ANSWER_2"));
+			
+			//放入差異表問卷內容
+			//網行銀不用放差異表內容
+			if(!StringUtils.equals("Y", inputVO.getFromWebYN())) { 
+				rtnMap.put("COMP_QUES", getComparisonQues(inputVO, lastAnswer2));
+			}
+			//放入前次問卷序號
+			rtnMap.put("LAST_SEQ", lastSeq);
+			//放入前次填答答案
+			rtnMap.put("LAST_ANSWER_2", lastAnswer2);
+		}
+
+		return rtnMap;
+	}
+	
+	/***
+	 * 取得差異表問卷內容
+	 * @param inputVO
+	 * @return
+	 */
+	private List<Map<String, Object>> getComparisonQues(KYC310InputVO inputVO, String lastAnswer2) {
+		List<Map<String, Object>> compList = new ArrayList<Map<String, Object>>();
+		//前次填答答案(依照題目來分割)
+		String[] lastAnsList = lastAnswer2.split(";");
+		
+		if(!inputVO.getQuest_list().isEmpty()){
+			for(Map<String,Object> questMap : inputVO.getQuest_list()){
+				//題號
+				Double questNo = Double.parseDouble(questMap.get("QST_NO").toString());
+				//差異表答案選項
+				List<Map<String, Object>> compAns = (List<Map<String, Object>>)questMap.get("ANSWER_LIST_COMP"); 
+				//有差異表答案選項
+				if(!compAns.isEmpty()) { 
+					Double thisAnsSeq = new Double(0); //本次填答題號先預設0
+					Double lastAnsSeq = new Double(0); //前次填答題號先預設0
+					List<Map<String, Object>> q3ProdTypeAns = new ArrayList<>(inputVO.getQ3_PROD_TYPEList()); //第三題答案依商品類別比較差異
+					
+					//答案選項
+					for (Map<String, Object> ansMap : (List<Map<String, Object>>)questMap.get("ANSWER_LIST")) { 
+						//本次填答題號
+						Double ansSeq = Double.parseDouble(ansMap.get("ANSWER_SEQ").toString());
+						if(ansMap.get("select") != null && (boolean)ansMap.get("select")) thisAnsSeq = ansSeq;
+						
+						for(int lastAnsIdx = 0; lastAnsIdx < lastAnsList.length; lastAnsIdx++) { //前次填答答案
+							if(questNo.equals(Double.parseDouble(ObjectUtils.toString(lastAnsIdx + 1)))) {
+								//取得該題目前次填答答案
+								String[] ansList = ObjectUtils.toString(lastAnsList[lastAnsIdx]).split(","); 
+								//前次填答答案
+								for(String ans : ansList) {
+									if (ansSeq.equals(Double.parseDouble(ans.trim()))) {
+										//前次填答答案有選的設定為true
+										ansMap.put("lastAnsSelect", true); 
+										lastAnsSeq = Double.parseDouble(ans.trim());
+										//本次填答
+										if(thisAnsSeq.equals(lastAnsSeq)) { 
+											//前次填答答案與本次填答填答答案相同
+											ansMap.put("sameAnsSelect", true); 
+										}
+									}
+								}
+							}
+						}
+						//將第三題本次與前次答案放入LIST中
+						if(questNo.equals(new Double(3))) {
+							for(Map<String, Object> q3Map : q3ProdTypeAns) {
+								if(StringUtils.equals((String)q3Map.get("DATA"), ansMap.get("ANSWER_SEQ").toString().substring(0, 1))) {
+									if(thisAnsSeq.compareTo(new Double(0)) > 0) q3Map.put("thisAnsSeq", thisAnsSeq);
+									if(lastAnsSeq.compareTo(new Double(0)) > 0) q3Map.put("lastAnsSeq", lastAnsSeq);
+								}
+							}
+						}
+					}
+					
+					if(questNo.equals(new Double(3))) {
+						//第三題
+						//檢核是否本次填答比上次上升兩級以上
+						for(Map<String, Object> q3Map : q3ProdTypeAns) {
+							if(((Double)q3Map.get("thisAnsSeq")).compareTo((Double)q3Map.get("lastAnsSeq") + 1) > 0) {
+								q3Map.put("Q3Over2Degree", true); //本次填答比上次上升兩級以上
+							}
+							//前次填答答案與本次填答填答是否相同
+							if(((Double)q3Map.get("thisAnsSeq")).compareTo((Double)q3Map.get("lastAnsSeq")) == 0) { 
+								q3Map.put("sameAnsSelect", true); //前次填答答案與本次填答填答答案相同
+							}
+							//將差異表答案選項依商品類別放入
+							q3Map.put("ANSWER_LIST_COMP", compAns);
+						}
+						//將第三題比較後資料放入差異表題目答案列表中
+						questMap.put("Q3_PROD_TYPEList_COMP", q3ProdTypeAns);
+					} else {
+						//非第三題
+						//前次填答答案與本次填答填答是否相同
+						if(thisAnsSeq.compareTo(lastAnsSeq) == 0) questMap.put("sameAnsSelect", true); //前次填答答案與本次填答填答答案相同
+					}
+					
+					//加入差異表題目答案列表
+					compList.add(questMap);
+				}
+			}
+		}
+		
+		return compList;
+	}
+	
+	/***
+	 * 寫入KYC差異表資料檔
+	 * @param inputVO
+	 * @param seq
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	private TBKYC_INVESTOREXAM_COMPVO inputVoToKycCompVo(KYC310InputVO inputVO , String seq) throws Exception {
+		//本次填答轉為字串
+		String ans2list = inputVO.getANSWER_2().toString();
+		String ans2 = ans2list.replace("[", "").replace(".0", "").replace("],", ";").replace("]", "").trim();
+		//差異表填答轉為字串
+		String ansComplist = inputVO.getANSWER_COMP().toString();
+		String ansComp = ansComplist.replace("[", "").replace(".0", "").replace("],", ";").replace("]", "").trim();
+		
+		TBKYC_INVESTOREXAM_COMPVO cvo = new TBKYC_INVESTOREXAM_COMPVO();
+		cvo.setSEQ(seq); //本次問卷主鍵
+		cvo.setEXAM_VERSION(inputVO.getEXAM_VERSION()); //問卷版本
+		cvo.setLAST_SEQ(inputVO.getLAST_SEQ()); //前次問卷主鍵
+		cvo.setANSWER_2(ans2); //本次KYC填答
+		cvo.setLAST_ANSWER_2(inputVO.getLAST_ANSWER_2()); //前次KYC填答
+		cvo.setANSWER_COMP(ansComp); //差異表填答
+		
+		return cvo;
+	}
+	
+	/***
+	 * 列印空白差異表單
+	 * @param body
+	 * @param header
+	 * @throws Exception 
+	 */
+	public void printBlankCompRpt(Object body, IPrimitiveMap<Object> header) throws Exception{
+		KYC310InputVO inputVO = (KYC310InputVO) body;
+		KYC310OutputVO outputVO = new KYC310OutputVO();
+		List<String> mergeUrl = new ArrayList();
+					
+		if ("03".equals(inputVO.getQUESTION_TYPE())){	//法人空白差異表單
+			KYC310_CorpRptEmptyComp report = PlatformContext.getBean("kyc310CorpRptEmptyComp", KYC310_CorpRptEmptyComp.class);
+			report.setInputVO(inputVO);
+			String filePath = report.genBlankPDF();
+			mergeUrl.add(filePath);
+		} else {	//自然人空白差異表單
+			KYC310_PersonRptEmptyComp report = PlatformContext.getBean("kyc310PersonRptEmptyComp", KYC310_PersonRptEmptyComp.class);
+			report.setInputVO(inputVO);
+			String filePath = report.genBlankPDF();
+			mergeUrl.add(filePath);
+		}
+			
+		String url = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), true, mergeUrl));
+		notifyClientViewDoc(url, "pdf"); 
+	}
+	
+	/***
+	 * 產生KYC差異表單，存入DB
+	 * @param body
+	 * @param header
+	 * @throws Exception 
+	 */
+	private TBKYC_REPORTVO genCompRpt(KYC310InputVO inputVO, String seq) throws Exception{
+		inputVO.setKYC_SEQ(seq); //本次KYC填答主鍵
+		List<String> mergeUrl = new ArrayList();
+		
+		if ("03".equals(inputVO.getQUESTION_TYPE())){	//法人差異表單
+			KYC310_CorpRptComp report = PlatformContext.getBean("kyc310CorpRptComp", KYC310_CorpRptComp.class);
+			report.setInputVO(inputVO);
+			String filePath = report.getPDFPath();
+			mergeUrl.add(filePath);
+		} else {	//自然人差異表單
+			KYC310_PersonRptComp report = PlatformContext.getBean("kyc310PersonRptComp", KYC310_PersonRptComp.class);
+			report.setInputVO(inputVO);
+			String filePath = report.getPDFPath();
+			mergeUrl.add(filePath);
+		}
+		String url = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), true, mergeUrl));
+		//root path
+		String serverPath = (String) SysInfo.getInfoValue(SystemVariableConsts.SERVER_PATH);
+				
+    	//用Blob寫入資料庫
+    	File fileEng = new File(serverPath, url);
+    	byte[] resultByte =  Files.readAllBytes(fileEng.toPath());
+    	System.out.println(fileEng.delete());
+    	
+    	TBKYC_REPORTVO repVO = (TBKYC_REPORTVO) getDataAccessManager().findByPKey(TBKYC_REPORTVO.TABLE_UID, seq);
+    	if(repVO != null) {
+    		repVO.setREPORT_FILE_COMP(ObjectUtil.byteArrToBlob(resultByte));
+    	}
+    	
+    	return repVO;
+		
+	}
+	
+	/***
+	 * KYC差異表問卷表單 (測試用)
+	 * @param inputVO
+	 * @param seq
+	 * @throws Exception
+	 */
+	private void printCompRpt(KYC310InputVO inputVO, String seq) throws Exception{
+		inputVO.setKYC_SEQ(seq); //本次KYC填答主鍵
+		List<String> mergeUrl = new ArrayList();
+		
+		if ("03".equals(inputVO.getQUESTION_TYPE())){	//法人差異表單
+			KYC310_CorpRptComp report = PlatformContext.getBean("kyc310CorpRptComp", KYC310_CorpRptComp.class);
+			report.setInputVO(inputVO);
+			String filePath = report.getPDFPath();
+			mergeUrl.add(filePath);
+		} else {	//自然人差異表單
+			KYC310_PersonRptComp report = PlatformContext.getBean("kyc310PersonRptComp", KYC310_PersonRptComp.class);
+			report.setInputVO(inputVO);
+			String filePath = report.getPDFPath();
+			mergeUrl.add(filePath);
+		}
+		String url = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), true, mergeUrl));
+		
+		notifyClientViewDoc(url, "pdf"); 	
+	}
+	
+	/***
+	 * 客戶勾選年收入區間與端末系統留存年收入比較
+	 * @param q2Ans：第二題年收入答案選項
+	 * @param incomeCBS：端末系統留存年收入
+	 * @return true: 客戶端末收入介於KYC收入區間 false:客戶端末收入"不"介於KYC收入區間
+	 * @throws JBranchException
+	 */
+	private boolean getIncomeCBSChk(String q2Ans, BigDecimal incomeCBS) throws JBranchException {
+		boolean rtnResult = false;
+		
+		//取得答案序號
+		int ansSeq = Integer.parseInt(q2Ans);
+		//KYC收入下限
+		BigDecimal lowerLimit = new BigDecimal(getParamName("IOT.API_KYC_Q2_ANS", String.valueOf(ansSeq-1)));
+		//KYC收入上限
+		BigDecimal upperLimit = new BigDecimal(getParamName("IOT.API_KYC_Q2_ANS", String.valueOf(ansSeq)));
+		//客戶端末收入介於KYC收入區間
+		if(incomeCBS.compareTo(lowerLimit) >= 0 && incomeCBS.compareTo(upperLimit) <= 0) {
+			rtnResult = true;
+		}
+		
+		return rtnResult;
+	}
+	
+	private String getParamName(String paramType, String paramCode) throws DAOException, JBranchException {
+		String paramName = "0";		
+		String queryStr = "SELECT PARAM_NAME FROM TBSYSPARAMETER WHERE PARAM_TYPE = :paramType AND PARAM_CODE = :paramCode ";		
+		List<Map<String, Object>> list = getDataAccessManager().exeQuery(genDefaultQueryConditionIF().setQueryString(queryStr)
+				.setObject("paramType" , paramType).setObject("paramCode" , paramCode));
+		if(CollectionUtils.isNotEmpty(list)) {
+			paramName = ObjectUtils.toString(list.get(0).get("PARAM_NAME"));
+		}
+
+		return paramName;
+	}
 }

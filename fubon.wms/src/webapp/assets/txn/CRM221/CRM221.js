@@ -82,6 +82,7 @@ eSoafApp.controller('CRM221Controller',
 		$scope.init();
 						
 		$scope.inquire = function() {
+			debugger
 			if($scope.inputVO.cust_id != undefined && $scope.inputVO.cust_id.trim() != ""){
 				$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase();				
 			}
@@ -97,7 +98,7 @@ eSoafApp.controller('CRM221Controller',
 				}
 			}
 			//分行為必輸欄位
-			if($scope.inputVO.ao_05 == undefined || $scope.inputVO.ao_05 == null || $scope.inputVO.ao_05 == "") {
+			if($scope.empListShowFlag != "UHRM" && ($scope.inputVO.ao_05 == undefined || $scope.inputVO.ao_05 == null || $scope.inputVO.ao_05 == "")) {
 				$scope.showErrorMsg("請輸入分行查詢");
 				return;
 			}

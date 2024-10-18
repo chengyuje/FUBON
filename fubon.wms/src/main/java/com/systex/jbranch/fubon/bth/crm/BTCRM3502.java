@@ -30,6 +30,17 @@ import com.systex.jbranch.platform.util.IPrimitiveMap;
 
 @Component("btcrm3502")
 @Scope("prototype")
+/*
+ * #2188_理專異動通知調整 2024.10.07 SamTu
+ * 新查詢邏輯
+ * 移除限制條件，使其能查出NEW_AOCODE為空的案例
+ * WHERE NEW_AO_CODE IS NOT NULL
+ * AND NEW_AO_NAME IS NOT NULL
+ * 新篩選邏輯注意事項
+ * 1. NEW_AOCODE為空的情況 不能寄出
+ * 2. 前舊理專姓名相同，但從維護CODE變成主、兼CODE要寄出
+ * 3. 多判斷NEW_AO_NAME要有值才寄出 (不然寄出去的信沒新理專名稱)
+ */
 public class BTCRM3502 extends BizLogic {
 	
 	private DataAccessManager dam = null;
@@ -240,6 +251,9 @@ public class BTCRM3502 extends BizLogic {
 	 * (2)  員工兼職理專 (TBORG_MEMBER_ROLE IN ('A145', 'A148', 'A221', 'A222', 'A223', 'A224', 'A237', 'A8A7', 'ABRE', 'ABRH'))
 	 * 20220104_#0829_理專異動函高端資訊修正
 	 * 不寫死NEW_AO_NAME
+	 * 
+	 * 2024.10.15 Sam Tu
+	 * 根據主管 修改分行名稱為私銀XX區
 	 */
 	private void transferUHRMData(List<Map<String, Object>> afterPrepareList) throws DAOException, JBranchException {
 		
@@ -472,14 +486,15 @@ public class BTCRM3502 extends BizLogic {
 		sql.append("          CT.COM_ZIP_CODE, ");
 		sql.append("          CT.COM_ADDRESS, ");
 		sql.append("          TD.DEPT_ID AS BRA_NBR, ");
-		sql.append("          REPLACE(TD.DEPT_NAME, '台北富邦') AS SIMP_NAME, ");
+		sql.append("          CASE WHEN UHRM_BOSS.BRANCH_AREA_NAME IS NOT NULL THEN REPLACE(UHRM_BOSS.BRANCH_AREA_NAME, '台北富邦') ELSE REPLACE(TD.DEPT_NAME, '台北富邦') END AS SIMP_NAME, ");
 		sql.append("          BR.ZIP_COD, ");
 		sql.append("          BR.CHIN_ADDR, ");
 		sql.append("          BR.TEL_NO_MAIN AS BRH_TEL, ");
 		sql.append("          CASE WHEN UHRM_BOSS.EMP_NAME IS NOT NULL THEN UHRM_BOSS.EMP_NAME ELSE BASE.EMP_NAME END AS EMP_NAME, ");
 		sql.append("          UHRM.AO_CODE AS UHRM_AO_CODE, ");
 		sql.append("          C.BRA_NBR AS CUST_BRA_NBR, ");
-		sql.append("          IVW.TYPE AS NEW_AO_TYPE ");
+		sql.append("          IVW.TYPE AS NEW_AO_TYPE, ");
+		sql.append("          OLDIVW.TYPE AS OLD_AO_TYPE ");
 		sql.append("  FROM TBCRM_CUST_AOCODE_CHGLOG L ");
 		sql.append("  LEFT JOIN TBCRM_CUST_CONTACT_FOR3502 CT ON L.CUST_ID = CT.CUST_ID ");
 		sql.append("  LEFT JOIN TBCRM_CUST_MAST C ON L.CUST_ID = C.CUST_ID ");
@@ -509,7 +524,7 @@ public class BTCRM3502 extends BizLogic {
 		sql.append("    WHERE 1 = 1 ");
 		sql.append("  ) UHRM ON UHRM.AO_CODE = L.NEW_AO_CODE "); // --判定高端
 		sql.append("  LEFT JOIN ( ");
-		sql.append("    SELECT DISTINCT EMP_ID, EMP_NAME, DEPT_ID ");
+		sql.append("    SELECT DISTINCT EMP_ID, EMP_NAME, DEPT_ID, BRANCH_AREA_NAME ");
 		sql.append("    FROM VWORG_EMP_UHRM_INFO ");
 		sql.append("    WHERE PRIVILEGEID = 'UHRM012' ");
 		sql.append("  ) UHRM_BOSS ON UHRM.DEPT_ID = UHRM_BOSS.DEPT_ID "); // --高端主管
@@ -519,8 +534,6 @@ public class BTCRM3502 extends BizLogic {
 		sql.append("  AND NOTE.DEATH_YN <> 'Y' "); // --排除死亡戶
 		sql.append("  ORDER BY L.LETGO_DATETIME ASC ");
 		sql.append(") ");
-		sql.append("WHERE NEW_AO_CODE IS NOT NULL ");
-		sql.append("AND NEW_AO_NAME IS NOT NULL ");
 		
 		return sql.toString();
 	}
@@ -600,8 +613,6 @@ public class BTCRM3502 extends BizLogic {
 		sql.append("  ) M ");
 		sql.append("  LEFT JOIN WMSUSER.VWORG_BRANCH_EMP_DETAIL_INFO VW ON M.PARENT_DEPT_ID = VW.BRANCH_AREA_ID AND VW.BRANCH_NBR IS NULL ");
 		sql.append(") ");
-		sql.append("WHERE NEW_AO_CODE IS NOT NULL ");
-		sql.append("AND NEW_AO_NAME IS NOT NULL ");
 				
 		return sql.toString();
 	}
@@ -673,12 +684,19 @@ public class BTCRM3502 extends BizLogic {
 	private boolean needPrintMap(Map<String, Object> compareMap) throws DAOException, JBranchException {
 		
 		String oldAoCode = ObjectUtils.toString(compareMap.get("ORG_AO_CODE"));
+		String newAoCode = ObjectUtils.toString(compareMap.get("NEW_AO_CODE"));
 		String oldAoCodeEmp = ObjectUtils.toString(compareMap.get("OLD_AO_EMP_ID"));
 		String newAoCodeEmp = ObjectUtils.toString(compareMap.get("NEW_AO_EMP_ID"));
+		String oldAoType = ObjectUtils.toString(compareMap.get("OLD_AO_TYPE"));
 		String newAoType = ObjectUtils.toString(compareMap.get("NEW_AO_TYPE"));
+		String newAoName = ObjectUtils.toString(compareMap.get("NEW_AO_NAME"));
+		
+		if(StringUtils.isBlank(newAoCode) || StringUtils.isBlank(newAoName) ) {
+			return false;
+		}
 
 		if (StringUtils.isEmpty(oldAoCode)) {
-			if(checkAOType(newAoType)) {
+			if(checkAOType(oldAoType,newAoType,"notSameName")) {
 				return true;
 			} else {
 				return false;
@@ -686,9 +704,14 @@ public class BTCRM3502 extends BizLogic {
 		} else {
 			if (newAoCodeEmp.equals(oldAoCodeEmp)) {
 				// 同的理專(人) 只是主 code 兼 code 互換 不用寄
-				return false;
+				// 同理專但從維護code變主、兼code要寄
+				if(checkAOType(oldAoType,newAoType,"sameName")) {
+					return true;
+				} else {
+					return false;
+				}
 			} else {
-				if(checkAOType(newAoType)) {
+				if(checkAOType(oldAoType,newAoType,"notSameName")) {
 					return true;
 				} else {
 					return false;
@@ -709,10 +732,17 @@ public class BTCRM3502 extends BizLogic {
 		String newAoCode = ObjectUtils.toString(newMap.get("NEW_AO_CODE"));
 		String oldAoCodeEmp = ObjectUtils.toString(oldMap.get("OLD_AO_EMP_ID"));
 		String newAoCodeEmp = ObjectUtils.toString(newMap.get("NEW_AO_EMP_ID"));
+		String oldAoType = ObjectUtils.toString(oldMap.get("OLD_AO_TYPE"));
 		String newAoType = ObjectUtils.toString(newMap.get("NEW_AO_TYPE"));
+		String newAoName = ObjectUtils.toString(newMap.get("NEW_AO_NAME"));
+		
+		if(StringUtils.isBlank(newAoCode) || StringUtils.isBlank(newAoName) ) {
+			return null;
+		}
+		
 
 		if (StringUtils.isEmpty(oldAoCode)) {
-			if(checkAOType(newAoType)) {
+			if(checkAOType(oldAoType,newAoType,"notSameName")) {
 				return newMap;
 			} else {
 				return null;
@@ -724,9 +754,14 @@ public class BTCRM3502 extends BizLogic {
 			} else {
 				if (newAoCodeEmp.equals(oldAoCodeEmp)) {
 					// 同的理專(人) 只是主 code 兼 code 互換 不用寄
-					return null;
+					// 同理專但從維護code變主、兼code要寄
+					if(checkAOType(oldAoType,newAoType,"sameName")) {
+						return newMap;
+					} else {
+						return null;
+					}				
 				} else {
-					if(checkAOType(newAoType)) {
+					if(checkAOType(oldAoType,newAoType,"notSameName")) {
 						return newMap;
 					} else {
 						return null;
@@ -790,11 +825,26 @@ public class BTCRM3502 extends BizLogic {
 		return returnString.substring(0, StrLen);
 	}
 	
-	private boolean checkAOType(String newAoType) {
-		if(StringUtils.equals("3", newAoType)) {
-			return false;
-		} else {
-			return true;
-		}	
+	
+	
+	private boolean checkAOType(String oldAoType, String newAoType, String method) {
+		
+		switch(method) {
+		  case "sameName" :
+			  if(StringUtils.equals("3", oldAoType) && !StringUtils.equals("3", newAoType)) {
+					return true;
+				} else {
+					return false;
+				}	
+		  case "notSameName" :
+			  if(StringUtils.equals("3", newAoType)) {
+					return false;
+				} else {
+					return true;
+				}	
+		  default:
+				return false;		
+		}
+		
 	}
 }

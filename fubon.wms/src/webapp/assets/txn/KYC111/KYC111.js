@@ -9,6 +9,7 @@ eSoafApp.controller('KYC111Controller',
 		$scope.controllerName = "KYC111Controller";
 		
 		$scope.init = function(){
+			debugger
 			if($scope.row){
 				var answer = $scope.row
 				$scope.isUpdate = true;
@@ -21,7 +22,9 @@ eSoafApp.controller('KYC111Controller',
 						ANS_MEMO_FLAG : $scope.row.ANS_MEMO_FLAG,
 						QUESTION_TYPE : $scope.row.QUESTION_TYPE,
 						DEL_ANSWER_DESC : [],
-						DOC_ID : $scope.row.DOC_ID
+						DOC_ID : $scope.row.DOC_ID,
+						ANSWER_DESC_COMP : answer.AnsComp,
+						DEL_ANSWER_DESC_COMP : []
 				};
 			}else{
 				$scope.isAdd = true;
@@ -32,7 +35,8 @@ eSoafApp.controller('KYC111Controller',
 						ANSWER_DESC : [],
 						ANS_OTHER_FLAG : 'N',
 						ANS_MEMO_FLAG : 'N',
-						QUESTION_TYPE : ''
+						QUESTION_TYPE : '',
+						ANSWER_DESC_COMP : []
 						
 				}
 			}
@@ -53,7 +57,7 @@ eSoafApp.controller('KYC111Controller',
 			$scope.inputVO.ANSWER_DESC.splice(index,1);
 			angular.forEach($scope.inputVO.ANSWER_DESC,function(row,index){
 				row.Display_order = index +1;
-			})
+			});
 		}
 		
 		$scope.saveData = function(){
@@ -102,7 +106,22 @@ eSoafApp.controller('KYC111Controller',
         	}
         };
 		
-		
+        $scope.addRowComp = function(){
+			$scope.inputVO.ANSWER_DESC_COMP.push({});
+			angular.forEach($scope.inputVO.ANSWER_DESC_COMP,function(row,index){
+				row.Display_order = index + 1;
+			});
+		}
+        
+		$scope.deleteRowComp = function(index,row){
+			if(row.ANSWER_SEQ_COMP){
+				$scope.inputVO.DEL_ANSWER_DESC_COMP.push(row.ANSWER_SEQ_COMP);
+			}
+			$scope.inputVO.ANSWER_DESC_COMP.splice(index,1);
+			angular.forEach($scope.inputVO.ANSWER_DESC_COMP,function(row,index){
+				row.Display_order = index +1;
+			});
+		}
 		
 		
 	}

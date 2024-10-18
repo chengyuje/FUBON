@@ -7,8 +7,9 @@ import java.util.Map;
 
 import com.systex.jbranch.platform.common.dataaccess.vo.PagingInputVO;
 
-public class KYC310InputVO extends PagingInputVO{
+public class KYC310InputVO extends PagingInputVO {
 	
+	private String KYC_SEQ;
 	private String CUST_ID;
 	private String cust_name;
 	private String COMMENTARY_STAFF;//解說人員
@@ -91,6 +92,16 @@ public class KYC310InputVO extends PagingInputVO{
 	private List<Map<String, Object>> EMAIL_CHANGEList; //全行重覆信箱原因
 	private Date HNWC_DUE_DATE;	//客戶高資產註記到期日(High Net Worth Client Data)
 	private Date HNWC_INVALID_DATE;	//客戶高資產註記註銷日(High Net Worth Client Data)
+	
+	private List<Map<String, Object>> Q3_PROD_TYPEList;
+	private List<Map<String, Object>> Q3_PROD_EXPList;
+	private String NEED_COMPARISON_YN;
+	private String LAST_SEQ;
+	private String LAST_ANSWER_2;
+	private List<Map<String, Object>> COMP_QUES; //差異表問卷內容
+	private List ANSWER_COMP;
+	private BigDecimal incomeFromCBS;
+	private String fromWebYN; //從網行銀來
 	
 	public List<Map<String, Object>> getMARRAGEList() {
 		return MARRAGEList;
@@ -561,6 +572,66 @@ public class KYC310InputVO extends PagingInputVO{
 	}
 	public void setHNWC_INVALID_DATE(Date hNWC_INVALID_DATE) {
 		HNWC_INVALID_DATE = hNWC_INVALID_DATE;
+	}
+	public List<Map<String, Object>> getCOMP_QUES() {
+		return COMP_QUES;
+	}
+	public void setCOMP_QUES(List<Map<String, Object>> cOMP_QUES) {
+		COMP_QUES = cOMP_QUES;
+	}
+	public String getKYC_SEQ() {
+		return KYC_SEQ;
+	}
+	public void setKYC_SEQ(String kYC_SEQ) {
+		KYC_SEQ = kYC_SEQ;
+	}
+	public List<Map<String, Object>> getQ3_PROD_TYPEList() {
+		return Q3_PROD_TYPEList;
+	}
+	public void setQ3_PROD_TYPEList(List<Map<String, Object>> q3_PROD_TYPEList) {
+		Q3_PROD_TYPEList = q3_PROD_TYPEList;
+	}
+	public List<Map<String, Object>> getQ3_PROD_EXPList() {
+		return Q3_PROD_EXPList;
+	}
+	public void setQ3_PROD_EXPList(List<Map<String, Object>> q3_PROD_EXPList) {
+		Q3_PROD_EXPList = q3_PROD_EXPList;
+	}
+	public String getNEED_COMPARISON_YN() {
+		return NEED_COMPARISON_YN;
+	}
+	public void setNEED_COMPARISON_YN(String nEED_COMPARISON_YN) {
+		NEED_COMPARISON_YN = nEED_COMPARISON_YN;
+	}
+	public String getLAST_SEQ() {
+		return LAST_SEQ;
+	}
+	public void setLAST_SEQ(String lAST_SEQ) {
+		LAST_SEQ = lAST_SEQ;
+	}
+	public String getLAST_ANSWER_2() {
+		return LAST_ANSWER_2;
+	}
+	public void setLAST_ANSWER_2(String lAST_ANSWER_2) {
+		LAST_ANSWER_2 = lAST_ANSWER_2;
+	}
+	public List getANSWER_COMP() {
+		return ANSWER_COMP;
+	}
+	public void setANSWER_COMP(List aNSWER_COMP) {
+		ANSWER_COMP = aNSWER_COMP;
+	}
+	public BigDecimal getIncomeFromCBS() {
+		return incomeFromCBS;
+	}
+	public void setIncomeFromCBS(BigDecimal incomeFromCBS) {
+		this.incomeFromCBS = incomeFromCBS;
+	}
+	public String getFromWebYN() {
+		return fromWebYN;
+	}
+	public void setFromWebYN(String fromWebYN) {
+		this.fromWebYN = fromWebYN;
 	}
 	
 }

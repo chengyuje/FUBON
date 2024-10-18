@@ -179,6 +179,7 @@ public class KYC320 extends FubonWmsBizLogic {
 			sb.append("       (SELECT DEPT_NAME FROM TBORG_DEFN WHERE DEPT_ID=T.INVEST_BRANCH_NBR) AS INVEST_BRANCH_NAME, ");
 			sb.append("       CASE WHEN R.REPORT_FILE IS NULL THEN 'N' ELSE 'Y' END AS KYC, ");
 			sb.append("       CASE WHEN R.REPORT_FILE_ENG IS NULL THEN 'N' ELSE 'Y' END AS KYC_ENG, ");
+			sb.append("       CASE WHEN R.REPORT_FILE_COMP IS NULL THEN 'N' ELSE 'Y' END AS KYC_COMP, ");
 			sb.append("       R.CREATOR AS RPT_CREATOR_EMPID, ");
 			sb.append("       CASE S.TYPE WHEN '1' THEN '1' ELSE '0' END AS TYPE, ");
 			sb.append("       (SELECT COUNT(1) ");
@@ -588,13 +589,15 @@ public class KYC320 extends FubonWmsBizLogic {
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
-		sb.append(" SELECT SEQ, REPORT_FILE, REPORT_FILE_ENG FROM TBKYC_REPORT WHERE SEQ = :seq ");
+		sb.append(" SELECT SEQ, REPORT_FILE, REPORT_FILE_ENG, REPORT_FILE_COMP FROM TBKYC_REPORT WHERE SEQ = :seq ");
 		queryCondition.setObject("seq", inputVO.getSEQ());
 		queryCondition.setQueryString(sb.toString());
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		
 		Object reportFile = null;
-		if(StringUtils.equals("Y", inputVO.getIsPrintKYCEng())) {
+		if(StringUtils.equals("C", inputVO.getIsPrintKYCEng())) {
+			reportFile = list.get(0).get("REPORT_FILE_COMP");	//問卷差異說明表單
+		} else if(StringUtils.equals("Y", inputVO.getIsPrintKYCEng())) {
 			reportFile = list.get(0).get("REPORT_FILE_ENG");	//英文版KYC
 		} else {
 			reportFile = list.get(0).get("REPORT_FILE");		//中文版KYC

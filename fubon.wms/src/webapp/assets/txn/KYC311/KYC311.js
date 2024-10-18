@@ -90,7 +90,8 @@ eSoafApp.controller('KYC311Controller', function(
 			//add by SamTu
 			CUST_EMAIL_BEFORE : $scope.basic_information.CUST_EMAIL_BEFORE,
 		    SAMEEMAIL_REASON : $scope.basic_information.SAMEEMAIL_REASON,
-		    SAMEEMAIL_CHOOSE : $scope.basic_information.SAMEEMAIL_CHOOSE
+		    SAMEEMAIL_CHOOSE : $scope.basic_information.SAMEEMAIL_CHOOSE,
+		    NEED_COMPARISON_YN : $scope.basic_information.NEED_COMPARISON_YN
 		}
 		
 		if($scope.inputVO.GENDER == '1'){
@@ -190,6 +191,15 @@ eSoafApp.controller('KYC311Controller', function(
 	//列印英文版
 	$scope.saveandPrintData_ENG = function(){
 		$scope.sendRecv("KYC311" , "print_ENG" , $scope.kyc311inputvo , $scope.inputVO , function(tota,isError){
+    		if (isError) {
+    			$scope.showErrorMsg(tota[0].body.msgData);
+    		}
+		});
+	}
+	
+	//列印客戶風險屬性評估問卷差異說明
+	$scope.saveandPrintData_COMP = function(){
+		$scope.sendRecv("KYC311" , "print_COMP" , $scope.kyc311inputvo , $scope.inputVO , function(tota,isError){
     		if (isError) {
     			$scope.showErrorMsg(tota[0].body.msgData);
     		}

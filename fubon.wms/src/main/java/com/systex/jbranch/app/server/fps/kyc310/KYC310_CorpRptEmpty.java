@@ -483,7 +483,7 @@ public class KYC310_CorpRptEmpty extends FubonWmsBizLogic {
         table.addCell(buildCell("　　　　　　　　　　　　　　　　　　　", uFont10, Paragraph.ALIGN_LEFT, -1, 0));
 
         PdfPCell cell = buildCell("", bFont10, Paragraph.ALIGN_LEFT, -1, 2);
-        cell.setBorder(0);
+        cell.setBorder(1);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setRowspan(7);
         table.addCell(cell);

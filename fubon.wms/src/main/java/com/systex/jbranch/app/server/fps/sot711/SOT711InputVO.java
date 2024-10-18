@@ -14,6 +14,7 @@ public class SOT711InputVO {
     private String      txFeeType;      //手續費議價 1：不議價 2：議價
     private String      trustAcct;      //信託帳號
     private String      debitAcct;      //扣款帳號
+    private String 		isOBU;
 
     public String getCustId() {
         return custId;
@@ -79,6 +80,14 @@ public class SOT711InputVO {
 		this.debitAcct = debitAcct;
 	}
 
+	public String getIsOBU() {
+		return isOBU;
+	}
+
+	public void setIsOBU(String isOBU) {
+		this.isOBU = isOBU;
+	}
+
 	@Override
     public String toString() {
         return "SOT711InputVO{" +
@@ -90,6 +99,7 @@ public class SOT711InputVO {
                 ", txFeeType='" + txFeeType + '\'' +
                 ", trustAcct='" + trustAcct + '\'' +
                 ", debitAcct='" + debitAcct + '\'' +
+                ", isOBU='" + isOBU + '\'' +
                 '}';
     }
 }

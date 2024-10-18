@@ -215,8 +215,7 @@ eSoafApp.controller('PMS429Controller',
 								//自取對帳單若AO為空，可由主管聯繫客戶(PROCESS_STATUS=null，尚未聯繫客戶)
 							} else {
 								if(!$scope.checkNull(row.CONTACT_STATUS)) {
-									if(!(row.CONTACT_STATUS === '1' || row.CONTACT_STATUS === '2' || row.CONTACT_STATUS === '3' || row.CONTACT_STATUS === '4' 
-										|| row.CONTACT_STATUS === '5' || row.CONTACT_STATUS === '6') 
+									if(!(row.CONTACT_STATUS === '5' || row.CONTACT_STATUS === '6') 
 											&& ($scope.checkNull(row.REC_SEQ) || $scope.checkNull(row.REC_DATE))) {
 										//錄音訪談紀錄若非選擇(無須電話錄音)之選項，錄音日期&錄音序號為必填
 										$scope.showErrorMsg("錄音訪談紀錄若非選擇(無須電話錄音)之選項，錄音日期&錄音序號為必填。");

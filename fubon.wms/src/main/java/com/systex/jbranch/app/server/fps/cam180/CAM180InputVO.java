@@ -21,6 +21,7 @@ public class CAM180InputVO extends PagingInputVO {
 	private Date eEDate;
 	private List<Map<String, Object>> query_list;
 	private String tabType;
+	private String bCodeType;
 
 	public String getTabType() {
 		return tabType;
@@ -124,5 +125,13 @@ public class CAM180InputVO extends PagingInputVO {
 
 	public void setQuery_list(List<Map<String, Object>> query_list) {
 		this.query_list = query_list;
+	}
+
+	public String getbCodeType() {
+		return bCodeType;
+	}
+
+	public void setbCodeType(String bCodeType) {
+		this.bCodeType = bCodeType;
 	}
 }

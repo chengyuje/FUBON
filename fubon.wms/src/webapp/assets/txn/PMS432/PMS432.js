@@ -32,6 +32,7 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 			custID: "",				//客戶ID
 			empCustID: "",          //理專ID
 			compareType: "",
+			checkedResult: "",
 			list: [],
 			uploadMark: false	    //上傳
 		};
@@ -69,21 +70,20 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 	function getNewList(resultList) {
 		var list = [];
 		angular.forEach(resultList, function(data, idx) {
+			debugger;
 			var disabled = false;
 			var chkResult = "";
 			var insurNo = "";
 			var othRel = "";
 			var rel = "";
 			var selected = false;
-			if (data.CHECKED_RESULT == "Y" || data.CHECKED_RESULT == "N") {
+			if (data.CHECKED_RESULT != null) {
 				//已維護過的資料(儲存後)，直接設值
 				chkResult = data.CHECKED_RESULT;
 				insurNo = data.INSURANCE_NO;
 				othRel = data.OTHER_REL;
 				rel = data.RELATION;
-				if (data.CHECKED_RESULT == "Y") {
-					disabled = true;
-				}
+				disabled = true;
 			} else if ($scope.tmpList.length > 0) {
 				//把在其他分頁需要維護的資料(儲存前)
 				//再把值重新塞回去
@@ -104,7 +104,7 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 				...data, CHECKED_RESULT: chkResult,
 				INSURANCE_NO: insurNo, OTHER_REL: othRel,
 				RELATION: rel, SELECTED: selected,
-				chkBoxDisbaled: disabled
+				chkBoxDisabled: disabled
 			}
 			list.push(data);
 		});
@@ -135,10 +135,7 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 	};
 	
 	//查詢
-	$scope.query = function(str) {
-		if (str == "save") {
-			$scope.inputVO.list = [];
-		}
+	$scope.query = function() {
 		if ($scope.inputVO.checkInterval == "") {
 			$scope.showMsg("請選擇查核區間!");
 			return;
@@ -194,6 +191,7 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 			  || $scope.inputVO.compareResult == "") {
 			$scope.inputVO.custID = "";
 			$scope.inputVO.empCustID = "";
+			$scope.inputVO.checkedResult = "";
 		}
 	};
 
@@ -228,7 +226,7 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 		for (var i = 0; i < $scope.tmpList.length; i++) {
 			var data = $scope.tmpList[i];
 			if (data.SELECTED) {
-				if (data.CHECKED_RESULT == "Y") {
+				if (data.CHECKED_RESULT == "Y" || data.CHECKED_RESULT == "N") {
 					if (data.RELATION == "" || data.INSURANCE_NO == "") {
 						$scope.showMsg("請選擇關係說明以及填寫保險文件編號");
 						return;
@@ -238,16 +236,15 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 							return;
 						}
 					}
-					data.MATCH_YN = "Y";
-					updateList.push(data);
-				} else {
-					if (data.CHECKED_RESULT == "N") {
+					if (data.CHECKED_RESULT == "Y") {
+						data.MATCH_YN = "Y";
+					} else {
 						data.MATCH_YN = "N";
-						updateList.push(data);
-					} else if (data.SELECTED) {
-						$scope.showMsg("勾選的資料列，請選擇查核結果、關係說明以及填寫保險文件編號!");
-						return;
 					}
+					updateList.push(data);
+				} else if (data.SELECTED) {
+					$scope.showMsg("勾選的資料列，請選擇查核結果、關係說明以及填寫保險文件編號!");
+					return;
 				}
 			}
 		}
@@ -257,7 +254,8 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 				function(tota, isError) {
 					if (!isError) {
 						$scope.showSuccessMsg('ehl_01_common_025');
-						$scope.query("save");
+						$scope.inquireInit();
+						$scope.query();
 					}
 				});
 		} else {
@@ -265,7 +263,6 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 		}
 
 	};
-
 
 	//匯出
 	$scope.export = function() {
@@ -308,7 +305,6 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 							$scope.showSuccessMsg("資料上傳成功!");
 							$scope.inputVO.uploadMark = false;
 							$scope.inquireInit();
-//							$scope.query();
 						}
 					});
 			} else if (data.value == "cancel") {

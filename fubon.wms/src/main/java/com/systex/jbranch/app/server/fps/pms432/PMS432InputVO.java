@@ -14,7 +14,8 @@ public class PMS432InputVO extends PagingInputVO {
 	private String custID;		  // 客戶ID
 	private String empCustID;	  // 理專ID
 	private String compareType;	  // 維護註記 相符:1 集中度:2
-
+	private String checkedResult; // 查核結果
+	
 	private String fileName;
 	private String fileRealName;
 
@@ -75,6 +76,14 @@ public class PMS432InputVO extends PagingInputVO {
 
 	public void setCompareType(String compareType) {
 		this.compareType = compareType;
+	}
+
+	public String getCheckedResult() {
+		return checkedResult;
+	}
+
+	public void setCheckedResult(String checkedResult) {
+		this.checkedResult = checkedResult;
 	}
 
 	public List<Map<String, Object>> getList() {

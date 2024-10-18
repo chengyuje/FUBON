@@ -5,7 +5,6 @@ import com.systex.jbranch.app.common.fps.table.TBKYC_INVESTOREXAM_MVO;
 import com.systex.jbranch.app.common.fps.table.TBKYC_INVESTOREXAM_M_HISVO;
 import com.systex.jbranch.app.server.fps.cmfpg000.CMFPG000;
 import com.systex.jbranch.app.server.fps.kyc.chk.KYCCheckIdentityWeights;
-import com.systex.jbranch.app.server.fps.kyc310.KYC310OutputVO;
 import com.systex.jbranch.app.server.fps.kycoperation.KycOperationDao;
 import com.systex.jbranch.app.server.fps.oth001.OTH001;
 import com.systex.jbranch.app.server.fps.sot701.FC032153DataVO;
@@ -26,7 +25,6 @@ import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.common.util.DateUtil;
 import com.systex.jbranch.platform.common.util.PlatformContext;
 import com.systex.jbranch.platform.common.util.StringUtil;
-import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
@@ -1924,7 +1922,7 @@ public class KYC311 extends FubonWmsBizLogic {
 //				}
 //			}
 //		} catch (Exception e) {
-//			// TODO Auto-generated catch block
+//			// Auto-generated catch block
 //			e.printStackTrace();
 //		}
 //		return COM_Experience;
@@ -1993,4 +1991,35 @@ public class KYC311 extends FubonWmsBizLogic {
 		sendRtnObject(null);
 	}
 
+	/***
+	 * 列印客戶風險屬性評估問卷差異說明表單
+	 * @param body
+	 * @param header
+	 * @throws JBranchException
+	 * @throws SQLException
+	 */
+	public void print_COMP(Object body, IPrimitiveMap<Object> header) throws JBranchException, SQLException {
+		KYC311InputVO inputVO = (KYC311InputVO) body;
+		QueryConditionIF qc = getDataAccessManager().getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("SELECT REPORT_FILE_COMP FROM TBKYC_REPORT where SEQ = :SEQ");
+		qc.setObject("SEQ", inputVO.getSEQ());
+		qc.setQueryString(sb.toString());
+		List dataList = getDataAccessManager().exeQueryWithoutSort(qc);
+
+		if (CollectionUtils.isNotEmpty(dataList)) {
+			Blob blob = (Blob) ((Map) dataList.get(0)).get("REPORT_FILE_COMP");
+			int blobLength = (int) blob.length();
+			byte[] reportData = blob.getBytes(1, blobLength);
+
+			String fileName = "reports/" + UUID.randomUUID().toString();
+			String url = new PdfInputOutputUtils().doWritePdfFile(reportData, fileName);
+
+			notifyClientViewDoc(url, "pdf");
+		}
+
+		sendRtnObject(null);
+	}
+	
 }

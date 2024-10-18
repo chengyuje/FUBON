@@ -89,7 +89,8 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
 	
 	$scope.inquireInit();
 	
-	$scope.inquire = function(tabType) {
+	$scope.inquire = function(tabType, isUHRM) {
+		debugger
 		if ($scope.date) {
 			$scope.showErrorMsg("ehl_01_common_022");
     		return;
@@ -102,6 +103,11 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
 		
 		if ($scope.inputVO.id) {
 			$scope.inputVO.id = $scope.inputVO.id.toUpperCase();
+		}
+		//非私銀非總行一定要選分行
+		if(!isUHRM && !$scope.IS_HEADMGR_ROLE && !$scope.inputVO.bCode) {
+			$scope.showErrorMsg("ehl_01_common_022");
+        	return;
 		}
 		
 		$scope.inputVO.tabType = tabType;

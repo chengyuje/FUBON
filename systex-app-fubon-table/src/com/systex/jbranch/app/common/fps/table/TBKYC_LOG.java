@@ -29,6 +29,9 @@ public class TBKYC_LOG extends VOBase {
 	private Clob returnXml;
 	private String status;
 	protected Timestamp statusUpdate;
+	private String NEED_COMPARISON_YN;
+	private String LAST_ANSWER_2;
+	private String LAST_SEQ;
 	
 	public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBKYC_LOG";
 
@@ -216,5 +219,29 @@ public class TBKYC_LOG extends VOBase {
 
 	public void setStatusUpdate(Timestamp statusUpdate) {
 		this.statusUpdate = statusUpdate;
+	}
+
+	public String getNEED_COMPARISON_YN() {
+		return NEED_COMPARISON_YN;
+	}
+
+	public void setNEED_COMPARISON_YN(String nEED_COMPARISON_YN) {
+		NEED_COMPARISON_YN = nEED_COMPARISON_YN;
+	}
+
+	public String getLAST_ANSWER_2() {
+		return LAST_ANSWER_2;
+	}
+
+	public void setLAST_ANSWER_2(String lAST_ANSWER_2) {
+		LAST_ANSWER_2 = lAST_ANSWER_2;
+	}
+
+	public String getLAST_SEQ() {
+		return LAST_SEQ;
+	}
+
+	public void setLAST_SEQ(String lAST_SEQ) {
+		LAST_SEQ = lAST_SEQ;
 	}
 }

@@ -245,10 +245,10 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
             	};
 		});	
 	    
-	    debugger
-		if(projInfoService.getAvailBranch().length == 1) {
-			$scope.inputVO.cust_02 = projInfoService.getBranchID();
-		}
+//	    debugger
+//		if(projInfoService.getAvailBranch().length == 1) {
+//			$scope.inputVO.cust_02 = projInfoService.getBranchID();
+//		}
 	};
 	
 	$scope.init_common();

@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +28,7 @@ import com.systex.jbranch.platform.util.IPrimitiveMap;
 @Component("cam180")
 @Scope("request")
 public class CAM180 extends FubonWmsBizLogic {
-
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 	private DataAccessManager dam = null;
 
 	// 讀取理專資料
@@ -84,296 +86,352 @@ public class CAM180 extends FubonWmsBizLogic {
 		this.sendRtnObject(return_VO);
 	}
 
+	//inquire查詢SQL
 	private StringBuffer genSql(QueryConditionIF queryCondition, CAM180InputVO inputVO) throws JBranchException {
+		StringBuffer sql = new StringBuffer();
+		
+		if ("CUS_RECORD".equals(inputVO.getFrom())) {
+			// TBCRM_CUST_VISIT_RECORD is A
+			//來源名單：客戶所有訪談記錄
+			if (StringUtils.isNotBlank(inputVO.getbCode()) &&
+					StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {
+				//查詢條件有分行代碼，行銷名單以及客戶主檔的分行條件不以OR做，用UNION ALL
+				inputVO.setbCodeType("1");
+				sql.append(genSql_CUS_RECORD(queryCondition, inputVO));
+				sql.append(" UNION ALL ");
+				inputVO.setbCodeType("2");
+				sql.append(genSql_CUS_RECORD(queryCondition, inputVO));
+				sql.append(" UNION ALL ");
+				inputVO.setbCodeType("3");
+				sql.append(genSql_CUS_RECORD(queryCondition, inputVO));
+			} else {
+				//沒有輸入分行代碼或是私銀人員，不需要UNION SQL
+				sql.append(genSql_CUS_RECORD(queryCondition, inputVO));
+			}
+		} else {
+			// TBCRM_CUST_VISIT_RECORD is F
+			//來源名單：非客戶所有訪談記錄
+			if (StringUtils.isNotBlank(inputVO.getbCode()) &&
+					StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {
+				//查詢條件有分行代碼，行銷名單以及客戶主檔的分行條件不以OR做，用UNION ALL
+				inputVO.setbCodeType("1");
+				sql.append(genSql_NOT_ALL(queryCondition, inputVO));
+				sql.append(" UNION ALL ");
+				inputVO.setbCodeType("2");
+				sql.append(genSql_NOT_ALL(queryCondition, inputVO));
+				sql.append(" UNION ALL ");
+				inputVO.setbCodeType("3");
+				sql.append(genSql_NOT_ALL(queryCondition, inputVO));
+			} else {
+				//沒有輸入分行代碼或是私銀人員，不需要UNION SQL
+				sql.append(genSql_NOT_ALL(queryCondition, inputVO));
+			}
+		}
+		sql.append("order by LEAD_NAME,DEPT_NAME,EMP_ID,CUST_ID ");
+		
+		logger.info("CAM180 inquire genSQL loginID: " + (String) getCommonVariable(FubonSystemVariableConsts.LOGINID));
+		logger.info("CAM180 inquire genSQL loginRole: " + (String) getCommonVariable(FubonSystemVariableConsts.LOGINROLE));
+		logger.info("CAM180 inquire genSQL loginFlag: " + (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG));
+		logger.info("CAM180 inquire genSQL SQL: " + sql.toString());
+		
+		return sql;
+	}
+
+	//客戶所有訪談記錄
+	private StringBuffer genSql_CUS_RECORD(QueryConditionIF queryCondition, CAM180InputVO inputVO) throws JBranchException {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
 
 		StringBuffer sql = new StringBuffer();
 		// TBCRM_CUST_VISIT_RECORD is A
-		if ("CUS_RECORD".equals(inputVO.getFrom())) {
-			sql.append("select r.RESPONSE_NAME, ");
-			sql.append("       b.LEAD_NAME, ");
-			sql.append("       c.CAMPAIGN_ID, ");
-			sql.append("       c.CAMPAIGN_DESC, ");
-			sql.append("       h.DEPT_NAME, ");
-			sql.append("       b.EMP_ID, ");
-			sql.append("       b.AO_CODE, ");
-			sql.append("       CASE WHEN cu.EMP_ID IS NOT NULL THEN NULL ELSE d.AO_CODE END AS CAO_CODE, ");
-			sql.append("       CASE WHEN cu.EMP_ID IS NOT NULL THEN cu.EMP_ID ELSE NULL END AS CU_EMP_ID, ");
-			sql.append("       d.CUST_ID, ");
-			sql.append("       d.CUST_NAME, ");
-			sql.append("       f.BASE_FLAG, ");
-			sql.append("       e.COMM_RS_YN, ");
-			sql.append("       e.COMM_NS_YN, ");
-			sql.append("       e.PROF_INVESTOR_YN, ");
-			sql.append("       e.SP_CUST_YN, ");
-			sql.append("       e.REC_YN, ");
-			sql.append("       e.SIGN_AGMT_YN, ");
-			sql.append("       c.LEAD_SOURCE_ID, ");
-			sql.append("       c.LEAD_TYPE, ");
-			sql.append("       b.LEAD_STATUS, ");
-			sql.append("       b.START_DATE, b.END_DATE, a.VISIT_MEMO, a.CREATETIME, a.LASTUPDATE, ");
-			sql.append("       a.VISIT_DT, a.VISIT_CREPLY, "); // #0000114 : 20200131 modify by ocean : WMS-CR-20200117-01_名單優化調整需求變更申請單");
-			sql.append("       a.CMU_TYPE, ");
-			sql.append("       CASE WHEN a.CREATOR <> 'SCHEDULER' THEN DECODE(a.CREATOR, NULL, NULL, g2.EMP_NAME || '-' || a.CREATOR) ELSE a.CREATOR END as CREATOR, ");
-			sql.append("       CASE WHEN a.MODIFIER <> 'SCHEDULER' THEN DECODE(a.MODIFIER, NULL, NULL, g3.EMP_NAME || '-' || a.MODIFIER) ELSE a.MODIFIER END as MODIFIER ");
-			sql.append("from ( ");
-			switch (inputVO.getTabType()) {
-				case "0":
-					sql.append("  SELECT * FROM TBCRM_CUST_VISIT_RECORD_NEW ");
-					sql.append(") a ");
-					break;
-				case "1":
-					sql.append("  SELECT * FROM TBCRM_CUST_VISIT_RECORD WHERE TRUNC(LASTUPDATE) < TRUNC(ADD_MONTHS(SYSDATE, -60)) ");
-					sql.append(") a ");
-					break;
-			}
-			sql.append("left join TBCAM_SFA_LEADS b on a.VISIT_SEQ = b.CUST_MEMO_SEQ ");
-			sql.append("left join TBCAM_SFA_CAMPAIGN c on (c.CAMPAIGN_ID = b.CAMPAIGN_ID and c.STEP_ID = b.STEP_ID) ");
-			sql.append("left join TBCAM_SFA_CAMP_RESPONSE r ON (c.LEAD_RESPONSE_CODE = r.CAMPAIGN_ID OR c.CAMPAIGN_ID = r.CAMPAIGN_ID) AND b.LEAD_STATUS = r.LEAD_STATUS ");
-			sql.append("left join TBCRM_CUST_MAST d on a.CUST_ID = d.CUST_ID ");
-			sql.append("left join VWORG_EMP_UHRM_INFO cu on cu.UHRM_CODE = d.AO_CODE ");
-			sql.append("left join TBCRM_CUST_NOTE e on a.CUST_ID = e.CUST_ID ");
-			sql.append("left join TBCRM_CUST_AGR_MKT_NOTE f on a.CUST_ID = f.CUST_ID ");
-			sql.append("left join TBORG_MEMBER g on b.EMP_ID = g.EMP_ID ");
-			sql.append("left join TBORG_MEMBER g2 on a.CREATOR = g2.EMP_ID ");
-			sql.append("left join TBORG_MEMBER g3 on a.MODIFIER = g3.EMP_ID ");
-			sql.append("left join TBORG_DEFN h on d.BRA_NBR = h.DEPT_ID ");
-			sql.append("where 1 = 1 ");
-
-			// 20200602 ADD BY OCEAN : 0000166: WMS-CR-20200226-01_高端業管功能改採兼任分行角色調整相關功能_登入底層+行銷模組
-			if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) { // 非任何uhrm相關人員
-				// 1.	以分行人員登入時，應僅含登入者建立的客戶訪談記錄。
-				// 2.	以分行主管登入時，應僅含分行人員建立(排除高端人員)的客戶訪談記錄。
-				// 3.	以總行人員登入時，應為全行客戶訪談記錄。
-				if (!headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-					sql.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.UHRM_CODE = d.AO_CODE) ");
-				}
-
-				if (StringUtils.isNotBlank(inputVO.getbCode())) {
-					sql.append("and ( ");
-					sql.append("     b.BRANCH_ID = :bcode ");
-					sql.append("  OR d.BRA_NBR = :bcode ");
-					sql.append(") ");
-					queryCondition.setObject("bcode", inputVO.getbCode());
-				}else {
-					sql.append("AND ( ");
-					sql.append("     b.BRANCH_ID IN (:branchIDList) ");
-					sql.append("  OR d.BRA_NBR IN (:branchIDList) ");
-					sql.append(") ");
-					queryCondition.setObject("branchIDList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
-				}
-				
-				if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("bs") >= 0) {
-					sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_BS_INFO BS WHERE BS.BS_CODE = d.AO_CODE) ");
-				}
-			} else if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).equals("uhrm")) {
-				sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.UHRM_CODE = d.AO_CODE AND UHRM.EMP_ID = :loginID) ");
-				queryCondition.setObject("loginID", getUserVariable(FubonSystemVariableConsts.LOGINID));
-			} else {
-				sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.UHRM_CODE = d.AO_CODE AND UHRM.DEPT_ID = :loginArea) ");
-				queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
-			}
-
-			if (StringUtils.isNotBlank(inputVO.getpCode())) {
-				// modify by ocean 20170905：下載時，若有指定理專，則找訪談記錄中建立人為該理專的訪談記錄
-				sql.append("and a.CREATOR = :pcode ");
-				queryCondition.setObject("pcode", inputVO.getpCode());
-			}
-
-			if (StringUtils.isNotBlank(inputVO.getId())) {
-				sql.append("and a.CUST_ID = :id ");
-				queryCondition.setObject("id", inputVO.getId());
-			}
-
-			if (StringUtils.isNotBlank(inputVO.getName())) {
-				sql.append("and b.LEAD_NAME like :name ");
-				queryCondition.setObject("name", "%" + inputVO.getName() + "%");
-			}
-
-			if (StringUtils.isNotBlank(inputVO.getModifier())) {
-				sql.append("and g.EMP_NAME = :mod ");
-				queryCondition.setObject("mod", inputVO.getModifier());
-			}
-
-			if (StringUtils.isNotBlank(inputVO.getForce())) {
-				sql.append("and a.VISITOR_ROLE IN (select roleid from tbsyssecurolpriass where privilegeid in (select param_code from TBSYSPARAMETER where PARAM_TYPE = 'CAM.CHANNEL_MAPPING' and param_name = :chan)) ");
-				queryCondition.setObject("chan", inputVO.getForce());
-			}
-
-			if (inputVO.getsDate() != null) {
-				sql.append("and a.CREATETIME >= TRUNC(:start) ");
-				queryCondition.setObject("start", inputVO.getsDate());
-			}
-
-			if (inputVO.geteDate() != null) {
-				sql.append("and a.CREATETIME < TRUNC(:end)+1 ");
-				queryCondition.setObject("end", inputVO.geteDate());
-			}
-
-			if (inputVO.getsEDate() != null) {
-				sql.append("and a.LASTUPDATE >= TRUNC(:estart) ");
-				queryCondition.setObject("estart", inputVO.getsEDate());
-			}
-
-			if (inputVO.geteEDate() != null) {
-				sql.append("and a.LASTUPDATE < TRUNC(:eend)+1 ");
-				queryCondition.setObject("eend", inputVO.geteEDate());
-			}
-
-			sql.append("order by LEAD_NAME,DEPT_NAME,EMP_ID,CUST_ID ");
-		} else {
-			// TBCRM_CUST_VISIT_RECORD is F
-			sql.append("select r.RESPONSE_NAME, ");
-			sql.append("       b.LEAD_NAME, ");
-			sql.append("       a.CAMPAIGN_ID, ");
-			sql.append("       a.CAMPAIGN_DESC, ");
-			sql.append("       case when c.BRA_NBR is not null then h.DEPT_ID || '-' || h.DEPT_NAME else h2.DEPT_ID || '-' || h2.DEPT_NAME end as DEPT_NAME, ");
-			sql.append("       b.EMP_ID, ");
-			sql.append("       b.AO_CODE, ");
-			sql.append("       CASE WHEN cu.EMP_ID IS NOT NULL THEN NULL ELSE c.AO_CODE END AS CAO_CODE, ");
-			sql.append("       CASE WHEN cu.EMP_ID IS NOT NULL THEN cu.EMP_ID ELSE NULL END AS CU_EMP_ID, ");
-			sql.append("       case when c.CUST_ID is not null then c.CUST_ID else b.CUST_ID end as CUST_ID, ");
-			sql.append("       c.CUST_NAME, ");
-			sql.append("       e.BASE_FLAG, ");
-			sql.append("       d.COMM_RS_YN, ");
-			sql.append("       d.COMM_NS_YN, ");
-			sql.append("       d.PROF_INVESTOR_YN, ");
-			sql.append("       d.SP_CUST_YN, ");
-			sql.append("       d.REC_YN, ");
-			sql.append("       d.SIGN_AGMT_YN, ");
-			sql.append("       a.LEAD_SOURCE_ID, ");
-			sql.append("       a.LEAD_TYPE, ");
-			sql.append("       b.LEAD_STATUS, ");
-			sql.append("       b.START_DATE, b.END_DATE, f.VISIT_MEMO, b.CREATETIME, b.LASTUPDATE, ");
-			sql.append("       f.VISIT_DT, f.VISIT_CREPLY, "); // #0000114 : 20200131 modify by ocean : WMS-CR-20200117-01_名單優化調整需求變更申請單
-			sql.append("       f.CMU_TYPE, ");
-			sql.append("       CASE WHEN b.CREATOR <> 'SCHEDULER' THEN DECODE(b.CREATOR, NULL, NULL, g2.EMP_NAME || '-' || b.CREATOR) ELSE b.CREATOR END as CREATOR, ");
-			sql.append("       CASE WHEN b.MODIFIER <> 'SCHEDULER' THEN DECODE(b.MODIFIER, NULL, NULL, g3.EMP_NAME || '-' || b.MODIFIER) ELSE b.MODIFIER END as MODIFIER ");
-			sql.append("from TBCAM_SFA_CAMPAIGN a ");
-			sql.append("left join TBCAM_SFA_LEADS b on (a.CAMPAIGN_ID = b.CAMPAIGN_ID and a.STEP_ID = b.STEP_ID) ");
-			sql.append("left join TBCAM_SFA_CAMP_RESPONSE r ON (a.LEAD_RESPONSE_CODE = r.CAMPAIGN_ID OR a.CAMPAIGN_ID = r.CAMPAIGN_ID) AND b.LEAD_STATUS = r.LEAD_STATUS ");
-			sql.append("left join TBCRM_CUST_MAST c on b.CUST_ID = c.CUST_ID ");
-			sql.append("left join VWORG_EMP_UHRM_INFO cu on c.AO_CODE = cu.UHRM_CODE ");
-			sql.append("left join TBCRM_CUST_NOTE d on b.CUST_ID = d.CUST_ID ");
-			sql.append("left join TBCRM_CUST_AGR_MKT_NOTE e on b.CUST_ID = e.CUST_ID ");
-			sql.append("left join TBCRM_CUST_VISIT_RECORD f on b.CUST_MEMO_SEQ = f.VISIT_SEQ ");
-			sql.append("left join TBORG_MEMBER g on b.EMP_ID = g.EMP_ID ");
-			sql.append("left join TBORG_MEMBER g2 on b.CREATOR = g2.EMP_ID ");
-			sql.append("left join TBORG_MEMBER g3 on b.MODIFIER = g3.EMP_ID ");
-			sql.append("left join TBORG_DEFN h on c.BRA_NBR = h.DEPT_ID ");
-			sql.append("left join TBORG_DEFN h2 on b.branch_ID = h2.DEPT_ID ");
-			sql.append("where 1=1 ");
-
-			// 20200602 ADD BY OCEAN : 0000166: WMS-CR-20200226-01_高端業管功能改採兼任分行角色調整相關功能_登入底層+行銷模組
-			if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) { // 非任何uhrm相關人員
-				// 1.	以分行人員登入時，應僅含登入者建立的客戶訪談記錄。
-				// 2.	以分行主管登入時，應僅含分行人員建立(排除高端人員)的客戶訪談記錄。
-				// 3.	以總行人員登入時，應為全行客戶訪談記錄。
-				if (headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-
-				} else {
-					sql.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = b.EMP_ID) ");
-				}
-				
-				// 20210224 ADD BY OCEAN : #0524: WMS-CR-20210208-01_新增銀證督導主管角色功能
-				if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("bs") >= 0) {
-					sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_BS_INFO BS WHERE BS.BS_CODE = b.AO_CODE) ");
-				}
-
-				if (StringUtils.isNotBlank(inputVO.getbCode())) {
-					sql.append("and ( ");
-					sql.append("     c.BRA_NBR = :bcode ");
-					sql.append("  OR b.BRANCH_ID = :bcode ");
-					sql.append(") ");
-					queryCondition.setObject("bcode", inputVO.getbCode());
-				} else {
-					sql.append("AND ( ");
-					sql.append("     c.BRA_NBR IN (:branchIDList) ");
-					sql.append("  OR b.BRANCH_ID IN (:branchIDList) ");
-					sql.append(") ");
-					queryCondition.setObject("branchIDList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
-				}
-			} else if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).equals("uhrm")) {
-				sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = b.EMP_ID AND UHRM.EMP_ID = :loginID) ");
-				queryCondition.setObject("loginID", getUserVariable(FubonSystemVariableConsts.LOGINID));
-			} else {
-				sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = b.EMP_ID) ");
-			}
-
-			if (StringUtils.isNotBlank(inputVO.getpCode())) {
-				sql.append("and b.EMP_ID = :pcode ");
-				queryCondition.setObject("pcode", inputVO.getpCode());
-			}
-
-			if (StringUtils.isNotBlank(inputVO.getId())) {
-				sql.append("and b.CUST_ID = :id ");
-				queryCondition.setObject("id", inputVO.getId());
-			}
-
-			if (StringUtils.isNotBlank(inputVO.getName())) {
-				sql.append("and b.LEAD_NAME like :name ");
-				queryCondition.setObject("name", "%" + inputVO.getName() + "%");
-			}
-
-			if (StringUtils.isNotBlank(inputVO.getFrom())) {
-				switch (inputVO.getFrom()) {
-					case "UNICA_MKT":
-						sql.append("and a.LEAD_SOURCE_ID = '01' and a.LEAD_TYPE in ('01', '02') ");
-						break;
-					case "UNICA_INFO":
-						sql.append("and a.LEAD_SOURCE_ID = '01' and a.LEAD_TYPE in ('05', '06', '07', '08', '09', 'H1', 'H2', 'F1', 'F2', 'I1', 'I2') ");
-						break;
-					case "USR":
-						sql.append("and a.LEAD_SOURCE_ID = '05' ");
-						break;
-					case "OTHER_LEADS":
-						sql.append("and SUBSTR(a.CAMPAIGN_ID, 9, 4) = 'TODO' ");
-						break;
-					default:
-						sql.append("and a.CAMPAIGN_ID = :campaign_id ");
-						queryCondition.setObject("campaign_id", inputVO.getFrom());
-						break;
-				}
-			}
-
-			if (StringUtils.isNotBlank(inputVO.getModifier())) {
-				sql.append("and g.EMP_NAME = :mod ");
-				queryCondition.setObject("mod", inputVO.getModifier());
-			}
-
-			if (StringUtils.isNotBlank(inputVO.getForce())) {
-				sql.append("and f.VISITOR_ROLE IN (select roleid from tbsyssecurolpriass where privilegeid in (select param_code from TBSYSPARAMETER where PARAM_TYPE = 'CAM.CHANNEL_MAPPING' and param_name = :chan)) ");
-				queryCondition.setObject("chan", inputVO.getForce());
-			}
-
-			if (inputVO.getsDate() != null) {
-				sql.append("and b.CREATETIME >= TRUNC(:start) ");
-				queryCondition.setObject("start", inputVO.getsDate());
-			}
-
-			if (inputVO.geteDate() != null) {
-				sql.append("and b.CREATETIME < TRUNC(:end)+1 ");
-				queryCondition.setObject("end", inputVO.geteDate());
-			}
-
-			if (inputVO.getsEDate() != null) {
-				sql.append("and b.LASTUPDATE >= TRUNC(:estart) ");
-				queryCondition.setObject("estart", inputVO.getsEDate());
-			}
-
-			if (inputVO.geteEDate() != null) {
-				sql.append("and b.LASTUPDATE < TRUNC(:eend)+1 ");
-				queryCondition.setObject("eend", inputVO.geteEDate());
-			}
-
-			sql.append("order by LEAD_NAME,DEPT_NAME,EMP_ID,CUST_ID ");
+		sql.append("select r.RESPONSE_NAME, ");
+		sql.append("       b.LEAD_NAME, ");
+		sql.append("       c.CAMPAIGN_ID, ");
+		sql.append("       c.CAMPAIGN_DESC, ");
+		sql.append("       h.DEPT_NAME, ");
+		sql.append("       b.EMP_ID, ");
+		sql.append("       b.AO_CODE, ");
+		sql.append("       CASE WHEN cu.EMP_ID IS NOT NULL THEN NULL ELSE d.AO_CODE END AS CAO_CODE, ");
+		sql.append("       CASE WHEN cu.EMP_ID IS NOT NULL THEN cu.EMP_ID ELSE NULL END AS CU_EMP_ID, ");
+		sql.append("       d.CUST_ID, ");
+		sql.append("       d.CUST_NAME, ");
+		sql.append("       f.BASE_FLAG, ");
+		sql.append("       e.COMM_RS_YN, ");
+		sql.append("       e.COMM_NS_YN, ");
+		sql.append("       e.PROF_INVESTOR_YN, ");
+		sql.append("       e.SP_CUST_YN, ");
+		sql.append("       e.REC_YN, ");
+		sql.append("       e.SIGN_AGMT_YN, ");
+		sql.append("       c.LEAD_SOURCE_ID, ");
+		sql.append("       c.LEAD_TYPE, ");
+		sql.append("       b.LEAD_STATUS, ");
+		sql.append("       b.START_DATE, b.END_DATE, a.VISIT_MEMO, a.CREATETIME, a.LASTUPDATE, ");
+		sql.append("       a.VISIT_DT, a.VISIT_CREPLY, "); // #0000114 : 20200131 modify by ocean : WMS-CR-20200117-01_名單優化調整需求變更申請單");
+		sql.append("       a.CMU_TYPE, ");
+		sql.append("       CASE WHEN a.CREATOR <> 'SCHEDULER' THEN DECODE(a.CREATOR, NULL, NULL, g2.EMP_NAME || '-' || a.CREATOR) ELSE a.CREATOR END as CREATOR, ");
+		sql.append("       CASE WHEN a.MODIFIER <> 'SCHEDULER' THEN DECODE(a.MODIFIER, NULL, NULL, g3.EMP_NAME || '-' || a.MODIFIER) ELSE a.MODIFIER END as MODIFIER ");
+		sql.append("from ( ");
+		switch (inputVO.getTabType()) {
+			case "0":
+				sql.append("  SELECT * FROM TBCRM_CUST_VISIT_RECORD_NEW ");
+				sql.append(") a ");
+				break;
+			case "1":
+				sql.append("  SELECT * FROM TBCRM_CUST_VISIT_RECORD WHERE TRUNC(LASTUPDATE) < TRUNC(ADD_MONTHS(SYSDATE, -60)) ");
+				sql.append(") a ");
+				break;
 		}
+		sql.append("left join TBCAM_SFA_LEADS b on a.VISIT_SEQ = b.CUST_MEMO_SEQ ");
+		sql.append("left join TBCAM_SFA_CAMPAIGN c on (c.CAMPAIGN_ID = b.CAMPAIGN_ID and c.STEP_ID = b.STEP_ID) ");
+		sql.append("left join TBCAM_SFA_CAMP_RESPONSE r ON (c.LEAD_RESPONSE_CODE = r.CAMPAIGN_ID OR c.CAMPAIGN_ID = r.CAMPAIGN_ID) AND b.LEAD_STATUS = r.LEAD_STATUS ");
+		sql.append("left join TBCRM_CUST_MAST d on a.CUST_ID = d.CUST_ID ");
+		sql.append("left join VWORG_EMP_UHRM_INFO cu on cu.UHRM_CODE = d.AO_CODE ");
+		sql.append("left join TBCRM_CUST_NOTE e on a.CUST_ID = e.CUST_ID ");
+		sql.append("left join TBCRM_CUST_AGR_MKT_NOTE f on a.CUST_ID = f.CUST_ID ");
+		sql.append("left join TBORG_MEMBER g on b.EMP_ID = g.EMP_ID ");
+		sql.append("left join TBORG_MEMBER g2 on a.CREATOR = g2.EMP_ID ");
+		sql.append("left join TBORG_MEMBER g3 on a.MODIFIER = g3.EMP_ID ");
+		sql.append("left join TBORG_DEFN h on d.BRA_NBR = h.DEPT_ID ");
+		sql.append("where 1 = 1 ");
+
+		// 20200602 ADD BY OCEAN : 0000166: WMS-CR-20200226-01_高端業管功能改採兼任分行角色調整相關功能_登入底層+行銷模組
+		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) { // 非任何uhrm相關人員
+			// 1.	以分行人員登入時，應僅含登入者建立的客戶訪談記錄。
+			// 2.	以分行主管登入時，應僅含分行人員建立(排除高端人員)的客戶訪談記錄。
+			// 3.	以總行人員登入時，應為全行客戶訪談記錄。
+			if (!headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sql.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.UHRM_CODE = d.AO_CODE) ");
+			}
+			//非總行一定要選分行，不用IN
+			//總行不需要限制分行
+			if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("1", inputVO.getbCodeType())) {
+				sql.append("and b.BRANCH_ID = :bcode and d.BRA_NBR <> :bcode ");
+				queryCondition.setObject("bcode", inputVO.getbCode());
+			} else if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("2", inputVO.getbCodeType())) {
+				sql.append("and d.BRA_NBR = :bcode and b.BRANCH_ID <> :bcode ");
+				queryCondition.setObject("bcode", inputVO.getbCode());
+			} else if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("3", inputVO.getbCodeType())) {
+				sql.append("and d.BRA_NBR = :bcode and b.BRANCH_ID = :bcode ");
+				queryCondition.setObject("bcode", inputVO.getbCode());
+			}
+			
+			if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("bs") >= 0) {
+				sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_BS_INFO BS WHERE BS.BS_CODE = d.AO_CODE) ");
+			}
+		} else if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).equals("uhrm")) {
+			sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.UHRM_CODE = d.AO_CODE AND UHRM.EMP_ID = :loginID) ");
+			queryCondition.setObject("loginID", getUserVariable(FubonSystemVariableConsts.LOGINID));
+		} else {
+			sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.UHRM_CODE = d.AO_CODE AND UHRM.DEPT_ID = :loginArea) ");
+			queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
+		}
+
+		if (StringUtils.isNotBlank(inputVO.getpCode())) {
+			// modify by ocean 20170905：下載時，若有指定理專，則找訪談記錄中建立人為該理專的訪談記錄
+			sql.append("and a.CREATOR = :pcode ");
+			queryCondition.setObject("pcode", inputVO.getpCode());
+		}
+
+		if (StringUtils.isNotBlank(inputVO.getId())) {
+			sql.append("and a.CUST_ID = :id ");
+			queryCondition.setObject("id", inputVO.getId());
+		}
+
+		if (StringUtils.isNotBlank(inputVO.getName())) {
+			sql.append("and b.LEAD_NAME = :name ");
+			queryCondition.setObject("name", inputVO.getName());
+		}
+
+		if (StringUtils.isNotBlank(inputVO.getModifier())) {
+			sql.append("and g.EMP_NAME = :mod ");
+			queryCondition.setObject("mod", inputVO.getModifier());
+		}
+
+		if (StringUtils.isNotBlank(inputVO.getForce())) {
+			sql.append("and a.VISITOR_ROLE IN (select roleid from tbsyssecurolpriass where privilegeid in (select param_code from TBSYSPARAMETER where PARAM_TYPE = 'CAM.CHANNEL_MAPPING' and param_name = :chan)) ");
+			queryCondition.setObject("chan", inputVO.getForce());
+		}
+
+		if (inputVO.getsDate() != null) {
+			sql.append("and a.CREATETIME >= TRUNC(:start) ");
+			queryCondition.setObject("start", inputVO.getsDate());
+		}
+
+		if (inputVO.geteDate() != null) {
+			sql.append("and a.CREATETIME < TRUNC(:end)+1 ");
+			queryCondition.setObject("end", inputVO.geteDate());
+		}
+
+		if (inputVO.getsEDate() != null) {
+			sql.append("and a.LASTUPDATE >= TRUNC(:estart) ");
+			queryCondition.setObject("estart", inputVO.getsEDate());
+		}
+
+		if (inputVO.geteEDate() != null) {
+			sql.append("and a.LASTUPDATE < TRUNC(:eend)+1 ");
+			queryCondition.setObject("eend", inputVO.geteEDate());
+		}
+
+//		sql.append("order by LEAD_NAME,DEPT_NAME,EMP_ID,CUST_ID ");
 
 		return sql;
 	}
+	
+	//非客戶所有訪談記錄
+	private StringBuffer genSql_NOT_ALL(QueryConditionIF queryCondition, CAM180InputVO inputVO) throws JBranchException {
 
+		XmlInfo xmlInfo = new XmlInfo();
+		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
+
+		StringBuffer sql = new StringBuffer();
+		// TBCRM_CUST_VISIT_RECORD is F
+		sql.append("select r.RESPONSE_NAME, ");
+		sql.append("       b.LEAD_NAME, ");
+		sql.append("       a.CAMPAIGN_ID, ");
+		sql.append("       a.CAMPAIGN_DESC, ");
+		sql.append("       case when c.BRA_NBR is not null then h.DEPT_ID || '-' || h.DEPT_NAME else h2.DEPT_ID || '-' || h2.DEPT_NAME end as DEPT_NAME, ");
+		sql.append("       b.EMP_ID, ");
+		sql.append("       b.AO_CODE, ");
+		sql.append("       CASE WHEN cu.EMP_ID IS NOT NULL THEN NULL ELSE c.AO_CODE END AS CAO_CODE, ");
+		sql.append("       CASE WHEN cu.EMP_ID IS NOT NULL THEN cu.EMP_ID ELSE NULL END AS CU_EMP_ID, ");
+		sql.append("       case when c.CUST_ID is not null then c.CUST_ID else b.CUST_ID end as CUST_ID, ");
+		sql.append("       c.CUST_NAME, ");
+		sql.append("       e.BASE_FLAG, ");
+		sql.append("       d.COMM_RS_YN, ");
+		sql.append("       d.COMM_NS_YN, ");
+		sql.append("       d.PROF_INVESTOR_YN, ");
+		sql.append("       d.SP_CUST_YN, ");
+		sql.append("       d.REC_YN, ");
+		sql.append("       d.SIGN_AGMT_YN, ");
+		sql.append("       a.LEAD_SOURCE_ID, ");
+		sql.append("       a.LEAD_TYPE, ");
+		sql.append("       b.LEAD_STATUS, ");
+		sql.append("       b.START_DATE, b.END_DATE, f.VISIT_MEMO, b.CREATETIME, b.LASTUPDATE, ");
+		sql.append("       f.VISIT_DT, f.VISIT_CREPLY, "); // #0000114 : 20200131 modify by ocean : WMS-CR-20200117-01_名單優化調整需求變更申請單
+		sql.append("       f.CMU_TYPE, ");
+		sql.append("       CASE WHEN b.CREATOR <> 'SCHEDULER' THEN DECODE(b.CREATOR, NULL, NULL, g2.EMP_NAME || '-' || b.CREATOR) ELSE b.CREATOR END as CREATOR, ");
+		sql.append("       CASE WHEN b.MODIFIER <> 'SCHEDULER' THEN DECODE(b.MODIFIER, NULL, NULL, g3.EMP_NAME || '-' || b.MODIFIER) ELSE b.MODIFIER END as MODIFIER ");
+		sql.append("from TBCAM_SFA_CAMPAIGN a ");
+		sql.append("inner join TBCAM_SFA_LEADS b on (a.CAMPAIGN_ID = b.CAMPAIGN_ID and a.STEP_ID = b.STEP_ID) ");
+		sql.append("left join TBCAM_SFA_CAMP_RESPONSE r ON (a.LEAD_RESPONSE_CODE = r.CAMPAIGN_ID OR a.CAMPAIGN_ID = r.CAMPAIGN_ID) AND b.LEAD_STATUS = r.LEAD_STATUS ");
+		sql.append("left join TBCRM_CUST_MAST c on b.CUST_ID = c.CUST_ID ");
+		sql.append("left join VWORG_EMP_UHRM_INFO cu on c.AO_CODE = cu.UHRM_CODE ");
+		sql.append("left join TBCRM_CUST_NOTE d on b.CUST_ID = d.CUST_ID ");
+		sql.append("left join TBCRM_CUST_AGR_MKT_NOTE e on b.CUST_ID = e.CUST_ID ");
+		sql.append("left join TBCRM_CUST_VISIT_RECORD f on b.CUST_MEMO_SEQ = f.VISIT_SEQ ");
+		sql.append("left join TBORG_MEMBER g on b.EMP_ID = g.EMP_ID ");
+		sql.append("left join TBORG_MEMBER g2 on b.CREATOR = g2.EMP_ID ");
+		sql.append("left join TBORG_MEMBER g3 on b.MODIFIER = g3.EMP_ID ");
+		sql.append("left join TBORG_DEFN h on c.BRA_NBR = h.DEPT_ID ");
+		sql.append("left join TBORG_DEFN h2 on b.branch_ID = h2.DEPT_ID ");
+		sql.append("where 1=1 ");
+
+		// 20200602 ADD BY OCEAN : 0000166: WMS-CR-20200226-01_高端業管功能改採兼任分行角色調整相關功能_登入底層+行銷模組
+		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) { // 非任何uhrm相關人員
+			// 1.	以分行人員登入時，應僅含登入者建立的客戶訪談記錄。
+			// 2.	以分行主管登入時，應僅含分行人員建立(排除高端人員)的客戶訪談記錄。
+			// 3.	以總行人員登入時，應為全行客戶訪談記錄。
+			if (headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+
+			} else {
+				sql.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = b.EMP_ID) ");
+			}
+			
+			// 20210224 ADD BY OCEAN : #0524: WMS-CR-20210208-01_新增銀證督導主管角色功能
+			if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("bs") >= 0) {
+				sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_BS_INFO BS WHERE BS.BS_CODE = b.AO_CODE) ");
+			}
+			//非總行一定要選分行，不用IN
+			//總行不需要限制分行
+			if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("1", inputVO.getbCodeType())) {
+				sql.append(" and c.BRA_NBR = :bcode and b.BRANCH_ID <> :bcode ");
+				queryCondition.setObject("bcode", inputVO.getbCode());
+			} else if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("2", inputVO.getbCodeType())) {
+				sql.append(" and b.BRANCH_ID = :bcode and c.BRA_NBR <> :bcode ");
+				queryCondition.setObject("bcode", inputVO.getbCode());
+			} else if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("3", inputVO.getbCodeType())) {
+				sql.append(" and b.BRANCH_ID = :bcode and c.BRA_NBR = :bcode ");
+				queryCondition.setObject("bcode", inputVO.getbCode());
+			}
+		} else if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).equals("uhrm")) {
+			sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = b.EMP_ID AND UHRM.EMP_ID = :loginID) ");
+			queryCondition.setObject("loginID", getUserVariable(FubonSystemVariableConsts.LOGINID));
+		} else {
+			sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = b.EMP_ID) ");
+		}
+
+		if (StringUtils.isNotBlank(inputVO.getpCode())) {
+			sql.append("and b.EMP_ID = :pcode ");
+			queryCondition.setObject("pcode", inputVO.getpCode());
+		}
+
+		if (StringUtils.isNotBlank(inputVO.getId())) {
+			sql.append("and b.CUST_ID = :id ");
+			queryCondition.setObject("id", inputVO.getId());
+		}
+
+		if (StringUtils.isNotBlank(inputVO.getName())) {
+			sql.append("and b.LEAD_NAME = :name ");
+			queryCondition.setObject("name", inputVO.getName());
+		}
+
+		if (StringUtils.isNotBlank(inputVO.getFrom())) {
+			switch (inputVO.getFrom()) {
+				case "UNICA_MKT":
+					sql.append("and a.LEAD_SOURCE_ID = '01' and a.LEAD_TYPE in ('01', '02') ");
+					break;
+				case "UNICA_INFO":
+					sql.append("and a.LEAD_SOURCE_ID = '01' and a.LEAD_TYPE in ('05', '06', '07', '08', '09', 'H1', 'H2', 'F1', 'F2', 'I1', 'I2') ");
+					break;
+				case "USR":
+					sql.append("and a.LEAD_SOURCE_ID = '05' ");
+					break;
+				case "OTHER_LEADS":
+					sql.append("and SUBSTR(a.CAMPAIGN_ID, 9, 4) = 'TODO' ");
+					break;
+				default:
+					sql.append("and a.CAMPAIGN_ID = :campaign_id ");
+					queryCondition.setObject("campaign_id", inputVO.getFrom());
+					break;
+			}
+		}
+
+		if (StringUtils.isNotBlank(inputVO.getModifier())) {
+			sql.append("and g.EMP_NAME = :mod ");
+			queryCondition.setObject("mod", inputVO.getModifier());
+		}
+
+		if (StringUtils.isNotBlank(inputVO.getForce())) {
+			sql.append("and f.VISITOR_ROLE IN (select roleid from tbsyssecurolpriass where privilegeid in (select param_code from TBSYSPARAMETER where PARAM_TYPE = 'CAM.CHANNEL_MAPPING' and param_name = :chan)) ");
+			queryCondition.setObject("chan", inputVO.getForce());
+		}
+
+		if (inputVO.getsDate() != null) {
+			sql.append("and b.CREATETIME >= TRUNC(:start) ");
+			queryCondition.setObject("start", inputVO.getsDate());
+		}
+
+		if (inputVO.geteDate() != null) {
+			sql.append("and b.CREATETIME < TRUNC(:end)+1 ");
+			queryCondition.setObject("end", inputVO.geteDate());
+		}
+
+		if (inputVO.getsEDate() != null) {
+			sql.append("and b.LASTUPDATE >= TRUNC(:estart) ");
+			queryCondition.setObject("estart", inputVO.getsEDate());
+		}
+
+		if (inputVO.geteEDate() != null) {
+			sql.append("and b.LASTUPDATE < TRUNC(:eend)+1 ");
+			queryCondition.setObject("eend", inputVO.geteEDate());
+		}
+
+//		sql.append("order by LEAD_NAME,DEPT_NAME,EMP_ID,CUST_ID ");
+
+		return sql;
+	}
+	
 	public void download(Object body, IPrimitiveMap header) throws Exception {
 
 		WorkStation ws = DataManager.getWorkStation(uuid);
@@ -477,7 +535,11 @@ public class CAM180 extends FubonWmsBizLogic {
 						break;
 					case "VISIT_DT":
 						try {
-							records[i] = "=\"" + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(map.get(csvRecord[i])) + "\"";
+							if(map.get(csvRecord[i]) != null) {
+								records[i] = "=\"" + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(map.get(csvRecord[i])) + "\"";
+							} else {
+								records[i] = "";
+							}
 						} catch (Exception e) {
 							records[i] = "";
 							e.printStackTrace();

@@ -20,6 +20,9 @@ public class TBKYC_REPORTVO extends VOBase {
     
     /** nullable persistent field */
     private Blob REPORT_FILE_ENG;
+    
+    /** nullable persistent field */
+    private Blob REPORT_FILE_COMP;
 
 
 public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBKYC_REPORT";
@@ -72,6 +75,14 @@ public String getTableuid () {
 
 	public void setREPORT_FILE_ENG(Blob rEPORT_FILE_ENG) {
 		REPORT_FILE_ENG = rEPORT_FILE_ENG;
+	}
+
+	public Blob getREPORT_FILE_COMP() {
+		return REPORT_FILE_COMP;
+	}
+
+	public void setREPORT_FILE_COMP(Blob rEPORT_FILE_COMP) {
+		REPORT_FILE_COMP = rEPORT_FILE_COMP;
 	}
 
 	public void checkDefaultValue() {

@@ -43,8 +43,8 @@ public class KycOperation {
 	@GET
 	@Path("/KycOperation")
 	@Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
-    public String testForm(
-    	@QueryParam("branch") String branch,
+	public String testForm(
+	    @QueryParam("branch") String branch,
 		@QueryParam("userID") String userID,
 		@QueryParam("custID") String custID,
 		@QueryParam("examID") String examID,
@@ -165,8 +165,8 @@ public class KycOperation {
 			if (kycDao.recordRiskIsDuplicatedOperation(tbkycLog.getCustId()))
 				throwRecordRiskIsPendingException(tbkycLog.getCustId());
 
-//			if (kycDao.isOverLimitationToRiskRecord(tbkycLog.getCustId()))
-//				throwOverLimitationToRiskRecordException();
+			if (kycDao.isOverLimitationToRiskRecord(tbkycLog.getCustId()))
+				throwOverLimitationToRiskRecordException();
 
 			kyc_ans = kycJava.getKycValue(kycin , tbkycLog);
 		}
@@ -201,7 +201,8 @@ public class KycOperation {
 		return getKycCountsXml(
 				kycDao.getKycCounts(tbkycLog.getCustId()),
 				kycDao.getKycWeekCounts(tbkycLog.getCustId()),
-				kycDao.recordRiskIsPending(tbkycLog.getCustId()));
+				kycDao.recordRiskIsPending(tbkycLog.getCustId()),
+				kycDao.inReviewStatus(tbkycLog.getCustId()));
 	}
 
 	private void checkRequiredParameters(Map<String, String> map) throws KycException, JBranchException {
@@ -291,12 +292,23 @@ public class KycOperation {
 		String coolingRiskName = ObjectUtils.toString(kycMap.get("CoolingRiskName"));
 		String coolingEffDate = ObjectUtils.toString(kycMap.get("CoolingEffDate"));
 		String expiry_date = ObjectUtils.toString(kycMap.get("EXPIRY_DATE"));
+		String needComparisonYN = ObjectUtils.toString(kycMap.get("NEED_COMPARISON_YN"));
+		String lastAnswers = ObjectUtils.toString(kycMap.get("LAST_ANSWER_2"));
 
     	StringBuffer sb = new StringBuffer();
     	if(StringUtils.isNotBlank(cDataUp)) {	//試算
     		sb.append("<item>\n")
 			  .append("<key xsi:type=\"soapenc:string\">popup</key>\n")
 			  .append("<value xsi:type=\"soapenc:string\">" + cDataUp + "</value>\n")
+			  .append("</item>\n")
+			  //試算加上：是否需填寫差異表 & 前一次KYC答案選項
+			  .append("<item>\n")
+			  .append("<key xsi:type=\"soapenc:string\">needComparisonYN</key>\n")
+			  .append("<value xsi:type=\"soapenc:string\">" + needComparisonYN + "</value>\n")
+			  .append("</item>\n")
+			  .append("<item>\n")
+			  .append("<key xsi:type=\"soapenc:string\">lastAnswers</key>\n")
+			  .append("<value xsi:type=\"soapenc:string\">" + lastAnswers + "</value>\n")
 			  .append("</item>\n");
     	} else {	//非試算，須加上冷靜期資料
     		sb.append("<item>\n")
@@ -374,7 +386,7 @@ public class KycOperation {
 		}
 	}
 
-	public String getKycCountsXml(BigDecimal kycCounts, BigDecimal kycWeekCounts, String isPending){
+	public String getKycCountsXml(BigDecimal kycCounts, BigDecimal kycWeekCounts, String isPending, String inReviewStatus){
     	return new StringBuffer()
 			.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n")
 			.append("<soapenv:Body>\n")
@@ -382,6 +394,7 @@ public class KycOperation {
 			.append("<kycCounts>" + kycCounts +"</kycCounts>\n")
 			.append("<kycWeekCounts>" + kycWeekCounts +"</kycWeekCounts>\n")
 			.append("<isPending>" + isPending +"</isPending>\n")
+			.append("<isInReviewStatus>" + inReviewStatus +"</isInReviewStatus>\n")
 			.append("</getKycCountsResponse>\n")
 			.append("</soapenv:Body>\n")
 			.append("</soapenv:Envelope>\n").toString();

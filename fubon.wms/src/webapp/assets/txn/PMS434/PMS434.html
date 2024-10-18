@@ -88,7 +88,33 @@
 							       				   && inputVO.similarInfo    != '' 
 							       				   && inputVO.compareResult  == '2' )" />
 						</td>
-					</tr>	
+					</tr>
+					<tr>
+						<th>查核結果：</th>
+						<td>
+							<e-combobox ng-datasource="checkResult_YN"
+	                                    ng-model="inputVO.checkedResult"
+	                                    ng-format="F3"
+	                                    width="200px" 
+								        ng-disabled="!(inputVO.checkInterval      != ''  
+								       				    && inputVO.similarInfo    != '' 
+								       				    && inputVO.compareSource  != '' 
+								       				    && inputVO.compareResult  != '' ) 
+								       			     &&
+								       			     !(inputVO.checkInterval      != '' 
+								       				    && inputVO.similarInfo    != '' 
+								       				    && inputVO.compareResult  == '2' )" 
+								        ng-readonly="!(inputVO.checkInterval      != ''  
+								       				    && inputVO.similarInfo    != '' 
+								       				    && inputVO.compareSource  != '' 
+								       				    && inputVO.compareResult  != '' ) 
+								       			     &&
+								       			     !(inputVO.checkInterval      != '' 
+								       				    && inputVO.similarInfo    != '' 
+								       				    && inputVO.compareResult  == '2' )"
+								       />
+						</td>
+					</tr>
 				</table>
 			</div>
 			<div class="search_box_btn text-center">
@@ -152,7 +178,7 @@
 						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
 							<!-- 勾選 -->
 							<td>
-								<input type="checkbox" ng-model="row.SELECTED" ng-click="rowClicked(row)" ng-disabled="row.chkBoxDisbaled" />
+								<input type="checkbox" ng-model="row.SELECTED" ng-click="rowClicked(row)" ng-disabled="row.chkBoxDisabled" />
 							</td>
 							<!-- 小計比數 -->
 							<td ng-show="inputVO.compareResult == '2'">
@@ -218,8 +244,8 @@
 								<e-combobox ng-datasource="relationList"
 		                                    ng-model="row.RELATION"
 		                                    ng-format="F3"
-		                                    ng-disabled="!row.SELECTED || row.CHECKED_RESULT == 'N'"
-		                                    ng-readonly="!row.SELECTED || row.CHECKED_RESULT == 'N'"
+		                                    ng-disabled="!row.SELECTED"
+		                                    ng-readonly="!row.SELECTED"
 		                                    ng-change="checkRelation(row)"
 		                                    width="200px" />
 		                        <input type="text" 
@@ -227,13 +253,11 @@
 		                        	   style="width: 150px; height: 30px; display: inline;" 
 		                        	   ng-model="row.OTHER_REL" 
 		                        	   placeholder="其他關係..." 
-		                        	   ng-disabled="row.RELATION != '9' 
-		                        	   				|| row.CHECKED_RESULT == 'N' 
-		                        	   				|| row.chkBoxDisbaled" />
+		                        	   ng-disabled="row.RELATION != '9' || row.chkBoxDisabled" />
 							</td>
 							<!-- 證明文件說明(保險文件編號) -->
 							<td>
-								<input type="text" class="form-control" ng-model="row.INSURANCE_NO" placeholder="請輸入...限20個字..." maxlength="20" ng-disabled="!row.SELECTED || row.CHECKED_RESULT == 'N'" />
+								<input type="text" class="form-control" ng-model="row.INSURANCE_NO" placeholder="請輸入...限20個字..." maxlength="20" ng-disabled="!row.SELECTED" />
 							</td>
 						</tr>
 					</tbody>

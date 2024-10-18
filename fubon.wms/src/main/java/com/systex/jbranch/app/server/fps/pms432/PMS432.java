@@ -126,7 +126,12 @@ public class PMS432 extends FubonWmsBizLogic {
 			sql.append("AND CHK.EMP_CUST_ID = :empCustID ");
 			condition.setObject("empCustID", inputVO.getEmpCustID());
 		}
-
+		
+		if(StringUtils.isNotBlank(inputVO.getCheckedResult())) {
+			sql.append("AND CHK.CHECKED_RESULT = :checkedResult ");
+			condition.setObject("checkedResult", inputVO.getCheckedResult());
+		}
+		
 		sql.append("ORDER BY CHK.CHECK_SOURCE_CONTENT");
 		condition.setQueryString(sql.toString());
 
@@ -197,6 +202,9 @@ public class PMS432 extends FubonWmsBizLogic {
 			list = checkConShow(dam.exeQuery(condition));
 			if (StringUtils.isNotBlank(inputVO.getCustID()) || StringUtils.isNotBlank(inputVO.getEmpCustID())) {
 				list = removeCustID(list, inputVO.getCustID(), inputVO.getEmpCustID());
+			}
+			if(StringUtils.isNotBlank(inputVO.getCheckedResult())) {
+				list = removeChkResult(list, inputVO.getCheckedResult());
 			}
 			outputVO.setTotalList(list);
 		} else { // 按分頁，不用重查
@@ -311,26 +319,17 @@ public class PMS432 extends FubonWmsBizLogic {
 		}
 		return returnList;
 	}
-
-	// 重新比對
-//	public void reCompare(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
-//		PMS432InputVO inputVO = (PMS432InputVO) body;
-//		dam = this.getDataAccessManager();
-//		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_SQL);
-//
-//		StringBuffer sql = new StringBuffer();
-//		sql.append("UPDATE TBIOT_ADDRTELMAIL_CHK CHK ");
-//		sql.append("SET (CHECKED_RESULT) = (");
-//		sql.append("SELECT 'Y' FROM TBCUST_EMP_REL REL WHERE REL.CUST_ID = CHK.CUST_ID  ");
-//		sql.append("AND REL.EMP_CUST_ID = CHK.EMP_CUST_ID) ");
-//		sql.append("WHERE CHK.YYYYMM = :YYYYMM ");
-////		sql.append("AND (CHK.CHECKED_RESULT <> 'N' OR CHK.CHECKED_RESULT IS NULL) ");
-//		condition.setObject("YYYYMM", inputVO.getCheckInterval());
-//		condition.setQueryString(sql.toString());
-//		dam.exeUpdate(condition);
-//
-//		this.sendRtnObject(null);
-//	}
+	
+	private List<Map<String, Object>> removeChkResult(List<Map<String, Object>> list, String checkedResult) {
+		List<Map<String, Object>> returnList = new ArrayList<>();
+		for (Map<String, Object> map : list) {
+			Object obj = map.get("CHECKED_RESULT");
+			if (checkedResult.equals(obj)) {
+				returnList.add(map);
+			}
+		}
+		return returnList;
+	}
 
 	// 檢查TBCUST_EMP_REL，存在 => 覆蓋 不存在 => 新增
 	public void checkUpdateInsert(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
@@ -339,12 +338,10 @@ public class PMS432 extends FubonWmsBizLogic {
 		
 		Map<String, Object> updateMap = new HashMap<>();
 		Map<String, Object> insertMap = new HashMap<>();
-		Map<String, Object> deleteMap = new HashMap<>();
 		
 		boolean uploadMark = inputVO.getUploadMark();
 		int updateRel_Row = 0;
 		int insertRel_Row = 0;
-		int deleteRel_Row = 0;
 
 		for (Map<String, Object> map : inputVO.getList()) {
 			QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -359,14 +356,12 @@ public class PMS432 extends FubonWmsBizLogic {
 				condition.setObject("empCustId", map.get("CUST_ID_B"));
 			}
 			List<Map<String, Object>> list = dam.exeQuery(condition);
-
-			if (list.size() > 0 && !"N".equals(map.get("CHECKED_RESULT"))) {
+			
+			if (list.size() > 0) {
 				updateMap.putAll(map);
-			} else if ("Y".equals(map.get("CHECKED_RESULT")) || (uploadMark && list.size() == 0)) {
+			} else if (list.size() == 0 || (uploadMark && list.size() == 0)) {
 				insertMap.putAll(map);
-			} else if (list.size() > 0 && "N".equals(map.get("CHECKED_RESULT"))) {
-				deleteMap.putAll(map);
-			}
+			} 
 
 			if (updateMap.size() > 0) {
 				updateRel_Row += this.updateRel(inputVO, updateMap, condition);
@@ -378,14 +373,10 @@ public class PMS432 extends FubonWmsBizLogic {
 				insertMap.clear();
 			}
 
-			if (deleteMap.size() > 0) {
-				deleteRel_Row += this.deleteRel(inputVO, deleteMap, condition);
-				deleteMap.clear();
-			}
 		}
 
 		if (!uploadMark) {
-			if (updateRel_Row > 0 || insertRel_Row > 0 || deleteRel_Row > 0 || inputVO.getList().size() > 0) {
+			if (updateRel_Row > 0 || insertRel_Row > 0 || inputVO.getList().size() > 0) {
 				if (!StringUtils.equals("2", inputVO.getCompareResult())) {
 					this.updateChk(inputVO, dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL));
 				} else {
@@ -462,25 +453,6 @@ public class PMS432 extends FubonWmsBizLogic {
 		insertRel_Row = dam.exeUpdate(condition);
 
 		return insertRel_Row;
-	}
-
-	private int deleteRel(PMS432InputVO inputVO, Map<String, Object> map, QueryConditionIF condition)
-			throws JBranchException, ParseException {
-		int deleteRel_Row = 0;
-		StringBuffer sql = new StringBuffer();
-		sql.append("DELETE FROM TBCUST_EMP_REL WHERE CUST_ID = :custId AND EMP_CUST_ID = :empCustId ");
-
-		if (!"2".equals(inputVO.getCompareResult())) {
-			condition.setObject("custId", map.get("CUST_ID"));
-			condition.setObject("empCustId", map.get("EMP_CUST_ID"));
-		} else {
-			condition.setObject("custId", map.get("CUST_ID_A"));
-			condition.setObject("empCustId", map.get("CUST_ID_B"));
-		}
-
-		condition.setQueryString(sql.toString());
-		deleteRel_Row = dam.exeUpdate(condition);
-		return deleteRel_Row;
 	}
 
 	private void updateChk(PMS432InputVO inputVO, QueryConditionIF condition) throws JBranchException, ParseException {

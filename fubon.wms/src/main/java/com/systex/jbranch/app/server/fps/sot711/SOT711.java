@@ -69,7 +69,13 @@ public class SOT711 extends EsbUtil {
      * @return
      */
     public void getDefaultFeeRateData(Object body, IPrimitiveMap header) throws Exception {
-        sendRtnObject(this.getDefaultFeeRateData(body));
+    	sot711InputVO = (SOT711InputVO) body;
+    	String isOBU = StringUtils.isBlank(sot711InputVO.getIsOBU()) ? "" : sot711InputVO.getIsOBU();
+    	if (isOBU.equals("Y")) {
+    		sendRtnObject(this.getDefaultFeeRateDataOBU(body));
+    	} else {
+    		sendRtnObject(this.getDefaultFeeRateData(body));
+    	}
     }
 
     /**

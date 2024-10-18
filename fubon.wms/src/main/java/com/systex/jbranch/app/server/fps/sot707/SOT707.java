@@ -152,6 +152,20 @@ public class SOT707 extends EsbUtil {
 		} else if (obj instanceof NJBRVD9OutputVO) {
 			errCode = ((NJBRVD9OutputVO) obj).getErrorCode();
 			errTxt = ((NJBRVD9OutputVO) obj).getErrorMsg();
+			
+		} else if (obj instanceof AJBRVA9OutputVO) {
+			errCode = ((AJBRVA9OutputVO) obj).getErrorCode();
+			errTxt = ((AJBRVA9OutputVO) obj).getErrorMsg();
+		} else if (obj instanceof AJBRVB9OutputVO) {
+			errCode = ((AJBRVB9OutputVO) obj).getErrorCode();
+			errTxt = ((AJBRVB9OutputVO) obj).getErrorMsg();
+		} else if (obj instanceof AJBRVC9OutputVO) {
+			errCode = ((AJBRVC9OutputVO) obj).getErrorCode();
+			errTxt = ((AJBRVC9OutputVO) obj).getErrorMsg();
+		} else if (obj instanceof AJBRVD9OutputVO) {
+			errCode = ((AJBRVD9OutputVO) obj).getErrorCode();
+			errTxt = ((AJBRVD9OutputVO) obj).getErrorMsg();
+			
 		} else if (obj instanceof NJBRVX2OutputVO) {
 			errCode = ((NJBRVX2OutputVO) obj).getErrorCode();
 			errTxt = ((NJBRVX2OutputVO) obj).getErrorMsg();

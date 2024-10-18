@@ -1,0 +1,128 @@
+<style>
+.modal-dialog.KYC310_COMPARISON {
+	width: 1200px; 
+}
+.table_title{
+	font-size: medium;
+	font-style: normal;
+	
+}
+.gv_tab_sc th {
+    white-space: nowrap;
+    padding: 7px 10px;
+    text-align: center;
+    color: #666;
+    vertical-align: bottom;
+    background-color:#B9E5FB;
+    border: 1px solid #fff;
+}
+table{
+	font-size: small;
+	font-weight: bold;
+}
+div{
+	font-size: small;
+	font-weight: bold;
+}
+input:required:invalid{
+ 	border-color: red;
+
+}
+</style>
+<script type="text/javascript" src="assets/txn/KYC310/KYC310_COMPARISON.js"></script>
+<div ng-controller="KYC310_COMPARISONController" ng-cloak>
+	<div class="modal-dialog KYC310_COMPARISON">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" style="text-align: center;">風險評估差異說明</h4>
+			</div>
+			<div class="modal-body" style="overflow: scroll;">
+				<div class="gv_tab_sc">
+					<table ng-repeat="row in inputVO.COMP_QUES track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<tr ng-if="$index == 0">
+							<th width="30%" colspan="2">題目</th>
+							<th width="20%">前次填答</th>
+							<th width="20%">本次填答</th>
+							<th width="30%">說明</th>
+						</tr>
+						<!-- 非第3題 -->
+						<tr ng-if="row.QST_NO != '3'">
+							<!-- 題目 -->
+							<td width="30%" colspan="2">Q{{row.QST_NO}}.{{row.QUESTION_DESC}}</td>
+							<!-- 前次填答 -->
+							<td width="20%">
+								<span ng-repeat="row1 in row.ANSWER_LIST track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<div ng-show="row1.lastAnsSelect">
+										<label>{{row1.ANSWER_DESC}}</label>
+									</div>
+								</span>
+							</td>
+							<!-- 本次填答 -->
+							<td width="20%">
+								<span ng-repeat="row1 in row.ANSWER_LIST track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<div ng-show="row1.select">
+										<label>{{row1.ANSWER_DESC}}</label>
+									</div>
+								</span>
+							</td>
+							<!-- 說明 -->
+							<td width="30%">
+								<span ng-repeat="row1 in row.ANSWER_LIST_COMP track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<div>
+										<input class="bLarger" type="radio" name={{row.QUESTION_VERSION}} ng-disabled="row.sameAnsSelect"
+											ng-change="ansClearComp(row.ANSWER_LIST_COMP, row1)" ng-model="row1.select" ng-value="true">
+										{{row1.ANSWER_DESC}}
+									</div>
+								</span>
+							</td>
+						</tr>
+						 <!-- 第3題特別處理，依商品類別分別填答 -->
+						<tr ng-if="row.QST_NO == '3'" ng-repeat="rowQ3 in row.Q3_PROD_TYPEList_COMP track by $index" style="align:center;">
+							<!-- 題目 -->
+							<td width="20%" ng-if="rowQ3.DATA == '1'" rowspan={{inputVO.Q3_PROD_TYPEList.length}}>Q{{row.QST_NO}}.{{row.QUESTION_DESC}}</td>
+							<!-- 商品類別 -->
+							<td width="10%">{{rowQ3.LABEL_CH}}</td>
+							<!-- 前次填答 -->
+							<td width="20%">
+								<span ng-repeat="row1 in row.ANSWER_LIST track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<span ng-repeat="ansQ3 in inputVO.Q3_PROD_EXPList track by $index">
+										<label ng-if="row1.lastAnsSelect 
+											&& row1.ANSWER_SEQ.toString().substr(0,1) == rowQ3.DATA
+											&& row1.ANSWER_SEQ.toString().substr(1,1) == ansQ3.DATA">{{ansQ3.LABEL_CH}}</label>
+									</span>
+								</span>
+							</td>
+							<!-- 本次填答 -->
+							<td width="20%">
+								<span ng-repeat="row1 in row.ANSWER_LIST track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<span ng-repeat="ansQ3 in inputVO.Q3_PROD_EXPList track by $index">
+										<label ng-if="row1.select 
+											&& row1.ANSWER_SEQ.toString().substr(0,1) == rowQ3.DATA
+											&& row1.ANSWER_SEQ.toString().substr(1,1) == ansQ3.DATA">{{ansQ3.LABEL_CH}}</label>
+									</span>
+								</span>
+							</td>
+							<!-- 說明 -->
+							<td width="30%">
+								<span ng-repeat="row1 in rowQ3.ANSWER_LIST_COMP track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+									<div ng-if="!(rowQ3.Q3Over2Degree && row1.ANSWER_SEQ == 1)">
+										<input class="bLarger" type="radio" name={{rowQ3.DATA}} ng-disabled="rowQ3.sameAnsSelect"
+											ng-change="ansClearComp(rowQ3.ANSWER_LIST_COMP, row1)" ng-model="row1.select" ng-value="true" >
+										{{row1.ANSWER_DESC}}
+									</div>
+								</span>
+							</td>
+						</tr>
+					</table>
+				</div>
+		 		
+		 		<div class="modal-footer" style="text-align:center;">
+		 			<button ng-click="returnQuesCompData()" class="btn btn-info"data-dismiss="modal" >確定</button> 
+			        <button ng-click="closeThisDialog('cancel')" class="btn btn-info"data-dismiss="modal">關閉</button> 
+			        <button ng-click="printBlankCompRpt()" class="btn btn-info"data-dismiss="modal" >列印空白差異表單</button> 
+		        </div>
+			</div>
+		</div>
+	</div>
+</div>

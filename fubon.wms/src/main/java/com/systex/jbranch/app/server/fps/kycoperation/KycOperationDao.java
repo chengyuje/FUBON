@@ -235,7 +235,7 @@ public class KycOperationDao extends FubonWmsBizLogic {
 	@SuppressWarnings("unchecked")
 	public List<Map<String , Object>> queryLastMastHisForStatus03(String custId) throws DAOException, JBranchException{
 		return exeQueryWithoutSortForQcf(genDefaultQueryConditionIF().setQueryString(new StringBuilder()
-			.append(" select CREATE_DATE , CUST_RISK_AFR from TBKYC_INVESTOREXAM_M_HIS ")
+			.append(" select CREATE_DATE , CUST_RISK_AFR, TRUNC(ADD_MONTHS(CREATE_DATE, 6)) as TESTDATE_ADD6MON, SEQ from TBKYC_INVESTOREXAM_M_HIS ")
 			.append(" where cust_id = :custId and status = '03' order by CREATE_DATE DESC FETCH FIRST 1 ROWS ONLY ").toString())
 			.setObject("custId" , custId));
 	}
@@ -510,6 +510,20 @@ public class KycOperationDao extends FubonWmsBizLogic {
 		return "P".equals(result.get(0).get("STATUS"))? "Y": "N";
 	}
 
+	/*** 客戶臨櫃已做KYC且待覆核，若是:Y 否則:N **/
+	public String inReviewStatus(String custId) throws JBranchException {
+		List<Map<String, String>> result =
+                Manager.manage(getDataAccessManager())
+                        .append("Select 1 ")
+                        .append("from TBKYC_INVESTOREXAM_M ")
+                        .append("where CUST_ID = :custId ")
+                        .append("and STATUS = '01' ")
+                        .put("custId", custId)
+                        .query();
+		
+		return CollectionUtils.isNotEmpty(result) ? "Y": "N";
+	}
+	
 	/** 判斷該客戶是否重複呼叫 recordRisk 服務 **/
 	public boolean recordRiskIsDuplicatedOperation(String custId) throws JBranchException {
 		List<Map<String, String>> result =

@@ -909,7 +909,7 @@ eSoafApp.controller('SOT1650Controller',
 		    //檢查變更扣款日期
 			if($scope.inputVO.chgTransDateYN == "Y") {
 				if($scope.inputVO.fTransDate1 == "N" && $scope.inputVO.fTransDate2 == "N" && $scope.inputVO.fTransDate3 == "N" &&
-						$scope.inputVO.fTransDate4 == "N" && $scope.inputVO.fTransDate5 == "N") {
+						$scope.inputVO.fTransDate4 == "N" && $scope.inputVO.fTransDate5 == "N" && $scope.inputVO.fTransDate6 == "N") {
 					$scope.inputVO.chgTransDateYN = "N";
 				}
 			}

@@ -17,6 +17,8 @@ public class KYC111InputVO extends PagingInputVO{
 	private String realTempName;
 	private String DOC_ID;
 	private String QUESTION_DESC_ENG;
+	private List<Map<String,Object>> ANSWER_DESC_COMP;
+	private List DEL_ANSWER_DESC_COMP;
 	
 	public String getDOC_ID() {
 		return DOC_ID;
@@ -84,6 +86,18 @@ public class KYC111InputVO extends PagingInputVO{
 	}
 	public void setQUESTION_DESC_ENG(String qUESTION_DESC_ENG) {
 		QUESTION_DESC_ENG = qUESTION_DESC_ENG;
+	}
+	public List<Map<String, Object>> getANSWER_DESC_COMP() {
+		return ANSWER_DESC_COMP;
+	}
+	public void setANSWER_DESC_COMP(List<Map<String, Object>> aNSWER_DESC_COMP) {
+		ANSWER_DESC_COMP = aNSWER_DESC_COMP;
+	}
+	public List getDEL_ANSWER_DESC_COMP() {
+		return DEL_ANSWER_DESC_COMP;
+	}
+	public void setDEL_ANSWER_DESC_COMP(List dEL_ANSWER_DESC_COMP) {
+		DEL_ANSWER_DESC_COMP = dEL_ANSWER_DESC_COMP;
 	}
 	
 		
