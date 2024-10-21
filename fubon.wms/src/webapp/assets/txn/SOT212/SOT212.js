@@ -111,6 +111,20 @@ eSoafApp.controller('SOT212Controller',
 			if (enterTime == 'change' && !$scope.interFlag) {
 				$scope.interFlag = true;
 			}
+			
+			$scope.toDay = $filter('date')(new Date(),'yyyy-MM-dd 00:00:00');//取當日日期
+			//比較系統日與契約迄日
+			if ($scope.inputVO.contractID != '') {
+				angular.forEach($scope.mappingSet['SOT.CONTRACT_LIST'], function(contractRow){ 
+					if ($scope.inputVO.contractID == contractRow.DATA) {
+							if(contractRow.CONTRACT_END_DAY < $scope.toJsDate($scope.toDay)){
+								$scope.showErrorMsgInDialog("契約迄日已過期");
+					        	$scope.inputVO.contractID = '';  		//清空契約編號
+					        	return false;
+							}
+						}
+					});
+				}
 		};
 		
 		$scope.noCallCustQueryByM = function() {
@@ -126,10 +140,11 @@ eSoafApp.controller('SOT212Controller',
 					$scope.mappingSet['SOT.DEBIT_ACCT_LIST#TRUST'] = [];
 //					$scope.mappingSet['SOT.CREDIT_ACCT_LIST#TRUST'] = [];
 					
-					if($scope.mappingSet['SOT.CONTRACT_LIST'].length == 1){ //只有一筆不能勾選
-						$scope.inputVO.contractID = $scope.mappingSet['SOT.CONTRACT_LIST'][0].DATA;
-						$scope.lockFlagByContractID = true;
-					} else if ($scope.mappingSet['SOT.CONTRACT_LIST'].length < 1){ //沒有契約資料不可以繼續 
+//					if($scope.mappingSet['SOT.CONTRACT_LIST'].length == 1){ //只有一筆不能勾選
+//						$scope.inputVO.contractID = $scope.mappingSet['SOT.CONTRACT_LIST'][0].DATA;
+//						$scope.lockFlagByContractID = true;
+//					} 
+					if ($scope.mappingSet['SOT.CONTRACT_LIST'].length < 1){ //沒有契約資料不可以繼續 
 //						$scope.lockFlagByContractID = true;
 						$scope.showErrorMsg("此客戶查無金錢信託契約資料");
 						$scope.custClear();

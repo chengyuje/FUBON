@@ -605,8 +605,8 @@ public class CRM8502 extends EsbUtil {
 				String obuFlag = (String)dataFundMap.get("obuFlag");
 
 				//判斷DBU OBU
-				SOT701 sot701 = (SOT701) PlatformContext.getBean("sot701");
-				SOT701InputVO sot701_inputVO = new SOT701InputVO();
+//				SOT701 sot701 = (SOT701) PlatformContext.getBean("sot701");
+//				SOT701InputVO sot701_inputVO = new SOT701InputVO();
 				SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
 				SOT707InputVO sot707_inputVO = new SOT707InputVO();
 
@@ -1115,25 +1115,23 @@ public class CRM8502 extends EsbUtil {
 		StringBuilder sb;
 		//共同基金-特定金錢信託
 		try {
-
 			//判斷DBU OBU
-
 			SOT701 sot701 = (SOT701) PlatformContext.getBean("sot701");
-			SOT701InputVO sot701_inputVO = new SOT701InputVO();
-			SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-			SOT707InputVO sot707_inputVO = new SOT707InputVO();
+//			SOT701InputVO sot701_inputVO = new SOT701InputVO();
+//			SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
+//			SOT707InputVO sot707_inputVO = new SOT707InputVO();
 
-			String obuFlag = "";
+			String obuFlag = sot701.checkOBUbyIDType(custID);
+//			String obuFlag = "";
 			try {
-
-				sot701_inputVO.setCustID(custID);
-				FP032675DataVO dataOBU = sot701.getFP032675Data(sot701_inputVO);
-				obuFlag = dataOBU.getObuFlag();
+//				sot701_inputVO.setCustID(custID);
+//				FP032675DataVO dataOBU = sot701.getFP032675Data(sot701_inputVO);
+//				obuFlag = dataOBU.getObuFlag();
 				//前手息用電文 njbrvb1 贖回庫存查詢
-				sot707_inputVO.setCustId(custID);
-				sot707_inputVO.setProdType("2");
-				sot707_inputVO.setIsOBU(obuFlag == "Y" ? "Y" : "N");
-
+//				sot707_inputVO.setCustId(custID);
+//				sot707_inputVO.setProdType("2");
+//				sot707_inputVO.setIsOBU(obuFlag == "Y" ? "Y" : "N");
+				
 				dataMap.put("obuFlag", obuFlag);
 			} catch (Exception e) {
 				logger.error("DBO,OBU justified failed "+e.getMessage());
@@ -1141,7 +1139,7 @@ public class CRM8502 extends EsbUtil {
 			List<CustAssetFundVO> AssetFunList = new ArrayList<CustAssetFundVO>();
 			//基金電文
 			try {
-				AssetFunList = getNFVIPA(custID , obuFlag);
+				AssetFunList = getAssetFunList(custID , obuFlag);
 			} catch (Exception e ) {
 				logger.error("getCustAssetNFD failed,",e);
 			}
@@ -1881,9 +1879,9 @@ public class CRM8502 extends EsbUtil {
     /*
      * 2021.09.14 改NF/AF電文發送邏輯 by SamTu
      */
-	public List<CustAssetFundVO> getNFVIPA(String cust_id , String isOBU) throws Exception {
-		List<CustAssetFundVO> D1List = sendNFVIPA("D1", cust_id, isOBU);
-		List<CustAssetFundVO> D2List = sendNFVIPA("D2", cust_id, isOBU);
+	public List<CustAssetFundVO> getAssetFunList(String cust_id , String isOBU) throws Exception {
+//		List<CustAssetFundVO> D1List = sendNFVIPA("D1", cust_id, isOBU);
+//		List<CustAssetFundVO> D2List = sendNFVIPA("D2", cust_id, isOBU);
 //		List<CustAssetFundVO> AssetFunList = getCustAssetNFData(cust_id, isOBU);
 
 		List<CustAssetFundVO> AssetFunList = new ArrayList();
@@ -1892,74 +1890,74 @@ public class CRM8502 extends EsbUtil {
 			crm821.getCustAssetNFData(cust_id, AssetFunList, "AF");
 		}
 
-		if(D2List.size() > 0){
-			for(CustAssetFundVO vo : D2List){
-				D1List.add(vo);
-			}
-		}
-		if(AssetFunList.size() > 0){
-			for(CustAssetFundVO vo : AssetFunList){
-				D1List.add(vo);
-			}
-		}
-		return D1List;
+//		if(D2List.size() > 0){
+//			for(CustAssetFundVO vo : D2List){
+//				D1List.add(vo);
+//			}
+//		}
+//		if(AssetFunList.size() > 0){
+//			for(CustAssetFundVO vo : AssetFunList){
+//				D1List.add(vo);
+//			}
+//		}
+		return AssetFunList;
 	}
-	private List<CustAssetFundVO> sendNFVIPA(String fun, String cust_id, String isOBU) throws Exception {
-//		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-		List<CustAssetFundVO> total = new ArrayList<CustAssetFundVO>();
-
-		try{
-			//init util
-			ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, ETF_ASSETS);
-			esbUtilInputVO.setModule(thisClaz+new Object(){}.getClass().getEnclosingMethod().getName());
-
-			//head
-			TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
-			esbUtilInputVO.setTxHeadVO(txHead);
-			txHead.setDefaultTxHead();
-
-			//body
-			NFVIPAInputVO txBodyVO = new NFVIPAInputVO();
-			esbUtilInputVO.setNfvipaInputVO(txBodyVO);
-			txBodyVO.setFUNCTION(fun);
-			txBodyVO.setCUSID(cust_id);
-			txBodyVO.setUNIT("Y".equals(isOBU) ? "O" : "D");
-
-			//發送電文
-			List<ESBUtilOutputVO> esbUtilOutputVO = send(esbUtilInputVO);
-
-			for(ESBUtilOutputVO vo : esbUtilOutputVO){
-				NFVIPAOutputVO nfvipaOutputVO = vo.getNfvipaOutputVO();
-				List<NFVIPAOutputVODetails> details = nfvipaOutputVO.getDetails();
-				details = (CollectionUtils.isEmpty(details)) ? new ArrayList<NFVIPAOutputVODetails>() : details;
-
-				for(NFVIPAOutputVODetails detail : details){
-					CustAssetFundVO retVO = new CustAssetFundVO();
-
-					retVO.setFundName(detail.getARR18());
-					retVO.setCurCode("TWD");
-					retVO.setCurAmt(decimalPoint(detail.getARR10(), 0));
-					retVO.setCurBal(decimalPoint(detail.getARR11(), 2));
-					retVO.setSignDigit(detail.getARR12());
-					retVO.setProfitAndLoss(decimalPoint(detail.getARR17(), 4));
-					retVO.setReturn(decimalPoint(detail.getARR13(), 4));
-					retVO.setFundType(detail.getARR01());
-					retVO.setFundNO(detail.getARR04());
-					retVO.setAssetType("0006");
-					retVO.setNetValueDate(detail.getARR09());
-					retVO.setStrdate(detail.getARR06());
-					retVO.setCurUntNum(decimalPoint(detail.getARR07(), 4));
-
-					total.add(retVO);
-				}
-			}
-		}catch(Exception e){
-			logger.debug("發送電文失敗：客戶ID = "+ cust_id);
-			logger.debug("ESB error:NFVIPA="+StringUtil.getStackTraceAsString(e));
-		}
-
-		return total;
-	}
+//	private List<CustAssetFundVO> sendNFVIPA(String fun, String cust_id, String isOBU) throws Exception {
+////		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+//		List<CustAssetFundVO> total = new ArrayList<CustAssetFundVO>();
+//
+//		try{
+//			//init util
+//			ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, ETF_ASSETS);
+//			esbUtilInputVO.setModule(thisClaz+new Object(){}.getClass().getEnclosingMethod().getName());
+//
+//			//head
+//			TxHeadVO txHead = esbUtilInputVO.getTxHeadVO();
+//			esbUtilInputVO.setTxHeadVO(txHead);
+//			txHead.setDefaultTxHead();
+//
+//			//body
+//			NFVIPAInputVO txBodyVO = new NFVIPAInputVO();
+//			esbUtilInputVO.setNfvipaInputVO(txBodyVO);
+//			txBodyVO.setFUNCTION(fun);
+//			txBodyVO.setCUSID(cust_id);
+//			txBodyVO.setUNIT("Y".equals(isOBU) ? "O" : "D");
+//
+//			//發送電文
+//			List<ESBUtilOutputVO> esbUtilOutputVO = send(esbUtilInputVO);
+//
+//			for(ESBUtilOutputVO vo : esbUtilOutputVO){
+//				NFVIPAOutputVO nfvipaOutputVO = vo.getNfvipaOutputVO();
+//				List<NFVIPAOutputVODetails> details = nfvipaOutputVO.getDetails();
+//				details = (CollectionUtils.isEmpty(details)) ? new ArrayList<NFVIPAOutputVODetails>() : details;
+//
+//				for(NFVIPAOutputVODetails detail : details){
+//					CustAssetFundVO retVO = new CustAssetFundVO();
+//
+//					retVO.setFundName(detail.getARR18());
+//					retVO.setCurCode("TWD");
+//					retVO.setCurAmt(decimalPoint(detail.getARR10(), 0));
+//					retVO.setCurBal(decimalPoint(detail.getARR11(), 2));
+//					retVO.setSignDigit(detail.getARR12());
+//					retVO.setProfitAndLoss(decimalPoint(detail.getARR17(), 4));
+//					retVO.setReturn(decimalPoint(detail.getARR13(), 4));
+//					retVO.setFundType(detail.getARR01());
+//					retVO.setFundNO(detail.getARR04());
+//					retVO.setAssetType("0006");
+//					retVO.setNetValueDate(detail.getARR09());
+//					retVO.setStrdate(detail.getARR06());
+//					retVO.setCurUntNum(decimalPoint(detail.getARR07(), 4));
+//
+//					total.add(retVO);
+//				}
+//			}
+//		}catch(Exception e){
+//			logger.debug("發送電文失敗：客戶ID = "+ cust_id);
+//			logger.debug("ESB error:NFVIPA="+StringUtil.getStackTraceAsString(e));
+//		}
+//
+//		return total;
+//	}
     /**
      * 檢查可用庫存(憑證,判斷單位數 > 0 )
      * @param devo

@@ -45,7 +45,7 @@ public final class NewVersionAcct  extends AcctRuler {
 		// 保險
 		else if (isINS(prodType)) return eq(pkind1(), "8168");
 		//其他商品:
-		else return pkind1().matches("8168|8178|8388") && ((isFUND(prodType) || isES(prodType)) || pkind1().matches("8168|8178|8388")) ; // FIXME 基金或ETF商品，可包含1-3碼為560帳號；其他商品不可包含560帳號 待新帳號提供
+		else return pkind1().matches("8168|8178|8388"); // FIXME 基金或ETF商品，可包含1-3碼為560帳號；其他商品不可包含560帳號 待新帳號提供
 	}
 
 	/*

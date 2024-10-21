@@ -46,8 +46,8 @@ public final class OldVersionAcct extends AcctRuler {
 		if (isSI(prodType)) return eq(pkind1(), "677");
 		// 保險
 		else if (isINS(prodType)) return eq(pkind1(), "168");
-		//其他商品: 基金或ETF商品，可包含1-3碼為560帳號；其他商品不可包含560帳號
-		else return pkind1().matches("168|368") && ((isFUND(prodType) ||isES(prodType)) || !eq(pkind3(), "560"));
+		//其他商品: 基金或ETF商品，可包含1-3碼為560帳號；其他商品不可包含560帳號 ==> WMS-CR-20240311-01_海外債券及SN OBU申購及贖回套表功能：此CR將該判斷移除(只有OBU客戶有560帳號 by 美芳)
+		else return pkind1().matches("168|368");
 }
 
 	/*

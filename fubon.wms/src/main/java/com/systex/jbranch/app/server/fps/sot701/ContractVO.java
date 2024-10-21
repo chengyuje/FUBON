@@ -1,6 +1,7 @@
 package com.systex.jbranch.app.server.fps.sot701;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class ContractVO {
 
@@ -21,8 +22,15 @@ public class ContractVO {
 	String CREDIT_FLAG; //受益人滿55歲(Y/N)
 	BigDecimal TRUST_PEOP_NUM;
 	String GUARDIANSHIP_FLAG; // 空白：無監護輔助 1.監護宣告 2輔助宣告
+	Date CONTRACT_END_DAY; //契約迄日
 	
-	
+	public Date getCONTRACT_END_DAY() {
+		return CONTRACT_END_DAY;
+	}
+
+	public void setCONTRACT_END_DAY(Date cONTRACT_END_DAY) {
+		CONTRACT_END_DAY = cONTRACT_END_DAY;
+	}
 	
 	public String getGUARDIANSHIP_FLAG() {
 		return GUARDIANSHIP_FLAG;

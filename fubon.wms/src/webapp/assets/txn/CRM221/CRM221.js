@@ -97,11 +97,6 @@ eSoafApp.controller('CRM221Controller',
 					return;
 				}
 			}
-			//分行為必輸欄位
-			if($scope.empListShowFlag != "UHRM" && ($scope.inputVO.ao_05 == undefined || $scope.inputVO.ao_05 == null || $scope.inputVO.ao_05 == "")) {
-				$scope.showErrorMsg("請輸入分行查詢");
-				return;
-			}
 			
 			$scope.inputVO.aolist = $scope.AO_LIST;
 			$scope.inputVO.branch_list = [];
@@ -110,6 +105,17 @@ eSoafApp.controller('CRM221Controller',
 					$scope.inputVO.branch_list.push({LABEL: row.LABEL, DATA: row.DATA});					
 				}
 			});
+			//分行為必輸欄位
+			if($scope.empListShowFlag != "UHRM" && ($scope.inputVO.ao_05 == undefined || $scope.inputVO.ao_05 == null || $scope.inputVO.ao_05 == "")) {
+				if(($scope.inputVO.branch_list.length > 0 && $scope.inputVO.branch_list[0].DATA.length > 3) ||
+						$scope.inputVO.branch_list.length == 0) {
+					//若選到私銀區，或沒有分行下拉選單資料
+					//不檢核
+				} else {
+					$scope.showErrorMsg("請輸入分行查詢");
+					return;
+				}
+			}			
 			$scope.inputVO.role = $scope.role;
 			$scope.sendRecv("CRM221", "inquire", "com.systex.jbranch.app.server.fps.crm221.CRM221InputVO", $scope.inputVO,
 				function(tota, isError) {

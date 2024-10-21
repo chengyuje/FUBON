@@ -56,6 +56,17 @@ public class NMVP6AOutputDetailsVO {
 	
 	@XmlElement
 	private String TRUST_PEOP_NUM;
+	
+	@XmlElement
+	private String CONTRACT_END_DAY; //契約迄日
+	
+	public String getCONTRACT_END_DAY() {
+		return CONTRACT_END_DAY;
+	}
+
+	public void setCONTRACT_END_DAY(String cONTRACT_END_DAY) {
+		CONTRACT_END_DAY = cONTRACT_END_DAY;
+	}
 
 	public String getTRUST_PEOP_NUM() {
 		return TRUST_PEOP_NUM;

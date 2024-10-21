@@ -9,6 +9,9 @@ eSoafApp.controller('SOT310Controller',
 		$scope.controllerName = "SOT310Controller";
 		//繼承PRD100高齡檢核
 		$controller('PRD100Controller', {$scope: $scope});
+		var pageID = $scope.connector('get','SOT310PAGE'); // 從哪前來SOT315
+		$scope.connector('set','SOT310PAGE', null);
+//		alert(pageID);
 
 		// filter
 		getParameter.XML(["SOT.CUST_TYPE", "SOT.MARKET_TYPE","SOT.SPEC_CUSTOMER","SOT.BN_CUR_LIMIT","SOT.BN_CUR_LIMIT_GTC", "SOT.BN_GTC_LIMITPRICE_RANGE", "OTH001", "SOT.BOND_WEB_TIMESTAMP"], function(totas) {
@@ -45,13 +48,16 @@ eSoafApp.controller('SOT310Controller',
 				}
 			});
 		};
-		$scope.getMaxGtcEndDate();
-
+		
+		if (pageID != 'SOT315') {
+			$scope.getMaxGtcEndDate();
+		}
+		
 		// date picker
-		$scope.apply_gtcEndDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
+//		$scope.apply_gtcEndDateOptions = {
+//			maxDate: $scope.maxDate,
+//			minDate: $scope.minDate
+//		};
 
 		$scope.model = {};
 		$scope.open = function($event, elementOpened) {

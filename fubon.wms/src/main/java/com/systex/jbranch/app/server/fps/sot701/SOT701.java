@@ -3134,7 +3134,7 @@ public class SOT701 extends EsbUtil {
 	 * 20220309 改用IDtype判斷，故同時更改functionName
 	 *
 	 */
-	private String checkOBUbyIDType(String custID) throws Exception {
+	public String checkOBUbyIDType(String custID) throws Exception {
 		// TODO Auto-generated method stub
 		// OBU DBU要用帳號判斷
 		// 發送電文
@@ -3448,6 +3448,7 @@ public class SOT701 extends EsbUtil {
 					contractVO.setCREDIT_FLAG(detailVO.getCREDIT_FLAG());
 					contractVO.setTRUST_PEOP_NUM(new EsbUtil().decimalPoint(detailVO.getTRUST_PEOP_NUM(), 0));
 					contractVO.setGUARDIANSHIP_FLAG(nmvp6aOutputVO.getGUARDIANSHIP_FLAG());
+					contractVO.setCONTRACT_END_DAY(new EsbUtil().toAdYearMMdd(detailVO.getCONTRACT_END_DAY(), false));
 					contractList.add(contractVO);
 				}
 			}
