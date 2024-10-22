@@ -117,7 +117,7 @@ eSoafApp.controller('SOT212Controller',
 			if ($scope.inputVO.contractID != '') {
 				angular.forEach($scope.mappingSet['SOT.CONTRACT_LIST'], function(contractRow){ 
 					if ($scope.inputVO.contractID == contractRow.DATA) {
-							if(contractRow.CONTRACT_END_DAY < $scope.toJsDate($scope.toDay)){
+							if($scope.toJsDate(contractRow.CONTRACT_END_DAY) < $scope.toJsDate($scope.toDay)){
 								$scope.showErrorMsgInDialog("契約迄日已過期");
 					        	$scope.inputVO.contractID = '';  		//清空契約編號
 					        	return false;

@@ -54,6 +54,7 @@ public class SOT315 extends FubonWmsBizLogic {
             map.put("CONTRACT_SPE_FLAG", vo.getCONTRACT_SPE_FLAG());
             map.put("CONTRACT_P_TYPE", vo.getCONTRACT_P_TYPE());
             map.put("CREDIT_FLAG", vo.getCREDIT_FLAG()); //受益人滿55歲(Y/N)
+            map.put("CONTRACT_END_DAY", vo.getCONTRACT_END_DAY());
 			contractList.add(map);
 		}
 		outputVO.setContractList(contractList);

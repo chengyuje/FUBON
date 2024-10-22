@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.Gson;
+import com.systex.jbranch.comutil.parse.JsonUtil;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
 import com.systex.jbranch.platform.common.dataManager.DataManager;
 import com.systex.jbranch.platform.common.dataManager.WorkStation;
@@ -22,6 +24,7 @@ import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.common.util.CSVUtil;
 import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
+import com.systex.jbranch.platform.server.info.SysInfo;
 import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
@@ -79,7 +82,8 @@ public class CAM180 extends FubonWmsBizLogic {
 		dam = this.getDataAccessManager();
 
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		queryCondition.setFetchSize(3000);
+//		queryCondition.setFetchSize(3000); //沒有用，不會真的限制3000筆資料
+		queryCondition.setMaxResults((Integer) SysInfo.getInfoValue(FubonSystemVariableConsts.QRY_MAX_RESULTS));
 		queryCondition.setQueryString(genSql(queryCondition, inputVO).toString());
 
 		return_VO.setResultList(dam.exeQuery(queryCondition));
@@ -98,11 +102,8 @@ public class CAM180 extends FubonWmsBizLogic {
 				//查詢條件有分行代碼，行銷名單以及客戶主檔的分行條件不以OR做，用UNION ALL
 				inputVO.setbCodeType("1");
 				sql.append(genSql_CUS_RECORD(queryCondition, inputVO));
-				sql.append(" UNION ALL ");
+				sql.append(" UNION ");
 				inputVO.setbCodeType("2");
-				sql.append(genSql_CUS_RECORD(queryCondition, inputVO));
-				sql.append(" UNION ALL ");
-				inputVO.setbCodeType("3");
 				sql.append(genSql_CUS_RECORD(queryCondition, inputVO));
 			} else {
 				//沒有輸入分行代碼或是私銀人員，不需要UNION SQL
@@ -116,11 +117,8 @@ public class CAM180 extends FubonWmsBizLogic {
 				//查詢條件有分行代碼，行銷名單以及客戶主檔的分行條件不以OR做，用UNION ALL
 				inputVO.setbCodeType("1");
 				sql.append(genSql_NOT_ALL(queryCondition, inputVO));
-				sql.append(" UNION ALL ");
+				sql.append(" UNION ");
 				inputVO.setbCodeType("2");
-				sql.append(genSql_NOT_ALL(queryCondition, inputVO));
-				sql.append(" UNION ALL ");
-				inputVO.setbCodeType("3");
 				sql.append(genSql_NOT_ALL(queryCondition, inputVO));
 			} else {
 				//沒有輸入分行代碼或是私銀人員，不需要UNION SQL
@@ -206,13 +204,10 @@ public class CAM180 extends FubonWmsBizLogic {
 			//非總行一定要選分行，不用IN
 			//總行不需要限制分行
 			if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("1", inputVO.getbCodeType())) {
-				sql.append("and b.BRANCH_ID = :bcode and d.BRA_NBR <> :bcode ");
+				sql.append("and b.BRANCH_ID = :bcode ");
 				queryCondition.setObject("bcode", inputVO.getbCode());
 			} else if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("2", inputVO.getbCodeType())) {
-				sql.append("and d.BRA_NBR = :bcode and b.BRANCH_ID <> :bcode ");
-				queryCondition.setObject("bcode", inputVO.getbCode());
-			} else if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("3", inputVO.getbCodeType())) {
-				sql.append("and d.BRA_NBR = :bcode and b.BRANCH_ID = :bcode ");
+				sql.append("and d.BRA_NBR = :bcode ");
 				queryCondition.setObject("bcode", inputVO.getbCode());
 			}
 			
@@ -345,13 +340,10 @@ public class CAM180 extends FubonWmsBizLogic {
 			//非總行一定要選分行，不用IN
 			//總行不需要限制分行
 			if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("1", inputVO.getbCodeType())) {
-				sql.append(" and c.BRA_NBR = :bcode and b.BRANCH_ID <> :bcode ");
+				sql.append(" and c.BRA_NBR = :bcode ");
 				queryCondition.setObject("bcode", inputVO.getbCode());
 			} else if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("2", inputVO.getbCodeType())) {
-				sql.append(" and b.BRANCH_ID = :bcode and c.BRA_NBR <> :bcode ");
-				queryCondition.setObject("bcode", inputVO.getbCode());
-			} else if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("3", inputVO.getbCodeType())) {
-				sql.append(" and b.BRANCH_ID = :bcode and c.BRA_NBR = :bcode ");
+				sql.append(" and b.BRANCH_ID = :bcode ");
 				queryCondition.setObject("bcode", inputVO.getbCode());
 			}
 		} else if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).equals("uhrm")) {
@@ -448,7 +440,9 @@ public class CAM180 extends FubonWmsBizLogic {
 		// FROM_FLAG 含CUS_RECORD、UNICA_MKT、UNICA_INFO、USR、CAMPAIGN_ID … ETC
 		// COLSE_REASON 為空值
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		queryCondition.setFetchSize(3000);
+//		queryCondition.setFetchSize(3000); //沒有用，不會真的限制3000筆資料
+		String downloadCount = (String) xmlInfo.getVariable("CAM.180_MAX_DOWNLOAD_COUNT", "1", "F3");
+		queryCondition.setMaxResults(Integer.parseInt(downloadCount)); //10000筆
 		queryCondition.setQueryString(genSql(queryCondition, inputVO).toString());
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		if (list.size() > 0) {

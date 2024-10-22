@@ -34,16 +34,16 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
 	$scope.limitDate = function() {
 		$scope.sDateOptions.maxDate = $scope.inputVO.eDate;
 		$scope.eDateOptions.minDate = $scope.inputVO.sDate;
-		if($scope.inputVO.sDate) {
-			var compare1 = new Date(($scope.inputVO.sDate.getFullYear()+1),$scope.inputVO.sDate.getMonth(),$scope.inputVO.sDate.getDate()-1);
-			$scope.eDateOptions.maxDate = compare1;
-			if(compare1 < $scope.inputVO.eDate)
-				$scope.inputVO.eDate = "";
-		}
-		if($scope.inputVO.sDate || $scope.inputVO.eDate || $scope.inputVO.sEDate || $scope.inputVO.eEDate)
+//		if($scope.inputVO.sDate) {
+//			var compare1 = new Date(($scope.inputVO.sDate.getFullYear()+1),$scope.inputVO.sDate.getMonth(),$scope.inputVO.sDate.getDate()-1);
+//			$scope.eDateOptions.maxDate = compare1;
+//			if(compare1 < $scope.inputVO.eDate)
+//				$scope.inputVO.eDate = "";
+//		}
+//		if($scope.inputVO.sDate || $scope.inputVO.eDate || $scope.inputVO.sEDate || $scope.inputVO.eEDate)
 			$scope.date = false;
-		else
-			$scope.date = true;
+//		else
+//			$scope.date = true;
 	};
 	
 	$scope.limitEDate = function() {
@@ -96,10 +96,10 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
     		return;
     	}
 		
-		if ($scope.parameterTypeEditForm.$invalid) {
-    		$scope.showErrorMsg("ehl_01_common_022");
-    		return;
-    	}
+//		if ($scope.parameterTypeEditForm.$invalid) {
+//    		$scope.showErrorMsg("ehl_01_common_022");
+//    		return;
+//    	}
 		
 		if ($scope.inputVO.id) {
 			$scope.inputVO.id = $scope.inputVO.id.toUpperCase();

@@ -28,6 +28,8 @@ import com.systex.jbranch.platform.common.errHandle.DAOException;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.common.util.PlatformContext;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
+import com.systex.jbranch.platform.server.info.SysInfo;
+import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
 @Component("mao211")
@@ -99,6 +101,9 @@ public class MAO211 extends FubonWmsBizLogic {
 		sql.append("    ) T_LIST ON 1 = 1 ");
 		sql.append("    WHERE M.FLAG = 'U' ");
 		sql.append("    AND M.DEV_STATUS = 'N' ");
+		sql.append("    AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = :loginID AND UHRM.DEPT_ID = M.OP_NBR) ");
+
+		queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
 
 		if (StringUtils.isNotBlank(inputVO.getDev_site_type())) {
 			sql.append("AND M.DEV_SITE_TYPE = :dev_site_type ");

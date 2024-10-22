@@ -139,12 +139,13 @@ eSoafApp.controller('SOT112Controller',
 			
 			$scope.mappingSet['SOT.DEBIT_ACCT_LIST#TRUST#DISPLAY'] = $scope.mappingSet['SOT.DEBIT_ACCT_LIST#TRUST'];
 			
+			
 			$scope.toDay = $filter('date')(new Date(),'yyyy-MM-dd 00:00:00');//取當日日期
 			//比較系統日與契約迄日
 			if ($scope.inputVO.contractID != '') {
 				angular.forEach($scope.mappingSet['SOT.CONTRACT_LIST'], function(contractRow){ 
 					if ($scope.inputVO.contractID == contractRow.DATA) {
-							if(contractRow.CONTRACT_END_DAY < $scope.toJsDate($scope.toDay)){
+							if($scope.toJsDate(contractRow.CONTRACT_END_DAY) < $scope.toJsDate($scope.toDay)){
 								$scope.showErrorMsgInDialog("契約迄日已過期");
 					        	$scope.inputVO.contractID = '';  		//清空契約編號
 					        	return false;
