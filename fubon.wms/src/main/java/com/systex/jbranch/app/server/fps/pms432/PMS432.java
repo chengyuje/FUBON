@@ -214,7 +214,7 @@ public class PMS432 extends FubonWmsBizLogic {
 
 		int size = list.size();
 		int start = inputVO.getCurrentPageIndex() * 10;
-		int end = start + 10 < size ? start + 10 : size;
+  		int end = start + 10 < size ? start + 10 : size;
 		outputVO.setTotalRecord(size);
 		outputVO.setTotalPage(size / 10 + (size % 10 != 0 ? 1 : 0));
 		outputVO.setResultList(outputVO.getTotalList().subList(start, end));
@@ -461,18 +461,9 @@ public class PMS432 extends FubonWmsBizLogic {
 			StringBuffer sql = new StringBuffer();
 			sql.append("UPDATE TBIOT_ADDRTELMAIL_CHK SET ");
 			sql.append("CHECKED_RESULT = :chkResult, MODIFIER = :modifier, LASTUPDATE = SYSDATE ");
-			if (!inputVO.getUploadMark()) {
-//				sql.append("WHERE SEQ = :seq");
-//				condition.setObject("seq", map.get("SEQ"));
-				sql.append("WHERE CUST_ID = :custId AND EMP_CUST_ID = :empCustId ");
-				condition.setObject("custId", map.get("CUST_ID"));
-				condition.setObject("empCustId", map.get("EMP_CUST_ID"));
-			} else {
-				sql.append("WHERE CUST_ID = :custId AND EMP_CUST_ID = :empCustId ");
-				condition.setObject("custId", map.get("CUST_ID"));
-				condition.setObject("empCustId", map.get("EMP_CUST_ID"));
-			}
-
+			sql.append("WHERE CUST_ID = :custId AND EMP_CUST_ID = :empCustId ");
+			condition.setObject("custId", map.get("CUST_ID"));
+			condition.setObject("empCustId", map.get("EMP_CUST_ID"));
 			condition.setObject("chkResult", map.get("CHECKED_RESULT"));
 			condition.setObject("modifier", loginID);
 			condition.setQueryString(sql.toString());
@@ -488,16 +479,14 @@ public class PMS432 extends FubonWmsBizLogic {
 			sql.append("UPDATE TBIOT_ADDRTELMAIL_CON_CHK SET ");
 			sql.append("CHECKED_RESULT = :chkResult, MODIFIER = :modifier, LASTUPDATE = SYSDATE ");
 			sql.append("WHERE CUST_ID_A = :custIdA and CUST_ID_B = :custIdB ");
-
 			if (!inputVO.getUploadMark()) {
-				condition.setObject("chkResult", map.get("CHECKED_RESULT"));
 				condition.setObject("custIdA", map.get("CUST_ID_A"));
 				condition.setObject("custIdB", map.get("CUST_ID_B"));
 			} else {
-				condition.setObject("chkResult", "Y");
 				condition.setObject("custIdA", map.get("CUST_ID"));
 				condition.setObject("custIdB", map.get("EMP_CUST_ID"));
 			}
+			condition.setObject("chkResult", map.get("CHECKED_RESULT"));
 			condition.setObject("modifier", loginID);
 			condition.setQueryString(sql.toString());
 			dam.exeUpdate(condition);
@@ -528,9 +517,13 @@ public class PMS432 extends FubonWmsBizLogic {
 		String[] csvHeader = null;
 
 		if (!"2".equals(inputVO.getCompareType())) {
-			csvHeader = new String[] { "客戶ID", "理專ID", "客戶與理專關係", "客戶與理專關係-其他", "證明文件說明(保險文件編號) 限20字" };
+			csvHeader = new String[] { "客戶ID", "理專ID", "查核結果(Y:有關係、N:無關係)", 
+									   "客戶與理專關係", "客戶與理專關係-其他", 
+									   "證明文件說明(保險文件編號) 限20字" };
 		} else {
-			csvHeader = new String[] { "客戶ID", "被比對客戶ID", "客戶與被比對客戶ID關係", "客戶與被比對客戶ID關係-其他", "證明文件說明(保險文件編號) 限20字" };
+			csvHeader = new String[] { "客戶ID", "被比對客戶ID", "查核結果(Y:有關係、N:無關係)", 
+									   "客戶與被比對客戶關係", "客戶與被比對客戶關係-其他", 
+									   "證明文件說明(保險文件編號) 限20字" };
 		}
 
 		List<Map<String, Object>> list = new ArrayList<>();
@@ -554,6 +547,8 @@ public class PMS432 extends FubonWmsBizLogic {
 							throw new Exception(row[3]);
 						else if (!csvHeader[4].equals(row[4].trim()))
 							throw new Exception(row[4]);
+						else if (!csvHeader[5].equals(row[5].trim()))
+							throw new Exception(row[5]);
 					} catch (Exception ex) {
 						throw new APException(ex.getMessage() + ":上傳格式錯誤，請下載範例檔案");
 					}
@@ -572,46 +567,61 @@ public class PMS432 extends FubonWmsBizLogic {
 					throw new JBranchException("請輸入客戶ID!");
 				}
 
-				// 理專ID(身分證字號)
+				// 理專ID/被比對客戶ID(身分證字號)
 				String empCustId = row[1].replace("\u3000", "").trim();
 				if (StringUtils.isNotBlank(empCustId)) {
 					if (row[1].matches("^[a-zA-Z][0-9]{9}$")) {
 						map.put("EMP_CUST_ID", empCustId.toUpperCase());
 					} else {
-						throw new JBranchException("理專ID格式錯誤，請輸入正確身份證字號格式!");
+					    throw new JBranchException(csvHeader[1] + "格式錯誤，請輸入正確身份證字號格式!");
 					}
 				} else {
-					throw new JBranchException("請輸入理專ID!");
+					throw new JBranchException("請輸入" + csvHeader[1] + "!");
 				}
+				
+				// 查核結果(Y:有關係、N:無關係)
+				String result = row[2].replace("\u3000", "").trim();
+				if (StringUtils.isNotBlank(result)) {
+					if ("Y".equals(result) || "N".equals(result)) {
+						map.put("CHECKED_RESULT", result);
+					} else {
+						throw new JBranchException("查核結果，請輸入 Y 或 N!");
+					}
 
-				// 客戶與理專關係(1 ~ 9) : 如是9，客戶與理專關係-其他必填，反之不用填。
-				String relation = row[2].trim();
-				String otherRel = row[3].trim();
+				} else {
+					throw new JBranchException("請輸入查核結果!");
+				}
+					
+				// 客戶與理專/被比對客戶ID 關係(1 ~ 9) 
+				// == 9，客戶與理專關係-其他必填，!= 9 不用填。
+				String relation = row[3].trim();
+				String otherRel = row[4].trim();
+				String id = csvHeader[1].substring(0, csvHeader[1].indexOf("I"));
 				if (StringUtils.isNotBlank(relation)) {
 					if (StringUtils.isNotBlank(relationMap.get(relation))) {
 						if ("9".equals(relation)) {
 							if (StringUtils.isBlank(otherRel)) {
-								throw new JBranchException("客戶與理專關係是9，客戶與理專關係-其他不能為空!");
+								throw new JBranchException("客戶與" + id + "關係是9，" + csvHeader[4] + "不能為空!");
 							} else {
 								map.put("RELATION", relation);
 								map.put("OTHER_REL", otherRel);
 							}
 						} else {
 							if (StringUtils.isNotBlank(otherRel)) {
-								throw new JBranchException("客戶與理專關係是1~8，客戶與理專關係-其他不需填寫!");
+								throw new JBranchException("客戶與" + id + "關係是1~8，" + csvHeader[4] + "不需填寫!");
 							} else {
 								map.put("RELATION", relation);
 							}
 						}
-					} else {
-						throw new JBranchException("客戶與理專關係格式錯誤，請輸入1~9!");
+				    } else {
+						throw new JBranchException("客戶與" + id + "關係格式錯誤，請輸入1~9!");
 					}
 				} else {
-					throw new JBranchException("請輸入客戶與理專關係!");
+					throw new JBranchException("請輸入客戶與" + id + "關係!");
 				}
 
 				// 證明文件說明(保險文件編號) : 限20字
-				String insuranceNo = row[4].trim();
+				String insuranceNo = row[5].trim();
 				if (StringUtils.isNotBlank(insuranceNo)) {
 					if (insuranceNo.length() > 20) {
 						throw new JBranchException("證明文件說明(保險文件編號) 限20字!");

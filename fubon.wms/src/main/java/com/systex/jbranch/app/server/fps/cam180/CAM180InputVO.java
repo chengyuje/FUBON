@@ -22,6 +22,8 @@ public class CAM180InputVO extends PagingInputVO {
 	private List<Map<String, Object>> query_list;
 	private String tabType;
 	private String bCodeType;
+	private String branch_area_id;
+	private String regionMrgUHRMAreaYN;
 
 	public String getTabType() {
 		return tabType;
@@ -133,5 +135,21 @@ public class CAM180InputVO extends PagingInputVO {
 
 	public void setbCodeType(String bCodeType) {
 		this.bCodeType = bCodeType;
+	}
+	
+	public String getBranch_area_id() {
+		return branch_area_id;
+	}
+
+	public void setBranch_area_id(String branch_area_id) {
+		this.branch_area_id = branch_area_id;
+	}
+
+	public String getRegionMrgUHRMAreaYN() {
+		return regionMrgUHRMAreaYN;
+	}
+
+	public void setRegionMrgUHRMAreaYN(String regionMrgUHRMAreaYN) {
+		this.regionMrgUHRMAreaYN = regionMrgUHRMAreaYN;
 	}
 }

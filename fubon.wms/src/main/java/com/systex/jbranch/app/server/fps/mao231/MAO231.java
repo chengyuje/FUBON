@@ -22,6 +22,9 @@ import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
 import com.systex.jbranch.platform.common.errHandle.APException;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
+import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
+import com.systex.jbranch.platform.server.info.SysInfo;
+import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.server.mail.FubonMail;
 import com.systex.jbranch.platform.server.mail.FubonSendJavaMail;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
@@ -58,6 +61,16 @@ public class MAO231 extends FubonWmsBizLogic {
 		sql.append("AND P.DEV_STATUS IN ('B04') ");
 		sql.append("AND EXISTS (SELECT DISTINCT EMP_ID FROM VWORG_EMP_UHRM_INFO UP WHERE UP.DEPT_ID = E.DEPT_ID AND P.APL_EMP_ID = UP.EMP_ID) ");
 
+		switch (getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG).toString()) {
+			case "uhrmMGR":
+			case "uhrmBMMGR":
+				//有UHRM權限人員只能查詢UHRM人員鍵機或UHRM為招攬人員的案件
+				sql.append("AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE E.DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID AND MT.DEPT_ID = :loginArea) ");
+				
+				queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
+				queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
+				break;
+		}
 		if (inputVO.getUse_date_bgn() != null) {
 			sql.append("AND TRUNC(P.USE_DATE) >= TRUNC(:start) ");
 			queryCondition.setObject("start", new Timestamp(inputVO.getUse_date_bgn().getTime()));

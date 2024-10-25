@@ -215,7 +215,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		}
 		
 		if (StringUtils.isNotBlank(inputVO.getRPT_DEPT())) {
-			sql.append(" and (DRM.RPT_DEPT =:RRPT_DEPT or DRM.RPT_DEPT_1=:RRPT_DEPT  or DRM.RPT_DEPT_2=:RRPT_DEPT) ");
+			sql.append(" and (DRM.RPT_DEPT = :RRPT_DEPT or DRM.RPT_DEPT_1=:RRPT_DEPT  or DRM.RPT_DEPT_2 = :RRPT_DEPT) ");
 			condition.setObject("RRPT_DEPT", inputVO.getRPT_DEPT());
 		}
 
@@ -843,23 +843,69 @@ public class PMS350 extends FubonWmsBizLogic {
 	public void queryRPTData(Object body, IPrimitiveMap header) throws JBranchException {
 		
 		XmlInfo xmlInfo = new XmlInfo();
-		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));	// 營運區
-		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));	// 營運區
-		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));	// 營運區
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));	
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));	
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));	
 
 		PMS350DetailInputVO inputVO = (PMS350DetailInputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
+		sql.append("WITH BASE_ORG AS ( ");
+		sql.append("  SELECT ID.DEPT_ID, ID.DEPT_NAME, ID.ORG_TYPE, ");
+		sql.append("	     CASE WHEN EXISTS (SELECT 1 FROM VWORG_DEPT_BR T WHERE T.DEPT_ID = ID.DEPT_ID_30) THEN ID.DEPT_ID_30 ELSE NULL END AS REGION_CENTER_ID, ");
+		sql.append("	     CASE WHEN EXISTS (SELECT 1 FROM VWORG_DEPT_BR T WHERE T.DEPT_ID = ID.DEPT_ID_40) THEN ID.DEPT_ID_40 ELSE NULL END AS BRANCH_AREA_ID, ");
+		sql.append("	     CASE WHEN EXISTS (SELECT 1 FROM VWORG_DEPT_BR T WHERE T.DEPT_ID = ID.DEPT_ID_50) THEN ID.DEPT_ID_50 ELSE NULL END AS BRANCH_NBR, ");
+		sql.append("	     ID.DEPT_ID_00, ");
+		sql.append("	     ID.DEPT_ID_05, ");
+		sql.append("	     ID.DEPT_ID_10, ");
+		sql.append("	     ID.DEPT_ID_20, ");
+		sql.append("	     ID.DEPT_ID_30, ");
+		sql.append("	     ID.DEPT_ID_40, ");
+		sql.append("	     ID.DEPT_ID_50 ");
+		sql.append("  FROM ( ");
+		sql.append("	SELECT * ");
+		sql.append("	FROM ( ");
+		sql.append("	  SELECT A.DEPT_ID, A.ORG_TYPE, A.DEPT_NAME, ORG.ORG_TYPE AS ORG_TYPE_CLS, ORG.DEPT_ID AS LEV_DEPT_ID ");
+		sql.append("	  FROM TBORG_DEFN A ");
+		sql.append("	  LEFT JOIN ( ");
+		sql.append("	    SELECT DISTINCT ORG_TYPE, CONNECT_BY_ROOT(DEPT_ID) AS CHILD_DEPT_ID, DEPT_ID, DEPT_NAME ");
+		sql.append("	    FROM TBORG_DEFN ");
+		sql.append("	    START WITH DEPT_ID IS NOT NULL ");
+		sql.append("	    CONNECT BY PRIOR PARENT_DEPT_ID = DEPT_ID ");
+		sql.append("	  ) ORG ON A.DEPT_ID = ORG.CHILD_DEPT_ID ");
+		sql.append("	) ");
+		sql.append("	PIVOT (MAX(LEV_DEPT_ID) FOR ORG_TYPE_CLS IN ('00' AS DEPT_ID_00, '05' AS DEPT_ID_05, '10' AS DEPT_ID_10, '20' AS DEPT_ID_20, '30' AS DEPT_ID_30, '40' AS DEPT_ID_40, '50' AS DEPT_ID_50)) ");
+		sql.append("  ) ID ");
+		sql.append(") ");
 		
 		sql.append("SELECT TT.* ");
 		sql.append("FROM ( ");
 		sql.append("  SELECT T.SEQ, T.ROW_SEQ, ");
 		sql.append("         D.DATA_YEARMON, ");
-		sql.append("         D.REGION_CENTER_ID, D.REGION_CENTER_NAME, D.BRANCH_AREA_ID, D.BRANCH_AREA_NAME, D.BRANCH_NBR, D.BRANCH_NAME, ");
-		sql.append("         D.EMP_ID, M.EMP_NAME, D.AO_CODE, ");
-		sql.append("         DEFN.PARENT_DEPT_ID AS REAL_RC, M.DEPT_ID AS REAL_OP, ");
+		sql.append("         D.REGION_CENTER_ID, ");
+		sql.append("         D.REGION_CENTER_NAME, ");
+		sql.append("         D.BRANCH_AREA_ID, ");
+		sql.append("         D.BRANCH_AREA_NAME, ");
+		sql.append("         D.BRANCH_NBR, ");
+		sql.append("         D.BRANCH_NAME, ");
+		sql.append("         D.EMP_ID, ");
+		sql.append("         M.EMP_NAME, ");
+		sql.append("         D.AO_CODE, ");
+		sql.append("         CASE WHEN ORG_50.DEPT_ID IS NOT NULL THEN ORG_50.REGION_CENTER_ID ");
+		sql.append("              WHEN ORG_40.DEPT_ID IS NOT NULL THEN ORG_40.REGION_CENTER_ID "); 
+		sql.append("              WHEN ORG_30.DEPT_ID IS NOT NULL THEN ORG_30.REGION_CENTER_ID ");
+		sql.append("         ELSE D.REGION_CENTER_ID END AS REAL_RC, ");
+		sql.append("         CASE WHEN ORG_50.DEPT_ID IS NOT NULL THEN ORG_50.BRANCH_AREA_ID ");
+		sql.append("              WHEN ORG_40.DEPT_ID IS NOT NULL THEN ORG_40.BRANCH_AREA_ID ");
+		sql.append("              WHEN ORG_30.DEPT_ID IS NOT NULL THEN ORG_30.BRANCH_AREA_ID ");
+		sql.append("         ELSE D.BRANCH_AREA_ID END AS REAL_OP, ");
+		sql.append("         CASE WHEN ORG_50.DEPT_ID IS NOT NULL THEN ORG_50.BRANCH_NBR ");
+		sql.append("              WHEN ORG_40.DEPT_ID IS NOT NULL THEN ORG_40.BRANCH_NBR ");
+		sql.append("              WHEN ORG_30.DEPT_ID IS NOT NULL THEN ORG_30.BRANCH_NBR ");
+		sql.append("         ELSE D.BRANCH_NBR END AS REAL_BR, ");
 		sql.append("         T.COL ");
 		sql.append("  FROM ( ");
 		sql.append("    SELECT DISTINCT SEQ, ROW_SEQ, ");
@@ -870,7 +916,9 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("  INNER JOIN TBPMS_DYNAMIC_RPT_DTL D ON D.SEQ = T.SEQ AND D.ROW_SEQ = T.ROW_SEQ ");
 		sql.append("  LEFT JOIN TBORG_MEMBER M ON D.EMP_ID = M.EMP_ID  ");
 		sql.append("  LEFT JOIN TBORG_DEFN DEFN ON DEFN.DEPT_ID = M.DEPT_ID  ");
-
+		sql.append("  LEFT JOIN BASE_ORG ORG_50 ON DEFN.ORG_TYPE = '50' AND DEFN.DEPT_ID = ORG_50.DEPT_ID  ");
+		sql.append("  LEFT JOIN BASE_ORG ORG_40 ON DEFN.ORG_TYPE = '40' AND DEFN.DEPT_ID = ORG_40.DEPT_ID  ");
+		sql.append("  LEFT JOIN BASE_ORG ORG_30 ON DEFN.ORG_TYPE = '30' AND DEFN.DEPT_ID = ORG_30.DEPT_ID  ");
 		sql.append("  WHERE 1 = 1 ");
 		
 		//此報表是否只查所屬的資料
@@ -927,7 +975,15 @@ public class PMS350 extends FubonWmsBizLogic {
 				if (isUHRMMGR || isOPMGR) {
 					sql.append("    OR M.DEPT_ID = :loginOP ");
 					condition.setObject("loginOP", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
-				} 
+				} else if (isARMGR || isHANDMGR) {
+					sql.append("    OR ( "); 
+					sql.append("   	  (CASE WHEN (SELECT COUNT(1) FROM TBORG_UHRM_BRH UB WHERE UB.EMP_ID = D.EMP_ID) > 0 THEN 'Y' ELSE 'N' END) = 'Y'  "); 
+					sql.append("   	  AND (CASE WHEN ORG_50.DEPT_ID IS NOT NULL THEN ORG_50.BRANCH_AREA_ID ");
+					sql.append("                WHEN ORG_40.DEPT_ID IS NOT NULL THEN ORG_40.BRANCH_AREA_ID "); 
+					sql.append("                WHEN ORG_30.DEPT_ID IS NOT NULL THEN ORG_30.BRANCH_AREA_ID ");
+					sql.append("           ELSE D.BRANCH_AREA_ID END) = :area_id ");
+					sql.append("    ) "); 	
+				}
 				
 				sql.append("  ) ");
 				
@@ -957,10 +1013,14 @@ public class PMS350 extends FubonWmsBizLogic {
 				if (isARMGR) {
 					sql.append("    OR ( "); 
 					sql.append("   	  (CASE WHEN (SELECT COUNT(1) FROM TBORG_UHRM_BRH UB WHERE UB.EMP_ID = D.EMP_ID) > 0 THEN 'Y' ELSE 'N' END) = 'Y'  "); 
-					sql.append("   	  AND DEFN.PARENT_DEPT_ID = :loginRC ");
+					sql.append("   	  AND (CASE WHEN ORG_50.DEPT_ID IS NOT NULL THEN ORG_50.REGION_CENTER_ID ");
+					sql.append("                WHEN ORG_40.DEPT_ID IS NOT NULL THEN ORG_40.REGION_CENTER_ID "); 
+					sql.append("                WHEN ORG_30.DEPT_ID IS NOT NULL THEN ORG_30.REGION_CENTER_ID ");
+					sql.append("           ELSE D.REGION_CENTER_ID END) = :loginRC ");
 					sql.append("    ) "); 	
 					condition.setObject("loginRC", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_REGION));
 				}
+				
 				sql.append("  ) ");
 				
 				condition.setObject("center_id", inputVO.getRegion_center_id());
@@ -1015,14 +1075,13 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("WHERE 1 = 1 ");
 
 		if (isUHRMMGR || isOPMGR) {
-			sql.append("AND TT.REAL_RC = :loginRC ");
-			sql.append("AND TT.REAL_OP = :loginOP ");
-			condition.setObject("loginRC", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_REGION));
+			sql.append("AND (TT.REAL_OP = :loginOP OR TT.REAL_OP IS NULL) ");
 			condition.setObject("loginOP", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
 		} else if (isARMGR) {
-			sql.append("AND TT.REAL_RC = :loginRC ");
+			sql.append("AND (TT.REAL_RC = :loginRC OR TT.REAL_RC IS NULL) ");
 			condition.setObject("loginRC", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_REGION));
 		}
+		
 		
 		//此報表是否只查所屬的資料
 		if ("1".equals(inputVO.getIsSelf()) && "".equals(inputVO.getEmp_id())) {
@@ -1272,11 +1331,23 @@ public class PMS350 extends FubonWmsBizLogic {
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
 		
-		sql.append("SELECT DISTINCT RPT_NAME AS RPT_NAME_D FROM TBPMS_DYNAMIC_RPT_MAST DRM ");
-		sql.append("LEFT JOIN  TBSYSSECUROLPRIASS P ON P.ROLEID = :USERROLES ");
-		sql.append("LEFT JOIN  TBORG_DEFN DEF ON DEF.DEPT_ID = CASE WHEN DRM.RPT_DEPT IS NOT NULL THEN DRM.RPT_DEPT ");
-		sql.append("                                               WHEN DRM.RPT_DEPT_2 IS NOT NULL THEN DRM.RPT_DEPT_2 ");
-		sql.append("                                          ELSE DRM.RPT_DEPT_1 END ");
+		sql.append("SELECT DISTINCT DRM.RPT_NAME AS RPT_NAME_D ");
+		sql.append("FROM ( ");
+		sql.append("  SELECT DISTINCT RPT_NAME, RPT_TYPE, RPT_DEPT, RPT_DEPT_1, RPT_DEPT_2, END_DATE, VALID_FLAG, REGEXP_SUBSTR(USER_ROLES_LIST, '[^,]+', 1, TEMP_T.LEV) AS USER_ROLES ");
+		sql.append("  FROM ( ");
+		sql.append("    SELECT DISTINCT RPT_NAME, RPT_TYPE, RPT_DEPT, RPT_DEPT_1, RPT_DEPT_2, END_DATE, VALID_FLAG, REPLACE(DRM.USER_ROLES, '、', ',') AS USER_ROLES_LIST ");
+		sql.append("    FROM TBPMS_DYNAMIC_RPT_MAST DRM ");
+		sql.append("  ) PAR ");
+		sql.append("  OUTER APPLY ( ");
+		sql.append("    SELECT LEVEL AS LEV ");
+		sql.append("    FROM DUAL ");
+		sql.append("    CONNECT BY LEVEL <= REGEXP_COUNT(PAR.USER_ROLES_LIST, ',') + 1 ");
+		sql.append("  ) TEMP_T ");
+		sql.append(") DRM ");
+		sql.append("LEFT JOIN TBSYSSECUROLPRIASS P ON P.ROLEID = :USERROLES ");
+		sql.append("LEFT JOIN TBORG_DEFN DEF ON DEF.DEPT_ID = CASE WHEN DRM.RPT_DEPT IS NOT NULL THEN DRM.RPT_DEPT ");
+		sql.append("                                                WHEN DRM.RPT_DEPT_2 IS NOT NULL THEN DRM.RPT_DEPT_2 ");
+		sql.append("                                           ELSE DRM.RPT_DEPT_1 END ");
 		sql.append("WHERE RPT_NAME IS NOT NULL ");
 		sql.append("AND DRM.VALID_FLAG = 'Y' ");
 		sql.append("AND TO_CHAR(DRM.END_DATE, 'YYYY/MM/DD') >= TO_CHAR(sysdate, 'YYYY/MM/DD') ");
@@ -1288,13 +1359,13 @@ public class PMS350 extends FubonWmsBizLogic {
 		
 		if (StringUtils.isNotBlank((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 			condition.setObject("USERROLES", (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
-			sql.append("AND INSTR(DRM.USER_ROLES, P.PRIVILEGEID) > 0 ");
+			sql.append("AND DRM.USER_ROLES = P.PRIVILEGEID ");
 		} else {
 			condition.setObject("USERROLES", "");
 		}
 		
 		sql.append("ORDER BY RPT_NAME DESC ");
-		
+
 		condition.setQueryString(sql.toString());
 
 		outputVO.setNamelist(dam.exeQuery(condition));

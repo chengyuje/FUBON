@@ -1712,6 +1712,15 @@ public class SOT707 extends EsbUtil {
 			txBodyVO.setTxVal(new EsbUtil().decimalPadding(mainVO.getPURCHASE_AMT(), 0)); // 委託面額
 		}
 		
+		/**
+		 * 預留欄位	Filler	X(60)
+		 * 1-7：參考報價(整數3小數4)
+		 * 8-15：參考報價日期
+		 * **/
+		String refVal = new EsbUtil().decimalPadding(mainVO.getREF_VAL(), 3, 4);
+		String refValDate = this.toChineseYearMMdd(mainVO.getREF_VAL_DATE());
+		txBodyVO.setFiller(refVal + refValDate);
+		
 		// 發送電文
 		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
 		

@@ -62,6 +62,28 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
 	};
 	// date picker end
 	
+	/*
+	 * 取得UHRM人員清單(由員工檔+角色檔)
+	 */
+	$scope.getUHRMList = function() {
+//		$scope.inputVO.regionCenterID = $scope.inputVO.ao_03;
+		$scope.inputVO.branchAreaID = $scope.inputVO.branch_area_id;
+		
+		$scope.sendRecv("ORG260", "getUHRMListByType", "com.systex.jbranch.app.server.fps.org260.ORG260InputVO", $scope.inputVO,  function(tota, isError) {
+			if (isError) {
+				return;
+			}
+			if (tota.length > 0) {
+				$scope.mappingSet['UHRM_LIST'] = tota[0].body.uhrmList;
+				if ($scope.mappingSet['UHRM_LIST'].length >= 1 && $scope.login == 'UHRM002') {
+					$scope.inputVO.uEmpID = $scope.mappingSet['UHRM_LIST'][0].DATA;
+				} else {
+					$scope.inputVO.uEmpID = '';
+				}
+			}
+		});
+	};
+	
 	$scope.init = function() {
 		$scope.inputVO = {};
 		$scope.limitDate();
@@ -69,14 +91,21 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
 		$scope.date = true;
 		// 理專使用訪談記錄下載功能時,角色欄位不可再選擇,預設為"全部FC"並反灰
 		var temp = ['001', '002', '003'];
-		if(temp.indexOf(projInfoService.getPriID()[0]) > -1)
+		if(temp.indexOf(projInfoService.getPriID()[0]) > -1) {
 			$scope.cam180IsFC = true;
-		
+		}
+		//業務處長
+		$scope.inputVO.isRegionMgr = (projInfoService.getPriID()[0] == "013");
 		// 組織連動
         $scope.region = ['N', $scope.inputVO, "region_center_id", "REGION_LIST", "branch_area_id", "AREA_LIST", "bCode", "BRANCH_LIST", "ao_code", "AO_LIST", "pCode", "EMP_LIST"];
         $scope.RegionController_setName($scope.region).then(function(data) {
-        	if($scope.EMP_LIST.length > 2)
+        	if($scope.EMP_LIST.length > 2) {
         		$scope.inputVO.pCode = "";
+        	}
+        	//處長登入，取得私銀人員資料
+        	if($scope.inputVO.isRegionMgr) {
+        		$scope.getUHRMList();
+        	}
         });
 	};
 	
@@ -104,8 +133,30 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
 		if ($scope.inputVO.id) {
 			$scope.inputVO.id = $scope.inputVO.id.toUpperCase();
 		}
+		
+		$scope.inputVO.branch_list = [];
+		angular.forEach($scope.BRANCH_LIST, function(row, index, objs){
+			if(row.DATA != "" && row.DATA != "0"){
+				$scope.inputVO.branch_list.push({LABEL: row.LABEL, DATA: row.DATA});					
+			}
+		});
+		
+		$scope.inputVO.regionMrgUHRMAreaYN = "N";
 		//非私銀非總行一定要選分行
-		if(!isUHRM && !$scope.IS_HEADMGR_ROLE && !$scope.inputVO.bCode) {
+		//業務處長有選營運區
+		if(!isUHRM && $scope.inputVO.isRegionMgr && $scope.inputVO.branch_area_id != undefined
+				&& $scope.inputVO.branch_area_id != null && $scope.inputVO.branch_area_id != "") {
+			if($scope.inputVO.branch_list.length > 0 && $scope.inputVO.branch_list[0].DATA.length > 3) {
+				//若選到私銀區，或沒有分行下拉選單資料
+				//不檢核
+				$scope.inputVO.regionMrgUHRMAreaYN = "Y"; //業務處長選私銀區
+			} else if(!$scope.inputVO.bCode) {
+				//業務處長選非私銀區，一定要選分行
+				$scope.showErrorMsg("ehl_01_common_022");
+				return;
+			}
+		} else if(!isUHRM && !$scope.IS_HEADMGR_ROLE && !$scope.inputVO.bCode) {
+			//非私銀非總行一定要選分行
 			$scope.showErrorMsg("ehl_01_common_022");
         	return;
 		}

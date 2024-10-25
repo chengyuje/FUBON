@@ -358,7 +358,7 @@ eSoafApp.controller('SOT510Controller',
 			if(validCustID==false) {
 				$scope.inputVO.custID='';
 			}else if(validCustID) {
-				$scope.sendRecv("SOT510", "getSOTCustInfo", "com.systex.jbranch.app.server.fps.sot510.SOT510InputVO", {'custID':$scope.inputVO.custID, 'prodType':5, 'tradeType':1, 'trustTS':$scope.inputVO.trustTS},
+				$scope.sendRecv("SOT510", "getSOTCustInfo", "com.systex.jbranch.app.server.fps.sot510.SOT510InputVO", {'custID':$scope.inputVO.custID, 'prodType':5, 'tradeType':1, 'trustTS':$scope.inputVO.trustTS, 'isOBU':$scope.inputVO.isOBU},
 						function(tota, isError) {
 							if (!isError) {
 								$scope.conCancel=false;

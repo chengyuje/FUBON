@@ -119,29 +119,31 @@ eSoafApp.controller('SOT511Controller',
 				$scope.showErrorMsg("ehl_02_common_007");
 				return;
 			}
-			$scope.sendRecv("SOT712", "updateBatchSeq", "com.systex.jbranch.app.server.fps.sot712.SOT712InputVO", {'prodType': 'SN', 
-				   'tradeSeq': $scope.inputVO.tradeSEQ},
-					function(tota, isError) {
-					if (!isError) {
-						$scope.sendRecv("SOT510", "verifyTradeBond", "com.systex.jbranch.app.server.fps.sot510.SOT510InputVO", {'tradeSEQ':$scope.inputVO.tradeSEQ,'prodType':1,'checkType':2,'recSEQ':$scope.inputVO.recSEQ,'purchaseAmt':$scope.inputVO.purchaseAmt},
-								function(totaCT, isError) {
-									if (!isError) {
-										if (totaCT[0].body.warningMsg != '' && totaCT[0].body.warningMsg != null) {
-											$scope.showErrorMsg(totaCT[0].body.warningMsg);
-										}
-										if (totaCT[0].body.errorMsg != '' && totaCT[0].body.errorMsg != null) {
-											$scope.showErrorMsg(totaCT[0].body.errorMsg);
-										} else {
-											//產生報表
-											$scope.printReport();
-
-											$scope.showMsg("ehl_02_SOT_002");
-											$scope.query();
-											return;
-										}
-									}
-								});
-					}
+			$scope.sendRecv("SOT712", "updateBatchSeq", "com.systex.jbranch.app.server.fps.sot712.SOT712InputVO", 
+			{'prodType': 'SN', 'tradeSeq': $scope.inputVO.tradeSEQ},
+			function(tota, isError) {
+				if (!isError) {
+					$scope.sendRecv("SOT510", "verifyTradeBond", "com.systex.jbranch.app.server.fps.sot510.SOT510InputVO", 
+					{'tradeSEQ':$scope.inputVO.tradeSEQ,'prodType':1,'checkType':2,'recSEQ':$scope.inputVO.recSEQ,
+					 'purchaseAmt':$scope.inputVO.purchaseAmt, 'isOBU': $scope.inputVO.isOBU},
+					function(totaCT, isError) {
+						if (!isError) {
+							if (totaCT[0].body.warningMsg != '' && totaCT[0].body.warningMsg != null) {
+								$scope.showErrorMsg(totaCT[0].body.warningMsg);
+							}
+							if (totaCT[0].body.errorMsg != '' && totaCT[0].body.errorMsg != null) {
+								$scope.showErrorMsg(totaCT[0].body.errorMsg);
+							} else {
+								//產生報表
+								$scope.printReport();
+	
+								$scope.showMsg("ehl_02_SOT_002");
+								$scope.query();
+								return;
+							}
+						}
+					});
+				}
 		    });
 		};
 		

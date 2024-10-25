@@ -20,6 +20,22 @@
 	       		<div class="search_table search_box2 scroll_y">
 	          		<form name="parameterTypeEditForm" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
 						<table>
+							<tr ng-if="inputVO.isRegionMgr">
+								<th>營運區：</th>
+				   					<td>
+				   						<e-combobox id="ao_04" name="ao_04"
+													ng-datasource="AREA_LIST"
+													ng-model="inputVO.branch_area_id"
+													ng-validate="false" 
+													ng-disabled="AVAIL_AREA.length == 1"
+													ng-readonly="AVAIL_AREA.length == 1" 
+													ng-editable="false"
+													ng-format="F3"
+													ng-required="false"
+													ng-change="ChangeArea(region);getUHRMList()"
+													style="line-height:20px;" />
+				   					</td>
+				   			</tr>
 							<tr>
 								<th><span ng-if="!IS_HEADMGR_ROLE">*</span>分行代碼：</th>
 								<td>
@@ -54,7 +70,7 @@
 								<th><span ng-if="!IS_HEADMGR_ROLE">*</span>客戶ID：</th>
 								<td><input type="text" class="form-control" placeholder="請輸入..." id="id" name="id" style="text-transform: uppercase;" ng-model="inputVO.id" e-length-limit="25"></td>
 								<th>名單名稱：</th>
-								<td><input type="text" class="form-control" placeholder="請輸入..." id="name" name="name" ng-model="inputVO.name" e-length-limit="25"></td>
+								<td><input type="text" class="form-control" placeholder="請輸入..." id="name" name="name" ng-model="inputVO.name" e-length-limit="100"></td>
 							</tr>
 							<tr>
 								<th>*名單來源：</th>

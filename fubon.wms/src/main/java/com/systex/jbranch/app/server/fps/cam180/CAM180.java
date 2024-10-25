@@ -93,6 +93,10 @@ public class CAM180 extends FubonWmsBizLogic {
 	//inquire查詢SQL
 	private StringBuffer genSql(QueryConditionIF queryCondition, CAM180InputVO inputVO) throws JBranchException {
 		StringBuffer sql = new StringBuffer();
+		//若業務處長選私銀區，將分行代碼清空，不以分行查詢
+		if(StringUtils.equals("Y", inputVO.getRegionMrgUHRMAreaYN())) {
+			inputVO.setbCode("");
+		}
 		
 		if ("CUS_RECORD".equals(inputVO.getFrom())) {
 			// TBCRM_CUST_VISIT_RECORD is A
@@ -198,7 +202,11 @@ public class CAM180 extends FubonWmsBizLogic {
 			// 1.	以分行人員登入時，應僅含登入者建立的客戶訪談記錄。
 			// 2.	以分行主管登入時，應僅含分行人員建立(排除高端人員)的客戶訪談記錄。
 			// 3.	以總行人員登入時，應為全行客戶訪談記錄。
-			if (!headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if(StringUtils.equals("Y", inputVO.getRegionMrgUHRMAreaYN())) {
+				//若業務處長選私銀區，查詢私銀區資料
+				sql.append(" AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.UHRM_CODE = d.AO_CODE AND UHRM.DEPT_ID = :branchAreaID) ");
+				queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
+			} else if (!headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 				sql.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.UHRM_CODE = d.AO_CODE) ");
 			}
 			//非總行一定要選分行，不用IN
@@ -329,6 +337,10 @@ public class CAM180 extends FubonWmsBizLogic {
 			// 3.	以總行人員登入時，應為全行客戶訪談記錄。
 			if (headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 
+			} else if(StringUtils.equals("Y", inputVO.getRegionMrgUHRMAreaYN())) {
+				//若業務處長選私銀區，查詢私銀區資料
+				sql.append(" AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = b.EMP_ID AND UHRM.DEPT_ID = :branchAreaID) ");
+				queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
 			} else {
 				sql.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = b.EMP_ID) ");
 			}

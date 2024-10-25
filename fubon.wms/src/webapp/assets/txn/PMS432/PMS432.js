@@ -4,6 +4,8 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 	$controller('BaseController', { $scope: $scope });
 	$scope.controllerName = "PMS432Controller";
 	
+	debugger;
+	
 	// 修改頁籤寬度
 	$("#eJumping select").css({
 		"width":      "95px",
@@ -195,15 +197,6 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 		}
 	};
 
-	// 查核結果選無關係 => 重製關係說明 其他關係 證明文件說明 欄位
-	$scope.checkReset = function(row) {
-		if (row.CHECKED_RESULT == 'N') {
-			row.RELATION = "";
-			row.OTHER_REL = "";
-			row.INSURANCE_NO = "";
-		}
-	};
-
 	$scope.checkRelation = function(row) {
 		if (row.RELATION != "9" && row.OTHER_REL != "") {
 			row.OTHER_REL = "";
@@ -294,12 +287,8 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 			if (data.value != "cancel" && data.value.resultList.length > 0) {
 				const {resultList, compareType} = data.value;
 				$scope.inputVO.compareType = compareType;
-				var list = [];
-				angular.forEach(resultList, function(row, idx) {
-					row = {...row, CHECKED_RESULT: "Y"};
-					list.push(row);
-				});
-				$scope.sendRecv("PMS432", "checkUpdateInsert", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", { ...$scope.inputVO, list: list, compareResult: data.value.compareResult },
+				$scope.inputVO.list = resultList;
+				$scope.sendRecv("PMS432", "checkUpdateInsert", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", $scope.inputVO,
 					function(tota, isError) {
 						if (!isError) {
 							$scope.showSuccessMsg("資料上傳成功!");
