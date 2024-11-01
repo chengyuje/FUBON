@@ -61,6 +61,7 @@ public class PMS422 extends FubonWmsBizLogic {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
 
 		sb.append("SELECT CASE WHEN RPT.RM_FLAG = 'U' THEN 'Y' ELSE 'N' END AS RM_FLAG, ");
 		sb.append("       SNAP_DATE, ");
@@ -271,7 +272,7 @@ public class PMS422 extends FubonWmsBizLogic {
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0 ||
 			StringUtils.lowerCase(inputVO.getMemLoginFlag()).equals("uhrm")) {
 
-			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
+			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("AND RPT.BRANCH_NBR = :branch ");
 				queryCondition.setObject("branch", inputVO.getBranch_nbr());
 			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
@@ -280,6 +281,11 @@ public class PMS422 extends FubonWmsBizLogic {
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("AND RPT.BRANCH_NBR IN (SELECT BRANCH_NBR FROM VWORG_DEFN_BRH WHERE DEPT_ID = :region) ");
 				queryCondition.setObject("region", inputVO.getRegion_center_id());
+			}
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("AND RPT.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {
@@ -331,6 +337,7 @@ public class PMS422 extends FubonWmsBizLogic {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
 
 		sb.append("SELECT * ");
 		sb.append("FROM ( ");
@@ -416,7 +423,7 @@ public class PMS422 extends FubonWmsBizLogic {
 		}
 
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) {
-			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
+			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("  AND RPT.BRANCH_NBR = :branch ");
 				queryCondition.setObject("branch", inputVO.getBranch_nbr());
 			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
@@ -425,6 +432,11 @@ public class PMS422 extends FubonWmsBizLogic {
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND RPT.BRANCH_NBR IN (SELECT BRANCH_NBR FROM VWORG_DEFN_BRH WHERE DEPT_ID = :region) ");
 				queryCondition.setObject("region", inputVO.getRegion_center_id());
+			}
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("  AND RPT.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {

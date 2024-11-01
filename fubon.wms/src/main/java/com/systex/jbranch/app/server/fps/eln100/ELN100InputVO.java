@@ -7,6 +7,7 @@ import com.systex.jbranch.platform.common.dataaccess.vo.PagingInputVO;
 public class ELN100InputVO extends PagingInputVO {
 	private Date query_date_s;
 	private Date query_date_e;
+	private String bbg_code;
 	private String bbg_code1;
 	private String bbg_code2;
 	private String bbg_code3;
@@ -14,6 +15,9 @@ public class ELN100InputVO extends PagingInputVO {
 	private Integer tenor;
 	private String ko_type;
 	private String ki_type;
+	private Integer type;
+	private String rate1;
+	private String rate2;
 
 	public Date getQuery_date_s() {
 		return query_date_s;
@@ -33,6 +37,14 @@ public class ELN100InputVO extends PagingInputVO {
 
 	public String getBbg_code1() {
 		return bbg_code1;
+	}
+
+	public String getBbg_code() {
+		return bbg_code;
+	}
+
+	public void setBbg_code(String bbg_code) {
+		this.bbg_code = bbg_code;
 	}
 
 	public void setBbg_code1(String bbg_code1) {
@@ -85,6 +97,30 @@ public class ELN100InputVO extends PagingInputVO {
 
 	public void setKi_type(String ki_type) {
 		this.ki_type = ki_type;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public String getRate1() {
+		return rate1;
+	}
+
+	public void setRate1(String rate1) {
+		this.rate1 = rate1;
+	}
+
+	public String getRate2() {
+		return rate2;
+	}
+
+	public void setRate2(String rate2) {
+		this.rate2 = rate2;
 	}
 	
 }

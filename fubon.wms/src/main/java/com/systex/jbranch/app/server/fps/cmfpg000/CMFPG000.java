@@ -115,6 +115,9 @@ public class CMFPG000 extends FubonWmsBizLogic {
 
 	private final String sysRoleUHRMMGR = "UHRMMGR";
 	private final String xmlUHRMMGR = "FUBONSYS.UHRMMGR_ROLE";
+	
+	private final String sysRoleUHRMBMMGR = "UHRMBMMGR";
+	private final String xmlUHRMBMMGR = "FUBONSYS.UHRMBMMGR_ROLE";
 
 	private final String sysRolePAO = "PAO";
 	private final String xmlPAO = "FUBONSYS.PAO_ROLE";
@@ -622,58 +625,64 @@ public class CMFPG000 extends FubonWmsBizLogic {
 
 		List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
 
-		//                 0          1          2           3            4             5              6             7            8               9               10           11             		12             13
-		String[] cases = { xmlFC,     xmlFCH,    xmlPAO,     xmlPSOP,     xmlBMMGR,     xmlMBRMGR,     xmlARMGR,     xmlFAIA,     xmlHEADMGR,     xmlUHRMMGR,     xmlUHRM,     "UHRMHEADMGR",        xmlBSMGR,     "BS" };
-		String[] flags = { "brhMem",  "brhMem",  "brhMem",   "brhMem",    "brhMem",     "brhMemMGR",   "brhMemMGR",  "ALL",       "ALL",          "uhrmMGR",      "UHRM",      "uhrmHeadMGR",        "bsMGR",      "BS" };
-		String[] sysRo = { sysRoleFC, sysRoleFC, sysRolePAO, sysRolePSOP, sysRoleBMMGR, sysRoleMBRMGR, sysRoleARMGR, sysRoleFAIA, sysRoleHEADMGR, sysRoleUHRMMGR, sysRoleUHRM, "sysRoleUHRMHEADMGR", sysRoleBSMGR, "sysRoleBS" };
+		//                 0          1          2           3            4             5              6             7            8               9               10           11             	     12            13           14
+		String[] cases = { xmlFC,     xmlFCH,    xmlPAO,     xmlPSOP,     xmlBMMGR,     xmlMBRMGR,     xmlARMGR,     xmlFAIA,     xmlHEADMGR,     xmlUHRMMGR,     xmlUHRM,     "UHRMHEADMGR",        xmlBSMGR,     "BS",        xmlUHRMBMMGR };
+		String[] flags = { "brhMem",  "brhMem",  "brhMem",   "brhMem",    "brhMem",     "brhMemMGR",   "brhMemMGR",  "ALL",       "ALL",          "uhrmMGR",      "UHRM",      "uhrmHeadMGR",        "bsMGR",      "BS",        "uhrmBMMGR" };
+		String[] sysRo = { sysRoleFC, sysRoleFC, sysRolePAO, sysRolePSOP, sysRoleBMMGR, sysRoleMBRMGR, sysRoleARMGR, sysRoleFAIA, sysRoleHEADMGR, sysRoleUHRMMGR, sysRoleUHRM, "sysRoleUHRMHEADMGR", sysRoleBSMGR, "sysRoleBS", sysRoleUHRMBMMGR };
 
 		String sysRole = sysRoleFC; // 預設FC
 		String memLoginFlag = flags[0]; // 預設brhMem
 
 		int i;
-		for (i = 0; i < cases.length; i++)
+		for (i = 0; i < cases.length; i++) {
 			if (!(i == 11 || i == 13)) { // 遇11(UHRMHEADMGR=ARM) & 13 (BS)有額外判斷，所以在此處略過
 				if (xmlInfo.doGetVariable(cases[i], FormatHelper.FORMAT_2).containsKey(roleId))
 					break;
 			}
-
-		switch (i) {
-		case 0: // FUBONSYS.FC_ROLE
-			sysRole = sysRo[i];
-
-			if (new BigDecimal((String) userInfo.get("DEPT_ID")).compareTo(new BigDecimal("200")) == 1 && !(new BigDecimal((String) userInfo.get("DEPT_ID")).compareTo(new BigDecimal("806")) == 0) && !(new BigDecimal((String) userInfo.get("DEPT_ID")).compareTo(new BigDecimal("810")) == 0) && new BigDecimal((String) userInfo.get("DEPT_ID")).compareTo(new BigDecimal("900")) == -1) { // 若人員主要組織為分行(200-900)，則判定為分行人員，排除806、810
-				memLoginFlag = flags[i];
-			} else if (loginBreach.size() > 0) { // 若人員於TBORG_UHRM_BRH中，判定為UHRM
-				memLoginFlag = flags[10];
-			} else if (StringUtils.equals(brhChgMap_BS.get("BS").toString(), (String) userInfo.get("DEPT_ID"))) { // 若人員主要組織非分行 且為175，則判定為銀證人員
-				memLoginFlag = flags[13];
-			} else { // 無法判斷者，則判定為分行人員
-				memLoginFlag = flags[i];
-			}
-			break;
-		case 8: // FUBONSYS.HEADMGR_ROLE
-			sysRole = sysRoleHEADMGR;
-			memLoginFlag = flags[i];
-
-			if (StringUtils.equals("R001", roleId)) //   2020/12/16 寫死 R001 ARM
-				memLoginFlag = flags[11];
-
-			break;
-		case 1: // FUBONSYS.FCH_ROLE
-		case 2: // FUBONSYS.PAO_ROLE
-		case 3: // FUBONSYS.PSOP_ROLE
-		case 4: // FUBONSYS.BMMGR_ROLE
-		case 5: // FUBONSYS.MBRMGR_ROLE
-		case 6: // FUBONSYS.ARMGR_ROLE
-		case 7: // FUBONSYS.FAIA_ROLE
-		case 9: // FUBONSYS.UHRMMGR_ROLE
-		case 10: // FUBONSYS.UHRM_ROLE
-		case 12: // FUBONSYS.BSMGR_ROLE
-			sysRole = sysRo[i];
-			memLoginFlag = flags[i];
-			break;
 		}
 
+		switch (i) {
+			case 0: // FUBONSYS.FC_ROLE
+				sysRole = sysRo[i];
+	
+				if (StringUtils.isNumeric((String) userInfo.get("DEPT_ID")) && 
+					new BigDecimal((String) userInfo.get("DEPT_ID")).compareTo(new BigDecimal("200")) == 1 && 
+					!(new BigDecimal((String) userInfo.get("DEPT_ID")).compareTo(new BigDecimal("806")) == 0) && 
+					!(new BigDecimal((String) userInfo.get("DEPT_ID")).compareTo(new BigDecimal("810")) == 0) && 
+					new BigDecimal((String) userInfo.get("DEPT_ID")).compareTo(new BigDecimal("900")) == -1) { // 若人員主要組織為分行(200-900)，則判定為分行人員，排除806、810
+					memLoginFlag = flags[i];
+				} else if (loginBreach.size() > 0) { // 若人員於TBORG_UHRM_BRH中，判定為UHRM
+					memLoginFlag = flags[10];
+				} else if (StringUtils.equals(brhChgMap_BS.get("BS").toString(), (String) userInfo.get("DEPT_ID"))) { // 若人員主要組織非分行 且為175，則判定為銀證人員
+					memLoginFlag = flags[13];
+				} else { // 無法判斷者，則判定為分行人員
+					memLoginFlag = flags[i];
+				}
+				break;
+			case 8: // FUBONSYS.HEADMGR_ROLE
+				sysRole = sysRoleHEADMGR;
+				memLoginFlag = flags[i];
+	
+				if (StringUtils.equals("R001", roleId)) //   2020/12/16 寫死 R001 ARM
+					memLoginFlag = flags[11];
+	
+				break;
+			case 1: // FUBONSYS.FCH_ROLE
+			case 2: // FUBONSYS.PAO_ROLE
+			case 3: // FUBONSYS.PSOP_ROLE
+			case 4: // FUBONSYS.BMMGR_ROLE
+			case 5: // FUBONSYS.MBRMGR_ROLE
+			case 6: // FUBONSYS.ARMGR_ROLE
+			case 7: // FUBONSYS.FAIA_ROLE
+			case 9: // FUBONSYS.UHRMMGR_ROLE
+			case 10: // FUBONSYS.UHRM_ROLE
+			case 12: // FUBONSYS.BSMGR_ROLE
+			case 14: // FUBONSYS.UHRMBMMGR_ROLE
+				sysRole = sysRo[i];
+				memLoginFlag = flags[i];
+				break;
+		}
+		
 		Map<String, Object> mapTemp = new HashMap<String, Object>();
 		mapTemp.put("sysRole", sysRole);
 		mapTemp.put("memLoginFlag", memLoginFlag);

@@ -1,0 +1,69 @@
+<style>
+.modal-dialog.ELN100_BBG {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 800px;
+	height: auto;
+}
+</style>
+<script type="text/javascript" src="assets/txn/ELN100/ELN100_BBG.js"></script>
+<div ng-controller="ELN100_BBGController" ng-cloak>
+	<div class="modal-dialog ELN100_BBG">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close"
+					ng-click="closeThisDialog('cancel')">&times;</button>
+				<h4 id="myModalAlertLabel" class="modal-title" align="center">標的查詢</h4>
+			</div>
+			<div class="modal-body">
+				<div>
+					<table>
+						<tr>
+							<th width="10%"></th>
+							<th width="30%"></th>
+							<th>連結標的：</th>
+	     					<td class="form-inline">
+								<input type="text" 
+									   id="bbg_code" name="bbg_code" 
+									   class="form-control" 
+									   style="width: 180px;"
+									   ng-model="inputVO.bbg_code" 
+									   ng-change="inputVO.bbg_code = inputVO.bbg_code.toUpperCase()"/>
+								<button type="button" class="btn btn-info" ng-click="getBBG()" function-type="query">查詢</button>
+							</td>
+						</tr>
+					</table>
+				</div></br>
+				<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+				<div class="gv_tab_sc scroll_y"
+					style="min-height: 235px; white-space: nowrap;">
+					<table class="tablesaw table table-striped table-bordered"
+						data-tablesaw-mode="swipe" data-tablesaw-sortable
+						data-tablesaw-minimap>
+						<thead>
+							<tr>
+								<th>選擇</th>
+								<th>BBG CODE</th>
+								<th>BBG NAME</th>
+								<th>AP CODE</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center">
+									<button type="button" class="btn btn-primary" ng-click="get(row)">選擇</button>
+								</td>
+								<td align="left" ng-bind="row.BBG_CODE"></td>
+								<td align="left" ng-bind="row.BBG_NAME"></td>
+								<td align="left" ng-bind="row.AP_CODE"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -327,6 +327,7 @@ public class PMS408 extends FubonWmsBizLogic {
 		Map<String, String> fcMap = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2); // 理專
 		Map<String, String> psopMap = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2); // OP
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); // 總行人員
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
 
 		//20170918問題單3719:若為本日無異動時, 不判斷NOTE不為空而是改判斷SEQ=N
 		StringBuffer sql = new StringBuffer();
@@ -478,7 +479,7 @@ public class PMS408 extends FubonWmsBizLogic {
 			// by Willis 20171024 此條件因為發現組織換區有異動(例如:東寧分行在正式環境10/1從西台南區換至東台南區)，跟之前組織對應會有問題，改為對應目前最新組織分行別
 
 			// 分行
-			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
+			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sql.append("AND ARLIST.BRANCH_NBR = :BRNCH_NBRR ");
 				condition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
 				// 營運區
@@ -501,6 +502,11 @@ public class PMS408 extends FubonWmsBizLogic {
 				sql.append(") ");
 
 				condition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
+			}
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sql.append("AND A.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {

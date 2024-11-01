@@ -87,7 +87,10 @@ public class PMS433 extends FubonWmsBizLogic {
 			sql.append(" AND VW.UHRM_CODE IS NULL ");
 		} else if (roleID.equals("R012")) { //UHRM科主管
 			sql.append(" AND VW.UHRM_CODE IS NOT NULL ");
-		} //其他身分都可檢視'B024','B026' 財管內控管理科經辦、財管績效科管理科經辦
+		} /*其他身分都可檢視'B024','B026','A164','B030'
+		    財管內控管理科經辦、財管績效科管理科經辦、業務處主管、個金行銷部經辦
+		  */
+		
 		
 		if(StringUtils.isNotBlank(inputVO.getsCreDate())) {
 			sql.append(" AND H.SELECTED_DATE = :YYYYMM ");
@@ -100,6 +103,12 @@ public class PMS433 extends FubonWmsBizLogic {
 		if(StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 			sql.append(" AND H.BRA_NBR = :BRA_NBR ");
 			condition.setObject("BRA_NBR", inputVO.getBranch_nbr());
+		} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
+			sql.append(" AND H.BRA_NBR in (:BRA_NBR) ");
+			condition.setObject("BRA_NBR", getFilterBranchLise(inputVO.getBranch_list()));
+		} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
+			sql.append(" AND H.BRA_NBR in (:BRA_NBR) ");
+			condition.setObject("BRA_NBR", getFilterBranchLise(inputVO.getBranch_list()));
 		} else {
 			sql.append(" AND H.BRA_NBR in (:BRA_NBR) ");
 			condition.setObject("BRA_NBR", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
@@ -120,6 +129,20 @@ public class PMS433 extends FubonWmsBizLogic {
 		}
 	}
 	
+	private Object getFilterBranchLise(List<Map<String, Object>>  branch_list) {
+		if (branch_list.size() == 0) {
+			return null;
+		}
+		
+		String filterBranchList[] = new String[branch_list.size()];
+		int i = 0;
+		for (Map map : branch_list) {
+			filterBranchList[i] = (String) map.get("DATA");
+			i++;
+		}
+		return filterBranchList;
+	}
+
 	/* === 產出Excel==== */
 	public void export(Object body, IPrimitiveMap header)
 			throws JBranchException {

@@ -18,8 +18,14 @@ eSoafApp.controller('PMS433Controller',
 		});
 		
 		$scope.role_id = projInfoService.getRoleID();
-        
-        
+		$scope.role_maintanence = projInfoService.getAuthorities().MODULEID[projInfoService.$currentModule].ITEMID['PMS433'].FUNCTIONID['maintenance'] === undefined ? false : projInfoService.getAuthorities().MODULEID[projInfoService.$currentModule].ITEMID['PMS433'].FUNCTIONID['maintenance'];
+		$scope.showUHRM = true;
+		if ($scope.role_id === 'B024' || $scope.role_id === 'B026' || $scope.role_id === 'A164' || $scope.role_id === 'B030') {
+			$scope.showUHRM = true;
+		} else {
+			$scope.showUHRM = false;
+		}
+
         //選取月份下拉選單 --> 重新設定可視範圍
         $scope.dateChange = function(){
         	//設定回傳時間
@@ -73,6 +79,7 @@ eSoafApp.controller('PMS433Controller',
 	    		$scope.showErrorMsg('欄位檢核錯誤:月份必要輸入欄位');
         		return;
         	}
+			$scope.inputVO.branch_list = $scope.BRANCH_LIST;
 			
 			$scope.sendRecv("PMS433", "query", "com.systex.jbranch.app.server.fps.pms433.PMS433InputVO", $scope.inputVO,
 					function(tota, isError) {

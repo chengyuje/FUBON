@@ -3,7 +3,7 @@
   請修改 Controller 名稱，以符合交易畫面的定義
  */
 'use strict';
-eSoafApp.controller('ELN100Controller', function($rootScope, $scope, $controller) {
+eSoafApp.controller('ELN100Controller', function($rootScope, $scope, $controller, ngDialog) {
 	$controller('BaseController', {$scope: $scope});
 	$scope.controllerName = "ELN100Controller";
 	
@@ -41,28 +41,23 @@ eSoafApp.controller('ELN100Controller', function($rootScope, $scope, $controller
 	}
 	
 	// 取得標的下拉
-	$scope.getBBG = function(){
-		$scope.sendRecv("ELN100", "getBBG", "com.systex.jbranch.app.server.fps.eln100.ELN100InputVO", {},
+	$scope.getBBG = function(nbr){
+		$scope.sendRecv("ELN100", "getBBG", "com.systex.jbranch.app.server.fps.eln100.ELN100InputVO", {'bbg_code1': $scope.inputVO['bbg_code' + nbr]},
 		function(tota, isError) {
 			if (!isError) {
-				$scope.mappingSet['ELN.BBG_CODE1'] = [];
-				$scope.mappingSet['ELN.BBG_CODE2'] = [];
-				$scope.mappingSet['ELN.BBG_CODE3'] = [];
-				
 				if (tota[0].body.resultList.length > 0) {
-					angular.forEach(tota[0].body.resultList, function(row){
-						$scope.mappingSet['ELN.BBG_CODE1'].push({LABEL: row.BBG_CODE, DATA: row.BBG_CODE});
-						$scope.mappingSet['ELN.BBG_CODE2'].push({LABEL: row.BBG_CODE, DATA: row.BBG_CODE});
-						$scope.mappingSet['ELN.BBG_CODE3'].push({LABEL: row.BBG_CODE, DATA: row.BBG_CODE});
-					});
+					// 
+				} else {
+					$scope.inputVO['bbg_code' + nbr] = undefined;
+					$scope.showErrorMsg("無此標的");
 				}
 			}
 		});
 	}
 	
 	$scope.init = function(){
+		$scope.disRate = false;
 		$scope.inquireInit();
-		$scope.getBBG();
 		
 		// 計價幣別 :USD、AUD、JPY、EUR
 		$scope.mappingSet['ELN.CURRENCY'] = [];
@@ -90,10 +85,20 @@ eSoafApp.controller('ELN100Controller', function($rootScope, $scope, $controller
 											  {LABEL:"EKI" , DATA: 'EKI'},
 											  {LABEL:"AKI" , DATA: 'AKI'});
 	}
+	
+	$scope.countDate = function (Date1, Date2) {
+		let milliseconds_Time = Date2.getTime() - Date1.getTime();
+		return (milliseconds_Time / (1000 * 3600 * 24)) +1;
+	};
 
 	$scope.inquire = function() {
 		if ($scope.inputVO.query_date_s == undefined || $scope.inputVO.query_date_e == undefined) {
 			$scope.showErrorMsg("查詢條件『*詢價起迄日』為必要輸入欄位。");
+			return;
+		}
+		
+		if ($scope.countDate($scope.inputVO.query_date_s, $scope.inputVO.query_date_e) > 3) {
+			$scope.showErrorMsg("查詢區間，限過去連續3個營業日。");
 			return;
 		}
 		
@@ -114,5 +119,103 @@ eSoafApp.controller('ELN100Controller', function($rootScope, $scope, $controller
 		});
 	}
 	
+	$scope.chooseBBG = function(nbr) {
+		var dialog = ngDialog.open({
+			template: 'assets/txn/ELN100/ELN100_BBG.html',
+			className: 'ELN100',
+			showClose: false,
+			scope : $scope,
+			controller: ['$scope', function($scope) {
+				
+            }]
+		}).closePromise.then(function (data) {
+			if(data.value != "cancel") {
+				$scope.inputVO['bbg_code' + nbr] = data.value.BBG_CODE;
+			}
+		});
+	}
+	
+	$scope.changeKiType = function() {
+		if ($scope.inputVO.type == 4) {
+			if ($scope.inputVO.ki_type == 'EKI' || $scope.inputVO.ki_type == 'AKI') {
+				$scope.disRate = false;
+				$scope.limitVal = 50;
+			} else {
+				$scope.inputVO.rate1 = undefined;
+				$scope.inputVO.rate2 = undefined;
+				$scope.limitVal = 0;
+				$scope.disRate = true;
+			}			
+		}
+	}
+	
+	$scope.changeType = function() {
+		$scope.disRate = false;
+		$scope.limitVal = 0;
+		$scope.inputVO.rate1 = undefined;
+		$scope.inputVO.rate2 = undefined;
+		
+		/**
+		 *  點選單一條件，輸入數值區間(非必要翰入欄位):
+		 *  1. 年化收益率	 ：查詢每日詢價明細資料庫中，收益率(年化%)	，限數值5以上。 
+		 *  2. 執行價格	 ：查詢每日詢價明細資料庫中，執行價格(%)  	，限數值50以上。
+		 *  3. KO 價格	 ：查詢每日詢價明細資料庫中，KO 價格(%)	，限數值80以上。
+		 *  4. KI 價格	 ：查詢每日詢價明細資料庫中，KI 價格(%)	，若『KI類型』有選EKI、AKI，開放輸入，限數值50以上; 選None，則不可輸入數值。
+		 *  5. 通路服務費率：查詢每日詢價明細資料庫中，UF(%)		，限數值0.5以上。
+		 * **/
+		switch ($scope.inputVO.type) {
+			case 1: {
+				$scope.limitVal = 5;
+				break;
+			}
+			case 2: {
+				$scope.limitVal = 50;
+				break;
+			}
+			case 3: {
+				$scope.limitVal = 80;
+				break;
+			}
+			case 4: {
+				if ($scope.inputVO.ki_type == 'EKI' || $scope.inputVO.ki_type == 'AKI') {
+					$scope.limitVal = 50;
+				} else {
+					$scope.limitVal = 0;
+					$scope.disRate = true;
+				}
+				break;
+			}
+			case 5: {
+				$scope.limitVal = 0.5;
+				break;
+			}
+			default: {
+				break;
+			}
+		}
+//		alert($scope.limitVal);
+	}
+	
+	$scope.checkRate = function(nbr) {
+		var val = $scope.inputVO['rate' + nbr];
+		if (val < $scope.limitVal) {
+			$scope.inputVO['rate' + nbr] = undefined;
+			$scope.showErrorMsg("限數值 " + $scope.limitVal + " 以上");
+			return;
+		}
+		
+		if ($scope.inputVO.rate1 != undefined && $scope.inputVO.rate2 != undefined) {
+			if ($scope.inputVO.rate1 > $scope.inputVO.rate2) {
+				if (nbr == '1') {
+					$scope.inputVO.rate1 = undefined;
+					$scope.showErrorMsg("數值需小於 " + $scope.inputVO.rate2);
+				} else {
+					$scope.inputVO.rate2 = undefined;
+					$scope.showErrorMsg("數值需大於 " + $scope.inputVO.rate1);
+				}
+			}
+		}
+	}
+	
 	$scope.init();
-});
+}); 

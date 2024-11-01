@@ -119,6 +119,7 @@ public class IOT111 extends FubonWmsBizLogic {
 				queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
 				break;
 			case "uhrmMGR":
+			case "uhrmBMMGR":
 				//有UHRM權限人員只能查詢UHRM人員鍵機或UHRM為招攬人員的案件
 				sql.append("AND ( ");
 				sql.append("         F.EMP_ID IS NOT NULL ");

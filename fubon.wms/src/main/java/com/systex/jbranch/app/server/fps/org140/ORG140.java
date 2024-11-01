@@ -26,7 +26,7 @@ import java.util.*;
  * 2016/07/05 add by Carley
  * 2017/04/27 modify by ocean - 由理專證照改為各角色證照
  * 2022/09/22 modify by ocean - WMS-CR-20220325-01_業管系統新增證券查詢資訊及報表
- * 
+ * 2024/10/01 modify by ocean - WMS-CR-20231026-01_分行人員內外部證照比對差異報表
  */
 @Component("org140")
 @Scope("request")

@@ -59,7 +59,8 @@ public class PMS496 extends FubonWmsBizLogic {
 		Map<String, String> fcMap = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2); // 理專
 		Map<String, String> psopMap = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2); // OP
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
+
 		PMS496InputVO inputVO = (PMS496InputVO) body;
 		PMS496OutputVO outputVO = new PMS496OutputVO();
 		dam = this.getDataAccessManager();
@@ -225,6 +226,11 @@ public class PMS496 extends FubonWmsBizLogic {
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND T.REGION_CENTER_ID = :regionCenterID ");
 				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
+			}
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("  AND T.RM_FLAG = 'N' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {

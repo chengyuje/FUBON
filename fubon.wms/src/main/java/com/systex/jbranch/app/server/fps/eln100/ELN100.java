@@ -27,7 +27,11 @@ public class ELN100 extends FubonWmsBizLogic {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT * FROM TBPRD_ELN_PRICE WHERE 1 = 1  ");
 		
-		// 詢價起日
+		// UF上限，產品天期1~6月超過2.5%、7~12月超過3%，不顯示。
+		sb.append(" AND ((TENOR BETWEEN 1 AND 6 AND UP_FRONT <= 2.5) ");
+		sb.append(" OR (TENOR BETWEEN 7 AND 12 AND UP_FRONT <= 3)) ");
+		
+		// 詢價起日 
 		if (inputVO.getQuery_date_s() != null) {
 			String sDate = sdf.format(inputVO.getQuery_date_s());
 			sb.append(" AND TO_CHAR(QUERY_DATE, 'YYYY/MM/DD') >= :sDate ");
@@ -86,6 +90,44 @@ public class ELN100 extends FubonWmsBizLogic {
 			sb.append(" AND KI_TYPE = :ki_type ");
 			qc.setObject("ki_type", inputVO.getKi_type());
 		}
+		
+		/**
+		 *  點選單一條件，輸入數值區間(非必要翰入欄位):
+		 *  1. 年化收益率	 ：查詢每日詢價明細資料庫中，收益率(年化%)	，限數值5以上。 
+		 *  2. 執行價格	 ：查詢每日詢價明細資料庫中，執行價格(%)  	，限數值50以上。
+		 *  3. KO 價格	 ：查詢每日詢價明細資料庫中，KO 價格(%)	，限數值80以上。
+		 *  4. KI 價格	 ：查詢每日詢價明細資料庫中，KI 價格(%)	，若『KI類型』有選EKI、AKI，開放輸入，限數值50以上; 選None，則不可輸入數值。
+		 *  5. 通路服務費率：查詢每日詢價明細資料庫中，UF(%)		，限數值0.5以上。
+		 * **/
+		if (inputVO.getType() != null && (StringUtils.isNotBlank(inputVO.getRate1()) || StringUtils.isNotBlank(inputVO.getRate2()))) {
+			String colName = "";
+			switch(inputVO.getType()){
+			    case 1 :
+			    	colName = "COUPON";
+			    	break;
+			    case 2 :
+			    	colName = "STRIKE";
+			    	break;
+			    case 3 :
+			    	colName = "KO_BARRIER";
+			    	break;
+			    case 4 :
+			    	colName = "KI_BARRIER";
+			    	break;
+			    case 5 :
+			    	colName = "UP_FRONT";
+			    	break;
+			}
+			if (StringUtils.isNotBlank(inputVO.getRate1())) {
+				sb.append(" AND " + colName + " >= :rate1 ");
+				qc.setObject("rate1", inputVO.getRate1());
+			}
+			if (StringUtils.isNotBlank(inputVO.getRate2())) {
+				sb.append(" AND " + colName + " <= :rate2 ");
+				qc.setObject("rate2", inputVO.getRate2());
+			}
+		}
+		
 		// 排序方式，按詢價日新到舊排序
 		sb.append(" ORDER BY QUERY_DATE DESC, QUERY_ID, QUERY_SEQ ");
 		
@@ -95,11 +137,22 @@ public class ELN100 extends FubonWmsBizLogic {
 	}
 	
 	public void getBBG (Object body, IPrimitiveMap header) throws JBranchException {
+		ELN100InputVO inputVO = (ELN100InputVO) body;
 		ELN100OutputVO outputVO = new ELN100OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
-		sb.append(" SELECT * FROM TBPRD_ELN_LINK_PROD ");
+		sb.append(" SELECT * FROM TBPRD_ELN_LINK_PROD WHERE 1 = 1");
+		
+		if (StringUtils.isNotBlank(inputVO.getBbg_code())) {
+			sb.append(" AND BBG_CODE LIKE :bbg_code ");
+			qc.setObject("bbg_code",  "%" + inputVO.getBbg_code() + "%");
+		}
+		
+		if (StringUtils.isNotBlank(inputVO.getBbg_code1())) {
+			sb.append(" AND BBG_CODE = :bbg_code ");
+			qc.setObject("bbg_code",  inputVO.getBbg_code1());
+		}
 		
 		qc.setQueryString(sb.toString());
 		outputVO.setResultList(dam.exeQuery(qc));

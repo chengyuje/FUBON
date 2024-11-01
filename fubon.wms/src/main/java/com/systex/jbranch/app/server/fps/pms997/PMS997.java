@@ -73,7 +73,8 @@ public class PMS997 extends FubonWmsBizLogic {
 		initUUID();
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
+
 		PMS997InputVO inputVO = (PMS997InputVO) body;
 		PMS997OutputVO outputVO = new PMS997OutputVO();
 		dam = this.getDataAccessManager();
@@ -142,7 +143,7 @@ public class PMS997 extends FubonWmsBizLogic {
 		}
 		
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) { 
-			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
+			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("AND ORG.BRANCH_NBR = :branchNbr ");
 				queryCondition.setObject("branchNbr", inputVO.getBranch_nbr());
 			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
@@ -151,6 +152,11 @@ public class PMS997 extends FubonWmsBizLogic {
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("AND ORG.REGION_CENTER_ID = :regionCenterID ");
 				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
+			}
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("AND DEP.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {

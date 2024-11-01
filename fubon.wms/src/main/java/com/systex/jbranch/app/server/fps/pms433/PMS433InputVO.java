@@ -1,6 +1,7 @@
 package com.systex.jbranch.app.server.fps.pms433;
 
 import java.util.List;
+import java.util.Map;
 
 public class PMS433InputVO {
 	private String sCreDate; //資料統計月份
@@ -12,6 +13,7 @@ public class PMS433InputVO {
 	private String reportDate; // YYYYMMDD(日報) YYYYMM(月報)
 	private String selected_date; // 
 	private String cust_id; // 
+	private List<Map<String, Object>> branch_list; //可視範圍的可出現分行清單
 	
 	private List resultList; //主查詢
 	
@@ -93,6 +95,13 @@ public class PMS433InputVO {
 	public void setCust_id(String cust_id) {
 		this.cust_id = cust_id;
 	}
+	public List<Map<String, Object>> getBranch_list() {
+		return branch_list;
+	}
+	public void setBranch_list(List<Map<String, Object>> branch_list) {
+		this.branch_list = branch_list;
+	}
+
 
 	
 }

@@ -155,11 +155,19 @@ public class SOT804 extends SotPdf{
 						isNotVerify = true;
 					}
 
-					if(StringUtils.equals(getString(data_map.get("SHORT_TYPE")), "1")){
-						data.addParameter("SHORT"+index, "＊符合公開說明書短線認定");  //短線交易判斷
-					}else if(StringUtils.equals(getString(data_map.get("SHORT_TYPE")), "2")){
-//						data.addParameter("SHORT"+index, "2: ＊可能符合公開說明書短線認定");  //短線交易判斷
-						data.addParameter("SHORT"+index, "＊可能符合公開說明書短線認定");  //短線交易判斷
+					if(StringUtils.equals("Y", data_list.get(0).get("OVS_PRIVATE_YN").toString())) { 
+						//境外私募基金
+						if(StringUtils.equals(getString(data_map.get("SHORT_TYPE")), "1") ||
+								StringUtils.equals(getString(data_map.get("SHORT_TYPE")), "2")) {
+							data.addParameter("SHORT"+index, "＊符合產品說明書贖回費認定");  //短線交易判斷
+						}
+					} else {
+						if(StringUtils.equals(getString(data_map.get("SHORT_TYPE")), "1")){
+							data.addParameter("SHORT"+index, "＊符合公開說明書短線認定");  //短線交易判斷
+						}else if(StringUtils.equals(getString(data_map.get("SHORT_TYPE")), "2")){
+	//						data.addParameter("SHORT"+index, "2: ＊可能符合公開說明書短線認定");  //短線交易判斷
+							data.addParameter("SHORT"+index, "＊可能符合公開說明書短線認定");  //短線交易判斷
+						}
 					}
 
 					if (data_map.get("REC_SEQ") != null && StringUtils.isNotBlank(data_map.get("REC_SEQ").toString())) {

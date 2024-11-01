@@ -143,29 +143,33 @@ public class SOT808 extends SotPdf {
 							XmlInfo xmlInfo = new XmlInfo();
 
 							if (data_map.get("ENTRUST_AMT") != null && StringUtils.isNotBlank(data_map.get("ENTRUST_AMT").toString())) {
-//								String EntrustType = (String) xmlInfo.getVariable("SOT.ENTRUST_TYPE_PURCHASE", data_map.get("ENTRUST_TYPE").toString(), "F3");
-								if (data_map.get("GTC_YN") != null && StringUtils.equals("Y", data_map.get("GTC_YN").toString())) {
-									// 長效單固定列印"限價"
-									data_map.put("ENTRUST_AMT", "■ 限價　" + data_map.get("ENTRUST_AMT").toString()); 	
-									
-								} else {
-									if (data_map.get("ENTRUST_TYPE") != null) {
-										String entrust_type = data_map.get("ENTRUST_TYPE").toString();
-										if (entrust_type.equals("2")) {
-											// 市價：單日單要帶金額、長效/預約單不帶金額
-											if (data_map.get("GTC_YN") != null && StringUtils.equals("N", data_map.get("GTC_YN").toString())) {
-												// 當日單
-												data_map.put("ENTRUST_AMT", "■ 市價　" + data_map.get("ENTRUST_AMT").toString());											
+								if (inputVO.getPrdType().equals("3")) {
+									if (data_map.get("GTC_YN") != null && StringUtils.equals("Y", data_map.get("GTC_YN").toString())) {
+										// 長效單固定列印"限價"
+										data_map.put("ENTRUST_AMT", "■ 限價　" + data_map.get("ENTRUST_AMT").toString()); 	
+										
+									} else {
+										if (data_map.get("ENTRUST_TYPE") != null) {
+											String entrust_type = data_map.get("ENTRUST_TYPE").toString();
+											if (entrust_type.equals("2")) {
+												// 市價：單日單要帶金額、長效/預約單不帶金額
+												if (data_map.get("GTC_YN") != null && StringUtils.equals("N", data_map.get("GTC_YN").toString())) {
+													// 當日單
+													data_map.put("ENTRUST_AMT", "■ 市價　" + data_map.get("ENTRUST_AMT").toString());											
+												} else {
+													// 長效/預約單
+													data_map.put("ENTRUST_AMT", "■ 市價　");
+												}
+													
 											} else {
-												// 長效/預約單
-												data_map.put("ENTRUST_AMT", "■ 市價　");
+												// 限價
+												data_map.put("ENTRUST_AMT", "■ 限價　" + data_map.get("ENTRUST_AMT").toString());
 											}
-												
-										} else {
-											// 限價
-											data_map.put("ENTRUST_AMT", "■ 限價　" + data_map.get("ENTRUST_AMT").toString());
 										}
 									}
+								} else if (inputVO.getPrdType().equals("5")) {
+									String EntrustType = (String) xmlInfo.getVariable("SOT.ENTRUST_TYPE_PURCHASE", data_map.get("ENTRUST_TYPE").toString(), "F3");
+									data_map.put("ENTRUST_AMT", EntrustType + "　" + data_map.get("ENTRUST_AMT").toString());
 								}
 							}
 

@@ -77,7 +77,8 @@ public class PMS401 extends FubonWmsBizLogic {
 		initUUID();
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
+		
 		PMS401InputVO inputVO = (PMS401InputVO) body;
 		PMS401OutputVO outputVO = new PMS401OutputVO();
 		dam = this.getDataAccessManager();
@@ -136,7 +137,7 @@ public class PMS401 extends FubonWmsBizLogic {
 		}
 
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) {
-			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {				
+			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {				
 				sb.append("  AND DEFN.BRANCH_NBR = :BRNCH_NBRR ");
 				queryCondition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
 			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
@@ -150,6 +151,11 @@ public class PMS401 extends FubonWmsBizLogic {
 			if (StringUtils.isNotBlank(inputVO.getPerson_role())) {
 				sb.append("  AND ROLE.PARAM_NAME = :PERSON_ROLE ");
 				queryCondition.setObject("PERSON_ROLE", inputVO.getPerson_role());
+			}
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("  AND DEP.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {

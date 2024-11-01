@@ -1255,11 +1255,16 @@ eSoafApp.controller('SOT130Controller',
 										return;
 									}
 									if(tota[0].body.Short_1!=''){
-										if(tota[0].body.Short_1==1){
-											$scope.showErrorMsg('ehl_01_SOT_015');
-										}
-										if(tota[0].body.Short_1==2){
-											$scope.showErrorMsg('ehl_01_SOT_016');
+										if($scope.inputVO.ovsPrivateYN == "Y") {
+											//境外私募基金
+											$scope.showErrorMsg("贖回費資訊!!此筆交易符合產品說明書贖回費認定，基金公司將依產品說明書收取贖回費用。");
+										} else {
+											if(tota[0].body.Short_1==1){
+												$scope.showErrorMsg('ehl_01_SOT_015');
+											}
+											if(tota[0].body.Short_1==2){
+												$scope.showErrorMsg('ehl_01_SOT_016');
+											}
 										}
 									}
 									$scope.refresh();

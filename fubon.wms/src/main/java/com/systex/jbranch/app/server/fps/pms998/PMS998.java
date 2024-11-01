@@ -179,7 +179,8 @@ public class PMS998 extends FubonWmsBizLogic {
 		initUUID();
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
+
 		PMS998InputVO inputVO = (PMS998InputVO) body;
 		PMS998OutputVO outputVO = new PMS998OutputVO();
 		dam = this.getDataAccessManager();
@@ -215,28 +216,23 @@ public class PMS998 extends FubonWmsBizLogic {
 		sb.append("WHERE 1 = 1 ");
 		
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) { 
-			if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
+			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
+				sb.append("AND DEFN.BRANCH_NBR = :branchID "); //分行代碼
+				queryCondition.setObject("branchID", inputVO.getBranch_nbr());
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
+				sb.append("AND DEFN.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼
+				queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
+			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("AND DEFN.REGION_CENTER_ID = :regionCenterID "); //區域代碼
 				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 			} else if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-				sb.append("AND (DEFN.REGION_CENTER_ID IN (:regionCenterIDList) OR DEFN.REGION_CENTER_ID IS NULL) ");
-				queryCondition.setObject("regionCenterIDList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
-			}
-		
-			if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
-				sb.append("AND DEFN.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼
-				queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
-			} else if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-				sb.append("AND (DEFN.BRANCH_AREA_ID IN (:branchAreaIDList) OR DEFN.BRANCH_AREA_ID IS NULL) ");
-				queryCondition.setObject("branchAreaIDList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
-			}
-		
-			if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && Integer.valueOf(inputVO.getBranch_nbr()) > 0) {
-				sb.append("AND DEFN.BRANCH_NBR = :branchID "); //分行代碼
-				queryCondition.setObject("branchID", inputVO.getBranch_nbr());
-			} else if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 				sb.append("AND (DEFN.BRANCH_NBR IN (:branchIDList) OR DEFN.BRANCH_NBR IS NULL) ");
 				queryCondition.setObject("branchIDList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
+			}
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UB WHERE UB.EMP_ID = A.EMP_ID) ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {

@@ -71,6 +71,7 @@ public class MAO231 extends FubonWmsBizLogic {
 				queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
 				break;
 		}
+		
 		if (inputVO.getUse_date_bgn() != null) {
 			sql.append("AND TRUNC(P.USE_DATE) >= TRUNC(:start) ");
 			queryCondition.setObject("start", new Timestamp(inputVO.getUse_date_bgn().getTime()));

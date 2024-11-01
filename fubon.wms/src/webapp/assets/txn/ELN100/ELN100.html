@@ -1,4 +1,5 @@
 <script type="text/javascript" src="assets/txn/ELN100/ELN100.js"></script>
+<script type="text/javascript" src="assets/txn/ELN100/ELN100_BBG.js"></script>
 <div ng-controller="ELN100Controller" ng-cloak>
 	<div>
 		<div class="tfb_content">
@@ -48,7 +49,20 @@
 					</tr>
      				<tr>
      					<th>標的1：</th>
-     					<td>
+     					<td class="form-inline">
+							<input type="text" 
+								   id="bbg_code1" name="bbg_code1" 
+								   class="form-control" 
+								   style="width: 180px;"
+								   ng-model="inputVO.bbg_code1" 
+								   ng-focus="saveOriCode('1')"
+								   ng-change="inputVO.bbg_code1 = inputVO.bbg_code1.toUpperCase()"
+								   ng-blur="getBBG('1')"/>
+							<button class="btn btn-info" ng-click="chooseBBG('1')" >
+								<i class="glyphicon glyphicon-search" title="標的查詢1"></i>
+							</button>
+						</td>
+     					<!-- <td>
      						<e-combobox id="bbg_code1"
 										ng-datasource="mappingSet['ELN.BBG_CODE1']"
 										ng-model="inputVO.bbg_code1"
@@ -58,9 +72,22 @@
 			   							ng-required="false"
 			   							width="180px"
 			   							style="line-height:20px;" />
-     					</td>
+     					</td> -->
      					<th>標的2：</th>
-     					<td>
+     					<td class="form-inline">
+							<input type="text" 
+								   id="bbg_code2" name="bbg_code2" 
+								   class="form-control" 
+								   style="width: 180px;"
+								   ng-model="inputVO.bbg_code2" 
+								   ng-focus="saveOriCode('2')"
+								   ng-change="inputVO.bbg_code2 = inputVO.bbg_code2.toUpperCase()"
+								   ng-blur="getBBG('2')"/>
+							<button class="btn btn-info" ng-click="chooseBBG('2')" >
+								<i class="glyphicon glyphicon-search" title="標的查詢2"></i>
+							</button>
+						</td>
+     					<!-- <td>
      						<e-combobox id="bbg_code2"
 										ng-datasource="mappingSet['ELN.BBG_CODE2']"
 										ng-model="inputVO.bbg_code2"
@@ -70,9 +97,23 @@
 			   							ng-required="false"
 			   							width="180px"
 			   							style="line-height:20px;" />
-     					</td>
+     					</td> -->
+     					
      					<th>標的3：</th>
-     					<td>
+     					<td class="form-inline">
+							<input type="text" 
+								   id="bbg_code3" name="bbg_code3" 
+								   class="form-control" 
+								   style="width: 180px;"
+								   ng-model="inputVO.bbg_code3" 
+								   ng-focus="saveOriCode('3')"
+								   ng-change="inputVO.bbg_code3 = inputVO.bbg_code3.toUpperCase()"
+								   ng-blur="getBBG('3')"/>
+							<button class="btn btn-info" ng-click="chooseBBG('3')" >
+								<i class="glyphicon glyphicon-search" title="標的查詢3"></i>
+							</button>
+						</td>
+     					<!-- <td>
      						<e-combobox id="bbg_code3"
 										ng-datasource="mappingSet['ELN.BBG_CODE3']"
 										ng-model="inputVO.bbg_code3"
@@ -82,7 +123,7 @@
 			   							ng-required="false"
 			   							width="180px"
 			   							style="line-height:20px;" />
-     					</td>
+     					</td> -->
   			  		</tr>
      				<tr>
      					<th>計價幣別：</th>
@@ -132,9 +173,35 @@
 			   							ng-editable="false"
 			   							ng-format="F3"
 			   							ng-required="false"
+			   							ng-change="changeKiType()"
 			   							width="180px"
 			   							style="line-height:20px;" />
      					</td>
+  			  		</tr>
+  			  		<tr>
+  			  			<td colspan="6">
+  			  				<label><input type="radio" ng-model="inputVO.type" ng-value="1" ng-change="changeType()"> 年化收益率</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type" ng-value="2" ng-change="changeType()"> 執行價格</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type" ng-value="3" ng-change="changeType()"> KO 價格</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type" ng-value="4" ng-change="changeType()"> KI 價格</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type" ng-value="5" ng-change="changeType()"> 通路服務費率：</label>
+  			  				<input type="text" 
+								   id="rate1" name="rate1" 
+								   class="form-control" 
+								   e-input-limit="NC"
+								   style="width: 180px; display: inline;"
+								   ng-model="inputVO.rate1" 
+								   ng-disabled="inputVO.type == undefined || disRate"
+								   ng-blur="checkRate('1')"/>(%)&nbsp;～&nbsp;
+							<input type="text" 
+								   id="rate2" name="rate2" 
+								   class="form-control" 
+								   e-input-limit="NC"
+								   style="width: 180px; display: inline;"
+								   ng-model="inputVO.rate2" 
+								   ng-disabled="inputVO.type == undefined || disRate"
+								   ng-blur="checkRate('2')"/>(%)
+  			  			</td>
   			  		</tr>
 				</table>
 			</div>

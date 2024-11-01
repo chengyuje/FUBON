@@ -44,7 +44,8 @@ public class PMS424 extends FubonWmsBizLogic {
 		initUUID();
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); // 總行人員
-		
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
+
 		PMS424InputVO inputVO = (PMS424InputVO) body;
 		PMS424OutputVO outputVO = new PMS424OutputVO();
 		dam = this.getDataAccessManager();
@@ -113,6 +114,11 @@ public class PMS424 extends FubonWmsBizLogic {
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND EXISTS (SELECT 1 FROM VWORG_DEFN_BRH BRHT WHERE BRHT.DEPT_ID = :regionCenterID AND RPT.BRANCH_NBR = BRHT.BRANCH_NBR) ");
 				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
+			}
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("  AND RPT.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {

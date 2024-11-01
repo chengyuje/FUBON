@@ -85,6 +85,7 @@ public class PMS431 extends FubonWmsBizLogic {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
 
 		sb.append("SELECT * ");
 		sb.append("FROM ( ");
@@ -147,6 +148,19 @@ public class PMS431 extends FubonWmsBizLogic {
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND RPT.AO_BRANCH_NBR IN (SELECT BRANCH_NBR FROM VWORG_DEFN_BRH WHERE DEPT_ID = :region) ");
 				queryCondition.setObject("region", inputVO.getRegion_center_id());
+			}
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("  AND CASE WHEN ( ");
+				sb.append("    SELECT COUNT(1) ");
+				sb.append("    FROM TBPMS_HIGH_RISK_INV_D_REP D ");
+				sb.append("    WHERE RPT.SNAP_YYYYMM = D.SNAP_YYYYMM ");
+				sb.append("    AND RPT.AO_BRANCH_NBR = D.AO_BRANCH_NBR ");
+				sb.append("    AND RPT.AO_EMP_CID = D.AO_EMP_ID ");
+				sb.append("    AND RPT.KIND_TYPE = D.KIND_TYPE ");
+				sb.append("    AND D.RM_FLAG = 'B' ");
+				sb.append("  ) > 0 THEN 'Y' ELSE 'N' END = 'Y' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {
@@ -329,6 +343,7 @@ public class PMS431 extends FubonWmsBizLogic {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
 
 		sb.append("SELECT * ");
 		sb.append("FROM ( ");
@@ -405,6 +420,11 @@ public class PMS431 extends FubonWmsBizLogic {
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND M.AO_BRANCH_NBR IN (SELECT BRANCH_NBR FROM VWORG_DEFN_BRH WHERE DEPT_ID = :region) ");
 				queryCondition.setObject("region", inputVO.getRegion_center_id());
+			}
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("AND D.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {

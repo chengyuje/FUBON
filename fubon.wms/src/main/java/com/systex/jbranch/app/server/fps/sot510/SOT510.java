@@ -401,6 +401,7 @@ public class SOT510 extends FubonWmsBizLogic {
 //		SOT711OutputVO sot711OutputVO = sot711.getDefaultFeeRateData(sot711InputVO);
 		SOT711OutputVO sot711OutputVO = new SOT711OutputVO();
 		if (isOBU.equals("Y")) {
+			sot711InputVO.setCustId(inputVO.getCustID());
 			sot711OutputVO = sot711.getDefaultFeeRateDataOBU(sot711InputVO);
 		} else {
 			sot711OutputVO = sot711.getDefaultFeeRateData(sot711InputVO);

@@ -56,7 +56,8 @@ public class PMS428 extends FubonWmsBizLogic {
 		initUUID();
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
+
 		PMS428InputVO inputVO = (PMS428InputVO) body;
 		PMS428OutputVO outputVO = new PMS428OutputVO();
 		dam = this.getDataAccessManager();
@@ -132,6 +133,11 @@ public class PMS428 extends FubonWmsBizLogic {
 				sb.append("AND ORG.REGION_CENTER_ID = :regionCenterID ");
 				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 			} 
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("AND CD.RM_FLAG = 'B' ");
+			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {
 				sb.append("AND (");

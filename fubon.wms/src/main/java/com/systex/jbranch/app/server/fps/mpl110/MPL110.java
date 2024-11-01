@@ -151,9 +151,9 @@ public class MPL110 extends FubonWmsBizLogic {
 		queryCondition.setQueryString(sb.toString());
 		List<Map<String, String>> resultList = dam.exeQuery(queryCondition);
 		
-		//                0         1         2         3         4         5            6            7       8          9          10      11             12       13 
-		String[] cases = {"FC",     "FCH",    "PAO",    "PSOP",   "BMMGR",  "MBRMGR",    "ARMGR",     "FAIA", "HEADMGR", "UHRMMGR", "UHRM", "UHRMHEADMGR", "BSMGR", "BS"};
-		String[] flags = {"brhMem", "brhMem", "brhMem", "brhMem", "brhMem", "brhMemMGR", "brhMemMGR", "ALL",  "ALL",     "uhrmMGR", "UHRM", "uhrmHeadMGR", "bsMGR", "BS"};
+		//                0         1         2         3         4         5            6            7       8          9          10      11             12       13    14
+		String[] cases = {"FC",     "FCH",    "PAO",    "PSOP",   "BMMGR",  "MBRMGR",    "ARMGR",     "FAIA", "HEADMGR", "UHRMMGR", "UHRM", "UHRMHEADMGR", "BSMGR", "BS", "UHRMBMMGR"};
+		String[] flags = {"brhMem", "brhMem", "brhMem", "brhMem", "brhMem", "brhMemMGR", "brhMemMGR", "ALL",  "ALL",     "uhrmMGR", "UHRM", "uhrmHeadMGR", "bsMGR", "BS", "uhrmBMMGR"};
 		
 		String memLoginFlag = flags[0];	// 預設brhMem
 		
@@ -200,6 +200,7 @@ public class MPL110 extends FubonWmsBizLogic {
 				case 9:		// FUBONSYS.UHRMMGR_ROLE
 				case 10:	// FUBONSYS.UHRM_ROLE
 				case 12:	// FUBONSYS.BSMGR_ROLE
+				case 14: 	// FUBONSYS.UHRMBMMGR_ROLE
 					memLoginFlag = flags[i];
 					break;
 			}
