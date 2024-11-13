@@ -41,7 +41,7 @@ public class CAM120 extends FubonWmsBizLogic {
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
 //		sql.append("select * from TBCAM_SFA_PARAMETER where 1=1 ");
-		sql.append("SELECT SFA_PARA_ID, CAMPAIGN_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, ");
+		sql.append("SELECT SFA_PARA_ID, CAMPAIGN_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, CAMP_PURPOSE, ");
 		sql.append("       LEAD_SOURCE_ID, LEAD_RESPONSE_CODE, LEAD_TYPE, LEAD_PARA1, LEAD_PARA2, EXAM_ID, SALES_PITCH, FIRST_CHANNEL, SECOND_CHANNEL, START_DT, END_DT, GIFT_CAMPAIGN_ID, ");
 		sql.append("       CREATETIME, CREATOR, MODIFIER, LASTUPDATE "); //, ");
 //		sql.append("       CASE WHEN CREATOR = :loginID THEN 'Y' WHEN (SELECT REPLACE(ROL.SYS_ROLE, '_ROLE', '') AS LOGIN_ROLE FROM TBORG_ROLE ROL WHERE ROLE_ID = :loginRole) = 'HEADMGR' THEN 'Y' ELSE 'N' END AS MODIFY_YN ");

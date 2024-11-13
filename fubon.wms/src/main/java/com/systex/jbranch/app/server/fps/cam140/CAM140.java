@@ -346,7 +346,8 @@ public class CAM140 extends FubonWmsBizLogic {
 							StringUtils.equals("UX", inputVO.getType()) ? "00" : "01", //#0000310: WMS-CR-20200714-01_優化線上留資名單功能:名單類型增加『電銷匯入留資名單』。該類型名單毋須經過放行。
 							inputVO.getGift_camp_id(), 
 							leTotCnt, 
-							inputVO.getResponseCode());
+							inputVO.getResponseCode(),
+							inputVO.getCamp_purpose());
 		
 		this.sendRtnObject(null);
 	}
@@ -380,12 +381,12 @@ public class CAM140 extends FubonWmsBizLogic {
 		case "view":
 			System.out.println("view");
 			sb.append("SELECT I.SEQNO, I.CAMPAIGN_ID, I.STEP_ID, I.CAMPAIGN_NAME, I.CAMPAIGN_DESC, I.LEAD_SOURCE_ID, I.LEAD_TYPE, I.LEAD_PARA1, I.LEAD_PARA2, ");
-			sb.append("       I.SALES_PITCH, I.FIRST_CHANNEL, I.SECOND_CHANNEL, I.START_DATE, I.END_DATE, I.GIFT_CAMPAIGN_ID, I.LEAD_RESPONSE_CODE ");
+			sb.append("       I.SALES_PITCH, I.FIRST_CHANNEL, I.SECOND_CHANNEL, I.START_DATE, I.END_DATE, I.GIFT_CAMPAIGN_ID, I.LEAD_RESPONSE_CODE, I.CAMP_PURPOSE ");
 			break;
 		case "updateImp" :
 			System.out.println("updateImp");
 			sb.append("SELECT I.SEQNO, C.CAMPAIGN_ID, C.STEP_ID, C.CAMPAIGN_NAME, C.CAMPAIGN_DESC, C.LEAD_SOURCE_ID, C.LEAD_TYPE, C.LEAD_PARA1, C.LEAD_PARA2, ");
-			sb.append("       C.SALES_PITCH, C.FIRST_CHANNEL, C.SECOND_CHANNEL, C.START_DATE, C.END_DATE, C.GIFT_CAMPAIGN_ID, C.LEAD_RESPONSE_CODE ");
+			sb.append("       C.SALES_PITCH, C.FIRST_CHANNEL, C.SECOND_CHANNEL, C.START_DATE, C.END_DATE, C.GIFT_CAMPAIGN_ID, C.LEAD_RESPONSE_CODE, C.CAMP_PURPOSE ");
 			
 			break;
 		}
@@ -412,6 +413,7 @@ public class CAM140 extends FubonWmsBizLogic {
 		outputVO.seteDate((Timestamp) list.get(0).get("END_DATE"));
 		outputVO.setGift_camp_id((String) list.get(0).get("GIFT_CAMPAIGN_ID"));
 		outputVO.setResponse_code((String) list.get(0).get("LEAD_RESPONSE_CODE"));
+		outputVO.setCamp_purpose((String) list.get(0).get("CAMP_PURPOSE"));
 		
 		System.out.println(sb.toString());
 		this.sendRtnObject(outputVO);
@@ -592,7 +594,8 @@ public class CAM140 extends FubonWmsBizLogic {
 		
 		if ("checkParameter".equals(inputVO.getAction())) {
 			StringBuffer sb = new StringBuffer();
-			sb.append("SELECT SFA_PARA_ID, CAMPAIGN_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, LEAD_SOURCE_ID, LEAD_TYPE, LEAD_PARA1, LEAD_PARA2, EXAM_ID, SALES_PITCH, FIRST_CHANNEL, SECOND_CHANNEL, START_DT, END_DT, GIFT_CAMPAIGN_ID ");
+			sb.append("SELECT SFA_PARA_ID, CAMPAIGN_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, LEAD_SOURCE_ID, LEAD_TYPE, LEAD_PARA1, ");
+			sb.append("LEAD_PARA2, EXAM_ID, SALES_PITCH, FIRST_CHANNEL, SECOND_CHANNEL, START_DT, END_DT, GIFT_CAMPAIGN_ID, CAMP_PURPOSE ");
 			sb.append("FROM TBCAM_SFA_PARAMETER ");
 			sb.append("WHERE CAMPAIGN_ID = :camp_id ");
 			condition.setQueryString(sb.toString());
@@ -624,7 +627,8 @@ public class CAM140 extends FubonWmsBizLogic {
 				vo.setEND_DT(new Timestamp(inputVO.geteDate().getTime()));// 專案截止日
 			vo.setGIFT_CAMPAIGN_ID(inputVO.getGift_camp_id()); //票券/贈品/講座活動代碼
 			vo.setLEAD_RESPONSE_CODE(inputVO.getResponseCode());
-	
+			vo.setCAMP_PURPOSE(inputVO.getCamp_purpose());
+			
 			// 儲存參考文件
 			for (int i = 0; i < inputVO.getFileName().size(); i++) {
 				// 2017/4/25 add other type
@@ -712,7 +716,8 @@ public class CAM140 extends FubonWmsBizLogic {
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		
 		StringBuffer sb = new StringBuffer();
-		sb.append("SELECT SFA_PARA_ID, CAMPAIGN_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, LEAD_SOURCE_ID, LEAD_RESPONSE_CODE, LEAD_TYPE, LEAD_PARA1, LEAD_PARA2, EXAM_ID, SALES_PITCH, FIRST_CHANNEL, SECOND_CHANNEL, START_DT, END_DT, GIFT_CAMPAIGN_ID ");
+		sb.append("SELECT SFA_PARA_ID, CAMPAIGN_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, LEAD_SOURCE_ID, LEAD_RESPONSE_CODE, LEAD_TYPE, ");
+		sb.append("LEAD_PARA1, LEAD_PARA2, EXAM_ID, SALES_PITCH, FIRST_CHANNEL, SECOND_CHANNEL, START_DT, END_DT, GIFT_CAMPAIGN_ID, CAMP_PURPOSE ");
 		sb.append("FROM TBCAM_SFA_PARAMETER ");
 		sb.append("WHERE SFA_PARA_ID = :sfaParaID ");
 		condition.setQueryString(sb.toString());
@@ -736,6 +741,7 @@ public class CAM140 extends FubonWmsBizLogic {
 			outputVO.setsDate((Timestamp) list.get(0).get("START_DT"));
 			outputVO.seteDate((Timestamp) list.get(0).get("END_DT"));
 			outputVO.setGift_camp_id((String) list.get(0).get("GIFT_CAMPAIGN_ID"));
+			outputVO.setCamp_purpose((String) list.get(0).get("CAMP_PURPOSE"));
 		}
 		
 		this.sendRtnObject(outputVO);
@@ -795,6 +801,7 @@ public class CAM140 extends FubonWmsBizLogic {
 			if(inputVO.geteDate() != null)
 				vo.setEND_DT(new Timestamp(inputVO.geteDate().getTime()));// 專案截止日
 			vo.setGIFT_CAMPAIGN_ID(inputVO.getGift_camp_id()); //票券/贈品/講座活動代碼
+			vo.setCAMP_PURPOSE(inputVO.getCamp_purpose());
 			
 			dam.update(vo);
 			
@@ -1171,6 +1178,18 @@ public class CAM140 extends FubonWmsBizLogic {
 		
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		queryCondition.setQueryString("select DOC_ID,DOC_NAME from TBSYS_FILE_MAIN where DOC_TYPE = '02' ");
+		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+		return_VO.setResultList(list);
+		
+		this.sendRtnObject(return_VO);
+	}
+	
+	public void getCampPurpose(Object body, IPrimitiveMap header) throws JBranchException {
+		CAM140OutputVO return_VO = new CAM140OutputVO();
+		dam = this.getDataAccessManager();
+		
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		queryCondition.setQueryString("SELECT PARAM_NAME, PARAM_CODE, PARAM_DESC FROM TBSYSPARAMETER WHERE PARAM_TYPE = 'CAM.CAMP_PURPOSE' ");
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		return_VO.setResultList(list);
 		

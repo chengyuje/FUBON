@@ -28,6 +28,7 @@ public class CAM140OutputVO extends PagingOutputVO {
 	private String lead_para2;
 	private String sales_pitch;
 	private String gift_camp_id;
+	private String camp_purpose;
 	
 	// 檔案相關
 	private List<Map<String,String>> fileName;
@@ -157,6 +158,13 @@ public class CAM140OutputVO extends PagingOutputVO {
 	}
 	public void setGift_camp_id(String gift_camp_id) {
 		this.gift_camp_id = gift_camp_id;
+	}
+	
+	public String getCamp_purpose() {
+		return camp_purpose;
+	}
+	public void setCamp_purpose(String camp_purpose) {
+		this.camp_purpose = camp_purpose;
 	}
 	public List<Map<String, String>> getFileName() {
 		return fileName;

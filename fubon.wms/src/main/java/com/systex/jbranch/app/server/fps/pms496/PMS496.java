@@ -220,15 +220,23 @@ public class PMS496 extends FubonWmsBizLogic {
 			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("  AND T.BRANCH_NBR = :branchNbr ");
 				queryCondition.setObject("branchNbr", inputVO.getBranch_nbr());
-			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-				sb.append("  AND T.BRANCH_AREA_ID = :branchAreaID ");
-				queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());				
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
+				sb.append("  AND ( ");
+				sb.append("    (T.RM_FLAG = 'B' AND T.BRANCH_AREA_ID = :branchAreaID) ");
+				
+				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+					sb.append("    OR (T.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE T.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :branchAreaID )) ");
+				}
+			
+				sb.append("  ) ");
+				queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND T.REGION_CENTER_ID = :regionCenterID ");
 				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 			}
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) && 
 				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 				sb.append("  AND T.RM_FLAG = 'N' ");
 			}

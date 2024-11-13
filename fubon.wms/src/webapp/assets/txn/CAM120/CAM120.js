@@ -9,12 +9,13 @@ eSoafApp.controller('CAM120Controller',
 		$scope.controllerName = "CAM120Controller";
 		
 		// combobox
-		getParameter.XML(["CAM.LEAD_SOURCE", "CAM.LEAD_TYPE", "CAM.LEAD_PARA1", "CAM.CHANNEL_CODE"], function(totas) {
+		getParameter.XML(["CAM.LEAD_SOURCE", "CAM.LEAD_TYPE", "CAM.LEAD_PARA1", "CAM.CHANNEL_CODE", "CAM.CAMP_PURPOSE"], function(totas) {
 			if (totas) {
 				$scope.LEAD_SOURCE = totas.data[totas.key.indexOf('CAM.LEAD_SOURCE')];
 				$scope.LEAD_TYPE = totas.data[totas.key.indexOf('CAM.LEAD_TYPE')];
 				$scope.LEAD_PARA1 = totas.data[totas.key.indexOf('CAM.LEAD_PARA1')];
 				$scope.CHANNEL_CODE = totas.data[totas.key.indexOf('CAM.CHANNEL_CODE')];
+				$scope.CAMP_PURPOSE = totas.data[totas.key.indexOf('CAM.CAMP_PURPOSE')];
 			}
 		});
 		

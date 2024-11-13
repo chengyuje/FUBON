@@ -17,6 +17,10 @@ public class PMS433InputVO {
 	
 	private List resultList; //主查詢
 	
+	private boolean uhrmFlag; //可視範圍的可出現分行清單
+	private String uhrm_region_center_id;
+	private String uhrm_branch_area_id;
+	
 	//明細查詢
 	private String seq; //流水號
 	
@@ -100,6 +104,24 @@ public class PMS433InputVO {
 	}
 	public void setBranch_list(List<Map<String, Object>> branch_list) {
 		this.branch_list = branch_list;
+	}
+	public boolean isUhrmFlag() {
+		return uhrmFlag;
+	}
+	public void setUhrmFlag(boolean uhrmFlag) {
+		this.uhrmFlag = uhrmFlag;
+	}
+	public String getUhrm_region_center_id() {
+		return uhrm_region_center_id;
+	}
+	public void setUhrm_region_center_id(String uhrm_region_center_id) {
+		this.uhrm_region_center_id = uhrm_region_center_id;
+	}
+	public String getUhrm_branch_area_id() {
+		return uhrm_branch_area_id;
+	}
+	public void setUhrm_branch_area_id(String uhrm_branch_area_id) {
+		this.uhrm_branch_area_id = uhrm_branch_area_id;
 	}
 
 

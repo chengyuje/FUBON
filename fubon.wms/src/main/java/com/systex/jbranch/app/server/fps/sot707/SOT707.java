@@ -359,7 +359,7 @@ public class SOT707 extends EsbUtil {
 	/**
 	 * 海外債/SN申購檢核、確認
 	 *
-	 * 使用電文: NJBRVA9
+	 * 使用電文: NJBRVA9、AJBRVA9
 	 *
 	 * @param body
 	 * @return
@@ -392,8 +392,15 @@ public class SOT707 extends EsbUtil {
 		// 由產品類別與交易序號取得主檔資料作為電文上行
 		MainInfoBean mainVO = mainInfo(prodType, tradeSeq);
 
+		Boolean isOBU = StringUtils.isNotBlank(sot707InputVO.getIsOBU()) && "Y".equals(sot707InputVO.getIsOBU());
+		
+		String esbType = ETF_SN_PURCHASE;
+		if (isOBU) {
+			esbType = AJBRVA9;
+		}
+		
 		// init util
-		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, ETF_SN_PURCHASE);
+		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, esbType);
 		esbUtilInputVO.setModule(thisClaz + new Object() {
 		}.getClass().getEnclosingMethod().getName());
 
@@ -486,33 +493,56 @@ public class SOT707 extends EsbUtil {
 				String flagNumber = mainVO.getFLAG_NUMBER() == null ? " " : mainVO.getFLAG_NUMBER();
 				txBodyVO.setFiller("           " + flagNumber);
 			}
-
 		}
 
 		// 發送電文
 		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
 
 		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
-			NJBRVA9OutputVO njbrva9Output = esbUtilOutputVO.getNjbrva9OutputVO();
-
-			// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
-			Boolean isErr = checkError(njbrva9Output);
-
-			//回傳下行電文資料儲存DB
-			//網行銀快速申購不須回寫NJBRVA9回傳資料
-			if (!isErr && !StringUtils.equals(mainVO.getIS_WEB(), "Y")) {
-				purchaseETFUpdateDB(prodType, tradeSeq, mainVO.getSEQ_NO(), njbrva9Output, mainVO.getDEFAULT_FEE_RATE(), mainVO.getTRUST_AMT());
-			}
-
-			// 若有專業投資人提示訊息
-			sot707OutputVO.setWarningCode(new ArrayList<String>());
-			if (StringUtils.equals("Y", njbrva9Output.getTxMsgCode())) {
-				if (sot707InputVO.getPurchaseAmt().compareTo(new BigDecimal("3000000")) == -1) { // 當申購金額小於3000000時，需顯示提示訊息
-					sot707OutputVO.getWarningCode().add("ehl_02_SOT_007");
+			if (isOBU) {
+				AJBRVA9OutputVO ajbrva9Output = esbUtilOutputVO.getAjbrva9OutputVO();
+				
+				// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
+				Boolean isErr = checkError(ajbrva9Output);
+				
+				//回傳下行電文資料儲存DB
+				//網行銀快速申購不須回寫AJBRVA9回傳資料
+				if (!isErr && !StringUtils.equals(mainVO.getIS_WEB(), "Y")) {
+					purchaseETFUpdateDB_OBU(prodType, tradeSeq, mainVO.getSEQ_NO(), ajbrva9Output, mainVO.getDEFAULT_FEE_RATE(), mainVO.getTRUST_AMT());
 				}
-				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
-			} else if (StringUtils.equals("A", njbrva9Output.getTxMsgCode())) {
-				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+				
+				// 若有專業投資人提示訊息
+				sot707OutputVO.setWarningCode(new ArrayList<String>());
+				if (StringUtils.equals("Y", ajbrva9Output.getTxMsgCode())) {
+					if (sot707InputVO.getPurchaseAmt().compareTo(new BigDecimal("3000000")) == -1) { // 當申購金額小於3000000時，需顯示提示訊息
+						sot707OutputVO.getWarningCode().add("ehl_02_SOT_007");
+					}
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+				} else if (StringUtils.equals("A", ajbrva9Output.getTxMsgCode())) {
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+				}
+			} else {
+				NJBRVA9OutputVO njbrva9Output = esbUtilOutputVO.getNjbrva9OutputVO();
+				
+				// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
+				Boolean isErr = checkError(njbrva9Output);
+				
+				//回傳下行電文資料儲存DB
+				//網行銀快速申購不須回寫NJBRVA9回傳資料
+				if (!isErr && !StringUtils.equals(mainVO.getIS_WEB(), "Y")) {
+					purchaseETFUpdateDB(prodType, tradeSeq, mainVO.getSEQ_NO(), njbrva9Output, mainVO.getDEFAULT_FEE_RATE(), mainVO.getTRUST_AMT());
+				}
+				
+				// 若有專業投資人提示訊息
+				sot707OutputVO.setWarningCode(new ArrayList<String>());
+				if (StringUtils.equals("Y", njbrva9Output.getTxMsgCode())) {
+					if (sot707InputVO.getPurchaseAmt().compareTo(new BigDecimal("3000000")) == -1) { // 當申購金額小於3000000時，需顯示提示訊息
+						sot707OutputVO.getWarningCode().add("ehl_02_SOT_007");
+					}
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+				} else if (StringUtils.equals("A", njbrva9Output.getTxMsgCode())) {
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+				}
 			}
 		}
 
@@ -663,7 +693,6 @@ public class SOT707 extends EsbUtil {
 				String flagNumber = mainVO.getFLAG_NUMBER() == null ? " " : mainVO.getFLAG_NUMBER();
 				txBodyVO.setFiller("           " + flagNumber);
 			}
-			
 		}
 		
 		// 發送電文
@@ -845,7 +874,7 @@ public class SOT707 extends EsbUtil {
 	/**
 	 * 海外債長效單申購檢核、確認
 	 *
-	 * 使用電文: NJBRVC9
+	 * 使用電文: NJBRVC9、AJBRVC9
 	 *
 	 * @param body
 	 * @return
@@ -876,9 +905,16 @@ public class SOT707 extends EsbUtil {
 
 		// 由產品類別與交易序號取得主檔資料作為電文上行
 		MainInfoBean mainVO = mainInfo(prodType, tradeSeq);
+		
+		Boolean isOBU = StringUtils.isNotBlank(sot707InputVO.getIsOBU()) && "Y".equals(sot707InputVO.getIsOBU());
+		
+		String esbType = BOND_GTC_PURCHASE;
+		if (isOBU) {
+			esbType = AJBRVC9;
+		}
 
 		// init util
-		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, BOND_GTC_PURCHASE);
+		ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, esbType);
 		esbUtilInputVO.setModule(thisClaz + new Object() {
 		}.getClass().getEnclosingMethod().getName());
 
@@ -963,30 +999,58 @@ public class SOT707 extends EsbUtil {
 		List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
 
 		for (ESBUtilOutputVO esbUtilOutputVO : vos) {
-			NJBRVC9OutputVO njbrvc9Output = esbUtilOutputVO.getNjbrvc9OutputVO();
-
-			// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
-			Boolean isErr = checkError(njbrvc9Output);
-
-			// 回傳下行電文資料儲存DB
-			if (!isErr) {
-				purchaseBondUpdateDB_GTC(prodType, tradeSeq, mainVO.getSEQ_NO(), njbrvc9Output, mainVO.getDEFAULT_FEE_RATE());
-			}
-
-			// 若有專業投資人提示訊息
-			sot707OutputVO.setWarningCode(new ArrayList<String>());
-			if (StringUtils.equals("Y", njbrvc9Output.getTxMsgCode())) {
-				if (sot707InputVO.getPurchaseAmt().compareTo(new BigDecimal("3000000")) == -1) { // 當申購金額小於3000000時，需顯示提示訊息
-					sot707OutputVO.getWarningCode().add("ehl_02_SOT_007");
+			if (isOBU) {
+				AJBRVC9OutputVO ajbrvc9Output = esbUtilOutputVO.getAjbrvc9OutputVO();
+				
+				// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
+				Boolean isErr = checkError(ajbrvc9Output);
+				
+				// 回傳下行電文資料儲存DB
+				if (!isErr) {
+					purchaseBondUpdateDB_GTC_OBU(prodType, tradeSeq, mainVO.getSEQ_NO(), ajbrvc9Output, mainVO.getDEFAULT_FEE_RATE());
 				}
-				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
-			} else if (StringUtils.equals("A", njbrvc9Output.getTxMsgCode())) {
-				sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
-			}
+				
+				// 若有專業投資人提示訊息
+				sot707OutputVO.setWarningCode(new ArrayList<String>());
+				if (StringUtils.equals("Y", ajbrvc9Output.getTxMsgCode())) {
+					if (sot707InputVO.getPurchaseAmt().compareTo(new BigDecimal("3000000")) == -1) { // 當申購金額小於3000000時，需顯示提示訊息
+						sot707OutputVO.getWarningCode().add("ehl_02_SOT_007");
+					}
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+				} else if (StringUtils.equals("A", ajbrvc9Output.getTxMsgCode())) {
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+				}
+				
+				// 委買單價與最新報價不符合
+				if (StringUtils.equals("Y", ajbrvc9Output.getTxMsgCode1())) {
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_012");
+				}
+			} else {
+				NJBRVC9OutputVO njbrvc9Output = esbUtilOutputVO.getNjbrvc9OutputVO();
 
-			// 委買單價與最新報價不符合
-			if (StringUtils.equals("Y", njbrvc9Output.getTxMsgCode1())) {
-				sot707OutputVO.getWarningCode().add("ehl_02_SOT_012");
+				// 若有回傳錯誤訊息ERR_COD,將錯誤碼及錯誤訊息拋出
+				Boolean isErr = checkError(njbrvc9Output);
+
+				// 回傳下行電文資料儲存DB
+				if (!isErr) {
+					purchaseBondUpdateDB_GTC(prodType, tradeSeq, mainVO.getSEQ_NO(), njbrvc9Output, mainVO.getDEFAULT_FEE_RATE());
+				}
+
+				// 若有專業投資人提示訊息
+				sot707OutputVO.setWarningCode(new ArrayList<String>());
+				if (StringUtils.equals("Y", njbrvc9Output.getTxMsgCode())) {
+					if (sot707InputVO.getPurchaseAmt().compareTo(new BigDecimal("3000000")) == -1) { // 當申購金額小於3000000時，需顯示提示訊息
+						sot707OutputVO.getWarningCode().add("ehl_02_SOT_007");
+					}
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+				} else if (StringUtils.equals("A", njbrvc9Output.getTxMsgCode())) {
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_008");
+				}
+
+				// 委買單價與最新報價不符合
+				if (StringUtils.equals("Y", njbrvc9Output.getTxMsgCode1())) {
+					sot707OutputVO.getWarningCode().add("ehl_02_SOT_012");
+				}
 			}
 		}
 
@@ -1199,7 +1263,7 @@ public class SOT707 extends EsbUtil {
 	 *
 	 * @param prodType
 	 * @param tradeSeq
-	 * @param njbrva9Output
+	 * @param ajbrva9Output
 	 * @param defaultFeeRate
 	 * @param trustAmt
 	 * @throws JBranchException
@@ -1246,7 +1310,7 @@ public class SOT707 extends EsbUtil {
 	/**
 	 * 海外債金錢信託申購檢核、確認
 	 *
-	 * 使用電文: NJBRVA9
+	 * 使用電文: NJBRVX2
 	 *
 	 * @param body
 	 * @return

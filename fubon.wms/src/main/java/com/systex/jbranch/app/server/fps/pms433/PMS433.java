@@ -81,6 +81,9 @@ public class PMS433 extends FubonWmsBizLogic {
 		sql.append(" LEFT JOIN TBORG_DEFN D ON H.BRA_NBR = D.DEPT_ID ");
 		sql.append(" LEFT JOIN TBORG_MEMBER M ON H.MODIFIER = M.EMP_ID ");
 		sql.append(" LEFT JOIN VWORG_EMP_UHRM_INFO VW ON C.AO_CODE = VW.UHRM_CODE ");
+		sql.append(" LEFT JOIN ( SELECT AO.EMP_ID, AO.AO_CODE, M.DEPT_ID FROM TBORG_SALES_AOCODE AO  ");
+		sql.append(" INNER JOIN TBORG_MEMBER M ON M.EMP_ID = AO.EMP_ID) AO_INFO ON C.AO_CODE = AO_INFO.AO_CODE ");
+		sql.append(" LEFT JOIN TBPMS_EMPLOYEE_REC_N MEM ON VW.EMP_ID = MEM.EMP_ID AND TO_DATE(H.YYYYMM,'yyyyMM') BETWEEN MEM.START_TIME AND MEM.END_TIME ");
 		sql.append(" WHERE 1 = 1  ");
 		//限制條件
 		if(roleID.matches("A150|ABRF|A157")) { //作業主管or有權人員
@@ -100,19 +103,27 @@ public class PMS433 extends FubonWmsBizLogic {
 			sql.append(" AND H.CALL_RESULT = :CALL_RESULT ");
 			condition.setObject("CALL_RESULT", inputVO.getCall_result());
 		}
-		if(StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
-			sql.append(" AND H.BRA_NBR = :BRA_NBR ");
-			condition.setObject("BRA_NBR", inputVO.getBranch_nbr());
-		} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-			sql.append(" AND H.BRA_NBR in (:BRA_NBR) ");
-			condition.setObject("BRA_NBR", getFilterBranchLise(inputVO.getBranch_list()));
-		} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-			sql.append(" AND H.BRA_NBR in (:BRA_NBR) ");
-			condition.setObject("BRA_NBR", getFilterBranchLise(inputVO.getBranch_list()));
+		if(inputVO.isUhrmFlag()) {
+			if (StringUtils.isNotBlank(inputVO.getUhrm_branch_area_id())) {
+				sql.append(" AND (AO_INFO.DEPT_ID = :BRA_AREA OR MEM.E_DEPT_ID = :BRA_AREA)  ");
+				condition.setObject("BRA_AREA", inputVO.getUhrm_branch_area_id());
+			}	
 		} else {
-			sql.append(" AND H.BRA_NBR in (:BRA_NBR) ");
-			condition.setObject("BRA_NBR", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
+			if(StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
+				sql.append(" AND H.BRA_NBR = :BRA_NBR ");
+				condition.setObject("BRA_NBR", inputVO.getBranch_nbr());
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
+				sql.append(" AND H.BRA_NBR in (:BRA_NBR) ");
+				condition.setObject("BRA_NBR", getFilterBranchLise(inputVO.getBranch_list()));
+			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
+				sql.append(" AND H.BRA_NBR in (:BRA_NBR) ");
+				condition.setObject("BRA_NBR", getFilterBranchLise(inputVO.getBranch_list()));
+			} else {
+				sql.append(" AND H.BRA_NBR in (:BRA_NBR) ");
+				condition.setObject("BRA_NBR", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
+			}
 		}
+
 		sql.append(" ) T");
 		sql.append(" WHERE T.RN = 1 ");
 		//排序

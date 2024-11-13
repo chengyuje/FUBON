@@ -27,6 +27,7 @@ public class CAM210InputVO extends PagingInputVO {
 	private String stepId;
 	private String toDoList;
 	private String leadType;
+	private String campType;
 	private Date camp_sDate;
 	private Date camp_eDate;
 	private Date camp_esDate;
@@ -231,6 +232,14 @@ public class CAM210InputVO extends PagingInputVO {
 
 	public void setLeadType(String leadType) {
 		this.leadType = leadType;
+	}
+
+	public String getCampType() {
+		return campType;
+	}
+
+	public void setCampType(String campType) {
+		this.campType = campType;
 	}
 
 	public Date getCamp_sDate() {

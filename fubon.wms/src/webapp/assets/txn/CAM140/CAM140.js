@@ -18,45 +18,64 @@ eSoafApp.controller('CAM140Controller',
 		var date = new Date();
 		
 		// combobox
-		getParameter.XML(["CAM.LEAD_SOURCE", "CAM.CHANNEL_CODE", "CAM.RESPONSE_CODE", "CAM.LEAD_TYPE"], function(totas) {
-			if (totas) {
-				$scope.TEMP = totas.data[totas.key.indexOf('CAM.LEAD_SOURCE')];
-				if(pageID == "CAM120") {
-					$scope.LEAD_SOURCE = [];
-					angular.forEach($scope.TEMP, function(row) {
-						if(row.DATA == "01" || row.DATA == "03")
-							$scope.LEAD_SOURCE.push(row);
-					});
-				} else {
-					$scope.LEAD_SOURCE = $scope.TEMP; 
-				}
+		// 參數取得
+        $scope.getParam = function () {
+            var deferred = $q.defer();
+//          alert('getParam');
+            getParameter.XML(["CAM.LEAD_SOURCE", "CAM.CHANNEL_CODE", "CAM.RESPONSE_CODE", "CAM.LEAD_TYPE", "CAM.CAMP_PURPOSE"], function(totas) {
+    			if (totas) {
+    				$scope.CAMP_PURPOSE_XML = totas.data[totas.key.indexOf('CAM.CAMP_PURPOSE')];
+    				$scope.TEMP = totas.data[totas.key.indexOf('CAM.LEAD_SOURCE')];
+    				if(pageID == "CAM120") {
+    					$scope.LEAD_SOURCE = [];
+    					angular.forEach($scope.TEMP, function(row) {
+    						if(row.DATA == "01" || row.DATA == "03")
+    							$scope.LEAD_SOURCE.push(row);
+    					});
+    				} else {
+    					$scope.LEAD_SOURCE = $scope.TEMP; 
+    				}
 
-				$scope.TEMP2 = totas.data[totas.key.indexOf('CAM.LEAD_TYPE')];
-				if(pageID == "CAM120") {
-					$scope.LEAD_TYPE = $scope.TEMP2;
-				} else {
-					$scope.LEAD_TYPE = []; 
-					angular.forEach($scope.TEMP2, function(row) {
-						if(row.DATA == "03" || row.DATA == "04" || row.DATA == "99" || row.DATA == "UX" || row.DATA == "10")
-							$scope.LEAD_TYPE.push(row);
-					});
-				}
-				
-				$scope.CHANNEL_CODE2 = [];
-				$scope.cc2 = totas.data[totas.key.indexOf('CAM.CHANNEL_CODE')];
-				for (var i = 0; i < $scope.cc2.length; i++) {
-					if ($scope.cc2[i].DATA.indexOf('BM') == 0 || $scope.cc2[i].DATA.indexOf('OPH') == 0 || $scope.cc2[i].DATA.indexOf('SH') == 0 || $scope.cc2[i].DATA.indexOf('B01') == 0 || $scope.cc2[i].DATA.indexOf('P01') == 0) {
-					} else {
-						$scope.CHANNEL_CODE2.push({
-							LABEL: $scope.cc2[i].LABEL,
-							DATA: $scope.cc2[i].DATA
-						});
-					}
-				}
-				
-				$scope.RESPONSE_CODE = totas.data[totas.key.indexOf('CAM.RESPONSE_CODE')];
-			}
-		});
+    				$scope.TEMP2 = totas.data[totas.key.indexOf('CAM.LEAD_TYPE')];
+    				if(pageID == "CAM120") {
+    					$scope.LEAD_TYPE = $scope.TEMP2;
+    				} else {
+    					$scope.LEAD_TYPE = []; 
+    					angular.forEach($scope.TEMP2, function(row) {
+    						if(row.DATA == "03" || row.DATA == "04" || row.DATA == "99" || row.DATA == "UX" || row.DATA == "10")
+    							$scope.LEAD_TYPE.push(row);
+    					});
+    				}
+    				
+    				$scope.CHANNEL_CODE2 = [];
+    				$scope.cc2 = totas.data[totas.key.indexOf('CAM.CHANNEL_CODE')];
+    				for (var i = 0; i < $scope.cc2.length; i++) {
+    					if ($scope.cc2[i].DATA.indexOf('BM') == 0 || $scope.cc2[i].DATA.indexOf('OPH') == 0 || $scope.cc2[i].DATA.indexOf('SH') == 0 || $scope.cc2[i].DATA.indexOf('B01') == 0 || $scope.cc2[i].DATA.indexOf('P01') == 0) {
+    					} else {
+    						$scope.CHANNEL_CODE2.push({
+    							LABEL: $scope.cc2[i].LABEL,
+    							DATA: $scope.cc2[i].DATA
+    						});
+    					}
+    				}
+    				
+    				$scope.RESPONSE_CODE = totas.data[totas.key.indexOf('CAM.RESPONSE_CODE')];
+    				
+    				// 取得參數：CAM.CAMP_PURPOSE
+    				$scope.CAMP_PURPOSE = [];
+    				$scope.sendRecv("CAM140", "getCampPurpose", "com.systex.jbranch.app.server.fps.cam140.CAM140InputVO", {},
+    				function(tota, isError) {
+    					if (!isError) {
+    						$scope.CAMP_PURPOSE = tota[0].body.resultList;
+//    						alert(JSON.stringify($scope.CAMP_PURPOSE));
+    						deferred.resolve();
+    					}
+    				});
+    			}
+    		});
+//          deferred.resolve();
+            return deferred.promise;
+        };
 		
 		$scope.startDateOptions = {
 			maxDate: $scope.inputVO.eDate || $scope.maxDate,
@@ -86,6 +105,29 @@ eSoafApp.controller('CAM140Controller',
 			
 			return String(value).split(',');
 		};
+		
+		// 依據所選『名單類型』變更『名單目的』下拉選項
+		$scope.getPurpose = function(){
+			$scope.inputVO.camp_purpose = undefined;
+			$scope.PURPOSE = [];
+
+			if ($scope.inputVO.type != undefined) {
+				angular.forEach($scope.CAMP_PURPOSE, function(row) {
+					if (row.PARAM_DESC.indexOf($scope.inputVO.type) >= 0) {
+						$scope.PURPOSE.push({LABEL:row.PARAM_NAME, DATA: row.PARAM_CODE});
+					}
+				});
+			}
+			if ($scope.PURPOSE.length == 0) {
+				$scope.PURPOSE = $scope.CAMP_PURPOSE_XML;
+			}
+			
+			if ($scope.camp_purpose_ori != undefined) {
+				$scope.inputVO.camp_purpose = angular.copy($scope.camp_purpose_ori);
+				$scope.camp_purpose_ori = undefined;
+			}
+//			alert(JSON.stringify($scope.PURPOSE));
+		}
 	     
 		$scope.init = function(){
 			$scope.inputVO = {
@@ -110,18 +152,21 @@ eSoafApp.controller('CAM140Controller',
 					loginUser: projInfoService.getUserID(),
 					loginDate: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' +  date.getDate(), 
 					exam_id: '', 
-					responseCode: ''
+					responseCode: '',
+					camp_purpose: undefined
         	};
 			
 			$scope.sourceFlag = true; //名單來源:欄位是否准許編輯 ture:不可 / false:可
 			$scope.columnFlag = true; //欄位是否可編輯 ture:不可 / false:可
 			if ($scope.data == "view") {
+				alert('view');
 				$scope.sourceFlag = true;
 				$scope.columnFlag = true;
 								
 				$scope.sendRecv("CAM140", "getImpDtl", "com.systex.jbranch.app.server.fps.cam140.CAM140InputVO", {seqNo: seqNo, interType: 'view'},
     					function(tota, isError) {
     						if (!isError) {
+    							$scope.camp_purpose_ori = tota[0].body.camp_purpose;
     							$scope.inputVO.seqNo = tota[0].body.seqNo;
     							$scope.inputVO.camp_id = tota[0].body.camp_id;
     							$scope.inputVO.camp_name = tota[0].body.camp_name;
@@ -139,15 +184,17 @@ eSoafApp.controller('CAM140Controller',
     							$scope.inputVO.exam_id = tota[0].body.exam_id;
     							$scope.inputVO.delId = [];
     							$scope.inputVO.responseCode = tota[0].body.response_code;
-    						
+    							
     							$scope.tempSource = true;
     							return;
     						}
     			});
 			} else if ($scope.data == "insert") {
+				alert('insert');
 				$scope.sourceFlag = false;
 				$scope.columnFlag = false;
 			} else if ($scope.data == "update") {
+				alert('update');
 				$scope.sourceFlag = false;
 				$scope.columnFlag = false;
 				$scope.isUpdate = true;
@@ -156,6 +203,7 @@ eSoafApp.controller('CAM140Controller',
 				$scope.sendRecv("CAM140", "getParameterDtl", "com.systex.jbranch.app.server.fps.cam140.CAM140InputVO", {sfaParaID: sfaParaID},
     					function(tota, isError) {
     						if (!isError) {
+    							$scope.camp_purpose_ori = tota[0].body.camp_purpose;
     							$scope.inputVO.sfaParaID = tota[0].body.sfaParaID;
     							$scope.inputVO.camp_id = tota[0].body.camp_id;
     							$scope.inputVO.camp_name = tota[0].body.camp_name;
@@ -202,6 +250,7 @@ eSoafApp.controller('CAM140Controller',
 				$scope.sendRecv("CAM140", "getImpDtl", "com.systex.jbranch.app.server.fps.cam140.CAM140InputVO", {seqNo: seqNo, interType: 'updateImp'},
     					function(tota, isError) {
     						if (!isError) {
+    							$scope.camp_purpose_ori = tota[0].body.camp_purpose;
     							$scope.inputVO.seqNo = tota[0].body.seqNo;
     							$scope.inputVO.camp_id = tota[0].body.camp_id;
     							$scope.inputVO.camp_name = tota[0].body.camp_name;
@@ -257,7 +306,7 @@ eSoafApp.controller('CAM140Controller',
 			
 			$scope.limitDate();
 		};
-		$scope.init();
+//		$scope.init();
         
         $scope.toggleSelection = function toggleSelection(data) {
         	var idx = $scope.inputVO.chkCode.indexOf(data);
@@ -470,5 +519,7 @@ eSoafApp.controller('CAM140Controller',
 			});
 		};
 		
-
+		$scope.getParam().then(function() {	
+			$scope.init();
+        });
 });

@@ -235,7 +235,7 @@ public class PMS400 extends FubonWmsBizLogic {
 		csv.setHeader(csvHeader);
 		csv.addRecordList(csvData);
 		
-		notifyClientToDownloadFile(csv.generateCSV(), "分行人員當日存款異動明細表_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "-" + getUserVariable(FubonSystemVariableConsts.LOGINID) + ".csv");
+		notifyClientToDownloadFile(csv.generateCSV(), "分行人員存款異動日報_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "-" + getUserVariable(FubonSystemVariableConsts.LOGINID) + ".csv");
 
 		this.sendRtnObject(null);
 	}

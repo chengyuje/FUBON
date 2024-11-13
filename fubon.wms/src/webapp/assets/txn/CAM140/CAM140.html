@@ -117,7 +117,7 @@
 					</td>
 					<td style="width: 5%;"></td>
 					<th style="width: 1%;"><!-- 第二使用通路：<br />(參考資訊) --></th>
-					<td style="width: 15%;" class="col-md-7 tdpadding" rowspan="2">
+					<td style="width: 15%;" class="col-md-7 tdpadding">
 <!-- 						<label ng-repeat="fccode in CHANNEL_CODE2"> -->
 <!-- 							<input type="checkbox" ng-disabled="columnFlag" name="selectedChannel[]" value="{{fccode.DATA}}" ng-checked="inputVO.chkCode.indexOf(fccode.DATA) > -1" ng-click="toggleSelection(fccode.DATA)"> {{fccode.LABEL}} -->
 <!-- 							&nbsp;&nbsp; -->
@@ -150,7 +150,7 @@
 					</td>
 					<td style="width: 5%;">
 					<th style="width: 1%;"></th>
-					<td style="width: 10%;" rowspan="5">
+					<td style="width: 10%;">
 <!-- 						1、匯入必要通知名單，使用部隊選擇FC時，若為高端客戶，名單將派至UHRM，FC自動改為參考資訊。<br /> -->
 <!-- 						2、匯入名單，使用部隊選擇非FC時，若為高端客戶，名單將增加參考資訊予UHRM。 -->
 					</td>
@@ -175,11 +175,25 @@
 									ng-disabled="columnFlag"
 									ng-format="F3"
 									ng-required="!ISCAM120"
+									ng-change="getPurpose()"
 									width="150px"
 									style="line-height:20px;"/>
 					</td>
 					<td style="width: 5%;">
-					<th style="width: 1%;"></th>
+					<th style="width: 1%;">名單目的：</th>
+					<td style="width: 10%;">
+						<e-combobox id="camp_purpose" name="camp_purpose" 
+									ng-datasource="PURPOSE"
+									ng-model="inputVO.camp_purpose"
+									ng-validate="false" 
+									ng-readonly="columnFlag || inputVO.type == ''"
+									ng-editable="false"
+									ng-disabled="columnFlag || inputVO.type == ''"
+									ng-format="F3"
+									ng-required="!ISCAM120"
+									width="150px"
+									style="line-height:20px;"/>
+					</td>
 				</tr>
 				<tr ng-show="parameterTypeEditForm.type.$error.required">
 					<td style="width: 6%;">

@@ -169,7 +169,8 @@ public class FPSVolatilityListBTH extends BizLogic {
           "00",
           null,
           new BigDecimal(invalidCustList.size()),
-          "0000000000");
+          "0000000000",
+          null);
     } catch (Exception e) {
       if (conn != null)
         conn.rollback();

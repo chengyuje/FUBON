@@ -17,6 +17,8 @@ public class CAM190InputVO extends PagingInputVO {
 	private String vipDegree;
 	private String leadDateRange;
 	private String leadType;
+	private String campPurpose;
+	private String campType;
 	private String conDegree;
 	private String customTabType;
 	private List<Map<String, Object>> custom_list;
@@ -88,6 +90,18 @@ public class CAM190InputVO extends PagingInputVO {
 	}
 	public void setLeadType(String leadType) {
 		this.leadType = leadType;
+	}
+	public String getCampPurpose() {
+		return campPurpose;
+	}
+	public void setCampPurpose(String campPurpose) {
+		this.campPurpose = campPurpose;
+	}
+	public String getCampType() {
+		return campType;
+	}
+	public void setCampType(String campType) {
+		this.campType = campType;
 	}
 	public String getConDegree() {
 		return conDegree;

@@ -108,6 +108,7 @@ public class PMS418 extends FubonWmsBizLogic {
 		sb.append("       TO_CHAR(TXN_TIME, 'YYYYMMDD') AS TXN_DAY, ");
 		sb.append("       RPT.CUST_AGE ");
 		sb.append("FROM TBPMS_IP_EBALT_RPT RPT ");
+		sb.append("LEFT JOIN VWORG_DEFN_INFO ORG ON RPT.BRANCH_NBR = ORG.BRANCH_NBR ");
 		sb.append("LEFT JOIN TBCRM_CUST_MAST MAST ON RPT.CUST_ID = MAST.CUST_ID ");
 		sb.append("LEFT JOIN TBPMS_EMPLOYEE_REC_N MEM ON RPT.AO_EMP_ID = MEM.EMP_ID AND RPT.BRANCH_NBR = MEM.DEPT_ID AND RPT.TXN_TIME BETWEEN MEM.START_TIME AND MEM.END_TIME ");
 		sb.append("WHERE 1 = 1 ");
@@ -156,28 +157,36 @@ public class PMS418 extends FubonWmsBizLogic {
 			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("AND RPT.BRANCH_NBR = :branch ");
 				queryCondition.setObject("branch", inputVO.getBranch_nbr());
-			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-				sb.append("AND RPT.BRANCH_NBR in (select BRANCH_NBR from VWORG_DEFN_BRH where DEPT_ID = :area) ");
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
+				sb.append("AND ( ");
+				sb.append("  (RPT.RM_FLAG = 'B' AND ORG.BRANCH_AREA_ID = :area) ");
+				
+				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+					sb.append("  OR (RPT.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :area )) ");
+				}
+			
+				sb.append(") ");
 				queryCondition.setObject("area", inputVO.getBranch_area_id());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-				sb.append("AND RPT.BRANCH_NBR in (select BRANCH_NBR from VWORG_DEFN_BRH where DEPT_ID = :region) ");
+				sb.append("AND ORG.REGION_CENTER_ID = :region ");
 				queryCondition.setObject("region", inputVO.getRegion_center_id());
 			}
-			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) && 
 				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-				sb.append("  AND RPT.RM_FLAG = 'B' ");
+				sb.append("AND RPT.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {
-				sb.append("  AND (");
-				sb.append("       EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.AO_EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :uhrmOP ) ");
-				sb.append("    OR MEM.E_DEPT_ID = :uhrmOP ");
-				sb.append("  )");
+				sb.append("AND (");
+				sb.append("     EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.AO_EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :uhrmOP ) ");
+				sb.append("  OR MEM.E_DEPT_ID = :uhrmOP ");
+				sb.append(")");
 				queryCondition.setObject("uhrmOP", inputVO.getUhrmOP());
 			}
 			
-			sb.append("  AND RPT.RM_FLAG = 'U' ");
+			sb.append("AND RPT.RM_FLAG = 'U' ");
 		}
 
 		//由工作首頁 CRM181 過來，只須查詢主管尚未確認資料
@@ -378,7 +387,7 @@ public class PMS418 extends FubonWmsBizLogic {
 		CSVUtil csv = new CSVUtil();
 		csv.setHeader(csvHeader);
 		csv.addRecordList(csvData);
-		notifyClientToDownloadFile(csv.generateCSV(), "理財戶同一IP交易警示報表_" + dateSdf.format(new Date()) + ".csv");
+		notifyClientToDownloadFile(csv.generateCSV(), "理財戶同一IP交易日報_" + dateSdf.format(new Date()) + ".csv");
 	}
 	
 	// 查詢-排除IP

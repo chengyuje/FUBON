@@ -16,20 +16,48 @@ eSoafApp.controller('CAM190Controller',
 			$scope.tabType = 'tab3';
 		}
 
-        getParameter.XML(['CRM.CON_DEGREE','CAM.LEAD_TYPE'], function(tota) {
+        getParameter.XML(['CRM.CON_DEGREE', 'CAM.LEAD_TYPE', 'CAM.CAMP_PURPOSE'], function(tota) {
 			if(tota){
 				$scope.mappingSet['CRM.CON_DEGREE'] = tota.data[tota.key.indexOf('CRM.CON_DEGREE')];
 				$scope.mappingSet['CAM.LEAD_TYPE'] = tota.data[tota.key.indexOf('CAM.LEAD_TYPE')];
+				$scope.mappingSet['CAM.CAMP_PURPOSE'] = tota.data[tota.key.indexOf('CAM.CAMP_PURPOSE')];
 			}
 		});
         // ===
+        
+        // 取得參數：CAM.CAMP_PURPOSE
+ 		$scope.getCampPurpose = function(){
+ 			$scope.CAMP_PURPOSE = [];
+ 			$scope.sendRecv("CAM140", "getCampPurpose", "com.systex.jbranch.app.server.fps.cam140.CAM140InputVO", {},
+ 			function(tota, isError) {
+ 				if (!isError) {
+ 					$scope.CAMP_PURPOSE = tota[0].body.resultList;
+ 				}
+ 			});
+ 		}
+ 		$scope.getCampPurpose();
+ 		
+ 		// 依據所選『名單類型』變更『名單目的』下拉選項
+ 		$scope.getPurpose = function(){
+ 			$scope.inputVO.camp_purpose = undefined;
+ 			$scope.PURPOSE = [];
+ 			if ($scope.inputVO.leadType != undefined) {
+				angular.forEach($scope.CAMP_PURPOSE, function(row) {
+					if (row.PARAM_DESC.indexOf($scope.inputVO.leadType) >= 0) {
+						$scope.PURPOSE.push({LABEL:row.PARAM_NAME, DATA: row.PARAM_CODE});
+					}
+				});
+			}
+ 			if ($scope.PURPOSE.length == 0) {
+ 				$scope.PURPOSE = $scope.mappingSet['CAM.CAMP_PURPOSE'];
+ 			}
+ 		}
 		
 		$scope.init = function() {
 			$scope.inputVO = {};
 		};
 		$scope.init();
-		
-		
+
 		$scope.getList = function(flag, type) {
 			if (typeof(type) !== 'undefined') {
 				$scope.customTabType = type ? type : $scope.customTabType;
@@ -70,8 +98,10 @@ eSoafApp.controller('CAM190Controller',
 		
 		$scope.campNameTemp = $scope.connector('get', 'campName');
 		$scope.leadTypeTemp = $scope.connector('get', 'leadType');
+		$scope.campType 	= $scope.connector('get', 'campType');
 		$scope.connector('set', 'campName', '');
 		$scope.connector('set', 'leadType', '');
+		$scope.connector('set', 'campType', '');
 		
 		$scope.initCustom = function(){
 			$scope.customList = [];
@@ -90,6 +120,7 @@ eSoafApp.controller('CAM190Controller',
 					leadDateRange: '',
 					leadType: $scope.leadTypeTemp,
 					conDegree: '', 
+					campType: $scope.campType,
 					
 					customTabType: $scope.customTabType
 			};
@@ -289,7 +320,6 @@ eSoafApp.controller('CAM190Controller',
         
         $scope.custConnectData = function(row, tabType) {
         	var customTabType = $scope.inputVO.customTabType;
-        	console.log("customTabType", customTabType);
         	if(customTabType == "tab97" || customTabType == "tab98" || customTabType == "tab99"){
         		$scope.sendRecv("CAM190", "updateContactInfo", "com.systex.jbranch.app.server.fps.cam190.CAM190InputVO", {custID: row.CUST_ID, sfaLeadID: row.SFA_LEAD_ID},
 						function(tota, isError) { 

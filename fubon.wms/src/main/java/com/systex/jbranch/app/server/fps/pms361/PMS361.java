@@ -136,15 +136,23 @@ public class PMS361 extends FubonWmsBizLogic {
 			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("  AND org.BRANCH_NBR = :bra_nbr ");
 				queryCondition.setObject("bra_nbr", inputVO.getBranch_nbr());
-			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-				sb.append("  AND org.BRANCH_AREA_ID = :area ");
-				queryCondition.setObject("area", inputVO.getBranch_area_id());
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
+				sb.append("  AND ( ");
+				sb.append("    (note.RM_FLAG = 'B' AND org.BRANCH_AREA_ID = :area) ");
+				
+				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+					sb.append("    OR (note.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE rpt.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :area )) ");
+				}
+			
+				sb.append("  ) ");
+				queryCondition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND org.REGION_CENTER_ID = :region ");
 				queryCondition.setObject("region", inputVO.getRegion_center_id());
 			}
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) && 
 				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 				sb.append("  AND note.RM_FLAG = 'B' ");
 			}
@@ -269,7 +277,7 @@ public class PMS361 extends FubonWmsBizLogic {
 		CSVUtil csv = new CSVUtil();
 		csv.setHeader(csvHeader);
 		csv.addRecordList(csvData);
-		notifyClientToDownloadFile(csv.generateCSV(), "行員行動銀行名單_" + sdf.format(new Date()) + ".csv");
+		notifyClientToDownloadFile(csv.generateCSV(), "行銀交易查核日報_" + sdf.format(new Date()) + ".csv");
 	}
 
 	private String checkIsNull(Map map, String key) {

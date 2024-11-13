@@ -44,11 +44,18 @@ eSoafApp.controller('PMS350_DETAILController', function($rootScope, $scope, $con
     	//可視範圍  觸發 
     	if ($scope.inputVO.sCreDate != '' && !$scope.memLoginFlag.startsWith('UHRM')) {
     		$scope.RegionController_getORG($scope.inputVO).then(function(data) {
-    			if (sysInfoService.getPriID() == "009" || sysInfoService.getPriID() == "010" || sysInfoService.getPriID() == "011" || sysInfoService.getPriID() == "002" || sysInfoService.getPriID() == "003") {
-            		$scope.inquireInit();
-    	        	$scope.query();
-    	        }
-    			
+    			switch (sysInfoService.getPriID()) {
+	    			case "002":
+	    			case "003":
+	    			case "009":
+	    			case "010":
+	    			case "011":
+	    			case "UHRM002":
+	    				$scope.inquireInit();
+	    	        	$scope.query();
+	    				break;
+	    		}
+	    			
     			$scope.disableEmp_id();	
 			});
     	}
@@ -153,15 +160,19 @@ eSoafApp.controller('PMS350_DETAILController', function($rootScope, $scope, $con
 		$scope.getAuthority();
 		$scope.getRPTCol();
 		$scope.paramList = [];	
-		$scope.csvList=[];
-  
-	    $scope.tempcsv=[];	
-	        
-	    if (sysInfoService.getPriID() == "002" || sysInfoService.getPriID() == "003" ||  sysInfoService.getPriID() == "004" || sysInfoService.getPriID() == "JRM")
-        	$scope.empIdDisabled = true;
-        else
-        	$scope.empIdDisabled = false;
-	
+		$scope.csvList = [];
+	    $scope.tempcsv = [];	
+	    console.log("1-1:"+sysInfoService.getPriID());
+	    
+	    if (sysInfoService.getPriID() == "002" || 
+			sysInfoService.getPriID() == "003" || 
+			sysInfoService.getPriID() == "004" || 
+			sysInfoService.getPriID() == "JRM" || 
+			sysInfoService.getPriID() == "UHRM002") {
+	    	$scope.empIdDisabled = true;
+	    } else {
+	    	$scope.empIdDisabled = false;
+	    }
 	};
 	
 	$scope.inquireInit = function() {
@@ -247,8 +258,8 @@ eSoafApp.controller('PMS350_DETAILController', function($rootScope, $scope, $con
 			return;
 		}
 		
-		$scope.csvList2=[];
-		var len=$scope.csvList.length;
+		$scope.csvList2 = [];
+		var len = $scope.csvList.length;
 		
 		for(var i = 0; i < len; ++i) {
 			$scope.csvList[i].aa = 'COL';	  
@@ -296,9 +307,14 @@ eSoafApp.controller('PMS350_DETAILController', function($rootScope, $scope, $con
 	$scope.disableEmp_id = function(){					
         //#1868 ps消金 disabled emp_id 欄位 並帶入自身員編
 		//#2011 jrm  disabled emp_id 欄位 並帶入自身員編
-        if (sysInfoService.getPriID() == "004" || sysInfoService.getPriID() == "JRM") {
-        	$scope.inputVO.emp_id = sysInfoService.getUserID();
-        }			
+		
+		if (sysInfoService.getPriID() == "002" || 
+			sysInfoService.getPriID() == "003" || 
+			sysInfoService.getPriID() == "004" || 
+			sysInfoService.getPriID() == "JRM" || 
+			sysInfoService.getPriID() == "UHRM002") {
+			$scope.inputVO.emp_id = sysInfoService.getUserID();
+	    } 
 	};
 	
 	$scope.init();

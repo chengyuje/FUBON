@@ -118,15 +118,23 @@ public class PMS417 extends FubonWmsBizLogic {
 			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {				// 分行
 				sql.append("AND	BRH.BRANCH_NBR = :branchNbr ");
 				condition.setObject("branchNbr", inputVO.getBranch_nbr());
-			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	// 營運區	
-				sql.append("AND	BRH.BRANCH_AREA_ID = :branchAreaID ");
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
+				sql.append("AND ( ");
+				sql.append("  (A.RM_FLAG = 'B' AND BRH.BRANCH_AREA_ID = :branchAreaID) ");
+				
+				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+					sql.append("  OR (A.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE EMPN.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :branchAreaID )) ");
+				}
+			
+				sql.append(") ");
 				condition.setObject("branchAreaID", inputVO.getBranch_area_id());
-			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {	// 區域中心
+			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sql.append("AND BRH.REGION_CENTER_ID = :regionCenterID ");
 				condition.setObject("regionCenterID", inputVO.getRegion_center_id());
 			}
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) && 
 				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 				sql.append("AND A.RM_FLAG = 'B' ");
 			}

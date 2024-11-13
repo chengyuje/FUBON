@@ -2,7 +2,6 @@ package com.systex.jbranch.fubon.commons;
 
 import static com.systex.jbranch.app.server.fps.kyccons.KYCCons.LEGAL_PERSON_FINANCE_BOSS;
 import static com.systex.jbranch.app.server.fps.kyccons.KYCCons.LEGAL_PERSON_FINANCE_OP;
-import static com.systex.jbranch.app.server.fps.kyccons.KYCCons.PERSONAL_FINANCE_BOSS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +26,8 @@ public class CheckBossAdmin extends BizLogic {
 	@Autowired
 	@Qualifier("KYCCheckIdentityWeights")
 	private KYCCheckIdentityWeights KYCCheck;
+	/**個金主管 不用區分轄下，以下主管權限都可覆核**/
+	public static final String[] PERSONAL_FINANCE_BOSS = {"008" , "007" , "006" , "009" , "010" , "011" , "012", "UHRM006", "UHRM012"};
 
 	public Boolean checkBossAdmin(String createrEmpID, String bossEmpID, String bossEmpPWD) throws Exception {
 
@@ -37,8 +38,8 @@ public class CheckBossAdmin extends BizLogic {
 		
 		KYC311 kyc311 = (KYC311) PlatformContext.getBean("kyc311");	
 		kyc311.checkBossAdmin(inputVO_KYC311);				
-
-		// (2)檢核轄下關係
+		
+		// (2)檢核主管角色權限
 		List<String> supervisoList = new ArrayList<String>();
 		
 		if (KYCCheck.chkRole(createrEmpID, LEGAL_PERSON_FINANCE_OP) && !KYCCheck.chkRole(bossEmpID, LEGAL_PERSON_FINANCE_BOSS)) {

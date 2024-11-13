@@ -145,7 +145,7 @@ public class ELN100 extends FubonWmsBizLogic {
 		sb.append(" SELECT * FROM TBPRD_ELN_LINK_PROD WHERE 1 = 1");
 		
 		if (StringUtils.isNotBlank(inputVO.getBbg_code())) {
-			sb.append(" AND BBG_CODE LIKE :bbg_code ");
+			sb.append(" AND (BBG_CODE LIKE :bbg_code OR BBG_NAME LIKE :bbg_code) ");
 			qc.setObject("bbg_code",  "%" + inputVO.getBbg_code() + "%");
 		}
 		

@@ -129,6 +129,8 @@ public class CAM999 extends BizLogic {
 		}
 		
 		campVO.setLEAD_RESPONSE_CODE((isPara && StringUtils.isNotBlank((String) paraMap.get(0).get("LEAD_RESPONSE_CODE"))) ? (String) paraMap.get(0).get("LEAD_RESPONSE_CODE") : (StringUtils.isNotBlank((String) campMap.get("LEAD_RESPONSE_CODE")) ? (String) campMap.get("LEAD_RESPONSE_CODE") : "0000000000"));
+		campVO.setCAMP_PURPOSE((String) campMap.get("CAMP_PURPOSE"));
+		
 		
 		// 開始產生名單
 		Integer returnCnt = getReturnCnt(dam).intValue(); //多少筆資料回寫一次資料庫
@@ -331,6 +333,32 @@ public class CAM999 extends BizLogic {
 		}
 		return returnResult;
 	}
+	
+	private String checkMaxCounts(DataAccessManager dam, String empID) throws JBranchException {
+		String goYN = "Y";
+		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT LEADS.EMP_ID, COUNT(1) AS COUNT, PAR.PARAM_NAME AS MAX_COUNTS ");
+		sb.append(" FROM TBCAM_SFA_LEADS LEADS ");
+		sb.append(" LEFT JOIN TBCAM_SFA_CAMPAIGN CAMP ON LEADS.CAMPAIGN_ID = CAMP.CAMPAIGN_ID AND LEADS.STEP_ID = CAMP.CAMPAIGN_ID ");
+		sb.append(" LEFT JOIN TBSYSPARAMETER PAR ON PAR.PARAM_TYPE = 'CAM.MONTHS_MAX_COUNTS' AND PAR.PARAM_CODE = 'MAX' ");
+		sb.append(" WHERE TO_CHAR(LEADS.CREATETIME, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM') ");
+		sb.append(" AND CAMP.LEAD_TYPE IN ('01', '10') ");
+		sb.append(" AND CAMP.FIRST_CHANNEL = 'FCALL' ");
+		sb.append(" AND LEADS.EMP_ID = :empID ");
+		sb.append(" GROUP BY LEADS.EMP_ID, PAR.PARAM_NAME ");
+		qc.setObject("empID", empID);
+		qc.setQueryString(sb.toString());
+		List<Map<String, Object>> list = dam.exeQuery(qc);
+		if (list != null && list.size() > 0) {
+			int count = list.get(0).get("COUNT") != null ? Integer.parseInt(list.get(0).get("COUNT").toString()) : 0;
+			int maxCount = list.get(0).get("MAX_COUNTS") != null ? Integer.parseInt(list.get(0).get("MAX_COUNTS").toString()) : 0;
+			if (count > maxCount) {
+				goYN = "N";
+			}
+		}
+		return goYN;
+	}
 
 	public boolean disLead (DataAccessManager dam, 
 							CAM998 cam998, 
@@ -347,33 +375,41 @@ public class CAM999 extends BizLogic {
 
 		if ("Y".equals(outputVO.get("DISPATCH")) && StringUtils.isNotBlank((String) outputVO.get("BRANCH_ID"))) {
 //			imTotalCnt++;
-
-			// 產生名單主檔
-			// 檢查名單是否已存在
-			if (checkLeadID(dam, sfaLeadID)) {
-				//"FIRST".equals(channelType) ? (String) campMap.get("LEAD_TYPE") : "04"
+			String goYN = this.checkMaxCounts(dam, (String) outputVO.get("EMP_ID"));
+			if (goYN.equals("Y")) {
+				// 產生名單主檔
+				// 檢查名單是否已存在
+				if (checkLeadID(dam, sfaLeadID)) {
+					//"FIRST".equals(channelType) ? (String) campMap.get("LEAD_TYPE") : "04"
+					if (StringUtils.equals("FIRST", channelType)) {
+						cam998.updLead(dam, "SCHDULER", "SYS", (String) campMap.get("CAMPAIGN_ID"), channl, campMap, tempMap);
+					} else {
+						return false;
+					}
+				} else {
+					if (!StringUtils.equals("FIRST", channelType) && StringUtils.isNotBlank((String) outputVO.get("AO_CODE"))) { 	
+						// 若非第一部隊，且有派至人員身上，則正常分派
+						cam998.insertLeads(dam, (String) campMap.get("CAMPAIGN_ID"), (String) campMap.get("STEP_ID"), channl, channelType, campMap, tempMap, outputVO, sfaLeadID);
+					} else if (StringUtils.equals("FIRST", channelType)) {	
+						// 若為第一部隊，參照分派結果
+						cam998.insertLeads(dam, (String) campMap.get("CAMPAIGN_ID"), (String) campMap.get("STEP_ID"), channl, channelType, campMap, tempMap, outputVO, sfaLeadID);
+					} else {
+						// 若非第一部隊，且無派至人員身上，則不產生名單
+					}
+				}
+				
 				if (StringUtils.equals("FIRST", channelType)) {
-					cam998.updLead(dam, "SCHDULER", "SYS", (String) campMap.get("CAMPAIGN_ID"), channl, campMap, tempMap);
-				} else {
-					return false;
+					updateImpLead(dam, (BigDecimal) tempMap.get("SEQNO"), "Y");
 				}
+				
+				return true;
+				
 			} else {
-				if (!StringUtils.equals("FIRST", channelType) && StringUtils.isNotBlank((String) outputVO.get("AO_CODE"))) { 	
-					// 若非第一部隊，且有派至人員身上，則正常分派
-					cam998.insertLeads(dam, (String) campMap.get("CAMPAIGN_ID"), (String) campMap.get("STEP_ID"), channl, channelType, campMap, tempMap, outputVO, sfaLeadID);
-				} else if (StringUtils.equals("FIRST", channelType)) {	
-					// 若為第一部隊，參照分派結果
-					cam998.insertLeads(dam, (String) campMap.get("CAMPAIGN_ID"), (String) campMap.get("STEP_ID"), channl, channelType, campMap, tempMap, outputVO, sfaLeadID);
-				} else {
-					// 若非第一部隊，且無派至人員身上，則不產生名單
-				}
+				logger.info("*****" + (BigDecimal) tempMap.get("SEQNO") + " - 分派失敗*****" + outputVO);
+				updateImpLead(dam, (BigDecimal) tempMap.get("SEQNO"), "E5");
+				
+				return false;
 			}
-			
-			if (StringUtils.equals("FIRST", channelType)) {
-				updateImpLead(dam, (BigDecimal) tempMap.get("SEQNO"), "Y");
-			}
-			
-			return true;
 		} else { // 分派失敗
 //			erOtherCnt++;
 

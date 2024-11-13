@@ -34,7 +34,8 @@ eSoafApp.controller('PMS433Controller',
         	} else {
         		//可視範圍  觸發 
         		$scope.inputVO.reportDate = $scope.inputVO.sCreDate;
-            	$scope.RegionController_getORG($scope.inputVO);
+        		$scope.getViewRegion($scope.inputVO);
+        		debugger;
         	}        	
         };
 
@@ -50,7 +51,10 @@ eSoafApp.controller('PMS433Controller',
 					call_result: '', //外撥結果
 					region_center_id: '',   //業務處
 					branch_area_id: '' ,   //營運區
-					branch_nbr: ''	     //歸屬行  			
+					branch_nbr: '',	     //歸屬行  	
+					uhrm_region_center_id: '',
+					uhrm_branch_area_id: '',
+					uhrmFlag		: String(sysInfoService.getMemLoginFlag()).toLowerCase().indexOf("uhrm") < 0 ? false : true
         	};
 			
 			$scope.sendRecv("PMS433", "init", "com.systex.jbranch.app.server.fps.pms433.PMS433InputVO", {}, function(tota, isError) {
@@ -58,7 +62,7 @@ eSoafApp.controller('PMS433Controller',
 					$scope.mappingSet['date'] = tota[0].body.dateList;
 					$scope.inputVO.reportDate = $scope.mappingSet['date'][0].DATA;
 					$scope.inputVO.sCreDate = $scope.mappingSet['date'][0].DATA;
-					$scope.RegionController_getORG($scope.inputVO);
+					$scope.getViewRegion($scope.inputVO);
 				} else {
 					$scope.showErrorMsg("參數初始化失敗，請重新登入此畫面或洽詢系統管理員。");
 				}
@@ -167,4 +171,31 @@ eSoafApp.controller('PMS433Controller',
 			}
 		}
 		
+		$scope.getViewRegion = function(inputVO){
+			if(inputVO.uhrmFlag) {
+				$scope.sendRecv("PMS401U", "isMainten", "com.systex.jbranch.app.server.fps.pms401u.PMS401UInputVO", {'itemID': 'PMS433'},function(tota, isError) {
+					if (!isError) {						
+						$scope.REGION_LIST = [];
+						$scope.AREA_LIST = [];
+
+						if (null != tota[0].body.uhrmORGList) {
+							angular.forEach(tota[0].body.uhrmORGList, function(row) {
+								$scope.REGION_LIST.push({LABEL: row.REGION_CENTER_NAME, DATA: row.REGION_CENTER_ID});
+							});	
+							
+							$scope.inputVO.uhrm_region_center_id = tota[0].body.uhrmORGList[0].REGION_CENTER_ID;
+							
+							angular.forEach(tota[0].body.uhrmORGList, function(row) {
+								$scope.AREA_LIST.push({LABEL: row.BRANCH_AREA_NAME, DATA: row.BRANCH_AREA_ID});
+							});
+							
+							$scope.inputVO.uhrm_branch_area_id = tota[0].body.uhrmORGList[0].BRANCH_AREA_ID;
+							debugger;
+				        }
+					}
+				});
+			} else {
+				$scope.RegionController_getORG($scope.inputVO);
+			}
+		}
 });

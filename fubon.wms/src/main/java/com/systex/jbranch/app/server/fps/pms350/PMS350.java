@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.ibm.db2.jcc.t4.sb;
 import com.opensymphony.util.TextUtils;
 import com.systex.jbranch.app.common.fps.table.TBPMS_DYNAMIC_RPT_MASTVO;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
@@ -35,10 +36,8 @@ import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
 /**
- * 動態報表
- * 2016/08/02 Frank
- * 2017/01/30 Kevin
- * 2021/04/27 Ocean 0000612: WMS-CR-20210422-01_銀證督導主要角色功能增修_動態報表 modify by ocean
+ * 動態報表 2016/08/02 Frank 2017/01/30 Kevin 2021/04/27 Ocean 0000612:
+ * WMS-CR-20210422-01_銀證督導主要角色功能增修_動態報表 modify by ocean
  *
  */
 
@@ -56,7 +55,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		
+
 		sql.append("SELECT ROWNUM, T.* ");
 		sql.append("FROM ( ");
 		sql.append("  SELECT DRM.SEQ, ");
@@ -96,18 +95,18 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("  LEFT JOIN TBORG_DEFN DEF1 ON DEF1.DEPT_ID = DRM.RPT_DEPT_1 ");
 		sql.append("  LEFT JOIN TBORG_DEFN DEF2 ON DEF2.DEPT_ID = DRM.RPT_DEPT_2 ");
 		sql.append("  LEFT JOIN TBORG_DEFN DEF3 ON DEF3.DEPT_ID = DRM.RPT_DEPT ");
-		
+
 		if (inputVO.getUSER_TYPE().equals("true")) {
 			sql.append("  LEFT JOIN  TBSYSSECUROLPRIASS P ON P.ROLEID = :UPLOADROLE ");
 		}
-		
+
 		sql.append("  WHERE 1 = 1 ");
 
 		if (StringUtils.isNotBlank(inputVO.getRptName())) {
 			sql.append(" and DRM.RPT_NAME Like :RRPT_NAME ");
 			condition.setObject("RRPT_NAME", "%" + inputVO.getRptName() + "%");
 		}
-		
+
 		if (StringUtils.isNotBlank(inputVO.getRPT_DEPT())) {
 			sql.append(" and (DRM.RPT_DEPT = :RRPT_DEPT or DRM.RPT_DEPT_1 = :RRPT_DEPT or DRM.RPT_DEPT_2 = :RRPT_DEPT) ");
 			condition.setObject("RRPT_DEPT", inputVO.getRPT_DEPT());
@@ -117,13 +116,13 @@ public class PMS350 extends FubonWmsBizLogic {
 			sql.append(" and DRM.RPT_TYPE =:RRPT_TYPE ");
 			condition.setObject("RRPT_TYPE", inputVO.getRPT_TYPE());
 		}
-		
+
 		if (StringUtils.isNotBlank(inputVO.getReport_description())) {
 			sql.append(" and DRM.RPT_EXPLAIN Like:RRPT_EXPLAIN ");
 			condition.setObject("RRPT_EXPLAIN", "%" + inputVO.getReport_description() + "%");
 
 		}
-		
+
 		// 判斷登入角色是否有權查看報表
 		if (inputVO.getUSER_TYPE().equals("true")) {
 			if (StringUtils.isNotBlank((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
@@ -133,12 +132,12 @@ public class PMS350 extends FubonWmsBizLogic {
 				condition.setObject("UPLOADROLE", "");
 			}
 		}
-		
+
 		sql.append("  order by DRM.BEGIN_DATE desc, DRM.LASTUPDATE desc ");
 		sql.append(") t ");
-		
+
 		condition.setQueryString(sql.toString().replaceAll("\\s+", " "));
-		
+
 		ResultIF list = dam.executePaging(condition, inputVO.getCurrentPageIndex() + 1, inputVO.getPageCount());
 		int totalPage_i = list.getTotalPage();
 		int totalRecord_i = list.getTotalRecord();
@@ -146,13 +145,13 @@ public class PMS350 extends FubonWmsBizLogic {
 		outputVO.setCurrentPageIndex(inputVO.getCurrentPageIndex());// 當前頁次
 		outputVO.setTotalPage(totalPage_i);// 總頁次
 		outputVO.setTotalRecord(totalRecord_i);// 總筆數
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** =======報表檢視扣除超過公告期間以及公告期間無效======== **/
 	public void queryData_Check(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
@@ -203,7 +202,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("  LEFT JOIN  TBSYSSECUROLPRIASS P ON P.ROLEID = :USERROLE ");
 
 		sql.append("  WHERE 1 = 1 ");
-		
+
 		// 2018/11/12 VALID_FLAG = 'Y' or Creator
 		sql.append("  AND (DRM.VALID_FLAG = 'Y' or DRM.RPT_UPDATER = :creator) ");
 		sql.append("  AND TO_CHAR(DRM.END_DATE,'YYYY/MM/DD') >= TO_CHAR(sysdate,'YYYY/MM/DD') ");
@@ -213,35 +212,35 @@ public class PMS350 extends FubonWmsBizLogic {
 			sql.append(" and DRM.RPT_NAME =:RRPT_NAME ");
 			condition.setObject("RRPT_NAME", inputVO.getRptName());
 		}
-		
+
 		if (StringUtils.isNotBlank(inputVO.getRPT_DEPT())) {
-			sql.append(" and (DRM.RPT_DEPT = :RRPT_DEPT or DRM.RPT_DEPT_1=:RRPT_DEPT  or DRM.RPT_DEPT_2 = :RRPT_DEPT) ");
+			sql.append(" and (DRM.RPT_DEPT = :RRPT_DEPT or DRM.RPT_DEPT_1=:RRPT_DEPT or DRM.RPT_DEPT_2 = :RRPT_DEPT) ");
 			condition.setObject("RRPT_DEPT", inputVO.getRPT_DEPT());
 		}
 
 		if (StringUtils.isNotBlank(inputVO.getRPT_TYPE())) {
-			sql.append(" and DRM.RPT_TYPE =:RRPT_TYPE ");
+			sql.append(" and DRM.RPT_TYPE = :RRPT_TYPE ");
 			condition.setObject("RRPT_TYPE", inputVO.getRPT_TYPE());
 		}
-		
+
 		if (StringUtils.isNotBlank(inputVO.getReport_description())) {
-			sql.append(" and DRM.RPT_EXPLAIN Like:RRPT_EXPLAIN ");
+			sql.append(" and DRM.RPT_EXPLAIN Like :RRPT_EXPLAIN ");
 			condition.setObject("RRPT_EXPLAIN", "%" + inputVO.getReport_description() + "%");
 		}
 
 		//判斷登入角色是否有權查看報表
 		if (StringUtils.isNotBlank((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 			condition.setObject("USERROLE", (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
-			sql.append("  AND (INSTR(DRM.USER_ROLES, P.PRIVILEGEID)>0 or DRM.RPT_UPDATER = :creator) ");
+			sql.append("  AND (INSTR(DRM.USER_ROLES, P.PRIVILEGEID) > 0 or DRM.RPT_UPDATER = :creator) ");
 		} else {
 			condition.setObject("USERROLE", "");
 		}
 
-		sql.append("  order by DRM.BEGIN_DATE desc,DRM.LASTUPDATE desc ");
+		sql.append("  order by DRM.BEGIN_DATE desc, DRM.LASTUPDATE desc ");
 		sql.append(") t ");
 
 		condition.setQueryString(sql.toString());
-		
+
 		ResultIF list = dam.executePaging(condition, inputVO.getCurrentPageIndex() + 1, inputVO.getPageCount());
 		int totalPage_i = list.getTotalPage();
 		int totalRecord_i = list.getTotalRecord();
@@ -249,25 +248,25 @@ public class PMS350 extends FubonWmsBizLogic {
 		outputVO.setCurrentPageIndex(inputVO.getCurrentPageIndex());// 當前頁次
 		outputVO.setTotalPage(totalPage_i);// 總頁次
 		outputVO.setTotalRecord(totalRecord_i);// 總筆數
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** ======= 人員代碼 ======== */
 	public void personnel(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuilder sql = new StringBuilder();
-		
+
 		try {
 			if (StringUtils.isNotBlank(inputVO.getUSER_TYPE())) {
 				if (inputVO.getUSER_TYPE().equals("user")) {
 					sql.append("SELECT PRIVILEGEID, NAME ");
 					sql.append("FROM TBSYSSECUPRI ");
-					
+
 					if (StringUtils.isNotBlank(inputVO.getRolesName())) {
 						sql.append(" WHERE NAME LIKE :name ");
 						condition.setObject("name", "%" + inputVO.getRolesName() + "%");
@@ -277,7 +276,7 @@ public class PMS350 extends FubonWmsBizLogic {
 					sql.append("FROM TBSYSSECUPRI ");
 					sql.append("WHERE PRIVILEGEID > '015' ");
 					sql.append("AND PRIVILEGEID NOT IN ('UHRM002', 'UHRM012', 'JRM', '023', '024', '032', '038', '039', '040', '053', '054', '055', '056', '057') ");
-					
+
 					if (StringUtils.isNotBlank(inputVO.getRolesName())) {
 						sql.append(" WHERE NAME LIKE :name ");
 						condition.setObject("name", "%" + inputVO.getRolesName() + "%");
@@ -287,12 +286,12 @@ public class PMS350 extends FubonWmsBizLogic {
 			} else {
 				sql.append("SELECT PRIVILEGEID, NAME ");
 				sql.append("FROM TBSYSSECUPRI ");
-				
+
 				if (StringUtils.isNotBlank(inputVO.getRolesName())) {
 					sql.append("WHERE NAME LIKE :name ");
 					condition.setObject("name", "%" + inputVO.getRolesName() + "%");
 				}
-				
+
 				sql.append("ORDER BY PRIVILEGEID ");
 			}
 			condition.setQueryString(sql.toString());
@@ -301,18 +300,18 @@ public class PMS350 extends FubonWmsBizLogic {
 			logger.error(String.format("發生錯誤:%s", StringUtil.getStackTraceAsString(e)));
 			throw new APException("系統發生錯誤請洽系統管理員");
 		}
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** ======= 管理科權限 ======== */
 	public void Authority(Object body, IPrimitiveMap header) throws Exception {
-		
+
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuilder sql = new StringBuilder();
-		
+
 		try {
 			sql.append("SELECT EMP_ID FROM VWORG_BRANCH_EMP_DETAIL_INFO WHERE ROLE_NAME = '分行績效管理科經辦' ");
 			condition.setQueryString(sql.toString());
@@ -321,18 +320,18 @@ public class PMS350 extends FubonWmsBizLogic {
 			logger.error(String.format("發生錯誤:%s", StringUtil.getStackTraceAsString(e)));
 			throw new APException("系統發生錯誤請洽系統管理員");
 		}
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** ======= 個金分行業務管理部權限(DEPT_ID = 175D) ======== **/
 	public void AuthorityOf175B(Object body, IPrimitiveMap header) throws Exception {
-		
+
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuilder sql = new StringBuilder();
-		
+
 		try {
 			sql.append("SELECT EMP_ID FROM tbpms_employee_rec_n WHERE dept_id like '175D' ");
 			condition.setQueryString(sql.toString());
@@ -341,21 +340,21 @@ public class PMS350 extends FubonWmsBizLogic {
 			logger.error(String.format("發生錯誤:%s", StringUtil.getStackTraceAsString(e)));
 			throw new APException("系統發生錯誤請洽系統管理員");
 		}
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** 檢視所屬資料權限 **/
 	public void queryAuthority(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350DetailInputVO inputVO = (PMS350DetailInputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition();
 		StringBuffer sql = new StringBuffer();
-		
+
 		ArrayList<String> sql_list = new ArrayList<String>();
-		
+
 		sql.append("SELECT ROLES ");
 		sql.append("FROM TBPMS_DYNAMIC_RPT_MAST ");
 		sql.append("WHERE SEQ = ? ");
@@ -365,7 +364,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		for (int sql_i = 0; sql_i < sql_list.size(); sql_i++) {
 			condition.setString(sql_i + 1, sql_list.get(sql_i));
 		}
-		
+
 		outputVO.setTotalList(dam.exeQuery(condition));
 
 		sendRtnObject(outputVO);
@@ -373,7 +372,7 @@ public class PMS350 extends FubonWmsBizLogic {
 
 	/** ======= 新增資料 ======== */
 	public void addRPT(Object body, IPrimitiveMap header) throws Exception {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
@@ -390,7 +389,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		vo.setMARQUEE_FLAG(inputVO.getMarqueeFlag());
 		vo.setMARQUEE_TXT(inputVO.getMarqueeTxt());
 		vo.setFILENAME(inputVO.getRealFileName());
-		
+
 		if (StringUtils.isNotBlank(inputVO.getWtfflag())) {
 			vo.setUPLOAD_ROLES(TextUtils.join("、", inputVO.getWtfupload()));
 			vo.setUSER_ROLES(TextUtils.join("、", inputVO.getWtfuser()));
@@ -400,12 +399,12 @@ public class PMS350 extends FubonWmsBizLogic {
 			vo.setUSER_ROLES(TextUtils.join("、", inputVO.getRoles()));
 			vo.setROLES(TextUtils.join("、", inputVO.getUSER_ROLES())); //檢視所屬資料權限
 		}
-		
+
 		vo.setRPT_DEPT_1(inputVO.getRPT_DEPT_1());
 		vo.setRPT_DEPT_2(inputVO.getRPT_DEPT_2());
 		vo.setRPT_DEPT(inputVO.getRPT_DEPT()); // 報表提供單位
 		vo.setRPT_TYPE(inputVO.getRPT_TYPE()); // 報表類型
-		
+
 		if (StringUtils.isNotBlank(inputVO.getUploadFlag())) {
 			if (inputVO.getUploadFlag().equals("Y")) {
 				insertCSVFile(inputVO, outputVO);
@@ -427,19 +426,19 @@ public class PMS350 extends FubonWmsBizLogic {
 
 		dam.create(vo);
 		outputVO.setReportId(inputVO.getSeq().toString());
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** ======= 修改資料 ======== */
 	public void updateRPT(Object body, IPrimitiveMap header) throws Exception {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuilder sql = new StringBuilder();
-		
+
 		TBPMS_DYNAMIC_RPT_MASTVO vo = (TBPMS_DYNAMIC_RPT_MASTVO) dam.findByPKey(TBPMS_DYNAMIC_RPT_MASTVO.TABLE_UID, inputVO.getSeq());
 		if (inputVO.getUploadFlag().equals("Y")) {
 			if (null != vo) {
@@ -452,23 +451,23 @@ public class PMS350 extends FubonWmsBizLogic {
 				vo.setMARQUEE_TXT(inputVO.getMarqueeTxt());
 				vo.setRPT_DEPT(inputVO.getRPT_DEPT());
 				vo.setRPT_TYPE(inputVO.getRPT_TYPE());
-				
+
 				if (!"".equals(inputVO.getFileName())) {
 					insertCSVFile(inputVO, outputVO);
 					vo.setFILENAME(inputVO.getRealFileName());
 				}
-				
+
 				if (StringUtils.equals("Y", inputVO.getUpdateUpdater())) {
 					vo.setRPT_UPDATER((String) getUserVariable(FubonSystemVariableConsts.LOGINID));
 					vo.setRPT_LASTUPDATE(new Timestamp(new Date().getTime()));
 				}
-				
+
 				if (inputVO.getEXPORT_YN()) {
 					vo.setEXPORT_YN("Y");
 				} else {
 					vo.setEXPORT_YN(null);
 				}
-				
+
 				dam.update(vo);
 			} else {
 				// 顯示資料不存在
@@ -491,37 +490,37 @@ public class PMS350 extends FubonWmsBizLogic {
 			if (updata_type != "") {
 				sql.append(" SELECT * FROM TBPMS_DYNAMIC_RPT_MAST WHERE 1 = 1 ");
 				switch (updata_type) {
-					case "1":
-					case "3":
-						sql.append(" AND RPT_NAME = :rptname ");
-						sql.append(" AND RPT_TYPE = :rpttype ");
-						condition.setObject("rptname", vo.getRPT_NAME());
-						condition.setObject("rpttype", vo.getRPT_TYPE());
-						
-						break;
-					case "2":
-						sql.append(" AND RPT_TYPE = :rpttype ");
-						condition.setObject("rpttype", vo.getRPT_TYPE());
-						
-						break;
-					case "4":
-						sql.append(" AND RPT_NAME = :rptname ");
-						sql.append(" AND RPT_TYPE = :rpttype ");
-						condition.setObject("rptname", vo.getRPT_NAME());
-						condition.setObject("rpttype", vo.getRPT_TYPE());
-						
-						if (vo.getEXPORT_YN() == null) {
-							sql.append(" AND EXPORT_YN is NULL ");
-						} else {
-							sql.append(" AND EXPORT_YN = :exportYN ");
-							condition.setObject("exportYN", vo.getEXPORT_YN());
-						}
-						
-						break;
+				case "1":
+				case "3":
+					sql.append(" AND RPT_NAME = :rptname ");
+					sql.append(" AND RPT_TYPE = :rpttype ");
+					condition.setObject("rptname", vo.getRPT_NAME());
+					condition.setObject("rpttype", vo.getRPT_TYPE());
+
+					break;
+				case "2":
+					sql.append(" AND RPT_TYPE = :rpttype ");
+					condition.setObject("rpttype", vo.getRPT_TYPE());
+
+					break;
+				case "4":
+					sql.append(" AND RPT_NAME = :rptname ");
+					sql.append(" AND RPT_TYPE = :rpttype ");
+					condition.setObject("rptname", vo.getRPT_NAME());
+					condition.setObject("rpttype", vo.getRPT_TYPE());
+
+					if (vo.getEXPORT_YN() == null) {
+						sql.append(" AND EXPORT_YN is NULL ");
+					} else {
+						sql.append(" AND EXPORT_YN = :exportYN ");
+						condition.setObject("exportYN", vo.getEXPORT_YN());
+					}
+
+					break;
 				}
 
 				condition.setQueryString(sql.toString());
-				
+
 				List<Map<String, Object>> list = dam.exeQuery(condition);
 				for (Map<String, Object> updataList : list) {
 					vo = (TBPMS_DYNAMIC_RPT_MASTVO) dam.findByPKey(TBPMS_DYNAMIC_RPT_MASTVO.TABLE_UID, (BigDecimal) updataList.get("SEQ"));
@@ -529,17 +528,17 @@ public class PMS350 extends FubonWmsBizLogic {
 						switch (updata_type) {
 						case "1":
 							vo.setRPT_NAME(inputVO.getRptName());
-							
+
 							break;
 						case "2":
 							vo.setRPT_TYPE(inputVO.getRPT_TYPE());
-							
+
 							break;
 						case "3":
 							vo.setUPLOAD_ROLES(TextUtils.join("、", inputVO.getWtfupload()));
 							vo.setUSER_ROLES(TextUtils.join("、", inputVO.getWtfuser()));
 							vo.setROLES(TextUtils.join("、", inputVO.getRoles()));
-							
+
 							break;
 						case "4":
 							if (inputVO.getEXPORT_YN()) {
@@ -547,15 +546,15 @@ public class PMS350 extends FubonWmsBizLogic {
 							} else {
 								vo.setEXPORT_YN(null);
 							}
-							
+
 							break;
 						}
-						
+
 						if (StringUtils.equals("Y", inputVO.getUpdateUpdater())) {
 							vo.setRPT_UPDATER((String) getUserVariable(FubonSystemVariableConsts.LOGINID));
 							vo.setRPT_LASTUPDATE(new Timestamp(new Date().getTime()));
 						}
-						
+
 						dam.update(vo);
 					} else {
 						// 顯示資料不存在
@@ -570,18 +569,18 @@ public class PMS350 extends FubonWmsBizLogic {
 					vo.setUPLOAD_ROLES(TextUtils.join("、", inputVO.getWtfupload()));
 					vo.setUSER_ROLES(TextUtils.join("、", inputVO.getWtfuser()));
 					vo.setROLES(TextUtils.join("、", inputVO.getRoles()));
-					
+
 					if (StringUtils.equals("Y", inputVO.getUpdateUpdater())) {
 						vo.setRPT_UPDATER((String) getUserVariable(FubonSystemVariableConsts.LOGINID));
 						vo.setRPT_LASTUPDATE(new Timestamp(new Date().getTime()));
 					}
-					
+
 					if (inputVO.getEXPORT_YN()) {
 						vo.setEXPORT_YN("Y");
 					} else {
 						vo.setEXPORT_YN(null);
 					}
-					
+
 					dam.update(vo);
 				} else {
 					// 顯示資料不存在
@@ -592,19 +591,19 @@ public class PMS350 extends FubonWmsBizLogic {
 
 		outputVO.setReportId(inputVO.getSeq().toString());
 		outputVO.setUploadFlag(inputVO.getUploadFlag());
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** ====== 檢查主檔相同名稱資料筆數 ======= **/
 	public void dataCount(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		
+
 		sql.append("SELECT count(*) as dataNum ");
 		sql.append("FROM TBPMS_DYNAMIC_RPT_MAST ");
 		sql.append("WHERE RPT_NAME = :RPT_NAMEE ");
@@ -612,17 +611,17 @@ public class PMS350 extends FubonWmsBizLogic {
 		if (StringUtils.isNotBlank(inputVO.getRptName())) {
 			condition.setObject("RPT_NAMEE", inputVO.getRptName());
 		}
-		
+
 		condition.setQueryString(sql.toString());
 
 		outputVO.setCountList(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** ====== 刪除主檔資料 ======= */
 	public void delData(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		dam = this.getDataAccessManager();
 
@@ -633,69 +632,69 @@ public class PMS350 extends FubonWmsBizLogic {
 			// 顯示資料不存在
 			throw new APException("ehl_01_commON_017");
 		}
-		
+
 		delHeadData(inputVO, header);
 		delDtlData(inputVO, header);
 		delRecData(inputVO, header);
-		
+
 		this.sendRtnObject(null);
 	}
 
 	/** ====== 刪除表頭資料 ======= */
 	public void delHeadData(PMS350InputVO inputVO, IPrimitiveMap header) throws JBranchException {
-		
+
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		
+
 		condition.setQueryString("delete TBPMS_DYNAMIC_RPT_HEADER WHERE SEQ = :seq");
 		condition.setObject("seq", inputVO.getSeq());
-		
+
 		dam.exeUpdate(condition);
 	}
 
 	/** ====== 刪除明細-固定欄位資料 ======= */
 	public void delDtlData(PMS350InputVO inputVO, IPrimitiveMap header) throws JBranchException {
-		
+
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		
+
 		condition.setQueryString("delete TBPMS_DYNAMIC_RPT_DTL WHERE SEQ = :seq");
 		condition.setObject("seq", inputVO.getSeq());
-		
+
 		dam.exeUpdate(condition);
 	}
 
 	/** ====== 刪除明細-動態欄位資料 ======= */
 	public void delRecData(PMS350InputVO inputVO, IPrimitiveMap header) throws JBranchException {
-		
+
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		
+
 		condition.setQueryString("delete TBPMS_DYNAMIC_RPT_DTL_REC WHERE SEQ = :seq");
 		condition.setObject("seq", inputVO.getSeq());
-		
+
 		dam.exeUpdate(condition);
 	}
 
 	/** 產生seq No */
 	private String getSN() throws JBranchException {
-		
+
 		SerialNumberUtil sn = new SerialNumberUtil();
 		String seqNum = "";
-		
+
 		try {
 			seqNum = sn.getNextSerialNumber("PMS350");
 		} catch (Exception e) {
 			sn.createNewSerial("PMS350", "0000000000", null, null, null, 6, new Long("99999999"), "y", new Long("0"), null);
 			seqNum = sn.getNextSerialNumber("PMS350");
 		}
-		
+
 		return seqNum;
 	}
 
 	/** 新增CSV檔 表頭、固定欄位、變動欄位資料 **/
 	private void insertCSVFile(PMS350InputVO inputVO, PMS350OutputVO outputVO) throws Exception {
-		
+
 		dam = this.getDataAccessManager();
 		StringBuffer sqlHead = new StringBuffer();
 		StringBuffer sqlValue = new StringBuffer();
@@ -703,7 +702,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		List<String> error = new ArrayList<String>();
 		String tempPath = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
 		List<String[]> dataCsv = CSVUtil.getBig5CSVFile(tempPath, inputVO.getFileName());
-		
+
 		if (!dataCsv.isEmpty()) {
 			QueryConditionIF dcON = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 
@@ -718,7 +717,7 @@ public class PMS350 extends FubonWmsBizLogic {
 
 			//報表資料長度
 			int report_len = dataCsv.get(0).length;
-			
+
 			//動態拼接SQL
 			sqlHead.append("INSERT INTO TBPMS_DYNAMIC_RPT_TEMP(RNUM");
 			for (int i = 1; i <= report_len; i++) {
@@ -728,7 +727,7 @@ public class PMS350 extends FubonWmsBizLogic {
 				sqlValue.append(",:");
 				sqlValue.append(colId);
 			}
-			
+
 			sqlHead.append(",FILED_50,FILED_51) VALUES (:RNUM");
 			sqlValue.append(",TO_CHAR(SYSDATE,'YYYYMMDD'),");
 			sqlValue.append(ReportId);
@@ -737,7 +736,7 @@ public class PMS350 extends FubonWmsBizLogic {
 			sql = sqlHead.append(sqlValue);
 
 			QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-			
+
 			for (int i = 0; i < dataCsv.size(); i++) {
 				String[] str = dataCsv.get(i);
 				// 2018/11/9 str[2] add 0
@@ -752,13 +751,13 @@ public class PMS350 extends FubonWmsBizLogic {
 				} else {
 					error.add("第" + i + "行：與表頭格式不同");
 				}
-				
+
 				qc.setObject("RNUM", i);
 				qc.setQueryString(sql.toString());
-				
+
 				dam.exeUpdate(qc);
 			}
-			
+
 			outputVO.setErrorList(error);
 		}
 	}
@@ -766,31 +765,31 @@ public class PMS350 extends FubonWmsBizLogic {
 	/** 調用存儲過程 **/
 	@SuppressWarnings({ "unused", "rawtypes" })
 	public void callStored(Object body, IPrimitiveMap header) throws APException {
-		
+
 		List<String> error = new ArrayList<String>();
 		dam = this.getDataAccessManager();
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
-		
+
 		try {
 			String tempPath = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
 			List<String[]> dataCsv = CSVUtil.getBig5CSVFile(tempPath, inputVO.getFileName());
-			
+
 			//報表ID
 			BigDecimal ReportId = inputVO.getSeq();
 
 			//報表資料長度
 			int report_len = dataCsv.get(0).length;
-			
+
 			QueryConditionIF qc1 = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			StringBuffer sb = new StringBuffer();
 			sb.append(" CALL PABTH_BTPMS352.SP_TBPMS_DYNAMIC_RPT(? ,? ,? ) ");
 			qc1.setString(1, ReportId.toString());
 			qc1.setString(2, String.valueOf(report_len));
 			qc1.registerOutParameter(3, Types.VARCHAR);
-			
+
 			qc1.setQueryString(sb.toString());
-			
+
 			Map<Integer, Object> resultMap = dam.executeCallable(qc1);
 			String str = (String) resultMap.get(3);
 			String[] strs = null;
@@ -804,15 +803,15 @@ public class PMS350 extends FubonWmsBizLogic {
 		} catch (Exception e) {
 			error.add(e.getMessage());
 		}
-		
+
 		outputVO.setErrorList(error);
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/**** PMS350_DETAIL ****/
 	public void queryRPTCol(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350DetailInputVO inputVO = (PMS350DetailInputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
@@ -830,29 +829,31 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql_list.add(inputVO.getSeq().toString());
 
 		condition.setQueryString(sql.toString());
-		
+
 		for (int sql_i = 0; sql_i < sql_list.size(); sql_i++) {
 			condition.setString(sql_i + 1, sql_list.get(sql_i));
 		}
-		
+
 		outputVO.setTotalList(dam.exeQuery(condition));
 
 		sendRtnObject(outputVO);
 	}
 
 	public void queryRPTData(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		XmlInfo xmlInfo = new XmlInfo();
 		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
-		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));	
-		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));	
-		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));	
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 
 		PMS350DetailInputVO inputVO = (PMS350DetailInputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
+
 		sql.append("WITH BASE_ORG AS ( ");
 		sql.append("  SELECT ID.DEPT_ID, ID.DEPT_NAME, ID.ORG_TYPE, ");
 		sql.append("	     CASE WHEN EXISTS (SELECT 1 FROM VWORG_DEPT_BR T WHERE T.DEPT_ID = ID.DEPT_ID_30) THEN ID.DEPT_ID_30 ELSE NULL END AS REGION_CENTER_ID, ");
@@ -880,7 +881,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("	PIVOT (MAX(LEV_DEPT_ID) FOR ORG_TYPE_CLS IN ('00' AS DEPT_ID_00, '05' AS DEPT_ID_05, '10' AS DEPT_ID_10, '20' AS DEPT_ID_20, '30' AS DEPT_ID_30, '40' AS DEPT_ID_40, '50' AS DEPT_ID_50)) ");
 		sql.append("  ) ID ");
 		sql.append(") ");
-		
+
 		sql.append("SELECT TT.* ");
 		sql.append("FROM ( ");
 		sql.append("  SELECT T.SEQ, T.ROW_SEQ, ");
@@ -895,7 +896,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("         M.EMP_NAME, ");
 		sql.append("         D.AO_CODE, ");
 		sql.append("         CASE WHEN ORG_50.DEPT_ID IS NOT NULL THEN ORG_50.REGION_CENTER_ID ");
-		sql.append("              WHEN ORG_40.DEPT_ID IS NOT NULL THEN ORG_40.REGION_CENTER_ID "); 
+		sql.append("              WHEN ORG_40.DEPT_ID IS NOT NULL THEN ORG_40.REGION_CENTER_ID ");
 		sql.append("              WHEN ORG_30.DEPT_ID IS NOT NULL THEN ORG_30.REGION_CENTER_ID ");
 		sql.append("         ELSE D.REGION_CENTER_ID END AS REAL_RC, ");
 		sql.append("         CASE WHEN ORG_50.DEPT_ID IS NOT NULL THEN ORG_50.BRANCH_AREA_ID ");
@@ -920,112 +921,112 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("  LEFT JOIN BASE_ORG ORG_40 ON DEFN.ORG_TYPE = '40' AND DEFN.DEPT_ID = ORG_40.DEPT_ID  ");
 		sql.append("  LEFT JOIN BASE_ORG ORG_30 ON DEFN.ORG_TYPE = '30' AND DEFN.DEPT_ID = ORG_30.DEPT_ID  ");
 		sql.append("  WHERE 1 = 1 ");
-		
+
 		//此報表是否只查所屬的資料
 		if ("0".equals(inputVO.getIsSelf())) {
-			if (StringUtils.isNotEmpty(inputVO.getBranch_nbr())) {	// 分行
+			if (StringUtils.isNotEmpty(inputVO.getBranch_nbr())) { // 分行
 				sql.append("  AND ( ");
-				
+
 				// 分行
 				sql.append("    D.BRANCH_NBR = :branch ");
-				
+
 				// 營運區合計
-				sql.append("    OR ( "); 																				
-				sql.append("   	      D.BRANCH_NBR IS NULL ");																										
-				sql.append("      AND EXISTS (SELECT 1 FROM VWORG_DEFN_INFO I WHERE I.BRANCH_AREA_ID = D.BRANCH_AREA_ID AND I.BRANCH_NBR = :branch)"); 																				
+				sql.append("    OR ( ");
+				sql.append("   	      D.BRANCH_NBR IS NULL ");
+				sql.append("      AND EXISTS (SELECT 1 FROM VWORG_DEFN_INFO I WHERE I.BRANCH_AREA_ID = D.BRANCH_AREA_ID AND I.BRANCH_NBR = :branch)");
 				sql.append("   	) ");
-				
+
 				// 業務處合計	
-				sql.append("    OR ( "); 																				
-				sql.append("   	      D.BRANCH_NAME LIKE '%處%合計%' "); 																				
-				sql.append("   	  AND D.BRANCH_AREA_ID IS NULL "); 																				
-				sql.append("   	  AND D.BRANCH_NBR IS NULL ");																		
-				sql.append("   	  AND REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(D.BRANCH_NAME, '合計', ''), '*', ''), '分行業務', ''), '處', ''), ' ', '') = (SELECT DISTINCT REPLACE(REPLACE(REGION_CENTER_NAME, '分行業務', ''), '處', '') FROM VWORG_DEFN_INFO I WHERE I.BRANCH_NBR = :branch)"); 																				
-				sql.append("   	) ");  
-				
+				sql.append("    OR ( ");
+				sql.append("   	      D.BRANCH_NAME LIKE '%處%合計%' ");
+				sql.append("   	  AND D.BRANCH_AREA_ID IS NULL ");
+				sql.append("   	  AND D.BRANCH_NBR IS NULL ");
+				sql.append("   	  AND REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(D.BRANCH_NAME, '合計', ''), '*', ''), '分行業務', ''), '處', ''), ' ', '') = (SELECT DISTINCT REPLACE(REPLACE(REGION_CENTER_NAME, '分行業務', ''), '處', '') FROM VWORG_DEFN_INFO I WHERE I.BRANCH_NBR = :branch)");
+				sql.append("   	) ");
+
 				// 全行合計
 				sql.append("   	OR (D.BRANCH_NAME NOT LIKE '%處%合計%' AND D.REGION_CENTER_ID IS NULL AND D.BRANCH_AREA_ID IS NULL AND D.BRANCH_NBR IS NULL) ");
-				
+
 				sql.append("  ) ");
-				
+
 				condition.setObject("branch", inputVO.getBranch_nbr());
 			} else if (StringUtils.isNotEmpty(inputVO.getBranch_area_id())) {
 				sql.append("  AND ( ");
-				
+
 				// 分行
 				sql.append("    EXISTS (SELECT 1 FROM VWORG_DEFN_INFO I WHERE D.BRANCH_NBR = I.BRANCH_NBR AND I.BRANCH_AREA_ID = :area_id) ");
-				
+
 				// 營運區合計
-				sql.append("    OR ( "); 																				
-				sql.append("   	  D.BRANCH_NBR IS NULL ");																										
-				sql.append("      AND EXISTS (SELECT 1 FROM VWORG_DEFN_INFO I WHERE I.BRANCH_AREA_ID = D.BRANCH_AREA_ID AND I.BRANCH_AREA_ID = :area_id)"); 																				
+				sql.append("    OR ( ");
+				sql.append("   	  D.BRANCH_NBR IS NULL ");
+				sql.append("      AND EXISTS (SELECT 1 FROM VWORG_DEFN_INFO I WHERE I.BRANCH_AREA_ID = D.BRANCH_AREA_ID AND I.BRANCH_AREA_ID = :area_id)");
 				sql.append("   	) ");
-				
+
 				// 業務處合計	
-				sql.append("    OR ( "); 																				
-				sql.append("   	  D.BRANCH_NAME LIKE '%處%合計%' "); 																				
-				sql.append("   	  AND D.BRANCH_AREA_ID IS NULL "); 																				
-				sql.append("   	  AND D.BRANCH_NBR IS NULL ");																		
-				sql.append("   	  AND REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(D.BRANCH_NAME, '合計', ''), '*', ''), '分行業務', ''), '處', ''), ' ', '') = (SELECT DISTINCT REPLACE(REPLACE(REGION_CENTER_NAME, '分行業務', ''), '處', '') FROM VWORG_DEFN_INFO I WHERE I.BRANCH_AREA_ID = :area_id)"); 																				
-				sql.append("   	) ");  
-				
+				sql.append("    OR ( ");
+				sql.append("   	  D.BRANCH_NAME LIKE '%處%合計%' ");
+				sql.append("   	  AND D.BRANCH_AREA_ID IS NULL ");
+				sql.append("   	  AND D.BRANCH_NBR IS NULL ");
+				sql.append("   	  AND REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(D.BRANCH_NAME, '合計', ''), '*', ''), '分行業務', ''), '處', ''), ' ', '') = (SELECT DISTINCT REPLACE(REPLACE(REGION_CENTER_NAME, '分行業務', ''), '處', '') FROM VWORG_DEFN_INFO I WHERE I.BRANCH_AREA_ID = :area_id)");
+				sql.append("   	) ");
+
 				// 全行合計
 				sql.append("   	OR (D.BRANCH_NAME NOT LIKE '%處%合計%' AND D.REGION_CENTER_ID IS NULL AND D.BRANCH_AREA_ID IS NULL AND D.BRANCH_NBR IS NULL) ");
-				
-				if (isUHRMMGR || isOPMGR) {
+
+				if (isUHRMMGR || isOPMGR || isUHRMBMMGR) {
 					sql.append("    OR M.DEPT_ID = :loginOP ");
 					condition.setObject("loginOP", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
 				} else if (isARMGR || isHANDMGR) {
-					sql.append("    OR ( "); 
-					sql.append("   	  (CASE WHEN (SELECT COUNT(1) FROM TBORG_UHRM_BRH UB WHERE UB.EMP_ID = D.EMP_ID) > 0 THEN 'Y' ELSE 'N' END) = 'Y'  "); 
+					sql.append("    OR ( ");
+					sql.append("   	  (CASE WHEN (SELECT COUNT(1) FROM TBORG_UHRM_BRH UB WHERE UB.EMP_ID = D.EMP_ID) > 0 THEN 'Y' ELSE 'N' END) = 'Y'  ");
 					sql.append("   	  AND (CASE WHEN ORG_50.DEPT_ID IS NOT NULL THEN ORG_50.BRANCH_AREA_ID ");
-					sql.append("                WHEN ORG_40.DEPT_ID IS NOT NULL THEN ORG_40.BRANCH_AREA_ID "); 
+					sql.append("                WHEN ORG_40.DEPT_ID IS NOT NULL THEN ORG_40.BRANCH_AREA_ID ");
 					sql.append("                WHEN ORG_30.DEPT_ID IS NOT NULL THEN ORG_30.BRANCH_AREA_ID ");
 					sql.append("           ELSE D.BRANCH_AREA_ID END) = :area_id ");
-					sql.append("    ) "); 	
+					sql.append("    ) ");
 				}
-				
+
 				sql.append("  ) ");
-				
+
 				condition.setObject("area_id", inputVO.getBranch_area_id());
 			} else if (StringUtils.isNotEmpty(inputVO.getRegion_center_id())) {
 				sql.append("  AND ( ");
-				
+
 				// 分行
 				sql.append("    EXISTS (SELECT 1 FROM VWORG_DEFN_INFO I WHERE D.BRANCH_NBR = I.BRANCH_NBR AND I.REGION_CENTER_ID = :center_id) ");
-				
+
 				// 營運區合計
-				sql.append("    OR ( "); 																				
-				sql.append("   	  D.BRANCH_NBR IS NULL ");																										
-				sql.append("      AND EXISTS (SELECT 1 FROM VWORG_DEFN_INFO I WHERE I.BRANCH_AREA_ID = D.BRANCH_AREA_ID AND I.REGION_CENTER_ID = :center_id)"); 																				
+				sql.append("    OR ( ");
+				sql.append("   	  D.BRANCH_NBR IS NULL ");
+				sql.append("      AND EXISTS (SELECT 1 FROM VWORG_DEFN_INFO I WHERE I.BRANCH_AREA_ID = D.BRANCH_AREA_ID AND I.REGION_CENTER_ID = :center_id)");
 				sql.append("   	) ");
-				
+
 				// 業務處合計	
-				sql.append("    OR ("); 																				
-				sql.append("   	    D.BRANCH_NAME LIKE '%處%合計%' "); 																				
-				sql.append("   	    AND D.BRANCH_AREA_ID IS NULL AND D.BRANCH_NBR IS NULL ");																		
-				sql.append("   	    AND REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(D.BRANCH_NAME, '合計', ''), '*', ''), '分行業務', ''), '處', ''), ' ', '') = (SELECT DISTINCT REPLACE(REPLACE(REGION_CENTER_NAME, '分行業務', ''), '處', '') FROM VWORG_DEFN_INFO I WHERE I.REGION_CENTER_ID = :center_id)"); 																				
-				sql.append("   	) ");  
-				
+				sql.append("    OR (");
+				sql.append("   	    D.BRANCH_NAME LIKE '%處%合計%' ");
+				sql.append("   	    AND D.BRANCH_AREA_ID IS NULL AND D.BRANCH_NBR IS NULL ");
+				sql.append("   	    AND REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(D.BRANCH_NAME, '合計', ''), '*', ''), '分行業務', ''), '處', ''), ' ', '') = (SELECT DISTINCT REPLACE(REPLACE(REGION_CENTER_NAME, '分行業務', ''), '處', '') FROM VWORG_DEFN_INFO I WHERE I.REGION_CENTER_ID = :center_id)");
+				sql.append("   	) ");
+
 				// 全行合計
 				sql.append("   	OR (D.BRANCH_NAME NOT LIKE '%處%合計%' AND D.REGION_CENTER_ID IS NULL AND D.BRANCH_AREA_ID IS NULL AND D.BRANCH_NBR IS NULL) ");
-				
+
 				if (isARMGR) {
-					sql.append("    OR ( "); 
-					sql.append("   	  (CASE WHEN (SELECT COUNT(1) FROM TBORG_UHRM_BRH UB WHERE UB.EMP_ID = D.EMP_ID) > 0 THEN 'Y' ELSE 'N' END) = 'Y'  "); 
+					sql.append("    OR ( ");
+					sql.append("   	  (CASE WHEN (SELECT COUNT(1) FROM TBORG_UHRM_BRH UB WHERE UB.EMP_ID = D.EMP_ID) > 0 THEN 'Y' ELSE 'N' END) = 'Y'  ");
 					sql.append("   	  AND (CASE WHEN ORG_50.DEPT_ID IS NOT NULL THEN ORG_50.REGION_CENTER_ID ");
-					sql.append("                WHEN ORG_40.DEPT_ID IS NOT NULL THEN ORG_40.REGION_CENTER_ID "); 
+					sql.append("                WHEN ORG_40.DEPT_ID IS NOT NULL THEN ORG_40.REGION_CENTER_ID ");
 					sql.append("                WHEN ORG_30.DEPT_ID IS NOT NULL THEN ORG_30.REGION_CENTER_ID ");
 					sql.append("           ELSE D.REGION_CENTER_ID END) = :loginRC ");
-					sql.append("    ) "); 	
+					sql.append("    ) ");
 					condition.setObject("loginRC", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_REGION));
 				}
-				
+
 				sql.append("  ) ");
-				
+
 				condition.setObject("center_id", inputVO.getRegion_center_id());
 			}
-			
+
 			// 2018/11/9
 			if (StringUtils.isNotBlank(inputVO.getEmp_id())) {
 				sql.append("  AND D.EMP_ID = :emp_id ");
@@ -1037,30 +1038,31 @@ public class PMS350 extends FubonWmsBizLogic {
 		if ("1".equals(inputVO.getIsSelf()) && !"".equals(inputVO.getEmp_id())) {
 			QueryConditionIF querycondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			StringBuffer sql1 = new StringBuffer();
-			
+
 			sql1.append("SELECT PRIVILEGEID ");
 			sql1.append("FROM TBSYSSECUROLPRIASS ");
 			sql1.append("WHERE ROLEID = :roleID ");
-			
+
 			querycondition.setQueryString(sql1.toString());
-			
+
 			querycondition.setObject("roleID", getUserVariable(FubonSystemVariableConsts.LOGINROLE));
-			
+
 			List<Map<String, Object>> pri = dam.exeQuery(querycondition);
 
 			switch ((String) pri.get(0).get("PRIVILEGEID")) {
-				case "004":	// 若為消金PS則不判斷AO_CODE
-					sql.append("AND D.EMP_ID = :emp_id ");
-					condition.setObject("emp_id", inputVO.getEmp_id());
-					break;
-				default : 	// 改為判斷員編或者AO_CODE, 因為會有繼承別人而來的AO_CODE
-					sql.append("AND (D.AO_CODE IN (:ao_code) OR D.EMP_ID = :emp_id) ");
-					condition.setObject("ao_code", getUserVariable(FubonSystemVariableConsts.LOGIN_AOCODE_LIST));
-					condition.setObject("emp_id", inputVO.getEmp_id());
-					break;
+			case "004": // 若為消金PS則不判斷AO_CODE
+			case "JRM":
+				sql.append("AND D.EMP_ID = :emp_id ");
+				condition.setObject("emp_id", inputVO.getEmp_id());
+				break;
+			default: // 改為判斷員編或者AO_CODE, 因為會有繼承別人而來的AO_CODE
+				sql.append("AND (D.AO_CODE IN (:ao_code) OR D.EMP_ID = :emp_id) ");
+				condition.setObject("ao_code", getUserVariable(FubonSystemVariableConsts.LOGIN_AOCODE_LIST));
+				condition.setObject("emp_id", inputVO.getEmp_id());
+				break;
 			}
 		}
-		
+
 		// 2021/04/27 0000612: WMS-CR-20210422-01_銀證督導主要角色功能增修_動態報表
 		if (StringUtils.equals(StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)), "bsmgr")) {
 			sql.append("AND ( ");
@@ -1068,21 +1070,20 @@ public class PMS350 extends FubonWmsBizLogic {
 			sql.append("  OR D.AO_CODE IS NOT NULL AND EXISTS (SELECT 1 FROM VWORG_EMP_BS_INFO U WHERE D.AO_CODE = U.BS_CODE) ");
 			sql.append(") ");
 		}
-		
+
 		sql.append("  ORDER BY T.ROW_SEQ ");
 		sql.append(") TT ");
-		
+
 		sql.append("WHERE 1 = 1 ");
 
-		if (isUHRMMGR || isOPMGR) {
+		if (isUHRMMGR || isOPMGR || isUHRMBMMGR) {
 			sql.append("AND (TT.REAL_OP = :loginOP OR TT.REAL_OP IS NULL) ");
 			condition.setObject("loginOP", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
 		} else if (isARMGR) {
 			sql.append("AND (TT.REAL_RC = :loginRC OR TT.REAL_RC IS NULL) ");
 			condition.setObject("loginRC", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_REGION));
 		}
-		
-		
+
 		//此報表是否只查所屬的資料
 		if ("1".equals(inputVO.getIsSelf()) && "".equals(inputVO.getEmp_id())) {
 			sql.append("AND TT.EMP_ID = :emp_id ");
@@ -1092,25 +1093,25 @@ public class PMS350 extends FubonWmsBizLogic {
 				condition.setObject("emp_id", "");
 			}
 		}
-		
+
 		condition.setObject("seq", inputVO.getSeq());
 		condition.setQueryString(sql.toString());
 
 		ResultIF list = dam.executePaging(condition, inputVO.getCurrentPageIndex() + 1, inputVO.getPageCount());
 		List<Map<String, Object>> csvList = dam.exeQuery(condition);
-		
+
 		outputVO.setResultList(list);
 		outputVO.setCurrentPageIndex(inputVO.getCurrentPageIndex());// 當前頁次
 		outputVO.setTotalPage(list.getTotalPage());// 總頁次
 		outputVO.setTotalRecord(list.getTotalRecord());// 總筆數
 		outputVO.setTotalList(csvList);
 		outputVO.setCsvList(csvList);
-		
+
 		sendRtnObject(outputVO);
 	}
 
 	public void queryDTLREC(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350DetailInputVO inputVO = (PMS350DetailInputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
@@ -1126,19 +1127,19 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql_list.add(inputVO.getSeq().toString());
 
 		condition.setQueryString(sql.toString());
-		
+
 		for (int sql_i = 0; sql_i < sql_list.size(); sql_i++) {
 			condition.setString(sql_i + 1, sql_list.get(sql_i));
 		}
-		
+
 		outputVO.setTotalList(dam.exeQuery(condition));
-		
+
 		sendRtnObject(outputVO);
 	}
 
 	/** 下載範例檔 **/
 	public void downloadSample(Object body, IPrimitiveMap header) throws Exception {
-		
+
 		notifyClientToDownloadFile("doc//PMS//PMS350_EXAMPLE.csv", "動態報表上傳範例.csv");
 
 		this.sendRtnObject(null);
@@ -1146,21 +1147,21 @@ public class PMS350 extends FubonWmsBizLogic {
 
 	/** 匯出 **/
 	public void export(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350OutputVO return_VO = (PMS350OutputVO) body;
 		List<Map<String, Object>> list = return_VO.getList();
 		List<Map<String, Object>> headerList = return_VO.getTotalList();
-		
+
 		CSVUtil csv = new CSVUtil();
-		String[] recordsKey = {"ITEM", "DATA_YEARMON", "REGION_CENTER_NAME", "BRANCH_AREA_NAME", "BRANCH_NBR", "BRANCH_NAME", "EMP_ID", "EMP_NAME", "AO_CODE"};
-		String[] headersKey = {"項次", "資料年月", "業務處", "營運區", "分行代號", "分行名稱", "員工編號", "員工姓名", "AO_CODE"};
+		String[] recordsKey = { "ITEM", "DATA_YEARMON", "REGION_CENTER_NAME", "BRANCH_AREA_NAME", "BRANCH_NBR", "BRANCH_NAME", "EMP_ID", "EMP_NAME", "AO_CODE" };
+		String[] headersKey = { "項次", "資料年月", "業務處", "營運區", "分行代號", "分行名稱", "員工編號", "員工姓名", "AO_CODE" };
 		try {
 			if (list.size() > 0) {
 				String.format("%1$,09d", -3123);
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 				String fileName = "動態報表" + sdf.format(new Date()) + "-" + getUserVariable(FubonSystemVariableConsts.LOGINID) + ".csv";
 				List listCSV = new ArrayList();
-				
+
 				// TITLE
 				String[] csvHeader = new String[headerList.size() + headersKey.length];
 				for (int i = 0; i < (headerList.size() + headersKey.length); i++) {
@@ -1173,36 +1174,36 @@ public class PMS350 extends FubonWmsBizLogic {
 				}
 				csv.setHeader(new String[] { return_VO.getReportId() });
 				listCSV.add(0, csvHeader);
-				
+
 				// CONTENT
 				for (int i = 0; i < list.size(); i++) {
 					String[] sp = checkIsNullAndSplit(list.get(i), "COL"); //資料切割
 					String[] records = new String[sp.length + recordsKey.length];
-					
+
 					for (int j = 0; j < (sp.length + recordsKey.length); j++) {
 						if (j < recordsKey.length) {
 							switch (recordsKey[j]) {
-								case "ITEM" : // 項次
-									records[j] = String.valueOf(i + 1);
-									break;
-								case "DATA_YEARMON": //資料年月 
-									records[j] = "=\"" + checkIsNull(list.get(i), recordsKey[j]) + "\""; 
-									break;
-								default:
-									records[j] = checkIsNull(list.get(i), recordsKey[j]);
-									break;
+							case "ITEM": // 項次
+								records[j] = String.valueOf(i + 1);
+								break;
+							case "DATA_YEARMON": //資料年月 
+								records[j] = "=\"" + checkIsNull(list.get(i), recordsKey[j]) + "\"";
+								break;
+							default:
+								records[j] = checkIsNull(list.get(i), recordsKey[j]);
+								break;
 							}
 						} else {
 							records[j] = "=\"" + sp[j - recordsKey.length] + "\""; //動態資料
 						}
 					}
-					
+
 					listCSV.add(records);
 				}
-				
+
 				csv.addRecordList(listCSV);
 				String url = csv.generateCSV();
-				
+
 				// download
 				notifyClientToDownloadFile(url, fileName);
 			} else {
@@ -1216,7 +1217,7 @@ public class PMS350 extends FubonWmsBizLogic {
 	}
 
 	private String checkIsNull(Map map, String key) {
-		
+
 		if (StringUtils.isNotBlank(String.valueOf(map.get(key)))) {
 			if (map.get(key) == null) {
 				return "";
@@ -1228,7 +1229,7 @@ public class PMS350 extends FubonWmsBizLogic {
 	}
 
 	private String[] checkIsNullAndSplit(Map map, String key) {
-		
+
 		String[] x = String.valueOf(map.get(key)).split(";");
 		int len = x.length;
 		for (int i = 0; i < len; ++i) {
@@ -1236,37 +1237,37 @@ public class PMS350 extends FubonWmsBizLogic {
 				x[i] = "";
 			}
 		}
-		
+
 		return x;
 	}
 
 	/** 報表名稱名單 **/
 	public void QUERY_NAME(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		
+
 		sql.append("SELECT DISTINCT RPT_NAME FROM TBPMS_DYNAMIC_RPT_MAST WHERE RPT_NAME IS NOT NULL ");
 
 		condition.setQueryString(sql.toString());
 
 		outputVO.setNamelist(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** 設定報表-取報表名稱 **/
 	public void QUERY_NAME2(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		
+
 		sql.append("SELECT DISTINCT RPT_NAME AS RPT_NAME_D FROM TBPMS_DYNAMIC_RPT_MAST DRM ");
 		sql.append("LEFT JOIN  TBORG_DEFN DEF ON DEF.DEPT_ID = CASE WHEN DRM.RPT_DEPT IS NOT NULL THEN DRM.RPT_DEPT ");
 		sql.append("                                               WHEN DRM.RPT_DEPT_2 IS NOT NULL THEN DRM.RPT_DEPT_2 ");
@@ -1274,7 +1275,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("WHERE RPT_NAME IS NOT NULL ");
 		//			sql.append(" AND DRM.VALID_FLAG = 'Y' ");
 		//			sql.append(" AND TO_CHAR(DRM.END_DATE,'YYYY/MM/DD') >= TO_CHAR(sysdate,'YYYY/MM/DD') ");
-		
+
 		if (StringUtils.isNotBlank(inputVO.getRPT_TYPE())) {
 			sql.append(" AND RPT_TYPE = :rpt_type ");
 			condition.setObject("rpt_type", inputVO.getRPT_TYPE());
@@ -1283,13 +1284,13 @@ public class PMS350 extends FubonWmsBizLogic {
 		condition.setQueryString(sql.toString());
 
 		outputVO.setNamelist(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** 報表名稱名單FOR上傳更新報表 **/
 	public void QUERY_NAME_UPLOAD(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
@@ -1302,35 +1303,35 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("                                               WHEN DRM.RPT_DEPT_2 IS NOT NULL THEN DRM.RPT_DEPT_2 ");
 		sql.append("                                          ELSE DRM.RPT_DEPT_1 END ");
 		sql.append("WHERE RPT_NAME IS NOT NULL ");
-		
+
 		if (StringUtils.isNotBlank(inputVO.getRPT_TYPE())) {
 			sql.append(" AND RPT_TYPE = :rpt_type ");
 			condition.setObject("rpt_type", inputVO.getRPT_TYPE());
 		}
-		
+
 		if (StringUtils.isNotBlank((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 			condition.setObject("UPLOADROLE", (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 			sql.append("AND INSTR(DRM.UPLOAD_ROLES, P.PRIVILEGEID) > 0 ");
 		} else {
 			condition.setObject("UPLOADROLE", "");
 		}
-		
+
 		condition.setQueryString(sql.toString());
 
 		outputVO.setNamelist(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** 報表名稱名單FOR上傳檢視報表 **/
 	public void QUERY_NAME_VIEW(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		
+
 		sql.append("SELECT DISTINCT DRM.RPT_NAME AS RPT_NAME_D ");
 		sql.append("FROM ( ");
 		sql.append("  SELECT DISTINCT RPT_NAME, RPT_TYPE, RPT_DEPT, RPT_DEPT_1, RPT_DEPT_2, END_DATE, VALID_FLAG, REGEXP_SUBSTR(USER_ROLES_LIST, '[^,]+', 1, TEMP_T.LEV) AS USER_ROLES ");
@@ -1351,31 +1352,31 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("WHERE RPT_NAME IS NOT NULL ");
 		sql.append("AND DRM.VALID_FLAG = 'Y' ");
 		sql.append("AND TO_CHAR(DRM.END_DATE, 'YYYY/MM/DD') >= TO_CHAR(sysdate, 'YYYY/MM/DD') ");
-		
+
 		if (StringUtils.isNotBlank(inputVO.getRPT_TYPE())) {
 			sql.append("AND RPT_TYPE = :rpt_type ");
 			condition.setObject("rpt_type", inputVO.getRPT_TYPE());
 		}
-		
+
 		if (StringUtils.isNotBlank((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 			condition.setObject("USERROLES", (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 			sql.append("AND DRM.USER_ROLES = P.PRIVILEGEID ");
 		} else {
 			condition.setObject("USERROLES", "");
 		}
-		
+
 		sql.append("ORDER BY RPT_NAME DESC ");
 
 		condition.setQueryString(sql.toString());
 
 		outputVO.setNamelist(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** 報表類型名單 - 設定報表 **/
 	public void QUERY_TYPE(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
@@ -1388,7 +1389,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("                                               WHEN DRM.RPT_DEPT_2 IS NOT NULL THEN DRM.RPT_DEPT_2 ");
 		sql.append("                                          ELSE DRM.RPT_DEPT_1 END ");
 		sql.append("WHERE RPT_TYPE IS NOT NULL ");
-		
+
 		//			sql.append(" AND DRM.VALID_FLAG = 'Y' ");
 		//			sql.append(" AND TO_CHAR(DRM.END_DATE,'YYYY/MM/DD') >= TO_CHAR(sysdate,'YYYY/MM/DD') ");
 
@@ -1402,7 +1403,7 @@ public class PMS350 extends FubonWmsBizLogic {
 				sql.append("AND RPT_DEPT_2 = :rpt_dept_2 ");
 				condition.setObject("rpt_dept_2", inputVO.getRPT_DEPT_2());
 			}
-			
+
 			if (StringUtils.isNotBlank(inputVO.getRPT_DEPT())) {
 				//sql.append(" AND (RPT_DEPT =:rpt_dept or RPT_DEPT_1=:rpt_dept  or RPT_DEPT_2=:rpt_dept) ");
 				sql.append("AND RPT_DEPT = :rpt_dept ");
@@ -1413,19 +1414,19 @@ public class PMS350 extends FubonWmsBizLogic {
 		condition.setQueryString(sql.toString());
 
 		outputVO.setTypelist(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** 報表類型名單FOR上傳更新報表 **/
 	public void QUERY_TYPE_UPLOAD(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		
+
 		sql.append("SELECT DISTINCT RPT_TYPE ");
 		sql.append("FROM TBPMS_DYNAMIC_RPT_MAST DRM ");
 		sql.append("LEFT JOIN  TBSYSSECUROLPRIASS P ON P.ROLEID = :UPLOADROLE ");
@@ -1433,7 +1434,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		sql.append("                                               WHEN DRM.RPT_DEPT_2 IS NOT NULL THEN DRM.RPT_DEPT_2 ");
 		sql.append("                                          ELSE DRM.RPT_DEPT_1 END ");
 		sql.append("WHERE RPT_TYPE IS NOT NULL ");
-		
+
 		if (StringUtils.isNotBlank(inputVO.getRPT_DEPT())) {
 			sql.append(" AND (RPT_DEPT = :rpt_dept or RPT_DEPT_1 = :rpt_dept or RPT_DEPT_2 = :rpt_dept) ");
 			condition.setObject("rpt_dept", inputVO.getRPT_DEPT());
@@ -1445,66 +1446,77 @@ public class PMS350 extends FubonWmsBizLogic {
 		} else {
 			condition.setObject("UPLOADROLE", "");
 		}
-		
+
 		condition.setQueryString(sql.toString());
 
 		outputVO.setTypelist(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** 報表類型名單 - 設定報表 **/
 	public void QUERY_TYPE_VIEW(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		
+
 		sql.append("SELECT DISTINCT RPT_TYPE ");
 		sql.append("FROM TBPMS_DYNAMIC_RPT_MAST DRM ");
-		sql.append("LEFT JOIN  TBSYSSECUROLPRIASS P ON P.ROLEID = :USERROLES ");
-		sql.append("LEFT JOIN  TBORG_DEFN DEF ON DEF.DEPT_ID = CASE WHEN DRM.RPT_DEPT IS NOT NULL THEN DRM.RPT_DEPT ");
-		sql.append("                                               WHEN DRM.RPT_DEPT_2 IS NOT NULL THEN DRM.RPT_DEPT_2 ");
-		sql.append("                                          ELSE DRM.RPT_DEPT_1 END ");
+		sql.append("LEFT JOIN TBORG_DEFN DEF ON DEF.DEPT_ID = CASE WHEN DRM.RPT_DEPT IS NOT NULL THEN DRM.RPT_DEPT WHEN DRM.RPT_DEPT_2 IS NOT NULL THEN DRM.RPT_DEPT_2 ELSE DRM.RPT_DEPT_1 END ");
 		sql.append("WHERE RPT_TYPE IS NOT NULL ");
 		sql.append("AND DRM.VALID_FLAG = 'Y' ");
-		sql.append("AND TO_CHAR(DRM.END_DATE,'YYYY/MM/DD') >= TO_CHAR(sysdate,'YYYY/MM/DD') ");
+		sql.append("AND TO_CHAR(DRM.END_DATE, 'YYYY/MM/DD') >= TO_CHAR(SYSDATE, 'YYYY/MM/DD') ");
 
 		//若是報表設定進來, 則用OR處理, 反之會按照RPT_DEPT_2及RPT_DEPT來查詢
 		if ("".equals(inputVO.getRPT_TYPE())) {
-			sql.append("AND (RPT_DEPT = :rpt_dept or RPT_DEPT_1 = :rpt_dept or RPT_DEPT_2 = :rpt_dept) ");
+			sql.append("AND (RPT_DEPT = :rpt_dept OR RPT_DEPT_1 = :rpt_dept OR RPT_DEPT_2 = :rpt_dept) ");
 			condition.setObject("rpt_dept", inputVO.getRPT_DEPT());
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getRPT_DEPT_2())) {
-				//sql.append("AND (RPT_DEPT =:rpt_dept or RPT_DEPT_1=:rpt_dept  or RPT_DEPT_2=:rpt_dept) ");
 				sql.append("AND RPT_DEPT_2 = :rpt_dept_2 ");
 				condition.setObject("rpt_dept_2", inputVO.getRPT_DEPT_2());
 			}
 			if (StringUtils.isNotBlank(inputVO.getRPT_DEPT())) {
-				//sql.append("AND (RPT_DEPT =:rpt_dept or RPT_DEPT_1=:rpt_dept  or RPT_DEPT_2=:rpt_dept) ");
 				sql.append("AND RPT_DEPT = :rpt_dept ");
 				condition.setObject("rpt_dept", inputVO.getRPT_DEPT());
 			}
 		}
 
 		if (StringUtils.isNotBlank((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-			condition.setObject("USERROLES", (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
-			sql.append("AND INSTR(DRM.USER_ROLES, P.PRIVILEGEID) > 0 ");
-		} else {
-			condition.setObject("USERROLES", "");
+			sql.append("AND EXISTS ( ");
+			sql.append("  SELECT BASE.RPT_TYPE, BASE.USER_ROLES ");
+			sql.append("  FROM ( ");
+			sql.append("    SELECT DISTINCT RPT_TYPE, REGEXP_SUBSTR(USER_ROLES_LIST, '[^,]+', 1, TEMP_T.LEV) AS USER_ROLES ");
+			sql.append("    FROM ( ");
+			sql.append("      SELECT DISTINCT RPT_TYPE, REPLACE(DRM.USER_ROLES, '、', ',') AS USER_ROLES_LIST ");
+			sql.append("      FROM TBPMS_DYNAMIC_RPT_MAST DRM ");
+			sql.append("    ) PAR ");
+			sql.append("    OUTER APPLY ( ");
+			sql.append("      SELECT LEVEL AS LEV ");
+			sql.append("      FROM DUAL ");
+			sql.append("      CONNECT BY LEVEL <= REGEXP_COUNT(PAR.USER_ROLES_LIST, ',') + 1 ");
+			sql.append("    ) TEMP_T ");
+			sql.append("  ) BASE ");
+			sql.append("  WHERE EXISTS (SELECT 1 FROM TBSYSSECUROLPRIASS P WHERE BASE.USER_ROLES = P.PRIVILEGEID AND P.ROLEID = :USERROLE) ");
+			sql.append("  AND BASE.RPT_TYPE = DRM.RPT_TYPE ");
+			sql.append(") ");
+
+			condition.setObject("USERROLE", (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		}
+
 		condition.setQueryString(sql.toString());
 
 		outputVO.setTypelist(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** 報表提供單位名稱名單 **/
 	public void QUERY_DEPTNAME(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -1519,18 +1531,18 @@ public class PMS350 extends FubonWmsBizLogic {
 		condition.setQueryString(sql.toString());
 
 		outputVO.setDeptNamelist(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** 報表提供單位名稱名單 **/
 	public void QUERY_DEPTNAME2(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		
+
 		sql.append("SELECT DISTINCT DEF.DEPT_NAME AS DEPT_NAME_D, DEF.DEPT_ID ");
 		sql.append("FROM TBPMS_DYNAMIC_RPT_MAST DRM ");
 		sql.append("LEFT JOIN  TBSYSSECUROLPRIASS P ON P.ROLEID = :USERROLES ");
@@ -1551,18 +1563,18 @@ public class PMS350 extends FubonWmsBizLogic {
 		condition.setQueryString(sql.toString());
 
 		outputVO.setDeptNamelist(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	/** 報表提供單位名稱名單FOR上傳更新報表 **/
 	public void QUERY_DEPTNAME_UPLOAD(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		
+
 		sql.append("SELECT DISTINCT DEF.DEPT_NAME, DEF.DEPT_ID ");
 		sql.append("FROM TBPMS_DYNAMIC_RPT_MAST DRM ");
 		sql.append("LEFT JOIN  TBSYSSECUROLPRIASS P ON P.ROLEID = :UPLOADROLE ");
@@ -1581,19 +1593,19 @@ public class PMS350 extends FubonWmsBizLogic {
 		condition.setQueryString(sql.toString());
 
 		outputVO.setDeptNamelist(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 
 	//報表提供單位名單
 	public void QUERY_DEPT(Object body, IPrimitiveMap header) throws JBranchException {
-		
+
 		PMS350InputVO inputVO = (PMS350InputVO) body;
 		PMS350OutputVO outputVO = new PMS350OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		
+
 		//第一階
 		if (ObjectUtils.equals("10", inputVO.getORG_TYPE())) {
 			sql.append("SELECT DEPT_ID, DEPT_NAME, ORG_TYPE, PARENT_DEPT_ID ");
@@ -1604,7 +1616,7 @@ public class PMS350 extends FubonWmsBizLogic {
 			sql.append("OR DEPT_NAME LIKE '%信用卡處%' ");
 			sql.append("ORDER BY ORG_TYPE, PARENT_DEPT_ID, DEPT_ID ");
 		}
-		
+
 		//第二階
 		if (ObjectUtils.equals("20", inputVO.getORG_TYPE())) {
 			sql.append("SELECT DEPT_ID, DEPT_NAME, ORG_TYPE, PARENT_DEPT_ID ");
@@ -1613,7 +1625,7 @@ public class PMS350 extends FubonWmsBizLogic {
 			sql.append("ORDER BY PARENT_DEPT_ID, org_type, DEPT_ID ");
 			condition.setObject("dpet_id", inputVO.getDEPT_NAME());
 		}
-		
+
 		//第三階
 		if (ObjectUtils.equals("30", inputVO.getORG_TYPE())) {
 			sql.append("SELECT DEPT_ID, DEPT_NAME, ORG_TYPE, PARENT_DEPT_ID ");
@@ -1626,382 +1638,7 @@ public class PMS350 extends FubonWmsBizLogic {
 		condition.setQueryString(sql.toString());
 
 		outputVO.setDeptlist(dam.exeQuery(condition));
-		
+
 		this.sendRtnObject(outputVO);
 	}
 }
-/****/
-//	public void getReport(Object body, IPrimitiveMap header) throws JBranchException {
-//		PMS350InputVO inputVO = (PMS350InputVO) body;
-//		PMS350OutputVO outputVO = new PMS350OutputVO();
-//		dam = this.getDataAccessManager();
-//		
-//		QueryConditionIF querycondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//		StringBuffer sb = new StringBuffer();
-//		sb.append(" SELECT SEQ, RPT_NAME, RPT_EXPLAIN FROM TBPMS_DYNAMIC_RPT_MAST WHERE SEQ BETWEEN 8341 AND 8344 ");
-//		
-//		querycondition.setQueryString(sb.toString());
-//		outputVO.setResultList(dam.exeQuery(querycondition));
-//		this.sendRtnObject(outputVO);
-//	}
-//	
-//	/****/
-//	public void getCol(Object body, IPrimitiveMap header) throws JBranchException {
-//		PMS350InputVO inputVO = (PMS350InputVO) body;
-//		PMS350OutputVO outputVO = new PMS350OutputVO();
-//		dam = this.getDataAccessManager();
-//		
-//		QueryConditionIF querycondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//		StringBuffer sb = new StringBuffer();
-//		if ("3".equals(inputVO.getChar_type())) {
-//			//手收圓餅圖
-//			sb.append(" SELECT COL_SEQ, COL_NAME FROM TBPMS_DYNAMIC_RPT_HEADER WHERE SEQ = 8340 AND COL_SEQ BETWEEN 8 AND 15 ");
-//		} else {
-//			sb.append(" SELECT COL_SEQ, COL_NAME FROM TBPMS_DYNAMIC_RPT_SEL_COL WHERE SEQ = '8344' ");			
-//		}
-//		
-//		querycondition.setQueryString(sb.toString());
-//		outputVO.setResultList(dam.exeQuery(querycondition));
-//		this.sendRtnObject(outputVO);
-//	}
-//	
-//	/****/
-//	public void getCharData(Object body, IPrimitiveMap header) throws JBranchException {
-//		PMS350InputVO inputVO = (PMS350InputVO) body;
-//		PMS350OutputVO outputVO = new PMS350OutputVO();
-//		String char_type = inputVO.getChar_type();
-//		List<Map<String,Object>> resultList = new ArrayList<Map<String,Object>>();
-//		
-//		dam = this.getDataAccessManager();
-//		QueryConditionIF querycondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//		StringBuffer sb = new StringBuffer();
-//		this.getChartSql(inputVO, querycondition, sb);
-//		querycondition.setQueryString(sb.toString());
-//		resultList = dam.exeQuery(querycondition);
-//		
-//		if ("2".equals(char_type)) {
-//			Set<String> line_name_set = new HashSet<>();
-//			for (Map<String,Object> map : resultList) {
-//				if (map.get("LINE_NAME") != null)
-//					line_name_set.add(map.get("LINE_NAME").toString());
-//			}
-//			if (line_name_set.size() > 0) {
-//				String[] line_name_array = line_name_set.toArray(new String[line_name_set.size()]);
-//				outputVO.setLine_name_array(line_name_array);				
-//			}
-//		}
-//		
-//		outputVO.setResultList(resultList);
-//		this.sendRtnObject(outputVO);
-//	}
-//	
-//	private void getChartSql(PMS350InputVO inputVO, QueryConditionIF querycondition, StringBuffer sb) throws JBranchException {
-//		String char_type = inputVO.getChar_type();
-//		if ("1".equals(char_type)) {
-//			sb.append(" SELECT M.BRANCH_NBR || '-' || O.DEPT_NAME AS BRANCH, M.VAL FROM ( ");
-//			sb.append(" SELECT TT.BRANCH_NBR, SUM(CONTENT) AS VAL ");
-//			sb.append(" FROM ( ");
-//			sb.append("   SELECT T.SEQ, ");
-//			sb.append("     T.ROW_SEQ, ");
-//			sb.append("     T.COL_SEQ, ");
-//			sb.append("     D.DATA_YEARMON, ");
-//			sb.append("     D.REGION_CENTER_ID, ");
-//			sb.append("     D.BRANCH_AREA_ID, ");
-//			sb.append("     D.BRANCH_NBR, ");
-//			sb.append("     D.EMP_ID, ");
-//			sb.append("     M.EMP_NAME, ");
-//			sb.append("     D.AO_CODE, ");
-//			sb.append("     TO_NUMBER(NVL(REGEXP_REPLACE(T.CONTENT,'[^0-9]', ''), '0'), '999999999990.00') AS CONTENT, ");
-//			sb.append("     D.REGION_CENTER_NAME, ");
-//			sb.append("     D.BRANCH_AREA_NAME, ");
-//			sb.append("     D.BRANCH_NAME ");
-//			sb.append("   FROM TBPMS_DYNAMIC_RPT_DTL_REC T ");
-//			sb.append("   INNER JOIN TBPMS_DYNAMIC_RPT_DTL D ON D.SEQ = T.SEQ AND D.ROW_SEQ = T.ROW_SEQ ");
-//			sb.append("   LEFT JOIN  TBORG_MEMBER M ON D.EMP_ID = M.EMP_ID  ");
-//			sb.append("   WHERE T.SEQ = 8344 AND T.COL_SEQ IN (:col_seq) ");
-//			
-//			if (inputVO.getsDate() != null) {
-//				sb.append("AND D.DATA_YEARMON >= TO_CHAR( :sDate , 'YYYYMMDD') ");
-//				querycondition.setObject("sDate", inputVO.getsDate());
-//			}
-//			
-//			if (inputVO.geteDate() != null) {
-//				sb.append("AND D.DATA_YEARMON <= TO_CHAR( :eDate , 'YYYYMMDD') ");
-//				querycondition.setObject("eDate", inputVO.geteDate());
-//			}
-//			
-//			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
-//				sb.append(" AND D.BRANCH_NBR = :branch_nbr ");
-//				querycondition.setObject("branch_nbr", inputVO.getBranch_nbr());
-//			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) { 
-//				//sb.append(" AND D.BRANCH_AREA_ID = :branch_area_id ");
-//				sb.append("  AND D.BRANCH_NBR IN ( ");
-//				sb.append("    SELECT BRANCH_NBR ");
-//				sb.append("    FROM VWORG_DEFN_BRH ");
-//				sb.append("    WHERE DEPT_ID = :branch_area_id ");
-//				sb.append("  ) ");
-//				querycondition.setObject("branch_area_id", inputVO.getBranch_area_id());
-//			} else if (StringUtils.isNotBlank(inputVO.getRegiON_center_id())) {
-//				//sb.append(" AND D.REGION_CENTER_ID = :regiON_center_id ");
-//				sb.append("  AND D.BRANCH_NBR IN ( ");
-//				sb.append("    SELECT BRANCH_NBR ");
-//				sb.append("    FROM VWORG_DEFN_BRH ");
-//				sb.append("    WHERE DEPT_ID = :regiON_center_id ");
-//				sb.append("  ) ");
-//				querycondition.setObject("regiON_center_id", inputVO.getRegiON_center_id());
-//			}
-//			
-//			sb.append(" ) TT ");
-//			sb.append(" GROUP BY BRANCH_NBR ");
-//			sb.append(" ORDER BY BRANCH_NBR ");
-//			sb.append(" ) M LEFT JOIN  TBORG_DEFN O ON M.BRANCH_NBR = O.DEPT_ID ");
-//			
-//			if (StringUtils.isNotBlank(inputVO.getCol_seq())) {
-//				querycondition.setObject("col_seq", inputVO.getCol_seq());
-//			} else {
-//				querycondition.setObject("col_seq", inputVO.getCol_seq_list());			
-//			}
-//			
-//		} else if ("2".equals(char_type)) {
-//			//以查詢條件統計
-//			if ("1".equals(inputVO.getSetupCategory())) {
-//				sb.append(" SELECT SUBSTR(A.YEARMON, 0, 4) || '/' || SUBSTR(A.YEARMON, 5, 6) AS X_AXIS, B.VAL, ");
-//				
-//				if (StringUtils.isBlank(inputVO.getRegiON_center_id())) {
-//					sb.append(" B.REGION_CENTER_ID AS LINE_NAME ");				
-//				} else {
-//					if (StringUtils.isBlank(inputVO.getBranch_area_id())) {
-//						sb.append(" B.BRANCH_AREA_ID AS LINE_NAME ");					
-//					} else {
-//						if (StringUtils.isBlank(inputVO.getBranch_nbr())) {
-//							sb.append(" B.BRANCH_NBR AS LINE_NAME ");
-//						} else {
-//							sb.append(" B.FC AS LINE_NAME ");
-//						}
-//					}
-//				}
-//				sb.append(" FROM ( ");
-//				sb.append(" SELECT DISTINCT SUBSTR(DATA_YEARMON, 1, 6) AS YEARMON ");
-//				sb.append(" FROM TBPMS_DYNAMIC_RPT_DTL WHERE SEQ IN (:seq) ");
-//				sb.append(" ) A LEFT JOIN  ( ");
-//				sb.append(" SELECT TT.YEARMON, SUM(CONTENT) AS VAL, ");
-//				
-//				if (StringUtils.isBlank(inputVO.getRegiON_center_id())) {
-//					sb.append(" REGION_CENTER_ID ");				
-//				} else {
-//					if (StringUtils.isBlank(inputVO.getBranch_area_id())) {
-//						sb.append(" BRANCH_AREA_ID ");				
-//					} else {
-//						if (StringUtils.isBlank(inputVO.getBranch_nbr())) {
-//							sb.append(" BRANCH_NBR ");
-//						} else {
-//							sb.append(" FC ");
-//						}
-//					}
-//				}
-//				sb.append(" FROM( ");
-//				sb.append("   SELECT T.SEQ, ");
-//				sb.append("     T.ROW_SEQ, ");
-//				sb.append("     D.DATA_YEARMON, ");
-//				sb.append("     D.REGION_CENTER_ID || C.DEPT_NAME AS REGION_CENTER_ID, ");
-//				sb.append("     D.BRANCH_AREA_ID || A.DEPT_NAME AS BRANCH_AREA_ID, ");
-//				sb.append("     D.BRANCH_NBR || B.DEPT_NAME AS BRANCH_NBR, ");
-//				sb.append("     D.EMP_ID, ");
-//				sb.append("     M.EMP_NAME, ");
-//				sb.append("     D.AO_CODE, ");
-//				sb.append("     F.FC, ");
-//				sb.append("     TO_NUMBER(NVL(REGEXP_REPLACE(T.CONTENT,'[^0-9]', ''), '0'), '999999999990.00') AS CONTENT, ");
-//				sb.append("     D.REGION_CENTER_NAME, ");
-//				sb.append("     D.BRANCH_AREA_NAME, ");
-//				sb.append("     D.BRANCH_NAME, ");
-//				sb.append(" 	SUBSTR(D.DATA_YEARMON, 1, 6) AS YEARMON ");
-//				sb.append("   FROM TBPMS_DYNAMIC_RPT_DTL_REC T ");
-//				sb.append("   INNER JOIN TBPMS_DYNAMIC_RPT_DTL D ON D.SEQ = T.SEQ AND D.ROW_SEQ = T.ROW_SEQ ");
-//				sb.append("   LEFT JOIN  TBORG_MEMBER M ON D.EMP_ID = M.EMP_ID ");
-//				sb.append("   LEFT JOIN  ( ");
-//				sb.append("   SELECT SEQ, ROW_SEQ, CONTENT FC FROM TBPMS_DYNAMIC_RPT_DTL_REC WHERE COL_SEQ = 5 ");
-//				sb.append("   ) F ON T.SEQ = F.SEQ AND T.ROW_SEQ = F.ROW_SEQ ");
-//				sb.append("   LEFT JOIN  TBORG_DEFN C ON D.REGION_CENTER_ID = C.DEPT_ID ");
-//				sb.append("   LEFT JOIN  TBORG_DEFN A ON D.BRANCH_AREA_ID = A.DEPT_ID ");
-//				sb.append("   LEFT JOIN  TBORG_DEFN B ON D.BRANCH_NBR = B.DEPT_ID ");
-//				sb.append("   WHERE T.SEQ IN (:seq) ");
-//				
-//				if (inputVO.getPms900() && StringUtils.isBlank(inputVO.getCol_seq())) {
-//					sb.append("   AND (T.COL_SEQ BETWEEN 6 AND 24 OR T.COL_SEQ = 30 OR T.COL_SEQ = 32) ");
-//				} else {
-//					sb.append("   AND T.COL_SEQ IN (:col_seq) ");
-//					
-//					if (StringUtils.isNotBlank(inputVO.getCol_seq())) {
-//						querycondition.setObject("col_seq", inputVO.getCol_seq());
-//					} else {
-//						querycondition.setObject("col_seq", inputVO.getCol_seq_list());			
-//					}
-//				}
-//				
-//				if (inputVO.getsDate() != null) {
-//					sb.append("AND D.DATA_YEARMON >= TO_CHAR( :sDate , 'YYYYMMDD') ");
-//					querycondition.setObject("sDate", inputVO.getsDate());
-//				}
-//				
-//				if (inputVO.geteDate() != null) {
-//					sb.append("AND D.DATA_YEARMON <= TO_CHAR( :eDate , 'YYYYMMDD') ");
-//					querycondition.setObject("eDate", inputVO.geteDate());
-//				}
-//				
-//				if (StringUtils.isNotBlank(inputVO.getFc())) {
-//					sb.append(" AND F.FC = :fc ");
-//					querycondition.setObject("fc", inputVO.getFc());
-//				} else if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
-//					sb.append(" AND D.BRANCH_NBR = :branch_nbr ");
-//					querycondition.setObject("branch_nbr", inputVO.getBranch_nbr());
-//				} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) { 
-//					//sb.append(" AND D.BRANCH_AREA_ID = :branch_area_id ");
-//					sb.append("  AND D.BRANCH_NBR IN ( ");
-//					sb.append("    SELECT BRANCH_NBR ");
-//					sb.append("    FROM VWORG_DEFN_BRH ");
-//					sb.append("    WHERE DEPT_ID = :branch_area_id ");
-//					sb.append("  ) ");
-//					querycondition.setObject("branch_area_id", inputVO.getBranch_area_id());
-//				} else if (StringUtils.isNotBlank(inputVO.getRegiON_center_id())) {
-//					//sb.append(" AND D.REGION_CENTER_ID = :regiON_center_id ");
-//					sb.append("  AND D.BRANCH_NBR IN ( ");
-//					sb.append("    SELECT BRANCH_NBR ");
-//					sb.append("    FROM VWORG_DEFN_BRH ");
-//					sb.append("    WHERE DEPT_ID = :regiON_center_id ");
-//					sb.append("  ) ");
-//					querycondition.setObject("regiON_center_id", inputVO.getRegiON_center_id());
-//				}
-//				
-//				sb.append(" ) TT ");
-//				sb.append(" GROUP BY YEARMON, "); 
-//				if (StringUtils.isBlank(inputVO.getRegiON_center_id())) {
-//					sb.append(" REGION_CENTER_ID ");				
-//				} else {
-//					if (StringUtils.isBlank(inputVO.getBranch_area_id())) {
-//						sb.append(" BRANCH_AREA_ID ");				
-//					} else {
-//						if (StringUtils.isBlank(inputVO.getBranch_nbr())) {
-//							sb.append(" BRANCH_NBR ");
-//						} else {
-//							sb.append(" FC ");
-//						}
-//					}
-//				}
-//				sb.append(" ORDER BY YEARMON ");
-//				sb.append(" ) B ON A.YEARMON = B.YEARMON ");
-//				
-//			} else if ("2".equals(inputVO.getSetupCategory())) {
-//				//以選取報表統計
-//				sb.append(" SELECT COL_SEQ AS X_AXIS, SUM(CONTENT) AS VAL, RPT_EXPLAIN AS LINE_NAME ");
-//				sb.append(" FROM( ");
-//				sb.append("   SELECT T.SEQ, ");
-//				sb.append("     T.COL_SEQ || '-' || H.COL_NAME AS COL_SEQ, ");
-//				sb.append("     R.RPT_EXPLAIN, ");
-//				sb.append("     T.ROW_SEQ, ");
-//				sb.append("     D.DATA_YEARMON, ");
-//				sb.append("     D.REGION_CENTER_ID, ");
-//				sb.append("     D.BRANCH_AREA_ID, ");
-//				sb.append("     D.BRANCH_NBR, ");
-//				sb.append("     D.EMP_ID, ");
-//				sb.append("     M.EMP_NAME, ");
-//				sb.append("     D.AO_CODE, ");
-//				sb.append("     F.FC, ");
-//				sb.append("     TO_NUMBER(NVL(REGEXP_REPLACE(T.CONTENT,'[^0-9]', ''), '0'), '999999999990.00') AS CONTENT, "); 
-//				sb.append("     D.REGION_CENTER_NAME, ");
-//				sb.append("     D.BRANCH_AREA_NAME, ");
-//				sb.append("     D.BRANCH_NAME, ");
-//				sb.append(" 	SUBSTR(D.DATA_YEARMON, 1, 6) AS YEARMON ");
-//				sb.append("   FROM TBPMS_DYNAMIC_RPT_DTL_REC T ");
-//				sb.append("   INNER JOIN TBPMS_DYNAMIC_RPT_DTL D ON D.SEQ = T.SEQ AND D.ROW_SEQ = T.ROW_SEQ ");
-//				sb.append("   LEFT JOIN  TBORG_MEMBER M ON D.EMP_ID = M.EMP_ID ");
-//				sb.append("   LEFT JOIN  ( ");
-//				sb.append("   SELECT SEQ, ROW_SEQ, CONTENT FC FROM TBPMS_DYNAMIC_RPT_DTL_REC WHERE COL_SEQ = 5 ");
-//				sb.append("   ) F ON T.SEQ = F.SEQ AND T.ROW_SEQ = F.ROW_SEQ ");
-//				sb.append("   LEFT JOIN  TBPMS_DYNAMIC_RPT_MAST R ON T.SEQ = R.SEQ ");
-//				sb.append("   LEFT JOIN  ( ");
-//				sb.append("   SELECT COL_SEQ, COL_NAME FROM TBPMS_DYNAMIC_RPT_HEADER WHERE SEQ = 8344 ");
-//				sb.append("   ) H ON T.COL_SEQ = H.COL_SEQ ");
-//				sb.append("   WHERE T.SEQ IN (:seq) ");
-//				
-//				if (inputVO.getPms900()) {
-//					sb.append("   AND T.COL_SEQ IN (6, 7, 19, 22, 23, 24, 30, 32) ");
-//				} else {
-//					sb.append("   AND T.COL_SEQ IN (:col_seq) ");
-//					querycondition.setObject("col_seq", inputVO.getCol_seq_list());	
-//				}
-//				
-//				sb.append(" ) TT "); 
-//				sb.append(" GROUP BY COL_SEQ, RPT_EXPLAIN "); 
-//				sb.append(" ORDER BY COL_SEQ ");
-//			}
-//			
-//			querycondition.setObject("seq", inputVO.getSeq_list());
-//					
-//		} else if ("3".equals(char_type)) {
-//			//手收圓餅圖
-//			sb.append("SELECT COL_SEQ, COL_NAME, SUM(CONTENT) AS VAL ");
-//			sb.append("FROM ( ");
-//			sb.append("  SELECT T.SEQ, ");
-//			sb.append("    T.ROW_SEQ, ");
-//			sb.append("    T.COL_SEQ, ");
-//			sb.append("    H.COL_NAME, ");
-//			sb.append("    D.DATA_YEARMON, ");
-//			sb.append("    D.REGION_CENTER_ID, ");
-//			sb.append("    D.BRANCH_AREA_ID, ");
-//			sb.append("    D.BRANCH_NBR, ");
-//			sb.append("    D.EMP_ID, ");
-//			sb.append("    M.EMP_NAME, ");
-//			sb.append("    D.AO_CODE, ");
-//			sb.append("    TO_NUMBER(NVL(REGEXP_REPLACE(T.CONTENT,'[^0-9]', ''), '0'), '999999999990.00') AS CONTENT, ");
-//			sb.append("    D.REGION_CENTER_NAME, ");
-//			sb.append("    D.BRANCH_AREA_NAME, ");
-//			sb.append("    D.BRANCH_NAME ");
-//			sb.append("  FROM TBPMS_DYNAMIC_RPT_DTL_REC T ");
-//			sb.append("  INNER JOIN TBPMS_DYNAMIC_RPT_DTL D ON D.SEQ = T.SEQ AND D.ROW_SEQ = T.ROW_SEQ ");
-//			sb.append("  LEFT JOIN  TBORG_MEMBER M ON D.EMP_ID = M.EMP_ID ");
-//			sb.append("  LEFT JOIN  TBPMS_DYNAMIC_RPT_HEADER H ON T.SEQ = H.SEQ AND T.COL_SEQ = H.COL_SEQ ");
-//			sb.append("  WHERE T.SEQ = 8340 AND T.COL_SEQ BETWEEN 8 AND 15 ");
-//			sb.append("  AND T.COL_SEQ IN (:col_seq) ");
-//			
-//			if (inputVO.getsDate() != null) {
-//				sb.append("AND D.DATA_YEARMON >= TO_CHAR( :sDate , 'YYYYMMDD') ");
-//				querycondition.setObject("sDate", inputVO.getsDate());
-//			}
-//			
-//			if (inputVO.geteDate() != null) {
-//				sb.append("AND D.DATA_YEARMON <= TO_CHAR( :eDate , 'YYYYMMDD') ");
-//				querycondition.setObject("eDate", inputVO.geteDate());
-//			}
-//			
-//			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
-//				sb.append(" AND D.BRANCH_NBR = :branch_nbr ");
-//				querycondition.setObject("branch_nbr", inputVO.getBranch_nbr());
-//			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) { 
-//				//sb.append(" AND D.BRANCH_AREA_ID = :branch_area_id ");
-//				sb.append("  AND D.BRANCH_NBR IN ( ");
-//				sb.append("    SELECT BRANCH_NBR ");
-//				sb.append("    FROM VWORG_DEFN_BRH ");
-//				sb.append("    WHERE DEPT_ID = :branch_area_id ");
-//				sb.append("  ) ");
-//				querycondition.setObject("branch_area_id", inputVO.getBranch_area_id());
-//			} else if (StringUtils.isNotBlank(inputVO.getRegiON_center_id())) {
-//				//sb.append(" AND D.REGION_CENTER_ID = :regiON_center_id ");
-//				sb.append("  AND D.BRANCH_NBR IN ( ");
-//				sb.append("    SELECT BRANCH_NBR ");
-//				sb.append("    FROM VWORG_DEFN_BRH ");
-//				sb.append("    WHERE DEPT_ID = :regiON_center_id ");
-//				sb.append("  ) ");
-//				querycondition.setObject("regiON_center_id", inputVO.getRegiON_center_id());
-//			}
-//			
-//			if (StringUtils.isNotBlank(inputVO.getCol_seq())) {
-//				querycondition.setObject("col_seq", inputVO.getCol_seq());
-//			} else {
-//				querycondition.setObject("col_seq", inputVO.getCol_seq_list());			
-//			}
-//			
-//			sb.append(") ");
-//			sb.append("GROUP BY COL_SEQ, COL_NAME ");
-//			sb.append("ORDER BY COL_SEQ ");
-//		}
-//	}

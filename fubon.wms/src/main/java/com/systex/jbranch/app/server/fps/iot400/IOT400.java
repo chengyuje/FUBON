@@ -531,6 +531,16 @@ public class IOT400 extends FubonWmsBizLogic {
 		sb.append(" APPLY_DATE = NULL, ");
 		sb.append(" REVIEW_STATUS = NULL, ");
 		sb.append(" CALL_PERSON = NULL, ");
+		
+		// #2172：電訪預約方便聯絡時間拿掉 18：00~20：00
+		// 若是在途件原有勾選時段18：00~20：00，當被派件人員退回(狀態改為未申請)時，由理專重新執行電訪預約，時段請拿掉18：00~20：00不顯示
+		sb.append(" C_TIME  = CASE WHEN C_TIME  IS NOT NULL THEN SUBSTR(C_TIME , 1, 3) || '0' ELSE NULL END, ");
+		sb.append(" C_TIME2 = CASE WHEN C_TIME2 IS NOT NULL THEN SUBSTR(C_TIME2, 1, 3) || '0' ELSE NULL END, ");
+		sb.append(" I_TIME  = CASE WHEN I_TIME  IS NOT NULL THEN SUBSTR(I_TIME , 1, 3) || '0' ELSE NULL END, ");
+		sb.append(" I_TIME2 = CASE WHEN I_TIME2 IS NOT NULL THEN SUBSTR(I_TIME2, 1, 3) || '0' ELSE NULL END, ");
+		sb.append(" P_TIME  = CASE WHEN P_TIME  IS NOT NULL THEN SUBSTR(P_TIME , 1, 3) || '0' ELSE NULL END, ");
+		sb.append(" P_TIME2 = CASE WHEN P_TIME2 IS NOT NULL THEN SUBSTR(P_TIME2, 1, 3) || '0' ELSE NULL END, ");
+		
 		sb.append(" MODIFIER = :loginID, ");
 		sb.append(" LASTUPDATE = SYSDATE ");
 		sb.append(" WHERE PREMATCH_SEQ = :prematch_seq ");

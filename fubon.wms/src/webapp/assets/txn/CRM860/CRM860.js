@@ -25,6 +25,17 @@ eSoafApp.controller('CRM860Controller',
 		$scope.limitDate = function() {
 			$scope.startDateOptions.maxDate = $scope.inputVO.endDate;
 			$scope.endDateOptions.minDate = $scope.inputVO.startDate;
+			
+			if($scope.inputVO.endDate) {
+				var tempDate = new Date($scope.inputVO.endDate.getFullYear(), $scope.inputVO.endDate.getMonth(), $scope.inputVO.endDate.getDate() - 365);				
+				$scope.startDateOptions.minDate = tempDate;
+
+			}
+			
+			if($scope.inputVO.startDate) {
+				var tempDate = new Date($scope.inputVO.startDate.getFullYear(), $scope.inputVO.startDate.getMonth(), $scope.inputVO.startDate.getDate() + 365)
+				$scope.endDateOptions.maxDate = tempDate;		
+			}
 		};
 		// date picker end
 		

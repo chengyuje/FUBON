@@ -17,6 +17,7 @@ public class CAM130InputVO extends PagingInputVO {
 	private Date sStaDate;
 	private Date eStaDate;
 	private String type;
+	private String camp_purpose;
 	private String status;
 	private Date sEndDate;
 	private Date eEndDate;
@@ -109,6 +110,14 @@ public class CAM130InputVO extends PagingInputVO {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getCamp_purpose() {
+		return camp_purpose;
+	}
+
+	public void setCamp_purpose(String camp_purpose) {
+		this.camp_purpose = camp_purpose;
 	}
 
 	public String getStatus() {

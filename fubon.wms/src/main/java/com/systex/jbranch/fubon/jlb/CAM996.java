@@ -56,7 +56,8 @@ public class CAM996 extends BizLogic {
 							  String checkStatus, 
 							  String giftCampaignID, 
 							  BigDecimal leTotalCnt, 
-							  String responseCode) throws JBranchException {
+							  String responseCode,
+							  String campPurpose) throws JBranchException {
 		
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer dayUseSQL = new StringBuffer();
@@ -89,6 +90,7 @@ public class CAM996 extends BizLogic {
 		vo.setLEAD_PARA2(leadPara2); //行銷活動參考文件
 		vo.setLE_TOTAL_CNT(leTotalCnt);
 		vo.setLEAD_RESPONSE_CODE(StringUtils.isNotBlank(responseCode) ? responseCode : "0000000000");
+		vo.setCAMP_PURPOSE(campPurpose);
 		
 		dam.create(vo);
 	}

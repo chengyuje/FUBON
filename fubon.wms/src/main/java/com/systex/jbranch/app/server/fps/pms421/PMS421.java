@@ -131,14 +131,22 @@ public class PMS421 extends FubonWmsBizLogic {
 				sql.append("AND B.BRANCH_NBR = :BRNCH_NBRR ");
 				condition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
 			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
-				sql.append("AND B.BRANCH_AREA_ID = :BRANCH_AREA_IDD ");
+				sql.append("AND ( ");
+				sql.append("  (B.RM_FLAG = 'B' AND B.BRANCH_AREA_ID = :BRANCH_AREA_IDD) ");
+				
+				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+					sql.append("  OR (B.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE MEM.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD )) ");
+				}
+			
+				sql.append(") ");
 				condition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sql.append("AND B.REGION_CENTER_ID = :REGION_CENTER_IDD ");
 				condition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
 			}
-			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
 				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 				sql.append("AND B.RM_FLAG = 'B' ");
 			}

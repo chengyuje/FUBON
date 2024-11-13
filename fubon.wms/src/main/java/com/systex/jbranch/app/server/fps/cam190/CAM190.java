@@ -425,8 +425,25 @@ public class CAM190 extends FubonWmsBizLogic {
 			}
 		}
 		
+		// 名單類型
 		if (StringUtils.isNotBlank(inputVO.getLeadType()))
 			sb.append("AND CAMP.LEAD_TYPE = :leadType ");
+		
+		// 名單目的
+		if (StringUtils.isNotBlank(inputVO.getCampPurpose()))
+			sb.append("AND CAMP.CAMP_PURPOSE = :campPurpose ");
+		
+		// 名單分類
+		if (StringUtils.isNotBlank(inputVO.getCampType())) {
+			String campType = inputVO.getCampType();
+			if ("OTHER".equals(campType)) {
+				sb.append("AND CAMP.LEAD_TYPE NOT IN ( ");
+				sb.append("SELECT PARAM_CODE FROM TBSYSPARAMETER WHERE PARAM_TYPE IN ('CAM.CAMP_TYPE_CONTROL', 'CAM.CAMP_TYPE_NEC_NOTIFY', 'CAM.CAMP_TYPE_MARKETING', 'CAM.CAMP_TYPE_LEAVE_INFO', 'CAM.CAMP_TYPE_REFER_INFO')) ");
+				
+			} else {
+				sb.append("AND CAMP.LEAD_TYPE IN (SELECT PARAM_CODE FROM TBSYSPARAMETER WHERE PARAM_TYPE = 'CAM.CAMP_TYPE_" + campType + "') ");
+			}
+		}
 		
 		if (StringUtils.isNotBlank(inputVO.getConDegree()))
 			sb.append("AND CUST.CON_DEGREE = :conDegree ");
@@ -483,6 +500,7 @@ public class CAM190 extends FubonWmsBizLogic {
 		logger.info("leadStatus:" + inputVO.getLeadStatus() + "%");
 		logger.info("vipDegree:" + inputVO.getVipDegree());
 		logger.info("leadType:" + inputVO.getLeadType());
+		logger.info("campPurpose:" + inputVO.getCampPurpose());
 		logger.info("conDegree:" + inputVO.getConDegree());
 		logger.info("=====CAM190 debug end=====");
 		
@@ -511,6 +529,10 @@ public class CAM190 extends FubonWmsBizLogic {
 			queryCondition.setObject("vipDegree", inputVO.getVipDegree());
 		if (StringUtils.isNotBlank(inputVO.getLeadType()))
 			queryCondition.setObject("leadType", inputVO.getLeadType());
+		if (StringUtils.isNotBlank(inputVO.getLeadType()))
+			queryCondition.setObject("leadType", inputVO.getLeadType());
+		if (StringUtils.isNotBlank(inputVO.getCampPurpose()))
+			queryCondition.setObject("campPurpose", inputVO.getCampPurpose());
 		if (StringUtils.isNotBlank(inputVO.getConDegree()))
 			queryCondition.setObject("conDegree", inputVO.getConDegree());
 		

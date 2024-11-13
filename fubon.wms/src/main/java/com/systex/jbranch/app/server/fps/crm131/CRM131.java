@@ -180,12 +180,12 @@ public class CRM131 extends FubonWmsBizLogic {
 		StringBuffer sql = new StringBuffer();
 		
 		// 0-分行理專 、1-輔銷FA、2-輔銷IA、3-主管 、4-消金、5-UHRM
-		sql.append("SELECT CASE WHEN PRIVILEGEID IN ('001', '002', '003', 'JRM', 'UHRM012') THEN 0 ");
+		sql.append("SELECT CASE WHEN PRIVILEGEID IN ('001', '002', '003', 'JRM') THEN 0 ");
 		sql.append("            WHEN PRIVILEGEID IN ('014', '015') THEN 1 ");
 		sql.append("            WHEN PRIVILEGEID IN ('023', '024') THEN 2 ");
 		sql.append("            WHEN PRIVILEGEID IN ('006', '009', '010', '011', '012', '013') THEN 3 ");
 		sql.append("            WHEN PRIVILEGEID IN ('004AO', '004', '005', '007', '008') THEN 4 ");
-		sql.append("            WHEN PRIVILEGEID IN ('UHRM013') THEN 5 ");
+		sql.append("            WHEN PRIVILEGEID IN ('UHRM012', 'UHRM013') THEN 5 ");
 		sql.append("       END AS COUNTS ");
 		sql.append("FROM TBSYSSECUROLPRIASS ");
 		sql.append("WHERE ROLEID = :roleID ");
@@ -207,28 +207,32 @@ public class CRM131 extends FubonWmsBizLogic {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
 		
-		sb.append("SELECT EMP.CONTACT_CUST, ");
-		sb.append("       EMP.CONTACTED_CUST, ");
-		sb.append("       EMP.CMPLT_R, ");
-		sb.append("       EMP.TOT_CONTROL_CUST AS TOTAL_CONTROL_CUST, ");
+		sb.append(" SELECT TOT_CONTROL_CUST, TOT_NEC_NOTIFY_CUST, TOT_MARKETING_CUST, ");
+		sb.append(" TOT_LEAVE_INFO_CUST, TOT_REFER_INFO_CUST, TOT_OTHER_CUST, LEAVE_INFO_YN ");
+		sb.append(" FROM TBCAM_LEADS_BY_EMP WHERE EMP_ID = :empID AND ROLE_ID = :roleID ");
 		
-		sb.append("       (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS LEAVE_INFO_YN ");
-		sb.append("        FROM TBCAM_SFA_LEADS LE ");
-		sb.append("        INNER JOIN TBCAM_SFA_CAMPAIGN CA ON LE.CAMPAIGN_ID = CA.CAMPAIGN_ID AND LE.STEP_ID = CA.STEP_ID ");
-		sb.append("        WHERE 1 = 1 ");
-		sb.append("        AND CA.LEAD_TYPE IN ('05', '06', '07', '08', 'H1', 'H2', 'F1', 'F2', 'I1', 'I2', '09', 'UX') ");
-		sb.append("        AND TRUNC(SYSDATE) BETWEEN LE.START_DATE AND LE.END_DATE ");
-		sb.append("        AND LE.LEAD_STATUS < '03' ");
-		sb.append("        AND LE.EMP_ID = EMP.EMP_ID ");
-		sb.append("        GROUP BY LE.EMP_ID) AS LEAVE_INFO_YN, ");
-		
-		sb.append("       EMP.BELLOW_UNDERSERV_CNT, ");
-		sb.append("       EMP.NEAR_UNDERSERV_CNT ");
-		sb.append("FROM TBCAM_LEADS_BY_EMP EMP ");
-		sb.append("WHERE EMP.EMP_ID = :empID ");
+//		sb.append("SELECT EMP.CONTACT_CUST, ");
+//		sb.append("       EMP.CONTACTED_CUST, ");
+//		sb.append("       EMP.CMPLT_R, ");
+//		sb.append("       EMP.TOT_CONTROL_CUST AS TOTAL_CONTROL_CUST, ");
+//		
+//		sb.append("       (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS LEAVE_INFO_YN ");
+//		sb.append("        FROM TBCAM_SFA_LEADS LE ");
+//		sb.append("        INNER JOIN TBCAM_SFA_CAMPAIGN CA ON LE.CAMPAIGN_ID = CA.CAMPAIGN_ID AND LE.STEP_ID = CA.STEP_ID ");
+//		sb.append("        WHERE 1 = 1 ");
+//		sb.append("        AND CA.LEAD_TYPE IN ('05', '06', '07', '08', 'H1', 'H2', 'F1', 'F2', 'I1', 'I2', '09', 'UX') ");
+//		sb.append("        AND TRUNC(SYSDATE) BETWEEN LE.START_DATE AND LE.END_DATE ");
+//		sb.append("        AND LE.LEAD_STATUS < '03' ");
+//		sb.append("        AND LE.EMP_ID = EMP.EMP_ID ");
+//		sb.append("        GROUP BY LE.EMP_ID) AS LEAVE_INFO_YN, ");
+//		
+//		sb.append("       EMP.BELLOW_UNDERSERV_CNT, ");
+//		sb.append("       EMP.NEAR_UNDERSERV_CNT ");
+//		sb.append("FROM TBCAM_LEADS_BY_EMP EMP ");
+//		sb.append("WHERE EMP.EMP_ID = :empID ");
 		
 		queryCondition.setObject("empID", ws.getUser().getUserID());
-
+		queryCondition.setObject("roleID", (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		queryCondition.setQueryString(sb.toString());
 
 		return_VO.setResultList(dam.exeQuery(queryCondition));
@@ -238,59 +242,87 @@ public class CRM131 extends FubonWmsBizLogic {
 
 	/** 聯繫名單-主管轄下理專今日名單應聯繫、已聯繫、完成率、主管應聯絡數 **/
 	public void inquire(Object body, IPrimitiveMap header) throws JBranchException {
-
 		WorkStation ws = DataManager.getWorkStation(uuid);
-		
 		CRM131InputVO inputVO = (CRM131InputVO) body;
 		CRM131OutputVO return_VO2 = new CRM131OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
 
-		sb.append("SELECT A.RM_CONTACT_CUST, ");
-		sb.append("       A.RM_TOT_CONTROL_CUST, ");	
-		sb.append("       A.RM_CONTACTED_CUST, ");
-		sb.append("       A.RM_CMPLT_R,  ");
-		sb.append("       A.CONTACT_CUST AS M_CONTACT_CUST, ");
-
-		sb.append("       (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS LEAVE_INFO_YN ");
-		sb.append("        FROM TBCAM_SFA_LEADS LE ");
-		sb.append("        INNER JOIN TBCAM_SFA_CAMPAIGN CA ON LE.CAMPAIGN_ID = CA.CAMPAIGN_ID AND LE.STEP_ID = CA.STEP_ID ");
-		sb.append("        WHERE 1 = 1 ");
-		sb.append("        AND CA.LEAD_TYPE IN ('05', '06', '07', '08', 'H1', 'H2', 'F1', 'F2', 'I1', 'I2', '09', 'UX') ");
-		sb.append("        AND LE.AO_CODE IS NULL ");
-		sb.append("        AND TRUNC(SYSDATE) BETWEEN LE.START_DATE AND LE.END_DATE ");
-		sb.append("        AND LE.BRANCH_ID = A.BRANCH_NBR ");
-		sb.append("        GROUP BY LE.BRANCH_ID) AS LEAVE_INFO_YN, ");
+//		sb.append("SELECT A.RM_CONTACT_CUST, ");
+//		sb.append("       A.RM_TOT_CONTROL_CUST, ");	
+//		sb.append("       A.RM_CONTACTED_CUST, ");
+//		sb.append("       A.RM_CMPLT_R,  ");
+//		sb.append("       A.CONTACT_CUST AS M_CONTACT_CUST, ");
+//
+//		sb.append("       (SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS LEAVE_INFO_YN ");
+//		sb.append("        FROM TBCAM_SFA_LEADS LE ");
+//		sb.append("        INNER JOIN TBCAM_SFA_CAMPAIGN CA ON LE.CAMPAIGN_ID = CA.CAMPAIGN_ID AND LE.STEP_ID = CA.STEP_ID ");
+//		sb.append("        WHERE 1 = 1 ");
+//		sb.append("        AND CA.LEAD_TYPE IN ('05', '06', '07', '08', 'H1', 'H2', 'F1', 'F2', 'I1', 'I2', '09', 'UX') ");
+//		sb.append("        AND LE.AO_CODE IS NULL ");
+//		sb.append("        AND TRUNC(SYSDATE) BETWEEN LE.START_DATE AND LE.END_DATE ");
+//		sb.append("        AND LE.BRANCH_ID = A.BRANCH_NBR ");
+//		sb.append("        GROUP BY LE.BRANCH_ID) AS LEAVE_INFO_YN, ");
+//		
+//		sb.append("       A.NEAR_UNDERSERV_CNT, ");
+//		sb.append("       A.BELLOW_UNDERSERV_CNT, ");
+//		sb.append("       A.WAIT_DISPATCH_LEADS, ");
+//		sb.append("       A.NRM_CONTACT_CUST, ");
+//		sb.append("       A.NRM_TOT_CONTROL_CUST, ");	
+//		sb.append("       A.NRM_CONTACTED_CUST, ");
+//		sb.append("       A.NRM_CMPLT_R  ");
+//		sb.append("FROM TBCAM_LEADS_BY_BOSS A ");
+//		sb.append("WHERE 1 = 1 ");
+//		
+//		switch (inputVO.getPri_id()) {
+//			case "UHRM012":
+//			case "UHRM013":
+//				sb.append("AND BRANCH_NBR = '031' ");
+//				
+//				break;
+//			default:
+//				sb.append("AND BRANCH_NBR IN (:brList) ");
+//				queryCondition.setObject("brList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
+//				
+//				break;
+//		}
+//		sb.append("AND EMP_ID = :empID ");
 		
-		sb.append("       A.NEAR_UNDERSERV_CNT, ");
-		sb.append("       A.BELLOW_UNDERSERV_CNT, ");
-		sb.append("       A.WAIT_DISPATCH_LEADS, ");
-		sb.append("       A.NRM_CONTACT_CUST, ");
-		sb.append("       A.NRM_TOT_CONTROL_CUST, ");	
-		sb.append("       A.NRM_CONTACTED_CUST, ");
-		sb.append("       A.NRM_CMPLT_R  ");
-		sb.append("FROM TBCAM_LEADS_BY_BOSS A ");
-		sb.append("WHERE 1 = 1 ");
+		sb.append("SELECT RM_TOT_CONTROL_CUST, ");
+		sb.append("		  RM_TOT_NEC_NOTIFY_CUST, ");
+		sb.append("		  RM_TOT_MARKETING_CUST, ");
+		sb.append("	      RM_TOT_LEAVE_INFO_CUST, ");
+		sb.append("	      RM_TOT_REFER_INFO_CUST, ");
+		sb.append("	      RM_TOT_OTHER_CUST, ");
+		sb.append("	      NRM_TOT_CONTROL_CUST, ");
+		sb.append("	      NRM_TOT_NEC_NOTIFY_CUST, ");
+		sb.append("	      NRM_TOT_MARKETING_CUST, ");
+		sb.append("	      NRM_TOT_LEAVE_INFO_CUST, ");
+		sb.append("	      NRM_TOT_REFER_INFO_CUST, ");
+		sb.append("	      NRM_TOT_OTHER_CUST, ");
+		sb.append("	      CONTACT_CUST AS M_CONTACT_CUST, ");
+		sb.append("	      WAIT_DISPATCH_LEADS ");
+		sb.append("FROM TBCAM_LEADS_BY_BOSS ");
+		sb.append("WHERE EMP_ID = :empID ");
+		sb.append("AND ROLE_ID = :loginRole ");
+		sb.append("AND BRANCH_AREA_ID = :loginArea ");
 		
 		switch (inputVO.getPri_id()) {
 			case "UHRM012":
 			case "UHRM013":
-				sb.append("AND BRANCH_NBR = '031' ");
-				
 				break;
 			default:
 				sb.append("AND BRANCH_NBR IN (:brList) ");
 				queryCondition.setObject("brList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
-				
 				break;
 		}
 		
-		sb.append("AND EMP_ID = :empID ");
 		queryCondition.setObject("empID", ws.getUser().getUserID());
+		queryCondition.setObject("loginRole", (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		queryCondition.setObject("loginArea", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
 		
 		queryCondition.setQueryString(sb.toString());
-
 		return_VO2.setResultList(dam.exeQuery(queryCondition));
 
 		this.sendRtnObject(return_VO2);

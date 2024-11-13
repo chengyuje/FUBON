@@ -31,6 +31,7 @@ public class MAO121 extends FubonWmsBizLogic {
 		
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> uhrmmgrMap = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2);
+		Map<String, String> uhrmBMmgrMap = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2);
 		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2);
 		
 		MAO121InputVO inputVO = (MAO121InputVO) body;
@@ -60,6 +61,7 @@ public class MAO121 extends FubonWmsBizLogic {
 		sql.append("WHERE 1 = 1 ");
 
 		if (uhrmmgrMap.containsKey((String)getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+			uhrmBMmgrMap.containsKey((String)getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
 			uhrmMap.containsKey((String)getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 			if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
 				sql.append("AND DM.OP_NBR = :branchAreaID "); //營運區代碼

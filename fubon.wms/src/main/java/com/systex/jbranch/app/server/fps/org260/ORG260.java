@@ -99,6 +99,7 @@ public class ORG260 extends FubonWmsBizLogic {
 				
 				outputVO.setuEmpID((String) getUserVariable(FubonSystemVariableConsts.LOGINID));
 				break;
+			case "UHRM006" :
 			case "UHRM012" : 
 				sb.append("AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.DEPT_ID = MEM.DEPT_ID AND MT.DEPT_ID = :loginArea) ");
 				queryCondition.setObject("loginArea", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
@@ -677,6 +678,7 @@ public class ORG260 extends FubonWmsBizLogic {
 				queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
 				
 				break;
+			case "UHRM006" :
 			case "UHRM012" : 
 			case "UHRM013" : 
 			case "UHRM045" : 
@@ -811,6 +813,7 @@ public class ORG260 extends FubonWmsBizLogic {
 				
 				outputVO.setuEmpID((String) getUserVariable(FubonSystemVariableConsts.LOGINID));
 				break;
+			case "UHRM006" :
 			case "UHRM012" : 
 				sb.append("AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.DEPT_ID = MEM.DEPT_ID AND MT.DEPT_ID = :loginArea) ");
 				queryCondition.setObject("loginArea", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
@@ -893,6 +896,7 @@ public class ORG260 extends FubonWmsBizLogic {
 				
 				outputVO.setuEmpID((String) getUserVariable(FubonSystemVariableConsts.LOGINID));
 				break;
+			case "UHRM006" :
 			case "UHRM012" : 
 				sb.append("AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.DEPT_ID = MEM.DEPT_ID AND MT.EMP_ID = :loginID) ");
 				queryCondition.setObject("loginID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));

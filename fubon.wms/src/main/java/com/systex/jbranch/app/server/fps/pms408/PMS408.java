@@ -437,7 +437,6 @@ public class PMS408 extends FubonWmsBizLogic {
 
 			default :
 				sql.append("LEFT JOIN TBKYC_COOLING_PERIOD COOL ON A.SEQ = COOL.SEQ ");
-//				sql.append("LEFT JOIN TBPMS_EMPLOYEE_REC_N EMP ON B.CREATOR = EMP.EMP_ID AND LAST_DAY(TO_DATE(:yearmonand,'YYYYMM')) BETWEEN EMP.START_TIME AND EMP.END_TIME ");
 				sql.append("LEFT JOIN TBPMS_BRANCH_IP C ON B.INVEST_IP = C.IPADDRESS  AND C.COM_TYPE = '1' ");
 				sql.append("LEFT JOIN TBSYSPARAMETER PAR ON PAR.PARAM_TYPE = 'PMS.KYC_TYPE' AND PAR.PARAM_CODE = A.DATA_TYPE ");
 				
@@ -478,33 +477,26 @@ public class PMS408 extends FubonWmsBizLogic {
 
 			// by Willis 20171024 此條件因為發現組織換區有異動(例如:東寧分行在正式環境10/1從西台南區換至東台南區)，跟之前組織對應會有問題，改為對應目前最新組織分行別
 
-			// 分行
 			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sql.append("AND ARLIST.BRANCH_NBR = :BRNCH_NBRR ");
 				condition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
-				// 營運區
-			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-				sql.append("AND EXISTS ( ");
-				sql.append("    SELECT 1 ");
-				sql.append("    FROM VWORG_DEFN_BRH VW  ");
-				sql.append("    WHERE VW.DEPT_ID = :BRANCH_AREA_IDD ");
-				sql.append("    AND VW.BRANCH_NBR = ARLIST.BRANCH_NBR ");
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
+				sql.append("AND ( ");
+				sql.append("  (A.RM_FLAG = 'B' AND ARLIST.BRANCH_AREA_ID = :BRANCH_AREA_IDD) ");
+				
+				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+					sql.append("  OR (A.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE EMP.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD )) ");
+				}
+			
 				sql.append(") ");
-
 				condition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
-				// 區域中心
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-				sql.append("AND EXISTS ( ");
-				sql.append("    SELECT 1 ");
-				sql.append("    FROM VWORG_DEFN_BRH VW ");
-				sql.append("    WHERE VW.DEPT_ID = :REGION_CENTER_IDD ");
-				sql.append("    AND VW.BRANCH_NBR = ARLIST.BRANCH_NBR ");
-				sql.append(") ");
-
+				sql.append("AND ARLIST.REGION_CENTER_ID = :REGION_CENTER_IDD ");
 				condition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
 			}
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
 				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 				sql.append("AND A.RM_FLAG = 'B' ");
 			}

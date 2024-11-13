@@ -219,18 +219,26 @@ public class PMS998 extends FubonWmsBizLogic {
 			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("AND DEFN.BRANCH_NBR = :branchID "); //分行代碼
 				queryCondition.setObject("branchID", inputVO.getBranch_nbr());
-			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-				sb.append("AND DEFN.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
+				sb.append("AND ( ");
+				sb.append("  (NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UB WHERE UB.EMP_ID = A.EMP_ID) AND DEFN.BRANCH_AREA_ID = :branchAreaID) ");
+				
+				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+					sb.append("  OR (EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UB WHERE UB.EMP_ID = A.EMP_ID) AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE DEP.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :branchAreaID )) ");
+				}
+			
+				sb.append(") ");
 				queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-				sb.append("AND DEFN.REGION_CENTER_ID = :regionCenterID "); //區域代碼
+				sb.append("AND DEFN.REGION_CENTER_ID = :regionCenterID ");
 				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 			} else if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 				sb.append("AND (DEFN.BRANCH_NBR IN (:branchIDList) OR DEFN.BRANCH_NBR IS NULL) ");
 				queryCondition.setObject("branchIDList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
 			}
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
 				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 				sb.append("AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UB WHERE UB.EMP_ID = A.EMP_ID) ");
 			}

@@ -29,6 +29,7 @@ public class CAM140InputVO extends PagingInputVO{
 	private String gift_camp_id;
 	
 	private String action;
+	private String camp_purpose;
 	
 	// 檔案
 	private List<Map<String,String>> fileName;
@@ -132,6 +133,14 @@ public class CAM140InputVO extends PagingInputVO{
 
 	public void setAction(String action) {
 		this.action = action;
+	}
+
+	public String getCamp_purpose() {
+		return camp_purpose;
+	}
+
+	public void setCamp_purpose(String camp_purpose) {
+		this.camp_purpose = camp_purpose;
 	}
 
 	public String getExam_id() {

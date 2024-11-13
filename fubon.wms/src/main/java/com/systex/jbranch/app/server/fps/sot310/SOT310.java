@@ -720,19 +720,22 @@ public class SOT310 extends EsbUtil {
 		SOT707OutputVO outputVO_707_S = new SOT707OutputVO();
 		SOT707OutputVO outputVO_707_M = new SOT707OutputVO();
 
+		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		inputVO_707.setProdType("2");
 		inputVO_707.setCheckType("1");
 		inputVO_707.setPurchaseAmt(inputVO.getPurchaseAmt());//2017/11/06增加，之前有漏
 		inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
-
-		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
+		inputVO_707.setIsOBU(isOBU);
+		
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
 		if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN())) {
-			if (isOBU.equals("Y")) {
-				outputVO_707_S = sot707.verifyESBPurchaseBN_GTC_OBU(inputVO_707);	// 長效單、預約單
-			} else {
-				outputVO_707_S = sot707.verifyESBPurchaseBN_GTC(inputVO_707); 		// 長效單、預約單				
-			}
+			outputVO_707_S = sot707.verifyESBPurchaseBN_GTC(inputVO_707); 		// 長效單、預約單
+			
+//			if (isOBU.equals("Y")) {
+//				outputVO_707_S = sot707.verifyESBPurchaseBN_GTC_OBU(inputVO_707);	// 長效單、預約單
+//			} else {
+//				outputVO_707_S = sot707.verifyESBPurchaseBN_GTC(inputVO_707); 		// 長效單、預約單				
+//			}
 		} else {
 			// 若為金錢信託，先 call NJBRVX2
 			if (StringUtils.equals("M", inputVO.getTrustTS())) {
@@ -741,11 +744,14 @@ public class SOT310 extends EsbUtil {
 				
 				// 債券申購電文 : 客戶ID=99331241 + 信託/扣款/收益入帳 = 原畫面值
 			}
-			if (isOBU.equals("Y")) {
-				outputVO_707_S = sot707.verifyESBPurchaseBN_OBU(inputVO_707); //當日單
-			} else {
-				outputVO_707_S = sot707.verifyESBPurchaseBN(inputVO_707); //當日單				
-			}
+			
+			outputVO_707_S = sot707.verifyESBPurchaseBN(inputVO_707); //當日單
+			
+//			if (isOBU.equals("Y")) {
+//				outputVO_707_S = sot707.verifyESBPurchaseBN_OBU(inputVO_707); //當日單
+//			} else {
+//				outputVO_707_S = sot707.verifyESBPurchaseBN(inputVO_707); //當日單				
+//			}
 		}
 		
 		// 金錢信託申請電文錯誤訊息
@@ -823,19 +829,25 @@ public class SOT310 extends EsbUtil {
 		inputVO_707.setCheckType("2");//電文確認碼 1:檢核  2:確認
 		inputVO_707.setPurchaseAmt(inputVO.getPurchaseAmt());
 		inputVO_707.setTradeSeq(inputVO.getTradeSEQ());
-		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
+		inputVO_707.setIsOBU(isOBU);
 		
-		if (isOBU.equals("Y")) {
-			if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
-				outputVO_707 = sot707.verifyESBPurchaseBN_GTC_OBU(inputVO_707);	// 長效單
-			else
-				outputVO_707 = sot707.verifyESBPurchaseBN_OBU(inputVO_707);		// 當日單
-		} else {
-			if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
-				outputVO_707 = sot707.verifyESBPurchaseBN_GTC(inputVO_707);		// 長效單
-			else
-				outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707);			// 當日單			
-		}
+		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
+		if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
+			outputVO_707 = sot707.verifyESBPurchaseBN_GTC(inputVO_707);		// 長效單
+		else
+			outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707);			// 當日單		
+		
+//		if (isOBU.equals("Y")) {
+//			if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
+//				outputVO_707 = sot707.verifyESBPurchaseBN_GTC_OBU(inputVO_707);	// 長效單
+//			else
+//				outputVO_707 = sot707.verifyESBPurchaseBN_OBU(inputVO_707);		// 當日單
+//		} else {
+//			if ("Y".equals(inputVO.getGtcYN()) || "P".equals(inputVO.getGtcYN()))
+//				outputVO_707 = sot707.verifyESBPurchaseBN_GTC(inputVO_707);		// 長效單
+//			else
+//				outputVO_707 = sot707.verifyESBPurchaseBN(inputVO_707);			// 當日單			
+//		}
 
 		String errorMsg = outputVO_707.getErrorMsg();
 		List<String> warningList = outputVO_707.getWarningCode();

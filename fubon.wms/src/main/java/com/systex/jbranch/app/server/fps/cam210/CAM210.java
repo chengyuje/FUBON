@@ -250,6 +250,18 @@ public class CAM210 extends FubonWmsBizLogic {
 			queryCondition.setObject("cust_id", inputVO.getCustId());
 		}
 		
+		// 名單分類
+		if (StringUtils.isNotBlank(inputVO.getCampType())) {
+			String campType = inputVO.getCampType();
+			if ("OTHER".equals(campType)) {
+				sql.append("AND CAMP.LEAD_TYPE NOT IN ( ");
+				sql.append("SELECT PARAM_CODE FROM TBSYSPARAMETER WHERE PARAM_TYPE IN ('CAM.CAMP_TYPE_CONTROL', 'CAM.CAMP_TYPE_NEC_NOTIFY', 'CAM.CAMP_TYPE_MARKETING', 'CAM.CAMP_TYPE_LEAVE_INFO', 'CAM.CAMP_TYPE_REFER_INFO')) ");
+				
+			} else {
+				sql.append("AND CAMP.LEAD_TYPE IN (SELECT PARAM_CODE FROM TBSYSPARAMETER WHERE PARAM_TYPE = 'CAM.CAMP_TYPE_" + campType + "') ");
+			}
+		}
+		
 		// #0000114 : 20200131 modify by ocean : WMS-CR-20200117-01_名單優化調整需求變更申請單
 		if (!StringUtils.isBlank(inputVO.getLeadType())) {
 			sql.append("AND LEADS.LEAD_TYPE = :leadType ");
@@ -392,6 +404,18 @@ public class CAM210 extends FubonWmsBizLogic {
 		if (!StringUtils.isBlank(inputVO.getLeadType())) {
 			sql.append("AND LEADS.LEAD_TYPE = :leadType ");
 			queryCondition.setObject("leadType", inputVO.getLeadType());
+		}
+		
+		// 名單分類
+		if (StringUtils.isNotBlank(inputVO.getCampType())) {
+			String campType = inputVO.getCampType();
+			if ("OTHER".equals(campType)) {
+				sql.append("AND CAMP.LEAD_TYPE NOT IN ( ");
+				sql.append("SELECT PARAM_CODE FROM TBSYSPARAMETER WHERE PARAM_TYPE IN ('CAM.CAMP_TYPE_CONTROL', 'CAM.CAMP_TYPE_NEC_NOTIFY', 'CAM.CAMP_TYPE_MARKETING', 'CAM.CAMP_TYPE_LEAVE_INFO', 'CAM.CAMP_TYPE_REFER_INFO')) ");
+				
+			} else {
+				sql.append("AND CAMP.LEAD_TYPE IN (SELECT PARAM_CODE FROM TBSYSPARAMETER WHERE PARAM_TYPE = 'CAM.CAMP_TYPE_" + campType + "') ");
+			}
 		}
 		
 		sql.append(") ");

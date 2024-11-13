@@ -4,9 +4,17 @@
  */
 'use strict';
 eSoafApp.controller('CAM130Controller',
-	function($rootScope, $scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter) {
+	function($rootScope, $scope, $controller, ngDialog, sysInfoService, projInfoService, getParameter) {
 		$controller('BaseController', {$scope: $scope});
 		$scope.controllerName = "CAM130Controller";
+		
+		$scope.privilegeID = sysInfoService.getPriID();
+		
+		getParameter.XML(["CAM.CAMP_PURPOSE"], function(totas) {
+			if (totas) {
+				$scope.mappingSet['CAM.CAMP_PURPOSE'] = totas.data[totas.key.indexOf('CAM.CAMP_PURPOSE')];
+			}
+		});
 		
 		// filter
 		var vo = {'param_type': 'CAM.LEAD_TYPE', 'desc': false};
@@ -90,6 +98,34 @@ eSoafApp.controller('CAM130Controller',
 		};
 		// date picker end
 		
+		// 取得參數：CAM.CAMP_PURPOSE
+		$scope.getCampPurpose = function(){
+			$scope.CAMP_PURPOSE = [];
+			$scope.sendRecv("CAM140", "getCampPurpose", "com.systex.jbranch.app.server.fps.cam140.CAM140InputVO", {},
+			function(tota, isError) {
+				if (!isError) {
+					$scope.CAMP_PURPOSE = tota[0].body.resultList;
+				}
+			});
+		}
+		$scope.getCampPurpose();
+		
+		// 依據所選『名單類型』變更『名單目的』下拉選項
+		$scope.getPurpose = function(){
+			$scope.inputVO.camp_purpose = undefined;
+			$scope.PURPOSE = [];
+			if ($scope.inputVO.type != undefined) {
+				angular.forEach($scope.CAMP_PURPOSE, function(row) {
+					if (row.PARAM_DESC.indexOf($scope.inputVO.type) >= 0) {
+						$scope.PURPOSE.push({LABEL:row.PARAM_NAME, DATA: row.PARAM_CODE});
+					}
+				});
+			}
+			if ($scope.PURPOSE.length == 0) {
+				$scope.PURPOSE = $scope.mappingSet['CAM.CAMP_PURPOSE'];
+			}
+		}
+		
 		$scope.init = function(){
 			$scope.inputVO = {};
 			$scope.limitDate();
@@ -156,5 +192,14 @@ eSoafApp.controller('CAM130Controller',
 			);
 		};
 		
+		// 匯出報表
+		$scope.exportRPT = function () {
+			$scope.sendRecv("CAM130", "exportRPT", "com.systex.jbranch.app.server.fps.cam130.CAM130InputVO", $scope.inputVO,
+			function(totas, isError) {
+            	if (isError) {
+            		$scope.showErrorMsg(totas[0].body.msgData);
+            	}
+			});
+		}
 		
 });

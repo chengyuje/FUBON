@@ -296,11 +296,14 @@ public class SOT510 extends FubonWmsBizLogic {
 		SOT510InputVO inputVO = (SOT510InputVO)body;
 		SOT510OutputVO outputVO = new SOT510OutputVO();
 
-	     SOT707InputVO input707 = new SOT707InputVO();
-	     input707.setProdType(inputVO.getProdType());
-	     input707.setTradeSeq(inputVO.getTradeSEQ());
-	     input707.setCheckType(inputVO.getCheckType());
-	     input707.setPurchaseAmt(inputVO.getPurchaseAmt());
+		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
+	    SOT707InputVO input707 = new SOT707InputVO();
+	    input707.setProdType(inputVO.getProdType());
+	    input707.setTradeSeq(inputVO.getTradeSEQ());
+	    input707.setCheckType(inputVO.getCheckType());
+	    input707.setPurchaseAmt(inputVO.getPurchaseAmt());
+	    input707.setIsOBU(isOBU);
+	    
 		dam = this.getDataAccessManager();
 //		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 
@@ -311,15 +314,15 @@ public class SOT510 extends FubonWmsBizLogic {
 		}
 		dam.update(mainVo);
 
-		String isOBU = StringUtils.isBlank(inputVO.getIsOBU()) ? "" : inputVO.getIsOBU();
 		SOT707 sot707 = (SOT707) PlatformContext.getBean("sot707");
-//		SOT707OutputVO outputVO_707 = sot707.verifyESBPurchaseBN(input707);
-		SOT707OutputVO outputVO_707 = new SOT707OutputVO();
-		if (isOBU.equals("Y")) {
-			outputVO_707 = sot707.verifyESBPurchaseBN_OBU(input707);
-		} else {
-			outputVO_707 = sot707.verifyESBPurchaseBN(input707);
-		}
+		SOT707OutputVO outputVO_707 = sot707.verifyESBPurchaseBN(input707);
+		
+//		SOT707OutputVO outputVO_707 = new SOT707OutputVO();
+//		if (isOBU.equals("Y")) {
+//			outputVO_707 = sot707.verifyESBPurchaseBN_OBU(input707);
+//		} else {
+//			outputVO_707 = sot707.verifyESBPurchaseBN(input707);
+//		}
 		
 		String errorMsg = outputVO_707.getErrorMsg();
 		List<String> warningList = outputVO_707.getWarningCode();

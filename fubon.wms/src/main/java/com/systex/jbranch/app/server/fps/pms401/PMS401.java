@@ -141,7 +141,15 @@ public class PMS401 extends FubonWmsBizLogic {
 				sb.append("  AND DEFN.BRANCH_NBR = :BRNCH_NBRR ");
 				queryCondition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
 			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
-				sb.append("  AND DEFN.BRANCH_AREA_ID = :BRANCH_AREA_IDD ");
+				sb.append("  AND ( ");
+				sb.append("    (DEP.RM_FLAG = 'B' AND DEFN.BRANCH_AREA_ID = :BRANCH_AREA_IDD) ");
+				
+				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+					sb.append("    OR (DEP.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE DEP.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD )) ");
+				}
+			
+				sb.append("  ) ");
 				queryCondition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND DEFN.REGION_CENTER_ID = :REGION_CENTER_IDD ");
@@ -153,16 +161,16 @@ public class PMS401 extends FubonWmsBizLogic {
 				queryCondition.setObject("PERSON_ROLE", inputVO.getPerson_role());
 			}
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
 				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
 				sb.append("  AND DEP.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {
-				sb.append("  AND (");
+				sb.append("  AND ( ");
 				sb.append("       EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE DEP.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :uhrmOP ) ");
 				sb.append("    OR EMPN.E_DEPT_ID = :uhrmOP ");
-				sb.append("  )");
+				sb.append("  ) ");
 				queryCondition.setObject("uhrmOP", inputVO.getUhrmOP());
 			}
 			
@@ -391,7 +399,7 @@ public class PMS401 extends FubonWmsBizLogic {
 		csv.setHeader(csvHeader);
 		csv.addRecordList(csvData);
 
-		notifyClientToDownloadFile(csv.generateCSV(), "分行人員當日存款異動明細表_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "-" + getUserVariable(FubonSystemVariableConsts.LOGINID) + ".csv");
+		notifyClientToDownloadFile(csv.generateCSV(), "分行人員存款異動日報_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "-" + getUserVariable(FubonSystemVariableConsts.LOGINID) + ".csv");
 	}
 
 	/* 產出CSV */
