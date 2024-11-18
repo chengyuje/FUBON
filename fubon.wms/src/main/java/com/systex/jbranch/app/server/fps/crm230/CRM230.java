@@ -1885,8 +1885,8 @@ public class CRM230 extends FubonWmsBizLogic {
 
 		//保險代碼
 		if (!StringUtils.isBlank(inputVO_CRM239.getPrd_id())) {
-			inWhere.append(" AND M.PRD_ID LIKE :prod_id ");
-			queryCondition.setObject("prod_id", "%" + inputVO_CRM239.getPrd_id().toUpperCase() + "%");
+			inWhere.append(" AND M.PRD_ID = :prod_id ");
+			queryCondition.setObject("prod_id", inputVO_CRM239.getPrd_id().toUpperCase());
 		}
 
 		//幣別
@@ -1968,8 +1968,8 @@ public class CRM230 extends FubonWmsBizLogic {
 		
 		//保險代碼
 		if (!StringUtils.isBlank(inputVO_CRM239.getPrd_id())) {
-			inWhere.append(" AND M.PRD_ID LIKE :prod_id ");
-			queryCondition.setObject("prod_id", "%" + inputVO_CRM239.getPrd_id().toUpperCase() + "%");
+			inWhere.append(" AND M.PRD_ID = :prod_id ");
+			queryCondition.setObject("prod_id", inputVO_CRM239.getPrd_id().toUpperCase());
 		}
 
 		//幣別

@@ -25,7 +25,14 @@ public class ELN100 extends FubonWmsBizLogic {
 		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		
 		StringBuffer sb = new StringBuffer();
-		sb.append(" SELECT * FROM TBPRD_ELN_PRICE WHERE 1 = 1  ");
+		sb.append(" SELECT MAX(QUERY_DATE) AS QUERY_DATE, PRODUCT, TENOR, ");
+		sb.append(" BBG_CODE1, BBG_CODE2, BBG_CODE3, BBG_CODE4, BBG_CODE5, ");
+		sb.append(" CURRENCY, COUPON, STRIKE, KO_BARRIER, ");
+		sb.append(" KO_TYPE, KI_BARRIER, KI_TYPE, UP_FRONT ");
+		sb.append(" FROM TBPRD_ELN_PRICE ");
+		sb.append(" WHERE 1 = 1 ");
+		
+//		sb.append(" SELECT * FROM TBPRD_ELN_PRICE WHERE 1 = 1 ");
 		
 		// UF上限，產品天期1~6月超過2.5%、7~12月超過3%，不顯示。
 		sb.append(" AND ((TENOR BETWEEN 1 AND 6 AND UP_FRONT <= 2.5) ");
@@ -128,8 +135,13 @@ public class ELN100 extends FubonWmsBizLogic {
 			}
 		}
 		
+		sb.append(" GROUP BY PRODUCT, TENOR, ");
+		sb.append(" BBG_CODE1, BBG_CODE2, BBG_CODE3, BBG_CODE4, BBG_CODE5, ");
+		sb.append(" CURRENCY, COUPON, STRIKE, KO_BARRIER, ");
+		sb.append(" KO_TYPE, KI_BARRIER, KI_TYPE, UP_FRONT ");
+		
 		// 排序方式，按詢價日新到舊排序
-		sb.append(" ORDER BY QUERY_DATE DESC, QUERY_ID, QUERY_SEQ ");
+		sb.append(" ORDER BY QUERY_DATE DESC ");
 		
 		qc.setQueryString(sb.toString());
 		outputVO.setResultList(dam.exeQuery(qc));

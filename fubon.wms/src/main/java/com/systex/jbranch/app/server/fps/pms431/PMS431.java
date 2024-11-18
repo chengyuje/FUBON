@@ -588,7 +588,7 @@ public class PMS431 extends FubonWmsBizLogic {
 		csv.addRecordList(listCSV);
 
 		SimpleDateFormat dateSdf = new SimpleDateFormat("yyyyMMdd");
-		notifyClientToDownloadFile(csv.generateCSV(), format("客戶經理高風險投資報表_%s.csv", dateSdf.format(new Date())));
+		notifyClientToDownloadFile(csv.generateCSV(), format("客戶經理高風險月報_%s.csv", dateSdf.format(new Date())));
 	}
 
 	// 格式時間

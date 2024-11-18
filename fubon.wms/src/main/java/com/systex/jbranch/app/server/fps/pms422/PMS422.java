@@ -860,7 +860,7 @@ public class PMS422 extends FubonWmsBizLogic {
 		csv.setHeader(csvHeader);
 		csv.addRecordList(listCSV);
 
-		notifyClientToDownloadFile(csv.generateCSV(), format("理財戶資金往來異常報表(RM與客戶往來)_%s.csv", dateSdf.format(new Date())));
+		notifyClientToDownloadFile(csv.generateCSV(), format("理財戶資金往來日報(RM與客戶往來)_%s.csv", dateSdf.format(new Date())));
 	}
 
 	// 理專十誡2.O 匯出CSV
@@ -1154,7 +1154,7 @@ public class PMS422 extends FubonWmsBizLogic {
 		csv.addRecordList(listCSV);
 
 		SimpleDateFormat dateSdf = new SimpleDateFormat("yyyyMMdd");
-		notifyClientToDownloadFile(csv.generateCSV(), format("理財戶資金往來異常報表(RM與客戶往來又轉入關聯戶)_%s.csv", dateSdf.format(new Date())));
+		notifyClientToDownloadFile(csv.generateCSV(), format("理財戶資金往來日報(RM與客戶往來又轉入關聯戶)_%s.csv", dateSdf.format(new Date())));
 	}
 
 	// 格式時間

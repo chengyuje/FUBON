@@ -412,6 +412,10 @@ public class SOT808 extends SotPdf {
 					data.addParameter("TRADE_TYPE", data_map.get("TRADE_TYPE").toString());
 					data.addParameter("ENTRUST_TYPE", data_map.get("ENTRUST_TYPE").toString());
 					data.addParameter("ENTRUST_AMT", data_map.get("ENTRUST_AMT").toString());
+					
+					if (data_map.get("AUTH_ID") != null && StringUtils.isNotBlank(data_map.get("AUTH_ID").toString())) {
+						data.addParameter("AUTH_ID", data_map.get("AUTH_ID").toString());
+					}
 
 					if (data_map.get("BRA") != null && StringUtils.isNotBlank(data_map.get("BRA").toString())) {
 						data.addParameter("BRA", data_map.get("BRA").toString());

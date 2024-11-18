@@ -14,7 +14,7 @@ eSoafApp.controller('CRM331Controller',
 		
 		// combobox
 		$scope.pri_id = String(sysInfoService.getPriID());
-		getParameter.XML(["CRM.CON_DEGREE", "CRM.VIP_DEGREE", "CRM.CUST_GENDER", "CRM.TRS_APL_REASON", "COMMON.YES_NO", "TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN", "CRM.CRM331_CHG_FRQ"], function(totas) {
+		getParameter.XML(["CRM.CON_DEGREE", "CRM.VIP_DEGREE", "CRM.CUST_GENDER", "CRM.TRS_APL_REASON", "COMMON.YES_NO", "TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN", "CRM.CRM331_CHG_FRQ", "CRM.331_MAX_QUERY_COUNT"], function(totas) {
 			if (totas) {
 				$scope.CON_DEGREE = totas.data[totas.key.indexOf('CRM.CON_DEGREE')];
 				$scope.VIP_DEGREE = totas.data[totas.key.indexOf('CRM.VIP_DEGREE')];
@@ -31,6 +31,7 @@ eSoafApp.controller('CRM331Controller',
 				$scope.COMYN = totas.data[totas.key.indexOf('COMMON.YES_NO')];
 				$scope.TCMYN = totas.data[totas.key.indexOf('TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN')];
 				$scope.CRM331_CHG_FRQ = totas.data[totas.key.indexOf('CRM.CRM331_CHG_FRQ')];
+				$scope.MAX_QUERY_COUNT = totas.data[totas.key.indexOf('CRM.331_MAX_QUERY_COUNT')];
 			}
 		}); 
 		//get處理方式
@@ -219,6 +220,12 @@ eSoafApp.controller('CRM331Controller',
 			if($scope.inputVO.re_ao_code)
 				$scope.inputVO.re_ao_code = $scope.inputVO.re_ao_code.toUpperCase();
 
+			//分行必輸
+			if($scope.inputVO.ao_05 == undefined || $scope.inputVO.ao_05 == null || $scope.inputVO.ao_05 == "") {
+				$scope.showErrorMsg('請輸入分行後再做查詢');
+        		return;
+			}
+			
 			$scope.sendRecv("CRM331", "inquire", "com.systex.jbranch.app.server.fps.crm331.CRM331InputVO", $scope.inputVO,
 			function(tota, isError) {
 				if (!isError) {
@@ -226,6 +233,12 @@ eSoafApp.controller('CRM331Controller',
 						$scope.showMsg("ehl_01_common_009");
             			return;
             		}
+					debugger
+					var maxcntAry = $filter('filter')($scope.MAX_QUERY_COUNT, {DATA: "1"});
+					var maxCount = (maxcntAry != null && maxcntAry.length > 0) ? maxcntAry[0].LABEL : 1000; //找不到參數，預設查詢筆數上限為1000
+					if(tota[0].body.resultList.length > maxCount) {
+						$scope.showWarningMsg("查詢結果超過筆數上限，只顯示前" + maxCount + "筆資料");
+					}
 					$scope.resultList = tota[0].body.resultList;
 					$scope.outputVO = tota[0].body;
 					return;

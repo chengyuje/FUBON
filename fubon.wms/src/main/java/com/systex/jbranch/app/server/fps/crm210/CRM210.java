@@ -1219,9 +1219,29 @@ public class CRM210 extends FubonWmsBizLogic {
 //				
 //		sql.append("ORDER BY V.CUST_ID ");
 		
-		queryCondition.setMaxResults((Integer) SysInfo.getInfoValue(FubonSystemVariableConsts.QRY_MAX_RESULTS));
-		queryCondition.setQueryString(sql.toString().replaceAll("\\s+", " "));
+		if(StringUtils.equals("CRM331", type)) {
+			//寫LOG
+			String logYN = (String)xmlInfo.getVariable("CRM.331_LOG_YN", "1", "F3"); //參數設定是否寫LOG
+			if(StringUtils.equals("Y", logYN)) {
+				String modId = "CRM210-" + type;
+				logger.info(modId + " inquire genSQL loginID: " + (String) getCommonVariable(FubonSystemVariableConsts.LOGINID));
+				logger.info(modId + " inquire genSQL loginRole: " + (String) getCommonVariable(FubonSystemVariableConsts.LOGINROLE));
+				logger.info(modId + " inquire genSQL loginFlag: " + (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG));
+				logger.info(modId + " inquire genSQL SQL: " + sql.toString().replaceAll("\\s+", " "));
+			}
+			//客戶移轉篩選，指定查詢最大筆數
+			try {
+				Integer maxCount = Integer.parseInt((String)xmlInfo.getVariable("CRM.331_MAX_QUERY_COUNT", "1", "F3"));
+				queryCondition.setMaxResults(maxCount);
+			} catch(Exception e) {
+				queryCondition.setMaxResults(1000); //有錯就先預設1000筆
+			}
+		} else {
+			//其他交易預設為2000
+			queryCondition.setMaxResults((Integer) SysInfo.getInfoValue(FubonSystemVariableConsts.QRY_MAX_RESULTS));
+		}
 		
+		queryCondition.setQueryString(sql.toString().replaceAll("\\s+", " "));
 		return_VO.setResultList(distinct(dam.exeQuery(queryCondition)));
 
 		return return_VO;
