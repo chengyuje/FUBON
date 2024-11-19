@@ -871,6 +871,60 @@ public class CRM8502 extends EsbUtil {
 			//證券複委託
 			if(subTot != null && subTot.compareTo(BigDecimal.ZERO) != 0){
 				
+				//總攬顯示
+				try{
+					sb = new StringBuilder();
+					sb.append(" SELECT NVL(SUM(CASE WHEN TYPE_TABLE = 'STOCK' THEN AUM END), 0) AS SUB_FSTOCK, ");
+					sb.append(" NVL(SUM(CASE WHEN TYPE_TABLE = 'BOND' THEN AUM END), 0) AS SUB_FBOND, ");
+					sb.append(" NVL(SUM(CASE WHEN TYPE_TABLE = 'SN' THEN AUM END), 0) AS SUB_SN, ");
+					sb.append(" NVL(SUM(CASE WHEN TYPE_TABLE = 'DSN' THEN AUM END), 0) AS SUB_DSN, ");
+					sb.append(" NVL(SUM(CASE WHEN TYPE_TABLE = 'STOCK' THEN AUM END), 0) + ");
+					sb.append(" NVL(SUM(CASE WHEN TYPE_TABLE = 'BOND' THEN AUM END), 0) + ");
+					sb.append(" NVL(SUM(CASE WHEN TYPE_TABLE = 'SN' THEN AUM END), 0) + ");
+					sb.append(" NVL(SUM(CASE WHEN TYPE_TABLE = 'DSN' THEN AUM END), 0) AS TOTAL_SUM ");
+					sb.append(" FROM ( SELECT  'STOCK' AS TYPE_TABLE, NVL(AUM_FC, 0) * NVL(TBPMS_IQ053.BUY_RATE, 1) AS AUM ");
+					sb.append(" FROM TBCRM_AST_INV_SEC_STOCK ");
+					sb.append(" LEFT JOIN ( SELECT CUR_COD, BUY_RATE, ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+					sb.append(" FROM TBPMS_IQ053 ");
+					sb.append(" ) TBPMS_IQ053 ON TBCRM_AST_INV_SEC_STOCK.CURRENCY = TBPMS_IQ053.CUR_COD ");
+					sb.append(" WHERE CUST_ID = :custId ");
+					sb.append(" AND TBPMS_IQ053.RN = 1 ");
+					sb.append(" AND DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_STOCK) ");
+					sb.append(" UNION ALL ");
+					sb.append(" SELECT ");
+					sb.append(" 'BOND' AS TYPE_TABLE, NVL(AUM_FC, 0) * NVL(TBPMS_IQ053.BUY_RATE, 1) AS AUM ");
+					sb.append(" FROM TBCRM_AST_INV_SEC_BOND  LEFT JOIN ( ");
+					sb.append(" SELECT CUR_COD, BUY_RATE, ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+					sb.append(" FROM TBPMS_IQ053 ");
+					sb.append(" ) TBPMS_IQ053 ON TBCRM_AST_INV_SEC_BOND.CURRENCY = TBPMS_IQ053.CUR_COD ");
+					sb.append(" WHERE CUST_ID = :custId "); 
+					sb.append(" AND TBPMS_IQ053.RN = 1 AND DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_BOND) ");
+				    sb.append(" UNION ALL ");
+				    sb.append(" SELECT 'SN' AS TYPE_TABLE, NVL(AUM_FC, 0) * NVL(TBPMS_IQ053.BUY_RATE, 1) AS AUM ");
+				    sb.append(" FROM TBCRM_AST_INV_SEC_SN ");
+				    sb.append(" LEFT JOIN ( ");
+				    sb.append(" SELECT CUR_COD, BUY_RATE, ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+				    sb.append(" FROM TBPMS_IQ053 ");
+				    sb.append(" ) TBPMS_IQ053 ON TBCRM_AST_INV_SEC_SN.CURRENCY = TBPMS_IQ053.CUR_COD ");
+				    sb.append(" WHERE CUST_ID = :custId ");
+				    sb.append(" AND DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_SN) ");
+				    sb.append(" UNION ALL ");
+				    sb.append(" SELECT  'DSN' AS TYPE_TABLE, NVL(AUM_TW, 0) * NVL(TBPMS_IQ053.BUY_RATE, 1) AS AUM ");
+				    sb.append(" FROM TBCRM_AST_INV_SEC_DSN ");
+				    sb.append(" LEFT JOIN ( ");
+				    sb.append(" SELECT BUY_RATE,CUR_COD, ROW_NUMBER() OVER (PARTITION BY CUR_COD ORDER BY MTN_DATE DESC) AS RN ");
+				   	sb.append(" FROM TBPMS_IQ053 ");
+				   	sb.append(" ) TBPMS_IQ053 ON TBCRM_AST_INV_SEC_DSN.CURRENCY = TBPMS_IQ053.CUR_COD ");
+				   	sb.append(" WHERE CUSTOMER_ID = :custId ");
+				   	sb.append("AND INS_DATE = (SELECT MAX(INS_DATE) FROM TBCRM_AST_INV_SEC_DSN) ");
+				   	sb.append("	) ");
+				
+					List<Map<String,Object>> list = this.getQueryExecute(sb.toString(), custId);
+					result.addRecordList("sub_Tot", list);
+				}catch(Exception e){
+					logger.error("sub_Tot error:"+e.getMessage(),e);
+				}
+				
 				//海外股票-證券複委託
 				if(subFstock != null  && subFstock.compareTo(BigDecimal.ZERO) != 0){
 					try{

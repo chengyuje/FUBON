@@ -83,8 +83,8 @@ public class IOT900 extends FubonWmsBizLogic{
 						qc.setObject("IN_INSPRDID", inputVO.getINSPRD_ID());
 					}
 					if(StringUtils.equals("1", inputVO.getREG_TYPE()) &&
-							StringUtils.isNotBlank(inputVO.getCASE_ID()) && !StringUtils.equals("J999", inputVO.getCASE_ID().substring(0, 4))) {
-						//新契約電子要保書：要保書案件編號不為J999或空白，則一險種帶出重要性2(檢附), 3(APP必備)資料
+							StringUtils.isNotBlank(inputVO.getCASE_ID()) && !StringUtils.equals("J9", inputVO.getCASE_ID().substring(0, 2))) {
+						//新契約電子要保書：要保書案件編號不為J9或空白，則一險種帶出重要性2(檢附), 3(APP必備)資料
 						sb.append(" AND DOC_LEVEL IN ('2', '3') ");
 					} else {
 						//其他都不需列出3(APP必備)資料
@@ -111,8 +111,8 @@ public class IOT900 extends FubonWmsBizLogic{
 						qc.setObject("IN_INSPRDID", inputVO.getINSPRD_ID());
 					}
 					if(StringUtils.equals("1", inputVO.getREG_TYPE()) &&
-							StringUtils.isNotBlank(inputVO.getCASE_ID()) && !StringUtils.equals("J999", inputVO.getCASE_ID().substring(0, 4))) {
-						//新契約電子要保書：要保書案件編號不為J999或空白，則一險種帶出重要性2(檢附), 3(APP必備)資料
+							StringUtils.isNotBlank(inputVO.getCASE_ID()) && !StringUtils.equals("J9", inputVO.getCASE_ID().substring(0, 2))) {
+						//新契約電子要保書：要保書案件編號不為J9或空白，則一險種帶出重要性2(檢附), 3(APP必備)資料
 						sb.append(" AND DOC_LEVEL IN ('2', '3') ");
 					} else {
 						//其他都不需列出3(APP必備)資料
