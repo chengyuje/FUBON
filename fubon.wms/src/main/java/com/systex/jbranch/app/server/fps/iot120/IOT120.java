@@ -113,7 +113,8 @@ public class IOT120 extends FubonWmsBizLogic {
 		sb.append(" P.INSURED_BIRTH, P.PAYER_BIRTH, A.QC_APEC, A.QC_LOAN_CHK, A.QC_SIGNATURE, P.C_SENIOR_PVAL, P.COMPANY_NUM, B.CNAME AS INS_COM_NAME, P.FB_COM_YN, P.CANCEL_CONTRACT_YN, ");
 		sb.append(" CASE WHEN D.C_PREMIUM_TRANSSEQ IS NOT NULL THEN D.C_PREMIUM_TRANSSEQ ELSE C.PREMIUM_TRANSSEQ END AS PREMIUM_TRANSSEQ, ");
 		sb.append(" CASE WHEN D.I_PREMIUM_TRANSSEQ IS NOT NULL THEN D.I_PREMIUM_TRANSSEQ ELSE C.I_PREMIUM_TRANSSEQ END AS I_PREMIUM_TRANSSEQ, ");
-		sb.append(" CASE WHEN D.P_PREMIUM_TRANSSEQ IS NOT NULL THEN D.P_PREMIUM_TRANSSEQ ELSE C.P_PREMIUM_TRANSSEQ END AS P_PREMIUM_TRANSSEQ ");
+		sb.append(" CASE WHEN D.P_PREMIUM_TRANSSEQ IS NOT NULL THEN D.P_PREMIUM_TRANSSEQ ELSE C.P_PREMIUM_TRANSSEQ END AS P_PREMIUM_TRANSSEQ, ");
+		sb.append(" P.BUSINESS_REL ");
 		sb.append(" From TBIOT_MAIN A ");
 		sb.append(" LEFT OUTER JOIN TBIOT_PREMATCH P ON P.PREMATCH_SEQ = A.PREMATCH_SEQ ");
 		sb.append(" LEFT OUTER JOIN TBPRD_INS_MAIN PRD ON PRD.INSPRD_KEYNO = P.INSPRD_KEYNO ");
@@ -441,6 +442,7 @@ public class IOT120 extends FubonWmsBizLogic {
 		sb.append("     ,CASE WHEN D.C_PREMIUM_TRANSSEQ IS NOT NULL THEN D.C_PREMIUM_TRANSSEQ ELSE C.PREMIUM_TRANSSEQ END AS PREMIUM_TRANSSEQ ");
 		sb.append("     ,CASE WHEN D.I_PREMIUM_TRANSSEQ IS NOT NULL THEN D.I_PREMIUM_TRANSSEQ ELSE C.I_PREMIUM_TRANSSEQ END AS I_PREMIUM_TRANSSEQ ");
 		sb.append("     ,CASE WHEN D.P_PREMIUM_TRANSSEQ IS NOT NULL THEN D.P_PREMIUM_TRANSSEQ ELSE C.P_PREMIUM_TRANSSEQ END AS P_PREMIUM_TRANSSEQ ");
+		sb.append("     ,BUSINESS_REL ");
 		sb.append(" From TBIOT_PREMATCH A ");
 		sb.append(" LEFT JOIN TBPRD_INS_MAIN P on P.INSPRD_KEYNO = A.INSPRD_KEYNO ");
 		sb.append(" LEFT JOIN TBJSB_INS_PROD_COMPANY B ON B.SERIALNUM = A.COMPANY_NUM ");
@@ -716,6 +718,13 @@ public class IOT120 extends FubonWmsBizLogic {
 						}
 						if ("Y".equals(INitem.get("SIGN_INC"))) {
 							SIGN_INC = "Y";
+						}
+						if(!StringUtils.equals("Y", inputVO.getCANCEL_CONTRACT_YN()) 
+								&& StringUtils.equals("Y", inputVO.getBUSINESS_REL()) && (Double)INitem.get("DOC_SEQ") == 9) {
+							if(!"Y".equals(INitem.get("DOC_CHK"))) {
+								inputVO.setSTATUS("10");
+								outputVO.setErrorMsg("分行留存文件應檢附「洗錢防制姓名檢核結果」");
+							}
 						}
 					}
 				}
@@ -1059,6 +1068,14 @@ public class IOT120 extends FubonWmsBizLogic {
 
 					if ("Y".equals(INitem.get("SIGN_INC"))) {
 						SIGN_INC = "Y";
+					}
+					
+					if(!StringUtils.equals("Y", inputVO.getCANCEL_CONTRACT_YN()) 
+							&& StringUtils.equals("Y", inputVO.getBUSINESS_REL()) && (Double)INitem.get("DOC_SEQ") == 9) {
+						if(!"Y".equals(INitem.get("DOC_CHK"))) {
+							inputVO.setSTATUS("10");
+							outputVO.setErrorMsg("分行留存文件應檢附「洗錢防制姓名檢核結果」");
+						}
 					}
 				}
 			}

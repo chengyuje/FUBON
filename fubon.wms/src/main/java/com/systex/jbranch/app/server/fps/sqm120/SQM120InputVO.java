@@ -22,6 +22,7 @@ public class SQM120InputVO extends PagingInputVO{
 	private String ho_check; //放行
 	private String case_no;  // 案件編號
 	private String owner_emp_id; //案件覆核人 
+	private String mgrUHRMAreaYN; //總行或業務處長有選私銀區
 	
 	private List<Map<String, Object>> delList;  // 需刪除的SEQ
 	
@@ -126,6 +127,11 @@ public class SQM120InputVO extends PagingInputVO{
 	public void setOwner_emp_id(String owner_emp_id) {
 		this.owner_emp_id = owner_emp_id;
 	}
-	
+	public String getMgrUHRMAreaYN() {
+		return mgrUHRMAreaYN;
+	}
+	public void setMgrUHRMAreaYN(String mgrUHRMAreaYN) {
+		this.mgrUHRMAreaYN = mgrUHRMAreaYN;
+	}
 	
 }

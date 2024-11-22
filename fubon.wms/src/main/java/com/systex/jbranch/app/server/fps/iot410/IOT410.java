@@ -124,9 +124,17 @@ public class IOT410 extends FubonWmsBizLogic {
 				sb.append(" FAIL_CALL_YN = 'Y', ");	
 				
 			} else if ("1".equals(status)) {
-				// 若狀態改為『1.未申請』需清掉檢視狀態＆電訪員
+				// 若狀態改為『1.未申請』需清掉檢視狀態 ＆電訪員 &18：00~20：00時段
 				sb.append(" REVIEW_STATUS = NULL, ");
 				sb.append(" CALL_PERSON = NULL, ");
+				
+				// #2172：電訪預約方便聯絡時間拿掉 18：00~20：00
+				sb.append(" C_TIME  = CASE WHEN C_TIME  IS NOT NULL THEN SUBSTR(C_TIME , 1, 3) || '0' ELSE NULL END, ");
+				sb.append(" C_TIME2 = CASE WHEN C_TIME2 IS NOT NULL THEN SUBSTR(C_TIME2, 1, 3) || '0' ELSE NULL END, ");
+				sb.append(" I_TIME  = CASE WHEN I_TIME  IS NOT NULL THEN SUBSTR(I_TIME , 1, 3) || '0' ELSE NULL END, ");
+				sb.append(" I_TIME2 = CASE WHEN I_TIME2 IS NOT NULL THEN SUBSTR(I_TIME2, 1, 3) || '0' ELSE NULL END, ");
+				sb.append(" P_TIME  = CASE WHEN P_TIME  IS NOT NULL THEN SUBSTR(P_TIME , 1, 3) || '0' ELSE NULL END, ");
+				sb.append(" P_TIME2 = CASE WHEN P_TIME2 IS NOT NULL THEN SUBSTR(P_TIME2, 1, 3) || '0' ELSE NULL END, ");
 			}
 		}
 		

@@ -78,19 +78,10 @@ public class SQM110 extends FubonWmsBizLogic {
 
 		String roleID = (String) getCommonVariable(SystemVariableConsts.LOGINROLE); //被代理人ROLE
 		String ID = (String) getCommonVariable(SystemVariableConsts.LOGINID); //被代理人id
-
-		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); // 總行人員
-		Map<String, String> mbrmgrMap = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2); // 區督導
-		Map<String, String> bmmgrMap = xmlInfo.doGetVariable("FUBONSYS.BMMGR_ROLE", FormatHelper.FORMAT_2); // 分行人員
 		
 		// 取得查詢資料可視範圍
 		PMS000InputVO pms000InputVO = new PMS000InputVO();
 		pms000InputVO.setReportDate(sdf.format(inputVO.getsCreDate()));
-
-		boolean headFlag = headmgrMap.containsKey(roleID);
-		boolean mbrFlag = mbrmgrMap.containsKey(roleID);
-		boolean bmFlag = bmmgrMap.containsKey(roleID);
 
 		// 『整體滿意度』OR『問題7』任一不滿意 ==> 需要出滿意度報告
 		sql.append(" WITH Q7 AS ( ");
@@ -141,7 +132,6 @@ public class SQM110 extends FubonWmsBizLogic {
 		sql.append("  	WHERE 1 = 1 AND A.QTN_TYPE = 'WMS03' AND A.SATISFACTION_O IN ('1', '2', '3') ");
 		sql.append("  	AND NOT EXISTS (SELECT 'X' FROM Q7 WHERE A.DATA_DATE = Q7.DATA_DATE AND A.QTN_TYPE = Q7.QTN_TYPE AND A.CUST_ID = Q7.QTN_TYPE) ");
 		sql.append("  )  A ");
-		sql.append("  LEFT JOIN TBCRM_CUST_MAST CM ON CM.CUST_ID = A.CUST_ID ");
 		sql.append("  LEFT JOIN TBPMS_ORG_REC_N ORG ON ORG.DEPT_ID = A.BRANCH_NBR AND TO_DATE(A.TRADE_DATE, 'yyyyMMdd') BETWEEN ORG.START_TIME AND ORG.END_TIME ");
 		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N EMP ON EMP.EMP_ID = A.EMP_ID AND TO_DATE(A.TRADE_DATE, 'yyyyMMdd') BETWEEN EMP.START_TIME AND EMP.END_TIME ");
 		sql.append("  LEFT JOIN TBPMS_CUST_REC_N CUST ON CUST.CUST_ID = A.CUST_ID AND TO_DATE(A.SEND_DATE, 'yyyyMMdd') BETWEEN CUST.START_TIME AND CUST.END_TIME ");
@@ -153,19 +143,10 @@ public class SQM110 extends FubonWmsBizLogic {
 		sql.append("    GROUP BY A.CUST_ID ");
 		sql.append("  ) VISIT ON VISIT.CREATETIME <= TO_DATE(A.SEND_DATE, 'yyyyMMdd') AND VISIT.CUST_ID = A.CUST_ID ");
 		sql.append("  LEFT JOIN ( ");
-		sql.append("    SELECT ROLE_ID FROM TBORG_ROLE WHERE SYS_ROLE IN('HEADMGR_ROLE', 'ARMGR_ROLE', 'MBRMGR_ROLE', 'BMMGR_ROLE') ORDER BY SYS_ROLE ");
+		sql.append("    SELECT ROLE_ID FROM TBORG_ROLE WHERE SYS_ROLE IN('HEADMGR_ROLE', 'ARMGR_ROLE', 'MBRMGR_ROLE', 'BMMGR_ROLE', 'UHRMMGR_ROLE', 'UHRMBMMGR_ROLE') ORDER BY SYS_ROLE ");
 		sql.append("  ) R ON R.ROLE_ID = :ROLE_ID ");
 		sql.append("  WHERE 1 = 1 ");
-		sql.append("  AND CM.UEMP_ID IS NULL "); // 排除高端客戶
-
 		condition.setObject("ROLE_ID", roleID);
-		//		if(roleID.equals("A164")||roleID.equals("A146")||roleID.equals("B024")){
-		//			sql.append("  and A.CASE_NO IS NOT NULL AND OWNER_EMP_ID = :ID ");	
-		//		}else{
-		//			sql.append("  and ((A.CASE_NO is null) or (A.CASE_NO IS NOT NULL and OWNER_EMP_ID = :ID)) ");
-		//		}
-		//		
-		//		condition.setObject("ID", ID);
 		
 		// 資料統計日期
 		if (inputVO.getsCreDate() != null) {
@@ -178,45 +159,46 @@ public class SQM110 extends FubonWmsBizLogic {
 			condition.setObject("timee", new java.text.SimpleDateFormat("yyyyMMdd").format(inputVO.geteCreDate()));
 		}
 
-		/*********** 歷史組織查詢條件篩選-START by willis ***********/
-		// 若ID等於自己，可以查詢自己所有資訊，不加其他組織查詢條件
-		if (ID.equals(inputVO.getEmp_id())) {
-			sql.append("  AND A.EMP_ID = :emp_id ");
-			condition.setObject("emp_id", inputVO.getEmp_id());
+		switch (getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG).toString()) {
+			//私銀角色
+			case "uhrmMGR":
+			case "uhrmBMMGR":
+				// 若ID等於自己，可以查詢自己所有資訊，不加其他組織查詢條件
+				if (ID.equals(inputVO.getEmp_id())) {
+					sql.append(" AND A.EMP_ID = :emp_id ");
+					condition.setObject("emp_id", inputVO.getEmp_id());
+				} else {
+					//有UHRM權限人員只能查詢UHRM人員鍵機或UHRM為招攬人員的案件
+					sql.append(" AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.EMP_ID = A.EMP_ID AND MT.DEPT_ID = :loginArea) ");
+					condition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
+					break;
+				}
+				break;	
+			//一般非私銀角色
+			default:
+				// 若ID等於自己，可以查詢自己所有資訊，不加其他組織查詢條件
+				if (ID.equals(inputVO.getEmp_id())) {
+					sql.append("  AND A.EMP_ID = :emp_id ");
+					condition.setObject("emp_id", inputVO.getEmp_id());
+				} else if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) { //有輸入分行
+					sql.append("  AND ORG.BRANCH_NBR = :BRNCH_NBRR ");
+					sql.append(" AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.EMP_ID = A.EMP_ID) ");
+					condition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
+				} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {  //有輸入營運區
+					if(StringUtils.equals("Y", inputVO.getMgrUHRMAreaYN())) {
+						//總行或業務處長選私銀區
+						sql.append(" AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.EMP_ID = A.EMP_ID AND MT.DEPT_ID = :areaId) ");
+					} else {
+						sql.append(" AND ORG.BRANCH_AREA_ID = :areaId ");
+						sql.append(" AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.EMP_ID = A.EMP_ID AND MT.DEPT_ID = :areaId) ");
+					}
+					condition.setObject("areaId", inputVO.getBranch_area_id());
+				} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) { //有輸入業務處
+					sql.append("  AND ORG.REGION_CENTER_ID = :REGION_CENTER_IDD ");
+					condition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
+				}
+				break;
 		}
-		// 分行角色、總行
-		else if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && (bmFlag || headFlag)) {
-			sql.append("  AND ORG.BRANCH_NBR = :BRNCH_NBRR ");
-			condition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
-		}
-		// 營運區、總行角色
-		else if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && (mbrFlag || headFlag)) {
-			sql.append("  AND ORG.BRANCH_AREA_ID = :BRANCH_AREA_IDD ");
-			condition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
-
-			// 區域主管有選分行需加上區域+分行，避免看到歷史其他區的紀錄
-			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
-				sql.append("  AND ORG.BRANCH_NBR = :BRNCH_NBRR ");
-				condition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
-			}
-		}
-		// 業務處 、總行角色
-		else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-			sql.append("  AND ORG.REGION_CENTER_ID = :REGION_CENTER_IDD ");
-			condition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
-	
-			// 業務處主管有選分行需加上業務處+分行，避免看到歷史其他業務處分行的紀錄
-			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
-				sql.append("  AND ORG.BRANCH_NBR = :BRNCH_NBRR ");
-				condition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
-			}
-			// 業務處主管有選區需加上業務處+區，避免看到歷史其他業務處區的紀錄
-			else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-				sql.append("  AND ORG.BRANCH_AREA_ID = :BRANCH_AREA_IDD ");
-				condition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
-			}
-		}
-		/*********** 歷史組織查詢條件篩選-END ***********/
 
 		if (StringUtils.isNotBlank(inputVO.getEmp_id())) {
 			sql.append("  AND A.EMP_ID = :emp_id ");
@@ -1649,4 +1631,31 @@ public class SQM110 extends FubonWmsBizLogic {
 		}
 	}
 
+	public void getUHRMList(Object body, IPrimitiveMap header) throws Exception {
+		sendRtnObject(getUHRMList(body));
+	}
+	
+	public SQM110OutputVO getUHRMList(Object body) throws Exception {
+		SQM110InputVO inputVO = (SQM110InputVO) body;
+		SQM110OutputVO outputVO = new SQM110OutputVO();
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("SELECT DISTINCT MEM.EMP_NAME AS LABEL, MEM.EMP_ID AS DATA, MEM.BRANCH_NBR, MEM.BRANCH_NAME ");
+		sb.append("FROM VWORG_EMP_UHRM_INFO MEM ");
+		sb.append("WHERE MEM.PRIVILEGEID = 'UHRM002' ");
+		sb.append("AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.DEPT_ID = MEM.DEPT_ID AND MT.DEPT_ID = :areaId) ");
+		if(StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
+			queryCondition.setObject("areaId", inputVO.getBranch_area_id());
+		} else {
+			queryCondition.setObject("areaId", (String) getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
+		}
+		sb.append("ORDER BY MEM.EMP_ID ");
+		queryCondition.setQueryString(sb.toString());
+		
+		outputVO.setUhrmList(dam.exeQuery(queryCondition));
+		
+		return outputVO;
+	}
 }

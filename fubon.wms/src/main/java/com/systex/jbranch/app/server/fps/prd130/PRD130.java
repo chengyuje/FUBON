@@ -333,12 +333,7 @@ public class PRD130 extends FubonWmsBizLogic {
 					// 客戶資料適配檢核失敗，Exception整段跳出
 					throw new APException(fOutputVO.getErrorID());
 				}
-				fOutputVO = prodFitness.validFundETFCustFATCA(inputVO.getCust_id());//客戶FATCA註記檢核 
-				if(fOutputVO.getIsError()) {
-					// 客戶資料適配檢核失敗，Exception整段跳出
-					throw new APException(fOutputVO.getErrorID());
-				}
-
+				
 				//逐筆檢核商品適配
 				List<Map<String, Object>> resultlist = new ArrayList<Map<String,Object>>();
 				for (Map<String, Object> product : list) {

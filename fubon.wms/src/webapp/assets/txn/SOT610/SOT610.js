@@ -135,14 +135,16 @@ eSoafApp.controller('SOT610Controller',
 		//===
         
 		// time picker
-		$scope.startDateOptions = {
-			maxDate: $scope.inputVO.eDate || $scope.maxDate,
-			minDate: $scope.minDate
-		};
-        $scope.endDateOptions = {
-			maxDate: $scope.inputVO.eDate || $scope.maxDate,
-			minDate: $scope.inputVO.sDate || $scope.minDate
-		};
+		$scope.optionsInit = function() {
+			$scope.startDateOptions = {
+				maxDate: $scope.inputVO.eDate || $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.endDateOptions = {
+				maxDate: $scope.inputVO.eDate || $scope.maxDate,
+				minDate: $scope.inputVO.sDate || $scope.minDate
+			};
+		}
 
 		$scope.altInputFormats = ['M!/d!/yyyy'];
 		$scope.model = {};
@@ -184,6 +186,7 @@ eSoafApp.controller('SOT610Controller',
 					eDate: undefined
         	};
 			$scope.mappingSet['SOT.TRADE_TYPE_COMBOBOX'] = [];
+			$scope.optionsInit();
 			$scope.limitDate();
 		};
 		$scope.init();

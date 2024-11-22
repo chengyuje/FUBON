@@ -116,11 +116,12 @@ eSoafApp.controller('IOT110Controller',
 								$scope.inputVO.hnwcData = tota[0].body.hnwcData; //高資產客戶註記
 								$scope.inputVO.INVESTList = tota[0].body.INVESTList; //險種標的清單
 
-								//尚未送覆核案件須重讀要保人、被保人、繳款人資料
+								//尚未送覆核案件須重讀要保人、被保人、繳款人資料，以及招攬人員資料(公平待客、高齡完訓資格)
 								if($scope.inputVO.REG_TYPE == "1" && ($scope.inputVO.STATUS == '1' || $scope.inputVO.STATUS == '4')) {
 									if($scope.inputVO.CUST_ID) $scope.getInfo('CUST');
 									if($scope.inputVO.INSURED_ID) $scope.getInfo('INSURED');
 									if($scope.inputVO.PAYER_ID) $scope.getInfo('PAYER');
+									if($scope.inputVO.RECRUIT_ID) $scope.getInfo('RECRUIT');
 								}
 
 								var findPrd = $filter('filter')($scope.mappingSet['IOT.NO_CHK_LOAN_INSPRD'], {DATA: $scope.inputVO.INSPRD_ID});
@@ -289,6 +290,7 @@ eSoafApp.controller('IOT110Controller',
 				$scope.inputVO.CHG_PROPOSER_BIRTH = undefined;
 				$scope.inputVO.AML = "";
 				$scope.inputVO.PRECHECK = "";
+				$scope.inputVO.BUSINESS_REL = "";
 			}
 		}
 
@@ -1071,19 +1073,41 @@ eSoafApp.controller('IOT110Controller',
     		}
     		
     		//非契撤，分紅商品，招攬人員是否有分紅證照
-    		if($scope.inputVO.CANCEL_CONTRACT_YN != "Y" && $scope.inputVO.PROD_DIVIDEND_YN && $scope.inputVO.PROD_DIVIDEND_YN == "Y" && $scope.inputVO.empDividendYN == "N") {
-    			$scope.showErrorMsgInDialog("輸入的招攬人員必須具有(銀行)人身保險業分紅保險商品教育訓練完訓資格");
-				return false;
+			var applydate = $filter('date')($scope.inputVO.APPLY_DATE,'yyyy-MM-dd');
+    		if($scope.inputVO.CANCEL_CONTRACT_YN != "Y" && $scope.inputVO.PROD_DIVIDEND_YN && $scope.inputVO.PROD_DIVIDEND_YN == "Y") {
+    			if($scope.inputVO.empDividendCertYN == "N") {
+	    			$scope.showErrorMsgInDialog("輸入的招攬人員必須具有(銀行)人身保險業分紅保險商品教育訓練完訓資格");
+					return false;
+    			}
+    			if($scope.toJsDate($scope.inputVO.empDividendEndDate) > $scope.toJsDate(applydate)) {
+    				$scope.showErrorMsgInDialog("要保書申請日不得小於分紅完訓日期");
+					return false;
+    			}
     		}
     		
-    		//高齡完訓資格檢核
+    		//非契撤，高齡完訓資格檢核
     		if($scope.inputVO.CANCEL_CONTRACT_YN != "Y" && $scope.inputVO.isOver65) {
     			var findEmp = $filter('filter')($scope.mappingSet['IOT.NO_SENIOR_CERTIFICATE_EMP'], {LABEL: $scope.inputVO.RECRUIT_ID}); //未完成高齡完訓資格員編
         		var isInNoCertEmp = (findEmp != null && findEmp.length > 0) ? true : false;
-        		if(isInNoCertEmp) {
+        		if(isInNoCertEmp || $scope.inputVO.empSeniorCertYN == "N") {
 	    			$scope.showErrorMsgInDialog("輸入的招攬人員必須具有高齡完訓資格");
 					return false;
         		}
+    		}
+    		
+    		//非契撤，公平待客完訓資格檢核
+    		if($scope.inputVO.CANCEL_CONTRACT_YN != "Y" && $scope.inputVO.empFairCertYN == "N") {
+    			$scope.showErrorMsgInDialog("要保書申請日不得小於公平待客訓練完訓日期");
+				return false;
+    		}
+    		
+    		//非契撤，要保人/被保人/繳款人戶況檢核
+    		if($scope.inputVO.CANCEL_CONTRACT_YN != "Y" &&
+    				(RegExp('[4678]').test($scope.inputVO.PROPOSER_CM_FLAG) ||
+    				 RegExp('[4678]').test($scope.inputVO.INSURED_CM_FLAG) ||
+    				 RegExp('[4678]').test($scope.inputVO.PAYER_CM_FLAG))) {
+    			$scope.showErrorMsgInDialog("要保人/被保人/繳款人不可為禁銷、拒銷、客訴戶");
+				return false;
     		}
     		
             return true;
@@ -1308,10 +1332,19 @@ eSoafApp.controller('IOT110Controller',
 						$scope.sendRecv("IOT920","chk_CertTraining","com.systex.jbranch.app.server.fps.iot920.chk_CTInputVO",
 								$scope.inputVO,function(tota,isError){
 									if(!isError){
-										$scope.inputVO.empDividendYN = tota[0].body.empDividendYN;
-										//分紅商品，招攬人員是否有分紅證照
-										if(data.value.DIVIDEND_YN && data.value.DIVIDEND_YN == "Y" && tota[0].body.empDividendYN == "N") {
-											$scope.showMsg("輸入的招攬人員必須具有(銀行)人身保險業分紅保險商品教育訓練完訓資格");
+										if($scope.inputVO.REG_TYPE == "1") {
+											//壽險新契約，檢核招攬人員分紅證照
+											$scope.inputVO.empDividendCertYN = tota[0].body.empDividendCert.EMP_DIVIDEND_YN;
+											$scope.inputVO.empDividendEndDate = tota[0].body.empDividendCert.EMP_DIVIDEND_END_DATE;
+											var applydate = $filter('date')($scope.inputVO.APPLY_DATE,'yyyy-MM-dd');
+											//分紅商品，招攬人員是否有分紅證照
+											if(data.value.DIVIDEND_YN && data.value.DIVIDEND_YN == "Y") {
+												if($scope.inputVO.empDividendCertYN == "N") {
+													$scope.showMsg("輸入的招攬人員必須具有(銀行)人身保險業分紅保險商品教育訓練完訓資格");
+												} else if($scope.toJsDate($scope.inputVO.empDividendEndDate) > $scope.toJsDate(applydate)) {
+													$scope.showMsg("要保書申請日不得小於分紅完訓日期");
+												}
+											}
 										}
 										if(tota[0].body.Chk_Pass == 'Y'){
 											$scope.INSPRD_Lock = true;
@@ -1419,6 +1452,7 @@ eSoafApp.controller('IOT110Controller',
 				$scope.inputVO.PROPOSER_CM_FLAG = '';
 				$scope.inputVO.AML = "";
 				$scope.inputVO.PRECHECK = "";
+				$scope.inputVO.BUSINESS_REL = "";
 				$scope.inputVO.PROPOSER_INCOME3 = undefined;
 				$scope.inputVO.hnwcData = undefined;
 //				$scope.inputVO.INVESTList = [];
@@ -1483,6 +1517,7 @@ eSoafApp.controller('IOT110Controller',
 				$scope.inputVO.CHG_PROPOSER_BIRTH = undefined;
 				$scope.inputVO.AML = "";
 				$scope.inputVO.PRECHECK = "";
+				$scope.inputVO.BUSINESS_REL = "";
 				$scope.inputVO.hnwcData = undefined;
 			}
 
@@ -1490,7 +1525,10 @@ eSoafApp.controller('IOT110Controller',
 				$scope.inputVO.RECRUIT_ID = $scope.inputVO.RECRUIT_ID ? $scope.inputVO.RECRUIT_ID.toUpperCase() : "";
 				$scope.EMP_NAME = '';
 				$scope.inputVO.EMP_NAME = '';
-				$scope.inputVO.empDividendYN = "N";
+				$scope.inputVO.empDividendCertYN = "N";
+				$scope.inputVO.empDividendEndDate = undefined;
+				$scope.inputVO.empFairCertYN = "N"; //招攬人員是否有公平待客完訓資格
+				$scope.inputVO.empSeniorCertYN = "N"; //招攬人員是否有高齡完訓資格
 			}
 
 			$scope.sendRecv("IOT920","getCUSTInfo","com.systex.jbranch.app.server.fps.iot920.IOT920InputVO",
@@ -1502,7 +1540,10 @@ eSoafApp.controller('IOT110Controller',
 						if(tota[0].body.EMP_NAME.length>0){
 							$scope.EMP_NAME = tota[0].body.EMP_NAME[0].EMP_NAME;
 							$scope.inputVO.EMP_NAME = tota[0].body.EMP_NAME[0].EMP_NAME;
-							$scope.inputVO.empDividendYN = tota[0].body.EMP_NAME[0].EMP_DIVIDEND_YN; //招攬人員是否有分紅商品證照
+							$scope.inputVO.empDividendCertYN = tota[0].body.EMP_NAME[0].EMP_DIVIDEND_CERT.EMP_DIVIDEND_YN; //招攬人員是否有分紅商品證照
+							$scope.inputVO.empDividendEndDate = tota[0].body.EMP_NAME[0].EMP_DIVIDEND_CERT.EMP_DIVIDEND_END_DATE; //招攬人員分紅商品證照完訓日
+							$scope.inputVO.empFairCertYN = tota[0].body.EMP_NAME[0].EMP_FAIR_CERT; //招攬人員是否有公平待客完訓資格
+							$scope.inputVO.empSeniorCertYN = tota[0].body.EMP_NAME[0].EMP_SENIOR_CERT; //招攬人員是否有高齡完訓資格
 						} else {
 							$scope.inputVO.RECRUIT_ID = "";
 						}
@@ -1605,11 +1646,20 @@ eSoafApp.controller('IOT110Controller',
 								}
 							}
 						}
+						debugger
+						if(tota[0].body.AML != null) $scope.inputVO.AML = tota[0].body.AML;
+						if(tota[0].body.PRECHECK != null) $scope.inputVO.PRECHECK = tota[0].body.PRECHECK;
+						if(tota[0].body.hnwcData != null) $scope.inputVO.hnwcData = tota[0].body.hnwcData; //高資產客戶註記
+						$scope.inputVO.insAsset = 0;
+						if(tota[0].body.INS_ASSET != null) $scope.inputVO.insAsset = tota[0].body.INS_ASSET;
+						//新增業務關係
+						if($scope.inputVO.AML == undefined || $scope.inputVO.AML == null || $scope.inputVO.AML == "" || $scope.inputVO.AML == "高") {
+							$scope.inputVO.BUSINESS_REL = $scope.inputVO.insAsset != 0 ? "N" : "Y";
+						} else {
+							$scope.inputVO.BUSINESS_REL = "";
+						}
 					}
-					debugger
-					if(tota[0].body.AML != null) $scope.inputVO.AML = tota[0].body.AML;
-					if(tota[0].body.PRECHECK != null) $scope.inputVO.PRECHECK = tota[0].body.PRECHECK;
-					if(tota[0].body.hnwcData != null) $scope.inputVO.hnwcData = tota[0].body.hnwcData; //高資產客戶註記
+					
 					if(tota[0].body.INSURED_NAME != null){
 						if(tota[0].body.INSURED_NAME.length>0){
 							if($scope.inputVO.INSURED_ID !=''){
@@ -1967,10 +2017,12 @@ eSoafApp.controller('IOT110Controller',
 		//要保書申請日期變更
 		$scope.applyDateChg = function() {
 			//重新取得要保人、被保人、繳款人保單貸款檢核、行內貸款檢核、定存不打折檢核
+			//以及招攬人員資料(公平待客、高齡完訓資格)
 			debugger;
 			$scope.getInfo("CUST");
 			$scope.getInfo("INSURED");
 			$scope.getInfo("PAYER");
+			$scope.getInfo("RECRUIT");
 		}
 
 		$scope.chgOthType = function() {
@@ -2201,9 +2253,13 @@ eSoafApp.controller('IOT110Controller',
 				COMPANY_NUM:'82',
 				CANCEL_CONTRACT_YN: 'N', //契撤案件
 				DATA_SHR_YN: 'N', 	//人壽資料分享案件
-				UHRM_CASE: 'N' 		//UHRM人員鍵機或UHRM為招攬人員的案件
+				UHRM_CASE: 'N', 		//UHRM人員鍵機或UHRM為招攬人員的案件
+				CUST_INS_ASSET: undefined, //要保人保險庫存金額
+				BUSINESS_REL: "" //新增業務關係
 			};
 
+			$scope.getInfo('RECRUIT');
+			
 			debugger
 			if($scope.connector('get', 'IOT_PREMATCH_SEQ')){
 				$scope.inputVO.PREMATCH_SEQ = $scope.connector('get', 'IOT_PREMATCH_SEQ');

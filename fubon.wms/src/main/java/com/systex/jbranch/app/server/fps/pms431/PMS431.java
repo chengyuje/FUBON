@@ -85,7 +85,6 @@ public class PMS431 extends FubonWmsBizLogic {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
 
 		sb.append("SELECT * ");
 		sb.append("FROM ( ");
@@ -127,7 +126,6 @@ public class PMS431 extends FubonWmsBizLogic {
 		sb.append("              AND RPT.KIND_TYPE = D.KIND_TYPE ");
 		sb.append("              GROUP BY D.SNAP_YYYYMM, D.AO_BRANCH_NBR, D.AO_EMP_ID), 0) AS NOT_RESPONDING ");
 		sb.append("  FROM TBPMS_HIGH_RISK_INV_M_REP RPT ");
-		sb.append("  LEFT JOIN VWORG_DEFN_INFO DEFN ON RPT.AO_BRANCH_NBR = DEFN.BRANCH_NBR ");
 		sb.append("  LEFT JOIN TBPMS_ORG_REC_N ORG ON RPT.AO_BRANCH_NBR = ORG.DEPT_ID AND TO_DATE(RPT.SNAP_YYYYMM || '01', 'YYYYMMDD') BETWEEN ORG.START_TIME AND ORG.END_TIME ");
 		sb.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N MEM ON RPT.AO_EMP_ID = MEM.EMP_ID AND RPT.AO_BRANCH_NBR = MEM.DEPT_ID AND TO_DATE(RPT.YYYYMM || '01', 'YYYYMMDD') BETWEEN MEM.START_TIME AND MEM.END_TIME ");
 
@@ -135,7 +133,7 @@ public class PMS431 extends FubonWmsBizLogic {
 		
 		// 統計月份
 		if (StringUtils.isNotEmpty(inputVO.getsCreDate())) {
-			sb.append("  AND RPT.YYYYMM = :sDate ");
+			sb.append("AND RPT.YYYYMM = :sDate ");
 			queryCondition.setObject("sDate", inputVO.getsCreDate());
 		}
 
@@ -143,54 +141,12 @@ public class PMS431 extends FubonWmsBizLogic {
 			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("  AND RPT.AO_BRANCH_NBR = :branch ");
 				queryCondition.setObject("branch", inputVO.getBranch_nbr());
-			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
-				sb.append("  AND ( ");
-				sb.append("      (CASE WHEN ( ");
-				sb.append("         SELECT COUNT(1) ");
-				sb.append("         FROM TBPMS_HIGH_RISK_INV_D_REP D ");
-				sb.append("         WHERE RPT.SNAP_YYYYMM = D.SNAP_YYYYMM ");
-				sb.append("         AND RPT.AO_BRANCH_NBR = D.AO_BRANCH_NBR ");
-				sb.append("         AND RPT.AO_EMP_CID = D.AO_EMP_ID ");
-				sb.append("         AND RPT.KIND_TYPE = D.KIND_TYPE ");
-				sb.append("         AND D.RM_FLAG = 'B' ");
-				sb.append("      ) > 0 THEN 'Y' ELSE 'N' END = 'Y' ");
-				sb.append("      AND DEFN.BRANCH_AREA_ID = :BRANCH_AREA_IDD) ");
-				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-					sb.append("  OR ( ");
-					sb.append("      (CASE WHEN ( ");
-					sb.append("         SELECT COUNT(1) ");
-					sb.append("         FROM TBPMS_HIGH_RISK_INV_D_REP D ");
-					sb.append("         WHERE RPT.SNAP_YYYYMM = D.SNAP_YYYYMM ");
-					sb.append("         AND RPT.AO_BRANCH_NBR = D.AO_BRANCH_NBR ");
-					sb.append("         AND RPT.AO_EMP_CID = D.AO_EMP_ID ");
-					sb.append("         AND RPT.KIND_TYPE = D.KIND_TYPE ");
-					sb.append("         AND D.RM_FLAG = 'U' ");
-					sb.append("      ) > 0 THEN 'Y' ELSE 'N' END = 'Y' ");
-					sb.append("      AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.AO_EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD )");
-					sb.append("  ) ");
-				}
-			
-				sb.append("  ) ");
-				queryCondition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
+				sb.append("  AND RPT.AO_BRANCH_NBR IN (SELECT BRANCH_NBR FROM VWORG_DEFN_BRH WHERE DEPT_ID = :area) ");
+				queryCondition.setObject("area", inputVO.getBranch_area_id());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-				sb.append("  AND DEFN.REGION_CENTER_ID = :REGION_CENTER_IDD ");
-				queryCondition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
-			}
-			
-			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-				sb.append("  AND CASE WHEN ( ");
-				sb.append("    SELECT COUNT(1) ");
-				sb.append("    FROM TBPMS_HIGH_RISK_INV_D_REP D ");
-				sb.append("    WHERE RPT.SNAP_YYYYMM = D.SNAP_YYYYMM ");
-				sb.append("    AND RPT.AO_BRANCH_NBR = D.AO_BRANCH_NBR ");
-				sb.append("    AND RPT.AO_EMP_CID = D.AO_EMP_ID ");
-				sb.append("    AND RPT.KIND_TYPE = D.KIND_TYPE ");
-				sb.append("    AND D.RM_FLAG = 'B' ");
-				sb.append("  ) > 0 THEN 'Y' ELSE 'N' END = 'Y' ");
+				sb.append("  AND RPT.AO_BRANCH_NBR IN (SELECT BRANCH_NBR FROM VWORG_DEFN_BRH WHERE DEPT_ID = :region) ");
+				queryCondition.setObject("region", inputVO.getRegion_center_id());
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {
@@ -373,7 +329,6 @@ public class PMS431 extends FubonWmsBizLogic {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
 
 		sb.append("SELECT * ");
 		sb.append("FROM ( ");
@@ -450,11 +405,6 @@ public class PMS431 extends FubonWmsBizLogic {
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND M.AO_BRANCH_NBR IN (SELECT BRANCH_NBR FROM VWORG_DEFN_BRH WHERE DEPT_ID = :region) ");
 				queryCondition.setObject("region", inputVO.getRegion_center_id());
-			}
-			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-				sb.append("AND D.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {

@@ -121,7 +121,6 @@ public class SQM140 extends FubonWmsBizLogic {
 		sql.append("         OWNER_EMP.EMP_NAME AS OWNER_EMP_NAME, ");
 		sql.append("         STATUS_MAPP.PARAM_NAME AS CASE_STATUS_NAME ");
 		sql.append("  FROM  TBSQM_CSM_IMPROVE_MAST A ");
-		sql.append("  LEFT JOIN TBCRM_CUST_MAST CM ON CM.CUST_ID = A.CUST_ID ");
 		sql.append("  LEFT JOIN TBPMS_ORG_REC_N ORG ON ORG.DEPT_ID = A.BRANCH_NBR AND TO_DATE(A.TRADE_DATE, 'YYYYMMDD') BETWEEN ORG.START_TIME AND ORG.END_TIME ");
 		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N EMP ON EMP.EMP_ID = A.EMP_ID AND TO_DATE(A.TRADE_DATE, 'YYYYMMDD') BETWEEN EMP.START_TIME AND EMP.END_TIME ");
 		sql.append("  LEFT JOIN TBSQM_CSM_IMPROVE_DTL DTL ON DTL.CASE_NO IS NOT NULL AND DTL.CASE_NO =  A.CASE_NO ");
@@ -154,7 +153,6 @@ public class SQM140 extends FubonWmsBizLogic {
 		sql.append("  LEFT JOIN TBSYSPARAMETER STATUS_MAPP ON A.CASE_STATUS = STATUS_MAPP.PARAM_CODE AND STATUS_MAPP.PARAM_TYPE = 'SQM.STATUS_LIST' ");
 		sql.append("  WHERE 1= 1 ");
 		sql.append("  AND A.DELETE_FLAG IS NULL ");
-		sql.append("  AND CM.UEMP_ID IS NULL "); //排除高端客戶
 
 		// 資料統計日期
 		if (inputVO.getsCreDate() != null) {
@@ -181,7 +179,8 @@ public class SQM140 extends FubonWmsBizLogic {
 
 		// 營運區
 		if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-			sql.append("  AND ORG.BRANCH_AREA_ID = :BRANCH_AREA_IDD ");
+			sql.append("  AND (ORG.BRANCH_AREA_ID = :BRANCH_AREA_IDD ");
+			sql.append("  		OR EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = A.EMP_ID AND UHRM.DEPT_ID = :BRANCH_AREA_IDD)) ");
 			condition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
 		} else {
 			// 登入非總行人員強制加營運區
@@ -476,6 +475,7 @@ public class SQM140 extends FubonWmsBizLogic {
 				paramVO.setSTEP_ID(ObjectUtils.toString(map.get("STEP_ID")));
 				paramVO.setSATISFACTION_O(ObjectUtils.toString(map.get("SATISFACTION_O")));
 				paramVO.setSATISFACTION_W(ObjectUtils.toString(map.get("SATISFACTION_W")));
+				paramVO.setUHRM_YN(ObjectUtils.toString(map.get("UHRM_YN")));
 				// paramVO.setQST_VERSION(qst_version);
 				dam.create(paramVO);
 

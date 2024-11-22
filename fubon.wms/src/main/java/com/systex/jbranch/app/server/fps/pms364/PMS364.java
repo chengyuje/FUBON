@@ -61,6 +61,7 @@ public class PMS364 extends FubonWmsBizLogic {
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NBR" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS DEPT_ID" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE_TYPE" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_EMP_ID" : "").append(", "); 
@@ -74,6 +75,7 @@ public class PMS364 extends FubonWmsBizLogic {
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NBR" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS DEPT_ID" : "").append(", ");
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE_TYPE" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_EMP_ID" : "").append(", "); 
@@ -87,6 +89,7 @@ public class PMS364 extends FubonWmsBizLogic {
 				sb.append("       BRANCH_AREA_NAME || ' 合計' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NBR " : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME " : "").append(", "); 
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS DEPT_ID" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE_TYPE" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_EMP_ID" : "").append(", "); 
@@ -100,6 +103,7 @@ public class PMS364 extends FubonWmsBizLogic {
 				sb.append("       BRANCH_AREA_NAME").append(", ");
 				sb.append("       BRANCH_NBR || '_TOTAL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NBR" : "").append(", ");
 				sb.append("       BRANCH_NAME || ' 合計' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS DEPT_ID" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE_TYPE" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_EMP_ID" : "").append(", "); 
@@ -113,6 +117,7 @@ public class PMS364 extends FubonWmsBizLogic {
 				sb.append("       BRANCH_AREA_NAME").append(", ");
 				sb.append("       BRANCH_NBR").append(", ");
 				sb.append("       BRANCH_NAME").append(", ");
+				sb.append("       EMP.DEPT_ID").append(", ");
 				sb.append("       AO_CODE").append(", ");
 				sb.append("       AO_CODE_TYPE").append(", ");
 				sb.append("       AO_EMP_ID").append(", ");
@@ -135,7 +140,7 @@ public class PMS364 extends FubonWmsBizLogic {
 		return sb;
 	}
 	
-	public StringBuffer genSQL (String genType, PMS364InputVO inputVO, boolean isFC, boolean isHeadMGR, String NOT_EXIST_BS, String NOT_EXIST_UHRM) {
+	public StringBuffer genSQL (String genType, PMS364InputVO inputVO, boolean isFC, boolean isHeadMGR, String memLoginFlag, String NOT_EXIST_BS, String NOT_EXIST_UHRM) {
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT ");
@@ -152,6 +157,7 @@ public class PMS364 extends FubonWmsBizLogic {
 		sb.append("       SUM(SUM_COMM_RS_Y) AS SUM_COMM_RS_Y, ");
 		sb.append("       SUM(SUM_COMM_NS_Y) AS SUM_COMM_NS_Y ");
 		sb.append("FROM TBPMS_MONTHLY_CUST_NOTE MCN ");
+		sb.append("LEFT JOIN (SELECT DISTINCT EMP_ID, EMP_DEPT_ID AS DEPT_ID FROM VWORG_EMP_INFO) EMP ON MCN.AO_EMP_ID = EMP.EMP_ID ");
 		sb.append("WHERE 1 = 1 ");
 		
 		// ==主查詢條件==
@@ -168,35 +174,76 @@ public class PMS364 extends FubonWmsBizLogic {
 					sb.append("AND AO_CODE = :ao_code ");
 				} else if (isFC) {
 					sb.append("AND AO_EMP_ID = :empID ");
+				} else if (StringUtils.equals(memLoginFlag, "UHRM")) {
+					sb.append("AND AO_EMP_ID = :loginID ");
 				}
 				
 			case "BRANCH":
-				// 分行
-				if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
-					sb.append("AND BRANCH_NBR = :branch_nbr ");
-				} else if (!isHeadMGR) {
-					// 登入非總行人員強制加分行
-					sb.append("AND BRANCH_NBR IN (:branch_nbr) ");
+				switch (memLoginFlag) {
+					case "UHRM":
+						break;
+					case "uhrmMGR":
+					case "uhrmBMMGR":
+						sb.append("  AND ( ");
+						sb.append("           EMP_ID IS NOT NULL ");
+						sb.append("       AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE EMP.DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID AND MT.DEPT_ID = :loginArea) ");
+						sb.append("  ) ");
+						
+						break;
+					default:
+						if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
+							sb.append("AND BRANCH_NBR = :branch_nbr ");
+						} else if (!isHeadMGR) {
+							// 登入非總行人員強制加分行
+							sb.append("AND BRANCH_NBR IN (:branch_nbr) ");
+						}
+						
+						break;
 				}
-				
 			case "AREA":
-				// 營運區
-				if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-					sb.append("AND BRANCH_AREA_ID = :branch_area_id ");
-				} else if (!isHeadMGR) {
-					// 登入非總行人員強制加營運區
-					sb.append("AND BRANCH_AREA_ID IN (:branch_area_id) ");
+				switch (memLoginFlag) {
+					case "UHRM":
+						break;
+					case "uhrmMGR":
+					case "uhrmBMMGR":
+						sb.append("  AND ( ");
+						sb.append("           EMP_ID IS NOT NULL ");
+						sb.append("       AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE EMP.DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID AND MT.DEPT_ID = :loginArea) ");
+						sb.append("  ) ");
+						
+						break;
+					default:
+						if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
+							sb.append("AND BRANCH_AREA_ID = :branch_area_id ");
+						} else if (!isHeadMGR) {
+							// 登入非總行人員強制加營運區
+							sb.append("AND BRANCH_AREA_ID IN (:branch_area_id) ");
+						}
+						
+						break;
 				}
 				
 			case "REGION":
-				// 區域中心
-				if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-					sb.append("AND REGION_CENTER_ID = :region_center_id ");
-				} else if (!isHeadMGR) {
-					// 登入非總行人員強制加區域中心
-					sb.append("AND REGION_CENTER_ID IN (:region_center_id) ");
+				switch (memLoginFlag) {
+					case "UHRM":
+						break;
+					case "uhrmMGR":
+					case "uhrmBMMGR":
+						sb.append("  AND ( ");
+						sb.append("           EMP_ID IS NOT NULL ");
+						sb.append("       AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE EMP.DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID AND MT.DEPT_ID = :loginArea) ");
+						sb.append("  ) ");
+						
+						break;
+					default:
+						if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
+							sb.append("AND REGION_CENTER_ID = :region_center_id ");
+						} else if (!isHeadMGR) {
+							// 登入非總行人員強制加區域中心
+							sb.append("AND REGION_CENTER_ID IN (:region_center_id) ");
+						}
+						break;
 				}
-				
 			case "ALL":
 				if (StringUtils.equals("Y", NOT_EXIST_BS)) {
 					sb.append("AND NOT EXISTS ( ");
@@ -211,19 +258,27 @@ public class PMS364 extends FubonWmsBizLogic {
 					sb.append(") ");
 				}
 				
-				if (StringUtils.equals("Y", NOT_EXIST_UHRM)) {
-					sb.append("AND NOT EXISTS ( ");
-					sb.append("  SELECT 1 ");
-					sb.append("  FROM TBPMS_EMPLOYEE_REC_N UCN ");
-					sb.append("  WHERE 1 = 1 ");
-					sb.append("  AND LAST_DAY(TO_DATE(:STARTTIME || '01', 'YYYYMMDD')) BETWEEN UCN.START_TIME AND UCN.END_TIME ");
-					sb.append("  AND IS_PRIMARY_ROLE = 'N' ");
-					sb.append("  AND AO_JOB_RANK IS NOT NULL ");
-					sb.append("  AND EXISTS (SELECT 1 FROM TBPMS_EMPLOYEE_REC_N UCN_T WHERE UCN_T.DEPT_ID IN ('031', '1001') AND UCN.EMP_ID = UCN_T.EMP_ID) ");
-					sb.append("  AND MCN.AO_EMP_ID = UCN.EMP_ID ");
-					sb.append(") ");
+				switch (NOT_EXIST_UHRM) {
+					case "Y":
+						sb.append("AND NOT EXISTS ( ");
+						sb.append("  SELECT 1 ");
+						sb.append("  FROM TBPMS_EMPLOYEE_REC_N UCN ");
+						sb.append("  WHERE 1 = 1 ");
+						sb.append("  AND LAST_DAY(TO_DATE(:STARTTIME || '01', 'YYYYMMDD')) BETWEEN UCN.START_TIME AND UCN.END_TIME ");
+						sb.append("  AND UCN.DEPT_ID <> UCN.E_DEPT_ID "); // 私銀理專
+						sb.append("  AND MCN.AO_EMP_ID = UCN.EMP_ID ");
+						sb.append(") ");
+						break;
+					case "U":
+						sb.append("AND EXISTS ( ");
+						sb.append("  SELECT 1 ");
+						sb.append("  FROM TBPMS_EMPLOYEE_REC_N UCN ");
+						sb.append("  WHERE 1 = 1 ");
+						sb.append("  AND LAST_DAY(TO_DATE(:STARTTIME || '01', 'YYYYMMDD')) BETWEEN UCN.START_TIME AND UCN.END_TIME ");
+						sb.append("  AND UCN.DEPT_ID <> UCN.E_DEPT_ID "); // 私銀理專
+						sb.append("  AND MCN.AO_EMP_ID = UCN.EMP_ID ");
+						sb.append(") ");
 				}
-				
 				break;
 		}
 		
@@ -244,9 +299,16 @@ public class PMS364 extends FubonWmsBizLogic {
 		StringBuffer sb = new StringBuffer();
 		
 		XmlInfo xmlInfo = new XmlInfo();
-		boolean isHeadMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 
+		String memLoginFlag = getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG).toString();
+		
 		//===取得查詢資料可視範圍
 		PMS000 pms000 = (PMS000) PlatformContext.getBean("pms000");
 		PMS000InputVO pms000InputVO = new PMS000InputVO();
@@ -263,27 +325,27 @@ public class PMS364 extends FubonWmsBizLogic {
 		sb.append("FROM ( "); 
 		
 		// 人員
-		sb.append(genSQL("EMP", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM()).toString().replaceAll("\\s+", " ")); 
+		sb.append(genSQL("EMP", inputVO, isFC, isHANDMGR, memLoginFlag, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM()).toString().replaceAll("\\s+", " ")); 
 		
 		sb.append("UNION "); 
 		
 		// 分行合計
-		sb.append(genSQL("BRANCH", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM()).toString().replaceAll("\\s+", " ")); 
+		sb.append(genSQL("BRANCH", inputVO, isFC, isHANDMGR, memLoginFlag, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM()).toString().replaceAll("\\s+", " ")); 
 		
 		sb.append("UNION "); 
 		
 		// 營運區合計
-		sb.append(genSQL("AREA", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM()).toString().replaceAll("\\s+", " ")); 
+		sb.append(genSQL("AREA", inputVO, isFC, isHANDMGR, memLoginFlag, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM()).toString().replaceAll("\\s+", " ")); 
 		
 		sb.append("UNION "); 
 		
 		// 業務處合計
-		sb.append(genSQL("REGION", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM()).toString().replaceAll("\\s+", " ")); 
+		sb.append(genSQL("REGION", inputVO, isFC, isHANDMGR, memLoginFlag, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM()).toString().replaceAll("\\s+", " ")); 
 
 		sb.append("UNION "); 
 		
 		// 全行合行
-		sb.append(genSQL("ALL", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM()).toString().replaceAll("\\s+", " ")); 
+		sb.append(genSQL("ALL", inputVO, isFC, isHANDMGR, memLoginFlag, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM()).toString().replaceAll("\\s+", " ")); 
 
 		sb.append(") "); 
 		sb.append(returnAppend("ORDER", "").toString().replaceAll("\\s+", " "));
@@ -300,28 +362,43 @@ public class PMS364 extends FubonWmsBizLogic {
 			queryCondition.setObject("empID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
 		}
 		
-		// 分行
-		if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
-			queryCondition.setObject("branch_nbr", inputVO.getBranch_nbr());
-		} else if (!isHeadMGR) {
-			// 登入非總行人員強制加分行
-			queryCondition.setObject("branch_nbr", pms000outputVO.getV_branchList());
-		}
-		
-		// 營運區
-		if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-			queryCondition.setObject("branch_area_id", inputVO.getBranch_area_id());
-		} else if (!isHeadMGR) {
-			// 登入非總行人員強制加營運區
-			queryCondition.setObject("branch_area_id", pms000outputVO.getV_areaList());
-		}
+		switch (memLoginFlag) {
+			case "UHRM":
+				queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
+				
+				break;
+			case "uhrmMGR":
+			case "uhrmBMMGR":
+				queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
+				queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
+				
+				break;
+			default:
+				// 分行
+				if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
+					queryCondition.setObject("branch_nbr", inputVO.getBranch_nbr());
+				} else if (!isHANDMGR) {
+					// 登入非總行人員強制加分行
+					queryCondition.setObject("branch_nbr", pms000outputVO.getV_branchList());
+				}
+				
+				// 營運區
+				if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
+					queryCondition.setObject("branch_area_id", inputVO.getBranch_area_id());
+				} else if (!isHANDMGR) {
+					// 登入非總行人員強制加營運區
+					queryCondition.setObject("branch_area_id", pms000outputVO.getV_areaList());
+				}
 
-		// 區域中心
-		if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-			queryCondition.setObject("region_center_id", inputVO.getRegion_center_id());
-		} else if (!isHeadMGR) {
-			// 登入非總行人員強制加區域中心
-			queryCondition.setObject("region_center_id", pms000outputVO.getV_regionList());
+				// 區域中心
+				if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
+					queryCondition.setObject("region_center_id", inputVO.getRegion_center_id());
+				} else if (!isHANDMGR) {
+					// 登入非總行人員強制加區域中心
+					queryCondition.setObject("region_center_id", pms000outputVO.getV_regionList());
+				}
+				
+				break;
 		}
 		
 		queryCondition.setQueryString(sb.toString());

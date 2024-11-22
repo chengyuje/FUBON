@@ -47,25 +47,23 @@ public class BTSQM410 extends BizLogic {
 		sb.append("( ");
 		sb.append("  SELECT DISTINCT A.CASE_NO, A.OWNER_EMP_ID, P.PRIVILEGEID ");
 		sb.append("  FROM TBSQM_CSM_IMPROVE_MAST A ");
-		sb.append("  left join TBCRM_CUST_MAST CM ON CM.CUST_ID = A.CUST_ID ");
 		sb.append("  left outer join tborg_member_role r on A.OWNER_EMP_ID = r.EMP_ID ");
 		sb.append("  left join TBSYSSECUROLPRIASS p  on r.ROLE_ID=p.roleid ");
 		sb.append("  WHERE A.DELETE_FLAG IS NULL AND A.HO_CHECK = 'Y' AND NVL(A.CASE_STATUS, ' ') <> 'N' ");
-		sb.append("  AND CM.UEMP_ID IS NULL ");  //排除高端客戶
 		sb.append("  AND A.CASE_NO IS NOT NULL AND A.OWNER_EMP_ID <> 'close' ");
 		sb.append("  AND A.OWNER_EMP_ID NOT IN (SELECT EMP_ID FROM TBORG_AGENT WHERE AGENT_STATUS = 'S' AND SYSDATE BETWEEN START_DATE AND END_DATE) "); //排除休假中
 		sb.append("  AND P.PRIVILEGEID in ('012','013') ");
+		sb.append("  AND NVL(A.UHRM_YN, 'N') = 'N' "); //排除私銀理專案件
 		sb.append("UNION ALL ");
 		sb.append("  SELECT DISTINCT A.CASE_NO, Ag.AGENT_ID, P.PRIVILEGEID ");
 		sb.append("  FROM TBSQM_CSM_IMPROVE_MAST A  ");
-		sb.append("  left join TBCRM_CUST_MAST CM ON CM.CUST_ID = A.CUST_ID  ");
 		sb.append("  left outer join tborg_member_role r on A.OWNER_EMP_ID = r.EMP_ID ");
 		sb.append("  left join TBSYSSECUROLPRIASS p  on r.ROLE_ID=p.roleid ");
 		sb.append("  inner join TBORG_AGENT ag on a.OWNER_EMP_ID = ag.EMP_ID AND AGENT_STATUS = 'S' AND SYSDATE BETWEEN ag.START_DATE AND ag.END_DATE ");
 		sb.append("  WHERE A.DELETE_FLAG IS NULL AND A.HO_CHECK = 'Y' AND NVL(A.CASE_STATUS, ' ') <> 'N' ");
-		sb.append("  AND CM.UEMP_ID IS NULL  ");
 		sb.append("  AND A.CASE_NO IS NOT NULL AND A.OWNER_EMP_ID <> 'close' ");
 		sb.append("  AND P.PRIVILEGEID in ('012','013') ");
+		sb.append("  AND NVL(A.UHRM_YN, 'N') = 'N' "); //排除私銀理專案件
 		sb.append(")TB GROUP BY OWNER_EMP_ID, PRIVILEGEID ");
 		queryCondition.setQueryString(sb.toString());
 		List<Map<String, Object>> mgrList = dam.exeQuery(queryCondition);
@@ -87,7 +85,7 @@ public class BTSQM410 extends BizLogic {
 				//處主管
 				msg.append("主管您好：\n");
 				msg.append("【客戶服務滿意度調查】：\n");
-				msg.append("  您轄下營運區現有客戶滿意度調查報告尚未批示完成，敬請於最後批示期限前完成報告並送至服務品管科彙整，謝謝。\n\n");
+				msg.append("  您轄下營運區現有客戶滿意度調查報告尚未批示，敬請於批示期限前完成，謝謝。\n\n");
 				msg.append("請點【檢視詳情】批示");
 			} else if("012".equals(privilegeid)) {
 				//區督導

@@ -221,7 +221,7 @@ public class SOT708 extends EsbUtil {
      * SI贖回確認
      *
      * 使用電文: SIBRVB9
-     *
+     * #2224_SI贖回SDACTQ5推薦分行別邏輯調整
      * @param body
      * @throws Exception
      */
@@ -260,7 +260,7 @@ public class SOT708 extends EsbUtil {
         txBodyVO.setTYPE(getType((Date) siInfoVO.getVALUE_DATE()));	//贖回類型
         txBodyVO.setIVID(mainVO.getCUST_ID());              //客戶證號
         txBodyVO.setSDPRD(siTradeDVO.getPROD_ID());			//產品編號
-        txBodyVO.setIVBRH(mainVO.getBRANCH_NBR());           //推薦分行別
+        txBodyVO.setIVBRH(null == sot708InputVO.getIvBrh() ?  mainVO.getBRANCH_NBR() : sot708InputVO.getIvBrh());           //推薦分行別
         txBodyVO.setIVRNO(siTradeDVO.getRECEIVED_NO());     //收件編號
         txBodyVO.setIVCUAC(siTradeDVO.getDEBIT_ACCT());     //活存帳號
         txBodyVO.setIVTDAC(siTradeDVO.getPROD_ACCT());      //定存帳號

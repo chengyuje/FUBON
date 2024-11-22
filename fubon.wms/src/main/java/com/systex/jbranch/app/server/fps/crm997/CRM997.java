@@ -50,6 +50,9 @@ import com.systex.jbranch.platform.server.info.SysInfo;
 import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
+/*
+ * #2116: 拆分成TBCRM_CUST_PT_DEGREE_SG以及TBCRM_CUST_XP_DEGREE_SG
+ */
 @Component("crm997")
 @Scope("request")
 public class CRM997 extends FubonWmsBizLogic {
@@ -63,36 +66,51 @@ public class CRM997 extends FubonWmsBizLogic {
 		dam = this.getDataAccessManager();		
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		sql.append("  SELECT CUST_ID,                              ");
-		sql.append("  	     POTENTIAL_LEVEL,                      ");//潛力等級
-		sql.append("  	     EXPERIENCE_LEVEL,                     ");//體驗等級
-		sql.append("  	     EXPERIENCE_BEGIN_DATE,                ");//體驗開始日
-		sql.append("  	     EXPERIENCE_END_DATE,                  ");//體驗結束日
-		sql.append("  	     VERSION,                              ");//版本
-		sql.append("  	     CREATETIME,                           ");//建立時間
-		sql.append("  	     CREATOR,                              ");//建立人員
-		sql.append("  	     MODIFIER,                             ");//最後修改人員
-		sql.append("  	     LASTUPDATE                            ");//最後修改時間
-		sql.append("  FROM TBCRM_CUST_XP_DEGREE                    ");
-		sql.append("  WHERE 1=1                                    ");
+		sql.append("  with ALL_CUST as (                              ");
+		sql.append("  	     select cust_id from tbcrm_cust_pt_degree ");
+		sql.append("  	    union                                     ");
+		sql.append("  	     select cust_id from tbcrm_cust_xp_degree ");
+		sql.append("  	    )                                         ");
+		sql.append("  SELECT ALL_CUST.CUST_ID,                             ");
+		sql.append("  	     PT.POTENTIAL_LEVEL,                      ");
+		sql.append("  	     PT.POTENTIAL_BEGIN_DATE,                 ");
+		sql.append("  	     PT.POTENTIAL_END_DATE,                   ");
+		sql.append("  	     PT.LASTUPDATE AS PT_LASTUPDATE,          ");
+		sql.append("  	     PT.MODIFIER AS PT_MODIFIER,                ");
+		sql.append("  	     XP.EXPERIENCE_LEVEL,                     ");
+		sql.append("  	     XP.EXPERIENCE_BEGIN_DATE,                ");
+		sql.append("  	     XP.EXPERIENCE_END_DATE,                  ");
+		sql.append("  	     XP.LASTUPDATE AS XP_LASTUPDATE,          ");
+		sql.append("  	     XP.MODIFIER AS XP_MODIFIER                ");
+		sql.append("  FROM ALL_CUST                            ");
+		sql.append("  LEFT JOIN TBCRM_CUST_PT_DEGREE PT ON ALL_CUST.CUST_ID = PT.CUST_ID               ");
+		sql.append("  LEFT JOIN TBCRM_CUST_XP_DEGREE XP ON ALL_CUST.CUST_ID = XP.CUST_ID                ");
+		sql.append("  WHERE 1=1                                       ");
 		if (StringUtils.isNotBlank(inputVO.getCustId())) {
-			sql.append(" AND CUST_ID = :cust_id  ");
+			sql.append(" AND ALL_CUST.CUST_ID = :cust_id  ");
 			queryCondition.setObject("cust_id", inputVO.getCustId());
 		}
 		if (StringUtils.isNotBlank(inputVO.getPotential_level())) {
-			sql.append(" AND POTENTIAL_LEVEL = :potential_level  ");
+			sql.append(" AND PT.POTENTIAL_LEVEL = :potential_level  ");
 			queryCondition.setObject("potential_level", inputVO.getPotential_level());
 		}
 		if (StringUtils.isNotBlank(inputVO.getExperience_level())) {
-			sql.append(" AND EXPERIENCE_LEVEL = :experience_level  ");
+			sql.append(" AND XP.EXPERIENCE_LEVEL = :experience_level  ");
 			queryCondition.setObject("experience_level", inputVO.getExperience_level());
 		}
 		if (inputVO.getExperience_begin_date() != null) {
-			sql.append(" AND TRUNC(EXPERIENCE_BEGIN_DATE) = TO_DATE(:experience_begin_date, 'yyyyMMdd') ");
+			sql.append(" AND TRUNC(XP.EXPERIENCE_BEGIN_DATE) >= TO_DATE(:experience_begin_date, 'yyyyMMdd') ");
 			queryCondition.setObject("experience_begin_date", new java.text.SimpleDateFormat("yyyyMMdd").format(inputVO.getExperience_begin_date()));
 		}if (inputVO.getExperience_end_date() != null) {
-			sql.append(" AND TRUNC(EXPERIENCE_END_DATE) = TO_DATE(:experience_end_date, 'yyyyMMdd')  ");
+			sql.append(" AND TRUNC(XP.EXPERIENCE_END_DATE) <= TO_DATE(:experience_end_date, 'yyyyMMdd')  ");
 			queryCondition.setObject("experience_end_date", new java.text.SimpleDateFormat("yyyyMMdd").format(inputVO.getExperience_end_date()));
+		}
+		if (inputVO.getPotential_begin_date() != null) {
+			sql.append(" AND TRUNC(PT.POTENTIAL_BEGIN_DATE) >= TO_DATE(:potential_begin_date, 'yyyyMMdd') ");
+			queryCondition.setObject("potential_begin_date", new java.text.SimpleDateFormat("yyyyMMdd").format(inputVO.getPotential_begin_date()));
+		}if (inputVO.getPotential_end_date() != null) {
+			sql.append(" AND TRUNC(PT.POTENTIAL_END_DATE) <= TO_DATE(:potential_end_date, 'yyyyMMdd')  ");
+			queryCondition.setObject("potential_end_date", new java.text.SimpleDateFormat("yyyyMMdd").format(inputVO.getPotential_end_date()));
 		}
 		queryCondition.setQueryString(sql.toString());
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
@@ -106,10 +124,15 @@ public class CRM997 extends FubonWmsBizLogic {
 		CRM997InputVO inputVO = (CRM997InputVO) body;
 		CRM997OutputVO outputVO = new CRM997OutputVO();
 		
+		String dsql = "";
 		//清空TBCRM_CUST_XP_DEGREE_SG
 		dam = this.getDataAccessManager();
 		QueryConditionIF dcon = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		String dsql = " TRUNCATE TABLE TBCRM_CUST_XP_DEGREE_SG ";
+		if(inputVO.getSetting_type().equals("1")) {
+			dsql = " TRUNCATE TABLE TBCRM_CUST_PT_DEGREE_SG ";
+		} else if(inputVO.getSetting_type().equals("2")){
+			dsql = " TRUNCATE TABLE TBCRM_CUST_XP_DEGREE_SG ";
+		}
 		dcon.setQueryString(dsql.toString());
 		dam.exeUpdate(dcon);
 		
@@ -121,67 +144,74 @@ public class CRM997 extends FubonWmsBizLogic {
         //潛力名單匯入
 		if(inputVO.getSetting_type().equals("1")) {
 			dam = this.getDataAccessManager();
-			QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			QueryConditionIF qc2 = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			
 	            for (int i = 1; i < lines.size(); i++) {
 	                liesCheck(lines.get(i).toString());
 	                String str_line = finalstring;
 	                String[] str = str_line.split(",");
-
+	                
 	                //檢查匯入欄位資料，空白資料不進行匯入
-	                if(str.length == 2 && StringUtils.isNotBlank(str[0]) && StringUtils.isNotBlank(str[1])) {
-						//#2177
+	                if(str.length == 4 && !StringUtils.isBlank(str[0]) && !StringUtils.isBlank(str[1]) && !StringUtils.isBlank(str[2]) && !StringUtils.isBlank(str[3])) {     	
+	                	//#2177
 	                	if (!str[1].matches("D|H|T|K|C")) {
 							throw new JBranchException("潛力等級請輸入D、H、T、K、C");
 						}
-	                	//新增資料至TBCRM_CUST_XP_DEGREE_SG
+	           
+	                	//體驗起日需大於系統日
+		                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+		                Date d1 = new Date(); //取得目前日期時間
+		                Date today = new Timestamp(sdf.parse(sdf.format(d1)).getTime());
+		                Date startDate = new Timestamp(sdf.parse(str[2].toString()).getTime());
+		                if(today.equals(startDate) || today.after(startDate))
+		                	throw new APException("檔案第"+ i +"筆資料有誤，體驗開始日應大於系統日期");		
+		                
+		              //新增資料至TBCRM_CUST_XP_DEGREE_SG
 	                    StringBuffer sb = new StringBuffer();
 	                    try {
-	                    	sb.append("  MERGE INTO TBCRM_CUST_XP_DEGREE_SG TCX ");
-	                    	sb.append("  USING( SELECT DISTINCT '" + str[0] + "' as CUST_ID,'" + str[1] + "' as POTENTIAL_LEVEL, '" + loginID + "' as LOGIN_ID FROM DUAL ) SG ");
+	                    	sb.append("  MERGE INTO TBCRM_CUST_PT_DEGREE_SG TCX ");
+	                    	sb.append("  USING( SELECT DISTINCT '" + str[0] + "' as CUST_ID,'" + str[1] + "' as POTENTIAL_LEVEL, ");
+	                    	sb.append(" 		TO_DATE(" + "'" + str[2] + "','YYYY/MM/DD') as POTENTIAL_BEGIN_DATE, TO_DATE('" + str[3] + "','YYYY/MM/DD') as POTENTIAL_END_DATE, ");
+			                sb.append(" 		'" + loginID + "' as LOGIN_ID FROM DUAL ) SG ");
 			                sb.append("  ON (TCX.CUST_ID = SG.CUST_ID) ");
 			                sb.append("  WHEN MATCHED THEN ");			                
 			                sb.append("     UPDATE SET  TCX.POTENTIAL_LEVEL = SG.POTENTIAL_LEVEL ");
+			                sb.append("                ,TCX.POTENTIAL_BEGIN_DATE = SG.POTENTIAL_BEGIN_DATE ");
+			                sb.append("                ,TCX.POTENTIAL_END_DATE = SG.POTENTIAL_END_DATE ");
 			                sb.append("                ,TCX.MODIFIER = SG.LOGIN_ID ");
 			                sb.append("                ,TCX.LASTUPDATE = SYSDATE ");
-			                sb.append("  WHEN NOT MATCHED THEN ");			                
-		                    sb.append(" INSERT ( ");
-		                    sb.append("    		CUST_ID, POTENTIAL_LEVEL, VERSION, CREATETIME, CREATOR, MODIFIER, LASTUPDATE ) ");
-		                    sb.append(" VALUES (SG.CUST_ID, SG.POTENTIAL_LEVEL, 0, SYSDATE, SG.LOGIN_ID, SG.LOGIN_ID, SYSDATE) "); 
-		                    qc.setQueryString(sb.toString());
+			                sb.append("  WHEN NOT MATCHED THEN ");			    			
+			                sb.append(" 	INSERT ( 			");
+		                    sb.append("    	CUST_ID, POTENTIAL_LEVEL,  					");
+		                    sb.append("    	POTENTIAL_BEGIN_DATE, POTENTIAL_END_DATE,  ");
+		                    sb.append("    	VERSION, CREATETIME, CREATOR, 				");
+		                    sb.append("    	MODIFIER, LASTUPDATE ) 						");
+		                    sb.append("    	VALUES (SG.CUST_ID, SG.POTENTIAL_LEVEL, SG.POTENTIAL_BEGIN_DATE, SG.POTENTIAL_END_DATE,  ");
+		                    sb.append("    			 0, SYSDATE, SG.LOGIN_ID, SG.LOGIN_ID, SYSDATE) ");
 		                   
-		                    dam.exeUpdate(qc);
+		                    qc2.setQueryString(sb.toString());
+		                    dam.exeUpdate(qc2);
+		            		
 	                    } catch (JBranchException e) {
 	                    	throw new APException("上傳檔案資料有誤，CUST_ID=" + str[0] + "; " + e.getMessage());
-	    				}
-	                }
+	                	}
+	                } 
 	            }
-	        //Merge->TBCRM_CUST_XP_DEGREE_SG至TBCRM_CUST_XP_DEGREE   
-	        QueryConditionIF qcAdd = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+	            
+	        //Merge->TBCRM_CUST_XP_DEGREE_SG至TBCRM_CUST_XP_DEGREE & 紀錄體驗活動上傳資料  
+            QueryConditionIF qcAdd2 = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_SQL);
 			StringBuffer sbAdd = new StringBuffer();					
-			sbAdd.append("  MERGE INTO TBCRM_CUST_XP_DEGREE TCX                                                                        ");
-			sbAdd.append("  USING(SELECT DISTINCT CUST_ID, SG.POTENTIAL_LEVEL,'" + loginID + "' as LOGIN_ID							   ");
-			sbAdd.append("  	FROM TBCRM_CUST_XP_DEGREE_SG SG ) SG                            		   							   ");
-			sbAdd.append("  ON (TCX.CUST_ID = SG.CUST_ID)                                                                              ");
-			sbAdd.append("  WHEN MATCHED THEN                                                                                      	   ");
-			sbAdd.append("     UPDATE SET  TCX.POTENTIAL_LEVEL                  = SG.POTENTIAL_LEVEL                                   ");
-			sbAdd.append("                ,TCX.MODIFIER                         = SG.LOGIN_ID                                          ");
-			sbAdd.append("                ,TCX.LASTUPDATE                       = SYSDATE                                         	   ");
-			sbAdd.append("  WHEN NOT MATCHED THEN                                                                                      ");
-			sbAdd.append("       INSERT (CUST_ID,POTENTIAL_LEVEL,VERSION,CREATETIME,CREATOR,MODIFIER,LASTUPDATE)    				   ");
-			sbAdd.append("       VALUES(SG.CUST_ID, SG.POTENTIAL_LEVEL, '0', SYSDATE, SG.LOGIN_ID, SG.LOGIN_ID, SYSDATE)    		   ");
+			sbAdd.append("  CALL PABTH_BTCRM997.PR_IMPORT_PT_DEGREE() ");
 			
-			qcAdd.setQueryString(sbAdd.toString());
+			qcAdd2.setQueryString(sbAdd.toString());
 			try {
-				dam.exeUpdate(qcAdd);
+				dam.exeUpdate(qcAdd2);
 			} catch (JBranchException e) {
-	           	throw new APException("上傳檔案資料有誤; " + e.getMessage());
+				throw new APException("上傳檔案資料有誤; " + e.getMessage());
 			}
 			
 			outputVO.setAddToList(null);
 			sendRtnObject(outputVO);
-	        
-		 //體驗名單匯入	
 		}else if(inputVO.getSetting_type().equals("2")){
 			dam = this.getDataAccessManager();
 			QueryConditionIF qc2 = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);

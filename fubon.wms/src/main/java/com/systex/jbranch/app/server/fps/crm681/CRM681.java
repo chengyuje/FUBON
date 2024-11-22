@@ -77,17 +77,20 @@ public class CRM681 extends EsbUtil {
 	private String thisClaz = this.getClass().getSimpleName() + ".";
 
 	public void inquire(Object body, IPrimitiveMap header) throws Exception {
-		
-		CRM681OutputVO return_VO = new CRM681OutputVO();
 		CRM681InputVO inputVO = (CRM681InputVO) body;
+		CRM681OutputVO return_VO = inquire(inputVO.getCust_id());
+		this.sendRtnObject(return_VO);
+	}
 
+	public CRM681OutputVO inquire(String custId) throws Exception {
+		CRM681OutputVO outputVO = new CRM681OutputVO();
 		dam = this.getDataAccessManager();
 
 		//抓取客戶保險總AUM 
 		CRM830 crm830 = (CRM830) PlatformContext.getBean("crm830");
 
 		//富壽保險庫存資料
-		List<Map<String, Object>> ins_list = crm830.getCustInsAUM(inputVO.getCust_id());
+		List<Map<String, Object>> ins_list = crm830.getCustInsAUM(custId);
 		BigDecimal insurance = new BigDecimal(0);
 		if (CollectionUtils.isNotEmpty(ins_list)) {
 			for (Map<String, Object> map : ins_list) {
@@ -96,7 +99,7 @@ public class CRM681 extends EsbUtil {
 			}
 		}
 		//日盛保險庫存資料
-		ins_list = crm830.getCustJSBInsAUM(inputVO.getCust_id());
+		ins_list = crm830.getCustJSBInsAUM(custId);
 		if (CollectionUtils.isNotEmpty(ins_list)) {
 			for (Map<String, Object> map : ins_list) {
 				if (map.get("TOTAL_INS_AMT_TWD") != null)
@@ -104,9 +107,9 @@ public class CRM681 extends EsbUtil {
 			}
 		}
 		
-		return_VO.setInsurance(insurance);
+		outputVO.setInsurance(insurance);
 
-		this.sendRtnObject(return_VO);
+		return outputVO;
 	}
 
 	/**

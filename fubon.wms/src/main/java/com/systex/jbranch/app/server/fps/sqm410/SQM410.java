@@ -58,11 +58,10 @@ public class SQM410 extends FubonWmsBizLogic {
 		StringBuffer sb = new StringBuffer();
 		sb.append("  SELECT SUBSTR(A.DATA_DATE, 0, 6) AS YEARMON, A.QTN_TYPE, ORG.BRANCH_AREA_ID, ORG.BRANCH_AREA_NAME, A.BRANCH_NBR, ORG.BRANCH_NAME, count(1) AS CASE_COUNT ");
 		sb.append("  FROM TBSQM_CSM_IMPROVE_MAST A ");
-		sb.append("  left join TBCRM_CUST_MAST CM ON CM.CUST_ID = A.CUST_ID ");
 		sb.append("  left join TBPMS_ORG_REC_N ORG on ORG.dept_id = A.branch_nbr and to_date(A.TRADE_DATE,'yyyymmdd') between ORG.START_TIME and ORG.END_TIME ");
 		sb.append("  WHERE A.DELETE_FLAG IS NULL AND A.HO_CHECK = 'Y' AND NVL(A.CASE_STATUS, ' ') <> 'N' ");
-		sb.append("  AND CM.UEMP_ID IS NULL ");  //排除高端客戶
 		sb.append("  AND A.CASE_NO IS NOT NULL AND A.OWNER_EMP_ID = :empId ");
+		sb.append("  AND NVL(A.UHRM_YN, 'N') = 'N' "); //排除私銀理專案件
 		sb.append("  GROUP BY SUBSTR(A.DATA_DATE, 0, 6), A.QTN_TYPE, ORG.BRANCH_AREA_ID, ORG.BRANCH_AREA_NAME, A.BRANCH_NBR, ORG.BRANCH_NAME ");
 		sb.append("  ORDER BY SUBSTR(A.DATA_DATE, 0, 6), ORG.BRANCH_AREA_ID, ORG.BRANCH_AREA_NAME, A.BRANCH_NBR, ORG.BRANCH_NAME, A.QTN_TYPE ");
 
@@ -78,11 +77,10 @@ public class SQM410 extends FubonWmsBizLogic {
 		sb = new StringBuffer();
 		sb.append("  SELECT SUBSTR(A.DATA_DATE, 0, 6) AS YEARMON, A.QTN_TYPE, ORG.BRANCH_AREA_ID, ORG.BRANCH_AREA_NAME, A.BRANCH_NBR, ORG.BRANCH_NAME, count(1) AS CASE_COUNT ");
 		sb.append("  FROM TBSQM_CSM_IMPROVE_MAST A ");
-		sb.append("  left join TBCRM_CUST_MAST CM ON CM.CUST_ID = A.CUST_ID ");
 		sb.append("  left join TBPMS_ORG_REC_N ORG on ORG.dept_id = A.branch_nbr and to_date(A.TRADE_DATE,'yyyymmdd') between ORG.START_TIME and ORG.END_TIME ");
 		sb.append("  WHERE A.DELETE_FLAG IS NULL AND A.HO_CHECK = 'Y' AND NVL(A.CASE_STATUS, ' ') <> 'N' ");
-		sb.append("  AND CM.UEMP_ID IS NULL ");  //排除高端客戶
 		sb.append("  AND A.CASE_NO IS NOT NULL AND A.OWNER_EMP_ID IN (SELECT EMP_ID FROM TBORG_AGENT WHERE AGENT_ID = :empId AND AGENT_STATUS = 'S' AND SYSDATE BETWEEN START_DATE AND END_DATE) ");
+		sb.append("  AND NVL(A.UHRM_YN, 'N') = 'N' "); //排除私銀理專案件
 		sb.append("  GROUP BY SUBSTR(A.DATA_DATE, 0, 6), A.QTN_TYPE, ORG.BRANCH_AREA_ID, ORG.BRANCH_AREA_NAME, A.BRANCH_NBR, ORG.BRANCH_NAME ");
 		sb.append("  ORDER BY SUBSTR(A.DATA_DATE, 0, 6), ORG.BRANCH_AREA_ID, ORG.BRANCH_AREA_NAME, A.BRANCH_NBR, ORG.BRANCH_NAME, A.QTN_TYPE ");
 
@@ -138,10 +136,10 @@ public class SQM410 extends FubonWmsBizLogic {
 		sb.append("  	 GROUP BY A.CUST_ID  ");
 		sb.append("  )VISIT ON VISIT.CREATETIME <= to_date(A.SEND_DATE,'yyyymmdd') AND VISIT.CUST_ID = A.CUST_ID  ");
 		sb.append("  WHERE A.DELETE_FLAG IS NULL AND A.HO_CHECK = 'Y' AND NVL(A.CASE_STATUS, ' ') <> 'N' ");
-		sb.append("  AND CM.UEMP_ID IS NULL ");  //排除高端客戶
 		sb.append("  AND A.CASE_NO IS NOT NULL AND (A.OWNER_EMP_ID = :empId ");
 		sb.append("  OR A.OWNER_EMP_ID IN (SELECT EMP_ID FROM TBORG_AGENT WHERE AGENT_ID = :empId AND AGENT_STATUS = 'S' AND SYSDATE BETWEEN START_DATE AND END_DATE)) ");
 		sb.append("  AND A.BRANCH_NBR = :branchNbr ");
+		sb.append("  AND NVL(A.UHRM_YN, 'N') = 'N' "); //排除私銀理專案件
 
 		queryCondition.setObject("empId", inputVO.getLoginEmpID());
 		queryCondition.setObject("branchNbr", inputVO.getBranchID());

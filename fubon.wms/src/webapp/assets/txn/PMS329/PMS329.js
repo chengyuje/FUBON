@@ -27,7 +27,9 @@ eSoafApp.controller('PMS329Controller', function($rootScope, $scope, $controller
 			branch_area_id   : '',			//營運區
 			branch_nbr       : '',			//分行
 			ao_code          : '',			//理專
-			funcPage         : 'PMS329'
+			funcPage         : 'PMS329', 
+			importSDate      : '',
+			importEDate      : ''
     	};
 		
 		$scope.paramList = [];

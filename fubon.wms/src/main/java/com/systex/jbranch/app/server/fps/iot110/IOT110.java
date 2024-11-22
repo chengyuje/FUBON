@@ -806,6 +806,7 @@ public class IOT110 extends FubonWmsBizLogic {
 		tpvo.setC_REVOLVING_LOAN_YN(inputVO.getC_REVOLVING_LOAN_YN());
 		tpvo.setI_REVOLVING_LOAN_YN(inputVO.getI_REVOLVING_LOAN_YN());
 		tpvo.setP_REVOLVING_LOAN_YN(inputVO.getP_REVOLVING_LOAN_YN());
+		tpvo.setBUSINESS_REL(inputVO.getBUSINESS_REL());
 	}
 
 	//寫入基金適配標的清單
@@ -1358,7 +1359,7 @@ public class IOT110 extends FubonWmsBizLogic {
 		data.addParameter("CUST_RISK",ObjectUtils.toString(list.get(0).get("CUST_RISK")));				//要保人風險屬性
 		data.addParameter("KYC_DUE_DATE",ObjectUtils.toString(list.get(0).get("CUST_RISK_DUE_STR")));	//KYC有效日
 		data.addParameter("AML",ObjectUtils.toString(list.get(0).get("AML")));							//要保人AML風險等級
-		data.addParameter("PRECHECK",ObjectUtils.toString(list.get(0).get("PRECHECK")));				//要保人Pre-check結果(洗錢防制法)
+		data.addParameter("BUSINESS_REL",ObjectUtils.toString(list.get(0).get("BUSINESS_REL")));		//新增業務關係
 		data.addParameter("PROPOSER_INCOME1",ObjectUtils.toString(list.get(0).get("PROPOSER_INCOME1"))); //要保人工作年收入(業報)
 		data.addParameter("PROPOSER_INCOME2",ObjectUtils.toString(list.get(0).get("PROPOSER_INCOME2"))); //要保人工作年收入(財告)
 		data.addParameter("PROPOSER_INCOME3",ObjectUtils.toString(list.get(0).get("PROPOSER_INCOME3"))); //要保人工作年收入(授信)
@@ -1477,9 +1478,14 @@ public class IOT110 extends FubonWmsBizLogic {
 			if(StringUtils.equals("Y", ObjectUtils.toString(list.get(0).get("I_REVOLVING_LOAN_YN")))) loan4Name += (StringUtils.isBlank(loan4Name) ? "" : "、") + "被保人";
 			if(StringUtils.equals("Y", ObjectUtils.toString(list.get(0).get("P_REVOLVING_LOAN_YN")))) loan4Name += (StringUtils.isBlank(loan4Name) ? "" : "、") + "繳款人";
 			//要保人或被保人或繳款人任一人有申辦循環型貸款
-			remarks.append("**" + loan4Name + "有申請額度式房貸，請檢視保費動用是否與該貸款相關，已建議客戶匯款繳交保費。 □是  □否  (□已告知客戶以貸款申購保險之相關風險。將持續追蹤保費扣款金流，確認不會動用透支額度。)\n");
+			remarks.append("**" + loan4Name + "有申請額度式房貸，請檢視保費動用與該貸款有無相關，且是否已建議客戶匯款繳交保費。 □是  □否  (□已告知客戶以貸款申購保險之相關風險。將持續追蹤保費扣款金流，確認不會動用透支額度。)\n");
 		}
 		
+		//有新增業務關係
+		if(StringUtils.equals("Y", ObjectUtils.toString(list.get(0).get("BUSINESS_REL")))) {
+			remarks.append("**首次開戶或高風險客戶於本行新增業務關係，請務必由OP於AML系統進行線上姓名檢核作業，檢核文件分行自行留存。\n");
+		}
+				
 		data.addParameter("QUOTA_LOAN_CHK", remarks.toString());
 				
 		report = gen.generateReport(txnCode, reportID, data);
@@ -1578,7 +1584,7 @@ public class IOT110 extends FubonWmsBizLogic {
 		data.addParameter("INSURED_ID",ObjectUtils.toString(list.get(0).get("INSURED_ID")));       		//被保人ID
 		data.addParameter("INSURED_NAME",ObjectUtils.toString(list.get(0).get("INSURED_NAME")));		//被保人NAME
 		data.addParameter("AML",ObjectUtils.toString(list.get(0).get("AML")));							//要保人AML風險等級
-		data.addParameter("PRECHECK",ObjectUtils.toString(list.get(0).get("PRECHECK")));				//要保人Pre-check結果(洗錢防制法)
+		data.addParameter("BUSINESS_REL",ObjectUtils.toString(list.get(0).get("BUSINESS_REL")));		//新增業務關係
 		data.addParameter("POLICY_NBR",ObjectUtils.toString(list.get(0).get("POLICY_NBR"))); //要保人工作年收入(業報)
 
 		report = gen.generateReport(txnCode, reportID, data);

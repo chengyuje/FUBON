@@ -8,6 +8,8 @@ public class CRM997InputVO{
 	private String experience_level;//體驗等級
 	private Date experience_begin_date;//體驗開始日
 	private Date experience_end_date;//體驗結束日
+	private Date potential_begin_date;//潛力開始日
+	private Date potential_end_date;//潛力結束日
 	private String rptVersion; //報表版本
 	private Date   createtime; //建立時間
 	private String creator;	   //建立人員	
@@ -88,6 +90,18 @@ public class CRM997InputVO{
 	}
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+	public Date getPotential_begin_date() {
+		return potential_begin_date;
+	}
+	public void setPotential_begin_date(Date potential_begin_date) {
+		this.potential_begin_date = potential_begin_date;
+	}
+	public Date getPotential_end_date() {
+		return potential_end_date;
+	}
+	public void setPotential_end_date(Date potential_end_date) {
+		this.potential_end_date = potential_end_date;
 	}
 	
 

@@ -166,6 +166,19 @@ eSoafApp.controller('CRM800Controller',
 			return defer.promise;
 		}
 		
+		//金市SN債
+        function getGoldSnAsset() {
+            var defer = $q.defer();
+            $scope.sendRecv("CRM82B", "getGoldSnAsset", "com.systex.jbranch.app.server.fps.crm82B.CRM82BInputVO", {"cust_id": $scope.custVO.CUST_ID}, 
+            	function (tota, isError) {
+                if (!isError) {
+                    $scope.crm82B = tota[0].body.SUMTrustVal;
+                }
+                defer.resolve($scope.crm82B);
+            });
+            return defer.promise;
+        }
+		
 		//1913 查詢存款庫存資料查詢
 		$scope.inquire_C = function() {
 			var deferred = $q.defer();
@@ -196,6 +209,7 @@ eSoafApp.controller('CRM800Controller',
 								$scope.crm827 +
 								$scope.crm829 +
 								$scope.crm82A +
+								$scope.crm82B +
 								$scope.other;
 
 			//畫圖參數設定
@@ -471,6 +485,7 @@ eSoafApp.controller('CRM800Controller',
 				$scope.custInvestmentVO.crm828 = $scope.crm828.SUMP_VALUE;
 				$scope.custInvestmentVO.crm829 = $scope.crm829;
 				$scope.custInvestmentVO.crm82A = $scope.crm82A;
+				$scope.custInvestmentVO.crm82B = $scope.crm82B;
 				$scope.custInvestmentVO.other  = $scope.other;
 				$scope.$emit("CRM610VO", {action:"set", type:"CRM681_Investment", data: $scope.custInvestmentVO});
 				$scope.connector("set","CRM681_Investment",$scope.custInvestmentVO);
@@ -587,6 +602,7 @@ eSoafApp.controller('CRM800Controller',
 				crm828: undefined,
 				crm829: undefined,
 				crm82A: undefined,
+				crm82B: undefined,
 				other: undefined,
 				total: undefined
 			}

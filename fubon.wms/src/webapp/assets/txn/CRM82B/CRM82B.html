@@ -1,0 +1,61 @@
+<script type="text/javascript" src="assets/txn/CRM82B/CRM82B.js"></script>
+<script type="text/javascript" src="assets/txn/CRM82B/CRM82B_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PRD141/PRD141_DETAIL.js"></script>
+<div class="CRM82B" ng-controller="CRM82BController" ng-cloak>
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<table>
+				<tr>
+					<th colspan="2">(約當臺幣)</th>
+				</tr>
+				<tr>
+					<th>庫存總金額：</th>
+					<td>{{SUMTrustVal | number :0}}</td>
+				</tr>
+			</table>
+		</div>
+		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
+		<div class="gv_tab_sc scroll_y" style="min-height:235px; white-space: nowrap;">
+			<table>
+				<thead>
+					<tr>
+						<th>ISIN Code</th>
+						<th>產品代號</th>
+						<th>產品簡稱</th>
+						<th>交易幣別</th>
+						<th>庫存面額</th>
+						<th>交易日</th>
+						<th>交割日</th>
+						<th>最新配息日</th>
+						<th>最新配息率</th>
+						<th>累積配息率</th>
+						<th>參考報價</th>
+						<th>含息報酬率</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+					
+						<td style="text-align: left;">
+							<a href="#" ng-click="detail(row)">{{row.ISIN_CODE}}</a>
+						</td>	
+						<td style="text-align: left;">{{row.PROD_ID}}</td>
+						
+						<td style="text-align: left;">
+							<a href="#" ng-click="goPrdDetail(row, 'SN')">{{row.PROD_NAME}}</a>
+						</td>
+						<td style="text-align: left;">{{row.CCY}}</td>
+						<td style="text-align: right;">{{row.M_TP_NOMINAL | number : 2}}</td>
+						<td style="text-align: center;">{{row.M_TP_DTETRN}}</td>
+						<td style="text-align: center;">{{row.M_TP_DTEPMT}}</td>
+						<td style="text-align: center;">{{row.LAST_INTEREST_DATE}}</td>
+						<td style="text-align: right;">{{row.LAST_INTEREST_RATE | number : 2}}</td>
+						<td style="text-align: right;">{{row.TOT_INTEREST_RATE | number : 2}}</td>
+						<td style="text-align: right;">{{row.REF_NAV | number : 2}}</td>
+						<td style="text-align: right;">{{row.DIV_RTN | number : 2}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

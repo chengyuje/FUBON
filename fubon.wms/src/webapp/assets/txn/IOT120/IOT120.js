@@ -128,6 +128,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 						LOAN_SOURCE2_YN:$scope.INS_INFORMATION[0].LOAN_SOURCE2_YN,
 						AML:$scope.INS_INFORMATION[0].AML,
 						PRECHECK:$scope.INS_INFORMATION[0].PRECHECK,
+						BUSINESS_REL:$scope.INS_INFORMATION[0].BUSINESS_REL,
 						PROPOSER_INCOME1:$scope.INS_INFORMATION[0].PROPOSER_INCOME1,
 						C_KYC_INCOME:$scope.INS_INFORMATION[0].C_KYC_INCOME,
 						PROPOSER_INCOME3:$scope.INS_INFORMATION[0].PROPOSER_INCOME3,
@@ -327,6 +328,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 					KYC_DUE_DATE: undefined,
 					AML: '',
 					PRECHECK: '',
+					BUSINESS_REL: '',
 					GUILD_RPT_DATE: undefined,
 					LOAN_PRD_YN: '',
 					LOAN_SOURCE_YN: '',
@@ -446,6 +448,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 			$scope.inputVO.KYC_DUE_DATE = undefined;
 			$scope.inputVO.AML = '';
 			$scope.inputVO.PRECHECK = '';
+			$scope.inputVO.BUSINESS_REL = '';
 			$scope.inputVO.GUILD_RPT_DATE = undefined;
 			$scope.inputVO.LOAN_PRD_YN = '';
 			$scope.inputVO.LOAN_SOURCE_YN = '';
@@ -711,6 +714,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 		$scope.inputVO.CUST_RISK = $scope.prematchList.CUST_RISK;
 		$scope.inputVO.AML = $scope.prematchList.AML;
 		$scope.inputVO.PRECHECK = $scope.prematchList.PRECHECK;
+		$scope.inputVO.BUSINESS_REL = $scope.prematchList.BUSINESS_REL;
 	//
 		//首期保費繳費方式
 		$scope.inputVO.FIRST_PAY_WAY = $scope.prematchList.FIRST_PAY_WAY;
@@ -1473,6 +1477,15 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 
 	$scope.Submit = function(){
 		debugger
+		//非契撤，要保人/被保人/繳款人戶況檢核
+		if($scope.inputVO.CANCEL_CONTRACT_YN != "Y" &&
+				(RegExp('[4678]').test($scope.inputVO.PROPOSER_CM_FLAG) ||
+				 RegExp('[4678]').test($scope.inputVO.INSURED_CM_FLAG) ||
+				 RegExp('[4678]').test($scope.inputVO.PAYER_CM_FLAG))) {
+			$scope.showErrorMsgInDialog("要保人/被保人/繳款人不可為禁銷、拒銷、客訴戶");
+			return false;
+		}
+		
 		//投資型商品或非投資型但須適配商品，適配日(要保人保險購買檢核的鍵機日)須等於要保書申請日
 		if($scope.checkFieldData() && ($scope.inputVO.PRODUCT_TYPE != '1' || $scope.inputVO.NEED_MATCH == 'Y')) {
 			$scope.sendRecv("IOT120","getInvPreMatch","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO",

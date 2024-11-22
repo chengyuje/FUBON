@@ -20,6 +20,7 @@ public class SQM110InputVO extends PagingInputVO{
 	private String case_no;  // 案件編號
 	private String satisfaction_o; //滿意度
 	private String case_status; //處理狀態
+	private String mgrUHRMAreaYN; //總行或業務處長有選私銀區
 	
 	
 	/***** 可試範圍專用END *****/
@@ -104,6 +105,12 @@ public class SQM110InputVO extends PagingInputVO{
 	}
 	public void setCase_status(String case_status) {
 		this.case_status = case_status;
+	}
+	public String getMgrUHRMAreaYN() {
+		return mgrUHRMAreaYN;
+	}
+	public void setMgrUHRMAreaYN(String mgrUHRMAreaYN) {
+		this.mgrUHRMAreaYN = mgrUHRMAreaYN;
 	}
 	
 	

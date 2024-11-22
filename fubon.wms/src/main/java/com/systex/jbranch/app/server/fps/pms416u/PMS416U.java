@@ -85,8 +85,10 @@ public class PMS416U extends FubonWmsBizLogic {
 		
 		sb.append("ORDER BY EN.EMP_ID, AR.TYPE ");
 
-		if (null != inputVO.getDataMon()) {
+		if (null != inputVO.getDataMon() && inputVO.getDataMon().length() > 6) {
 			condition.setObject("reportDate", new SimpleDateFormat("yyyyMMdd").parse(new SimpleDateFormat("yyyyMM").format(new Date(Long.parseLong(inputVO.getDataMon()))) + "01"));
+		} else if (null != inputVO.getDataMon() && inputVO.getDataMon().length() == 6) {
+			condition.setObject("reportDate", new SimpleDateFormat("yyyyMMdd").parse(inputVO.getDataMon() + "01"));
 		} else if (null != inputVO.getsCreDate()) {
 			condition.setObject("reportDate", inputVO.getsCreDate());
 		} else {
@@ -94,7 +96,6 @@ public class PMS416U extends FubonWmsBizLogic {
 		} 
 
 		condition.setQueryString(sb.toString());
-
 		outputVO.setUHRMList(dam.exeQuery(condition));
 		
 		this.sendRtnObject(outputVO);
@@ -124,9 +125,16 @@ public class PMS416U extends FubonWmsBizLogic {
 			condition.setObject("loginID", DataManager.getWorkStation(uuid).getUser().getCurrentUserId());
 		}
 		
+		if (StringUtils.isNotEmpty(inputVO.getUhrmOP())) {
+			sb.append("AND EN.E_DEPT_ID = :eDeptID ");
+			condition.setObject("eDeptID", inputVO.getUhrmOP());
+		}
+		
 		sb.append("ORDER BY EN.EMP_ID ");
 		
-		if (StringUtils.isNotBlank(inputVO.getDataMon())) {
+		if (null != inputVO.getDataMon() && inputVO.getDataMon().length() > 6) {
+			condition.setObject("reportDate", new SimpleDateFormat("yyyyMMdd").parse(new SimpleDateFormat("yyyyMM").format(new Date(Long.parseLong(inputVO.getDataMon()))) + "01"));
+		} else if (null != inputVO.getDataMon() && inputVO.getDataMon().length() == 6) {
 			condition.setObject("reportDate", new SimpleDateFormat("yyyyMMdd").parse(inputVO.getDataMon() + "01"));
 		} else if (null != inputVO.getsCreDate()) {
 			condition.setObject("reportDate", inputVO.getsCreDate());

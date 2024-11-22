@@ -43,6 +43,9 @@ public class PRDFitInputVO {
 	private String prdNameC2;		//商品名稱
 	private String prdNameC3;		//商品名稱
 	
+	//SI贖回
+	private String ivBrh; //推薦分行
+	
 	public String getIsbBackend() {
 		return isbBackend;
 	}
@@ -204,6 +207,12 @@ public class PRDFitInputVO {
 	}
 	public void setPrdNameC3(String prdNameC3) {
 		this.prdNameC3 = prdNameC3;
+	}
+	public String getIvBrh() {
+		return ivBrh;
+	}
+	public void setIvBrh(String ivBrh) {
+		this.ivBrh = ivBrh;
 	}
 	
 }

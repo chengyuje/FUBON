@@ -41,6 +41,25 @@ public class PMS329InputVO extends PagingInputVO {
 	
 	private String NOT_EXIST_UHRM;
 
+	private String importSDate;
+	private String importEDate;
+	
+	public String getImportSDate() {
+		return importSDate;
+	}
+
+	public void setImportSDate(String importSDate) {
+		this.importSDate = importSDate;
+	}
+
+	public String getImportEDate() {
+		return importEDate;
+	}
+
+	public void setImportEDate(String importEDate) {
+		this.importEDate = importEDate;
+	}
+
 	public String getNOT_EXIST_UHRM() {
 		return NOT_EXIST_UHRM;
 	}

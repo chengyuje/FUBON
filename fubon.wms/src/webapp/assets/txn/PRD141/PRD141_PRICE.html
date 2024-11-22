@@ -1,0 +1,88 @@
+<div class="search_table">
+	<h4 class="h4-title">查詢條件</h4>
+	<table>
+		<tr>
+			<th>報價查詢起訖日期</th>
+			<td>
+				<div class="form-group">
+					<div class="input-group datebox datewidth">
+						<input type="text" id="sDate" name="sDate"
+						class="form-control"
+						uib-datepicker-popup="yyyy/MM/dd"
+						ng-model="inputVO.sDate"
+						is-open="model.a"
+						datepicker-options="sDateOptions"
+						ng-readonly="true"
+						ng-change="limitDate()"/>
+						<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+							<i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+					<div style="float: left !important;">～</div>
+					<div class="input-group datebox datewidth">
+						<input type="text" id="eDate" name="eDate"
+						class="form-control"
+						uib-datepicker-popup="yyyy/MM/dd"
+						ng-model="inputVO.eDate"
+						is-open="model.b"
+						datepicker-options="eDateOptions"
+						ng-readonly="true"
+						ng-change="limitDate()"/>
+						<!-- 製作日曆button -->
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+							<i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+				</div>
+			</td>
+			<th>報價查詢期間</th>
+			<td>
+				<e-combobox id="stime" 
+					ng-datasource="mappingSet['Time']"
+					ng-model="inputVO.stime"
+   					ng-validate="false"
+   					ng-readonly="false" 
+   					ng-editable="false"
+   					ng-format="F3"
+   					ng-change="setDate()"
+   					ng-required="false"
+   					width="100px"
+   					style="line-height:20px;" />
+			</td>
+		</tr>
+		<tr>
+			<th><button type="button" class="btn btn-info" ng-click="getBondPrice()" function-type="query">查詢</button></th>
+		</tr>
+	</table>
+	<br>
+	<table>
+		<tr>
+			<th width="60%">
+				<nvd3 options="options" data="data"></nvd3>
+			</th>
+			<th width="40%">
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="table table-bordered e-table-freeze" e-top="true" e-mode="1" e-height="40vw" e-list="CHART">
+						<thead>
+							<tr>
+								<th width="50%">參考報價日期</th>
+<!-- 								<th width="33%">參考申購價格</th> -->
+								<th width="50%">參考賣出價格%</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in CHART | orderBy:'-' track by $index">
+								<td>{{toJsDate(row.NAV_DATE) | date:'yyyy/MM/dd'}}</td>
+<!-- 								<td>{{row.BUY_PRICE}}</td> -->
+								<td>{{row.NAV}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</th>
+		</tr>
+	</table>
+</div>

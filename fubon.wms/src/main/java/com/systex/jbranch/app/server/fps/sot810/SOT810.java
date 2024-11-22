@@ -80,7 +80,7 @@ public class SOT810 extends SotPdf {
                     data.addParameter("CUST_NAME", tradeData.get("CUST_NAME").toString());
                 }
                 // 推薦分行代碼為「庫存收件行」
-                data.addParameter("RECOMMAND_BRH_ID", tradeData.get("BRANCH_NBR"));
+                data.addParameter("RECOMMAND_BRH_ID", null == inputVO.getIvBrh() ? tradeData.get("BRANCH_NBR") : inputVO.getIvBrh());
 
                 // 中解受理分行為「理專歸屬行」
                 String branchName = ObjectUtils.toString(tradeData.get("BRANCH_NAME"));

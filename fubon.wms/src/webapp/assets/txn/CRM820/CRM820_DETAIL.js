@@ -57,10 +57,15 @@ eSoafApp.controller('CRM820_DETAILController',
 	        		$scope.page_title="奈米投";
 	        		$scope.page_inde= "assets/txn/CRM829/CRM829.html";
 	        		break;
-	        		/*海外債-金市*/
+	        	/*海外債-金市*/
 		    	case 10:
 		    		$scope.page_title="海外債-金市";
 		    		$scope.page_inde= "assets/txn/CRM82A/CRM82A.html";
+		    		break;
+	    		/*境外結構型債券-金市*/
+		    	case 11:
+		    		$scope.page_title="境外結構型債券-金市";
+		    		$scope.page_inde= "assets/txn/CRM82B/CRM82B.html";
 		    		break;
 	        	}
         };

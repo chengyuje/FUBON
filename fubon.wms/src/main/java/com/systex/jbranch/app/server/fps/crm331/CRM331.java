@@ -116,8 +116,8 @@ public class CRM331 extends FubonWmsBizLogic {
 		List<String> res6 = new ArrayList<String>();
 		Boolean Check7 = false;  //十保專區檢查, 半年內不可移回原理專
 		List<String> res7 = new ArrayList<String>();
-//		Boolean Check8 = false;  //主CODE客戶僅可移入主CODE
-//		List<String> res8 = new ArrayList<String>();
+		Boolean Check8 = false;  //主CODE客戶不可移轉至維護CODE
+		List<String> res8 = new ArrayList<String>();
 		Boolean Check9 = false;  //禁銷戶檢核
 		List<String> res9 = new ArrayList<String>();
 		Boolean Check10 = false;  //2022換手名單：已換手經營客戶未滿6個月不可移轉回原個金RM
@@ -287,12 +287,11 @@ public class CRM331 extends FubonWmsBizLogic {
 				res12.add(ObjectUtils.toString(map.get("CUST_ID")));
 			}
 			
-			//主CODE客戶僅可移入主CODE
-			//#2085:取消此檢核
-//			if(StringUtils.equals("1", ObjectUtils.toString(map.get("AO_CODE_TYPE"))) && !StringUtils.equals("1", inputVO.getNew_ao_type())) {
-//				Check8 = true;
-//				res8.add(ObjectUtils.toString(map.get("CUST_ID")));
-//			}
+			//#2225: 主CODE移轉規則調整，主CODE客戶不可移轉至維護CODE
+			if(StringUtils.equals("1", ObjectUtils.toString(map.get("AO_CODE_TYPE"))) && StringUtils.equals("3", inputVO.getNew_ao_type())) {
+				Check8 = true;
+				res8.add(ObjectUtils.toString(map.get("CUST_ID")));
+			}
 			
 			//禁銷戶
 			if(StringUtils.equals(ObjectUtils.toString(map.get("COMM_NS_YN")), "Y")) {
@@ -331,9 +330,9 @@ public class CRM331 extends FubonWmsBizLogic {
 		} else if(Check7) {
 			outputVO.setResultList(res7); //十保檢查
 			outputVO.setResultList2("ERR7");
-//		} else if(Check8) {
-//			outputVO.setResultList(res8); //主CODE客戶僅可移入主CODE
-//			outputVO.setResultList2("ERR8");
+		} else if(Check8) {
+			outputVO.setResultList(res8); //主CODE客戶不可移轉至維護CODE
+			outputVO.setResultList2("ERR8");
 		} else if(Check9) {
 			outputVO.setResultList(res9); //禁銷戶
 			outputVO.setResultList2("ERR9");

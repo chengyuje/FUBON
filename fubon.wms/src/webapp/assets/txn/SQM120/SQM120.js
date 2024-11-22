@@ -29,6 +29,22 @@ eSoafApp.controller('SQM120Controller',
 			}
 		});		
 		
+		//取得UHRM人員清單
+		$scope.getUHRMList = function() {
+			debugger
+			$scope.sendRecv("SQM110", "getUHRMList", "com.systex.jbranch.app.server.fps.sqm110.SQM110InputVO", {"branch_area_id":$scope.inputVO.branch_area_id}, 
+				function(tota, isError) {
+					debugger
+					if (isError) {
+						return;
+					}
+					if (tota.length > 0) {
+						$scope.mappingSet['UHRM_LIST'] = tota[0].body.uhrmList;
+						$scope.inputVO.emp_id = tota[0].body.uEmpID;
+					}
+			});
+		};
+		
 		 // date picker
 		var currDate = new Date(2018, 8, 1, 0, 0, 0);
 		$scope.bgn_sDateOptions = {
@@ -53,7 +69,6 @@ eSoafApp.controller('SQM120Controller',
 		// date picker end
 
 		$scope.init = function(){
-			debugger;
 			$scope.inputVO = {
 					sCreDate: new Date(new Date().getFullYear(),new Date().getMonth(),1),
 					eCreDate: new Date(),
@@ -65,14 +80,27 @@ eSoafApp.controller('SQM120Controller',
 			$scope.paramList = [];
 			$scope.outputVO={totalList:[]};	
 			$scope.limitDate();
+			debugger
+			
+			$scope.inputVO.mgrUHRMAreaYN = "N";
+			$scope.isUHRMArea = false;
+			$scope.pri_id = projInfoService.getPriID();
+			$scope.memLoginFlag = String(sysInfoService.getMemLoginFlag()).toUpperCase();
+			//是否為業務處長
+			$scope.inputVO.isRegionMgr = ($scope.pri_id[0] == "013");
+			//是否為私銀角色
+			$scope.isUHRM = $scope.memLoginFlag.startsWith('UHRM') ? true : false;
+			if($scope.isUHRM) {
+				$scope.getUHRMList();
+			}
+			
 			$scope.region = ['N', $scope.inputVO, "region_center_id", "REGION_LIST", "branch_area_id", "AREA_LIST", "branch_nbr", "BRANCH_LIST", "ao_code", "AO_LIST", "emp_id", "EMP_LIST"];
 	    	$scope.RegionController_setName($scope.region).then(function(data) {
 	    		debugger
 	    		//檢核需不需要預設員編	
-	    		if ($scope.EMP_LIST.length >= 3)
-	    			$scope.inputVO.emp_id = '';
-	    	});
-	    	console.log("$scope.inputVO2 ", $scope.inputVO); 	
+	    		if ($scope.EMP_LIST.length >= 3) $scope.inputVO.emp_id = '';
+	    	}); 	
+		
 		};
 		$scope.init();
 		$scope.inquireInit = function(){
@@ -176,6 +204,29 @@ eSoafApp.controller('SQM120Controller',
 						$scope.query();
 					}
 				});
-	        };
+	      };
+	      
+	      $scope.checkIsUHRMArea = function() {
+	  		$scope.inputVO.brhList = [];
+	  		angular.forEach($scope.BRANCH_LIST, function(row, index, objs){
+	  			if(row.DATA != "" && row.DATA != "0"){
+	  				$scope.inputVO.brhList.push({LABEL: row.LABEL, DATA: row.DATA});					
+	  			}
+	  		});
+	  		debugger
+	  		$scope.inputVO.mgrUHRMAreaYN = "N";
+	  		$scope.isUHRMArea = false;
+	  		//總行或業務處長有選營運區
+	  		if(($scope.headmgr_flag || $scope.inputVO.isRegionMgr) && $scope.inputVO.branch_area_id != undefined
+	  				&& $scope.inputVO.branch_area_id != null && $scope.inputVO.branch_area_id != "") {
+	  			if($scope.inputVO.brhList.length > 0 && $scope.inputVO.brhList[0].DATA.length > 3) {
+	  				//若選到私銀區，或沒有分行下拉選單資料
+	  				$scope.inputVO.mgrUHRMAreaYN = "Y"; //總行或業務處長選私銀區
+	  				$scope.isUHRMArea = true;
+	  				$scope.getUHRMList();
+	  				$scope.inputVO.branch_nbr = ""; //私銀區不顯示分行
+	  			}
+	  		}
+	  	}
                 	
 });

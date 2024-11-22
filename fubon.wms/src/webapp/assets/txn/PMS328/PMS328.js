@@ -27,7 +27,9 @@ eSoafApp.controller('PMS328Controller', function($rootScope, $scope, $controller
 				branch_area_id   : '',			//營運區
 				branch_nbr       : '',			//分行
 				ao_code          : '',			//理專
-				funcPage         : 'PMS328'
+				funcPage         : 'PMS328', 
+				importSDate      : '',
+				importEDate      : ''
     	};
 		
 		$scope.paramList = [];
@@ -210,7 +212,7 @@ eSoafApp.controller('PMS328Controller', function($rootScope, $scope, $controller
     		$scope.inputVO.eTimes = '';
     	}
 		
-		$scope.sendRecv("PMS328", "queryData", "com.systex.jbranch.app.server.fps.pms329.PMS329InputVO", $scope.inputVO, function(tota, isError) {
+		$scope.sendRecv("PMS328", "queryData", "com.systex.jbranch.app.server.fps.pms328.PMS328InputVO", $scope.inputVO, function(tota, isError) {
 			if (!isError) {
 				
 				if(tota[0].body.resultList.length == 0) {

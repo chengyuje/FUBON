@@ -22,6 +22,7 @@ public class IOT920OutputVO extends PagingOutputVO{
 	private BigDecimal INCOME3;
 	private String Message;
 	private CustHighNetWorthDataVO hnwcData;
+	private BigDecimal INS_ASSET;
 
 	
 	public List<Map<String, Object>> getEMP_NAME() {
@@ -126,6 +127,14 @@ public class IOT920OutputVO extends PagingOutputVO{
 
 	public void setHnwcData(CustHighNetWorthDataVO hnwcData) {
 		this.hnwcData = hnwcData;
+	}
+
+	public BigDecimal getINS_ASSET() {
+		return INS_ASSET;
+	}
+
+	public void setINS_ASSET(BigDecimal iNS_ASSET) {
+		INS_ASSET = iNS_ASSET;
 	}
 	
 }

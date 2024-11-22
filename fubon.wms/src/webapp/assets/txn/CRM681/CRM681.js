@@ -314,7 +314,8 @@ eSoafApp.controller('CRM681Controller',
             					$scope.crm827 + 
             					$scope.crm828 + 
             					$scope.crm829 + 
-            					$scope.crm82A + 
+            					$scope.crm82A +
+            					$scope.crm82B +
             					$scope.other;
 
             $scope.sec = $scope.crm871AUM + $scope.crm872AUM + $scope.crm873AUM + $scope.crm874AUM;
@@ -328,6 +329,18 @@ eSoafApp.controller('CRM681Controller',
                     $scope.crm82A = tota[0].body.totalMarketValueTwd;
                 }
                 defer.resolve($scope.crm82A);
+            });
+            return defer.promise;
+        }
+        
+      //金市SN債
+        function getGoldSnAsset() {
+            var defer = $q.defer();
+            $scope.sendRecv("CRM82B", "getGoldSnAsset", "com.systex.jbranch.app.server.fps.crm82B.CRM82BInputVO", {"cust_id": $scope.custVO.CUST_ID}, function (tota, isError) {
+                if (!isError) {
+                    $scope.crm82B = tota[0].body.SUMTrustVal;
+                }
+                defer.resolve($scope.crm82B);
             });
             return defer.promise;
         }
@@ -368,11 +381,13 @@ eSoafApp.controller('CRM681Controller',
 	                $scope.custInvestmentVO.crm828 = $scope.crm828;
 	                $scope.custInvestmentVO.crm829 = $scope.crm829;
 	                $scope.custInvestmentVO.crm82A = $scope.crm82A;
+	                $scope.custInvestmentVO.crm82B = $scope.crm82B;
 	                $scope.custInvestmentVO.other = $scope.other;
 	                $scope.$emit("CRM610VO", {action: "set", type: "CRM681_Investment", data: $scope.custInvestmentVO});
 	                $scope.connector("set", "CRM681_Investment", $scope.custInvestmentVO);
 	        		break;
 	        	case "CRM870" :
+	        		
 	        		$scope.custSecVO.total = $scope.sec;
 	                $scope.custSecVO.crm871AUM 			= $scope.crm871AUM;
 	                $scope.custSecVO.crm871INVEST_AUM 	= $scope.crm871INVEST_AUM;
@@ -392,6 +407,7 @@ eSoafApp.controller('CRM681Controller',
 	                $scope.custSecVO.crm874BENEFIT_AMT2 = $scope.crm874BENEFIT_AMT2;
  	                $scope.$emit("CRM610VO", {action: "set", type: "CRM681_Sec", data: $scope.custSecVO});
 	                $scope.connector("set", "CRM681_Sec", $scope.custSecVO);
+	                debugger
 	        		break;
         	}
             var url = "assets/txn/" + path + "/" + path + ".html";
@@ -491,6 +507,7 @@ eSoafApp.controller('CRM681Controller',
             $scope.custInvestmentVO.crm828 = $scope.crm828;
             $scope.custInvestmentVO.crm829 = $scope.crm829;
             $scope.custInvestmentVO.crm82A = $scope.crm82A;
+            $scope.custInvestmentVO.crm82B = $scope.crm82B;
             $scope.custInvestmentVO.other = $scope.other;
             
             $scope.$emit("CRM610VO", {action: "set", type: "CRM681_Investment", data: $scope.custInvestmentVO});
@@ -608,6 +625,7 @@ eSoafApp.controller('CRM681Controller',
                 crm828: undefined,
                 crm829: undefined,
                 crm82A: undefined,
+                crm82B: undefined,     
                 other: undefined
             }
             
@@ -678,6 +696,7 @@ eSoafApp.controller('CRM681Controller',
                 nano: getNanoAsset(),
                 gold: inquireGold(),
                 goldBond: getGoldBondAsset(),
+                goldSn: getGoldSnAsset(),
 
                 debt: getCustAssetInvestData2(crm610Data.acctData),
                 deposit: getCustAssetDepositData(crm610Data.acctData),

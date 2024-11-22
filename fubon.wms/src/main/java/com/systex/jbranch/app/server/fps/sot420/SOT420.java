@@ -339,7 +339,7 @@ public class SOT420 extends FubonWmsBizLogic {
 
 		inputVO_708.setCheckType("2"); //2:確認
 		inputVO_708.setTradeSeq(inputVO.getTradeSEQ());
-
+        inputVO_708.setIvBrh(inputVO.getIvBrh()); 
 		SOT708 sot708 = (SOT708) PlatformContext.getBean("sot708");
 		String errorMsg = null;
 		try {

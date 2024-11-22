@@ -439,6 +439,8 @@ public class CRM361 extends FubonWmsBizLogic {
 		List<String> res8 = new ArrayList<String>();
 		Boolean Check9 = false;
 		List<String> res9 = new ArrayList<String>();
+		Boolean Check10 = false;
+		List<String> res10 = new ArrayList<String>();
 		
 		// follow crm331
 		for (Map<String, Object> map : inputVO.getApply_list()) {
@@ -486,6 +488,11 @@ public class CRM361 extends FubonWmsBizLogic {
 				if ("1".equals(OLD_TYPE) && fchMap.containsKey(map.get("OLD_ROLE_ID")) && "3".equals(NEW_TYPE) && fchMap.containsKey(NEW_ROLE_ID)) {
 					Check3 = true;
 					res3.add(ObjectUtils.toString(map.get("CUST_ID")));
+				}
+				//#2225: 主CODE移轉規則調整，主CODE客戶不可移轉至維護CODE
+				if ("1".equals(OLD_TYPE) && "3".equals(NEW_TYPE)) {
+					Check10 = true;
+					res10.add(ObjectUtils.toString(map.get("CUST_ID")));
 				}
 			}
 			
@@ -631,6 +638,9 @@ public class CRM361 extends FubonWmsBizLogic {
 		} else if (Check9) { //加強管控未回函重新分派名單，尚未完成覆核，主管不得於”例行”以及”專案”移轉覆核時分派新理專
 			return_VO.setResultList2("ERR9");
 			return_VO.setResultList(res9);
+		} else if(Check10) { //#2225: 主CODE移轉規則調整，主CODE客戶不可移轉至維護CODE
+			return_VO.setResultList2("ERR10");
+			return_VO.setResultList(res10);
 		} else
 			return_VO.setResultList2("GOOD");
 		this.sendRtnObject(return_VO);

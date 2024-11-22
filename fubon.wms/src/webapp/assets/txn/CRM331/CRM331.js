@@ -342,8 +342,8 @@ eSoafApp.controller('CRM331Controller',
 								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", 公司戶與公司負責人掛Code需一致");
 							} else if (tota[0].body.resultList2 == 'ERR7') {
 								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", 該客戶屬十保監控客戶未滿六個月需客戶同意書才可移回原理專");
-//							} else if (tota[0].body.resultList2 == 'ERR8') { //#2085:取消此檢核
-//								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", 主CODE客戶僅可移入主CODE");
+							} else if (tota[0].body.resultList2 == 'ERR8') { //#2225:主CODE客戶不可移轉至維護CODE
+								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", 主CODE客戶不可移轉至維護CODE");
 							} else if (tota[0].body.resultList2 == 'ERR9') {
 								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + "為NS戶，無法申請客戶移入，請洽分行內控品管科。");
 							} else if (tota[0].body.resultList2 == 'ERR10') {

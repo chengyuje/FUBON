@@ -39,6 +39,7 @@ eSoafApp.controller('CRM820Controller',
 			$scope.crm828 = 0; //黃金存摺
 			$scope.crm829 = 0; //奈米投
 			$scope.crm82A = 0; //金市海外債
+			$scope.crm82B = 0; //金市SN債
 			$scope.other = 0;  //其他
 			$scope.total = 0;  //投資總計(約當台幣)
 			
@@ -52,6 +53,7 @@ eSoafApp.controller('CRM820Controller',
 			if(!isNaN($scope.investment.crm828)) $scope.crm828 = $scope.investment.crm828;
 			if(!isNaN($scope.investment.crm829)) $scope.crm829 = $scope.investment.crm829;
 			if(!isNaN($scope.investment.crm82A)) $scope.crm82A = $scope.investment.crm82A;
+			if(!isNaN($scope.investment.crm82B)) $scope.crm82B = $scope.investment.crm82B;
 			if(!isNaN($scope.investment.other))  $scope.other  = $scope.investment.other;
 			if(!isNaN($scope.investment.total)) $scope.total  = $scope.investment.total;
 		};
@@ -87,7 +89,8 @@ eSoafApp.controller('CRM820Controller',
 		};
 		
 		if ($scope.crm821 == 0 && $scope.crm822 == 0 && $scope.crm823 == 0 && $scope.crm824 == 0 && $scope.crm825 == 0 
-				&& $scope.crm826 == 0 && $scope.crm827 == 0 && $scope.crm828 == 0 && $scope.crm829 == 0 && $scope.crm82A == 0 && $scope.other == 0) {
+				&& $scope.crm826 == 0 && $scope.crm827 == 0 && $scope.crm828 == 0 && $scope.crm829 == 0 && $scope.crm82A == 0 && $scope.crm82B == 0 
+				&& $scope.other == 0) {
 			$scope.data = [];
 		} else {
 			//繪圖資料
@@ -117,6 +120,10 @@ eSoafApp.controller('CRM820Controller',
 	                             y: $scope.crm825
 	                         },
 	                         {
+	                             key: "境外結構型債券-金市",
+	                             y: $scope.crm82B
+	                         },
+	                         {
 	                             key: "外匯雙享利(DCI)",
 	                             y: $scope.crm826
 	                         },
@@ -140,7 +147,6 @@ eSoafApp.controller('CRM820Controller',
 		}
 			
 		$scope.detail = function(index){
-			debugger;
 			var index = index-1 ;
 			var set = $scope.connector("set","CRM820_TAB",index);
 			var path = "assets/txn/CRM820/CRM820_DETAIL.html";

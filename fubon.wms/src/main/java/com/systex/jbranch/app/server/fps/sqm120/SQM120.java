@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -74,6 +75,7 @@ public class SQM120 extends FubonWmsBizLogic {
 		String roleID = (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
 		// String ID = (String) getUserVariable(FubonSystemVariableConsts.LOGINID);
 		String ID = (String) getCommonVariable(SystemVariableConsts.LOGINID); // 被代理人id
+		String memLoginFlag = getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG).toString();
 		
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); // 總行人員
@@ -83,6 +85,7 @@ public class SQM120 extends FubonWmsBizLogic {
 		boolean headFlag = headmgrMap.containsKey(roleID);
 		boolean mbrFlag = mbrmgrMap.containsKey(roleID);
 		boolean bmFlag = bmmgrMap.containsKey(roleID);
+		boolean uhrmMgr = memLoginFlag.matches("uhrmMGR|uhrmBMMGR"); //是否為私銀主管角色:私銀區主管,私銀作業主管
 
 		// 取得查詢資料可視範圍
 		// PMS000 pms000 = (PMS000) PlatformContext.getBean("pms000");
@@ -106,7 +109,6 @@ public class SQM120 extends FubonWmsBizLogic {
 		sql.append("       'N' as NO_IMPROVE_FLAG, "); //臨櫃/開戶客戶不滿意案件，調整為客戶任一不滿意案件皆須填寫滿意度回覆
 		sql.append("       CASE WHEN A.CASE_STATUS = 'N' then null else COALESCE(A.CASE_STATUS,'0') end AS CASE_STATUS_FLAG ");
 		sql.append("from TBSQM_CSM_IMPROVE_MAST A  ");
-		sql.append("left join TBCRM_CUST_MAST CM ON CM.CUST_ID = A.CUST_ID ");
 		sql.append("left join TBPMS_ORG_REC_N ORG on ORG.dept_id = A.branch_nbr and to_date(A.TRADE_DATE, 'yyyymmdd') between ORG.START_TIME and ORG.END_TIME ");
 		sql.append("left join TBPMS_EMPLOYEE_REC_N EMP on EMP.EMP_id = A.EMP_ID and to_date(A.TRADE_DATE, 'yyyymmdd') between EMP.START_TIME and EMP.END_TIME ");
 		sql.append("left join TBPMS_CUST_REC_N CUST ON CUST.CUST_ID = A.CUST_ID and to_date(A.SEND_DATE, 'yyyymmdd') between CUST.START_TIME and CUST.END_TIME ");
@@ -121,7 +123,6 @@ public class SQM120 extends FubonWmsBizLogic {
 		sql.append("and A.DELETE_FLAG is null ");
 		sql.append("and A.HO_CHECK = 'Y' ");
 		sql.append("and NVL(A.CASE_STATUS, ' ') <> 'N' ");
-		sql.append("AND CM.UEMP_ID IS NULL "); // 排除高端客戶
 
 		// 總行人員可以查詢已進行簽核中的案件
 		if (headFlag) {
@@ -130,10 +131,10 @@ public class SQM120 extends FubonWmsBizLogic {
 				sql.append("and OWNER_EMP_ID = :owner_emp_id  ");
 				condition.setObject("owner_emp_id", inputVO.getOwner_emp_id());
 			}
-		} else if (!bmFlag) {
+		} else if (!bmFlag && !uhrmMgr) { //非分行主管且非私銀主管
 			sql.append("and A.CASE_NO IS NOT NULL AND OWNER_EMP_ID = :ID ");
 			condition.setObject("ID", ID);
-		} else {
+		} else { //分行主管或私銀主管
 			sql.append("and ((A.CASE_NO is null) or (A.CASE_NO IS NOT NULL and OWNER_EMP_ID = :ID) or (A.CASE_NO IS NOT NULL and OWNER_EMP_ID IS NULL)) ");
 			condition.setObject("ID", ID);
 		}
@@ -150,49 +151,46 @@ public class SQM120 extends FubonWmsBizLogic {
 			condition.setObject("timee", new java.text.SimpleDateFormat("yyyyMMdd").format(inputVO.geteCreDate()));
 		}
 
-		/*********** 歷史組織查詢條件篩選-START by willis ***********/
-
-		// 若ID等於自己，可以查詢自己所有資訊，不加其他組織查詢條件
-		if (ID.equals(inputVO.getEmp_id())) {
-			sql.append("and A.EMP_ID = :emp_id ");
-			condition.setObject("emp_id", inputVO.getEmp_id());
-		}
-		// 分行角色、總行
-		else if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && (bmFlag || headFlag)) {
-			sql.append("AND ORG.BRANCH_NBR = :BRNCH_NBRR ");
-			condition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
-		}
-		// 營運區、總行角色
-		else if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && (mbrFlag || headFlag)) {
-			sql.append("AND ORG.BRANCH_AREA_ID = :BRANCH_AREA_IDD ");
-			condition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
-
-			// 區域主管有選分行需加上區域+分行，避免看到歷史其他區的紀錄
-			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
-				sql.append("AND ORG.BRANCH_NBR = :BRNCH_NBRR ");
-				condition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
-			}
-		}
-		// 業務處 、總行角色
-		else {
-			if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-				sql.append("AND ORG.REGION_CENTER_ID = :REGION_CENTER_IDD ");
-				condition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
-
-				// 業務處主管有選分行需加上業務處+分行，避免看到歷史其他業務處分行的紀錄
-				if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
-					sql.append("AND ORG.BRANCH_NBR = :BRNCH_NBRR ");
+		switch (getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG).toString()) {
+			//私銀角色
+			case "uhrmMGR":
+			case "uhrmBMMGR":
+				// 若ID等於自己，可以查詢自己所有資訊，不加其他組織查詢條件
+				if (ID.equals(inputVO.getEmp_id())) {
+					sql.append(" AND A.EMP_ID = :emp_id ");
+					condition.setObject("emp_id", inputVO.getEmp_id());
+				} else {
+					//有UHRM權限人員只能查詢UHRM人員鍵機或UHRM為招攬人員的案件
+					sql.append(" AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.EMP_ID = A.EMP_ID AND MT.DEPT_ID = :loginArea) ");
+					condition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
+					break;
+				}
+				break;	
+			//一般非私銀角色
+			default:
+				// 若ID等於自己，可以查詢自己所有資訊，不加其他組織查詢條件
+				if (ID.equals(inputVO.getEmp_id())) {
+					sql.append("  AND A.EMP_ID = :emp_id ");
+					condition.setObject("emp_id", inputVO.getEmp_id());
+				} else if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) { //有輸入分行
+					sql.append("  AND ORG.BRANCH_NBR = :BRNCH_NBRR ");
+					sql.append(" AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.EMP_ID = A.EMP_ID) ");
 					condition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
+				} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {  //有輸入營運區
+					if(StringUtils.equals("Y", inputVO.getMgrUHRMAreaYN())) {
+						//總行或業務處長選私銀區
+						sql.append(" AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.EMP_ID = A.EMP_ID AND MT.DEPT_ID = :areaId) ");
+					} else {
+						sql.append(" AND ORG.BRANCH_AREA_ID = :areaId ");
+						sql.append(" AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MT.EMP_ID = A.EMP_ID AND MT.DEPT_ID = :areaId) ");
+					}
+					condition.setObject("areaId", inputVO.getBranch_area_id());
+				} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) { //有輸入業務處
+					sql.append("  AND ORG.REGION_CENTER_ID = :REGION_CENTER_IDD ");
+					condition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
 				}
-				// 業務處主管有選區需加上業務處+區，避免看到歷史其他業務處區的紀錄
-				else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-					sql.append("AND ORG.BRANCH_AREA_ID = :BRANCH_AREA_IDD ");
-					condition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
-				}
-			}
-		}
-
-		/*********** 歷史組織查詢條件篩選-END ***********/
+				break;
+		}	
 
 		if (StringUtils.isNotBlank(inputVO.getEmp_id())) {
 			sql.append("and A.EMP_ID like :emp_id% ");
@@ -327,7 +325,7 @@ public class SQM120 extends FubonWmsBizLogic {
 	 * @throws ParseException
 	 **/
 	public void getSendRole(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
-		
+		//
 		SQM120EditInputVO inputVO = (SQM120EditInputVO) body;
 		SQM120OutputVO outputVO = new SQM120OutputVO();
 		dam = this.getDataAccessManager();
@@ -346,122 +344,160 @@ public class SQM120 extends FubonWmsBizLogic {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); // 總行人員
-		
-		queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		sb = new StringBuffer();
-		
-		sb.append("SELECT * FROM VWORG_DEFN_INFO WHERE BRANCH_NBR = :branch_nbr ");
-		
-		queryCondition.setObject("branch_nbr", branch_nbr);
-		
-		queryCondition.setQueryString(sb.toString());
-		
-		List<Map<String, Object>> defnList = dam.exeQuery(queryCondition);
-
-		String region_center_id = "";
-		String branch_area_id = "";
-
-		if (defnList.size() > 0) {
-			region_center_id = defnList.get(0).get("REGION_CENTER_ID").toString();
-			branch_area_id = defnList.get(0).get("BRANCH_AREA_ID").toString();
-			// branch_nbr = defnList.get(0).get("BRANCH_NBR").toString();
-		}
-
-		String roleID = (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
-		if (StringUtils.isBlank(roleID)) {
-			//從M+過來沒有LOGINROLE
+		String memLoginFlag = getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG).toString();
+		//M+沒有開放私銀主管角色，直接抓SystemVariables
+		boolean uhrmMgr = memLoginFlag.matches("uhrmMGR|uhrmBMMGR"); //是否為私銀主管角色:私銀區主管,私銀作業主管
+		if(uhrmMgr) { //私銀主管角色:私銀區主管,私銀作業主管
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			sb = new StringBuffer();
-			
-			sb.append(" select ROLE_ID FROM VWORG_EMP_INFO WHERE EMP_ID = :EMP_ID ORDER BY PRIVILEGEID DESC "); //取最大權限
-			
-			queryCondition.setObject("EMP_ID", loginID);
-			
+			sb.append("SELECT REGION_CENTER_ID FROM VWORG_EMP_UHRM_INFO WHERE PRIVILEGEID IN ('UHRM006', 'UHRM012') AND EMP_ID = :empId ");
+			queryCondition.setObject("empId", loginID);
 			queryCondition.setQueryString(sb.toString());
+			List<Map<String, Object>> uhrmEmpList = dam.exeQuery(queryCondition);
+			String uhrmRegionCenterId = "";
+			if(CollectionUtils.isNotEmpty(uhrmEmpList)) {
+				uhrmRegionCenterId = (String)uhrmEmpList.get(0).get("REGION_CENTER_ID");
+			}
 			
-			List<Map<String, Object>> role_list = dam.exeQuery(queryCondition);
-
-			roleID = ObjectUtils.toString(role_list.get(0).get("ROLE_ID"));
-		}
-		
-		boolean headFlag = headmgrMap.containsKey(roleID);
-
-		queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		StringBuffer sql = new StringBuffer();
-
-		StringBuffer sql1 = new StringBuffer();
-		sql1.append("SELECT JOB_TITLE_NAME, EMP_ID, EMP_NAME, CASE WHEN JOB_TITLE_NAME = '處主管' THEN ROLE_ID || '_1' ELSE ROLE_ID END AS ROLE_ID ");
-		sql1.append("FROM VWORG_EMP_INFO WHERE 1 = 1 ");
-
-		StringBuffer sql3 = new StringBuffer();
-		sql3.append("SELECT ORG.JOB_TITLE_NAME, MAN.EMP_ID, ORG.EMP_NAME, ORG.ROLE_ID FROM ( ");
-		sql3.append("SELECT PARAM_CODE AS EMP_ID FROM TBSYSPARAMETER WHERE PARAM_TYPE ='SQM.HEAD_EMP_ID') MAN ");
-		sql3.append("LEFT JOIN VWORG_EMP_INFO ORG ON MAN.EMP_ID = ORG.EMP_ID AND ORG.ROLE_ID = 'B038' ");
-		// sql3.append("ORDER BY ROLE_ID ");
-
-		StringBuffer sql2 = new StringBuffer();
-		if (roleID.equals("A161") || roleID.equals("A149")) {
-			// 若登入者為"個金分行主管"，能選擇選項: 區督導、處副主管、處主管、總行。
-			sql2.append("AND (BRANCH_AREA_ID = :branch_area_id AND ROLE_ID IN ('A146', 'A301')) ");
-			sql2.append("OR (REGION_CENTER_ID = :region_center_id AND ROLE_ID = 'A164') ");
-			sql2.append("UNION ");
-
-			sql = sql1.append(sql2).append(sql3);
-			queryCondition.setObject("branch_area_id", branch_area_id);
-			queryCondition.setObject("region_center_id", region_center_id);
-
-		} else if (roleID.equals("A146") || roleID.equals("A301")) {
-			// 若登入者為"區督導"，能選擇選項: 處副主管、處主管、總行。
+			//私銀主管，可選業務處長以及總行人員
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			StringBuffer sql = new StringBuffer();
+			
+			StringBuffer sql1 = new StringBuffer();
+			sql1.append("SELECT JOB_TITLE_NAME, EMP_ID, EMP_NAME, CASE WHEN JOB_TITLE_NAME = '處主管' THEN ROLE_ID || '_1' ELSE ROLE_ID END AS ROLE_ID ");
+			sql1.append("FROM VWORG_EMP_INFO WHERE 1 = 1 ");
+	
+			StringBuffer sql3 = new StringBuffer();
+			sql3.append("SELECT ORG.JOB_TITLE_NAME, MAN.EMP_ID, ORG.EMP_NAME, ORG.ROLE_ID FROM ( ");
+			sql3.append("SELECT PARAM_CODE AS EMP_ID FROM TBSYSPARAMETER WHERE PARAM_TYPE ='SQM.HEAD_EMP_ID') MAN ");
+			sql3.append("LEFT JOIN VWORG_EMP_INFO ORG ON MAN.EMP_ID = ORG.EMP_ID AND ORG.ROLE_ID = 'B038' ");
+			
+			StringBuffer sql2 = new StringBuffer();
 			sql2.append("AND (REGION_CENTER_ID = :region_center_id AND ROLE_ID = 'A164') ");
 			sql2.append("UNION ");
 
 			sql = sql1.append(sql2).append(sql3);
-			queryCondition.setObject("region_center_id", region_center_id);
-
-		} else if (roleID.equals("A164")) {
-			// 若登入者為"處副主管"，能選擇選項: 處主管、總行。
-			// 若登入者為"處主管"，能選擇選項: 總行。
-			if (StringUtils.isNotBlank(inputVO.getIsFrom()) && StringUtils.equals(inputVO.getIsFrom(), "SQM410")) {
-				// M+ 進來的交易直接排除處長送總行
-				// M+處/副主管簽核完成臨櫃/開戶直接給員編913600
-				// M+處/副主管簽核完成臨櫃/開戶直接給員編229881
-				sql.append("SELECT ORG.JOB_TITLE_NAME, MAN.EMP_ID, ORG.EMP_NAME, ORG.ROLE_ID FROM ( ");
-				sql.append("SELECT PARAM_NAME AS EMP_ID FROM TBSYSPARAMETER WHERE PARAM_TYPE ='SQM.HEAD_EMP_ID_M' ");
-				sql.append(" AND PARAM_CODE = DECODE(:qtn_type, 'WMS03', 'EMP_ID_1', 'WMS04', 'EMP_ID_1', 'EMP_ID_2')) MAN ");
-				sql.append("LEFT JOIN VWORG_EMP_INFO ORG ON MAN.EMP_ID = ORG.EMP_ID AND ORG.ROLE_ID = 'B038' ");
-
-				queryCondition.setObject("qtn_type", inputVO.getQtnType());
-			} else {
-				sql2.append("AND (REGION_CENTER_ID = :region_center_id AND ROLE_ID = 'A164') ");
-				sql2.append("AND JOB_TITLE_NAME <> '處副主管' AND EMP_ID <> :emp_id ");
-				sql2.append("UNION ");
-
-				queryCondition.setObject("region_center_id", region_center_id);
-				queryCondition.setObject("emp_id", loginID);
-
-				sql = sql1.append(sql2).append(sql3);
-			}
-		} else if (headFlag) {
-			// 新加邏輯總行可以發送給總行
-			sql = sql3.append("WHERE MAN.EMP_ID <> :emp_id ");
-			queryCondition.setObject("emp_id", loginID);
+			queryCondition.setObject("region_center_id", uhrmRegionCenterId);
+			
+			sql.append(") ");
+			sql.append("ORDER BY DECODE(ROLE_ID, 'A161', 1, 'A149', 1, 'A146', 2, 'A301', 2, 'A164', 3, 'A164_1', 4, 5) ");
+			
+			queryCondition.setQueryString("SELECT * FROM ( " + sql.toString());
 		} else {
-			// 若登入者為"作業主管"，能選擇選項: 個金分行主管、區督導、處副主管、處主管、總行。
-			sql2.append("AND (BRANCH_NBR = :branch_nbr AND ROLE_ID IN ('A161', 'A149')) ");
-			sql2.append("OR (BRANCH_AREA_ID = :branch_area_id AND ROLE_ID IN ('A146', 'A301')) ");
-			sql2.append("OR (REGION_CENTER_ID = :region_center_id AND ROLE_ID = 'A164') ");
-			sql2.append("UNION ");
-
-			sql = sql1.append(sql2).append(sql3);
+			//其他非私銀主管
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			sb = new StringBuffer();
+			sb.append("SELECT * FROM VWORG_DEFN_INFO WHERE BRANCH_NBR = :branch_nbr ");
 			queryCondition.setObject("branch_nbr", branch_nbr);
-			queryCondition.setObject("branch_area_id", branch_area_id);
-			queryCondition.setObject("region_center_id", region_center_id);
+			queryCondition.setQueryString(sb.toString());
+			List<Map<String, Object>> defnList = dam.exeQuery(queryCondition);
+	
+			String region_center_id = "";
+			String branch_area_id = "";
+	
+			if (defnList.size() > 0) {
+				region_center_id = defnList.get(0).get("REGION_CENTER_ID").toString();
+				branch_area_id = defnList.get(0).get("BRANCH_AREA_ID").toString();
+				// branch_nbr = defnList.get(0).get("BRANCH_NBR").toString();
+			}
+	
+			String roleID = (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
+			if (StringUtils.isBlank(roleID)) {
+				//從M+過來沒有LOGINROLE
+				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+				sb = new StringBuffer();
+				
+				sb.append(" select ROLE_ID FROM VWORG_EMP_INFO WHERE EMP_ID = :EMP_ID ORDER BY PRIVILEGEID DESC "); //取最大權限
+				
+				queryCondition.setObject("EMP_ID", loginID);
+				
+				queryCondition.setQueryString(sb.toString());
+				
+				List<Map<String, Object>> role_list = dam.exeQuery(queryCondition);
+	
+				roleID = ObjectUtils.toString(role_list.get(0).get("ROLE_ID"));
+			}
+			
+			boolean headFlag = headmgrMap.containsKey(roleID);
+	
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			StringBuffer sql = new StringBuffer();
+	
+			StringBuffer sql1 = new StringBuffer();
+			sql1.append("SELECT JOB_TITLE_NAME, EMP_ID, EMP_NAME, CASE WHEN JOB_TITLE_NAME = '處主管' THEN ROLE_ID || '_1' ELSE ROLE_ID END AS ROLE_ID ");
+			sql1.append("FROM VWORG_EMP_INFO WHERE 1 = 1 ");
+	
+			StringBuffer sql3 = new StringBuffer();
+			sql3.append("SELECT ORG.JOB_TITLE_NAME, MAN.EMP_ID, ORG.EMP_NAME, ORG.ROLE_ID FROM ( ");
+			sql3.append("SELECT PARAM_CODE AS EMP_ID FROM TBSYSPARAMETER WHERE PARAM_TYPE ='SQM.HEAD_EMP_ID') MAN ");
+			sql3.append("LEFT JOIN VWORG_EMP_INFO ORG ON MAN.EMP_ID = ORG.EMP_ID AND ORG.ROLE_ID = 'B038' ");
+			// sql3.append("ORDER BY ROLE_ID ");
+	
+			StringBuffer sql2 = new StringBuffer();
+			if (roleID.equals("A161") || roleID.equals("A149")) {
+				// 若登入者為"個金分行主管"，能選擇選項: 區督導、處副主管、處主管、總行。
+				sql2.append("AND (BRANCH_AREA_ID = :branch_area_id AND ROLE_ID IN ('A146', 'A301')) ");
+				sql2.append("OR (REGION_CENTER_ID = :region_center_id AND ROLE_ID = 'A164') ");
+				sql2.append("UNION ");
+	
+				sql = sql1.append(sql2).append(sql3);
+				queryCondition.setObject("branch_area_id", branch_area_id);
+				queryCondition.setObject("region_center_id", region_center_id);
+	
+			} else if (roleID.equals("A146") || roleID.equals("A301")) {
+				// 若登入者為"區督導"，能選擇選項: 處副主管、處主管、總行。
+				sql2.append("AND (REGION_CENTER_ID = :region_center_id AND ROLE_ID = 'A164') ");
+				sql2.append("UNION ");
+	
+				sql = sql1.append(sql2).append(sql3);
+				queryCondition.setObject("region_center_id", region_center_id);
+	
+			} else if (roleID.equals("A164")) {
+				// 若登入者為"處副主管"，能選擇選項: 處主管、總行。
+				// 若登入者為"處主管"，能選擇選項: 總行。
+				if (StringUtils.isNotBlank(inputVO.getIsFrom()) && StringUtils.equals(inputVO.getIsFrom(), "SQM410")) {
+					// M+ 進來的交易直接排除處長送總行
+					// M+處/副主管簽核完成臨櫃/開戶直接給員編913600
+					// M+處/副主管簽核完成臨櫃/開戶直接給員編229881
+					sql.append("SELECT ORG.JOB_TITLE_NAME, MAN.EMP_ID, ORG.EMP_NAME, ORG.ROLE_ID FROM ( ");
+					sql.append("SELECT PARAM_NAME AS EMP_ID FROM TBSYSPARAMETER WHERE PARAM_TYPE ='SQM.HEAD_EMP_ID_M' ");
+					sql.append(" AND PARAM_CODE = DECODE(:qtn_type, 'WMS03', 'EMP_ID_1', 'WMS04', 'EMP_ID_1', 'EMP_ID_2')) MAN ");
+					sql.append("LEFT JOIN VWORG_EMP_INFO ORG ON MAN.EMP_ID = ORG.EMP_ID AND ORG.ROLE_ID = 'B038' ");
+	
+					queryCondition.setObject("qtn_type", inputVO.getQtnType());
+				} else {
+					sql2.append("AND (REGION_CENTER_ID = :region_center_id AND ROLE_ID = 'A164') ");
+					sql2.append("AND JOB_TITLE_NAME <> '處副主管' AND EMP_ID <> :emp_id ");
+					sql2.append("UNION ");
+	
+					queryCondition.setObject("region_center_id", region_center_id);
+					queryCondition.setObject("emp_id", loginID);
+	
+					sql = sql1.append(sql2).append(sql3);
+				}
+			} else if (headFlag) {
+				// 新加邏輯總行可以發送給總行
+				sql = sql3.append("WHERE MAN.EMP_ID <> :emp_id ");
+				queryCondition.setObject("emp_id", loginID);
+			} else {
+				// 若登入者為"作業主管"，能選擇選項: 個金分行主管、區督導、處副主管、處主管、總行。
+				sql2.append("AND (BRANCH_NBR = :branch_nbr AND ROLE_ID IN ('A161', 'A149')) ");
+				sql2.append("OR (BRANCH_AREA_ID = :branch_area_id AND ROLE_ID IN ('A146', 'A301')) ");
+				sql2.append("OR (REGION_CENTER_ID = :region_center_id AND ROLE_ID = 'A164') ");
+				sql2.append("UNION ");
+	
+				sql = sql1.append(sql2).append(sql3);
+				queryCondition.setObject("branch_nbr", branch_nbr);
+				queryCondition.setObject("branch_area_id", branch_area_id);
+				queryCondition.setObject("region_center_id", region_center_id);
+			}
+	
+			sql.append(") ");
+			sql.append("ORDER BY DECODE(ROLE_ID, 'A161', 1, 'A149', 1, 'A146', 2, 'A301', 2, 'A164', 3, 'A164_1', 4, 5) ");
+			
+			queryCondition.setQueryString("SELECT * FROM ( " + sql.toString());
 		}
-
-		sql.append(") ");
-		sql.append("ORDER BY DECODE(ROLE_ID, 'A161', 1, 'A149', 1, 'A146', 2, 'A301', 2, 'A164', 3, 'A164_1', 4, 5) ");
-
-		queryCondition.setQueryString("SELECT * FROM ( " + sql.toString());
+		
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		List<Map<String, Object>> titleList = new ArrayList();
 		String title = "";

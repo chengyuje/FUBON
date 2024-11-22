@@ -1,0 +1,213 @@
+<style>
+.datewidth{
+	width:180px !important;
+}
+
+.rstable thead tr th {
+	vertical-align:middle;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS364/PMS364.js"></script>
+<script type="text/javascript" src="assets/txn/PMS364/PMS364_DETAIL.js"></script>
+<script type="text/javascript" src="assets/txn/PMS364U/PMS364U.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS364U" ng-controller="PMS364UController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+
+		<div class="panel_content">
+			<div class="search_table search_box3">
+				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+					<table>
+						<tr>						
+							<th><font color="red">＊</font>資料月份：</th>
+							<td>
+								<e-combobox id="sCreDate" name="sCreDate"
+											ng-datasource="mappingSet['timeE']"
+											ng-model="inputVO.sCreDate"
+											ng-validate="false"
+											ng-readonly="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="true"
+											ng-change="dateChangeU();inquireInit();"
+											width="150px"
+											style="line-height:20px;" />
+							</td>
+							<th></th>
+							<td></td>
+							<th></th>
+							<td></td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr>
+							<th>業務處：</th>
+							<td>
+								<e-combobox id="region_center_id" name="region_center_id"
+											ng-datasource="uhrmRCList"
+											ng-model="inputVO.uhrmRC"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											style="line-height:20px;" />
+							</td>
+							<th>營運區：</th>
+							<td>
+								<e-combobox id="branch_area_id" name="branch_area_id"
+											ng-datasource="uhrmOPList"
+											ng-model="inputVO.uhrmOP"
+											ng-validate="false" 
+											ng-disabled="true"
+											ng-readonly="true" 
+											ng-editable="false"
+											ng-format="F1"
+											ng-required="true"
+											style="line-height:20px;" />
+							</td>
+							<th>私銀RM：</th>
+							<td>
+								<e-combobox id="aoCode" name="aoCode"
+											ng-datasource="mappingSet['EmpName']"
+											ng-model="inputVO.aoCode"
+											ng-validate="false"
+											ng-disabled="false"
+											ng-readonly="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-required="false"
+											style="line-height:20px;" />	
+							</td>
+							<th></th>
+							<td></td>
+						</tr>			
+					</table>
+				</form>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()" ng-disabled="inputVO.sCreDate == '' || inputVO.sCreDate == undefined">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();initPMS_U();inquireInit()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length == 0">匯出</button>
+			</div>
+		</div>
+	</div>
+
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<!--Content of the panel-->
+		<div class="panel_content">
+			<e-jumping-once output="outputVO" list="data" totallist="paramList"></e-jumping-once>
+			<div algin="left">
+				<table>
+			    	<tr>
+			    		<td>資料日期：</td>
+			    	</tr>
+			    	<tr>
+			    		<td></td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+				<table class="table-bordered e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th rowspan="2">業務處</th>
+							<th rowspan="2">區別</th>
+							<th rowspan="2">分行</th>
+							<th rowspan="2">AO Code</th>
+							<th colspan="2">專業投資人<br />(有效)</th>
+							<th colspan="2">專業投資人<br />(無效)</th>
+							<th rowspan="2">信託同意</th>
+							<th rowspan="2">衍商同意</th>
+							<th rowspan="2">客訴戶</th>
+							<th rowspan="2">拒銷戶</th>
+							<th rowspan="2">禁銷戶</th>						
+						</tr>
+						<tr>
+						     <th>A板塊</th>
+						     <th>C板塊</th>
+						     
+						     <th>A板塊</th>
+						     <th>C板塊</th>		   
+						</tr>
+					</thead>
+
+					<tbody>
+						<tr ng-repeat-start="dataA in data | groupBy: 'REGION_CENTER_NAME' as resultA">
+							<td align="center"
+								rowspan="{{(dataA[0].REGION_CENTER_NAME).indexOf('合計') > -1 ? 4 : (dataA.length + 
+																								    numGroups(filterByKey(data, 'REGION_CENTER_NAME', dataA[0].REGION_CENTER_NAME), 'REGION_CENTER_NAME') + 
+																									numGroups(filterByKey(data, 'REGION_CENTER_NAME', dataA[0].REGION_CENTER_NAME), 'BRANCH_AREA_NAME') + 
+																									numGroups(filterByKey(data, 'REGION_CENTER_NAME', dataA[0].REGION_CENTER_NAME), 'BRANCH_NAME')
+											)}}"
+								colspan="{{(dataA[0].REGION_CENTER_NAME).indexOf('合計') > -1 ? 4 : 0}}">
+								{{dataA[0].REGION_CENTER_NAME}}
+							</td>
+						</tr>
+						<tr ng-repeat-start="dataB in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
+							<td align="center"
+								rowspan="{{dataB.length + 
+										   numGroups(filterByKey(dataA, 'BRANCH_AREA_NAME', dataB[0].BRANCH_AREA_NAME), 'BRANCH_AREA_NAME') + 
+										   numGroups(filterByKey(dataA, 'BRANCH_AREA_NAME', dataB[0].BRANCH_AREA_NAME), 'BRANCH_NAME')}}" 
+								colspan="{{((dataB[0].BRANCH_AREA_NAME).indexOf('合計') > -1 ? 3 : 0)}}"
+								ng-hide="(dataB[0].REGION_CENTER_NAME).indexOf('合計') > -1">
+								{{dataB[0].BRANCH_AREA_NAME}}
+							</td>
+						</tr>
+						<tr ng-repeat-start="dataC in dataB | groupBy: 'BRANCH_NAME' as resultC">	
+							<td align="center"
+								rowspan="{{dataC.length + 1}}" 
+								colspan="{{((dataC[0].BRANCH_NAME).indexOf('合計') > -1 ? 2 : 0)}}"
+								ng-hide="(dataC[0].BRANCH_AREA_NAME).indexOf('合計') > -1 || (dataC[0].REGION_CENTER_NAME).indexOf('合計') > -1">
+								{{dataC[0].BRANCH_NAME}}
+							</td>
+						</tr>
+						<tr ng-repeat-end ng-repeat="row in dataC">
+							<td align="center" 
+								ng-hide="(row.BRANCH_NAME).indexOf('合計') > -1 || (row.BRANCH_AREA_NAME).indexOf('合計') > -1 || (row.REGION_CENTER_NAME).indexOf('合計') > -1">
+								{{row.CUST_AO}}
+							</td>
+							<td align="right" ng-show="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_PROF_INVESTOR_A_Y == 0">{{row.SUM_PROF_INVESTOR_A_Y}}</td>
+							<td align="right" ng-hide="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_PROF_INVESTOR_A_Y == 0"><a ng-click="openDialog(row, 'PROF_INVESTOR_Y');">{{row.SUM_PROF_INVESTOR_A_Y}}</a></td>
+							
+							<td align="right" ng-show="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_PROF_INVESTOR_C_Y == 0">{{row.SUM_PROF_INVESTOR_C_Y}}</td>
+							<td align="right" ng-hide="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_PROF_INVESTOR_C_Y == 0"><a ng-click="openDialog(row, 'PROF_INVESTOR_Y');">{{row.SUM_PROF_INVESTOR_C_Y}}</a></td>
+							
+							<td align="right" ng-show="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_PROF_INVESTOR_A_N == 0">{{row.SUM_PROF_INVESTOR_A_N}}</td>
+							<td align="right" ng-hide="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_PROF_INVESTOR_A_N == 0"><a ng-click="openDialog(row, 'PROF_INVESTOR_N');">{{row.SUM_PROF_INVESTOR_A_N}}</a></td>
+							
+							<td align="right" ng-show="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_PROF_INVESTOR_C_N == 0">{{row.SUM_PROF_INVESTOR_C_N}}</td>
+							<td align="right" ng-hide="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_PROF_INVESTOR_C_N == 0"><a ng-click="openDialog(row, 'PROF_INVESTOR_N');">{{row.SUM_PROF_INVESTOR_C_N}}</a></td>
+							
+							<td align="right" ng-show="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_TX_FLAG_Y == 0">{{row.SUM_TX_FLAG_Y}}</td>
+							<td align="right" ng-hide="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_TX_FLAG_Y == 0"><a ng-click="openDialog(row, 'TX_FLAG');">{{row.SUM_TX_FLAG_Y}}</a></td>
+							
+							<td align="right" ng-show="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_IS_EFFETIVE_Y == 0">{{row.SUM_IS_EFFETIVE_Y}}</td>
+							<td align="right" ng-hide="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_IS_EFFETIVE_Y == 0"><a ng-click="openDialog(row, 'IS_EFFETIVE');">{{row.SUM_IS_EFFETIVE_Y}}</a></td>
+							
+							<td align="right" ng-show="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_COMPLAIN_Y == 0">{{row.SUM_COMPLAIN_Y}}</td>
+							<td align="right" ng-hide="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_COMPLAIN_Y == 0"><a ng-click="openDialog(row, 'COMPLAIN_YN');">{{row.SUM_COMPLAIN_Y}}</a></td>
+							
+							<td align="right" ng-show="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_COMM_RS_Y == 0">{{row.SUM_COMM_RS_Y}}</td>
+							<td align="right" ng-hide="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_COMM_RS_Y == 0"><a ng-click="openDialog(row, 'COMM_RS_YN');">{{row.SUM_COMM_RS_Y}}</a></td>
+							
+							<td align="right" ng-show="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_COMM_NS_Y == 0">{{row.SUM_COMM_NS_Y}}</td>
+							<td align="right" ng-hide="(row.BRANCH_NAME).indexOf('合計') > 0 || (row.BRANCH_AREA_NAME).indexOf('合計') > 0 || (row.REGION_CENTER_NAME).indexOf('合計') > 0 || row.SUM_COMM_NS_Y == 0"><a ng-click="openDialog(row, 'COMM_NS_YN');">{{row.SUM_COMM_NS_Y}}</a></td>
+						</tr>
+						<tr ng-repeat-end ng-hide="true"></tr>
+						<tr ng-repeat-end ng-hide="true"></tr>
+					</tbody>
+				</table>
+			</div>		
+		</div>
+	</div>
+</div>

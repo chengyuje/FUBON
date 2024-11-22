@@ -122,6 +122,8 @@ eSoafApp.controller('CRM822_QueryHistController',
 			$scope.inputVO.StartDt = '';
 			$scope.inputVO.EndDt = '';
 			$scope.bgn_sDateOptions.maxDate = '';
+			$scope.bgn_sDateOptions.minDate = '';
+			$scope.bgn_eDateOptions.maxDate = '';
 			$scope.bgn_eDateOptions.minDate = '';
 			$scope.inputVO.time = '';
 			$scope.inputVO.account = '';

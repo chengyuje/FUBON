@@ -14,15 +14,17 @@ eSoafApp.controller('SOT330Controller',
 		$scope.mappingSet['EntrustStatus'].push({LABEL: '已成交' , DATA: '01'}, {LABEL: '未成交' , DATA: '02'}, {LABEL: '部分成交' , DATA: '03'});
         		
 		// time picker
-		$scope.startDateOptions = {
-			maxDate: $scope.inputVO.eDate || $scope.maxDate,
-			minDate: $scope.minDate
-		};
-        $scope.endDateOptions = {
-			maxDate: $scope.inputVO.eDate || $scope.maxDate,
-			minDate: $scope.inputVO.sDate || $scope.minDate
-		};
-
+		$scope.optionsInit = function() {
+			$scope.startDateOptions = {
+				maxDate: $scope.inputVO.eDate || $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.endDateOptions = {
+				maxDate: $scope.inputVO.eDate || $scope.maxDate,
+				minDate: $scope.inputVO.sDate || $scope.minDate
+			};
+		}
+		
 		$scope.altInputFormats = ['M!/d!/yyyy'];
 		$scope.model = {};
 		$scope.open = function($event, elementOpened) {
@@ -57,6 +59,7 @@ eSoafApp.controller('SOT330Controller',
 					sDate: undefined, 
 					eDate: undefined
         	};
+        	$scope.optionsInit();
 			$scope.limitDate();
 		};
 		$scope.init();

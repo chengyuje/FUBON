@@ -55,11 +55,12 @@ public final class NewVersionAcct  extends AcctRuler {
 	 */
 	@Override
 	protected boolean fitDebit() {
+		if (isSI(prodType)) return  pkind1().matches("8168|8311|8312|8381|8382");
 		// 保險不加入扣款帳號
-		if (isINS(prodType)) return false;
+		else if (isINS(prodType)) return false;
 		// 其他商品 扣款帳號&收益入帳帳號    FIXME ETF商品，可包含1-3碼為560帳號；其他商品不可包含560帳號 待新帳號提供
 		//OBU帳號只有8381 8382 8389 所以 !pkind2().matches("838")
-		else return pkind1().matches("8211|8216|8212|8168|8221|8222|8311|8312|8381|8382|8389") && ((isFUND(prodType) ||isES(prodType))  || !pkind2().matches("838"));  
+		else return pkind1().matches("8211|8216|8212|8168|8221|8222|8311|8312|8381|8382|8389") && ((isFUND(prodType) ||isES(prodType)) || !pkind2().matches("838"));  
 	}
 
 	@Override

@@ -1366,8 +1366,9 @@ public class ProdFitness extends FubonWmsBizLogic {
 		outputVO = new ProdFitnessOutputVO();
 		
 		//65歲以上客戶沒有專投資格
-		if(!StringUtils.equals("Y", this.getCustVO().getFp032675DataVO().getAgeUnder70Flag()) && //AgeUnder70Flag內容已改為65歲以下
-				!StringUtils.equals("Y", this.getCustVO().getFp032675DataVO().getCustProFlag())) {
+		if(!StringUtils.equals("Y", this.getCustVO().getFp032675DataVO().getAgeUnder70Flag()) && // AgeUnder70Flag內容已改為65歲以下
+		   !StringUtils.equals("Y", this.getCustVO().getFp032675DataVO().getCustProFlag()) &&
+		   !StringUtils.equals("Y", this.getCustVO().getHNWCDataVO().getValidHnwcYN())) {		 // 非高資產客戶
 			if((this.getCustVO().getAge().add(this.getProdMaturityDate())).compareTo(new BigDecimal(80)) >= 0) {
 				//客戶年齡+海外債到期年限超過80以上
 				//65歲以上客戶除非有專投資格，否則不得申購客戶年齡+海外債到期年限超過80以上之商品(取消)

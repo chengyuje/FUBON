@@ -44,8 +44,7 @@ public class PMS424 extends FubonWmsBizLogic {
 		initUUID();
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); // 總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
-
+		
 		PMS424InputVO inputVO = (PMS424InputVO) body;
 		PMS424OutputVO outputVO = new PMS424OutputVO();
 		dam = this.getDataAccessManager();
@@ -108,25 +107,12 @@ public class PMS424 extends FubonWmsBizLogic {
 			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("  AND RPT.BRANCH_NBR = :branchNbr ");
 				queryCondition.setObject("branchNbr", inputVO.getBranch_nbr());
-			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
-				sb.append("  AND ( ");
-				sb.append("    (DEP.RM_FLAG = 'B' AND ORG.BRANCH_AREA_ID = :BRANCH_AREA_IDD) ");
-				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-					sb.append("    OR (DEP.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD )) ");
-				}
-			
-				sb.append("  ) ");
-				queryCondition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
+				sb.append("  AND EXISTS (SELECT 1 FROM VWORG_DEFN_BRH BRHT WHERE DEPT_ID = :branchAreaID AND RPT.BRANCH_NBR = BRHT.BRANCH_NBR ) ");
+				queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());				
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-				sb.append("  AND ORG.REGION_CENTER_ID = :REGION_CENTER_IDD ");
-				queryCondition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
-			}
-
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-				sb.append("  AND RPT.RM_FLAG = 'B' ");
+				sb.append("  AND EXISTS (SELECT 1 FROM VWORG_DEFN_BRH BRHT WHERE BRHT.DEPT_ID = :regionCenterID AND RPT.BRANCH_NBR = BRHT.BRANCH_NBR) ");
+				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {
@@ -308,7 +294,7 @@ public class PMS424 extends FubonWmsBizLogic {
 
 	public void getExample (Object body, IPrimitiveMap header) throws Exception {
 		
-		notifyClientToDownloadFile("doc//PMS//PMS424_getExample.xlsx", "2020.1_11關聯戶交易日報.xlsx");
+		notifyClientToDownloadFile("doc//PMS//PMS424_getExample.xlsx", "2020.1_11關聯戶報表.xlsx");
 	    this.sendRtnObject(null);
 	}
 	

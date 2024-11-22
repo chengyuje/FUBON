@@ -57,7 +57,9 @@ public final class OldVersionAcct extends AcctRuler {
 	 */
 	@Override
 	protected boolean fitDebit() {
-		if (isINS(prodType)) return false;
+		if (isSI(prodType)) return eq(pkind1(), "168") || pkind2().matches("17|18");
+		// 保險不加入扣款帳號
+		else if (isINS(prodType)) return false;
 		// 其他商品 扣款帳號&收益入帳帳號
 		else return (pkind1().matches("102|104|120|168|210|221") || pkind2().matches("17|18"))
 					&& ((isFUND(prodType) ||isES(prodType)) || !eq(pkind3(), "560"));

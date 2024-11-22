@@ -235,13 +235,19 @@ eSoafApp.controller('CRM341Controller',
     			$scope.showErrorMsg('請先選擇移入AO CODE');
 	    		return;
     		}
-    		$scope.sendRecv("CRM341", "download", "com.systex.jbranch.app.server.fps.crm341.CRM341InputVO", $scope.inputVO,
+    		// 下載前先檢核：主CODE客戶不可移轉至維護CODE
+    		if($scope.resultList.TYPE == '1' && $scope.resultList2.NEW_AO_TYPE == '3') {
+    			$scope.showErrorMsg('主CODE客戶不可移轉至維護CODE');
+	    		return;
+        	} else {
+	    		$scope.sendRecv("CRM341", "download", "com.systex.jbranch.app.server.fps.crm341.CRM341InputVO", $scope.inputVO,
 					function(tota, isError) {
 						if (!isError) {
 							$scope.showMsg('ehl_01_common_004');
 							return;
 						}
-			});
+				});
+        	}
 		};
 	    
 	    //上傳客戶同意書
@@ -304,6 +310,12 @@ eSoafApp.controller('CRM341Controller',
         	// 申請他行空CODE移入維護CODE
         	if(!$scope.resultList.AO_CODE && $scope.resultList.BRA_NBR != $scope.resultList2.NEW_BRA_NBR && $scope.resultList2.NEW_AO_TYPE == 3 && !$scope.inputVO.realfileName) {
     			$scope.showErrorMsg('需經客戶簽署「主要往來方行異動申請書」，上傳後才可申請移入');
+	    		return;
+        	}
+        	
+        	// 主CODE客戶不可移轉至維護CODE
+        	if($scope.resultList.TYPE == '1' && $scope.resultList2.NEW_AO_TYPE == '3') {
+    			$scope.showErrorMsg('主CODE客戶不可移轉至維護CODE');
 	    		return;
         	}
         	

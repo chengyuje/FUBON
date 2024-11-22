@@ -13,6 +13,7 @@ public class SOT708InputVO {
     private Date    endDate;    //申購迄日
     private String  tradeSeq;   //下單交易序號
     private String  checkType;  //電文確認碼 1:檢核 2:確認
+    private String ivBrh;               //分行別(收件行) 庫存
 
     public String getCustId() {
         return custId;
@@ -70,7 +71,15 @@ public class SOT708InputVO {
         this.checkType = checkType;
     }
 
-    @Override
+    public String getIvBrh() {
+		return ivBrh;
+	}
+
+	public void setIvBrh(String ivBrh) {
+		this.ivBrh = ivBrh;
+	}
+
+	@Override
     public String toString() {
         return "SOT708InputVO{" +
                 "custId='" + custId + '\'' +

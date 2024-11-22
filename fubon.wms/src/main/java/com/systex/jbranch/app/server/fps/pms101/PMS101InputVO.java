@@ -1,22 +1,7 @@
 package com.systex.jbranch.app.server.fps.pms101;
 
-import java.util.Date;
-
 import com.systex.jbranch.platform.common.dataaccess.vo.PagingInputVO;
 
-/**
- * 
- * Copy Right Information : <br>
- * Project : fubon.wms<br>
- * JDK version used : JDK1.7.0 <br>
- * Description : 金流名單<br>
- * Comments Name : pms101InputVO.java<br>
- * Author :Kevin<br>
- * Date :2016年06月17日 <br>
- * Version : 1.01 <br>
- * Editor : Kevin<br>
- * Editor Date : 2017年02月01日<br>
- */
 public class PMS101InputVO extends PagingInputVO {
 
 	private String CUST_ID; // 客戶ID
@@ -29,6 +14,15 @@ public class PMS101InputVO extends PagingInputVO {
 	private String branch_nbr; // 分行
 	private String ao_code; // 理專
 	private String DATA_DATE; //明細日期
+	private String aoCode;
+
+	public String getAoCode() {
+		return aoCode;
+	}
+
+	public void setAoCode(String aoCode) {
+		this.aoCode = aoCode;
+	}
 
 	public String getsCreDate() {
 		return sCreDate;

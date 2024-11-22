@@ -1,0 +1,337 @@
+<style>
+/* open dialog */
+.ngdialog.PMS101U {
+	
+}
+/* dialog panl */
+.modal-dialog.PMS101U {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 1100px;
+	height: auto;
+}
+
+.PMS101U table.little {
+	width: 60%;
+}
+/* change row */
+.PMS101U.table>tbody>tr>td {
+	table-layout: fixed;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+/* scroll && height */
+.scroll_PMS101U_dialog {
+	overflow: scroll;
+	width: 400px;
+	height: 300px;
+}
+
+.tdpadding {
+	padding: 10px 5px 5px 5px;
+}
+
+.alignleft {
+	text-align: left !important;
+}
+
+.bigspace {
+	margin-left: 50px !important;
+}
+
+.datewidth {
+	width: 180px !important;
+	float: left !important;
+}
+</style>
+<script type="text/javascript" src="assets/txn/CRM210/CRM210.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PMS109.js"></script>
+<script type="text/javascript" src="assets/txn/PMS108/PMS108.js"></script>
+<script type="text/javascript" src="assets/txn/PMS109/PPAP.js"></script>
+<script type="text/javascript" src="assets/txn/PMS101/PMS101.js"></script>
+<script type="text/javascript" src="assets/txn/PMS101/PMS101_LEADS.js"></script>
+<script type="text/javascript" src="assets/txn/PMS101U/PMS101U.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+
+<div class="PMS101U" ng-controller="PMS101UController" ng-cloak>
+	<div class="tfb_content">
+		<div class="tfb_content_icon"></div>
+		<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">資料查詢</div>
+	</div>
+	<div class="panel_content">
+		<div class="search_table search_box3">
+			<form name="parameterTypeEditForm" class="form-horizontal" style="overflow: auto;" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
+				<table>
+					<tr>
+						<th>*報表年月：</th>
+						<td>
+							<e-combobox id="dataMonth" name="dataMonth"
+										ng-datasource="mappingSet['timeE']" 
+										ng-model="inputVO.sCreDate"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-change="limitDate();dateChangeU()" 
+										ng-format="F3"
+										ng-required="true" />
+						</td>
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="uhrmRCList"
+										ng-model="inputVO.uhrmRC"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="uhrmOPList"
+										ng-model="inputVO.uhrmOP"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
+						<th>狀態：</th>
+						<td>
+							<e-combobox id="checked" name="checked"
+										ng-datasource="mappingSet['type']" 
+										ng-model="inputVO.TYPE"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3" 
+										ng-required="false" 
+										ng-change="pins()" />
+						</td>
+					</tr>
+					<tr>
+						<th>商品類別：</th>
+						<td><e-combobox 
+								ng-datasource="mappingSet['PRD_TYPE']"
+								ng-model="inputVO.PROD_TYPE" 
+								ng-validate="false"
+								ng-readonly="false" 
+								ng-editable="false" 
+								ng-format="F3"
+								ng-required="false" 
+								ng-change="pins()" 
+								height="30px" 
+								style="line-height:20px;" />
+						</td>	
+						<th>私銀RM：</th>
+						<td>
+							<e-combobox id="aoCode" name="aoCode"
+										ng-datasource="mappingSet['EmpName']"
+										ng-model="inputVO.aoCode"
+										ng-validate="false"
+										ng-disabled="false"
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										style="line-height:20px;" />						 
+						</td>
+						<th>客戶ID：</th>
+						<td><input class="form-control" ng-model="inputVO.CUST_ID" type="text" style="width: 250px"></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="search_box_btn text-center">
+			<button type="button" class="btn btn-info" ng-click="inquire();" function-type="query">查詢</button>
+			<button type="button" class="btn btn-info" ng-click="init()">清除</button>
+		</div>
+
+		<e-jumping-once ng-show="shows=='Y'" output="outputVOy" isend="OY" list="datay" totallist="paramListy"></e-jumping-once>
+		<e-jumping-once ng-show="shows=='N'" output="outputVOn" isend="ON" list="datan" totallist="paramList"></e-jumping-once>
+		<div algin="left">
+			<table>
+				<tr>
+					<td>產出頻率：</td>
+					<td>每月</td>
+				</tr>
+				<tr>
+					<td>產出日：</td>
+					<td ng-if="shows=='Y'">{{toJsDate(paramListy[0].CREATETIME) |date:'yyyy/MM/dd'}}</td>
+					<td ng-if="shows=='N'">{{toJsDate(paramList[0].CREATETIME) |date:'yyyy/MM/dd'}}</td>
+				</tr>
+			</table>
+		</div>
+		<uib-tabset active="activeJustified" Justified="true" style="overflow: auto;"> 
+			<uib-tab index="0" heading="未轉銷售計劃" ng-click="pinse('N')">
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="datan">
+						<thead>
+							<tr>
+								<th style="vertical-align: middle;" rowspan="2">詳細資料</th>
+								<!-- 問題單:0003268 隱藏銷售計劃 -->
+								<th style="vertical-align: middle;" rowspan="2">加入計劃</th>
+								<th style="vertical-align: middle;" rowspan="2"><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="inquire()">客戶ID</e-sorter></th>
+								<th style="vertical-align: middle;" rowspan="2"><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="inquire()">客戶姓名</e-sorter></th>
+								<!-- <th style="vertical-align: middle;" rowspan="2"><e-sorter e-input="inputVO" e-mode="auto" e-col="REL_CODE" e-query="inquire()">關係</e-sorter></th> -->
+								<th style="vertical-align: middle;" rowspan="1" colspan="6">已入帳金流</th>
+							</tr>
+							<tr>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="EXP_CF_TOTAL" e-query="inquire()">T+1月到期<br />總金額</e-sorter></th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="REC_CF_TOTAL" e-query="inquire()">T-1月已入帳<br />總金額</e-sorter></th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="REC_CF_TXN" e-query="inquire()">已承作金額</e-sorter></th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="REC_CF_CONT_FLAG" e-query="inquire()">未聯繫警示</e-sorter></th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="REC_CF_YTD_DEP" e-query="inquire()">前日帳上<br />活存餘額</e-sorter></th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="REC_CF_LOS_FLAG" e-query="inquire()">入帳流失警示</e-sorter></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in datan | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center"><a href="#" data-toggle="modal" class="btn btn-info btn-circle" ng-click="edit2(row,inputVO.sCreDate)"> <i class="glyphicon glyphicon-search"></i></a></td>
+								<!-- 問題單:0003268 隱藏銷售計劃 -->
+								<td align="center"><a href="#" data-toggle="modal" class="btn btn-warning btn-circle" ng-click="ppap(undefined, row.CUST_ID, row.CUST_NAME, '1', 'add');"><i class="glyphicon glyphicon-pencil"></i></a></td>
+								<td align="center">{{row.CUST_ID }}</td>
+								<td align="center">{{row.CUST_NAME}}</td>
+								<!-- <td align="center">{{row.REL_CODE}}</td> -->
+								<td align="right">{{row.EXP_CF_TOTAL | number:0}}</td>
+								<td align="right">{{row.REC_CF_TOTAL | number:0}}</td>
+								<td align="right">{{row.REC_CF_TXN | number:0}}</td>
+								<td align="center"><span ng-show="row.REC_CF_CONT_FLAG=='Y'"><img src="assets/images/icon/u1210.jpg"></span></td><!-- <span ng-hide="row.REC_CF_CONT_FLAG=='Y'"><img src="assets/images/icon/u740.jpg"></span> -->
+								<td align="right">{{row.REC_CF_YTD_DEP | number:0}}</td>
+								<td align="center"><span ng-show="row.REC_CF_LOS_FLAG=='Y'"><img src="assets/images/icon/u1210.jpg"></span></td><!-- <span ng-hide="row.REC_CF_LOS_FLAG=='Y'"><img src="assets/images/icon/u740.jpg"></span> -->
+							</tr>
+							<tr class="repeat-row" ng-show="($index+1)==datan.length || datan.length==0" ng-repeat="row in datan | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<!-- 問題單:0003268 隱藏銷售計劃  欄位   colspan-1   -->
+								<td colspan="4" align="center">本頁小計</td>
+								<!--	<td colspan="3" align="center">本頁小計</td> -->
+								<td align="right">{{getSum(datan, 'EXP_CF_TOTAL') | number:0}}</td>
+								<td align="right">{{getSum(datan, 'REC_CF_TOTAL') | number:0}}</td>
+								<td align="right">{{getSum(datan, 'REC_CF_TXN') | number:0}}</td>
+								<td></td>
+								<td align="right">{{getSum(datan, 'REC_CF_YTD_DEP') | number:0}}</td>
+								<td></td>
+							</tr>
+							<tr class="red" ng-show="ON ">
+								<!-- 問題單:0003268 隱藏銷售計劃  欄位   colspan-1   -->
+								<!-- <td colspan="3" align="center">總計</td>-->
+								<td colspan="4" align="center">總計</td>
+								<td align="right">{{sumExpTot | number:0}}</td>
+								<td align="right">{{sumRecTot | number:0}}</td>
+								<td align="right">{{sumRecTxn | number:0}}</td>
+								<td></td>
+								<td align="right">{{sumRecDep | number:0}}</td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</uib-tab> 
+			<uib-tab index="1" heading="已轉銷售計劃" ng-click="pinse('Y')">
+				<div class="gv_tab_sc" style="white-space: nowrap;">
+					<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true">
+						<thead>
+							<tr>
+								<th style="vertical-align: middle;" rowspan="2">詳細資料</th>
+								<!-- 問題單:0003268 隱藏銷售計劃  欄位   colspan-1   -->
+								<th style="vertical-align: middle;" rowspan="2">新增計劃</th>
+								<th style="vertical-align: middle;" rowspan="2"><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_ID" e-query="inquire()">客戶ID</e-sorter></th>
+								<th style="vertical-align: middle;" rowspan="2"><e-sorter e-input="inputVO" e-mode="auto" e-col="CUST_NAME" e-query="inquire()">客戶姓名</e-sorter></th>
+								<!-- <th style="vertical-align: middle;" rowspan="2"><e-sorter e-input="inputVO" e-mode="auto" e-col="REL_CODE" e-query="inquire()">關係</e-sorter></th> -->
+								<th style="vertical-align: middle;" rowspan="1" colspan="3">即期金流</th>
+								<th style="vertical-align: middle;" rowspan="1" colspan="6">已入帳金流</th>
+								<th style="vertical-align: middle;" rowspan="2">維護人員</th>
+								<th style="vertical-align: middle;" rowspan="2">維護日期</th>
+							</tr>
+							<tr>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="EXP_CF_TOTAL" e-query="inquire()">T+1月到期<br />總金額</th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="EXP_CF_PLAN" e-query="inquire()">已規劃金額</th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="EXP_CF_BAL" e-query="inquire()">未規劃金額</th>
+								<!--  剩餘金額   -->
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="REC_CF_TOTAL" e-query="inquire()">T-1月已入帳<br />總金額</th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="REC_CF_TXN" e-query="inquire()">已承作金額</th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="REC_CF_PLAN" e-query="inquire()">已規劃金額</th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="REC_CF_BAL" e-query="inquire()">剩餘金額</th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="REC_CF_YTD_DEP" e-query="inquire()">前日帳上活存餘額</th>
+								<th style="vertical-align: middle;"><e-sorter e-input="inputVO" e-mode="auto" e-col="REC_CF_LOS_FLAG" e-query="inquire()">入帳流失警示</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="repeat-row" ng-repeat="row in datay | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+								<td align="center"><a href="#" data-toggle="modal" class="btn btn-info btn-circle" ng-click="edit2(row,inputVO.sCreDate)"> <i class="glyphicon glyphicon-search"></i></a></td>
+								<!-- 問題單:0003268 隱藏銷售計劃  欄位   colspan-1   -->
+								<td align="center"><a href="#" data-toggle="modal" class="btn btn-warning btn-circle" ng-click="ppap(undefined, row.CUST_ID, row.CUST_NAME, '1', 'add');"><i class="glyphicon glyphicon-pencil"></i></a></td>
+								<td align="center">{{row.CUST_ID }}</td>
+								<td align="center">{{row.CUST_NAME}}</td>
+								<!-- <td align="center">{{row.REL_CODE | mapping:mappingSet['CRM.REL_TYPE']}}</td> -->
+								<td align="right">{{row.EXP_CF_TOTAL | number:0}}</td>
+								<td align="right">{{row.EXP_CF_PLAN | number:0}}</td>
+								<td align="right">{{row.EXP_CF_BAL | number:0}}</td>
+								<td align="right">{{row.REC_CF_TOTAL | number:0}}</td>
+								<td align="right">{{row.REC_CF_TXN | number:0}}</td>
+								<td align="right">{{row.REC_CF_PLAN | number:0}}</td>
+								<td align="right">{{row.REC_CF_BAL | number:0}}</td>
+								<td align="right">{{row.REC_CF_YTD_DEP | number:0}}</td>
+								<td align="center"><span ng-show="row.REC_CF_LOS_FLAG=='Y'"><img src="assets/images/icon/u1210.jpg"></span> <!-- <span ng-hide="row.REC_CF_LOS_FLAG=='Y'"><img src="assets/images/icon/u740.jpg"></span> --></td>
+								<td><span ng-hide="row.M_EMP_NAME == null">{{row.M_EMP_NAME}}-{{rowCountLimit}}</span></td>
+								<td>{{toJsDate(row.M_DATE) | date:"yyyy/MM/dd"}}</td>
+							</tr>
+							<tr>
+								<!-- 問題單:0003268 隱藏銷售計劃  欄位   colspan-1   -->
+								<!-- <td colspan="3" align="center">本頁小計</td> -->
+								<td colspan="4" align="center">本頁小計</td>
+								<td align="right">{{getSum(datay, 'EXP_CF_TOTAL') |
+									number:0}}</td>
+								<td align="right">{{getSum(datay, 'EXP_CF_PLAN') | number:0}}</td>
+								<td align="right">{{getSum(datay, 'EXP_CF_BAL') | number:0}}</td>
+								<td align="right">{{getSum(datay, 'REC_CF_TOTAL') |
+									number:0}}</td>
+								<td align="right">{{getSum(datay, 'REC_CF_TXN') | number:0}}</td>
+								<td align="right">{{getSum(datay, 'REC_CF_PLAN') | number:0}}</td>
+								<td align="right">{{getSum(datay, 'REC_CF_BAL') | number:0}}</td>
+								<td align="right">{{getSum(datay, 'REC_CF_YTD_DEP') |
+									number:0}}</td>
+								<td align="right"></td>
+								<td align="right"></td>
+								<td align="right"></td>
+							</tr>
+							<tr class="red" ng-show="OY">
+								<!-- 問題單:0003268 隱藏銷售計劃  欄位   colspan-1   -->
+								<!-- <td colspan="3" align="center">總計</td>-->
+								<td colspan="4" align="center">總計</td>
+								<td align="right">{{sumExpToty | number:0}}</td>
+								<td align="right">{{sumExpPlany | number:0}}</td>
+								<td align="right">{{sumExpBaly | number:0}}</td>
+								<td align="right">{{sumRecToty | number:0}}</td>
+								<td align="right">{{sumRecTxny | number:0}}</td>
+								<td align="right">{{sumRecPlany | number:0}}</td>
+								<td align="right">{{sumRecBaly | number:0}}</td>
+								<td align="right">{{sumRecDepy | number:0}}</td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</uib-tab> 
+		</uib-tabset>
+		<div algin="left">
+			<table>
+				<tr>
+					<td align="right">說明：本頁小計與總計為全商品加總</td>
+					<td align="left"></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>

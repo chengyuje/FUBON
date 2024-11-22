@@ -90,8 +90,8 @@ public class IOT120InputVO extends PagingInputVO{
 	private String PREMIUM_TRANSSEQ_NEED_YN;
 	private String I_PREMIUM_TRANSSEQ_NEED_YN;
 	private String P_PREMIUM_TRANSSEQ_NEED_YN;
-
 	private String fromIOT110;
+	private String BUSINESS_REL;
 
 	public String getAO_ID() {
 		return AO_ID;
@@ -586,6 +586,12 @@ public class IOT120InputVO extends PagingInputVO{
 	}
 	public void setP_PREMIUM_TRANSSEQ_NEED_YN(String p_PREMIUM_TRANSSEQ_NEED_YN) {
 		P_PREMIUM_TRANSSEQ_NEED_YN = p_PREMIUM_TRANSSEQ_NEED_YN;
+	}
+	public String getBUSINESS_REL() {
+		return BUSINESS_REL;
+	}
+	public void setBUSINESS_REL(String bUSINESS_REL) {
+		BUSINESS_REL = bUSINESS_REL;
 	}
 
 }

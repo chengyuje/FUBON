@@ -21,6 +21,9 @@ public class IOT111InputVO extends PagingInputVO {
 	private String fileRealName;
 	private List<Map<String, Object>> resultList;
 	private String INS_ID;
+	private String region_id;
+	private String area_id;
+	private String branch_id;
 	
 	public String getREG_TYPE() {
 		return REG_TYPE;
@@ -105,6 +108,24 @@ public class IOT111InputVO extends PagingInputVO {
 	}
 	public void setINS_ID(String iNS_ID) {
 		INS_ID = iNS_ID;
+	}
+	public String getRegion_id() {
+		return region_id;
+	}
+	public void setRegion_id(String region_id) {
+		this.region_id = region_id;
+	}
+	public String getArea_id() {
+		return area_id;
+	}
+	public void setArea_id(String area_id) {
+		this.area_id = area_id;
+	}
+	public String getBranch_id() {
+		return branch_id;
+	}
+	public void setBranch_id(String branch_id) {
+		this.branch_id = branch_id;
 	}	
 	
 }

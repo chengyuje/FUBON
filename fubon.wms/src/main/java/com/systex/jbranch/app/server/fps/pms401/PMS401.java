@@ -77,8 +77,7 @@ public class PMS401 extends FubonWmsBizLogic {
 		initUUID();
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
-		
+
 		PMS401InputVO inputVO = (PMS401InputVO) body;
 		PMS401OutputVO outputVO = new PMS401OutputVO();
 		dam = this.getDataAccessManager();
@@ -137,19 +136,11 @@ public class PMS401 extends FubonWmsBizLogic {
 		}
 
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) {
-			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {				
+			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {				
 				sb.append("  AND DEFN.BRANCH_NBR = :BRNCH_NBRR ");
 				queryCondition.setObject("BRNCH_NBRR", inputVO.getBranch_nbr());
 			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
-				sb.append("  AND ( ");
-				sb.append("    (DEP.RM_FLAG = 'B' AND DEFN.BRANCH_AREA_ID = :BRANCH_AREA_IDD) ");
-				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-					sb.append("    OR (DEP.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE DEP.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD )) ");
-				}
-			
-				sb.append("  ) ");
+				sb.append("  AND DEFN.BRANCH_AREA_ID = :BRANCH_AREA_IDD ");
 				queryCondition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND DEFN.REGION_CENTER_ID = :REGION_CENTER_IDD ");
@@ -160,17 +151,12 @@ public class PMS401 extends FubonWmsBizLogic {
 				sb.append("  AND ROLE.PARAM_NAME = :PERSON_ROLE ");
 				queryCondition.setObject("PERSON_ROLE", inputVO.getPerson_role());
 			}
-			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-				sb.append("  AND DEP.RM_FLAG = 'B' ");
-			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {
-				sb.append("  AND ( ");
+				sb.append("  AND (");
 				sb.append("       EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE DEP.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :uhrmOP ) ");
 				sb.append("    OR EMPN.E_DEPT_ID = :uhrmOP ");
-				sb.append("  ) ");
+				sb.append("  )");
 				queryCondition.setObject("uhrmOP", inputVO.getUhrmOP());
 			}
 			
@@ -474,7 +460,7 @@ public class PMS401 extends FubonWmsBizLogic {
 		csv.setHeader(csvHeader);
 		csv.addRecordList(csvData);
 
-		notifyClientToDownloadFile(csv.generateCSV(), "分行人員當日存款異動明細表_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "-" + outputVO.getTotalList().get(0).get("MEM_EMP_ID") + "該員當日存款異動明細-" + getUserVariable(FubonSystemVariableConsts.LOGINID) + ".csv");
+		notifyClientToDownloadFile(csv.generateCSV(), "分行人員存款異動日報_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "-" + outputVO.getTotalList().get(0).get("MEM_EMP_ID") + "該員當日存款異動明細-" + getUserVariable(FubonSystemVariableConsts.LOGINID) + ".csv");
 	}
 	/* 檢查Map取出欄位是否為Null */
 	private String checkIsNull(Map map, String key) {

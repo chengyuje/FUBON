@@ -96,8 +96,8 @@ input.faChkSqr:after {
 						</td>											    											
 					</tr>
 					<tr>
-						<th>業務處：</th>
-						<td>
+						<th ng-if="!isUHRM">業務處：</th>
+						<td ng-if="!isUHRM">
 							<e-combobox id="region_center_id" name="region_center_id"
 							ng-datasource="REGION_LIST"
 							ng-model="inputVO.region_center_id"
@@ -111,8 +111,8 @@ input.faChkSqr:after {
 							width="155px"
 							style="line-height:20px;" />
 						</td>						
-						<th>營運區：</th>
-						<td>
+						<th ng-if="!isUHRM">營運區：</th>
+						<td ng-if="!isUHRM">
 							<e-combobox id="branch_area_id" name="branch_area_id"
 							ng-datasource="AREA_LIST"
 							ng-model="inputVO.branch_area_id"
@@ -122,17 +122,17 @@ input.faChkSqr:after {
 							ng-editable="false"
 							ng-format="F3"
 							ng-required="true"
-							ng-change="ChangeArea(region)"
+							ng-change="ChangeArea(region);checkIsUHRMArea();"
 							width="100px"
 							style="line-height:20px;" />
 						</td>
-						<th>分行別：</th>
-						<td>
+						<th ng-if="!isUHRM">分行別：</th>
+						<td ng-if="!isUHRM">
 							<e-combobox id="branch_nbr" name="branch_nbr"
 							ng-datasource="BRANCH_LIST"
 							ng-model="inputVO.branch_nbr"
 							ng-validate="false" 
-							ng-disabled="AVAIL_BRANCH.length == 1"
+							ng-disabled="AVAIL_BRANCH.length == 1 || isUHRMArea"
 							ng-readonly="AVAIL_BRANCH.length == 1"
 							ng-editable="false"
 							ng-format="F1"
@@ -144,7 +144,7 @@ input.faChkSqr:after {
 <!-- 						<th>員編：</th> -->
 <!-- 						<td><input type="text" ng-model="inputVO.emp_id" style="width: 100px; " ng-disabled="disableBranchCombo"/></td> -->
 						<th>員編：</th>
-						<td>		
+						<td ng-if="!isUHRM && !isUHRMArea">		
 							<e-combobox id="emp_id" name="emp_id"
 										ng-datasource="EMP_LIST"
 										ng-model="inputVO.emp_id"
@@ -155,7 +155,19 @@ input.faChkSqr:after {
 										ng-format="F1"
 										ng-required="false"
 										ng-change="ChangeEmp_id(region)"
-										style="line-height:20px;" />					 					 
+										style="line-height:20px;" />
+						</td>
+						<td ng-if="isUHRM || isUHRMArea">
+							<e-combobox id="emp_id" name="emp_id"
+										ng-datasource="mappingSet['UHRM_LIST']"
+										ng-model="inputVO.emp_id"
+										ng-validate="false" 
+										ng-disabled="mappingSet['UHRM_LIST'].length == 2 && pri_id != 'UHRM012'"
+										ng-readonly="mappingSet['UHRM_LIST'].length == 2 && pri_id != 'UHRM012'" 
+										ng-editable="false"
+										ng-format="F1"
+										style="line-height:20px;" />
+								</td>					 					 
 						</td>	
 					</tr>
 					<tr>

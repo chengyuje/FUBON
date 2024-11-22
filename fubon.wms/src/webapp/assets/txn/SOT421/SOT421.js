@@ -451,7 +451,8 @@ eSoafApp.controller('SOT421Controller',
 				custId   :		$scope.inputVO.custID,		//客戶ID
 				prdType  :      4,							//商品類別 : SI
 				tradeSeq : 		$scope.inputVO.tradeSEQ, 	//交易序號
-				tradeSubType:	2							//交易類型 : 贖回
+				tradeSubType:	2,							//交易類型 : 贖回
+				ivBrh :         $scope.inputVO.ivBrh    
 			}
 				
 			$scope.sendRecv("SOT712", "fitToGetPDF", "com.systex.jbranch.app.server.fps.sot712.PRDFitInputVO", fitVO,

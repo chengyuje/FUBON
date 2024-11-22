@@ -159,6 +159,7 @@ public class IOT110InputVO extends PagingInputVO {
 	private String C_REVOLVING_LOAN_YN;
 	private String I_REVOLVING_LOAN_YN;
 	private String P_REVOLVING_LOAN_YN;
+	private String BUSINESS_REL;
 
 	public String getPREMATCH_SEQ() {
 		return PREMATCH_SEQ;
@@ -1029,6 +1030,12 @@ public class IOT110InputVO extends PagingInputVO {
 	}
 	public void setP_REVOLVING_LOAN_YN(String p_REVOLVING_LOAN_YN) {
 		P_REVOLVING_LOAN_YN = p_REVOLVING_LOAN_YN;
+	}
+	public String getBUSINESS_REL() {
+		return BUSINESS_REL;
+	}
+	public void setBUSINESS_REL(String bUSINESS_REL) {
+		BUSINESS_REL = bUSINESS_REL;
 	}
 
 }

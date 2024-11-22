@@ -81,7 +81,7 @@ public class IOT130 extends FubonWmsBizLogic{
 			sb.append(" (CASE WHEN A.FB_COM_YN = 'Y' THEN PRD.INSPRD_NAME ELSE JPRD.PRODUCTNAME END) AS INSPRD_NAME, ");
 			sb.append(" (CASE WHEN A.FB_COM_YN = 'Y' THEN PRD.INSPRD_TYPE ELSE (CASE WHEN TRIM(JPRD.PRODUCTTYPE1) <> '投資型' THEN '1' ELSE '2' END) END) AS INSPRD_TYPE, ");
 			sb.append(" A.LOAN_PRD_YN, A.QC_IMMI, A.PREMATCH_SEQ, A.GUILD_RPT_DATE, A.NOT_PASS_REASON, A.PREMIUM_TRANSSEQ, A.QC_PROPOSER_CHG, ");
-			sb.append(" A.PREMIUM_USAGE, A.PAY_WAY, A.PAYER_ID, A.RLT_BT_PROPAY, A.LOAN_SOURCE_YN, A.DOC_KEYIN_DATE, P.AML, P.PRECHECK, ");
+			sb.append(" A.PREMIUM_USAGE, A.PAY_WAY, A.PAYER_ID, A.RLT_BT_PROPAY, A.LOAN_SOURCE_YN, A.DOC_KEYIN_DATE, P.AML, P.PRECHECK, P.BUSINESS_REL, ");
 			sb.append(" A.VALID_CHG_CUST_YN, P.CHG_CUST_ID, P.C_SENIOR_PVAL, B.CNAME AS INS_COM_NAME, ");
 			sb.append(" A.FB_COM_YN, A.COMPANY_NUM, A.REVISE_CONFIRM_YN, ");
 			sb.append(" A.OTH_FUND_PURPOSE_1, A.OTH_FUND_PURPOSE_2, A.OTH_FUND_PURPOSE_3, A.OTH_FUND_PURPOSE_4, A.OTH_FUND_PURPOSE_5, A.OTH_FUND_PURPOSE_6, ");
@@ -263,6 +263,12 @@ public class IOT130 extends FubonWmsBizLogic{
 						}
 						if("Y".equals(INitem.get("SIGN_INC"))  && "Y".equals(INitem.get("DOC_CHK"))){
 							SIGN_INC = "Y";
+						}
+						if(StringUtils.equals("Y", inputVO.getBUSINESS_REL()) && (Double)INitem.get("DOC_SEQ") == 9) {
+							if(!"Y".equals(INitem.get("DOC_CHK"))) {
+								errorMsg = "分行留存文件應檢附「洗錢防制姓名檢核結果」";
+								throw new APException(errorMsg);
+							}
 						}
 					}
 				}
@@ -489,6 +495,12 @@ public class IOT130 extends FubonWmsBizLogic{
 					}
 					if("Y".equals(INitem.get("SIGN_INC")) && "Y".equals(INitem.get("DOC_CHK"))){
 						SIGN_INC = "Y";
+					}
+					if(StringUtils.equals("Y", inputVO.getBUSINESS_REL()) && (Double)INitem.get("DOC_SEQ") == 9) {
+						if(!"Y".equals(INitem.get("DOC_CHK"))) {
+							errorMsg = "分行留存文件應檢附「洗錢防制姓名檢核結果」";
+							throw new APException(errorMsg);
+						}
 					}
 				}
 			}
@@ -1004,7 +1016,7 @@ public class IOT130 extends FubonWmsBizLogic{
 		sb.append(" Select A.PREMATCH_SEQ, A.INS_KIND, A.INS_ID, A.CASE_ID, A.POLICY_NO1, A.POLICY_NO2, A.POLICY_NO3, A.OTH_TYPE, A.BRANCH_NBR ");
 		sb.append(" 	,A.CUST_ID, A.CUST_RISK, A.PROPOSER_NAME, A.PROPOSER_BIRTH, A.INSURED_ID, A.INSURED_NAME, A.REPRESET_ID, A.REPRESET_NAME, A.RLT_BT_PROREP ");
 		sb.append(" 	,A.PAYER_ID, A.PAYER_NAME, A.RLT_BT_PROPAY, A.INSPRD_KEYNO, A.INSPRD_ID, A.REAL_PREMIUM, A.BASE_PREMIUM, A.MOP2, A.LOAN_SOURCE_YN, A.APPLY_DATE ");
-		sb.append(" 	,A.MATCH_DATE, A.RECRUIT_ID, A.PROPOSER_CM_FLAG, A.INSURED_CM_FLAG, A.PAYER_CM_FLAG, A.AML,PRECHECK, A.PROPOSER_INCOME1, A.PROPOSER_INCOME2 ");
+		sb.append(" 	,A.MATCH_DATE, A.RECRUIT_ID, A.PROPOSER_CM_FLAG, A.INSURED_CM_FLAG, A.PAYER_CM_FLAG, A.AML, A.PRECHECK, A.BUSINESS_REL, A.PROPOSER_INCOME1, A.PROPOSER_INCOME2 ");
 		sb.append(" 	,A.PROPOSER_INCOME3, A.INSURED_INCOME1, A.INSURED_INCOME2, A.INSURED_INCOME3, A.LOAN_CHK1_YN, A.LOAN_CHK2_YN, A.CD_CHK_YN, A.INCOME_REMARK ");
 		sb.append("		,A.LOAN_SOURCE_REMARK, A.STATUS, (CASE WHEN A.STATUS = '3' THEN 'Y' ELSE 'N' END) AS AUTH_YN, A.CHG_CUST_ID, A.C_SENIOR_PVAL ");
 		sb.append(" From TBIOT_PREMATCH A ");

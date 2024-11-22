@@ -280,6 +280,7 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 							$scope.inputVO.APPLY_DATE = $scope.toJsDate($scope.INS_INFORMATION[0].APPLY_DATE);
 							$scope.inputVO.AML = $scope.INS_INFORMATION[0].AML;
 							$scope.inputVO.PRECHECK = $scope.INS_INFORMATION[0].PRECHECK;
+							$scope.inputVO.BUSINESS_REL = $scope.INS_INFORMATION[0].BUSINESS_REL;
 							$scope.inputVO.LOAN_CHK1_YN = $scope.INS_INFORMATION[0].LOAN_CHK1_YN;
 							$scope.inputVO.LOAN_CHK2_YN = $scope.INS_INFORMATION[0].LOAN_CHK2_YN;
 							$scope.inputVO.CD_CHK_YN = $scope.INS_INFORMATION[0].CD_CHK_YN;
@@ -977,6 +978,7 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 //
 		$scope.inputVO.AML = $scope.prematchList.AML;
 		$scope.inputVO.PRECHECK = $scope.prematchList.PRECHECK;
+		$scope.inputVO.BUSINESS_REL = $scope.prematchList.BUSINESS_REL;
 
 		$scope.inputVO.LOAN_SOURCE_YN = $scope.prematchList.LOAN_SOURCE_YN;
 		$scope.inputVO.LOAN_CHK1_YN = $scope.prematchList.LOAN_CHK1_YN;
@@ -1058,6 +1060,7 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 		$scope.inputVO.PREMATCH_SEQ = '';
 		$scope.inputVO.AML = '';
 		$scope.inputVO.PRECHECK = '';
+		$scope.inputVO.BUSINESS_REL = '';
 		$scope.inputVO.AUTH_YN = '';
 		$scope.inputVO.PREMIUM_USAGE = '3';
 		$scope.inputVO.PAY_WAY = '';

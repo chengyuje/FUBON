@@ -15,13 +15,15 @@ eSoafApp.controller('SOT312Controller',
 		});
         		
 		// time picker
-		$scope.startDateOptions = {
-			maxDate: $scope.inputVO.eDate || $scope.maxDate,
-			minDate: $scope.minDate
-		};
-        $scope.endDateOptions = {
-			maxDate: $scope.inputVO.eDate || $scope.maxDate,
-			minDate: $scope.inputVO.sDate || $scope.minDate
+		$scope.optionsInit = function() {
+			$scope.startDateOptions = {
+				maxDate: $scope.inputVO.eDate || $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.endDateOptions = {
+				maxDate: $scope.inputVO.eDate || $scope.maxDate,
+				minDate: $scope.inputVO.sDate || $scope.minDate
+			}
 		};
 		$scope.altInputFormats = ['M!/d!/yyyy'];
 		$scope.model = {};
@@ -57,6 +59,7 @@ eSoafApp.controller('SOT312Controller',
 					sDate: undefined, 
 					eDate: undefined
         	};
+        	$scope.optionsInit();
 			$scope.limitDate();
 		};
 		$scope.init();

@@ -23,6 +23,8 @@ import com.systex.jbranch.platform.common.dataaccess.query.ResultIF;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
+import com.systex.jbranch.platform.server.info.SysInfo;
+import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
@@ -37,19 +39,18 @@ public class CUS140 extends FubonWmsBizLogic {
 
 	/**
 	 * 依登入使用者與查詢條件,查詢計畫內容
-	 *
-	 * @param body
-	 * @param header
-	 * @throws JBranchException
 	 */
 	public void queryData(Object body, IPrimitiveMap header) throws JBranchException {
 
-		// 依系統角色決定下拉選單可視範圍
 		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行
-		Map<String, String> armgrMap = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2); //業務處
-		Map<String, String> mbrmgrMap = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2); //營運區
-		Map<String, String> FAIAMap = xmlInfo.doGetVariable("FUBONSYS.FAIA_ROLE", FormatHelper.FORMAT_2);
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isFAIA = xmlInfo.doGetVariable("FUBONSYS.FAIA_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 
 		CUS140InputVO inputVO = (CUS140InputVO) body;
 		CUS140OutputVO outputVO = new CUS140OutputVO();
@@ -57,7 +58,26 @@ public class CUS140 extends FubonWmsBizLogic {
 
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		sql.append("SELECT MAIN.IVG_PLAN_SEQ, CONTENT.IVG_RESULT_SEQ, CONTENT.EMP_ID as CONTENT_EMP_ID, MEMBER.EMP_NAME as CONTENT_EMP_NAME, CONTENT.REGION_CENTER_ID as CONTENT_REGION, CONTENT.BRANCH_AREA_ID as CONTENT_AREA, CONTENT.BRANCH_NBR as CONTENT_BRANCH, CONTENT.ROLE_ID as CONTENT_ROLE_ID, MAIN.IVG_PLAN_NAME, MAIN.IVG_PLAN_DESC, MAIN.IVG_TYPE, MAIN.IVG_PLAN_TYPE, MAIN.IVG_START_DATE, MAIN.IVG_END_DATE, MAIN.MODIFIER, MEMBER2.EMP_NAME as MODIFIER_NAME, MAIN.LASTUPDATE, CONTENT.RES_FLAG, FL.DOC_ID, FL.DOC_NAME ");
+		sql.append("SELECT MAIN.IVG_PLAN_SEQ, ");
+		sql.append("       CONTENT.IVG_RESULT_SEQ, ");
+		sql.append("       CONTENT.EMP_ID AS CONTENT_EMP_ID, ");
+		sql.append("       MEMBER.EMP_NAME AS CONTENT_EMP_NAME, ");
+		sql.append("       CONTENT.REGION_CENTER_ID AS CONTENT_REGION, ");
+		sql.append("       CONTENT.BRANCH_AREA_ID AS CONTENT_AREA, ");
+		sql.append("       CONTENT.BRANCH_NBR AS CONTENT_BRANCH, ");
+		sql.append("       CONTENT.ROLE_ID AS CONTENT_ROLE_ID, ");
+		sql.append("       MAIN.IVG_PLAN_NAME, ");
+		sql.append("       MAIN.IVG_PLAN_DESC, ");
+		sql.append("       MAIN.IVG_TYPE, ");
+		sql.append("       MAIN.IVG_PLAN_TYPE, ");
+		sql.append("       MAIN.IVG_START_DATE, ");
+		sql.append("       MAIN.IVG_END_DATE, ");
+		sql.append("       MAIN.MODIFIER, ");
+		sql.append("       MEMBER2.EMP_NAME AS MODIFIER_NAME, ");
+		sql.append("       MAIN.LASTUPDATE, ");
+		sql.append("       CONTENT.RES_FLAG, ");
+		sql.append("       FL.DOC_ID, ");
+		sql.append("       FL.DOC_NAME ");
 		sql.append("FROM TBCAM_IVG_PLAN_MAIN MAIN ");
 		//多筆回報有複數content，取ivg_result_seq 最新一筆回報
 		sql.append("LEFT JOIN ( ");
@@ -66,41 +86,45 @@ public class CUS140 extends FubonWmsBizLogic {
 		sql.append("  WHERE Z.IVG_RESULT_SEQ in ( ");
 		sql.append("    SELECT MAX(Y.IVG_RESULT_SEQ) ");
 		sql.append("    FROM TBCAM_IVG_PLAN_CONTENT Y ");
+		sql.append("    LEFT JOIN (SELECT DISTINCT EMP_ID, EMP_DEPT_ID AS DEPT_ID FROM VWORG_EMP_INFO) EMP ON Y.EMP_ID = EMP.EMP_ID ");
 		sql.append("    WHERE Y.EMP_ID = :emp_id ");
 		sql.append("    AND Y.ROLE_ID = :role_id ");
 
-		if (headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+		if (StringUtils.equals(getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG).toString(), "UHRM")) {
+			sql.append("AND Y.EMP_ID = :loginID ");
+		} else if (isUHRMMGR || isUHRMBMMGR) {
+			sql.append("AND ( ");
+			sql.append("      Y.EMP_ID IS NOT NULL ");
+			sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE EMP.DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID AND MT.DEPT_ID = :loginArea) ");
+			sql.append(") ");
+		} else if (isHANDMGR || isFAIA) {
 			sql.append("    AND (Y.REGION_CENTER_ID IN (:rcIdList) OR Y.REGION_CENTER_ID IS NULL) ");
 			sql.append("    AND (Y.BRANCH_AREA_ID IN (:opIdList) OR Y.BRANCH_AREA_ID IS NULL) ");
 			sql.append("    AND (Y.BRANCH_NBR IN (:brNbrList) OR Y.BRANCH_NBR IS NULL) ");
-		} else if (armgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+		} else if (isARMGR) {
 			sql.append("    AND (Y.REGION_CENTER_ID IN (:rcIdList)) ");
 			sql.append("    AND (Y.BRANCH_AREA_ID IN (:opIdList) OR Y.BRANCH_AREA_ID IS NULL) ");
 			sql.append("    AND (Y.BRANCH_NBR IN (:brNbrList) OR Y.BRANCH_NBR IS NULL) ");
-		} else if (mbrmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+		} else if (isOPMGR) {
 			sql.append("    AND (Y.REGION_CENTER_ID IN (:rcIdList)) ");
 			sql.append("    AND (Y.BRANCH_AREA_ID IN (:opIdList)) ");
 			sql.append("    AND (Y.BRANCH_NBR IN (:brNbrList) OR Y.BRANCH_NBR IS NULL) ");
-		} else if (FAIAMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
-			sql.append("    AND (Y.REGION_CENTER_ID IN (:rcIdList) OR Y.REGION_CENTER_ID IS NULL) ");
-			sql.append("    AND (Y.BRANCH_AREA_ID IN (:opIdList) OR Y.BRANCH_AREA_ID IS NULL) ");
-			sql.append("    AND (Y.BRANCH_NBR IN (:brNbrList) OR Y.BRANCH_NBR IS NULL) ");
 		} else {
-			if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0 || 
-				StringUtils.lowerCase(inputVO.getMemLoginFlag()).equals("uhrm")) {
-				sql.append("    AND (Y.REGION_CENTER_ID IN (:rcIdList)) ");
-				sql.append("    AND (Y.BRANCH_AREA_ID IN (:opIdList)) ");
-				sql.append("    AND (Y.BRANCH_NBR IN (:brNbrList)) ");
-			} else {
-				sql.append("    AND (Y.REGION_CENTER_ID IN (:rcIdList) OR Y.REGION_CENTER_ID IS NULL) ");
-				sql.append("    AND (Y.BRANCH_AREA_ID IN (:opIdList) OR Y.BRANCH_AREA_ID IS NULL) ");
-				sql.append("    AND (Y.BRANCH_NBR IN (:brNbrList) OR Y.BRANCH_NBR IS NULL) ");
-			}
+			sql.append("    AND (Y.REGION_CENTER_ID IN (:rcIdList)) ");
+			sql.append("    AND (Y.BRANCH_AREA_ID IN (:opIdList)) ");
+			sql.append("    AND (Y.BRANCH_NBR IN (:brNbrList)) ");
 		}
-
-		queryCondition.setObject("rcIdList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
-		queryCondition.setObject("opIdList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
-		queryCondition.setObject("brNbrList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
+		
+		if (StringUtils.equals(getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG).toString(), "UHRM")) {
+			queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
+		} else if (isUHRMMGR || isUHRMBMMGR) {
+			queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
+			queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
+		} else {
+			queryCondition.setObject("rcIdList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
+			queryCondition.setObject("opIdList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
+			queryCondition.setObject("brNbrList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
+		}
 
 		sql.append("    GROUP BY Y.IVG_PLAN_SEQ");
 		sql.append("  )");
@@ -108,9 +132,8 @@ public class CUS140 extends FubonWmsBizLogic {
 		sql.append("LEFT JOIN TBORG_MEMBER MEMBER ON CONTENT.EMP_ID = MEMBER.EMP_ID ");
 		sql.append("LEFT JOIN TBORG_MEMBER MEMBER2 ON MAIN.MODIFIER = MEMBER2.EMP_ID ");
 		sql.append("LEFT JOIN TBSYS_FILE_MAIN FL ON MAIN.DOC_ID = FL.DOC_ID ");
-		sql.append("WHERE 1=1 ");
+		sql.append("WHERE 1 = 1 ");
 
-		// 只查自己 2016/12/13
 		sql.append("AND CONTENT.EMP_ID = :emp_id ");
 		queryCondition.setObject("emp_id", getUserVariable(FubonSystemVariableConsts.LOGINID));
 		queryCondition.setObject("role_id", getUserVariable(FubonSystemVariableConsts.LOGINROLE));
@@ -133,7 +156,8 @@ public class CUS140 extends FubonWmsBizLogic {
 		}
 
 		// 計畫狀態 mantis always 有效
-		sql.append("AND MAIN.IVG_PLAN_TYPE = '1' and TRUNC(sysdate) between TRUNC(MAIN.IVG_START_DATE) and TRUNC(MAIN.IVG_END_DATE) ");
+		sql.append("AND MAIN.IVG_PLAN_TYPE = '1' ");
+		sql.append("AND TRUNC(SYSDATE) BETWEEN TRUNC(MAIN.IVG_START_DATE) AND TRUNC(MAIN.IVG_END_DATE) ");
 
 		//是否已回報
 		if (!StringUtils.isBlank(inputVO.getResFlag())) {
@@ -157,21 +181,19 @@ public class CUS140 extends FubonWmsBizLogic {
 		sql.append("ORDER BY MAIN.IVG_END_DATE, CONTENT.RES_FLAG ");
 
 		queryCondition.setQueryString(sql.toString());
+		
 		ResultIF list = dam.executePaging(queryCondition, inputVO.getCurrentPageIndex() + 1, inputVO.getPageCount());
-		int totalPage = list.getTotalPage();
-		outputVO.setTotalPage(totalPage);
+
+		outputVO.setTotalPage(list.getTotalPage());
 		outputVO.setResultList(list);
 		outputVO.setTotalRecord(list.getTotalRecord());
 		outputVO.setCurrentPageIndex(inputVO.getCurrentPageIndex());
+		
 		this.sendRtnObject(outputVO);
 	}
 
 	/**
 	 * 依各計畫,顯示其動態欄位
-	 *
-	 * @param body
-	 * @param header
-	 * @throws JBranchException
 	 */
 	public void queryField(Object body, IPrimitiveMap header) throws JBranchException {
 		CUS140InputVO inputVO = (CUS140InputVO) body;

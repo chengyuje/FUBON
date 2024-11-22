@@ -9,6 +9,7 @@ public class SQM110OutputVO extends PagingOutputVO {
 	private List resultList; //主查詢資訊 包含修改
 	private List totalList;
 	private List<Map<String, String>> orgList;	//主查詢資訊 
+	private List<Map<String, String>> uhrmList;
 
 	public List getResultList() {
 		return resultList;
@@ -33,4 +34,13 @@ public class SQM110OutputVO extends PagingOutputVO {
 	public void setOrgList(List<Map<String, String>> orgList) {
 		this.orgList = orgList;
 	}
+
+	public List<Map<String, String>> getUhrmList() {
+		return uhrmList;
+	}
+
+	public void setUhrmList(List<Map<String, String>> uhrmList) {
+		this.uhrmList = uhrmList;
+	}
+	
 }

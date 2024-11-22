@@ -1,0 +1,182 @@
+<style>
+.tdpadding{
+	padding:  10px 5px 5px 5px;
+}
+.alignleft{
+	text-align: left !important;
+}
+.bigspace{
+	margin-left: 50px !important;
+}
+.datewidth{
+	width:180px !important;
+}
+.search-table-outter{
+	overflow-x: scroll;
+}
+
+.colwidth>thead>tr>th {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+.rstable >thead>tr>th {
+	vertical-align:middle;
+      min-width: 10px;
+	white-space: nowrap;
+}
+</style>
+<script type="text/javascript" src="assets/txn/PMS342/PMS342.js"></script>
+<script type="text/javascript" src="assets/txn/PMS342U/PMS342U.js"></script>
+<script type="text/javascript" src="assets/txn/PMS000/PMSRegionController.js"></script>
+<div class="PMS342U" ng-controller="PMS342UController" ng-cloak>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
+		</div>
+		<div class="panel_content">
+			<div class="search_table search_box3" >
+				<table class="rstable">
+					<tr>						
+						<th>資料統計日期：</th>
+						<td colspan="7">							
+							<div class="input-group datebox datewidth" style="float:left">
+								<input type="text" id="sCreDate" name="sCreDate"
+									   class="form-control"
+									   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.sCreDate"
+									   is-open="model.a"
+									   datepicker-options="bgn_sDateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate();dateChangeU()"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																			
+								</span>
+							</div>																					
+							<div style="float:left">&nbsp; ～ &nbsp;</div>	
+							<div class="input-group datebox datewidth" style="float:left">
+								<input type="text" id="eCreDate" name="eCreDate"
+									   class="form-control"
+			   						   uib-datepicker-popup="yyyy/MM/dd"
+									   ng-model="inputVO.eCreDate"
+									   is-open="model.b"
+									   datepicker-options="bgn_eDateOptions"
+									   ng-readonly="true"								
+									   ng-change="limitDate();dateChangeU()"/>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
+									<i class="glyphicon glyphicon-calendar"></i></button>																		
+								</span>
+							</div>								
+						</td>																	    												
+					</tr>
+					<tr>
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="uhrmRCList"
+										ng-model="inputVO.uhrmRC"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="uhrmOPList"
+										ng-model="inputVO.uhrmOP"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
+						<th>私銀RM：</th>
+						<td>
+							<e-combobox id="aoCode" name="aoCode"
+										ng-datasource="mappingSet['EmpName']"
+										ng-model="inputVO.ao_code"
+										ng-validate="false"
+										ng-disabled="false"
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										style="line-height:20px;" />	
+						</td>
+						<th></th>
+						<td></td>
+					</tr>					
+				</table>
+			</div>
+			<div class="search_box_btn text-center">
+				<button type="button" class="btn btn-info" ng-click="inquireInit();query()">查詢</button>
+				<button type="button" class="btn btn-info" ng-click="init();limitDate()">清除</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-disabled="paramList.length < 1">匯出</button>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="tfb_content">
+			<div class="tfb_content_icon"></div>
+			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢結果</div>
+		</div>
+		<div class="panel_content">		    
+			<e-jumping output="outputVO" input="inputVO" query="query()" list="paramList"></e-jumping>
+			<div algin="left">
+				<table>
+			    	<tr>
+			    		<td align="right">產生頻率：</td>
+			    		<td align="left">每日</td>
+			    	</tr>
+			    	<tr>
+			    		<td align="left">產出日：</td>
+			    		<td align="left">{{toJsDate(paramList[0].CREATETIME) | date:'yyyy/MM/dd'}}</td>
+			    	</tr>
+		    	</table>
+			</div>	
+			<div class="gv_tab_sc scroll_y" style="min-height:235px;white-space: nowrap;">
+				<table class="rstable e-table-freeze" e-height="360px" e-mode="1" e-top="true" e-list="paramList">
+					<thead>
+						<tr>
+							<th>序號</th>
+							<th>交易日期</th>
+							<th>客戶ID</th>
+							<th>客戶姓名</th>
+							<th>帳號</th>
+							<th>借方金額</th>
+							<th>貸方金額</th>
+							<th>摘要</th>
+							<th>理專員編</th>
+							<th>理專姓名</th>
+							<th>是否為法金戶</th>																									
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						 	<td>{{outputVO.currentPageIndex*10+$index+1}}</td>
+						 	<td>{{row.TRADE_DATE}}</td>
+							<td>{{row.CUST_ID}}</td>
+							<td>{{row.CUST_NAME}}</td>
+							<td>{{row.ACCOUNT}}</td>
+							<td align="right">{{row.DEBIT_AMT | currency:''}}</td>
+							<td align="right">{{row.CREDIT_AMT | currency:''}}</td>
+							<td>{{row.SUMMARY}}</td>
+							<td>{{row.EMP_ID}}</td>
+							<td>{{row.EMP_NAME}}</td>
+							<td>{{row.CO_ACCT_YN | mapping:mappingSet['COMMON.YES_NO']:'F3'}}</td>																								 				
+						</tr>
+					</tbody>
+				</table>				
+			</div>
+		</div>
+	</div>
+</div>

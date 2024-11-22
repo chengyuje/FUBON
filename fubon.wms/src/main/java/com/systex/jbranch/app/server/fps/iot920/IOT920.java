@@ -162,7 +162,7 @@ public class IOT920 extends FubonWmsBizLogic{
 			}else{
 				NO_SALE = "N";
 			}
-
+			
 			//結清戶
 			qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			sb = new StringBuilder();
@@ -273,7 +273,16 @@ public class IOT920 extends FubonWmsBizLogic{
 							outputVO.getEMP_NAME().get(0).put("AO_CODE", AO_CODE);
 						}
 						//招攬人員是否有分紅證照
-						outputVO.getEMP_NAME().get(0).put("EMP_DIVIDEND_YN", getEmpDividendYN(inputVO.getRECRUIT_ID()));
+						outputVO.getEMP_NAME().get(0).put("EMP_DIVIDEND_CERT", getEmpDividendCert(inputVO.getRECRUIT_ID()));
+						if(inputVO.getAPPLY_DATE() != null) {
+							//招攬人員是否有公平待客完訓資格
+							outputVO.getEMP_NAME().get(0).put("EMP_FAIR_CERT", getFairCert(inputVO.getRECRUIT_ID(), inputVO.getAPPLY_DATE()));
+							//招攬人員是否有高齡完訓資格
+							outputVO.getEMP_NAME().get(0).put("EMP_SENIOR_CERT", getSeniorCert(inputVO.getRECRUIT_ID(), inputVO.getAPPLY_DATE()));
+						} else {
+							outputVO.getEMP_NAME().get(0).put("EMP_FAIR_CERT", "N");
+							outputVO.getEMP_NAME().get(0).put("EMP_SENIOR_CERT", "N");
+						}
 					}
 					break;
 				case "CHG_CUST":
@@ -391,7 +400,10 @@ public class IOT920 extends FubonWmsBizLogic{
 							// AML 防洗錢註記
 							AML004OutputVO aml004OutputVO = aml004Service.search(inputVO.getCUST_ID().toUpperCase());
 							outputVO.setAML(aml004OutputVO != null ? aml004OutputVO.getRiskRanking(): "");
-
+							//取得保險庫存金額
+							CRM681 crm681 = (CRM681) PlatformContext.getBean("crm681");
+							outputVO.setINS_ASSET((crm681.inquire(inputVO.getCUST_ID())).getInsurance());
+							
 							outputVO.setINCOME3(getIncome3(inputVO.getCUST_ID().toUpperCase()));
 							
 							//取得要保人高資產註記
@@ -1061,7 +1073,7 @@ public class IOT920 extends FubonWmsBizLogic{
 		}
 		//檢核招攬人員是否有分紅證照
 		if(StringUtils.isNotBlank(inputVO.getEMP_ID())){
-			outputVO.setEmpDividendYN(getEmpDividendYN(inputVO.getEMP_ID()));
+			outputVO.setEmpDividendCert(getEmpDividendCert(inputVO.getEMP_ID()));
 		}
 		
 		return outputVO;
@@ -1069,22 +1081,78 @@ public class IOT920 extends FubonWmsBizLogic{
 
 	/***
 	 * 招攬人員是否有分紅證照
-	 * @param empId
-	 * @return Y:有證照 N:沒證照
+	 * @param empId 招攬人員員編
+	 * @return 	EMP_DIVIDEND_YN Y:有證照 N:沒證照
+	 * 			EMP_DIVIDEND_END_DATE 完訓日
 	 * @throws DAOException
 	 * @throws JBranchException
 	 */
-	private String getEmpDividendYN(String empId) throws DAOException, JBranchException {
+	private Map<String, Object> getEmpDividendCert(String empId) throws DAOException, JBranchException {
 		dam_obj = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		sql.append(" SELECT 1 FROM TBORG_PS_SA_INS_EMPFUND ");
+		sql.append(" SELECT TRUNC(END_DATE) AS END_DATE FROM TBORG_PS_SA_INS_EMPFUND ");
 		sql.append(" WHERE CLASS = 'MA02' AND EMPID = :EMP_ID ");
 		queryCondition.setObject("EMP_ID", empId);
 		queryCondition.setQueryString(sql.toString());
 		List<Map<String, Object>> temp1 = dam_obj.exeQuery(queryCondition);
 		
-		return CollectionUtils.isEmpty(temp1) ? "N" : "Y";
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(CollectionUtils.isEmpty(temp1)) {
+			map.put("EMP_DIVIDEND_YN", "N");
+			map.put("EMP_DIVIDEND_END_DATE", null);
+		} else {
+			map.put("EMP_DIVIDEND_YN", "Y");
+			map.put("EMP_DIVIDEND_END_DATE", temp1.get(0).get("END_DATE"));
+		}
+				
+		return map;
+	}
+	
+	/***
+	 * 招攬人員公平待客完訓資格
+	 * @param empId 招攬人員員編
+	 * @param applyDate 要保書申請日
+	 * @return Y: 有完訓資格 N:沒有完訓資格
+	 * @throws DAOException
+	 * @throws JBranchException
+	 */
+	private String getFairCert(String empId, Date applyDate) throws DAOException, JBranchException {
+		dam_obj = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sql = new StringBuffer();
+		sql.append(" SELECT 1 FROM TBORG_MEMBER_CERT ");
+		sql.append(" WHERE CERTIFICATE_CODE = '11' AND EMP_ID = :EMP_ID ");
+		sql.append("   AND (TRUNC(TRAIN_DATE) <= TRUNC(:applyDate) OR TRUNC(TRAIN_DATE_BEFORE) <= TRUNC(:applyDate)) ");
+		queryCondition.setObject("EMP_ID", empId);
+		queryCondition.setObject("applyDate", applyDate);
+		queryCondition.setQueryString(sql.toString());
+		List<Map<String, Object>> chkList = dam_obj.exeQuery(queryCondition);
+		
+		return (CollectionUtils.isNotEmpty(chkList) ? "Y" : "N");
+	}
+	
+	/***
+	 * 招攬人員高齡完訓資格
+	 * @param empId 招攬人員員編
+	 * @param applyDate 要保書申請日
+	 * @return Y: 有完訓資格 N:沒有完訓資格
+	 * @throws DAOException
+	 * @throws JBranchException
+	 */
+	private String getSeniorCert(String empId, Date applyDate) throws DAOException, JBranchException {
+		dam_obj = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sql = new StringBuffer();
+		sql.append(" SELECT 1 FROM TBORG_MEMBER_CERT ");
+		sql.append(" WHERE CERTIFICATE_CODE = '09' AND EMP_ID = :EMP_ID ");
+		sql.append("   AND (TRUNC(TRAIN_DATE_BEFORE) >= ADD_MONTHS(TRUNC(:applyDate), -12) AND TRUNC(TRAIN_DATE_BEFORE) <= TRUNC(:applyDate)) ");
+		queryCondition.setObject("EMP_ID", empId);
+		queryCondition.setObject("applyDate", applyDate);
+		queryCondition.setQueryString(sql.toString());
+		List<Map<String, Object>> chkList = dam_obj.exeQuery(queryCondition);
+		
+		return (CollectionUtils.isNotEmpty(chkList) ? "Y" : "N");
 	}
 	
 	//抓取產險險種
