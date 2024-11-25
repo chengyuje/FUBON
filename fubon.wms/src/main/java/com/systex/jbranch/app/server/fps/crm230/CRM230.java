@@ -351,8 +351,22 @@ public class CRM230 extends FubonWmsBizLogic {
 		String stepID = sdf.format(date);
 		String leadSourceId = "04";
 		Date startDate = new Timestamp(Calendar.getInstance().getTime().getTime());
-		Date endDate = new Timestamp(inputVO.getCampaign_date().getTime());
-		String leadType = "03";
+
+		/*
+		 * WMS-CR-20240524-02_RM名單管理機制調整：
+		 * 1. 名單類別調整為「參考資訊」(04)。
+		 * 2. 名單到期日為T(建立日) + 60日
+		 * **/
+		Date today = new Date();
+//	    System.out.println("Today：" + today);
+	    Calendar c = Calendar.getInstance();
+	    c.setTime(today);
+	    c.add(Calendar.DATE, 60);
+	    Date endDate = c.getTime();
+//		Date endDate = new Timestamp(inputVO.getCampaign_date().getTime());
+		String leadType = "04";
+//		String leadType = "03";
+		
 		String leadPara1 = "N";
 		String leadPara2 = "N";
 		String examID = null;
@@ -367,7 +381,8 @@ public class CRM230 extends FubonWmsBizLogic {
 		String giftCampaignID = null;
 		BigDecimal leTotalCnt = new BigDecimal(inputVO.getCampaign_custlist().size());
 
-		cam996.saveCampaign(dam, campaign_Seq, campaignID, campaignName, campaignDesc, stepID, leadSourceId, startDate, endDate, leadType, leadPara1, leadPara2, examID, salesPitch, firstChannel, secondChannel, impStatus, checkStatus, giftCampaignID, leTotalCnt, null);
+		cam996.saveCampaign(dam, campaign_Seq, campaignID, campaignName, campaignDesc, stepID, leadSourceId, startDate, endDate, leadType, leadPara1, leadPara2, 
+							examID, salesPitch, firstChannel, secondChannel, impStatus, checkStatus, giftCampaignID, leTotalCnt, null, null);
 
 		for (Map<String, String> data : inputVO.getCampaign_custlist()) {
 			BigDecimal seqNo = campaign_Seq;

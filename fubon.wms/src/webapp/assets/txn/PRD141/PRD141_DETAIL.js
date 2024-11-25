@@ -16,8 +16,6 @@ eSoafApp.controller('PRD141_DETAILController',
 				$scope.BOND_CURRENCY = totas.data[totas.key.indexOf('PRD.BOND_CURRENCY')];
 				$scope.PROD_RISK_LEVEL = totas.data[totas.key.indexOf('FPS.PROD_RISK_LEVEL')];
 				$scope.DIVIDEND_FREQ_BOND = totas.data[totas.key.indexOf('FPS.DIVIDEND_FREQ_BOND')];
-				$scope.SN_PROJECT = totas.data[totas.key.indexOf('PRD.SN_PROJECT')];
-				$scope.SN_CUSTOMER_LEVEL = totas.data[totas.key.indexOf('PRD.SN_CUSTOMER_LEVEL')];
 			}
 		});
 		

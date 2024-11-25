@@ -932,6 +932,7 @@ public class SOT701 extends EsbUtil {
 		sot701InputVO = (SOT701InputVO) body;
 		String custID = sot701InputVO.getCustID();
 
+		String exceptionAcctFlag  = getExceptionAcctFlag(custID);
 		W8BenDataVO w8BenDataVO = new W8BenDataVO();
 		WMS032275OutputVO wms032275OutputVO = queryCustW8BenFATCA(custID);
 
@@ -989,13 +990,13 @@ public class SOT701 extends EsbUtil {
 			w8BenDataVO.setIDF_S(idfS);
 
 			// 辨識完成
-			if ("Y".equals(idfS) && StringUtils.isNotBlank(idfN)) {
+			if ("辨識完成".equals(idfS) && StringUtils.isNotBlank(idfN)) {
 				// 判斷身份
-				if (idfN.startsWith("12")) {
+				if (idfN.matches("1201|1202|1203|1204|1205|C010|C020|C030|C040|C050|C060|C070|C090") && "N".equals(exceptionAcctFlag)) {
 					w8BenDataVO.setFatcaType("N"); // 不合作
-				} else if (idfN.matches("1301|1302|1303")) {
+				} else if (idfN.matches("1301|1302|1303|B010")) {
 					w8BenDataVO.setFatcaType("Y"); // 美國人
-				} else if (idfN.equals("0800")) {
+				} else if (idfN.matches("0800|1206|D013|C013|D023|C023")) {
 					w8BenDataVO.setFatcaType("X"); // 未簽署
 				}
 			}
@@ -1033,12 +1034,15 @@ public class SOT701 extends EsbUtil {
 	 *
 	 * 使用電文: FC032275
 	 *
+	 *#1981 不合作例外帳戶例外管理 by SamTu 2024.05.03
 	 * @param body
 	 * @return FatcaDataVO
 	 */
 	public FatcaDataVO getFatcaData(Object body) throws Exception {
 		sot701InputVO = (SOT701InputVO) body;
 		String custID = sot701InputVO.getCustID();
+		
+		String exceptionAcctFlag  = getExceptionAcctFlag(custID);
 
 		WMS032275OutputVO wms032275OutputVO = queryCustW8BenFATCA(custID);
 
@@ -1057,7 +1061,14 @@ public class SOT701 extends EsbUtil {
 			fatcaDataVO.setIDF_S(idfS);
 
 			if (StringUtils.isNotBlank(idfN)) // 依照idfN去設置fatcaType
-				fatcaDataVO.setFatcaType(idfN);
+				// 判斷身份
+				if (idfN.matches("1201|1202|1203|1204|1205|C010|C020|C030|C040|C050|C060|C070|C090") && "N".equals(exceptionAcctFlag)) {
+					fatcaDataVO.setFatcaType("N"); // 不合作
+				} else if (idfN.matches("1301|1302|1303|B010")) {
+					fatcaDataVO.setFatcaType("Y"); // 美國人
+				} else if (idfN.matches("0800|1206|D013|C013|D023|C023")) {
+					fatcaDataVO.setFatcaType("X"); // 未簽署
+				}
 		}
 		return fatcaDataVO;
 	}

@@ -60,8 +60,9 @@ public class PRD141 extends FubonWmsBizLogic {
 		sb.append(" WHERE PROD_ID =:prd_id  ");
 		qc.setObject("prd_id", inputVO.getPrd_id());
 		
-		qc.setObject("start", inputVO.getsDate());
-		qc.setObject("end", inputVO.geteDate());
+		sb.append(" and A.NAV_DATE BETWEEN :startDate AND :endDate order by A.NAV_DATE  ");
+		qc.setObject("startDate", inputVO.getsDate());
+		qc.setObject("endDate", inputVO.geteDate());
 		qc.setQueryString(sb.toString());
 		List<Map<String, Object>> list = dam.exeQuery(qc);
 		outputVO.setResultList(list);

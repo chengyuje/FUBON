@@ -428,7 +428,7 @@ public class KYC610_Qst extends FubonWmsBizLogic{
         table.addCell(blank);
         table.addCell(blank);
         table.addCell(buildTitle(" 主管 ：" , bFont, Paragraph.ALIGN_LEFT));
-        table.addCell(buildTitle(" 作業人員/ARM(核對親簽)  ：" , bFont, Paragraph.ALIGN_LEFT));
+        table.addCell(buildTitle(" 作業人員/未涉及銷售之業務人員(核對親簽)  ：" , bFont, Paragraph.ALIGN_LEFT));
         table.addCell(blank);
         table.addCell(buildTitle(" □通過" , bFont, Paragraph.ALIGN_LEFT));
         table.addCell(blank);

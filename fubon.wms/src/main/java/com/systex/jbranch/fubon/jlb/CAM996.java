@@ -37,63 +37,6 @@ public class CAM996 extends BizLogic {
 	}
 	
 	public void saveCampaign (DataAccessManager dam, 
-			  BigDecimal seqNO, 
-			  String campaignID, 
-			  String campaignName, 
-			  String campaignDesc, 
-			  String stepID, 
-			  String leadSourceId, 
-			  Date startDate, 
-			  Date endDate, 
-			  String leadType, 
-			  String leadPara1, 
-			  String leadPara2,
-			  String examID, 
-			  String salesPitch, 
-			  String firstChannel, 
-			  String secondChannel, 
-			  String impStatus, 
-			  String checkStatus, 
-			  String giftCampaignID, 
-			  BigDecimal leTotalCnt, 
-			  String responseCode) throws JBranchException {
-
-		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		StringBuffer dayUseSQL = new StringBuffer();
-		dayUseSQL.append("SELECT PABTH_UTIL.FC_getTwoDateDiff(TO_DATE(:sDate, 'yyyyMMdd'), TO_DATE(:eDate, 'yyyyMMdd')) AS WORK_DAY ");
-		dayUseSQL.append("FROM DUAL ");
-		queryCondition.setObject("sDate", SDFYYYYMMDD.format(startDate));
-		queryCondition.setObject("eDate", SDFYYYYMMDD.format(endDate));
-		queryCondition.setQueryString(dayUseSQL.toString());
-		List<Map<String, Object>> dayUse = dam.exeQueryWithoutSort(queryCondition);
-		
-		TBCAM_SFA_LEADS_IMPVO vo = new TBCAM_SFA_LEADS_IMPVO();
-		vo.setSEQNO(seqNO);
-		vo.setCAMPAIGN_ID(campaignID); // 行銷活動代碼
-		vo.setCAMPAIGN_NAME(campaignName); // 行銷活動名稱
-		vo.setCAMPAIGN_DESC(campaignDesc); // 簡要說明
-		vo.setSTEP_ID(stepID); // 行銷活動步驟代碼
-		vo.setLEAD_SOURCE_ID(leadSourceId); //名單來源
-		vo.setSTART_DATE(new Timestamp(startDate.getTime())); // 行銷活動起日
-		vo.setEND_DATE(new Timestamp(endDate.getTime())); // 行銷活動迄日
-		vo.setLEAD_TYPE(leadType); // 名單類型
-		vo.setLEAD_PARA1(leadPara1); //附帶資料蒐集
-		vo.setLEAD_DAYUSE(new BigDecimal(dayUse.get(0).get("WORK_DAY").toString()));
-		vo.setEXAM_ID(examID);
-		vo.setSALES_PITCH(salesPitch); // 話術
-		vo.setFIRST_CHANNEL(firstChannel); // 使用部隊
-		vo.setSECOND_CHANNEL(secondChannel); // 第二使用通路
-		vo.setIMP_STATUS(impStatus); // 匯入狀態:IN-未處理
-		vo.setCHECK_STATUS(checkStatus); // 放行狀態:01-待放行
-		vo.setGIFT_CAMPAIGN_ID(giftCampaignID); //票券/贈品/講座活動代碼
-		vo.setLEAD_PARA2(leadPara2); //行銷活動參考文件
-		vo.setLE_TOTAL_CNT(leTotalCnt);
-		vo.setLEAD_RESPONSE_CODE(StringUtils.isNotBlank(responseCode) ? responseCode : "0000000000");
-		
-		dam.create(vo);
-	}
-	
-	public void saveCampaign (DataAccessManager dam, 
 							  BigDecimal seqNO, 
 							  String campaignID, 
 							  String campaignName, 

@@ -38,7 +38,19 @@ eSoafApp.controller('SQM140Controller',
 		};
 		$scope.limitDate = function() {
 			$scope.bgn_sDateOptions.maxDate = $scope.inputVO.eCreDate || $scope.maxDate;
+			if ($scope.inputVO.eCreDate) {
+				let y = $scope.inputVO.eCreDate.getFullYear() - 1;
+				let m = $scope.inputVO.eCreDate.getMonth();
+				let d = $scope.inputVO.eCreDate.getDate();
+				$scope.bgn_sDateOptions.minDate = new Date(y, m, d);
+			}
 			$scope.bgn_eDateOptions.minDate = $scope.inputVO.sCreDate || currDate;
+			if ($scope.inputVO.sCreDate) {
+				let y = $scope.inputVO.sCreDate.getFullYear() + 1;
+				let m = $scope.inputVO.sCreDate.getMonth();
+				let d = $scope.inputVO.sCreDate.getDate();
+				$scope.bgn_eDateOptions.maxDate = new Date(y, m, d);
+			}
 		};
 		// date picker end
 

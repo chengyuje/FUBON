@@ -13,8 +13,10 @@ eSoafApp.controller('SQM310_2Controller',
 		});
 		
 		// date picker
-		$scope.sDateOptions = {};
-		$scope.eDateOptions = {};
+		$scope.optionsInit = function() {
+			$scope.sDateOptions = {};
+			$scope.eDateOptions = {};
+		}
 		// config
 		$scope.model = {};
 		$scope.open = function($event, elementOpened) {
@@ -23,14 +25,28 @@ eSoafApp.controller('SQM310_2Controller',
 			$scope.model[elementOpened] = !$scope.model[elementOpened];
 		};
 		$scope.limitDate = function() {
+			debugger;
 			$scope.sDateOptions.maxDate = $scope.queryVO.eDate
-			$scope.eDateOptions.minDate = $scope.queryVO.sDate;
+			if ($scope.queryVO.eDate) {
+				let y = $scope.queryVO.eDate.getFullYear() - 1;
+				let m = $scope.queryVO.eDate.getMonth();
+				let d = $scope.queryVO.eDate.getDate();
+				$scope.sDateOptions.minDate = new Date(y, m, d);
+			}
+			$scope.eDateOptions.sDate = $scope.queryVO.sDate;
+			if ($scope.queryVO.sDate) {
+				let y = $scope.queryVO.sDate.getFullYear() + 1;
+				let m = $scope.queryVO.sDate.getMonth();
+				let d = $scope.queryVO.sDate.getDate();
+				$scope.eDateOptions.maxDate = new Date(y, m, d);
+			}
 		};
 		
 		$scope.init = function() {
 			$scope.resultList = [];
 			$scope.inputVO = {totalList: []};
 			$scope.queryVO = {closed: 'N'};
+			$scope.optionsInit();
 			$scope.limitDate();
 			$scope.checkVO = {
 				clickAll: false,

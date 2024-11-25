@@ -50,33 +50,35 @@ eSoafApp.controller('CAM130Controller',
         //
 		
      	// date picker
-        // 匯入日期
-        $scope.sCreDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
-		$scope.eCreDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
-		// 活動起始日
-        $scope.sStaDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
-		$scope.eStaDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
-		// 活動截止日
-        $scope.sEndDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
-		$scope.eEndDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
+		$scope.optionsInit = function() {
+			// 匯入日期
+			$scope.sCreDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.eCreDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			// 活動起始日
+			$scope.sStaDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.eStaDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			// 活動截止日
+			$scope.sEndDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.eEndDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+		}
 		// config
 		$scope.model = {};
 		$scope.open = function($event, elementOpened) {
@@ -84,17 +86,54 @@ eSoafApp.controller('CAM130Controller',
 			$event.stopPropagation();
 			$scope.model[elementOpened] = !$scope.model[elementOpened];
 		};
+		
 		$scope.limitDate = function() {
 			$scope.sCreDateOptions.maxDate = $scope.inputVO.eCreDate || $scope.maxDate;
+			if ($scope.inputVO.eCreDate) {
+				let y = $scope.inputVO.eCreDate.getFullYear() - 1;
+				let m = $scope.inputVO.eCreDate.getMonth();
+				let d = $scope.inputVO.eCreDate.getDate();
+				$scope.sCreDateOptions.minDate = new Date(y, m, d);
+			}
 			$scope.eCreDateOptions.minDate = $scope.inputVO.sCreDate || $scope.minDate;
+			if ($scope.inputVO.sCreDate) {
+				let y = $scope.inputVO.sCreDate.getFullYear() + 1;
+				let m = $scope.inputVO.sCreDate.getMonth();
+				let d = $scope.inputVO.sCreDate.getDate();
+				$scope.eCreDateOptions.maxDate = new Date(y, m, d);
+			}
 		};
 		$scope.limitDate2 = function() {
 			$scope.sStaDateOptions.maxDate = $scope.inputVO.eStaDate || $scope.maxDate;
+			if ($scope.inputVO.eStaDate) {
+				let y = $scope.inputVO.eStaDate.getFullYear() - 1;
+				let m = $scope.inputVO.eStaDate.getMonth();
+				let d = $scope.inputVO.eStaDate.getDate();
+				$scope.sStaDateOptions.minDate = new Date(y, m, d);
+			}
 			$scope.eStaDateOptions.minDate = $scope.inputVO.sStaDate || $scope.minDate;
+			if ($scope.inputVO.sStaDate) {
+				let y = $scope.inputVO.sStaDate.getFullYear() + 1;
+				let m = $scope.inputVO.sStaDate.getMonth();
+				let d = $scope.inputVO.sStaDate.getDate();
+				$scope.eStaDateOptions.maxDate = new Date(y, m, d);
+			}
 		};
 		$scope.limitDate3 = function() {
 			$scope.sEndDateOptions.maxDate = $scope.inputVO.eEndDate || $scope.maxDate;
+			if ($scope.inputVO.eEndDate) {
+				let y = $scope.inputVO.eEndDate.getFullYear() - 1;
+				let m = $scope.inputVO.eEndDate.getMonth();
+				let d = $scope.inputVO.eEndDate.getDate();
+				$scope.sEndDateOptions.minDate = new Date(y, m, d);
+			}
 			$scope.eEndDateOptions.minDate = $scope.inputVO.sEndDate || $scope.minDate;
+			if ($scope.inputVO.sEndDate) {
+				let y = $scope.inputVO.sEndDate.getFullYear() + 1;
+				let m = $scope.inputVO.sEndDate.getMonth();
+				let d = $scope.inputVO.sEndDate.getDate();
+				$scope.eEndDateOptions.maxDate = new Date(y, m, d);
+			}
 		};
 		// date picker end
 		
@@ -128,6 +167,7 @@ eSoafApp.controller('CAM130Controller',
 		
 		$scope.init = function(){
 			$scope.inputVO = {};
+			$scope.optionsInit();
 			$scope.limitDate();
 			$scope.limitDate2();
 			$scope.limitDate3();

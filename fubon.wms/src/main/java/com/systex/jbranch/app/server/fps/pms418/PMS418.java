@@ -78,6 +78,7 @@ public class PMS418 extends FubonWmsBizLogic {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
 
 		// #0731: WMS-CR-20210906-01_調整同一IP及分行人員資金往來報表 => 交易日為同一天+交易項目相同+同一IP+同一客戶 =簡化筆數 
 		sb.append("SELECT CASE WHEN RPT.RM_FLAG = 'U' THEN 'Y' ELSE 'N' END AS RM_FLAG, ");
@@ -107,6 +108,7 @@ public class PMS418 extends FubonWmsBizLogic {
 		sb.append("       TO_CHAR(TXN_TIME, 'YYYYMMDD') AS TXN_DAY, ");
 		sb.append("       RPT.CUST_AGE ");
 		sb.append("FROM TBPMS_IP_EBALT_RPT RPT ");
+		sb.append("LEFT JOIN VWORG_DEFN_INFO ORG ON RPT.BRANCH_NBR = ORG.BRANCH_NBR ");
 		sb.append("LEFT JOIN TBCRM_CUST_MAST MAST ON RPT.CUST_ID = MAST.CUST_ID ");
 		sb.append("LEFT JOIN TBPMS_EMPLOYEE_REC_N MEM ON RPT.AO_EMP_ID = MEM.EMP_ID AND RPT.BRANCH_NBR = MEM.DEPT_ID AND RPT.TXN_TIME BETWEEN MEM.START_TIME AND MEM.END_TIME ");
 		sb.append("WHERE 1 = 1 ");
@@ -155,23 +157,36 @@ public class PMS418 extends FubonWmsBizLogic {
 			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("AND RPT.BRANCH_NBR = :branch ");
 				queryCondition.setObject("branch", inputVO.getBranch_nbr());
-			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-				sb.append("AND RPT.BRANCH_NBR in (select BRANCH_NBR from VWORG_DEFN_BRH where DEPT_ID = :area) ");
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
+				sb.append("AND ( ");
+				sb.append("  (RPT.RM_FLAG = 'B' AND ORG.BRANCH_AREA_ID = :area) ");
+				
+				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+					sb.append("  OR (RPT.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :area )) ");
+				}
+			
+				sb.append(") ");
 				queryCondition.setObject("area", inputVO.getBranch_area_id());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-				sb.append("AND RPT.BRANCH_NBR in (select BRANCH_NBR from VWORG_DEFN_BRH where DEPT_ID = :region) ");
+				sb.append("AND ORG.REGION_CENTER_ID = :region ");
 				queryCondition.setObject("region", inputVO.getRegion_center_id());
+			}
+
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) && 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("AND RPT.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {
-				sb.append("  AND (");
-				sb.append("       EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.AO_EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :uhrmOP ) ");
-				sb.append("    OR MEM.E_DEPT_ID = :uhrmOP ");
-				sb.append("  )");
+				sb.append("AND (");
+				sb.append("     EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.AO_EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :uhrmOP ) ");
+				sb.append("  OR MEM.E_DEPT_ID = :uhrmOP ");
+				sb.append(")");
 				queryCondition.setObject("uhrmOP", inputVO.getUhrmOP());
 			}
 			
-			sb.append("  AND RPT.RM_FLAG = 'U' ");
+			sb.append("AND RPT.RM_FLAG = 'U' ");
 		}
 
 		//由工作首頁 CRM181 過來，只須查詢主管尚未確認資料

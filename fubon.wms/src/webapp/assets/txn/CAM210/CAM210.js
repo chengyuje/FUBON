@@ -29,10 +29,12 @@ eSoafApp.controller('CAM210Controller', function($scope, $rootScope, $controller
 	
 	// 2017/9/13 date picker
 	// 活動起訖日
-	$scope.camp_sDateOptions = {};
-	$scope.camp_eDateOptions = {};
-	$scope.camp_esDateOptions = {};
-	$scope.camp_eeDateOptions = {};
+	$scope.optionsInit = function() {
+		$scope.camp_sDateOptions = {};
+		$scope.camp_eDateOptions = {};
+		$scope.camp_esDateOptions = {};
+		$scope.camp_eeDateOptions = {};
+	}
 	// config
 	$scope.altInputFormats = ['M!/d!/yyyy'];
 	$scope.model = {};
@@ -43,11 +45,35 @@ eSoafApp.controller('CAM210Controller', function($scope, $rootScope, $controller
 	};
 	$scope.limitDate = function() {
 		$scope.camp_sDateOptions.maxDate = $scope.inputVO.camp_eDate;
+		if ($scope.inputVO.camp_eDate) {
+			let y = $scope.inputVO.camp_eDate.getFullYear() - 1;
+			let m = $scope.inputVO.camp_eDate.getMonth();
+			let d = $scope.inputVO.camp_eDate.getDate();
+			$scope.camp_sDateOptions.minDate = new Date(y, m, d);
+		}
 		$scope.camp_eDateOptions.minDate = $scope.inputVO.camp_sDate;
+		if ($scope.inputVO.camp_sDate) {
+			let y = $scope.inputVO.camp_sDate.getFullYear() + 1;
+			let m = $scope.inputVO.camp_sDate.getMonth();
+			let d = $scope.inputVO.camp_sDate.getDate();
+			$scope.camp_eDateOptions.maxDate = new Date(y, m, d);
+		}
 	};
 	$scope.limitDate2 = function() {
 		$scope.camp_esDateOptions.maxDate = $scope.inputVO.camp_eeDate;
+		if ($scope.inputVO.camp_eeDate) {
+			let y = $scope.inputVO.camp_eeDate.getFullYear() - 1;
+			let m = $scope.inputVO.camp_eeDate.getMonth();
+			let d = $scope.inputVO.camp_eeDate.getDate();
+			$scope.camp_esDateOptions.minDate = new Date(y, m, d);
+		}
 		$scope.camp_eeDateOptions.minDate = $scope.inputVO.camp_esDate;
+		if ($scope.inputVO.camp_esDate) {
+			let y = $scope.inputVO.camp_esDate.getFullYear() + 1;
+			let m = $scope.inputVO.camp_esDate.getMonth();
+			let d = $scope.inputVO.camp_esDate.getDate();
+			$scope.camp_eeDateOptions.maxDate = new Date(y, m, d);
+		}
 	};
 	// date picker end
 	
@@ -134,7 +160,9 @@ eSoafApp.controller('CAM210Controller', function($scope, $rootScope, $controller
 		min_mon.setMonth(min_mon.getMonth() - 2, 1);
 		min_mon.setHours(0, 0, 0, 0);
 		$scope.inputVO.camp_sDate = min_mon;
+		$scope.optionsInit();
 		$scope.limitDate();
+		$scope.limitDate2();
 		
 		//組織連動
         $scope.region = ['N', $scope.inputVO, "region", "REGION_LIST", "op", "AREA_LIST", "branch", "BRANCH_LIST", "aoCode", "AO_LIST", "empId", "EMP_LIST"];

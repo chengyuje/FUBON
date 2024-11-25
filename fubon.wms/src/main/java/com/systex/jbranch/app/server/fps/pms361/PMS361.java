@@ -71,7 +71,8 @@ public class PMS361 extends FubonWmsBizLogic {
 		//
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		
+		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
+
 		queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		sb = new StringBuffer();
 		sb.append("SELECT ROWNUM, A.* ");
@@ -132,15 +133,28 @@ public class PMS361 extends FubonWmsBizLogic {
 		}
 		
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) {
-			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
+			if (StringUtils.isNumeric(inputVO.getBranch_nbr()) && StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("  AND org.BRANCH_NBR = :bra_nbr ");
 				queryCondition.setObject("bra_nbr", inputVO.getBranch_nbr());
-			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-				sb.append("  AND org.BRANCH_AREA_ID = :area ");
-				queryCondition.setObject("area", inputVO.getBranch_area_id());
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
+				sb.append("  AND ( ");
+				sb.append("    (note.RM_FLAG = 'B' AND org.BRANCH_AREA_ID = :area) ");
+				
+				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
+					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+					sb.append("    OR (note.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE rpt.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :area )) ");
+				}
+			
+				sb.append("  ) ");
+				queryCondition.setObject("BRANCH_AREA_IDD", inputVO.getBranch_area_id());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("  AND org.REGION_CENTER_ID = :region ");
 				queryCondition.setObject("region", inputVO.getRegion_center_id());
+			}
+			
+			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) && 
+				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				sb.append("  AND note.RM_FLAG = 'B' ");
 			}
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {

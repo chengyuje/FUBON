@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import com.ibm.icu.util.Calendar;
 import com.systex.jbranch.fubon.commons.esb.EsbFmpJRunConfiguer;
 import com.systex.jbranch.fubon.commons.esb.EsbUtil;
+import com.systex.jbranch.fubon.commons.esb.EsbUtil3;
 import com.systex.jbranch.fubon.commons.esb.cons.EsbSotCons;
 import com.systex.jbranch.fubon.commons.esb.vo.ESBUtilInputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.ESBUtilOutputVO;
@@ -50,8 +51,8 @@ import com.systex.jbranch.platform.util.IPrimitiveMap;
 /**
  * crm821
  * 
- * @author moron, Walalala
- * @date 2016/06/14, 2016/12/13
+ * @author moron, Walalala, Jemmy
+ * @date 2016/06/14, 2016/12/13, 2024/11/22
  * @spec null
  */
 @Component("crm821")
@@ -233,6 +234,33 @@ public class CRM821 extends EsbUtil {
 		String cust_id = inputVO.getCust_id();
 		String isOBU = inputVO.getIsOBU();
 		
+		String txtId = StringUtils.equals("Y", isOBU) ? EsbSotCons.VN084N1 : EsbSotCons.VN084N;			// 電文代碼
+		String module = thisClaz+new Object(){}.getClass().getEnclosingMethod().getName();	// 模組代碼
+		EsbUtil3 esbUtil3 = new EsbUtil3(module);
+        //head
+		String txHeadXml = esbUtil3.getTxHead(txtId, null); 
+
+        //body
+		String txBodyXml = esbUtil3.getTxBody(
+			new HashMap<String, String>(){{
+				put("CustId", cust_id);
+			}}
+		);
+
+		//發送電文
+		List<String> dnXmls = esbUtil3.send(txHeadXml + txBodyXml);
+		String dnXml = dnXmls.isEmpty() ? "" : dnXmls.get(0);
+		String fundAmount = esbUtil3.getTagValue(dnXml, "Amount");
+		outputVO.setFundAmount(new BigDecimal(fundAmount));
+		this.sendRtnObject(outputVO);
+	}
+	
+	public void getFundDeposit_old(Object body, IPrimitiveMap header) throws Exception {
+		CRM821InputVO inputVO = (CRM821InputVO) body;
+		CRM821OutputVO outputVO = new CRM821OutputVO();
+		String cust_id = inputVO.getCust_id();
+		String isOBU = inputVO.getIsOBU();
+		
 		String constant = null;
 		
 		if (StringUtils.equals("Y", isOBU)) {
@@ -280,8 +308,7 @@ public class CRM821 extends EsbUtil {
 		outputVO.setFundAmount(new BigDecimal(fundAmount));
 		this.sendRtnObject(outputVO);
 	}
-	
-	
+
 	//日期去時分秒
 	private static Date getZeroTimeDate(Date date) {
 		Calendar calendar = Calendar.getInstance();
@@ -315,6 +342,78 @@ public class CRM821 extends EsbUtil {
 	}
 	
 	private void getRedeemData(String cust_id, List<Map<String, Object>> resultList, String mark) throws Exception {
+		boolean isAF = "AF".equals(mark);
+		String txtId = isAF ? CUST_ASSET_NF_OBU : CUST_ASSET_NF_DBU;			// 電文代碼
+		String module = thisClaz+new Object(){}.getClass().getEnclosingMethod().getName();	// 模組代碼
+		EsbUtil3 esbUtil3 = new EsbUtil3(module);
+        //head
+		String txHeadXml = esbUtil3.getTxHead(txtId, 
+			new HashMap<String, String>(){{
+				put("HFMTID", "0001");
+			}}
+		);
+
+        //body
+		String txBodyXml = esbUtil3.getTxBody(
+			new HashMap<String, String>(){{
+				put("CustId", cust_id);
+			}}
+		);
+
+		//發送電文
+		List<String> dnXmls = esbUtil3.send(txHeadXml + txBodyXml);
+		for(String dnXml : dnXmls) {
+			String hfmtid = esbUtil3.getTagValue(dnXml, "HFMTID");
+			hfmtid = hfmtid == null ? "" : hfmtid.trim();
+			/**
+             * Header.‧HFMTID =1003：贖回在途
+             */
+            if("1003".equals(hfmtid)) {
+            	String txBody = esbUtil3.getTagValue("TxBody", dnXml);
+            	List<String> txRepeats = esbUtil3.getTagValueList(txBody, "TxRepeat");
+            	for (String txRepeat : txRepeats) {
+            		String EffDate = StringUtils.clean(esbUtil3.getTagValue(txRepeat, "EffDate"));
+            		Date effDate = null;
+            		if (!"0000000".equals(EffDate)) {
+            			effDate = esbUtil3.toAdYearMMdd(EffDate.trim());
+            		}
+            		String[] fields = {
+            				"EviNum", "FundNO", "FundName", "CurFund", "CurUntNum"
+            		};
+            		Map<String, Object> map = new HashMap<>();
+            		map.put("EffDate", effDate);
+            		for (String field : fields) {
+            			map.put(field, StringUtils.clean( esbUtil3.getTagValue(txRepeat, field)));
+            		}
+            		map.put("CurUntNum", decimalPoint(esbUtil3.getTagValue(txRepeat, "CurUntNum"), 4));
+            		
+            		String RedeemNetValue = StringUtils.clean( esbUtil3.getTagValue(txRepeat, "RedeemNetValue"));
+            		BigDecimal redeemNetValue = "0000000000".equals(RedeemNetValue) ? null : decimalPoint(RedeemNetValue, 4);
+            		map.put("RedeemNetValue", redeemNetValue);
+            		
+            		String RedeemOrgAmt = StringUtils.clean( esbUtil3.getTagValue(txRepeat, "RedeemOrgAmt"));
+            		BigDecimal redeemOrgAmt = "000000000000000".equals(RedeemOrgAmt) ? null : decimalPoint(RedeemOrgAmt, 2);
+            		map.put("RedeemOrgAmt", redeemOrgAmt);
+            		
+            		Date postingDate = null;
+            		String PostingDate = StringUtils.clean(esbUtil3.getTagValue(txRepeat, "PostingDate"));
+            		if (!"00000000".equals(PostingDate)) {
+            			// 『本行預計入帳日』若已過期則排除
+            			postingDate = esbUtil3.toAdYearMMdd(PostingDate);
+            			Date today = this.getZeroTimeDate(new Date());
+            			if (postingDate.before(today))
+            				continue;
+            		}
+            		map.put("PostingDate", postingDate);
+            		
+            		resultList.add(map);
+            	}
+            }
+		}		
+	}
+
+	
+	private void getRedeemData_old(String cust_id, List<Map<String, Object>> resultList, String mark) throws Exception {
 		Boolean isAF = StringUtils.equals("AF", mark);
 		ESBUtilInputVO esbUtilInputVO;
 		
@@ -427,6 +526,60 @@ public class CRM821 extends EsbUtil {
 		
 		try{
 			//init util
+			String txtId = ETF_ASSETS;			// 電文代碼
+			String module = thisClaz+new Object(){}.getClass().getEnclosingMethod().getName();	// 模組代碼
+			EsbUtil3 esbUtil3 = new EsbUtil3(module);
+	        //head
+			String txHeadXml = esbUtil3.getTxHead(txtId, null); 
+
+	        //body
+			String txBodyXml = esbUtil3.getTxBody(
+				new HashMap<String, String>(){{
+					put("FUNCTION", fun);
+					put("CUSID", cust_id);
+					put("UNIT", "Y".equals(isOBU) ? "O" : "D");
+				}}
+			);
+
+			//發送電文
+			List<String> dnXmls = esbUtil3.send(txHeadXml + txBodyXml);
+			for(String dnXml : dnXmls) {
+				String txBody = esbUtil3.getTagValue("TxBody", dnXml);
+            	List<String> txRepeats = esbUtil3.getTagValueList(txBody, "TxRepeat");
+            	for (String txRepeat : txRepeats) {
+            		CustAssetFundVO retVO = new CustAssetFundVO();
+					
+					retVO.setFundName(StringUtils.clean(esbUtil3.getTagValue(txRepeat, "ARR18")));
+					retVO.setCurCode("TWD");
+					retVO.setCurAmt(decimalPoint(esbUtil3.getTagValue(txRepeat, "ARR10"), 0));
+					retVO.setCurBal(decimalPoint(esbUtil3.getTagValue(txRepeat, "ARR11"), 2));
+					retVO.setSignDigit(esbUtil3.getTagValue(txRepeat, "ARR12"));
+					retVO.setProfitAndLoss(decimalPoint(esbUtil3.getTagValue(txRepeat, "ARR17"), 4));
+					retVO.setReturn(decimalPoint(esbUtil3.getTagValue(txRepeat, "ARR13"), 4));
+					retVO.setFundType(esbUtil3.getTagValue(txRepeat, "ARR01"));
+					retVO.setFundNO(esbUtil3.getTagValue(txRepeat, "ARR04"));
+					retVO.setAssetType("0006");
+					retVO.setNetValueDate(esbUtil3.getTagValue(txRepeat, "ARR09"));
+					retVO.setStrdate(esbUtil3.getTagValue(txRepeat, "ARR06"));
+					retVO.setCurUntNum(decimalPoint(esbUtil3.getTagValue(txRepeat, "ARR07"), 4));
+					
+					total.add(retVO);
+            	}
+			}
+		}catch(Exception e){
+			logger.debug("發送電文失敗：客戶ID = "+ cust_id);
+			logger.debug("ESB error:NFVIPA="+StringUtil.getStackTraceAsString(e));
+		}
+		
+		return total;
+	}
+    
+	private List<CustAssetFundVO> sendNFVIPA_old(String fun, String cust_id, String isOBU) throws Exception {
+//		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		List<CustAssetFundVO> total = new ArrayList<CustAssetFundVO>();
+		
+		try{
+			//init util
 			ESBUtilInputVO esbUtilInputVO = getTxInstance(ESB_TYPE, ETF_ASSETS);
 			esbUtilInputVO.setModule(thisClaz+new Object(){}.getClass().getEnclosingMethod().getName());
 
@@ -477,7 +630,8 @@ public class CRM821 extends EsbUtil {
 		
 		return total;
 	}
-    /**
+   
+	/**
      * 2021.09.13 DBU身分只打NF電文 OBU身分則打NF+AF電文  
      * @param cust_id
      * @param total
@@ -487,6 +641,32 @@ public class CRM821 extends EsbUtil {
      * @author SamTu
      */
 	public void getCustAssetNFData(String cust_id, List<CustAssetFundVO> total, String mark) throws Exception {
+        boolean isAF = StringUtils.equals("AF", mark);
+		String txtId = isAF ? CUST_ASSET_NF_OBU : CUST_ASSET_NF_DBU;			// 電文代碼
+		String module = thisClaz+new Object(){}.getClass().getEnclosingMethod().getName();	// 模組代碼
+		EsbUtil3 esbUtil3 = new EsbUtil3(module);
+        //head
+		String txHeadXml = esbUtil3.getTxHead(txtId, 
+			new HashMap<String, String>(){{
+				put("HFMTID", "0001");
+			}}
+		);
+
+        //body
+		String txBodyXml = esbUtil3.getTxBody(
+			new HashMap<String, String>(){{
+				put("CustId", cust_id);
+			}}
+		);
+
+		//發送電文
+		List<String> dnXmls = esbUtil3.send(txHeadXml + txBodyXml);
+
+        //處理資料
+		dealAF_NF_Data(esbUtil3, dnXmls, total,mark);
+	}
+
+	public void getCustAssetNFData_old(String cust_id, List<CustAssetFundVO> total, String mark) throws Exception {
         Boolean isAF = StringUtils.equals("AF", mark);
         //init util
         ESBUtilInputVO esbUtilInputVO;
@@ -519,10 +699,393 @@ public class CRM821 extends EsbUtil {
         List<ESBUtilOutputVO> vos = send(esbUtilInputVO);
 
         //處理資料
-		dealAF_NF_Data(vos,total,mark);
+		dealAF_NF_Data_old(vos,total,mark);
 	}
-	
-	private void dealAF_NF_Data(List<ESBUtilOutputVO> vos, List<CustAssetFundVO> total, String mark) {
+
+	private void dealAF_NF_Data(EsbUtil3 esbUtil3, List<String> vos, List<CustAssetFundVO> total, String mark) {
+		Boolean isAF = StringUtils.equals("AF", mark);
+        for(String dnXml : vos){
+        	String hfmtid = esbUtil3.getTagValue(dnXml, "HFMTID");
+			hfmtid = hfmtid == null ? "" : hfmtid.trim();
+            /**
+             * RN9的下行電文會有5個Format的格式
+             * Header.‧HFMTID =0001：單筆
+             * Header.‧HFMTID =0002：定期定額
+             * Header.‧HFMTID =0003：定期不定額
+             * Header.‧HFMTID =0004：定存轉基金
+             * Header.‧HFMTID =0005：基金套餐
+             */
+        	String txBody = esbUtil3.getTagValue("TxBody", dnXml);
+        	List<String> txRepeats = esbUtil3.getTagValueList(txBody, "TxRepeat");
+            if("0001".equals(hfmtid)) {
+            	for (String txRepeat : txRepeats) {
+                	//2017-01-18 by Jacky 判斷單位數 > 0 才回傳前端
+                	//動態鎖利單位數為0也需顯示
+            		String CurUntNum = esbUtil3.getTagValue(txRepeat, "CurUntNum");
+            		boolean checkCustAssetFund =  decimalPoint(CurUntNum, 4).compareTo(BigDecimal.ZERO) == 1;
+            		if (checkCustAssetFund || StringUtils.isNotBlank(StringUtils.clean(esbUtil3.getTagValue(txRepeat, "Dynamic")))) {
+                		CustAssetFundVO retVO = new CustAssetFundVO();
+                        retVO.setAssetType(hfmtid); //信託種類       
+
+                        retVO.setSPRefId(esbUtil3.getTagValue(dnXml, "SPRefId"));
+                        retVO.setAcctId16(esbUtil3.getTagValue(dnXml, "AcctId16"));
+                        retVO.setOccur(esbUtil3.getTagValue(dnXml, "Occur"));
+                        retVO.setAcctId02(esbUtil3.getTagValue(dnXml, "AcctId02"));
+                        retVO.setEviNum(esbUtil3.getTagValue(dnXml, "EviNum"));
+                        retVO.setFundNO(esbUtil3.getTagValue(dnXml, "FundNO"));
+                        retVO.setFundName(esbUtil3.getTagValue(dnXml, "FundName"));
+                        retVO.setCurFund(esbUtil3.getTagValue(dnXml, "CurFund"));
+                        retVO.setCurCode(esbUtil3.getTagValue(dnXml, "CurCode"));
+                        retVO.setCurAmt(decimalPoint(esbUtil3.getTagValue(dnXml, "CurAmt"), 2));
+                        retVO.setCurAmtNT(decimalPoint(esbUtil3.getTagValue(dnXml, "CurAmtNT"), 2));
+                        retVO.setCurBal(decimalPoint(esbUtil3.getTagValue(dnXml, "CurBal"), 2));
+                        retVO.setCurBalNT(decimalPoint(esbUtil3.getTagValue(dnXml, "CurBalNT"), 2));
+                        retVO.setProfitAndLoss(decimalPoint(esbUtil3.getTagValue(dnXml, "ProfitAndLoss"), 2));
+                        retVO.setIncrease(decimalPoint(esbUtil3.getTagValue(dnXml, "Increase"), 2));
+                        retVO.setSignDigit(esbUtil3.getTagValue(dnXml, "SignDigit"));
+                        retVO.setReturn(decimalPoint(esbUtil3.getTagValue(dnXml, "Return"), 2));
+                        retVO.setRewRateDigit(esbUtil3.getTagValue(dnXml, "RewRateDigit"));
+                        retVO.setAccAllocateRewRate(decimalPoint(esbUtil3.getTagValue(dnXml, "AccAllocateRewRate"), 2));
+                        retVO.setCurUntNum(decimalPoint(esbUtil3.getTagValue(dnXml, "CurUntNum"), 4));
+                        retVO.setReferenceExchangeRate(decimalPoint(esbUtil3.getTagValue(dnXml, "ReferenceExchangeRate"), 4));
+                        retVO.setNetValueDate(esbUtil3.getTagValue(dnXml, "NetValueDate"));
+                        String NetValue = esbUtil3.getTagValue(dnXml, "NetValue");
+                        if(isNumeric(NetValue))
+                        	retVO.setNetValue(decimalPoint(NetValue, 4));
+                        retVO.setStoplossSign(esbUtil3.getTagValue(dnXml, "StoplossSign"));
+                        if(isNumeric(NetValue))
+                        	retVO.setStoploss(decimalPoint(esbUtil3.getTagValue(dnXml, "Stoploss"), 2));
+                        retVO.setSatisfiedSign(esbUtil3.getTagValue(dnXml, "SatisfiedSign"));
+                        retVO.setSatisfied(decimalPoint(esbUtil3.getTagValue(dnXml, "Satisfied"), 2));
+                        retVO.setStrdate(esbUtil3.getTagValue(dnXml, "Strdate"));
+                        retVO.setFundType(esbUtil3.getTagValue(dnXml, "FundType"));
+                        retVO.setApproveFlag(esbUtil3.getTagValue(dnXml, "ApproveFlag"));
+                        retVO.setProjectCode(esbUtil3.getTagValue(dnXml, "ProjectCode"));
+                        retVO.setGroupCode(esbUtil3.getTagValue(dnXml, "GroupCode"));
+                        retVO.setPayAcctId(esbUtil3.getTagValue(dnXml, "PayAcctId"));
+                        retVO.setAccAllocateRew(decimalPoint(esbUtil3.getTagValue(dnXml, "AccAllocateRew"), 2));
+                        String CmkType = esbUtil3.getTagValue(dnXml, "CmkType");
+                        retVO.setIsPledged(StringUtils.isEmpty(CmkType) ? "N" : StringUtils.equals(CmkType.trim(), CMKTYPE_MK03) ? "Y" : "N");	//質借圈存註記
+                        
+						if (retVO.getAcctId02() != null)
+							retVO.setAcctId02(StringUtils.trim(retVO.getAcctId02()));
+						if (retVO.getPayAcctId() != null)
+							retVO.setPayAcctId(StringUtils.trim(retVO.getPayAcctId()));
+						if (retVO.getPayAccountNo() != null)
+							retVO.setPayAccountNo(StringUtils.trim(retVO.getPayAccountNo()));
+
+                        retVO.setDynamic(esbUtil3.getTagValue(dnXml, "Dynamic"));
+                        retVO.setComboReturnDate(esbUtil3.getTagValue(dnXml, "ComboReturnDate"));
+                        retVO.setComboReturnSign(esbUtil3.getTagValue(dnXml, "ComboReturnSign"));
+                        retVO.setComboReturn(decimalPoint(esbUtil3.getTagValue(dnXml, "ComboReturn"), 2));
+                        retVO.setSatelliteBuyDate1(esbUtil3.getTagValue(dnXml, "SatelliteBuyDate1"));
+                        retVO.setSatelliteBuyDate2(esbUtil3.getTagValue(dnXml, "SatelliteBuyDate2"));
+                        retVO.setSatelliteBuyDate3(esbUtil3.getTagValue(dnXml, "SatelliteBuyDate3"));
+                        retVO.setSatelliteBuyDate4(esbUtil3.getTagValue(dnXml, "SatelliteBuyDate4"));
+                        retVO.setSatelliteBuyDate5(esbUtil3.getTagValue(dnXml, "SatelliteBuyDate5"));
+                        retVO.setSatelliteBuyDate6(esbUtil3.getTagValue(dnXml, "SatelliteBuyDate6"));
+                        retVO.setBenefitReturnRate1(decimalPoint(esbUtil3.getTagValue(dnXml, "BenefitReturnRate1"), 2));
+                        retVO.setBenefitReturnRate2(decimalPoint(esbUtil3.getTagValue(dnXml, "BenefitReturnRate2"), 2));
+                        retVO.setBenefitReturnRate3(decimalPoint(esbUtil3.getTagValue(dnXml, "BenefitReturnRate3"), 2));
+                        retVO.setTRANSFERAmt(decimalPoint(esbUtil3.getTagValue(dnXml, "TRANSFERAmt"), 0));
+                        retVO.setEviNumType(esbUtil3.getTagValue(dnXml, "EviNumType"));
+						
+                        total.add(retVO);
+            		}
+                }
+            }
+            else if("0002".equals(hfmtid)) {   //定期定額
+            	for (String txRepeat : txRepeats) {
+                	//2017-01-18 by Jacky 判斷單位數 > 0 才回傳前端
+//                	if(checkCustAssetFundVO(devo)){ 
+                	if(true){	//測試用 TODO
+                		CustAssetFundVO retVO = new CustAssetFundVO();
+                        retVO.setAssetType(hfmtid);
+                        retVO.setSPRefId(esbUtil3.getTagValue(dnXml, "SPRefId"));
+                        retVO.setOccur(esbUtil3.getTagValue(dnXml, "Occur"));
+                        retVO.setAcctId02(esbUtil3.getTagValue(dnXml, "AcctId02"));
+                        retVO.setEviNum(esbUtil3.getTagValue(dnXml, "EviNum"));
+                        retVO.setFundNO(esbUtil3.getTagValue(dnXml, "FundNO"));
+                        retVO.setFundName(esbUtil3.getTagValue(dnXml, "FundName"));
+                        retVO.setCurFund(esbUtil3.getTagValue(dnXml, "CurFund"));
+                        retVO.setCurCode(esbUtil3.getTagValue(dnXml, "CurCode"));
+                        retVO.setCurAmt(decimalPoint(esbUtil3.getTagValue(dnXml, "CurAmt"), 2));
+                        retVO.setCurAmtNT(decimalPoint(esbUtil3.getTagValue(dnXml, "CurAmtNT"), 2));
+                        retVO.setCurBal(decimalPoint(esbUtil3.getTagValue(dnXml, "CurBal"), 2));
+                        retVO.setCurBalNT(decimalPoint(esbUtil3.getTagValue(dnXml, "CurBalNT"), 2));
+                        retVO.setProfitAndLoss(decimalPoint(esbUtil3.getTagValue(dnXml, "ProfitAndLoss"), 2));
+                        retVO.setIncrease(decimalPoint(esbUtil3.getTagValue(dnXml, "Increase"), 2));
+                        retVO.setSignDigit(esbUtil3.getTagValue(dnXml, "SignDigit"));
+                        retVO.setReturn(decimalPoint(esbUtil3.getTagValue(dnXml, "Return"), 2));
+                        retVO.setRewRateDigit(esbUtil3.getTagValue(dnXml, "RewRateDigit"));
+                        retVO.setAccAllocateRewRate(decimalPoint(esbUtil3.getTagValue(dnXml, "AccAllocateRewRate"), 2));
+                        retVO.setCurUntNum(decimalPoint(esbUtil3.getTagValue(dnXml, "CurUntNum"), 4));
+                        retVO.setReferenceExchangeRate(decimalPoint(esbUtil3.getTagValue(dnXml, "ReferenceExchangeRate"), 4));
+                        retVO.setNetValueDate(esbUtil3.getTagValue(dnXml, "NetValueDate"));
+                        retVO.setNetValue(decimalPoint(esbUtil3.getTagValue(dnXml, "NetValue"), 4));
+                        retVO.setTransferAmt(decimalPoint(esbUtil3.getTagValue(dnXml, "TransferAmt"), 0));
+                        retVO.setTransferDate01(esbUtil3.getTagValue(dnXml, "TransferDate01"));
+                        retVO.setTransferDate02(esbUtil3.getTagValue(dnXml, "TransferDate02"));
+                        retVO.setTransferDate03(esbUtil3.getTagValue(dnXml, "TransferDate03"));
+                        retVO.setTransferDate04(esbUtil3.getTagValue(dnXml, "TransferDate04"));
+                        retVO.setTransferDate05(esbUtil3.getTagValue(dnXml, "TransferDate05"));
+                        retVO.setTransferDate06(esbUtil3.getTagValue(dnXml, "TransferDate06"));
+                        retVO.setTransferCount(esbUtil3.getTagValue(dnXml, "TransferCount"));
+                        retVO.setPayCount(esbUtil3.getTagValue(dnXml, "PayCount"));
+                        retVO.setStatus(esbUtil3.getTagValue(dnXml, "Status"));
+                        retVO.setStoplossSign(esbUtil3.getTagValue(dnXml, "StoplossSign"));
+                        String Stoploss = esbUtil3.getTagValue(dnXml, "Stoploss");
+                        if(isNumeric(Stoploss))
+                        	retVO.setStoploss(decimalPoint(Stoploss, 2));
+                        retVO.setSatisfiedSign(esbUtil3.getTagValue(dnXml, "SatisfiedSign"));
+                        retVO.setSatisfied(decimalPoint(esbUtil3.getTagValue(dnXml, "Satisfied"), 2));
+                        retVO.setStrdate(esbUtil3.getTagValue(dnXml, "Strdate"));
+                        retVO.setFundType(esbUtil3.getTagValue(dnXml, "FundType"));
+                        retVO.setApproveFlag(esbUtil3.getTagValue(dnXml, "ApproveFlag"));
+                        retVO.setProjectCode(esbUtil3.getTagValue(dnXml, "ProjectCode"));
+                        retVO.setGroupCode(esbUtil3.getTagValue(dnXml, "GroupCode"));
+                        retVO.setPayAcctId(esbUtil3.getTagValue(dnXml, "PayAcctId"));
+                        retVO.setPayAccountNo(esbUtil3.getTagValue(dnXml, "PayAccountNo"));
+                        retVO.setTxType(esbUtil3.getTagValue(dnXml, "TxType"));
+                        retVO.setFrgnPurchaseFlag(esbUtil3.getTagValue(dnXml, "FrgnPurchaseFlag"));
+                        retVO.setSame(esbUtil3.getTagValue(dnXml, "Same"));
+                        retVO.setLongDiscount(decimalPoint(esbUtil3.getTagValue(dnXml, "LongDiscount").trim(), 2));
+                        retVO.setAccAllocateRew(decimalPoint(esbUtil3.getTagValue(dnXml, "AccAllocateRew"), 2));
+                        String CmkType = esbUtil3.getTagValue(dnXml, "CmkType");
+                        retVO.setIsPledged(StringUtils.isEmpty(CmkType) ? "N" : StringUtils.equals(CmkType.trim(), CMKTYPE_MK03) ? "Y" : "N");	//質借圈存註記
+                        if (retVO.getAcctId02() != null)
+							retVO.setAcctId02(StringUtils.trim(retVO.getAcctId02()));
+						if (retVO.getPayAcctId() != null)
+							retVO.setPayAcctId(StringUtils.trim(retVO.getPayAcctId()));
+						if (retVO.getPayAccountNo() != null)
+							retVO.setPayAccountNo(StringUtils.trim(retVO.getPayAccountNo()));
+                        total.add(retVO);
+                	}
+                }
+            }
+            else if("0003".equals(hfmtid)) {//定期不定額
+            	for (String txRepeat : txRepeats) {
+                	//2017-01-18 by Jacky 判斷單位數 > 0 才回傳前端
+//                	if(checkCustAssetFundVO(devo)){
+                	if(true){	//測試用 TODO
+                		CustAssetFundVO retVO = new CustAssetFundVO();
+                        retVO.setAssetType(hfmtid);
+                        retVO.setSPRefId(esbUtil3.getTagValue(dnXml, "SPRefId"));
+                        retVO.setOccur(esbUtil3.getTagValue(dnXml, "Occur"));
+                        retVO.setAcctId02(esbUtil3.getTagValue(dnXml, "AcctId02"));
+                        retVO.setEviNum(esbUtil3.getTagValue(dnXml, "EviNum"));
+                        retVO.setFundNO(esbUtil3.getTagValue(dnXml, "FundNO"));
+                        retVO.setFundName(esbUtil3.getTagValue(dnXml, "FundName"));
+                        retVO.setCurFund(esbUtil3.getTagValue(dnXml, "CurFund"));
+                        retVO.setCurCode(esbUtil3.getTagValue(dnXml, "CurCode"));
+                        retVO.setCurAmt(decimalPoint(esbUtil3.getTagValue(dnXml, "CurAmt"), 2));
+                        retVO.setCurAmtNT(decimalPoint(esbUtil3.getTagValue(dnXml, "CurAmtNT"), 2));
+                        retVO.setCurBal(decimalPoint(esbUtil3.getTagValue(dnXml, "CurBal"), 2));
+                        retVO.setCurBalNT(decimalPoint(esbUtil3.getTagValue(dnXml, "CurBalNT"), 2));
+                        retVO.setProfitAndLoss(decimalPoint(esbUtil3.getTagValue(dnXml, "ProfitAndLoss"), 2));
+                        retVO.setIncrease(decimalPoint(esbUtil3.getTagValue(dnXml, "Increase"), 2));
+                        retVO.setSignDigit(esbUtil3.getTagValue(dnXml, "SignDigit"));
+                        retVO.setReturn(decimalPoint(esbUtil3.getTagValue(dnXml, "Return"), 2));
+                        retVO.setRewRateDigit(esbUtil3.getTagValue(dnXml, "RewRateDigit"));
+                        retVO.setAccAllocateRewRate(decimalPoint(esbUtil3.getTagValue(dnXml, "AccAllocateRewRate"), 2));
+                        retVO.setCurUntNum(decimalPoint(esbUtil3.getTagValue(dnXml, "CurUntNum"), 4));
+                        retVO.setReferenceExchangeRate(decimalPoint(esbUtil3.getTagValue(dnXml, "ReferenceExchangeRate"), 4));
+                        retVO.setNetValueDate(esbUtil3.getTagValue(dnXml, "NetValueDate"));
+                        retVO.setNetValue(decimalPoint(esbUtil3.getTagValue(dnXml, "NetValue"), 4));
+                        retVO.setTransferAmt_H(decimalPoint(esbUtil3.getTagValue(dnXml, "TransferAmt_H"), 0));
+                        retVO.setTransferAmt_M(decimalPoint(esbUtil3.getTagValue(dnXml, "TransferAmt_M"), 0));
+                        retVO.setTransferAmt_L(decimalPoint(esbUtil3.getTagValue(dnXml, "TransferAmt_L"), 0));
+                        retVO.setTransferDate01(esbUtil3.getTagValue(dnXml, "TransferDate01"));
+                        retVO.setTransferDate02(esbUtil3.getTagValue(dnXml, "TransferDate02"));
+                        retVO.setTransferDate03(esbUtil3.getTagValue(dnXml, "TransferDate03"));
+                        retVO.setTransferDate04(esbUtil3.getTagValue(dnXml, "TransferDate04"));
+                        retVO.setTransferDate05(esbUtil3.getTagValue(dnXml, "TransferDate05"));
+                        retVO.setTransferDate06(esbUtil3.getTagValue(dnXml, "TransferDate06"));
+                        retVO.setTransferCount(esbUtil3.getTagValue(dnXml, "TransferCount"));
+                        retVO.setPayCount(esbUtil3.getTagValue(dnXml, "PayCount"));
+                        retVO.setStatus(esbUtil3.getTagValue(dnXml, "Status"));
+                        retVO.setStoplossSign(esbUtil3.getTagValue(dnXml, "StoplossSign"));
+                        String Stoploss = esbUtil3.getTagValue(dnXml, "Stoploss");
+                        if(isNumeric(Stoploss))
+                        	retVO.setStoploss(decimalPoint(Stoploss, 2));
+                        retVO.setSatisfiedSign(esbUtil3.getTagValue(dnXml, "SatisfiedSign"));
+                        retVO.setSatisfied(decimalPoint(esbUtil3.getTagValue(dnXml, "Satisfied"), 2));
+                        retVO.setStrdate(esbUtil3.getTagValue(dnXml, "Strdate"));
+                        retVO.setFundType(esbUtil3.getTagValue(dnXml, "FundType"));
+                        retVO.setApproveFlag(esbUtil3.getTagValue(dnXml, "ApproveFlag"));
+                        retVO.setProjectCode(esbUtil3.getTagValue(dnXml, "ProjectCode"));
+                        retVO.setGroupCode(esbUtil3.getTagValue(dnXml, "GroupCode"));
+                        retVO.setPayAcctId(esbUtil3.getTagValue(dnXml, "PayAcctId"));
+                        retVO.setPayAccountNo(esbUtil3.getTagValue(dnXml, "PayAccountNo"));
+                        retVO.setTxType(esbUtil3.getTagValue(dnXml, "TxType"));
+                        retVO.setFrgnPurchaseFlag(esbUtil3.getTagValue(dnXml, "FrgnPurchaseFlag"));
+                        retVO.setSame(esbUtil3.getTagValue(dnXml, "Same"));
+                        retVO.setAccAllocateRew(decimalPoint(esbUtil3.getTagValue(dnXml, "AccAllocateRew"), 2));
+                        String CmkType = esbUtil3.getTagValue(dnXml, "CmkType");
+                        retVO.setIsPledged(StringUtils.isEmpty(CmkType) ? "N" : StringUtils.equals(CmkType.trim(), CMKTYPE_MK03) ? "Y" : "N");	//質借圈存註記
+                        if (retVO.getAcctId02() != null)
+							retVO.setAcctId02(StringUtils.trim(retVO.getAcctId02()));
+						if (retVO.getPayAcctId() != null)
+							retVO.setPayAcctId(StringUtils.trim(retVO.getPayAcctId()));
+						if (retVO.getPayAccountNo() != null)
+							retVO.setPayAccountNo(StringUtils.trim(retVO.getPayAccountNo()));
+                        total.add(retVO);
+                	}                    
+                }
+            }
+            else if("0004".equals(hfmtid)) {
+            	for (String txRepeat : txRepeats) {
+                	//2017-01-18 by Jacky 判斷單位數 > 0 才回傳前端
+//                	if(checkCustAssetFundVO(devo)){
+                	if(true){	//測試用 TODO
+                		CustAssetFundVO retVO = new CustAssetFundVO();
+                        retVO.setAssetType(hfmtid);
+                        retVO.setSPRefId(esbUtil3.getTagValue(dnXml, "SPRefId"));
+                        retVO.setOccur(esbUtil3.getTagValue(dnXml, "Occur"));
+                        retVO.setAcctId02(esbUtil3.getTagValue(dnXml, "AcctId02"));
+                        retVO.setEviNum(esbUtil3.getTagValue(dnXml, "EviNum"));
+                        retVO.setFundNO(esbUtil3.getTagValue(dnXml, "FundNO"));
+                        retVO.setFundName(esbUtil3.getTagValue(dnXml, "FundName"));
+                        retVO.setCurFund(esbUtil3.getTagValue(dnXml, "CurFund"));
+                        retVO.setCurCode(esbUtil3.getTagValue(dnXml, "CurCode"));
+                        retVO.setCurAmt(decimalPoint(esbUtil3.getTagValue(dnXml, "CurAmt"), 2));
+                        retVO.setCurAmtNT(decimalPoint(esbUtil3.getTagValue(dnXml, "CurAmtNT"), 2));
+                        retVO.setCurBal(decimalPoint(esbUtil3.getTagValue(dnXml, "CurBal"), 2));
+                        retVO.setCurBalNT(decimalPoint(esbUtil3.getTagValue(dnXml, "CurBalNT"), 2));
+                        retVO.setProfitAndLoss(decimalPoint(esbUtil3.getTagValue(dnXml, "ProfitAndLoss"), 2));
+                        retVO.setIncrease(decimalPoint(esbUtil3.getTagValue(dnXml, "Increase"), 2));
+                        retVO.setSignDigit(esbUtil3.getTagValue(dnXml, "SignDigit"));
+                        retVO.setReturn(decimalPoint(esbUtil3.getTagValue(dnXml, "Return"), 2));
+                        retVO.setRewRateDigit(esbUtil3.getTagValue(dnXml, "RewRateDigit"));
+                        retVO.setAccAllocateRewRate(decimalPoint(esbUtil3.getTagValue(dnXml, "AccAllocateRewRate"), 2));
+                        retVO.setCurUntNum(decimalPoint(esbUtil3.getTagValue(dnXml, "CurUntNum"), 4));
+                        retVO.setReferenceExchangeRate(decimalPoint(esbUtil3.getTagValue(dnXml, "ReferenceExchangeRate"), 4));
+                        retVO.setNetValueDate(esbUtil3.getTagValue(dnXml, "NetValueDate"));
+                        retVO.setNetValue(decimalPoint(esbUtil3.getTagValue(dnXml, "NetValue"), 4));
+                        retVO.setTransferAmt(decimalPoint(esbUtil3.getTagValue(dnXml, "TransferAmt"), 0));
+                        retVO.setTransferDate01(esbUtil3.getTagValue(dnXml, "TransferDate01"));
+                        retVO.setTransferDate02(esbUtil3.getTagValue(dnXml, "TransferDate02"));
+                        retVO.setTransferDate03(esbUtil3.getTagValue(dnXml, "TransferDate03"));
+                        retVO.setTransferDate04(esbUtil3.getTagValue(dnXml, "TransferDate04"));
+                        retVO.setTransferDate05(esbUtil3.getTagValue(dnXml, "TransferDate05"));
+                        retVO.setTransferDate06(esbUtil3.getTagValue(dnXml, "TransferDate06"));
+                        retVO.setTransferCount(esbUtil3.getTagValue(dnXml, "TransferCount"));
+                        retVO.setPayCount(esbUtil3.getTagValue(dnXml, "PayCount"));
+                        retVO.setStatus(esbUtil3.getTagValue(dnXml, "Status"));
+                        retVO.setStoplossSign(esbUtil3.getTagValue(dnXml, "StoplossSign"));
+                        retVO.setStoploss(decimalPoint(esbUtil3.getTagValue(dnXml, "Stoploss"), 2));
+                        retVO.setSatisfiedSign(esbUtil3.getTagValue(dnXml, "SatisfiedSign"));
+                        retVO.setSatisfied(decimalPoint(esbUtil3.getTagValue(dnXml, "Satisfied"), 2));
+                        retVO.setStrdate(esbUtil3.getTagValue(dnXml, "Strdate"));
+                        retVO.setFundType(esbUtil3.getTagValue(dnXml, "FundType"));
+                        retVO.setApproveFlag(esbUtil3.getTagValue(dnXml, "ApproveFlag"));
+                        retVO.setGroupCode(esbUtil3.getTagValue(dnXml, "GroupCode"));
+                        retVO.setPayAccountNo(esbUtil3.getTagValue(dnXml, "PayAccountNo"));
+                        retVO.setAcctId(esbUtil3.getTagValue(dnXml, "AcctId"));
+                        retVO.setTimeDepositPrjCd(esbUtil3.getTagValue(dnXml, "TimeDepositPrjCd"));
+                        retVO.setTotal_Cnt(esbUtil3.getTagValue(dnXml, "Total_Cnt"));
+                        retVO.setPay_Cnt(esbUtil3.getTagValue(dnXml, "Pay_Cnt"));
+                        retVO.setEnd_Flg(esbUtil3.getTagValue(dnXml, "End_Flg"));
+                        retVO.setSame(esbUtil3.getTagValue(dnXml, "Same"));
+                        retVO.setAccAllocateRew(decimalPoint(esbUtil3.getTagValue(dnXml, "AccAllocateRew"), 2));
+                        String CmkType = esbUtil3.getTagValue(dnXml, "CmkType");
+                        retVO.setIsPledged(StringUtils.isEmpty(CmkType) ? "N" : StringUtils.equals(CmkType.trim(), CMKTYPE_MK03) ? "Y" : "N");	//質借圈存註記
+                        if (retVO.getAcctId02() != null)
+							retVO.setAcctId02(StringUtils.trim(retVO.getAcctId02()));
+						if (retVO.getPayAcctId() != null)
+							retVO.setPayAcctId(StringUtils.trim(retVO.getPayAcctId()));
+						if (retVO.getPayAccountNo() != null)
+							retVO.setPayAccountNo(StringUtils.trim(retVO.getPayAccountNo()));
+                        total.add(retVO);
+                	}                    
+                }
+            }
+            else if("0005".equals(hfmtid)) {
+            	for (String txRepeat : txRepeats) {
+                	//2017-01-18 by Jacky 判斷單位數 > 0 才回傳前端
+                	if(true){	//測試用 TODO
+//                	if(checkCustAssetFundVO(devo)){
+                		CustAssetFundVO retVO = new CustAssetFundVO();
+                        retVO.setAssetType(hfmtid);
+                        retVO.setSPRefId(esbUtil3.getTagValue(dnXml, "SPRefId"));
+                        retVO.setAcctId16(esbUtil3.getTagValue(dnXml, "AcctId16"));
+                        retVO.setOccur(esbUtil3.getTagValue(dnXml, "Occur"));
+                        retVO.setAcctId02(esbUtil3.getTagValue(dnXml, "AcctId02"));
+                        retVO.setEviNum(esbUtil3.getTagValue(dnXml, "EviNum"));
+                        retVO.setFundNO(esbUtil3.getTagValue(dnXml, "FundNO"));
+                        retVO.setFundName(esbUtil3.getTagValue(dnXml, "FundName"));
+                        retVO.setCurFund(esbUtil3.getTagValue(dnXml, "CurFund"));
+                        retVO.setCurCode(esbUtil3.getTagValue(dnXml, "CurCode"));
+                        retVO.setCurAmt(decimalPoint(esbUtil3.getTagValue(dnXml, "CurAmt"), 2));
+                        retVO.setCurAmtNT(decimalPoint(esbUtil3.getTagValue(dnXml, "CurAmtNT"), 2));
+                        retVO.setCurBal(decimalPoint(esbUtil3.getTagValue(dnXml, "CurBal"), 2));
+                        retVO.setCurBalNT(decimalPoint(esbUtil3.getTagValue(dnXml, "CurBalNT"), 2));
+                        retVO.setProfitAndLoss(decimalPoint(esbUtil3.getTagValue(dnXml, "ProfitAndLoss"), 2));
+                        retVO.setIncrease(decimalPoint(esbUtil3.getTagValue(dnXml, "Increase"), 2));
+                        retVO.setSignDigit(esbUtil3.getTagValue(dnXml, "SignDigit"));
+                        retVO.setReturn(decimalPoint(esbUtil3.getTagValue(dnXml, "Return"), 2));
+                        retVO.setRewRateDigit(esbUtil3.getTagValue(dnXml, "RewRateDigit"));
+                        retVO.setAccAllocateRewRate(decimalPoint(esbUtil3.getTagValue(dnXml, "AccAllocateRewRate"), 2));
+                        retVO.setCurUntNum(decimalPoint(esbUtil3.getTagValue(dnXml, "CurUntNum"), 4));
+                        retVO.setReferenceExchangeRate(decimalPoint(esbUtil3.getTagValue(dnXml, "ReferenceExchangeRate"), 4));
+                        retVO.setNetValueDate(esbUtil3.getTagValue(dnXml, "NetValueDate"));
+                        retVO.setNetValue(decimalPoint(esbUtil3.getTagValue(dnXml, "NetValue"), 4));
+                        retVO.setTransferAmt(decimalPoint(esbUtil3.getTagValue(dnXml, "TransferAmt"), 0));
+                        retVO.setTransferDate01(esbUtil3.getTagValue(dnXml, "TransferDate01"));
+                        retVO.setTransferDate02(esbUtil3.getTagValue(dnXml, "TransferDate02"));
+                        retVO.setTransferDate03(esbUtil3.getTagValue(dnXml, "TransferDate03"));
+                        retVO.setTransferDate04(esbUtil3.getTagValue(dnXml, "TransferDate04"));
+                        retVO.setTransferDate05(esbUtil3.getTagValue(dnXml, "TransferDate05"));
+                        retVO.setTransferDate06(esbUtil3.getTagValue(dnXml, "TransferDate06"));
+                        retVO.setTransferCount(esbUtil3.getTagValue(dnXml, "TransferCount"));
+                        retVO.setPayCount(esbUtil3.getTagValue(dnXml, "PayCount"));
+                        retVO.setStatus(esbUtil3.getTagValue(dnXml, "Status"));
+                        retVO.setStoplossSign(esbUtil3.getTagValue(dnXml, "StoplossSign"));
+                        retVO.setStoploss(decimalPoint(esbUtil3.getTagValue(dnXml, "Stoploss"), 2));
+                        retVO.setSatisfiedSign(esbUtil3.getTagValue(dnXml, "SatisfiedSign"));
+                        retVO.setSatisfied(decimalPoint(esbUtil3.getTagValue(dnXml, "Satisfied"), 2));
+                        retVO.setStrdate(esbUtil3.getTagValue(dnXml, "Strdate"));
+                        retVO.setFundType(esbUtil3.getTagValue(dnXml, "FundType"));
+                        retVO.setApproveFlag(esbUtil3.getTagValue(dnXml, "ApproveFlag"));
+                        retVO.setProjectCode(esbUtil3.getTagValue(dnXml, "ProjectCode"));
+                        retVO.setGroupCode(esbUtil3.getTagValue(dnXml, "GroupCode"));
+                        retVO.setPayAcctId(esbUtil3.getTagValue(dnXml, "PayAcctId"));
+                        retVO.setPayAccountNo(esbUtil3.getTagValue(dnXml, "PayAccountNo"));
+                        retVO.setTxType(esbUtil3.getTagValue(dnXml, "TxType"));
+                        retVO.setSame(esbUtil3.getTagValue(dnXml, "Same"));
+                        retVO.setFundPackageNo(esbUtil3.getTagValue(dnXml, "FundPackageNo"));
+                        retVO.setFundPackage(esbUtil3.getTagValue(dnXml, "FundPackage"));
+                        retVO.setEnd_Flg(esbUtil3.getTagValue(dnXml, "End_Flg"));
+                        retVO.setAccAllocateRew(decimalPoint(esbUtil3.getTagValue(dnXml, "AccAllocateRew"), 2));
+                        String CmkType = esbUtil3.getTagValue(dnXml, "CmkType");
+                        retVO.setIsPledged(StringUtils.isEmpty(CmkType) ? "N" : StringUtils.equals(CmkType.trim(), CMKTYPE_MK03) ? "Y" : "N");	//質借圈存註記
+                        if (retVO.getAcctId02() != null)
+							retVO.setAcctId02(StringUtils.trim(retVO.getAcctId02()));
+						if (retVO.getPayAcctId() != null)
+							retVO.setPayAcctId(StringUtils.trim(retVO.getPayAcctId()));
+						if (retVO.getPayAccountNo() != null)
+							retVO.setPayAccountNo(StringUtils.trim(retVO.getPayAccountNo()));
+                        total.add(retVO);
+                	}                    
+                }
+            }
+        }
+        
+		Collections.sort(total, new Comparator<CustAssetFundVO>() {
+		    public int compare( CustAssetFundVO o1,  CustAssetFundVO o2) {
+		    	if(StringUtils.isEmpty(o1.getEviNum())){
+		    		 return -1;
+		    	}
+		    	if(StringUtils.isEmpty(o2.getEviNum())){
+		    		return 1;
+		    	}
+		    	return (o1.getEviNum()).compareTo(o2.getEviNum());
+		     }
+		});
+		
+	}
+
+	private void dealAF_NF_Data_old(List<ESBUtilOutputVO> vos, List<CustAssetFundVO> total, String mark) {
 		Boolean isAF = StringUtils.equals("AF", mark);
         for(ESBUtilOutputVO esbUtilOutputVO : vos){
             TxHeadVO headVO = esbUtilOutputVO.getTxHeadVO();
@@ -923,5 +1486,4 @@ public class CRM821 extends EsbUtil {
 		});
 		
 	}
-	
 }

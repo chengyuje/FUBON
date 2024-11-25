@@ -167,14 +167,14 @@ eSoafApp.controller('CRM800Controller',
 		}
 		
 		//金市SN債
-        function getGoldSnAsset() {
+		$scope.getGoldSnAsset= function() {
             var defer = $q.defer();
             $scope.sendRecv("CRM82B", "getGoldSnAsset", "com.systex.jbranch.app.server.fps.crm82B.CRM82BInputVO", {"cust_id": $scope.custVO.CUST_ID}, 
             	function (tota, isError) {
                 if (!isError) {
                     $scope.crm82B = tota[0].body.SUMTrustVal;
                 }
-                defer.resolve($scope.crm82B);
+                defer.resolve("success");
             });
             return defer.promise;
         }
