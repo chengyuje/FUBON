@@ -12,7 +12,7 @@ eSoafApp.controller('CAM211Controller', function($scope, $rootScope, $controller
 	$controller('CAM210Controller', {$scope: $scope});
 	
 	$scope.initCAM211 = function() {
-		$scope.inputVO = {};
+//		$scope.inputVO = {};
 		var min_mon = new Date();
 		min_mon.setMonth(min_mon.getMonth() - 2, 1);
 		min_mon.setHours(0, 0, 0, 0);

@@ -1,6 +1,6 @@
 
 'use strict';
-eSoafApp.controller('CRM131Controller', function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService,sysInfoService) {
+eSoafApp.controller('CRM131Controller', function($rootScope, $scope, $controller, $confirm, projInfoService, sysInfoService) {
 	$controller('BaseController', {$scope: $scope});
 	$scope.controllerName = "CRM131Controller";
 	
@@ -214,6 +214,7 @@ eSoafApp.controller('CRM131Controller', function($rootScope, $scope, $controller
 			$scope.connector('set', 'tab', tabType);
 			$scope.connector('set', 'tabNumber', (tabType + 1 + "") );
 			$scope.connector('set', 'leadType', leadTypeFlag);
+			$scope.connector('set', 'campType', campType);
 			$rootScope.menuItemInfo.url = "assets/txn/CAM211/CAM211.html";
 			
 			break;

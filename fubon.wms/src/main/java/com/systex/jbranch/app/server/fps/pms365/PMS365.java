@@ -339,6 +339,10 @@ public class PMS365 extends FubonWmsBizLogic {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
 		
+		if (StringUtils.isEmpty(inputVO.getNOT_EXIST_UHRM())) {
+			inputVO.setNOT_EXIST_UHRM("N");
+		}
+		
 		XmlInfo xmlInfo = new XmlInfo();
 		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
@@ -575,7 +579,7 @@ public class PMS365 extends FubonWmsBizLogic {
 		}
 		
 //		sb.append("FETCH FIRST 100 ROWS ONLY ");
-		
+
 		queryCondition.setQueryString(sb.toString());
 		
 		outputVO.setDtlList(dam.exeQuery(queryCondition));

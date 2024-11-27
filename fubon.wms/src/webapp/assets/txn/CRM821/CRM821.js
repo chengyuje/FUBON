@@ -52,7 +52,10 @@ eSoafApp.controller('CRM821Controller',
 //									$scope.showMsg("ehl_01_common_009");
 //									return;
 								}
-								$scope.resultList = tota[0].body.resultList;
+								$scope.redeemResultList = tota[0].body.redeemList; //贖回在途資料
+								$scope.redeemOutputVO = tota[0].body;
+								
+								$scope.resultList = tota[0].body.resultList; //庫存資料
 
 								angular.forEach($scope.resultList, function(row, index, objs) {
 									row.set = [];
@@ -175,14 +178,14 @@ eSoafApp.controller('CRM821Controller',
 		
 
 		// 贖回在途資料
-		$scope.sendRecv("CRM821", "getRedeem", "com.systex.jbranch.app.server.fps.crm821.CRM821InputVO", { "cust_id": $scope.inputVO.cust_id, "isOBU": $scope.inputVO.isOBU },
-			function(tota, isError) {
-				if (!isError) {
-					$scope.redeemResultList = tota[0].body.resultList;
-					$scope.redeemOutputVO = tota[0].body;
-					return;
-				}
-			});
+//		$scope.sendRecv("CRM821", "getRedeem", "com.systex.jbranch.app.server.fps.crm821.CRM821InputVO", { "cust_id": $scope.inputVO.cust_id, "isOBU": $scope.inputVO.isOBU },
+//			function(tota, isError) {
+//				if (!isError) {
+//					$scope.redeemResultList = tota[0].body.resultList;
+//					$scope.redeemOutputVO = tota[0].body;
+//					return;
+//				}
+//			});
 
 		
 		$scope.goCharge = function() {

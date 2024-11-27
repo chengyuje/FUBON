@@ -628,19 +628,21 @@ eSoafApp.controller('CRM800Controller',
 					console.log("CRM800 getCustAssetInvestData2 finished" + new Date());
 					$scope.inquireGoldBond().then(function(data) {
 						console.log("CRM800 inquireGoldBond finished" + new Date());
-						getGold().then(function(data) {
-							console.log("CRM800 getGold finished" + new Date());
-							$scope.inquire_A().then(function(data) {
-								console.log("CRM800 inquire_A finished" + new Date());
-								$scope.inquire_B().then(function(data) {
-									console.log("CRM800 inquire_B finished" + new Date());
-									$scope.getCustAssetInvestData($scope.inputVO.isOBU).then(function(data) {
-										$scope.getFundDeposit($scope.inputVO.isOBU).then(function(data) {
-											$scope.getETFStockDeposit().then(function(data) {
-												$scope.getBondSnDeposit($scope.inputVO.isOBU).then(function(data) {
-													$scope.getSIDeposit().then(function(data) {
-														$scope.inquire_C().then(function(data) {
-															console.log("CRM800 inquire_C finished" + new Date());
+						$scope.getGoldSnAsset().then(function(data) {
+							console.log("CRM800 getGoldSnAsset finished" + new Date());
+							getGold().then(function(data) {
+								console.log("CRM800 getGold finished" + new Date());
+								$scope.inquire_A().then(function(data) {
+									console.log("CRM800 inquire_A finished" + new Date());
+									$scope.inquire_B().then(function(data) {
+										console.log("CRM800 inquire_B finished" + new Date());
+											$scope.getCustAssetInvestData($scope.inputVO.isOBU).then(function(data) {
+												$scope.getFundDeposit($scope.inputVO.isOBU).then(function(data) {
+													$scope.getETFStockDeposit().then(function(data) {
+														$scope.getBondSnDeposit($scope.inputVO.isOBU).then(function(data) {
+															$scope.getSIDeposit().then(function(data) {
+																$scope.inquire_C().then(function(data) {
+																	console.log("CRM800 inquire_C finished" + new Date());
 														});
 													});
 												});
@@ -654,6 +656,7 @@ eSoafApp.controller('CRM800Controller',
 				});
 			});
 		});
+	});
 		};
 		$scope.init();
 		

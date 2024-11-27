@@ -176,7 +176,7 @@ public class CUS150 extends FubonWmsBizLogic {
 
 		sql.append(") temp ");
 		sql.append("WHERE temp.TOTAL_COUNT <> 0 ");
-		
+
 		queryCondition.setQueryString(sql.toString());
 		
 		ResultIF list = dam.executePaging(queryCondition, inputVO.getCurrentPageIndex() + 1, inputVO.getPageCount());

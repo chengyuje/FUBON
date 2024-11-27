@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.xml.bind.JAXBContext;
+
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.IOException;
@@ -71,6 +72,7 @@ public class EsbUtil extends FubonWmsBizLogic {
 	// private String newEsbSnoLog = null; //SHOW交易序號 FOR UI
 	private List resList = new ArrayList(); // 回傳資料集合
 	private String module; // 模組代號
+	private static Map<String, JAXBContext> JAXBContextMap = new HashMap<>();
 
 	// regex
 	private Pattern pattern = Pattern.compile("TxBody");
@@ -212,8 +214,12 @@ public class EsbUtil extends FubonWmsBizLogic {
 				}
 
 				StringWriter writer = new StringWriter();
-				JAXBContext context = JAXBContext.newInstance(ESBUtilInputVO.class);
-
+				// JAXBContext context = JAXBContext.newInstance(ESBUtilInputVO.class);
+				JAXBContext context = JAXBContextMap.get(ESBUtilInputVO.class.getName());
+				if (context == null ) {
+					context = JAXBContext.newInstance(ESBUtilInputVO.class);
+					JAXBContextMap.put(ESBUtilInputVO.class.getName(), context);
+				}
 				Marshaller marshal = context.createMarshaller();
 				marshal.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 

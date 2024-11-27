@@ -144,7 +144,7 @@ public class PMS101 extends FubonWmsBizLogic {
 			sb.append("    ) ");
 			sb.append("    AND SUBSTR(DATA_DATE, 0, 6) = :DATA_DATEE");
 			sb.append("  ) MASTO　");
-			sb.append("  LEFT JOIN (SELECT DISTINCT EMP_ID, DEPT_ID FROM VWORG_EMP_INFO) F ON F.AO_CODE = MASTO.AO_CODE "); 
+			sb.append("  LEFT JOIN (SELECT DISTINCT EMP_ID, AO_CODE, EMP_DEPT_ID AS DEPT_ID FROM VWORG_EMP_INFO) F ON F.AO_CODE = MASTO.AO_CODE "); 
 			sb.append("  LEFT JOIN TBPMS_ORG_REC_N REC ON REC.BRANCH_AREA_ID = MASTO.BRANCH_AREA_ID AND REC.BRANCH_NBR = MASTO.BRANCH_NBR AND REC.REGION_CENTER_ID = MASTO.REGION_CENTER_ID AND TO_DATE(MASTO.DATA_DATE,'YYYYMMDD') BETWEEN REC.START_TIME AND REC.END_TIME  ");
 			sb.append("  LEFT JOIN (");
 			sb.append("    SELECT NVL(SUM(EST_AMT),0) AS EST_AMT, CUST_ID ");
@@ -186,7 +186,7 @@ public class PMS101 extends FubonWmsBizLogic {
 			sb.append("    ) ");
 			sb.append("    AND SUBSTR(DATA_DATE, 0, 6) = :DATA_DATEE");
 			sb.append("  ) MASTO　");
-			sb.append("  LEFT JOIN (SELECT DISTINCT EMP_ID, DEPT_ID FROM VWORG_EMP_INFO) F ON F.AO_CODE = MASTO.AO_CODE "); 
+			sb.append("  LEFT JOIN (SELECT DISTINCT EMP_ID, AO_CODE, EMP_DEPT_ID AS DEPT_ID FROM VWORG_EMP_INFO) F ON F.AO_CODE = MASTO.AO_CODE "); 
 			sb.append("  LEFT JOIN TBPMS_ORG_REC_N REC ON REC.BRANCH_AREA_ID = MASTO.BRANCH_AREA_ID AND REC.BRANCH_NBR = MASTO.BRANCH_NBR AND REC.REGION_CENTER_ID = MASTO.REGION_CENTER_ID AND TO_DATE(MASTO.DATA_DATE, 'YYYYMMDD') BETWEEN REC.START_TIME AND REC.END_TIME ");
 			sb.append(") ");
 
@@ -216,7 +216,7 @@ public class PMS101 extends FubonWmsBizLogic {
 						sb.append("SELECT ROWNUM, ALLS.* ");
 						sb.append("FROM ( ");
 						sb.append("  SELECT * ");
-						sb.append("  FROM noturnsell T ");
+						sb.append("  FROM NOTURNSELL T ");
 						
 						if (!StringUtils.isBlank(inputVO.getPROD_TYPE())) {
 							sb.append("  INNER JOIN ( ");
@@ -302,7 +302,7 @@ public class PMS101 extends FubonWmsBizLogic {
 					case "Y":
 						if (!StringUtils.isBlank(Y_N)) {
 							if ("N".equals(Y_N)) {
-								sb.append("  AND T.REC_CF_CONT_FLAG = 'Y' "); //已入帳未聯繫
+								sb.append("  AND T.REC_CF_CONT_FLAG = 0 "); //已入帳未聯繫
 							}
 						}
 						

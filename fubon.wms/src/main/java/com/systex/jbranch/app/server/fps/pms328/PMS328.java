@@ -420,7 +420,7 @@ public class PMS328 extends FubonWmsBizLogic {
 				if (StringUtils.equals(inputVO.getFuncPage(), "PMS328DT")) {
 					sb.append("AND TEAM_TYPE IS NOT NULL ");
 				}
-				
+
 				switch (NOT_EXIST_UHRM) {
 					case "Y":
 						sb.append("AND NOT EXISTS ( ");
@@ -463,6 +463,10 @@ public class PMS328 extends FubonWmsBizLogic {
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
+		
+		if (StringUtils.isEmpty(inputVO.getNOT_EXIST_UHRM())) {
+			inputVO.setNOT_EXIST_UHRM("N");
+		}
 		
 		XmlInfo xmlInfo = new XmlInfo();
 		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
@@ -655,7 +659,7 @@ public class PMS328 extends FubonWmsBizLogic {
 		}
 		
 		//=== MAIN SQL END ===
-		
+
 		queryCondition.setQueryString(sb.toString());
 		
 		ResultIF list = dam.executePaging(queryCondition, inputVO.getCurrentPageIndex() + 1, inputVO.getPageCount());

@@ -461,6 +461,10 @@ public class PMS329 extends FubonWmsBizLogic {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
 		
+		if (StringUtils.isEmpty(inputVO.getNOT_EXIST_UHRM())) {
+			inputVO.setNOT_EXIST_UHRM("N");
+		}
+		
 		XmlInfo xmlInfo = new XmlInfo();
 		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
@@ -655,7 +659,7 @@ public class PMS329 extends FubonWmsBizLogic {
 		}
 		
 		//=== MAIN SQL END ===
-		
+
 		queryCondition.setQueryString(sb.toString());
 				
 		ResultIF list = dam.executePaging(queryCondition, inputVO.getCurrentPageIndex() + 1, inputVO.getPageCount());

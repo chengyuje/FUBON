@@ -402,7 +402,7 @@ public class PMS364 extends FubonWmsBizLogic {
 		}
 		
 		queryCondition.setQueryString(sb.toString());
-		
+
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		
 		outputVO.setResultList(list);

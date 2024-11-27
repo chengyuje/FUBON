@@ -24,50 +24,35 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
-import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
-import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
 
 /**
  * author Jemmy Tsai
  * 以XML字串處理取代序列化Java Object
  */
-public class EsbUtil3 extends FubonWmsBizLogic {
+public class EsbUtil3 { // extends FubonWmsBizLogic {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	private static Logger esblog = LoggerFactory.getLogger("ESB_LOG");
-	// 核心DB元件
-	private DataAccessManager dam = null;
-	private QueryConditionIF condition = null;
 	
-	private static String esbUrl;							// ESB URL
-	private static String esbId;							// 主機
+	private String esbUrl;							// ESB URL
+	private String esbId;							// 主機
+	private String esbSeq;							// 序號
 	private List<String> dnXML = new ArrayList<String>();	// 下行電文
 	// 以下欄位用於記錄
 	private String module;									// 應用程式模組名稱
 	private String HTXTID;									// 交易代碼
 	private String HSTANO;									// 電文序號
 	
-	public EsbUtil3(String module) {
+	public EsbUtil3(String module, String esbUrl, String esbId, String esbSeq) {
 		this.module = module;
-		if (esbUrl == null) {
-			try {
-				esbUrl = this.getEsbUrl();
-			} catch (Exception e) {
-				logger.warn("get esb url fail:" + e.getMessage());
-			}
-		}
-		if (esbId == null) {
-			try {
-				esbId = this.getEsbID("ESB");
-			} catch (Exception e) {
-				logger.warn("get esb id fail:" + e.getMessage());
-			}
-		}
+		this.esbUrl = esbUrl;
+		this.esbId = esbId;
+		this.esbSeq = esbSeq;
 	}
 	
 	// 電文完成Log模版，主要記錄該次電文運行時間
 	private String endEsbLogFormat = "[%s][%s][%s] total spent %d ms";
+	private String errEsbLogFormat = "[%s][%s][%s] HERRID[%s]:\n %s";
 	/**
 	 * 發送電文
 	 * @param xml 上行電文
@@ -75,17 +60,21 @@ public class EsbUtil3 extends FubonWmsBizLogic {
 	 * @throws JBranchException
 	 */
 	public List<String> send(String xml) throws JBranchException {
+		String hReturn = null;
 		long start = System.currentTimeMillis();
-        String hReturn = this.sendESB(xml);
-        while (hReturn.equals("C")) {
-        	String txHead = this.getTagValue(xml, "TxHead"); 
-        	if (txHead.indexOf("<HRETURN>") >= 0) {		// 表示已有<HRETURN>標籤
+		do {
+			String txHead = this.getTagValue(xml, "TxHead"); 
+        	if (txHead.indexOf("<HRETURN>") >= 0 && hReturn != null) {		// 表示已有<HRETURN>標籤
         		// NOT TO DO
         	} else {
         		xml = xml.replaceFirst("</TxHead>", "<HRETURN>C</HRETURN></TxHead>");
         	}
             hReturn = this.sendESB(xml);
-        }
+            if (hReturn != null && hReturn.length() > 2) {
+            	logger.warn(String.format(errEsbLogFormat, this.HSTANO, this.HTXTID, this.module, hReturn, this.dnXML.get(this.dnXML.size() -1)));
+            	throw new JBranchException("HERRID is " + hReturn);
+            }
+		} while (hReturn.equals("C"));
         long end = System.currentTimeMillis();
         logger.info(String.format(endEsbLogFormat, this.HSTANO, this.HTXTID, this.module, (end -start)));
         return this.dnXML;
@@ -102,7 +91,7 @@ public class EsbUtil3 extends FubonWmsBizLogic {
             HTLID = StringUtils.isEmpty(HTLID) ? "" : HTLID;	// 可忽略的欄位，必須用空字串取代，用於計算密碼
             String HTXTID = this.getTagValue(xml, "HTXTID");
             String txHead = this.getTagValue(xml, "TxHead");
-            String txBody = this.getTagValue(xml, "txBody");
+            String txBody = this.getTagValue(xml, "TxBody");
             String fmpStr = this.makeFMPConnectionString(HWSID, HSTANO, HTLID, HTXTID);
             String inXML = String.format(baseUpXml, HTXTID, fmpStr, txHead, txBody);
             long start = System.currentTimeMillis();
@@ -125,51 +114,15 @@ public class EsbUtil3 extends FubonWmsBizLogic {
             	this.HTXTID = HTXTID;
             	this.HSTANO = HSTANO;
             }
-            return this.getTagValue(outXML, "HRETRN");
+            String HERRID = this.getTagValue(outXML, "HERRID");
+            String hReturn = this.getTagValue(outXML, "HRETRN");
+            return "0000".equals(HERRID) ? hReturn : HERRID;		// HERRID為0000則回HReturn，否則回HERRID
         } catch (Exception e) {
         	logger.warn("send ESB fail", e);
         	throw new JBranchException(e.getMessage());
         }
 	}
 	
-	/**
-	 * 取指定電文主機URL
-	 *
-	 * @param paramType
-	 * @return
-	 * @throws JBranchException
-	 */
-	private String getEsbUrl() throws JBranchException {
-		dam = getDataAccessManager();
-		condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		condition.setQueryString("select PARAM_NAME from TBSYSPARAMETER where PARAM_TYPE = 'CBS.URL.HTTP' ");
-
-		List<Map> esbUrlRes = dam.exeQuery(condition);
-		return (!esbUrlRes.isEmpty()) ? (String) esbUrlRes.get(0).get("PARAM_NAME") : null;
-	}
-	
-	/**
-	 * 取指定電文主機ID
-	 *
-	 * @param paramType
-	 * @return
-	 * @throws JBranchException
-	 */
-	private String getEsbID(String paramType) throws JBranchException {
-		String esbID = "";
-		paramType = new StringBuffer(paramType).append(".ID").toString();
-
-		StringBuffer sql = new StringBuffer("select PARAM_NAME from TBSYSPARAMETER where PARAM_TYPE = :ESB_ID ");
-		dam = getDataAccessManager();
-		condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		condition.setObject("ESB_ID", paramType);
-		condition.setQueryString(sql.toString());
-		List<Map> esbIDRes = dam.exeQuery(condition);
-
-		esbID = (!esbIDRes.isEmpty()) ? (String) esbIDRes.get(0).get("PARAM_NAME") : null;
-
-		return esbID;
-	}
 	
 	// [序號][上下行][交易代碼][模組名稱]spent毫秒ms
 	private String upEsbLogFormat = "[%s][上行][%s][%s][%s]";
@@ -213,6 +166,22 @@ public class EsbUtil3 extends FubonWmsBizLogic {
         }
         return null;
     }
+    
+    // 無此標籤時，回傳空字串
+    public String getTagClearValue(String xml, String tag) {
+        Pattern pattern = Pattern.compile("<" + tag + ">(.+?)</" + tag + ">");
+        Matcher mat = pattern.matcher(xml);
+        if (mat.find()) {
+            return mat.group(1);
+        } else {
+            Pattern pattern1 = Pattern.compile("<" + tag + " ?/>");
+            mat = pattern1.matcher(xml);
+            if (mat.find()) {
+                return "";
+            }
+        }
+        return "";
+    }
 
     public List<String> getTagValueList(String xml, String tag) {
     	List<String> valueList = new ArrayList<String>();
@@ -242,11 +211,11 @@ public class EsbUtil3 extends FubonWmsBizLogic {
 			"<TxHead><HWSID>%s</HWSID><HSTANO>%s</HSTANO><HTXTID>%s</HTXTID>%s</TxHead>";
 	public String getTxHead(String HTXTID, Map<String, String> other) {
 		try {
-			return String.format(baseTxHeadXml, esbId, this.getEsbSeq(), HTXTID, this.mapToXmlTag(other));
+			return String.format(baseTxHeadXml, this.esbId, this.esbSeq, HTXTID, this.mapToXmlTag(other));
 		} catch (Exception e) {
 			logger.warn("getEsbSeq fail: " + e.getMessage());
 			// DB取序號失敗改用UUID作為序號
-			return String.format(baseTxHeadXml, esbId, UUID.randomUUID().toString(), HTXTID, this.mapToXmlTag(other));
+			return String.format(baseTxHeadXml, this.esbId, UUID.randomUUID().toString(), HTXTID, this.mapToXmlTag(other));
 		}
 	}
 	

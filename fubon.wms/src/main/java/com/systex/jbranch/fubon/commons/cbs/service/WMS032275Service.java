@@ -6,6 +6,8 @@ import com.systex.jbranch.fubon.commons.cbs.vo._062410_062411.CBS062411OutputDet
 import com.systex.jbranch.fubon.commons.cbs.vo._062410_062411.CBS062411OutputVO;
 import com.systex.jbranch.fubon.commons.cbs.vo.basic.CBSUtilOutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.wms032275.WMS032275OutputVO;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +62,7 @@ public class WMS032275Service {
         esbVO.setIDX_7(cbsVO.getUSIndex7());
         esbVO.setIDX_8(cbsVO.getUSIndex8());
         esbVO.setIDF_N(cbsVO.getIdentityNo());
-        esbVO.setIDF_S(cbsVO.getCurrIdentityDesc());
+        esbVO.setIDF_S(StringUtils.trim(cbsVO.getCurrIdentityDesc()));
         esbVO.setIDF_P(cbsVO.getPrevIdentityNo());
         esbVO.setTIN(cbsVO.getLastYrIdentityNo());
         esbVO.setIDF_Y(cbsVO.getLastYrIdentityNo());
