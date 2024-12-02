@@ -421,20 +421,20 @@ public class PRD110 extends FubonWmsBizLogic {
 					throw new APException(fOutputVO.getErrorID());
 				}
 				
-				//基金、美國籍及商品代號查詢
-				List<Map<String, Object>> listMap = new ArrayList<Map<String,Object>>();
-				if (StringUtils.isNotBlank(inputVO.getFund_id())) {
-					QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-					StringBuilder sb = new StringBuilder();
-					sb.append(" SELECT * FROM TBPRD_NATIONALITY	WHERE SOU_TYPE = 'NF' AND COUNTRY_ID = 'US' AND PROD_ID = :PRD_ID ");
-					qc.setObject("PRD_ID", inputVO.getFund_id());
-					qc.setQueryString(sb.toString());
-					listMap = dam.exeQuery(qc);										
+				//客戶資料適配檢核
+				fOutputVO = prodFitness.validFundETFCustFATCA(inputVO.getCust_id());//客戶FATCA註記檢核
+				if(fOutputVO.getIsError()) {
+					// 客戶資料適配檢核失敗，Exception整段跳出
+					throw new APException(fOutputVO.getErrorID());
 				}
 				
+				//美國籍及商品代號查詢
+				SOT712 sot712 = (SOT712) PlatformContext.getBean(SOT712.class.getSimpleName().toLowerCase());
+				List<Map<String, Object>> listMap = sot712.identifyProdNationality(inputVO.getFund_id());
+				
 				if (listMap.size() > 0){
-					//客戶資料適配檢核
-					fOutputVO = prodFitness.validFundETFCustFATCA(inputVO.getCust_id());//客戶FATCA註記檢核
+					//針對新CRS/FATCA美國來源所得交易管控
+					fOutputVO = prodFitness.validUSACustAndProd(inputVO.getCust_id());//客戶FATCA註記檢核
 					if(fOutputVO.getIsError()) {
 						// 客戶資料適配檢核失敗，Exception整段跳出
 						throw new APException(fOutputVO.getErrorID());

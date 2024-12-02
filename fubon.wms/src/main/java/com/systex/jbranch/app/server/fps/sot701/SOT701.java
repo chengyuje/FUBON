@@ -924,7 +924,8 @@ public class SOT701 extends EsbUtil {
 	 * 
 	 * 使用電文: FC032275
 	 *
-	 *#1981 不合作例外帳戶例外管理 by SamTu 2024.05.03
+	 *#1981 不合作例外帳戶例外管理 by SamTu 2024.11.28
+	 *針對新CRS/FATCA不合作帳戶管理
 	 * @param body
 	 * @return W8BenDataVO
 	 */
@@ -989,15 +990,15 @@ public class SOT701 extends EsbUtil {
 			w8BenDataVO.setIDF_P(idfP);
 			w8BenDataVO.setIDF_S(idfS);
 
-			// 辨識完成
-			if ("辨識完成".equals(idfS) && StringUtils.isNotBlank(idfN)) {
+			
+			if (StringUtils.isNotBlank(idfN)) {
 				// 判斷身份
 				if (idfN.matches("1201|1202|1203|1204|1205|C010|C020|C030|C040|C050|C060|C070|C090") && "N".equals(exceptionAcctFlag)) {
-					w8BenDataVO.setFatcaType("N"); // 不合作
-				} else if (idfN.matches("1301|1302|1303|B010")) {
-					w8BenDataVO.setFatcaType("Y"); // 美國人
+					w8BenDataVO.setFatcaType("N"); // 已有不合作帳戶註記，不得承作新商品
+				} else if (idfN.matches("1101|1102")) {
+					w8BenDataVO.setFatcaType("Y"); // 屬受限制之外國金融機構，不得新承作商品
 				} else if (idfN.matches("0800|1206|D013|C013|D023|C023")) {
-					w8BenDataVO.setFatcaType("X"); // 未簽署
+					w8BenDataVO.setFatcaType("X"); // 未簽署協議之外國金融機構，不得承作新商品
 				}
 			}
 
@@ -1035,6 +1036,7 @@ public class SOT701 extends EsbUtil {
 	 * 使用電文: FC032275
 	 *
 	 *#1981 不合作例外帳戶例外管理 by SamTu 2024.05.03
+	 *針對新CRS/FATCA美國來源所得交易管控
 	 * @param body
 	 * @return FatcaDataVO
 	 */
@@ -1062,12 +1064,15 @@ public class SOT701 extends EsbUtil {
 
 			if (StringUtils.isNotBlank(idfN)) // 依照idfN去設置fatcaType
 				// 判斷身份
-				if (idfN.matches("1201|1202|1203|1204|1205|C010|C020|C030|C040|C050|C060|C070|C090") && "N".equals(exceptionAcctFlag)) {
-					fatcaDataVO.setFatcaType("N"); // 不合作
-				} else if (idfN.matches("1301|1302|1303|B010")) {
-					fatcaDataVO.setFatcaType("Y"); // 美國人
-				} else if (idfN.matches("0800|1206|D013|C013|D023|C023")) {
-					fatcaDataVO.setFatcaType("X"); // 未簽署
+				if (idfN.matches("1301|1302|1303|B010") 
+						|| "US".equals(wms032275OutputVO.getCountry())
+						|| "US".equals(wms032275OutputVO.getTaxCountry1())
+						|| "US".equals(wms032275OutputVO.getTaxCountry2())
+						|| "US".equals(wms032275OutputVO.getTaxCountry3())
+						|| "US".equals(wms032275OutputVO.getTaxCountry4())
+						|| "US".equals(wms032275OutputVO.getTaxCountry5())				
+						) {
+					fatcaDataVO.setFatcaType("Z"); // 客戶屬美國國籍或稅籍不受理交易申請
 				}
 		}
 		return fatcaDataVO;

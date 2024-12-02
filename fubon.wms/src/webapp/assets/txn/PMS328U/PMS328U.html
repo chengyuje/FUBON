@@ -146,7 +146,7 @@
 			</div>
 		</div>
 		<div class="panel_content">
-			<e-jumping output="outputVO" input="inputVO" query="inquire()" list="paramList2" rowCountLimit="20"></e-jumping>
+			<e-jumping output="outputVO" input="inputVO" query="inquireU()" list="paramList2" rowCountLimit="20"></e-jumping>
 			<div align="left">
 				<div algin="left">
 					<table>
@@ -204,52 +204,94 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat-start="(a, dataA) in paramList2 | groupBy: 'REGION_CENTER_NAME' as resultA">
-							<td rowspan="{{(dataA.length + numGroups(resultB)) * 2 + 1}}" ng-show="cp != tp && !(a.indexOf('合計') > -1)">{{a}}</td>
-							<td rowspan="{{dataA.length + numGroups(resultB) * 2 + 2 + (numGroupsA(paramList2) > 1 ? 1 : 0 ) + (numGroupsA(paramList2) < 1 ? -1 : 0 )}} " ng-show="cp == tp && !(a.indexOf('合計') > -1)">{{a}}</td>
-							<td rowspan="{{dataA.length + numGroups(resultB) * 2 + 2 + (numGroupsA(paramList2) > 1 ? 1 : 0 ) + (numGroupsA(paramList2) < 1 ? -1 : 0 )}} " align="center" colspan="5" ng-show="(a.indexOf('合計') > -1)">{{a}}</td>
-						</tr>
-						<tr ng-repeat-start="(b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
-							<td rowspan="{{dataB.length + numGroups(resultC) * 2 + 1}}" ng-show="b != 'REGION' && b != 'ALL' && cp != tp">{{b}}</td>
-							<td rowspan="{{dataB.length + numGroups(resultC) * 2 + (numGroups(resultC) > 2 ? 0 : 1) }}" ng-show="b != 'REGION' && b != 'ALL' && cp == tp">{{b}}</td>
-						</tr>
-						<tr ng-repeat-start="(c, dataC) in dataB | groupBy: 'BRANCH_NAME' as resultC">
-							<td rowspan="{{dataC.length + 1}}" ng-hide="c == 'REGION' || c == 'AREA' || c == 'ALL'">{{c}}</td>
-						</tr>
-						<tr ng-repeat="c1 in dataC">
-							<td colspan="4" align="center" ng-show="c1.AO_CODE == 'ZZZZZREGION'">{{c1.REGION_CENTER_NAME}} 合計</td>
-							<td colspan="3" align="center" ng-show="c1.AO_CODE == 'ZZZZZAREA'">{{c1.BRANCH_AREA_NAME}} 合計</td>
-							<td colspan="2" align="center" ng-show="c1.AO_CODE == 'ZZZZZBRANCH'">{{c1.BRANCH_NAME}} 合計</td>
-							<td ng-hide="c1.AO_CODE == 'ZZZZZREGION' || c1.AO_CODE == 'ZZZZZAREA' || c1.AO_CODE == 'ZZZZZBRANCH' || c1.AO_CODE == 'ZZZZZ'">{{c1.AO_CODE}}{{c1.AO_TYPE | mapping:mappingSet['AO_TYPE']:'F3'}}-{{c1.EMP_NAME}}</PS></td>
-							<td ng-hide="c1.AO_CODE == 'ZZZZZREGION' || c1.AO_CODE == 'ZZZZZAREA' || c1.AO_CODE == 'ZZZZZBRANCH' || c1.AO_CODE == 'ZZZZZ'">{{c1.YM}}</td>
-							<td align="right">{{0 + c1.TOTAL | currency:'':0}}</td>
-							<td align="right">{{0 + c1.CGPR_PRIVATE | currency:'':0}}</td>
-							<td align="right">{{0 + c1.CGPR_PLATINUM | currency:'':0}}</td>
-							<td align="right">{{0 + c1.CGPR_PERSON | currency:'':0}}</td>
-							<td align="right">{{0 + c1.CGPR_MASS   | currency:'':0}}</td>
-							<td ng-hide="s_time < '2024/08'">
-								{{0 + c1.CGPR_SUM-c1.CGPR_PRIVATE-c1.CGPR_PLATINUM-c1.CGPR_PERSON-c1.CGPR_MASS | currency:'':0}}
-							</td>
-							<td align="right">{{0 + c1.CGPR_SUM | currency:'':0}}</td>
-							<td align="right">{{0 + c1.EIP_E | currency:'':0}}</td>
-							<td align="right">{{0 + c1.EIP_I | currency:'':0}}</td>
-							<td align="right">{{0 + c1.EIP_P | currency:'':0}}</td>
-							<td align="right">{{0 + c1.EIP_O | currency:'':0}}</td>
-							<td align="right">{{0 + c1.EIP_S | currency:'':0}}</td>
-							<td align="right">{{0 + c1.EIP_Z | currency:'':0}}</td>
-							<td align="right">{{0 + c1.EIP_SUM | currency:'':0}}</td>
-							<td align="right">{{0 + c1.II_INV_INS | currency:'':0}}</td>
-							<td align="right">{{0 + c1.II_NON | currency:'':0}}</td>
-							<td align="right">{{0 + c1.II_INV | currency:'':0}}</td>
-							<td align="right">{{0 + c1.II_INS | currency:'':0}}</td>
-							<td align="right">{{0 + c1.II_SUM | currency:'':0}}</td>
-							<td align="right">{{0 + c1.CUST_TYPE_PERSON | currency:'':0}}</td>
-							<td align="right">{{0 + c1.CUST_TYPE_CORPOR | currency:'':0}}</td>
-							<td align="right">{{0 + c1.CUST_TYPE_SUM | currency:'':0}}</td>
-						</tr>
-						<tr ng-repeat-end ng-hide="true">
-						<tr ng-repeat-end ng-hide="true">
-						<tr ng-repeat-end ng-hide="true">
+					<tr class="repeat-row" align="center" ng-repeat="row in paramList2 track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td align="center" ng-show="row.AO_CODE != 'ZZZZZREGION'">{{row.REGION_CENTER_NAME}}</td>
+						<td align="center" ng-show="row.AO_CODE == 'ZZZZZREGION'">{{row.REGION_CENTER_NAME}} 合計</td>
+						<td align="center" ng-show="row.AO_CODE != 'ZZZZZAREA'">{{row.BRANCH_AREA_NAME}}</td>
+						<td  align="center" ng-show="row.AO_CODE == 'ZZZZZAREA'">{{row.BRANCH_AREA_NAME}} 合計</td>
+						<td align="center" ng-show="row.AO_CODE != 'ZZZZZBRANCH'">{{row.BRANCH_NAME}}</td>
+						<td align="center" ng-show="row.AO_CODE == 'ZZZZZBRANCH'">{{row.BRANCH_NAME}} 合計</td>
+						<td ng-hide="row.AO_CODE == 'ZZZZZREGION' || row.AO_CODE == 'ZZZZZAREA' || row.AO_CODE == 'ZZZZZBRANCH' || row.AO_CODE == 'ZZZZZ'">{{row.AO_CODE}}{{row.AO_TYPE | mapping:mappingSet['AO_TYPE']:'F3'}}-{{row.EMP_NAME}}</PS></td>
+						<td ng-hide="row.AO_CODE == 'ZZZZZREGION' || row.AO_CODE == 'ZZZZZAREA' || row.AO_CODE == 'ZZZZZBRANCH' || row.AO_CODE == 'ZZZZZ'">{{row.YM}}</td>
+						<td ng-show="row.AO_CODE == 'ZZZZZREGION' || row.AO_CODE == 'ZZZZZAREA' || row.AO_CODE == 'ZZZZZBRANCH' || row.AO_CODE == 'ZZZZZ'"></td>
+						<td ng-show="row.AO_CODE == 'ZZZZZREGION' || row.AO_CODE == 'ZZZZZAREA' || row.AO_CODE == 'ZZZZZBRANCH' || row.AO_CODE == 'ZZZZZ'"></td>
+						<td align="right">{{0 + row.TOTAL | currency:'':0}}</td>
+						<td align="right">{{0 + row.CGPR_PRIVATE | currency:'':0}}</td>
+						<td align="right">{{0 + row.CGPR_PLATINUM | currency:'':0}}</td>
+						<td align="right">{{0 + row.CGPR_PERSON | currency:'':0}}</td>
+						<td align="right">{{0 + row.CGPR_MASS   | currency:'':0}}</td>
+						<td ng-hide="s_time < '2024/08'">
+							{{0 + row.CGPR_SUM - row.CGPR_PRIVATE - row.CGPR_PLATINUM - row.CGPR_PERSON - row.CGPR_MASS | currency:'':0}}
+						</td>
+						<td ng-hide="s_time >= '2024/08'">
+							{{0 | currency:'':0}}
+						</td>
+						<td align="right">{{0 + row.CGPR_SUM | currency:'':0}}</td>
+						<td align="right">{{0 + row.EIP_E | currency:'':0}}</td>
+						<td align="right">{{0 + row.EIP_I | currency:'':0}}</td>
+						<td align="right">{{0 + row.EIP_P | currency:'':0}}</td>
+						<td align="right">{{0 + row.EIP_O | currency:'':0}}</td>
+						<td align="right">{{0 + row.EIP_S | currency:'':0}}</td>
+						<td align="right">{{0 + row.EIP_Z | currency:'':0}}</td>
+						<td align="right">{{0 + row.EIP_SUM | currency:'':0}}</td>
+						<td align="right">{{0 + row.II_INV_INS | currency:'':0}}</td>
+						<td align="right">{{0 + row.II_NON | currency:'':0}}</td>
+						<td align="right">{{0 + row.II_INV | currency:'':0}}</td>
+						<td align="right">{{0 + row.II_INS | currency:'':0}}</td>
+						<td align="right">{{0 + row.II_SUM | currency:'':0}}</td>
+						<td align="right">{{0 + row.CUST_TYPE_PERSON | currency:'':0}}</td>
+						<td align="right">{{0 + row.CUST_TYPE_CORPOR | currency:'':0}}</td>
+						<td align="right">{{0 + row.CUST_TYPE_SUM | currency:'':0}}</td>
+					</tr>
+<!-- 						<tr ng-repeat-start="(a, dataA) in paramList2 | groupBy: 'REGION_CENTER_NAME' as resultA"> -->
+<!-- 							<td rowspan="{{(dataA.length + numGroups(resultB)) * 2 + 1}}" ng-show="cp != tp && !(a.indexOf('合計') > -1)">1/{{a}}</td> -->
+<!-- 							<td rowspan="{{dataA.length + numGroups(resultB) * 2 + 2 + (numGroupsA(paramList2) > 1 ? 1 : 0 ) + (numGroupsA(paramList2) < 1 ? -1 : 0 )}} " ng-show="cp == tp && !(a.indexOf('合計') > -1)">2/{{a}}</td> -->
+<!-- 							<td rowspan="{{dataA.length + numGroups(resultB) * 2 + 2 + (numGroupsA(paramList2) > 1 ? 1 : 0 ) + (numGroupsA(paramList2) < 1 ? -1 : 0 )}} " align="center" colspan="5" ng-show="(a.indexOf('合計') > -1)">3/{{a}}</td> -->
+<!-- 						</tr> -->
+<!-- 						<tr ng-repeat-start="(b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB"> -->
+<!-- 							<td rowspan="{{dataB.length + numGroups(resultC) * 2 + 1}}" ng-show="b != 'REGION' && b != 'ALL' && cp != tp">{{dataB.length + numGroups(resultC) * 2 + 1}}/{{b}}</td> -->
+<!-- 							<td rowspan="{{dataB.length + numGroups(resultC) * 2 + (numGroups(resultC) > 2 ? 0 : 1) }}" ng-show="b != 'REGION' && b != 'ALL' && cp == tp">{{dataB.length + numGroups(resultC) * 2 + (numGroups(resultC) > 2 ? 0 : 1) }}/{{b}}</td> -->
+<!-- 						</tr> -->
+<!-- 						<tr ng-repeat-start="(c, dataC) in dataB | groupBy: 'BRANCH_NAME' as resultC"> -->
+<!-- 							<td rowspan="{{dataC.length + 1}}" ng-hide="c == 'REGION' || c == 'AREA' || c == 'ALL'">{{c}}</td> -->
+<!-- 						</tr> -->
+<!-- 						<tr ng-repeat="c1 in dataC"> -->
+<!-- 							<td colspan="4" align="center" ng-show="c1.AO_CODE == 'ZZZZZREGION'">1234/{{c1.REGION_CENTER_NAME}} 合計</td> -->
+<!-- 							<td colspan="3" align="center" ng-show="c1.AO_CODE == 'ZZZZZAREA'">{{c1.BRANCH_AREA_NAME}} 合計</td> -->
+<!-- 							<td colspan="2" align="center" ng-show="c1.AO_CODE == 'ZZZZZBRANCH'">{{c1.BRANCH_NAME}} 合計</td> -->
+<!-- 							<td ng-hide="c1.AO_CODE == 'ZZZZZREGION' || c1.AO_CODE == 'ZZZZZAREA' || c1.AO_CODE == 'ZZZZZBRANCH' || c1.AO_CODE == 'ZZZZZ'">{{c1.AO_CODE}}{{c1.AO_TYPE | mapping:mappingSet['AO_TYPE']:'F3'}}-{{c1.EMP_NAME}}</PS></td> -->
+<!-- 							<td ng-hide="c1.AO_CODE == 'ZZZZZREGION' || c1.AO_CODE == 'ZZZZZAREA' || c1.AO_CODE == 'ZZZZZBRANCH' || c1.AO_CODE == 'ZZZZZ'">{{c1.YM}}</td> -->
+<!-- 							<td align="right">{{0 + c1.TOTAL | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.CGPR_PRIVATE | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.CGPR_PLATINUM | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.CGPR_PERSON | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.CGPR_MASS   | currency:'':0}}</td> -->
+<!-- 							<td ng-hide="s_time < '2024/08'"> -->
+<!-- 								{{0 + c1.CGPR_SUM - c1.CGPR_PRIVATE - c1.CGPR_PLATINUM - c1.CGPR_PERSON-c1.CGPR_MASS | currency:'':0}} -->
+<!-- 							</td> -->
+<!-- 							<td ng-hide="s_time >= '2024/08'"> -->
+<!-- 								{{0 | currency:'':0}} -->
+<!-- 							</td> -->
+<!-- 							<td align="right">{{0 + c1.CGPR_SUM | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.EIP_E | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.EIP_I | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.EIP_P | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.EIP_O | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.EIP_S | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.EIP_Z | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.EIP_SUM | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.II_INV_INS | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.II_NON | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.II_INV | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.II_INS | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.II_SUM | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.CUST_TYPE_PERSON | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.CUST_TYPE_CORPOR | currency:'':0}}</td> -->
+<!-- 							<td align="right">{{0 + c1.CUST_TYPE_SUM | currency:'':0}}</td> -->
+<!-- 						</tr> -->
+<!-- 						<tr ng-repeat-end ng-hide="true"> -->
+<!-- 						<tr ng-repeat-end ng-hide="true"> -->
+<!-- 						<tr ng-repeat-end ng-hide="true"> -->
 					</tbody>
 				</table>
 			</div>

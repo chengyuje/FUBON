@@ -5,6 +5,7 @@ import com.systex.jbranch.app.server.fps.sot701.CustHighNetWorthDataVO;
 import com.systex.jbranch.app.server.fps.sot701.CustKYCDataVO;
 import com.systex.jbranch.app.server.fps.sot701.FP032675DataVO;
 import com.systex.jbranch.app.server.fps.sot701.SOT701;
+import com.systex.jbranch.app.server.fps.sot712.SOT712;
 import com.systex.jbranch.app.server.fps.sot714.SOT714;
 import com.systex.jbranch.comutil.collection.CustomComparator;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
@@ -282,7 +283,9 @@ public class PRD140 extends FubonWmsBizLogic {
 					// 客戶資料適配檢核失敗，Exception整段跳出
 					throw new APException(fOutputVO.getErrorID());
 				}
-				fOutputVO = prodFitness.validFundETFCustFATCA(inputVO.getCust_id());//客戶FATCA註記檢核 
+				
+				//針對新CRS/FATCA美國來源所得交易管控
+				fOutputVO = prodFitness.validUSACustAndProd(inputVO.getCust_id());//客戶FATCA註記檢核
 				if(fOutputVO.getIsError()) {
 					// 客戶資料適配檢核失敗，Exception整段跳出
 					throw new APException(fOutputVO.getErrorID());

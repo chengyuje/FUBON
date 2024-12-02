@@ -93,6 +93,7 @@ public class PMS101 extends FubonWmsBizLogic {
 		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRM = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 
@@ -284,7 +285,7 @@ public class PMS101 extends FubonWmsBizLogic {
 				sb.append("  AND T.AO_CODE = :AO_CODEE "); // 分行
 				queryCondition.setObject("AO_CODEE", inputVO.getAo_code()); //員工
 			} else {
-				if (isFC || isPSOP || isUHRMMGR) {
+				if (isFC || isPSOP || isUHRM) {
 					sb.append("  AND T.AO_CODE IN (:ao_code) ");
 					queryCondition.setObject("ao_code", pms000outputVO.getV_aoList());
 				}

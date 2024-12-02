@@ -50,8 +50,15 @@ public class CAM210 extends FubonWmsBizLogic {
 	public void getCampaignName(Object body, IPrimitiveMap header) throws JBranchException {
 		
 		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRM = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+
 		CAM210InputVO inputVO = (CAM210InputVO) body;
 		CAM210OutputVO outputVO = new CAM210OutputVO();
 		dam = this.getDataAccessManager();
@@ -93,8 +100,8 @@ public class CAM210 extends FubonWmsBizLogic {
 			sb.append("      AND LEADS.LEAD_TYPE = :leadType ");
 			queryCondition.setObject("leadType", inputVO.getLeadType());
 		}
-				
-		if (StringUtils.isNotBlank(inputVO.getEmpId())) {
+
+		if (StringUtils.isNotBlank(inputVO.getEmpId()) && (!isUHRMMGR && !isUHRMBMMGR)) {
 			sb.append("      AND LEADS.EMP_ID = :empID ");
 			queryCondition.setObject("empID", inputVO.getEmpId());
 		}
@@ -601,7 +608,16 @@ public class CAM210 extends FubonWmsBizLogic {
     //即期活動執行現況
     public void queryData_4(Object body, IPrimitiveMap header) throws JBranchException {
 
-		XmlInfo xmlInfo = new XmlInfo();
+    	XmlInfo xmlInfo = new XmlInfo();
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRM = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+
     	Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2);
     	
     	CAM210InputVO inputVO = (CAM210InputVO) body ;
@@ -670,13 +686,13 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		sql.append("AND TRUNC(LEAD.START_DATE) <= TRUNC(SYSDATE) ");
 		
-		if (StringUtils.isNotBlank(inputVO.getEmpId())) {
+		if (StringUtils.isNotBlank(inputVO.getEmpId()) && (!isUHRMMGR && !isUHRMBMMGR)) {
 			sql.append("AND LEAD.EMP_ID = :empID ");
 			queryCondition.setObject("empID", inputVO.getEmpId());
 		}
 		
 		if (StringUtils.isNotBlank(inputVO.getuEmpId())) {
-			sql.append("      AND LEADS.EMP_ID = :empID ");
+			sql.append("AND LEAD.EMP_ID = :empID ");
 			queryCondition.setObject("empID", inputVO.getuEmpId());
 		}
 		
@@ -761,9 +777,6 @@ public class CAM210 extends FubonWmsBizLogic {
 		sql.append("ORDER BY ");
 		
 		if (!StringUtils.isBlank(inputVO.getCampaignName())) {
-//			sql.append("DECODE(CAMPAIGN_NAME, :campaignName, 1, DECODE(STEP_ID, :stepId, 1, 99), 2, 99), ");
-//			queryCondition.setObject("campaignName", inputVO.getCampaignName());	
-//			queryCondition.setObject("stepId", inputVO.getStepId());
 			sql.append("CAMPAIGN_ID, STEP_ID, ");
 		}
 		
@@ -779,7 +792,16 @@ public class CAM210 extends FubonWmsBizLogic {
     //已過期活動一覽
     public void queryData_5(Object body, IPrimitiveMap header) throws JBranchException {	
 
-		XmlInfo xmlInfo = new XmlInfo();
+    	XmlInfo xmlInfo = new XmlInfo();
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRM = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2);
 		
     	CAM210InputVO inputVO = (CAM210InputVO) body ;
@@ -843,13 +865,13 @@ public class CAM210 extends FubonWmsBizLogic {
 			queryCondition.setObject("leadType", inputVO.getLeadType());
 		}
 				
-		if (StringUtils.isNotBlank(inputVO.getEmpId())) {
+		if (StringUtils.isNotBlank(inputVO.getEmpId()) && (!isUHRMMGR && !isUHRMBMMGR)) {
 			sql.append("AND LEAD.EMP_ID = :empID ");
 			queryCondition.setObject("empID", inputVO.getEmpId());
 		}
 		
 		if (StringUtils.isNotBlank(inputVO.getuEmpId())) {
-			sql.append("      AND LEADS.EMP_ID = :empID ");
+			sql.append("AND LEAD.EMP_ID = :empID ");
 			queryCondition.setObject("empID", inputVO.getuEmpId());
 		}
 		

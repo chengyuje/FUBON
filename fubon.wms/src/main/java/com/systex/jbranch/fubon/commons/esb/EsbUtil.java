@@ -73,9 +73,56 @@ public class EsbUtil extends FubonWmsBizLogic {
 	private List resList = new ArrayList(); // 回傳資料集合
 	private String module; // 模組代號
 	private static Map<String, JAXBContext> JAXBContextMap = new HashMap<>();
-
+	
+	private static Map<Integer, JaxbInstance> jaxbMap = new HashMap<>();
 	// regex
 	private Pattern pattern = Pattern.compile("TxBody");
+	
+	public EsbUtil() {
+		this.initPool();
+	}
+	
+	private synchronized void initPool() {
+		try {
+			if (jaxbMap.isEmpty()) {
+				for (int i=1; i<=200; i++) {
+					JAXBContext inContext = JAXBContext.newInstance(ESBUtilInputVO.class);
+					JaxbInstance instance = new JaxbInstance();
+					instance.id = i;
+					instance.inContext = inContext;
+					jaxbMap.put(i, instance);
+				}
+			}
+		} catch (Exception e) {
+			logger.warn("init fail", e);		
+		}
+	}
+	
+	private int countFree() {
+		int cnt = 0;
+		for (JaxbInstance instance : jaxbMap.values()) {
+			if (!instance.used) cnt++;
+		}
+		return cnt;
+	}
+
+	
+	private JaxbInstance getFreeInstance() {
+		for (JaxbInstance instance : jaxbMap.values()) {
+			if (!instance.used) {
+				instance.used = true;
+				int cnt = this.countFree();
+				logger.info("Get #{}, free: {}", instance.id, cnt);
+				return instance;
+			}
+		}
+		return null;
+	}
+	
+	private void freeJaxbInstance(JaxbInstance instance) {
+		instance.used = false;
+		logger.info("release #{}, free: {}", instance.id, this.countFree());
+	}
 
 	public FmpJRunTx getFmpJRunTx() {
 		return fmpJRunTx;
@@ -204,8 +251,11 @@ public class EsbUtil extends FubonWmsBizLogic {
 		}
 		return result;
 	}
+	
+	
 
 	public List<ESBUtilOutputVO> send(ESBUtilInputVO esbUtilInputVO, List onMsg, List offMsg) throws Exception {
+			JaxbInstance instance = null;
 			try {
 				this.module = esbUtilInputVO.getModule();
 
@@ -215,19 +265,26 @@ public class EsbUtil extends FubonWmsBizLogic {
 
 				StringWriter writer = new StringWriter();
 				// JAXBContext context = JAXBContext.newInstance(ESBUtilInputVO.class);
-				JAXBContext context = JAXBContextMap.get(ESBUtilInputVO.class.getName());
-				if (context == null ) {
-					context = JAXBContext.newInstance(ESBUtilInputVO.class);
-					JAXBContextMap.put(ESBUtilInputVO.class.getName(), context);
-				}
+//				JAXBContext context = JAXBContextMap.get(ESBUtilInputVO.class.getName());
+//				if (context == null ) {
+//					context = JAXBContext.newInstance(ESBUtilInputVO.class);
+//					JAXBContextMap.put(ESBUtilInputVO.class.getName(), context);
+//				}
+				instance = this.getFreeInstance();
+				if (instance == null) throw new JBranchException("電文系統忙碌中，請稍侯再試");
+				JAXBContext context = instance.inContext;
 				Marshaller marshal = context.createMarshaller();
 				marshal.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
 				marshal.marshal(esbUtilInputVO, writer);
-
+				this.freeJaxbInstance(instance);
 				fmpJRunTx.setInboundXML(writer.toString());
+			} catch (JBranchException je) {
+				throw je;
 			} catch (Exception e) {
 				e.printStackTrace();
+			} finally {
+				if (instance != null) this.freeJaxbInstance(instance);
 			}
 
 			esbSend();

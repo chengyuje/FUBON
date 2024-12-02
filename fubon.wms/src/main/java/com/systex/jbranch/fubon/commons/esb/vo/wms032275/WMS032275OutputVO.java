@@ -69,6 +69,18 @@ public class WMS032275OutputVO {
 	private String SIG_DATE3;// 簽署(取得)日3
 	@XmlElement
 	private String EFF_DATE3;// 有效日期3
+	@XmlElement
+	private String Country;
+	@XmlElement
+	private String TaxCountry1;
+	@XmlElement
+	private String TaxCountry2;
+	@XmlElement
+	private String TaxCountry3;
+	@XmlElement
+	private String TaxCountry4;
+	@XmlElement
+	private String TaxCountry5;
 
 	
 	
@@ -295,4 +307,54 @@ public class WMS032275OutputVO {
 	public List<WMS032275OutputDetailsVO> setDetails(List<WMS032275OutputDetailsVO> details) {
 		return this.details = details;
 	}
+
+	public String getCountry() {
+		return Country;
+	}
+
+	public void setCountry(String country) {
+		Country = country;
+	}
+
+	public String getTaxCountry1() {
+		return TaxCountry1;
+	}
+
+	public void setTaxCountry1(String taxCountry1) {
+		TaxCountry1 = taxCountry1;
+	}
+
+	public String getTaxCountry2() {
+		return TaxCountry2;
+	}
+
+	public void setTaxCountry2(String taxCountry2) {
+		TaxCountry2 = taxCountry2;
+	}
+
+	public String getTaxCountry3() {
+		return TaxCountry3;
+	}
+
+	public void setTaxCountry3(String taxCountry3) {
+		TaxCountry3 = taxCountry3;
+	}
+
+	public String getTaxCountry4() {
+		return TaxCountry4;
+	}
+
+	public void setTaxCountry4(String taxCountry4) {
+		TaxCountry4 = taxCountry4;
+	}
+
+	public String getTaxCountry5() {
+		return TaxCountry5;
+	}
+
+	public void setTaxCountry5(String taxCountry5) {
+		TaxCountry5 = taxCountry5;
+	}
+
+	
 }

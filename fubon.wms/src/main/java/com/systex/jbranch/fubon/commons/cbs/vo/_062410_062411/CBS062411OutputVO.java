@@ -40,6 +40,34 @@ public class CBS062411OutputVO {
 	private String SrchDtElectronic;
 	private String SrchDtManual;
 	private String MandIdentificatnDt;
+	private String ReportEngAdd1;
+	private String ReportEngAdd2;
+	private String ReportEngAdd3;
+	private String ReportEngAdd4;
+	private String ReportCountry;
+	private String TaxCountry1;
+	private String TaxCode1;
+	private String NoTaxCodeReason1;
+	private String SeqNumber1;
+	private String TaxCountry2;
+	private String TaxCode2;
+	private String NoTaxCodeReason2;
+	private String SeqNumber2;
+	private String TaxCountry3;
+	private String TaxCode3;
+	private String NoTaxCodeReason3;
+	private String SeqNumber3;
+	private String TaxCountry4;
+	private String TaxCode4;
+	private String NoTaxCodeReason4;
+	private String SeqNumber4;
+	private String TaxCountry5;
+	private String TaxCode5;
+	private String NoTaxCodeReason5;
+	private String SeqNumber5;
+	private String BirthCountry;
+	private String BirthCity;
+	private String AnnotationFlag;
 
 	public CBS062411OutputVO() {
 		this.CustNo = "";
@@ -312,6 +340,230 @@ public class CBS062411OutputVO {
 
 	public void setMandIdentificatnDt(String mandIdentificatnDt) {
 		MandIdentificatnDt = mandIdentificatnDt;
+	}
+
+	public String getReportEngAdd1() {
+		return ReportEngAdd1;
+	}
+
+	public void setReportEngAdd1(String reportEngAdd1) {
+		ReportEngAdd1 = reportEngAdd1;
+	}
+
+	public String getReportEngAdd2() {
+		return ReportEngAdd2;
+	}
+
+	public void setReportEngAdd2(String reportEngAdd2) {
+		ReportEngAdd2 = reportEngAdd2;
+	}
+
+	public String getReportEngAdd3() {
+		return ReportEngAdd3;
+	}
+
+	public void setReportEngAdd3(String reportEngAdd3) {
+		ReportEngAdd3 = reportEngAdd3;
+	}
+
+	public String getReportEngAdd4() {
+		return ReportEngAdd4;
+	}
+
+	public void setReportEngAdd4(String reportEngAdd4) {
+		ReportEngAdd4 = reportEngAdd4;
+	}
+
+	public String getReportCountry() {
+		return ReportCountry;
+	}
+
+	public void setReportCountry(String reportCountry) {
+		ReportCountry = reportCountry;
+	}
+
+	public String getTaxCountry1() {
+		return TaxCountry1;
+	}
+
+	public void setTaxCountry1(String taxCountry1) {
+		TaxCountry1 = taxCountry1;
+	}
+
+	public String getTaxCode1() {
+		return TaxCode1;
+	}
+
+	public void setTaxCode1(String taxCode1) {
+		TaxCode1 = taxCode1;
+	}
+
+	public String getNoTaxCodeReason1() {
+		return NoTaxCodeReason1;
+	}
+
+	public void setNoTaxCodeReason1(String noTaxCodeReason1) {
+		NoTaxCodeReason1 = noTaxCodeReason1;
+	}
+
+	public String getSeqNumber1() {
+		return SeqNumber1;
+	}
+
+	public void setSeqNumber1(String seqNumber1) {
+		SeqNumber1 = seqNumber1;
+	}
+
+	public String getTaxCountry2() {
+		return TaxCountry2;
+	}
+
+	public void setTaxCountry2(String taxCountry2) {
+		TaxCountry2 = taxCountry2;
+	}
+
+	public String getTaxCode2() {
+		return TaxCode2;
+	}
+
+	public void setTaxCode2(String taxCode2) {
+		TaxCode2 = taxCode2;
+	}
+
+	public String getNoTaxCodeReason2() {
+		return NoTaxCodeReason2;
+	}
+
+	public void setNoTaxCodeReason2(String noTaxCodeReason2) {
+		NoTaxCodeReason2 = noTaxCodeReason2;
+	}
+
+	public String getSeqNumber2() {
+		return SeqNumber2;
+	}
+
+	public void setSeqNumber2(String seqNumber2) {
+		SeqNumber2 = seqNumber2;
+	}
+
+	public String getTaxCountry3() {
+		return TaxCountry3;
+	}
+
+	public void setTaxCountry3(String taxCountry3) {
+		TaxCountry3 = taxCountry3;
+	}
+
+	public String getTaxCode3() {
+		return TaxCode3;
+	}
+
+	public void setTaxCode3(String taxCode3) {
+		TaxCode3 = taxCode3;
+	}
+
+	public String getNoTaxCodeReason3() {
+		return NoTaxCodeReason3;
+	}
+
+	public void setNoTaxCodeReason3(String noTaxCodeReason3) {
+		NoTaxCodeReason3 = noTaxCodeReason3;
+	}
+
+	public String getSeqNumber3() {
+		return SeqNumber3;
+	}
+
+	public void setSeqNumber3(String seqNumber3) {
+		SeqNumber3 = seqNumber3;
+	}
+
+	public String getTaxCountry4() {
+		return TaxCountry4;
+	}
+
+	public void setTaxCountry4(String taxCountry4) {
+		TaxCountry4 = taxCountry4;
+	}
+
+	public String getTaxCode4() {
+		return TaxCode4;
+	}
+
+	public void setTaxCode4(String taxCode4) {
+		TaxCode4 = taxCode4;
+	}
+
+	public String getNoTaxCodeReason4() {
+		return NoTaxCodeReason4;
+	}
+
+	public void setNoTaxCodeReason4(String noTaxCodeReason4) {
+		NoTaxCodeReason4 = noTaxCodeReason4;
+	}
+
+	public String getSeqNumber4() {
+		return SeqNumber4;
+	}
+
+	public void setSeqNumber4(String seqNumber4) {
+		SeqNumber4 = seqNumber4;
+	}
+
+	public String getTaxCountry5() {
+		return TaxCountry5;
+	}
+
+	public void setTaxCountry5(String taxCountry5) {
+		TaxCountry5 = taxCountry5;
+	}
+
+	public String getTaxCode5() {
+		return TaxCode5;
+	}
+
+	public void setTaxCode5(String taxCode5) {
+		TaxCode5 = taxCode5;
+	}
+
+	public String getNoTaxCodeReason5() {
+		return NoTaxCodeReason5;
+	}
+
+	public void setNoTaxCodeReason5(String noTaxCodeReason5) {
+		NoTaxCodeReason5 = noTaxCodeReason5;
+	}
+
+	public String getSeqNumber5() {
+		return SeqNumber5;
+	}
+
+	public void setSeqNumber5(String seqNumber5) {
+		SeqNumber5 = seqNumber5;
+	}
+
+	public String getBirthCountry() {
+		return BirthCountry;
+	}
+
+	public void setBirthCountry(String birthCountry) {
+		BirthCountry = birthCountry;
+	}
+
+	public String getBirthCity() {
+		return BirthCity;
+	}
+
+	public void setBirthCity(String birthCity) {
+		BirthCity = birthCity;
+	}
+
+	public String getAnnotationFlag() {
+		return AnnotationFlag;
+	}
+
+	public void setAnnotationFlag(String annotationFlag) {
+		AnnotationFlag = annotationFlag;
 	}
 
 }

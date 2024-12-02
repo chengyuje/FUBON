@@ -76,44 +76,44 @@ public class PMS328 extends FubonWmsBizLogic {
 				sb.append("       'ALL_TOTAL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS REGION_CENTER_ID" : "").append(", ");
 				sb.append("       '全行 合計' ").append(StringUtils.equals("SELECT", sqlType) ? "AS REGION_CENTER_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_ID" : "").append(", "); 
-				sb.append("       'ALL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NBR" : "").append(", "); 
-				sb.append("       'ALL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
 				
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
 				
 				if (StringUtils.equals(funcPage, "PMS328DT")) {
-					sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS TEAM_TYPE" : "").append(", "); 
+					sb.append("       'ZZZZZ' ").append(StringUtils.equals("SELECT", sqlType) ? "AS TEAM_TYPE" : "").append(", "); 
 				}
 				
 				sb.append("       'ZZZZZ' ").append(StringUtils.equals("SELECT", sqlType) ? "AS DEPT_ID" : "").append(", "); 
-				sb.append("       'ZZZZZ' ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
-				sb.append("       'ZZZZZ' ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_TYPE" : "").append(", "); 
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_TYPE" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_ID" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_NAME" : "").append(", "); 
 				
-				sb.append("       'ALL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS YM " : " ").append(StringUtils.equals("SELECT", sqlType) ? ", " : " ");
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS YM " : " ").append(StringUtils.equals("SELECT", sqlType) ? ", " : " ");
 				
 				break;
 			case "REGION":
 				sb.append("       REGION_CENTER_ID || '_TOTAL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS REGION_CENTER_ID" : "").append(", ");
 				sb.append("       REGION_CENTER_NAME ").append(StringUtils.equals("SELECT", sqlType) ? "AS REGION_CENTER_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_ID" : "").append(", "); 
-				sb.append("       'REGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NBR" : "").append(", "); 
-				sb.append("       'AREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
 				
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
+				sb.append("       'ZZZZZREGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
 				
 				if (StringUtils.equals(funcPage, "PMS328DT")) {
-					sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS TEAM_TYPE" : "").append(", "); 
+					sb.append("       'ZZZZZREGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS TEAM_TYPE" : "").append(", "); 
 				}
 				
 				sb.append("       'ZZZZZREGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS DEPT_ID" : "").append(", "); 
 				sb.append("       'ZZZZZREGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
 				sb.append("       'ZZZZZREGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_TYPE" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_ID" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_NAME" : "").append(", "); 
+				sb.append("       'ZZZZZREGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_ID" : "").append(", "); 
+				sb.append("       'ZZZZZREGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_NAME" : "").append(", "); 
 				
 				sb.append("       'REGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS YM " : " ").append(StringUtils.equals("SELECT", sqlType) ? ", " : " ");
 				
@@ -125,19 +125,19 @@ public class PMS328 extends FubonWmsBizLogic {
 				sb.append("       BRANCH_AREA_ID || '_TOTAL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_ID" : "").append(", ");
 				sb.append("       BRANCH_AREA_NAME ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NBR " : "").append(", "); 
-				sb.append("       'AREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME " : "").append(", "); 
+				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME " : "").append(", "); 
 				
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
+				sb.append("       'ZZZZZAREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
 				
 				if (StringUtils.equals(funcPage, "PMS328DT")) {
-					sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS TEAM_TYPE" : "").append(", "); 
+					sb.append("       'ZZZZZAREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS TEAM_TYPE" : "").append(", "); 
 				}
 				
 				sb.append("       'ZZZZZAREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS DEPT_ID" : "").append(", "); 
 				sb.append("       'ZZZZZAREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
 				sb.append("       'ZZZZZAREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_TYPE" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_ID" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_NAME" : "").append(", "); 
+				sb.append("       'ZZZZZAREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_ID" : "").append(", "); 
+				sb.append("       'ZZZZZAREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_NAME" : "").append(", "); 
 				
 				sb.append("       'AREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS YM " : " ").append(StringUtils.equals("SELECT", sqlType) ? ", " : " ");
 				
@@ -150,17 +150,17 @@ public class PMS328 extends FubonWmsBizLogic {
 				sb.append("       BRANCH_NBR || '_TOTAL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NBR" : "").append(", ");
 				sb.append("       BRANCH_NAME ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
 				
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
+				sb.append("       'ZZZZZBRANCH' ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
 				
 				if (StringUtils.equals(funcPage, "PMS328DT")) {
-					sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS TEAM_TYPE" : "").append(", "); 
+					sb.append("       'ZZZZZBRANCH' ").append(StringUtils.equals("SELECT", sqlType) ? "AS TEAM_TYPE" : "").append(", "); 
 				}
 				
 				sb.append("       'ZZZZZBRANCH' ").append(StringUtils.equals("SELECT", sqlType) ? "AS DEPT_ID" : "").append(", "); 
 				sb.append("       'ZZZZZBRANCH' ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
 				sb.append("       'ZZZZZBRANCH' ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_TYPE" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_ID" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_NAME" : "").append(", "); 
+				sb.append("       'ZZZZZBRANCH' ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_ID" : "").append(", "); 
+				sb.append("       'ZZZZZBRANCH' ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_NAME" : "").append(", "); 
 				
 				sb.append("       'BRANCH' ").append(StringUtils.equals("SELECT", sqlType) ? "AS YM " : " ").append(StringUtils.equals("SELECT", sqlType) ? ", " : " ");
 				
@@ -196,7 +196,7 @@ public class PMS328 extends FubonWmsBizLogic {
 				sb.append("       BRANCH_NBR").append(", ");
 				sb.append("       BRANCH_NAME").append(", ");
 				
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
+				sb.append("       'ZZZZZTEAM' ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
 				
 				if (StringUtils.equals(funcPage, "PMS328DT")) {
 					sb.append("       TEAM_TYPE").append(", ");
@@ -205,8 +205,8 @@ public class PMS328 extends FubonWmsBizLogic {
 				sb.append("       'ZZZZZTEAM' ").append(StringUtils.equals("SELECT", sqlType) ? "AS DEPT_ID" : "").append(", "); 
 				sb.append("       'ZZZZZTEAM' ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
 				sb.append("       'ZZZZZTEAM' ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_TYPE" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_ID" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_NAME" : "").append(", ");
+				sb.append("       'ZZZZZTEAM' ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_ID" : "").append(", "); 
+				sb.append("       'ZZZZZTEAM' ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_NAME" : "").append(", ");
 				
 				sb.append("       'TEAM' ").append(StringUtils.equals("SELECT", sqlType) ? "AS YM " : " ").append(StringUtils.equals("SELECT", sqlType) ? ", " : " ");
 				
@@ -661,7 +661,7 @@ public class PMS328 extends FubonWmsBizLogic {
 		//=== MAIN SQL END ===
 
 		queryCondition.setQueryString(sb.toString());
-		
+		System.out.println(sb.toString());
 		ResultIF list = dam.executePaging(queryCondition, inputVO.getCurrentPageIndex() + 1, inputVO.getPageCount());
 		List<Map<String, Object>> csvList = dam.exeQuery(queryCondition);
 
@@ -735,7 +735,7 @@ public class PMS328 extends FubonWmsBizLogic {
 										break;
 									case "AO_TYPE":
 										String codeType = checkIsNull(map, csvMainNew[i]);
-										records[i] = StringUtils.equals("1", codeType) ? "計績" : StringUtils.equals("2", codeType) ? "兼職" : StringUtils.equals("3", codeType) ? "維護" : "000";
+										records[i] = "=\"" + (StringUtils.equals("1", codeType) ? "計績" : StringUtils.equals("2", codeType) ? "兼職" : StringUtils.equals("3", codeType) ? "維護" : "000") + "\"";
 										
 										break;
 									case "CGPR_REAL_MASS":

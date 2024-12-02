@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -508,19 +509,20 @@ public class SQM140 extends FubonWmsBizLogic {
 		try {
 			condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			sql = new StringBuffer();
-			
 			sql.append("SELECT REGION_CENTER_ID,BRANCH_AREA_ID ");
 			sql.append("FROM VWORG_DEFN_INFO ");
 			sql.append("WHERE BRANCH_NBR = :BRANCH_NBR ");
-			
 			condition.setObject("BRANCH_NBR", inputVO.getBranch_nbr());
-			
 			condition.setQueryString(sql.toString());
-			
 			List<Map<String, Object>> ORGLIST = dam.exeQuery(condition);
+			
+			//取得私銀註記
+			condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			condition.setQueryString("SELECT 1 FROM VWORG_EMP_UHRM_INFO WHERE EMP_ID = :empId ");
+			condition.setObject("empId", inputVO.getEmp_id());
+			List<Map<String, Object>> uhrmlist = dam.exeQuery(condition);
 
 			BigDecimal seqNo = new BigDecimal(inputVO.getSeq());
-			
 			//將資料刪除註記壓Y	
 			TBSQM_CSM_IMPROVE_MASTPK pk = new TBSQM_CSM_IMPROVE_MASTPK();
 			pk.setSEQ(seqNo);
@@ -529,13 +531,13 @@ public class SQM140 extends FubonWmsBizLogic {
 			pk.setQTN_TYPE(inputVO.getQtnType());
 			
 			TBSQM_CSM_IMPROVE_MASTVO paramVO = (TBSQM_CSM_IMPROVE_MASTVO) dam.findByPKey(TBSQM_CSM_IMPROVE_MASTVO.TABLE_UID, pk);
-			paramVO.setREGION_CENTER_ID(ObjectUtils.toString(ORGLIST.get(0).get("REGION_CENTER_ID")));
-			paramVO.setBRANCH_AREA_ID(ObjectUtils.toString(ORGLIST.get(0).get("BRANCH_AREA_ID")));
-			paramVO.setBRANCH_NBR(inputVO.getBranch_nbr());
-			paramVO.setEMP_ID(inputVO.getEmp_id());
-			paramVO.setRESP_NOTE(inputVO.getResp_note());
-
 			if (paramVO != null) {
+				paramVO.setREGION_CENTER_ID(ObjectUtils.toString(ORGLIST.get(0).get("REGION_CENTER_ID")));
+				paramVO.setBRANCH_AREA_ID(ObjectUtils.toString(ORGLIST.get(0).get("BRANCH_AREA_ID")));
+				paramVO.setBRANCH_NBR(inputVO.getBranch_nbr());
+				paramVO.setEMP_ID(inputVO.getEmp_id());
+				paramVO.setRESP_NOTE(inputVO.getResp_note());
+				paramVO.setUHRM_YN(CollectionUtils.isNotEmpty(uhrmlist) ? "Y" : "N"); //私銀註記
 				dam.update(paramVO);
 				sendRtnObject(null);
 			}

@@ -1106,8 +1106,26 @@ eSoafApp.controller('IOT110Controller',
     				(RegExp('[4678]').test($scope.inputVO.PROPOSER_CM_FLAG) ||
     				 RegExp('[4678]').test($scope.inputVO.INSURED_CM_FLAG) ||
     				 RegExp('[4678]').test($scope.inputVO.PAYER_CM_FLAG))) {
-    			$scope.showErrorMsgInDialog("要保人/被保人/繳款人不可為禁銷、拒銷、客訴戶");
-				return false;
+    			if($scope.inputVO.PROPOSER_CM_FLAG == "4" || $scope.inputVO.INSURED_CM_FLAG == "4" || 
+    					$scope.inputVO.PAYER_CM_FLAG == "4") {
+    				$scope.showErrorMsgInDialog("客戶為NS禁銷戶，不得送出覆核。");
+    				return false;
+    			}
+    			if($scope.inputVO.PROPOSER_CM_FLAG == "6" || $scope.inputVO.INSURED_CM_FLAG == "6" || 
+    					$scope.inputVO.PAYER_CM_FLAG == "6") {
+    				$scope.showErrorMsgInDialog("客戶為客訴+NS禁銷戶，不得送出覆核。");
+    				return false;
+    			}
+    			if($scope.inputVO.PROPOSER_CM_FLAG == "7" || $scope.inputVO.INSURED_CM_FLAG == "7" || 
+    					$scope.inputVO.PAYER_CM_FLAG == "7") {
+    				$scope.showErrorMsgInDialog("客戶為拒銷+NS禁銷戶，不得送出覆核。");
+    				return false;
+    			}
+    			if($scope.inputVO.PROPOSER_CM_FLAG == "8" || $scope.inputVO.INSURED_CM_FLAG == "8" || 
+    					$scope.inputVO.PAYER_CM_FLAG == "8") {
+    				$scope.showErrorMsgInDialog("客戶為客訴+拒銷+NS禁銷戶，不得送出覆核。");
+    				return false;
+    			}
     		}
     		
             return true;

@@ -52,8 +52,9 @@ eSoafApp.controller('CRM821Controller',
 //									$scope.showMsg("ehl_01_common_009");
 //									return;
 								}
+								debugger
 								$scope.redeemResultList = tota[0].body.redeemList; //贖回在途資料
-								$scope.redeemOutputVO = tota[0].body;
+								$scope.redeemOutputVO = tota[0].body.redeemList;
 								
 								$scope.resultList = tota[0].body.resultList; //庫存資料
 

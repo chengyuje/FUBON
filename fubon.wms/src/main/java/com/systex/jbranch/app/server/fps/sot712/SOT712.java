@@ -21,6 +21,7 @@ import com.systex.jbranch.fubon.commons.PdfUtil;
 import com.systex.jbranch.fubon.commons.cbs.CBSService;
 import com.systex.jbranch.fubon.commons.fitness.ProdFitness;
 import com.systex.jbranch.fubon.commons.fitness.ProdFitnessCustVO;
+import com.systex.jbranch.fubon.commons.fitness.ProdFitnessOutputVO;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
 import com.systex.jbranch.platform.common.errHandle.APException;
@@ -2699,17 +2700,33 @@ public class SOT712 extends FubonWmsBizLogic{
 		ProdFitness prodFitness = (ProdFitness) PlatformContext.getBean("ProdFitness");
 		prodFitness.setCustID(inputVO.getCustId());
 		ProdFitnessCustVO custVO = prodFitness.getCustVO();
-
+		ProdFitnessOutputVO fOutputVO = null;
     // 問題單6525
 		// if (custVO.getBranchNbr() == null) throw new APException("該客戶尚未有歸屬行，導致無法適配！");
-
-		// 特殊身分判斷
-		if (CollectionUtils.isNotEmpty(identifyProdNationality(inputVO.getPrdId()))
-				|| CollectionUtils.isNotEmpty(identifyEtfStockExchange(inputVO.getPrdId()))) {
-			String facaType = custVO.getFatcaDataVO().getFatcaType();
-			if (StringUtils.equals("N", facaType)) throw new APException("ehl_01_SOT702_011"); // 已有不合作帳戶註記，不得新承作商品
-			if (StringUtils.equals("Y", facaType)) throw new APException("ehl_01_SOT702_012"); // 客戶屬美國國籍或稅籍不受理交易申請
-			if (StringUtils.equals("X", facaType)) throw new APException("ehl_01_SOT702_013"); // 未簽署協議之外國金融機構，不得新承作商品
+		
+		//客戶資料適配檢核
+		fOutputVO = prodFitness.validFundETFCustFATCA(prodFitness.getCustID());//客戶FATCA註記檢核
+		if(fOutputVO.getIsError()) {
+			// 客戶資料適配檢核失敗，Exception整段跳出
+			throw new APException(fOutputVO.getErrorID());
+		}
+		//針對新CRS/FATCA美國來源所得交易管控
+		if("NFD".equals(inputVO.getPrdType())) {
+			if(CollectionUtils.isNotEmpty(identifyProdNationality(inputVO.getPrdId()))) {
+				//針對新CRS/FATCA美國來源所得交易管控
+				fOutputVO = prodFitness.validUSACustAndProd(prodFitness.getCustID());//客戶FATCA註記檢核
+				if(fOutputVO.getIsError()) {
+					// 客戶資料適配檢核失敗，Exception整段跳出
+					throw new APException(fOutputVO.getErrorID());
+				}
+			}		
+		} else if ("SN".equals(inputVO.getPrdType()) || "ETF".equals(inputVO.getPrdType()) || "STOCK".equals(inputVO.getPrdType()) || "BND".equals(inputVO.getPrdType())) {
+			//針對新CRS/FATCA美國來源所得交易管控
+			fOutputVO = prodFitness.validUSACustAndProd(prodFitness.getCustID());//客戶FATCA註記檢核
+			if(fOutputVO.getIsError()) {
+				// 客戶資料適配檢核失敗，Exception整段跳出
+				throw new APException(fOutputVO.getErrorID());
+			}
 		}
 
 		// 判斷今日該客戶是否有存入適配資料
@@ -2731,12 +2748,16 @@ public class SOT712 extends FubonWmsBizLogic{
 	}
 
 	/** 判斷商品國籍，部分商品需要特殊身分判斷 **/
-	private List identifyProdNationality(String prdId) throws JBranchException {
+	public List identifyProdNationality(String prdId) throws JBranchException {
+		if(StringUtils.isBlank(prdId) || prdId.length() < 2) {
+			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+			return list; 
+		}
 		return exeQueryForQcf(genDefaultQueryConditionIF()
-				.setQueryString("select 1 from TBPRD_NATIONALITY where COUNTRY_ID = 'US' and PROD_ID = :prdId ")
-				.setObject("prdId", prdId));
+				.setQueryString("select 1 from TBPRD_NATIONALITY where COUNTRY_ID = 'US' and PROD_ID like :prdId ")
+				.setObject("prdId", "%" + prdId.substring(0,2) + "%" ));
 	}
-
+	
 	/** SI下單及申購時，判斷KYC鍵機日期及是否有錄音序號 **/
 	public void identifyKYCDateAndRecord(Object body, IPrimitiveMap<?> header) throws JBranchException {
 		sendRtnObject(this.identifyKYCDateAndRecord(body));

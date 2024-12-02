@@ -188,14 +188,7 @@ eSoafApp.controller('PMS328Controller', function($rootScope, $scope, $controller
     		$scope.showErrorMsg('欄位檢核錯誤:必要輸入欄位(資料統計月份)起訖!!');
     		return;
     	}
-//    	if($scope.inputVO.eTime == $scope.inputVO.sTime && ($scope.inputVO.sTime == '' && $scope.inputVO.eTime == '')){
-//    		$scope.showErrorMsg('欄位檢核錯誤:必要輸入欄位(資料統計月份)起訖!!');
-//    		return;
-//    	}
-//    	alert($scope.inputVO.eTime);
-//    	alert($scope.inputVO.sTime);
-//    	alert(JSON.stringify($scope.mappingSet['time']));
-//    	alert($scope.mappingSet['time'][$scope.inputVO.sTime-1].LABEL);
+
     	$scope.s_time = $scope.mappingSet['time'][$scope.inputVO.sTime-1].LABEL;
     	$scope.e_time = $scope.mappingSet['time'][$scope.inputVO.eTime-1].LABEL;
     	

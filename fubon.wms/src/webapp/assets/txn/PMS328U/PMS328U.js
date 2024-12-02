@@ -1,6 +1,6 @@
 
 'use strict';
-eSoafApp.controller('PMS328UController', function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService,sysInfoService,$filter) {
+eSoafApp.controller('PMS328UController', function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService, $filter) {
 	
 	$controller('BaseController', {$scope: $scope});
 	
@@ -104,6 +104,14 @@ eSoafApp.controller('PMS328UController', function($rootScope, $scope, $controlle
     		$scope.showErrorMsg('欄位檢核錯誤:必要輸入欄位(資料月份)起訖!!');
     		return;
     	}
+
+    	$scope.s_time = $filter('date')($scope.inputVO.importSDate,'yyyy/MM');
+    	
+    	if ($scope.s_time < '2024/08' && $scope.e_time >= '2024/08') {
+    		$scope.showErrorMsg('(2024/08起)因新制財管會員分級，故不可以新舊跨月查詢');
+    		return;
+    	}
+    	
 
 		$scope.sendRecv("PMS328", "queryData", "com.systex.jbranch.app.server.fps.pms328.PMS328InputVO", $scope.inputVO, function(tota, isError) {
 			if (!isError) {

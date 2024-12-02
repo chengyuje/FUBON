@@ -431,6 +431,7 @@ public class ProdFitness extends FubonWmsBizLogic {
 	/**
 	 * 基金、ETF/基金客戶資料適配檢核
 	 * validCustFATCA：客戶FATCA註記檢核
+	 * #1981 擴大到海外債 SI SN
 	 * @param custId：客戶ID
 	 * @return
 	 * @throws DAOException
@@ -813,9 +814,11 @@ public class ProdFitness extends FubonWmsBizLogic {
 	
 	/***
 	 * 客戶FATCA註記檢核
-	 * N 不合作客戶：已有FATCA不合作帳戶註記，不受理交易申請
-	 * Y 美國人客戶：客戶屬美國籍，不受理交易申請
-	 * X 未簽署客戶：與IRS未簽署協議之外國金融機構，不受理交易申請
+	 * N 已有不合作帳戶註記，不得承作新商品
+	 * Y 屬受限制之外國金融機構，不得新承作商品
+	 * X 未簽署協議之外國金融機構，不得承作新商品
+	 * 
+	 * #1981 不合作例外帳戶例外管理  2024.11.28  Sam Tu
 	 * @return
 	 * @throws Exception 
 	 */
@@ -823,13 +826,13 @@ public class ProdFitness extends FubonWmsBizLogic {
 		String facaType = this.getCustVO().getW8BenDataVO().getFatcaType();
 		
 		if (StringUtils.equals("N", facaType)) {			
-			//不合作客戶：已有FATCA不合作帳戶註記，不受理交易申請
+			//已有不合作帳戶註記，不得承作新商品
 			outputVO.setErrorID("ehl_01_SOT702_011");
 		} else if (StringUtils.equals("Y", facaType)) {		
-			//美國人客戶：客戶屬美國籍，不受理交易申請
-			outputVO.setErrorID("ehl_01_SOT702_012");
+			//屬受限制之外國金融機構，不得新承作商品
+			outputVO.setErrorID("ehl_01_SOT702_025");
 		} else if (StringUtils.equals("X", facaType)) {		
-			//未簽署客戶：與IRS未簽署協議之外國金融機構，不受理交易申請
+			//未簽署協議之外國金融機構，不得承作新商品
 			outputVO.setErrorID("ehl_01_SOT702_013");
 		}
 		
@@ -1491,6 +1494,25 @@ public class ProdFitness extends FubonWmsBizLogic {
 		}
 		
 		return (outputVO.getIsError() ? Boolean.FALSE : Boolean.TRUE);
+	}
+
+	public ProdFitnessOutputVO validUSACustAndProd(String cust_id) throws DAOException, JBranchException, Exception {
+		this.setCustID(cust_id);
+		
+		if(BooleanUtils.isTrue(this.validUSACustAndProd()))
+			return new ProdFitnessOutputVO();
+		else
+			return outputVO;
+	}
+
+	private Boolean validUSACustAndProd()  throws Exception {
+				String facaType = this.getCustVO().getFatcaDataVO().getFatcaType();
+				
+				if (StringUtils.equals("Z", facaType)) {			
+					//客戶屬美國國籍或稅籍不受理交易申請
+					outputVO.setErrorID("ehl_01_SOT702_012");
+				}				
+				return (outputVO.getIsError() ? Boolean.FALSE : Boolean.TRUE);
 	}
 	
 }
