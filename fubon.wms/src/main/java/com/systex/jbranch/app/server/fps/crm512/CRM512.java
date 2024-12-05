@@ -323,7 +323,8 @@ public class CRM512 extends FubonWmsBizLogic {
 					sb.append("  AFT_REMARK, ");
 					sb.append("  AUTH_DIRECTOR_EMP_ID, ");
 					sb.append("  AUTH_DATE, ");
-					sb.append("  VERSION, CREATETIME, CREATOR, MODIFIER, LASTUPDATE ");
+					sb.append("  VERSION, CREATETIME, CREATOR, MODIFIER, LASTUPDATE, ");
+					sb.append("  AUTH_REASON ");
 					sb.append(") ");
 					sb.append("VALUES ( ");
 					sb.append("  TBCRM_OLD_AGE_CHECK_LIST_SEQ.NEXTVAL, ");
@@ -339,7 +340,8 @@ public class CRM512 extends FubonWmsBizLogic {
 					sb.append("  :AFT_REMARK, ");
 					sb.append("  :AUTH_DIRECTOR_EMP_ID, ");
 					sb.append("  SYSDATE, ");
-					sb.append("  0, SYSDATE, :loginID, :loginID, SYSDATE ");
+					sb.append("  0, SYSDATE, :loginID, :loginID, SYSDATE, ");
+					sb.append("  :AUTH_REASON ");
 					sb.append(") ");
 
 					queryCondition.setQueryString(sb.toString());
@@ -371,6 +373,7 @@ public class CRM512 extends FubonWmsBizLogic {
 					
 					queryCondition.setObject("AUTH_DIRECTOR_EMP_ID", inputVO.getBossEmpID());
 					queryCondition.setObject("loginID", getUserVariable(FubonSystemVariableConsts.LOGINID));
+					queryCondition.setObject("AUTH_REASON", inputVO.getAuthReason());
 
 					dam.exeUpdate(queryCondition);
 				}

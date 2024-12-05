@@ -5,71 +5,71 @@ import java.math.BigDecimal;
 import javax.xml.bind.annotation.XmlElement;
 
 public class CustAssetFundVO {
-	private String AssetType; // Header.‧HFMTID =0001：單筆 0002：定期定額 0003：定期不定額 0004：定存轉基金 0005：基金套餐
-	private String SPRefId;
-	private String AcctId16;
-	private String Occur;
-	private String AcctId02;
-	private String EviNum;
-	private String FundNO;
-	private String FundName;
-	private String CurFund;
-	private String CurCode;
-	private BigDecimal CurAmt;
-	private BigDecimal CurAmtNT;
-	private BigDecimal CurBal;
-	private BigDecimal CurBalNT;
-	private BigDecimal ProfitAndLoss;
-	private BigDecimal Increase;
-	private String SignDigit;
-	private BigDecimal Return;
-	private String RewRateDigit;
-	private BigDecimal AccAllocateRewRate;
-	private BigDecimal CurUntNum;
-	private BigDecimal ReferenceExchangeRate;
-	private String NetValueDate;
-	private BigDecimal NetValue;
-	private String StoplossSign;
-	private BigDecimal Stoploss;
-	private String SatisfiedSign;
-	private BigDecimal Satisfied;
-	private String Strdate;
-	private String FundType;
-	private String ApproveFlag;
-	private String ProjectCode;
-	private String GroupCode;
-	private String PayAcctId;
-	private BigDecimal TransferAmt;
-	private String TransferDate01;
-	private String TransferDate02;
-	private String TransferDate03;
-	private String TransferDate04;
-	private String TransferDate05;
-	private String TransferDate06;
-	private String TransferCount;
-	private String PayCount;
-	private String Status;
-	private String PayAccountNo;
-	private String TxType;
-	private String FrgnPurchaseFlag;
-	private String Same;
-	private BigDecimal TransferAmt_H;
-	private BigDecimal TransferAmt_M;
-	private BigDecimal TransferAmt_L;
-	private String AcctId;
-	private String TimeDepositPrjCd;
-	private String Total_Cnt;
-	private String Pay_Cnt;
-	private String End_Flg;
-	private String FundPackageNo;
-	private String FundPackage;
-	private BigDecimal LongDiscount;
-	private BigDecimal AccAllocateRew;
-	private String IsPledged;			//質借圈存註記(cmkType=MK03 ==> Y else N) 	MK01 法院圈存; MK02 警示戶圈存; MK03 質權設定圈存  => 區分 他行,個金,法金; MK99 其他 
-	private String Dynamic;	//動態鎖利註記 1:母基金 2:子基金		
-	private String ComboReturnDate;	//組合報酬參考日		
-	private String ComboReturnSign;	//組合報酬正負		
-	private BigDecimal ComboReturn;	//基金組合報酬率		
+	private String AssetType;         // Header.‧HFMTID =0001：單筆 0002：定期定額 0003：定期不定額 0004：定存轉基金 0005：基金套餐
+	private String SPRefId;           // 傳送序號
+	private String AcctId16;          // 身分證ID
+	private String Occur;             // 資料筆數
+	private String AcctId02;          // 信託帳號
+	private String EviNum;            // 憑證號碼
+	private String FundNO;            // 基金代號
+	private String FundName;          // 基金名稱
+	private String CurFund;           // 基金幣別
+	private String CurCode;           // 交易幣別
+	private BigDecimal CurAmt;        // 投資金額
+	private BigDecimal CurAmtNT;      // 投資金額(折臺)
+	private BigDecimal CurBal;        // 參考市值
+	private BigDecimal CurBalNT;      // 參考市值(折臺)
+	private BigDecimal ProfitAndLoss; // 投資損益
+	private BigDecimal Increase;      // 累積現金配息
+	private String SignDigit;         // 報酬率正負
+	private BigDecimal Return;        // 報酬率
+	private String RewRateDigit;      // 含調整後累積現金配息報酬率正負
+	private BigDecimal AccAllocateRewRate;  // 含調整後累積現金配息報酬率
+	private BigDecimal CurUntNum;     // 單位數
+	private BigDecimal ReferenceExchangeRate;  // 參考匯率
+	private String NetValueDate;      // 參考淨值日期
+	private BigDecimal NetValue;      // 參考淨值
+	private String StoplossSign;      // 停損正負號
+	private BigDecimal Stoploss;      // 停損點
+	private String SatisfiedSign;     // 滿足正負號
+	private BigDecimal Satisfied;     // 滿足點
+	private String Strdate;           // 投資起日
+	private String FundType;          // 基金類型 1. 一般　 3. 貨幣   4. 債券   5. 平衡
+	private String ApproveFlag;       // 未核備
+	private String ProjectCode;       // 專案代號
+	private String GroupCode;         // 團體代號
+	private String PayAcctId;         // 收益入帳帳號
+	private BigDecimal TransferAmt;   // 扣款金額
+	private String TransferDate01;    // 扣款日期一
+	private String TransferDate02;    // 扣款日期二
+	private String TransferDate03;    // 扣款日期三
+	private String TransferDate04;    // 扣款日期四
+	private String TransferDate05;    // 扣款日期五
+	private String TransferDate06;    // 扣款日期六
+	private String TransferCount;     // 扣款次數
+	private String PayCount;          // 扣款成功次數
+	private String Status;            // 狀態
+	private String PayAccountNo;      // 扣款帳號
+	private String TxType;            // 交易類別
+	private String FrgnPurchaseFlag;  // 換匯申購 Y:是 N:否
+	private String Same;              // 申請扣款是否為同一人 Y:同一人 N :不同人
+	private BigDecimal TransferAmt_H; // 扣款金額(高)
+	private BigDecimal TransferAmt_M; // 扣款金額(中)
+	private BigDecimal TransferAmt_L; // 扣款金額(低)
+	private String AcctId;            // 專案帳號
+	private String TimeDepositPrjCd;  // 定存專案編號
+	private String Total_Cnt;         // 總投資期數
+	private String Pay_Cnt;           // 已投資期數
+	private String End_Flg;           // 終止碼 Y:專案中止
+	private String FundPackageNo;     // 基金套餐編號
+	private String FundPackage;       // 基金套餐
+	private BigDecimal LongDiscount;  // 與時聚金折扣金額
+	private BigDecimal AccAllocateRew;  // 調整後累積現金配息
+	private String IsPledged;		    //質借圈存註記(cmkType=MK03 ==> Y else N) 	MK01 法院圈存; MK02 警示戶圈存; MK03 質權設定圈存  => 區分 他行,個金,法金; MK99 其他 
+	private String Dynamic;	            //動態鎖利註記 1:母基金 2:子基金		
+	private String ComboReturnDate;	    //組合報酬參考日		
+	private String ComboReturnSign;	    //組合報酬正負		
+	private BigDecimal ComboReturn;	    //基金組合報酬率		
 	private String SatelliteBuyDate1;	//約定申購子基金日1	
 	private String SatelliteBuyDate2;	//約定申購子基金日2	
 	private String SatelliteBuyDate3;	//約定申購子基金日3	
@@ -80,7 +80,11 @@ public class CustAssetFundVO {
 	private BigDecimal BenefitReturnRate2;	//約定停利報酬率2		
 	private BigDecimal BenefitReturnRate3;	//約定停利報酬率3	
 	private BigDecimal TRANSFERAmt;	//轉換金額
-	private String EviNumType;	//狀態 Y=暫停
+	private String EviNumType;	    //狀態 Y=暫停
+	
+	private BigDecimal AccAllocateRewN;      // 調整後累積現金配息(含轉換前息)
+	private String RewRateDigitN;            // 含調整後累積現金配息報酬率正負(含轉換前息)
+	private BigDecimal AccAllocateRewRateN;  // 含調整後累積現金配息報酬率(含轉換前息)
 	
 	public String getAssetType() {
 		return AssetType;
@@ -538,5 +542,22 @@ public class CustAssetFundVO {
 	public void setEviNumType(String eviNumType) {
 		EviNumType = eviNumType;
 	}
-		
+	public BigDecimal getAccAllocateRewN() {
+		return AccAllocateRewN;
+	}
+	public void setAccAllocateRewN(BigDecimal accAllocateRewN) {
+		AccAllocateRewN = accAllocateRewN;
+	}
+	public String getRewRateDigitN() {
+		return RewRateDigitN;
+	}
+	public void setRewRateDigitN(String rewRateDigitN) {
+		RewRateDigitN = rewRateDigitN;
+	}
+	public BigDecimal getAccAllocateRewRateN() {
+		return AccAllocateRewRateN;
+	}
+	public void setAccAllocateRewRateN(BigDecimal accAllocateRewRateN) {
+		AccAllocateRewRateN = accAllocateRewRateN;
+	}
 }

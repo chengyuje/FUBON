@@ -46,8 +46,12 @@
 					<td>{{FundType_3 | number :0}}</td>
 				</tr>
 				<tr>
-					<th>參考總報酬率(含配息)：</th>
+					<th>參考總含息報酬率(不含轉換前配息)：</th>
 					<td>{{Return_int | number :2}} {{Return_int != null ? '%' : ''}}</td>
+				</tr>
+				<tr>
+					<th>參考總含息報酬率(含轉換前配息)：</th>
+					<td>{{Return_int2 | number :2}} {{Return_int2 != null ? '%' : ''}}</td>
 				</tr>
 			</table>
 		</div>
@@ -93,7 +97,10 @@
 							<e-sorter e-input="inputVO" >參考報酬率</br>(不含配息)</e-sorter>
 						</th>
 						<th ng-click = "sortBy('AccAllocateRewRate')">
-							<e-sorter e-input="inputVO" >參考報酬率</br>(含現金配息)</e-sorter>
+							<e-sorter e-input="inputVO" >參考含息報酬率</br>(不含轉換前配息)</e-sorter>
+						</th>
+						<th ng-click = "sortBy('AccAllocateRewRateN')">
+							<e-sorter e-input="inputVO" >參考含息報酬率</br>(含轉換前配息)</e-sorter>
 						</th>
 						<th ng-click = "sortBy('VigCheck')">
 							<e-sorter e-input="inputVO" >警示基金</e-sorter>
@@ -148,6 +155,8 @@
 						<td style="text-align: right;">{{row.ProfitAndLoss | number :0}}</td>
 						<td style="text-align: right;">{{row.Return | number : 2}}{{row.Return != null ? '%' : ''}}</td>
 						<td style="text-align: right;" ng-show="row.AssetType != '0006'">{{row.AccAllocateRewRate | number:2}}{{row.AccAllocateRewRate != null ? '%' : ''}} </td>
+						<td style="text-align: right;" ng-show="row.AssetType == '0006'">暫不提供</td>
+						<td style="text-align: right;" ng-show="row.AssetType != '0006'">{{row.AccAllocateRewRateN | number:2}}{{row.AccAllocateRewRateN != null ? '%' : ''}} </td>
 						<td style="text-align: right;" ng-show="row.AssetType == '0006'">暫不提供</td>
 						<td style="text-align: center;">{{row.VigCheck}}</td>
 <!-- 						<td style="text-align: center;">{{row.Vigilant | mapping:mappingSet['PRD.FUND_VIGILANT']:'F3'}}</td> -->

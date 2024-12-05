@@ -90,7 +90,7 @@ eSoafApp.factory('socketService', ['$rootScope', '$http', '$q', '$timeout', 'sys
 	      		
 				if (bShowWaitMsg) {
 					var dialog = ngDialog.open({
-						template: '<div><img style="display:block; margin:auto;vertical-align:middle;" width="100px" height="100px" src="./resource/loading.gif"></div>',
+						template: '<div><img style="display:block; margin:auto;vertical-align:middle;" width="100px" height="100px" src="./resource/cat.gif"></div>',
 						plain: true,
 						showClose: false,
 						closeByDocument: false,

@@ -18,6 +18,7 @@ eSoafApp.directive('functionType',['$timeout','projInfoService', function($timeo
 }]);
 function _functionType_process(scope,projInfoService,elm,$timeout) {
 	$timeout(function(){
+		debugger;
 		scope.show = scope.show || 'hide';
 		var enable = false;
 		//version 1: only current name , currentTxn extend by menu.

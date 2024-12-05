@@ -150,11 +150,9 @@ eSoafApp.controller('CAM210Controller', function($scope, $rootScope, $controller
 	
 	$scope.init = function() {
 		$scope.inputVO = {
-			leadType : ($scope.connector('get', 'leadType') != undefined ? $scope.connector('get', 'leadType') : ''),
-			campType : ($scope.connector('get', 'campType') != undefined ? $scope.connector('get', 'campType') : '')
+			leadType : ($scope.connector('get', 'leadType') != undefined ? $scope.connector('get', 'leadType') : '')
 		};
 		$scope.connector('set', 'leadType', '');
-		$scope.connector('set', 'campType', '');
 
 		var min_mon = new Date();
 		min_mon.setMonth(min_mon.getMonth() - 2, 1);

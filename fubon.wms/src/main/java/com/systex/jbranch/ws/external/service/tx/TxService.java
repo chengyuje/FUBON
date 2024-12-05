@@ -5,8 +5,10 @@ import com.systex.jbranch.fubon.commons.mail.MailConfig;
 import com.systex.jbranch.fubon.commons.mail.MailService;
 import com.systex.jbranch.fubon.commons.tx.tool.Box;
 import com.systex.jbranch.platform.common.dataManager.DataManager;
+import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.common.util.PlatformContext;
 import com.systex.jbranch.ws.external.service.tx.action.TxAction;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -39,7 +42,7 @@ public class TxService {
     public String test(
             @PathVariable("txId") String txId,
             @RequestParam String xml
-    ) {
+    ) throws JBranchException {
         System.out.println("txId: " + txId + ", xml: " + xml);
         return execute(txId, xml);
     }
@@ -54,7 +57,7 @@ public class TxService {
     public String execute(
             @PathVariable("txId") String txId,
             @RequestBody String xml
-    ) {
+    ) throws JBranchException {
         logger.info("TxService => txId: {}, content: {}. ", txId, xml);
         TxVO txVO = new TxVO();
         try {

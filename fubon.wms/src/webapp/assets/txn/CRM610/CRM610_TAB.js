@@ -15,7 +15,6 @@ eSoafApp.controller('CRM610_TABController',
 		getParameter.XML(["CRM.FAMILY_DEGREE"], function(totas) {
 			if (totas) {
 				$scope.mappingSet['CRM.FAMILY_DEGREE'] = totas.data[totas.key.indexOf('CRM.FAMILY_DEGREE')];
-				
 			}
 		});
 		
@@ -24,9 +23,7 @@ eSoafApp.controller('CRM610_TABController',
 		$scope.sendRecv("CRM610", "initial", "com.systex.jbranch.app.server.fps.crm610.CRM610InputVO", $scope.inputVO,
 				function(tota, isError) {
 					if (!isError) {
-						
 						if(tota[0].body.resultList != null && tota[0].body.resultList.length > 0) {
-//							
 							$scope.resultList = tota[0].body.resultList;
 							$scope.cust_id = $scope.resultList[0].CUST_ID;
 							$scope.cust_name = $scope.resultList[0].CUST_NAME;

@@ -344,10 +344,12 @@ public class SQM120 extends FubonWmsBizLogic {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); // 總行人員
-		String memLoginFlag = getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG).toString();
+		String memLoginFlag = ObjectUtils.toString(getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG));
 		//M+沒有開放私銀主管角色，直接抓SystemVariables
 		boolean uhrmMgr = memLoginFlag.matches("uhrmMGR|uhrmBMMGR"); //是否為私銀主管角色:私銀區主管,私銀作業主管
 		if(uhrmMgr) { //私銀主管角色:私銀區主管,私銀作業主管
+			//1.正常流程：私銀區長 => 處/副主管、總行
+			//2.特殊流程：私銀作業主管 => 私銀區長-處/副主管、總行
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			sb = new StringBuffer();
 			sb.append("SELECT REGION_CENTER_ID FROM VWORG_EMP_UHRM_INFO WHERE PRIVILEGEID IN ('UHRM006', 'UHRM012') AND EMP_ID = :empId ");
@@ -362,27 +364,29 @@ public class SQM120 extends FubonWmsBizLogic {
 			//私銀主管，可選業務處長以及總行人員
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			StringBuffer sql = new StringBuffer();
-			
-			StringBuffer sql1 = new StringBuffer();
-			sql1.append("SELECT JOB_TITLE_NAME, EMP_ID, EMP_NAME, CASE WHEN JOB_TITLE_NAME = '處主管' THEN ROLE_ID || '_1' ELSE ROLE_ID END AS ROLE_ID ");
-			sql1.append("FROM VWORG_EMP_INFO WHERE 1 = 1 ");
-	
-			StringBuffer sql3 = new StringBuffer();
-			sql3.append("SELECT ORG.JOB_TITLE_NAME, MAN.EMP_ID, ORG.EMP_NAME, ORG.ROLE_ID FROM ( ");
-			sql3.append("SELECT PARAM_CODE AS EMP_ID FROM TBSYSPARAMETER WHERE PARAM_TYPE ='SQM.HEAD_EMP_ID') MAN ");
-			sql3.append("LEFT JOIN VWORG_EMP_INFO ORG ON MAN.EMP_ID = ORG.EMP_ID AND ORG.ROLE_ID = 'B038' ");
-			
-			StringBuffer sql2 = new StringBuffer();
-			sql2.append("AND (REGION_CENTER_ID = :region_center_id AND ROLE_ID = 'A164') ");
-			sql2.append("UNION ");
-
-			sql = sql1.append(sql2).append(sql3);
+			sql.append("SELECT * FROM ( ");
+			//處副主管、處主管
+			sql.append(" SELECT JOB_TITLE_NAME, EMP_ID, EMP_NAME, CASE WHEN JOB_TITLE_NAME = '處主管' THEN ROLE_ID || '_1' ELSE ROLE_ID END AS ROLE_ID ");
+			sql.append(" FROM VWORG_EMP_INFO WHERE 1 = 1 ");
+			sql.append(" AND REGION_CENTER_ID = :region_center_id AND ROLE_ID = 'A164' ");
 			queryCondition.setObject("region_center_id", uhrmRegionCenterId);
-			
+			//總行
+			sql.append(" UNION ");
+			sql.append(" SELECT ORG.JOB_TITLE_NAME, MAN.EMP_ID, ORG.EMP_NAME, ORG.ROLE_ID FROM ( ");
+			sql.append("  SELECT PARAM_CODE AS EMP_ID FROM TBSYSPARAMETER WHERE PARAM_TYPE ='SQM.HEAD_EMP_ID') MAN ");
+			sql.append("  LEFT JOIN VWORG_EMP_INFO ORG ON MAN.EMP_ID = ORG.EMP_ID AND ORG.ROLE_ID = 'B038' ");
+			//登入為私銀作業主管，可選私銀區長
+			if(memLoginFlag.matches("uhrmBMMGR")) {
+				sql.append(" UNION ");
+				sql.append(" SELECT JOB_TITLE_NAME, EMP_ID, EMP_NAME, ROLE_ID ");
+				sql.append(" FROM VWORG_EMP_UHRM_INFO ");
+				sql.append(" WHERE PRIVILEGEID = 'UHRM012' AND DEPT_ID = :loginArea ");
+				queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
+			}
 			sql.append(") ");
-			sql.append("ORDER BY DECODE(ROLE_ID, 'A161', 1, 'A149', 1, 'A146', 2, 'A301', 2, 'A164', 3, 'A164_1', 4, 5) ");
+			sql.append("ORDER BY DECODE(ROLE_ID, 'R012', 1, 'A164', 2, 'A164_1', 3, 4) ");
 			
-			queryCondition.setQueryString("SELECT * FROM ( " + sql.toString());
+			queryCondition.setQueryString(sql.toString());
 		} else {
 			//其他非私銀主管
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);

@@ -9,6 +9,7 @@ import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
 import com.systex.jbranch.platform.server.info.SysInfo;
 import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.birt.report.model.api.util.StringUtil;
 import org.springframework.context.annotation.Scope;
@@ -40,7 +41,8 @@ public class CRM110 extends FubonWmsBizLogic {
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		
+		Map<String, String> fcMap = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2); // 理專
+		String roleID = getUserVariable(FubonSystemVariableConsts.LOGINROLE).toString();
 		String brNbr = getUserVariable(FubonSystemVariableConsts.LOGINBRH).toString();
 
 		sql.append("SELECT CUST_ID, CUST_NAME, BRA_NBR, AO_CODE ");
@@ -56,6 +58,10 @@ public class CRM110 extends FubonWmsBizLogic {
 				// 開放全行查詢
 			} else {
 				sql.append("and BRA_NBR in (:branchlist) ");
+				 //理專不可查私銀客戶
+				if (fcMap.containsKey(roleID)) {
+					sql.append("and NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO T WHERE T.UHRM_CODE = CM.AO_CODE) ");
+				}
 
 				// 輔銷人員 FAIA、無歸屬行（分行000）、PAO 使用轄下可視分行作條件查詢
 				if (StringUtils.defaultString(inputVO.getRole()).matches("faia|pao") || StringUtil.isEqual(brNbr, "000")) {

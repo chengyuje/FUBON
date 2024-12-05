@@ -27,42 +27,55 @@
 				<div class="gv_tab_sc scroll_y">
 					<table class="table-bordered">
 						<tr>
+							<th width="10%">基金公司</th>
+							<td width="23%" style="text-align: right;">{{row.table[0].TRUST_COM}}</td>
 							<th width="10%">信託型態</th>
 							<td width="23%" style="text-align: right;">{{row.AssetType | mapping:mappingSet['AssetType']:'F3'}}</td>
-							<th width="10%">調整後<br>累積現金配息(C)</th>
-							<td width="23%" style="text-align: right;">
-								<span ng-if = "row.CurCode == 'TWD'">{{row.AccAllocateRew | number:0}}</span>
-								<span ng-if = "row.CurCode != 'TWD'">{{row.AccAllocateRew | number:2}}</span>
-							</td>
 							<th width="10%">信託帳號</th>
 							<td width="23%" style="text-align: right;">{{row.AcctId02}}</td>
 						</tr>
 						<tr>
+							<th width="10%">憑證號碼</th>
+							<td width="23%" style="text-align: right;">{{row.EviNum}}</td>
 							<th width="10%">憑證註記</th>
 							<td width="23%" style="text-align: right;">{{row.DynamicType}}</td>
-							<th width="10%">累積現金配息</th>
+							<th width="10%">憑證狀態</th>
+							<td width="23%" style="text-align: right;">{{row.Status | mapping:mappingSet['Status']:'F3'}}</td>
+						</tr>
+						<tr>
+							<th width="10%">投資起日</th>
+							<td width="23%" style="text-align: right;">{{Strdate}}</td>
+							<th width="10%">單位數</th>
+							<td width="23%" style="text-align: right;">{{row.CurUntNum | number:4}}</td>
+							<th width="10%">交易幣別</th>
+							<td width="23%" style="text-align: right;">{{row.CurCode}}</td>
+						</tr>
+						<tr>
+							<th width="10%">參考匯率</th>
+							<td width="23%" style="text-align: right;">{{cod | number:4}}</td>
+							<th width="10%">淨值</th>
+							<td width="23%" style="text-align: right;">{{row.NetValue | number:4}}</td>
+							<th width="10%">淨值日期</th>
+							<td width="23%" style="text-align: right;">{{NetValueDate}}</td>
+						</tr>
+						<tr>
+							<th width="10%" style="vertical-align: middle;">累積現金配息</th>
 							<td width="23%" style="text-align: right;">
 								<span ng-if = "row.CurCode == 'TWD'">{{row.Increase | number:0}}</span>
 								<span ng-if = "row.CurCode != 'TWD'">{{row.Increase | number:2}}</span>
 							</td>
-							<th width="10%">憑證號碼</th>
-							<td width="23%" style="text-align: right;">{{row.EviNum}}</td>
-						</tr>
-						<tr>
-							<th width="10%">單位數</th>
-							<td width="23%" style="text-align: right;">{{row.CurUntNum | number:4}}</td>
-							<th width="10%">參考匯率</th>
-							<td width="23%" style="text-align: right;">{{cod | number:4}}</td>
-							<th width="10%">基金公司</th>
-							<td width="23%" style="text-align: right;">{{row.table[0].TRUST_COM}}</td>
-						</tr>
-						<tr>
-							<th width="10%">交易幣別</th>
-							<td width="23%" style="text-align: right;">{{row.CurCode}}</td>
-							<th width="10%">淨值</th>
-							<td width="23%" style="text-align: right;">{{row.NetValue | number:4}}</td>
-							<th width="10%">投資起日</th>
-							<td width="23%" style="text-align: right;">{{Strdate}}</td>
+<!-- 							調整後累積不含轉換前現金配息(C) -->
+							<th width="10%">調整後<br/>累積不含轉換前<br/>現金配息(C)</th>
+							<td width="23%" style="text-align: right;">
+								<span ng-if = "row.CurCode == 'TWD'">{{row.AccAllocateRew | number:0}}</span>
+								<span ng-if = "row.CurCode != 'TWD'">{{row.AccAllocateRew | number:2}}</span>
+							</td>
+<!-- 							調整後累積含轉換前現金配息(D) -->
+							<th width="10%">調整後<br/>累積含轉換前<br/>現金配息(D)</th>
+							<td width="23%" style="text-align: right;">
+								<span ng-if = "row.CurCode == 'TWD'">{{row.AccAllocateRewN | number:0}}</span>
+								<span ng-if = "row.CurCode != 'TWD'">{{row.AccAllocateRewN | number:2}}</span>
+							</td>
 						</tr>
 						<tr>
 							<th width="10%">投資金額(A)</th>
@@ -70,31 +83,32 @@
 								<span ng-if = "row.CurCode == 'TWD'">{{row.CurAmt | number:0}}</span>
 								<span ng-if = "row.CurCode != 'TWD'">{{row.CurAmt | number:2}}</span>
 							</td>
-							<th width="10%">淨值日期</th>
-							<td width="23%" style="text-align: right;">{{NetValueDate}}</td>
-							<th width="10%">憑證狀態</th>
-							<td width="23%" style="text-align: right;">{{row.Status | mapping:mappingSet['Status']:'F3'}}</td>
-						</tr>
-						<tr>
 							<th width="10%">參考市值(B)</th>
 							<td width="23%" style="text-align: right;">
 								<span ng-if = "row.CurCode == 'TWD'">{{row.CurBal | number:0}}</span>
 								<span ng-if = "row.CurCode != 'TWD'">{{row.CurBal | number:2}}</span>
 							</td>
-							<th width="10%">參考報酬率<br>(不含配息)<br>[(B-A)/A]%</th>
-							<td width="23%" style="text-align: right;">{{row.Return | number : 2}}{{row.Return != null ? '%' : ''}} </td>
-							<th width="10%">參考報酬率<br>(含累積現金配息)<br>[(B-A+C)/A]%</th>
-							<td width="23%" style="text-align: right;">{{row.AccAllocateRewRate | number:2}}{{row.AccAllocateRewRate != null ? '%' : ''}} </td>							
-						</tr>
-						<tr>
 							<th width="10%">投資損益(B-A)</th>
 							<td width="23%" style="text-align: right;">
 								<span ng-if = "row.CurCode == 'TWD'">{{row.CurBal - row.CurAmt | number:0}}</span>
 								<span ng-if = "row.CurCode != 'TWD'">{{row.CurBal - row.CurAmt | number:2}}</span>
 							</td>
-							<th ng-if="!(row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2'))" width="10%">滿足/停損點</th>
-							<td ng-if="!(row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2'))" width="23%" style="text-align: right;">滿足點:{{row.SatisfiedSign == 'X' ? '未設定' : row.SatisfiedSign+row.Satisfied}}<br>
-																	   停損點:{{row.StoplossSign =='X' ? '未設定' : row.StoplossSign+row.Stoploss}}</td>
+						</tr>
+						<tr>
+							<th width="10%">參考報酬率<br>(不含配息)<br>[(B-A)/A]%</th>
+							<td width="23%" style="text-align: right;">{{row.Return | number : 2}}{{row.Return != null ? '%' : ''}} </td>
+							<th width="10%">參考報酬率<br>(含累積現金配息)<br>[(B-A+C)/A]%</th>
+							<td width="23%" style="text-align: right;">{{row.AccAllocateRewRate | number:2}}{{row.AccAllocateRewRate != null ? '%' : ''}} </td>			
+							<th width="10%">參考報酬率<br>(含累積現金配息)<br>[(B-A+D)/A]%</th>
+							<td width="23%" style="text-align: right;">{{row.AccAllocateRewRateN | number:2}}{{row.AccAllocateRewRateN != null ? '%' : ''}} </td>	
+						</tr>
+						<tr>
+							<th ng-if="!(row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2'))" width="10%" style="vertical-align: middle;">滿足/停損點</th>
+							<td ng-if="!(row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2'))" width="23%" style="text-align: right;">
+								滿足點:{{row.SatisfiedSign == 'X' ? '未設定' : row.SatisfiedSign+row.Satisfied}}
+								<br>
+								停損點:{{row.StoplossSign =='X' ? '未設定' : row.StoplossSign+row.Stoploss}}
+							</td>
 							<th ng-if="row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2')" width="10%"></th>
 							<td ng-if="row.Dynamic && (row.Dynamic == '1' || row.Dynamic == '2')" width="23%" style="text-align: right;"></td>
 							<th width="10%"></th>

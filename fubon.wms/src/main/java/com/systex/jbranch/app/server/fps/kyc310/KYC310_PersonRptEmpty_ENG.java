@@ -218,7 +218,8 @@ public class KYC310_PersonRptEmpty_ENG extends FubonWmsBizLogic {
      * 取得列印日期
      **/
     private String getPrintDate() {
-        return String.format("Print Date：%s/%s/%s", year, month, day);
+//        return String.format("Print Date：%s/%s/%s", year, month, day);
+        return String.format("Print Date：", "", "", "");
     }
 
     /**
@@ -280,13 +281,13 @@ public class KYC310_PersonRptEmpty_ENG extends FubonWmsBizLogic {
     private PdfPCell basicInfoRow() throws Exception {
         PdfPTable table = buildTable(new int[]{10, 8, 12, 14, 12, 15, 5, 8});
         table.addCell(buildCellWithBorder("Name", bFont, Paragraph.ALIGN_CENTER));
-        table.addCell(buildCellhardWord(StringEscapeUtils.unescapeHtml(inputVO.getCust_name()), nFont, nFont_a, Paragraph.ALIGN_CENTER));
+        table.addCell(buildCellhardWord(StringEscapeUtils.unescapeHtml(""), nFont, nFont_a, Paragraph.ALIGN_CENTER));
         table.addCell(buildCellWithBorder("ID Number", bFont, Paragraph.ALIGN_CENTER));
-        table.addCell(buildCellWithBorder(inputVO.getCUST_ID(), nFont, Paragraph.ALIGN_CENTER));
+        table.addCell(buildCellWithBorder("", nFont, Paragraph.ALIGN_CENTER));
         table.addCell(buildCellWithBorder("Date of Birth", bFont, Paragraph.ALIGN_CENTER));
-        table.addCell(buildCellWithBorder(getCustBirthday(), nFont, Paragraph.ALIGN_CENTER));
+        table.addCell(buildCellWithBorder("", nFont, Paragraph.ALIGN_CENTER));
         table.addCell(buildCellWithBorder("Gender", bFont, Paragraph.ALIGN_CENTER));
-        table.addCell(buildCellWithBorder(getCustGender(), nFont, Paragraph.ALIGN_CENTER));
+        table.addCell(buildCellWithBorder("", nFont, Paragraph.ALIGN_CENTER));
         return new PdfPCell(table);
     }
 
@@ -296,7 +297,7 @@ public class KYC310_PersonRptEmpty_ENG extends FubonWmsBizLogic {
     private PdfPCell educationRow() throws Exception {
         PdfPTable table = buildTable(new int[]{10, 15, 59});
         table.addCell(setMiddle(buildCellWithBorder("Education", bFont, Paragraph.ALIGN_CENTER)));
-        table.addCell(setMiddle(buildCellWithBorder(getCustEducation(), nFont, Paragraph.ALIGN_CENTER)));
+        table.addCell(setMiddle(buildCellWithBorder("", nFont, Paragraph.ALIGN_CENTER)));
         table.addCell(buildCellWithBorder(getEducationOptions(), nFont, Paragraph.ALIGN_LEFT));
         return new PdfPCell(table);
     }
@@ -307,7 +308,7 @@ public class KYC310_PersonRptEmpty_ENG extends FubonWmsBizLogic {
     private PdfPCell careerRow() throws Exception {
         PdfPTable table = buildTable(new int[]{10, 15, 59});
         table.addCell(setMiddle(buildCellWithBorder("Occupation", bFont, Paragraph.ALIGN_CENTER)));
-        table.addCell(setMiddle(buildCellWithBorder(getCustCareer(), nFont, Paragraph.ALIGN_CENTER)));
+        table.addCell(setMiddle(buildCellWithBorder("", nFont, Paragraph.ALIGN_CENTER)));
         table.addCell(buildCellWithBorder(getCareerOptions(), nFont, Paragraph.ALIGN_LEFT));
         return new PdfPCell(table);
     }
@@ -318,7 +319,7 @@ public class KYC310_PersonRptEmpty_ENG extends FubonWmsBizLogic {
     private PdfPCell marriageRow() throws Exception {
         PdfPTable table = buildTable(new int[]{10, 15, 59});
         table.addCell(buildCellWithBorder("Marital Status", bFont, Paragraph.ALIGN_CENTER));
-        table.addCell(buildCellWithBorder(getCustMarriage(), nFont, Paragraph.ALIGN_CENTER));
+        table.addCell(buildCellWithBorder("", nFont, Paragraph.ALIGN_CENTER));
         table.addCell(buildCellWithBorder(getMarriageOptions(), nFont, Paragraph.ALIGN_LEFT));
         return new PdfPCell(table);
     }
@@ -329,7 +330,7 @@ public class KYC310_PersonRptEmpty_ENG extends FubonWmsBizLogic {
     private PdfPCell kidRow() throws Exception {
         PdfPTable table = buildTable(new int[]{10, 15, 59});
         table.addCell(buildCellWithBorder("Children", bFont, Paragraph.ALIGN_CENTER));
-        table.addCell(buildCellWithBorder(getCustKids(), nFont, Paragraph.ALIGN_CENTER));
+        table.addCell(buildCellWithBorder("", nFont, Paragraph.ALIGN_CENTER));
         table.addCell(buildCellWithBorder(getKidsOptions(), nFont, Paragraph.ALIGN_LEFT));
         return new PdfPCell(table);
     }
@@ -342,7 +343,7 @@ public class KYC310_PersonRptEmpty_ENG extends FubonWmsBizLogic {
     private PdfPCell phoneRow() throws Exception {
         PdfPTable table = buildTable(new int[]{10, 15, 59});
         table.addCell(setMiddle(buildCellWithBorder("Contact Number", bFont, Paragraph.ALIGN_CENTER)));
-        table.addCell(buildCellWithBorder(getCustPhone(), nFont, Paragraph.ALIGN_LEFT));
+        table.addCell(buildCellWithBorder("", nFont, Paragraph.ALIGN_LEFT));
         table.addCell(buildCellWithBorder(getPhoneOptions(), nFont, Paragraph.ALIGN_LEFT));
         return new PdfPCell(table);
     }
@@ -353,7 +354,7 @@ public class KYC310_PersonRptEmpty_ENG extends FubonWmsBizLogic {
     private PdfPCell addressRow() throws Exception {
         PdfPTable table = buildTable(new int[]{10, 15, 59});
         table.addCell(setMiddle(buildCellWithBorder("Mailing Address", bFont, Paragraph.ALIGN_CENTER)));
-        table.addCell(buildCellWithBorder(inputVO.getCUST_ADDR_1().trim().replace("　", ""), nFont, Paragraph.ALIGN_LEFT));
+        table.addCell(buildCellWithBorder("", nFont, Paragraph.ALIGN_LEFT));
         table.addCell(buildCellWithBorder("□□□\n     ", nFont, Paragraph.ALIGN_LEFT));
         return new PdfPCell(table);
     }
@@ -364,7 +365,7 @@ public class KYC310_PersonRptEmpty_ENG extends FubonWmsBizLogic {
     private PdfPCell emailRow() throws Exception {
         PdfPTable table = buildTable(new int[]{10, 15, 59});
         table.addCell(buildCellWithBorder("E-mail Address", bFont, Paragraph.ALIGN_CENTER));
-        table.addCell(buildCellWithBorder(inputVO.getEMAIL_ADDR(), nFont, Paragraph.ALIGN_LEFT));
+        table.addCell(buildCellWithBorder("", nFont, Paragraph.ALIGN_LEFT));
         table.addCell(buildCellWithBorder("", nFont, Paragraph.ALIGN_LEFT));
         return new PdfPCell(table);
     }
@@ -1084,14 +1085,15 @@ public class KYC310_PersonRptEmpty_ENG extends FubonWmsBizLogic {
                 code39.setCode(inputVO.getCUST_ID());
                 code39.setBarHeight(18);
 
-                cell = new PdfPCell();
-                cell.setFixedHeight(20);
-                cell.setPadding(0);
-                cell.setBorderWidth(0);
-                if (StringUtils.isNotBlank(inputVO.getCUST_ID())) {
-                    cell.addElement(code39.createImageWithBarcode(cb, null, null));
-                }
-                tBarCode.addCell(cell);
+//                cell = new PdfPCell();
+//                cell.setFixedHeight(20);
+//                cell.setPadding(0);
+//                cell.setBorderWidth(0);
+//                if (StringUtils.isNotBlank(inputVO.getCUST_ID())) {
+//                    cell.addElement(code39.createImageWithBarcode(cb, null, null));
+//                }
+//                tBarCode.addCell(cell);
+                tBarCode.addCell(blank);
                 tBarCode.addCell(blank);
 
                 // barcode - tw date

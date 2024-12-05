@@ -63,6 +63,7 @@ eSoafApp.controller('PMS417Controller',	function($rootScope, $scope, $controller
 			resultList      : [], 
 			memLoginFlag    : String(sysInfoService.getMemLoginFlag())
     	}; 
+    	console.log("$scope.inputVO.memLoginFlag", $scope.inputVO.memLoginFlag);
 		$scope.resultList = [];
 		$scope.curDate = new Date();
 		$scope.dateChange();

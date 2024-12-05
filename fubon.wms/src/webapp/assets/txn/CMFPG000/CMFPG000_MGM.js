@@ -186,9 +186,9 @@ eSoafApp.controller('CMFPG000Controller', ["$rootScope", "$scope", "$location", 
 						$scope.finAuthorities = true;
 					}),
 
-					// i18nLoad().then(function(data) {
-					// $scope.finI18n = true;
-					// }),
+					 i18nLoad().then(function(data) {
+					 $scope.finI18n = true;
+					 }),
 					loadWatermark().then(function(data) {
 						$scope.finWatermark = true;
 					})

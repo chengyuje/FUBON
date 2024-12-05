@@ -1,8 +1,5 @@
 package com.systex.jbranch.fubon.bth.job.business_logic;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -11,73 +8,71 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class SqlLdr {
-	
-	private static String rootName = "D:\\";
-	private static String ctlSuffix = ".ctl";
-	private static String logSuffix = ".log";
-	private static String blanks = " ";
+
+	private static String ROOTNAME = "D:\\";
+	private static String CTL_SUFFIX = ".ctl";
+	private static String LOG_SUFFIX = ".log";
+	private static String BLANKS = " ";
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-
 		// SIT >> WMSUSER/WMSUSER@172.19.243.30:5211/TWMSM
 		// UAT >> WMSUSER/WMSUSERWMSUSER@172.19.243.30:5211/TWMS
 		// ODS_C >> WMSUSER/(OL>0p;/@172.19.243.30:5211/TWMSC
 		// 2020.11.27 避免密碼的字元@出錯 要用/"前後包起來
 
-		// LOCAL=============================
-		String userName = "FUBON_LOCAL_DB";
-		String password = "oracle";
-		String hostName = "localhost";
-		String port = "1521";
-		String serviceName = "xe";
-		// LOCAL=============================
+//		String db_name = "LOCAL";
+		String db_name = "FUBON";
 
-		// Fubon=============================
-//		String userName = "WMSUSER";
-//		String password = "1qaz@WSX";
-//		String hostName = "172.19.243.28";
-//		String port = "5211";
-//		String serviceName = "TWMSC";
-		// Fubon=============================
+		DatabaseInfo info = new DatabaseInfo(db_name);
 
-		String ctlName = "TBPMS_EMP_DAILY_TXN_SUM_D_SG";
-		String logName = "TBPMS_EMP_DAILY_TXN_SUM_D_SG";
-		String srcName = "EMP_DAILY_TXN_SUM_D_20240608.TXT";
+		String ctlName = "TBPRD_ELN_LINK_PROD";
+		String logName = "TBPRD_ELN_LINK_PROD";
+		String srcName = "UNDERLYING_20240906.csv";
+		
 		SqlLdr ldr = new SqlLdr();
-		String command = ldr.getCommand(userName, password, hostName, port, serviceName, ctlName, logName, srcName);
+		String command = ldr.getCommand(info, ctlName, logName, srcName);
 
+//		StringTokenizer st = new StringTokenizer(command, SqlLdr.BLANKS);
+//		String[] command_array = new String[st.countTokens()];
+//		for(int i = 0; st.hasMoreTokens(); i++) {
+//			command_array[i] = st.nextToken();
+//		}
+//
+//		ProcessBuilder pb = new ProcessBuilder(command_array);	
+//		Process p = pb.start();
 		Process p = Runtime.getRuntime().exec(command);
 		p.waitFor();
 		p.getOutputStream().close();
 		ldr.printLog(logName);
+
 	}
 
-	private String getCommand(String username, String password, String hostName, String port, String serviceName,
-			String ctlName, String logName, String srcName) {
+	private String getCommand(DatabaseInfo info, String ctlName, String logName, String srcName) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("cmd").append(SqlLdr.blanks);
-		sb.append("/c").append(SqlLdr.blanks);
-		sb.append("sqlldr").append(SqlLdr.blanks);
-		sb.append(username).append("/");
-		sb.append("\\\"").append(password);
-		sb.append("\\\"@").append(hostName);
-		sb.append(":").append(port);
-		sb.append("/").append(serviceName);
-		sb.append(SqlLdr.blanks);
-		sb.append("CONTROL=").append(SqlLdr.rootName).append(ctlName).append(SqlLdr.ctlSuffix);
-		sb.append(SqlLdr.blanks);
-		sb.append("LOG=").append(SqlLdr.rootName).append(logName).append(SqlLdr.logSuffix);
-		sb.append(SqlLdr.blanks);
-		sb.append("DATA=").append(SqlLdr.rootName).append(srcName);
+		sb.append("cmd").append(SqlLdr.BLANKS);
+		sb.append("/c").append(SqlLdr.BLANKS);
+		sb.append("sqlldr").append(SqlLdr.BLANKS);
+		sb.append(info.getUserName()).append("/");
+		sb.append("\\\"").append(info.getPassword());
+		sb.append("\\\"@").append(info.getHostName());
+		sb.append(":").append(info.getPort());
+		sb.append("/").append(info.getServiceName());
+		sb.append(SqlLdr.BLANKS);
+		sb.append("CONTROL=").append(SqlLdr.ROOTNAME).append(ctlName).append(SqlLdr.CTL_SUFFIX);
+		sb.append(SqlLdr.BLANKS);
+		sb.append("LOG=").append(SqlLdr.ROOTNAME).append(logName).append(SqlLdr.LOG_SUFFIX);
+		sb.append(SqlLdr.BLANKS);
+		sb.append("DATA=").append(SqlLdr.ROOTNAME).append(srcName);
+//		sb.append(SqlLdr.BLANKS);
+//		sb.append("CHARACTERSET AL32UTF8");
 		return sb.toString();
 	}
-	
 
 	private void printLog(String logName) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(SqlLdr.rootName);
-		sb.append(logName).append(SqlLdr.logSuffix);
-		
+		sb.append(SqlLdr.ROOTNAME);
+		sb.append(logName).append(SqlLdr.LOG_SUFFIX);
+
 //		File file = new File(sb.toString().trim());
 //		try (FileReader fw = new FileReader(file); 
 //				BufferedReader br = new BufferedReader(fw);) {
@@ -88,7 +83,7 @@ public class SqlLdr {
 //		} catch (IOException e) {
 //
 //		}
-		
+
 		Path path = Paths.get(sb.toString().trim());
 		try {
 			List<String> source = Files.readAllLines(path, Charset.defaultCharset());
@@ -98,6 +93,72 @@ public class SqlLdr {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
+}
+
+class DatabaseInfo {
+
+	private String userName;
+	private String password;
+	private String hostName;
+	private String port;
+	private String serviceName;
+
+	public DatabaseInfo(String db_name) {
+		if ("LOCAL".equals(db_name)) {
+			this.setUserName("FUBON_LOCAL_DB");
+			this.setPassword("oracle");
+			this.setHostName("localhost");
+			this.setPort("1521");
+			this.setServiceName("xe");
+		} else if ("FUBON".equals(db_name)) {
+			this.setUserName("WMSUSER");
+			this.setPassword("1qaz@WSX");
+			this.setHostName("172.19.243.28");
+			this.setPort("5211");
+			this.setServiceName("TWMSC");
+		}
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getHostName() {
+		return hostName;
+	}
+
+	public void setHostName(String hostName) {
+		this.hostName = hostName;
+	}
+
+	public String getPort() {
+		return port;
+	}
+
+	public void setPort(String port) {
+		this.port = port;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
 }

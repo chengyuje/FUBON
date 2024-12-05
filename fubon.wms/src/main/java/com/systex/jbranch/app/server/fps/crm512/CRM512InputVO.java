@@ -18,7 +18,16 @@ public class CRM512InputVO extends PagingInputVO {
 	private String bossEmpID;
 	private String bossEmpPWD;
 	private String checkBossFlag;
+	private String authReason;
 	
+	public String getAuthReason() {
+		return authReason;
+	}
+
+	public void setAuthReason(String authReason) {
+		this.authReason = authReason;
+	}
+
 	public String getCheckBossFlag() {
 		return checkBossFlag;
 	}

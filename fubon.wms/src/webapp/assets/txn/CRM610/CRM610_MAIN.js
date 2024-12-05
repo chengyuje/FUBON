@@ -34,6 +34,7 @@ eSoafApp.controller('CRM610_MAINController',
 			var defer = $q.defer();
 			$scope.sendRecv("SOT701", "getCustAccountDetail", "com.systex.jbranch.app.server.fps.sot701.SOT701InputVO", {"custID": $scope.custVO.CUST_ID},
 				function (tota, isError) {
+					debugger;
 					if (!isError) {
 						defer.resolve(tota[0].body);
 					} else {

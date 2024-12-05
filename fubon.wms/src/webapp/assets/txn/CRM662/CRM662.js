@@ -79,7 +79,9 @@ eSoafApp.controller('CRM662Controller',
 		// 權限
 		$scope.pri = sysInfoService.getPriID()[0];
         $scope.ao = sysInfoService.getAoCode()[0] ? sysInfoService.getAoCode()[0] : '';
-        
+        console.log("sysInfoService.getAoCode()", sysInfoService.getAoCode());
+        console.log("sysInfoService.getAoCode()[0]", sysInfoService.getAoCode()[0]);
+        debugger;
         if ($scope.ao != '' && $scope.ao != undefined) {
         	$scope.check_ao = true;
         } else {
@@ -434,77 +436,79 @@ eSoafApp.controller('CRM662Controller',
 			$scope.add_first_row();
 		}
 		/** ----新增家庭戶----* */
-		$scope.prv_add = function() {
-			// 必須選擇一位關係戶成員才可以加入家庭戶
-			if(!$scope.addList_prv[0].prv_cust_id){
-				$scope.showErrorMsgInDialog('請選取成員客戶ID');
-				return;				
-			}
-
-			for(var i = 0; i < $scope.addList_prv.length; i++){
-				if(($scope.addList_prv[i].rel_type == undefined || $scope.addList_prv[i].rel_type == "") 
-						&& ($scope.addList_prv[i].prv_cust_id != undefined) ){
-					var id = $scope.addList_prv[i].prv_cust_id;
-					var name = $scope.addList_prv[i].prv_cust_name;
-					$scope.showErrorMsgInDialog('請選取成員 ' + id + ' ' + name + '與主戶的關係');
-					return;	
-				}
-			}
-
-		// =====================================================================================//
-		
-			// 抓出FAMILY_DEGREE相對應的整戶門檻金額
-			var listDegreeAUM = $scope.mappingSet['CRM.FAMILY_DEGREE_AUM'];
-			
-			// 將抓出來的資料整理成一個map
-			// map = {'A':3000, 'V':1000}
-			var mapDegreeAUM = {};
-			for (var i = 0; i < listDegreeAUM.length; i++){
-				mapDegreeAUM[listDegreeAUM[i].DATA] = listDegreeAUM[i].LABEL;
-			}
-			
-			// 抓出相對應的DEGREE --> 'V' or 'A'
-			var degree = $scope.resultList_prv[0].VIP_DEGREE;
-			// 將DEGREE轉換成相對應的金額
-			var Aum = Number(mapDegreeAUM[degree]) * 10000;
-			// 錯誤類型 : 整戶金額門檻未達3000/1000萬
-			if($scope.inputVO.aum_total < Aum){
-				$scope.inputVO.reject_reason = '整戶金額門檻未達6000萬/2000萬/600萬';
-//				$scope.inputVO.reject_reason = '整戶金額門檻未達3000/1000萬';
-				$scope.showErrorMsgInDialog($scope.inputVO.reject_reason);
-				return;
-			}
-		
-		// =====================================================================================//
-						
-			$scope.inputVO.add_list_prv = $scope.addList_prv;
-			$scope.inputVO.prv_list = $scope.resultList_prv;
-			// $scope.inputVO.prv_list_length = $scope.resultList_prv.length;
-			$confirm({text: $filter('i18n')('確定新增家庭成員?')}, {size: 'sm'}).then(function() {
-				$scope.sendRecv("CRM662", "prv_add", "com.systex.jbranch.app.server.fps.crm662.CRM662InputVO", $scope.inputVO,
-						function(tota, isError) {
-							if (isError) {
-								$scope.showErrorMsgInDialog(tota.body.msgData);
-								return;
-							}
-							if (tota.length > 0) {								
-								// 錯誤類型C:申請人只能歸屬一位主戶成為家庭會員
-								if (tota[0].body.prv_add_err_type == 'C') {
-									$scope.inputVO.reject_reason = '每一位客戶僅能歸屬一位主戶成為其家庭會員';
-									$scope.showErrorMsgInDialog($scope.inputVO.reject_reason);
-								}
-								// 錯誤類型N:無錯誤，通過檢核
-								else if (tota[0].body.prv_add_err_type == 'N') {
-									$scope.showMsg('新增申請成功，待主管覆核');
-									$scope.inputVO.reject_reason = '';
-									$scope.init();
-					                $scope.inquireInit();
-					                $scope.inquire();
-					                $scope.add_first_row();
-								}
-			                };
-				});
-			});
+		$scope.prv_add = function(rowCustID) {
+			console.log("inputVO.cust_id", $scope.inputVO.cust_id);
+			console.log("rowCustID", rowCustID);
+//			// 必須選擇一位關係戶成員才可以加入家庭戶
+//			if(!$scope.addList_prv[0].prv_cust_id){
+//				$scope.showErrorMsgInDialog('請選取成員客戶ID');
+//				return;				
+//			}
+//
+//			for(var i = 0; i < $scope.addList_prv.length; i++){
+//				if(($scope.addList_prv[i].rel_type == undefined || $scope.addList_prv[i].rel_type == "") 
+//						&& ($scope.addList_prv[i].prv_cust_id != undefined) ){
+//					var id = $scope.addList_prv[i].prv_cust_id;
+//					var name = $scope.addList_prv[i].prv_cust_name;
+//					$scope.showErrorMsgInDialog('請選取成員 ' + id + ' ' + name + '與主戶的關係');
+//					return;	
+//				}
+//			}
+//
+//		// =====================================================================================//
+//		
+//			// 抓出FAMILY_DEGREE相對應的整戶門檻金額
+//			var listDegreeAUM = $scope.mappingSet['CRM.FAMILY_DEGREE_AUM'];
+//			
+//			// 將抓出來的資料整理成一個map
+//			// map = {'A':3000, 'V':1000}
+//			var mapDegreeAUM = {};
+//			for (var i = 0; i < listDegreeAUM.length; i++){
+//				mapDegreeAUM[listDegreeAUM[i].DATA] = listDegreeAUM[i].LABEL;
+//			}
+//			
+//			// 抓出相對應的DEGREE --> 'V' or 'A'
+//			var degree = $scope.resultList_prv[0].VIP_DEGREE;
+//			// 將DEGREE轉換成相對應的金額
+//			var Aum = Number(mapDegreeAUM[degree]) * 10000;
+//			// 錯誤類型 : 整戶金額門檻未達3000/1000萬
+//			if($scope.inputVO.aum_total < Aum){
+//				$scope.inputVO.reject_reason = '整戶金額門檻未達6000萬/2000萬/600萬';
+////				$scope.inputVO.reject_reason = '整戶金額門檻未達3000/1000萬';
+//				$scope.showErrorMsgInDialog($scope.inputVO.reject_reason);
+//				return;
+//			}
+//		
+//		// =====================================================================================//
+//						
+//			$scope.inputVO.add_list_prv = $scope.addList_prv;
+//			$scope.inputVO.prv_list = $scope.resultList_prv;
+//			// $scope.inputVO.prv_list_length = $scope.resultList_prv.length;
+//			$confirm({text: $filter('i18n')('確定新增家庭成員?')}, {size: 'sm'}).then(function() {
+//				$scope.sendRecv("CRM662", "prv_add", "com.systex.jbranch.app.server.fps.crm662.CRM662InputVO", $scope.inputVO,
+//						function(tota, isError) {
+//							if (isError) {
+//								$scope.showErrorMsgInDialog(tota.body.msgData);
+//								return;
+//							}
+//							if (tota.length > 0) {								
+//								// 錯誤類型C:申請人只能歸屬一位主戶成為家庭會員
+//								if (tota[0].body.prv_add_err_type == 'C') {
+//									$scope.inputVO.reject_reason = '每一位客戶僅能歸屬一位主戶成為其家庭會員';
+//									$scope.showErrorMsgInDialog($scope.inputVO.reject_reason);
+//								}
+//								// 錯誤類型N:無錯誤，通過檢核
+//								else if (tota[0].body.prv_add_err_type == 'N') {
+//									$scope.showMsg('新增申請成功，待主管覆核');
+//									$scope.inputVO.reject_reason = '';
+//									$scope.init();
+//					                $scope.inquireInit();
+//					                $scope.inquire();
+//					                $scope.add_first_row();
+//								}
+//			                };
+//				});
+//			});
 						
 		}
 		

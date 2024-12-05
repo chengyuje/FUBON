@@ -192,7 +192,6 @@ public class CRM391 extends FubonWmsBizLogic {
 				sql.append("AND TTAP.NEW_AO_CODE = :new_ao_code ");
 				queryCondition.setObject("new_ao_code", inputVO.getNew_ao_code());
 			}
-			
 			queryCondition.setObject("rcIdList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
 			queryCondition.setObject("opIdList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
 			queryCondition.setObject("brNbrList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));

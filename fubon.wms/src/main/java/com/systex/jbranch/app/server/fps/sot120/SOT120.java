@@ -1319,24 +1319,24 @@ public class SOT120 extends FubonWmsBizLogic {
 		}
 
 		//查詢次數型優惠
-		if(!StringUtils.equals(inputVO.getTrustTS(), "M")){//金錢信託不用查詢次數型優惠	
-		SOT709OutputVO sot709OutputVO = new SOT709OutputVO();
-		sot709OutputVO = sot709.getMeteringFeeRate(sot709InputVO);
-		List<MeteringFeeRateVO> meteringRateList = sot709OutputVO.getMeteringFeeRateList();
-		if (CollectionUtils.isNotEmpty(meteringRateList)) {
-			for (MeteringFeeRateVO mvo : meteringRateList) {
-				if (StringUtils.isNotBlank(mvo.getCntReg())) { //空白表示沒有優惠
-					Map mRate = new HashMap();
-					mRate.put("LABEL", mvo.getGroupName()); //團體名稱
-					mRate.put("feeType", "E"); //E：次數型團體優惠
-					mRate.put("groupCode", mvo.getCntReg()); //臨櫃小額
-					mRate.put("totalCount", mvo.getTotalCount());
-					mRate.put("UsedCount", mvo.getUsedCount());
-					mRate.put("feeTypeIndex", "idx" + feeTypeIndex++);
-					feeTypeList.add(mRate);
+		if (!StringUtils.equals(inputVO.getTrustTS(), "M")) {// 金錢信託不用查詢次數型優惠
+			SOT709OutputVO sot709OutputVO = new SOT709OutputVO();
+			sot709OutputVO = sot709.getMeteringFeeRate(sot709InputVO);
+			List<MeteringFeeRateVO> meteringRateList = sot709OutputVO.getMeteringFeeRateList();
+			if (CollectionUtils.isNotEmpty(meteringRateList)) {
+				for (MeteringFeeRateVO mvo : meteringRateList) {
+					if (StringUtils.isNotBlank(mvo.getCntReg())) { // 空白表示沒有優惠
+						Map mRate = new HashMap();
+						mRate.put("LABEL", mvo.getGroupName()); // 團體名稱
+						mRate.put("feeType", "E"); // E：次數型團體優惠
+						mRate.put("groupCode", mvo.getCntReg()); // 臨櫃小額
+						mRate.put("totalCount", mvo.getTotalCount());
+						mRate.put("UsedCount", mvo.getUsedCount());
+						mRate.put("feeTypeIndex", "idx" + feeTypeIndex++);
+						feeTypeList.add(mRate);
+					}
 				}
 			}
-		}
 		}
 
 		outputVO.setFeeTypeList(feeTypeList);

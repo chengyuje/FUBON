@@ -276,7 +276,7 @@ public class IOT110 extends FubonWmsBizLogic {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		Date now = df.parse(df.format(new Date()));
-		Date kycDueDate = df.parse(df.format(custKYCDataVO.getKycDueDate().getTime()));
+		Date kycDueDate = (custKYCDataVO != null && custKYCDataVO.getKycDueDate() != null) ? df.parse(df.format(custKYCDataVO.getKycDueDate().getTime())) : null;
 		String kycLevel = custKYCDataVO.getKycLevel();
 		Boolean isAbleOverPval = false; //是否可越級
 		inputVO.setNeedCalHnwcRiskValue(false); //是否需要做風險權值檢核
@@ -480,29 +480,35 @@ public class IOT110 extends FubonWmsBizLogic {
 				
 		/**如果是投資型商品需要檢核KYC**/
 		if(inputVO.getREG_TYPE().matches("1|2") && !"1".equals(inputVO.getPRODUCT_TYPE())){
-			checkKYCList = checkKYC(inputVO, custKYCDataVO);
-			
-			if(CollectionUtils.isEmpty(checkKYCList)) {
-				if(StringUtils.equals("Y", inputVO.getC_SALE_SENIOR_YN())) { //高齡投資
-					if(StringUtils.equals("Y", inputVO.getPRO_YN())) {
-						throw new APException("高齡專投客戶只能申購風險值為P3(含)以下之標的。"); //高齡專投
-					} else {
-						throw new APException("高齡客戶無相關投資經驗只能申購風險值為P2之標的。"); //高齡非專投
-					}
-				}
+			//新契約且為契撤案件，不檢核
+			if(!(StringUtils.equals("1", inputVO.getREG_TYPE()) && StringUtils.equals("Y", inputVO.getCANCEL_CONTRACT_YN()))) {
+				checkKYCList = checkKYC(inputVO, custKYCDataVO);
 				
-				ErrorMsg = "ehl_01_iot110_005";
-				throw new APException(ErrorMsg);
+				if(CollectionUtils.isEmpty(checkKYCList)) {
+					if(StringUtils.equals("Y", inputVO.getC_SALE_SENIOR_YN())) { //高齡投資
+						if(StringUtils.equals("Y", inputVO.getPRO_YN())) {
+							throw new APException("高齡專投客戶只能申購風險值為P3(含)以下之標的。"); //高齡專投
+						} else {
+							throw new APException("高齡客戶無相關投資經驗只能申購風險值為P2之標的。"); //高齡非專投
+						}
+					}
+					
+					ErrorMsg = "ehl_01_iot110_005";
+					throw new APException(ErrorMsg);
+				}
 			}
 		}
 		/**非投資型但須適配商品**/
 		if(inputVO.getREG_TYPE().matches("1|2") && StringUtils.equals("1", inputVO.getPRODUCT_TYPE()) && StringUtils.equals("Y", inputVO.getNEED_MATCH())) {
-			checkKYCNotInv(inputVO, custKYCDataVO);
-			//若可越級適配，高資產客戶投組風險權值檢核
-			if(inputVO.isNeedCalHnwcRiskValue()) {
-				//高資產客戶投組風險權值檢核
-				if(!validHnwcRiskValue(inputVO)) {
-					throw new APException("客戶加計此筆投資之越級比率已超標");
+			//新契約且為契撤案件，不檢核
+			if(!(StringUtils.equals("1", inputVO.getREG_TYPE()) && StringUtils.equals("Y", inputVO.getCANCEL_CONTRACT_YN()))) {
+				checkKYCNotInv(inputVO, custKYCDataVO);
+				//若可越級適配，高資產客戶投組風險權值檢核
+				if(inputVO.isNeedCalHnwcRiskValue()) {
+					//高資產客戶投組風險權值檢核
+					if(!validHnwcRiskValue(inputVO)) {
+						throw new APException("客戶加計此筆投資之越級比率已超標");
+					}
 				}
 			}
 		}

@@ -80,5 +80,16 @@ eSoafApp.controller('CRM435Controller',
 				});
 		}
 
-
+		$scope.test = function() {
+			debugger;
+			const age = "18";
+			var test = new Map();
+			const result = `AGE => ${age}`;
+			
+			$scope.showMsg();
+			
+			var filter = $filter("i18n");
+			console.log("filter", filter);
+			
+		}
 	});

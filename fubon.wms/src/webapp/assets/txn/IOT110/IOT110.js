@@ -167,6 +167,9 @@ eSoafApp.controller('IOT110Controller',
 						//非UHRM案件，主管登入，狀態為主管覆核中，顯示"核可"、"退回" Button
 						$scope.brhmgrAuthing = true;
 					}
+					if(!$scope.brhmgrAuthing) {
+						$confirm({text: "要保人高風險或AML風險值為空白，需由個金分行主管/私銀區長始能覆核。"}, {size: 'sm'});
+					}
 				} else if($scope.privilegeGroup == "BRHMGR") {
 					if($scope.inputVO.UHRM_CASE == "Y" && ($scope.isHeadMgr || $scope.memLoginFlag == "UHRMMGR")) {
 						//UHRM案件且為總行或UHRM主管登入，狀態為主管覆核中，顯示"核可"、"退回" Button
@@ -805,15 +808,18 @@ eSoafApp.controller('IOT110Controller',
 			//KYC: 投資型險種或外幣商品或非投資型險種但需視配商品，須檢查KYC
 			if(($scope.inputVO.PRODUCT_TYPE != "1" || $scope.inputVO.CURR_CD != "TWD" || ($scope.inputVO.PRODUCT_TYPE == "1" && $scope.inputVO.NEED_MATCH == "Y")) &&
 					($scope.inputVO.CUST_RISK == undefined || $scope.inputVO.CUST_RISK == null || $scope.inputVO.CUST_RISK == '')) {
-				$scope.showErrorMsgInDialog("要保人KYC日期為空白");
-		    	return false;
+				if($scope.inputVO.CANCEL_CONTRACT_YN != "Y") { //契撤不須檢核
+					$scope.showErrorMsgInDialog("要保人KYC日期為空白");
+			    	return false;
+				}
 			}
-			debugger
 			$scope.toDay = $filter('date')(new Date(),'yyyy-MM-dd 00:00:00');//取當日日期
 		    if (($scope.inputVO.PRODUCT_TYPE != "1" || $scope.inputVO.CURR_CD != "TWD" || ($scope.inputVO.PRODUCT_TYPE == "1" && $scope.inputVO.NEED_MATCH == "Y")) &&
 		    		($scope.inputVO.CUST_RISK_DUE < $scope.toJsDate($scope.toDay))) { //KYC過期
-		    	$scope.showErrorMsgInDialog("要保人KYC日期已過期");
-		    	return false;
+		    	if($scope.inputVO.CANCEL_CONTRACT_YN != "Y") { //契撤不須檢核
+			    	$scope.showErrorMsgInDialog("要保人KYC日期已過期");
+			    	return false;
+		    	}
 		    }
 
 		    //投資型商品適配日(要保人保險購買檢核的鍵機日)須等於要保書申請日
@@ -1349,6 +1355,7 @@ eSoafApp.controller('IOT110Controller',
 						$scope.inputVO.EMP_ID = $scope.inputVO.RECRUIT_ID;
 						$scope.sendRecv("IOT920","chk_CertTraining","com.systex.jbranch.app.server.fps.iot920.chk_CTInputVO",
 								$scope.inputVO,function(tota,isError){
+									debugger
 									if(!isError){
 										if($scope.inputVO.REG_TYPE == "1") {
 											//壽險新契約，檢核招攬人員分紅證照
@@ -1359,7 +1366,7 @@ eSoafApp.controller('IOT110Controller',
 											if(data.value.DIVIDEND_YN && data.value.DIVIDEND_YN == "Y") {
 												if($scope.inputVO.empDividendCertYN == "N") {
 													$scope.showMsg("輸入的招攬人員必須具有(銀行)人身保險業分紅保險商品教育訓練完訓資格");
-												} else if($scope.toJsDate($scope.inputVO.empDividendEndDate) > $scope.toJsDate(applydate)) {
+												} else if($scope.toJsDate($scope.inputVO.empDividendEndDate) > applydate) {
 													$scope.showMsg("要保書申請日不得小於分紅完訓日期");
 												}
 											}

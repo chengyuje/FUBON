@@ -14,7 +14,8 @@
 				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REF_AMT_ORGD" e-query="inquire()">贖回金額(原幣)</e-sorter></th>
 <!-- 				<th ng-if="inputVO.prdType=='03'">贖回前手息(原幣)</th> -->
 <!-- 				<th ng-if="inputVO.prdType=='03'">申購前手息(原幣)</th> -->
-				<th>原幣不含息報酬率(%)</th>
+				<th>原幣含息報酬率(不含轉換前配息)%</th>
+				<th>原幣含息報酬率(含轉換前配息)%</th>
 				<th ng-if="inputVO.prdType=='03'">原幣含息報酬率(%)</th>
 				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="INV_COST_TWD" e-query="inquire()">投資成本(折台幣)</e-sorter></th>
 				<th><e-sorter e-input="inputVO" e-mode="auto" e-col="REF_AMT_TWD" e-query="inquire()">贖回金額(折台幣)</e-sorter></th>
@@ -38,7 +39,10 @@
 <!-- 				<td style="text-align: right;" ng-if="inputVO.prdType=='03'">{{row.RDM_PRE_DIVID | number}}</td> -->
 <!-- 				<td style="text-align: right;" ng-if="inputVO.prdType=='03'">{{row.PUR_PRE_DIVID | number}}</td> -->
 				<!-- 原幣不含息報酬率 = (贖回金額原幣 – 投資成本(原幣) ) *100 / 投資成本 , 小數點2位 -->
-				<td style="text-align: right;">{{(row.REF_AMT_ORGD - row.INV_COST_ORGD) * 100 / row.INV_COST_ORGD  | number:2}}</td>
+				<td style="text-align: right;">
+				{{(row.REF_AMT_ORGD - row.INV_COST_ORGD) * 100 / row.INV_COST_ORGD  | number:2}}
+				</td>
+				<td style="text-align: right;"></td>
 				<!-- 海外債(到期): 原幣含息報酬率 = (還本原幣金額 + 累積配息金額 - 申購成交金額 -申購前手息) * 100 / 申購成交金額 , 小數點2位 -->
 				<td style="text-align: right;" ng-if="inputVO.prdType=='03' && row.PROD_TYPE == 'PD22'">{{(row.REF_AMT_ORGD + row.TXN_DIVID_ORGD - row.INV_COST_ORGD - row.PUR_PRE_DIVID) * 100 / row.INV_COST_ORGD | number:2}}</td>
 				<!-- 海外債(贖回): 原幣含息報酬率 = (還本原幣金額 + 贖回前手息 + 累積配息金額 - 申購成交金額 -申購前手息) * 100 / 申購成交金額 , 小數點2位 -->
@@ -63,7 +67,8 @@
 				<th>贖回金額(原幣)</th>
 				<th>投資成本(台幣)</th>
 				<th>贖回金額(台幣)</th>
-				<th>原幣不含息報酬率(%)</th>
+				<th>原幣含息報酬率(不含轉換前配息)%</th>
+				<th>原幣含息報酬率(含轉換前配息)%</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -74,6 +79,7 @@
 				<td class="td_right">{{row.INV_COST_TWD | number:0}}</td>
 				<td class="td_right">{{row.REF_AMT_TWD | number:0}}</td>
 				<td class="td_right">{{(row.REF_AMT_ORGD - row.INV_COST_ORGD) * 100 / row.INV_COST_ORGD  | number:2}}</td>
+				<td class="td_right"></td>
 			</tr>
 		</tbody>
 	</table>

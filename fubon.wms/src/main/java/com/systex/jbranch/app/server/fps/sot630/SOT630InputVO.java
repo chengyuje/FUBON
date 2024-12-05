@@ -26,7 +26,16 @@ public class SOT630InputVO extends PagingInputVO {
 	private String AUTH_DIRECTOR_EMP_ID;
 	private Date AUTH_DATE;
 	private String FINACIAL_COGNITION_RESULT;
+	private String AUTH_REASON;
 	
+	public String getAUTH_REASON() {
+		return AUTH_REASON;
+	}
+
+	public void setAUTH_REASON(String aUTH_REASON) {
+		AUTH_REASON = aUTH_REASON;
+	}
+
 	public String getFINACIAL_COGNITION_RESULT() {
 		return FINACIAL_COGNITION_RESULT;
 	}

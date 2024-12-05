@@ -99,10 +99,13 @@ public class ProcessContext {
      * @throws Exception
      */
     public void prepareConnection(String server, String user) throws Exception {
-        if (server.equals(ORACLE_SERVER)) setConn(oracleDS.getConnection());
-        else if (server.equals(SQL_SERVER))
-            if (user.equals(SQL_INS)) setConn(sqlServerInsDS.getConnection());
-            else if (user.equals(SQL_BNK)) setConn(sqlServerBnkDS.getConnection());
+		if (server.equals(ORACLE_SERVER))
+			setConn(oracleDS.getConnection());
+		else if (server.equals(SQL_SERVER))
+			if (user.equals(SQL_INS))
+				setConn(sqlServerInsDS.getConnection());
+			else if (user.equals(SQL_BNK))
+				setConn(sqlServerBnkDS.getConnection());
     }
 
     /**

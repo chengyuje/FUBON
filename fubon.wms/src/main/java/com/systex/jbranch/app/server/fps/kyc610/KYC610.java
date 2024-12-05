@@ -147,13 +147,13 @@ public class KYC610 extends EsbUtil{
 		KYC610OutputVO outputVO = new KYC610OutputVO();
 		List<String> megerurl = new ArrayList<String>();
 		String qstType = inputVO.getQUEST_TYPE();
-		String qstName = qstType.equals("04")?"專業投資人金融(含債券)專業知識評估":qstType.equals("05")?"結構型商品專業知識評估":"";
+		String qstName = qstType.equals("04") ? "專業投資人金融(含債券)專業知識評估" : qstType.equals("05") ? "結構型商品專業知識評估" : "";
 		//問卷列印歷史記錄,Map key:EXAM_VERSION
 		List<TBKYC_PROEXAM_M_HISTVO> limitList = queryQuestHis(inputVO);
 
 		try{
 			if (limitList.size() >= 2) {
-					throw new JBranchException("已超過當日可執行次數");
+				throw new JBranchException("已超過當日可執行次數");
 			}
 	
 			//取得已啟用且當日未做過的問卷

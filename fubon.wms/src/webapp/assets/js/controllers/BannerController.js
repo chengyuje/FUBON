@@ -10,8 +10,10 @@ eSoafApp.controller("BannerController", ['$rootScope', '$scope', '$controller', 
 				function(tota, isError) {
 					if (!isError) {
 						angular.forEach(tota[0].body.resultList, function(row) {
-							if(row.PARAM_CODE == $scope.role)
+							if(row.PARAM_CODE == $scope.role){
 								$scope.canQuick = false
+							}
+							
 	        			});
 					}
 					

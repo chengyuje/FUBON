@@ -52,8 +52,7 @@ public class BTSQM410 extends BizLogic {
 		sb.append("  WHERE A.DELETE_FLAG IS NULL AND A.HO_CHECK = 'Y' AND NVL(A.CASE_STATUS, ' ') <> 'N' ");
 		sb.append("  AND A.CASE_NO IS NOT NULL AND A.OWNER_EMP_ID <> 'close' ");
 		sb.append("  AND A.OWNER_EMP_ID NOT IN (SELECT EMP_ID FROM TBORG_AGENT WHERE AGENT_STATUS = 'S' AND SYSDATE BETWEEN START_DATE AND END_DATE) "); //排除休假中
-		sb.append("  AND P.PRIVILEGEID in ('012','013') ");
-		sb.append("  AND NVL(A.UHRM_YN, 'N') = 'N' "); //排除私銀理專案件
+		sb.append("  AND (P.PRIVILEGEID = '013' OR (P.PRIVILEGEID = '012' AND NVL(A.UHRM_YN, 'N') = 'N')) "); //處長或區長非私銀案件
 		sb.append("UNION ALL ");
 		sb.append("  SELECT DISTINCT A.CASE_NO, Ag.AGENT_ID, P.PRIVILEGEID ");
 		sb.append("  FROM TBSQM_CSM_IMPROVE_MAST A  ");
@@ -62,8 +61,7 @@ public class BTSQM410 extends BizLogic {
 		sb.append("  inner join TBORG_AGENT ag on a.OWNER_EMP_ID = ag.EMP_ID AND AGENT_STATUS = 'S' AND SYSDATE BETWEEN ag.START_DATE AND ag.END_DATE ");
 		sb.append("  WHERE A.DELETE_FLAG IS NULL AND A.HO_CHECK = 'Y' AND NVL(A.CASE_STATUS, ' ') <> 'N' ");
 		sb.append("  AND A.CASE_NO IS NOT NULL AND A.OWNER_EMP_ID <> 'close' ");
-		sb.append("  AND P.PRIVILEGEID in ('012','013') ");
-		sb.append("  AND NVL(A.UHRM_YN, 'N') = 'N' "); //排除私銀理專案件
+		sb.append("  AND (P.PRIVILEGEID = '013' OR (P.PRIVILEGEID = '012' AND NVL(A.UHRM_YN, 'N') = 'N')) "); //處長或區長非私銀案件
 		sb.append(")TB GROUP BY OWNER_EMP_ID, PRIVILEGEID ");
 		queryCondition.setQueryString(sb.toString());
 		List<Map<String, Object>> mgrList = dam.exeQuery(queryCondition);

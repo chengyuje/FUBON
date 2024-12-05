@@ -84,8 +84,9 @@ public class EsbUtil extends FubonWmsBizLogic {
 	
 	private synchronized void initPool() {
 		try {
+			int MAX_JAXB_INSTANCES = "AIX".equals(System.getProperty("os.name")) ? 200 : 1;
 			if (jaxbMap.isEmpty()) {
-				for (int i=1; i<=200; i++) {
+				for (int i=1; i<=MAX_JAXB_INSTANCES; i++) {
 					JAXBContext inContext = JAXBContext.newInstance(ESBUtilInputVO.class);
 					JaxbInstance instance = new JaxbInstance();
 					instance.id = i;
@@ -98,10 +99,25 @@ public class EsbUtil extends FubonWmsBizLogic {
 		}
 	}
 	
+	private synchronized void increaseJaxbInstance(int cnt) {
+		try {
+			JAXBContext inContext = JAXBContext.newInstance(ESBUtilInputVO.class);
+			JaxbInstance instance = new JaxbInstance();
+			instance.id = cnt;
+			instance.inContext = inContext;
+			jaxbMap.put(cnt, instance);
+		} catch (Exception e) {
+			logger.warn("increaseJaxbInstance fail", e);		
+		}
+	}
+	
 	private int countFree() {
 		int cnt = 0;
 		for (JaxbInstance instance : jaxbMap.values()) {
 			if (!instance.used) cnt++;
+			if (cnt >= jaxbMap.size()) {	// 大於等於Pool, 就主動加一instance
+				this.increaseJaxbInstance(cnt+1);
+			}
 		}
 		return cnt;
 	}

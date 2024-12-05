@@ -76,7 +76,6 @@ eSoafApp.controller('CRM211Controller',
 						 $scope.aolist = _.sortBy(tota[0].body.resultList, ['AO_CODE']);
 						 $scope.mappingSet['ao_list'] = [];
 						 $scope.inputVO.aolist = [];
-						
 						 if ($scope.ao_code != '' && $scope.ao_code != undefined) {		//有AO_CODE
 							 if($scope.ao_code.length > 1){		//有兩個以上AO_CODE的理專
 								 angular.forEach($scope.aolist, function(row, index, objs){

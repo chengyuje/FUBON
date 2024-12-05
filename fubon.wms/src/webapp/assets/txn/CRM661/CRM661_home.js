@@ -37,7 +37,8 @@ eSoafApp.controller('CRM661_HOMEController',
 					
 					//判斷家庭戶是否有資料，有可能V做從戶
 					$scope.sendRecv("CRM661", "query_PRV", "com.systex.jbranch.app.server.fps.crm661.CRM661InputVO", {'cust_id':$scope.custVO.CUST_ID},
-						function(tota, isError) {						
+						function(tota, isError) {			
+							debugger;			
 							if(tota[0].body.resultList.length > 0) {
 								if(tota[0].body.resultList[0].CUST_ID_M == $scope.custVO.CUST_ID){		//主戶
 									$scope.VATYPE = '2';

@@ -98,7 +98,12 @@ public class CRM814 extends EsbUtil {
 		
 		String livingFinalUsedDate = dealFinalUsedDate(livingAcctSecondPartStartDate, chequeAcctSecondPartStartDate);
 		//查活存數字電文 
-		EB202674OutputVO livingAcctData = eb202674Service.search(inputVO.getAccount(), livingFinalUsedDate != null ? changeDatePattern(livingFinalUsedDate) : sdf.format(inputVO.getsCreDate()), sdf.format(inputVO.geteCreDate()), "01", livingFinalUsedDate);
+		EB202674OutputVO livingAcctData = 
+				eb202674Service.search(inputVO.getAccount(),
+								livingFinalUsedDate != null ? changeDatePattern(livingFinalUsedDate) : sdf.format(inputVO.getsCreDate()), 
+								sdf.format(inputVO.geteCreDate()), 
+								"01", 
+								livingFinalUsedDate);
 		if (null != livingAcctData) {
 			if (isNotEmpty(livingAcctData.getDetails()))
 				for (EB202674OutputDetailsVO detail : livingAcctData.getDetails()) {

@@ -68,6 +68,7 @@ public class PRD100 extends FubonWmsBizLogic {
 			inputVO630.setAUTH_BRANCH_NBR((String) getUserVariable(FubonSystemVariableConsts.LOGINBRH));
 			inputVO630.setAUTH_DIRECTOR_EMP_ID(inputVO.getBossEmpID());
 			inputVO630.setAUTH_DATE(new Date());
+			inputVO630.setAUTH_REASON(inputVO.getAuthReason());
 			
 			SOT630 sot630 = (SOT630) PlatformContext.getBean("sot630");
 			sot630.save(inputVO630);

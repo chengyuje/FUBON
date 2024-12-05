@@ -13,6 +13,7 @@ public class PRD100InputVO extends PagingInputVO {
 	private String invalidMsgC;
 	private String invalidMsgF;
 	private String trustTS;
+	private String authReason;
 	
 	public String getBossEmpID() {
 		return bossEmpID;
@@ -73,6 +74,12 @@ public class PRD100InputVO extends PagingInputVO {
 	}
 	public void setTrustTS(String trustTS) {
 		this.trustTS = trustTS;
+	}
+	public String getAuthReason() {
+		return authReason;
+	}
+	public void setAuthReason(String authReason) {
+		this.authReason = authReason;
 	}
 	
 }

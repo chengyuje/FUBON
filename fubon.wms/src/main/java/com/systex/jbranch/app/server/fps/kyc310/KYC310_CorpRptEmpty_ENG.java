@@ -209,28 +209,28 @@ public class KYC310_CorpRptEmpty_ENG extends FubonWmsBizLogic {
 
         PdfPTable tbText2 = buildTable(new int[]{17, 82});
         tbText2.addCell(buildTitle("Print Date：", nFont10, Paragraph.ALIGN_LEFT));
-        tbText2.addCell(buildTitle(year + "/" + (month.matches("\\d{2}") ? "" : "0") + month + "/" + (day.matches("\\d{2}") ? "" : "0") + day, nFont10, Paragraph.ALIGN_LEFT));
+        tbText2.addCell(buildTitle(addStrBehind("", addStr, lineLength), nFont10, Paragraph.ALIGN_LEFT));
 
 
         PdfPTable tbText3 = buildTable(new int[]{17, 30, 3, 20, 30});
         tbText3.addCell(buildTitle("Company Name：", nFont10, Paragraph.ALIGN_LEFT));
-        tbText3.addCell(buildCellhardWordTitle(addStrBehind(inputVO.getCust_name(), addStr, lineLength), uFont10, uFont10eudc, Paragraph.ALIGN_LEFT));
+        tbText3.addCell(buildCellhardWordTitle(addStrBehind("", addStr, lineLength), uFont10, uFont10eudc, Paragraph.ALIGN_LEFT));
 
         tbText3.addCell(blank);
         tbText3.addCell(buildTitle("Responsible Person：", nFont10, Paragraph.ALIGN_LEFT));
-        tbText3.addCell(buildCellhardWordTitle(addStrBehind(inputVO.getRPRS_NAME(), addStr, lineLength), uFont10, uFont10eudc, Paragraph.ALIGN_LEFT));
+        tbText3.addCell(buildCellhardWordTitle(addStrBehind("", addStr, lineLength), uFont10, uFont10eudc, Paragraph.ALIGN_LEFT));
 
         PdfPTable tbText4 = buildTable(new int[]{17, 30, 3, 20, 30});
         tbText4.addCell(buildTitle("Company ID：", nFont10, Paragraph.ALIGN_LEFT));
-        tbText4.addCell(buildTitle(addStrBehind(inputVO.getCUST_ID(), addStr, lineLength), uFont10, Paragraph.ALIGN_LEFT));
+        tbText4.addCell(buildTitle(addStrBehind("", addStr, lineLength), uFont10, Paragraph.ALIGN_LEFT));
 
         tbText4.addCell(blank);
         tbText4.addCell(buildTitle("Contact Number：", nFont10, Paragraph.ALIGN_LEFT));
-        tbText4.addCell(buildTitle(addStrBehind(inputVO.getDAY(), addStr, lineLength), uFont10, Paragraph.ALIGN_LEFT));
+        tbText4.addCell(buildTitle(addStrBehind("", addStr, lineLength), uFont10, Paragraph.ALIGN_LEFT));
 
         PdfPTable tbText5 = buildTable(new int[]{17, 82});
         tbText5.addCell(buildTitle("Mailing Address：", nFont10, Paragraph.ALIGN_LEFT));
-        tbText5.addCell(buildTitle(addStrBehind(inputVO.getCUST_ADDR_1(), addStr, 84), uFont10, Paragraph.ALIGN_LEFT));
+        tbText5.addCell(buildTitle(addStrBehind("", addStr, 84), uFont10, Paragraph.ALIGN_LEFT));
 
         PdfPTable tbText6 = buildTable(new int[]{100});
         tbText6.addCell(buildTitle("This questionnaire can help assess the company's risk attribute, and to protect the company's interests, please fill the answers based on actual situations of the company. The analysis results of this questionnaire is valid for one year.", bFont10, Paragraph.ALIGN_LEFT));
@@ -238,7 +238,7 @@ public class KYC310_CorpRptEmpty_ENG extends FubonWmsBizLogic {
 //        
         PdfPTable tbText7 = buildTable(new int[]{17, 30, 23, 30});
         tbText7.addCell(buildTitle("E-mail Address：", nFont10, Paragraph.ALIGN_LEFT));
-        tbText7.addCell(buildTitle(addStrBehind(inputVO.getCUST_EMAIL_BEFORE(), addStr, lineLength), uFont10, Paragraph.ALIGN_LEFT));
+        tbText7.addCell(buildTitle(addStrBehind("", addStr, lineLength), uFont10, Paragraph.ALIGN_LEFT));
         tbText7.addCell(buildTitle("Updated E-mail Address：", nFont10, Paragraph.ALIGN_LEFT));
         tbText7.addCell(buildTitle(addStrBehind("", addStr, lineLength), uFont10, Paragraph.ALIGN_LEFT));
 
@@ -746,17 +746,18 @@ public class KYC310_CorpRptEmpty_ENG extends FubonWmsBizLogic {
             tBarCodeTable.addCell(blank);
 
             //barcode - 客戶ID
-            code39 = new Barcode39();
-            code39.setCode(inputVO.getCUST_ID());
-            code39.setBarHeight(18);//設定高度
-
-            cell = new PdfPCell();
-            cell.setFixedHeight(30);//儲存格高度
-            cell.setPadding(0);    //間格
-            cell.setBorderWidth(0); //邊框的寬度
-            cell.addElement(code39.createImageWithBarcode(pdfContentByte, null, null));//產生一張barCode圖片並添加到列中
-
-            tBarCodeTable.addCell(cell);//添加到表中
+//            code39 = new Barcode39();
+//            code39.setCode(inputVO.getCUST_ID());
+//            code39.setBarHeight(18);//設定高度
+//
+//            cell = new PdfPCell();
+//            cell.setFixedHeight(30);//儲存格高度
+//            cell.setPadding(0);    //間格
+//            cell.setBorderWidth(0); //邊框的寬度
+//            cell.addElement(code39.createImageWithBarcode(pdfContentByte, null, null));//產生一張barCode圖片並添加到列中
+//
+//            tBarCodeTable.addCell(cell);//添加到表中
+            tBarCodeTable.addCell(blank);
             tBarCodeTable.addCell(blank);
 
             //barcode - page

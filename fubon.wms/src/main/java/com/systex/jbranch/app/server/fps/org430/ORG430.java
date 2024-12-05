@@ -666,6 +666,7 @@ public class ORG430 extends FubonWmsBizLogic {
 				if (null != list.get(i).get(mainLine[0]) && "ROLE_NAME".equals(mainLine[j]) && null == list.get(i).get(mainLine[j])) {
 					cell.setCellValue("小計");
 				} else {
+					System.out.println(list.get(i).get(mainLine[j]));
 					cell.setCellValue(list.get(i).get(mainLine[j]));
 				}
 			}

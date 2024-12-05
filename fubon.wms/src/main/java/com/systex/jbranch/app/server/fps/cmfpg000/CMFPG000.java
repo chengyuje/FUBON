@@ -550,7 +550,7 @@ public class CMFPG000 extends FubonWmsBizLogic {
 					//					}
 
 					if (!isMobile && !isPassIp) {
-						throw new JBranchException("非合法連線");
+//						throw new JBranchException("非合法連線");
 					}
 				}
 
