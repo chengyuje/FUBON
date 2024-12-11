@@ -410,6 +410,8 @@ eSoafApp.controller('CRM361_COMMONController',
 						$scope.showErrorMsg("客戶:" + res_data.resultList + ", 未執行帳務確認客戶於專案執行日系統拔CODE後，主管不得於「例行」以及「專案」移轉覆核時分派新理專");
 					} else if (res_data.resultList2 == 'ERR10') {
 						$scope.showErrorMsg("客戶:" + res_data.resultList + ", 主CODE客戶不可移轉至維護CODE");
+					} else if (res_data.resultList2 == 'ERR11') {
+						$scope.showErrorMsg("客戶:" + res_data.resultList + ", 不可將分行客戶移入私銀CODE");
 					} else if (res_data.resultList2 == 'ERR1') {
 						if(IsMBRM) {
 							$confirm({text: '此次放行名單將使得理專：' + res_data.resultList + '會超過最適客戶管理原則，需經營運督導放行生效，請確認是否放行？'}, {size: 'sm'}).then(function() {

@@ -1335,6 +1335,12 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 	    	}
 			debugger
 	    	if (tota.length > 0) {
+				 debugger
+				//有錯誤訊息，則開popup
+				if(tota[0].body.errorMsg) {
+					var rmsg = tota[0].body.errorMsg;
+					$confirm({text: rmsg}, {size: 'sm'}).then(function(){});
+				}
 	    		//INS_ID重複跳錯誤訊息
 	    		//CASE_ID重複跳錯誤訊息
 	    		if($scope.OPR_STATUS == 'new' && tota[0].body.ErrorCASE_ID){

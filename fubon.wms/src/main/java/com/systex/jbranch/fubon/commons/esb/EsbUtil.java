@@ -84,14 +84,16 @@ public class EsbUtil extends FubonWmsBizLogic {
 	
 	private synchronized void initPool() {
 		try {
-			int MAX_JAXB_INSTANCES = "AIX".equals(System.getProperty("os.name")) ? 200 : 1;
+			int MAX_JAXB_INSTANCES = "AIX".equals(System.getProperty("os.name")) ? 5 : 2;
 			if (jaxbMap.isEmpty()) {
 				for (int i=1; i<=MAX_JAXB_INSTANCES; i++) {
 					JAXBContext inContext = JAXBContext.newInstance(ESBUtilInputVO.class);
 					JaxbInstance instance = new JaxbInstance();
 					instance.id = i;
 					instance.inContext = inContext;
+					instance.used = false;
 					jaxbMap.put(i, instance);
+					logger.info("newInstance JaxbInstance #" + i);
 				}
 			}
 		} catch (Exception e) {
@@ -99,15 +101,17 @@ public class EsbUtil extends FubonWmsBizLogic {
 		}
 	}
 	
-	private synchronized void increaseJaxbInstance(int cnt) {
+	private synchronized void increaseJaxbInstance() {
 		try {
 			JAXBContext inContext = JAXBContext.newInstance(ESBUtilInputVO.class);
 			JaxbInstance instance = new JaxbInstance();
-			instance.id = cnt;
+			instance.id = jaxbMap.size() + 1;
 			instance.inContext = inContext;
-			jaxbMap.put(cnt, instance);
+			instance.used = false;
+			jaxbMap.put(instance.id, instance);
+			logger.info("increase JaxbInstance #" + instance.id);
 		} catch (Exception e) {
-			logger.warn("increaseJaxbInstance fail", e);		
+			logger.warn("increase JaxbInstance #" + (jaxbMap.size() + 1) + " fail", e);
 		}
 	}
 	
@@ -115,9 +119,9 @@ public class EsbUtil extends FubonWmsBizLogic {
 		int cnt = 0;
 		for (JaxbInstance instance : jaxbMap.values()) {
 			if (!instance.used) cnt++;
-			if (cnt >= jaxbMap.size()) {	// 大於等於Pool, 就主動加一instance
-				this.increaseJaxbInstance(cnt+1);
-			}
+		}
+		if (cnt == 0) {	// 用完, 就主動加一instance
+			this.increaseJaxbInstance();
 		}
 		return cnt;
 	}
@@ -293,7 +297,6 @@ public class EsbUtil extends FubonWmsBizLogic {
 				marshal.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
 				marshal.marshal(esbUtilInputVO, writer);
-				this.freeJaxbInstance(instance);
 				fmpJRunTx.setInboundXML(writer.toString());
 			} catch (JBranchException je) {
 				throw je;

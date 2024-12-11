@@ -1123,7 +1123,10 @@ public class IOT920 extends FubonWmsBizLogic{
 		StringBuffer sql = new StringBuffer();
 		sql.append(" SELECT 1 FROM TBORG_MEMBER_CERT ");
 		sql.append(" WHERE CERTIFICATE_CODE = '11' AND EMP_ID = :EMP_ID ");
-		sql.append("   AND (TRUNC(TRAIN_DATE) <= TRUNC(:applyDate) OR TRUNC(TRAIN_DATE_BEFORE) <= TRUNC(:applyDate)) ");
+		sql.append("   AND (TO_CHAR(TRAIN_DATE, 'YYYY') = TO_CHAR(:applyDate, 'YYYY') OR ");
+		sql.append("        TO_CHAR(TRAIN_DATE, 'YYYY') = TO_CHAR(ADD_MONTHS(:applyDate, -12), 'YYYY') OR ");
+		sql.append("		(TRAIN_DATE_BEFORE IS NOT NULL AND TO_CHAR(TRAIN_DATE_BEFORE, 'YYYY') = TO_CHAR(:applyDate, 'YYYY')) OR ");
+		sql.append("		(TRAIN_DATE_BEFORE IS NOT NULL AND TO_CHAR(TRAIN_DATE_BEFORE, 'YYYY') = TO_CHAR(ADD_MONTHS(:applyDate, -12), 'YYYY'))) ");
 		queryCondition.setObject("EMP_ID", empId);
 		queryCondition.setObject("applyDate", applyDate);
 		queryCondition.setQueryString(sql.toString());
@@ -1146,7 +1149,8 @@ public class IOT920 extends FubonWmsBizLogic{
 		StringBuffer sql = new StringBuffer();
 		sql.append(" SELECT 1 FROM TBORG_MEMBER_CERT ");
 		sql.append(" WHERE CERTIFICATE_CODE = '09' AND EMP_ID = :EMP_ID ");
-		sql.append("   AND (TRUNC(TRAIN_DATE_BEFORE) >= ADD_MONTHS(TRUNC(:applyDate), -12) AND TRUNC(TRAIN_DATE_BEFORE) <= TRUNC(:applyDate)) ");
+		sql.append("   AND (TO_CHAR(TRAIN_DATE, 'YYYY') = TO_CHAR(ADD_MONTHS(:applyDate, -12), 'YYYY') OR ");
+		sql.append("   		(TRAIN_DATE_BEFORE IS NOT NULL AND TO_CHAR(TRAIN_DATE_BEFORE, 'YYYY') = TO_CHAR(ADD_MONTHS(:applyDate, -12), 'YYYY'))) ");
 		queryCondition.setObject("EMP_ID", empId);
 		queryCondition.setObject("applyDate", applyDate);
 		queryCondition.setQueryString(sql.toString());

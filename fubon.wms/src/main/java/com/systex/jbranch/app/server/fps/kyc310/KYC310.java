@@ -643,20 +643,31 @@ public class KYC310 extends FubonWmsBizLogic{
 					outputVO.setCustEduHighSchool(sot701.getCustEduHighSchool(sot701vo));
 				}
 				
-				//取得法代與年收入資料
-				Map<String, String> legalRegMap = getData067050ByType(inputVO.getCUST_ID()); 
-				//年收入
-				BigDecimal yearIncome = BigDecimal.ZERO;
-				if(StringUtils.isNotBlank(legalRegMap.get("INCOME_FROM_CBS"))) {
-					try {
-						yearIncome = new BigDecimal(legalRegMap.get("INCOME_FROM_CBS"));
-					} catch(Exception e) {
-						yearIncome = BigDecimal.ZERO;
-					}
-				}
-				outputVO.setIncomeFromCBS(yearIncome); //端末系統留存的年收入
+//				//取得法代與年收入資料
+//				Map<String, String> legalRegMap = getData067050ByType(inputVO.getCUST_ID()); 
+//				//年收入
+//				BigDecimal yearIncome = BigDecimal.ZERO;
+//				if(StringUtils.isNotBlank(legalRegMap.get("INCOME_FROM_CBS"))) {
+//					try {
+//						yearIncome = new BigDecimal(legalRegMap.get("INCOME_FROM_CBS"));
+//					} catch(Exception e) {
+//						yearIncome = BigDecimal.ZERO;
+//					}
+//				}
+//				outputVO.setIncomeFromCBS(yearIncome); //端末系統留存的年收入
 				//未滿18歲自然人，取得法定代理人KYC
 				if(inputVO.getCUST_ID().length() >= 10 && age < 18) {
+					//取得法代與年收入資料
+					Map<String, String> legalRegMap = getData067050ByType(inputVO.getCUST_ID()); 
+					//年收入
+					BigDecimal yearIncome = BigDecimal.ZERO;
+					if(StringUtils.isNotBlank(legalRegMap.get("INCOME_FROM_CBS"))) {
+						try {
+							yearIncome = new BigDecimal(legalRegMap.get("INCOME_FROM_CBS"));
+						} catch(Exception e) {
+							yearIncome = BigDecimal.ZERO;
+						}
+					}
 					//取得法代資料
 					if(StringUtils.isNotBlank(legalRegMap.get("REP_RISK_1")) && StringUtils.isBlank(legalRegMap.get("REP_RISK_2"))) {
 						//法代1有風險屬性，法代2沒有；取法代1風險屬性
@@ -672,7 +683,7 @@ public class KYC310 extends FubonWmsBizLogic{
 							outputVO.setLegalRegKycLevel(legalRegMap.get("REP_RISK_1"));
 						}
 					}
-				}
+				}else {outputVO.setIncomeFromCBS(BigDecimal.ZERO);}
 				
 				//依照類型取題目(法人、自然人)
 				List<Map<String, Object>> questList = queryQuestion(inputVO.getQUESTION_TYPE());//找題目
@@ -751,6 +762,7 @@ public class KYC310 extends FubonWmsBizLogic{
 						map.put("RISK_LIST", getDataAccessManager().exeQueryWithoutSort(qc));
 					}
 				}
+			
 				
 				//設定output題目答案
 				outputVO.setQuestionnaireList(questList);

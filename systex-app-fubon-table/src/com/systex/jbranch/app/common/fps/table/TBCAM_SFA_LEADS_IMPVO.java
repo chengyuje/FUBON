@@ -122,6 +122,9 @@ public class TBCAM_SFA_LEADS_IMPVO extends VOBase {
 
     /** nullable persistent field */
     private Timestamp REL_DATETIME;
+    
+    /** nullable persistent field */
+    private String CAMP_PURPOSE;
 
 
 public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBCAM_SFA_LEADS_IMP";
@@ -132,7 +135,13 @@ public String getTableuid () {
 }
 
     /** full constructor */
-    public TBCAM_SFA_LEADS_IMPVO(BigDecimal SEQNO, String CAMPAIGN_ID, String CAMPAIGN_NAME, String CAMPAIGN_DESC, String STEP_ID, String STEP_NAME, String LEAD_SOURCE_ID, Timestamp START_DATE, Timestamp END_DATE, String LEAD_USE_DP, String LEAD_TYPE, String LEAD_PARA1, String LEAD_PARA2, BigDecimal LEAD_DAYUSE, BigDecimal FILE_SEQ, String EXAM_ID, String SALES_PITCH, String FIRST_CHANNEL, String SECOND_CHANNEL, String IMP_STATUS, String CHECK_STATUS, BigDecimal LE_TOTAL_CNT, BigDecimal IM_TOTAL_CNT, BigDecimal IM_AO_CNT, BigDecimal IM_OTHER_CNT, BigDecimal ER_CNT, BigDecimal RV_LE_CNT, String RV_REASON, Timestamp START_DT, Timestamp END_DT, String GIFT_CAMPAIGN_ID, String RE_STATUS, String RE_LOG, BigDecimal HANDLE_CNT, String LEAD_RESPONSE_CODE, String REL_EMP_ID, Timestamp REL_DATETIME, Timestamp createtime, String creator, String modifier, Timestamp lastupdate, Long version) {
+    public TBCAM_SFA_LEADS_IMPVO(BigDecimal SEQNO, String CAMPAIGN_ID, String CAMPAIGN_NAME, String CAMPAIGN_DESC, String STEP_ID, String STEP_NAME, String LEAD_SOURCE_ID, 
+    							 Timestamp START_DATE, Timestamp END_DATE, String LEAD_USE_DP, String LEAD_TYPE, String LEAD_PARA1, String LEAD_PARA2, BigDecimal LEAD_DAYUSE, 
+    							 BigDecimal FILE_SEQ, String EXAM_ID, String SALES_PITCH, String FIRST_CHANNEL, String SECOND_CHANNEL, String IMP_STATUS, String CHECK_STATUS, 
+    							 BigDecimal LE_TOTAL_CNT, BigDecimal IM_TOTAL_CNT, BigDecimal IM_AO_CNT, BigDecimal IM_OTHER_CNT, BigDecimal ER_CNT, BigDecimal RV_LE_CNT, 
+    							 String RV_REASON, Timestamp START_DT, Timestamp END_DT, String GIFT_CAMPAIGN_ID, String RE_STATUS, String RE_LOG, BigDecimal HANDLE_CNT, 
+    							 String LEAD_RESPONSE_CODE, String REL_EMP_ID, Timestamp REL_DATETIME, String CAMP_PURPOSE, 
+    							 Timestamp createtime, String creator, String modifier, Timestamp lastupdate, Long version) {
         this.SEQNO = SEQNO;
         this.CAMPAIGN_ID = CAMPAIGN_ID;
         this.CAMPAIGN_NAME = CAMPAIGN_NAME;
@@ -170,6 +179,7 @@ public String getTableuid () {
         this.LEAD_RESPONSE_CODE = LEAD_RESPONSE_CODE;
         this.REL_EMP_ID = REL_EMP_ID;
         this.REL_DATETIME = REL_DATETIME;
+        this.CAMP_PURPOSE = CAMP_PURPOSE;
         this.createtime = createtime;
         this.creator = creator;
         this.modifier = modifier;
@@ -482,7 +492,15 @@ public String getTableuid () {
         this.REL_DATETIME = REL_DATETIME;
     }
 
-    public void checkDefaultValue() {
+    public String getCAMP_PURPOSE() {
+		return CAMP_PURPOSE;
+	}
+
+	public void setCAMP_PURPOSE(String cAMP_PURPOSE) {
+		CAMP_PURPOSE = cAMP_PURPOSE;
+	}
+
+	public void checkDefaultValue() {
     }
 
     public String toString() {

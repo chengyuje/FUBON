@@ -1672,6 +1672,7 @@ eSoafApp.controller('KYC310Controller', function(
     
     //送出
     $scope.submitData = function(){
+		debugger;
     	$scope.inputVO.KYC_TEST_DATE = new Date();
     	//法人不檢核電話號碼，自然人因為可以修改基本資料所以需要檢查
     	if($scope.inputVO.CUST_ID.length <= 10 || $scope.checkTEL()){

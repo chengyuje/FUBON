@@ -32,6 +32,7 @@ import com.systex.jbranch.app.common.fps.table.TBCRM_TRS_AOCHG_PLISTVO;
 import com.systex.jbranch.app.server.fps.crm341.CRM341;
 import com.systex.jbranch.app.server.fps.crm8501.CRM8501;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
+import com.systex.jbranch.fubon.jlb.DataFormat;
 import com.systex.jbranch.platform.common.dataManager.DataManager;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
@@ -87,7 +88,8 @@ public class CRM361 extends FubonWmsBizLogic {
 		sql.append("       P.CUST_ID, N.COMPLAIN_YN, N.COMM_NS_YN, C.CUST_NAME, P.TRS_TYPE, P.TEMP_CAL_YN, C.CON_DEGREE, P.SEQ AS TRS_SEQ, ");
 		sql.append("       C.VIP_DEGREE, C.AUM_AMT, P.ORG_AO_CODE, P.NEW_AO_CODE, P.APL_REASON, P.APL_OTH_REASON, P.ORG_AO_BRH, ");
 		sql.append("       P.OVER_CUST_NO_LIMIT_UP_YN, P.NEW_AO_BRH, P.AGMT_SEQ, P.AGMT_FILE, P.TRS_FLOW_TYPE, P.PROCESS_STATUS, P.TRS_TXN_SOURCE, P.APL_EMP_ID, P.APL_DATETIME, P.APL_BRH_MGR_RPL_DATETIME, ORG_BRH_MGR_RPL_DATETIME, OP_MGR_RPL_DATETIME, ");
-		sql.append("       DC_MGR_RPL_DATETIME, EMP.EMP_NAME AS ORG_AO_NAME, DEFN1.BRANCH_NAME AS ORG_BRANCH_NAME, EMP.EMP_ID AS ORG_AO_EMP_ID, EMP2.EMP_NAME AS NEW_AO_NAME, DEFN2.BRANCH_NAME AS NEW_BRANCH_NAME, EMP2.EMP_ID AS NEW_AO_EMP_ID, RO.ROLE_ID as OLD_ROLE_ID ");
+		sql.append("       DC_MGR_RPL_DATETIME, EMP.EMP_NAME AS ORG_AO_NAME, DEFN1.BRANCH_NAME AS ORG_BRANCH_NAME, EMP.EMP_ID AS ORG_AO_EMP_ID, EMP2.EMP_NAME AS NEW_AO_NAME, DEFN2.BRANCH_NAME AS NEW_BRANCH_NAME, EMP2.EMP_ID AS NEW_AO_EMP_ID, RO.ROLE_ID as OLD_ROLE_ID, ");
+		sql.append("	   CASE WHEN C.GENDER = '1' THEN '先生' WHEN C.GENDER = '2' THEN '小姐' END AS GENDER ");
 		sql.append("FROM TBCRM_CUST_MAST C ");
 		sql.append(" INNER JOIN TBCRM_TRS_AOCHG_PLIST P ON C.CUST_ID = P.CUST_ID ");
 		sql.append(" LEFT JOIN TBCRM_CUST_NOTE N ON C.CUST_ID = N.CUST_ID ");
@@ -235,7 +237,8 @@ public class CRM361 extends FubonWmsBizLogic {
 		sql.append("       P.OVER_CUST_NO_LIMIT_UP_YN, P.NEW_AO_BRH, P.AGMT_SEQ, P.AGMT_FILE, P.TRS_FLOW_TYPE, P.PROCESS_STATUS, P.TRS_TXN_SOURCE, P.APL_EMP_ID, P.APL_DATETIME, P.APL_BRH_MGR_RPL_DATETIME, ORG_BRH_MGR_RPL_DATETIME, OP_MGR_RPL_DATETIME, ");
 		sql.append("       DC_MGR_RPL_DATETIME, EMP.EMP_NAME AS ORG_AO_NAME, DEFN1.BRANCH_NAME AS ORG_BRANCH_NAME, EMP.EMP_ID AS ORG_AO_EMP_ID, EMP2.EMP_NAME AS NEW_AO_NAME, DEFN2.BRANCH_NAME AS NEW_BRANCH_NAME, EMP2.EMP_ID AS NEW_AO_EMP_ID, RO.ROLE_ID as OLD_ROLE_ID, ");
 		sql.append("       PDTL.DATA_01, PDTL.DATA_02, PDTL.DATA_03, PDTL.DATA_04, PDTL.DATA_05, PDTL.DATA_06, PDTL.DATA_07, ");
-		sql.append("       PDTL.DATA_08, PDTL.DATA_09, PDTL.DATA_10, PDTL.DATA_11, PDTL.DATA_12, PDTL.DATA_13, PDTL.DATA_14, PDTL.DATA_15 ");
+		sql.append("       PDTL.DATA_08, PDTL.DATA_09, PDTL.DATA_10, PDTL.DATA_11, PDTL.DATA_12, PDTL.DATA_13, PDTL.DATA_14, PDTL.DATA_15, ");
+		sql.append("       CASE WHEN C.GENDER = '1' THEN '先生' WHEN C.GENDER = '2' THEN '小姐' END AS GENDER ");
 		sql.append(" FROM TBCRM_CUST_MAST C ");
 		sql.append(" INNER JOIN TBCRM_TRS_AOCHG_PLIST P ON C.CUST_ID = P.CUST_ID ");
 		sql.append(" LEFT JOIN TBCRM_CUST_NOTE N ON N.CUST_ID = C.CUST_ID ");
@@ -438,6 +441,8 @@ public class CRM361 extends FubonWmsBizLogic {
 		List<String> res9 = new ArrayList<String>();
 		Boolean Check10 = false;
 		List<String> res10 = new ArrayList<String>();
+		Boolean Check11 = false; //分行不可於客戶移轉篩選及主管覆核客戶移轉中，將分行客戶移入私銀
+		List<String> res11 = new ArrayList<String>();
 		
 		// follow crm331
 		for (Map<String, Object> map : inputVO.getApply_list()) {
@@ -588,6 +593,18 @@ public class CRM361 extends FubonWmsBizLogic {
 				res6.add(ObjectUtils.toString(map.get("CUST_ID")));
 			}
 			
+			//分行不可於客戶移轉篩選及主管覆核客戶移轉中，將分行客戶移入私銀
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			sql = new StringBuffer();
+			sql.append("SELECT 1 FROM VWORG_EMP_UHRM_INFO WHERE UHRM_CODE = :newAoCode ");
+			queryCondition.setObject("newAoCode", ObjectUtils.toString(map.get("NEW_AO_CODE")));
+			queryCondition.setQueryString(sql.toString());
+			List<Map<String, Object>> list5 = dam.exeQuery(queryCondition);
+			if(CollectionUtils.isNotEmpty(list5)) {
+				Check11 = true;
+				res11.add(ObjectUtils.toString(map.get("CUST_ID")));
+			}
+			
 			// 公司戶與公司負責人Code不同
 			//			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			//			sql = new StringBuffer();
@@ -638,8 +655,12 @@ public class CRM361 extends FubonWmsBizLogic {
 		} else if(Check10) { //#2225: 主CODE移轉規則調整，主CODE客戶不可移轉至維護CODE
 			return_VO.setResultList2("ERR10");
 			return_VO.setResultList(res10);
-		} else
+		} else if(Check11) {
+			return_VO.setResultList(res11); //分行不可於客戶移轉篩選及主管覆核客戶移轉中，將分行客戶移入私銀
+			return_VO.setResultList2("ERR11"); 
+		} else {
 			return_VO.setResultList2("GOOD");
+		}
 		this.sendRtnObject(return_VO);
 	}
 
@@ -885,19 +906,11 @@ public class CRM361 extends FubonWmsBizLogic {
 									//設定信件主旨
 									mail.setSubject("系統通知！轄下分行客戶申請移轉至他行" + ObjectUtils.toString(data.get("NEW_AO_BRH")));
 									//設定信件內容
-									mail.setContent("轄下分行客戶" + data.get("CUST_ID") + "-" + data.get("CUST_NAME") + "申請移轉至他行" + data.get("NEW_AO_BRH") + "-" + data.get("NEW_BRANCH_NAME"));
-									//附件
-									QueryConditionIF queryCondition_annexData = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-									queryCondition_annexData.setQueryString("select AGMT_FILE FROM TBCRM_TRS_AOCHG_PLIST WHERE SEQ = :seq");
-									queryCondition_annexData.setObject("seq", data.get("TRS_SEQ"));
-									List<Map<String, Object>> annexData_data = dam.exeQuery(queryCondition_annexData);
-									if (annexData_data.size() > 0 && annexData_data.get(0).get("AGMT_FILE") != null) {
-										Blob file = (Blob) annexData_data.get(0).get("AGMT_FILE");
-										int fileLength = (int) file.length();
-										byte[] onversion = file.getBytes(1, fileLength);
-										file.free();
-										annexData.put("異動申請書.pdf", onversion);
-									}
+									mail.setContent("轄下分行客戶" + DataFormat.getCustIdMaskForHighRisk(data.get("CUST_ID").toString())
+																  + "-" + DataFormat.getNameForHighRisk(data.get("CUST_NAME").toString()) + data.get("GENDER")
+																  + "申請移轉至他行" 
+																  + data.get("NEW_AO_BRH") 
+																  + "-" + data.get("NEW_BRANCH_NAME"));
 									//寄出信件
 									sendMail.sendMail(mail, annexData);
 								}
@@ -1009,19 +1022,11 @@ public class CRM361 extends FubonWmsBizLogic {
 									//設定信件主旨
 									mail.setSubject("系統通知！轄下分行客戶申請移轉至他行" + ObjectUtils.toString(data.get("NEW_AO_BRH")));
 									//設定信件內容
-									mail.setContent("轄下分行客戶" + data.get("CUST_ID") + "-" + data.get("CUST_NAME") + "申請移轉至他行" + data.get("NEW_AO_BRH") + "-" + data.get("NEW_BRANCH_NAME"));
-									//附件
-									QueryConditionIF queryCondition_annexData = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-									queryCondition_annexData.setQueryString("select AGMT_FILE FROM TBCRM_TRS_AOCHG_PLIST WHERE SEQ = :seq");
-									queryCondition_annexData.setObject("seq", data.get("TRS_SEQ"));
-									List<Map<String, Object>> annexData_data = dam.exeQuery(queryCondition_annexData);
-									if (annexData_data.size() > 0 && annexData_data.get(0).get("AGMT_FILE") != null) {
-										Blob file = (Blob) annexData_data.get(0).get("AGMT_FILE");
-										int fileLength = (int) file.length();
-										byte[] onversion = file.getBytes(1, fileLength);
-										file.free();
-										annexData.put("異動申請書.pdf", onversion);
-									}
+									mail.setContent("轄下分行客戶" + DataFormat.getCustIdMaskForHighRisk(data.get("CUST_ID").toString()) 
+																  + "-" + DataFormat.getNameForHighRisk(data.get("CUST_NAME").toString()) + data.get("GENDER")
+																  + "申請移轉至他行" 
+																  + data.get("NEW_AO_BRH") 
+																  + "-" + data.get("NEW_BRANCH_NAME"));
 									//寄出信件
 									sendMail.sendMail(mail, annexData);
 								}

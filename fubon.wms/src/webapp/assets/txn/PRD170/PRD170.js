@@ -4,7 +4,7 @@
  */
 'use strict';
 eSoafApp.controller('PRD170Controller',
-    function($rootScope, $scope, $controller, sysInfoService, getParameter) {
+    function($rootScope, $scope, $controller, sysInfoService, getParameter, ngDialog) {
         $controller('BaseController', {$scope: $scope});
         $scope.controllerName = "PRD170Controller";
 
@@ -70,6 +70,17 @@ eSoafApp.controller('PRD170Controller',
                     break;
             }
         }
+        
+		$scope.openPAR_EDIT = function () {
+			var dialog = ngDialog.open({
+				template: 'assets/txn/PRD170/PRD170_PAR_EDIT.html',
+				className: 'PRD170',
+				showClose: false,
+	            controller: ['$scope', function($scope) {
+	            	
+	            }]
+			});
+		};
 
 
 

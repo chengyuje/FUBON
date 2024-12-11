@@ -264,7 +264,7 @@ public class IOT130 extends FubonWmsBizLogic{
 						if("Y".equals(INitem.get("SIGN_INC"))  && "Y".equals(INitem.get("DOC_CHK"))){
 							SIGN_INC = "Y";
 						}
-						if(StringUtils.equals("Y", inputVO.getBUSINESS_REL()) && (Double)INitem.get("DOC_SEQ") == 9) {
+						if(StringUtils.equals("Y", inputVO.getBUSINESS_REL()) && (Double)INitem.get("DOC_SEQ") == 1) {
 							if(!"Y".equals(INitem.get("DOC_CHK"))) {
 								errorMsg = "分行留存文件應檢附「洗錢防制姓名檢核結果」";
 								throw new APException(errorMsg);
@@ -496,7 +496,7 @@ public class IOT130 extends FubonWmsBizLogic{
 					if("Y".equals(INitem.get("SIGN_INC")) && "Y".equals(INitem.get("DOC_CHK"))){
 						SIGN_INC = "Y";
 					}
-					if(StringUtils.equals("Y", inputVO.getBUSINESS_REL()) && (Double)INitem.get("DOC_SEQ") == 9) {
+					if(StringUtils.equals("Y", inputVO.getBUSINESS_REL()) && (Double)INitem.get("DOC_SEQ") == 1) {
 						if(!"Y".equals(INitem.get("DOC_CHK"))) {
 							errorMsg = "分行留存文件應檢附「洗錢防制姓名檢核結果」";
 							throw new APException(errorMsg);

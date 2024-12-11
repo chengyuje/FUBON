@@ -49,7 +49,7 @@ public class SOT630 extends FubonWmsBizLogic {
         sb.append("       CREATOR, ");
         sb.append("       MODIFIER, ");
         sb.append("       LASTUPDATE, ");
-        sb.append("       FINACIAL_COGNITION_RESULT ");
+        sb.append("       FINACIAL_COGNITION_RESULT, ");
         sb.append("       AUTH_REASON ");
 		sb.append("FROM ( ");
 		sb.append("  SELECT  SEQNO, ");
@@ -78,6 +78,7 @@ public class SOT630 extends FubonWmsBizLogic {
 		sb.append("          BASE.CUST_ID, ");
 		sb.append("         BASE.CUST_NAME, ");
 		sb.append("         'C' AS AUTH_TYPE, ");
+		sb.append("         NULL AS PROD_TYPE, ");
 		sb.append("         NULL AS TRADE_TYPE, ");
 		sb.append("         BASE.EVALUATE_VALID_DATE, ");
 		sb.append("         BASE.ABILITY_RESULT, ");
@@ -97,7 +98,6 @@ public class SOT630 extends FubonWmsBizLogic {
 		sb.append("            EVALUATE_VALID_DATE, ");
 		sb.append("            AUTH_DIRECTOR_EMP_ID, ");
 		sb.append("            AUTH_DATE, ");
-		sb.append("            AUTH_REASON, ");
 		sb.append("            CREATETIME, ");
 		sb.append("            CREATOR, ");
 		sb.append("            MODIFIER, ");
@@ -134,7 +134,7 @@ public class SOT630 extends FubonWmsBizLogic {
 		sb.append(") ");
 		
 		sb.append("WHERE 1 = 1 ");
-		
+
 		if (StringUtils.isNotEmpty(inputVO.getCustID())) {
 			sb.append("AND CUST_ID = :custID ");
 			queryCondition.setObject("custID", inputVO.getCustID());

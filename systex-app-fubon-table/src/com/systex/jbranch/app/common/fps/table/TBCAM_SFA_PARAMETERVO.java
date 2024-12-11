@@ -58,6 +58,9 @@ public class TBCAM_SFA_PARAMETERVO extends VOBase {
 
     /** nullable persistent field */
     private String GIFT_CAMPAIGN_ID;
+    
+    /** nullable persistent field */
+    private String CAMP_PURPOSE;
 
 
 public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBCAM_SFA_PARAMETER";
@@ -68,7 +71,7 @@ public String getTableuid () {
 }
 
     /** full constructor */
-    public TBCAM_SFA_PARAMETERVO(String SFA_PARA_ID, String CAMPAIGN_ID, String CAMPAIGN_NAME, String CAMPAIGN_DESC, String LEAD_SOURCE_ID, String LEAD_RESPONSE_CODE, String LEAD_TYPE, String LEAD_PARA1, String LEAD_PARA2, String EXAM_ID, String SALES_PITCH, String FIRST_CHANNEL, String SECOND_CHANNEL, Timestamp START_DT, Timestamp END_DT, String GIFT_CAMPAIGN_ID, Timestamp createtime, String creator, String modifier, Timestamp lastupdate, Long version) {
+    public TBCAM_SFA_PARAMETERVO(String SFA_PARA_ID, String CAMPAIGN_ID, String CAMPAIGN_NAME, String CAMPAIGN_DESC, String LEAD_SOURCE_ID, String LEAD_RESPONSE_CODE, String LEAD_TYPE, String LEAD_PARA1, String LEAD_PARA2, String EXAM_ID, String SALES_PITCH, String FIRST_CHANNEL, String SECOND_CHANNEL, Timestamp START_DT, Timestamp END_DT, String GIFT_CAMPAIGN_ID, String CAMP_PURPOSE, Timestamp createtime, String creator, String modifier, Timestamp lastupdate, Long version) {
         this.SFA_PARA_ID = SFA_PARA_ID;
         this.CAMPAIGN_ID = CAMPAIGN_ID;
         this.CAMPAIGN_NAME = CAMPAIGN_NAME;
@@ -85,6 +88,7 @@ public String getTableuid () {
         this.START_DT = START_DT;
         this.END_DT = END_DT;
         this.GIFT_CAMPAIGN_ID = GIFT_CAMPAIGN_ID;
+        this.CAMP_PURPOSE = CAMP_PURPOSE;
         this.createtime = createtime;
         this.creator = creator;
         this.modifier = modifier;
@@ -229,7 +233,15 @@ public String getTableuid () {
         this.GIFT_CAMPAIGN_ID = GIFT_CAMPAIGN_ID;
     }
 
-    public void checkDefaultValue() {
+    public String getCAMP_PURPOSE() {
+		return CAMP_PURPOSE;
+	}
+
+	public void setCAMP_PURPOSE(String cAMP_PURPOSE) {
+		CAMP_PURPOSE = cAMP_PURPOSE;
+	}
+
+	public void checkDefaultValue() {
     }
 
     public String toString() {

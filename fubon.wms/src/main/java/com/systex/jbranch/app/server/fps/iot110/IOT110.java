@@ -1593,6 +1593,12 @@ public class IOT110 extends FubonWmsBizLogic {
 		data.addParameter("BUSINESS_REL",ObjectUtils.toString(list.get(0).get("BUSINESS_REL")));		//新增業務關係
 		data.addParameter("POLICY_NBR",ObjectUtils.toString(list.get(0).get("POLICY_NBR"))); //要保人工作年收入(業報)
 
+		//有新增業務關係
+		if(StringUtils.equals("Y", ObjectUtils.toString(list.get(0).get("BUSINESS_REL")))) {
+			data.addParameter("BUSINESS_REL_YN", "**"); 
+			data.addParameter("BUSINESS_REL_YN_REMARK", "首次開戶或高風險客戶於本行新增業務關係，請務必由OP於AML系統進行線上姓名檢核作業，檢核文件分行自行留存。"); 
+		}
+				
 		report = gen.generateReport(txnCode, reportID, data);
 		return report.getLocation();
 	}

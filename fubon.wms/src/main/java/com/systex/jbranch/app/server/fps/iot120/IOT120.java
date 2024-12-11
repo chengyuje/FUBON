@@ -478,12 +478,11 @@ public class IOT120 extends FubonWmsBizLogic {
 		return list;
 	}
 
-	public void chkData(Object body, IPrimitiveMap<Object> header)
-			throws JBranchException {
+	public void chkData(Object body, IPrimitiveMap<Object> header) throws JBranchException {
 		String First_buy = "";
 		String chk_Ab = "";
 		IOT120InputVO inputVO = (IOT120InputVO) body;
-
+		IOT120OutputVO outputVO = new IOT120OutputVO();
 		IOT920 iot920 = (IOT920) PlatformContext.getBean("iot920");
 		FirstBuyInputVO iot920_FBInputVO = new FirstBuyInputVO();
 		FirstBuyDataVO iot920_FBOutputVO = new FirstBuyDataVO();
@@ -561,7 +560,7 @@ public class IOT120 extends FubonWmsBizLogic {
 							if ("Y".equals(chk_Ab) && inputVO.getAB_TRANSSEQ() == null) {
 								if(StringUtils.equals("Y", inputVO.getCANCEL_CONTRACT_YN())) {
 									//契撤案件不用檢核非常態錄音
-									submit(body, header);
+									outputVO = submit(inputVO);
 								} else {
 									throw new APException("ehl_01_iot120_009");
 								}
@@ -570,10 +569,10 @@ public class IOT120 extends FubonWmsBizLogic {
 								if (checkREC.size() <= 0) {
 									throw new APException("ehl_01_iot120_007");
 								} else {
-									submit(body, header);
+									outputVO = submit(inputVO);
 								}
 							} else if ("N".equals(chk_Ab) && inputVO.getAB_TRANSSEQ() == null) {
-								submit(body, header);
+								outputVO = submit(inputVO);
 							}
 						} else {
 							// 針對非投資型外幣商品
@@ -581,7 +580,7 @@ public class IOT120 extends FubonWmsBizLogic {
 								if ("Y".equals(chk_Ab) && StringUtils.isBlank(inputVO.getAB_TRANSSEQ())) {
 									if(StringUtils.equals("Y", inputVO.getCANCEL_CONTRACT_YN())) {
 										//契撤案件不用檢核非常態錄音
-										submit(body, header);
+										outputVO = submit(inputVO);
 									} else {
 										throw new APException("ehl_01_iot120_009");
 									}
@@ -590,21 +589,21 @@ public class IOT120 extends FubonWmsBizLogic {
 									if (checkREC.size() <= 0) {
 										throw new APException("ehl_01_iot120_007");
 									} else {
-										submit(body, header);
+										outputVO = submit(inputVO);
 									}
 								} else if ("N".equals(chk_Ab) && StringUtils.isBlank(inputVO.getAB_TRANSSEQ())) {
-									submit(body, header);
+									outputVO = submit(inputVO);
 								}
 							} else if (StringUtils.isNotBlank(inputVO.getAB_TRANSSEQ())) {
 								// 針對非投資型非外幣，但有輸入非常態交易錄音序號
 								if (checkREC.size() <= 0) {
 									throw new APException("ehl_01_iot120_007");
 								} else {
-									submit(body, header);
+									outputVO = submit(inputVO);
 								}
 							} else {
 								// 非投資型非外幣
-								submit(body, header);
+								outputVO = submit(inputVO);
 							}
 						}
 					}
@@ -616,6 +615,7 @@ public class IOT120 extends FubonWmsBizLogic {
 //			logger.error(String.format("發生錯誤:%s", StringUtil.getStackTraceAsString(e)));
 //			throw new APException(e.getMessage());
 //		}
+		sendRtnObject(outputVO);
 	}
 
 	/***
@@ -676,10 +676,15 @@ public class IOT120 extends FubonWmsBizLogic {
 	}
 	
 	public void submit(Object body, IPrimitiveMap<Object> header) throws JBranchException {
+		IOT120InputVO inputVO = (IOT120InputVO) body;
+		IOT120OutputVO outputVO = submit(inputVO);
+		sendRtnObject(outputVO);
+	}
+	
+	public IOT120OutputVO submit(IOT120InputVO inputVO) throws JBranchException {
 		IOT920 iot920 = (IOT920) PlatformContext.getBean("iot920");
 		INSIDInputVOinputVO iot920_inputVO = new INSIDInputVOinputVO();
 		INSIDDataVO iot920_outputVO = new INSIDDataVO();
-		IOT120InputVO inputVO = (IOT120InputVO) body;
 		IOT120OutputVO outputVO = new IOT120OutputVO();
 		String loginbrh = (String) getCommonVariable(SystemVariableConsts.LOGINBRH);
 		String CASE_ID = "";
@@ -1011,18 +1016,18 @@ public class IOT120 extends FubonWmsBizLogic {
 				outputVO.setINSKEY_NO(INS_KEYNO);
 				if ("2".equals(inputVO.getREG_TYPE().toString())) {
 					outputVO.setINS_ID(INS_ID);
-					sendRtnObject(outputVO);
+					return outputVO;
 				} else {
-					sendRtnObject(outputVO);
+					return outputVO;
 				}
 			} catch (Exception e) {
 				logger.error(String.format("發生錯誤:%s", StringUtil.getStackTraceAsString(e)));
 				if ("ehl_02_IOT920_001".equals(e.getMessage())) {
 					outputVO.setErrorINS_ID(inputVO.getINS_ID());
-					sendRtnObject(outputVO);
+					return outputVO;
 				} else if ("ehl_02_common_002".equals(e.getMessage())) {
 					outputVO.setErrorINS_RIDER(e.getMessage());
-					sendRtnObject(outputVO);
+					return outputVO;
 				} else if("NOT_VALIDPREMIUM_SEQ".equals(e.getMessage())) {
 					throw new APException("保費來源錄音序號異常，請洽保險商品處。");
 				} else {
@@ -1392,9 +1397,9 @@ public class IOT120 extends FubonWmsBizLogic {
 					}
 				}
 			}
-			sendRtnObject(outputVO);
+			return outputVO;
 		}
-
+		return outputVO;
 	}
 
 	// 留存/送件文件新增

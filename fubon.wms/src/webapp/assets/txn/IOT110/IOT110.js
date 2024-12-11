@@ -1083,11 +1083,11 @@ eSoafApp.controller('IOT110Controller',
     		if($scope.inputVO.CANCEL_CONTRACT_YN != "Y" && $scope.inputVO.PROD_DIVIDEND_YN && $scope.inputVO.PROD_DIVIDEND_YN == "Y") {
     			if($scope.inputVO.empDividendCertYN == "N") {
 	    			$scope.showErrorMsgInDialog("輸入的招攬人員必須具有(銀行)人身保險業分紅保險商品教育訓練完訓資格");
-					return false;
+	    			if(chkStatus == '2') return false; //購買檢核只顯示訊息，仍可儲存；但不能送出覆核
     			}
-    			if($scope.toJsDate($scope.inputVO.empDividendEndDate) > $scope.toJsDate(applydate)) {
+    			if($scope.inputVO.empDividendEndDate > applydate) {
     				$scope.showErrorMsgInDialog("要保書申請日不得小於分紅完訓日期");
-					return false;
+    				if(chkStatus == '2') return false; //購買檢核只顯示訊息，仍可儲存；但不能送出覆核
     			}
     		}
     		
@@ -1096,15 +1096,15 @@ eSoafApp.controller('IOT110Controller',
     			var findEmp = $filter('filter')($scope.mappingSet['IOT.NO_SENIOR_CERTIFICATE_EMP'], {LABEL: $scope.inputVO.RECRUIT_ID}); //未完成高齡完訓資格員編
         		var isInNoCertEmp = (findEmp != null && findEmp.length > 0) ? true : false;
         		if(isInNoCertEmp || $scope.inputVO.empSeniorCertYN == "N") {
-	    			$scope.showErrorMsgInDialog("輸入的招攬人員必須具有高齡完訓資格");
-					return false;
+	    			$scope.showErrorMsgInDialog("輸入的招攬人員必須具有高齡完訓資格。");
+	    			if(chkStatus == '2') return false; //購買檢核只顯示訊息，仍可儲存；但不能送出覆核
         		}
     		}
     		
     		//非契撤，公平待客完訓資格檢核
     		if($scope.inputVO.CANCEL_CONTRACT_YN != "Y" && $scope.inputVO.empFairCertYN == "N") {
-    			$scope.showErrorMsgInDialog("要保書申請日不得小於公平待客訓練完訓日期");
-				return false;
+    			$scope.showErrorMsgInDialog("輸入的招攬人員必須具有公平待客完訓資格。");
+    			if(chkStatus == '2') return false; //購買檢核只顯示訊息，仍可儲存；但不能送出覆核
     		}
     		
     		//非契撤，要保人/被保人/繳款人戶況檢核
@@ -1366,7 +1366,7 @@ eSoafApp.controller('IOT110Controller',
 											if(data.value.DIVIDEND_YN && data.value.DIVIDEND_YN == "Y") {
 												if($scope.inputVO.empDividendCertYN == "N") {
 													$scope.showMsg("輸入的招攬人員必須具有(銀行)人身保險業分紅保險商品教育訓練完訓資格");
-												} else if($scope.toJsDate($scope.inputVO.empDividendEndDate) > applydate) {
+												} else if($scope.inputVO.empDividendEndDate > applydate) {
 													$scope.showMsg("要保書申請日不得小於分紅完訓日期");
 												}
 											}

@@ -1,19 +1,20 @@
 package com.systex.jbranch.app.server.fps.pms433;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+import javax.xml.bind.JAXBException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
+
 import com.systex.jbranch.fubon.jlb.DataFormat;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
@@ -39,14 +40,16 @@ import com.systex.jbranch.platform.util.IPrimitiveMap;
 public class PMS433 extends FubonWmsBizLogic {
 	private DataAccessManager dam = null;
 	private Logger logger = LoggerFactory.getLogger(PMS433.class);
+
 		
 	/** 查詢資料 
-	 * @throws ParseException **/
-	public void query(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
+	 * @throws ParseException 
+	 * @throws JAXBException **/
+	public void query(Object body, IPrimitiveMap header) throws JBranchException, ParseException, JAXBException {
 		PMS433InputVO inputVO = (PMS433InputVO) body;
 		PMS433OutputVO outputVO = new PMS433OutputVO();
 		DataAccessManager dam = this.getDataAccessManager();
-		
+				
 		String roleID = (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
 		if(StringUtils.isBlank(roleID)) {
 			roleID = "999";
@@ -86,9 +89,9 @@ public class PMS433 extends FubonWmsBizLogic {
 		sql.append(" LEFT JOIN TBPMS_EMPLOYEE_REC_N MEM ON VW.EMP_ID = MEM.EMP_ID AND TO_DATE(H.YYYYMM,'yyyyMM') BETWEEN MEM.START_TIME AND MEM.END_TIME ");
 		sql.append(" WHERE 1 = 1  ");
 		//限制條件
-		if(roleID.matches("A150|ABRF|A157")) { //作業主管or有權人員
+		if(roleID.matches("A150|ABRF|A157|A147|A257|")) { //作業主管or有權人員or業務主管
 			sql.append(" AND VW.UHRM_CODE IS NULL ");
-		} else if (roleID.equals("R012")) { //UHRM科主管
+		} else if (roleID.matches("R012|R006")) { //UHRM科主管or私銀作業主管
 			sql.append(" AND VW.UHRM_CODE IS NOT NULL ");
 		} /*其他身分都可檢視'B024','B026','A164','B030'
 		    財管內控管理科經辦、財管績效科管理科經辦、業務處主管、個金行銷部經辦

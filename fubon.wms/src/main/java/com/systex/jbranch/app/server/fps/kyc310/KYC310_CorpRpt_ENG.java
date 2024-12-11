@@ -1262,6 +1262,9 @@ public class KYC310_CorpRpt_ENG extends FubonWmsBizLogic{
 		
 		//產生barCode
 		public void appendBarCodeForEndPage(PdfWriter writer){
+			// #2252_調整KYC問卷條碼及版次
+        	if (writer.getPageNumber() != 1) return;
+        	
 			PdfPTable tBarCodeTable = new PdfPTable(6);//表格
 			tBarCodeTable.setTotalWidth(545);
 			
@@ -1317,7 +1320,7 @@ public class KYC310_CorpRpt_ENG extends FubonWmsBizLogic{
 			
 			//barcode - page
 			code39 = new Barcode39();
-			code39.setCode("88-0601-" + (writer.getPageNumber() <= 9 ? "0" + String.valueOf(writer.getPageNumber()) : String.valueOf(writer.getPageNumber())));
+			code39.setCode("88-0601-99");
 			code39.setBarHeight(12);
 			code39.setSize(6);
 			code39.setBaseline(6);
@@ -1362,7 +1365,7 @@ public class KYC310_CorpRpt_ENG extends FubonWmsBizLogic{
             PdfPCell version = new PdfPCell();
             version.setBorderWidth(0);
             
-            Chunk chunkVer = new Chunk("Version 2023.06", nFont10);
+            Chunk chunkVer = new Chunk("Version 2024.12", nFont10);
             Paragraph textVer = new Paragraph();
             textVer.setAlignment(Phrase.ALIGN_RIGHT);
             textVer.add(chunkVer);

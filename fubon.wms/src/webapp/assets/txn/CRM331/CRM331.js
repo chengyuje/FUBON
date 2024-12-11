@@ -358,6 +358,8 @@ eSoafApp.controller('CRM331Controller',
 								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + "輪調RM名單上傳後，執行前名單中RM/客戶不可做移入申請");
 							} else if (tota[0].body.resultList2 == 'ERR15') {
 								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", RM輪調後，帶走核心客戶，一年內不得再帶走該RM轄下原分行客戶");
+							} else if (tota[0].body.resultList2 == 'ERR16') {
+								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", 不可將分行客戶移入私銀CODE");
 							} else {
 								$scope.sendRecv("CRM331", "confirm", "com.systex.jbranch.app.server.fps.crm331.CRM331InputVO", $scope.inputVO2,
 										function(tota, isError) {

@@ -132,6 +132,8 @@ public class CRM331 extends FubonWmsBizLogic {
 		List<String> res14 = new ArrayList<String>();
 		Boolean Check15 = false;  //必輪調名單：RM輪調後，帶走30%核心客戶，一年內不得再帶走該RM轄下原分行70%客戶
 		List<String> res15 = new ArrayList<String>();
+		Boolean Check16 = false; //分行不可於客戶移轉篩選及主管覆核客戶移轉中，將分行客戶移入私銀
+		List<String> res16 = new ArrayList<String>();
 		
 		// follow crm341 check
 		// 檢核是否超過客戶數上限  NEW_ROLE_ID in (FC1, FC2, FC3, FC4, FC5)
@@ -310,6 +312,18 @@ public class CRM331 extends FubonWmsBizLogic {
 				Check11 = true;
 				res11.add(ObjectUtils.toString(map.get("CUST_ID")));
 			}
+			
+			//分行不可於客戶移轉篩選及主管覆核客戶移轉中，將分行客戶移入私銀
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			sql = new StringBuffer();
+			sql.append("SELECT 1 FROM VWORG_EMP_UHRM_INFO WHERE UHRM_CODE = :newAoCode ");
+			queryCondition.setObject("newAoCode", inputVO.getNew_ao_code());
+			queryCondition.setQueryString(sql.toString());
+			List<Map<String, Object>> list5 = dam.exeQuery(queryCondition);
+			if(CollectionUtils.isNotEmpty(list5)) {
+				Check16 = true;
+				res16.add(ObjectUtils.toString(map.get("CUST_ID")));
+			}
 		}
 		
 		outputVO.setRole_name(NEW_ROLE_NAME);
@@ -356,6 +370,9 @@ public class CRM331 extends FubonWmsBizLogic {
 		} else if(Check15) {
 			outputVO.setResultList(res15); //必輪調名單：RM輪調後，帶走30%核心客戶，一年內不得再帶走該RM轄下原分行70%客戶
 			outputVO.setResultList2("ERR15"); 
+		} else if(Check16) {
+			outputVO.setResultList(res16); //分行不可於客戶移轉篩選及主管覆核客戶移轉中，將分行客戶移入私銀
+			outputVO.setResultList2("ERR16"); 
 		} else {
 			outputVO.setResultList2("GOOD");
 		}

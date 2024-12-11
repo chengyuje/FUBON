@@ -136,15 +136,16 @@ public class IOT111 extends FubonWmsBizLogic {
 				if (StringUtils.isNotBlank(inputVO.getBranch_id())) {
 					sql.append(" and A.BRANCH_NBR = :branch_nbr ");
 					queryCondition.setObject("branch_nbr", inputVO.getBranch_id());
-				} else if (StringUtils.isNotBlank(inputVO.getArea_id())) {
-					// 區
-					sql.append(" and ORG.BRANCH_AREA_ID = :branch_area_id ");
-					queryCondition.setObject("branch_area_id", inputVO.getArea_id());
-				} else if (StringUtils.isNotBlank(inputVO.getRegion_id())) {
-					// 處
-					sql.append(" and ORG.REGION_CENTER_ID = :region_center_id ");
-					queryCondition.setObject("region_center_id", inputVO.getRegion_id());
 				} else {
+					if (StringUtils.isNotBlank(inputVO.getArea_id())) {
+						// 區
+						sql.append(" and ORG.BRANCH_AREA_ID = :branch_area_id ");
+						queryCondition.setObject("branch_area_id", inputVO.getArea_id());
+					} else if (StringUtils.isNotBlank(inputVO.getRegion_id())) {
+						// 處
+						sql.append(" and ORG.REGION_CENTER_ID = :region_center_id ");
+						queryCondition.setObject("region_center_id", inputVO.getRegion_id());
+					}
 					if(!headmgrMap.containsKey(roleID)) {
 						sql.append(" AND A.BRANCH_NBR IN ( :branchList ) ");
 						queryCondition.setObject("branchList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));

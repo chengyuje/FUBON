@@ -56,7 +56,7 @@ public class PRD100 extends FubonWmsBizLogic {
 		if(checkResult) {
 			//檢核通過，寫入主管確認紀錄檔
 			SOT630InputVO inputVO630 = new SOT630InputVO();
-			inputVO630.setCUST_ID(inputVO.getCustID());
+			inputVO630.setCUST_ID(inputVO.getCustID().toUpperCase());
 			inputVO630.setCUST_NAME(getCustName(inputVO.getCustID()));
 			inputVO630.setAUTH_TYPE(inputVO.getSeniorAuthType());
 			inputVO630.setPROD_TYPE(inputVO.getProdType());

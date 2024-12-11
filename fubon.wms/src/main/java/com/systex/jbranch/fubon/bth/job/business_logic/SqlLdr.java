@@ -25,9 +25,9 @@ public class SqlLdr {
 
 		DatabaseInfo info = new DatabaseInfo(db_name);
 
-		String ctlName = "TBPRD_ELN_LINK_PROD";
-		String logName = "TBPRD_ELN_LINK_PROD";
-		String srcName = "UNDERLYING_20240906.csv";
+		String ctlName = "TBCRM_PIMDATA";
+		String logName = ctlName;
+		String srcName = "PIMDATA_20241206_R.TXT";
 		
 		SqlLdr ldr = new SqlLdr();
 		String command = ldr.getCommand(info, ctlName, logName, srcName);

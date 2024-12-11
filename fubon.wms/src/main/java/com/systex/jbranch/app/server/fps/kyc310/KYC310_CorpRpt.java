@@ -1242,6 +1242,9 @@ public class KYC310_CorpRpt extends FubonWmsBizLogic{
 		
 		//產生barCode
 		public void appendBarCodeForEndPage(PdfWriter writer){
+			// #2252_調整KYC問卷條碼及版次
+			if (writer.getPageNumber() != 1) return; 
+			
 			PdfPTable tBarCodeTable = new PdfPTable(6);//表格
 			tBarCodeTable.setTotalWidth(545);
 			
@@ -1267,52 +1270,52 @@ public class KYC310_CorpRpt extends FubonWmsBizLogic{
     		blank.setBorderWidth(0);//邊框寬度
     		blank.setFixedHeight(10);//儲存格高度
 
-    		//barcode - tw date
+			// barcode - tw date
 			Barcode39 code39 = new Barcode39();
-			code39.setCode(codeDate);//設定內容為民國年月日
-			code39.setBarHeight(14);//設定高度
-			
-			PdfPCell cell = new PdfPCell();//產生列物件
-    		cell.setFixedHeight(30);//儲存格高度
-        	cell.setPadding(0);	//間格
-    		cell.setBorderWidth(0); //邊框的寬度
-    		cell.addElement(code39.createImageWithBarcode(pdfContentByte, null, null));//產生一張barCode圖片並添加到列中
-    		
-    		tBarCodeTable.addCell(cell);//添加到表中
-    		tBarCodeTable.addCell(blank);
-			
-			//barcode - 客戶ID
+			code39.setCode(codeDate);// 設定內容為民國年月日
+			code39.setBarHeight(14);// 設定高度
+
+			PdfPCell cell = new PdfPCell();// 產生列物件
+			cell.setFixedHeight(30);// 儲存格高度
+			cell.setPadding(0); // 間格
+			cell.setBorderWidth(0); // 邊框的寬度
+			cell.addElement(code39.createImageWithBarcode(pdfContentByte, null, null));// 產生一張barCode圖片並添加到列中
+
+			tBarCodeTable.addCell(cell);// 添加到表中
+			tBarCodeTable.addCell(blank);
+
+			// barcode - 客戶ID
 			code39 = new Barcode39();
 			code39.setCode(custId);
-			code39.setBarHeight(18);//設定高度
-			
+			code39.setBarHeight(18);// 設定高度
+
 			cell = new PdfPCell();
-    		cell.setFixedHeight(30);//儲存格高度
-        	cell.setPadding(0);	//間格
-    		cell.setBorderWidth(0); //邊框的寬度
-    		cell.addElement(code39.createImageWithBarcode(pdfContentByte, null, null));//產生一張barCode圖片並添加到列中
-			
-    		tBarCodeTable.addCell(cell);//添加到表中
-    		tBarCodeTable.addCell(blank);
-			
-			//barcode - page
+			cell.setFixedHeight(30);// 儲存格高度
+			cell.setPadding(0); // 間格
+			cell.setBorderWidth(0); // 邊框的寬度
+			cell.addElement(code39.createImageWithBarcode(pdfContentByte, null, null));// 產生一張barCode圖片並添加到列中
+
+			tBarCodeTable.addCell(cell);// 添加到表中
+			tBarCodeTable.addCell(blank);
+
+			// barcode - page
 			code39 = new Barcode39();
-			code39.setCode("88-0601-" + (writer.getPageNumber() <= 9 ? "0" + String.valueOf(writer.getPageNumber()) : String.valueOf(writer.getPageNumber())));
+			code39.setCode("88-0601-99");
 			code39.setBarHeight(12);
 			code39.setSize(6);
 			code39.setBaseline(6);
-			
-    		Image image = code39.createImageWithBarcode(pdfContentByte, null, null);
-    		image.setWidthPercentage(90);
-    		
-    		cell = new PdfPCell();
+
+			Image image = code39.createImageWithBarcode(pdfContentByte, null, null);
+			image.setWidthPercentage(90);
+
+			cell = new PdfPCell();
 			cell.setColspan(2);
-    		cell.setFixedHeight(30);
-        	cell.setPadding(0);	
-    		cell.setBorderWidth(0);
-    		cell.addElement(image);
-    		
-    		tBarCodeTable.addCell(cell);//添加到表中
+			cell.setFixedHeight(30);
+			cell.setPadding(0);
+			cell.setBorderWidth(0);
+			cell.addElement(image);
+
+			tBarCodeTable.addCell(cell);// 添加到表中
     		tBarCodeTable.writeSelectedRows(0, -1, 25, 80, writer.getDirectContent());
 		}
 		
@@ -1342,7 +1345,7 @@ public class KYC310_CorpRpt extends FubonWmsBizLogic{
             PdfPCell version = new PdfPCell();
             version.setBorderWidth(0);
             
-            Chunk chunkVer = new Chunk("2023年6月版", nFont10);
+            Chunk chunkVer = new Chunk("2024年12月版", nFont10);
             Paragraph textVer = new Paragraph();
             textVer.setAlignment(Phrase.ALIGN_RIGHT);
             textVer.add(chunkVer);

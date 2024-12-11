@@ -16,6 +16,8 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.systex.jbranch.fubon.commons.cbs.vo.basic.CBSUtilInputVO;
@@ -29,7 +31,7 @@ import com.systex.jbranch.platform.common.errHandle.JBranchException;
  */
 @Component
 public class Box {
-
+	protected static Logger logger = LoggerFactory.getLogger(Box.class);
 	private static Map<Integer, JaxbInstance> CBSjaxbMap = new HashMap<>();
 	private static Map<Integer, JaxbInstance> ESBjaxbMap = new HashMap<>();
 	
@@ -39,26 +41,56 @@ public class Box {
 	
 	private synchronized void initPool() {
 		try {
+			//int MAX_JAXB_INSTANCES = "AIX".equals(System.getProperty("os.name")) ? 5 : 2;
+			int MAX_JAXB_INSTANCES = 5;
 			if (CBSjaxbMap.isEmpty()) {
-				for (int i=1; i<=5; i++) {
+				for (int i=1; i<=MAX_JAXB_INSTANCES; i++) {
 					JAXBContext inContext = JAXBContext.newInstance(CBSUtilInputVO.class);
 					JaxbInstance instance = new JaxbInstance();
 					instance.id = i;
 					instance.inContext = inContext;
 					CBSjaxbMap.put(i, instance);
+					logger.info("CBSjaxbMap newInstance JaxbInstance #" + i);
 				}
 			}
 			if (ESBjaxbMap.isEmpty()) {
-				for (int i=1; i<=5; i++) {
+				for (int i=1; i<=MAX_JAXB_INSTANCES; i++) {
 					JAXBContext inContext = JAXBContext.newInstance(ESBUtilInputVO.class);
 					JaxbInstance instance = new JaxbInstance();
 					instance.id = i;
 					instance.inContext = inContext;
 					ESBjaxbMap.put(i, instance);
+					logger.info("ESBjaxbMap newInstance JaxbInstance #" + i);
 				}
 			}
 		} catch (Exception e) {
 
+		}
+	}
+	
+	private synchronized static void increaseJaxbInstance(String type) {
+		try {
+			if("CBSUtilInputVO".equals(type)) {
+				JAXBContext inContext = JAXBContext.newInstance(CBSUtilInputVO.class);
+				JaxbInstance instance = new JaxbInstance();
+				instance.id = CBSjaxbMap.size() + 1;
+				instance.inContext = inContext;
+				instance.used = false;
+				CBSjaxbMap.put(instance.id, instance);
+				logger.info("CBSjaxbMap increase JaxbInstance #" + instance.id);
+				
+			} else if("ESBUtilInputVO".equals(type)) {
+				JAXBContext inContext = JAXBContext.newInstance(ESBUtilInputVO.class);
+				JaxbInstance instance = new JaxbInstance();
+				instance.id = ESBjaxbMap.size() + 1;
+				instance.inContext = inContext;
+				instance.used = false;
+				ESBjaxbMap.put(instance.id, instance);
+				logger.info("CBSjaxbMap increase JaxbInstance #" + instance.id);
+			}
+		} catch (Exception e) {
+			logger.warn("CBSUtilInputVO".equals(type) ? "CBSjaxbMap" : "ESBjaxbMap" + "increase JaxbInstance #" 
+		+ ("CBSUtilInputVO".equals(type) ? (CBSjaxbMap.size() + 1) : (ESBjaxbMap.size() + 1)) +  " fail", e);
 		}
 	}
 	
@@ -68,9 +100,15 @@ public class Box {
 			for (JaxbInstance instance : CBSjaxbMap.values()) {
 				if (!instance.used) cnt++;
 			}
+			if (cnt == 0) {	// 用完, 就主動加一instance
+				increaseJaxbInstance(type);
+			}
 		} else if("ESBUtilInputVO".equals(type)) {
 			for (JaxbInstance instance : ESBjaxbMap.values()) {
 				if (!instance.used) cnt++;
+			}
+			if (cnt == 0) {	// 用完, 就主動加一instance
+				increaseJaxbInstance(type);
 			}
 		}
 		return cnt;
@@ -83,7 +121,7 @@ public class Box {
 				if (!instance.used) {
 					instance.used = true;
 					int cnt = countFree(type);
-					
+					logger.info("CBSjaxbMap Get #{}, free: {}", instance.id, cnt);
 					return instance;
 				}
 			}
@@ -92,7 +130,7 @@ public class Box {
 				if (!instance.used) {
 					instance.used = true;
 					int cnt = countFree(type);
-					
+					logger.info("ESBjaxbMap Get #{}, free: {}", instance.id, cnt);
 					return instance;
 				}
 			}

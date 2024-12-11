@@ -1366,7 +1366,10 @@ public class CRM8502 extends EsbUtil {
 			Map<String,Object> siMap = this.getInvSI(custID);
 			invSi = (BigDecimal)siMap.get("tot");
 			data.put("INV_SI", invSi); //組合式商品
-			totInv = invFund.add(invEtf).add(invFbond).add(invSn).add(invSi).add(invGold).add(invVpbnd).add(invNano);
+			//證券複委託總金額
+			subTot = subTot.add(subFstock).add(subFbond).add(subSn).add(subDsn); 
+			data.put("TOT_SUB", subTot); //證券複委託加總
+			totInv = invFund.add(invEtf).add(invFbond).add(invSn).add(invSi).add(invGold).add(invVpbnd).add(invNano).add(subTot);
 			data.put("TOT_INV", totInv); //總投資金額
 			//取得保險資料（進件來源：台北富邦銀行）
 			Map<String,Object> insMap = this.getIns(custID);
@@ -1376,9 +1379,6 @@ public class CRM8502 extends EsbUtil {
 			BigDecimal insTotJSB = (BigDecimal) insMapJSB.get("totJSB");
 			data.put("TOT_INS", insTot.add(insTotJSB)); //保險商品（富邦 + 日盛）
 			
-			//證券複委託總金額
-			subTot = subTot.add(subFstock).add(subFbond).add(subSn).add(subDsn); 
-			data.put("TOT_SUB", subTot); //證券複委託加總
 			data.put("TOT_ASSET", totDep.add(totInv).add(insTot).add(insTotJSB)); //總資產
 
 		} catch (Exception e) {
