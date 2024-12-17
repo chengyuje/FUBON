@@ -403,7 +403,7 @@ public class PMS408 extends FubonWmsBizLogic {
 				sql.append("       B.CUST_NAME, ");
 				sql.append("       B.AO_CODE, ");
 				sql.append("       COALESCE(COOL.CUST_RISK_BEF, B.CUST_RISK_BEF) AS CUST_RISK_BEF, ");
-				sql.append("       CASE WHEN B.CREATOR = '999996' THEN 'Fubon+' ELSE B.CREATOR END AS CREATOR, ");
+				sql.append("       B.CREATOR, ");
 				sql.append("       COALESCE(COOL.CUST_RISK_AFR, B.CUST_RISK_AFR) AS CUST_RISK_AFR, ");
 				sql.append("       TO_CHAR(B.SIGNOFF_DATE, 'YYYY-MM-DD') AS SIGNOFF_DATE, ");
 				sql.append("       EMP.EMP_NAME, ");

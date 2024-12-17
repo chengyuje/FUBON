@@ -647,8 +647,6 @@ public class CAM210 extends FubonWmsBizLogic {
 		sql.append("  AND CAMP.REMOVE_FLAG = 'N' ");
 		
 		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {
-			
-		
 			if (StringUtils.isNotBlank(inputVO.getBranch()) && Integer.valueOf(inputVO.getBranch()) > 0) {
 				sql.append("AND BR.DEPT_ID = :branchID "); //分行代碼
 				queryCondition.setObject("branchID", inputVO.getBranch());
@@ -1466,22 +1464,19 @@ public class CAM210 extends FubonWmsBizLogic {
 		sb.append("         CAMP.END_DATE, ");
 		sb.append("         LEAD.CUST_ID, ");
 		sb.append("         LEAD.EMP_ID, ");
-		sb.append("         MEM.EMP_NAME || CASE WHEN (SELECT COUNT(1) FROM VWORG_EMP_UHRM_INFO UI WHERE UI.EMP_ID = LEAD.EMP_ID) > 0 THEN '' ELSE '' END AS EMP_NAME, ");
+		sb.append("         MEM.EMP_NAME, ");
 		sb.append("         MEM.JOB_TITLE_NAME, ");
-		sb.append("         RC.DEPT_ID AS REGION_CENTER_ID, ");
-		sb.append("         RC.DEPT_NAME AS REGION_CENTER_NAME, ");
-		sb.append("         OP.DEPT_ID AS BRANCH_AREA_ID, ");
-		sb.append("         OP.DEPT_NAME AS BRANCH_AREA_NAME, ");
-		sb.append("         BR.DEPT_ID AS BRANCH_NBR, ");
-		sb.append("         BR.DEPT_NAME AS BRANCH_NAME, ");
+		sb.append("         DEFN.REGION_CENTER_ID, ");
+		sb.append("         DEFN.REGION_CENTER_NAME, ");
+		sb.append("         DEFN.BRANCH_AREA_ID, ");
+		sb.append("         DEFN.BRANCH_AREA_NAME, ");
+		sb.append("         DEFN.BRANCH_NBR, ");
+		sb.append("         DEFN.BRANCH_NAME, ");
 		sb.append("         1 AS LEAD_COUNTS, ");
 		sb.append("         CASE WHEN NVL (LEAD.AO_CODE, ' ') = ' ' THEN 1 ELSE 0 END AS LEAD_WAIT_COUNTS, ");
 		sb.append("         CASE WHEN NVL (LEAD.AO_CODE, ' ') <> ' ' AND LEAD.LEAD_STATUS >= '03' THEN 1 ELSE 0 END AS LEAD_CLOSE ");
 		sb.append("  FROM TBCAM_SFA_CAMPAIGN CAMP, TBCAM_SFA_LEADS LEAD ");
 		sb.append("  INNER JOIN VWORG_DEFN_INFO DEFN ON DEFN.BRANCH_NBR = LEAD.BRANCH_ID ");
-		sb.append("  LEFT JOIN TBORG_DEFN BR ON BR.ORG_TYPE = '50' AND LEAD.BRANCH_ID = BR.DEPT_ID ");
-		sb.append("  LEFT JOIN TBORG_DEFN OP ON OP.ORG_TYPE = '40' AND BR.PARENT_DEPT_ID = OP.DEPT_ID ");
-		sb.append("  LEFT JOIN TBORG_DEFN RC ON RC.ORG_TYPE = '30' AND OP.PARENT_DEPT_ID = RC.DEPT_ID ");
 		sb.append("  LEFT JOIN TBORG_MEMBER MEM ON LEAD.EMP_ID = MEM.EMP_ID ");
 		sb.append("  WHERE CAMP.CAMPAIGN_ID = LEAD.CAMPAIGN_ID ");
 		sb.append("  AND CAMP.STEP_ID = LEAD.STEP_ID ");
@@ -1558,10 +1553,35 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		sql.append(vwcam_campaign_emp_stat_X4(inputVO.getLeadType(), (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE), (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG), xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2)));
 
-		sql.append("SELECT CAMPAIGN_ID, STEP_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, END_DATE, ");
-		sql.append("       REGION_CENTER_ID, REGION_CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, '' AS BRANCH_NBR, '' AS BRANCH_NAME, '' AS EMP_ID, '' AS EMP_NAME, '' AS JOB_TITLE_NAME, ");
-		sql.append("       SUM(LEAD_COUNTS) AS LEAD_COUNTS, SUM(LEAD_WAIT_COUNTS) AS LEAD_WAIT_COUNTS, SUM(LEAD_CLOSE) AS LEAD_CLOSE ");
+		sql.append("SELECT CAMPAIGN_ID, ");
+		sql.append("       STEP_ID, ");
+		sql.append("       CAMPAIGN_NAME, ");
+		sql.append("       CAMPAIGN_DESC, ");
+		sql.append("       END_DATE, ");
+		sql.append("       CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID   END AS REGION_CENTER_ID, ");
+		sql.append("       CASE WHEN UEMP.REGION_CENTER_NAME IS NOT NULL THEN UEMP.REGION_CENTER_NAME ELSE BASE.REGION_CENTER_NAME END AS REGION_CENTER_NAME, ");
+		sql.append("       CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID     END AS BRANCH_AREA_ID, ");
+		sql.append("       CASE WHEN UEMP.BRANCH_AREA_NAME IS NOT NULL   THEN UEMP.BRANCH_AREA_NAME   ELSE BASE.BRANCH_AREA_NAME   END AS BRANCH_AREA_NAME, ");
+		sql.append("       '' AS BRANCH_NBR, ");
+		sql.append("       '' AS BRANCH_NAME, ");
+		sql.append("       '' AS EMP_ID, ");
+		sql.append("       '' AS EMP_NAME, ");
+		sql.append("       '' AS JOB_TITLE_NAME, ");
+		sql.append("       SUM(LEAD_COUNTS) AS LEAD_COUNTS, ");
+		sql.append("       SUM(LEAD_WAIT_COUNTS) AS LEAD_WAIT_COUNTS, ");
+		sql.append("       SUM(LEAD_CLOSE) AS LEAD_CLOSE ");
 		sql.append("FROM BASE ");
+		sql.append("LEFT JOIN ( ");
+		sql.append("  SELECT  DISTINCT EMP_ID, ");
+		sql.append("          DEPT_ID_30 AS REGION_CENTER_ID, ");
+		sql.append("          DEPT_NAME_30 AS REGION_CENTER_NAME, ");
+		sql.append("          DEPT_ID_40 AS BRANCH_AREA_ID, ");
+		sql.append("          DEPT_NAME_40 AS BRANCH_AREA_NAME, ");
+		sql.append("          DEPT_ID_50 AS BRANCH_NBR, ");
+		sql.append("          DEPT_NAME_50 AS BRANCH_NAME ");
+		sql.append("  FROM VWORG_EMP_INFO ");
+		sql.append("  WHERE PRIVILEGEID LIKE 'UHRM%' ");
+		sql.append(") UEMP ON BASE.EMP_ID = UEMP.EMP_ID ");
 		sql.append("WHERE 1 = 1 ");
 		sql.append("AND TRUNC(START_DATE) <= TRUNC(SYSDATE) ");
 		sql.append("AND CAMPAIGN_ID = :campaignID ");
@@ -1570,22 +1590,15 @@ public class CAM210 extends FubonWmsBizLogic {
 		queryCondition.setObject("campaignID", inputVO.getCampaignId());
 		queryCondition.setObject("stepID", inputVO.getStepId());
 		
-		System.out.println("campaignID:"+ inputVO.getCampaignId());
-		System.out.println("stepID:"+ inputVO.getStepId());
-		System.out.println("campaignID:"+ inputVO.getOp());
 		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {
 			if (StringUtils.isNotBlank(inputVO.getBranch()) && Integer.valueOf(inputVO.getBranch()) > 0) {
-				sql.append("AND BRANCH_NBR = :branchID "); 
+				sql.append("AND BASE.BRANCH_NBR = :branchID "); 
 				queryCondition.setObject("branchID", inputVO.getBranch());
 			} else if (StringUtils.isNotBlank(inputVO.getOp()) && !"null".equals(inputVO.getOp())) {
-				sql.append("AND ( ");
-				sql.append("     BASE.BRANCH_AREA_ID = :branchAreaID ");
-				sql.append("  OR EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = BASE.EMP_ID AND UHRM.DEPT_ID = :branchAreaID) ");
-				sql.append(") ");
-				
+				sql.append("AND CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL THEN UEMP.BRANCH_AREA_ID ELSE BASE.BRANCH_AREA_ID END = :branchAreaID ");
 				queryCondition.setObject("branchAreaID", inputVO.getOp());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion()) && !"null".equals(inputVO.getRegion())) {
-				sql.append("AND REGION_CENTER_ID = :regionCenterID "); 
+				sql.append("AND BASE.REGION_CENTER_ID = :regionCenterID "); 
 				queryCondition.setObject("regionCenterID", inputVO.getRegion());
 			} 
 		} else {
@@ -1598,8 +1611,19 @@ public class CAM210 extends FubonWmsBizLogic {
 			queryCondition.setObject("aoCode", inputVO.getAoCode());
 		}
 		
-		sql.append("GROUP BY CAMPAIGN_ID, STEP_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, END_DATE, REGION_CENTER_ID, REGION_CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME ");
-
+		sql.append("GROUP BY  CAMPAIGN_ID, ");
+		sql.append("          STEP_ID, ");
+		sql.append("          CAMPAIGN_NAME, ");
+		sql.append("          CAMPAIGN_DESC, ");
+		sql.append("          END_DATE, ");
+		sql.append("          CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID END, ");
+		sql.append("          CASE WHEN UEMP.REGION_CENTER_NAME IS NOT NULL THEN UEMP.REGION_CENTER_NAME ELSE BASE.REGION_CENTER_NAME END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_NAME IS NOT NULL   THEN UEMP.BRANCH_AREA_NAME   ELSE BASE.BRANCH_AREA_NAME END ");
+		
+		sql.append("ORDER BY  CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID END ");
+		
 		queryCondition.setQueryString(sql.toString());
 
 		return_VO.setResultList(dam.exeQuery(queryCondition));
@@ -1620,10 +1644,35 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		sql.append(vwcam_campaign_emp_stat_X4(inputVO.getLeadType(), (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE), (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG), xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2)));
 		
-		sql.append("SELECT CAMPAIGN_ID, STEP_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, END_DATE, ");
-		sql.append("       REGION_CENTER_ID, REGION_CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_NBR, BRANCH_NAME, EMP_ID, EMP_NAME, JOB_TITLE_NAME, ");
-		sql.append("       SUM(LEAD_COUNTS) AS LEAD_COUNTS, SUM(LEAD_WAIT_COUNTS) AS LEAD_WAIT_COUNTS, SUM(LEAD_CLOSE) AS LEAD_CLOSE "); 
+		sql.append("SELECT CAMPAIGN_ID, ");
+		sql.append("       STEP_ID, ");
+		sql.append("       CAMPAIGN_NAME, ");
+		sql.append("       CAMPAIGN_DESC, ");
+		sql.append("       END_DATE, ");
+		sql.append("       CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID   END AS REGION_CENTER_ID, ");
+		sql.append("       CASE WHEN UEMP.REGION_CENTER_NAME IS NOT NULL THEN UEMP.REGION_CENTER_NAME ELSE BASE.REGION_CENTER_NAME END AS REGION_CENTER_NAME, ");
+		sql.append("       CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID     END AS BRANCH_AREA_ID, ");
+		sql.append("       CASE WHEN UEMP.BRANCH_AREA_NAME IS NOT NULL   THEN UEMP.BRANCH_AREA_NAME   ELSE BASE.BRANCH_AREA_NAME   END AS BRANCH_AREA_NAME, ");
+		sql.append("       BASE.BRANCH_NBR, ");
+		sql.append("       BASE.BRANCH_NAME, ");
+		sql.append("       BASE.EMP_ID, ");
+		sql.append("       EMP_NAME, ");
+		sql.append("       JOB_TITLE_NAME, ");
+		sql.append("       SUM(LEAD_COUNTS) AS LEAD_COUNTS, ");
+		sql.append("       SUM(LEAD_WAIT_COUNTS) AS LEAD_WAIT_COUNTS, ");
+		sql.append("       SUM(LEAD_CLOSE) AS LEAD_CLOSE "); 
 		sql.append("FROM BASE ");
+		sql.append("LEFT JOIN ( ");
+		sql.append("  SELECT  DISTINCT EMP_ID, ");
+		sql.append("          DEPT_ID_30 AS REGION_CENTER_ID, ");
+		sql.append("          DEPT_NAME_30 AS REGION_CENTER_NAME, ");
+		sql.append("          DEPT_ID_40 AS BRANCH_AREA_ID, ");
+		sql.append("          DEPT_NAME_40 AS BRANCH_AREA_NAME, ");
+		sql.append("          DEPT_ID_50 AS BRANCH_NBR, ");
+		sql.append("          DEPT_NAME_50 AS BRANCH_NAME ");
+		sql.append("  FROM VWORG_EMP_INFO ");
+		sql.append("  WHERE PRIVILEGEID LIKE 'UHRM%' ");
+		sql.append(") UEMP ON BASE.EMP_ID = UEMP.EMP_ID ");
 		sql.append("WHERE 1 = 1 ");
 		sql.append("AND TRUNC(START_DATE) <= TRUNC(SYSDATE) ");
 		sql.append("AND CAMPAIGN_ID = :campaignID ");
@@ -1631,20 +1680,16 @@ public class CAM210 extends FubonWmsBizLogic {
 
 		queryCondition.setObject("campaignID", inputVO.getCampaignId());
 		queryCondition.setObject("stepID", inputVO.getStepId());
-		
+
 		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {
 			if (StringUtils.isNotBlank(inputVO.getBranch()) && Integer.valueOf(inputVO.getBranch()) > 0) {
-				sql.append("AND BRANCH_NBR = :branchID "); //分行代碼
+				sql.append("AND BASE.BRANCH_NBR = :branchID "); //分行代碼
 				queryCondition.setObject("branchID", inputVO.getBranch());
 			} else if (StringUtils.isNotBlank(inputVO.getOp()) && !"null".equals(inputVO.getOp())) {
-				sql.append("AND ( ");
-				sql.append("     BASE.BRANCH_AREA_ID = :branchAreaID ");
-				sql.append("  OR EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = BASE.EMP_ID AND UHRM.DEPT_ID = :branchAreaID) ");
-				sql.append(") ");
-				
+				sql.append("AND CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL THEN UEMP.BRANCH_AREA_ID ELSE BASE.BRANCH_AREA_ID END = :branchAreaID ");
 				queryCondition.setObject("branchAreaID", inputVO.getOp());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion()) && !"null".equals(inputVO.getRegion())) {
-				sql.append("AND REGION_CENTER_ID = :regionCenterID "); //區域代碼
+				sql.append("AND BASE.REGION_CENTER_ID = :regionCenterID "); //區域代碼
 				queryCondition.setObject("regionCenterID", inputVO.getRegion());
 			} 
 		} else {
@@ -1654,13 +1699,30 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		// 2017/9/1 ocean add ao_code
 		if (StringUtils.isNotBlank(inputVO.getAoCode())) {
-			sql.append("AND EMP_ID = (SELECT EMP_ID FROM TBORG_SALES_AOCODE WHERE AO_CODE = :aoCode) ");
+			sql.append("AND BASE.EMP_ID = (SELECT EMP_ID FROM TBORG_SALES_AOCODE WHERE AO_CODE = :aoCode) ");
 			queryCondition.setObject("aoCode", inputVO.getAoCode());
 		}
 		
-		sql.append("GROUP BY CAMPAIGN_ID, STEP_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, END_DATE, REGION_CENTER_ID, REGION_CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_NBR, BRANCH_NAME, EMP_ID, EMP_NAME, JOB_TITLE_NAME ");
-		sql.append("ORDER BY REGION_CENTER_ID, BRANCH_AREA_ID, BRANCH_NBR, EMP_ID, JOB_TITLE_NAME ");
-		
+		sql.append("GROUP BY  CAMPAIGN_ID, ");
+		sql.append("          STEP_ID, ");
+		sql.append("          CAMPAIGN_NAME, ");
+		sql.append("          CAMPAIGN_DESC, ");
+		sql.append("          END_DATE, ");
+		sql.append("          CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID END, ");
+		sql.append("          CASE WHEN UEMP.REGION_CENTER_NAME IS NOT NULL THEN UEMP.REGION_CENTER_NAME ELSE BASE.REGION_CENTER_NAME END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_NAME IS NOT NULL   THEN UEMP.BRANCH_AREA_NAME   ELSE BASE.BRANCH_AREA_NAME END, ");
+		sql.append("          BASE.BRANCH_NBR, ");
+		sql.append("          BASE.BRANCH_NAME, ");
+		sql.append("          BASE.EMP_ID, ");
+		sql.append("          EMP_NAME, ");
+		sql.append("          JOB_TITLE_NAME ");
+		sql.append("ORDER BY  CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID END, ");
+		sql.append("          BASE.BRANCH_NBR, ");
+		sql.append("          BASE.EMP_ID, ");
+		sql.append("          JOB_TITLE_NAME ");
+
 		queryCondition.setQueryString(sql.toString());
 		
 		return_VO.setResultList(dam.exeQuery(queryCondition));
@@ -1688,21 +1750,18 @@ public class CAM210 extends FubonWmsBizLogic {
 		sb.append("         LEAD.EMP_ID, ");
 		sb.append("         MEM.EMP_NAME || CASE WHEN (SELECT COUNT(1) FROM VWORG_EMP_UHRM_INFO UI WHERE UI.EMP_ID = LEAD.EMP_ID) > 0 THEN '' ELSE '' END AS EMP_NAME, ");
 		sb.append("         MEM.JOB_TITLE_NAME, ");
-		sb.append("         RC.DEPT_ID AS REGION_CENTER_ID, ");
-		sb.append("         RC.DEPT_NAME AS REGION_CENTER_NAME, ");
-		sb.append("         OP.DEPT_ID AS BRANCH_AREA_ID, ");
-		sb.append("         OP.DEPT_NAME AS BRANCH_AREA_NAME, ");
-		sb.append("         BR.DEPT_ID AS BRANCH_NBR, ");
-		sb.append("         BR.DEPT_NAME AS BRANCH_NAME, ");
+		sb.append("         DEFN.REGION_CENTER_ID, ");
+		sb.append("         DEFN.REGION_CENTER_NAME, ");
+		sb.append("         DEFN.BRANCH_AREA_ID, ");
+		sb.append("         DEFN.BRANCH_AREA_NAME, ");
+		sb.append("         DEFN.BRANCH_NBR, ");
+		sb.append("         DEFN.BRANCH_NAME, ");
 		sb.append("			CASE WHEN LEAD.LEAD_TYPE <> '04' THEN 1 ELSE 1 END AS LEAD_COUNTS, ");
 		sb.append("			CASE WHEN LEAD.LEAD_TYPE <> '04' AND LEAD.LEAD_STATUS >= '03' THEN 1 ");
 		sb.append("				 WHEN LEAD.LEAD_TYPE = '04' THEN 1 ");
 		sb.append("         ELSE 0 END AS LEAD_CLOSE ");
 		sb.append("  FROM TBCAM_SFA_CAMPAIGN CAMP, TBCAM_SFA_LEADS LEAD ");
 		sb.append("  INNER JOIN VWORG_DEFN_INFO DEFN ON DEFN.BRANCH_NBR = LEAD.BRANCH_ID ");
-		sb.append("  LEFT JOIN TBORG_DEFN BR ON BR.ORG_TYPE = '50' AND LEAD.BRANCH_ID = BR.DEPT_ID ");
-		sb.append("  LEFT JOIN TBORG_DEFN OP ON OP.ORG_TYPE = '40' AND BR.PARENT_DEPT_ID = OP.DEPT_ID ");
-		sb.append("  LEFT JOIN TBORG_DEFN RC ON RC.ORG_TYPE = '30' AND OP.PARENT_DEPT_ID = RC.DEPT_ID ");
 		sb.append("  LEFT JOIN TBORG_MEMBER MEM ON LEAD.EMP_ID = MEM.EMP_ID ");
 		sb.append("  LEFT JOIN TBCRM_CUST_MAST CM ON LEAD.CUST_ID = CM.CUST_ID ");
 		sb.append("  , TBCAM_SFA_CAMP_RESPONSE RES ");
@@ -1982,10 +2041,35 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		sql.append(vwcam_campaign_emp_stat_exp_X4(inputVO.getLeadType(), (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE), (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG), xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2)));
 
-		sql.append("SELECT CAMPAIGN_ID, STEP_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, END_DATE, ");
-		sql.append("       REGION_CENTER_ID, REGION_CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, '' AS BRANCH_NBR, '' AS BRANCH_NAME, '' AS EMP_ID, '' AS EMP_NAME, '' AS JOB_TITLE_NAME, ");
-		sql.append("       SUM(LEAD_COUNTS) AS LEAD_COUNTS, SUM(LEAD_WAIT_COUNTS) AS LEAD_WAIT_COUNTS, SUM(LEAD_CLOSE) AS LEAD_CLOSE ");
+		sql.append("SELECT CAMPAIGN_ID, ");
+		sql.append("       STEP_ID, ");
+		sql.append("       CAMPAIGN_NAME, ");
+		sql.append("       CAMPAIGN_DESC, ");
+		sql.append("       END_DATE, ");
+		sql.append("       CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID   END AS REGION_CENTER_ID, ");
+		sql.append("       CASE WHEN UEMP.REGION_CENTER_NAME IS NOT NULL THEN UEMP.REGION_CENTER_NAME ELSE BASE.REGION_CENTER_NAME END AS REGION_CENTER_NAME, ");
+		sql.append("       CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID     END AS BRANCH_AREA_ID, ");
+		sql.append("       CASE WHEN UEMP.BRANCH_AREA_NAME IS NOT NULL   THEN UEMP.BRANCH_AREA_NAME   ELSE BASE.BRANCH_AREA_NAME   END AS BRANCH_AREA_NAME, ");
+		sql.append("       '' AS BRANCH_NBR, ");
+		sql.append("       '' AS BRANCH_NAME, ");
+		sql.append("       '' AS EMP_ID, ");
+		sql.append("       '' AS EMP_NAME, ");
+		sql.append("       '' AS JOB_TITLE_NAME, ");
+		sql.append("       SUM(LEAD_COUNTS) AS LEAD_COUNTS, ");
+		sql.append("       SUM(LEAD_WAIT_COUNTS) AS LEAD_WAIT_COUNTS, ");
+		sql.append("       SUM(LEAD_CLOSE) AS LEAD_CLOSE ");
 		sql.append("FROM BASE ");
+		sql.append("LEFT JOIN ( ");
+		sql.append("  SELECT  DISTINCT EMP_ID, ");
+		sql.append("          DEPT_ID_30 AS REGION_CENTER_ID, ");
+		sql.append("          DEPT_NAME_30 AS REGION_CENTER_NAME, ");
+		sql.append("          DEPT_ID_40 AS BRANCH_AREA_ID, ");
+		sql.append("          DEPT_NAME_40 AS BRANCH_AREA_NAME, ");
+		sql.append("          DEPT_ID_50 AS BRANCH_NBR, ");
+		sql.append("          DEPT_NAME_50 AS BRANCH_NAME ");
+		sql.append("  FROM VWORG_EMP_INFO ");
+		sql.append("  WHERE PRIVILEGEID LIKE 'UHRM%' ");
+		sql.append(") UEMP ON BASE.EMP_ID = UEMP.EMP_ID ");
 		sql.append("WHERE 1 = 1 ");
 		sql.append("AND CAMPAIGN_ID = :campaignID ");
 		sql.append("AND STEP_ID = :stepID ");
@@ -1995,17 +2079,13 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {
 			if (StringUtils.isNotBlank(inputVO.getBranch()) && Integer.valueOf(inputVO.getBranch()) > 0) {
-				sql.append("AND BRANCH_NBR = :branchID "); 
+				sql.append("AND BASE.BRANCH_NBR = :branchID "); 
 				queryCondition.setObject("branchID", inputVO.getBranch());
 			} else if (StringUtils.isNotBlank(inputVO.getOp()) && !"null".equals(inputVO.getOp())) {
-				sql.append("AND ( ");
-				sql.append("     BASE.BRANCH_AREA_ID = :branchAreaID ");
-				sql.append("  OR EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = BASE.EMP_ID AND UHRM.DEPT_ID = :branchAreaID) ");
-				sql.append(") ");
-				
+				sql.append("AND CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL THEN UEMP.BRANCH_AREA_ID ELSE BASE.BRANCH_AREA_ID END = :branchAreaID ");
 				queryCondition.setObject("branchAreaID", inputVO.getOp());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion()) && !"null".equals(inputVO.getRegion())) {
-				sql.append("AND REGION_CENTER_ID = :regionCenterID "); 
+				sql.append("AND BASE.REGION_CENTER_ID = :regionCenterID "); 
 				queryCondition.setObject("regionCenterID", inputVO.getRegion());
 			} 
 		} else {
@@ -2014,12 +2094,21 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		// 2017/9/1 ocean add ao_code
 		if (StringUtils.isNotBlank(inputVO.getAoCode())) {
-			sql.append("AND EMP_ID = (SELECT EMP_ID FROM TBORG_SALES_AOCODE WHERE AO_CODE = :aoCode) ");
+			sql.append("AND BASE.EMP_ID = (SELECT EMP_ID FROM TBORG_SALES_AOCODE WHERE AO_CODE = :aoCode) ");
 			queryCondition.setObject("aoCode", inputVO.getAoCode());
 		}
 		
-		sql.append("GROUP BY CAMPAIGN_ID, STEP_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, END_DATE, REGION_CENTER_ID, REGION_CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME ");
-		sql.append("ORDER BY REGION_CENTER_ID, BRANCH_AREA_ID, BRANCH_NBR, EMP_ID, JOB_TITLE_NAME ");
+		sql.append("GROUP BY  CAMPAIGN_ID, ");
+		sql.append("          STEP_ID, ");
+		sql.append("          CAMPAIGN_NAME, ");
+		sql.append("          CAMPAIGN_DESC, ");
+		sql.append("          END_DATE, ");
+		sql.append("          CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID END, ");
+		sql.append("          CASE WHEN UEMP.REGION_CENTER_NAME IS NOT NULL THEN UEMP.REGION_CENTER_NAME ELSE BASE.REGION_CENTER_NAME END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_NAME IS NOT NULL   THEN UEMP.BRANCH_AREA_NAME   ELSE BASE.BRANCH_AREA_NAME END ");
+		sql.append("ORDER BY  CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID END ");
 
 		queryCondition.setQueryString(sql.toString());
 
@@ -2041,10 +2130,35 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		sql.append(vwcam_campaign_emp_stat_exp_X4(inputVO.getLeadType(), (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE), (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG), xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2)));
 
-		sql.append("SELECT CAMPAIGN_ID, STEP_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, END_DATE, ");
-		sql.append("       REGION_CENTER_ID, REGION_CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_NBR, BRANCH_NAME, EMP_ID, EMP_NAME, JOB_TITLE_NAME, ");
-		sql.append("       SUM(LEAD_COUNTS) AS LEAD_COUNTS, SUM(LEAD_WAIT_COUNTS) AS LEAD_WAIT_COUNTS, SUM(LEAD_CLOSE) AS LEAD_CLOSE ");
+		sql.append("SELECT CAMPAIGN_ID, ");
+		sql.append("       STEP_ID, ");
+		sql.append("       CAMPAIGN_NAME, ");
+		sql.append("       CAMPAIGN_DESC, ");
+		sql.append("       END_DATE, ");
+		sql.append("       CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID   END AS REGION_CENTER_ID, ");
+		sql.append("       CASE WHEN UEMP.REGION_CENTER_NAME IS NOT NULL THEN UEMP.REGION_CENTER_NAME ELSE BASE.REGION_CENTER_NAME END AS REGION_CENTER_NAME, ");
+		sql.append("       CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID     END AS BRANCH_AREA_ID, ");
+		sql.append("       CASE WHEN UEMP.BRANCH_AREA_NAME IS NOT NULL   THEN UEMP.BRANCH_AREA_NAME   ELSE BASE.BRANCH_AREA_NAME   END AS BRANCH_AREA_NAME, ");
+		sql.append("       BASE.BRANCH_NBR, ");
+		sql.append("       BASE.BRANCH_NAME, ");
+		sql.append("       BASE.EMP_ID, ");
+		sql.append("       EMP_NAME, ");
+		sql.append("       JOB_TITLE_NAME, ");
+		sql.append("       SUM(LEAD_COUNTS) AS LEAD_COUNTS, ");
+		sql.append("       SUM(LEAD_WAIT_COUNTS) AS LEAD_WAIT_COUNTS, ");
+		sql.append("       SUM(LEAD_CLOSE) AS LEAD_CLOSE ");
 		sql.append("FROM BASE ");
+		sql.append("LEFT JOIN ( ");
+		sql.append("  SELECT  DISTINCT EMP_ID, ");
+		sql.append("          DEPT_ID_30 AS REGION_CENTER_ID, ");
+		sql.append("          DEPT_NAME_30 AS REGION_CENTER_NAME, ");
+		sql.append("          DEPT_ID_40 AS BRANCH_AREA_ID, ");
+		sql.append("          DEPT_NAME_40 AS BRANCH_AREA_NAME, ");
+		sql.append("          DEPT_ID_50 AS BRANCH_NBR, ");
+		sql.append("          DEPT_NAME_50 AS BRANCH_NAME ");
+		sql.append("  FROM VWORG_EMP_INFO ");
+		sql.append("  WHERE PRIVILEGEID LIKE 'UHRM%' ");
+		sql.append(") UEMP ON BASE.EMP_ID = UEMP.EMP_ID ");
 		sql.append("WHERE 1 = 1 ");
 		sql.append("AND CAMPAIGN_ID = :campaignID ");
 		sql.append("AND STEP_ID = :stepID ");
@@ -2054,17 +2168,13 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {
 			if (StringUtils.isNotBlank(inputVO.getBranch()) && Integer.valueOf(inputVO.getBranch()) > 0) {
-				sql.append("AND BRANCH_NBR = :branchID "); //分行代碼
+				sql.append("AND BASE.BRANCH_NBR = :branchID "); //分行代碼
 				queryCondition.setObject("branchID", inputVO.getBranch());
 			} else if (StringUtils.isNotBlank(inputVO.getOp()) && !"null".equals(inputVO.getOp())) {
-				sql.append("AND ( ");
-				sql.append("     BASE.BRANCH_AREA_ID = :branchAreaID ");
-				sql.append("  OR EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = BASE.EMP_ID AND UHRM.DEPT_ID = :branchAreaID) ");
-				sql.append(") ");
-				
+				sql.append("AND CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL THEN UEMP.BRANCH_AREA_ID ELSE BASE.BRANCH_AREA_ID END = :branchAreaID ");
 				queryCondition.setObject("branchAreaID", inputVO.getOp());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion()) && !"null".equals(inputVO.getRegion())) {
-				sql.append("AND REGION_CENTER_ID = :regionCenterID "); //區域代碼
+				sql.append("AND BASE.REGION_CENTER_ID = :regionCenterID "); //區域代碼
 				queryCondition.setObject("regionCenterID", inputVO.getRegion());
 			} 
 		} else {
@@ -2074,12 +2184,29 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		// 2017/9/1 ocean add ao_code
 		if (StringUtils.isNotBlank(inputVO.getAoCode())) {
-			sql.append("AND EMP_ID = (SELECT EMP_ID FROM TBORG_SALES_AOCODE WHERE AO_CODE = :aoCode) ");
+			sql.append("AND BASE.EMP_ID = (SELECT EMP_ID FROM TBORG_SALES_AOCODE WHERE AO_CODE = :aoCode) ");
 			queryCondition.setObject("aoCode", inputVO.getAoCode());
 		}
 		
-		sql.append("GROUP BY CAMPAIGN_ID, STEP_ID, CAMPAIGN_NAME, CAMPAIGN_DESC, END_DATE, REGION_CENTER_ID, REGION_CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_NBR, BRANCH_NAME, EMP_ID, EMP_NAME, JOB_TITLE_NAME ");
-		sql.append("ORDER BY REGION_CENTER_ID, BRANCH_AREA_ID, BRANCH_NBR, EMP_ID, JOB_TITLE_NAME ");
+		sql.append("GROUP BY  CAMPAIGN_ID, ");
+		sql.append("          STEP_ID, ");
+		sql.append("          CAMPAIGN_NAME, ");
+		sql.append("          CAMPAIGN_DESC, ");
+		sql.append("          END_DATE, ");
+		sql.append("          CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID END, ");
+		sql.append("          CASE WHEN UEMP.REGION_CENTER_NAME IS NOT NULL THEN UEMP.REGION_CENTER_NAME ELSE BASE.REGION_CENTER_NAME END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_NAME IS NOT NULL   THEN UEMP.BRANCH_AREA_NAME   ELSE BASE.BRANCH_AREA_NAME END, ");
+		sql.append("          BASE.BRANCH_NBR, ");
+		sql.append("          BASE.BRANCH_NAME, ");
+		sql.append("          BASE.EMP_ID, ");
+		sql.append("          EMP_NAME, ");
+		sql.append("          JOB_TITLE_NAME ");
+		sql.append("ORDER BY  CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE BASE.REGION_CENTER_ID END, ");
+		sql.append("          CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE BASE.BRANCH_AREA_ID END, ");
+		sql.append("          BASE.BRANCH_NBR, ");
+		sql.append("          BASE.EMP_ID, ");
+		sql.append("          JOB_TITLE_NAME ");
 
 		queryCondition.setQueryString(sql.toString());
 		
@@ -2332,12 +2459,12 @@ public class CAM210 extends FubonWmsBizLogic {
 		sql.append("         MEM.EMP_NAME || CASE WHEN (SELECT COUNT(1) FROM VWORG_EMP_UHRM_INFO UI WHERE UI.EMP_ID = LEAD.EMP_ID) > 0 THEN '' ELSE '' END AS EMP_NAME, ");
 		sql.append("         MEM.JOB_TITLE_NAME, ");
 		sql.append("         CASE WHEN LENGTH(LEAD.AO_CODE) = 3 THEN LEAD.AO_CODE ELSE NULL END AS AO_CODE, ");
-		sql.append("         DEFN.REGION_CENTER_ID, ");
-		sql.append("         DEFN.REGION_CENTER_NAME, ");
-		sql.append("         DEFN.BRANCH_AREA_ID, ");
-		sql.append("         DEFN.BRANCH_AREA_NAME, ");
-		sql.append("         DEFN.BRANCH_NAME, ");
-		sql.append("         DEFN.BRANCH_NBR, ");
+		sql.append("         CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE DEFN.REGION_CENTER_ID   END AS REGION_CENTER_ID, ");
+		sql.append("         CASE WHEN UEMP.REGION_CENTER_NAME IS NOT NULL THEN UEMP.REGION_CENTER_NAME ELSE DEFN.REGION_CENTER_NAME END AS REGION_CENTER_NAME, ");
+		sql.append("         CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE DEFN.BRANCH_AREA_ID     END AS BRANCH_AREA_ID, ");
+		sql.append("         CASE WHEN UEMP.BRANCH_AREA_NAME IS NOT NULL   THEN UEMP.BRANCH_AREA_NAME   ELSE DEFN.BRANCH_AREA_NAME   END AS BRANCH_AREA_NAME, ");
+		sql.append("         CASE WHEN UEMP.BRANCH_NBR IS NOT NULL         THEN UEMP.BRANCH_NBR         ELSE DEFN.BRANCH_NBR         END AS BRANCH_NBR, ");
+		sql.append("         CASE WHEN UEMP.BRANCH_NAME IS NOT NULL        THEN UEMP.BRANCH_NAME        ELSE DEFN.BRANCH_NAME        END AS BRANCH_NAME, ");
 		sql.append("         1 AS LEAD_COUNTS, ");
 		sql.append("         CASE WHEN NVL(LEAD.AO_CODE, ' ') = ' ' THEN 1 ELSE 0 END AS LEAD_WAIT_COUNTS, ");
 		sql.append("         CASE WHEN NVL(LEAD.AO_CODE, ' ') <> ' ' AND LEAD.LEAD_STATUS >= '03' THEN 1 ELSE 0 END AS LEAD_CLOSE, ");
@@ -2345,6 +2472,17 @@ public class CAM210 extends FubonWmsBizLogic {
 		sql.append("  FROM TBCAM_SFA_CAMPAIGN CAMP, TBCAM_SFA_LEADS LEAD ");
 		sql.append("  LEFT JOIN VWORG_DEFN_INFO DEFN ON LEAD.BRANCH_ID = DEFN.BRANCH_NBR ");
 		sql.append("  LEFT JOIN TBORG_MEMBER MEM ON LEAD.EMP_ID = MEM.EMP_ID ");
+		sql.append("  LEFT JOIN ( ");
+		sql.append("    SELECT  DISTINCT EMP_ID, ");
+		sql.append("            DEPT_ID_30 AS REGION_CENTER_ID, ");
+		sql.append("            DEPT_NAME_30 AS REGION_CENTER_NAME, ");
+		sql.append("            DEPT_ID_40 AS BRANCH_AREA_ID, ");
+		sql.append("            DEPT_NAME_40 AS BRANCH_AREA_NAME, ");
+		sql.append("            DEPT_ID_50 AS BRANCH_NBR, ");
+		sql.append("            DEPT_NAME_50 AS BRANCH_NAME ");
+		sql.append("    FROM VWORG_EMP_INFO ");
+		sql.append("    WHERE PRIVILEGEID LIKE 'UHRM%' ");
+		sql.append("  ) UEMP ON LEAD.EMP_ID = UEMP.EMP_ID ");
 		sql.append("  WHERE CAMP.CAMPAIGN_ID = LEAD.CAMPAIGN_ID AND CAMP.STEP_ID = LEAD.STEP_ID ");
 		sql.append("  AND TO_CHAR(LEAD.END_DATE, 'yyyyMMdd') >= TO_CHAR(SYSDATE-10, 'yyyyMMdd') ");
 		sql.append("  AND LEAD.LEAD_STATUS <> 'TR' ");
@@ -2364,25 +2502,15 @@ public class CAM210 extends FubonWmsBizLogic {
 				queryCondition.setObject("uhrmOP", inputVO.getUhrmOP());
 			}
 			
-			if (StringUtils.isNotBlank(inputVO.getRegion()) && !"null".equals(inputVO.getRegion())) {
-				sql.append("  AND DEFN.REGION_CENTER_ID = :regionCenterID "); //區域代碼
-				queryCondition.setObject("regionCenterID", inputVO.getRegion());
-			} else {
-				sql.append("  AND (DEFN.REGION_CENTER_ID IN (:regionCenterIDList) OR DEFN.REGION_CENTER_ID IS NOT NULL) ");
-				queryCondition.setObject("regionCenterIDList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
-			}
-			
-			if (StringUtils.isNotBlank(inputVO.getOp()) && !"null".equals(inputVO.getOp())) {
-				sql.append("  AND DEFN.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼getOp
-				queryCondition.setObject("branchAreaID", inputVO.getOp());
-			} else {
-				sql.append("  AND (DEFN.BRANCH_AREA_ID IN (:branchAreaIDList) OR DEFN.BRANCH_AREA_ID IS NOT NULL) ");
-				queryCondition.setObject("branchAreaIDList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
-			}
-		
 			if (StringUtils.isNotBlank(inputVO.getBranch()) && Integer.valueOf(inputVO.getBranch()) > 0) {
 				sql.append("  AND DEFN.BRANCH_NBR = :branchID "); //分行代碼
 				queryCondition.setObject("branchID", inputVO.getBranch());
+			} else if (StringUtils.isNotBlank(inputVO.getOp()) && !"null".equals(inputVO.getOp())) {
+				sql.append("  AND DEFN.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼getOp
+				queryCondition.setObject("branchAreaID", inputVO.getOp());
+			} else if (StringUtils.isNotBlank(inputVO.getRegion()) && !"null".equals(inputVO.getRegion())) {
+				sql.append("  AND DEFN.REGION_CENTER_ID = :regionCenterID "); //區域代碼
+				queryCondition.setObject("regionCenterID", inputVO.getRegion());
 			} else {
 				sql.append("  AND (DEFN.BRANCH_NBR IN (:branchIDList) OR DEFN.BRANCH_NBR IS NOT NULL) ");
 				queryCondition.setObject("branchIDList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
@@ -2483,9 +2611,21 @@ public class CAM210 extends FubonWmsBizLogic {
 		sql.append("LEFT JOIN TBORG_ROLE R ON MR.ROLE_ID = R.ROLE_ID ");
 		sql.append("WHERE 1 = 1 ");
 
-		sql.append("GROUP BY L.CAMPAIGN_ID, L.STEP_ID, L.CAMPAIGN_NAME, TO_CHAR(L.END_DATE, 'yyyy-MM-dd'), L.CAMPAIGN_DESC, ");
-		sql.append("         L.REGION_CENTER_ID, L.REGION_CENTER_NAME, L.BRANCH_AREA_ID, L.BRANCH_AREA_NAME, L.BRANCH_NBR, L.BRANCH_NAME, ");
-		sql.append("         R.ROLE_NAME, L.EMP_NAME, L.AO_CODE, L.EMP_ID ");
+		sql.append("GROUP BY L.CAMPAIGN_ID, ");
+		sql.append("         L.STEP_ID, ");
+		sql.append("         L.CAMPAIGN_NAME, ");
+		sql.append("         TO_CHAR(L.END_DATE, 'yyyy-MM-dd'), ");
+		sql.append("         L.CAMPAIGN_DESC, ");
+		sql.append("         L.REGION_CENTER_ID, ");
+		sql.append("         L.REGION_CENTER_NAME, ");
+		sql.append("         L.BRANCH_AREA_ID, ");
+		sql.append("         L.BRANCH_AREA_NAME, ");
+		sql.append("         L.BRANCH_NBR, ");
+		sql.append("         L.BRANCH_NAME, ");
+		sql.append("         R.ROLE_NAME, ");
+		sql.append("         L.EMP_NAME, ");
+		sql.append("         L.AO_CODE, ");
+		sql.append("         L.EMP_ID ");
 
 		sql.append("ORDER BY ");
 		
@@ -2603,12 +2743,13 @@ public class CAM210 extends FubonWmsBizLogic {
 		StringBuffer sb = new StringBuffer();
 		
 		sb.append("WITH BASE AS ( ");
-		sb.append("  SELECT DISTINCT DEFN.REGION_CENTER_ID, ");
-		sb.append("         DEFN.REGION_CENTER_NAME, ");
-		sb.append("         DEFN.BRANCH_AREA_ID, ");
-		sb.append("         DEFN.BRANCH_AREA_NAME, ");
-		sb.append("         DEFN.BRANCH_NAME, ");
-		sb.append("         DEFN.BRANCH_NBR, ");
+		sb.append("  SELECT DISTINCT ");
+		sb.append("         CASE WHEN UEMP.REGION_CENTER_ID IS NOT NULL   THEN UEMP.REGION_CENTER_ID   ELSE DEFN.REGION_CENTER_ID   END AS REGION_CENTER_ID, ");
+		sb.append("         CASE WHEN UEMP.REGION_CENTER_NAME IS NOT NULL THEN UEMP.REGION_CENTER_NAME ELSE DEFN.REGION_CENTER_NAME END AS REGION_CENTER_NAME, ");
+		sb.append("         CASE WHEN UEMP.BRANCH_AREA_ID IS NOT NULL     THEN UEMP.BRANCH_AREA_ID     ELSE DEFN.BRANCH_AREA_ID     END AS BRANCH_AREA_ID, ");
+		sb.append("         CASE WHEN UEMP.BRANCH_AREA_NAME IS NOT NULL   THEN UEMP.BRANCH_AREA_NAME   ELSE DEFN.BRANCH_AREA_NAME   END AS BRANCH_AREA_NAME, ");
+		sb.append("         CASE WHEN UEMP.BRANCH_NBR IS NOT NULL         THEN UEMP.BRANCH_NBR         ELSE DEFN.BRANCH_NBR         END AS BRANCH_NBR, ");
+		sb.append("         CASE WHEN UEMP.BRANCH_NAME IS NOT NULL        THEN UEMP.BRANCH_NAME        ELSE DEFN.BRANCH_NAME        END AS BRANCH_NAME, ");
 		sb.append("         R.ROLE_NAME, ");
 		sb.append("         MEM.EMP_NAME || CASE WHEN (SELECT COUNT(1) FROM VWORG_EMP_UHRM_INFO UI WHERE UI.EMP_ID = LEADS.EMP_ID) > 0 THEN '' ELSE '' END AS EMP_NAME, ");
 		sb.append("         CASE WHEN LENGTH(LEADS.AO_CODE) > 3 THEN NULL ELSE LEADS.AO_CODE END AS AO_CODE, MEM.EMP_ID, ");
@@ -2624,6 +2765,17 @@ public class CAM210 extends FubonWmsBizLogic {
 		sb.append("  LEFT JOIN TBORG_MEMBER_ROLE MR ON MR.EMP_ID = MEM.EMP_ID AND MR.IS_PRIMARY_ROLE = 'Y' ");
 		sb.append("  LEFT JOIN TBORG_ROLE R ON MR.ROLE_ID = R.ROLE_ID ");
 		sb.append("  LEFT JOIN VWORG_DEFN_INFO DEFN ON LEADS.BRANCH_ID = DEFN.BRANCH_NBR ");
+		sb.append("  LEFT JOIN ( ");
+		sb.append("    SELECT  DISTINCT EMP_ID, ");
+		sb.append("            DEPT_ID_30 AS REGION_CENTER_ID, ");
+		sb.append("            DEPT_NAME_30 AS REGION_CENTER_NAME, ");
+		sb.append("            DEPT_ID_40 AS BRANCH_AREA_ID, ");
+		sb.append("            DEPT_NAME_40 AS BRANCH_AREA_NAME, ");
+		sb.append("            DEPT_ID_50 AS BRANCH_NBR, ");
+		sb.append("            DEPT_NAME_50 AS BRANCH_NAME ");
+		sb.append("    FROM VWORG_EMP_INFO ");
+		sb.append("    WHERE PRIVILEGEID LIKE 'UHRM%' ");
+		sb.append("  ) UEMP ON LEADS.EMP_ID = UEMP.EMP_ID ");
 		sb.append("  WHERE LEADS.LEAD_STATUS < '03' ");
 		sb.append("  AND TO_CHAR(LEADS.END_DATE+10, 'yyyyMMdd') >= TO_CHAR(SYSDATE, 'yyyyMMdd') ");
 		sb.append("  AND LEADS.LEAD_TYPE <> '04' ");
@@ -2643,25 +2795,15 @@ public class CAM210 extends FubonWmsBizLogic {
 				queryCondition.setObject("uhrmOP", inputVO.getUhrmOP());
 			}
 			
-			if (StringUtils.isNotBlank(inputVO.getRegion()) && !"null".equals(inputVO.getRegion())) {
-				sb.append("  AND DEFN.REGION_CENTER_ID = :regionCenterID "); //區域代碼
-				queryCondition.setObject("regionCenterID", inputVO.getRegion());
-			} else {
-				sb.append("  AND (DEFN.REGION_CENTER_ID IN (:regionCenterIDList) OR DEFN.REGION_CENTER_ID IS NOT NULL) ");
-				queryCondition.setObject("regionCenterIDList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
-			}
-			
-			if (StringUtils.isNotBlank(inputVO.getOp()) && !"null".equals(inputVO.getOp())) {
-				sb.append("  AND DEFN.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼getOp
-				queryCondition.setObject("branchAreaID", inputVO.getOp());
-			} else {
-				sb.append("  AND (DEFN.BRANCH_AREA_ID IN (:branchAreaIDList) OR DEFN.BRANCH_AREA_ID IS NOT NULL) ");
-				queryCondition.setObject("branchAreaIDList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
-			}
-		
 			if (StringUtils.isNotBlank(inputVO.getBranch()) && Integer.valueOf(inputVO.getBranch()) > 0) {
 				sb.append("  AND DEFN.BRANCH_NBR = :branchID "); //分行代碼
 				queryCondition.setObject("branchID", inputVO.getBranch());
+			} else if (StringUtils.isNotBlank(inputVO.getOp()) && !"null".equals(inputVO.getOp())) {
+				sb.append("  AND DEFN.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼getOp
+				queryCondition.setObject("branchAreaID", inputVO.getOp());
+			} else if (StringUtils.isNotBlank(inputVO.getRegion()) && !"null".equals(inputVO.getRegion())) {
+				sb.append("  AND DEFN.REGION_CENTER_ID = :regionCenterID "); //區域代碼
+				queryCondition.setObject("regionCenterID", inputVO.getRegion());
 			} else {
 				sb.append("  AND (DEFN.BRANCH_NBR IN (:branchIDList) OR DEFN.BRANCH_NBR IS NOT NULL) ");
 				queryCondition.setObject("branchIDList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
@@ -2682,8 +2824,8 @@ public class CAM210 extends FubonWmsBizLogic {
 		sb.append("         DEFN.REGION_CENTER_NAME, ");
 		sb.append("         DEFN.BRANCH_AREA_ID, ");
 		sb.append("         DEFN.BRANCH_AREA_NAME, ");
-		sb.append("         DEFN.BRANCH_NAME, ");
 		sb.append("         DEFN.BRANCH_NBR, ");
+		sb.append("         DEFN.BRANCH_NAME, ");
 		sb.append("         NULL AS ROLE_NAME, ");
 		sb.append("         NULL AS EMP_NAME, ");
 		sb.append("         NULL AS AO_CODE, ");

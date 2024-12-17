@@ -160,7 +160,7 @@ eSoafApp.controller('IOT110Controller',
 
 				if($scope.inputVO.AML == "高" || $scope.inputVO.PRECHECK == "高" || (($scope.inputVO.AML == "" || $scope.inputVO.AML == null) && $scope.inputVO.PRECHECK == "NONE")) {
 					//AML或PRECHECK為高或未開戶，則需分行主管以上層級才可覆核(分行主管、營運督導、處主管)
-					if($scope.isAMLAuthRole && $scope.inputVO.UHRM_CASE == "Y" && $scope.memLoginFlag == "UHRMMGR") {
+					if($scope.isAMLAuthRole && $scope.inputVO.UHRM_CASE == "Y" && ($scope.memLoginFlag == "UHRMMGR" || $scope.memLoginFlag == "UHRMBMMGR")) {
 						//UHRM案件且為UHRM主管登入，狀態為主管覆核中，顯示"核可"、"退回" Button
 						$scope.brhmgrAuthing = true;
 					} else if($scope.isAMLAuthRole && $scope.inputVO.UHRM_CASE == "N" && (findBranch != null && findBranch != undefined && findBranch.length > 0)) {
@@ -171,7 +171,7 @@ eSoafApp.controller('IOT110Controller',
 						$confirm({text: "要保人高風險或AML風險值為空白，需由個金分行主管/私銀區長始能覆核。"}, {size: 'sm'});
 					}
 				} else if($scope.privilegeGroup == "BRHMGR") {
-					if($scope.inputVO.UHRM_CASE == "Y" && ($scope.isHeadMgr || $scope.memLoginFlag == "UHRMMGR")) {
+					if($scope.inputVO.UHRM_CASE == "Y" && ($scope.isHeadMgr || $scope.memLoginFlag == "UHRMMGR" || $scope.memLoginFlag == "UHRMBMMGR")) {
 						//UHRM案件且為總行或UHRM主管登入，狀態為主管覆核中，顯示"核可"、"退回" Button
 						$scope.brhmgrAuthing = true;
 					} else if($scope.inputVO.UHRM_CASE == "N" && ($scope.isHeadMgr || (findBranch != null && findBranch != undefined && findBranch.length > 0))) {
@@ -188,7 +188,7 @@ eSoafApp.controller('IOT110Controller',
 
 				if($scope.inputVO.AML == "高" || $scope.inputVO.PRECHECK == "高" || (($scope.inputVO.AML == "" || $scope.inputVO.AML == null) && $scope.inputVO.PRECHECK == "NONE")) {
 					//AML或PRECHECK為高或未開戶，則需分行主管以上層級才可覆核、退回(分行主管、營運督導、處主管)
-					if($scope.isAMLAuthRole && $scope.inputVO.UHRM_CASE == "Y" && $scope.memLoginFlag == "UHRMMGR") {
+					if($scope.isAMLAuthRole && $scope.inputVO.UHRM_CASE == "Y" && ($scope.memLoginFlag == "UHRMMGR" || $scope.memLoginFlag == "UHRMBMMGR")) {
 						//UHRM案件且為UHRM主管登入，狀態為已覆核，主管仍可退回
 						$scope.brhmgrAllowDeny = true;
 					} else if($scope.isAMLAuthRole && $scope.inputVO.UHRM_CASE == "N" && (findBranch != null && findBranch != undefined && findBranch.length > 0)) {
@@ -196,7 +196,7 @@ eSoafApp.controller('IOT110Controller',
 						$scope.brhmgrAllowDeny = true;
 					}
 				} else if($scope.privilegeGroup == "BRHMGR") {
-					if($scope.inputVO.UHRM_CASE == "Y" && ($scope.isHeadMgr || $scope.memLoginFlag == "UHRMMGR")) {
+					if($scope.inputVO.UHRM_CASE == "Y" && ($scope.isHeadMgr || $scope.memLoginFlag == "UHRMMGR" || $scope.memLoginFlag == "UHRMBMMGR")) {
 						//UHRM案件且為總行或UHRM主管登入，狀態為已覆核，主管仍可退回
 						$scope.brhmgrAllowDeny = true;
 					} else if($scope.inputVO.UHRM_CASE == "N" && ($scope.isHeadMgr || (findBranch != null && findBranch != undefined && findBranch.length > 0))) {
@@ -889,7 +889,7 @@ eSoafApp.controller('IOT110Controller',
 
 			//要保人AML為空白或高風險
 			if($scope.inputVO.AML == "高" || $scope.inputVO.PRECHECK == "高" || (($scope.inputVO.AML == "" || $scope.inputVO.AML == null) && $scope.inputVO.PRECHECK == "NONE")) {
-				$scope.showMsg("要保人AML 風險值須個金分行主管(BM)才能進行覆核。");
+				$scope.showMsg("要保人高風險或AML風險值為空白，需由個金分行主管/私銀區長始能覆核。");
 			}
 		    debugger
 		    $scope.validSeniorRec = false;	//高齡非常態錄音檢核
@@ -1079,13 +1079,14 @@ eSoafApp.controller('IOT110Controller',
     		}
     		
     		//非契撤，分紅商品，招攬人員是否有分紅證照
-			var applydate = $filter('date')($scope.inputVO.APPLY_DATE,'yyyy-MM-dd');
+			var applydate = $filter('date')($scope.inputVO.APPLY_DATE,'yyyy-MM-dd 00:00:00');
+			var dividendEndDate = $filter('date')($scope.inputVO.empDividendEndDate,'yyyy-MM-dd 00:00:00');
     		if($scope.inputVO.CANCEL_CONTRACT_YN != "Y" && $scope.inputVO.PROD_DIVIDEND_YN && $scope.inputVO.PROD_DIVIDEND_YN == "Y") {
     			if($scope.inputVO.empDividendCertYN == "N") {
 	    			$scope.showErrorMsgInDialog("輸入的招攬人員必須具有(銀行)人身保險業分紅保險商品教育訓練完訓資格");
 	    			if(chkStatus == '2') return false; //購買檢核只顯示訊息，仍可儲存；但不能送出覆核
     			}
-    			if($scope.inputVO.empDividendEndDate > applydate) {
+    			if(applydate < dividendEndDate) {
     				$scope.showErrorMsgInDialog("要保書申請日不得小於分紅完訓日期");
     				if(chkStatus == '2') return false; //購買檢核只顯示訊息，仍可儲存；但不能送出覆核
     			}
@@ -1361,12 +1362,13 @@ eSoafApp.controller('IOT110Controller',
 											//壽險新契約，檢核招攬人員分紅證照
 											$scope.inputVO.empDividendCertYN = tota[0].body.empDividendCert.EMP_DIVIDEND_YN;
 											$scope.inputVO.empDividendEndDate = tota[0].body.empDividendCert.EMP_DIVIDEND_END_DATE;
-											var applydate = $filter('date')($scope.inputVO.APPLY_DATE,'yyyy-MM-dd');
+											var applydate = $filter('date')($scope.inputVO.APPLY_DATE,'yyyy-MM-dd 00:00:00');
+											var dividendEndDate = $filter('date')($scope.inputVO.empDividendEndDate,'yyyy-MM-dd 00:00:00');
 											//分紅商品，招攬人員是否有分紅證照
 											if(data.value.DIVIDEND_YN && data.value.DIVIDEND_YN == "Y") {
 												if($scope.inputVO.empDividendCertYN == "N") {
 													$scope.showMsg("輸入的招攬人員必須具有(銀行)人身保險業分紅保險商品教育訓練完訓資格");
-												} else if($scope.inputVO.empDividendEndDate > applydate) {
+												} else if(applydate < dividendEndDate) {
 													$scope.showMsg("要保書申請日不得小於分紅完訓日期");
 												}
 											}
@@ -1415,7 +1417,7 @@ eSoafApp.controller('IOT110Controller',
 											$scope.isInNoChkLoan = false;
 											$scope.inputVO.NEED_MATCH = '';//是否需要適配
 											$scope.inputVO.PRD_RISK = '';//商品風險值
-											$scope.inputVO.COMPANY_NUM = '';//保險公司代碼
+											if($scope.inputVO.REG_TYPE != "1") $scope.inputVO.COMPANY_NUM = '';//保險公司代碼//新契約目前不用清空，固定富壽82
 											$scope.inputVO.INS_COM_NAME = '';//保險公司名稱
 											$scope.inputVO.PROD_DIVIDEND_YN = "";
 											$scope.showErrorMsg('ehl_01_iot120_002')

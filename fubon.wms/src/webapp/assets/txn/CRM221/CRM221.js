@@ -1,6 +1,6 @@
 'use strict';
 eSoafApp.controller('CRM221Controller',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService, $filter, $timeout) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService, $filter, $timeout, crmService) {
 		$controller('BaseController', {$scope: $scope});
 		// include
 		$controller('CRM210Controller', {$scope: $scope});
@@ -9,7 +9,9 @@ eSoafApp.controller('CRM221Controller',
 		
 		$scope.priID = String(sysInfoService.getPriID());
 		$scope.memLoginFlag = String(sysInfoService.getMemLoginFlag()).toUpperCase();
-
+		
+		crmService.getForbiddenList();
+		
 		$scope.empListShowEXT = function () {
 			$scope.empListShowFlag = "AO";
 			
@@ -84,7 +86,12 @@ eSoafApp.controller('CRM221Controller',
 		$scope.inquire = function() {
 			debugger
 			if($scope.inputVO.cust_id != undefined && $scope.inputVO.cust_id.trim() != ""){
-				$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase();				
+				$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase();		
+				
+				if(crmService.checkCustId($rootScope.forbiddenData,$scope.inputVO.cust_id)) {
+					$scope.showErrorMsg("ehl_01_CRM_002");
+	    			return;
+				}
 			}
 			//手收貢獻度檢查
 			if($scope.inputVO.manage_05_Date != undefined){
@@ -126,6 +133,8 @@ eSoafApp.controller('CRM221Controller',
                 		}
 						$scope.obj.resultList = tota[0].body.resultList;
 						$scope.obj.outputVO = tota[0].body;
+						
+						$scope.obj.resultList = crmService.filterList($rootScope.forbiddenData,$scope.obj.resultList);
 					}
 				}
 			);

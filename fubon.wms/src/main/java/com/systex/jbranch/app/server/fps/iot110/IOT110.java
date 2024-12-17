@@ -108,7 +108,8 @@ public class IOT110 extends FubonWmsBizLogic {
 			sql.append(" 	  WHEN EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO WHERE EMP_ID = P.MODIFIER) THEN 'Y' ");
 			sql.append(" 	  WHEN EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO WHERE EMP_ID = P.RECRUIT_ID) THEN 'Y' ");
 			sql.append(" ELSE 'N' END AS UHRM_CASE, "); //UHRM案件//UHRM人員鍵機或UHRM為招攬人員的案件
-			sql.append(" CASE WHEN NVL(E.STATUS, '@') IN ('2', '3', '4', '5', '6', '8') THEN 'Y' ELSE 'N' END AS CALLOUT_YN ");
+			sql.append(" CASE WHEN NVL(E.STATUS, '@') IN ('2', '3', '4', '5', '6', '8') THEN 'Y' ELSE 'N' END AS CALLOUT_YN, ");
+			sql.append(" M.DIVIDEND_YN AS PROD_DIVIDEND_YN "); 
 			sql.append(" FROM TBIOT_PREMATCH P ");
 			sql.append(" LEFT OUTER JOIN TBPRD_INS_MAIN M ON M.INSPRD_KEYNO = P.INSPRD_KEYNO "); //富壽商品
 			sql.append(" LEFT OUTER JOIN TBJSB_INS_PROD_MAIN J ON J.PRODUCTSERIALNUM = P.INSPRD_KEYNO "); //非富壽商品

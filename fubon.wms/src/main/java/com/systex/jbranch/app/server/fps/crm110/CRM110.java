@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+
+
 /**
  * @author walalala、Carley
  * @date 2016/08/18
@@ -27,7 +29,7 @@ import java.util.Map;
 @Component("crm110")
 @Scope("request")
 public class CRM110 extends FubonWmsBizLogic {
-
+	
 	private DataAccessManager dam;
 
 	//可視範圍 : 轄下掛Code客戶、歸屬行或帳戶行空Code客戶
@@ -185,6 +187,20 @@ public class CRM110 extends FubonWmsBizLogic {
 		queryCondition.setQueryString(sql.toString());
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		return_VO.setResultList(list);
+		this.sendRtnObject(return_VO);
+	}
+	
+	public void getForbiddenList(Object body, IPrimitiveMap header) throws JBranchException {
+		CRM110InputVO inputVO = (CRM110InputVO) body;
+		CRM110OutputVO return_VO = new CRM110OutputVO();
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sql = new StringBuffer();
+		sql.append("SELECT DISTINCT OU_ID_NO AS CUST_ID ");
+		sql.append("FROM TBCRM_PIMDATA");
+		queryCondition.setQueryString(sql.toString());
+		List<Map<String, Object>> resultList = dam.exeQuery(queryCondition);
+		return_VO.setResultList(resultList);
 		this.sendRtnObject(return_VO);
 	}
 }

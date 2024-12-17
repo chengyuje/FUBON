@@ -108,7 +108,9 @@ public class SQM110 extends FubonWmsBizLogic {
 		sql.append("         CUST.CON_DEGREE, ");
 		sql.append("         FRQ.FRQ_DAY, ");
 		sql.append("         TO_CHAR(VISIT.CREATETIME, 'yyyyMMdd') AS LAST_VISIT_DATE, ");
-		sql.append("         CASE WHEN R.ROLE_ID IS NULL THEN NULL ELSE R.ROLE_ID END AS ROLE_FLAG ");
+		sql.append("         CASE WHEN R.ROLE_ID IS NULL THEN NULL ELSE R.ROLE_ID END AS ROLE_FLAG, ");
+		sql.append("         UH.DEPT_ID AS UHRM_DEPT, ");
+		sql.append("         UHDEPT.DEPT_NAME AS UHRM_DEPT_NAME ");
 		sql.append("  FROM ( ");
 		sql.append("  	SELECT SEQ, DATA_DATE, QTN_TYPE, REGION_CENTER_ID, BRANCH_AREA_ID, BRANCH_NBR, EMP_ID, AO_CODE, QUESTION_DESC, CUST_NAME, CUST_ID, ");
 		sql.append("           MOBILE_NO, ANSWER, RESP_NOTE, TRADE_DATE, RESP_DATE, SEND_DATE, CAMPAIGN_ID, STEP_ID, SATISFACTION_O, SATISFACTION_W, ");
@@ -145,6 +147,8 @@ public class SQM110 extends FubonWmsBizLogic {
 		sql.append("  LEFT JOIN ( ");
 		sql.append("    SELECT ROLE_ID FROM TBORG_ROLE WHERE SYS_ROLE IN('HEADMGR_ROLE', 'ARMGR_ROLE', 'MBRMGR_ROLE', 'BMMGR_ROLE', 'UHRMMGR_ROLE', 'UHRMBMMGR_ROLE') ORDER BY SYS_ROLE ");
 		sql.append("  ) R ON R.ROLE_ID = :ROLE_ID ");
+		sql.append("  LEFT JOIN (SELECT DISTINCT EMP_ID, DEPT_ID FROM VWORG_EMP_UHRM_INFO WHERE PRIVILEGEID IN ('UHRM001', 'UHRM002')) UH ON UH.EMP_ID = A.EMP_ID ");
+		sql.append("  LEFT JOIN TBORG_DEFN UHDEPT ON UHDEPT.DEPT_ID = UH.DEPT_ID ");
 		sql.append("  WHERE 1 = 1 ");
 		condition.setObject("ROLE_ID", roleID);
 		
@@ -535,6 +539,7 @@ public class SQM110 extends FubonWmsBizLogic {
 
 			headerLineTop.add("業務處");
 			headerLineTop.add("營運區");
+			headerLineTop.add("私銀區");
 			headerLineTop.add("分行別");
 			headerLineTop.add("AO_CODE");
 			headerLineTop.add("個金RM姓名");
@@ -621,6 +626,7 @@ public class SQM110 extends FubonWmsBizLogic {
 			int detailColumn = 0;
 			map.put(detailColumn++, "REGION_CENTER_NAME");
 			map.put(detailColumn++, "BRANCH_AREA_NAME");
+			map.put(detailColumn++, "UHRM_DEPT_NAME");
 			map.put(detailColumn++, "BRANCH_NAME");
 			map.put(detailColumn++, "AO_CODE");
 			map.put(detailColumn++, "EMP_NAME");
@@ -715,6 +721,7 @@ public class SQM110 extends FubonWmsBizLogic {
 
 			headerLineTop.add("業務處");
 			headerLineTop.add("營運區");
+			headerLineTop.add("私銀區");
 			headerLineTop.add("分行別");
 			headerLineTop.add("AO_CODE");
 			headerLineTop.add("個金RM姓名");
@@ -801,6 +808,7 @@ public class SQM110 extends FubonWmsBizLogic {
 			int detailColumn = 0;
 			map.put(detailColumn++, "REGION_CENTER_NAME");
 			map.put(detailColumn++, "BRANCH_AREA_NAME");
+			map.put(detailColumn++, "UHRM_DEPT_NAME");
 			map.put(detailColumn++, "BRANCH_NAME");
 			map.put(detailColumn++, "AO_CODE");
 			map.put(detailColumn++, "EMP_NAME");
@@ -899,6 +907,7 @@ public class SQM110 extends FubonWmsBizLogic {
 
 			headerLineTop.add("業務處");
 			headerLineTop.add("營運區");
+			headerLineTop.add("私銀區");
 			headerLineTop.add("分行別");
 			headerLineTop.add("員工編號");
 			headerLineTop.add("員工姓名");
@@ -983,6 +992,7 @@ public class SQM110 extends FubonWmsBizLogic {
 			int detailColumn = 0;
 			map.put(detailColumn++, "REGION_CENTER_NAME");
 			map.put(detailColumn++, "BRANCH_AREA_NAME");
+			map.put(detailColumn++, "UHRM_DEPT_NAME");
 			map.put(detailColumn++, "BRANCH_NAME");
 			map.put(detailColumn++, "EMP_ID");
 			map.put(detailColumn++, "EMP_NAME");
@@ -1079,6 +1089,7 @@ public class SQM110 extends FubonWmsBizLogic {
 
 			headerLineTop.add("業務處");
 			headerLineTop.add("營運區");
+			headerLineTop.add("私銀區");
 			headerLineTop.add("分行別");
 			headerLineTop.add("員工編號");
 			headerLineTop.add("員工姓名");
@@ -1161,6 +1172,7 @@ public class SQM110 extends FubonWmsBizLogic {
 			int detailColumn = 0;
 			map.put(detailColumn++, "REGION_CENTER_NAME");
 			map.put(detailColumn++, "BRANCH_AREA_NAME");
+			map.put(detailColumn++, "UHRM_DEPT_NAME");
 			map.put(detailColumn++, "BRANCH_NAME");
 			map.put(detailColumn++, "EMP_ID");
 			map.put(detailColumn++, "EMP_NAME");
@@ -1256,6 +1268,7 @@ public class SQM110 extends FubonWmsBizLogic {
 
 			headerLineTop.add("業務處");
 			headerLineTop.add("營運區");
+			headerLineTop.add("私銀區");
 			headerLineTop.add("分行別");
 			headerLineTop.add("員工編號");
 			headerLineTop.add("員工姓名");
@@ -1297,6 +1310,7 @@ public class SQM110 extends FubonWmsBizLogic {
 			int detailColumn = 0;
 			map.put(detailColumn++, "REGION_CENTER_NAME");
 			map.put(detailColumn++, "BRANCH_AREA_NAME");
+			map.put(detailColumn++, "UHRM_DEPT_NAME");
 			map.put(detailColumn++, "BRANCH_NAME");
 			map.put(detailColumn++, "EMP_ID");
 			map.put(detailColumn++, "EMP_NAME");

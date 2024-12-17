@@ -120,7 +120,9 @@ public class SQM140 extends FubonWmsBizLogic {
 		sql.append("         FLOW.CRMGR, ");
 		sql.append("         FLOW.HEADMGR, ");
 		sql.append("         OWNER_EMP.EMP_NAME AS OWNER_EMP_NAME, ");
-		sql.append("         STATUS_MAPP.PARAM_NAME AS CASE_STATUS_NAME ");
+		sql.append("         STATUS_MAPP.PARAM_NAME AS CASE_STATUS_NAME, ");
+		sql.append("         UH.DEPT_ID AS UHRM_DEPT, ");
+		sql.append("         UHDEPT.DEPT_NAME AS UHRM_DEPT_NAME ");
 		sql.append("  FROM  TBSQM_CSM_IMPROVE_MAST A ");
 		sql.append("  LEFT JOIN TBPMS_ORG_REC_N ORG ON ORG.DEPT_ID = A.BRANCH_NBR AND TO_DATE(A.TRADE_DATE, 'YYYYMMDD') BETWEEN ORG.START_TIME AND ORG.END_TIME ");
 		sql.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N EMP ON EMP.EMP_ID = A.EMP_ID AND TO_DATE(A.TRADE_DATE, 'YYYYMMDD') BETWEEN EMP.START_TIME AND EMP.END_TIME ");
@@ -152,6 +154,8 @@ public class SQM140 extends FubonWmsBizLogic {
 		sql.append("  ) FLOW ON A.CASE_NO = FLOW.CASE_NO ");
 		sql.append("  LEFT JOIN TBORG_MEMBER OWNER_EMP ON A.OWNER_EMP_ID = OWNER_EMP.EMP_ID ");
 		sql.append("  LEFT JOIN TBSYSPARAMETER STATUS_MAPP ON A.CASE_STATUS = STATUS_MAPP.PARAM_CODE AND STATUS_MAPP.PARAM_TYPE = 'SQM.STATUS_LIST' ");
+		sql.append("  LEFT JOIN (SELECT DISTINCT EMP_ID, DEPT_ID FROM VWORG_EMP_UHRM_INFO WHERE PRIVILEGEID IN ('UHRM001', 'UHRM002')) UH ON UH.EMP_ID = A.EMP_ID ");
+		sql.append("  LEFT JOIN TBORG_DEFN UHDEPT ON UHDEPT.DEPT_ID = UH.DEPT_ID ");
 		sql.append("  WHERE 1= 1 ");
 		sql.append("  AND A.DELETE_FLAG IS NULL ");
 
@@ -1024,6 +1028,7 @@ public class SQM140 extends FubonWmsBizLogic {
 		headerLineTop.add("交易日期");
 		headerLineTop.add("業務處");
 		headerLineTop.add("營運區");
+		headerLineTop.add("私銀區");
 		headerLineTop.add("分行別");
 		headerLineTop.add("員工編號");
 		headerLineTop.add("AO_CODE");
@@ -1060,8 +1065,9 @@ public class SQM140 extends FubonWmsBizLogic {
 		String[] mainLine    = {"CASE_NO", 
 								"QTN_TYPE", 
 								"TRADE_DATE", 
-								"REGION_CENTER_NAME", 
+								"REGION_CENTER_NAME",
 								"BRANCH_AREA_NAME", 
+								"UHRM_DEPT_NAME",
 								"BRANCH_NAME", 
 								"EMP_ID", 
 								"AO_CODE", 

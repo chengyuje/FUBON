@@ -4,11 +4,13 @@
  */
 'use strict';
 eSoafApp.controller('CRM211Controller',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService, crmService) {
 		$controller('BaseController', {$scope: $scope});
 
 		$controller('CRM210Controller', {$scope: $scope});
 		$scope.controllerName = "CRM211Controller";
+		
+		crmService.getForbiddenList();
 		
 		$scope.priID = String(sysInfoService.getPriID());
 		/*
@@ -76,6 +78,7 @@ eSoafApp.controller('CRM211Controller',
 						 $scope.aolist = _.sortBy(tota[0].body.resultList, ['AO_CODE']);
 						 $scope.mappingSet['ao_list'] = [];
 						 $scope.inputVO.aolist = [];
+						
 						 if ($scope.ao_code != '' && $scope.ao_code != undefined) {		//有AO_CODE
 							 if($scope.ao_code.length > 1){		//有兩個以上AO_CODE的理專
 								 angular.forEach($scope.aolist, function(row, index, objs){
@@ -107,7 +110,12 @@ eSoafApp.controller('CRM211Controller',
 		
 		$scope.inquire = function() {
 			if($scope.inputVO.cust_id != ''){
-				$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase();				
+				$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase();	
+				
+				if(crmService.checkCustId($rootScope.forbiddenData,$scope.inputVO.cust_id)) {
+					$scope.showErrorMsg("ehl_01_CRM_002");
+	    			return;
+				}
 			}
 			//手收貢獻度檢查
 			if($scope.inputVO.manage_05_Date != undefined){
@@ -130,6 +138,8 @@ eSoafApp.controller('CRM211Controller',
                 		}
 						$scope.obj.resultList = tota[0].body.resultList;
 						$scope.obj.outputVO = tota[0].body;
+						
+						$scope.obj.resultList = crmService.filterList($rootScope.forbiddenData,$scope.obj.resultList);
 					}
 			});
 	    };

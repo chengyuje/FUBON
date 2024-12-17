@@ -91,7 +91,7 @@ public class PMS417 extends FubonWmsBizLogic {
 		sql.append("       MEM.EMP_ID, ");
 		sql.append("       MEM.EMP_NAME, ");
 		sql.append("       CUS.AO_CODE, ");
-		sql.append("       CASE WHEN A.CUST_AGE >= 65 THEN '65' ELSE '' END AS CUST_AGE ");
+		sql.append("       CASE WHEN A.CUST_AGE >= 65 THEN A.CUST_AGE ELSE '' END AS CUST_AGE ");
 		sql.append("FROM TBPMS_FUND_FREQ A ");
 		sql.append("LEFT JOIN VWORG_DEFN_INFO BRH ON A.BRANCH_NBR = BRH.BRANCH_NBR ");
 		sql.append("LEFT JOIN TBCRM_CUST_MAST CUS ON A.CUST_ID = CUS.CUST_ID ");

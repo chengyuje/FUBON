@@ -1,5 +1,6 @@
 <script type="text/javascript" src="assets/txn/ELN100/ELN100.js"></script>
 <script type="text/javascript" src="assets/txn/ELN100/ELN100_BBG.js"></script>
+<script type="text/javascript" src="assets/txn/ELN100/ELN100_DETAIL.js"></script>
 <div ng-controller="ELN100Controller" ng-cloak>
 	<div>
 		<div class="tfb_content">
@@ -180,18 +181,18 @@
   			  		</tr>
   			  		<tr>
   			  			<td colspan="6">
-  			  				<label><input type="radio" ng-model="inputVO.type" ng-value="1" ng-change="changeType()"> 年化收益率</label>&nbsp;
-  			  				<label><input type="radio" ng-model="inputVO.type" ng-value="2" ng-change="changeType()"> 執行價格</label>&nbsp;
-  			  				<label><input type="radio" ng-model="inputVO.type" ng-value="3" ng-change="changeType()"> KO 價格</label>&nbsp;
-  			  				<label><input type="radio" ng-model="inputVO.type" ng-value="4" ng-change="changeType()"> KI 價格</label>&nbsp;
-  			  				<label><input type="radio" ng-model="inputVO.type" ng-value="5" ng-change="changeType()"> 通路服務費率：</label>
+  			  				<label><input type="radio" ng-model="inputVO.type1" ng-value="1" ng-change="changeType('1')"> 年化收益率</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type1" ng-value="2" ng-change="changeType('1')"> 執行價格</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type1" ng-value="3" ng-change="changeType('1')"> KO 價格</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type1" ng-value="4" ng-change="changeType('1')"> KI 價格</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type1" ng-value="5" ng-change="changeType('1')"> 通路服務費率：</label>
   			  				<input type="text" 
 								   id="rate1" name="rate1" 
 								   class="form-control" 
 								   e-input-limit="NC"
 								   style="width: 180px; display: inline;"
 								   ng-model="inputVO.rate1" 
-								   ng-disabled="inputVO.type == undefined || disRate"
+								   ng-disabled="inputVO.type1 == undefined || disRate1"
 								   ng-blur="checkRate('1')"/>(%)&nbsp;～&nbsp;
 							<input type="text" 
 								   id="rate2" name="rate2" 
@@ -199,8 +200,33 @@
 								   e-input-limit="NC"
 								   style="width: 180px; display: inline;"
 								   ng-model="inputVO.rate2" 
-								   ng-disabled="inputVO.type == undefined || disRate"
+								   ng-disabled="inputVO.type1 == undefined || disRate1"
 								   ng-blur="checkRate('2')"/>(%)
+  			  			</td>
+  			  		</tr>
+  			  		<tr>
+  			  			<td colspan="6">
+  			  				<label><input type="radio" ng-model="inputVO.type2" ng-value="1" ng-change="changeType('2')" ng-disabled="inputVO.type1 == undefined"> 年化收益率</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type2" ng-value="2" ng-change="changeType('2')" ng-disabled="inputVO.type1 == undefined"> 執行價格</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type2" ng-value="3" ng-change="changeType('2')" ng-disabled="inputVO.type1 == undefined"> KO 價格</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type2" ng-value="4" ng-change="changeType('2')" ng-disabled="inputVO.type1 == undefined"> KI 價格</label>&nbsp;
+  			  				<label><input type="radio" ng-model="inputVO.type2" ng-value="5" ng-change="changeType('2')" ng-disabled="inputVO.type1 == undefined"> 通路服務費率：</label>
+  			  				<input type="text" 
+								   id="rate3" name="rate3" 
+								   class="form-control" 
+								   e-input-limit="NC"
+								   style="width: 180px; display: inline;"
+								   ng-model="inputVO.rate3" 
+								   ng-disabled="inputVO.type1 == undefined || inputVO.type2 == undefined || disRate2"
+								   ng-blur="checkRate('3')"/>(%)&nbsp;～&nbsp;
+							<input type="text" 
+								   id="rate4" name="rate4" 
+								   class="form-control" 
+								   e-input-limit="NC"
+								   style="width: 180px; display: inline;"
+								   ng-model="inputVO.rate4" 
+								   ng-disabled="inputVO.type1 == undefined || inputVO.type2 == undefined || disRate2"
+								   ng-blur="checkRate('4')"/>(%)
   			  			</td>
   			  		</tr>
 				</table>
@@ -244,7 +270,10 @@
 					</thead>
 					<tbody>
 						<tr class="repeat-row" ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
-							<td>{{toJsDate(row.QUERY_DATE) | date:'yyyy-MM-dd HH:mm'}}</td>
+							<td>
+								<a href="#" ng-click="getDetail(row)">{{toJsDate(row.QUERY_DATE) | date:'yyyy-MM-dd HH:mm'}}</a>
+							</td>
+							<!-- <td>{{toJsDate(row.QUERY_DATE) | date:'yyyy-MM-dd HH:mm'}}</td> -->
 							<td>{{row.PRODUCT}}</td>
 							<td align="right">{{row.TENOR}}</td>
 							<td>{{row.CURRENCY}}</td>
@@ -257,8 +286,8 @@
 							<td align="right">{{row.STRIKE}}</td>
 							<td align="right">{{row.KO_BARRIER}}</td>
 							<td>{{row.KO_TYPE}}</td>
-							<td align="right">{{row.KI_BARRIER}}</td>
-							<td>{{row.KI_TYPE}}</td>
+							<td align="right">{{row.KI_BARRIER == 'null' ? '' : row.KI_BARRIER}}</td>
+							<td>{{row.KI_TYPE.toUpperCase() == 'NONE' ? '' : row.KI_TYPE}}</td>
 							<td align="right">{{row.UP_FRONT}}</td>
 							<!-- <td>{{row.QUERY_EMP}}</td>
 							<td>{{row.QUERY_ID}}</td>

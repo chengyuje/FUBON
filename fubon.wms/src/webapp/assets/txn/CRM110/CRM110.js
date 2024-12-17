@@ -1,10 +1,15 @@
 'use strict';
-eSoafApp.controller('CRM110Controller', function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService, getParameter) {
+eSoafApp.controller('CRM110Controller', function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService, getParameter, crmService) {
 	$controller('BaseController', {$scope: $scope});
 	$scope.controllerName = "CRM110Controller";
 	
 	$scope.role = sysInfoService.getPriID();
 	$scope.ao_code = String(sysInfoService.getAoCode());
+	
+//	crmService.getForbiddenList().then(function(result) {
+//	      $scope.forbiddenData = result; 
+//	    });
+	crmService.getForbiddenList();
 	
 	$scope.mappingSet['cust_type'] = [];
 	$scope.mappingSet['cust_type'].push({LABEL: '客戶ID' , DATA: 'ID'}, {LABEL: '客戶姓名' , DATA: 'NAME'});
@@ -61,8 +66,6 @@ eSoafApp.controller('CRM110Controller', function($rootScope, $scope, $controller
 	}
 	
 	$scope.inquire = function(){
-		$scope.noQuery = false;
-
 		if ($scope.inputVO.crm110Type == '') {
 			$scope.showErrorMsg("請選取");
 			return;
@@ -72,6 +75,12 @@ eSoafApp.controller('CRM110Controller', function($rootScope, $scope, $controller
 			$scope.inputVO.cust_name = $scope.inputVO.cust;
 		} else if ($scope.inputVO.crm110Type == 'ID') {		
 			$scope.inputVO.cust_id = $scope.inputVO.cust.toUpperCase();	
+			
+			if(crmService.checkCustId($rootScope.forbiddenData,$scope.inputVO.cust_id)) {
+				$scope.showErrorMsg("ehl_01_CRM_002");
+    			$scope.noQuery = true;
+    			return;
+			}
 			
 			angular.forEach($scope.mappingSet['CRM.NONSEARCH_ID'], function(row) {
         		if($scope.inputVO.cust_id === row.DATA ){
@@ -134,6 +143,12 @@ eSoafApp.controller('CRM110Controller', function($rootScope, $scope, $controller
 				//單筆資料
 				if (tota[0].body.resultList.length == 1) {
 					
+					if(crmService.checkCustId($rootScope.forbiddenData,$scope.inputVO.cust_id)) {
+						$scope.showErrorMsg("ehl_01_CRM_002");
+		    			$scope.noQuery = true;
+		    			return;
+					}
+					
 					angular.forEach($scope.mappingSet['CRM.NONSEARCH_ID'], function(row) {
 		        		if (tota[0].body.resultList[0].CUST_ID === row.DATA){
 		        			$scope.showErrorMsg("ehl_01_CRM_001");
@@ -184,6 +199,11 @@ eSoafApp.controller('CRM110Controller', function($rootScope, $scope, $controller
 					var role = $scope.inputVO.role;
 					var cust_name = $scope.inputVO.cust;
 					var ao_code = $scope.ao_code;
+					debugger;
+					row = crmService.filterList($rootScope.forbiddenData,row);
+					debugger;
+			    	
+					
 					var dialog = ngDialog.open({
 						template: 'assets/txn/CRM110/CRM110_MultiData.html',
 						className: 'CRM110_MultiData',

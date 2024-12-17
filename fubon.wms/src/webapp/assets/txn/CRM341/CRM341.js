@@ -4,9 +4,11 @@
  */
 'use strict';
 eSoafApp.controller('CRM341Controller',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, $q, getParameter, $filter) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, $q, getParameter, $filter, crmService) {
 		$controller('BaseController', {$scope: $scope});
 		$scope.controllerName = "CRM341Controller";
+		
+		crmService.getForbiddenList();
 		
 		// combobox
 		$scope.pri_id = projInfoService.getPriID()[0];
@@ -109,6 +111,11 @@ eSoafApp.controller('CRM341Controller',
 		//查詢
 		$scope.inquire = function() {
 			$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase().trim();
+			
+			if(crmService.checkCustId($rootScope.forbiddenData,$scope.inputVO.cust_id)) {
+				$scope.showErrorMsg("ehl_01_CRM_002");
+    			return;
+			}
 			// 給同意書用
 			$scope.inputVO.oldVOList = {};
 			$scope.sendRecv("CRM341", "inquire", "com.systex.jbranch.app.server.fps.crm341.CRM341InputVO", $scope.inputVO,

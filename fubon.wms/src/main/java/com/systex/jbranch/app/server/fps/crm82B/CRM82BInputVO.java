@@ -4,13 +4,13 @@ import com.systex.jbranch.platform.common.dataaccess.vo.PagingInputVO;
 
 public class CRM82BInputVO extends PagingInputVO {
 	private String cust_id;
-	private String prd_id;
+	private String prod_id;
 	
 	public String getPrd_id() {
-		return prd_id;
+		return prod_id;
 	}
-	public void setPrd_id(String prd_id) {
-		this.prd_id = prd_id;
+	public void setPrd_id(String prod_id) {
+		this.prod_id = prod_id;
 	}
 	public String getCust_id() {
 		return cust_id;

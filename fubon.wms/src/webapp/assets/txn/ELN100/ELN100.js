@@ -56,7 +56,8 @@ eSoafApp.controller('ELN100Controller', function($rootScope, $scope, $controller
 	}
 	
 	$scope.init = function(){
-		$scope.disRate = false;
+		$scope.disRate1 = false;
+		$scope.disRate2 = false;
 		$scope.inquireInit();
 		
 		// 計價幣別 :USD、AUD、JPY、EUR
@@ -136,24 +137,48 @@ eSoafApp.controller('ELN100Controller', function($rootScope, $scope, $controller
 	}
 	
 	$scope.changeKiType = function() {
-		if ($scope.inputVO.type == 4) {
-			if ($scope.inputVO.ki_type == 'EKI' || $scope.inputVO.ki_type == 'AKI') {
-				$scope.disRate = false;
-				$scope.limitVal = 50;
-			} else {
-				$scope.inputVO.rate1 = undefined;
-				$scope.inputVO.rate2 = undefined;
-				$scope.limitVal = 0;
-				$scope.disRate = true;
-			}			
+		for (var i = 1; i <= 2; i++) {
+			if ($scope.inputVO['type' + i] == 4) {
+				if ($scope.inputVO.ki_type == 'EKI' || $scope.inputVO.ki_type == 'AKI') {
+					$scope['disRate' + i] = false;
+					$scope['limitVal' + i] = 50;
+				} else {
+					$scope['disRate' + i] = true;
+					$scope['limitVal' + i] = 0;
+					
+					if (i == 1) {
+						$scope.inputVO.rate1 = undefined;
+						$scope.inputVO.rate2 = undefined;						
+					} else {
+						$scope.inputVO.rate3 = undefined;
+						$scope.inputVO.rate4 = undefined;
+					}
+					
+				}			
+			}
 		}
 	}
 	
-	$scope.changeType = function() {
-		$scope.disRate = false;
-		$scope.limitVal = 0;
-		$scope.inputVO.rate1 = undefined;
-		$scope.inputVO.rate2 = undefined;
+	$scope.changeType = function(nbr) {
+		$scope['disRate' + nbr] = false;
+		$scope['limitVal' + nbr] = 0;
+		
+		if (nbr == '1') {
+			$scope.inputVO.type2 = undefined;
+			
+			$scope.inputVO.rate1 = undefined;
+			$scope.inputVO.rate2 = undefined;
+			$scope.inputVO.rate3 = undefined;
+			$scope.inputVO.rate4 = undefined;
+		} else {
+			if ($scope.inputVO.type2 == $scope.inputVO.type1) {
+				$scope.inputVO.type2 = undefined;
+				$scope.showErrorMsg("兩列不能重複選項。");
+			}
+			
+			$scope.inputVO.rate3 = undefined;
+			$scope.inputVO.rate4 = undefined;
+		}
 		
 		/**
 		 *  點選單一條件，輸入數值區間(非必要翰入欄位):
@@ -163,30 +188,30 @@ eSoafApp.controller('ELN100Controller', function($rootScope, $scope, $controller
 		 *  4. KI 價格	 ：查詢每日詢價明細資料庫中，KI 價格(%)	，若『KI類型』有選EKI、AKI，開放輸入，限數值50以上; 選None，則不可輸入數值。
 		 *  5. 通路服務費率：查詢每日詢價明細資料庫中，UF(%)		，限數值0.5以上。
 		 * **/
-		switch ($scope.inputVO.type) {
+		switch ($scope.inputVO['type' + nbr]) {
 			case 1: {
-				$scope.limitVal = 5;
+				$scope['limitVal' + nbr] = 5;
 				break;
 			}
 			case 2: {
-				$scope.limitVal = 50;
+				$scope['limitVal' + nbr] = 50;
 				break;
 			}
 			case 3: {
-				$scope.limitVal = 80;
+				$scope['limitVal' + nbr] = 80;
 				break;
 			}
 			case 4: {
 				if ($scope.inputVO.ki_type == 'EKI' || $scope.inputVO.ki_type == 'AKI') {
-					$scope.limitVal = 50;
+					$scope['limitVal' + nbr] = 50;
 				} else {
-					$scope.limitVal = 0;
-					$scope.disRate = true;
+					$scope['limitVal' + nbr] = 0;
+					$scope['disRate' + nbr] = true;
 				}
 				break;
 			}
 			case 5: {
-				$scope.limitVal = 0.5;
+				$scope['limitVal' + nbr] = 0.5;
 				break;
 			}
 			default: {
@@ -198,9 +223,11 @@ eSoafApp.controller('ELN100Controller', function($rootScope, $scope, $controller
 	
 	$scope.checkRate = function(nbr) {
 		var val = $scope.inputVO['rate' + nbr];
-		if (val < $scope.limitVal) {
+		var limitNbr = nbr > '2' ? '2' : '1';
+		
+		if (val < $scope['limitVal' + limitNbr]) {
 			$scope.inputVO['rate' + nbr] = undefined;
-			$scope.showErrorMsg("限數值 " + $scope.limitVal + " 以上");
+			$scope.showErrorMsg("限數值 " + $scope['limitVal' + limitNbr] + " 以上");
 			return;
 		}
 		
@@ -215,6 +242,33 @@ eSoafApp.controller('ELN100Controller', function($rootScope, $scope, $controller
 				}
 			}
 		}
+		if ($scope.inputVO.rate3 != undefined && $scope.inputVO.rate4 != undefined) {
+			if ($scope.inputVO.rate3 > $scope.inputVO.rate4) {
+				if (nbr == '3') {
+					$scope.inputVO.rate3 = undefined;
+					$scope.showErrorMsg("數值需小於 " + $scope.inputVO.rate4);
+				} else {
+					$scope.inputVO.rate4 = undefined;
+					$scope.showErrorMsg("數值需大於 " + $scope.inputVO.rate3);
+				}
+			}
+		}
+	}
+	
+	$scope.getDetail = function(row) {
+		var row = row;
+		
+		var dialog = ngDialog.open({
+			template: 'assets/txn/ELN100/ELN100_DETAIL.html',
+			className: 'ELN100',
+			showClose: false,
+			scope : $scope,
+			controller: ['$scope', function($scope) {
+				$scope.row = row;
+            }]
+		}).closePromise.then(function (data) {
+			//
+		});
 	}
 	
 	$scope.init();

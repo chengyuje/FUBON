@@ -119,7 +119,7 @@ public class PMS496 extends FubonWmsBizLogic {
 		sb.append("           A.RECORD_SEQ, ");
 		sb.append("           NULL AS TRANS_DAYS, ");
 //		sb.append("           A.RM_FLAG, ");
-		sb.append("           CASE WHEN A.CUST_AGE >= 65 THEN '65' ELSE '' END AS CUST_AGE ");
+		sb.append("           CASE WHEN A.CUST_AGE >= 65 THEN A.CUST_AGE ELSE '' END AS CUST_AGE ");
 		sb.append("    FROM TBPMS_SHORT_BOND A ");
 		sb.append("    LEFT JOIN TBPRD_BOND BOND ON A.BOND_NBR = BOND.PRD_ID ");
 		sb.append("    LEFT JOIN VWORG_DEFN_INFO BRH ON A.BRANCH_NBR = BRH.BRANCH_NBR ");
@@ -176,7 +176,7 @@ public class PMS496 extends FubonWmsBizLogic {
 		sb.append("           A.RECORD_SEQ, ");
 		sb.append("           A.TRANS_DAYS, ");
 //		sb.append("           A.RM_FLAG, ");
-		sb.append("           CASE WHEN A.CUST_AGE >= 65 THEN '65' ELSE '' END AS CUST_AGE ");
+		sb.append("           CASE WHEN A.CUST_AGE >= 65 THEN A.CUST_AGE ELSE '' END AS CUST_AGE ");
 		sb.append("    FROM TBPMS_SHORT_TRAN A ");
 		sb.append("    LEFT JOIN TBSYSPARAMETER B ON PARAM_TYPE = 'PMS.SHORT_TRADE_TRANS_SRC' AND B.PARAM_CODE = A.TRADE_SRC ");
 		sb.append("    WHERE 1 = 1 ");

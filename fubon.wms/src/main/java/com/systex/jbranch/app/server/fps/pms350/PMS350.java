@@ -275,7 +275,7 @@ public class PMS350 extends FubonWmsBizLogic {
 					sql.append("SELECT PRIVILEGEID, NAME ");
 					sql.append("FROM TBSYSSECUPRI ");
 					sql.append("WHERE PRIVILEGEID > '015' ");
-					sql.append("AND PRIVILEGEID NOT IN ('UHRM002', 'UHRM012', 'JRM', '023', '024', '032', '038', '039', '040', '053', '054', '055', '056', '057') ");
+					sql.append("AND PRIVILEGEID NOT IN ('UHRM002', 'UHRM006', 'UHRM012', 'JRM', '023', '024', '032', '038', '039', '040', '053', '054', '055', '056', '057') ");
 
 					if (StringUtils.isNotBlank(inputVO.getRolesName())) {
 						sql.append(" WHERE NAME LIKE :name ");

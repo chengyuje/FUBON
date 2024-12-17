@@ -81,9 +81,10 @@ public class CRM82B extends FubonWmsBizLogic {
 		
 		sb.append(" SELECT A.INTEREST_DATE, A.TXN_TYPE, A.TXN_CCY, A.TXN_AMT ");
 		sb.append(" FROM TBCRM_AST_INV_VPSN_TXN A ");
-		sb.append(" WHERE A.PROD_ID =:prd_id AND TXN_TYPE = '2' ");
+		sb.append(" WHERE A.PROD_ID =:prd_id AND A.CUST_ID = :cust_id ");
 
 		qc.setObject("prd_id", inputVO.getPrd_id());
+		qc.setObject("cust_id", inputVO.getCust_id());
 		qc.setQueryString(sb.toString());
 		resultList = dam.exeQuery(qc);
 		
