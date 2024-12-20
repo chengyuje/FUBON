@@ -403,7 +403,7 @@ public class PMS408 extends FubonWmsBizLogic {
 				sql.append("       B.CUST_NAME, ");
 				sql.append("       B.AO_CODE, ");
 				sql.append("       COALESCE(COOL.CUST_RISK_BEF, B.CUST_RISK_BEF) AS CUST_RISK_BEF, ");
-				sql.append("       B.CREATOR, ");
+				sql.append("       CASE WHEN B.CREATOR = '999996' THEN 'Fubon+' ELSE B.CREATOR END AS CREATOR, ");
 				sql.append("       COALESCE(COOL.CUST_RISK_AFR, B.CUST_RISK_AFR) AS CUST_RISK_AFR, ");
 				sql.append("       TO_CHAR(B.SIGNOFF_DATE, 'YYYY-MM-DD') AS SIGNOFF_DATE, ");
 				sql.append("       EMP.EMP_NAME, ");
@@ -662,9 +662,9 @@ public class PMS408 extends FubonWmsBizLogic {
 		
 		String[] csvHeaderT = { "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1",  
 	  			   				"V2", "V2", "V2", "V2", "V2", "V2", "V2", "V2"}; 
-		String[] csvHeader 	= { "序號", "私銀註記", "資料日期", "分行代碼", "分行名稱", "測試管道", "公用電腦IP位置", "身分證字號", "客戶姓名", "高齡客戶", "AO Code", "風險承受度前", "風險承受度後", "測試/簽置日期", "資料來源", "短期多次重作KYC次數", "建立人", "建立人姓名", "專員沒有勸誘客戶提高風險屬性", "查證方式", "檢核說明", "首次建立時間", "最新異動人員", "最新異動日期",  
+		String[] csvHeader 	= { "序號", "私銀註記", "資料日期", "分行代碼", "分行名稱", "公用電腦IP位置", "身分證字號", "客戶姓名", "高齡客戶", "AO Code", "風險承受度前", "風險承受度後", "測試/簽置日期", "資料來源", "短期多次重作KYC次數", "建立人", "建立人姓名", "專員沒有勸誘客戶提高風險屬性", "查證方式", "檢核說明", "首次建立時間", "最新異動人員", "最新異動日期",  
 			   	  			   	"前次測試/聲明代號", "前次題號", "前次題目", "前次答案", "本次測試/聲明代號", "本次題號", "本次題目", "本次答案"};
-		String[] csvMain   	= { "SEQ", "RM_FLAG", "DATA_DATE", "BRANCH_NBR", "BRANCH_NAME", "INVEST_SOURCE", "INVEST_IP", "CUST_ID", "CUST_NAME", "CUST_AGE", "AO_CODE", "CUST_RISK_BEF", "CUST_RISK_AFR", "SIGNOFF_DATE", "DATA_TYPE", "REDO_KYC_TIMES", "CREATOR", "EMP_NAME", "HR_ATTR", "NOTE", "NOTE2", "FIRSTUPDATE", "MODIFIER", "LASTUPDATE", 
+		String[] csvMain   	= { "SEQ", "RM_FLAG", "DATA_DATE", "BRANCH_NBR", "BRANCH_NAME", "INVEST_IP", "CUST_ID", "CUST_NAME", "CUST_AGE", "AO_CODE", "CUST_RISK_BEF", "CUST_RISK_AFR", "SIGNOFF_DATE", "DATA_TYPE", "REDO_KYC_TIMES", "CREATOR", "EMP_NAME", "HR_ATTR", "NOTE", "NOTE2", "FIRSTUPDATE", "MODIFIER", "LASTUPDATE", 
 			   	               	"TEST_SEQ_BEF", "QST_NO_BEF", "QUESTION_DESC_BEF", "ANSWER_DESC_BEF", "TEST_SEQ_AFR", "QST_NO_AFR", "QUESTION_DESC_AFR", "ANSWER_DESC_AFR"};
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");

@@ -421,6 +421,7 @@ public class CRM341 extends FubonWmsBizLogic {
 		crm8501InputVO.setPrintFundMkt("N");
 		crm8501InputVO.setPrintPortfolio("N");
 		crm8501InputVO.setFromTxn("CRM341");
+		crm8501InputVO.setFundSortType("byCERT_NBR");
 		
 		String docSeq = "";
 		String docUrl = "";

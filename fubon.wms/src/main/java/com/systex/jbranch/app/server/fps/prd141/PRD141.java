@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.ibm.icu.text.SimpleDateFormat;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
 import com.systex.jbranch.fubon.commons.cbs.CBSService;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
@@ -31,7 +32,7 @@ public class PRD141 extends FubonWmsBizLogic {
 		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT A.ISIN_CODE, A.CCY, A.INSTITION_OF_FLOTATION, A.INSTITION_OF_AVOUCH, ");
-		sb.append(" A.FLO_CREDIT_RATING, A.AVO_CREDIT_RATING, A.DATE_OF_TXN, A.DATE_OF_FLOTATION  ");
+		sb.append(" A.FLO_CREDIT_RATING, A.AVO_CREDIT_RATING, A.DATE_OF_TXN, A.DATE_OF_FLOTATION,  ");
 		sb.append(" A.DATE_OF_MATURITY, A.START_DATE_OF_BUYBACK, A.RISKCATE_ID, A.RATE_GUARANTEEPAY,  ");
 		sb.append(" A.BASE_AMT_OF_PURCHASE, A.UNIT_AMT_OF_PURCHASE, A.BASE_AMT_OF_BUYBACK,  ");
 		sb.append(" A.UNIT_AMT_OF_BUYBACK, A.FREQUENCY_OF_INTEST_PAY, A.CDSC, A.FIXED_RATE_DURATION,  ");
@@ -52,6 +53,9 @@ public class PRD141 extends FubonWmsBizLogic {
 		PRD141InputVO inputVO = (PRD141InputVO) body;
 		PRD141OutputVO outputVO = new PRD141OutputVO();
 		dam = this.getDataAccessManager();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		String sDate = sdf.format(inputVO.getsDate());
+		String eDate = sdf.format(inputVO.geteDate());
 		
 		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
@@ -60,9 +64,12 @@ public class PRD141 extends FubonWmsBizLogic {
 		sb.append(" WHERE PROD_ID =:prd_id  ");
 		qc.setObject("prd_id", inputVO.getPrd_id());
 		
-		sb.append(" and A.NAV_DATE BETWEEN :startDate AND :endDate order by A.NAV_DATE  ");
-		qc.setObject("startDate", inputVO.getsDate());
-		qc.setObject("endDate", inputVO.geteDate());
+		sb.append(" AND TO_CHAR(A.NAV_DATE, 'YYYYMMDD') >= :sDate ");
+		sb.append(" AND TO_CHAR(A.NAV_DATE, 'YYYYMMDD') <= :eDate ");
+		sb.append(" Order by A.NAV_DATE  ");
+		
+		qc.setObject("sDate", sDate);
+		qc.setObject("eDate", eDate);
 		qc.setQueryString(sb.toString());
 		List<Map<String, Object>> list = dam.exeQuery(qc);
 		outputVO.setResultList(list);

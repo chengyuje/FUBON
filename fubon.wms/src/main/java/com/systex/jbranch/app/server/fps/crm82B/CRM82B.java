@@ -35,7 +35,7 @@ public class CRM82B extends FubonWmsBizLogic {
 		CRM82BInputVO inputVO = (CRM82BInputVO) body;
 		CRM82BOutputVO outputVO = new CRM82BOutputVO();
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-		BigDecimal sumTrustVal = BigDecimal.ZERO; //庫存總金額
+		BigDecimal SUMTrustVal = BigDecimal.ZERO; //庫存總金額
 		
 		dam = getDataAccessManager();
 		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -44,7 +44,7 @@ public class CRM82B extends FubonWmsBizLogic {
 		sb.append(" SELECT A.ISIN_Code, A.PROD_ID, A.PROD_NAME, A.CCY, A.M_TP_NOMINAL, ");
 		sb.append(" A.M_TP_DTETRN, A.M_TP_DTEPMT, A.LAST_INTEREST_DATE, ");
 		sb.append(" A.LAST_INTEREST_RATE, A.TOT_INTEREST_RATE, A.REF_NAV, A.DIV_RTN, ");
-		sb.append(" SUM(NVL(A.BAL_AMT_TWD, 0)) AS SUMTrustVal, A.CUST_ID ");
+		sb.append(" SUM(NVL(A.BAL_AMT_TWD, 0)) AS SUMTRUSTVAL, A.CUST_ID ");
 		sb.append(" FROM TBCRM_AST_INV_VPSN A ");
 		sb.append(" WHERE A.CUST_ID = :cust_id ");
 		sb.append(" GROUP BY A.ISIN_Code, A.PROD_ID, A.PROD_NAME, A.CCY, A.M_TP_NOMINAL, ");
@@ -56,11 +56,11 @@ public class CRM82B extends FubonWmsBizLogic {
 		resultList = dam.exeQuery(qc);
         
 		if(!resultList.isEmpty()){
-			sumTrustVal = (BigDecimal)resultList.get(0).get("SUMTrustVal"); //庫存總金額
+			SUMTrustVal = (BigDecimal)resultList.get(0).get("SUMTRUSTVAL"); //庫存總金額
 		}
 		
 		outputVO.setResultList(resultList);
-		outputVO.setSUMTrustVal(sumTrustVal);
+		outputVO.setSUMTrustVal(SUMTrustVal);
 		
 		this.sendRtnObject(outputVO);
 	}

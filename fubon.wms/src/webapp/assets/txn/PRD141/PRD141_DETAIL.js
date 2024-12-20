@@ -8,19 +8,7 @@ eSoafApp.controller('PRD141_DETAILController',
 	function($scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter, getParameter) {
 		$controller('BaseController', {$scope: $scope});
 		$scope.controllerName = "PRD141_DETAILController";
-		
-		// mapping
-		// combobox
-		getParameter.XML(["PRD.BOND_TYPE","PRD.BOND_CURRENCY","FPS.PROD_RISK_LEVEL","FPS.DIVIDEND_FREQ_BOND","PRD.BOND_COUPON_TYPE","PRD.SN_PROJECT","PRD.SN_CUSTOMER_LEVEL"], function(totas) {
-			if (totas) {
-				$scope.BOND_CURRENCY = totas.data[totas.key.indexOf('PRD.BOND_CURRENCY')];
-				$scope.PROD_RISK_LEVEL = totas.data[totas.key.indexOf('FPS.PROD_RISK_LEVEL')];
-				$scope.DIVIDEND_FREQ_BOND = totas.data[totas.key.indexOf('FPS.DIVIDEND_FREQ_BOND')];
-			}
-		});
-		
-		//$scope.TwNum = ['一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十'];
-		
+	
 		// -------------------------------------INFO----------------------------------------
 		$scope.sendRecv("PRD141", "getBondSnInfo", "com.systex.jbranch.app.server.fps.prd141.PRD141InputVO", {'prd_id':$scope.row.PRD_ID},
 				function(tota, isError) {
@@ -156,6 +144,16 @@ eSoafApp.controller('PRD141_DETAILController',
 					if (!isError) {
 						$scope.dividend = tota[0].body.resultList;
 						$scope.dividendVO = tota[0].body;
+						return;
+					}
+		});
+		
+		// -------------------------------------庫存明細----------------------------------------
+		$scope.sendRecv("PRD141", "getSnStocks", "com.systex.jbranch.app.server.fps.prd141.PRD141InputVO", {'prd_id':$scope.row.PRD_ID, 'from': 'PRD141'},
+				function(tota, isError) {
+					if (!isError) {
+						$scope.stocks = tota[0].body.resultList;
+						$scope.stocksVO = tota[0].body;
 						return;
 					}
 		});

@@ -81,6 +81,7 @@ public class CRM210 extends FubonWmsBizLogic {
 		sql.append("       V.AMT_24, "); 											// 全行海外商品餘額
 		sql.append("       V.AMT_25, "); 											// 全行奈米投餘額
 		sql.append("       V.AMT_26, "); 											// 全行金市海外債餘額
+		sql.append("       V.AMT_27, "); 											// 全行金市結構債餘額
 		sql.append("       V.AMT_12, "); 											// 全行SI
 		sql.append("       V.AMT_13, "); 											// 全行海外債商品
 		sql.append("       V.AMT_14, "); 											// 全行DCI

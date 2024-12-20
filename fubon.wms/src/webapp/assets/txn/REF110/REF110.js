@@ -293,7 +293,6 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 					
 					break;
 			}
-			
 			$scope.tempRefEmpID = $scope.inputVO.refEmpID; 
 		}
 	}
@@ -477,8 +476,7 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 			
 			$scope.clearRefEmp();
 		}
-		
-		if (($scope.inputVO.refEmpID != "" && $scope.inputVO.refEmpID != undefined) && $scope.tempRefEmpID != $scope.inputVO.refEmpID) {
+		if (($scope.inputVO.refEmpID != "" && $scope.inputVO.refEmpID != undefined)) {
 			$scope.sendRecv("REF110", "queryUserProfile", "com.systex.jbranch.app.server.fps.ref110.REF110InputVO", $scope.inputVO, function(tota, isError) {
 				if (!isError) {
 					if (null != tota[0].body.refEmpName) {
