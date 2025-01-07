@@ -142,17 +142,27 @@ public class CUS130 extends FubonWmsBizLogic {
 				sql.append("    WHERE TRIM(EN.DEPT_ID) IS NOT NULL ");
 				sql.append("    AND A.CREATOR = EN.EMP_ID ");
 				sql.append("    AND TRUNC(A.CREATETIME) BETWEEN EN.START_TIME AND EN.END_TIME ");
-				sql.append("    AND ( EN.START_TIME BETWEEN ORGN.START_TIME AND ORGN.END_TIME ");
-				sql.append("    or EN.END_TIME BETWEEN ORGN.START_TIME AND ORGN.END_TIME ) ");
+				sql.append("    AND ( ");
+				sql.append("        EN.START_TIME BETWEEN ORGN.START_TIME AND ORGN.END_TIME ");
+				sql.append("      OR EN.END_TIME BETWEEN ORGN.START_TIME AND ORGN.END_TIME ");
+				sql.append("    ) ");
+				sql.append("    AND ( ");
+                sql.append("      D.DEPT_ID_10 = ORGN.HEAD_OFFICE_ID ");
+                sql.append("      OR D.DEPT_ID_20 = ORGN.HEAD_OFFICE_ID ");
+                sql.append("    ) ");
 				sql.append("    AND D.DEPT_ID_20 = ORGN.HEAD_OFFICE_ID ");
-				sql.append("    AND EXISTS (SELECT 1 FROM TBORG_MEMBER T ");
-				sql.append("                LEFT JOIN VWORG_EMP_INFO S ON T.EMP_ID = S.EMP_ID ");
-				sql.append("                WHERE T.EMP_ID = :loginID ");
-				sql.append("                AND S.DEPT_ID_20 = ORGN.HEAD_OFFICE_ID) ");
+				sql.append("    AND EXISTS ( ");
+				sql.append("      SELECT 1 FROM TBORG_MEMBER T ");
+				sql.append("      LEFT JOIN VWORG_EMP_INFO S ON T.EMP_ID = S.EMP_ID ");
+				sql.append("      WHERE T.EMP_ID = :loginID ");
+				sql.append("      AND ( ");
+				sql.append("        S.DEPT_ID_10 = ORGN.HEAD_OFFICE_ID ");
+				sql.append("        OR S.DEPT_ID_20 = ORGN.HEAD_OFFICE_ID ");
+				sql.append("      ) ");
+				sql.append("    ) ");
 				sql.append("  ) ");
 				queryCondition.setObject("loginID", getUserVariable(FubonSystemVariableConsts.LOGINID));
 			}
-
 		}
 
 		if (!headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {

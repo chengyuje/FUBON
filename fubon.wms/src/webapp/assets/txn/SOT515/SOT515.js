@@ -155,6 +155,12 @@ eSoafApp.controller('SOT515Controller',
 //                        $scope.lockFlagByContractID = false;
 //                    }
 
+                    // 取消自動選擇契約的邏輯，允許契約皆可選
+                    //避免契約迄日到期直接帶入
+		            $scope.lockFlagByContractID = false; 
+		            $scope.interFlag = $scope.mappingSet['SOT.CONTRACT_LIST'].length > 0; 
+		            
+		            
                     deferred.resolve("success");
                 }
             });

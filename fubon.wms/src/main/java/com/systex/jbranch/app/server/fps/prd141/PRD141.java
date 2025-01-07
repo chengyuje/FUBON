@@ -53,7 +53,7 @@ public class PRD141 extends FubonWmsBizLogic {
 		PRD141InputVO inputVO = (PRD141InputVO) body;
 		PRD141OutputVO outputVO = new PRD141OutputVO();
 		dam = this.getDataAccessManager();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
 		String sDate = sdf.format(inputVO.getsDate());
 		String eDate = sdf.format(inputVO.geteDate());
 		
@@ -64,8 +64,8 @@ public class PRD141 extends FubonWmsBizLogic {
 		sb.append(" WHERE PROD_ID =:prd_id  ");
 		qc.setObject("prd_id", inputVO.getPrd_id());
 		
-		sb.append(" AND TO_CHAR(A.NAV_DATE, 'YYYYMMDD') >= :sDate ");
-		sb.append(" AND TO_CHAR(A.NAV_DATE, 'YYYYMMDD') <= :eDate ");
+		sb.append(" AND A.NAV_DATE >= :sDate ");
+		sb.append(" AND A.NAV_DATE <= :eDate ");
 		sb.append(" Order by A.NAV_DATE  ");
 		
 		qc.setObject("sDate", sDate);

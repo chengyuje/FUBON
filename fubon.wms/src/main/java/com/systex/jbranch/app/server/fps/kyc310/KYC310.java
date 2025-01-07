@@ -1072,12 +1072,24 @@ public class KYC310 extends FubonWmsBizLogic{
 				
 				getPicture(inputVO);
 				String filePath = "";
-				
+				KYC310InputVO test = new KYC310InputVO();
+				test.setEDUCATIONList(inputVO.getEDUCATIONList());
+				test.setCAREERList(inputVO.getCAREERList());
+				test.setMARRAGEList(inputVO.getMARRAGEList());
+				test.setCHILD_NOList(inputVO.getCHILD_NOList());
+				test.setSICK_TYPEList(inputVO.getSICK_TYPEList());
+				test.setQuest_list(inputVO.getQuest_list());
+				test.setCUST_ID("");
+				test.setEDUCATION("");
+				test.setCAREER("");
+				test.setMARRAGE("");
+				test.setCHILD_NO("");
+				test.setCUST_ADDR_1("");
 				if(PRINT_QUESTIONNAIRE.equals(inputVO.getChk_type())){
 					//列印中文空白表單
 					if ("03".equals(inputVO.getQUESTION_TYPE())){	//法人中文
 						KYC310_CorpRptEmpty report = PlatformContext.getBean("kyc310CorpRptEmpty", KYC310_CorpRptEmpty.class);
-						report.setInputVO(inputVO);
+						report.setInputVO(test);
 						filePath = report.genBlankPDF();
 					} else {	//自然人中文
 						KYC310_PersonRptEmpty report = PlatformContext.getBean("kyc310PersonRptEmpty", KYC310_PersonRptEmpty.class);
@@ -1088,7 +1100,7 @@ public class KYC310 extends FubonWmsBizLogic{
 					//列印英文空白表單
 					if ("03".equals(inputVO.getQUESTION_TYPE())){	//法人英文
 						KYC310_CorpRptEmpty_ENG report = PlatformContext.getBean("kyc310CorpRptEmptyENG", KYC310_CorpRptEmpty_ENG.class);
-						report.setInputVO(inputVO);
+						report.setInputVO(test);
 						filePath = report.genBlankPDF();
 					} else {	//自然人英文
 						KYC310_PersonRptEmpty_ENG report = PlatformContext.getBean("kyc310PersonRptEmptyENG", KYC310_PersonRptEmpty_ENG.class);
@@ -1105,7 +1117,7 @@ public class KYC310 extends FubonWmsBizLogic{
 					PRDFitInputVO pdfInputVO = new PRDFitInputVO();
 					pdfInputVO.setCaseCode(2);
 					pdfInputVO.setCustId(inputVO.getCUST_ID());
-					mergeUrl.addAll(new SotPdfContext(pdfInputVO, "sot813").getSotPdfULst());
+//					mergeUrl.addAll(new SotPdfContext(pdfInputVO, "sot813").getSotPdfULst());
 				}
 				
 				String url = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), true, mergeUrl));

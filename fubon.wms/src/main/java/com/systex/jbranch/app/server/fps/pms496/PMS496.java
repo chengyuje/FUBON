@@ -55,12 +55,6 @@ public class PMS496 extends FubonWmsBizLogic {
 		initUUID();
 		SimpleDateFormat sdfYYYYMM = new SimpleDateFormat("yyyyMM");
 
-		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> fcMap = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2); // 理專
-		Map<String, String> psopMap = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2); // OP
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
-
 		PMS496InputVO inputVO = (PMS496InputVO) body;
 		PMS496OutputVO outputVO = new PMS496OutputVO();
 		dam = this.getDataAccessManager();
@@ -68,7 +62,13 @@ public class PMS496 extends FubonWmsBizLogic {
 		StringBuffer sb = new StringBuffer();
 		
 		String loginRoleID = null != inputVO.getSelectRoleID() ? inputVO.getSelectRoleID() : (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
-
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		
 		sb.append("SELECT ROWNUM, BASE.* ");
 		sb.append("FROM ( ");
 		sb.append("  SELECT T.* ");
@@ -212,7 +212,7 @@ public class PMS496 extends FubonWmsBizLogic {
 
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) {
 			// 登入為銷售人員強制加AO_CODE
-			if (fcMap.containsKey(loginRoleID) || psopMap.containsKey(loginRoleID)) {
+			if (isFC || isPSOP) {
 				sb.append("  AND T.AO_CODE IN :aoCodeList ");
 				queryCondition.setObject("aoCodeList", getUserVariable(FubonSystemVariableConsts.LOGIN_AOCODE_LIST));
 			}
@@ -224,8 +224,7 @@ public class PMS496 extends FubonWmsBizLogic {
 				sb.append("  AND ( ");
 				sb.append("    (T.RM_FLAG = 'B' AND T.BRANCH_AREA_ID = :branchAreaID) ");
 				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				if (isHANDMGR || isARMGR) {
 					sb.append("    OR (T.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE T.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :branchAreaID )) ");
 				}
 			
@@ -236,8 +235,7 @@ public class PMS496 extends FubonWmsBizLogic {
 				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 			}
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) && 
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (!isHANDMGR && !isARMGR) {
 				sb.append("  AND T.RM_FLAG = 'N' ");
 			}
 		} else {

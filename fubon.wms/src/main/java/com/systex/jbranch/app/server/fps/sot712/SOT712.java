@@ -2711,7 +2711,7 @@ public class SOT712 extends FubonWmsBizLogic{
 			throw new APException(fOutputVO.getErrorID());
 		}
 		//針對新CRS/FATCA美國來源所得交易管控
-		if("NFD".equals(inputVO.getPrdType())) {
+		if("MFD".equals(inputVO.getPrdType())) {
 			if(CollectionUtils.isNotEmpty(identifyProdNationality(inputVO.getPrdId()))) {
 				//針對新CRS/FATCA美國來源所得交易管控
 				fOutputVO = prodFitness.validUSACustAndProd(prodFitness.getCustID());//客戶FATCA註記檢核
@@ -2753,9 +2753,18 @@ public class SOT712 extends FubonWmsBizLogic{
 			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 			return list; 
 		}
+		
+		//先看四碼
+		List<Map<String, Object>> twoNumberList = exeQueryForQcf(genDefaultQueryConditionIF()
+				.setQueryString("select 1 from TBPRD_NATIONALITY where COUNTRY_ID = 'US' and SOU_TYPE = 'NF' AND PROD_ID = :prdId ")
+				.setObject("prdId", prdId));
+		if(twoNumberList.size() > 0) {
+			return twoNumberList;
+		}
+		//再看兩碼
 		return exeQueryForQcf(genDefaultQueryConditionIF()
-				.setQueryString("select 1 from TBPRD_NATIONALITY where COUNTRY_ID = 'US' and PROD_ID like :prdId ")
-				.setObject("prdId", "%" + prdId.substring(0,2) + "%" ));
+				.setQueryString("select 1 from TBPRD_NATIONALITY where COUNTRY_ID = 'US' and SOU_TYPE = 'NF' AND PROD_ID = :prdId ")
+				.setObject("prdId", prdId.substring(0,2)));
 	}
 	
 	/** SI下單及申購時，判斷KYC鍵機日期及是否有錄音序號 **/

@@ -1255,66 +1255,14 @@ public class KYC310_PersonRpt extends FubonWmsBizLogic{
 		
 		@Override
 		public void onEndPage(PdfWriter writer, Document document) {
-			PdfPTable tBarCode;
-			PdfPTable tPageNum;
-			int page = writer.getPageNumber();
             
 			try {
 				// barcode - page
-				tBarCode = new PdfPTable(5);
+				PdfPTable tBarCode = new PdfPTable(5);
 				tBarCode.setTotalWidth(545);
-				PdfContentByte cb = writer.getDirectContent();
-				
-				// #2252_調整KYC問卷條碼及版次
-				if (page == 1) {
-					Barcode39 code39 = new Barcode39();
-					code39.setCode("88-0402-99");
-					code39.setBarHeight(18);
-
-					PdfPCell cell = new PdfPCell();
-					cell.setFixedHeight(30);
-					cell.setPadding(0);
-					cell.setBorderWidth(0);
-					cell.addElement(code39.createImageWithBarcode(cb, null, null));
-
-					PdfPCell blank = new PdfPCell();
-					blank.setBorderWidth(0);
-					blank.setFixedHeight(10);
-
-					tBarCode.addCell(cell);
-					tBarCode.addCell(blank);
-
-					// barcode - cust id
-					code39 = new Barcode39();
-					code39.setCode(cust_id);
-					code39.setBarHeight(18);
-
-					cell = new PdfPCell();
-					cell.setFixedHeight(30);
-					cell.setPadding(0);
-					cell.setBorderWidth(0);
-					cell.addElement(code39.createImageWithBarcode(cb, null, null));
-
-					tBarCode.addCell(cell);
-					tBarCode.addCell(blank);
-
-					// barcode - tw date
-					code39 = new Barcode39();
-					code39.setCode(twYear + month + day);
-					code39.setSize(6);
-					code39.setBarHeight(14);
-
-					cell = new PdfPCell();
-					cell.setFixedHeight(30);
-					cell.setPadding(0);
-					cell.setBorderWidth(0);
-					cell.addElement(code39.createImageWithBarcode(cb, null, null));
-
-					tBarCode.addCell(cell);
-				}
 				
 				// page num
-				tPageNum = new PdfPTable(4);
+				PdfPTable tPageNum = new PdfPTable(4);
 				tPageNum.setTotalWidth(545);
 				int[] data = new int[4];
 				data = new int[]{250, 45, 125, 125};

@@ -756,58 +756,32 @@ public class KYC310_CorpRptEmpty extends FubonWmsBizLogic {
         	// #2252_調整KYC問卷條碼及版次
         	if (writer.getPageNumber() != 1) return;
         	
-            PdfPTable tBarCodeTable = new PdfPTable(6);//表格
+            PdfPTable tBarCodeTable = new PdfPTable(4);//表格
             tBarCodeTable.setTotalWidth(545);
-
+            
             PdfContentByte pdfContentByte = writer.getDirectContent();
 
             PdfPCell blank = new PdfPCell();//空白列
             blank.setBorderWidth(0);//邊框寬度
             blank.setFixedHeight(10);//儲存格高度
-
-			// barcode - tw date
-			Barcode39 code39 = new Barcode39();
-
-			PdfPCell cell = new PdfPCell();// 產生列物件
-			cell.setFixedHeight(30);// 儲存格高度
-			cell.setPadding(0); // 間格
-			cell.setBorderWidth(0); // 邊框的寬度
-
-			tBarCodeTable.addCell(cell);// 添加到表中
-			tBarCodeTable.addCell(blank);
-
-			// barcode - 客戶ID
-			code39 = new Barcode39();
-			code39.setCode(inputVO.getCUST_ID());
-			code39.setBarHeight(18);// 設定高度
-
-			cell = new PdfPCell();
-			cell.setFixedHeight(30);// 儲存格高度
-			cell.setPadding(0); // 間格
-			cell.setBorderWidth(0); // 邊框的寬度
-			cell.addElement(code39.createImageWithBarcode(pdfContentByte, null, null));// 產生一張barCode圖片並添加到列中
-
-			tBarCodeTable.addCell(cell);// 添加到表中
-			tBarCodeTable.addCell(blank);
-
+		
 			// barcode - page
-			code39 = new Barcode39();
+			Barcode39 code39 = new Barcode39();
 			code39.setCode("88-0601-99");
-			code39.setBarHeight(12);
-			code39.setSize(6);
-			code39.setBaseline(6);
+			code39.setBarHeight(17);
+			code39.setSize(7);
 
-			Image image = code39.createImageWithBarcode(pdfContentByte, null, null);
-			image.setWidthPercentage(90);
-
-			cell = new PdfPCell();
-			cell.setColspan(2);
+			PdfPCell cell = new PdfPCell();
+			cell.setColspan(1);
 			cell.setFixedHeight(30);
 			cell.setPadding(0);
 			cell.setBorderWidth(0);
-			cell.addElement(image);
+			cell.addElement(code39.createImageWithBarcode(pdfContentByte, null, null));
 			
 			tBarCodeTable.addCell(cell);// 添加到表中
+			for (int i = 0; i < tBarCodeTable.getNumberOfColumns(); i++) {
+				tBarCodeTable.addCell(blank);
+			}
             tBarCodeTable.writeSelectedRows(0, -1, 25, 80, writer.getDirectContent());
         }
 

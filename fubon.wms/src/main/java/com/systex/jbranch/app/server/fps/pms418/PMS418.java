@@ -77,8 +77,8 @@ public class PMS418 extends FubonWmsBizLogic {
 		String loginRoleID = null != inputVO.getSelectRoleID() ? inputVO.getSelectRoleID() : (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
 
 		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
 
 		// #0731: WMS-CR-20210906-01_調整同一IP及分行人員資金往來報表 => 交易日為同一天+交易項目相同+同一IP+同一客戶 =簡化筆數 
 		sb.append("SELECT CASE WHEN RPT.RM_FLAG = 'U' THEN 'Y' ELSE 'N' END AS RM_FLAG, ");
@@ -161,8 +161,7 @@ public class PMS418 extends FubonWmsBizLogic {
 				sb.append("AND ( ");
 				sb.append("  (RPT.RM_FLAG = 'B' AND ORG.BRANCH_AREA_ID = :area) ");
 				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				if (isHANDMGR || isARMGR) {
 					sb.append("  OR (RPT.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :area )) ");
 				}
 			
@@ -173,8 +172,7 @@ public class PMS418 extends FubonWmsBizLogic {
 				queryCondition.setObject("region", inputVO.getRegion_center_id());
 			}
 
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) && 
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (!isHANDMGR && !isARMGR) {
 				sb.append("AND RPT.RM_FLAG = 'B' ");
 			}
 		} else {

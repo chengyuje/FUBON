@@ -68,10 +68,10 @@ public class PMS421 extends FubonWmsBizLogic {
 		String roleID = inputVO.getLoginRole();
 
 		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> fcMap = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2); // 理專
-		Map<String, String> psopMap = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2); // OP
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
 
 		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyyMM");
 
@@ -122,7 +122,7 @@ public class PMS421 extends FubonWmsBizLogic {
 
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) {
 			// 登入為銷售人員強制加AO_CODE
-			if (fcMap.containsKey(loginRoleID) || psopMap.containsKey(loginRoleID)) {
+			if (isFC || isPSOP) {
 				sql.append("AND B.AO_CODE IN :aoCodeList ");
 				condition.setObject("aoCodeList", getUserVariable(FubonSystemVariableConsts.LOGIN_AOCODE_LIST));
 			}
@@ -134,8 +134,7 @@ public class PMS421 extends FubonWmsBizLogic {
 				sql.append("AND ( ");
 				sql.append("  (B.RM_FLAG = 'B' AND B.BRANCH_AREA_ID = :BRANCH_AREA_IDD) ");
 				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				if (isHANDMGR || isARMGR) {
 					sql.append("  OR (B.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE MEM.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD )) ");
 				}
 			
@@ -146,8 +145,7 @@ public class PMS421 extends FubonWmsBizLogic {
 				condition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
 			}
 
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (!isHANDMGR && !isARMGR) {
 				sql.append("AND B.RM_FLAG = 'B' ");
 			}
 		} else {
@@ -193,161 +191,6 @@ public class PMS421 extends FubonWmsBizLogic {
 	public PMS421OutputVO queryData2(Object body) throws JBranchException, ParseException {
 		
 		return null;
-
-//		initUUID();
-//
-//		PMS421InputVO inputVO = (PMS421InputVO) body;
-//		PMS421OutputVO outputVO = new PMS421OutputVO();
-//		dam = this.getDataAccessManager();
-//		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//		StringBuffer sql = new StringBuffer();
-//		
-//		String loginRoleID = null != inputVO.getSelectRoleID() ? inputVO.getSelectRoleID() : (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
-//
-//		String roleID = inputVO.getLoginRole();
-//
-//		XmlInfo xmlInfo = new XmlInfo();
-//		Map<String, String> fcMap = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2); // 理專
-//		Map<String, String> psopMap = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2); // OP
-//		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-//
-//		PMS000OutputVO pms000outputVO = new PMS000OutputVO();
-//		
-//		// 非由工作首頁 CRM181 過來
-//		if (!StringUtils.equals("Y", inputVO.getFrom181())) {
-//			if (inputVO.getPerson_role() == null || !inputVO.getPerson_role().equals("UHRM")) {
-//				// 取得查詢資料可視範圍
-//				PMS000 pms000 = (PMS000) PlatformContext.getBean("pms000");
-//				PMS000InputVO pms000InputVO = new PMS000InputVO();
-//				pms000InputVO.setReportDate(sdfYYYYMM.format(inputVO.getsCreDate()));
-//				pms000outputVO = pms000.getOrg(pms000InputVO);
-//			}
-//		}
-//		
-//		sql.append("SELECT B.REGION_CENTER_NAME, ");
-//		sql.append("	   B.BRANCH_AREA_NAME, ");
-//		sql.append("	   B.BRANCH_NAME, ");
-//		sql.append("	   B.BRANCH_NBR, ");
-//		sql.append("       B.CUST_NAME, ");
-//		sql.append("	   B.CUST_ID, ");
-//		sql.append("	   B.EMP_NAME, ");
-//		sql.append("	   B.AO_CODE, ");
-//		sql.append("       CASE WHEN TRUNC(B.CREATETIME) <= TRUNC(TO_DATE('20230630', 'YYYYMMDD')) THEN 'N' ELSE 'Y' END AS RECORD_YN, ");
-//		sql.append("	   CASE WHEN B.DATA_SOURCE = 'E' THEN '電子函證' ELSE '簡訊' END AS DATA_SOURCE, ");
-//		sql.append("	   B.DATA_DATE, ");
-//		sql.append("	   SUBSTR(B.SEND_DATE, 0, 10) AS SEND_DATE, ");
-//		sql.append("	   SUBSTR(B.RECV_DATE,0,10) AS RECV_DATE, ");
-//		sql.append("	   B.UPDATE_REMARK, ");
-//		sql.append("       B.RECORD_SEQ, ");
-//		sql.append("	   B.FIRSTUPDATE_TIME, ");
-//		sql.append("	   B.FIRSTUPDATE_EMPID, ");
-//		sql.append("	   B.LASTUPDATE, ");
-//		sql.append("	   B.MODIFIER, ");
-//		sql.append(" 	   M.EMP_NAME AS FIRSTUPDATE_EMPNAME, ");
-//		sql.append("	   B.EBILL_CONTENT_FLAG, ");
-//		sql.append("	   CASE B.EBILL_COMFIRM_SOU WHEN '1' THEN '每季' WHEN '2' THEN '輪調加強' ELSE '其它' END AS EBILL_COMFIRM_SOU ");
-//		sql.append("FROM TBPMS_10CMDT_EBILL_COMFIRM_TD B ");
-//		sql.append("LEFT JOIN TBORG_MEMBER M ON B.FIRSTUPDATE_EMPID = M.EMP_ID ");
-//		sql.append("WHERE 1 = 1 ");
-//		sql.append("AND B.CONFIRM_FLAG = 'N' ");
-//		sql.append("AND SUBSTR(B.RECV_DATE, 0, 10) BETWEEN :sDATE AND :eDATE ");
-//
-//		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0 || StringUtils.lowerCase(inputVO.getMemLoginFlag()).equals("uhrm")) {
-//
-//			if (!headmgrMap.containsKey(loginRoleID) && !StringUtils.lowerCase(inputVO.getMemLoginFlag()).equals("uhrm")) {
-//				// 非總人行員 且 非 為031之兼任FC，僅可視轄下
-//				sql.append("AND B.RM_FLAG = 'B' ");
-//
-//				// 登入為銷售人員強制加AO_CODE
-//				if (fcMap.containsKey(loginRoleID) || psopMap.containsKey(loginRoleID)) {
-//					sql.append("AND B.AO_CODE IN :aoCodeList ");
-//					condition.setObject("aoCodeList", getUserVariable(FubonSystemVariableConsts.LOGIN_AOCODE_LIST));
-//				}
-//			} else if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).equals("uhrm")) {
-//				sql.append("AND B.AO_CODE IN :aoCodeList ");
-//				condition.setObject("aoCodeList", getUserVariable(FubonSystemVariableConsts.LOGIN_AOCODE_LIST));
-//			}
-//
-//			// 區域中心
-//			if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
-//				sql.append("AND B.BRANCH_NBR IN ( ");
-//				sql.append("  SELECT BRANCH_NBR ");
-//				sql.append("  FROM VWORG_DEFN_BRH ");
-//				sql.append("  WHERE DEPT_ID = :region_id ");
-//				sql.append(") ");
-//				condition.setObject("region_id", inputVO.getRegion_center_id());
-//			} else {
-//				// 登入非總行人員強制加區域中心
-//				if (!headmgrMap.containsKey(roleID)) {
-//					sql.append("AND B.BRANCH_NBR IN ( ");
-//					sql.append("  SELECT BRANCH_NBR ");
-//					sql.append("  FROM VWORG_DEFN_BRH ");
-//					sql.append("  WHERE DEPT_ID IN (:REGION_CENTER_IDD) ");
-//					sql.append(") ");
-//					condition.setObject("REGION_CENTER_IDD", pms000outputVO.getV_regionList());
-//				}
-//			}
-//
-//			// 營運區	
-//			if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
-//				sql.append("AND B.BRANCH_NBR IN ( ");
-//				sql.append("  SELECT BRANCH_NBR ");
-//				sql.append("  FROM VWORG_DEFN_BRH ");
-//				sql.append("  WHERE DEPT_ID = :area_id ");
-//				sql.append(") ");
-//				condition.setObject("area_id", inputVO.getBranch_area_id());
-//			} else {
-//				// 登入非總行人員強制加營運區
-//				if (!headmgrMap.containsKey(roleID)) {
-//					sql.append("AND B.BRANCH_NBR IN ( ");
-//					sql.append("  SELECT BRANCH_NBR ");
-//					sql.append("  FROM VWORG_DEFN_BRH ");
-//					sql.append("  WHERE DEPT_ID IN (:BRANCH_AREA_IDD) ");
-//					sql.append(") ");
-//					condition.setObject("BRANCH_AREA_IDD", pms000outputVO.getV_areaList());
-//				}
-//			}
-//
-//			// 分行
-//			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
-//				sql.append("AND B.BRANCH_NBR = :branch_nbr ");
-//				condition.setObject("branch_nbr", inputVO.getBranch_nbr());
-//			} else if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) {
-//				// 登入非總行人員強制加分行
-//				if (!headmgrMap.containsKey(roleID)) {
-//					sql.append("AND B.BRANCH_NBR IN (:BRNCH_NBRR) ");
-//					condition.setObject("BRNCH_NBRR", pms000outputVO.getV_branchList());
-//				}
-//			}
-//		} else {
-//			sql.append("AND B.RM_FLAG = 'U' ");
-//		}
-//
-//		if (StringUtils.isNotBlank(inputVO.getAo_code())) {
-//			sql.append("AND B.AO_CODE = :AO_CODE ");
-//			condition.setObject("AO_CODE", inputVO.getAo_code());
-//		}
-//
-//		if (StringUtils.isNotBlank(inputVO.getEbill_Comfirm_Sou())) {
-//			sql.append("AND B.EBILL_COMFIRM_SOU = :EBILL_COMFIRM_SOU ");
-//			condition.setObject("EBILL_COMFIRM_SOU", inputVO.getEbill_Comfirm_Sou());
-//		}
-//
-//		//由工作首頁 CRM181 過來，只須查詢主管尚未確認資料
-//		if (StringUtils.equals("Y", inputVO.getFrom181())) {
-//			sql.append(" and B.UPDATE_REMARK is null ");
-//		}
-//
-//		condition.setObject("sDATE", sdfYYYYMMDD.format(inputVO.getsCreDate()));
-//		condition.setObject("eDATE", sdfYYYYMMDD.format(inputVO.getEndDate()));
-//
-//		sql.append("ORDER BY B.REGION_CENTER_ID, B.BRANCH_AREA_ID, B.BRANCH_NBR ");
-//
-//		condition.setQueryString(sql.toString());
-//
-//		outputVO.setResultList(dam.exeQuery(condition));
-//
-//		return outputVO;
 	}
 
 	// 【儲存】更新資料，在前端篩選編輯過的資料。

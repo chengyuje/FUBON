@@ -174,7 +174,10 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 						COMPANY_NUM: $scope.INS_INFORMATION[0].COMPANY_NUM,
 						INS_COM_NAM: $scope.INS_INFORMATION[0].INS_COM_NAME, //保險公司名稱
 						FB_COM_YN: $scope.INS_INFORMATION[0].FB_COM_YN, //富壽:Y 非富壽:N
-						CANCEL_CONTRACT_YN: $scope.INS_INFORMATION[0].CANCEL_CONTRACT_YN //契撤案件
+						CANCEL_CONTRACT_YN: $scope.INS_INFORMATION[0].CANCEL_CONTRACT_YN, //契撤案件
+						PAY_SERV_RETURN_CODE: $scope.INS_INFORMATION[0].PAY_SERV_RETURN_CODE,
+						REMIT_COUNTRY_FLAG: $scope.INS_INFORMATION[0].REMIT_COUNTRY_FLAG,
+						FIRST_PAY_WAY: $scope.INS_INFORMATION[0].FIRST_PAY_WAY //首期保費繳費方式：匯款件
 					};
 
 				if(tota[0].body.PreMatchList.length>0){
@@ -379,7 +382,9 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 					QC_LOAN_CHK: '',
 					QC_SIGNATURE: '',
 					NEED_MATCH:'',
-					C_SENIOR_PVAL:''
+					C_SENIOR_PVAL:'',
+					isRCFlagDisalbed: true,
+					payServeRemit: false
 				};
 		}
 	}
@@ -582,6 +587,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 				$scope.webservice_clear();
 				debugger
 				$scope.inputVO.CASE_ID = $scope.inputVO.CASE_ID.toUpperCase();
+				$scope.inputVO.fromIOT120 = "Y";
 				$scope.sendRecv("IOT120","Get_InsInfo","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO",
     					$scope.inputVO,function(tota,isError){
 					if(!isError){
@@ -597,8 +603,26 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 								$scope.showErrorMsg(errorMsg);
 								$scope.init();
 							}else{
-								$scope.parseWebserviceData();
-								$scope.CASEPDF();
+								//富壽繳款單API回傳資料
+								$scope.wsPayServData = null;
+								if(tota[0].body.wsPayServData) {
+									$scope.wsPayServData = tota[0].body.wsPayServData;
+									$scope.inputVO.PAY_SERV_RETURN_CODE = $scope.wsPayServData.ReturnCode; //富壽繳款服務單API回傳狀態 100:成功
+									$scope.inputVO.PAY_SERV_REMIT_NATNO = $scope.wsPayServData.PAY_SERV_REMIT_NATIVENO; //匯款國別 001:中華民國 其他:境外
+									if($scope.inputVO.PAY_SERV_RETURN_CODE == "100") {
+										$scope.inputVO.REMIT_COUNTRY_FLAG = ($scope.inputVO.PAY_SERV_REMIT_NATNO == "001" ? "1" : "2");
+										$scope.inputVO.FIRST_PAY_WAY = "1"; //首期保費繳費方式：匯款件
+										$scope.inputVO.isRCFlagDisalbed = true; //匯款國家disabled
+										$scope.inputVO.payServeRemit = true; //線上繳款匯款件
+									} else {
+										$scope.inputVO.REMIT_COUNTRY_FLAG = "";
+										$scope.inputVO.isRCFlagDisalbed = false;
+										$scope.inputVO.payServeRemit = false; //線上繳款匯款件
+									}
+								}
+								//parsing電子要保書API回傳資料
+								$scope.parseWebserviceData(); 
+								$scope.CASEPDF(); //取得電子要保書PDF資料
 
 								//將購買檢核資料放入頁面中
 								$scope.sendRecv("IOT120","get_PreMatch","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO", $scope.inputVO,function(tota,isError){
@@ -1491,7 +1515,13 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 			$scope.showErrorMsgInDialog("要保人/被保人/繳款人不可為禁銷、拒銷、客訴戶");
 			return false;
 		}
-		
+		//首期繳款方式為"匯款件"，"匯款國家"為必填欄位
+		if($scope.inputVO.FIRST_PAY_WAY == "1") { //首期保費繳費方式：匯款件)
+			if($scope.inputVO.REMIT_COUNTRY_FLAG == undefined || $scope.inputVO.REMIT_COUNTRY_FLAG == null || $scope.inputVO.REMIT_COUNTRY_FLAG == "") {
+				$scope.showErrorMsgInDialog("首期保費繳費方式為匯款件，請選擇匯款國家");
+				return false;
+			}
+		}
 		//投資型商品或非投資型但須適配商品，適配日(要保人保險購買檢核的鍵機日)須等於要保書申請日
 		if($scope.checkFieldData() && ($scope.inputVO.PRODUCT_TYPE != '1' || $scope.inputVO.NEED_MATCH == 'Y')) {
 			$scope.sendRecv("IOT120","getInvPreMatch","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO",
@@ -1656,4 +1686,14 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 		return redate;
 	}
 
+	//首期保費繳費方式
+	$scope.firstPayChanged = function() {
+		if($scope.inputVO.FIRST_PAY_WAY == "1") { //首期保費繳費方式：匯款件)
+			$scope.inputVO.isRCFlagDisalbed = false;
+		} else {
+			//非匯款件，不需選擇匯款國家
+			$scope.inputVO.REMIT_COUNTRY_FLAG = "";
+			$scope.inputVO.isRCFlagDisalbed = true;
+		}
+	}
 });

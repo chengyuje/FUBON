@@ -407,7 +407,7 @@ public class SOT413 extends FubonWmsBizLogic {
 		String recCode = (String) xmlInfo.getVariable("PRD.FCI_CURRENCY_CODE", currId, "F3"); //幣別代碼
 		
 		Date date = new Date();
-		SimpleDateFormat simpleY = new SimpleDateFormat("YYYY");
+		SimpleDateFormat simpleY = new SimpleDateFormat("yyyy");
 		SimpleDateFormat simpleM = new SimpleDateFormat("MM");
 		String dateYear = simpleY.format(date).substring(2); //西元年後兩碼
 		String dateMon = simpleM.format(date); //交易日月份

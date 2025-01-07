@@ -15,6 +15,25 @@ public class PMS401UOutputVO extends PagingOutputVO {
 
 	private List<Map<String, Object>> uhrmORGList;
 
+	private List<Map<String, Object>> ARList;
+	private List<Map<String, Object>> OPList;
+	
+	public List<Map<String, Object>> getARList() {
+		return ARList;
+	}
+
+	public void setARList(List<Map<String, Object>> aRList) {
+		ARList = aRList;
+	}
+
+	public List<Map<String, Object>> getOPList() {
+		return OPList;
+	}
+
+	public void setOPList(List<Map<String, Object>> oPList) {
+		OPList = oPList;
+	}
+
 	public List<Map<String, Object>> getUhrmORGList() {
 		return uhrmORGList;
 	}

@@ -114,7 +114,7 @@ public class IOT120 extends FubonWmsBizLogic {
 		sb.append(" CASE WHEN D.C_PREMIUM_TRANSSEQ IS NOT NULL THEN D.C_PREMIUM_TRANSSEQ ELSE C.PREMIUM_TRANSSEQ END AS PREMIUM_TRANSSEQ, ");
 		sb.append(" CASE WHEN D.I_PREMIUM_TRANSSEQ IS NOT NULL THEN D.I_PREMIUM_TRANSSEQ ELSE C.I_PREMIUM_TRANSSEQ END AS I_PREMIUM_TRANSSEQ, ");
 		sb.append(" CASE WHEN D.P_PREMIUM_TRANSSEQ IS NOT NULL THEN D.P_PREMIUM_TRANSSEQ ELSE C.P_PREMIUM_TRANSSEQ END AS P_PREMIUM_TRANSSEQ, ");
-		sb.append(" P.BUSINESS_REL ");
+		sb.append(" P.BUSINESS_REL, A.PAY_SERV_RETURN_CODE, A.PAY_SERV_REMIT_NATNO, A.REMIT_COUNTRY_FLAG ");
 		sb.append(" From TBIOT_MAIN A ");
 		sb.append(" LEFT OUTER JOIN TBIOT_PREMATCH P ON P.PREMATCH_SEQ = A.PREMATCH_SEQ ");
 		sb.append(" LEFT OUTER JOIN TBPRD_INS_MAIN PRD ON PRD.INSPRD_KEYNO = P.INSPRD_KEYNO ");
@@ -323,6 +323,22 @@ public class IOT120 extends FubonWmsBizLogic {
 			}
 
 			outputVO.setWebserviceData(webServiceResult);
+			
+			//富壽繳款服務API //IOT110呼叫的時候不用CALL此API
+			if(StringUtils.equals("Y", inputVO.getFromIOT120())) {
+				Map<String, Object> payServData = new HashMap<String, Object>();
+				Map<String, Object> payServResult = new HashMap<String, Object>();
+	
+				payServData = getWebServiceInfo(3, inputVO.getCASE_ID());
+				if (payServData.get("ReturnCode") != null
+						&& payServData.get("ReturnCode").toString().equals("100")
+						&& StringUtils.isNotBlank(payServData.get("Result").toString())) {
+					payServResult = (Map<String, Object>) webServiceData.get("Result");
+				}
+				//ReturnCode=100:成功，不須檢富繳款服務單  200:無繳款服務單資訊  300:尚未審核通過
+				payServResult.put("ReturnCode", payServData.get("ReturnCode").toString());
+				outputVO.setWsPayServData(payServResult);
+			}
 
 			sendRtnObject(outputVO);
 
@@ -752,6 +768,14 @@ public class IOT120 extends FubonWmsBizLogic {
 								outputVO.setErrorMsg("契撤案件需檢附「契撤申請書」");
 							}
 						}
+						if(!StringUtils.equals("Y", inputVO.getCANCEL_CONTRACT_YN()) && 
+								StringUtils.equals("2", inputVO.getREMIT_COUNTRY_FLAG()) &&
+								(Double)OUTitem.get("DOC_SEQ") == 30) {
+							if(!"Y".equals(OUTitem.get("DOC_CHK"))) {
+								inputVO.setSTATUS("10");
+								outputVO.setErrorMsg("境外匯款件，境外匯款聲明書為必備文件。");
+							}
+						}
 					}
 				}
 
@@ -940,6 +964,9 @@ public class IOT120 extends FubonWmsBizLogic {
 				tmvo.setQC_SIGNATURE(inputVO.getQC_SIGNATURE());
 				tmvo.setFB_COM_YN(inputVO.getFB_COM_YN());
 				tmvo.setCOMPANY_NUM(inputVO.getCOMPANY_NUM());
+				tmvo.setPAY_SERV_RETURN_CODE(inputVO.getPAY_SERV_RETURN_CODE());
+				tmvo.setPAY_SERV_REMIT_NATNO(inputVO.getPAY_SERV_REMIT_NATNO());
+				tmvo.setREMIT_COUNTRY_FLAG(inputVO.getREMIT_COUNTRY_FLAG());
 
 				dam_obj.create(tmvo);
 
@@ -1106,6 +1133,14 @@ public class IOT120 extends FubonWmsBizLogic {
 						if(!"Y".equals(OUTitem.get("DOC_CHK"))) {
 							inputVO.setSTATUS("10");
 							outputVO.setErrorMsg("契撤案件需檢附「契撤申請書」");
+						}
+					}
+					if(!StringUtils.equals("Y", inputVO.getCANCEL_CONTRACT_YN()) && 
+							StringUtils.equals("2", inputVO.getREMIT_COUNTRY_FLAG()) &&
+							(Double)OUTitem.get("DOC_SEQ") == 30) {
+						if(!"Y".equals(OUTitem.get("DOC_CHK"))) {
+							inputVO.setSTATUS("10");
+							outputVO.setErrorMsg("境外匯款件，境外匯款聲明書為必備文件。");
 						}
 					}
 				}
@@ -1298,6 +1333,9 @@ public class IOT120 extends FubonWmsBizLogic {
 			tmvo.setQC_SIGNATURE(inputVO.getQC_SIGNATURE());
 			tmvo.setFB_COM_YN(inputVO.getFB_COM_YN());
 			tmvo.setCOMPANY_NUM(inputVO.getCOMPANY_NUM());
+			tmvo.setPAY_SERV_RETURN_CODE(inputVO.getPAY_SERV_RETURN_CODE());
+			tmvo.setPAY_SERV_REMIT_NATNO(inputVO.getPAY_SERV_REMIT_NATNO());
+			tmvo.setREMIT_COUNTRY_FLAG(inputVO.getREMIT_COUNTRY_FLAG());
 
 			dam_obj.update(tmvo);
 
@@ -1720,6 +1758,14 @@ public class IOT120 extends FubonWmsBizLogic {
 			throw new APException(e.getMessage());
 		}
 	}
+	
+	/***
+	 * CALL富壽API
+	 * @param type
+	 * @param caseId
+	 * @return
+	 * @throws Exception
+	 */
 	public Map<String, Object> getWebServiceInfo(int type, String caseId)
 			throws Exception {
 
@@ -1729,8 +1775,7 @@ public class IOT120 extends FubonWmsBizLogic {
 
 		// 讀取XML參數表中的值
 		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> MappCaseMobileMap =
-				xmlInfo.doGetVariable("IOT.GETMAPPCASE_MOBILE", FormatHelper.FORMAT_3);
+		Map<String, String> MappCaseMobileMap = xmlInfo.doGetVariable("IOT.GETMAPPCASE_MOBILE", FormatHelper.FORMAT_3);
 		String ip      = getIPAddress();
 		String SysCode = "";
 		String WsID    = "";
@@ -1738,17 +1783,23 @@ public class IOT120 extends FubonWmsBizLogic {
 		String url     = "";
 
 		switch (type) {
-		case 1:
+		case 1: //電子要保書PDF檔案
 			SysCode = MappCaseMobileMap.get("PDF_SYSCODE").toString();
 			WsID    = MappCaseMobileMap.get("PDF_WS_ID").toString();
 			WsPwd   = MappCaseMobileMap.get("PDF_WS_PWD").toString();
 			url     = MappCaseMobileMap.get("PDF_URL").toString();
 			break;
-		case 2:
+		case 2: //電子要保書內容
 			SysCode = MappCaseMobileMap.get("CASE_SYSCODE").toString();
 			WsID    = MappCaseMobileMap.get("CASE_WS_ID").toString();
 			WsPwd   = MappCaseMobileMap.get("CASE_WS_PWD").toString();
 			url     = MappCaseMobileMap.get("CASE_URL").toString();
+			break;
+		case 3: //繳款服務單API
+			SysCode = MappCaseMobileMap.get("PAY_SERV_SYSCODE").toString();
+			WsID    = MappCaseMobileMap.get("PAY_SERV_WS_ID").toString();
+			WsPwd   = MappCaseMobileMap.get("PAY_SERV_WS_PWD").toString();
+			url     = MappCaseMobileMap.get("PAY_SERV_URL").toString();
 			break;
 		default:
 			break;

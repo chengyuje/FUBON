@@ -25,7 +25,6 @@ import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
 import com.systex.jbranch.platform.common.dataManager.DataManager;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
-import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
 import com.systex.jbranch.platform.server.info.SysInfo;
 import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
@@ -49,35 +48,288 @@ public class ORG431 extends FubonWmsBizLogic {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		
 		StringBuffer sb = new StringBuffer();
-		sb.append("SELECT MQUOTA.ROLE_TYPE, ");
-		sb.append("       NVL(BASE.GOAL_COUNT, 0) AS GOAL_COUNTS, ");
-		sb.append("       NVL(BASE.ROLE_COUNT, 0) AS ACTUAL_COUNTS, ");
-		sb.append("       NVL(MQUOTA.ROLE_QUOTA_COUNT, 0) AS QUOTA_COUNTS, ");
-		sb.append("       CASE WHEN (NVL(MQUOTA.ROLE_QUOTA_COUNT, 0) - NVL(BASE.ROLE_COUNT, 0)) < 0 THEN 0 ELSE (NVL(MQUOTA.ROLE_QUOTA_COUNT, 0) - NVL(BASE.ROLE_COUNT, 0)) END AS SHORT_COUNTS ");
-		sb.append("FROM ( ");
-		sb.append("  SELECT REPLACE(ROLE_TYPE, '_CNT') AS ROLE_TYPE, ");
-		sb.append("         ROLE_QUOTA_COUNT ");
-		sb.append("  FROM TBORG_UHRM_MBR_QUOTA ");
-		sb.append("  UNPIVOT (ROLE_QUOTA_COUNT FOR ROLE_TYPE IN (RM1_CNT, RM2_CNT, SRM_CNT)) ");
-		sb.append(") MQUOTA ");
-		sb.append("LEFT JOIN ( ");
-		sb.append("  SELECT ROLE_TYPE, COUNT(ROLE_TYPE) AS ROLE_COUNT, COUNT(PERF_EFF_DATE) AS GOAL_COUNT ");
+		sb.append("WITH DTL AS ( ");
+		sb.append("  SELECT CENTER_ID, ");
+		sb.append("         CENTER_NAME, ");
+		sb.append("         BRANCH_AREA_ID, ");
+		sb.append("         BRANCH_AREA_NAME, ");
+		sb.append("         ROLE_NAME, ");
+		sb.append("         SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("         SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("         SRM_COUNT, ");
+		sb.append("         SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("         NVL(SRM_COUNT, 0) - NVL(SUM(SERVING_COUNT), 0) AS ESTIMATED ");
 		sb.append("  FROM ( ");
-		sb.append("    SELECT DISTINCT UHRM.EMP_ID, MEM.JOB_TITLE_NAME, ");
-		sb.append("           SUBSTR(MEM.JOB_TITLE_NAME, INSTR(MEM.JOB_TITLE_NAME, '(') + 1, LENGTH(MEM.JOB_TITLE_NAME) - INSTR(MEM.JOB_TITLE_NAME, '(') - 1) AS ROLE_TYPE, ");
-		sb.append("           MEM.PERF_EFF_DATE ");
-		sb.append("    FROM VWORG_EMP_UHRM_INFO UHRM ");
-		sb.append("    LEFT JOIN TBORG_MEMBER MEM ON UHRM.EMP_ID = MEM.EMP_ID ");
-		sb.append("    WHERE UHRM.PRIVILEGEID = 'UHRM002' ");
+		sb.append("    SELECT CENTER_ID, ");
+		sb.append("           CENTER_NAME, ");
+		sb.append("           BRANCH_AREA_ID, ");
+		sb.append("           BRANCH_AREA_NAME, ");
+		sb.append("           ROLEID, ");
+		sb.append("           ROLE_NAME, ");
+		sb.append("           (SELECT COUNT(MEM.EMP_ID) ");
+		sb.append("            FROM TBORG_MEMBER MEM ");
+		sb.append("            LEFT JOIN TBORG_MEMBER_ROLE MROLE ON MEM.EMP_ID = MROLE.EMP_ID AND MROLE.IS_PRIMARY_ROLE = 'Y' ");
+		sb.append("             WHERE MROLE.ROLE_ID = BASE.ROLEID ");
+		sb.append("            AND MEM.SERVICE_FLAG = 'A' ");
+		sb.append("            AND MEM.CHANGE_FLAG IN ('A', 'M', 'P') ");
+		sb.append("            AND MEM.DEPT_ID = BASE.BRANCH_AREA_ID ");
+		sb.append("            AND TO_CHAR(MEM.PERF_EFF_DATE, 'yyyyMM') <= TO_CHAR(SYSDATE, 'yyyyMM')) AS GOAL_COUNT, ");
+		sb.append("           NVL(NOW_STATUS.SERVING, 0) AS SERVING_COUNT, ");
+		sb.append("           NVL(MQUOTA.SRM_COUNT, 0) AS SRM_COUNT, "); 
+		sb.append("           NVL(NOW_STATUS.LEAVING, 0) AS LEAVING_COUNT ");
+		sb.append("    FROM ( ");
+		sb.append("      SELECT REGION_CENTER_ID AS CENTER_ID, ");
+		sb.append("             REGION_CENTER_NAME AS CENTER_NAME, ");
+		sb.append("             BRANCH_AREA_ID, ");
+		sb.append("             BRANCH_AREA_NAME, ");
+		sb.append("             SYS_ROL.ROLEID, ");
+		sb.append("             REPLACE(REPLACE(REPLACE(REPLACE(FUBON_ROL.JOB_TITLE_NAME, '私人銀行客戶經理', ''), '(', ''), ')', ''), '私銀', '') AS ROLE_NAME ");
+		sb.append("      FROM TBSYSSECUROLPRIASS SYS_ROL ");
+		sb.append("      LEFT JOIN TBORG_ROLE FUBON_ROL ON SYS_ROL.ROLEID = FUBON_ROL.ROLE_ID ");
+		sb.append("      LEFT JOIN VWORG_DEFN_INFO DEPT_DTL ON DEPT_DTL.BRANCH_AREA_NAME LIKE '私銀%' ");
+		sb.append("      WHERE PRIVILEGEID IN ('UHRM002') ");
+		sb.append("    ) BASE ");
+		sb.append("    LEFT JOIN ( ");
+		sb.append("      SELECT DEPT_ID, ");
+		sb.append("             REPLACE(ROLE_TYPE, '_CNT') AS ROLE_TYPE, ");
+		sb.append("             SRM_COUNT ");
+		sb.append("      FROM TBORG_UHRM_MBR_QUOTA ");
+		sb.append("      UNPIVOT (SRM_COUNT FOR ROLE_TYPE IN (SRM1_CNT, SRM2_CNT, SRM3_CNT)) ");
+		sb.append("    ) MQUOTA ON BASE.ROLE_NAME = MQUOTA.ROLE_TYPE AND MQUOTA.DEPT_ID = BASE.BRANCH_AREA_ID ");
+		sb.append("    LEFT JOIN ( ");
+		sb.append("      SELECT DEPT_ID, ROLE_ID, SUM(SERVING) AS SERVING, SUM(LEAVING) AS LEAVING ");
+		sb.append("      FROM ( ");
+		sb.append("        SELECT MEM.DEPT_ID, ");
+		sb.append("               MEM.EMP_ID, ");
+		sb.append("               MROLE.ROLE_ID, ");
+		sb.append("               R.ROLE_NAME, ");
+		sb.append("               CASE WHEN (MEM.JOB_RESIGN_DATE IS NULL OR TO_CHAR(MEM.JOB_RESIGN_DATE, 'yyyyMMdd') > TO_CHAR(SYSDATE, 'yyyyMMdd')) THEN 1 ELSE 0 END AS SERVING, ");
+		sb.append("               CASE WHEN (TO_CHAR(MEM.JOB_RESIGN_DATE, 'yyyyMMdd') >= TO_CHAR(SYSDATE, 'yyyyMMdd')) THEN 1 ELSE 0 END AS LEAVING ");
+		sb.append("        FROM TBORG_MEMBER MEM, TBORG_MEMBER_ROLE MROLE ");
+		sb.append("        LEFT JOIN TBORG_ROLE R ON MROLE.ROLE_ID = R.ROLE_ID ");
+		sb.append("        WHERE MEM.DEPT_ID IS NOT NULL ");
+		sb.append("        AND MEM.EMP_ID = MROLE.EMP_ID ");
+		sb.append("        AND MROLE.IS_PRIMARY_ROLE = 'Y' ");
+		sb.append("        AND MROLE.ROLE_ID IN (SELECT ROLEID FROM TBSYSSECUROLPRIASS WHERE PRIVILEGEID IN ('UHRM002')) ");
+		sb.append("        AND MEM.SERVICE_FLAG = 'A' ");
+		sb.append("        AND MEM.CHANGE_FLAG IN ('A', 'M', 'P') ");
+		sb.append("      ) ARRANGE ");
+		sb.append("      GROUP BY DEPT_ID, ROLE_ID ");
+		sb.append("    ) NOW_STATUS ON BASE.BRANCH_AREA_ID = NOW_STATUS.DEPT_ID AND BASE.ROLEID = NOW_STATUS.ROLE_ID ");
 		sb.append("  ) ");
-		sb.append("  GROUP BY ROLE_TYPE ");
-		sb.append(") BASE ON MQUOTA.ROLE_TYPE = BASE.ROLE_TYPE ");
-		sb.append("ORDER BY MQUOTA.ROLE_TYPE ");
+		sb.append("  GROUP BY CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, ROLE_NAME, SRM_COUNT ");
+		sb.append(") ");
+		
+		sb.append("SELECT CENTER_ID, ");
+		sb.append("       CENTER_NAME || ' 合計' AS CENTER_NAME, ");
+		sb.append("       '' AS BRANCH_AREA_ID, ");
+		sb.append("       '' AS BRANCH_AREA_NAME, ");
+		sb.append("       ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(SRM_COUNT) AS SRM_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("FROM DTL ");
+		sb.append("WHERE 1 = 1 ");
+		
+		if (StringUtils.isNotEmpty(inputVO.getUhrmRC())) {
+			sb.append("AND DTL.CENTER_ID = :CENTER_ID "); 
+			queryCondition.setObject("CENTER_ID", inputVO.getUhrmRC());
+		}
+		
+		sb.append("GROUP BY CENTER_ID, CENTER_NAME || ' 合計', ROLE_NAME ");
+		
+		sb.append("UNION ");
+		
+		sb.append("SELECT CENTER_ID, ");
+		sb.append("       CENTER_NAME || ' 合計' AS CENTER_NAME, ");
+		sb.append("       '' AS BRANCH_AREA_ID, ");
+		sb.append("       '' AS BRANCH_AREA_NAME, ");
+		sb.append("       '' AS ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(SRM_COUNT) AS SRM_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("FROM DTL ");
+		sb.append("WHERE 1 = 1 ");
+		
+		if (StringUtils.isNotEmpty(inputVO.getUhrmRC())) {
+			sb.append("AND DTL.CENTER_ID = :CENTER_ID "); 
+			queryCondition.setObject("CENTER_ID", inputVO.getUhrmRC());
+		}
+		
+		sb.append("GROUP BY CENTER_ID, CENTER_NAME || ' 合計' ");
+		
+		sb.append("UNION ");
+		
+		sb.append("SELECT CENTER_ID, ");
+		sb.append("       CENTER_NAME, ");
+		sb.append("       BRANCH_AREA_ID, ");
+		sb.append("       BRANCH_AREA_NAME, ");
+		sb.append("       ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(SRM_COUNT) AS SRM_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("FROM DTL ");
+		sb.append("WHERE 1 = 1 ");
+		
+		if (StringUtils.isNotEmpty(inputVO.getUhrmOP())) {
+			sb.append("AND DTL.BRANCH_AREA_ID = :BRANCH_AREA_ID "); 
+			queryCondition.setObject("BRANCH_AREA_ID", inputVO.getUhrmOP());
+		} else if (StringUtils.isNotEmpty(inputVO.getUhrmRC())) {
+			sb.append("AND DTL.CENTER_ID = :CENTER_ID "); 
+			queryCondition.setObject("CENTER_ID", inputVO.getUhrmRC());
+		}
+		
+		sb.append("GROUP BY CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, ROLE_NAME ");
+		
+		sb.append("UNION ");
+		
+		sb.append("SELECT CENTER_ID, ");
+		sb.append("       CENTER_NAME, ");
+		sb.append("       BRANCH_AREA_ID, ");
+		sb.append("       BRANCH_AREA_NAME, ");
+		sb.append("       '' AS ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(SRM_COUNT) AS SRM_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("FROM DTL ");
+		sb.append("WHERE 1 = 1 ");
+		
+		if (StringUtils.isNotEmpty(inputVO.getUhrmOP())) {
+			sb.append("AND DTL.BRANCH_AREA_ID = :BRANCH_AREA_ID "); 
+			queryCondition.setObject("BRANCH_AREA_ID", inputVO.getUhrmOP());
+		} else if (StringUtils.isNotEmpty(inputVO.getUhrmRC())) {
+			sb.append("AND DTL.CENTER_ID = :CENTER_ID "); 
+			queryCondition.setObject("CENTER_ID", inputVO.getUhrmRC());
+		}
+		
+		sb.append("GROUP BY CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME ");
+		
+		sb.append("UNION ");
+		
+		sb.append("SELECT '' AS CENTER_ID, ");
+		sb.append("       '全行 合計' AS CENTER_NAME, ");
+		sb.append("       '' AS BRANCH_AREA_ID, ");
+		sb.append("       '' AS BRANCH_AREA_NAME, ");
+		sb.append("       ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(SRM_COUNT) AS SRM_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("FROM DTL ");
+		sb.append("GROUP BY '', '全行 合計', ROLE_NAME ");
+		
+		sb.append("UNION ");
+		
+		sb.append("SELECT '' AS CENTER_ID, ");
+		sb.append("       '全行 合計' AS CENTER_NAME, ");
+		sb.append("       '' AS BRANCH_AREA_ID, ");
+		sb.append("       '' AS BRANCH_AREA_NAME, ");
+		sb.append("       '' AS ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(SRM_COUNT) AS SRM_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("FROM DTL ");
+		sb.append("GROUP BY '', '全行 合計' ");
+		
+		sb.append("ORDER BY CENTER_ID ASC, BRANCH_AREA_ID ASC, ROLE_NAME ASC ");
 
 		queryCondition.setQueryString(sb.toString());
 		
-		outputVO.setAoCntLst(dam.exeQuery(queryCondition));
-		outputVO.setReportLst(dam.exeQuery(queryCondition));
+		List<Map<String, Object>> list = dam.exeQuery(queryCondition);		
+		List<Map<String, Object>> returnList = new ArrayList<Map<String,Object>>();
+		
+		ArrayList<String> centerTempList = new ArrayList<String>(); //比對用
+		for (Map<String, Object> centerMap : list) {
+			String regionCenter = (String) centerMap.get("CENTER_NAME");
+			if (centerTempList.indexOf(regionCenter) < 0) { //regionCenter
+				centerTempList.add(regionCenter);
+				
+				Integer centerRowspan = 1;
+				
+				List<Map<String, Object>> branchAreaList = new ArrayList<Map<String,Object>>();
+				ArrayList<String> branchAreaTempList = new ArrayList<String>(); //比對用
+
+				for (Map<String, Object> branchAreaMap : list) {
+					String branchArea = (String) branchAreaMap.get("BRANCH_AREA_NAME");
+					
+					Integer branchAreaRowspan = 1;
+					
+					if (regionCenter.equals((String) branchAreaMap.get("CENTER_NAME"))) { 
+						if (branchAreaTempList.indexOf(branchArea) < 0) { //branchArea
+							branchAreaTempList.add(branchArea);
+							
+							List<Map<String, Object>> roleList = new ArrayList<Map<String,Object>>();
+							ArrayList<String> roleTempList = new ArrayList<String>(); //比對用
+								
+							for (Map<String, Object> roleMap : list) {
+								String role = (String) roleMap.get("ROLE_NAME");
+								
+								if (null != branchArea && roleMap.get("BRANCH_AREA_NAME") != null) {
+									if (branchArea.equals((String) roleMap.get("BRANCH_AREA_NAME"))) {
+										if (roleTempList.indexOf(role) < 0) { //branchArea
+											roleTempList.add(role);
+											
+											Map<String, Object> roleTempMap = new HashMap<String, Object>();
+											roleTempMap.put("ROLE_NAME", role);
+											roleTempMap.put("GOAL_COUNT", (BigDecimal) roleMap.get("GOAL_COUNT"));
+											roleTempMap.put("SERVING_COUNT", (BigDecimal) roleMap.get("SERVING_COUNT"));
+											roleTempMap.put("SRM_COUNT", (BigDecimal) roleMap.get("SRM_COUNT"));
+											roleTempMap.put("LEAVING_COUNT", (BigDecimal) roleMap.get("LEAVING_COUNT"));
+											roleTempMap.put("ESTIMATED", (BigDecimal) roleMap.get("ESTIMATED"));
+											
+											roleList.add(roleTempMap);
+										}
+									}
+								} else if (regionCenter.equals(roleMap.get("CENTER_NAME"))) {
+									Map<String, Object> roleTempMap = new HashMap<String, Object>();
+									roleTempMap.put("ROLE_NAME", role);
+									roleTempMap.put("GOAL_COUNT", (BigDecimal) roleMap.get("GOAL_COUNT"));
+									roleTempMap.put("SERVING_COUNT", (BigDecimal) roleMap.get("SERVING_COUNT"));
+									roleTempMap.put("SRM_COUNT", (BigDecimal) roleMap.get("SRM_COUNT"));
+									roleTempMap.put("LEAVING_COUNT", (BigDecimal) roleMap.get("LEAVING_COUNT"));
+									roleTempMap.put("ESTIMATED", (BigDecimal) roleMap.get("ESTIMATED"));
+									
+									roleList.add(roleTempMap);
+								}
+							}
+							
+							Map<String, Object> branchAreaTempMap = new HashMap<String, Object>();
+							branchAreaTempMap.put("BRANCH_AREA_NAME", branchArea);
+							branchAreaTempMap.put("ROLE", roleList);
+							centerRowspan = centerRowspan + roleList.size();
+							branchAreaRowspan = branchAreaRowspan + roleList.size();
+							branchAreaTempMap.put("ROWSPAN", branchAreaRowspan);
+							branchAreaTempMap.put("COLSPAN", (roleList.size() == 1 ? 2 : 1));
+
+							branchAreaList.add(branchAreaTempMap);
+						} 
+					}
+				}
+				
+				Map<String, Object> centerTempMap = new HashMap<String, Object>();
+				centerTempMap.put("CENTER_NAME", regionCenter);
+				centerTempMap.put("BRANCH_AREA", branchAreaList);
+				centerRowspan = centerRowspan + branchAreaList.size();
+				centerTempMap.put("ROWSPAN", centerRowspan);
+				centerTempMap.put("COLSPAN", (branchAreaList.size() == 1 && branchAreaList.get(0).get("BRANCH_AREA_NAME") == null ? 2 : 1));
+
+				returnList.add(centerTempMap);
+			}
+		}
+		
+		outputVO.setAoCntLst(returnList);
+		outputVO.setReportLst(list);
 
 		Calendar calender = Calendar.getInstance();
 		outputVO.setYear(sdfYYYY.format(new Date()));
@@ -97,23 +349,23 @@ public class ORG431 extends FubonWmsBizLogic {
 		ORG431InputVO inputVO = (ORG431InputVO) body;
 		ORG431OutputVO outputVO = new ORG431OutputVO();
 		
-		String[] headerLine1 = {"職務", inputVO.getNowMonth() + "掛Goal人數", 
+		String[] headerLine1 = {"業務處", "營運區", "職務", inputVO.getNowMonth() + "掛Goal人數", 
 								inputVO.getYear() + "應有員額", inputVO.getYear() + "應有員額", inputVO.getYear() + "應有員額"};
 		
-		String[] headerLine2 = {"", "", 
+		String[] headerLine2 = {"", "", "", "", 
 							  	"截至" + inputVO.getToDay() + "實際數", "員額", "缺額"}; 
 		
-		String[] mainLine    = {"ROLE_TYPE", "GOAL_COUNTS",
-								"ACTUAL_COUNTS", "QUOTA_COUNTS", "SHORT_COUNTS"};
+		String[] mainLine    = {"CENTER_NAME", "BRANCH_AREA_NAME", "ROLE_NAME", "GOAL_COUNT",
+								"SERVING_COUNT", "SRM_COUNT", "ESTIMATED"};
 		
-		String fileName = "個金高端RM員額表_" + sdfYYYYMMDD.format(new Date()) + ".xlsx";
+		String fileName = "私銀理專員額表_" + sdfYYYYMMDD.format(new Date()) + ".xlsx";
 		String uuid = UUID.randomUUID().toString();
 		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
 		
 		String filePath = Path + uuid;
 
 		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet("個金高端RM員額表_" + sdfYYYYMMDD.format(new Date()));
+		XSSFSheet sheet = workbook.createSheet("私銀理專員額表_" + sdfYYYYMMDD.format(new Date()));
 		sheet.setDefaultColumnWidth(20);
 		
 		XSSFCellStyle style = workbook.createCellStyle();
@@ -161,14 +413,72 @@ public class ORG431 extends FubonWmsBizLogic {
 		
 		index++;
 
+		ArrayList<String> centerTempList = new ArrayList<String>(); //比對用
+		ArrayList<String> branchAreaTempList = new ArrayList<String>(); //比對用
+		Integer centerStartFlag = 0, branchAreaStartFlag = 0;
+		Integer centerEndFlag = 0, branchAreaEndFlag = 0;
+		
+		Integer contectStartIndex = index;
+		
 		List<Map<String, String>> list = inputVO.getEXPORT_LST();
 		for (int i = 0; i < list.size(); i++) {
 			row = sheet.createRow(index);
-			if (list.get(i) != null) {
-				for (int j = 0; j < mainLine.length; j++) {
-					XSSFCell cell = row.createCell(j);
-					cell.setCellStyle(style);
-					cell.setCellValue(list.get(i).get(mainLine[j]));
+			
+			for (int j = 0; j < mainLine.length; j++) {
+				XSSFCell cell = row.createCell(j);
+				cell.setCellStyle(style);
+				if (null != list.get(i)) {
+					String centerName = list.get(i).get("CENTER_NAME");
+					String branchAreaName = list.get(i).get("BRANCH_AREA_NAME");
+					
+					if (j == 0 && centerTempList.indexOf(centerName) < 0) {
+						centerTempList.add(centerName);
+						if (centerEndFlag != 0) {
+							if (null != centerName && centerName.indexOf("合計") > 0) {
+								if (StringUtils.equals("全行 合計", centerName)) {
+									sheet.addMergedRegion(new CellRangeAddress(centerStartFlag + contectStartIndex, centerEndFlag + contectStartIndex, j, j + 1)); // firstRow, endRow, firstColumn, endColumn
+								} else {
+									sheet.addMergedRegion(new CellRangeAddress(centerStartFlag + contectStartIndex, centerEndFlag + contectStartIndex, j, j)); // firstRow, endRow, firstColumn, endColumn
+								}
+							} else {
+								sheet.addMergedRegion(new CellRangeAddress(centerStartFlag + contectStartIndex, centerEndFlag + contectStartIndex, j, j + 1)); // firstRow, endRow, firstColumn, endColumn
+							}
+						}
+						
+						centerStartFlag = i;
+						centerEndFlag = 0;
+					} else if (j == 0 && null != list.get(i).get("CENTER_NAME")) {
+						centerEndFlag = i;
+					}
+					
+					if (j == 1 && branchAreaTempList.indexOf(branchAreaName) < 0) {
+						branchAreaTempList.add(branchAreaName);
+						
+						if (branchAreaEndFlag != 0) {
+							if (null != branchAreaName && branchAreaName.indexOf("合計") > 0) {
+								sheet.addMergedRegion(new CellRangeAddress(branchAreaStartFlag + contectStartIndex, branchAreaEndFlag + contectStartIndex, j, j + 1)); // firstRow, endRow, firstColumn, endColumn
+							} else {
+								sheet.addMergedRegion(new CellRangeAddress(branchAreaStartFlag + contectStartIndex, branchAreaEndFlag + contectStartIndex, j, j)); // firstRow, endRow, firstColumn, endColumn
+							}
+						}
+						branchAreaStartFlag = i;
+						branchAreaEndFlag = 0;
+					} else if (j == 1 && null != list.get(i).get("BRANCH_AREA_NAME")) {
+						branchAreaEndFlag = i;
+					}
+					
+					if (j == (mainLine.length - 1) && i == (list.size() - 3) && null != centerName && StringUtils.equals("全行 合計", centerName)) {
+						if (StringUtils.isEmpty(inputVO.getUhrmRC())) {
+							sheet.addMergedRegion(new CellRangeAddress(branchAreaStartFlag + contectStartIndex, branchAreaEndFlag + contectStartIndex, 1, 1)); // firstRow, endRow, firstColumn, endColumn
+						}
+						sheet.addMergedRegion(new CellRangeAddress(centerStartFlag + contectStartIndex, centerEndFlag + contectStartIndex + 1, 0, 1)); // firstRow, endRow, firstColumn, endColumn
+					} 
+					
+					if (null != list.get(i).get(mainLine[0]) && "ROLE_NAME".equals(mainLine[j]) && null == list.get(i).get(mainLine[j])) {
+						cell.setCellValue("小計");
+					} else {
+						cell.setCellValue(list.get(i).get(mainLine[j]));
+					}
 				}
 			}
 			

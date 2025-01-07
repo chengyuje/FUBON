@@ -15,6 +15,14 @@ public class AesEncryptDecryptUtils {
 	public static final String AES_ENCRYPT = "AES";
 	public static final String AES_ECB_PKCS7_PADDING = "AES/ECB/PKCS7Padding";
 	public static final String AES_CBC_PKCS5_PADDING = "AES/CBC/PKCS5Padding";
+	
+	
+	public static void main(String[] args) throws Exception {
+		String encrypt = AesEncryptDecryptUtils
+		.encryptAesEcbPkcs7Padding("6ed98832ff72eaf7", "03689902");
+		System.out.println(encrypt);
+//		AesEncryptDecryptUtils.decryptAesEcbPkcs7Padding();
+	}
     
 	/** AES NO PADDING encrypt 128 **/
     public static String encryptAes128(String key ,String val) throws Exception {

@@ -25,17 +25,19 @@ eSoafApp.controller('ORG231Controller', function(sysInfoService, $scope, $contro
 			if (tota.length > 0) {
 				$scope.resultList = tota[0].body.resultList;
 				$scope.outputVO = tota[0].body;
-				
-				$scope.inputVO.RM1_CNT    = $scope.resultList[0].RM1_CNT;
-				$scope.inputVO.RM2_CNT    = $scope.resultList[0].RM2_CNT;
-				$scope.inputVO.SRM_CNT    = $scope.resultList[0].SRM_CNT;
-				$scope.inputVO.MODIFIER   = $scope.resultList[0].MODIFIER;
-				$scope.inputVO.LASTUPDATE = $scope.resultList[0].LASTUPDATE;
 			}
 		});
 	};
 	
-	$scope.save = function() {
+	$scope.save = function(row) {
+		$scope.inputVO.SRM1_CNT = row.SRM1_CNT;
+		$scope.inputVO.SRM2_CNT = row.SRM2_CNT;
+		$scope.inputVO.SRM3_CNT = row.SRM3_CNT;
+		$scope.inputVO.OPH_CNT  = row.OPH_CNT;
+		$scope.inputVO.OP1_CNT  = row.OP1_CNT;
+		$scope.inputVO.OP2_CNT  = row.OP2_CNT;
+		$scope.inputVO.DEPT_ID  = row.DEPT_ID;
+		
 		$scope.sendRecv("ORG231", "save", "com.systex.jbranch.app.server.fps.org231.ORG231InputVO", $scope.inputVO, function(tota, isError) {
 			if (isError) {
 				$scope.showErrorMsgInDialog(tota.body.msgData);
@@ -43,7 +45,7 @@ eSoafApp.controller('ORG231Controller', function(sysInfoService, $scope, $contro
 			}
 			
 			if (tota.length > 0) {
-				$scope.showMsg("ehl_01_common_010");
+				$scope.showMsg("儲存成功");
 			}
 			
 			$scope.getList();

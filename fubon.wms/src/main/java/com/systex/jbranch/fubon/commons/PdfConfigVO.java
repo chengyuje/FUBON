@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class PdfConfigVO {
     private final List<String> files;
     private boolean isAddBlank = false; // 預設 PDF 不需要空白頁
-    private boolean encrypt = true;     // 預設 PDF 需加密
+    private boolean encrypt = false;     // 預設 PDF 需加密
     private String userPassword;
     private String ownerPassword;
     private DataAccessManager dam;

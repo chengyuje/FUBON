@@ -35,12 +35,54 @@ public class ORG231 extends FubonWmsBizLogic {
 
 		ORG231OutputVO outputVO = new ORG231OutputVO();
 		dam = this.getDataAccessManager();
-		
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
 		
-		sb.append("SELECT RM1_CNT, RM2_CNT, SRM_CNT, MODIFIER, LASTUPDATE ");
-		sb.append("FROM TBORG_UHRM_MBR_QUOTA ");
+		sb.append("MERGE INTO TBORG_UHRM_MBR_QUOTA A ");
+		sb.append("USING ( ");
+		sb.append("  SELECT DEPT_ID ");
+		sb.append("  FROM TBORG_DEFN ");
+		sb.append("  WHERE DEPT_NAME LIKE '私銀%區' ");
+		sb.append(") B ON (A.DEPT_ID = B.DEPT_ID) ");
+		sb.append("WHEN NOT MATCHED THEN ");
+		sb.append("INSERT ( ");
+		sb.append("  VERSION, ");
+		sb.append("  CREATETIME, ");
+		sb.append("  CREATOR, ");
+		sb.append("  MODIFIER, ");
+		sb.append("  LASTUPDATE, ");
+		sb.append("  SRM1_CNT, ");
+		sb.append("  SRM2_CNT, ");
+		sb.append("  SRM3_CNT, ");
+		sb.append("  OPH_CNT, ");
+		sb.append("  OP1_CNT, ");
+		sb.append("  OP2_CNT, ");
+		sb.append("  DEPT_ID ");
+		sb.append(") ");
+		sb.append("VALUES ( ");
+		sb.append("  0, SYSDATE, 'SYSTEM', 'SYSTEM', SYSDATE, 0, 0, 0, 0, 0, 0, B.DEPT_ID ");
+		sb.append(") ");
+		
+		queryCondition.setQueryString(sb.toString());
+		
+		dam.exeUpdate(queryCondition);
+		
+		queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		sb = new StringBuffer();
+		sb.append("SELECT  Q.DEPT_ID, ");
+		sb.append("        D.BRANCH_AREA_NAME, ");
+		sb.append("        D.REGION_CENTER_NAME, ");
+		sb.append("        Q.SRM1_CNT, ");
+		sb.append("        Q.SRM2_CNT, ");
+		sb.append("        Q.SRM3_CNT, ");
+		sb.append("        Q.OPH_CNT, ");
+		sb.append("        Q.OP1_CNT, ");
+		sb.append("        Q.OP2_CNT,  ");
+		sb.append("        Q.MODIFIER, ");
+		sb.append("        Q.LASTUPDATE ");
+		sb.append("FROM TBORG_UHRM_MBR_QUOTA Q ");
+		sb.append("LEFT JOIN VWORG_DEFN_INFO D ON Q.DEPT_ID = D.BRANCH_AREA_ID ");
+		sb.append("ORDER BY Q.DEPT_ID ");
 		
 		queryCondition.setQueryString(sb.toString());
 		
@@ -55,23 +97,34 @@ public class ORG231 extends FubonWmsBizLogic {
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		
-			StringBuffer sb = new StringBuffer();
-						
-			sb = new StringBuffer();
-			sb.append("UPDATE TBORG_UHRM_MBR_QUOTA ");
-			sb.append("SET RM1_CNT = :RM1_CNT, RM2_CNT = :RM2_CNT, SRM_CNT = :SRM_CNT, "); 
-			sb.append("    VERSION = VERSION + 1, MODIFIER = :empId, LASTUPDATE = sysdate ");
-			
-			queryCondition.setObject("RM1_CNT", StringUtils.isNotEmpty(inputVO.getRM1_CNT()) ? new BigDecimal(inputVO.getRM1_CNT()) : BigDecimal.ZERO);
-			queryCondition.setObject("RM2_CNT", StringUtils.isNotEmpty(inputVO.getRM2_CNT()) ? new BigDecimal(inputVO.getRM2_CNT()) : BigDecimal.ZERO);
-			queryCondition.setObject("SRM_CNT", StringUtils.isNotEmpty(inputVO.getSRM_CNT()) ? new BigDecimal(inputVO.getSRM_CNT()) : BigDecimal.ZERO);
-			queryCondition.setObject("empId", getUserVariable(FubonSystemVariableConsts.LOGINID));
-			
-			queryCondition.setQueryString(sb.toString());
-			
-			dam.exeUpdate(queryCondition);
+		StringBuffer sb = new StringBuffer();
+					
+		sb = new StringBuffer();
+		sb.append("UPDATE TBORG_UHRM_MBR_QUOTA ");
+		sb.append("SET SRM1_CNT = :SRM1_CNT, "); 
+		sb.append("    SRM2_CNT = :SRM2_CNT, "); 
+		sb.append("    SRM3_CNT = :SRM3_CNT, "); 
+		sb.append("    OPH_CNT = :OPH_CNT, ");
+		sb.append("    OP1_CNT = :OP1_CNT, ");
+		sb.append("    OP2_CNT = :OP2_CNT,  ");
+		sb.append("    VERSION = VERSION + 1, "); 
+		sb.append("    MODIFIER = :empId, "); 
+		sb.append("    LASTUPDATE = sysdate ");
+		sb.append("WHERE DEPT_ID = :DEPT_ID ");
+		
+		queryCondition.setObject("SRM1_CNT", StringUtils.isNotEmpty(inputVO.getSRM1_CNT()) ? new BigDecimal(inputVO.getSRM1_CNT()) : BigDecimal.ZERO);
+		queryCondition.setObject("SRM2_CNT", StringUtils.isNotEmpty(inputVO.getSRM2_CNT()) ? new BigDecimal(inputVO.getSRM2_CNT()) : BigDecimal.ZERO);
+		queryCondition.setObject("SRM3_CNT", StringUtils.isNotEmpty(inputVO.getSRM3_CNT()) ? new BigDecimal(inputVO.getSRM3_CNT()) : BigDecimal.ZERO);
+		queryCondition.setObject("OPH_CNT", StringUtils.isNotEmpty(inputVO.getOPH_CNT()) ? new BigDecimal(inputVO.getOPH_CNT()) : BigDecimal.ZERO);
+		queryCondition.setObject("OP1_CNT", StringUtils.isNotEmpty(inputVO.getOP1_CNT()) ? new BigDecimal(inputVO.getOP1_CNT()) : BigDecimal.ZERO);
+		queryCondition.setObject("OP2_CNT", StringUtils.isNotEmpty(inputVO.getOP2_CNT()) ? new BigDecimal(inputVO.getOP2_CNT()) : BigDecimal.ZERO);
+		queryCondition.setObject("empId", getUserVariable(FubonSystemVariableConsts.LOGINID));
+		queryCondition.setObject("DEPT_ID", inputVO.getDEPT_ID());
+		
+		queryCondition.setQueryString(sb.toString());
+		
+		dam.exeUpdate(queryCondition);
 
 		sendRtnObject(null);
 	}
-	
 }

@@ -14,6 +14,25 @@ public class ORG431InputVO extends PagingInputVO {
 	private String nowMonth;
 	private String nextMonth;
 	private String next2Month;
+	
+	private String uhrmRC;
+	private String uhrmOP;
+
+	public String getUhrmRC() {
+		return uhrmRC;
+	}
+
+	public void setUhrmRC(String uhrmRC) {
+		this.uhrmRC = uhrmRC;
+	}
+
+	public String getUhrmOP() {
+		return uhrmOP;
+	}
+
+	public void setUhrmOP(String uhrmOP) {
+		this.uhrmOP = uhrmOP;
+	}
 
 	public String getYear() {
 		return year;

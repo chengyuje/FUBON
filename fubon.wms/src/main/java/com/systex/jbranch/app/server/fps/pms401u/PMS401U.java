@@ -11,7 +11,9 @@ import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
+import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
+import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
 @Component("pms401u")
@@ -71,6 +73,57 @@ public class PMS401U extends FubonWmsBizLogic {
 			outputVO.setUhrmORGList(uhrmOrgList);
 		}
 						
+		sendRtnObject(outputVO);
+	}
+	
+	public void getORG(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		
+		PMS401UInputVO inputVO = (PMS401UInputVO) body;
+		PMS401UOutputVO outputVO = new PMS401UOutputVO();
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sb = new StringBuffer();
+		
+		switch (inputVO.getOrgType()) {
+			case "getOP" :
+				sb.append("SELECT DISTINCT REGION_CENTER_ID, ");
+				sb.append("       REGION_CENTER_NAME, ");
+				sb.append("       BRANCH_AREA_ID, ");
+				sb.append("       BRANCH_AREA_NAME ");
+				sb.append("FROM VWORG_DEFN_INFO ");
+				sb.append("WHERE BRANCH_AREA_NAME LIKE '私銀%' "); 
+				sb.append("AND REGION_CENTER_ID = :REGION_CENTER_ID ");
+				sb.append("ORDER BY REGION_CENTER_ID, BRANCH_AREA_ID ");
+				
+				queryCondition.setObject("REGION_CENTER_ID", inputVO.getUhrmRC()); 
+				
+				break;
+			case "getAR" :
+				sb.append("SELECT DISTINCT REGION_CENTER_ID, ");
+				sb.append("       REGION_CENTER_NAME ");
+				sb.append("FROM VWORG_DEFN_INFO DEPT_DTL ");
+				sb.append("WHERE DEPT_DTL.BRANCH_AREA_NAME LIKE '私銀%' "); 
+				sb.append("ORDER BY REGION_CENTER_ID ");
+				
+				break;
+		}
+		
+		queryCondition.setQueryString(sb.toString());
+		
+		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+
+		switch (inputVO.getOrgType()) {
+			case "getOP" :
+				outputVO.setOPList(list);
+				break;
+			case "getAR" :
+				outputVO.setARList(list);
+				break;
+		}
+				
 		sendRtnObject(outputVO);
 	}
 }

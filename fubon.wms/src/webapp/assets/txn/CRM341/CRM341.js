@@ -238,6 +238,11 @@ eSoafApp.controller('CRM341Controller',
 	    
 	    //下載客戶同意書
     	$scope.download = function() {
+    		if($scope.inputVO.oldVOList && $scope.inputVO.oldVOList.CUST_ID != $scope.inputVO.cust_id) {
+    			$scope.showMsg('ehl_01_CRM341_001');
+				return;
+    		}
+    			
     		if(!$scope.inputVO.new_ao_code) {
     			$scope.showErrorMsg('請先選擇移入AO CODE');
 	    		return;
@@ -283,6 +288,11 @@ eSoafApp.controller('CRM341Controller',
         
         $scope.checkadd = function() {
         	$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase().trim();
+        	
+        	if($scope.inputVO.oldVOList && $scope.inputVO.oldVOList.CUST_ID != $scope.inputVO.cust_id) {
+    			$scope.showMsg('ehl_01_CRM341_001');
+				return;
+    		}
 
         	//2022換手名單：已換手經營客戶未滿6個月移轉回原個金RM，需簽署「客戶資產現況表申請書」及「客戶指定個金客戶經理自主聲明書」
         	if($scope.inputVO.is2022CMDTCust3) {

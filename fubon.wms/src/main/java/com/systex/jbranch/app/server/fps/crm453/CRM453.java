@@ -37,8 +37,8 @@ public class CRM453 extends FubonWmsBizLogic {
 	
 	// 接到M+傳來auserid解碼後用來查詢EMP_ID
 	public void getEmpIdByAuserId (Object body, IPrimitiveMap header) throws Exception {
-		logger.info("#1585埋log追蹤getEmpIdByAuserId(): 進入getEmpIdByAuserId() ");
-		System.out.println("#1585埋log追蹤getEmpIdByAuserId(): 進入getEmpIdByAuserId() ");
+		//logger.info("#1585埋log追蹤getEmpIdByAuserId(): 進入getEmpIdByAuserId() ");
+		//System.out.println("#1585埋log追蹤getEmpIdByAuserId(): 進入getEmpIdByAuserId() ");
 		CRM453InputVO inputVO = (CRM453InputVO) body ;
 		CRM453OutputVO outputVO = new CRM453OutputVO();
 		List<Map<String, Object>> resultList = new ArrayList<Map<String,Object>>();
@@ -52,8 +52,8 @@ public class CRM453 extends FubonWmsBizLogic {
 		if (StringUtils.isNotBlank(auserID)) {
 			// AES解密
 			mplus_uid = AesEncryptDecryptUtils.decryptAesEcbPkcs7Padding(aesKey, auserID);
-			logger.info("#1585埋log追蹤getEmpIdByAuserId(): plus " + mplus_uid);
-			System.out.println("#1585埋log追蹤getEmpIdByAuserId(): plus " + mplus_uid);
+			//logger.info("#1585埋log追蹤getEmpIdByAuserId(): plus " + mplus_uid);
+			//System.out.println("#1585埋log追蹤getEmpIdByAuserId(): plus " + mplus_uid);
 //			System.out.println("==================");
 //			System.out.println(aesKey);
 //			System.out.println(auserID);
@@ -69,8 +69,8 @@ public class CRM453 extends FubonWmsBizLogic {
 			queryCondition.setObject("mplus_uid", mplus_uid);
 			queryCondition.setQueryString(sql.toString());
 			List<Map<String, Object>> list = dam.exeQuery(queryCondition);
-			logger.info("#1585埋log追蹤getEmpIdByAuserId(): list撈出幾筆? " + list.size() + " 筆");
-			System.out.println("#1585埋log追蹤getEmpIdByAuserId(): list撈出幾筆? " + list.size() + " 筆");
+			//logger.info("#1585埋log追蹤getEmpIdByAuserId(): list撈出幾筆? " + list.size() + " 筆");
+			//System.out.println("#1585埋log追蹤getEmpIdByAuserId(): list撈出幾筆? " + list.size() + " 筆");
 			// 有可能一個 MPLUS_UID 會對到多個 EMP_NUMBER，此時需取最大角色。
 			String emp_number = "";
 			int pri = 0;
@@ -95,21 +95,21 @@ public class CRM453 extends FubonWmsBizLogic {
 			Map<String, Object> resultMap = new HashMap<String, Object>(); 
 			resultMap.put("EMP_NUMBER", emp_number);
 			resultMap.put("PRIVILEGEID", privilegeID);
-			logger.info("#1585埋log追蹤getEmpIdByAuserId(): EMP_NUMBER? " + resultMap.get("EMP_NUMBER"));
-			logger.info("#1585埋log追蹤getEmpIdByAuserId(): PRIVILEGEID? " + resultMap.get("PRIVILEGEID"));
-			System.out.println("#1585埋log追蹤getEmpIdByAuserId(): EMP_NUMBER? " + resultMap.get("EMP_NUMBER"));
-			System.out.println("#1585埋log追蹤getEmpIdByAuserId(): PRIVILEGEID? " + resultMap.get("PRIVILEGEID"));
+			//logger.info("#1585埋log追蹤getEmpIdByAuserId(): EMP_NUMBER? " + resultMap.get("EMP_NUMBER"));
+			//logger.info("#1585埋log追蹤getEmpIdByAuserId(): PRIVILEGEID? " + resultMap.get("PRIVILEGEID"));
+			//System.out.println("#1585埋log追蹤getEmpIdByAuserId(): EMP_NUMBER? " + resultMap.get("EMP_NUMBER"));
+			//System.out.println("#1585埋log追蹤getEmpIdByAuserId(): PRIVILEGEID? " + resultMap.get("PRIVILEGEID"));
 			resultList.add(resultMap);
 			outputVO.setResultList(resultList);
 		}
-		logger.info("#1585埋log追蹤getEmpIdByAuserId(): 結束getEmpIdByAuserId()");
-		System.out.println("#1585埋log追蹤getEmpIdByAuserId(): 結束getEmpIdByAuserId()");
+		//logger.info("#1585埋log追蹤getEmpIdByAuserId(): 結束getEmpIdByAuserId()");
+		//System.out.println("#1585埋log追蹤getEmpIdByAuserId(): 結束getEmpIdByAuserId()");
 		this.sendRtnObject(outputVO);
 	}
 	
 	public void inquire(Object body, IPrimitiveMap header) throws JBranchException {
-		logger.info("#1585埋log追蹤inquire(): 進入inquire()");
-		System.out.println("#1585埋log追蹤inquire(): 進入inquire()");
+		//logger.info("#1585埋log追蹤inquire(): 進入inquire()");
+		//System.out.println("#1585埋log追蹤inquire(): 進入inquire()");
 		CRM453InputVO inputVO = (CRM453InputVO) body ;
 		CRM453OutputVO outputVO = new CRM453OutputVO();
 		List<Map<String, Object>> resultList = new ArrayList<Map<String,Object>>();
@@ -131,13 +131,13 @@ public class CRM453 extends FubonWmsBizLogic {
 		sb.append("  AND AG.AGENT_STATUS = 'S' ");
 		sb.append("  AND AG.EMP_ID = INFO.EMP_ID ");
 		sb.append(") ");
-		logger.info("#1585埋log追蹤inquire(): empID? " + inputVO.getEmpID());
+		//logger.info("#1585埋log追蹤inquire(): empID? " + inputVO.getEmpID());
 		queryCondition.setObject("empID", inputVO.getEmpID());
 		queryCondition.setQueryString(sb.toString());
 		
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
-		logger.info("#1585埋log追蹤inquire(): list幾筆? " + list.size() + " 筆");
-		System.out.println("#1585埋log追蹤inquire(): list幾筆? " + list.size() + " 筆");
+		//logger.info("#1585埋log追蹤inquire(): list幾筆? " + list.size() + " 筆");
+		//System.out.println("#1585埋log追蹤inquire(): list幾筆? " + list.size() + " 筆");
 		if (list.size() > 0) {
 			for(Map<String, Object> agentMap : list){
 				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -166,11 +166,11 @@ public class CRM453 extends FubonWmsBizLogic {
 				
 				queryCondition.setObject("emp_id", agentMap.get("EMP_ID").toString());
 				queryCondition.setQueryString(sb.toString());
-				logger.info("#1585埋log追蹤inquire(): for loop empID? " + agentMap.get("EMP_ID").toString());
-				System.out.println("#1585埋log追蹤inquire(): for loop empID? " + agentMap.get("EMP_ID").toString());
+				//logger.info("#1585埋log追蹤inquire(): for loop empID? " + agentMap.get("EMP_ID").toString());
+				//System.out.println("#1585埋log追蹤inquire(): for loop empID? " + agentMap.get("EMP_ID").toString());
 				List<Map<String, Object>> tempList = dam.exeQuery(queryCondition);
-				logger.info("#1585埋log追蹤inquire(): for loop list幾筆? " + tempList.size() + " 筆");
-				System.out.println("#1585埋log追蹤inquire(): for loop list幾筆? " + tempList.size() + " 筆");
+				//logger.info("#1585埋log追蹤inquire(): for loop list幾筆? " + tempList.size() + " 筆");
+				//System.out.println("#1585埋log追蹤inquire(): for loop list幾筆? " + tempList.size() + " 筆");
 				for (Map<String, Object> map : tempList) {
 					// 將分行兩個字拿掉
 					if (map.get("BRANCH") != null && String.valueOf(map.get("BRANCH")).indexOf("分行") >= 0) {
@@ -256,10 +256,10 @@ public class CRM453 extends FubonWmsBizLogic {
 			}
 		}
 		outputVO.setResultList(resultList);
-		logger.info("#1585埋log追蹤inquire(): 最後回送resultList有幾筆? " + resultList.size() + " 筆");
-		logger.info("#1585埋log追蹤inquire(): 結束inquire()");
-		System.out.println("#1585埋log追蹤inquire(): 最後回送resultList有幾筆? " + resultList.size() + " 筆");
-		System.out.println("#1585埋log追蹤inquire(): 結束inquire()");
+		//logger.info("#1585埋log追蹤inquire(): 最後回送resultList有幾筆? " + resultList.size() + " 筆");
+		//logger.info("#1585埋log追蹤inquire(): 結束inquire()");
+		//System.out.println("#1585埋log追蹤inquire(): 最後回送resultList有幾筆? " + resultList.size() + " 筆");
+		//System.out.println("#1585埋log追蹤inquire(): 結束inquire()");
 		this.sendRtnObject(outputVO);
 	}
 	

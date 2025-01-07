@@ -6,9 +6,11 @@ import com.systex.jbranch.platform.common.dataManager.DataManager;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
+import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
 import com.systex.jbranch.platform.server.info.SysInfo;
 import com.systex.jbranch.platform.server.info.SystemVariableConsts;
+import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
 import org.apache.commons.lang.StringUtils;
@@ -37,7 +39,6 @@ public class ORG140 extends FubonWmsBizLogic {
 	
 	public void getRoleList (Object body, IPrimitiveMap header) throws JBranchException {
 		
-		ORG140InputVO inputVO = (ORG140InputVO) body;
 		ORG140OutputVO outputVO = new ORG140OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -45,7 +46,7 @@ public class ORG140 extends FubonWmsBizLogic {
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT PARAM_CODE AS DATA, PARAM_NAME AS LABEL ");
 		sb.append("FROM TBSYSPARAMETER ");
-		sb.append("WHERE PARAM_TYPE IN ('ORG.CERT_MGR', 'ORG.CERT_FC', 'ORG.CERT_PS', 'ORG.CERT_OP_1', 'ORG.CERT_OP_2', 'ORG.CERT_NEWAO', 'ORG.CERT_PAO') ");
+		sb.append("WHERE PARAM_TYPE IN ('ORG.CERT_MGR', 'ORG.CERT_FC', 'ORG.CERT_PS', 'ORG.CERT_OP_1', 'ORG.CERT_OP_2', 'ORG.CERT_NEWAO', 'ORG.CERT_PAO', 'ORG.CERT_UHRM', 'ORG.CERT_JRM') ");
 		sb.append("ORDER BY PARAM_TYPE, PARAM_ORDER, PARAM_CODE ");
 		
 		queryCondition.setQueryString(sb.toString());
@@ -57,17 +58,23 @@ public class ORG140 extends FubonWmsBizLogic {
 
 	public void queryData(Object body, IPrimitiveMap header) throws JBranchException {
 		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+
 		ORG140InputVO inputVO = (ORG140InputVO) body;
 		ORG140OutputVO outputVO = new ORG140OutputVO();
 		dam = this.getDataAccessManager();
-
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		
 		StringBuffer sb = new StringBuffer();
+		
 		sb.append("WITH CERT_GROUP_LIST AS ( ");
 		sb.append("  SELECT PARAM_TYPE AS CERT_GROUP, PARAM_CODE AS PRIVILEGEID ");
 		sb.append("  FROM TBSYSPARAMETER ");
-		sb.append("  WHERE PARAM_TYPE IN ('ORG.CERT_MGR', 'ORG.CERT_FC', 'ORG.CERT_PS', 'ORG.CERT_OP_1', 'ORG.CERT_OP_2', 'ORG.CERT_NEWAO', 'ORG.CERT_PAO') ");
+		sb.append("  WHERE PARAM_TYPE IN ('ORG.CERT_MGR', 'ORG.CERT_FC', 'ORG.CERT_PS', 'ORG.CERT_OP_1', 'ORG.CERT_OP_2', 'ORG.CERT_NEWAO', 'ORG.CERT_PAO', 'ORG.CERT_UHRM', 'ORG.CERT_JRM') ");
 		sb.append(") ");
 		sb.append(", CERT_MAIN_LIST AS ( ");
 		sb.append("  SELECT REPLACE(PARAM_TYPE, '_LIST', '') AS CERT_GROUP, PARAM_CODE AS CERT_ID, PARAM_NAME AS CERT_NAME, PARAM_DESC AS CERT_GET_TYPE, PARAM_ORDER AS CERT_ORDER ");
@@ -108,12 +115,16 @@ public class ORG140 extends FubonWmsBizLogic {
 		
 		sb.append(") ");
 		
-		sb.append("SELECT DISTINCT REGION_CENTER_ID, REGION_CENTER_NAME, ");
-		sb.append("       BRANCH_AREA_ID, BRANCH_AREA_NAME, ");
-		sb.append("       BRANCH_NBR, BRANCH_NAME, ");
+		sb.append("SELECT DISTINCT REGION_CENTER_ID, ");
+		sb.append("       REGION_CENTER_NAME, ");
+		sb.append("       BRANCH_AREA_ID, ");
+		sb.append("       BRANCH_AREA_NAME, ");
+		sb.append("       BRANCH_NBR, ");
+		sb.append("       BRANCH_NAME, ");
 		sb.append("       EMP_ID, ");
 		sb.append("       EMP_NAME, ");
 		sb.append("       ROLE_ID, ");
+		sb.append("       EMP_DEPT_ID, ");
 		sb.append("       JOB_TITLE_NAME, ");
 		sb.append("       ROLE_NAME, ");
 		sb.append("       IS_PRIMARY_ROLE, ");
@@ -129,66 +140,62 @@ public class ORG140 extends FubonWmsBizLogic {
 		sb.append("       EXPECTED_END_FLAG, ");
 		sb.append("       ONBOARD_DATE ");
 		sb.append("FROM ( ");
-		sb.append("  SELECT BASE.REGION_CENTER_ID, BASE.REGION_CENTER_NAME, ");
-		sb.append("         BASE.BRANCH_AREA_ID, BASE.BRANCH_AREA_NAME, ");
-		sb.append("         BASE.BRANCH_NBR, BASE.BRANCH_NAME, ");
+		sb.append("  SELECT CASE WHEN PRI.PRIVILEGEID LIKE 'UHRM%' THEN BASE.DEPT_ID_30 ELSE BASE.REGION_CENTER_ID END AS REGION_CENTER_ID, ");
+		sb.append("         CASE WHEN PRI.PRIVILEGEID LIKE 'UHRM%' THEN BASE.DEPT_NAME_30 ELSE BASE.REGION_CENTER_NAME END AS REGION_CENTER_NAME, ");
+		sb.append("         CASE WHEN PRI.PRIVILEGEID LIKE 'UHRM%' THEN BASE.DEPT_ID_40 ELSE BASE.BRANCH_AREA_ID END AS BRANCH_AREA_ID, ");
+		sb.append("         CASE WHEN PRI.PRIVILEGEID LIKE 'UHRM%' THEN BASE.DEPT_NAME_40 ELSE BASE.BRANCH_AREA_NAME END AS BRANCH_AREA_NAME, ");
+		sb.append("         BASE.BRANCH_NBR, ");
+		sb.append("         BASE.BRANCH_NAME, ");
 		sb.append("         BASE.EMP_ID, ");
 		sb.append("         BASE.EMP_NAME, ");
 		sb.append("         BASE.ROLE_ID, ");
 		sb.append("         BASE.ROLE_NAME, ");
-		sb.append("         BASE.IS_PRIMARY_ROLE, ");
-		sb.append("         CASE WHEN M.JOB_TITLE_NAME IS NOT NULL THEN M.JOB_TITLE_NAME WHEN MP.JOB_TITLE_NAME IS NOT NULL THEN MP.JOB_TITLE_NAME ELSE NULL END AS JOB_TITLE_NAME, PRI.PRIVILEGEID, CGL.CERT_GROUP, ");
+		sb.append("         BASE.ROLE_TYPE AS IS_PRIMARY_ROLE, ");
+		sb.append("         BASE.EMP_DEPT_ID, ");
+		sb.append("         CASE WHEN M.JOB_TITLE_NAME IS NOT NULL THEN M.JOB_TITLE_NAME WHEN MP.JOB_TITLE_NAME IS NOT NULL THEN MP.JOB_TITLE_NAME ELSE NULL END AS JOB_TITLE_NAME, ");
+		sb.append("         PRI.PRIVILEGEID, ");
+		sb.append("         CGL.CERT_GROUP, ");
 		sb.append("         (SELECT LISTAGG(CERT_ID, ',') WITHIN GROUP (ORDER BY CERT_ORDER) FROM CERT_MAIN_LIST CML WHERE CML.CERT_GROUP = CGL.CERT_GROUP AND CML.CERT_GET_TYPE = 'CHOOSE_ONE') AS CHOOSE_ONE_LIST, ");
 		sb.append("         (SELECT LISTAGG(CERTIFICATE_CODE, ',') WITHIN GROUP (ORDER BY CERT_ORDER) FROM MEM_CERT_LIST MCL WHERE MCL.EMP_ID = BASE.EMP_ID AND MCL.CERT_GET_TYPE = 'CHOOSE_ONE') AS CHOOSE_ONE_GET_LIST, ");
 		sb.append("         (SELECT LISTAGG(CERT_ID, ',') WITHIN GROUP (ORDER BY CERT_ORDER) FROM CERT_MAIN_LIST CML WHERE CML.CERT_GROUP = CGL.CERT_GROUP AND CML.CERT_GET_TYPE = 'CHOOSE_ONE' AND CERT_ID NOT IN (SELECT CERTIFICATE_CODE FROM MEM_CERT_LIST MCL WHERE MCL.EMP_ID = BASE.EMP_ID AND MCL.CERT_GET_TYPE = 'CHOOSE_ONE' AND MCL.REG_DATE IS NOT NULL)) AS CHOOSE_ONE_NON_GET_LIST, ");
 		sb.append("         (SELECT LISTAGG(CERT_ID, ',') WITHIN GROUP (ORDER BY CERT_ORDER) AS ROLE_ID FROM CERT_MAIN_LIST CML WHERE CML.CERT_GROUP = CGL.CERT_GROUP AND CML.CERT_GET_TYPE = 'ESSENTIAL') AS ESSENTIAL_LIST, ");
 		sb.append("         (SELECT LISTAGG(CERTIFICATE_CODE, ',') WITHIN GROUP (ORDER BY CERT_ORDER) FROM MEM_CERT_LIST MCL WHERE MCL.EMP_ID = BASE.EMP_ID AND MCL.CERT_GET_TYPE = 'ESSENTIAL') AS ESSENTIAL_GET_LIST, ");
 		sb.append("         (SELECT LISTAGG(CERT_ID, ',') WITHIN GROUP (ORDER BY CERT_ORDER) AS ROLE_ID FROM CERT_MAIN_LIST CML WHERE CML.CERT_GROUP = CGL.CERT_GROUP AND CML.CERT_GET_TYPE = 'ESSENTIAL' AND CERT_ID NOT IN (SELECT CERTIFICATE_CODE FROM MEM_CERT_LIST MCL WHERE MCL.EMP_ID = BASE.EMP_ID AND MCL.CERT_GET_TYPE = 'ESSENTIAL' AND MCL.REG_DATE IS NOT NULL)) AS ESSENTIAL_NON_GET_LIST, ");
-		sb.append("         M.EXPECTED_END_DATE, CASE WHEN M.EXPECTED_END_DATE IS NULL THEN '✓' ELSE NULL END AS EXPECTED_END_FLAG, M.ONBOARD_DATE ");
-		sb.append("  FROM ( ");
-		sb.append("    SELECT REGION_CENTER_ID, REGION_CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_NBR, BRANCH_NAME, EMP_ID, EMP_NAME, ROLE_ID, JOB_TITLE_NAME, ROLE_TYPE AS IS_PRIMARY_ROLE, ROLE_NAME ");
-		sb.append("    FROM VWORG_EMP_INFO ");
-		sb.append("  ) BASE ");
+		sb.append("         M.EXPECTED_END_DATE, ");
+		sb.append("         CASE WHEN M.EXPECTED_END_DATE IS NULL THEN '✓' ELSE NULL END AS EXPECTED_END_FLAG, ");
+		sb.append("         M.ONBOARD_DATE ");
+		sb.append("  FROM VWORG_EMP_INFO BASE ");
 		sb.append("  LEFT JOIN TBSYSSECUROLPRIASS PRI ON BASE.ROLE_ID = PRI.ROLEID ");
 		sb.append("  LEFT JOIN CERT_GROUP_LIST CGL ON CGL.PRIVILEGEID = PRI.PRIVILEGEID ");
 		sb.append("  LEFT JOIN TBORG_MEMBER M ON BASE.EMP_ID = M.EMP_ID ");
 		sb.append("  LEFT JOIN TBORG_MEMBER_PLURALISM MP ON BASE.EMP_ID = MP.EMP_ID ");
 		sb.append("  WHERE CGL.PRIVILEGEID IN (SELECT PRIVILEGEID FROM CERT_GROUP_LIST) ");
 		sb.append(") A ");
-		sb.append("WHERE 1 = 1 "); //((CHOOSE_ONE_LIST IS NOT NULL AND CHOOSE_ONE_GET_LIST IS NULL) OR (ESSENTIAL_LIST <> ESSENTIAL_GET_LIST)) ");
+		sb.append("WHERE 1 = 1 "); 
 
-		// 為高端組織下，但非uhrm人員
-		// 2023/08/02 ADD MARK BY OCEAN : WMS-CR-20230714-01_高端業務移轉人管科報表功能調整
-		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") >= 0 &&
-			!StringUtils.equals(StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)), "uhrm")) {
-			sb.append("AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO U WHERE A.EMP_ID = U.EMP_ID) ");
+		if (isUHRMMGR || isUHRMBMMGR) {
+			sb.append("AND ( ");
+			sb.append("      A.EMP_ID IS NOT NULL ");
+			sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE A.EMP_DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID AND MT.DEPT_ID = :loginArea) ");
+			sb.append(") ");
+			
+			queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
+			queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
 		} else {
-			// 20210412 by 慧芝 : 證照大表乃個金總處客群業務處專屬之表單，請排除高端總處人員。 ==> modify by ocean
-//			sb.append("AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = A.EMP_ID) ");
-		}
-		
-		if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
-			sb.append("AND REGION_CENTER_ID = :regID "); //區域代碼
-			queryCondition.setObject("regID", inputVO.getRegion_center_id());
-		} else {
-			sb.append(" AND REGION_CENTER_ID IN (:rcIdList) ");
-			queryCondition.setObject("rcIdList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
-		}
-		
-		if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
-			sb.append("AND BRANCH_AREA_ID = :branID "); //營運區代碼
-			queryCondition.setObject("branID", inputVO.getBranch_area_id());
-		} else {
-			sb.append(" AND (BRANCH_AREA_ID IN (:opIdList) OR BRANCH_AREA_ID IS NULL) ");
-			queryCondition.setObject("opIdList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
-		}
-	
-		if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && Integer.valueOf(inputVO.getBranch_nbr()) > 0) {
-			sb.append("AND BRANCH_NBR like :branNbr "); //分行代碼
-			queryCondition.setObject("branNbr", inputVO.getBranch_nbr());
-		} else {
-			sb.append(" AND (BRANCH_NBR IN (:brNbrList) OR BRANCH_NBR IS NULL) ");
-			queryCondition.setObject("brNbrList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
+			if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && Integer.valueOf(inputVO.getBranch_nbr()) > 0) {
+				if (isHANDMGR || isARMGR || isOPMGR) {
+					sb.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE A.EMP_ID = MT.EMP_ID) ");
+				}
+				
+				sb.append("AND BRANCH_NBR like :branNbr "); 
+				queryCondition.setObject("branNbr", inputVO.getBranch_nbr());
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
+				sb.append("AND BRANCH_AREA_ID = :branID "); 
+				queryCondition.setObject("branID", inputVO.getBranch_area_id());
+			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
+				sb.append("AND REGION_CENTER_ID = :regID "); 
+				queryCondition.setObject("regID", inputVO.getRegion_center_id());
+			}
 		}
 		
 		if (!StringUtils.isBlank(inputVO.getEmpId())) {
@@ -201,10 +208,13 @@ public class ORG140 extends FubonWmsBizLogic {
 			queryCondition.setObject("empName", inputVO.getEmpName() + "%");
 		}
 		
-		if ("Y".equals(inputVO.getProbation())) {
-			sb.append("AND EXPECTED_END_DATE IS NULL "); //過試用期 
-		} else if ("N".equals(inputVO.getProbation())){
-			sb.append("AND EXPECTED_END_DATE IS NOT NULL "); //未過試用期
+		switch (inputVO.getProbation()) {
+			case "Y":
+				sb.append("AND EXPECTED_END_DATE IS NULL "); //過試用期 
+				break;
+			case "N":
+				sb.append("AND EXPECTED_END_DATE IS NOT NULL "); //未過試用期
+				break;
 		}
 		
 		if (null != inputVO.getOnboardDateStart()){   //入行日-起
@@ -229,7 +239,7 @@ public class ORG140 extends FubonWmsBizLogic {
 		}
 		
 		sb.append("ORDER BY REGION_CENTER_ID, BRANCH_AREA_ID, BRANCH_NBR, JOB_TITLE_NAME ");
-				
+
 		queryCondition.setQueryString(sb.toString());
 		
 		outputVO.setResultList(dam.exeQuery(queryCondition));
@@ -240,6 +250,13 @@ public class ORG140 extends FubonWmsBizLogic {
 	/*  === 產出Excel==== */
 	public void export(Object body, IPrimitiveMap header) throws JBranchException, Exception {
 		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+
 		ORG140InputVO inputVO = (ORG140InputVO) body;
 		ORG140OutputVO outputVO = new ORG140OutputVO();
 		dam = this.getDataAccessManager();
@@ -326,6 +343,7 @@ public class ORG140 extends FubonWmsBizLogic {
 		sb.append("         MEM_LIST.EMP_ID, ");
 		sb.append("         MEM_LIST.JOB_TITLE_NAME, ");
 		sb.append("         MEM_LIST.ROLE_NAME, ");
+		sb.append("         MEM_LIST.EMP_DEPT_ID, ");
 		sb.append("         CASE WHEN MEM_LIST.IS_PRIMARY_ROLE = 'Y' THEN '是' ELSE '否' END AS IS_PRIMARY_ROLE, ");
 		sb.append("         CERT_ALL.CERT_ID, ");
 		sb.append("         CASE WHEN CERT_ALL.CERT_DESC = 'ESSENTIAL' AND MC.REG_DATE IS NOT NULL AND (MC.UNREG_DATE IS NOT NULL AND TO_CHAR(MC.REG_DATE, 'yyyyMMdd') < TO_CHAR(MC.UNREG_DATE, 'yyyyMMdd')) THEN NULL ");	// 若為 必要取得證照 且 人資證照檔登錄日期有值 且(註銷日有值 且 登錄日 < 註銷日) → 顯示空值
@@ -337,12 +355,17 @@ public class ORG140 extends FubonWmsBizLogic {
 		sb.append("              WHEN CERT_ALL.CERT_DESC = 'CHOOSE_ONE' AND MC.REG_DATE IS NULL AND MC.CERTIFICATE_GET_DATE IS NOT NULL THEN TO_CHAR(MC.CERTIFICATE_GET_DATE, 'yyyy/MM/dd') "); // 若為 非必要取得證照 且 人資證照檔登錄日期為空值 且 人資證照檔取得日期有值 → 顯示人資證照檔取得日期
 		sb.append("              WHEN CERT_ALL.CERT_DESC = 'CHOOSE_ONE' AND MC.REG_DATE IS NULL AND MC.CERTIFICATE_GET_DATE IS NULL AND MC.APPLY_DATE IS NOT NULL THEN TO_CHAR(MC.APPLY_DATE, 'yyyy/MM/dd') "); // 若為 非必要取得證照 且 人資證照檔登錄日期為空值 且 人資證照檔取得日期為空值 且 人資證照檔申請日期有值 → 顯示人資證照檔申請日期
 		sb.append("         ELSE NULL END AS REG_DATE, "); // 若以上條件皆不符合 → 顯示人資證照檔登錄日期
-		sb.append("         EXPECTED_END_FLAG, TO_CHAR(ONBOARD_DATE, 'yyyy/MM/dd') AS ONBOARD_DATE, TO_CHAR(JOB_RESIGN_DATE, 'yyyy/MM/dd') AS JOB_RESIGN_DATE ");
+		sb.append("         EXPECTED_END_FLAG, ");
+		sb.append("         TO_CHAR(ONBOARD_DATE, 'yyyy/MM/dd') AS ONBOARD_DATE, ");
+		sb.append("         TO_CHAR(JOB_RESIGN_DATE, 'yyyy/MM/dd') AS JOB_RESIGN_DATE ");
 		sb.append("  FROM CERT_ALL ");
 		sb.append("  LEFT JOIN ( ");
-		sb.append("    SELECT INFO.REGION_CENTER_ID, INFO.REGION_CENTER_NAME, ");
-		sb.append("           INFO.BRANCH_AREA_ID, INFO.BRANCH_AREA_NAME, ");
-		sb.append("           INFO.BRANCH_NBR, INFO.BRANCH_NAME, ");
+		sb.append("    SELECT CASE WHEN INFO.PRIVILEGEID LIKE 'UHRM%' THEN INFO.DEPT_ID_30 ELSE INFO.REGION_CENTER_ID END AS REGION_CENTER_ID, ");
+		sb.append("           CASE WHEN INFO.PRIVILEGEID LIKE 'UHRM%' THEN INFO.DEPT_NAME_30 ELSE INFO.REGION_CENTER_NAME END AS REGION_CENTER_NAME, ");
+		sb.append("           CASE WHEN INFO.PRIVILEGEID LIKE 'UHRM%' THEN INFO.DEPT_ID_40 ELSE INFO.BRANCH_AREA_ID END AS BRANCH_AREA_ID, ");
+		sb.append("           CASE WHEN INFO.PRIVILEGEID LIKE 'UHRM%' THEN INFO.DEPT_NAME_40 ELSE INFO.BRANCH_AREA_NAME END AS BRANCH_AREA_NAME, ");
+		sb.append("           INFO.BRANCH_NBR, ");
+		sb.append("           INFO.BRANCH_NAME, ");
 		sb.append("           MBR.EMP_ID, ");
 		sb.append("           MBR.EMP_NAME, ");
 		sb.append("           MBR.JOB_TITLE_NAME, ");
@@ -353,13 +376,14 @@ public class ORG140 extends FubonWmsBizLogic {
 		sb.append("           MBR.EXPECTED_END_DATE, ");
 		sb.append("           CASE WHEN MBR.EXPECTED_END_DATE IS NULL THEN '✓' ELSE NULL END AS EXPECTED_END_FLAG, ");
 		sb.append("           MBR.ONBOARD_DATE, ");
-		sb.append("           MBR.JOB_RESIGN_DATE ");
+		sb.append("           MBR.JOB_RESIGN_DATE, ");
+		sb.append("           INFO.EMP_DEPT_ID ");
 		sb.append("    FROM VWORG_EMP_INFO INFO ");
 		sb.append("    LEFT JOIN TBORG_MEMBER MBR ON INFO.EMP_ID = MBR.EMP_ID ");
 		sb.append("    WHERE INFO.PRIVILEGEID IN ( ");
 		sb.append("      SELECT PARAM_CODE ");
 		sb.append("      FROM TBSYSPARAMETER ");
-		sb.append("      WHERE PARAM_TYPE IN ('ORG.CERT_MGR', 'ORG.CERT_FC', 'ORG.CERT_PS', 'ORG.CERT_OP_1', 'ORG.CERT_OP_2', 'ORG.CERT_NEWAO', 'ORG.CERT_PAO') ");
+		sb.append("      WHERE PARAM_TYPE IN ('ORG.CERT_MGR', 'ORG.CERT_FC', 'ORG.CERT_PS', 'ORG.CERT_OP_1', 'ORG.CERT_OP_2', 'ORG.CERT_NEWAO', 'ORG.CERT_PAO', 'ORG.CERT_UHRM', 'ORG.CERT_JRM') ");
 		sb.append("    ) ");
 		sb.append("  ) MEM_LIST ON 1 = 1 ");
 		sb.append("  LEFT JOIN TBORG_MEMBER_CERT MC ON MEM_LIST.EMP_ID = MC.EMP_ID AND CERT_ALL.CERT_ID = MC.CERTIFICATE_CODE ");
@@ -367,39 +391,31 @@ public class ORG140 extends FubonWmsBizLogic {
 		sb.append("	 LEFT JOIN TBORG_MEMBER_CERT MC_INS ON MEM_LIST.EMP_ID = MC_INS.EMP_ID AND CERT_MAPP.PARAM_DESC = MC_INS.CERTIFICATE_CODE ");
 		sb.append("  WHERE 1 = 1 ");
 		
-		// 為高端組織下，但非uhrm人員
-//		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") >= 0 &&
-//			!StringUtils.equals(StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)), "uhrm")) {
-//			sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = MEM_LIST.EMP_ID) ");
-//		} else {
-//			// 20210412 by 慧芝 : 證照大表乃個金總處客群業務處專屬之表單，請排除高端總處人員。 ==> modify by ocean
-//			sb.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = MEM_LIST.EMP_ID) ");
-//		}
-		
 		sb.append("  AND REGION_CENTER_NAME IS NOT NULL ");
 
-		if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
-			sb.append("AND MEM_LIST.REGION_CENTER_ID = :regID "); //區域代碼
-			queryCondition.setObject("regID", inputVO.getRegion_center_id());
+		if (isUHRMMGR || isUHRMBMMGR) {
+			sb.append("AND ( ");
+			sb.append("      A.EMP_ID IS NOT NULL ");
+			sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE A.EMP_DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID AND MT.DEPT_ID = :loginArea) ");
+			sb.append(") ");
+			
+			queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
+			queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
 		} else {
-			sb.append("AND (MEM_LIST.REGION_CENTER_ID IN (:rcIdList) OR MEM_LIST.REGION_CENTER_ID IS NULL) ");
-			queryCondition.setObject("rcIdList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
-		}
-		
-		if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
-			sb.append("AND MEM_LIST.BRANCH_AREA_ID = :branID "); //營運區代碼
-			queryCondition.setObject("branID", inputVO.getBranch_area_id());
-		} else {
-			sb.append("AND (MEM_LIST.BRANCH_AREA_ID IN (:opIdList) OR MEM_LIST.BRANCH_AREA_ID IS NULL) ");
-			queryCondition.setObject("opIdList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
-		}
-	
-		if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && Integer.valueOf(inputVO.getBranch_nbr()) > 0) {
-			sb.append("AND MEM_LIST.BRANCH_NBR like :branNbr "); //分行代碼
-			queryCondition.setObject("branNbr", inputVO.getBranch_nbr());
-		} else {
-			sb.append("AND (MEM_LIST.BRANCH_NBR IN (:brNbrList) OR MEM_LIST.BRANCH_NBR IS NULL) ");
-			queryCondition.setObject("brNbrList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
+			if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && Integer.valueOf(inputVO.getBranch_nbr()) > 0) {
+				if (isHANDMGR || isARMGR || isOPMGR) {
+					sb.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE A.EMP_ID = MT.EMP_ID) ");
+				}
+				
+				sb.append("AND MEM_LIST.BRANCH_NBR like :branNbr "); //分行代碼
+				queryCondition.setObject("branNbr", inputVO.getBranch_nbr());
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
+				sb.append("AND MEM_LIST.BRANCH_AREA_ID = :branID "); //營運區代碼
+				queryCondition.setObject("branID", inputVO.getBranch_area_id());
+			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
+				sb.append("AND MEM_LIST.REGION_CENTER_ID = :regID "); //區域代碼
+				queryCondition.setObject("regID", inputVO.getRegion_center_id());
+			}
 		}
 		
 		if (!StringUtils.isBlank(inputVO.getEmpId())) {
@@ -412,10 +428,13 @@ public class ORG140 extends FubonWmsBizLogic {
 			queryCondition.setObject("empName", "%" + inputVO.getEmpName() + "%");
 		}
 		
-		if ("Y".equals(inputVO.getProbation())) {
-			sb.append("AND (TO_CHAR(MEM_LIST.EXPECTED_END_DATE, 'YYYYMMDD') < TO_CHAR(SYSDATE, 'YYYYMMDD') OR MEM_LIST.EXPECTED_END_DATE IS NULL) "); //過試用期 
-		} else if ("N".equals(inputVO.getProbation())){
-			sb.append("AND (TO_CHAR(MEM_LIST.EXPECTED_END_DATE, 'YYYYMMDD') > TO_CHAR(SYSDATE, 'YYYYMMDD') AND MEM_LIST.EXPECTED_END_DATE IS NOT NULL) "); //未過試用期
+		switch (inputVO.getProbation()) {
+			case "Y":
+				sb.append("AND (TO_CHAR(MEM_LIST.EXPECTED_END_DATE, 'YYYYMMDD') < TO_CHAR(SYSDATE, 'YYYYMMDD') OR MEM_LIST.EXPECTED_END_DATE IS NULL) "); //過試用期 
+				break;
+			case "N":
+				sb.append("AND (TO_CHAR(MEM_LIST.EXPECTED_END_DATE, 'YYYYMMDD') > TO_CHAR(SYSDATE, 'YYYYMMDD') AND MEM_LIST.EXPECTED_END_DATE IS NOT NULL) "); //未過試用期
+				break;
 		}
 		
 		if (null != inputVO.getOnboardDateStart()){   //入行日-起
@@ -442,6 +461,7 @@ public class ORG140 extends FubonWmsBizLogic {
 		sb.append("ORDER BY REGION_CENTER_NAME, BRANCH_AREA_NAME, BRANCH_NBR, ROLE_NAME, EMP_ID ");
 				
 		queryCondition.setQueryString(sb.toString());
+		
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		
 		XSSFWorkbook wb = new XSSFWorkbook();
@@ -503,9 +523,6 @@ public class ORG140 extends FubonWmsBizLogic {
 	
 	/**
 	* 檢查Map取出欄位是否為Null
-	* 
-	* @param map
-	* @return String
 	*/
 	private String checkIsNull(Map map, String key) {
 		if(StringUtils.isNotBlank(String.valueOf(map.get(key))) && map.get(key) != null){

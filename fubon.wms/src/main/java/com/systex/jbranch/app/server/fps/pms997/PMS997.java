@@ -71,10 +71,7 @@ public class PMS997 extends FubonWmsBizLogic {
 	public PMS997OutputVO query(Object body) throws Exception {
 
 		initUUID();
-		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
-
+		
 		PMS997InputVO inputVO = (PMS997InputVO) body;
 		PMS997OutputVO outputVO = new PMS997OutputVO();
 		dam = this.getDataAccessManager();
@@ -82,7 +79,11 @@ public class PMS997 extends FubonWmsBizLogic {
 		StringBuffer sb = new StringBuffer();
 
 		String loginRoleID = null != inputVO.getSelectRoleID() ? inputVO.getSelectRoleID() : (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
-
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		
 		sb.append("SELECT CASE WHEN DEP.RM_FLAG = 'U' THEN 'Y' ELSE 'N' END AS RM_FLAG, ");
 		sb.append("       DEP.YYYYMM, ");
 		sb.append("       DEP.EMP_ID, ");
@@ -150,8 +151,7 @@ public class PMS997 extends FubonWmsBizLogic {
 				sb.append("AND ( ");
 				sb.append("  (DEP.RM_FLAG = 'B' AND ORG.BRANCH_AREA_ID = :branchAreaID) ");
 				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				if (isHANDMGR || isARMGR) {
 					sb.append("  OR (DEP.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE DEP.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :branchAreaID )) ");
 				}
 			
@@ -162,8 +162,7 @@ public class PMS997 extends FubonWmsBizLogic {
 				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 			}
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (!isHANDMGR && !isARMGR) {
 				sb.append("AND DEP.RM_FLAG = 'B' ");
 			}
 		} else {

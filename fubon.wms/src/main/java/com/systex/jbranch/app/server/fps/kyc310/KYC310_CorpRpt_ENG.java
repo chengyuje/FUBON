@@ -1205,10 +1205,6 @@ public class KYC310_CorpRpt_ENG extends FubonWmsBizLogic{
 		public void onEndPage(PdfWriter writer, Document document) {
 			try {
 				appendPageFourCorners(writer);//四角加號
-				//一共四頁，後三頁不顯示barcode
-				if(getKyc310Gen().isBank())
-					appendBarCodeForEndPage(writer);//barCode
-				
 				appendPageNumForEndPage(writer);//頁碼
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1259,86 +1255,7 @@ public class KYC310_CorpRpt_ENG extends FubonWmsBizLogic{
 			}
 			tmpTable.flushContent();
 		}
-		
-		//產生barCode
-		public void appendBarCodeForEndPage(PdfWriter writer){
-			// #2252_調整KYC問卷條碼及版次
-        	if (writer.getPageNumber() != 1) return;
-        	
-			PdfPTable tBarCodeTable = new PdfPTable(6);//表格
-			tBarCodeTable.setTotalWidth(545);
-			
-			PdfContentByte pdfContentByte = writer.getDirectContent();
-			
-			Date createDate = (Date)getInputVO().getBasic_information().get("CREATE_DATE");//鑑機日期
-			String codeDate = "";
-			if(createDate != null){
-				Calendar calCreateDate = Calendar.getInstance();
-				calCreateDate.setTime(createDate);
-				String twYear = String.valueOf(calCreateDate.get(Calendar.YEAR) - 1911);
-				String month =  (calCreateDate.get(Calendar.MONTH) + 1) < 10 ? "0" : "";
-				month += (calCreateDate.get(Calendar.MONTH) + 1);
-				String day = String.valueOf(calCreateDate.get(Calendar.DAY_OF_MONTH));
-				codeDate = twYear + month + day;
-			}
-			else{
-				twYear = Integer.parseInt(year) - 1911;//民國年
-				codeDate = String.valueOf(twYear) + (month.matches("\\d{2}") ? "" : "0") + month + (day.matches("\\d{2}") ? "" : "0") + day;
-			}
-			
-			PdfPCell blank = new PdfPCell();//空白列
-    		blank.setBorderWidth(0);//邊框寬度
-    		blank.setFixedHeight(10);//儲存格高度
 
-    		//barcode - tw date
-			Barcode39 code39 = new Barcode39();
-			code39.setCode(codeDate);//設定內容為民國年月日
-			code39.setBarHeight(14);//設定高度
-			
-			PdfPCell cell = new PdfPCell();//產生列物件
-    		cell.setFixedHeight(30);//儲存格高度
-        	cell.setPadding(0);	//間格
-    		cell.setBorderWidth(0); //邊框的寬度
-    		cell.addElement(code39.createImageWithBarcode(pdfContentByte, null, null));//產生一張barCode圖片並添加到列中
-    		
-    		tBarCodeTable.addCell(cell);//添加到表中
-    		tBarCodeTable.addCell(blank);
-			
-			//barcode - 客戶ID
-			code39 = new Barcode39();
-			code39.setCode(custId);
-			code39.setBarHeight(18);//設定高度
-			
-			cell = new PdfPCell();
-    		cell.setFixedHeight(30);//儲存格高度
-        	cell.setPadding(0);	//間格
-    		cell.setBorderWidth(0); //邊框的寬度
-    		cell.addElement(code39.createImageWithBarcode(pdfContentByte, null, null));//產生一張barCode圖片並添加到列中
-			
-    		tBarCodeTable.addCell(cell);//添加到表中
-    		tBarCodeTable.addCell(blank);
-			
-			//barcode - page
-			code39 = new Barcode39();
-			code39.setCode("88-0601-99");
-			code39.setBarHeight(12);
-			code39.setSize(6);
-			code39.setBaseline(6);
-			
-    		Image image = code39.createImageWithBarcode(pdfContentByte, null, null);
-    		image.setWidthPercentage(90);
-    		
-    		cell = new PdfPCell();
-			cell.setColspan(2);
-    		cell.setFixedHeight(30);
-        	cell.setPadding(0);	
-    		cell.setBorderWidth(0);
-    		cell.addElement(image);
-    		
-    		tBarCodeTable.addCell(cell);//添加到表中
-    		tBarCodeTable.writeSelectedRows(0, -1, 25, 80, writer.getDirectContent());
-		}
-		
 		//產生頁碼
 		public void appendPageNumForEndPage(PdfWriter writer) throws DocumentException{			
 			PdfPTable tPageNum = null;

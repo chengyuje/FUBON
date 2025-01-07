@@ -1,7 +1,7 @@
 /*
   交易畫面邏輯定義
   請修改 Controller 名稱，以符合交易畫面的定義
-  金市SN債
+  金市結構債
  */
 'use strict';
 eSoafApp.controller('PRD141_DETAILController',
@@ -18,8 +18,6 @@ eSoafApp.controller('PRD141_DETAILController',
                 			return;
                 		}
 						$scope.snInfo = tota[0].body.resultList[0];
-						if ($scope.snInfo.INVESTMENT_TARGETS)
-							$scope.invest = $scope.snInfo.INVESTMENT_TARGETS.split(";");
 					}
 		});
 	
@@ -94,7 +92,7 @@ eSoafApp.controller('PRD141_DETAILController',
         			bottom: 55,
         			left: 65
         		},
-        		x: function(d){ return d.x; },
+        		x: function(d){ return new Date(d.x); },
         		y: function(d){ return d.y; },
         		useInteractiveGuideline: true,
         		xAxis: {
@@ -130,10 +128,13 @@ eSoafApp.controller('PRD141_DETAILController',
 //							for (var i = 0; i < $scope.CHART.length; i++) {
 //								$scope.data[0].values.push({ x: $scope.toJsDate($scope.CHART[i].BARGAIN_DATE), y: $scope.CHART[i].BUY_PRICE});
 //							}
-							$scope.data[0].values = [];
-							for (var i = 0; i < $scope.CHART.length; i++) {
-								$scope.data[0].values.push({ x: $scope.toJsDate($scope.CHART[i].NAV_DATE), y: $scope.CHART[i].NAV});
-							}
+			                $scope.data[0].values = [];
+			                for (var i = 0; i < $scope.CHART.length; i++) {
+			                    $scope.data[0].values.push({ 
+			                        x: $scope.CHART[i].NAV_DATE, 
+			                        y: $scope.CHART[i].NAV 
+			                    });
+			                }
 				            return;
 						}
 			});

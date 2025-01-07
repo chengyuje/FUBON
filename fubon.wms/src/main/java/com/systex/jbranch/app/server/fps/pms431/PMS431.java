@@ -84,8 +84,8 @@ public class PMS431 extends FubonWmsBizLogic {
 		String loginRoleID = null != inputVO.getSelectRoleID() ? inputVO.getSelectRoleID() : (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
 
 		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
 
 		sb.append("SELECT * ");
 		sb.append("FROM ( ");
@@ -142,6 +142,16 @@ public class PMS431 extends FubonWmsBizLogic {
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) { 		
 			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("  AND RPT.AO_BRANCH_NBR = :branch ");
+				sb.append("  AND CASE WHEN ( ");
+				sb.append("           SELECT COUNT(1) ");
+				sb.append("           FROM TBPMS_HIGH_RISK_INV_D_REP D ");
+				sb.append("           WHERE RPT.SNAP_YYYYMM = D.SNAP_YYYYMM ");
+				sb.append("           AND RPT.AO_BRANCH_NBR = D.AO_BRANCH_NBR ");
+				sb.append("           AND RPT.AO_EMP_CID = D.AO_EMP_ID ");
+				sb.append("           AND RPT.KIND_TYPE = D.KIND_TYPE ");
+				sb.append("           AND D.RM_FLAG = 'U' ");
+				sb.append("         ) > 0 THEN 'Y' ELSE 'N' END = 'N' ");
+				
 				queryCondition.setObject("branch", inputVO.getBranch_nbr());
 			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
 				sb.append("  AND ( ");
@@ -156,8 +166,7 @@ public class PMS431 extends FubonWmsBizLogic {
 				sb.append("      ) > 0 THEN 'Y' ELSE 'N' END = 'Y' ");
 				sb.append("      AND DEFN.BRANCH_AREA_ID = :BRANCH_AREA_IDD) ");
 				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				if (isHANDMGR || isARMGR) {
 					sb.append("  OR ( ");
 					sb.append("      (CASE WHEN ( ");
 					sb.append("         SELECT COUNT(1) ");
@@ -168,7 +177,7 @@ public class PMS431 extends FubonWmsBizLogic {
 					sb.append("         AND RPT.KIND_TYPE = D.KIND_TYPE ");
 					sb.append("         AND D.RM_FLAG = 'U' ");
 					sb.append("      ) > 0 THEN 'Y' ELSE 'N' END = 'Y' ");
-					sb.append("      AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.AO_EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD )");
+					sb.append("      AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.AO_EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD) ");
 					sb.append("  ) ");
 				}
 			
@@ -180,8 +189,7 @@ public class PMS431 extends FubonWmsBizLogic {
 			}
 			
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (!isHANDMGR && !isARMGR) {
 				sb.append("  AND CASE WHEN ( ");
 				sb.append("    SELECT COUNT(1) ");
 				sb.append("    FROM TBPMS_HIGH_RISK_INV_D_REP D ");
@@ -246,7 +254,7 @@ public class PMS431 extends FubonWmsBizLogic {
 		}
 
 		sb.append("ORDER BY BASE.CREATETIME DESC, BASE.BRANCH_NBR, BASE.AO_EMP_ID, BASE.KIND_TYPE ");
-
+System.out.println(sb.toString());
 		queryCondition.setQueryString(sb.toString());
 
 		ResultIF list = dam.executePaging(queryCondition, inputVO.getCurrentPageIndex() + 1, inputVO.getPageCount());

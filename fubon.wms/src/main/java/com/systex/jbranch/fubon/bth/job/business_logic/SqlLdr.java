@@ -9,10 +9,11 @@ import java.util.List;
 
 public class SqlLdr {
 
-	private static String ROOTNAME = "D:\\";
-	private static String CTL_SUFFIX = ".ctl";
-	private static String LOG_SUFFIX = ".log";
-	private static String BLANKS = " ";
+	public static String ROOTNAME = "D:\\";
+	public static String CTL_SUFFIX = ".ctl";
+	public static String LOG_SUFFIX = ".log";
+	public static String BAD_SUFFIX = ".bad";
+	public static String BLANKS = " ";
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		// SIT >> WMSUSER/WMSUSER@172.19.243.30:5211/TWMSM
@@ -25,12 +26,16 @@ public class SqlLdr {
 
 		DatabaseInfo info = new DatabaseInfo(db_name);
 
-		String ctlName = "TBCRM_PIMDATA";
-		String logName = ctlName;
-		String srcName = "PIMDATA_20241206_R.TXT";
+//		String ctlName = "TBCRM_AST_INV_VPSN_TXN";
+//		String logName = ctlName;
+//		String srcName = "tradefile_20241210.txt";	
 		
-		SqlLdr ldr = new SqlLdr();
-		String command = ldr.getCommand(info, ctlName, logName, srcName);
+		String ctlName = "TBCRM_AST_INV_VPSN_BILL";
+		String logName = ctlName;
+		String srcName = "assets.txt";
+		
+		Utility util = new Utility();
+		String command = util.getCommand(info, ctlName, logName, srcName);
 
 //		StringTokenizer st = new StringTokenizer(command, SqlLdr.BLANKS);
 //		String[] command_array = new String[st.countTokens()];
@@ -43,11 +48,17 @@ public class SqlLdr {
 		Process p = Runtime.getRuntime().exec(command);
 		p.waitFor();
 		p.getOutputStream().close();
-		ldr.printLog(logName);
+		util.printLog(logName);
+//		util.delete(logName, srcName.substring(0, srcName.indexOf(".")));
 
 	}
 
-	private String getCommand(DatabaseInfo info, String ctlName, String logName, String srcName) {
+}
+
+class Utility {
+	
+	
+	public String getCommand(DatabaseInfo info, String ctlName, String logName, String srcName) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("cmd").append(SqlLdr.BLANKS);
 		sb.append("/c").append(SqlLdr.BLANKS);
@@ -68,7 +79,7 @@ public class SqlLdr {
 		return sb.toString();
 	}
 
-	private void printLog(String logName) {
+	public void printLog(String logName) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(SqlLdr.ROOTNAME);
 		sb.append(logName).append(SqlLdr.LOG_SUFFIX);
@@ -95,6 +106,30 @@ public class SqlLdr {
 		}
 
 	}
+	
+	public void delete(String file, String src) {	
+		StringBuilder sb = null;
+		
+		sb = new StringBuilder()
+				.append(SqlLdr.ROOTNAME)
+				.append(file)
+				.append(SqlLdr.LOG_SUFFIX);
+		Path path = Paths.get(sb.toString());
+		
+		sb = new StringBuilder()
+				.append(SqlLdr.ROOTNAME)
+				.append(src)
+				.append(SqlLdr.BAD_SUFFIX);
+		Path path2 = Paths.get(sb.toString());
+		try {
+			Files.deleteIfExists(path);
+			Files.deleteIfExists(path2);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 }
 
 class DatabaseInfo {

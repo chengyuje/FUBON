@@ -177,16 +177,19 @@ public class PMS998 extends FubonWmsBizLogic {
 	public void query(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
 
 		initUUID();
-		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
-
+		
 		PMS998InputVO inputVO = (PMS998InputVO) body;
 		PMS998OutputVO outputVO = new PMS998OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
+		
+		String loginRoleID = (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
 
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		
 		sb.append("SELECT CASE WHEN (SELECT COUNT(1) FROM TBORG_UHRM_BRH UB WHERE UB.EMP_ID = A.EMP_ID) > 0 THEN 'Y' ELSE 'N' END AS RM_FLAG,  ");
 		sb.append("       A.SEQ, ");
 		sb.append("       A.BRANCH_NBR, ");
@@ -223,8 +226,7 @@ public class PMS998 extends FubonWmsBizLogic {
 				sb.append("AND ( ");
 				sb.append("  (NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UB WHERE UB.EMP_ID = A.EMP_ID) AND DEFN.BRANCH_AREA_ID = :branchAreaID) ");
 				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				if (isHANDMGR || isARMGR) {
 					sb.append("  OR (EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UB WHERE UB.EMP_ID = A.EMP_ID) AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE DEP.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :branchAreaID )) ");
 				}
 			
@@ -233,13 +235,12 @@ public class PMS998 extends FubonWmsBizLogic {
 			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
 				sb.append("AND DEFN.REGION_CENTER_ID = :regionCenterID ");
 				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
-			} else if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			} else if (!isHANDMGR) {
 				sb.append("AND (DEFN.BRANCH_NBR IN (:branchIDList) OR DEFN.BRANCH_NBR IS NULL) ");
 				queryCondition.setObject("branchIDList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
 			}
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (!isHANDMGR && !isARMGR) {
 				sb.append("AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UB WHERE UB.EMP_ID = A.EMP_ID) ");
 			}
 		} else {

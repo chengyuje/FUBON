@@ -42,10 +42,6 @@ public class PMS424 extends FubonWmsBizLogic {
 	public PMS424OutputVO query (Object body) throws JBranchException {
 		
 		initUUID();
-		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); // 總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
-
 		PMS424InputVO inputVO = (PMS424InputVO) body;
 		PMS424OutputVO outputVO = new PMS424OutputVO();
 		dam = this.getDataAccessManager();
@@ -53,6 +49,10 @@ public class PMS424 extends FubonWmsBizLogic {
 		StringBuffer sb = new StringBuffer();
 
 		String loginRoleID = null != inputVO.getSelectRoleID() ? inputVO.getSelectRoleID() : (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
 
 		sb.append("SELECT ROWNUM, A.* ");
 		sb.append("FROM ( ");
@@ -112,8 +112,7 @@ public class PMS424 extends FubonWmsBizLogic {
 				sb.append("  AND ( ");
 				sb.append("    (DEP.RM_FLAG = 'B' AND ORG.BRANCH_AREA_ID = :BRANCH_AREA_IDD) ");
 				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				if (isHANDMGR || isARMGR) {
 					sb.append("    OR (DEP.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD )) ");
 				}
 			
@@ -124,8 +123,7 @@ public class PMS424 extends FubonWmsBizLogic {
 				queryCondition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
 			}
 
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (!isHANDMGR && !isARMGR) {
 				sb.append("  AND RPT.RM_FLAG = 'B' ");
 			}
 		} else {

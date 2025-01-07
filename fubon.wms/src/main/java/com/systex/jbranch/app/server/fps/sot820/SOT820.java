@@ -356,7 +356,8 @@ public class SOT820 extends SotPdf {
 		
 		Map<String, Object> rtnMap = new HashMap<String, Object>();
 		List<Map<String, String>> relList = new ArrayList<Map<String, String>>();
-		String ageOver65Rmk = "";		
+		
+		String ageOver65Rmk = "";	
 		//指示類型為"5.信託財產管理運用"
 		if (null != nmvp8DataVO && CollectionUtils.isNotEmpty(nmvp8DataVO.getDetails()) && StringUtils.equals("5", nmvp8DataVO.getINS_TYPE())) {
 			XmlInfo xmlInfo = new XmlInfo();
@@ -365,7 +366,6 @@ public class SOT820 extends SotPdf {
 			if(nmvp8DataVO.getDetails().size() == 1 && 
 					(StringUtils.isBlank(nmvp8DataVO.getDetails().get(0).getREL_NAME()) || StringUtils.isBlank(nmvp8DataVO.getDetails().get(0).getREL_TYPE()))) {
 				Map<String, String> map = new HashMap<String, String>();
-				
 				map.put("REL_TYPE", "");	//信託關係
 				map.put("REL_ID", "");		//關係人ID
 				map.put("REL_NAME", "");	//關係人姓名
@@ -382,8 +382,15 @@ public class SOT820 extends SotPdf {
 					
 					map.put("REL_TYPE", ObjectUtils.toString(xmlInfo.getVariable("CRM.MON_REL_TYPE", detailVO.getREL_TYPE(), "F3")));	//信託關係中文
 					map.put("REL_ID", detailVO.getREL_ID());		//關係人ID
-					map.put("REL_NAME", detailVO.getREL_NAME());	//關係人姓名
-								
+					
+					//#2269
+					String relName = checkHotName(detailVO.getREL_ID()); 
+					if (StringUtils.isNotBlank(relName)) {
+						map.put("REL_NAME", relName);
+					} else {
+						map.put("REL_NAME", detailVO.getREL_NAME());
+					}
+					
 					String ageover65 = "";
 					if(nmvp8DataVO.getCON_TYPE().matches("1|2") && StringUtils.equals("1", detailVO.getREL_TYPE()) && isAgeOver65(detailVO.getREL_ID())) {
 						ageover65 = "●"; 	//委託人單獨 或 委託人+全體信託監察人 => 判讀委託人年齡是否超過65歲
@@ -445,6 +452,27 @@ public class SOT820 extends SotPdf {
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		
 		return (CollectionUtils.isNotEmpty(list) && StringUtils.equals("Y", list.get(0).get("OVER65_YN").toString())) ? true : false;
+  	}
+  	
+  	/*
+  	 * #2269
+  	 * AS400回傳的編碼是ANSI，回傳到報表難字會顯示不出來
+  	 * REL_ID有出現在TBCRM_HOTNAME_FLAG裡面，
+  	 * 取 => TBCRM_HOTNAME.NAME
+  	 * 其餘使用400回傳
+  	 */
+  	private String checkHotName(String relID) throws Exception {
+  		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT A.NAME FROM ");
+		sb.append("TBCRM_HOTNAME A JOIN TBCRM_HOTNAME_FLAG B ");
+		sb.append("ON A.ID = B.ID ");
+		sb.append("WHERE A.ID = :relID");
+		queryCondition.setQueryString(sb.toString());
+		queryCondition.setObject("relID", relID);
+		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+		return list.size() > 0 ? list.get(0).get("NAME").toString() : "";
   	}
   	
 }

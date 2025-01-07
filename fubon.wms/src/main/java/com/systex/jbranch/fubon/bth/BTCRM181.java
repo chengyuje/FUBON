@@ -136,6 +136,8 @@ public class BTCRM181 extends FubonWmsBizLogic {
 				case "010":
 				case "011":
 					loginBranch = (String) map.get("E_BRANCH_NBR");
+				case "UHRM006":
+				case "UHRM012":
 				case "012":
 					loginArea = (String) map.get("E_BRANCH_AREA_ID");
 				case "013":
@@ -149,6 +151,8 @@ public class BTCRM181 extends FubonWmsBizLogic {
 				case "009":
 				case "010":
 				case "011":
+				case "UHRM006":
+				case "UHRM012":
 				case "012":
 				case "013":
 					//若無明細資料，則於前端無須呈現(針對分行主管) #5908
@@ -373,7 +377,7 @@ public class BTCRM181 extends FubonWmsBizLogic {
 							pms421InputVO.setUhrmOP(loginArea);
 
 							PMS421 pms421 = (PMS421) PlatformContext.getBean("pms421");
-							PMS421OutputVO pms421OutputVO = pms421.queryData2(pms421InputVO);
+							PMS421OutputVO pms421OutputVO = pms421.queryData(pms421InputVO);
 							if (CollectionUtils.isEmpty(pms421OutputVO.getResultList())) {
 								pstmt.setString(1, "N");
 								pstmt.addBatch();

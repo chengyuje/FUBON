@@ -13,11 +13,22 @@ eSoafApp.controller('CRM870_HISController',
 			maxDate: $scope.inputVO.endDate || $scope.maxDate,
 			minDate: $scope.minDate
 		};
-		
+
 		$scope.endDateOptions = {
 			maxDate: $scope.maxDate,
 			minDate: $scope.inputVO.startDate || $scope.minDate
 		};
+		
+		//清除
+		$scope.clear = function() {
+			if ($scope.inputVO.RPT_TYPE == 'DT_SEARCH') {
+				$scope.inputVO.startDate = null;
+				$scope.inputVO.endDate = null;
+				$scope.limitDate();
+			} else {
+				$scope.inputVO.prdID = "";
+			}
+		}
 		
 		// config
 		$scope.model = {};
@@ -29,23 +40,27 @@ eSoafApp.controller('CRM870_HISController',
 		
 		$scope.limitDate = function() {
 			// 起日最小值(一年)
-			var startDate_Min = new Date($scope.inputVO.endDate);
-			startDate_Min.setMonth(startDate_Min.getMonth() - 12);
-			startDate_Min.setHours(0, 0, 0, 0);
-			
-			$scope.startDateOptions.minDate = startDate_Min || $scope.minDate;	
-			
+			var startDate_Min = null;
+			if ($scope.inputVO.endDate != null) {
+				startDate_Min = new Date($scope.inputVO.endDate);
+				startDate_Min.setMonth(startDate_Min.getMonth() - 12);
+				startDate_Min.setHours(0, 0, 0, 0);
+			}
+			$scope.startDateOptions.minDate = startDate_Min || $scope.minDate;
+
 			// 起日最大值 (不限)
 			$scope.startDateOptions.maxDate = $scope.inputVO.endDate || $scope.maxDate;
 
 			// 迄日最小值
-			$scope.endDateOptions.minDate = $scope.inputVO.startDate || $scope.maxDate;
-			
+			$scope.endDateOptions.minDate = $scope.inputVO.startDate || $scope.minDate;
+
 			// 迄日最大值(一年)
-			var endDate_Max = new Date($scope.inputVO.startDate);
-			endDate_Max.setMonth(endDate_Max.getMonth() + 12);
-			endDate_Max.setHours(0, 0, 0, 0);
-			
+			var endDate_Max = null;
+			if($scope.inputVO.startDate != null) {
+				var endDate_Max = new Date($scope.inputVO.startDate);
+				endDate_Max.setMonth(endDate_Max.getMonth() + 12);
+				endDate_Max.setHours(0, 0, 0, 0);
+			}
 			$scope.endDateOptions.maxDate = endDate_Max || $scope.maxDate;
 		};
 		// date picker end
@@ -78,32 +93,35 @@ eSoafApp.controller('CRM870_HISController',
     																										   "prdID"     : $scope.inputVO.prdID, 
     																										   "rptType"   : $scope.inputVO.RPT_TYPE}, function(tota, isError) {
         		if (!isError) {
-        			switch (tabSheet) {
-	        			case 1:
-	        				$scope.outputVO_t_all = tota[0].body.txnList;
-	        				$scope.txnList_all = tota[0].body.txnList;
-	        				break;
-	        			case 2:
-	        				$scope.outputVO_t_stock = tota[0].body.txnList;
-	        				$scope.txnList_stock = tota[0].body.txnList;
-	        				break;
-	        			case 3:
-	        				$scope.outputVO_t_bond = tota[0].body.txnList;
-	        				$scope.txnList_bond = tota[0].body.txnList;
-	        				break;
-	        			case 4:
-	        				$scope.outputVO_t_sn = tota[0].body.txnList;
-	        				$scope.txnList_sn = tota[0].body.txnList;
-	        				break;
-	        			case 5:
-	        				$scope.outputVO_t_dsn = tota[0].body.txnList;
-	        				$scope.txnList_dsn = tota[0].body.txnList;
-	        				
-	        				$scope.outputVO_t_dsn_e = tota[0].body.maturityList;
-	        				$scope.txnList_dsn_e = tota[0].body.maturityList;
-	        				break;
-        			}
-        			
+					if (tota[0].body.txnList.length == 0) {
+						$scope.showMsg("查無資料");
+					} else {
+						switch (tabSheet) {
+							case 1:
+								$scope.outputVO_t_all = tota[0].body.txnList;
+								$scope.txnList_all = tota[0].body.txnList;
+								break;
+							case 2:
+								$scope.outputVO_t_stock = tota[0].body.txnList;
+								$scope.txnList_stock = tota[0].body.txnList;
+								break;
+							case 3:
+								$scope.outputVO_t_bond = tota[0].body.txnList;
+								$scope.txnList_bond = tota[0].body.txnList;
+								break;
+							case 4:
+								$scope.outputVO_t_sn = tota[0].body.txnList;
+								$scope.txnList_sn = tota[0].body.txnList;
+								break;
+							case 5:
+								$scope.outputVO_t_dsn = tota[0].body.txnList;
+								$scope.txnList_dsn = tota[0].body.txnList;
+
+								$scope.outputVO_t_dsn_e = tota[0].body.maturityList;
+								$scope.txnList_dsn_e = tota[0].body.maturityList;
+								break;
+						}
+					}
         			return;       			
         		}      		
         	});
@@ -134,29 +152,32 @@ eSoafApp.controller('CRM870_HISController',
     																										   "prdID"     : $scope.inputVO.prdID, 
     																										   "rptType"   : $scope.inputVO.RPT_TYPE}, function(tota, isError) {
         		if (!isError) {
-        			switch (tabSheet) {
-	        			case 1:
-	        				$scope.outputVO_d_all = tota[0].body;
-	        				$scope.divList_all = tota[0].body.divList;
-	        				break;
-	        			case 2:
-	        				$scope.outputVO_d_stock = tota[0].body;
-	        				$scope.divList_stock = tota[0].body.divList;
-	        				break;
-	        			case 3:
-	        				$scope.outputVO_d_bond = tota[0].body;
-	        				$scope.divList_bond = tota[0].body.divList;
-	        				break;
-	        			case 4:
-	        				$scope.outputVO_d_sn = tota[0].body;
-	        				$scope.divList_sn = tota[0].body.divList;
-	        				break;
-	        			case 5:
-	        				$scope.outputVO_d_dsn = tota[0].body;
-	        				$scope.divList_dsn = tota[0].body.divList;
-	        				break;
-        			}
-        			
+					if (tota[0].body.divList.length == 0) {
+						$scope.showMsg("配股/配息查無資料");
+					} else {
+						switch (tabSheet) {
+							case 1:
+								$scope.outputVO_d_all = tota[0].body;
+								$scope.divList_all = tota[0].body.divList;
+								break;
+							case 2:
+								$scope.outputVO_d_stock = tota[0].body;
+								$scope.divList_stock = tota[0].body.divList;
+								break;
+							case 3:
+								$scope.outputVO_d_bond = tota[0].body;
+								$scope.divList_bond = tota[0].body.divList;
+								break;
+							case 4:
+								$scope.outputVO_d_sn = tota[0].body;
+								$scope.divList_sn = tota[0].body.divList;
+								break;
+							case 5:
+								$scope.outputVO_d_dsn = tota[0].body;
+								$scope.divList_dsn = tota[0].body.divList;
+								break;
+						}
+					}
         			return;       			
         		}      		
         	});
@@ -213,7 +234,6 @@ eSoafApp.controller('CRM870_HISController',
 			endDate_Max.setDate(endDate_Max.getDate() - 1);
 			endDate_Max.setHours(0, 0, 0, 0);
 			$scope.inputVO.endDate = endDate_Max;
-			
 			$scope.limitDate();
 			
 			$scope.getTXNList($scope.tabSheet);

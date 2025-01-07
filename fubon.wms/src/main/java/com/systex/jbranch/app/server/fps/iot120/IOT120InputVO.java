@@ -92,6 +92,10 @@ public class IOT120InputVO extends PagingInputVO{
 	private String P_PREMIUM_TRANSSEQ_NEED_YN;
 	private String fromIOT110;
 	private String BUSINESS_REL;
+	private String PAY_SERV_RETURN_CODE;
+	private String PAY_SERV_REMIT_NATNO;
+	private String REMIT_COUNTRY_FLAG;
+	private String fromIOT120;
 
 	public String getAO_ID() {
 		return AO_ID;
@@ -592,6 +596,30 @@ public class IOT120InputVO extends PagingInputVO{
 	}
 	public void setBUSINESS_REL(String bUSINESS_REL) {
 		BUSINESS_REL = bUSINESS_REL;
+	}
+	public String getPAY_SERV_RETURN_CODE() {
+		return PAY_SERV_RETURN_CODE;
+	}
+	public void setPAY_SERV_RETURN_CODE(String pAY_SERV_RETURN_CODE) {
+		PAY_SERV_RETURN_CODE = pAY_SERV_RETURN_CODE;
+	}
+	public String getPAY_SERV_REMIT_NATNO() {
+		return PAY_SERV_REMIT_NATNO;
+	}
+	public void setPAY_SERV_REMIT_NATNO(String pAY_SERV_REMIT_NATNO) {
+		PAY_SERV_REMIT_NATNO = pAY_SERV_REMIT_NATNO;
+	}
+	public String getREMIT_COUNTRY_FLAG() {
+		return REMIT_COUNTRY_FLAG;
+	}
+	public void setREMIT_COUNTRY_FLAG(String rEMIT_COUNTRY_FLAG) {
+		REMIT_COUNTRY_FLAG = rEMIT_COUNTRY_FLAG;
+	}
+	public String getFromIOT120() {
+		return fromIOT120;
+	}
+	public void setFromIOT120(String fromIOT120) {
+		this.fromIOT120 = fromIOT120;
 	}
 
 }

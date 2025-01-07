@@ -324,10 +324,10 @@ public class PMS408 extends FubonWmsBizLogic {
 		String loginRoleID = null != inputVO.getSelectRoleID() ? inputVO.getSelectRoleID() : (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
 
 		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> fcMap = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2); // 理專
-		Map<String, String> psopMap = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2); // OP
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); // 總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
 
 		//20170918問題單3719:若為本日無異動時, 不判斷NOTE不為空而是改判斷SEQ=N
 		StringBuffer sql = new StringBuffer();
@@ -461,7 +461,7 @@ public class PMS408 extends FubonWmsBizLogic {
 			} else {
 				// 登入為銷售人員強制加AO_CODE
 				if (!"A157".equals(loginRoleID)) {
-					if (fcMap.containsKey(loginRoleID) || psopMap.containsKey(loginRoleID)) {
+					if (isFC || isPSOP) {
 
 						// 取得查詢資料可視範圍
 						PMS000 pms000 = (PMS000) PlatformContext.getBean("pms000");
@@ -484,8 +484,7 @@ public class PMS408 extends FubonWmsBizLogic {
 				sql.append("AND ( ");
 				sql.append("  (A.RM_FLAG = 'B' AND ARLIST.BRANCH_AREA_ID = :BRANCH_AREA_IDD) ");
 				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				if (isHANDMGR || isARMGR) {
 					sql.append("  OR (A.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE EMP.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD )) ");
 				}
 			
@@ -496,8 +495,7 @@ public class PMS408 extends FubonWmsBizLogic {
 				condition.setObject("REGION_CENTER_IDD", inputVO.getRegion_center_id());
 			}
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (!isHANDMGR && !isARMGR) {
 				sql.append("AND A.RM_FLAG = 'B' ");
 			}
 		} else {
@@ -660,7 +658,7 @@ public class PMS408 extends FubonWmsBizLogic {
 				break;
 		}
 		
-		String[] csvHeaderT = { "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1",  
+		String[] csvHeaderT = { "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1", "V1",  
 	  			   				"V2", "V2", "V2", "V2", "V2", "V2", "V2", "V2"}; 
 		String[] csvHeader 	= { "序號", "私銀註記", "資料日期", "分行代碼", "分行名稱", "公用電腦IP位置", "身分證字號", "客戶姓名", "高齡客戶", "AO Code", "風險承受度前", "風險承受度後", "測試/簽置日期", "資料來源", "短期多次重作KYC次數", "建立人", "建立人姓名", "專員沒有勸誘客戶提高風險屬性", "查證方式", "檢核說明", "首次建立時間", "最新異動人員", "最新異動日期",  
 			   	  			   	"前次測試/聲明代號", "前次題號", "前次題目", "前次答案", "本次測試/聲明代號", "本次題號", "本次題目", "本次答案"};

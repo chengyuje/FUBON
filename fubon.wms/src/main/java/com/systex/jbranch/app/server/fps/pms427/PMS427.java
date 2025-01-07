@@ -64,10 +64,6 @@ public class PMS427 extends FubonWmsBizLogic {
 	public PMS427OutputVO query(Object body) throws Exception {
 
 		initUUID();
-		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-		Map<String, String> armgrMap   = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2);	//處長
-
 		PMS427InputVO inputVO = (PMS427InputVO) body;
 		PMS427OutputVO outputVO = new PMS427OutputVO();
 		dam = this.getDataAccessManager();
@@ -75,6 +71,10 @@ public class PMS427 extends FubonWmsBizLogic {
 		StringBuffer sb = new StringBuffer();
 
 		String loginRoleID = null != inputVO.getSelectRoleID() ? inputVO.getSelectRoleID() : (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(loginRoleID);
 
 		sb.append("SELECT CASE WHEN CD.RM_FLAG = 'U' THEN 'Y' ELSE 'N' END AS RM_FLAG, ");
 		sb.append("       ORG.REGION_CENTER_ID, ");
@@ -131,8 +131,7 @@ public class PMS427 extends FubonWmsBizLogic {
 				sb.append("AND ( ");
 				sb.append("  (CD.RM_FLAG = 'B' AND ORG.BRANCH_AREA_ID = :branchAreaID) ");
 				
-				if (headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) ||
-					armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+				if (isHANDMGR || isARMGR) {
 					sb.append("  OR (CD.RM_FLAG = 'U' AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE CD.EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :branchAreaID )) ");
 				}
 			
@@ -143,8 +142,7 @@ public class PMS427 extends FubonWmsBizLogic {
 				queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 			}
 			
-			if (!headmgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE)) &&
-				!armgrMap.containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (!isHANDMGR && !isARMGR) {
 				sb.append("AND CD.RM_FLAG = 'B' ");
 			}
 		} else {

@@ -76,7 +76,7 @@ public class CRM435 extends FubonWmsBizLogic {
 //			e.printStackTrace();
 		}
 
-		this.sendRtnObject(returnVO);
+		this.sendRtnObject(null);
 	}
 
 	public void print(Object body, IPrimitiveMap<?> header) throws Exception {

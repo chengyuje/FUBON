@@ -47,17 +47,19 @@ eSoafApp.controller('CRM435Controller',
 			$scope.sendRecv("CRM435", "inquire", "com.systex.jbranch.app.server.fps.crm435.CRM435InputVO", $scope.inputVO,
 				function(tota, isError) {
 					if (!isError) {
-						var errMsg = tota[0].body.errMsg;
-						if (errMsg) {
-							$scope.showErrorMsg(errMsg);
-							return;
-						}
-						if (tota[0].body.resultList.length) {
-							$scope.resultList = tota[0].body.resultList;
-							$scope.outputVO = tota[0].body;
-						} else {
-							$scope.showMsg("ehl_01_common_009");
-						}
+						console.log("tota", tota);
+						console.log("tota.length > 0", tota.length>0);
+//						var errMsg = tota[0].body.errMsg;
+//						if (errMsg) {
+//							$scope.showErrorMsg(errMsg);
+//							return;
+//						}
+//						if (tota[0].body.resultList.length) {
+//							$scope.resultList = tota[0].body.resultList;
+//							$scope.outputVO = tota[0].body;
+//						} else {
+//							$scope.showMsg("ehl_01_common_009");
+//						}
 					}
 				});
 			console.log("filter", $filter);

@@ -321,6 +321,7 @@ public class SOT420 extends FubonWmsBizLogic {
 		dtlVO.setTRADE_DATE(new Timestamp(new SimpleDateFormat("yyyyMMddHHmmss").parse(cbsservice.getCBSTestDate()).getTime())); //交易日期		 
 		dtlVO.setNARRATOR_ID(inputVO.getNarratorID()); //解說專員員編
 		dtlVO.setNARRATOR_NAME(inputVO.getNarratorName()); //解說專員姓名
+		dtlVO.setQ4_BRANCH_NBR(inputVO.getIvBrh());//Q4電文的IVBRH
 
 		dam.create(dtlVO);
 

@@ -35,8 +35,8 @@ public class CRM452 extends FubonWmsBizLogic {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public void viewDetail(Object body, IPrimitiveMap header) throws JBranchException {
-		logger.info("#1585埋log追蹤viewDetail(): 進入viewDetail()");
-		System.out.println("#1585埋log追蹤viewDetail(): 進入viewDetail()");
+		//logger.info("#1585埋log追蹤viewDetail(): 進入viewDetail()");
+		//System.out.println("#1585埋log追蹤viewDetail(): 進入viewDetail()");
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
 		
@@ -66,11 +66,11 @@ public class CRM452 extends FubonWmsBizLogic {
 		
 		queryCondition.setObject("empID", inputVO.getEmpID());
 		queryCondition.setQueryString(sb.toString());
-		logger.info("#1585埋log追蹤viewDetail(): empID? " + inputVO.getEmpID());
-		System.out.println("#1585埋log追蹤viewDetail(): empID? " + inputVO.getEmpID());
+		//logger.info("#1585埋log追蹤viewDetail(): empID? " + inputVO.getEmpID());
+		//System.out.println("#1585埋log追蹤viewDetail(): empID? " + inputVO.getEmpID());
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
-		logger.info("#1585埋log追蹤viewDetail(): 撈出幾筆empid? " + list.size() +"筆");
-		System.out.println("#1585埋log追蹤viewDetail(): 撈出幾筆empid? " + list.size() +"筆");
+		//logger.info("#1585埋log追蹤viewDetail(): 撈出幾筆empid? " + list.size() +"筆");
+		//System.out.println("#1585埋log追蹤viewDetail(): 撈出幾筆empid? " + list.size() +"筆");
 		if(list.size() > 0){
 			for(Map<String, Object> map : list){			
 				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -125,13 +125,13 @@ public class CRM452 extends FubonWmsBizLogic {
 				queryCondition.setObject("custID", inputVO.getCustID());
 				queryCondition.setObject("emp_id", (String) map.get("EMP_ID"));
 				queryCondition.setQueryString(sb.toString());
-				logger.info("#1585埋log追蹤viewDetail(): 目前custid " + inputVO.getCustID());
-				logger.info("#1585埋log追蹤viewDetail(): 目前empid " + (String) map.get("EMP_ID"));
-				System.out.println("#1585埋log追蹤viewDetail(): 目前custid " + inputVO.getCustID());
-				System.out.println("#1585埋log追蹤viewDetail(): 目前empid " + (String) map.get("EMP_ID"));
+				//logger.info("#1585埋log追蹤viewDetail(): 目前custid " + inputVO.getCustID());
+				//logger.info("#1585埋log追蹤viewDetail(): 目前empid " + (String) map.get("EMP_ID"));
+				//System.out.println("#1585埋log追蹤viewDetail(): 目前custid " + inputVO.getCustID());
+				//System.out.println("#1585埋log追蹤viewDetail(): 目前empid " + (String) map.get("EMP_ID"));
 				List<Map<String, Object>> tempList = dam.exeQuery(queryCondition);
-				logger.info("#1585埋log追蹤viewDetail(): 撈出幾筆 p1? " + tempList.size() +"筆");
-				System.out.println("#1585埋log追蹤viewDetail(): 撈出幾筆 p1? " + tempList.size() +"筆");
+				//logger.info("#1585埋log追蹤viewDetail(): 撈出幾筆 p1? " + tempList.size() +"筆");
+				//System.out.println("#1585埋log追蹤viewDetail(): 撈出幾筆 p1? " + tempList.size() +"筆");
 				for(Map<String, Object> tempMap : tempList){
 					String apply_seq = tempMap.get("APPLY_SEQ").toString();
 					String terminate_reason = "";
@@ -161,10 +161,10 @@ public class CRM452 extends FubonWmsBizLogic {
 		}
 		
 		outputVO.setApplyList(applyList);
-		logger.info("#1585埋log追蹤viewDetail(): 撈出幾筆 p2? " + applyList.size() +"筆");
-		logger.info("#1585埋log追蹤viewDetail(): 結束viewDetail()");
-		System.out.println("#1585埋log追蹤viewDetail(): 撈出幾筆 p2? " + applyList.size() +"筆");
-		System.out.println("#1585埋log追蹤viewDetail(): 結束viewDetail()");
+		//logger.info("#1585埋log追蹤viewDetail(): 撈出幾筆 p2? " + applyList.size() +"筆");
+		//logger.info("#1585埋log追蹤viewDetail(): 結束viewDetail()");
+		//System.out.println("#1585埋log追蹤viewDetail(): 撈出幾筆 p2? " + applyList.size() +"筆");
+		//System.out.println("#1585埋log追蹤viewDetail(): 結束viewDetail()");
 		this.sendRtnObject(outputVO);
 	} 
 	

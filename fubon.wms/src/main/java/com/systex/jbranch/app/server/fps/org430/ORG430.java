@@ -51,105 +51,153 @@ public class ORG430 extends FubonWmsBizLogic {
 		//===取得理專員額表
 		StringBuffer sb = new StringBuffer();
 		sb.append("WITH DTL AS ( ");
-		sb.append("SELECT CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_ID, BRANCH_NAME, ROLE_NAME, ");
-		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, SUM(SERVING_COUNT) AS SERVING_COUNT, FC_COUNT, SUM(LEAVING_COUNT) AS LEAVING_COUNT, (NVL(FC_COUNT, 0) - NVL(SUM(SERVING_COUNT), 0)) AS SHORTFALL, ");
-		sb.append("       SUM(WAIT_IN) AS WAIT_IN, SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, ");
-		sb.append("       (NVL(FC_COUNT, 0) - NVL(SUM(SERVING_COUNT), 0)) - (NVL(SUM(MON1_WAIT_IN), 0) + NVL(SUM(MON2_WAIT_IN), 0) + NVL(SUM(MON3_WAIT_IN), 0)) AS ESTIMATED ");
-		sb.append("FROM ( ");
-		sb.append("  SELECT CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_ID, BRANCH_NAME, ROLEID, ROLE_NAME, ");
-//		sb.append("         (SELECT COUNT(MEM.EMP_ID) FROM TBORG_MEMBER MEM LEFT JOIN TBORG_MEMBER_ROLE MROLE ON MEM.EMP_ID = MROLE.EMP_ID AND MROLE.IS_PRIMARY_ROLE = 'Y' WHERE MROLE.ROLE_ID = BASE.ROLEID AND MEM.DEPT_ID = BASE.BRANCH_ID AND TO_CHAR(MEM.PERF_EFF_DATE, 'yyyyMM') <= TO_CHAR(SYSDATE, 'yyyyMM')) AS GOAL_COUNT, ");
-		sb.append("         CASE WHEN ROLEID = 'FCH' THEN (SELECT COUNT(DISTINCT MEM.EMP_ID) ");
-		sb.append("                                        FROM TBORG_MEMBER MEM ");
-		sb.append("                                        LEFT JOIN TBORG_MEMBER_ROLE MROLE ON MEM.EMP_ID = MROLE.EMP_ID AND MROLE.IS_PRIMARY_ROLE = 'Y' ");
-		sb.append("                                        INNER JOIN TBSYSSECUROLPRIASS PRI ON MROLE.ROLE_ID = PRI.ROLEID AND PRI.PRIVILEGEID = '003' ");
-		sb.append("                                        WHERE 1 = 1 ");
-		sb.append("                                        AND MEM.SERVICE_FLAG = 'A' ");
-		sb.append("                                        AND MEM.CHANGE_FLAG IN ('A', 'M', 'P') ");
-		sb.append("                                        AND MEM.DEPT_ID = BASE.BRANCH_ID ");
-		sb.append("                                        AND TO_CHAR(MEM.PERF_EFF_DATE, 'yyyyMM') <= TO_CHAR(SYSDATE, 'yyyyMM')) ");
-		sb.append("         ELSE (SELECT COUNT(MEM.EMP_ID) ");
-		sb.append("               FROM TBORG_MEMBER MEM ");
-		sb.append("               LEFT JOIN TBORG_MEMBER_ROLE MROLE ON MEM.EMP_ID = MROLE.EMP_ID AND MROLE.IS_PRIMARY_ROLE = 'Y' ");
-		sb.append("               WHERE MROLE.ROLE_ID = BASE.ROLEID ");
-		sb.append("               AND MEM.SERVICE_FLAG = 'A' ");
-		sb.append("               AND MEM.CHANGE_FLAG IN ('A', 'M', 'P') ");
-		sb.append("               AND MEM.DEPT_ID = BASE.BRANCH_ID ");
-		sb.append("               AND TO_CHAR(MEM.PERF_EFF_DATE, 'yyyyMM') <= TO_CHAR(SYSDATE, 'yyyyMM')) END AS GOAL_COUNT, ");
-		sb.append("         NVL(NOW_STATUS.SERVING, 0) AS SERVING_COUNT, ");
-		sb.append("         NVL(MQUOTA.FC_COUNT, 0) AS FC_COUNT, ");
-		sb.append("         NVL(NOW_STATUS.LEAVING, 0) AS LEAVING_COUNT, ");
-		sb.append("         NVL(ING_STATUS.WAIT_IN, 0) AS WAIT_IN, ");
-		sb.append("         NVL(ING_STATUS.MON1_WAIT_IN, 0) AS MON1_WAIT_IN, ");
-		sb.append("         NVL(ING_STATUS.MON2_WAIT_IN, 0) AS MON2_WAIT_IN, ");
-		sb.append("         NVL(ING_STATUS.MON3_WAIT_IN, 0) AS MON3_WAIT_IN, ");
-		sb.append("         NVL(ING_STATUS.CHK_PRICE_ING, 0) AS CHK_PRICE_ING, ");
-		sb.append("         NVL(ING_STATUS.CHK_WAIT_MEET, 0) AS CHK_WAIT_MEET, ");
-		sb.append("         NVL(ING_STATUS.CHK_PIP_REPORT, 0) AS CHK_PIP_REPORT ");
-		sb.append("  FROM (");
-		sb.append("    SELECT REGION_CENTER_ID AS CENTER_ID, REGION_CENTER_NAME AS CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_NBR AS BRANCH_ID, BRANCH_NAME, SYS_ROL.ROLEID, FUBON_ROL.ROLE_NAME ");
-		sb.append("    FROM TBSYSSECUROLPRIASS SYS_ROL ");
-		sb.append("    LEFT JOIN TBORG_ROLE FUBON_ROL ON SYS_ROL.ROLEID = FUBON_ROL.ROLE_ID ");
-		sb.append("    LEFT JOIN VWORG_DEFN_INFO DEPT_DTL ON 1=1 ");
-		sb.append("    WHERE PRIVILEGEID IN ('002') ");
-//		sb.append("    WHERE PRIVILEGEID IN ('002','01A') ");//01A:新興AO,消金AO
-		sb.append("    UNION ");
-		sb.append("    SELECT REGION_CENTER_ID AS CENTER_ID, REGION_CENTER_NAME AS CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_NBR AS BRANCH_ID, BRANCH_NAME, 'FCH', 'FCH' ");
-		sb.append("    FROM DUAL SYS_ROL ");
-		sb.append("    LEFT JOIN VWORG_DEFN_INFO DEPT_DTL ON 1=1 ");
-		sb.append("    ORDER BY CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_ID, BRANCH_NAME, ROLE_NAME ");
-		sb.append("  ) BASE ");
-		sb.append("  LEFT JOIN (");
-		sb.append("    SELECT DEPT_ID, ");
-		sb.append("           CASE WHEN REPLACE(ROLE_TYPE, '_CNT') = 'OP' THEN '作業人員' ");
-		sb.append("                WHEN REPLACE(ROLE_TYPE, '_CNT') = 'OPH' THEN '作業主管' ");
-		sb.append("                WHEN REPLACE(ROLE_TYPE, '_CNT') = 'AO' THEN '新興AO' ");
-		sb.append("                WHEN REPLACE(ROLE_TYPE, '_CNT') = 'CAO' THEN '消金AO' ");//需新增角色後才可統計
-		sb.append("           ELSE REPLACE(ROLE_TYPE, '_CNT') END AS ROLE_TYPE, ");
-		sb.append("           FC_COUNT ");
-		sb.append("    FROM TBORG_BRH_MBR_QUOTA ");
-		sb.append("    UNPIVOT (FC_COUNT FOR ROLE_TYPE IN (FC1_CNT, FC2_CNT, FC3_CNT, FC4_CNT, FC5_CNT, FCH_CNT, OP_CNT, OPH_CNT, PS_CNT, AO_CNT, CAO_CNT	)) ");
-		sb.append("  ) MQUOTA ON BASE.ROLE_NAME = MQUOTA.ROLE_TYPE AND MQUOTA.DEPT_ID = BASE.BRANCH_ID ");
-		sb.append("  LEFT JOIN (");
-		sb.append("    SELECT DEPT_ID, CASE WHEN ROLE_NAME LIKE 'FCH%' THEN 'FCH' ELSE ROLE_ID END AS ROLE_ID, SUM(SERVING) AS SERVING, SUM(LEAVING) AS LEAVING ");
-		sb.append("    FROM (SELECT MEM.DEPT_ID, MEM.EMP_ID, CASE WHEN R.ROLE_NAME = 'AFC' THEN 'A145' ELSE MROLE.ROLE_ID END AS ROLE_ID, CASE WHEN R.ROLE_NAME = 'AFC' THEN 'FC1' ELSE R.ROLE_NAME END AS ROLE_NAME, ");
-		sb.append("                 CASE WHEN (MEM.JOB_RESIGN_DATE IS NULL OR TO_CHAR(MEM.JOB_RESIGN_DATE, 'yyyyMMdd') > TO_CHAR(SYSDATE, 'yyyyMMdd')) THEN 1 ELSE 0 END AS SERVING, ");
-		sb.append("                 CASE WHEN (TO_CHAR(MEM.JOB_RESIGN_DATE, 'yyyyMMdd') >= TO_CHAR(SYSDATE, 'yyyyMMdd')) THEN 1 ELSE 0 END AS LEAVING ");
-		sb.append("          FROM TBORG_MEMBER MEM, TBORG_MEMBER_ROLE MROLE ");
-		sb.append("          LEFT JOIN TBORG_ROLE R ON MROLE.ROLE_ID = R.ROLE_ID ");
-		sb.append("          WHERE MEM.DEPT_ID IS NOT NULL ");
-		sb.append("          AND MEM.EMP_ID = MROLE.EMP_ID ");
-		sb.append("          AND MROLE.IS_PRIMARY_ROLE = 'Y' ");
-		sb.append("          AND MROLE.ROLE_ID IN (SELECT ROLEID FROM TBSYSSECUROLPRIASS WHERE PRIVILEGEID IN ('001', '002', '003')) ");
-		sb.append("          AND MEM.SERVICE_FLAG = 'A' ");
-		sb.append("          AND MEM.CHANGE_FLAG IN ('A', 'M', 'P') ");
-		sb.append("    ) ARRANGE ");
-		sb.append("    GROUP BY DEPT_ID, CASE WHEN ROLE_NAME LIKE 'FCH%' THEN 'FCH' ELSE ROLE_ID END ");
-		sb.append("  ) NOW_STATUS ON BASE.BRANCH_ID = NOW_STATUS.DEPT_ID AND BASE.ROLEID = NOW_STATUS.ROLE_ID ");
-		sb.append("  LEFT JOIN ( ");
-		sb.append("    SELECT BRANCH_NBR, AO_JOB_RANK, SUM(WAIT_IN) AS WAIT_IN, SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT ");
+		sb.append("  SELECT CENTER_ID, ");
+		sb.append("         CENTER_NAME, ");
+		sb.append("         BRANCH_AREA_ID, ");
+		sb.append("         BRANCH_AREA_NAME, ");
+		sb.append("         BRANCH_ID, ");
+		sb.append("         BRANCH_NAME, ");
+		sb.append("         ROLE_NAME, ");
+		sb.append("         SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("         SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("         FC_COUNT, SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("         (NVL(FC_COUNT, 0) - NVL(SUM(SERVING_COUNT), 0)) AS SHORTFALL, ");
+		sb.append("         SUM(WAIT_IN) AS WAIT_IN, ");
+		sb.append("         SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, ");
+		sb.append("         SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, ");
+		sb.append("         SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
+		sb.append("         SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, ");
+		sb.append("         SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, ");
+		sb.append("         SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, ");
+		sb.append("         (NVL(FC_COUNT, 0) - NVL(SUM(SERVING_COUNT), 0)) - (NVL(SUM(MON1_WAIT_IN), 0) + NVL(SUM(MON2_WAIT_IN), 0) + NVL(SUM(MON3_WAIT_IN), 0)) AS ESTIMATED ");
+		sb.append("  FROM ( ");
+		sb.append("    SELECT CENTER_ID, ");
+		sb.append("           CENTER_NAME, ");
+		sb.append("           BRANCH_AREA_ID, ");
+		sb.append("           BRANCH_AREA_NAME, ");
+		sb.append("           BRANCH_ID, ");
+		sb.append("           BRANCH_NAME, ");
+		sb.append("           ROLEID, ");
+		sb.append("           ROLE_NAME, ");
+		sb.append("           CASE WHEN ROLEID = 'FCH' THEN (SELECT COUNT(DISTINCT MEM.EMP_ID) ");
+		sb.append("                                          FROM TBORG_MEMBER MEM ");
+		sb.append("                                          LEFT JOIN TBORG_MEMBER_ROLE MROLE ON MEM.EMP_ID = MROLE.EMP_ID AND MROLE.IS_PRIMARY_ROLE = 'Y' ");
+		sb.append("                                          INNER JOIN TBSYSSECUROLPRIASS PRI ON MROLE.ROLE_ID = PRI.ROLEID AND PRI.PRIVILEGEID = '003' ");
+		sb.append("                                          WHERE 1 = 1 ");
+		sb.append("                                          AND MEM.SERVICE_FLAG = 'A' ");
+		sb.append("                                          AND MEM.CHANGE_FLAG IN ('A', 'M', 'P') ");
+		sb.append("                                          AND MEM.DEPT_ID = BASE.BRANCH_ID ");
+		sb.append("                                          AND TO_CHAR(MEM.PERF_EFF_DATE, 'yyyyMM') <= TO_CHAR(SYSDATE, 'yyyyMM')) ");
+		sb.append("           ELSE (SELECT COUNT(MEM.EMP_ID) ");
+		sb.append("                 FROM TBORG_MEMBER MEM ");
+		sb.append("                 LEFT JOIN TBORG_MEMBER_ROLE MROLE ON MEM.EMP_ID = MROLE.EMP_ID AND MROLE.IS_PRIMARY_ROLE = 'Y' ");
+		sb.append("                 WHERE MROLE.ROLE_ID = BASE.ROLEID ");
+		sb.append("                 AND MEM.SERVICE_FLAG = 'A' ");
+		sb.append("                 AND MEM.CHANGE_FLAG IN ('A', 'M', 'P') ");
+		sb.append("                 AND MEM.DEPT_ID = BASE.BRANCH_ID ");
+		sb.append("                 AND TO_CHAR(MEM.PERF_EFF_DATE, 'yyyyMM') <= TO_CHAR(SYSDATE, 'yyyyMM')) END AS GOAL_COUNT, ");
+		sb.append("           NVL(NOW_STATUS.SERVING, 0) AS SERVING_COUNT, ");
+		sb.append("           NVL(MQUOTA.FC_COUNT, 0) AS FC_COUNT, ");
+		sb.append("           NVL(NOW_STATUS.LEAVING, 0) AS LEAVING_COUNT, ");
+		sb.append("           NVL(ING_STATUS.WAIT_IN, 0) AS WAIT_IN, ");
+		sb.append("           NVL(ING_STATUS.MON1_WAIT_IN, 0) AS MON1_WAIT_IN, ");
+		sb.append("           NVL(ING_STATUS.MON2_WAIT_IN, 0) AS MON2_WAIT_IN, ");
+		sb.append("           NVL(ING_STATUS.MON3_WAIT_IN, 0) AS MON3_WAIT_IN, ");
+		sb.append("           NVL(ING_STATUS.CHK_PRICE_ING, 0) AS CHK_PRICE_ING, ");
+		sb.append("           NVL(ING_STATUS.CHK_WAIT_MEET, 0) AS CHK_WAIT_MEET, ");
+		sb.append("           NVL(ING_STATUS.CHK_PIP_REPORT, 0) AS CHK_PIP_REPORT ");
 		sb.append("    FROM ( ");
-		sb.append("      SELECT CUST_ID, BRANCH_NBR, AO_JOB_RANK, ");
-		sb.append("             CASE WHEN STATUS = '07' THEN 1 ELSE 0 END AS WAIT_IN, ");
-		sb.append("             CASE WHEN (STATUS = '07' AND TO_CHAR(BOOKED_ONBOARD_DATE, 'yyyyMM') = TO_CHAR(SYSDATE, 'yyyyMM') AND TO_CHAR(BOOKED_ONBOARD_DATE, 'yyyyMMdd') > TO_CHAR(SYSDATE, 'yyyyMMdd')) THEN 1 ELSE 0 END AS MON1_WAIT_IN, ");
-		sb.append("             CASE WHEN (STATUS = '07' AND TO_CHAR(BOOKED_ONBOARD_DATE, 'yyyyMM') = TO_CHAR(ADD_MONTHS(SYSDATE, 1), 'yyyyMM')) THEN 1 ELSE 0 END AS MON2_WAIT_IN, ");
-		sb.append("             CASE WHEN (STATUS = '07' AND TO_CHAR(BOOKED_ONBOARD_DATE, 'yyyyMM') = TO_CHAR(ADD_MONTHS(SYSDATE, 2), 'yyyyMM')) THEN 1 ELSE 0 END AS MON3_WAIT_IN, ");
-		sb.append("             CASE WHEN STATUS IN ('04', '05', '06') THEN 1 ELSE 0 END AS CHK_PRICE_ING, ");
-		sb.append("             CASE WHEN STATUS IN ('01', '02', '03', '11') THEN 1 ELSE 0 END AS CHK_WAIT_MEET, ");
-		sb.append("             CASE WHEN STATUS IN ('01', '02', '03', '11') THEN 1 ELSE 0 END AS CHK_PIP_REPORT ");
-		sb.append("      FROM TBORG_EMP_HIRE_INFO ");
-		sb.append("      WHERE AO_JOB_RANK IN (SELECT ROLE_NAME FROM TBSYSSECUROLPRIASS PRIASS, TBORG_ROLE ORG_ROLE WHERE PRIASS.ROLEID = ORG_ROLE.ROLE_ID AND PRIVILEGEID IN ('002', '003')) ");
-		sb.append("    ) HIRE_INFO ");
-		sb.append("    GROUP BY BRANCH_NBR, AO_JOB_RANK ");
-		sb.append("  ) ING_STATUS ON BASE.BRANCH_ID = ING_STATUS.BRANCH_NBR AND BASE.ROLE_NAME = ING_STATUS.AO_JOB_RANK ");
-		sb.append(") ");
+		sb.append("      SELECT REGION_CENTER_ID AS CENTER_ID, ");
+		sb.append("             REGION_CENTER_NAME AS CENTER_NAME, ");
+		sb.append("             BRANCH_AREA_ID, BRANCH_AREA_NAME, ");
+		sb.append("             BRANCH_NBR AS BRANCH_ID, ");
+		sb.append("             BRANCH_NAME, ");
+		sb.append("             SYS_ROL.ROLEID, ");
+		sb.append("             FUBON_ROL.ROLE_NAME ");
+		sb.append("      FROM TBSYSSECUROLPRIASS SYS_ROL ");
+		sb.append("      LEFT JOIN TBORG_ROLE FUBON_ROL ON SYS_ROL.ROLEID = FUBON_ROL.ROLE_ID ");
+		sb.append("      LEFT JOIN VWORG_DEFN_INFO DEPT_DTL ON 1 = 1 ");
+		sb.append("      WHERE PRIVILEGEID IN ('002', 'JRM') ");
+		sb.append("    ) BASE ");
+		sb.append("    LEFT JOIN (");
+		sb.append("      SELECT DEPT_ID, ");
+		sb.append("             CASE WHEN REPLACE(ROLE_TYPE, '_CNT') = 'OP' THEN '作業人員' ");
+		sb.append("                  WHEN REPLACE(ROLE_TYPE, '_CNT') = 'OPH' THEN '作業主管' ");
+		sb.append("                  WHEN REPLACE(ROLE_TYPE, '_CNT') = 'AO' THEN '新興AO' ");
+		sb.append("                  WHEN REPLACE(ROLE_TYPE, '_CNT') = 'CAO' THEN '消金AO' ");//需新增角色後才可統計
+		sb.append("             ELSE REPLACE(ROLE_TYPE, '_CNT') END AS ROLE_TYPE, ");
+		sb.append("             FC_COUNT ");
+		sb.append("      FROM TBORG_BRH_MBR_QUOTA ");
+		sb.append("      UNPIVOT (FC_COUNT FOR ROLE_TYPE IN (FC1_CNT, FC2_CNT, FC3_CNT, FC4_CNT, FC5_CNT, FCH_CNT, OP_CNT, OPH_CNT, PS_CNT, AO_CNT, CAO_CNT, JRM_CNT)) ");
+		sb.append("    ) MQUOTA ON BASE.ROLE_NAME = MQUOTA.ROLE_TYPE AND MQUOTA.DEPT_ID = BASE.BRANCH_ID ");
+		sb.append("    LEFT JOIN (");
+		sb.append("      SELECT DEPT_ID, CASE WHEN ROLE_NAME LIKE 'FCH%' THEN 'FCH' ELSE ROLE_ID END AS ROLE_ID, SUM(SERVING) AS SERVING, SUM(LEAVING) AS LEAVING ");
+		sb.append("      FROM (SELECT MEM.DEPT_ID, ");
+		sb.append("                   MEM.EMP_ID, ");
+		sb.append("                   CASE WHEN R.ROLE_NAME = 'AFC' THEN 'A145' ELSE MROLE.ROLE_ID END AS ROLE_ID, ");
+		sb.append("                   CASE WHEN R.ROLE_NAME = 'AFC' THEN 'FC1' ELSE R.ROLE_NAME END AS ROLE_NAME, ");
+		sb.append("                   CASE WHEN (MEM.JOB_RESIGN_DATE IS NULL OR TO_CHAR(MEM.JOB_RESIGN_DATE, 'yyyyMMdd') > TO_CHAR(SYSDATE, 'yyyyMMdd')) THEN 1 ELSE 0 END AS SERVING, ");
+		sb.append("                   CASE WHEN (TO_CHAR(MEM.JOB_RESIGN_DATE, 'yyyyMMdd') >= TO_CHAR(SYSDATE, 'yyyyMMdd')) THEN 1 ELSE 0 END AS LEAVING ");
+		sb.append("            FROM TBORG_MEMBER MEM, TBORG_MEMBER_ROLE MROLE ");
+		sb.append("            LEFT JOIN TBORG_ROLE R ON MROLE.ROLE_ID = R.ROLE_ID ");
+		sb.append("            WHERE MEM.DEPT_ID IS NOT NULL ");
+		sb.append("            AND MEM.EMP_ID = MROLE.EMP_ID ");
+		sb.append("            AND MROLE.IS_PRIMARY_ROLE = 'Y' ");
+		sb.append("            AND MROLE.ROLE_ID IN (SELECT ROLEID FROM TBSYSSECUROLPRIASS WHERE PRIVILEGEID IN ('001', '002', '003', 'JRM')) ");
+		sb.append("            AND MEM.SERVICE_FLAG = 'A' ");
+		sb.append("            AND MEM.CHANGE_FLAG IN ('A', 'M', 'P') ");
+		sb.append("      ) ARRANGE ");
+		sb.append("      GROUP BY DEPT_ID, CASE WHEN ROLE_NAME LIKE 'FCH%' THEN 'FCH' ELSE ROLE_ID END ");
+		sb.append("    ) NOW_STATUS ON BASE.BRANCH_ID = NOW_STATUS.DEPT_ID AND BASE.ROLEID = NOW_STATUS.ROLE_ID ");
+		sb.append("    LEFT JOIN ( ");
+		sb.append("      SELECT BRANCH_NBR, ");
+		sb.append("             AO_JOB_RANK, ");
+		sb.append("             SUM(WAIT_IN) AS WAIT_IN, ");
+		sb.append("             SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, ");
+		sb.append("             SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, ");
+		sb.append("             SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
+		sb.append("             SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, ");
+		sb.append("             SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, ");
+		sb.append("             SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT ");
+		sb.append("      FROM ( ");
+		sb.append("        SELECT CUST_ID, BRANCH_NBR, AO_JOB_RANK, ");
+		sb.append("               CASE WHEN STATUS = '07' THEN 1 ELSE 0 END AS WAIT_IN, ");
+		sb.append("               CASE WHEN (STATUS = '07' AND TO_CHAR(BOOKED_ONBOARD_DATE, 'yyyyMM') = TO_CHAR(SYSDATE, 'yyyyMM') AND TO_CHAR(BOOKED_ONBOARD_DATE, 'yyyyMMdd') > TO_CHAR(SYSDATE, 'yyyyMMdd')) THEN 1 ELSE 0 END AS MON1_WAIT_IN, ");
+		sb.append("               CASE WHEN (STATUS = '07' AND TO_CHAR(BOOKED_ONBOARD_DATE, 'yyyyMM') = TO_CHAR(ADD_MONTHS(SYSDATE, 1), 'yyyyMM')) THEN 1 ELSE 0 END AS MON2_WAIT_IN, ");
+		sb.append("               CASE WHEN (STATUS = '07' AND TO_CHAR(BOOKED_ONBOARD_DATE, 'yyyyMM') = TO_CHAR(ADD_MONTHS(SYSDATE, 2), 'yyyyMM')) THEN 1 ELSE 0 END AS MON3_WAIT_IN, ");
+		sb.append("               CASE WHEN STATUS IN ('04', '05', '06') THEN 1 ELSE 0 END AS CHK_PRICE_ING, ");
+		sb.append("               CASE WHEN STATUS IN ('01', '02', '03', '11') THEN 1 ELSE 0 END AS CHK_WAIT_MEET, ");
+		sb.append("               CASE WHEN STATUS IN ('01', '02', '03', '11') THEN 1 ELSE 0 END AS CHK_PIP_REPORT ");
+		sb.append("        FROM TBORG_EMP_HIRE_INFO ");
+		sb.append("        WHERE AO_JOB_RANK IN (SELECT ROLE_NAME FROM TBSYSSECUROLPRIASS PRIASS, TBORG_ROLE ORG_ROLE WHERE PRIASS.ROLEID = ORG_ROLE.ROLE_ID AND PRIVILEGEID IN ('002', '003', 'JRM')) ");
+		sb.append("      ) HIRE_INFO ");
+		sb.append("      GROUP BY BRANCH_NBR, AO_JOB_RANK ");
+		sb.append("    ) ING_STATUS ON BASE.BRANCH_ID = ING_STATUS.BRANCH_NBR AND BASE.ROLE_NAME = ING_STATUS.AO_JOB_RANK ");
+		sb.append("  ) ");
 		sb.append("GROUP BY CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_ID, BRANCH_NAME, ROLE_NAME, FC_COUNT ");
 		sb.append(") ");
 
 		//業務處小計
-		sb.append("SELECT CENTER_ID, CENTER_NAME || ' 合計' AS CENTER_NAME, '' AS BRANCH_AREA_ID, '' AS BRANCH_AREA_NAME, '' AS BRANCH_ID, '' AS BRANCH_NAME, ROLE_NAME, ");
-		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, SUM(SERVING_COUNT) AS SERVING_COUNT, SUM(FC_COUNT) AS FC_COUNT, SUM(LEAVING_COUNT) AS LEAVING_COUNT, SUM(SHORTFALL) AS SHORTFALL, ");
-		sb.append("       SUM(WAIT_IN) AS WAIT_IN, SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
-		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("SELECT CENTER_ID, ");
+		sb.append("       CENTER_NAME || ' 合計' AS CENTER_NAME, ");
+		sb.append("       '' AS BRANCH_AREA_ID, ");
+		sb.append("       '' AS BRANCH_AREA_NAME, ");
+		sb.append("       '' AS BRANCH_ID, ");
+		sb.append("       '' AS BRANCH_NAME, ");
+		sb.append("       ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(FC_COUNT) AS FC_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(SHORTFALL) AS SHORTFALL, ");
+		sb.append("       SUM(WAIT_IN) AS WAIT_IN, ");
+		sb.append("       SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, ");
+		sb.append("       SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, ");
+		sb.append("       SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
+		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, ");
+		sb.append("       SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, ");
+		sb.append("       SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
 		sb.append("FROM DTL ");
 		sb.append("WHERE 1 = 1 ");
 		
@@ -162,12 +210,30 @@ public class ORG430 extends FubonWmsBizLogic {
 		}
 		
 		sb.append("GROUP BY CENTER_ID, CENTER_NAME || ' 合計', ROLE_NAME ");
+		
 		sb.append("UNION ");
+		
 		// 業務處合計
-		sb.append("SELECT CENTER_ID, CENTER_NAME || ' 合計' AS CENTER_NAME, '' AS BRANCH_AREA_ID, '' AS BRANCH_AREA_NAME, '' AS BRANCH_ID, '' AS BRANCH_NAME, '' AS ROLE_NAME, ");
-		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, SUM(SERVING_COUNT) AS SERVING_COUNT, SUM(FC_COUNT) AS FC_COUNT, SUM(LEAVING_COUNT) AS LEAVING_COUNT, SUM(SHORTFALL) AS SHORTFALL, "); 
-		sb.append("       SUM(WAIT_IN) AS WAIT_IN, SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
-		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("SELECT CENTER_ID, ");
+		sb.append("       CENTER_NAME || ' 合計' AS CENTER_NAME, ");
+		sb.append("       '' AS BRANCH_AREA_ID, ");
+		sb.append("       '' AS BRANCH_AREA_NAME, ");
+		sb.append("       '' AS BRANCH_ID, ");
+		sb.append("       '' AS BRANCH_NAME, ");
+		sb.append("       '' AS ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(FC_COUNT) AS FC_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(SHORTFALL) AS SHORTFALL, "); 
+		sb.append("       SUM(WAIT_IN) AS WAIT_IN, ");
+		sb.append("       SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, ");
+		sb.append("       SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, ");
+		sb.append("       SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
+		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, ");
+		sb.append("       SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, ");
+		sb.append("       SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
 		sb.append("FROM DTL ");
 		sb.append("WHERE 1 = 1 ");
 		
@@ -180,145 +246,224 @@ public class ORG430 extends FubonWmsBizLogic {
 		}
 		
 		sb.append("GROUP BY CENTER_ID, CENTER_NAME || ' 合計' ");
+		
 		sb.append("UNION ");
+		
 		//營運中心小計
-		sb.append("SELECT CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME || ' 合計' AS BRANCH_AREA_NAME, '' AS BRANCH_ID, '' AS BRANCH_NAME, ROLE_NAME, ");
-		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, SUM(SERVING_COUNT) AS SERVING_COUNT, SUM(FC_COUNT) AS FC_COUNT, SUM(LEAVING_COUNT) AS LEAVING_COUNT, SUM(SHORTFALL) AS SHORTFALL, ");
-		sb.append("       SUM(WAIT_IN) AS WAIT_IN, SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
-		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("SELECT CENTER_ID, ");
+		sb.append("       CENTER_NAME, ");
+		sb.append("       BRANCH_AREA_ID, ");
+		sb.append("       BRANCH_AREA_NAME || ' 合計' AS BRANCH_AREA_NAME, ");
+		sb.append("       '' AS BRANCH_ID, ");
+		sb.append("       '' AS BRANCH_NAME, ");
+		sb.append("       ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(FC_COUNT) AS FC_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(SHORTFALL) AS SHORTFALL, ");
+		sb.append("       SUM(WAIT_IN) AS WAIT_IN, ");
+		sb.append("       SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, ");
+		sb.append("       SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, ");
+		sb.append("       SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
+		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, ");
+		sb.append("       SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, ");
+		sb.append("       SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
 		sb.append("FROM DTL ");
 		sb.append("WHERE 1 = 1 ");
 		
-		if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
-			sb.append("AND DTL.CENTER_ID = :regionCenterID "); //區域代碼
-			queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
-		} else {
-			sb.append("AND DTL.CENTER_ID IN (:regionCenterIDList) ");
-			queryCondition.setObject("regionCenterIDList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
-		}
-	
 		if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
 			sb.append("AND DTL.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼
 			queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
+		} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
+			sb.append("AND DTL.CENTER_ID = :regionCenterID "); //區域代碼
+			queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 		} else {
 			sb.append("AND DTL.BRANCH_AREA_ID IN (:branchAreaIDList) ");
 			queryCondition.setObject("branchAreaIDList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
 		}
-		
+		 
 		sb.append("GROUP BY CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME || ' 合計', ROLE_NAME ");
+		
 		sb.append("UNION ");
+		
 		//營運區合計
-		sb.append("SELECT CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME || ' 合計' AS BRANCH_AREA_NAME, '' AS BRANCH_ID, '' AS BRANCH_NAME, '' AS ROLE_NAME, ");
-		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, SUM(SERVING_COUNT) AS SERVING_COUNT, SUM(FC_COUNT) AS FC_COUNT, SUM(LEAVING_COUNT) AS LEAVING_COUNT, SUM(SHORTFALL) AS SHORTFALL, ");
-		sb.append("       SUM(WAIT_IN) AS WAIT_IN, SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
-		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("SELECT CENTER_ID, ");
+		sb.append("       CENTER_NAME, ");
+		sb.append("       BRANCH_AREA_ID, ");
+		sb.append("       BRANCH_AREA_NAME || ' 合計' AS BRANCH_AREA_NAME, ");
+		sb.append("       '' AS BRANCH_ID, ");
+		sb.append("       '' AS BRANCH_NAME, ");
+		sb.append("       '' AS ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(FC_COUNT) AS FC_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(SHORTFALL) AS SHORTFALL, ");
+		sb.append("       SUM(WAIT_IN) AS WAIT_IN, ");
+		sb.append("       SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, ");
+		sb.append("       SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, ");
+		sb.append("       SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
+		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, ");
+		sb.append("       SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, ");
+		sb.append("       SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
 		sb.append("FROM DTL ");
 		sb.append("WHERE 1 = 1 ");
 		
-		if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
-			sb.append("AND DTL.CENTER_ID = :regionCenterID "); //區域代碼
-			queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
-		} else {
-			sb.append("AND DTL.CENTER_ID IN (:regionCenterIDList) ");
-			queryCondition.setObject("regionCenterIDList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
-		}
-	
 		if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
 			sb.append("AND DTL.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼
 			queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
+		} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
+			sb.append("AND DTL.CENTER_ID = :regionCenterID "); //區域代碼
+			queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 		} else {
 			sb.append("AND DTL.BRANCH_AREA_ID IN (:branchAreaIDList) ");
 			queryCondition.setObject("branchAreaIDList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
 		}
 		
 		sb.append("GROUP BY CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME || ' 合計' ");
+		
 		sb.append("UNION ");
+		
 		//分行小計
-		sb.append("SELECT CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_ID, BRANCH_NAME, ROLE_NAME, ");
-		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, SUM(SERVING_COUNT) AS SERVING_COUNT, SUM(FC_COUNT) AS FC_COUNT, SUM(LEAVING_COUNT) AS LEAVING_COUNT, SUM(SHORTFALL) AS SHORTFALL, ");
-		sb.append("       SUM(WAIT_IN) AS WAIT_IN, SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
-		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("SELECT CENTER_ID, ");
+		sb.append("       CENTER_NAME, ");
+		sb.append("       BRANCH_AREA_ID, ");
+		sb.append("       BRANCH_AREA_NAME, ");
+		sb.append("       BRANCH_ID, ");
+		sb.append("       BRANCH_NAME, ");
+		sb.append("       ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(FC_COUNT) AS FC_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(SHORTFALL) AS SHORTFALL, ");
+		sb.append("       SUM(WAIT_IN) AS WAIT_IN, ");
+		sb.append("       SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, ");
+		sb.append("       SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, ");
+		sb.append("       SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
+		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, ");
+		sb.append("       SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, ");
+		sb.append("       SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
 		sb.append("FROM DTL ");
 		sb.append("WHERE 1 = 1 ");
 
-		if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
-			sb.append("AND DTL.CENTER_ID = :regionCenterID "); //區域代碼
-			queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
-		} else {
-			sb.append("AND DTL.CENTER_ID IN (:regionCenterIDList) ");
-			queryCondition.setObject("regionCenterIDList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
-		}
-	
-		if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
-			sb.append("AND DTL.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼
-			queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
-		} else {
-			sb.append("AND DTL.BRANCH_AREA_ID IN (:branchAreaIDList) ");
-			queryCondition.setObject("branchAreaIDList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
-		}
-	
 		if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && Integer.valueOf(inputVO.getBranch_nbr()) > 0) {
 			sb.append("AND DTL.BRANCH_ID = :branchID "); //分行代碼
 			queryCondition.setObject("branchID", inputVO.getBranch_nbr());
+		} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
+			sb.append("AND DTL.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼
+			queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
+		} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
+			sb.append("AND DTL.CENTER_ID = :regionCenterID "); //區域代碼
+			queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 		} else {
 			sb.append("AND DTL.BRANCH_ID IN (:branchIDList) ");
 			queryCondition.setObject("branchIDList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
 		}
 		
 		sb.append("GROUP BY CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_ID, BRANCH_NAME, ROLE_NAME ");
+		
 		sb.append("UNION ");
+		
 		//分行合計
-		sb.append("SELECT CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_ID, BRANCH_NAME, '' AS ROLE_NAME, ");
-		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, SUM(SERVING_COUNT) AS SERVING_COUNT, SUM(FC_COUNT) AS FC_COUNT, SUM(LEAVING_COUNT) AS LEAVING_COUNT, SUM(SHORTFALL) AS SHORTFALL, ");
-		sb.append("       SUM(WAIT_IN) AS WAIT_IN, SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
-		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("SELECT CENTER_ID, ");
+		sb.append("       CENTER_NAME, ");
+		sb.append("       BRANCH_AREA_ID, ");
+		sb.append("       BRANCH_AREA_NAME, ");
+		sb.append("       BRANCH_ID, BRANCH_NAME, ");
+		sb.append("       '' AS ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(FC_COUNT) AS FC_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(SHORTFALL) AS SHORTFALL, ");
+		sb.append("       SUM(WAIT_IN) AS WAIT_IN, ");
+		sb.append("       SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, ");
+		sb.append("       SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, ");
+		sb.append("       SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
+		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, ");
+		sb.append("       SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, ");
+		sb.append("       SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
 		sb.append("FROM DTL ");
 		sb.append("WHERE 1 = 1 ");
 
-		if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
-			sb.append("AND DTL.CENTER_ID = :regionCenterID "); //區域代碼
-			queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
-		} else {
-			sb.append("AND DTL.CENTER_ID IN (:regionCenterIDList) ");
-			queryCondition.setObject("regionCenterIDList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
-		}
-	
-		if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
-			sb.append("AND DTL.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼
-			queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
-		} else {
-			sb.append("AND DTL.BRANCH_AREA_ID IN (:branchAreaIDList) ");
-			queryCondition.setObject("branchAreaIDList", getUserVariable(FubonSystemVariableConsts.AVAILAREALIST));
-		}
-	
 		if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && Integer.valueOf(inputVO.getBranch_nbr()) > 0) {
 			sb.append("AND DTL.BRANCH_ID = :branchID "); //分行代碼
 			queryCondition.setObject("branchID", inputVO.getBranch_nbr());
+		} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id()) && !"null".equals(inputVO.getBranch_area_id())) {
+			sb.append("AND DTL.BRANCH_AREA_ID = :branchAreaID "); //營運區代碼
+			queryCondition.setObject("branchAreaID", inputVO.getBranch_area_id());
+		} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id()) && !"null".equals(inputVO.getRegion_center_id())) {
+			sb.append("AND DTL.CENTER_ID = :regionCenterID "); //區域代碼
+			queryCondition.setObject("regionCenterID", inputVO.getRegion_center_id());
 		} else {
 			sb.append("AND DTL.BRANCH_ID IN (:branchIDList) ");
 			queryCondition.setObject("branchIDList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
 		}
 		
 		sb.append("GROUP BY CENTER_ID, CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_ID, BRANCH_NAME ");
+		
 		sb.append("UNION ");
+		
 		//全行小計
-		sb.append("SELECT '' AS CENTER_ID, '全行 合計' AS CENTER_NAME, '' AS BRANCH_AREA_ID, '' AS BRANCH_AREA_NAME, '' AS BRANCH_ID, '' AS BRANCH_NAME, ROLE_NAME, ");
-		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, SUM(SERVING_COUNT) AS SERVING_COUNT, SUM(FC_COUNT) AS FC_COUNT, SUM(LEAVING_COUNT) AS LEAVING_COUNT, SUM(SHORTFALL) AS SHORTFALL, ");
-		sb.append("       SUM(WAIT_IN) AS WAIT_IN, SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
-		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, SUM(ESTIMATED) AS ESTIMATED ");
-		sb.append("FROM DTL GROUP BY '', '全行 合計', ROLE_NAME ");
+		sb.append("SELECT '' AS CENTER_ID, ");
+		sb.append("       '全行 合計' AS CENTER_NAME, ");
+		sb.append("       '' AS BRANCH_AREA_ID, ");
+		sb.append("       '' AS BRANCH_AREA_NAME, ");
+		sb.append("       '' AS BRANCH_ID, ");
+		sb.append("       '' AS BRANCH_NAME, ");
+		sb.append("       ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(FC_COUNT) AS FC_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(SHORTFALL) AS SHORTFALL, ");
+		sb.append("       SUM(WAIT_IN) AS WAIT_IN, ");
+		sb.append("       SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, ");
+		sb.append("       SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, ");
+		sb.append("       SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
+		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, ");
+		sb.append("       SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, ");
+		sb.append("       SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("FROM DTL ");
+		sb.append("GROUP BY '', '全行 合計', ROLE_NAME ");
+		
 		sb.append("UNION ");
+		
 		//全行合計
-		sb.append("SELECT '' AS CENTER_ID, '全行 合計' AS CENTER_NAME, '' AS BRANCH_AREA_ID, '' AS BRANCH_AREA_NAME, '' AS BRANCH_ID, '' AS BRANCH_NAME, '' AS ROLE_NAME, ");
-		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, SUM(SERVING_COUNT) AS SERVING_COUNT, SUM(FC_COUNT) AS FC_COUNT, SUM(LEAVING_COUNT) AS LEAVING_COUNT, SUM(SHORTFALL) AS SHORTFALL, ");
-		sb.append("       SUM(WAIT_IN) AS WAIT_IN, SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
-		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, SUM(ESTIMATED) AS ESTIMATED ");
-		sb.append("FROM DTL GROUP BY '', '全行 合計' ");
+		sb.append("SELECT '' AS CENTER_ID, ");
+		sb.append("       '全行 合計' AS CENTER_NAME, ");
+		sb.append("       '' AS BRANCH_AREA_ID, ");
+		sb.append("       '' AS BRANCH_AREA_NAME, ");
+		sb.append("       '' AS BRANCH_ID, ");
+		sb.append("       '' AS BRANCH_NAME, ");
+		sb.append("       '' AS ROLE_NAME, ");
+		sb.append("       SUM(GOAL_COUNT) AS GOAL_COUNT, ");
+		sb.append("       SUM(SERVING_COUNT) AS SERVING_COUNT, ");
+		sb.append("       SUM(FC_COUNT) AS FC_COUNT, ");
+		sb.append("       SUM(LEAVING_COUNT) AS LEAVING_COUNT, ");
+		sb.append("       SUM(SHORTFALL) AS SHORTFALL, ");
+		sb.append("       SUM(WAIT_IN) AS WAIT_IN, ");
+		sb.append("       SUM(MON1_WAIT_IN) AS MON1_WAIT_IN, ");
+		sb.append("       SUM(MON2_WAIT_IN) AS MON2_WAIT_IN, ");
+		sb.append("       SUM(MON3_WAIT_IN) AS MON3_WAIT_IN, ");
+		sb.append("       SUM(CHK_PRICE_ING) AS CHK_PRICE_ING, ");
+		sb.append("       SUM(CHK_WAIT_MEET) AS CHK_WAIT_MEET, ");
+		sb.append("       SUM(CHK_PIP_REPORT) AS CHK_PIP_REPORT, ");
+		sb.append("       SUM(ESTIMATED) AS ESTIMATED ");
+		sb.append("FROM DTL ");
+		sb.append("GROUP BY '', '全行 合計' ");
 		
 		sb.append("ORDER BY CENTER_ID ASC, BRANCH_AREA_ID ASC, BRANCH_ID ASC, ROLE_NAME ASC ");
 				       
 		queryCondition.setQueryString(sb.toString());
-		
+
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);		
 		List<Map<String, Object>> returnList = new ArrayList<Map<String,Object>>();
 		
@@ -666,7 +811,6 @@ public class ORG430 extends FubonWmsBizLogic {
 				if (null != list.get(i).get(mainLine[0]) && "ROLE_NAME".equals(mainLine[j]) && null == list.get(i).get(mainLine[j])) {
 					cell.setCellValue("小計");
 				} else {
-					System.out.println(list.get(i).get(mainLine[j]));
 					cell.setCellValue(list.get(i).get(mainLine[j]));
 				}
 			}

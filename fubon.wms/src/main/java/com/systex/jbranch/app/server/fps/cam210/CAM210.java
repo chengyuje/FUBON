@@ -257,6 +257,7 @@ public class CAM210 extends FubonWmsBizLogic {
 			queryCondition.setObject("cust_id", inputVO.getCustId());
 		}
 		
+		
 		// 名單分類
 		if (StringUtils.isNotBlank(inputVO.getCampType())) {
 			String campType = inputVO.getCampType();
@@ -627,9 +628,24 @@ public class CAM210 extends FubonWmsBizLogic {
 		StringBuffer sql = new StringBuffer();	
 		
 		sql.append("WITH LEADS AS ( ");
-		sql.append("  SELECT LEAD.LASTUPDATE, LEAD.LEAD_STATUS, LEAD.LEAD_TYPE, ");
-		sql.append("         CAMP.CAMPAIGN_ID, CAMP.STEP_ID, CAMP.CAMPAIGN_NAME, CAMP.CAMPAIGN_DESC, CAMP.END_DATE, LEAD.CUST_ID, LEAD.EMP_ID, MEM.EMP_NAME, MEM.JOB_TITLE_NAME, ");
-		sql.append("         RC.DEPT_ID AS REGION_CENTER_ID, RC.DEPT_NAME AS REGION_CENTER_NAME, OP.DEPT_ID AS BRANCH_AREA_ID, OP.DEPT_NAME AS BRANCH_AREA_NAME, BR.DEPT_ID AS BRANCH_NBR, BR.DEPT_NAME AS BRANCH_NAME, ");
+		sql.append("  SELECT LEAD.LASTUPDATE, ");
+		sql.append("         LEAD.LEAD_STATUS, ");
+		sql.append("         LEAD.LEAD_TYPE, ");
+		sql.append("         CAMP.CAMPAIGN_ID, ");
+		sql.append("         CAMP.STEP_ID, ");
+		sql.append("         CAMP.CAMPAIGN_NAME, ");
+		sql.append("         CAMP.CAMPAIGN_DESC, ");
+		sql.append("         CAMP.END_DATE, ");
+		sql.append("         LEAD.CUST_ID, ");
+		sql.append("         LEAD.EMP_ID, ");
+		sql.append("         MEM.EMP_NAME, ");
+		sql.append("         MEM.JOB_TITLE_NAME, ");
+		sql.append("         RC.DEPT_ID AS REGION_CENTER_ID, ");
+		sql.append("         RC.DEPT_NAME AS REGION_CENTER_NAME, ");
+		sql.append("         OP.DEPT_ID AS BRANCH_AREA_ID, ");
+		sql.append("         OP.DEPT_NAME AS BRANCH_AREA_NAME, ");
+		sql.append("         BR.DEPT_ID AS BRANCH_NBR, ");
+		sql.append("         BR.DEPT_NAME AS BRANCH_NAME, ");
 		sql.append("         1 AS LEAD_COUNTS, ");
 		sql.append("         CASE WHEN LEAD.LEAD_STATUS >= '03' AND NVL(LEAD.AO_CODE, ' ') <> ' ' THEN 1 ELSE 0 END AS LEAD_CLOSE ");
 		sql.append("  FROM TBCAM_SFA_CAMPAIGN CAMP, TBCAM_SFA_LEADS LEAD ");
@@ -649,6 +665,8 @@ public class CAM210 extends FubonWmsBizLogic {
 		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {
 			if (StringUtils.isNotBlank(inputVO.getBranch()) && Integer.valueOf(inputVO.getBranch()) > 0) {
 				sql.append("AND BR.DEPT_ID = :branchID "); //分行代碼
+				sql.append("AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID) ");
+
 				queryCondition.setObject("branchID", inputVO.getBranch());
 			} else if (StringUtils.isNotBlank(inputVO.getOp()) && !"null".equals(inputVO.getOp())) {
 				sql.append("AND ( ");
@@ -659,9 +677,11 @@ public class CAM210 extends FubonWmsBizLogic {
 				queryCondition.setObject("branchAreaID", inputVO.getOp());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion()) && !"null".equals(inputVO.getRegion())) {
 				sql.append("AND RC.DEPT_ID = :regionCenterID "); //區域代碼
+				
 				queryCondition.setObject("regionCenterID", inputVO.getRegion());
 			} else {
 				sql.append("AND RC.DEPT_ID IN (:regionCenterIDList) ");
+				
 				queryCondition.setObject("regionCenterIDList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
 			}
 			
@@ -673,6 +693,7 @@ public class CAM210 extends FubonWmsBizLogic {
 			}
 		} else {
 			sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID AND UHRM.DEPT_ID = :uhrmOP) ");
+			
 			queryCondition.setObject("uhrmOP", inputVO.getUhrmOP());
 		}
 				
@@ -830,6 +851,8 @@ public class CAM210 extends FubonWmsBizLogic {
 		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {		
 			if (StringUtils.isNotBlank(inputVO.getBranch()) && Integer.valueOf(inputVO.getBranch()) > 0) {
 				sql.append("AND BR.DEPT_ID = :branchID ");
+				sql.append("AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID) ");
+				
 				queryCondition.setObject("branchID", inputVO.getBranch());
 			} else if (StringUtils.isNotBlank(inputVO.getOp()) && !"null".equals(inputVO.getOp())) {
 				sql.append("AND ( ");
@@ -840,9 +863,11 @@ public class CAM210 extends FubonWmsBizLogic {
 				queryCondition.setObject("branchAreaID", inputVO.getOp());
 			} else if (StringUtils.isNotBlank(inputVO.getRegion()) && !"null".equals(inputVO.getRegion())) {
 				sql.append("AND RC.DEPT_ID = :regionCenterID "); 
+				
 				queryCondition.setObject("regionCenterID", inputVO.getRegion());
 			} else {
 				sql.append("AND RC.DEPT_ID IN (:regionCenterIDList) ");
+				
 				queryCondition.setObject("regionCenterIDList", getUserVariable(FubonSystemVariableConsts.AVAILREGIONLIST));
 			}
 		
@@ -854,6 +879,7 @@ public class CAM210 extends FubonWmsBizLogic {
 			}
 		} else {
 			sql.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID AND UHRM.DEPT_ID = :uhrmOP) ");
+			
 			queryCondition.setObject("uhrmOP", inputVO.getUhrmOP());
 		}
 		
@@ -1452,6 +1478,16 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 	public String vwcam_campaign_emp_stat_X4 (String leadType, String loginRole, String memLoginFlag, Map<String, String> headmgrMap) throws JBranchException {
 		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRM = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+
 		StringBuffer sb = new StringBuffer();
 		sb.append("WITH LEADS AS ( ");
 		sb.append("  SELECT LEAD.LASTUPDATE, ");
@@ -1488,13 +1524,15 @@ public class CAM210 extends FubonWmsBizLogic {
 		else
 			sb.append("  AND LEAD.LEAD_TYPE <> '04' ");
 		
-		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {		
+		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {	
 			// 20240325 ADD BY OCEAN : 0001920: WMS-CR-20240129-01_行銷活動管理及高端名單統計數
-			if (headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (isHANDMGR || isARMGR) {
 			} else if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("bs") >= 0) {
 				// 20210224 ADD BY OCEAN : #0524: WMS-CR-20210208-01_新增銀證督導主管角色功能
 				sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_BS_INFO BS WHERE BS.BS_CODE = LEAD.AO_CODE) ");
-			} 
+			} else {
+				sb.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID) ");
+			}
 		} else {
 			sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID AND UHRM.DEPT_ID = :uhrmOP) ");
 		}
@@ -1732,6 +1770,16 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 	public String vwcam_camp_emp_cust_stat_X4(String leadType, String loginRole, String memLoginFlag, Map<String, String> headmgrMap) throws JBranchException {
 		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRM = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+
 		StringBuffer sb = new StringBuffer();
 		sb.append("WITH LEADS AS ( ");
 		sb.append("  SELECT LEAD.LASTUPDATE, ");
@@ -1782,10 +1830,12 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		// 20240325 ADD BY OCEAN : 0001920: WMS-CR-20240129-01_行銷活動管理及高端名單統計數
 		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {		
-			if (headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (isHANDMGR || isARMGR) {
 			} else if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("bs") >= 0) {
 				// 20210224 ADD BY OCEAN : #0524: WMS-CR-20210208-01_新增銀證督導主管角色功能
 				sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_BS_INFO BS WHERE BS.BS_CODE = LEAD.AO_CODE) ");
+			} else {
+				sb.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID) ");
 			}
 		} else {
 			sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID AND UHRM.DEPT_ID = :uhrmOP) ");
@@ -1939,6 +1989,16 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 	public String vwcam_campaign_emp_stat_exp_X4(String leadType, String loginRole, String memLoginFlag, Map<String, String> headmgrMap) throws JBranchException {
 		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRM = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+
 		StringBuffer sb = new StringBuffer();
 		sb.append("WITH LEADS AS ( ");
 		sb.append("  SELECT LEAD.LASTUPDATE, ");
@@ -1979,11 +2039,13 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		// 20240325 ADD BY OCEAN : 0001920: WMS-CR-20240129-01_行銷活動管理及高端名單統計數
 		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {		
-			if (headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (isHANDMGR || isARMGR) {
 			} else if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("bs") >= 0) {
 				// 20210224 ADD BY OCEAN : #0524: WMS-CR-20210208-01_新增銀證督導主管角色功能
 				sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_BS_INFO BS WHERE BS.BS_CODE = LEAD.AO_CODE) ");
-			} 
+			} else {
+				sb.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID) ");
+			}
 		} else {
 			sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID AND UHRM.DEPT_ID = :uhrmOP) ");
 		}
@@ -2217,6 +2279,16 @@ public class CAM210 extends FubonWmsBizLogic {
 	
 	public String vwcam_camp_emp_cust_stat_exp_X4(String leadType, String loginRole, String memLoginFlag, Map<String, String> headmgrMap) throws JBranchException {
 		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isARMGR = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isOPMGR = xmlInfo.doGetVariable("FUBONSYS.MBRMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRM = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+
 		StringBuffer sb = new StringBuffer();
 		sb.append("WITH LEADS AS ( ");
 		sb.append("  SELECT LEAD.LASTUPDATE, ");
@@ -2267,11 +2339,13 @@ public class CAM210 extends FubonWmsBizLogic {
 		
 		// 20240325 ADD BY OCEAN : 0001920: WMS-CR-20240129-01_行銷活動管理及高端名單統計數
 		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") < 0) {		
-			if (headmgrMap.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE))) {
+			if (isHANDMGR || isARMGR) {
 			} else if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("bs") >= 0) {
 				// 20210224 ADD BY OCEAN : #0524: WMS-CR-20210208-01_新增銀證督導主管角色功能
 				sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_BS_INFO BS WHERE BS.BS_CODE = LEAD.AO_CODE) ");
-			} 
+			} else {
+				sb.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID) ");
+			}
 		} else {
 			sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE UHRM.EMP_ID = LEAD.EMP_ID AND UHRM.DEPT_ID = :uhrmOP) ");
 		}

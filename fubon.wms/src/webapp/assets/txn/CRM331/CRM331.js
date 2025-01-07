@@ -4,13 +4,15 @@
  */
 'use strict';
 eSoafApp.controller('CRM331Controller',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, $filter, getParameter,sysInfoService) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, $filter, getParameter,sysInfoService, crmService) {
 		$controller('BaseController', {$scope: $scope});
 		// include
 		$controller('CRM210Controller', {$scope: $scope});
 		$controller('RegionController', {$scope: $scope});
 		//
 		$scope.controllerName = "CRM331Controller";
+		
+		crmService.getForbiddenList();
 		
 		// combobox
 		$scope.pri_id = String(sysInfoService.getPriID());
@@ -215,8 +217,15 @@ eSoafApp.controller('CRM331Controller',
 				}
 			});
 			// toUpperCase
-			if($scope.inputVO.cust_id)
+			if($scope.inputVO.cust_id) {
 				$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase();
+				
+			if(crmService.checkCustId($rootScope.forbiddenData,$scope.inputVO.cust_id)) {
+					$scope.showErrorMsg("ehl_01_CRM_002");
+	    			return;
+			}
+			}
+		
 			if($scope.inputVO.re_ao_code)
 				$scope.inputVO.re_ao_code = $scope.inputVO.re_ao_code.toUpperCase();
 
@@ -241,6 +250,8 @@ eSoafApp.controller('CRM331Controller',
 					}
 					$scope.resultList = tota[0].body.resultList;
 					$scope.outputVO = tota[0].body;
+					
+					$scope.resultList = crmService.filterList($rootScope.forbiddenData,$scope.resultList);
 					return;
 				}
 			});

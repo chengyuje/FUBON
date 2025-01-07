@@ -1045,14 +1045,15 @@ public class KYC310_PersonRptEmpty extends FubonWmsBizLogic {
             
             try {
             	tBarCode = new PdfPTable(4);
-                tBarCode.setTotalWidth(450);
+                tBarCode.setTotalWidth(545);
                 PdfContentByte cb = writer.getDirectContent();
             	//#2252_調整KYC問卷條碼及版次
                 if(page == 1) {
                 	// barcode - page
                     Barcode39 code39 = new Barcode39();
                     code39.setCode("88-0402-99");
-                    code39.setBarHeight(18);
+                    code39.setBarHeight(17);
+                    code39.setSize(7);
 
                     PdfPCell cell = new PdfPCell();
                     cell.setFixedHeight(30);
@@ -1065,36 +1066,9 @@ public class KYC310_PersonRptEmpty extends FubonWmsBizLogic {
                     blank.setFixedHeight(10);
 
                     tBarCode.addCell(cell);
-                    tBarCode.addCell(blank);
-
-                    // barcode - cust id
-                    code39 = new Barcode39();
-                    code39.setCode(inputVO.getCUST_ID());
-                    code39.setBarHeight(18);
-
-                    cell = new PdfPCell();
-                    cell.setFixedHeight(30);
-                    cell.setPadding(0);
-                    cell.setBorderWidth(0);
-                    if (StringUtils.isNotBlank(inputVO.getCUST_ID())) {
-                        cell.addElement(code39.createImageWithBarcode(cb, null, null));
-                    }
-                    tBarCode.addCell(cell);
-                    tBarCode.addCell(blank);
-
-                    // barcode - tw date
-                    code39 = new Barcode39();
-                    code39.setCode(twYear + "-" + month + "-" + day);
-                    code39.setBarHeight(18);
-
-                    cell = new PdfPCell();
-                    cell.setFixedHeight(30);
-                    cell.setPadding(0);
-                    cell.setBorderWidth(0);
-                    cell.addElement(code39.createImageWithBarcode(cb, null, null));
-
-                    tBarCode.addCell(cell);
-                	
+					for (int i = 0; i < tBarCode.getNumberOfColumns(); i++) {
+						tBarCode.addCell(blank);
+					}
                 }
                 
                 // page num

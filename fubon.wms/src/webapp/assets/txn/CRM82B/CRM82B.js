@@ -28,7 +28,6 @@ eSoafApp.controller('CRM82BController',
 		}
 		
 		$scope.goPrdDetail = function(data) {
-			debugger
 			var row = {};
 			row.PRD_ID = data.PROD_ID;
 			row.BOND_CNAME = data.PROD_NAME;

@@ -11,6 +11,7 @@ eSoafApp.controller("CRM452Controller",['$rootScope', '$scope', '$controller', '
 		$controller('BaseController', {$scope : $scope});
 		
 		$scope.init = function() {
+			debugger;
 			$scope.inputVO = {
 				empID : $location.search().empID, 
 				type  : $location.search().type, 
