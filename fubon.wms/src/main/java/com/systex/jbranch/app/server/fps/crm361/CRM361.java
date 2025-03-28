@@ -77,6 +77,7 @@ public class CRM361 extends FubonWmsBizLogic {
 	}
 
 	public void inquire_common(Object body, IPrimitiveMap header) throws JBranchException {
+		long startTime = System.currentTimeMillis();
 		CRM361InputVO inputVO = (CRM361InputVO) body;
 		CRM361OutputVO return_VO = new CRM361OutputVO();
 		dam = this.getDataAccessManager();
@@ -219,6 +220,10 @@ public class CRM361 extends FubonWmsBizLogic {
 		queryCondition.setQueryString(sql.toString());
 		List list = dam.exeQuery(queryCondition);
 		return_VO.setResultList(list);
+		long endTime = System.currentTimeMillis();
+		System.out.println("=====================");
+		System.out.println((endTime-startTime)/1000);
+		System.out.println("=====================");
 		this.sendRtnObject(return_VO);
 	}
 

@@ -11,4 +11,5 @@ public interface SingleSignOnDaoInf {
 	public GenericMap queryAasSsoConfig() throws JBranchException;
 	public GenericMap queryConfig(String paramType) throws JBranchException;
 	public GenericMap queryInsSigSsoConfig() throws JBranchException;
+	public GenericMap queryMfaSigSsoConfig() throws JBranchException;
 }

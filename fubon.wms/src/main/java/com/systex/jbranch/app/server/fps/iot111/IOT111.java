@@ -296,7 +296,7 @@ public class IOT111 extends FubonWmsBizLogic {
 			Map<String, String> failTypeMap = xmlInfo.doGetVariable("CALLOUT.FAIL_TYPE", FormatHelper.FORMAT_3);
 			
 			for (Map<String, Object> map : list) {
-				String[] records = new String[96];
+				String[] records = new String[98];
 				int i = 0;
 				String regType = regTypeMap.get(checkIsNull(map, "REG_TYPE"));
 				records[i]	 = regType == null ? "" : regType;				// 保險交易項目
@@ -356,7 +356,7 @@ public class IOT111 extends FubonWmsBizLogic {
 				
 				records[++i] = checkIsNull(map, "PROPOSER_WORK");			// 要保人工作內容
 				records[++i] = checkIsNull(map, "AML");						// 要保人AML風險等級
-				records[++i] = checkIsNull(map, "PRECHECK");				// 要保人Pre-check結果
+				records[++i] = checkIsNull(map, "BUSINESS_REL");			// 新增業務關係
 				String cPremDate = this.onlyDate(checkIsNull(map, "C_PREM_DATE"));
 				records[++i] = cPremDate;									// 提領保額/保價日
 				String cLoanApplyDate = this.onlyDate(checkIsNull(map, "C_LOAN_APPLY_DATE"));
@@ -366,6 +366,8 @@ public class IOT111 extends FubonWmsBizLogic {
 				records[++i] = checkIsNull(map, "PROPOSER_INCOME3");		// 要保人授信收入
 				String cLoanChk2Date = this.onlyDate(checkIsNull(map, "C_LOAN_CHK2_DATE"));
 				records[++i] = cLoanChk2Date;								// 要保人最近撥貸日
+				String cCreditLastupdate = this.onlyDate(checkIsNull(map, "C_CREDIT_LASTUPDATE"));
+				records[++i] = cCreditLastupdate;							// 要保人最近授信收入維護日
 				String YN3 = YNMap.get(checkIsNull(map, "C_LOAN_CHK1_YN"));
 				String YN4 = YNMap.get(checkIsNull(map, "C_LOAN_CHK2_YN"));
 				String YN5 = YNMap.get(checkIsNull(map, "C_LOAN_CHK3_YN"));
@@ -382,6 +384,8 @@ public class IOT111 extends FubonWmsBizLogic {
 				records[++i] = iLoanApplyDate;								// 被保險人行内貸款申請日
 				String iLoanChk2Date = this.onlyDate(checkIsNull(map, "I_LOAN_CHK2_DATE"));
 				records[++i] = iLoanChk2Date;								// 被保人最近撥貸日
+				String iCreditLastupdate = this.onlyDate(checkIsNull(map, "I_CREDIT_LASTUPDATE"));
+				records[++i] = iCreditLastupdate;							// 被保人最近授信收入維護日
 				records[++i] = checkIsNull(map, "INSURED_WORK");			// 被保險人工作内容
 				records[++i] = currencyFormat(map, "INSURED_INCOME1");		// 被保險人業報書年收入(工作+其他)
 				records[++i] = checkIsNull(map, "I_KYC_INCOME");			// 被保險人行内KYC收入
@@ -465,7 +469,7 @@ public class IOT111 extends FubonWmsBizLogic {
 		}
 
 		// header
-		String[] csvHeader = new String[96];
+		String[] csvHeader = new String[98];
 		int j = 0;
 		csvHeader[j]   = "保險交易項目";
 		csvHeader[++j] = "適合度檢核編碼";
@@ -506,13 +510,14 @@ public class IOT111 extends FubonWmsBizLogic {
 		csvHeader[++j] = "要保人KYC等級/效期";
 		csvHeader[++j] = "要保人工作內容";
 		csvHeader[++j] = "要保人AML風險等級";
-		csvHeader[++j] = "要保人Pre-check結果";
+		csvHeader[++j] = "新增業務關係";
 		csvHeader[++j] = "要保人舊保單提領保額/保價日";
 		csvHeader[++j] = "要保人行內貸款申請日";
 		csvHeader[++j] = "要保人業報書年收入(工作+其他)";
 		csvHeader[++j] = "要保人行內KYC收入";
 		csvHeader[++j] = "要保人授信收入";
 		csvHeader[++j] = "要保人最近撥貸日";
+		csvHeader[++j] = "要保人最近授信收入維護日";
 		csvHeader[++j] = "要保人保單貸款檢核(透過本行送件)";
 		csvHeader[++j] = "要保人行內貸款檢核";
 		csvHeader[++j] = "要保人行內保單解約檢核";
@@ -521,6 +526,7 @@ public class IOT111 extends FubonWmsBizLogic {
 		csvHeader[++j] = "被保險人戶況檢核";
 		csvHeader[++j] = "被保險人行內貸款申請日";
 		csvHeader[++j] = "被保人最近撥貸日";
+		csvHeader[++j] = "被保人最近授信收入維護日";
 		csvHeader[++j] = "被保險人工作內容";
 		csvHeader[++j] = "被保險人業報書年收入(工作+其他)";
 		csvHeader[++j] = "被保險人行內KYC收入";

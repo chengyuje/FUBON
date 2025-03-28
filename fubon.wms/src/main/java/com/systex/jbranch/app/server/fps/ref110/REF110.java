@@ -107,9 +107,9 @@ public class REF110 extends FubonWmsBizLogic {
 		queryCondition.setQueryString(sb.toString());
 
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
-		String[] roleArray = {"CAM.REF_ROLE_OPH_DTL", "CAM.REF_ROLE_FC_DTL", "CAM.REF_ROLE_PS_DTL", "", "", "CAM.REF_ROLE_PAO_DTL", "CAM.REF_ROLE_JRM_DTL"};
+		String[] roleArray = {"CAM.REF_ROLE_OPH_DTL", "CAM.REF_ROLE_FC_DTL", "CAM.REF_ROLE_PS_DTL", "", "", "CAM.REF_ROLE_PAO_DTL", "CAM.REF_ROLE_JRM_DTL", "CAM.REF_ROLE_NEWPS_DTL"};
 		if (list.size() > 0) {
-			//1:理專 / 2:消金PS / 3:新金PS / 4:商金RM / 0:作業主管(暫) / 5:個金AO / 6: JRM
+			//1:理專 / 2:消金PS / 3:新金PS / 4:商金RM / 0:作業主管(暫) / 5:個金AO / 6: JRM / 7: 新興PS
 			StringBuffer roleSQL = new StringBuffer();
 			roleSQL.append("SELECT PARAM_TYPE FROM TBSYSPARAMETER WHERE PARAM_TYPE = :paramType AND PARAM_CODE = :privilegeID ");
 			Integer blur = 0;
@@ -126,6 +126,7 @@ public class REF110 extends FubonWmsBizLogic {
 						blur = i;
 				}
 			}
+
 			outputVO.setRefEmpRoleName(String.valueOf(blur));
 			outputVO.setRefEmpName((String) list.get(0).get("EMP_NAME"));
 			outputVO.setRefEmpJobTitleName((String) list.get(0).get("JOB_TITLE_NAME"));
@@ -149,7 +150,9 @@ public class REF110 extends FubonWmsBizLogic {
 				// 是否為銀證
 				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 				sb = new StringBuffer();
-				sb.append("SELECT REGION_CENTER_ID, BRANCH_AREA_ID, BRANCH_NBR, BS_CODE AS AO_CODE, EMP_ID, EMP_NAME, JOB_TITLE_NAME FROM VWORG_EMP_BS_INFO WHERE EMP_ID = :refEmpID ");
+				sb.append("SELECT REGION_CENTER_ID, BRANCH_AREA_ID, BRANCH_NBR, BS_CODE AS AO_CODE, EMP_ID, EMP_NAME, JOB_TITLE_NAME ");
+				sb.append("FROM VWORG_EMP_BS_INFO ");
+				sb.append("WHERE EMP_ID = :refEmpID ");
 
 				queryCondition.setObject("refEmpID", inputVO.getRefEmpID());
 				queryCondition.setQueryString(sb.toString());
@@ -211,7 +214,7 @@ public class REF110 extends FubonWmsBizLogic {
 
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		if (list.size() > 0) {
-			//1:櫃員 / 2:理專 / 3:消金PS / 4:作業主管 / 5:個金主管 / 6:業務主管 / 7:其他 / 8:個金AO / 9:JRM
+			//1:櫃員 / 2:理專 / 3:消金PS / 4:作業主管 / 5:個金主管 / 6:業務主管 / 7:其他 / 8:個金AO / 9:JRM / 10:新興PS
 			outputVO.setEmpRoleName(list.get(0).get("ROLE_TYPE").toString());
 			outputVO.setEmpName((String) list.get(0).get("EMP_NAME"));
 			outputVO.setEmpJobTitleName((String) list.get(0).get("JOB_TITLE_NAME"));
@@ -329,14 +332,14 @@ public class REF110 extends FubonWmsBizLogic {
 			sb.append("          FROM TBCAM_LOAN_SALEREC ");
 			sb.append("          WHERE CUST_ID = CUST.CUST_ID ");
 			sb.append("          AND REF_PROD = :refProd ");
-			sb.append("          AND (TO_CHAR(TXN_DATE, 'yyyyMMdd') >= TO_CHAR(LAST_DAY(ADD_MONTHS(SYSDATE, -3)), 'yyyyMMdd') AND TO_CHAR(TXN_DATE, 'yyyyMMdd') <= TO_CHAR(SYSDATE, 'yyyyMMdd')) ");
+			sb.append("          AND TO_CHAR(SYSDATE, 'yyyyMMdd') BETWEEN TO_CHAR(TXN_DATE, 'yyyyMMdd') AND TO_CHAR(LAST_DAY(ADD_MONTHS(TXN_DATE, 3)), 'yyyyMMdd') ");
 			sb.append("          UNION ");
 			sb.append("          SELECT CUST_ID ");
 			sb.append("          FROM TBCAM_LOAN_SALEREC_REVIEW ");
 			sb.append("          WHERE CUST_ID = CUST.CUST_ID ");
 			sb.append("          AND REF_PROD = :refProd ");
 			sb.append("          AND STATUS != 'C' ");
-			sb.append("          AND (TO_CHAR(TXN_DATE, 'yyyyMMdd') >= TO_CHAR(LAST_DAY(ADD_MONTHS(SYSDATE, -3)), 'yyyyMMdd') AND TO_CHAR(TXN_DATE, 'yyyyMMdd') <= TO_CHAR(SYSDATE, 'yyyyMMdd')) ");
+			sb.append("          AND TO_CHAR(SYSDATE, 'yyyyMMdd') BETWEEN TO_CHAR(TXN_DATE, 'yyyyMMdd') AND TO_CHAR(LAST_DAY(ADD_MONTHS(TXN_DATE, 3)), 'yyyyMMdd') ");
 			sb.append("        ) ");
 			sb.append("       ) AS SALEREC_COUNTS ");
 			

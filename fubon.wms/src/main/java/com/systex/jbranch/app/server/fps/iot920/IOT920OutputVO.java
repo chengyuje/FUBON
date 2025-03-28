@@ -1,6 +1,7 @@
 package com.systex.jbranch.app.server.fps.iot920;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ public class IOT920OutputVO extends PagingOutputVO{
 	private String AML;
 	private String PRECHECK;
 	private BigDecimal INCOME3;
+	private Date CREDIT_LASTUPDATE;
 	private String Message;
 	private CustHighNetWorthDataVO hnwcData;
 	private BigDecimal INS_ASSET;
@@ -111,6 +113,14 @@ public class IOT920OutputVO extends PagingOutputVO{
 
 	public void setINCOME3(BigDecimal iNCOME3) {
 		INCOME3 = iNCOME3;
+	}
+
+	public Date getCREDIT_LASTUPDATE() {
+		return CREDIT_LASTUPDATE;
+	}
+
+	public void setCREDIT_LASTUPDATE(Date cREDIT_LASTUPDATE) {
+		CREDIT_LASTUPDATE = cREDIT_LASTUPDATE;
 	}
 
 	public String getMessage() {

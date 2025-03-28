@@ -19,14 +19,17 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
+import com.systex.jbranch.app.server.fps.iot920.IOT920;
 import com.systex.jbranch.comutil.collection.GenericMap;
 import com.systex.jbranch.comutil.parse.JsonUtil;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
+import com.systex.jbranch.fubon.jlb.DataFormat;
 import com.systex.jbranch.fubon.webservice.rs.SeniorCitizenClientRS;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
 import com.systex.jbranch.platform.common.errHandle.DAOException;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
+import com.systex.jbranch.platform.common.util.PlatformContext;
 import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
@@ -218,6 +221,49 @@ public class SeniorValidation extends FubonWmsBizLogic {
 			Map<String, String> map = new HashMap<String, String>();
 			
 			map.put("invalidCode", "E"); //金融認知填答第二或第三個選項
+			rtnList.add(map);
+		}
+		
+		return rtnList;
+	}
+	
+	/***
+	 * 前一次填答紀錄：保險要保人購買檢核高齡評估量表檢核(主管覆核)
+	 * 要保人或被保人或繳款人，年齡>=64.5歲(保險年齡=65歲以上)
+	 * CL：前一次填答紀錄：高齡客戶資訊觀察表取得能力表現是否填答<>8.無上述情形
+	 * DL：前一次填答紀錄：金融認知是否填答第一選項：無法自行透過報章雜誌或網路查詢，取得金融資訊
+	 * EL：前一次填答紀錄：高齡客戶資訊觀察表是否有填答不可申購的選項(金融認知中第二或第三個選項)
+	 * @param custId
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Map<String, String>> validSeniorCustEvalIOTLast(String custID) throws Exception  {
+		List<Map<String, String>> rtnList = new ArrayList<Map<String, String>>();
+		custID = custID.toUpperCase();
+			
+		//CL：前一次填答紀錄：高齡客戶資訊觀察表取得能力表現是否填答<>8.無上述情形
+		if(validSeniorCust01BChkBuyLastAns(custID, "IOT")) {
+			Map<String, String> map = new HashMap<String, String>();
+			
+			map.put("invalidCode", "CL"); //能力表現填答<>8.無上述情形
+			rtnList.add(map);
+		}
+		
+		//CL：前一次填答紀錄：金融認知是否填答第一選項：無法自行透過報章雜誌或網路查詢，取得金融資訊
+		//Y：是/N：否
+		if(validSeniorCust01FChkBuyLastAns(custID, "IOT")) {
+			Map<String, String> map = new HashMap<String, String>();
+			
+			map.put("invalidCode", "DL"); //金融認知填答第一選項
+			rtnList.add(map);
+		}
+		
+		//CL：前一次填答紀錄：高齡客戶資訊觀察表是否有填答不可申購的選項(金融認知中第二或第三個選項)
+		//true 是，有填答 (不可申購) false：否，沒有填答(可申購)
+		if(validSeniorCust02FNoBuyLastAns(custID, "IOT")) {
+			Map<String, String> map = new HashMap<String, String>();
+			
+			map.put("invalidCode", "EL"); //金融認知填答第二或第三個選項
 			rtnList.add(map);
 		}
 		
@@ -488,6 +534,71 @@ public class SeniorValidation extends FubonWmsBizLogic {
 	}
 	
 	/***
+	 * 前一次填答紀錄：金融認知是否填答第一選項：無法自行透過報章雜誌或網路查詢，取得金融資訊
+	 * @param custID
+	 * @param source
+	 * @return	true：是(需主管確認)
+	 * 			false：否(可申購) //若沒有前一次填答紀錄當作"可申購"
+	 * @throws Exception
+	 */
+	private boolean validSeniorCust01FChkBuyLastAns(String custID, String source) throws Exception {
+		//傳入參數
+		GenericMap inputGmap = new GenericMap();
+		inputGmap.put("CUST_ID", custID);
+		inputGmap.put("SOURCE_METHOD", source);
+		
+		//前一次填答紀錄：金融認知是否填答第一選項 Y：是(需主管確認)/N：否(可申購)
+		Map<String, Object> result = sendSeniorEvalAPI("getOldCust_01F_ChkBuy_LastAns", inputGmap);
+		String needAuth = ObjectUtils.toString(result.get("FINACIAL_COGNITION_YN"));
+		this.setSeniorCust01FChkBuyDTL(ObjectUtils.toString(result.get("FINACIAL_COGNITION_DTL")));
+		
+		return "Y".equals(needAuth) ? true : false;
+	}
+	
+	/***
+	 * 前一次填答紀錄：高齡客戶資訊觀察表是否有填答不可申購的選項(金融認知中第二或第三個選項)
+	 * getOldCust_02F_NoBuy_LastAns
+	 * @return	true：是，有填答 (不可申購)
+	 * 			false：否，沒有填答(可申購) //若沒有前一次填答紀錄當作"可申購"
+	 * @throws Exception
+	 */
+	public boolean validSeniorCust02FNoBuyLastAns(String custID, String source) throws Exception {
+		//傳入參數
+		GenericMap inputGmap = new GenericMap();
+		inputGmap.put("CUST_ID", custID);
+		inputGmap.put("SOURCE_METHOD", source);
+		
+		//前一次填答紀錄：金融認知是否填答2或3項	Y：是(不可申購)/N：否(可申購)
+		Map<String, Object> result = sendSeniorEvalAPI("getOldCust_02F_NoBuy_LastAns", inputGmap);		
+		String item23 = ObjectUtils.toString(result.get("FINACIAL_COGNITION_YN"));
+				
+		return "Y".equals(item23) ? true : false;
+	}
+	
+	/***
+	 * 前一次填答紀錄：高齡客戶資訊觀察表取得能力表現是否填答需主管確認方可申購
+	 * getOldCust_01B_ChkBuy_LastAns
+	 * 能力表現是否填答1~7項
+	 * @return	true：是(需主管確認)
+	 * 			false：否(可申購) //若沒有前一次填答紀錄當作"可申購"
+	 * 設定setSeniorCust01ANoBuyDTL：選項明細(各項選項串成明細，以；連接)
+	 * @throws Exception
+	 */
+	public boolean validSeniorCust01BChkBuyLastAns(String custID, String source) throws Exception {
+		//傳入參數
+		GenericMap inputGmap = new GenericMap();
+		inputGmap.put("CUST_ID", custID);
+		inputGmap.put("SOURCE_METHOD", source);
+		
+		//前一次填答紀錄：能力表現是否填答1~7項 Y：是(需主管確認)/N：否(可申購)
+		Map<String, Object> result = sendSeniorEvalAPI("getOldCust_01B_ChkBuy_LastAns", inputGmap);
+		String needAuth = ObjectUtils.toString(result.get("ABILITY_YN"));
+		this.setSeniorCust01ANoBuyDTL(ObjectUtils.toString(result.get("ABILITY_DTL")));
+		
+		return "Y".equals(needAuth) ? true : false;
+	}
+	
+	/***
 	 * 呼叫高齡評估量表資料API
 	 * @param apiName
 	 * @param inputVO
@@ -500,15 +611,24 @@ public class SeniorValidation extends FubonWmsBizLogic {
 		//取得API URL
 		String url = (String) xmlInfo.getVariable("SYS.SENIOR_CITIZEN_URL", apiName, "F3");
 		
-		//呼叫API Log
-		logger.info(apiName + " url:" + url);
-		logger.info(apiName + " inputVO:" + gson.toJson(inputVO.getParamMap()));
+//		DataFormat dfObj = new DataFormat();
+//		
+//		//呼叫API Log
+//		logger.info(apiName + " url:" + url);
+//		logger.info(apiName + " inputVO:" + dfObj.maskJson(gson.toJson(inputVO.getParamMap()), "CUST_?[IN][DO]"));
 		
 		//取得客戶評估量表API回傳資料
 		Map<String, Object> apiResult = new SeniorCitizenClientRS().getMap(url, inputVO);
 		
-		//API回傳Log
-		logger.info(apiName + " return:" + apiResult.toString());
+//		//API回傳Log
+//		logger.info(apiName + " return:" + apiResult.toString());
+		
+		//將每次呼叫高齡API資料寫入LOG檔
+		try {
+			IOT920 iot920 = (IOT920) PlatformContext.getBean("iot920");
+			String txnId = this.getClass().getSimpleName() + "." + new Object() {}.getClass().getEnclosingMethod().getName();
+			iot920.writeWebServiceLog(txnId, url, "", gson.toJson(inputVO.getParamMap()), apiResult.toString());
+		} catch(Exception e) {}
 		
 		//若API有回錯誤訊息
 		if(StringUtils.isNotBlank(ObjectUtils.toString(apiResult.get("EMSGTXT")))) {

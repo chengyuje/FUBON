@@ -29,7 +29,9 @@ public class IOT110OutputVO extends PagingOutputVO {
 	private String invalidSeniorCustEvlBossE;
 	private CustHighNetWorthDataVO hnwcData;
 	private String CALLOUT_YN;
-
+	private String invalidSeniorCustEvlBossCL;
+	private String invalidSeniorCustEvlBossDL;
+	private String invalidSeniorCustEvlBossEL;
 
 	public List getKYCList() {
 		return KYCList;
@@ -156,6 +158,24 @@ public class IOT110OutputVO extends PagingOutputVO {
 	}
 	public void setCALLOUT_YN(String cALLOUT_YN) {
 		CALLOUT_YN = cALLOUT_YN;
+	}
+	public String getInvalidSeniorCustEvlBossCL() {
+		return invalidSeniorCustEvlBossCL;
+	}
+	public void setInvalidSeniorCustEvlBossCL(String invalidSeniorCustEvlBossCL) {
+		this.invalidSeniorCustEvlBossCL = invalidSeniorCustEvlBossCL;
+	}
+	public String getInvalidSeniorCustEvlBossDL() {
+		return invalidSeniorCustEvlBossDL;
+	}
+	public void setInvalidSeniorCustEvlBossDL(String invalidSeniorCustEvlBossDL) {
+		this.invalidSeniorCustEvlBossDL = invalidSeniorCustEvlBossDL;
+	}
+	public String getInvalidSeniorCustEvlBossEL() {
+		return invalidSeniorCustEvlBossEL;
+	}
+	public void setInvalidSeniorCustEvlBossEL(String invalidSeniorCustEvlBossEL) {
+		this.invalidSeniorCustEvlBossEL = invalidSeniorCustEvlBossEL;
 	}
 		
 }

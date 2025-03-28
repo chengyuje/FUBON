@@ -176,6 +176,22 @@ eSoafApp.controller('PMS227Controller', function($rootScope, $scope, $controller
     	});
 	}
 	
+	/** 上傳客戶ROA **/
+	$scope.updateROA = function(){
+		var dialog = ngDialog.open({
+			template: 'assets/txn/PMS227/PMS227_UPLOAD.html',
+			className: 'PMS227_UPLOAD',
+			showClose: false,
+			controller: ['$scope', function($scope) {
+				$scope.uploadName = 'importROA';
+            }]
+		}).closePromise.then(function(data) {
+//    		if(data.value == 'cancel'){
+//    			
+//			}
+    	});
+	}
+	
 	/** 匯出 **/
 	$scope.exportRPT = function() {
 		$scope.sendRecv("PMS227", "export",	"com.systex.jbranch.app.server.fps.pms227.PMS227OutputVO", {'list':$scope.csvList}, function(tota, isError) {

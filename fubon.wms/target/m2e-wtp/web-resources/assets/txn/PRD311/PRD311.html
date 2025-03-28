@@ -5,6 +5,7 @@
 </style>
 <script type="text/javascript" src="assets/txn/PRD311/PRD311.js"></script>
 <script type="text/javascript" src="assets/txn/PRD311/PRD311_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/PRD311/PRD311_MODIFY.js"></script>
 <div class="PRD311" ng-controller="PRD311Controller">
     <div class="tfb_content">
         <div class="tfb_content_icon"></div>
@@ -79,7 +80,7 @@
                     <th ng-bind="'員工姓名'"></th>
                     <th ng-bind="'通過狀態'"></th>
                     <th ng-bind="'通過時間'"></th>
-                    <th ng-bind="'刪除'"></th>
+                    <th ng-bind="'功能'"></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -90,12 +91,22 @@
                     <td class="center" ng-bind="row.EMP_ID"></td>
                     <td class="center" ng-bind="row.EMP_NAME"></td>
                     <td class="center" ng-bind="row.STATUS | mapping:mappingSet['STATUS']:'F3'"></td>
-                    <td class="center" ng-bind="toJsDate(row.COMPLETE_DATE) | date:'yyyy-MM-dd'"></td>
+                    <td class="center" ng-bind="row.COMPLETE_DATE | date:'yyyy-MM-dd'"></td>
                     <td class="center">
-                        <button ng-click="delete(row)" class="btn btn-danger">
+                    	<e-combobox id="function"
+									ng-datasource="mappingSet['FUNCTION']"
+									ng-model="row.FUNCTION"
+		   							ng-validate="false" 
+		   							ng-editable="false"
+		   							ng-format="F3"
+		   							ng-required="true"
+		   							ng-change="modify(row)"
+		   							width="180px"
+		   							style="line-height:20px;" />
+                       <!--  <button ng-click="delete(row)" class="btn btn-danger">
                             <span class="glyphicon glyphicon-trash"></span>
                             <span ng-bind="'刪除'"></span>
-                        </button>
+                        </button> -->
                     </td>
                 </tr>
                 </tbody>

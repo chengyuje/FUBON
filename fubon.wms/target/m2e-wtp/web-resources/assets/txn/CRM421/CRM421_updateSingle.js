@@ -20,7 +20,7 @@ eSoafApp.controller('CRM421_updateSingleController',
 	    //
 		
 		$scope.mappingSet['APPLY_TYPE']=[];
-		$scope.mappingSet['APPLY_TYPE'].push({LABEL:"基金單筆申購" , DATA: '1'}, {LABEL:"基金定期(不)定額申購" , DATA: '2'}, {LABEL:"海外ETF/股票申購" , DATA: '4'});
+		$scope.mappingSet['APPLY_TYPE'].push({LABEL:"基金單筆申購" , DATA: '1'}, {LABEL:"基金定期(不)定額申購" , DATA: '2'}, {LABEL:"基金動態鎖利" , DATA: '6'}, {LABEL:"海外ETF/股票申購" , DATA: '4'});
 		
 		// init
 		$scope.init = function(){
@@ -52,23 +52,28 @@ eSoafApp.controller('CRM421_updateSingleController',
 			var mainYN = main_prd;
 			var dialog = ngDialog.open({
 				template: 'assets/txn/CRM421/CRM421_searchProd.html',
-				className: (apply_type == '1' || apply_type == '2' ? 'PRD110' : 'PRD120'),
+				className: (apply_type == '1' || apply_type == '2' || apply_type == '6' ? 'PRD110' : 'PRD120'),
 				showClose: false,
 				scope : $scope,
 				controller: ['$scope', function($scope) {
-					if(mainYN){
-						$scope.txnName = "本月主推";
-					}else{
-						$scope.txnName = "搜尋基金";
+					if(apply_type == "6") {
+						$scope.txnName = "搜尋母基金";
+						$scope.dynamicType = "M"; //動態鎖利類別 M:母基金 C:子基金
+					} else {
+						if(mainYN){
+							$scope.txnName = "本月主推";
+						}else{
+							$scope.txnName = "搜尋基金";
+						}
 					}
 					$scope.isPop = true;
-	        		$scope.routeURL = (apply_type == '1' || apply_type == '2' ? 'assets/txn/PRD110/PRD110.html' : 'assets/txn/PRD120/PRD120.html');
-	        		$scope.tradeType = (apply_type == '1' ? '1' : (apply_type == '2' ? '5' : '1'));
+	        		$scope.routeURL = (apply_type == '1' || apply_type == '2' || apply_type == '6' ? 'assets/txn/PRD110/PRD110.html' : 'assets/txn/PRD120/PRD120.html');
+	        		$scope.tradeType = ((apply_type == '1' || apply_type == '6') ? '1' : (apply_type == '2' ? '5' : '1'));
 	        		$scope.cust_id = cust_id
 	        		$scope.main_prd = (mainYN == 'Y' ? mainYN : '');
 	            }]
 			}).closePromise.then(function (data) {
-				if (apply_type == '1') {
+				if (apply_type == '1' || apply_type == '6') {
 					$scope.prod_id_1 = data.value.PRD_ID;
 				} else if (apply_type == '2') {
 					$scope.prod_id_2 = data.value.PRD_ID;
@@ -119,7 +124,7 @@ eSoafApp.controller('CRM421_updateSingleController',
                 		}
 						$scope.updateList = tota[0].body.updateList;
 						
-						if ($scope.updateList[0].APPLY_TYPE == '1') {
+						if ($scope.updateList[0].APPLY_TYPE == '1' || $scope.updateList[0].APPLY_TYPE == '6') {
 				    		
 				    		$scope.prod_id_1 = $scope.updateList[0].PROD_ID;
 				    		$scope.prod_name_1 = $scope.updateList[0].PROD_NAME;
@@ -162,7 +167,7 @@ eSoafApp.controller('CRM421_updateSingleController',
 	    //僅單次議價且完成覆核方可進行修改，並僅能修改商品和金額
 	    $scope.updateApplyFlow = function() {
 	    	
-	    	if ($scope.inputVO.apply_type == '1') {
+	    	if ($scope.inputVO.apply_type == '1' || $scope.inputVO.apply_type == '6') {
 	    		
 	    		$scope.inputVO.prod_id = $scope.prod_id_1;
 	    		$scope.inputVO.prod_name = $scope.prod_name_1;

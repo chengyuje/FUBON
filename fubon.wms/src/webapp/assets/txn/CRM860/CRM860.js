@@ -42,14 +42,14 @@ eSoafApp.controller('CRM860Controller',
 		$scope.init = function() {
 			$scope.inputVO = {};
 			$scope.inputVO.custID = $scope.custVO.CUST_ID;
-//			var min_mon = new Date();
-//			min_mon.setMonth(min_mon.getMonth() - 3);
-//			min_mon.setHours(0, 0, 0, 0);
-//			$scope.inputVO.startDate = min_mon;
-//			var min_mon2 = new Date();
-//			min_mon2.setDate(min_mon2.getDate() - 1);
-//			min_mon2.setHours(0, 0, 0, 0);
-//			$scope.inputVO.endDate = min_mon2;
+			var min_mon = new Date();
+			min_mon.setMonth(min_mon.getMonth() - 3);
+			min_mon.setHours(0, 0, 0, 0);
+			$scope.inputVO.startDate = min_mon;
+			var min_mon2 = new Date();
+			min_mon2.setDate(min_mon2.getDate() - 1);
+			min_mon2.setHours(0, 0, 0, 0);
+			$scope.inputVO.endDate = min_mon2;
 			$scope.limitDate();
 			$scope.firstTime = true;
 		};

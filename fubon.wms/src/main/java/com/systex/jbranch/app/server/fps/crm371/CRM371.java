@@ -129,6 +129,7 @@ public class CRM371 extends FubonWmsBizLogic {
 	}
 
 	public void inquire_common(Object body, IPrimitiveMap header) throws JBranchException {
+		long startTime = System.currentTimeMillis();
 		CRM371InputVO inputVO = (CRM371InputVO) body;
 		CRM371OutputVO return_VO = new CRM371OutputVO();
 		dam = this.getDataAccessManager();
@@ -175,7 +176,7 @@ public class CRM371 extends FubonWmsBizLogic {
 			}
 			sql.append("EXISTS (SELECT 1 FROM VWCRM_AO_CONTROL VAC WHERE P.NEW_AO_CODE = VAC.AO_CODE) ");
 		}
-
+		//調整類別
 		if (!StringUtils.isBlank(inputVO.getTrs_type())) {
 			sql.append("AND P.TRS_TYPE = :trs_type ");
 			queryCondition.setObject("trs_type", inputVO.getTrs_type());
@@ -199,12 +200,12 @@ public class CRM371 extends FubonWmsBizLogic {
 			sql.append("AND P.CUST_ID = :cust_id ");
 			queryCondition.setObject("cust_id", inputVO.getCust_id());
 		}
-
+		//等級
 		if (!StringUtils.isBlank(inputVO.getCon_degree())) {
 			sql.append("AND C.CON_DEGREE = :con_degree ");
 			queryCondition.setObject("con_degree", inputVO.getCon_degree());
 		}
-
+		//最近異動頻率
 		if (!StringUtils.isBlank(inputVO.getChg_frq())) {
 			sql.append("AND P.CUST_ID IN (SELECT CUST_ID FROM TBCRM_CUST_AOCODE_CHGLOG ");
 			sql.append("WHERE TRUNC(LETGO_DATETIME) >= TRUNC(SYSDATE - :chg_frq )) ");
@@ -215,17 +216,17 @@ public class CRM371 extends FubonWmsBizLogic {
 			sql.append("AND C.CUST_NAME like :cust_name ");
 			queryCondition.setObject("cust_name", "%" + inputVO.getCust_name() + "%");
 		}
-
+		//客群身分
 		if (!StringUtils.isBlank(inputVO.getVip_degree())) {
 			sql.append("AND C.VIP_DEGREE = :vip_degree ");
 			queryCondition.setObject("vip_degree", inputVO.getVip_degree());
 		}
-
+		//經營頻次符合度
 		if (!StringUtils.isBlank(inputVO.getMatch_yn())) {
 			sql.append("AND N.TAKE_CARE_MATCH_YN = :match_yn ");
 			queryCondition.setObject("match_yn", inputVO.getMatch_yn());
 		}
-
+		//已照會客戶
 		if (!StringUtils.isBlank(inputVO.getCall_review_type())) {
 			sql.append("AND P.CALL_REVIEW_STATUS = :call_review_type ");
 			queryCondition.setObject("call_review_type", inputVO.getCall_review_type());
@@ -247,6 +248,10 @@ public class CRM371 extends FubonWmsBizLogic {
 		queryCondition.setQueryString(sql.toString());
 		List list = dam.exeQuery(queryCondition);
 		return_VO.setResultList(list);
+		long endTime = System.currentTimeMillis();
+		System.out.println("=====================");
+		System.out.println((endTime-startTime)/1000);
+		System.out.println("=====================");
 		this.sendRtnObject(return_VO);
 	}
 

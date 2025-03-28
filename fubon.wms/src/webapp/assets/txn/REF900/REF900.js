@@ -94,8 +94,8 @@ eSoafApp.controller('REF900Controller',
 							}
 							// 若非受轉人，但權限群組是011/012/013/046 且是待仲裁案件， 用主管的下拉選單
 							else if(row.STATUS == 'A' && row.SALES_BOSS == $scope.pri_id && boss_temp.indexOf(projInfoService.getUserID()) > -1) {
-								row.set.push({LABEL: "發回轉介", DATA: "Y"});
-								row.set.push({LABEL: "刪除", DATA: "C"});
+								row.set.push({LABEL: "轉介成立", DATA: "Y"});
+								row.set.push({LABEL: "轉介不成立", DATA: "C"});
 							}
 							else
 								row.enableCombo = false;

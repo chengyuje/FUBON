@@ -36,7 +36,8 @@
 							</thead>
 							<tbody>
 								<tr class="repeat-row" ng-repeat="row in data track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
-									<td><button ng-click="checkEviNumAndCloseDialog(row)" class="btn btn-info" ng-hide="disButton && (row.AssetType=='0004' || row.AssetType =='0005')" data-dismiss="modal">選擇</button></td>
+									<td ng-if="!dynamicYN || dynamicYN != 'Y'"><button ng-click="checkEviNumAndCloseDialog(row)" class="btn btn-info" ng-hide="disButton && (row.AssetType=='0004' || row.AssetType =='0005')" data-dismiss="modal">選擇</button></td>
+									<td ng-if="dynamicYN && dynamicYN == 'Y'"><button ng-click="getDynaData(row)" class="btn btn-info" ng-disabled="row.Dynamic == '2'" data-dismiss="modal">選擇</button></td>
 									<td>{{row.assetTradeSubTypeD| mapping:mappingSet['SOT.ASSET_TRADE_SUB_TYPE']:'F3'}}</td>
 <!-- 									<td>{{row.assetTradeSubType}}</td> -->
 									<td>{{row.EviNum}}</td>

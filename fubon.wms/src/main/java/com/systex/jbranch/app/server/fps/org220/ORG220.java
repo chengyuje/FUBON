@@ -616,7 +616,7 @@ public class ORG220 extends FubonWmsBizLogic {
 		TBORG_AGENTVO vo = new TBORG_AGENTVO();
 		vo = (TBORG_AGENTVO) dam.findByPKey(TBORG_AGENTVO.TABLE_UID, inputVO.getSeq_no());
 		
-		System.out.println(vo);
+//		System.out.println(vo);
 		if (null != vo) {	
 			if ("ORG".equals(inputVO.getRPT_TYPE())) {
 				vo.setAGENT_ID(inputVO.getEmp_id());

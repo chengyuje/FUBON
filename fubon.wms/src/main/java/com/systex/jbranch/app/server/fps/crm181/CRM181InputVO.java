@@ -23,6 +23,9 @@ public class CRM181InputVO extends PagingInputVO {
 	private String seqNo;
 	private String seqM_No;
 	private String pri_type;
+	private String CERT_NBR;
+	private String PRD_ID;
+	private Date TXN_DATE;
 	
 	private String memLoginFlag;
 
@@ -160,6 +163,30 @@ public class CRM181InputVO extends PagingInputVO {
 
 	public void setPri_type(String pri_type) {
 		this.pri_type = pri_type;
+	}
+
+	public String getCERT_NBR() {
+		return CERT_NBR;
+	}
+
+	public void setCERT_NBR(String cERT_NBR) {
+		CERT_NBR = cERT_NBR;
+	}
+
+	public String getPRD_ID() {
+		return PRD_ID;
+	}
+
+	public void setPRD_ID(String pRD_ID) {
+		PRD_ID = pRD_ID;
+	}
+
+	public Date getTXN_DATE() {
+		return TXN_DATE;
+	}
+
+	public void setTXN_DATE(Date tXN_DATE) {
+		TXN_DATE = tXN_DATE;
 	}
 
 }

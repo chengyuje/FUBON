@@ -4,11 +4,17 @@
 */
 'use strict';
 eSoafApp.controller('CRM110_MultiDataController',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService, getParameter) {
 		$controller('BaseController', {$scope: $scope});
 		$scope.controllerName = "CRM110_MultiDataController";
 		$scope.userList = $scope.row;
 		$scope.totaBody = $scope.totaBody;
+		
+		getParameter.XML(["CRM.NONSEARCH_ID"], function(totas) {
+			if (totas) {
+				$scope.mappingSet['CRM.NONSEARCH_ID'] = totas.data[totas.key.indexOf("CRM.NONSEARCH_ID")];
+			}
+		});
 		
 		/** 抓出所有分行 **/
 		$scope.mappingSet['branchsDesc_all'] = [];		
@@ -46,6 +52,22 @@ eSoafApp.controller('CRM110_MultiDataController',
 		};
 		
 	    $scope.goCRM610 = function(row){
+	    	$scope.noQuery = false;
+	    	
+	    	angular.forEach($scope.mappingSet['CRM.NONSEARCH_ID'], function(rowrow) {
+        		if(row.CUST_ID === rowrow.DATA ){
+        			$scope.showErrorMsg("ehl_01_CRM_001");
+        			$scope.noQuery = true;
+        			return;
+        		}
+			});		
+			
+			if($scope.noQuery) {
+				return;
+			}
+	    	
+	    	
+	    	
 	    	$scope.CRM_CUSTVO = {
 					CUST_ID :  row.CUST_ID,
 					CUST_NAME :row.CUST_NAME

@@ -211,7 +211,7 @@ public class PMS108 extends FubonWmsBizLogic {
 					VO.setTYPE(map.get("TYPE").toString());
 					BigDecimal ROI = new BigDecimal(map.get("ROI").toString());
 					VO.setROI(ROI);
-					System.out.println("ggggggg"+map.get("AMT_TWD"));
+//					System.out.println("ggggggg"+map.get("AMT_TWD"));
 					BigDecimal AMT_TWD = new BigDecimal(String.valueOf(map.get("AMT_TWD")));
 					VO.setAMT_TWD(AMT_TWD);
 					dam.update(VO);

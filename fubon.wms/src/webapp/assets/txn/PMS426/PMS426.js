@@ -7,45 +7,50 @@ eSoafApp.controller('PMS426Controller', function($rootScope, $scope, $controller
 	$controller('RegionController', {$scope: $scope});
 	
 	// filter
-	getParameter.XML(["PMS.CHECK_TYPE"], function(totas) {
+	getParameter.XML(["PMS.CHECK_TYPE", "PMS.ACCOUNT_REL"], function(totas) {
 		if (totas) {
 			$scope.mappingSet['PMS.CHECK_TYPE'] = totas.data[totas.key.indexOf('PMS.CHECK_TYPE')];
+			$scope.mappingSet['PMS.ACCOUNT_REL'] = totas.data[totas.key.indexOf('PMS.ACCOUNT_REL')];
 		}
 	});
 	// ===
 	
-	var NowDate = new Date();
-	var yr = NowDate.getFullYear();
-    var mm = NowDate.getMonth() + 1;
-    var strmm = '';
-    $scope.mappingSet['timeE'] = [];
-    for(var i = 0; i < 13; i++){
-    	mm = mm -1;
-    	if(mm == 0){
-    		mm = 12;
-    		yr = yr-1;
-    	}
-    	if(mm < 10)
-    		strmm = '0' + mm;
-    	else
-    		strmm = mm;        		
-    	$scope.mappingSet['timeE'].push({
-    		LABEL: yr + '/' + strmm,
-    		DATA: yr + '' + strmm
-    	});        
-    }
+	$scope.model = {};
+	$scope.open = function($event, elementOpened) {
+		$event.preventDefault();
+		$event.stopPropagation();
+		$scope.model[elementOpened] = !$scope.model[elementOpened];
+	};
+	
+    $scope.importStartDateOptions = {
+    	minMode: 'month', 
+		maxDate: $scope.inputVO.eCreDate || $scope.maxDate,
+		minDate: $scope.minDate
+	};
+    
+	$scope.importEndDateOptions = {
+		minMode: 'month',
+		maxDate: $scope.maxDate,
+		minDate: $scope.inputVO.sCreDate || $scope.minDate
+	};
+	
+	$scope.limitDate = function() {
+		$scope.importStartDateOptions.maxDate = $scope.inputVO.eCreDate || $scope.maxDate;
+		$scope.importEndDateOptions.minDate = $scope.inputVO.sCreDate || $scope.minDate;
+	};
 
-    //選取月份下拉選單 --> 重新設定可視範圍
-    $scope.dateChange = function() {
-	   if($scope.inputVO.sCreDate != ''){
-	   		$scope.inputVO.reportDate = $scope.inputVO.sCreDate;
-	   } else {   
-		   $scope.inputVO.sCreDate = '201701';
-		   $scope.inputVO.reportDate = $scope.inputVO.sCreDate;    
-		   $scope.inputVO.sCreDate = '';
-	   } 
-    	$scope.inputVO.dataMon = $scope.inputVO.sCreDate; 
-    }; 
+	 //選取月份下拉選單 --> 重新設定可視範圍
+	$scope.dateChange = function(){
+		if ($scope.inputVO.sCreDate != '') {
+			$scope.inputVO.reportDate = $scope.inputVO.sCreDate;
+		} else {   
+			$scope.inputVO.sCreDate = '201701';
+			$scope.inputVO.reportDate = $scope.inputVO.sCreDate;
+			$scope.inputVO.sCreDate = '';
+		} 
+		
+		$scope.inputVO.dataMonth = $scope.inputVO.sCreDate; 
+	}; 
     
 	// 初始化
 	$scope.init = function() {
@@ -53,6 +58,7 @@ eSoafApp.controller('PMS426Controller', function($rootScope, $scope, $controller
 
 		$scope.inputVO = {
 			sCreDate			: '',
+			eCreDate            : '',
 			region_center_id	: '',   // 區域中心
 			branch_area_id		: '', 	// 營運區
 			branch_nbr			: '',	// 分行	
@@ -101,6 +107,7 @@ eSoafApp.controller('PMS426Controller', function($rootScope, $scope, $controller
     		return;
     	}
 		
+		$scope.paramList = [];
 		$scope.resultList = [];
 		$scope.sendRecv("PMS426", "query", "com.systex.jbranch.app.server.fps.pms426.PMS426InputVO", $scope.inputVO, function(tota, isError) {
 			if (!isError) {
@@ -147,7 +154,9 @@ eSoafApp.controller('PMS426Controller', function($rootScope, $scope, $controller
 		angular.forEach($scope.paramList, function(row, index, objs){
 			if (row.UPDATE_FLAG == 'Y') {
 				if (!row.HR_ATTR || 
-					!row.NOTE2 ||
+					(!row.CUST_BASE || // 客戶背景或關係需填寫
+					 (row.CUST_BASE == 'O' && !row.NOTE2) // 客戶背景或關係若為其它，請補充查證方式
+					) || 
 					(!row.NOTE_TYPE || // 查證方式需填寫
 					 (row.NOTE_TYPE == 'O' && !row.NOTE) || // 查證方式若為其它，請補充查證方式
 					 ((row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A') && !row.RECORD_SEQ && row.RECORD_YN == 'Y') || // 查證方式若為電訪/系統查詢及電訪客戶，請輸入電訪錄音編號
@@ -172,5 +181,21 @@ eSoafApp.controller('PMS426Controller', function($rootScope, $scope, $controller
             }
         });
     };
+    
+    $scope.setDefaultVal = function (row) {
+		switch(row.CUST_BASE) {
+			case "M":
+			case "PC":
+			case "BS":
+			case "G":
+			case "B":
+				row.HR_ATTR = 'N';
+				break;
+			case "O":
+				break;
+			default:
+				break;
+		}
+	}
 	
 });

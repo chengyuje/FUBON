@@ -59,6 +59,7 @@ eSoafApp.controller('CAM190Controller',
 		$scope.init();
 
 		$scope.getList = function(flag, type) {
+			debugger;
 			if (typeof(type) !== 'undefined') {
 				$scope.customTabType = type ? type : $scope.customTabType;
 				$scope.objForTab.secTab = $scope.customTabType == 'tab97' ? 97 : ($scope.customTabType == 'tab98' ? 98 : 99);
@@ -91,6 +92,7 @@ eSoafApp.controller('CAM190Controller',
 		};
 		
 		$scope.customQuery = function(type) {
+			debugger;
 			$scope.searchFlag = true;
 			$scope.customTabType = (typeof(type) !== 'undefined' ? type : $scope.customTabType);
 			$scope.getList($scope.searchFlag, $scope.customTabType);
@@ -141,7 +143,7 @@ eSoafApp.controller('CAM190Controller',
 			
 			if (!(typeof($scope.leadTypeTemp) === 'undefined')) {
 
-				if ($scope.pri_id == '004AO') {
+				if ($scope.pri_id == '004AO' || $scope.pri_id == '004PS' ) {
 					if ($scope.AVAIL_REGION.length > 1) {
 						$scope.inputVO.regionID = '';
 					}

@@ -16,15 +16,15 @@ public class PMS422InputVO extends PagingInputVO {
 	private String branch_nbr;
 	private String emp_id;
 	private String sourceOfDemand;
-	private String custID;
-
+	
 	private String outCustID1;
 	private String inCustID1;
 	private String inCustID2;
 	private String actStartDate;
 	private String actEndDate;
-
-	private String empID; // sheet1 查詢條件：行員id
+	
+	private String custID;// 查詢條件：員工編號
+	private String empID; // 查詢條件：行員身分證號
 	private String noteStatus; // sheet2 查詢條件：已回覆/未回覆
 	private String outCustID; // sheet2 查詢條件：轉出id
 	private String selectRoleID;

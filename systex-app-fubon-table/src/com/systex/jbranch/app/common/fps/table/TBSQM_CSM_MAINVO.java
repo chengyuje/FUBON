@@ -79,6 +79,9 @@ public class TBSQM_CSM_MAINVO extends VOBase {
 
     /** nullable persistent field */
     private String PAPER_UUID;
+    
+    /** nullable persistent field */
+    private String UHRM_YN;
 
 
 public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBSQM_CSM_MAIN";
@@ -304,7 +307,15 @@ public String getTableuid () {
         this.PAPER_UUID = PAPER_UUID;
     }
 
-    public void checkDefaultValue() {
+    public String getUHRM_YN() {
+		return UHRM_YN;
+	}
+
+	public void setUHRM_YN(String uHRM_YN) {
+		UHRM_YN = uHRM_YN;
+	}
+
+	public void checkDefaultValue() {
     }
 
     public String toString() {

@@ -486,6 +486,62 @@ public class PMS227 extends FubonWmsBizLogic {
 				}
 				
 				break;
+			case "importROA" :
+				pstmtTruncate = conn.prepareStatement("TRUNCATE TABLE TBPMS_ROA ");
+				pstmtTruncate.execute();
+				conn.commit();
+
+				sb = new StringBuffer();
+				sb.append("INSERT INTO TBPMS_ROA ( ");
+				sb.append("  CUST_ID, ");
+				sb.append("  ROA, ");
+				sb.append("  VERSION, CREATETIME, CREATOR, MODIFIER, LASTUPDATE ");
+				sb.append(") ");
+				sb.append("VALUES ( ");
+				sb.append("  ?, ");
+				sb.append("  ?, ");
+				sb.append("  0, SYSDATE, ?, ?, SYSDATE ");
+				sb.append(") ");
+
+				pstmt = conn.prepareStatement(sb.toString());
+
+				int index = 0;
+
+				try {
+					for (int i = 1; i < lines.size(); i++) {
+						liesCheck(lines.get(i).toString());
+						String str_line = finalstring;
+						String[] str = str_line.split(",");
+						if (str.length < 2)
+							throw new APException("第" + (i + 1) + "筆,欄位數小於兩筆!");
+
+						index++;
+
+						pstmt.setString(1, str[0]);
+						pstmt.setString(2, (str[1].equals("") ? "0" : str[1]));
+						pstmt.setString(3, (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
+						pstmt.setString(4, (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
+
+						pstmt.addBatch();
+
+						if (index % 1000 == 0) {
+							pstmt.executeBatch();
+							conn.commit();
+						}
+					}
+					pstmt.executeBatch();
+					conn.commit();
+					outputVO.setFlag(index);
+				} catch (JBranchException e) {
+					conn.rollback();
+					e.printStackTrace();
+					throw new APException("第" + (index + 1) + "筆檔案的資料有誤!");
+				} finally {
+					pstmt.close();
+					conn.close();
+				}
+				
+				break;
 		}
 		
 		this.sendRtnObject(null);
@@ -543,6 +599,9 @@ public class PMS227 extends FubonWmsBizLogic {
 			case "importActualCust":
 				notifyClientToDownloadFile("doc//PMS//PMS227_CUST_EXAMPLE.csv", "實動戶客戶名單_上傳範例.csv"); 
 				break;
+			case "importROA":
+				notifyClientToDownloadFile("doc//PMS//PMS227_ROA.csv", "客戶ROA_上傳範例.csv"); 
+				break;
 		}
 		
 		this.sendRtnObject(null);
@@ -567,13 +626,20 @@ public class PMS227 extends FubonWmsBizLogic {
 				break;
 			case "importActualCust":
 				break;
+			case "importROA":
+				spName = "SP_TBPMS_ROA";
+				break;
 		}
 		
 		if (StringUtils.isNotEmpty(spName)) {
-			sb.append("CALL PABTH_BTPMS726.").append(spName).append("(?, ?) ");
-
-			qc.setString(1, inputVO.getsTime());
-			qc.registerOutParameter(2, Types.VARCHAR);
+			if (!spName.equals("SP_TBPMS_ROA")) {
+				sb.append("CALL PABTH_BTPMS726.").append(spName).append("(?, ?) ");
+				
+				qc.setString(1, inputVO.getsTime());
+				qc.registerOutParameter(2, Types.VARCHAR);				
+			} else {
+				sb.append("CALL PABTH_BTPMS726.SP_TBPMS_ROA()");
+			}
 			
 			qc.setQueryString(sb.toString());
 			

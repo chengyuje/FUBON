@@ -56,6 +56,9 @@ import com.systex.jbranch.app.server.fps.pms428.PMS428OutputVO;
 import com.systex.jbranch.app.server.fps.pms431.PMS431;
 import com.systex.jbranch.app.server.fps.pms431.PMS431InputVO;
 import com.systex.jbranch.app.server.fps.pms431.PMS431OutputVO;
+import com.systex.jbranch.app.server.fps.pms433.PMS433;
+import com.systex.jbranch.app.server.fps.pms433.PMS433InputVO;
+import com.systex.jbranch.app.server.fps.pms433.PMS433OutputVO;
 import com.systex.jbranch.app.server.fps.pms496.PMS496;
 import com.systex.jbranch.app.server.fps.pms496.PMS496InputVO;
 import com.systex.jbranch.app.server.fps.pms496.PMS496OutputVO;
@@ -155,6 +158,7 @@ public class BTCRM181 extends FubonWmsBizLogic {
 				case "UHRM012":
 				case "012":
 				case "013":
+				case "049":
 					//若無明細資料，則於前端無須呈現(針對分行主管) #5908
 					switch ((String) map.get("RPT_PROG_URL")) {
 						// TODO:日報
@@ -393,7 +397,8 @@ public class BTCRM181 extends FubonWmsBizLogic {
 						case "PMS426U":
 							PMS426InputVO pms426InputVO = new PMS426InputVO();
 							
-							pms426InputVO.setDataMon(sdfYYYYMM.format(calLast1Mon.getTime()));
+							pms426InputVO.setsCreDate(sdfYYYYMM.format(calLast2Mon.getTime()));
+							pms426InputVO.seteCreDate(sdfYYYYMM.format(calLast1Mon.getTime()));
 							pms426InputVO.setBranch_nbr(loginBranch);
 							pms426InputVO.setBranch_area_id(loginArea);
 							pms426InputVO.setRegion_center_id(loginRegion);
@@ -417,7 +422,8 @@ public class BTCRM181 extends FubonWmsBizLogic {
 						case "PMS427U":
 							PMS427InputVO pms427InputVO = new PMS427InputVO();
 							
-							pms427InputVO.setDataMon(sdfYYYYMM.format(calLast1Mon.getTime()));
+							pms427InputVO.setsCreDate(sdfYYYYMM.format(calLast2Mon.getTime()));
+							pms427InputVO.seteCreDate(sdfYYYYMM.format(calLast1Mon.getTime()));
 							pms427InputVO.setBranch_nbr(loginBranch);
 							pms427InputVO.setBranch_area_id(loginArea);
 							pms427InputVO.setRegion_center_id(loginRegion);
@@ -441,6 +447,8 @@ public class BTCRM181 extends FubonWmsBizLogic {
 						case "PMS431U":
 							PMS431InputVO pms431InputVO = new PMS431InputVO();
 							
+							pms431InputVO.setsCreDate(sdfYYYYMM.format(calLast2Mon.getTime()));
+							pms431InputVO.seteCreDate(sdfYYYYMM.format(calLast1Mon.getTime()));
 							pms431InputVO.setBranch_nbr(loginBranch);
 							pms431InputVO.setBranch_area_id(loginArea);
 							pms431InputVO.setRegion_center_id(loginRegion);
@@ -555,6 +563,30 @@ public class BTCRM181 extends FubonWmsBizLogic {
 								pstmt.addBatch();
 							}
 							
+							break;
+						case "PMS433":
+							PMS433InputVO pms433InputVO = new PMS433InputVO();
+							pms433InputVO.setRegion_center_id(loginRegion);
+							pms433InputVO.setBranch_area_id(loginArea);
+							pms433InputVO.setBranch_nbr(loginBranch);
+							
+							pms433InputVO.setUhrm_branch_area_id(loginArea);
+							String privilegeID = (String) map.get("E_PRIVILEGEID");
+							pms433InputVO.setUhrmFlag(privilegeID.indexOf("UHRM") > 0 ? true : false);
+							
+							pms433InputVO.setSysRole((String) map.get("E_ROLE_ID"));
+							
+							
+							PMS433 pms433 = (PMS433) PlatformContext.getBean("pms433");
+							PMS433OutputVO pms433OutputVO = pms433.queryForCRM181(pms433InputVO);
+							if(CollectionUtils.isEmpty(pms433OutputVO.getResultList())) {
+								pstmt.setString(1, "N");
+								pstmt.addBatch();
+							} else {
+								pstmt.setString(1, "Y");
+								pstmt.addBatch();
+							}
+
 							break;
 					}
 					break;

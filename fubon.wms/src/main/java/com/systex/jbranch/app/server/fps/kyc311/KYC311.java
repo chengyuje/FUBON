@@ -13,6 +13,8 @@ import com.systex.jbranch.app.server.fps.sot701.SOT701;
 import com.systex.jbranch.app.server.fps.sot701.SOT701InputVO;
 import com.systex.jbranch.common.io.util.PdfInputOutputUtils;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
+import com.systex.jbranch.fubon.commons.PdfConfigVO;
+import com.systex.jbranch.fubon.commons.PdfUtil;
 import com.systex.jbranch.fubon.commons.cbs.CBSService;
 import com.systex.jbranch.fubon.commons.esb.vo.fc032154.FC032154InputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.fp032151.FP032151OutputVO;
@@ -25,6 +27,7 @@ import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.common.util.DateUtil;
 import com.systex.jbranch.platform.common.util.PlatformContext;
 import com.systex.jbranch.platform.common.util.StringUtil;
+import com.systex.jbranch.platform.server.info.SysInfo;
 import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
@@ -45,6 +48,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Blob;
@@ -1929,7 +1936,7 @@ public class KYC311 extends FubonWmsBizLogic {
 //	}
 
 	/**
-	 * 列印中文版表單
+	 * 列印中文版表單，若有差異表單一起印出
 	 * @param body
 	 * @param header
 	 * @throws JBranchException
@@ -1985,37 +1992,6 @@ public class KYC311 extends FubonWmsBizLogic {
 			String url = new PdfInputOutputUtils().doWritePdfFile(reportData, fileName);
 
 			// 若 CUST_ID().length() >= 10 為自然人表單_英文版，否則法人表單_英文版.pdf
-			notifyClientViewDoc(url, "pdf");
-		}
-
-		sendRtnObject(null);
-	}
-
-	/***
-	 * 列印客戶風險屬性評估問卷差異說明表單
-	 * @param body
-	 * @param header
-	 * @throws JBranchException
-	 * @throws SQLException
-	 */
-	public void print_COMP(Object body, IPrimitiveMap<Object> header) throws JBranchException, SQLException {
-		KYC311InputVO inputVO = (KYC311InputVO) body;
-		QueryConditionIF qc = getDataAccessManager().getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("SELECT REPORT_FILE_COMP FROM TBKYC_REPORT where SEQ = :SEQ");
-		qc.setObject("SEQ", inputVO.getSEQ());
-		qc.setQueryString(sb.toString());
-		List dataList = getDataAccessManager().exeQueryWithoutSort(qc);
-
-		if (CollectionUtils.isNotEmpty(dataList)) {
-			Blob blob = (Blob) ((Map) dataList.get(0)).get("REPORT_FILE_COMP");
-			int blobLength = (int) blob.length();
-			byte[] reportData = blob.getBytes(1, blobLength);
-
-			String fileName = "reports/" + UUID.randomUUID().toString();
-			String url = new PdfInputOutputUtils().doWritePdfFile(reportData, fileName);
-
 			notifyClientViewDoc(url, "pdf");
 		}
 

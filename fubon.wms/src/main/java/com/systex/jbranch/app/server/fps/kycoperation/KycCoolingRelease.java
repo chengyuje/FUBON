@@ -132,7 +132,7 @@ public class KycCoolingRelease extends FubonWmsBizLogic {
 			kyc311InputVO.setBRANCH(branch);  
 				
 			SOT701 sot701 = (SOT701) PlatformContext.getBean("sot701");
-			logger.info(kyc311InputVO.getCUST_ID() + "冷靜期解除:[" + seq + "]上送390CUST_DATA：" + kyc311InputVO.toString());
+//			logger.info(kyc311InputVO.getCUST_ID() + "冷靜期解除:[" + seq + "]上送390CUST_DATA：" + kyc311InputVO.toString());
 			
 			try{
 				//執行TP032675更新		
@@ -141,7 +141,7 @@ public class KycCoolingRelease extends FubonWmsBizLogic {
 				sot701.kycUpdateSupervisorCheck(kyc311InputVO);
 				// 更新基本資料先註解掉
 //				sot701.kycUpdateBasic(kyc311InputVO);
-				logger.info(kyc311InputVO.getCUST_ID() + "冷靜期解除:[" + seq + "]上送390CUST_DATA：回傳");
+//				logger.info(kyc311InputVO.getCUST_ID() + "冷靜期解除:[" + seq + "]上送390CUST_DATA：回傳");
 						
 				//將此筆資料上送主機狀態更新
 				TBKYC_COOLING_PERIODVO tcpVO = (TBKYC_COOLING_PERIODVO) dam.findByPKey(TBKYC_COOLING_PERIODVO.TABLE_UID, seq);

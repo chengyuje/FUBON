@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,8 @@ public class PMS427 extends FubonWmsBizLogic {
 	public PMS427OutputVO query(Object body) throws Exception {
 
 		initUUID();
+		SimpleDateFormat sdfYYYYMM = new SimpleDateFormat("yyyyMM");
+
 		PMS427InputVO inputVO = (PMS427InputVO) body;
 		PMS427OutputVO outputVO = new PMS427OutputVO();
 		dam = this.getDataAccessManager();
@@ -117,12 +120,29 @@ public class PMS427 extends FubonWmsBizLogic {
 
 		sb.append("WHERE 1 = 1 ");
 		
-		//資料月份
-		if (StringUtils.isNotBlank(inputVO.getDataMon())) {
-			sb.append("AND TO_CHAR(CD.DATA_DATE, 'YYYYMM') = :dataMon ");
-			queryCondition.setObject("dataMon", inputVO.getDataMon());
-		}
-
+        if (StringUtils.equals("Y", inputVO.getFrom181())) {
+        	if (StringUtils.isNotBlank(inputVO.getsCreDate())) {
+    			sb.append("AND TO_CHAR(CD.DATA_DATE, 'YYYYMM') >= :yearMonS ");
+    			queryCondition.setObject("yearMonS", inputVO.getsCreDate());
+    		}
+			
+			if (StringUtils.isNotBlank(inputVO.geteCreDate())) {
+    			sb.append("AND TO_CHAR(CD.DATA_DATE, 'YYYYMM') <= :yearMonE ");
+    			queryCondition.setObject("yearMonE", inputVO.geteCreDate());
+    		}
+        } else {
+        	//資料月份
+    		if (StringUtils.isNotBlank(inputVO.getsCreDate())) {
+    			sb.append("AND TO_CHAR(CD.DATA_DATE, 'YYYYMM') >= :yearMonS ");
+    			queryCondition.setObject("yearMonS", sdfYYYYMM.format(new Date(Long.parseLong(inputVO.getsCreDate()))));
+    		}
+    		
+    		if (StringUtils.isNotBlank(inputVO.geteCreDate())) {
+    			sb.append("AND TO_CHAR(CD.DATA_DATE, 'YYYYMM') <= :yearMonE ");
+    			queryCondition.setObject("yearMonE", sdfYYYYMM.format(new Date(Long.parseLong(inputVO.geteCreDate()))));
+    		}
+        }
+		
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) { 
 			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("AND ORG.BRANCH_NBR = :branchNbr ");
@@ -242,17 +262,19 @@ public class PMS427 extends FubonWmsBizLogic {
 
 		List<Map<String, Object>> list = inputVO.getExportList();
 
-		String fileName = "理財戶對帳單退件及資產減損月報_" + inputVO.getDataMon() + ".xlsx";
+		String reportName = "理財戶對帳單退件及資產減損月報";
+		String fileName = reportName + "_" + inputVO.getDataMon() + ".xlsx";
 		String uuid = UUID.randomUUID().toString();
 		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
 
 		String filePath = Path + uuid;
 
 		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet("理財戶對帳單退件及資產減損月報");
+		XSSFSheet sheet = workbook.createSheet(reportName);
 		sheet.setDefaultColumnWidth(20);
 		sheet.setDefaultRowHeightInPoints(20);
 
+		// 表頭 CELL型式
 		XSSFCellStyle headingStyle = workbook.createCellStyle();
 		headingStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
 		headingStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
@@ -263,6 +285,24 @@ public class PMS427 extends FubonWmsBizLogic {
 		headingStyle.setBorderLeft((short) 1);
 		headingStyle.setBorderRight((short) 1);
 		headingStyle.setWrapText(true);
+
+		// 資料 CELL型式
+		XSSFCellStyle mainStyle = workbook.createCellStyle();
+		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		mainStyle.setBorderBottom((short) 1);
+		mainStyle.setBorderTop((short) 1);
+		mainStyle.setBorderLeft((short) 1);
+		mainStyle.setBorderRight((short) 1);
+		
+		// 資料 CELL型式
+		XSSFCellStyle titleStyle = workbook.createCellStyle();
+		titleStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+		titleStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderBottom((short) 1);
+		titleStyle.setBorderTop((short) 1);
+		titleStyle.setBorderLeft((short) 1);
+		titleStyle.setBorderRight((short) 1);
 
 		String[] headerLine = { "私銀註記", 
 								"資料日期", 
@@ -302,6 +342,15 @@ public class PMS427 extends FubonWmsBizLogic {
 		Integer index = 0;
 
 		XSSFRow row = sheet.createRow(index);
+		for (int i = 0; i < 1; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(titleStyle);
+			cell.setCellValue(reportName);
+		}
+		
+		index++;
+		
+		row = sheet.createRow(index);
 		for (int i = 0; i < headerLine.length; i++) {
 			XSSFCell cell = row.createCell(i);
 			cell.setCellStyle(headingStyle);
@@ -309,15 +358,6 @@ public class PMS427 extends FubonWmsBizLogic {
 		}
 
 		index++;
-
-		// 資料 CELL型式
-		XSSFCellStyle mainStyle = workbook.createCellStyle();
-		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
-		mainStyle.setBorderBottom((short) 1);
-		mainStyle.setBorderTop((short) 1);
-		mainStyle.setBorderLeft((short) 1);
-		mainStyle.setBorderRight((short) 1);
 
 		for (Map<String, Object> map : list) {
 			row = sheet.createRow(index);

@@ -12,7 +12,6 @@ eSoafApp.controller('SQM320_visitTotalController', function($scope, $controller,
 	$scope.controllerName = "SQM320_visitTotal";
 	$scope.loginBranchID = projInfoService.getBranchID();
 	
-	
 	//資料查詢
 	$scope.getVisitTotal = function() {	
 		$scope.sendRecv("SQM320", "getVisitTotal", "com.systex.jbranch.app.server.fps.sqm320.SQM320InputVO", $scope.inputVO, function(tota, isError) {
@@ -43,14 +42,18 @@ eSoafApp.controller('SQM320_visitTotalController', function($scope, $controller,
 		if ($scope.memLoginFlag.toLowerCase().startsWith('uhrm')) {
 			$scope.inputVO.yearQtr = $scope.yearQtr;
 			$scope.inputVO.branch_nbr = $scope.branch_nbr;
-			$scope.inputVO.memLoginFlag = $scope.memLoginFlag
+			$scope.inputVO.memLoginFlag = $scope.memLoginFlag;
+			$scope.inputVO.uhrmOP = $scope.uhrmOP;
+			$scope.inputVO.uhrmRC = $scope.uhrmRC;
+			
 			$scope.getVisitTotal();
 		} else {
 			//可視範圍  觸發 
 			$scope.RegionController_getORG($scope.inputVO).then(function(data) {
 				$scope.inputVO.yearQtr = $scope.yearQtr;
 				$scope.inputVO.branch_nbr = $scope.branch_nbr;
-				$scope.inputVO.memLoginFlag = $scope.memLoginFlag
+				$scope.inputVO.memLoginFlag = $scope.memLoginFlag;
+			
 				$scope.getVisitTotal();
 			});
 		}

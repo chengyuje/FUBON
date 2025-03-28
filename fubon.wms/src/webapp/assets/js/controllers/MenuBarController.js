@@ -142,10 +142,74 @@ eSoafApp.controller("MenuBarController", ['$rootScope', '$scope', '$http', '$coo
 	            // if(sysInfoService.getAuthorities() && sysInfoService.getAuthorities().MODULEID[sysInfoService.$currentModule].ITEMID[sysInfoService.$currentTxn] && sysInfoService.getAuthorities().MODULEID[sysInfoService.$currentModule].ITEMID[sysInfoService.$currentTxn].FUNCTIONID['security']){
 	            // 	unSecurity = false;
 	            // }
-				// # 0559 總是鎖右鍵，無關操作權限
-	            document.oncontextmenu = new Function("return false ");
-	            // # 0559 總是禁止拖曳功能以防止複製資料
-	            document.ondragstart = new Function("return false ");
+				// 禁用右鍵、拖曳與選中功能
+			    document.oncontextmenu = new Function("return false ");
+			    document.ondragstart = new Function("return false ");
+			    document.onselectstart = new Function("return false ");
+			    
+			    // 2025/01/08 Steven:以下為控制PrintScreen、非焦點視窗的PrintScreen的寫法，目前先註解。Start
+			    // 狀態變數模擬黑屏控制
+//			    let showBlackScreen = false;
+//
+//			    // 黑屏 DOM 元素
+//			    let blackScreenElement = document.getElementById("black-screen");
+//			    if (!blackScreenElement) {
+//			        blackScreenElement = document.createElement("div");
+//			        blackScreenElement.id = "black-screen";
+//			        blackScreenElement.style.cssText = `
+//			            width: 100vw; height: 100vh; background-color: black; color: white;
+//			            display: none; justify-content: center; align-items: center; font-size: 24px; 
+//			            font-weight: bold; position: fixed; top: 0; left: 0; z-index: 9999;
+//			        `;
+//			        blackScreenElement.innerText = "禁止截圖";
+//			        document.body.appendChild(blackScreenElement);
+//			    }
+//
+//			    // 顯示或隱藏黑屏的函數
+//			    function toggleBlackScreen(show) {
+//			        showBlackScreen = show;
+//			        blackScreenElement.style.display = show ? "flex" : "none";
+//			    }
+//
+//			    // 鍵盤事件處理
+//			    const keysPressed = { ShiftLeft: false, MetaLeft: false };
+//
+//			    document.onkeydown = function (event) {
+//			        if (event.code in keysPressed) {
+//			            keysPressed[event.code] = true;
+//			            if (keysPressed.ShiftLeft && keysPressed.MetaLeft) {
+//			                toggleBlackScreen(true);
+//			                console.log("禁止截圖");
+//			                return false;
+//			            }
+//			        }
+//			    };
+//
+//			    document.onkeyup = function (event) {
+//			        if (event.key === "PrintScreen") {
+//			            navigator.clipboard.writeText(" ");
+//			            toggleBlackScreen(true);
+//			            console.log("禁止截圖");
+//			            setTimeout(() => toggleBlackScreen(false), 4000);
+//			        }
+//			        if (event.code in keysPressed) {
+//			            keysPressed[event.code] = false;
+//			            setTimeout(() => toggleBlackScreen(false), 4000);
+//			        }
+//			    };
+//
+//			    // 視窗焦點事件處理
+//			    window.onfocus = function () {
+//			        console.log("視窗獲得焦點");
+//			        toggleBlackScreen(false);
+//			    };
+//
+//			    window.onblur = function () {
+//			        console.log("視窗失去焦點");
+//			        toggleBlackScreen(true);
+//			    };
+			    // 2025/01/08 Steven:以上為控制PrintScreen、非焦點視窗的PrintScreen的寫法，目前先註解。End
+			    
 	            // CTRL+C, PRINT
 	            var screenSecurity = false;
 	            if(sysInfoService.getAuthorities() && sysInfoService.getAuthorities().MODULEID[sysInfoService.$currentModule].ITEMID[sysInfoService.$currentTxn] && sysInfoService.getAuthorities().MODULEID[sysInfoService.$currentModule].ITEMID[sysInfoService.$currentTxn].FUNCTIONID['screen'])

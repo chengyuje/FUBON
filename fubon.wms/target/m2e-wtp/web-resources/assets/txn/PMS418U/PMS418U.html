@@ -71,33 +71,31 @@
 						<th>業務處：</th>
 						<td>
 							<e-combobox id="region_center_id" name="region_center_id"
-										ng-paramtype="PMS.UHRM_RC"
+										ng-datasource="uhrmRCList"
 										ng-model="inputVO.uhrmRC"
-										ng-validate="false"
+										ng-validate="false" 
 										ng-disabled="true"
-										ng-readonly="true"
+										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										ng-change="ChangeRegion()"
-										width="200px"
 										style="line-height:20px;" />
 						</td>
-						<th>業務中心：</th>
+						<th>營運區：</th>
 						<td>
 							<e-combobox id="branch_area_id" name="branch_area_id"
-										ng-paramtype="PMS.UHRM_OP"
+										ng-datasource="uhrmOPList"
 										ng-model="inputVO.uhrmOP"
-										ng-validate="false"
+										ng-validate="false" 
 										ng-disabled="true"
-										ng-readonly="true"
+										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										ng-change="ChangeArea()"
-										width="200px"
 										style="line-height:20px;" />
 						</td>
+						<th></th>
+						<td></td>
 					</tr>
 					<tr>
 	                	<th>IP：</th>
@@ -151,6 +149,7 @@
                 <thead>
 	                <tr>
 	                    <th>更新<br>資料</th>
+	                    <th>私銀註記</th>
 	                    <th>報表日期</th>
 	                    <th>分行代碼</th>
 	                    <th>分行名稱</th>
@@ -174,6 +173,7 @@
                 <tbody>
 	                <tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
 						<td align="center"><input type="checkbox" ng-disabled="" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"></td>
+	                    <td>{{row.RM_FLAG}}</td>
 	                    <td>{{toJsDate(row.CREATETIME) | date:'yyyyMMdd'}}</td>
 	                    <td>{{row.BRANCH_NBR}}</td>
 	                    <td>{{row.BRANCH_NAME}}</td>
@@ -238,6 +238,10 @@
 			提醒：<br>
 			(1) 每位客戶請務必依各檢核欄位進行說明留軌，勿僅填<span class="noticed">｢同上｣或｢同前｣</span>等字義，並<span class="noticed">確認非為個金RM代理操作</span>。<br>
 			(2) 查核重點應確認不同客戶出現於相同之原因及是否為行員代客戶操作。
+			<br/>
+			<span class="noticed">
+				(3) 如照會有非本人承作KYC態樣，需確認客戶本人是否知悉，及提醒客戶為維護自身權益，建議重新進行風險屬性評估，並於業管系統留軌。
+			</span>
 		</div>
 	</div>
 </div>

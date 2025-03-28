@@ -33,7 +33,7 @@
 	                                    width="200px" />
 						</td>
 					</tr>
-					<tr>					
+					<tr ng-show="!inputVO.uhrmFlag">					
 						<th>業務處：</th>
 						<td>
 							<e-combobox id="region_center_id" name="region_center_id"
@@ -79,12 +79,42 @@
 							width="200px"
 							style="line-height:20px;" />
 						</td>
+					</tr>
+					<tr ng-show="inputVO.uhrmFlag">					
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="uhrm_region_center_id" name="uhrm_region_center_id"
+							ng-datasource="REGION_LIST"
+							ng-model="inputVO.uhrm_region_center_id"
+							ng-validate="false" 
+							ng-disabled="true"
+							ng-readonly="true" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="true"
+							width="200px"
+							style="line-height:20px;" />
+						</td>
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="uhrm_branch_area_id" name="uhrm_branch_area_id"
+							ng-datasource="AREA_LIST"
+							ng-model="inputVO.uhrm_branch_area_id"
+							ng-validate="false" 
+							ng-disabled="true"
+							ng-readonly="true" 
+							ng-editable="false"
+							ng-format="F1"
+							ng-required="true"
+							width="200px"
+							style="line-height:20px;" />
+						</td>
 					</tr>	
 				</table>
 			</div>
 			<div class="search_box_btn text-center">
 				<button type="button" class="btn btn-primary" ng-click="inquirInit();query()"><span class="glyphicon glyphicon-search"></span>查詢</button>
-				<button type="button" class="btn btn-info" ng-click="init()"><span class="glyphicon glyphicon-erase"></span> 清除</button>
+				<button type="button" class="btn btn-info" ng-click="init()" function-type="query"><span class="glyphicon glyphicon-erase"></span> 清除</button>
 				<button type="button" class="btn btn-warning" ng-click="export()"><span class="glyphicon glyphicon-download"></span> 匯出</button>
 			</div>
 		</div>
@@ -107,7 +137,7 @@
 							<th>年齡</th>
 							<th>歸屬行</th>
 							<th>分行名稱</th>
-							<th>高資產客戶</th>
+							<th ng-show="showUHRM">高端客戶</th>
 							<th>外撥結果</th>
 							<th>電訪錄音編號</th>
 							<th>備註說明</th>
@@ -124,25 +154,32 @@
 							<td>{{row.AGE}}</td>
 							<td>{{row.BRA_NBR}}</td>
 							<td>{{row.DEPT_NAME}}</td>
-							<td>{{row.HIGH}}</td>
+							<td ng-show="showUHRM">{{row.ISUHRM}}</td>
 							<td><e-combobox ng-datasource="mappingSet['PMS.HIGH_SOT_CALL_RESULT']"
 	                                    ng-model="row.CALL_RESULT"
 	                                    ng-format="F3"
 	                                    ng-change="modifyResult(row);"
-	                                    width="200px" /></td>
+	                                    ng-change="modifyResult(row);"
+	                                    width="200px"
+	                                    ng-disabled="!role_maintanence"
+	                                    /></td>
 							<td><input type="text" 
 		                        	   class="form-control" 
 		                        	   style="width: 200px; height: 30px; display: inline;" 
 		                        	   ng-model="row.REC_SEQ" 
 		                        	   ng-change="modifyResult(row);"
 		                        	   e-length-limit="16"
+		                        	   function-type="maintenance"
+	                                   function-show="disable"
 		                        	   /></td>
 							<td><input type="text" 
 		                        	   class="form-control" 
 		                        	   style="width: 300px; height: 30px; display: inline;" 
-		                        	   ng-model="row.MEMO" 
+		                        	   ng-model="row.MEMO"
 		                        	   ng-change="modifyResult(row);"
-		                        	   e-length-limit="100"
+		                        	   e-length-limit="900"
+		                        	   function-type="maintenance"
+	                                   function-show="disable"
 		                        	   /></td>
 							<td>{{row.CREATETIME}}</td>
 							<td>{{row.LASTUPDATE}}</td>

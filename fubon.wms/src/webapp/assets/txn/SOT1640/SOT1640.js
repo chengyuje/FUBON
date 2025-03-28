@@ -91,6 +91,7 @@ eSoafApp.controller('SOT1640Controller',
 		}
 		
 		$scope.custClear = function() {
+			$scope.mappingSet['debitAcct']= undefined; 				//手續費扣款帳號
 //			console.log("custClear:");
 			$scope.inputVO.custName = '';
 			$scope.inputVO.kycLV = '';									//KYC等級
@@ -109,6 +110,7 @@ eSoafApp.controller('SOT1640Controller',
 			$scope.inputVO.debitAcct = '';								//扣款帳號
 			$scope.inputVO.trustAcct = '';								//信託帳號
 			$scope.inputVO.creditAcct = '';								//收益入帳帳號
+			$scope.inputVO.debitAcct ='';								//手續費扣款帳號
 			$scope.inputVO.w8benEffDate = undefined;					//W8ben有效日期
 			$scope.inputVO.custType = 'CUST';							//來行人員
 			$scope.inputVO.agentID = '';								//代理人ID
@@ -545,6 +547,14 @@ eSoafApp.controller('SOT1640Controller',
 									$scope.inputVO.hnwcServiceYN = tota[0].body.hnwcServiceYN;
 									$scope.inputVO.flagNumber = tota[0].body.flagNumber; 					//90天內是否有貸款紀錄 Y/N
 									
+									var car_debitAcct = $scope.inputVO.debitAcct;     //扣款帳號
+									$scope.mappingSet['debitAcct'] = tota[0].body.feeDebitAcct; //扣款帳號LIST
+									if (!loadEdit) {//沒有設loadEdit  從編輯按鈕(風控)過來不寫預設  因為信託帳號跟手續費有關 !$scope.inputVO.seqNo
+										$scope.inputVO.debitAcct = (tota[0].body.feeDebitAcct.length > 0 ? tota[0].body.feeDebitAcct[0].LABEL : "");
+									} else if(loadEdit) {  
+										$scope.inputVO.debitAcct = car_debitAcct;     //扣款帳號  
+									} 
+									
 									deferred.resolve("success");
 									return deferred.promise;
 							} else {
@@ -590,6 +600,7 @@ eSoafApp.controller('SOT1640Controller',
 			$scope.inputVO.trustCurr = row.TRUST_CURR;     //信託幣別
 			$scope.inputVO.trustAcct = row.TRUST_ACCT;  //信託帳號
 			$scope.inputVO.creditAcct = row.CREDIT_ACCT; //收益入帳帳號
+			$scope.inputVO.debitAcct = row.DEBIT_ACCT;     //手續費扣款帳號
 			$scope.inputVO.purchaseAmt = row.PURCHASE_AMT;     //申購金額 
 			$scope.inputVO.certificateID = row.CERTIFICATE_ID;	//庫存憑證編號
 			$scope.inputVO.tradeDateType = row.TRADE_DATE_TYPE;     //交易日期類別
@@ -682,7 +693,7 @@ eSoafApp.controller('SOT1640Controller',
 			var prodId = $filter('uppercase')(obj);
 		    
 			if(prodId) {
-				$scope.sendRecv("SOT1640", "getProdDTL", "com.systex.jbranch.app.server.fps.sot1640.SOT1640InputVO", {"prodId": prodId},
+				$scope.sendRecv("SOT1640", "getProdDTL", "com.systex.jbranch.app.server.fps.sot1640.SOT1640InputVO", {"prodId": prodId, "dynamicType": type, "custID": $scope.inputVO.custID},
 					function(tota, isError) {
 					if (!isError) {
 						if (tota[0].body.prodDTL != null) {
@@ -690,6 +701,12 @@ eSoafApp.controller('SOT1640Controller',
 								if(type == "M") {
 									//母基金商品資料
 									$scope.setProdDataM(tota[0].body);
+									//子基金轉回母基金時，母基金(轉入)需做適配
+									//若適配有誤，先存錯誤訊息
+									$scope.inputVO.prodMFitErrorMsg = "";
+									$scope.inputVO.prodMFitWarningMsg = "";
+									if(tota[0].body.errorMsg != null && tota[0].body.errorMsg != "") $scope.inputVO.prodMFitErrorMsg = tota[0].body.errorMsg;
+									if(tota[0].body.warningMsg != null && tota[0].body.warningMsg != "") $scope.inputVO.prodMFitWarningMsg = tota[0].body.warningMsg;
 								} else {
 									//子基金商品資料
 									if(idx == "1") $scope.setProdDataC1(tota[0].body);
@@ -1048,6 +1065,12 @@ eSoafApp.controller('SOT1640Controller',
 				$scope.inputVO.inProdC4YN = "N";
 				$scope.inputVO.inProdC5YN = "N";
 			} else if($scope.inputVO.transferType == '2') {	//子基金轉回母基金
+				//轉入母基金需做適配
+				if($scope.inputVO.prodMFitErrorMsg != "") {
+					$scope.showErrorMsg($scope.inputVO.prodMFitErrorMsg);
+					$scope.inputVO.transferType = "";
+        			return;
+				}
 				if(!$scope.inputVO.prodIdC1) {
 					$scope.showErrorMsg("此庫存無子基金");
 					$scope.inputVO.transferType = "";

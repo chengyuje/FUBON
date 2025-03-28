@@ -20,21 +20,17 @@ eSoafApp.controller('PMS333_DETAILController',
         } else
         	$scope.mappingSet['CRM.VIP_DEGREE'] = projInfoService.mappingSet['CRM.VIP_DEGREE'];
      
-		if($scope.row.ind=='1')
-		{
-			$scope.type='V';
+		if ($scope.row.ind == '1') {
+			$scope.type = 'H';
 		}
-		if($scope.row.ind=='2')
-		{
-			$scope.type='A';
+		if ($scope.row.ind == '2') {
+			$scope.type = 'T';
 		}
-		if($scope.row.ind=='3')
-		{
-			$scope.type='B';
+		if ($scope.row.ind == '3') {
+			$scope.type = 'K';
 		}
-		if($scope.row.ind=='4')
-		{
-			$scope.type="%";
+		if ($scope.row.ind == '4') {
+			$scope.type = "%";
 		}
 	
 		$scope.inquire = function(){

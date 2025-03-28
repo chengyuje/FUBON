@@ -71,12 +71,13 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
     }
 
     //要保書類型/戶況檢核
-	getParameter.XML(["IOT.CM_FLAG", "IOT.PAYER_REL_PROPOSER", "IOT.NO_CHK_LOAN_INSPRD"],function(totas){
+	getParameter.XML(["IOT.CM_FLAG", "IOT.PAYER_REL_PROPOSER", "IOT.NO_CHK_LOAN_INSPRD", "IOT.OTH_TYPE_SENIOR_CHK"],function(totas){
 		if(totas){
 			//戶況檢核
 			$scope.mappingSet['IOT.CM_FLAG'] = totas.data[totas.key.indexOf('IOT.CM_FLAG')];
 			$scope.mappingSet['IOT.PAYER_REL_PROPOSER'] = totas.data[totas.key.indexOf('IOT.PAYER_REL_PROPOSER')];
 			$scope.mappingSet['IOT.NO_CHK_LOAN_INSPRD'] = totas.data[totas.key.indexOf('IOT.NO_CHK_LOAN_INSPRD')];
+			$scope.mappingSet['IOT.OTH_TYPE_SENIOR_CHK'] = totas.data[totas.key.indexOf('IOT.OTH_TYPE_SENIOR_CHK')];
 		}
 	});
 
@@ -280,6 +281,7 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 							$scope.inputVO.APPLY_DATE = $scope.toJsDate($scope.INS_INFORMATION[0].APPLY_DATE);
 							$scope.inputVO.AML = $scope.INS_INFORMATION[0].AML;
 							$scope.inputVO.PRECHECK = $scope.INS_INFORMATION[0].PRECHECK;
+							$scope.inputVO.BUSINESS_REL = $scope.INS_INFORMATION[0].BUSINESS_REL;
 							$scope.inputVO.LOAN_CHK1_YN = $scope.INS_INFORMATION[0].LOAN_CHK1_YN;
 							$scope.inputVO.LOAN_CHK2_YN = $scope.INS_INFORMATION[0].LOAN_CHK2_YN;
 							$scope.inputVO.CD_CHK_YN = $scope.INS_INFORMATION[0].CD_CHK_YN;
@@ -287,7 +289,16 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 							$scope.inputVO.CHG_CUST_ID = $scope.INS_INFORMATION[0].CHG_CUST_ID;
 							$scope.inputVO.INVESTList = tota[0].body.INVESTList;
 							$scope.inputVO.REVISE_CONFIRM_YN = $scope.INS_INFORMATION[0].REVISE_CONFIRM_YN;
-
+							$scope.inputVO.OTH_FUND_PURPOSE_1 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_1;
+							$scope.inputVO.OTH_FUND_PURPOSE_2 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_2;
+							$scope.inputVO.OTH_FUND_PURPOSE_3 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_3;
+							$scope.inputVO.OTH_FUND_PURPOSE_4 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_4;
+							$scope.inputVO.OTH_FUND_PURPOSE_5 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_5;
+							$scope.inputVO.OTH_FUND_PURPOSE_6 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_6;
+							$scope.inputVO.OTH_FUND_PURPOSE_RMK_1 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_RMK_1;
+							$scope.inputVO.OTH_FUND_PURPOSE_RMK_2 = $scope.INS_INFORMATION[0].OTH_FUND_PURPOSE_RMK_2;
+							$scope.inputVO.AUTH_YN = $scope.INS_INFORMATION[0].AUTH_YN;
+							
 							if($scope.INS_INFORMATION[0].INSPRD_TYPE != 1){
 								$scope.MatchButton=false;
 							}
@@ -359,6 +370,15 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 		$scope.inputVO.temp_OTH_TYPE = undefined;
 		$scope.inputVO.tempFX_PROD = undefined;
 		$scope.inputVO.FB_COM_YN = 'Y';
+		$scope.inputVO.REVISE_CONFIRM_YN = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_1 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_2 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_3 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_4 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_5 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_6 = 'N';
+		$scope.inputVO.OTH_FUND_PURPOSE_RMK_1 = '';
+		$scope.inputVO.OTH_FUND_PURPOSE_RMK_2 = '';
 
 //		$scope.initCheckItems();
 	}
@@ -523,13 +543,25 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 			$scope.notCNCT = false;
 		}
 		if($scope.inputVO.OTH_TYPE == '2'){
+			//契變-解約/縮小保額/部分提領(終止)
 			$scope.inputVO.TERMINATED_INC = 'Y';
 			$scope.inputVO.REVISE_CONFIRM_YN = "N";
 			$scope.inputVO.notOthType2 = false;
+			$scope.inputVO.othFundRmkDisabled1 = true;
+			$scope.inputVO.othFundRmkDisabled2 = true;
 		}else{
 			$scope.inputVO.TERMINATED_INC = 'N';
 			$scope.inputVO.REVISE_CONFIRM_YN = "N";
 			$scope.inputVO.notOthType2 = true;
+			//非2，清空資金用途欄位
+			$scope.inputVO.OTH_FUND_PURPOSE_1 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_2 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_3 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_4 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_5 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_6 = "N";
+			$scope.inputVO.OTH_FUND_PURPOSE_RMK_1 = "";
+			$scope.inputVO.OTH_FUND_PURPOSE_RMK_2 = "";
 		}
 
 		$scope.premiumUsageChange();
@@ -727,6 +759,16 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 			}
 		}
 
+		$scope.inputVO.C_SENIOR_DOCCHK_YN = "N"; //需檢核分行留存文件是否有勾選"銀行端高齡評估量表(維護)"
+		var keyinDate = new Date($scope.inputVO.DOC_KEYIN_DATE); //文件填寫申請日
+		var birthDate = new Date($scope.inputVO.PROPOSER_BIRDAY); //要保人生日
+        var chkDate65C = new Date(birthDate.getFullYear() + 64, birthDate.getMonth() + 6, birthDate.getDate()); //要保人64.5歲以上
+        var findOthType = $filter('filter')($scope.mappingSet['IOT.OTH_TYPE_SENIOR_CHK'], {DATA: $scope.inputVO.OTH_TYPE});//需檢核高齡的文件種類
+        if(keyinDate >= chkDate65C && (findOthType != null && findOthType.length > 0)) {
+        	//要保人>=64.5歲，且符合需檢核高齡文件種類
+        	$scope.inputVO.C_SENIOR_DOCCHK_YN = "Y";
+        }
+        
 		return true;
 	}
 
@@ -795,6 +837,22 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 						}
 						if($scope.inputVO.INSPRD_ID != "" && $scope.inputVO.INSPRD_KEYNO != ''){
 							$scope.checkData();
+						}
+						if($scope.inputVO.OTH_TYPE == '2') { //契變-解約/縮小保額/部分提領(終止)
+							if(($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_1) || $scope.inputVO.OTH_FUND_PURPOSE_1 =="N") && 
+									($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_2) || $scope.inputVO.OTH_FUND_PURPOSE_2 =="N") &&
+									($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_3) || $scope.inputVO.OTH_FUND_PURPOSE_3 =="N") && 
+									($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_4) || $scope.inputVO.OTH_FUND_PURPOSE_4 =="N") &&
+									($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_5) || $scope.inputVO.OTH_FUND_PURPOSE_5 =="N") && 
+									($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_6) || $scope.inputVO.OTH_FUND_PURPOSE_6 =="N")) {
+								$scope.showErrorMsg("*為必要輸入欄位，請輸入後重試");
+								return;
+							}
+							if(($scope.inputVO.OTH_FUND_PURPOSE_5 == "Y" && ($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_RMK_1))) || 
+									($scope.inputVO.OTH_FUND_PURPOSE_6 == "Y" && ($scope.isEmpty($scope.inputVO.OTH_FUND_PURPOSE_RMK_2)))) {
+								$scope.showErrorMsg("資金用途為其他，請說明");
+								return;
+							}
 						}
 						$scope.inputVO.OPR_STATUS = $scope.OPR_STATUS;
 						$scope.sendRecv("IOT130","submit","com.systex.jbranch.app.server.fps.iot130.IOT130InputVO",$scope.inputVO,
@@ -931,6 +989,7 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 //
 		$scope.inputVO.AML = $scope.prematchList.AML;
 		$scope.inputVO.PRECHECK = $scope.prematchList.PRECHECK;
+		$scope.inputVO.BUSINESS_REL = $scope.prematchList.BUSINESS_REL;
 
 		$scope.inputVO.LOAN_SOURCE_YN = $scope.prematchList.LOAN_SOURCE_YN;
 		$scope.inputVO.LOAN_CHK1_YN = $scope.prematchList.LOAN_CHK1_YN;
@@ -979,10 +1038,40 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 		}
 	}
 
+	$scope.onfundpurposeChg = function(idx) {
+		debugger
+		if(idx == "5") {
+			//其他資金用途
+			if($scope.inputVO.OTH_FUND_PURPOSE_5 == "N") {
+				$scope.inputVO.OTH_FUND_PURPOSE_RMK_1 = "";
+				$scope.inputVO.othFundRmkDisabled1 = true;
+			} else {
+				$scope.inputVO.othFundRmkDisabled1 = false;
+			}
+		} else if(idx == "6") {
+			//非運用於本行之其他資金用途
+			if($scope.inputVO.OTH_FUND_PURPOSE_6 == "N") {
+				$scope.inputVO.OTH_FUND_PURPOSE_RMK_2 = "";
+				$scope.inputVO.othFundRmkDisabled2 = true;
+			} else {
+				$scope.inputVO.othFundRmkDisabled2 = false;
+			}
+		}
+	}
+		
+	$scope.isEmpty = function(val) {
+		if(val == undefined || val == null || val == "") {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	$scope.initCheckItems = function() {
 		$scope.inputVO.PREMATCH_SEQ = '';
 		$scope.inputVO.AML = '';
 		$scope.inputVO.PRECHECK = '';
+		$scope.inputVO.BUSINESS_REL = '';
 		$scope.inputVO.AUTH_YN = '';
 		$scope.inputVO.PREMIUM_USAGE = '3';
 		$scope.inputVO.PAY_WAY = '';
@@ -999,6 +1088,8 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 		$scope.inputVO.QC_PROPOSER_CHG = '';
 		$scope.inputVO.CHG_CUST_ID = '';
 		$scope.inputVO.VALID_CHG_CUST_YN = 'N';
+		$scope.inputVO.othFundRmkDisabled1 = true;
+		$scope.inputVO.othFundRmkDisabled2 = true;
 
 		$scope.premiumUsageChange();
 	}
@@ -1115,7 +1206,15 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 					INVESTList:[],
 					COMPANY_NUM:'82',
 					REVISE_CONFIRM_YN: "N",
-					notOthType2: true
+					notOthType2: true,
+					OTH_FUND_PURPOSE_1: "N",
+					OTH_FUND_PURPOSE_2: "N",
+					OTH_FUND_PURPOSE_3: "N",
+					OTH_FUND_PURPOSE_4: "N",
+					OTH_FUND_PURPOSE_5: "N",
+					OTH_FUND_PURPOSE_6: "N",
+					OTH_FUND_PURPOSE_RMK_1: "",
+					OTH_FUND_PURPOSE_RMK_2: ""
 			}
 			$scope.initCheckItems();
 			$timeout(function(){$scope.inquireCompanyFB();},700);

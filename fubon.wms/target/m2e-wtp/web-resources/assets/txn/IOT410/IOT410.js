@@ -39,20 +39,20 @@ eSoafApp.controller('IOT410Controller', function($scope, $controller, getParamet
 				$scope.inputVO = tota[0].body.resultList[0];
 				
 				// 判斷是否需輸入錄音序號 S01.CUST_ID, S01.INSURED_ID, S01.PAYER_ID,
-				$scope.cFlag = false;
-				$scope.iFlag = false;
-				$scope.pFlag = false;
-				if ($scope.inputVO.C_PREMIUM_TRANSSEQ_YN == undefined || $scope.inputVO.C_PREMIUM_TRANSSEQ_YN != 'Y') {
-					$scope.cFlag = true;
-				}
-				if ($scope.inputVO.I_PREMIUM_TRANSSEQ_YN == undefined || $scope.inputVO.I_PREMIUM_TRANSSEQ_YN != 'Y' || 
-					$scope.inputVO.INSURED_ID == $scope.inputVO.CUST_ID) {
-					$scope.iFlag = true;
-				}
-				if ($scope.inputVO.P_PREMIUM_TRANSSEQ_YN == undefined || $scope.inputVO.P_PREMIUM_TRANSSEQ_YN != 'Y' || 
-					$scope.inputVO.PAYER_ID == $scope.inputVO.CUST_ID || $scope.inputVO.PAYER_ID == $scope.inputVO.INSURED_ID ) {
-					$scope.pFlag = true;
-				}
+//				$scope.cFlag = false;
+//				$scope.iFlag = false;
+//				$scope.pFlag = false;
+//				if ($scope.inputVO.C_PREMIUM_TRANSSEQ_YN == undefined || $scope.inputVO.C_PREMIUM_TRANSSEQ_YN != 'Y') {
+//					$scope.cFlag = true;
+//				}
+//				if ($scope.inputVO.I_PREMIUM_TRANSSEQ_YN == undefined || $scope.inputVO.I_PREMIUM_TRANSSEQ_YN != 'Y' || 
+//					$scope.inputVO.INSURED_ID == $scope.inputVO.CUST_ID) {
+//					$scope.iFlag = true;
+//				}
+//				if ($scope.inputVO.P_PREMIUM_TRANSSEQ_YN == undefined || $scope.inputVO.P_PREMIUM_TRANSSEQ_YN != 'Y' || 
+//					$scope.inputVO.PAYER_ID == $scope.inputVO.CUST_ID || $scope.inputVO.PAYER_ID == $scope.inputVO.INSURED_ID ) {
+//					$scope.pFlag = true;
+//				}
 				
 				// 若該案有多筆同案件編號且電訪記錄之電訪狀態有「電訪疑義」「取消投保」之記錄，需產生提醒訊息
 				$scope.showWarningMsg = tota[0].body.showMsg;
@@ -97,15 +97,16 @@ eSoafApp.controller('IOT410Controller', function($scope, $controller, getParamet
 		// 拉選「電訪狀態=電訪成功」，需判斷應電訪對象之錄音序號是否有值，若無值則產生提醒訊息：「請登打錄音序號」
 		if ($scope.inputVO.STATUS == '4') {
 			var types = ['C', 'I', 'P'];
-			for (var i = 0; i < types.length; i++) {
-				var transSeq = $scope.inputVO[types[i] + '_PREMIUM_TRANSSEQ'];
-//				if ($scope.inputVO[types[i] + '_NEED_CALL_YN'] == 'Y' && (transSeq == undefined || transSeq == '')) {
-				if ($scope.inputVO[types[i] + '_PREMIUM_TRANSSEQ_YN'] == 'Y' && (transSeq == undefined || transSeq == '')) {
-					$scope.showErrorMsg('請登打錄音序號');
-					flag = false;
-					break;
-				}
-			}
+			
+//			for (var i = 0; i < types.length; i++) {
+//				var transSeq = $scope.inputVO[types[i] + '_PREMIUM_TRANSSEQ'];
+////				if ($scope.inputVO[types[i] + '_NEED_CALL_YN'] == 'Y' && (transSeq == undefined || transSeq == '')) {
+//				if ($scope.inputVO[types[i] + '_PREMIUM_TRANSSEQ_YN'] == 'Y' && (transSeq == undefined || transSeq == '')) {
+//					$scope.showErrorMsg('請登打錄音序號');
+//					flag = false;
+//					break;
+//				}
+//			}
 			
 			if (flag) {
 				for (var i = 0; i < types.length; i++) {

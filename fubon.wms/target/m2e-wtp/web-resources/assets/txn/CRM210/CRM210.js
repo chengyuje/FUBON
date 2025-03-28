@@ -29,13 +29,15 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
     });
 	
 	// filter
-	getParameter.XML(["CRM.CON_DEGREE", "CRM.VIP_DEGREE", "CRM.FAMILY_DEGREE", "TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN", "CRM.ACT_PRD_NUMS"], function(totas) {
+	getParameter.XML(["CRM.CON_DEGREE", "CRM.VIP_DEGREE", "CRM.FAMILY_DEGREE", "TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN", "CRM.ACT_PRD_NUMS", "CRM.NONSEARCH_ID", "CRM.EXPERIENCE_LEVEL"], function(totas) {
 		if (totas) {
 			$scope.mappingSet['CRM.CON_DEGREE'] = totas.data[totas.key.indexOf('CRM.CON_DEGREE')];											/** 貢獻度等級 **/
 			$scope.mappingSet['CRM.VIP_DEGREE'] = totas.data[totas.key.indexOf('CRM.VIP_DEGREE')];											/** 理財會員等級 **/
 			$scope.mappingSet['CRM.FAMILY_DEGREE'] = totas.data[totas.key.indexOf('CRM.FAMILY_DEGREE')];									/** 家庭會員等級 **/
 			$scope.mappingSet['TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN'] = totas.data[totas.key.indexOf('TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN')];	/** 經營頻次符合度 **/
 			$scope.mappingSet['CRM.ACT_PRD_NUMS'] = totas.data[totas.key.indexOf('CRM.ACT_PRD_NUMS')];										/** 客戶活躍度1~9 **/
+			$scope.mappingSet['CRM.NONSEARCH_ID'] = totas.data[totas.key.indexOf("CRM.NONSEARCH_ID")];
+			$scope.mappingSet['CRM.EXPERIENCE_LEVEL'] = totas.data[totas.key.indexOf('CRM.EXPERIENCE_LEVEL')];
 		}
 	});
     //
@@ -242,6 +244,11 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
         			}   		
             	};
 		});	
+	    
+//	    debugger
+//		if(projInfoService.getAvailBranch().length == 1) {
+//			$scope.inputVO.cust_02 = projInfoService.getBranchID();
+//		}
 	};
 	
 	$scope.init_common();
@@ -365,7 +372,21 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
     	);
     };
 	
-    $scope.goCRM610 = function(row){
+    $scope.goCRM610 = function(row){ 	
+    	$scope.noQuery = false;
+    	
+    	angular.forEach($scope.mappingSet['CRM.NONSEARCH_ID'], function(rowrow) {
+    		if(row.CUST_ID === rowrow.DATA ){
+    			$scope.showErrorMsg("ehl_01_CRM_001");
+    			$scope.noQuery = true;
+    			return;
+    		}
+		});		
+		
+		if($scope.noQuery) {
+			return;
+		}
+		
     	$scope.CRM_CUSTVO = {
 				CUST_ID :  row.CUST_ID,
 				CUST_NAME :row.CUST_NAME

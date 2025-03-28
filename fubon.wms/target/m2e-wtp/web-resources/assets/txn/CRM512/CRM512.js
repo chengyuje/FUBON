@@ -358,4 +358,24 @@ eSoafApp.controller('CRM512Controller', function ($scope, $controller, socketSer
 			$scope.inputVO.goExpDisabled = false;
 		}, 1000);
 	};
+	
+	//標點符號 空格 半形轉全形
+	$scope.ChangeToFullWidth = function(answer) {
+		var temp = "";
+		for (var i = 0; i < answer.ANSWER_REMARK.length; i++) {
+			var charCode = answer.ANSWER_REMARK.charCodeAt(i);
+			if (charCode == 32) {
+				charCode = 12288;
+			} else if (
+				(charCode >= 33 && charCode <= 47)   ||  // ! " # $ % & ' ( ) * + , - . /
+				(charCode >= 58 && charCode <= 64)   ||  // : ; < = > ? @
+				(charCode >= 91 && charCode <= 96)   ||  // [ \ ] ^ _ `
+				(charCode >= 123 && charCode <= 126)     // { | } ~
+			) {
+				charCode += 65248; // 轉換為全形標點
+			}
+			temp += String.fromCharCode(charCode);
+		}
+		answer.ANSWER_REMARK = temp;
+	};
 });

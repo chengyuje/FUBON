@@ -151,7 +151,7 @@ public class KYC310_CorpRptEmpty extends FubonWmsBizLogic {
         /** 製表相關時間資訊 **/
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        year = String.valueOf(calendar.get(Calendar.YEAR));//年
+        year = String.valueOf(calendar.get(Calendar.YEAR) - 1911);//年
         month = String.valueOf(calendar.get(Calendar.MONTH) + 1);//月
         day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));//日
 
@@ -756,7 +756,7 @@ public class KYC310_CorpRptEmpty extends FubonWmsBizLogic {
         	// #2252_調整KYC問卷條碼及版次
         	if (writer.getPageNumber() != 1) return;
         	
-            PdfPTable tBarCodeTable = new PdfPTable(4);//表格
+            PdfPTable tBarCodeTable = new PdfPTable(5);//表格
             tBarCodeTable.setTotalWidth(545);
             
             PdfContentByte pdfContentByte = writer.getDirectContent();
@@ -764,24 +764,35 @@ public class KYC310_CorpRptEmpty extends FubonWmsBizLogic {
             PdfPCell blank = new PdfPCell();//空白列
             blank.setBorderWidth(0);//邊框寬度
             blank.setFixedHeight(10);//儲存格高度
-		
-			// barcode - page
-			Barcode39 code39 = new Barcode39();
+            
+            Barcode39 code39;
+            PdfPCell cell;
+            //Barcode 99
+			code39 = new Barcode39();
 			code39.setCode("88-0601-99");
-			code39.setBarHeight(17);
-			code39.setSize(7);
-
-			PdfPCell cell = new PdfPCell();
-			cell.setColspan(1);
-			cell.setFixedHeight(30);
-			cell.setPadding(0);
-			cell.setBorderWidth(0);
-			cell.addElement(code39.createImageWithBarcode(pdfContentByte, null, null));
+            code39.setBarHeight(18);
+            code39.setSize(8);
+			cell = getPdfCell(code39, pdfContentByte);
+			tBarCodeTable.addCell(cell);
+			tBarCodeTable.addCell(blank);
 			
-			tBarCodeTable.addCell(cell);// 添加到表中
-			for (int i = 0; i < tBarCodeTable.getNumberOfColumns(); i++) {
-				tBarCodeTable.addCell(blank);
-			}
+			//Barcode CustID
+			code39 = new Barcode39();
+			code39.setCode(inputVO.getCUST_ID());
+            code39.setBarHeight(15);
+            code39.setSize(7);
+			cell = getPdfCell(code39, pdfContentByte);
+			tBarCodeTable.addCell(cell);
+			tBarCodeTable.addCell(blank);
+			
+			//Barcode Date
+			code39 = new Barcode39();
+			code39.setCode(year + "0" + month + day);
+			code39.setBarHeight(13.6f);
+            code39.setSize(6.4f);
+            cell = getPdfCell(code39, pdfContentByte);
+            tBarCodeTable.addCell(cell);
+			
             tBarCodeTable.writeSelectedRows(0, -1, 25, 80, writer.getDirectContent());
         }
 
@@ -832,6 +843,15 @@ public class KYC310_CorpRptEmpty extends FubonWmsBizLogic {
             Phrase text = new Phrase();
             text.add(chunk);
             ColumnText.showTextAligned(total, Element.ALIGN_LEFT, text, 3, 2, 0);
+        }
+        
+        public PdfPCell getPdfCell(Barcode39 code39, PdfContentByte cb) {
+        	PdfPCell cell = new PdfPCell();
+            cell.setFixedHeight(30);
+            cell.setPadding(0);
+            cell.setBorderWidth(0);
+            cell.addElement(code39.createImageWithBarcode(cb, null, null));
+            return cell;
         }
     }
 

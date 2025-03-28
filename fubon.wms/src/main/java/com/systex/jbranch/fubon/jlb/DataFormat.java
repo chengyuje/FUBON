@@ -1,5 +1,8 @@
 package com.systex.jbranch.fubon.jlb;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringUtils;
 
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
@@ -218,7 +221,7 @@ public class DataFormat extends FubonWmsBizLogic {
 	/*
 	 * 客戶ID遮罩
 	 */
-	public static String maskID(String CustID){
+	public String maskID(String CustID){
 		String custID = "";
 
 		if(StringUtils.length(CustID) == 10){ //本國人ID
@@ -234,6 +237,39 @@ public class DataFormat extends FubonWmsBizLogic {
 		}
 		return custID;
 	}
+	
+	/*
+	 * 電文客戶ID遮罩
+	 */
+	public String maskXml(String xml, String tag) {
+        Pattern pattern = Pattern.compile("<" + tag + ">(.+?)</" + tag + ">", Pattern.CASE_INSENSITIVE);
+        Matcher mat = pattern.matcher(xml);
+        if (mat.find()) {
+            String tagVal = mat.group(1).trim();
+            String maskVal = maskID(tagVal);
+            xml = xml.replaceFirst(tagVal, maskVal);
+        }
+        return xml;
+    }
+	
+	/*
+	 * API 客戶ID遮罩
+	 */
+	public String maskJson(String orig, String tag) {
+        String origPat = "\"(" + tag + ")\" *?: *?\"(.+?)\"";
+        Pattern pat = Pattern.compile(origPat, Pattern.CASE_INSENSITIVE);
+        Matcher mat = pat.matcher(orig);
+        if (mat.find()) {
+        	String tagKey = mat.group(1);
+            String val = mat.group(2);
+            if (val != null && val.length() > 9) {
+                String hidCode = maskID(val);
+                orig = orig.replaceAll(origPat, "\"" + tagKey + "\":\"" + hidCode + "\"");
+            }
+        }
+        return orig;
+    }
+	
 	/*
 	 * 地址遮罩
 	 */

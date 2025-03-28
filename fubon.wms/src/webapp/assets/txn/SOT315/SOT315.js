@@ -114,7 +114,7 @@ eSoafApp.controller('SOT315Controller',
 			if (enterTime == 'change' && !$scope.interFlag) {
 				$scope.interFlag = true;
 			}
-			console.log($scope.mappingSet['SOT.CONTRACT_LIST']);
+
 			
 			$scope.toDay = $filter('date')(new Date(),'yyyy-MM-dd 00:00:00');//取當日日期
 			//比較系統日與契約迄日

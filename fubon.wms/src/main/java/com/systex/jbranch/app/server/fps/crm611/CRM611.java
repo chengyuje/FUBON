@@ -17,7 +17,12 @@ import com.systex.jbranch.app.server.fps.sot701.SOT701InputVO;
 import com.systex.jbranch.comutil.collection.GenericMap;
 import com.systex.jbranch.comutil.parse.JsonUtil;
 import com.systex.jbranch.fubon.commons.cbs.CBSService;
+import com.systex.jbranch.fubon.commons.cbs.dao._067050_067439DAO;
+import com.systex.jbranch.fubon.commons.cbs.dao._067439_067442DAO;
 import com.systex.jbranch.fubon.commons.cbs.service.FP032151Service;
+import com.systex.jbranch.fubon.commons.cbs.vo._067439_067442.CBS067439OutputVO;
+import com.systex.jbranch.fubon.commons.cbs.vo._067439_067442.CBS067442OutputVO;
+import com.systex.jbranch.fubon.commons.cbs.vo.basic.CBSUtilOutputVO;
 import com.systex.jbranch.fubon.commons.esb.EsbUtil;
 import com.systex.jbranch.fubon.commons.esb.vo.fp032151.FP032151OutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.wms032154.WMS032154OutputDetailsVO;
@@ -49,6 +54,13 @@ public class CRM611 extends EsbUtil {
 	private FP032151Service fp032151Service;
 	
 	private DataAccessManager dam = null;
+	
+	@Autowired
+	_067050_067439DAO _067050_067439dao;			
+	
+	@Autowired
+	_067439_067442DAO _067439_067442dao;
+	
 
 	private String apiParam = "SYS.SENIOR_CITIZEN_URL";
 	
@@ -116,6 +128,9 @@ public class CRM611 extends EsbUtil {
 		/** 投資比重與KYC資產配直佔比(Y:超過/N:未超過) **/
 		sql.append("	   AMT_KYC.AMT_KYC_FLAG, ");
 		
+		/** WMS-CR-20250124-01_新增客戶ROA資訊相關功能 **/
+		sql.append("	   ROA.ROA, ");
+		
 		/** 授信異常註記 **/
 		sql.append("	   TCN.CREDIT_ABNORMAL ");
 		
@@ -133,11 +148,12 @@ public class CRM611 extends EsbUtil {
 		sql.append("  SELECT AMT_BASE.CUST_ID, ");
 		sql.append("         AMT_BASE.AUM_SEC_TOTAL, ");
 		sql.append("         AMT_BASE.INV_AMT, ");
+		sql.append("         AMT_BASE.ROA, ");
 		sql.append("         CASE WHEN AMT_BASE.AUM_SEC_TOTAL = 0 THEN 0 ELSE ROUND(AMT_BASE.INV_AMT / AMT_BASE.AUM_SEC_TOTAL, 2) END AS INV_RATIO, ");
 		sql.append("         CASE WHEN AMT_BASE.ANS_INV_RATIO IS NULL THEN 0 ELSE (AMT_BASE.ANS_INV_RATIO * 100) END || '%' AS  ANS_INV_RATIO, ");
 		sql.append("         CASE WHEN (CASE WHEN AMT_BASE.AUM_SEC_TOTAL = 0 THEN 0 ELSE ROUND(AMT_BASE.INV_AMT / AMT_BASE.AUM_SEC_TOTAL, 2) END) > AMT_BASE.ANS_INV_RATIO THEN 'Y' ELSE 'N' END AS AMT_KYC_FLAG ");
 		sql.append("  FROM ( ");
-		sql.append("    SELECT AMT.CUST_ID, AMT.CUST_NAME, AMT.BRA_NBR, AMT.AO_CODE, AMT.AO_02 AS EMP_ID, ");
+		sql.append("    SELECT AMT.CUST_ID, AMT.CUST_NAME, AMT.BRA_NBR, AMT.AO_CODE, AMT.AO_02 AS EMP_ID, AMT.ROA, ");
 		sql.append("           AMT.AUM_SEC_TOTAL, ");
 		sql.append("           (AMT.AMT_09 + AMT.AMT_22 + AMT.AMT_23 + AMT.AMT_12 + AMT.AMT_13 + AMT.AMT_11 + AMT.AMT_21 + AMT.AMT_15 + AMT.AMT_16 + AMT.AMT_14 + AMT.AMT_25 + AMT.AMT_26 + AMT_EXTEND.AMT_17_INV) AS INV_AMT, ");
 		sql.append("           AMT_EXTEND.ANS_INV_RATIO ");
@@ -148,6 +164,11 @@ public class CRM611 extends EsbUtil {
 		sql.append("    AND CASE WHEN ROUND(MONTHS_BETWEEN(SYSDATE, AMT.BIRTH_DATE) / 12, 2) >= 64.5 THEN 'Y' ELSE 'N' END = 'Y' ");
 		sql.append("  ) AMT_BASE ");
 		sql.append(") AMT_KYC ON TCM.CUST_ID = AMT_KYC.CUST_ID ");
+		
+		/** WMS-CR-20250124-01_新增客戶ROA資訊相關功能 **/
+		sql.append("LEFT JOIN ( ");
+		sql.append("SELECT CUST_ID, ROA FROM MVCRM_AST_AMT WHERE CUST_ID = :cust_id AND ROA IS NOT NULL ");
+		sql.append(") ROA ON ROA.CUST_ID = TCM.CUST_ID ");
 		
 		sql.append("WHERE TCM.CUST_ID = :cust_id ");
 		
@@ -404,5 +425,33 @@ public class CRM611 extends EsbUtil {
 			return false;
 		}
 	}
+	
+	/*
+	 * #2325
+	 * 取得對帳單寄送註記
+	 */
+	public void getBillNote(Object body, IPrimitiveMap header) throws Exception {
+		CRM611InputVO inputVO = (CRM611InputVO) body;
+		CRM611OutputVO outputVO = new CRM611OutputVO();
+		
+		String custID = inputVO.getCust_id();
+		String idType = cbsservice.getCBSIDCode(custID);
+		
+//		@Autowired
+//		_067050_067439DAO _067050_067439dao;			
+//		
+//		@Autowired
+//		_067439_067442DAO _067439_067442dao;
+		List<CBSUtilOutputVO> list = _067050_067439dao.search(custID, idType);
+		
+		CBS067439OutputVO outputVO067439 = list.get(0).getCbs067439OutputVO();
+		
+		List<CBSUtilOutputVO> list2 = _067439_067442dao.search(outputVO067439);
+		
+		CBS067442OutputVO outputVO067442 = list2.get(0).getCbs067442OutputVO();
+					
+		this.sendRtnObject(outputVO);
+	}
+	
 
 }

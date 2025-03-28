@@ -316,7 +316,7 @@ public class PMS302 extends FubonWmsBizLogic {
 			sql.append(" SELECT * FROM   ( ");
 			sql.append(" SELECT item, CUST_NAME, AO_CODE, ");
 			sql.append(" Sum(Nvl(fee,0)) AS fee, tx_date, B.CUST_ID  ");
-			sql.append(" FROM "+tragetTable+" B  ");
+			sql.append(" FROM " + tragetTable + " B  ");
 			sql.append(" LEFT JOIN (SELECT CUST_ID, CUST_NAME FROM TBCRM_CUST_MAST ) A ");
 			sql.append(" ON A.CUST_ID=B.CUST_ID ");
 			sql.append(" AND CUST_NAME=A.CUST_NAME  ");
@@ -329,7 +329,7 @@ public class PMS302 extends FubonWmsBizLogic {
 			sql.append(" SELECT * FROM   ( ");
 			sql.append(" SELECT item, CUST_NAME, AO_CODE, ");
 			sql.append(" Sum(Nvl(fee,0)) AS fee, B.CUST_ID  ");
-			sql.append(" FROM "+tragetTable+" B  ");
+			sql.append(" FROM " + tragetTable + " B  ");
 			sql.append(" LEFT JOIN (SELECT CUST_ID, CUST_NAME FROM TBPMS_CUST_REC_N WHERE LAST_DAY(TO_DATE(:ym,'YYYYMM')) BETWEEN START_TIME AND END_TIME ) A ");
 			sql.append(" ON A.CUST_ID=B.CUST_ID ");
 			sql.append(" AND CUST_NAME=A.CUST_NAME  WHERE 1=1 ");

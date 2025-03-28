@@ -74,14 +74,14 @@ public class BTFPS400 extends BizLogic {
         	System.out.println("fbsjlb:"+map.get("FBSJLB").toString());
         	System.out.println("vr_return_vol_rate:"+vr_return_vol_rate);
         	System.out.println("risk_attr:"+risk_attr);
-        	System.out.println("cust_id:"+cust_id);
+//        	System.out.println("cust_id:"+cust_id);
 
         	if((risk_attr.equals("1") && vr_return_vol_rate > vr_risk_atr_1) ||
         	   (risk_attr.equals("2") && vr_return_vol_rate > vr_risk_atr_2) ||
         	   (risk_attr.equals("3") && vr_return_vol_rate > vr_risk_atr_3)){
         			System.out.println("************BTFPS_5*************");
         			System.out.println("plan_id:"+plan_id);
-                	System.out.println("cust_id:"+cust_id);
+//                	System.out.println("cust_id:"+cust_id);
                 	System.out.println("************BTFPS_5*************");
         			BTFPS_5(dam, cust_id, plan_id, vr_return_vol_rate);
         	}

@@ -14,7 +14,10 @@ eSoafApp.controller('SOT321Controller',
 				$scope.mappingSet['SOT.CUST_TYPE'] = totas.data[totas.key.indexOf('SOT.CUST_TYPE')];
 				$scope.mappingSet['SOT.TRUST_CURR_TYPE'] = totas.data[totas.key.indexOf('SOT.TRUST_CURR_TYPE')];
 				$scope.mappingSet['SOT.MARKET_TYPE'] = totas.data[totas.key.indexOf('SOT.MARKET_TYPE')];
+				
 				$scope.mappingSet['SOT.ENTRUST_TYPE_REDEEM_SN'] = totas.data[totas.key.indexOf('SOT.ENTRUST_TYPE_REDEEM_SN')];
+				$scope.mappingSet['SOT.ENTRUST_TYPE_REDEEM_SN'].push({'LABEL':'自設', 'DATA':'1'});
+						
 		        $scope.mappingSet['SOT.SPEC_CUSTOMER'] = totas.data[totas.key.indexOf('SOT.SPEC_CUSTOMER')];//客戶註記
 		        $scope.mappingSet['SOT.BN_CUR_LIMIT_GTC'] = totas.data[totas.key.indexOf('SOT.BN_CUR_LIMIT_GTC')];
 				$scope.mappingSet['SOT.BN_GTC_LIMITPRICE_RANGE'] = totas.data[totas.key.indexOf('SOT.BN_GTC_LIMITPRICE_RANGE')];
@@ -61,17 +64,17 @@ eSoafApp.controller('SOT321Controller',
 			var minEndDate   = $scope.inputVO.MIN_GTC_END_DATE;
 			var maxEndDate   = $scope.inputVO.MAX_GTC_END_DATE;
 			
-			var endDate = undefined;
-			if ($scope.inputVO.gtcYN != 'P' && $scope.inputVO.gtcEndDate != undefined) {
-				endDate = angular.copy($scope.inputVO.gtcEndDate);
-				endDate = endDate.setDate(endDate.getDate()-1);					
-				endDate = new Date(endDate);
-				if (endDate > maxEndDate) {
-					endDate = maxEndDate;
-				}
-			}
+//			var endDate = undefined;
+//			if ($scope.inputVO.gtcYN != 'P' && $scope.inputVO.gtcEndDate != undefined) {
+//				endDate = angular.copy($scope.inputVO.gtcEndDate);
+//				endDate = endDate.setDate(endDate.getDate()-1);					
+//				endDate = new Date(endDate);
+//				if (endDate > maxEndDate) {
+//					endDate = maxEndDate;
+//				}
+//			}
 			$scope.apply_gtcStartDateOptions.minDate = minStartDate;
-			$scope.apply_gtcStartDateOptions.maxDate = endDate || maxStartDate;
+			$scope.apply_gtcStartDateOptions.maxDate = maxStartDate;
 			
 			// 長效單起迄日邏輯：最短2日最長5日,要連續的日期區間
 			if ($scope.inputVO.gtcYN == 'Y') {
@@ -96,6 +99,13 @@ eSoafApp.controller('SOT321Controller',
 			} else {
 				$scope.apply_gtcEndDateOptions.minDate = minEndDate;
 				$scope.apply_gtcEndDateOptions.maxDate = maxEndDate;
+			}
+			
+			if ($scope.inputVO.gtcStartDate != undefined && $scope.inputVO.gtcEndDate != undefined) {
+				if ($scope.inputVO.gtcStartDate > $scope.inputVO.gtcEndDate) {
+					// 若起日大於迄日，則清空迄日
+					$scope.inputVO.gtcEndDate = undefined;
+				}
 			}
 		};
 		
@@ -122,6 +132,7 @@ eSoafApp.controller('SOT321Controller',
 		};
 
 		$scope.init = function(){
+			$scope.disGtcRefVal = false;
 			$scope.checkTradeDateType();
 			$scope.mappingSet['SOT.DEBIT_ACCT_LIST']=[];
 			$scope.mappingSet['SOT.DEBIT_ACCT_LIST#DSIPLAY']=[];
@@ -188,7 +199,7 @@ eSoafApp.controller('SOT321Controller',
 					tradeDate: undefined,						//交易日期
 
 					certificateID: '',							//憑證編號
-					gtcYN: 'N',									//當日單N, 長效單Y
+					gtcYN: null,									//當日單N, 長效單Y
 					gtcEndDate: undefined,						//長效單迄日
 					gtcRefVal: undefined,						//長效單委託價格
 
@@ -461,6 +472,19 @@ eSoafApp.controller('SOT321Controller',
 		};
 
 		$scope.calculate = function () {
+			// 選限價1%、3%、5%時，下面的『委託贖回限價價格』欄位就要反灰不能填寫
+			if ($scope.inputVO.entrustType != "1") {
+				$scope.disGtcRefVal = true;
+				$scope.inputVO.gtcRefVal = undefined;
+			} else {
+				$scope.disGtcRefVal = false;
+			}
+			
+			if ($scope.inputVO.gtcYN == 'N' && $scope.inputVO.entrustType == '1') {
+				$scope.inputVO.entrustType = '2';
+				$scope.showErrorMsg("當日單不可選自設");
+			}
+			
 			var refVal = undefined;
 			if ($scope.inputVO.entrustType == "4") {
 				refVal = $scope.inputVO.refVal - 1;
@@ -487,33 +511,53 @@ eSoafApp.controller('SOT321Controller',
 		}
 
 		$scope.gtcYN_Changed = function() {
-			if($scope.inputVO.gtcYN == "N") {
-				$scope.inputVO.gtcRefVal = undefined;
-			} else {
-				$scope.inputVO.gtcRefVal = $scope.inputVO.refVal;
-			}
-			
 			if ($scope.inputVO.gtcYN == "N") {
 				// 當日單
+				$scope.inputVO.entrustType = "2";
+				$scope.inputVO.gtcRefVal = undefined;
 				$scope.inputVO.gtcStartDate = undefined;
-				$scope.inputVO.gtcEndDate = undefined;	
+				$scope.inputVO.gtcEndDate = undefined;
 				
+				var today = new Date();
+				var year = today.getFullYear();
+				var month = today.getMonth();
+				var date = today.getDate();
+				//報價日期
+				var refPriceDate = new Date($scope.inputVO.refValDate);
+				var refValYear = refPriceDate.getFullYear();
+				var refValMonth = refPriceDate.getMonth();
+				var refValDate = refPriceDate.getDate();
+
+				//#2340
+				if (refValYear != year || refValMonth != month || refValDate != date) {
+					$scope.inputVO.gtcYN = null;
+					$scope.showErrorMsg("尚無當日參考報價");
+					return;
+				}
 			} else if ($scope.inputVO.gtcYN == "Y") {
 				// 長效單
+				$scope.inputVO.entrustType = "1";
+				$scope.inputVO.gtcRefVal = $scope.inputVO.refVal;
 				$scope.inputVO.gtcEndDate = undefined;
 				
 			} else if ($scope.inputVO.gtcYN == "P") {
 				// 預約單
+				$scope.inputVO.entrustType = "2";
+				$scope.inputVO.gtcRefVal = undefined;
 				$scope.inputVO.gtcEndDate = $scope.inputVO.gtcStartDate;
 			}
+			
 			$scope.limitDate();
-
-			$scope.inputVO.entrustType = "2";
 			$scope.calculate();
 		}
 
 		$scope.chkGtcRefVal = function() {
-			if($scope.inputVO.gtcYN == "Y") {
+			if ($scope.inputVO.gtcRefVal == 0) {
+				$scope.inputVO.gtcRefVal = undefined;
+				$scope.showErrorMsg("委託贖回限價價格不可為0");
+				return;
+			}
+			if($scope.inputVO.gtcYN != "N") {
 				//參數取得"限價超過參考報價的正負N"
 				var rangelist = $filter('filter')($scope.mappingSet["SOT.BN_GTC_LIMITPRICE_RANGE"], "1");
 				var range = 3;
@@ -656,7 +700,13 @@ eSoafApp.controller('SOT321Controller',
 			
 			// 長效單：未輸入限價價格，顯示錯誤訊息「請輸入參考委託贖回價格」(長效單只有限價，無市價選項) 
 			if ($scope.inputVO.gtcYN == "Y" && ($scope.inputVO.gtcRefVal == undefined || $scope.inputVO.gtcRefVal == '') ) {
-				$scope.showErrorMsg("請輸入參考委託贖回價格");
+				$scope.showErrorMsg("請輸入委託贖回限價價格");
+				return;
+			}
+			
+			// 預約單＋自設限價：未輸入限價價格，顯示錯誤訊息「請輸入參考委託贖回價格」
+			if ($scope.inputVO.gtcYN == "P" && $scope.inputVO.entrustType == '1' && ($scope.inputVO.gtcRefVal == undefined || $scope.inputVO.gtcRefVal == '') ) {
+				$scope.showErrorMsg("請輸入委託贖回限價價格");
 				return;
 			}
 			
@@ -692,23 +742,22 @@ eSoafApp.controller('SOT321Controller',
 								return;
 							}
 						}
-						
-						/********************************************************************************************************/
-						$scope.sendRecv("SOT310", "checkTime", "com.systex.jbranch.app.server.fps.sot310.SOT310InputVO", {},
-						function(tota, isError) {
-							if (!isError) {
-								$scope.sotYN = tota[0].body.sotYN;
-//								alert($scope.sotYN);
-								if ($scope.sotYN == 'N' && $scope.inputVO.gtcYN == 'N') {
-									$scope.showMsg("已過當日交易截止時間，請改採長效單或預約單委託。");
-									return;
-								} else {
-									alert("do_goOP");
-//									$scope.do_goOP();
-								}
-							}				
-						});
+						$scope.do_goOP();
 					}
+				});
+			} else {
+				// 當日單
+				$scope.sendRecv("SOT310", "checkTime", "com.systex.jbranch.app.server.fps.sot310.SOT310InputVO", {},
+				function(tota, isError) {
+					if (!isError) {
+						$scope.sotYN = tota[0].body.sotYN;
+//						alert($scope.sotYN);
+						if ($scope.sotYN == 'N' && $scope.inputVO.gtcYN == 'N') {
+							$scope.showMsg("已過當日交易截止時間，請改採長效單或預約單委託。");
+							return;
+						}
+						$scope.do_goOP();
+					}				
 				});
 			}
 		};

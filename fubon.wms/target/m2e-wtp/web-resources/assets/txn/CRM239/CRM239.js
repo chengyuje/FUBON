@@ -4,11 +4,13 @@
  */
 'use strict';
 eSoafApp.controller('CRM239Controller',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, $filter) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, $filter, crmService) {
 		$controller('BaseController', {$scope: $scope});
 		$controller('CRM230Controller', {$scope: $scope});
 		
 		$scope.controllerName = "CRM239Controller";
+		
+		crmService.getForbiddenList();
 		
 		$scope.inquire = function() {
 //			$scope.inputVO.aolist = $scope.aolist;
@@ -31,6 +33,7 @@ eSoafApp.controller('CRM239Controller',
 									$scope.resultList.push(row);
 								}								
 							});
+							$scope.resultList = crmService.filterList($rootScope.forbiddenData,$scope.resultList);
 							$scope.outputVO = {'data':$scope.resultList};
 							
 							//客戶資訊(一個客戶只呈現一筆)
@@ -40,6 +43,7 @@ eSoafApp.controller('CRM239Controller',
 								if (!temp)
 		            				$scope.custList.push(row);
 							});
+							$scope.custList = crmService.filterList($rootScope.forbiddenData,$scope.custList);
 							$scope.custOutputVO = {'data':$scope.custList};
 							return;
 							

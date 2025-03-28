@@ -30,9 +30,9 @@ public class SqlLdr {
 //		String logName = ctlName;
 //		String srcName = "tradefile_20241210.txt";	
 		
-		String ctlName = "TBCRM_AST_INV_VPSN_BILL";
+		String ctlName = "TBCAM_SFA_WMG_HA_QCHECK_SG";
 		String logName = ctlName;
-		String srcName = "assets.txt";
+		String srcName = "2336.csv";
 		
 		Utility util = new Utility();
 		String command = util.getCommand(info, ctlName, logName, srcName);

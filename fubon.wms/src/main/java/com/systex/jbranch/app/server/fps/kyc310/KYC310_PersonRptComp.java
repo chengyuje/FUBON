@@ -804,15 +804,11 @@ public class KYC310_PersonRptComp extends FubonWmsBizLogic {
 				tBarCode.setTotalWidth(545);
 				PdfContentByte cb = writer.getDirectContent();
 				
-				Barcode39 code39 = new Barcode39();
-				code39.setCode("88-0402-0" + page);
-				code39.setBarHeight(18);
-				
 				PdfPCell cell = new PdfPCell();
 	    		cell.setFixedHeight(30);
 	        	cell.setPadding(0);	
 	    		cell.setBorderWidth(0);
-	    		cell.addElement(code39.createImageWithBarcode(cb, null, null));
+	    		cell.addElement(new Paragraph());
 
 	    		PdfPCell blank = new PdfPCell();
 	    		blank.setBorderWidth(0);
@@ -820,32 +816,21 @@ public class KYC310_PersonRptComp extends FubonWmsBizLogic {
 	    		
 				tBarCode.addCell(cell);
 				tBarCode.addCell(blank);
-				
-				// barcode - cust id
-				code39 = new Barcode39();
-				code39.setCode(inputVO.getCUST_ID());
-				code39.setBarHeight(18);
-				
+								
 				cell = new PdfPCell();
 	    		cell.setFixedHeight(30);
 	        	cell.setPadding(0);	
 	    		cell.setBorderWidth(0);
-	    		cell.addElement(code39.createImageWithBarcode(cb, null, null));
+	    		cell.addElement(new Paragraph());
 	    		
 	    		tBarCode.addCell(cell);
 				tBarCode.addCell(blank);
 				
-	    		// barcode - tw date
-				code39 = new Barcode39();
-				code39.setCode(twYear + month + day);
-				code39.setSize(6);
-				code39.setBarHeight(14);
-				
 				cell = new PdfPCell();
 	    		cell.setFixedHeight(30);
 	        	cell.setPadding(0);	
 	    		cell.setBorderWidth(0);
-	    		cell.addElement(code39.createImageWithBarcode(cb, null, null));
+	    		cell.addElement(new Paragraph());
 				
 				tBarCode.addCell(cell);
 				
@@ -888,7 +873,7 @@ public class KYC310_PersonRptComp extends FubonWmsBizLogic {
                 PdfPCell version = new PdfPCell();
                 version.setBorderWidth(0);
                 
-                Chunk chunkVer = new Chunk("2024年6月版", nFont);
+                Chunk chunkVer = new Chunk("2025年03月版", nFont);
                 Paragraph textVer = new Paragraph();
                 textVer.setAlignment(Phrase.ALIGN_RIGHT);
                 textVer.add(chunkVer);

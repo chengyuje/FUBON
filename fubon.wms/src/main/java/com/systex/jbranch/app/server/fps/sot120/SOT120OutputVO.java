@@ -63,6 +63,9 @@ public class SOT120OutputVO extends PagingOutputVO {
 	private String deathFlag;	//死亡戶
 	private String isInterdict;	//禁治產
 	
+	//#2304_商品適配及申購新增KYC快到期提醒
+    private boolean kycDueDateLessOneMonth; //KYC校期小於等於1個月(30天)
+	
 	
 	
 	public boolean isKycDueDateUseful() {
@@ -323,6 +326,14 @@ public class SOT120OutputVO extends PagingOutputVO {
 
 	public void setHnwcServiceYN(String hnwcServiceYN) {
 		this.hnwcServiceYN = hnwcServiceYN;
+	}
+
+	public boolean isKycDueDateLessOneMonth() {
+		return kycDueDateLessOneMonth;
+	}
+
+	public void setKycDueDateLessOneMonth(boolean kycDueDateLessOneMonth) {
+		this.kycDueDateLessOneMonth = kycDueDateLessOneMonth;
 	}
 	
 }

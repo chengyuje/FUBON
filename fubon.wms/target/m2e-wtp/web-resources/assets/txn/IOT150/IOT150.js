@@ -275,7 +275,7 @@ eSoafApp.controller('IOT150Controller',
 		               				//TODO 測試案例要還原
 		               				//$scope.IOT_MAINList[i].isOpBatchNonewEtopShow = RegExp('^P.*').test(opBatchNo);
 		               				//$scope.IOT_MAINList[i].STATUS = 40;
-		               				isEtop = isEtop || $scope.IOT_MAINList[i].isOpBatchNonewEtopShow || $scope.IOT_MAINList[i].isOpBatchS;
+		               				isEtop = isEtop || $scope.IOT_MAINList[i].isOpBatchNonewEtopShow || $scope.IOT_MAINList[i].isOpBatchS || ($scope.IOT_MAINList[i].FUND_UPLOAD_YN == 'Y');
 		               			}
 
 		               			$scope.signViewFileShow = isEtop;
@@ -608,4 +608,20 @@ eSoafApp.controller('IOT150Controller',
 	        	}
 	        });
         }
+		
+		//逾期查詢報表
+		$scope.exportOverdue = function(){
+			$scope.sendRecv("IOT150","exportOverdue","com.systex.jbranch.app.server.fps.iot150.IOT150InputVO",$scope.inputVO,function(tota,isError){
+	        	if (!isError) {
+	        	}
+	        });
+        }
+		
+		//檢視保費資金證明上傳文件
+        $scope.openFundUploadFile = function(keyNo){
+           	$scope.sendRecv("IOT150" , "getFundUploadPdfFile" , "com.systex.jbranch.app.server.fps.iot150.IOT150InputVO" , {"INS_KEYNO" : keyNo} , function(tota , isError){
+           		if(!isError){}
+        	});
+        }
+		
 	});

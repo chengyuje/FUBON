@@ -4,7 +4,7 @@
  */
 'use strict';
 eSoafApp.controller('SOT511Controller',
-	function($rootScope, $scope, $controller, $filter, $confirm,sysInfoService, socketService, ngDialog, projInfoService, $q,getParameter, $timeout) {
+	function($rootScope, $scope, $controller, $filter, $confirm, sysInfoService, $q, getParameter, $timeout) {
 		$controller('BaseController', {$scope: $scope});
 		$scope.controllerName = "SOT511Controller";
 		
@@ -119,29 +119,31 @@ eSoafApp.controller('SOT511Controller',
 				$scope.showErrorMsg("ehl_02_common_007");
 				return;
 			}
-			$scope.sendRecv("SOT712", "updateBatchSeq", "com.systex.jbranch.app.server.fps.sot712.SOT712InputVO", {'prodType': 'SN', 
-				   'tradeSeq': $scope.inputVO.tradeSEQ},
-					function(tota, isError) {
-					if (!isError) {
-						$scope.sendRecv("SOT510", "verifyTradeBond", "com.systex.jbranch.app.server.fps.sot510.SOT510InputVO", {'tradeSEQ':$scope.inputVO.tradeSEQ,'prodType':1,'checkType':2,'recSEQ':$scope.inputVO.recSEQ,'purchaseAmt':$scope.inputVO.purchaseAmt},
-								function(totaCT, isError) {
-									if (!isError) {
-										if (totaCT[0].body.warningMsg != '' && totaCT[0].body.warningMsg != null) {
-											$scope.showErrorMsg(totaCT[0].body.warningMsg);
-										}
-										if (totaCT[0].body.errorMsg != '' && totaCT[0].body.errorMsg != null) {
-											$scope.showErrorMsg(totaCT[0].body.errorMsg);
-										} else {
-											//產生報表
-											$scope.printReport();
-
-											$scope.showMsg("ehl_02_SOT_002");
-											$scope.query();
-											return;
-										}
-									}
-								});
-					}
+			$scope.sendRecv("SOT712", "updateBatchSeq", "com.systex.jbranch.app.server.fps.sot712.SOT712InputVO", 
+			{'prodType': 'SN', 'tradeSeq': $scope.inputVO.tradeSEQ},
+			function(tota, isError) {
+				if (!isError) {
+					$scope.sendRecv("SOT510", "verifyTradeBond", "com.systex.jbranch.app.server.fps.sot510.SOT510InputVO", 
+					{'tradeSEQ':$scope.inputVO.tradeSEQ,'prodType':1,'checkType':2,'recSEQ':$scope.inputVO.recSEQ,
+					 'purchaseAmt':$scope.inputVO.purchaseAmt, 'isOBU': $scope.inputVO.isOBU},
+					function(totaCT, isError) {
+						if (!isError) {
+							if (totaCT[0].body.warningMsg != '' && totaCT[0].body.warningMsg != null) {
+								$scope.showErrorMsg(totaCT[0].body.warningMsg);
+							}
+							if (totaCT[0].body.errorMsg != '' && totaCT[0].body.errorMsg != null) {
+								$scope.showErrorMsg(totaCT[0].body.errorMsg);
+							} else {
+								//產生報表
+								$scope.printReport();
+	
+								$scope.showMsg("ehl_02_SOT_002");
+								$scope.query();
+								return;
+							}
+						}
+					});
+				}
 		    });
 		};
 		
@@ -246,41 +248,33 @@ eSoafApp.controller('SOT511Controller',
 		
 		//非常規交易
 		$scope.getSOTCustInfoCT = function () {
-			$scope.sendRecv("SOT510", 
-							"getSOTCustInfoCT", 
-							"com.systex.jbranch.app.server.fps.sot510.SOT510InputVO", 
-							{'custID':$scope.inputVO.custID, 
-						 	 'prodType': $scope.inputVO.prodType, 
-							 'tradeType': $scope.inputVO.tradeType, 
-							 'prodID': $scope.inputVO.prodID},
-					function(totaCT, isError) {
-						if (!isError) {
-//							$scope.isFirstTrade = (totaCT[0].body.isFirstTrade == "Y" ? $filter('i18n')('ehl_02_SOT_003') : ""); 
-							$scope.isFirstTrade = ""; // SI，SN不判斷是否為首購 
-							$scope.ageUnder70Flag = (totaCT[0].body.ageUnder70Flag == "N" ? $filter('i18n')('ehl_02_SOT_004') : "");
-							$scope.eduJrFlag = (totaCT[0].body.eduJrFlag == "N" ? $filter('i18n')('ehl_02_SOT_005') : ""); ;
-							$scope.healthFlag = (totaCT[0].body.healthFlag == "N" ? $filter('i18n')('ehl_02_SOT_006') : "");
+			$scope.sendRecv("SOT510", "getSOTCustInfoCT", "com.systex.jbranch.app.server.fps.sot510.SOT510InputVO", 
+			{'custID':$scope.inputVO.custID, 'prodType': $scope.inputVO.prodType, 'tradeType': $scope.inputVO.tradeType, 
+			 'prodID': $scope.inputVO.prodID, 'isOBU': $scope.inputVO.isOBU},
+			function(totaCT, isError) {
+				if (!isError) {
+//					$scope.isFirstTrade = (totaCT[0].body.isFirstTrade == "Y" ? $filter('i18n')('ehl_02_SOT_003') : ""); 
+					$scope.isFirstTrade = ""; // SI，SN不判斷是否為首購 
+					$scope.ageUnder70Flag = (totaCT[0].body.ageUnder70Flag == "N" ? $filter('i18n')('ehl_02_SOT_004') : "");
+					$scope.eduJrFlag = (totaCT[0].body.eduJrFlag == "N" ? $filter('i18n')('ehl_02_SOT_005') : ""); ;
+					$scope.healthFlag = (totaCT[0].body.healthFlag == "N" ? $filter('i18n')('ehl_02_SOT_006') : "");
 
-							if ($scope.mainList[0].IS_REC_NEEDED == 'N') {
-								$scope.recSeqFlagOrg = 'N';
-							} else {
-//								$scope.recSeqFlagOrg = (totaCT[0].body.isFirstTrade == "Y" || totaCT[0].body.custRemarks == "Y" ? "Y" : "N");     //是否弱勢或首購客戶 控制<傳送OP交易及列印表單>與<網銀快速下單>按鈕
-								$scope.recSeqFlagOrg = 'Y';
-							}	
-							
-							$scope.recSeqFlag = $scope.recSeqFlagOrg;
-							if($scope.inputVO.custID.length == 10)
-								$scope.custAge = (totaCT[0].body.custAge < 18 ? $filter('i18n')('ehl_01_sot510_001') : ""); //委託人未成年，請查詢印鑑備註訊息或法代同意書內容
-							
-//							if($scope.isFirstTrade =="" &&
-//							   $scope.ageUnder70Flag =="" &&
-//							   $scope.eduJrFlag =="" &&
-//							   $scope.healthFlag ==""
-//							){
-//								 $scope.recNeeded=false;
-//							}
-							return;
-						}
+					if ($scope.mainList[0].IS_REC_NEEDED == 'N') {
+						$scope.recSeqFlagOrg = 'N';
+					} else {
+//						$scope.recSeqFlagOrg = (totaCT[0].body.isFirstTrade == "Y" || totaCT[0].body.custRemarks == "Y" ? "Y" : "N");     //是否弱勢或首購客戶 控制<傳送OP交易及列印表單>與<網銀快速下單>按鈕
+						$scope.recSeqFlagOrg = 'Y';
+					}	
+					
+					$scope.recSeqFlag = $scope.recSeqFlagOrg;
+					if($scope.inputVO.custID.length == 10)
+						$scope.custAge = (totaCT[0].body.custAge < 18 ? $filter('i18n')('ehl_01_sot510_001') : ""); //委託人未成年，請查詢印鑑備註訊息或法代同意書內容
+					
+//					if ($scope.isFirstTrade == "" && $scope.ageUnder70Flag == "" && $scope.eduJrFlag == "" && $scope.healthFlag == ""){
+//						 $scope.recNeeded=false;
+//					}
+					return;
+				}
 			});
 		};
 		

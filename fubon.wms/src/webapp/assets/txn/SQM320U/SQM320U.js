@@ -36,8 +36,6 @@ eSoafApp.controller('SQM320UController',
         }; 
         
 		$scope.initSQM320U = function() {
-			$scope.dateChangeU();
-			
 			$scope.sendRecv("PMS401U", "isMainten", "com.systex.jbranch.app.server.fps.pms401u.PMS401UInputVO", {'itemID': 'SQM320U'}, function(tota, isError) {
 				if (!isError) {
 					$scope.chkMaintenance = tota[0].body.isMaintenancePRI == 'Y' ? true : false;
@@ -57,6 +55,8 @@ eSoafApp.controller('SQM320UController',
 						});
 						
 						$scope.inputVO.uhrmOP = tota[0].body.uhrmORGList[0].BRANCH_AREA_ID;
+						
+						$scope.dateChangeU();
 			        }
 				}						
 			});

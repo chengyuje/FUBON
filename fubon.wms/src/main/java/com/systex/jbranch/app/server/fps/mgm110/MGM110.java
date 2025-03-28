@@ -183,7 +183,7 @@ public class MGM110 extends FubonWmsBizLogic {
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			sb = new StringBuffer();
 			sb.append("SELECT LDAY_AUM_AMT FROM TBCRM_CUST_AUM_MONTHLY_HIST WHERE CUST_ID = :cust_id ");
-			sb.append("AND DATA_YEAR = :data_year AND DATA_MONTH = '12' ");	
+			sb.append("AND DATA_YEAR = '2024' AND DATA_MONTH = '12' ");	
 			queryCondition.setObject("cust_id", cust_id);
 			
 			if(StringUtils.isNotBlank(act_year)){
@@ -192,7 +192,7 @@ public class MGM110 extends FubonWmsBizLogic {
 				act_year = String.valueOf(data_year_int);
 			}
 			
-			queryCondition.setObject("data_year", act_year);
+//			queryCondition.setObject("data_year", act_year);
 			queryCondition.setQueryString(sb.toString());
 			list = dam.exeQuery(queryCondition);
 			if(list.size() > 0 && list.get(0).get("LDAY_AUM_AMT") != null){

@@ -84,6 +84,9 @@ public class SOT310OutputVO extends PagingOutputVO {
 	private String sotYN;
 	private String overCentRateResult; //集中度檢核結果
 	
+	//#2304_商品適配及申購新增KYC快到期提醒
+    private boolean kycDueDateLessOneMonth; //KYC校期小於等於1個月(30天)
+	
 	public List<Map<String, Object>> getResultList() {
 		return resultList;
 	}
@@ -551,6 +554,14 @@ public class SOT310OutputVO extends PagingOutputVO {
 
 	public void setOverCentRateResult(String overCentRateResult) {
 		this.overCentRateResult = overCentRateResult;
+	}
+
+	public boolean isKycDueDateLessOneMonth() {
+		return kycDueDateLessOneMonth;
+	}
+
+	public void setKycDueDateLessOneMonth(boolean kycDueDateLessOneMonth) {
+		this.kycDueDateLessOneMonth = kycDueDateLessOneMonth;
 	}
 	
 }

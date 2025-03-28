@@ -55,7 +55,9 @@
 <script type="text/javascript" src="assets/txn/CAM210/CAM210_3.js"></script>
 <script type="text/javascript" src="assets/txn/CAM210/CAM210_4.js"></script>
 <script type="text/javascript" src="assets/txn/CAM210/CAM210_5.js"></script>
+<script type="text/javascript" src="assets/txn/CAM211/CAM211.js"></script>
 <script type="text/javascript" src="assets/txn/CAM211/CAM211_DOWNLOAD.js"></script>
+
 <div class="CAM211" ng-controller="CAM211Controller" ng-cloak>
 	<div class="tfb_content">
 		<div class="tfb_content_icon"></div>
@@ -68,52 +70,59 @@
 				<tr>
 					<th>業務處：</th>
 					<td>
-						<e-combobox id="region" name="region"
-									ng-datasource="UHRM_REGION_CENTER_LIST"
-									ng-model="inputVO.uhrmRegion"
+						<e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="uhrmRCList"
+									ng-model="inputVO.uhrmRC"
 									ng-validate="false" 
 									ng-disabled="true"
 									ng-readonly="true" 
 									ng-editable="false"
-									ng-format="F3"
-									ng-required="false"
+									ng-format="F1"
+									ng-required="true"
 									style="line-height:20px;" />
-				   	</td>
-					<th>業務中心：</th>
+					</td>		
+					<th>營運區：</th>
 					<td>
-						<e-combobox id="op" name="op"
-									ng-datasource="UHRM_BRANCH_AREA_LIST"
-									ng-model="inputVO.uhrmOp"
+						<e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="uhrmOPList"
+									ng-model="inputVO.uhrmOP"
 									ng-validate="false" 
 									ng-disabled="true"
 									ng-readonly="true" 
 									ng-editable="false"
-									ng-format="F3"
-									ng-required="false"
+									ng-format="F1"
+									ng-required="true"
 									style="line-height:20px;" />
-				   	</td>
+					</td>
 				</tr>
 				<tr>
 					<th>員工姓名：</th>
 					<td>
 						<e-combobox id="empId" name="empId"
-										ng-datasource="mappingSet['UHRM_LIST']"
-										ng-model="inputVO.empId"
-										ng-validate="false" 
-										ng-disabled="mappingSet['UHRM_LIST'].length == 2"
-										ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
-										ng-editable="false"
-										ng-format="F1"
-										style="line-height:20px;" />
+									ng-datasource="mappingSet['UHRM_LIST']"
+									ng-model="inputVO.uEmpId"
+									ng-validate="false" 
+									ng-disabled="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F1"
+									style="line-height:20px;" />
 			    	</td>
 			    	<th>客戶ID:</th>
-					<td><input type="text" class="form-control" placeholder="請輸入..." id="custId" name="custId" style="text-transform: uppercase;" ng-model="inputVO.custId" e-length-limit="16"></td>
+					<td>
+						<input type="text" class="form-control" 
+							   placeholder="請輸入..." 
+							   id="custId" name="custId" 
+							   style="text-transform: uppercase; width: 237px;" 
+							   ng-model="inputVO.custId" 
+							   e-length-limit="16">
+					</td>
 				</tr>
 				<tr ng-show="tabSheet == '3' || tabSheet == '4'">
 					<th>*活動名稱:</th>
 					<td>
 						<input	class="banner-input-1 form-control e_size ng-valid ng-dirty ng-valid-parse ng-empty ng-touched" 
-								style="width:237px;display:inline;"
+								style="width:237px; display:inline;"
 			    				type="text" 	
 								placeholder="請輸入..." 
 								id="campaignName" 
@@ -128,17 +137,16 @@
 					<td colspan="3">
 						<div class="form-group">
 							<div class="input-group datebox datewidth">
-								<input type="text" id="camp_sDate" name="camp_sDate"
-									class="form-control"
-									uib-datepicker-popup="yyyy/MM/dd"
-									ng-model="inputVO.camp_sDate"
-									is-open="model.a"
-									datepicker-options="camp_sDateOptions"
-									alt-input-formats="altInputFormats"
-									ng-readonly="true"
-									ng-change="limitDate()"
-									show-button-bar="true" />
-								<!-- 製作日曆button -->
+								<input 	type="text" id="camp_sDate" name="camp_sDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.camp_sDate"
+										is-open="model.a"
+										datepicker-options="camp_sDateOptions"
+										alt-input-formats="altInputFormats"
+										ng-readonly="true"
+										ng-change="limitDate()"
+										show-button-bar="true" />
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" ng-click="open($event,'a')">
 									<i class="glyphicon glyphicon-calendar"></i></button>
@@ -146,17 +154,16 @@
 							</div>
 							<div style="float: left !important;">～</div>
 							<div class="input-group datebox datewidth">
-								<input type="text" id="camp_eDate" name="camp_eDate"
-									class="form-control"
-									uib-datepicker-popup="yyyy/MM/dd"
-									ng-model="inputVO.camp_eDate"
-									is-open="model.b"
-									datepicker-options="camp_eDateOptions"
-									alt-input-formats="altInputFormats"
-									ng-readonly="true"
-									ng-change="limitDate()"
-									show-button-bar="true" />
-								<!-- 製作日曆button -->
+								<input 	type="text" id="camp_eDate" name="camp_eDate"
+										class="form-control"
+										uib-datepicker-popup="yyyy/MM/dd"
+										ng-model="inputVO.camp_eDate"
+										is-open="model.b"
+										datepicker-options="camp_eDateOptions"
+										alt-input-formats="altInputFormats"
+										ng-readonly="true"
+										ng-change="limitDate()"
+										show-button-bar="true" />
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" ng-click="open($event,'b')">
 									<i class="glyphicon glyphicon-calendar"></i></button>
@@ -167,7 +174,14 @@
 				</tr>
 				<tr ng-show="tabSheet == '3' || tabSheet == '4'">
 					<th>活動步驟代碼:</th>
-					<td><input type="text" class="form-control" placeholder="請輸入..." id="stepId" name="stepId" ng-model="inputVO.stepId" e-length-limit="18"></td>
+					<td>
+						<input type="text" class="form-control" 
+							   placeholder="請輸入..." 
+							   id="stepId" name="stepId" 
+							   style="width: 237px;" 
+							   ng-model="inputVO.stepId" 
+							   e-length-limit="18">
+					</td>
 					<th>活動訖日:</th>
 					<td colspan="3">
 						<div class="form-group">
@@ -221,8 +235,16 @@
 									ng-format="F3"
 									style="line-height:20px;"/>
 					</td>
-					<th></th>
-					<td></td>
+					<th>名單分類：</th>
+	              	<td>
+	              		<e-combobox id="leadType" name="leadType" 
+									ng-paramtype="CAM.CAMP_TYPE"
+									ng-model="inputVO.campType"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									style="line-height:20px;" />
 				</tr>
 			</table>
 		</div>

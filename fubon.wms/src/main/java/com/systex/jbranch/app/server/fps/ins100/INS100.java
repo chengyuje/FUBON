@@ -304,7 +304,7 @@ public class INS100 extends FubonWmsBizLogic {
 		
 		policyNbrMap.put("custId", custId);
 		policyNbrMap.put("policyNbr", policyNbrList);
-		System.out.println(new Gson().toJson(policyNbrMap));
+//		System.out.println(new Gson().toJson(policyNbrMap));
 		this.sendRtnObject(policyNbrMap);
 	}
 	

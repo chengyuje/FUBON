@@ -5,14 +5,36 @@ eSoafApp.controller('CAM210Controller', function($scope, $rootScope, $controller
 	//組織連動繼承
 	$controller('RegionController', {$scope: $scope});
 	$scope.controllerName = "CAM210Controller";
+	
+	/*
+	 * 取得UHRM人員清單(由員工檔+角色檔)
+	 */
+	$scope.getUHRMList = function() {
+		$scope.inputVO.regionCenterID = $scope.inputVO.region;
+		$scope.inputVO.branchAreaID = $scope.inputVO.op;
+		
+		$scope.sendRecv("ORG260", "getUHRMList", "com.systex.jbranch.app.server.fps.org260.ORG260InputVO", $scope.inputVO, function(tota, isError) {
+			if (isError) {
+				return;
+			}
+			if (tota.length > 0) {
+				$scope.mappingSet['UHRM_LIST'] = tota[0].body.uhrmList;
+				$scope.inputVO.pCode = tota[0].body.uEmpID;
+			}
+		});
+	};
+	
+	$scope.priID = String(sysInfoService.getPriID());
 	$scope.memLoginFlag = String(sysInfoService.getMemLoginFlag()).toUpperCase();
 	
 	// 2017/9/13 date picker
 	// 活動起訖日
-	$scope.camp_sDateOptions = {};
-	$scope.camp_eDateOptions = {};
-	$scope.camp_esDateOptions = {};
-	$scope.camp_eeDateOptions = {};
+	$scope.optionsInit = function() {
+		$scope.camp_sDateOptions = {};
+		$scope.camp_eDateOptions = {};
+		$scope.camp_esDateOptions = {};
+		$scope.camp_eeDateOptions = {};
+	}
 	// config
 	$scope.altInputFormats = ['M!/d!/yyyy'];
 	$scope.model = {};
@@ -23,11 +45,35 @@ eSoafApp.controller('CAM210Controller', function($scope, $rootScope, $controller
 	};
 	$scope.limitDate = function() {
 		$scope.camp_sDateOptions.maxDate = $scope.inputVO.camp_eDate;
+		if ($scope.inputVO.camp_eDate) {
+			let y = $scope.inputVO.camp_eDate.getFullYear() - 1;
+			let m = $scope.inputVO.camp_eDate.getMonth();
+			let d = $scope.inputVO.camp_eDate.getDate();
+			$scope.camp_sDateOptions.minDate = new Date(y, m, d);
+		}
 		$scope.camp_eDateOptions.minDate = $scope.inputVO.camp_sDate;
+		if ($scope.inputVO.camp_sDate) {
+			let y = $scope.inputVO.camp_sDate.getFullYear() + 1;
+			let m = $scope.inputVO.camp_sDate.getMonth();
+			let d = $scope.inputVO.camp_sDate.getDate();
+			$scope.camp_eDateOptions.maxDate = new Date(y, m, d);
+		}
 	};
 	$scope.limitDate2 = function() {
 		$scope.camp_esDateOptions.maxDate = $scope.inputVO.camp_eeDate;
+		if ($scope.inputVO.camp_eeDate) {
+			let y = $scope.inputVO.camp_eeDate.getFullYear() - 1;
+			let m = $scope.inputVO.camp_eeDate.getMonth();
+			let d = $scope.inputVO.camp_eeDate.getDate();
+			$scope.camp_esDateOptions.minDate = new Date(y, m, d);
+		}
 		$scope.camp_eeDateOptions.minDate = $scope.inputVO.camp_esDate;
+		if ($scope.inputVO.camp_esDate) {
+			let y = $scope.inputVO.camp_esDate.getFullYear() + 1;
+			let m = $scope.inputVO.camp_esDate.getMonth();
+			let d = $scope.inputVO.camp_esDate.getDate();
+			$scope.camp_eeDateOptions.maxDate = new Date(y, m, d);
+		}
 	};
 	// date picker end
 	
@@ -104,15 +150,19 @@ eSoafApp.controller('CAM210Controller', function($scope, $rootScope, $controller
 	
 	$scope.init = function() {
 		$scope.inputVO = {
-			leadType : ($scope.connector('get', 'leadType') != undefined ? $scope.connector('get', 'leadType') : '')
+			leadType : ($scope.connector('get', 'leadType') != undefined ? $scope.connector('get', 'leadType') : ''),
+			campType : ($scope.connector('get', 'campType') != undefined ? $scope.connector('get', 'campType') : '')
 		};
 		$scope.connector('set', 'leadType', '');
+		$scope.connector('set', 'campType', '');
 
 		var min_mon = new Date();
 		min_mon.setMonth(min_mon.getMonth() - 2, 1);
 		min_mon.setHours(0, 0, 0, 0);
 		$scope.inputVO.camp_sDate = min_mon;
+		$scope.optionsInit();
 		$scope.limitDate();
+		$scope.limitDate2();
 		
 		//組織連動
         $scope.region = ['N', $scope.inputVO, "region", "REGION_LIST", "op", "AREA_LIST", "branch", "BRANCH_LIST", "aoCode", "AO_LIST", "empId", "EMP_LIST"];

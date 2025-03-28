@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
+import com.systex.jbranch.fubon.jlb.DataFormat;
 import com.systex.jbranch.platform.common.dataManager.DataManager;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
@@ -54,6 +55,9 @@ public class PMS997 extends FubonWmsBizLogic {
 		svipCaseMColumnMap.put("資料月份(YYYYMM)", "SNAP_YYYYMM");
 		svipCaseMColumnMap.put("客戶ID", "CUST_ID");
 		svipCaseMColumnMap.put("關懷類別", "CARE_TYPE");
+		svipCaseMColumnMap.put("備註說明(一)", "REMARK1");
+		svipCaseMColumnMap.put("備註說明(二)", "REMARK2");
+		svipCaseMColumnMap.put("備註說明(三)", "REMARK3");
 		
 		svipCaseTColumnMap.put("關懷類別", "CARE_TYPE");
 		svipCaseTColumnMap.put("說明內容", "CARE_DRCR");
@@ -108,7 +112,11 @@ public class PMS997 extends FubonWmsBizLogic {
 		sb.append("       DEP.CREATETIME, ");
 		sb.append("       DEP.CREATOR, ");
 		sb.append("       DEP.MODIFIER, ");
-		sb.append("       DEP.LASTUPDATE ");
+		sb.append("       DEP.LASTUPDATE, ");
+		
+		sb.append("       DEP.REMARK1, ");
+		sb.append("       DEP.REMARK2, ");
+		sb.append("       DEP.REMARK3 ");
 		
 		sb.append("FROM TBPMS_SVIP_CASE DEP ");
 		sb.append("LEFT JOIN VWORG_DEFN_INFO ORG ON DEP.BRANCH_NBR = ORG.BRANCH_NBR ");
@@ -475,21 +483,25 @@ public class PMS997 extends FubonWmsBizLogic {
 	// 匯出
 	public void export(Object body, IPrimitiveMap header) throws JBranchException, ParseException, FileNotFoundException, IOException {
 
+		SimpleDateFormat sdfYYYYMM = new SimpleDateFormat("yyyyMM");
+
 		PMS997InputVO inputVO = (PMS997InputVO) body;
 
 		List<Map<String, Object>> list = inputVO.getExportList();
 
-		String fileName = "內部強化關懷名單_" + sdfYYYYMM.format(new Date(Long.parseLong(inputVO.getImportSDate()))) + ".xlsx";
+		String reportName = "內部強化關懷名單";
+		String fileName = reportName + "_" + sdfYYYYMM.format(new Date(Long.parseLong(inputVO.getImportSDate()))) + ".xlsx";
 		String uuid = UUID.randomUUID().toString();
 		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
 
 		String filePath = Path + uuid;
 
 		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet("內部強化關懷名單");
+		XSSFSheet sheet = workbook.createSheet(reportName);
 		sheet.setDefaultColumnWidth(20);
 		sheet.setDefaultRowHeightInPoints(20);
 
+		// 表頭 CELL型式
 		XSSFCellStyle headingStyle = workbook.createCellStyle();
 		headingStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
 		headingStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
@@ -501,15 +513,36 @@ public class PMS997 extends FubonWmsBizLogic {
 		headingStyle.setBorderRight((short) 1);
 		headingStyle.setWrapText(true);
 
+		// 資料 CELL型式
+		XSSFCellStyle mainStyle = workbook.createCellStyle();
+		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		mainStyle.setBorderBottom((short) 1);
+		mainStyle.setBorderTop((short) 1);
+		mainStyle.setBorderLeft((short) 1);
+		mainStyle.setBorderRight((short) 1);
+		
+		// 資料 CELL型式
+		XSSFCellStyle titleStyle = workbook.createCellStyle();
+		titleStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+		titleStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderBottom((short) 1);
+		titleStyle.setBorderTop((short) 1);
+		titleStyle.setBorderLeft((short) 1);
+		titleStyle.setBorderRight((short) 1);
+
 		String[] headerLine = { "私銀註記", 
 								"資料月份", 
+								"關懷類別",
 								"行員歸屬行", 
 								"員編", 
 								"行員姓名", 
 								"客戶姓名", 
 								"客戶ID", 
-								"高齡客戶", 
-								"關懷類別", 
+								"高齡客戶",  
+								"備註說明(一)",
+								"備註說明(二)",
+								"備註說明(三)",
 								"說明內容", 
 								"查詢方式",
 								"電訪錄音編號",
@@ -518,16 +551,20 @@ public class PMS997 extends FubonWmsBizLogic {
 								"首次建立時間",
 								"最新異動人員",
 								"最新異動日期 "};
+		
 		String[] mainLine	= { "RM_FLAG", 
 								"YYYYMM", 
+								"CARE_TYPE", 
 								"BRANCH_NBR", 
 								"EMP_ID", 
 								"EMP_NAME", 
 								"CUST_NAME", 
 								"CUST_ID", 
 								"AGE", 
-								"CARE_TYPE", 
 								"CARE_DRCR", 
+								"REMARK1", 
+								"REMARK2",
+								"REMARK3",
 								"NOTE",
 								"RECORD_SEQ",
 								"NOTE2",
@@ -539,6 +576,15 @@ public class PMS997 extends FubonWmsBizLogic {
 		Integer index = 0;
 
 		XSSFRow row = sheet.createRow(index);
+		for (int i = 0; i < 1; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(titleStyle);
+			cell.setCellValue(reportName);
+		}
+		
+		index++;
+		
+		row = sheet.createRow(index);
 		for (int i = 0; i < headerLine.length; i++) {
 			XSSFCell cell = row.createCell(i);
 			cell.setCellStyle(headingStyle);
@@ -546,16 +592,7 @@ public class PMS997 extends FubonWmsBizLogic {
 		}
 
 		index++;
-
-		// 資料 CELL型式
-		XSSFCellStyle mainStyle = workbook.createCellStyle();
-		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
-		mainStyle.setBorderBottom((short) 1);
-		mainStyle.setBorderTop((short) 1);
-		mainStyle.setBorderLeft((short) 1);
-		mainStyle.setBorderRight((short) 1);
-
+		
 		for (Map<String, Object> map : list) {
 			row = sheet.createRow(index);
 
@@ -584,6 +621,9 @@ public class PMS997 extends FubonWmsBizLogic {
 						}
 						
 						cell.setCellValue((StringUtils.isNotEmpty(note) ? note : ""));
+						break;
+					case "CUST_ID":
+						cell.setCellValue(DataFormat.getCustIdMaskForHighRisk(checkIsNull(map, mainLine[i])));
 						break;
 					case "RECORD_SEQ":
 						cell.setCellValue(checkIsNull(map, mainLine[i]) + "");

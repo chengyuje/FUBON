@@ -7,9 +7,10 @@ eSoafApp.controller('PMS428Controller', function($rootScope, $scope, $controller
 	$controller('PMSRegionController', {$scope: $scope});
 	
 	// filter
-	getParameter.XML(["PMS.CHECK_TYPE"], function(totas) {
+	getParameter.XML(["PMS.CHECK_TYPE", "PMS.PMS428_DATA_SOURCE"], function(totas) {
 		if (totas) {
 			$scope.mappingSet['PMS.CHECK_TYPE'] = totas.data[totas.key.indexOf('PMS.CHECK_TYPE')];
+			$scope.mappingSet['PMS.PMS428_DATA_SOURCE'] = totas.data[totas.key.indexOf('PMS.PMS428_DATA_SOURCE')];
 		}
 	});
     //

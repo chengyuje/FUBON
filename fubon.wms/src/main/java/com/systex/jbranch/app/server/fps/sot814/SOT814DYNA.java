@@ -137,7 +137,7 @@ public class SOT814DYNA extends SotPdf {
 		record.put("REWARD", record.get("REWARD") == null ? 0 : getString(record.get("REWARD")));
 		if (StringUtils.isNotBlank(getString(record.get("WARNING")))) {
 			XmlInfo xmlInfo = new XmlInfo();
-			Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_ALERT", FormatHelper.FORMAT_3);
+			Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_C_ALERT", FormatHelper.FORMAT_3);
 			String WARNING = map.get(getString(record.get("WARNING")));
 			record.put("WARNING", WARNING);
 		}
@@ -266,7 +266,7 @@ public class SOT814DYNA extends SotPdf {
 				record.put("TRUST_COM", record.get("TRUST_COM") == null ? " " : record.get("TRUST_COM").toString().trim());
 				if (StringUtils.isNotBlank(getString(record.get("WARNING")))) {
 					XmlInfo xmlInfo = new XmlInfo();
-					Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_ALERT", FormatHelper.FORMAT_3);
+					Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_C_ALERT", FormatHelper.FORMAT_3);
 					String WARNING = map.get(getString(record.get("WARNING")));
 					record.put("WARNING", WARNING);
 				}
@@ -396,7 +396,7 @@ public class SOT814DYNA extends SotPdf {
 		record.put("REWARD", record.get("REWARD") == null ? 0 : getString(record.get("REWARD")));
 		if (StringUtils.isNotBlank(getString(record.get("WARNING")))) {
 			XmlInfo xmlInfo = new XmlInfo();
-			Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_ALERT", FormatHelper.FORMAT_3);
+			Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_C_ALERT", FormatHelper.FORMAT_3);
 			String WARNING = map.get(getString(record.get("WARNING")));
 			record.put("WARNING", WARNING);
 		}

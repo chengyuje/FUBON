@@ -1,27 +1,35 @@
 package com.systex.jbranch.app.server.fps.pms361;
 
+import java.io.FileOutputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.ibm.icu.math.BigDecimal;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
-import com.systex.jbranch.fubon.commons.Manager;
 import com.systex.jbranch.fubon.jlb.DataFormat;
 import com.systex.jbranch.platform.common.dataManager.DataManager;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
-import com.systex.jbranch.platform.common.util.CSVUtil;
 import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
+import com.systex.jbranch.platform.server.info.SysInfo;
+import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
@@ -103,7 +111,8 @@ public class PMS361 extends FubonWmsBizLogic {
 		sb.append("         note.MODIFIER, ");
 		sb.append("         note.LASTUPDATE, ");
 		sb.append("         note.FIRSTUPDATE, ");
-		sb.append("         rpt.CUST_AGE ");
+		sb.append("         rpt.CUST_AGE, ");
+		sb.append("         rpt.DEL_TYPE ");
 		sb.append("  FROM TBPMS_BNKALT_RPT rpt ");
 		sb.append("  INNER JOIN TBPMS_BNKALT_RPT_NOTE note ON rpt.ACCESS_TIME = note.ACCESS_TIME and rpt.EMP_ID = note.EMP_ID and rpt.DEVICE_ID = note.DEVICE_ID and rpt.BRANCH_NBR = note.BRANCH_NBR ");
 		sb.append("  LEFT JOIN TBPMS_EMPLOYEE_REC_N MEM ON rpt.EMP_ID = MEM.EMP_ID AND rpt.BRANCH_NBR = MEM.DEPT_ID AND rpt.ACCESS_TIME BETWEEN MEM.START_TIME AND MEM.END_TIME ");
@@ -195,6 +204,17 @@ public class PMS361 extends FubonWmsBizLogic {
 			}
 		}
 		
+		//#0002261_WMS-CR-20241118-02_擬優化行銀及內控強化關懷報表
+		if (StringUtils.isNotBlank(inputVO.getDelType())) { 
+			sb.append("  AND rpt.DEL_TYPE = :delType ");
+			queryCondition.setObject("delType", inputVO.getDelType());
+		}
+		
+		if (StringUtils.isNotBlank(inputVO.getDeviceID())) { 
+			sb.append("  AND UPPER(rpt.DEVICE_ID) LIKE :deviceID ");
+			queryCondition.setObject("deviceID", "%" + inputVO.getDeviceID().toUpperCase() + "%");
+		}
+
 		sb.append("  ORDER BY rpt.ACCESS_TIME DESC ");
 		sb.append(") A ");
 		
@@ -208,73 +228,183 @@ public class PMS361 extends FubonWmsBizLogic {
 	/** 匯出報表 **/
 	public void export(Object body, IPrimitiveMap header) throws Exception {
 		
-		PMS361InputVO inputVO = (PMS361InputVO) body;
-		
-		String[] csvHeader = { 	"私銀註記", "資料日期", "分行代碼", "分行名稱", "行員員編", "行員姓名", "AO CODE", 
-								"交易時間", "交易項目", "客戶ID", "客戶姓名", "高齡客戶", "客戶所屬理專", 
-								"查證方式", "電訪錄音編號", "客戶背景或關係", "具體說明", "初判異常轉法遵部調查", "首次建立時間", 
-								"最新異動人員", "最新異動日期", "DEVICE ID" };
-		String[] csvMain   = { 	"RM_FLAG", "NOTE_CREATETIME", "BRANCH_NBR", "BRANCH_NAME", "EMP_ID", "EMP_NAME", "AO_CODE", 
-								"ACCESS_TIME", "TXN_TYP", "CUST_ID", "CUST_NAME", "CUST_AGE", "CUST_AO_CODE", 
-								"NOTE", "RECORD_SEQ", "NOTE2", "NOTE3", "WARNING_YN", "FIRSTUPDATE", 
-								"MODIFIER", "LASTUPDATE", "DEVICE_ID" };
-		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		
-		List<Object[]> csvData = new ArrayList<Object[]>();
+		SimpleDateFormat sdfYYYYMMDD = new SimpleDateFormat("yyyyMMdd");
 		
 		XmlInfo xmlInfo = new XmlInfo();
+		
+		PMS361InputVO inputVO = (PMS361InputVO) body;
+		
+		String reportName = "行銀交易查核日報";
+		String fileName = reportName + "_" + sdfYYYYMMDD.format(new Date()) + ".xlsx";
+		String uuid = UUID.randomUUID().toString();
+		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
 
+		String filePath = Path + uuid;
+
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet(reportName);
+		sheet.setDefaultColumnWidth(20);
+		sheet.setDefaultRowHeightInPoints(20);
+
+		// 表頭 CELL型式
+		XSSFCellStyle headingStyle = workbook.createCellStyle();
+		headingStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		headingStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		headingStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);// 填滿顏色
+		headingStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+		headingStyle.setBorderBottom((short) 1);
+		headingStyle.setBorderTop((short) 1);
+		headingStyle.setBorderLeft((short) 1);
+		headingStyle.setBorderRight((short) 1);
+		headingStyle.setWrapText(true);
+
+		// 資料 CELL型式
+		XSSFCellStyle mainStyle = workbook.createCellStyle();
+		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		mainStyle.setBorderBottom((short) 1);
+		mainStyle.setBorderTop((short) 1);
+		mainStyle.setBorderLeft((short) 1);
+		mainStyle.setBorderRight((short) 1);
+		
+		// 資料 CELL型式
+		XSSFCellStyle titleStyle = workbook.createCellStyle();
+		titleStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+		titleStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderBottom((short) 1);
+		titleStyle.setBorderTop((short) 1);
+		titleStyle.setBorderLeft((short) 1);
+		titleStyle.setBorderRight((short) 1);
+		
+		String[] headerLine = { "私銀註記", 
+								"資料日期", 
+								"態樣類別", 
+								"分行代碼", 
+								"分行名稱", 
+								"行員員編", 
+								"行員姓名", 
+								"AO CODE", 
+								"交易時間", 
+								"交易項目", 
+								"DEVICE ID", 
+								"客戶ID", 
+								"客戶姓名", 
+								"高齡客戶", 
+								"客戶所屬理專", 
+								"查證方式", 
+								"電訪錄音編號", 
+								"客戶背景或關係", 
+								"具體說明", 
+								"初判異常轉法遵部調查", 
+								"首次建立時間", 
+								"最新異動人員", 
+								"最新異動日期" };
+		String[] mainLine   = { "RM_FLAG", 
+								"NOTE_CREATETIME", 
+								"DEL_TYPE", 
+								"BRANCH_NBR", 
+								"BRANCH_NAME", 
+								"EMP_ID", 
+								"EMP_NAME", 
+								"AO_CODE", 
+								"ACCESS_TIME", 
+								"TXN_TYP", 
+								"DEVICE_ID", 
+								"CUST_ID", 
+								"CUST_NAME", 
+								"CUST_AGE", 
+								"CUST_AO_CODE", 
+								"NOTE", 
+								"RECORD_SEQ", 
+								"NOTE2", 
+								"NOTE3", 
+								"WARNING_YN", 
+								"FIRSTUPDATE", 
+								"MODIFIER", 
+								"LASTUPDATE" };
+
+		Integer index = 0;
+
+		XSSFRow row = sheet.createRow(index);
+		for (int i = 0; i < 1; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(titleStyle);
+			cell.setCellValue(reportName);
+		}
+		
+		index++;
+		
+		row = sheet.createRow(index);
+		for (int i = 0; i < headerLine.length; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(headingStyle);
+			cell.setCellValue(headerLine[i]);
+		}
+
+		index++;
+		
 		for (Map<String, Object> map : inputVO.getTotalList()) {
-			String[] records = new String[csvHeader.length];
-			for (int i = 0; i < csvHeader.length; i++) {
-				switch (csvMain[i]) {
-					case "NOTE_CREATETIME":
-					case "ACCESS_TIME":
-					case "MODIFIER":
-					case "LASTUPDATE":
-						records[i] = "=\"" + checkIsNull(map, csvMain[i]) + "\"";
-						break;
+			row = sheet.createRow(index);
+
+			for (int i = 0; i < mainLine.length; i++) {
+				XSSFCell cell = row.createCell(i);
+				cell.setCellStyle(mainStyle);
+				
+				switch (mainLine[i]) {
 					case "CUST_ID":
-						records[i] = DataFormat.getCustIdMaskForHighRisk(checkIsNull(map, csvMain[i]));
+						cell.setCellValue(DataFormat.getCustIdMaskForHighRisk(checkIsNull(map, mainLine[i])));
 						break;
 					case "CUST_AGE":
-						records[i] = StringUtils.equals("", checkIsNull(map, csvMain[i])) ? "" : (new BigDecimal(checkIsNull(map, csvMain[i])).compareTo(new BigDecimal("65")) >= 0 ? checkIsNull(map, csvMain[i]) : "");
+						cell.setCellValue(StringUtils.equals("", checkIsNull(map, mainLine[i])) ? "" : (new BigDecimal(checkIsNull(map, mainLine[i])).compareTo(new BigDecimal("65")) >= 0 ? checkIsNull(map, mainLine[i]) : ""));
 						break;
 					case "NOTE":
 						String note = (String) xmlInfo.getVariable("PMS.CHECK_TYPE", (String) map.get("NOTE_TYPE"), "F3");
 
 						if (null != map.get("NOTE_TYPE") && StringUtils.equals("O", (String) map.get("NOTE_TYPE"))) {
-							note = note + "：" + StringUtils.defaultString((String) map.get(csvMain[i]));
+							note = note + "：" + StringUtils.defaultString((String) map.get(mainLine[i]));
 						}
 						
-						records[i] = note;
+						cell.setCellValue(note);
 						break;
 					case "NOTE2":
 						String note2 = (String) xmlInfo.getVariable("PMS.CUST_BASE", (String) map.get("CUST_BASE"), "F3");
 
 						if (null != map.get("CUST_BASE") && StringUtils.equals("O", (String) map.get("CUST_BASE"))) {
-							note2 = note2 + "：" + StringUtils.defaultString((String) map.get(csvMain[i]));
+							note2 = note2 + "：" + StringUtils.defaultString((String) map.get(mainLine[i]));
 						}
 						
-						records[i] = note2;
+						cell.setCellValue(note2);
+						break;
+					case "WARNING_YN":
+						switch (checkIsNull(map, mainLine[i])) {
+							case "Y":
+								cell.setCellValue("是-通報有異常");
+								break;
+							case "N":
+								cell.setCellValue("否-非行員代客戶操作");
+								break;
+							default:
+								cell.setCellValue(checkIsNull(map, mainLine[i]));
+								break;
+						}
 						break;
 					case "RECORD_SEQ":
-						records[i] = "=\"" + checkIsNull(map, csvMain[i]) + "\"";
+						cell.setCellValue(checkIsNull(map, mainLine[i]) + "");
 						break;
 					default :
-						records[i] = checkIsNull(map, csvMain[i]);
+						cell.setCellValue(checkIsNull(map, mainLine[i]));
 						break;
 				}
 			}
 			
-			csvData.add(records);
+			index++;
 		}
 
-		CSVUtil csv = new CSVUtil();
-		csv.setHeader(csvHeader);
-		csv.addRecordList(csvData);
-		notifyClientToDownloadFile(csv.generateCSV(), "行銀交易查核日報_" + sdf.format(new Date()) + ".csv");
+		workbook.write(new FileOutputStream(filePath));
+
+		notifyClientToDownloadFile(DataManager.getSystem().getPath().get("temp").toString() + uuid, fileName);
+
+		sendRtnObject(null);
 	}
 
 	private String checkIsNull(Map map, String key) {
@@ -290,43 +420,74 @@ public class PMS361 extends FubonWmsBizLogic {
 		
 		PMS361InputVO inputVO = (PMS361InputVO) body;
 		dam = this.getDataAccessManager();
-		String loginID = DataManager.getWorkStation(uuid).getUser().getCurrentUserId();
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sb = new StringBuffer();
+		
 		for (Map<String, Object> map : inputVO.getTotalList()) {
-			Manager.manage(this.getDataAccessManager())
-			.append("update TBPMS_BNKALT_RPT_NOTE ")
-			.append("SET NOTE = :note, ")
-			.append("    NOTE2 = :note2, ")
-			.append("    NOTE3 = :note3, ")
-			.append("    RECORD_SEQ = :recordSEQ, ")
-			.append("    NOTE_TYPE = :noteType, ")
-			.append("    CUST_BASE = :custBase, ")
-			.append("    WARNING_YN = :warning_yn, ")
-			.append("    MODIFIER = :modifier, ")
-			.append("    LASTUPDATE = sysdate ")
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			sb = new StringBuffer();
 			
-			/** 第一次使用者儲存編輯的資料，更新其 FIRSTUPDATE（首次建立時間） 欄位 **/
-			.condition(map.get("FIRSTUPDATE") == null, ", FIRSTUPDATE = sysdate ")
+			sb.append("UPDATE TBPMS_BNKALT_RPT_NOTE  ");
+			sb.append("SET NOTE = :note, ");
+			sb.append("    NOTE2 = :note2, ");
+			sb.append("    NOTE3 = :note3, ");
+			sb.append("    RECORD_SEQ = :recordSEQ, ");
+			sb.append("    NOTE_TYPE = :noteType, ");
+			sb.append("    CUST_BASE = :custBase, ");
+			sb.append("    WARNING_YN = :warning_yn, ");
+			sb.append("    MODIFIER = :modifier, ");
+			sb.append("    LASTUPDATE = sysdate ");
+			
+			if (null == map.get("FIRSTUPDATE")) {
+				sb.append("    , FIRSTUPDATE = sysdate ");
+			}
+			
+			switch ((String) map.get("DEL_TYPE")) {
+				case "多位客戶同一裝置":
+				case "客戶使用多台裝置":
+					sb.append("WHERE (ACCESS_TIME, EMP_ID, DEVICE_ID, BRANCH_NBR) IN ( ");
+					sb.append("  SELECT ACCESS_TIME, EMP_ID, DEVICE_ID, BRANCH_NBR ");
+					sb.append("  FROM TBPMS_BNKALT_RPT ");
+					sb.append("  WHERE 1 = 1 ");
+					sb.append("  AND TO_CHAR(ACCESS_TIME, 'YYYYMM') = TO_CHAR(:accessTime, 'YYYYMM') ");
+					sb.append("  AND BRANCH_NBR = :branch ");
+					sb.append("  AND CUST_ID = :custID ");
+					sb.append(") ");
+					
+					// KEY
+					queryCondition.setObject("accessTime", new Timestamp(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(map.get("ACCESS_TIME").toString()).getTime()));
+					queryCondition.setObject("branch", map.get("BRANCH_NBR"));
+					queryCondition.setObject("custID", map.get("CUST_ID"));
+					
+					break;
+				default: // 行員與客戶相同裝置
+					sb.append("WHERE ACCESS_TIME = :accessTime ");
+					sb.append("AND BRANCH_NBR = :branch ");
+					sb.append("AND EMP_ID = :empId ");
+					sb.append("AND DEVICE_ID = :deviceId ");
+					
+					// KEY
+					queryCondition.setObject("accessTime", new Timestamp(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(map.get("ACCESS_TIME").toString()).getTime()));
+					queryCondition.setObject("branch", map.get("BRANCH_NBR"));
+					queryCondition.setObject("empId", map.get("EMP_ID"));
+					queryCondition.setObject("deviceId", map.get("DEVICE_ID"));
+					
+					break;
+			}
+			
+			// CONTENT
+			queryCondition.setObject("note", map.get("NOTE"));
+			queryCondition.setObject("note2", map.get("NOTE2"));
+			queryCondition.setObject("note3", map.get("NOTE3"));
+			queryCondition.setObject("recordSEQ", map.get("RECORD_SEQ"));
+			queryCondition.setObject("noteType", map.get("NOTE_TYPE"));
+			queryCondition.setObject("custBase", map.get("CUST_BASE"));
+			queryCondition.setObject("warning_yn", map.get("WARNING_YN"));
+			queryCondition.setObject("modifier", DataManager.getWorkStation(uuid).getUser().getCurrentUserId());
+			
+			queryCondition.setQueryString(sb.toString());
 
-			.append("where ACCESS_TIME = :accessTime ")
-			.append("and BRANCH_NBR = :branch ")
-			.append("and EMP_ID = :empId ")
-			.append("and DEVICE_ID = :deviceId ")
-			
-			//.put("superFlag", map.get("SUPERVISOR_FLAG"))
-			.put("note", map.get("NOTE"))
-			.put("note2", map.get("NOTE2"))
-			.put("note3", map.get("NOTE3"))
-			.put("recordSEQ", map.get("RECORD_SEQ"))
-			.put("noteType", map.get("NOTE_TYPE"))
-			.put("custBase", map.get("CUST_BASE"))
-			.put("warning_yn", map.get("WARNING_YN"))
-			.put("modifier", loginID)
-			.put("accessTime", new Timestamp(sdf.parse(map.get("ACCESS_TIME").toString()).getTime()))
-			.put("branch", map.get("BRANCH_NBR"))
-			.put("empId", map.get("EMP_ID"))
-			.put("deviceId", map.get("DEVICE_ID")).update();
+			dam.exeUpdate(queryCondition);
 		}
 
 		this.sendRtnObject(null);

@@ -30,7 +30,7 @@ public class KycOperationDao extends FubonWmsBizLogic {
 		return exeQueryWithoutSortForQcf(genDefaultQueryConditionIF().setQueryString(new StringBuilder()
 			.append(" select SEQ , CREATE_DATE from TBKYC_INVESTOREXAM_M ")
 			.append(" where CUST_ID = :custid and STATUS = '01' and INVEST_BRANCH_NBR != '999' ").toString())
-			.setObject("custid", custId));
+			.setObject("custid", custId)); 
     }
 
     @SuppressWarnings("unchecked")

@@ -96,7 +96,7 @@ public class IOT140 extends FubonWmsBizLogic {
 			sb.append(" (CASE WHEN A.FB_COM_YN = 'Y' THEN P.INSPRD_NAME ELSE JPRD.PRODUCTNAME END) AS INSPRD_NAME, ");
 			sb.append(" (CASE WHEN A.FB_COM_YN = 'Y' THEN P.INSPRD_TYPE ELSE (CASE WHEN TRIM(JPRD.PRODUCTTYPE1) <> '投資型' THEN '1' ELSE '2' END) END) AS INSPRD_TYPE, ");
 			sb.append(" (CASE WHEN A.FB_COM_YN = 'Y' THEN P.INSPRD_TYPE ELSE (CASE WHEN TRIM(JPRD.PRODUCTTYPE1) <> '投資型' THEN '1' ELSE '2' END) END) AS PRODUCT_TYPE, ");
-			sb.append(" E.ITEM_REMRK ");
+			sb.append(" E.ITEM_REMRK, NVL(A.NO_PAPER_YN, 'N') AS NO_PAPER_YN ");
 			sb.append(" From TBIOT_MAIN A ");
 			sb.append(" LEFT JOIN TBPRD_INS_MAIN P on P.INSPRD_KEYNO = A.INSPRD_KEYNO ");
 			sb.append(" LEFT JOIN TBJSB_INS_PROD_COMPANY B ON B.SERIALNUM = A.COMPANY_NUM ");
@@ -225,8 +225,10 @@ public class IOT140 extends FubonWmsBizLogic {
 			.append(" CASE WHEN PRE.SENIOR_AUTH_ID IS NULL THEN '' ELSE '關懷主管員編：' || PRE.SENIOR_AUTH_ID END AS SENIOR_AUTH_ID, ")
 			.append(" NVL(DCHK.DOC_CHK, 'N') AS FOREIGN_DOC_YN, ") //”境外匯款聲明書”有勾選為Y，否則為N
 			.append(" CASE WHEN A.FIRST_PAY_WAY = '1' AND A.PAY_SERV_RETURN_CODE = '100' THEN '匯款件線上填寫繳款服務單成功' ")
-			.append(" 	   WHEN A.FIRST_PAY_WAY = '1' AND A.PAY_SERV_RETURN_CODE <> '100' THEN '匯款件需檢附紙本繳款服務單或便簽' ELSE '' END AS REMIT_REMARK, ")
-			.append(" CASE WHEN A.FIRST_PAY_WAY = '1' AND A.REMIT_COUNTRY_FLAG = '2' THEN '匯款國家非境內應檢附境外匯款聲明書' ELSE '' END AS REMIT_COUNTRY_REMARK ")
+			.append(" 	   WHEN A.FIRST_PAY_WAY = '1' AND NVL(A.PAY_SERV_RETURN_CODE, '999') <> '100' THEN '匯款件需檢附紙本繳款服務單或便簽' ELSE '' END AS REMIT_REMARK, ")
+			.append(" CASE WHEN A.FIRST_PAY_WAY = '1' AND A.REMIT_COUNTRY_FLAG = '2' THEN '匯款國家非境內應檢附境外匯款聲明書' ELSE '' END AS REMIT_COUNTRY_REMARK, ")
+			.append(" CASE WHEN NVL(A.NO_PAPER_YN, 'N') = 'Y' THEN '本批號全為無紙張，送件明細表請分行自行歸檔' ELSE '' END AS NO_PAPER_REMARK, ")
+			.append(" CASE WHEN PDF.PDF_FILE IS NULL THEN '' ELSE '新契約保費資金證明上傳=Y' END AS UPLOAD_FILE_REMARKS ")
 			.append(" FROM TBIOT_MAIN A ")
 			.append(" LEFT JOIN (select distinct INS_KEYNO, listagg(decode(DOC_SEQ,99,'■'||DOC_NAME||DOC_NAME_OTH,'■'||DOC_NAME), chr(10)) within group (order by DOC_SEQ)")
 			.append(" over (partition by INS_KEYNO )DOC_NAME_1 from TBIOT_DOC_CHK WHERE DOC_TYPE = '1' and DOC_CHK='Y') B ON A.INS_KEYNO = B.INS_KEYNO ")
@@ -239,6 +241,7 @@ public class IOT140 extends FubonWmsBizLogic {
 			.append(" LEFT JOIN TBSYSPARAMETER PARAM ON PARAM.PARAM_TYPE = 'IOT.OTH_TYPE_BARCODE' AND PARAM.PARAM_CODE = A.OTH_TYPE ")
 			.append(" LEFT JOIN TBIOT_PREMATCH PRE on PRE.PREMATCH_SEQ = A.PREMATCH_SEQ ")
 			.append(" LEFT JOIN TBIOT_DOC_CHK DCHK on DCHK.INS_KEYNO = A.INS_KEYNO AND DCHK.DOC_TYPE = '2' AND DCHK.DOC_SEQ = 30 ")
+			.append(" LEFT JOIN TBIOT_MAIN_PDF PDF on PDF.INS_KEYNO = A.INS_KEYNO ")
 			.append(" WHERE 1 = 1")
 			.append(" AND decode(A.reg_type, 1, 1, A.reg_type-1) = :regType ")
 			.append(" AND D.OP_BATCH_NO = :opBatchNo ")
@@ -359,6 +362,8 @@ public class IOT140 extends FubonWmsBizLogic {
 			data.addParameter("INS_SOURCE", ObjectUtils.toString(list.get(0).get("INS_SOURCE")));
 			data.addParameter("SENIOR_AUTH_REMARKS", ObjectUtils.toString(list.get(0).get("SENIOR_AUTH_REMARKS")));
 			data.addParameter("SENIOR_AUTH_ID", ObjectUtils.toString(list.get(0).get("SENIOR_AUTH_ID")));
+			data.addParameter("NO_PAPER_REMARK", ObjectUtils.toString(list.get(0).get("NO_PAPER_REMARK")));
+//			data.addParameter("UPLOAD_FILE_REMARKS", ObjectUtils.toString(list.get(0).get("UPLOAD_FILE_REMARKS")));
 			data.addParameter("cnt", list.size());
 
 			if("000".equals(branchID)){
@@ -380,11 +385,13 @@ public class IOT140 extends FubonWmsBizLogic {
 			String url_1 = report.getLocation();
 			urltemp.add(url_1);
 
-			if(!"2".equals(regType)){
+			if(!"2".equals(regType)){ 
+				// 新契約
 				for(Map<String, Object> map:list){
 					List<Map<String, Object>> tempList = new ArrayList<Map<String,Object>>();
 					tempList.add(map);
 					data.addRecordList("INSPRD", tempList);
+					data.addParameter("UPLOAD_FILE_REMARKS", ObjectUtils.toString(map.get("UPLOAD_FILE_REMARKS")));
 					// 封面
 					report = gen.generateReport(txnCode, reportID_2, data);
 					String url_2 = report.getLocation();
@@ -565,6 +572,8 @@ public class IOT140 extends FubonWmsBizLogic {
 				return "N";	//電子要保書，線上簽署行動投保服務同意書案件
 			case "O":
 				return "O";	//非富壽
+			case "A":
+				return "A";	//無紙化案件
 			case "1":
 			case "2":
 				return "P";	//新契約
@@ -602,8 +611,10 @@ public class IOT140 extends FubonWmsBizLogic {
 		final List<Map<String, Object>> onlineInv = new ArrayList<Map<String, Object>>();
 		final List<Map<String, Object>> digitalSign = new ArrayList<Map<String, Object>>();
 		final List<Map<String, Object>> digitalSignInv = new ArrayList<Map<String, Object>>();
+		final List<Map<String, Object>> digitalSignNoPaper = new ArrayList<Map<String, Object>>();
 		final List<Map<String, Object>> mappVideo = new ArrayList<Map<String, Object>>();
 		final List<Map<String, Object>> mappVideoInv = new ArrayList<Map<String, Object>>();
+		final List<Map<String, Object>> mappVideoNoPaper = new ArrayList<Map<String, Object>>();
 		final List<Map<String, Object>> other = new ArrayList<Map<String, Object>>();
 		final List<Map<String, Object>> otherInv = new ArrayList<Map<String, Object>>();
 
@@ -660,14 +671,20 @@ public class IOT140 extends FubonWmsBizLogic {
 							}
 						} else if (StringUtils.equals("Y", ObjectUtils.toString(IOT_MAIN.get("DIGITAL_AGREESIGN_YN")))) {
 							/** 電子要保書，線上簽署行動投保服務同意書案件 **/
-							if(!"1".equals(ObjectUtils.toString(IOT_MAIN.get("PRODUCT_TYPE")))) {
+							if ("Y".equals(ObjectUtils.toString(IOT_MAIN.get("NO_PAPER_YN")))) {
+								/** 是否符合無紙化認定 **/
+								digitalSignNoPaper.add(IOT_MAIN);
+							} else if(!"1".equals(ObjectUtils.toString(IOT_MAIN.get("PRODUCT_TYPE")))) {
 								digitalSignInv.add(IOT_MAIN);	//投資型商品另外打包
 							} else {
 								digitalSign.add(IOT_MAIN);
 							}
 						} else if (StringUtils.equals("Y", ObjectUtils.toString(IOT_MAIN.get("MAPPVIDEO_YN")))) {
 							/** 行動要保書視訊投保 **/
-							if(!"1".equals(ObjectUtils.toString(IOT_MAIN.get("PRODUCT_TYPE")))) {
+							if ("Y".equals(ObjectUtils.toString(IOT_MAIN.get("NO_PAPER_YN")))) {
+								/** 是否符合無紙化認定 **/
+								mappVideoNoPaper.add(IOT_MAIN);
+							} else if(!"1".equals(ObjectUtils.toString(IOT_MAIN.get("PRODUCT_TYPE")))) {
 								mappVideoInv.add(IOT_MAIN);	//投資型商品另外打包
 							} else {
 								mappVideo.add(IOT_MAIN);
@@ -762,8 +779,10 @@ public class IOT140 extends FubonWmsBizLogic {
 		genReport(onlineInv, urlList, inputVO.getREG_TYPE(), "E");
 		genReport(otherInv, urlList, inputVO.getREG_TYPE(), "");
 		genReport(loanPrdInv, urlList, inputVO.getREG_TYPE(), "H");
+		genReport(mappVideoNoPaper, urlList, inputVO.getREG_TYPE(), "S");
 		genReport(mappVideo, urlList, inputVO.getREG_TYPE(), "S");
 		genReport(mappVideoInv, urlList, inputVO.getREG_TYPE(), "S");
+		genReport(digitalSignNoPaper, urlList, inputVO.getREG_TYPE(), "N");
 		genReport(digitalSign, urlList, inputVO.getREG_TYPE(), "N");
 		genReport(digitalSignInv, urlList, inputVO.getREG_TYPE(), "N");
 		//非富壽案件，各保險公司分別打包

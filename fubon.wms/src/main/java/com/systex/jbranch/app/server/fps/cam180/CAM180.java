@@ -177,13 +177,12 @@ public class CAM180 extends FubonWmsBizLogic {
 		switch (inputVO.getTabType()) {
 			case "0":
 				sql.append("  SELECT * FROM TBCRM_CUST_VISIT_RECORD_NEW ");
-				sql.append(") a ");
 				break;
 			case "1":
 				sql.append("  SELECT * FROM TBCRM_CUST_VISIT_RECORD WHERE TRUNC(LASTUPDATE) < TRUNC(ADD_MONTHS(SYSDATE, -60)) ");
-				sql.append(") a ");
 				break;
 		}
+		sql.append(") a ");
 		sql.append("left join TBCAM_SFA_LEADS b on a.VISIT_SEQ = b.CUST_MEMO_SEQ ");
 		sql.append("left join TBCAM_SFA_CAMPAIGN c on (c.CAMPAIGN_ID = b.CAMPAIGN_ID and c.STEP_ID = b.STEP_ID) ");
 		sql.append("left join TBCAM_SFA_CAMP_RESPONSE r ON (c.LEAD_RESPONSE_CODE = r.CAMPAIGN_ID OR c.CAMPAIGN_ID = r.CAMPAIGN_ID) AND b.LEAD_STATUS = r.LEAD_STATUS ");
@@ -322,7 +321,16 @@ public class CAM180 extends FubonWmsBizLogic {
 		sql.append("left join VWORG_EMP_UHRM_INFO cu on c.AO_CODE = cu.UHRM_CODE ");
 		sql.append("left join TBCRM_CUST_NOTE d on b.CUST_ID = d.CUST_ID ");
 		sql.append("left join TBCRM_CUST_AGR_MKT_NOTE e on b.CUST_ID = e.CUST_ID ");
-		sql.append("left join TBCRM_CUST_VISIT_RECORD f on b.CUST_MEMO_SEQ = f.VISIT_SEQ ");
+		sql.append("left join ( ");
+		switch (inputVO.getTabType()) {
+		case "0":
+			sql.append("  SELECT * FROM TBCRM_CUST_VISIT_RECORD_NEW ");
+			break;
+		case "1":
+			sql.append("  SELECT * FROM TBCRM_CUST_VISIT_RECORD WHERE TRUNC(LASTUPDATE) < TRUNC(ADD_MONTHS(SYSDATE, -60)) ");
+			break;
+	}
+	    sql.append(") f  on b.CUST_MEMO_SEQ = f.VISIT_SEQ ");
 		sql.append("left join TBORG_MEMBER g on b.EMP_ID = g.EMP_ID ");
 		sql.append("left join TBORG_MEMBER g2 on b.CREATOR = g2.EMP_ID ");
 		sql.append("left join TBORG_MEMBER g3 on b.MODIFIER = g3.EMP_ID ");

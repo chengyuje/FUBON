@@ -33,6 +33,10 @@
 	width:180px !important;
 	float: left !important;
 }
+.CAM200ToolTip .tooltip-inner {
+    font-size: 12pt;
+	max-width: 200px !important;
+}
 </style>
 <script type="text/javascript" src="assets/txn/PMS361/PMS361.js"></script>
 <script type="text/javascript" src="assets/txn/PMS361U/PMS361U.js"></script>
@@ -112,7 +116,23 @@
 				<tr>
     				<th>行員員編ID：</th>
     				<td><input class="form-control" type="text" placeholder="請輸入..." id="empIDSearch" name="empIDSearch" ng-model="inputVO.empIDSearch" e-length-limit="60"></td>
-    				<th>已回覆/未回覆：</th>
+    				<th>態樣類別：</th>
+					<td>
+						<e-combobox id="noteStatus" name="noteStatus" 
+									ng-paramtype="PMS.PMS361_DEL_TYPE"
+									ng-model="inputVO.delType"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									style="line-height:20px;"/>
+					</td>
+					<th>DEVICE_ID：</th>
+					<td><input class="form-control" type="text" placeholder="請輸入..." id="deviceID" name="deviceID" ng-model="inputVO.deviceID" e-length-limit="60"></td>
+
+    			</tr>
+    			<tr>
+					<th>已回覆/未回覆：</th>
 					<td>
 						<e-combobox id="noteStatus" name="noteStatus" 
 									ng-paramtype="PMS.NOTE_STATUS"
@@ -123,6 +143,8 @@
 									ng-format="F3"
 									style="line-height:20px;"/>
 					</td>
+					<th></th>
+					<td></td>
 					<th></th>
 					<td></td>
     			</tr>
@@ -141,6 +163,7 @@
                   		<th>更新<br>資料</th>
                   		<th>私銀註記</th>
                   		<th>資料日期</th>
+                  		<th>態樣類別</th>
 						<th>分行代碼</th>
 						<th>分行名稱</th>
 						<th>行員員編</th>
@@ -148,6 +171,7 @@
 						<th>AO CODE</th>
 						<th>交易時間</th>
 						<th>交易項目</th>
+						<th>DEVICE ID</th>
 						<th>客戶ID</th>
 						<th>客戶姓名</th>
 						<th>高齡客戶</th>
@@ -160,7 +184,6 @@
 						<th>首次<br>建立時間</th>
 						<th>最新<br>異動人員</th>
 						<th>最新<br>異動日期</th>
-						<th>DEVICE ID</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -168,6 +191,7 @@
 						<td align="center"><input type="checkbox" ng-disabled="" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"></td> 
 						<td>{{row.RM_FLAG}}</td>
 						<td>{{row.NOTE_CREATETIME}}</td>
+						<td>{{row.DEL_TYPE}}</td>
 						<td>{{row.BRANCH_NBR}}</td>
 						<td>{{row.BRANCH_NAME}}</td>
 						<td>{{row.EMP_ID}}</td>
@@ -175,6 +199,11 @@
 						<td>{{row.AO_CODE}}</td>
 						<td>{{toJsDate(row.ACCESS_TIME) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
 						<td>{{row.TXN_TYP}}</td>
+						<td>
+							<div uib-tooltip="{{row.DEVICE_ID}}" tooltip-placement="right-bottom" tooltip-class="CAM200ToolTip">
+								{{row.DEVICE_ID.length > 10 ? (row.DEVICE_ID | limitTo: 10) + "..." : row.DEVICE_ID}}
+							</div>
+						</td>
 						<td>{{row.CUST_ID}}</td>
 						<td>{{row.CUST_NAME}}</td>
 						<td>{{row.CUST_AGE >= 65 ? row.CUST_AGE : ''}}</td>
@@ -216,13 +245,12 @@
 						
 						<td><input type="text" style="width:300px;" class="form-control" placeholder="請輸入..." ng-model="row.NOTE3" e-length-limit="600" ng-disabled="row.NOTE == '本日無異動'"  ng-blur="updateFlag(row)"></td>
 	                    <td align="center">
-	                        <label>是<input type="radio" value="Y" ng-model="row.WARNING_YN" ng-click="updateFlag(row)" ng-disabled="row.NOTE == '本日無資料'" /></label>&emsp;
-	                        <label>否<input type="radio" value="N" ng-model="row.WARNING_YN" ng-click="updateFlag(row)" ng-disabled="row.NOTE == '本日無資料'" /></label>
+	                        <label><input type="radio" value="Y" ng-model="row.WARNING_YN" ng-click="updateFlag(row)" ng-disabled="row.NOTE == '本日無資料'" />是-通報有異常</label>&emsp;
+	                        <label><input type="radio" value="N" ng-model="row.WARNING_YN" ng-click="updateFlag(row)" ng-disabled="row.NOTE == '本日無資料'" />否-非行員代客戶操作</label>
 	                    </td>
 						<td ng-bind="row.FIRSTUPDATE"></td>
 						<td>{{row.MODIFIER}}</td>
 						<td>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
-						<td>{{row.DEVICE_ID}}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -234,7 +262,11 @@
 			</button>
 		</div>
 		<div>
-			說明：如「客戶背景或關係」選行員末成年子女。具體說明及初判異常欄位系統自動會帶入。
+			說明：<br>
+			(1) 如「客戶背景或關係」選行員未成年子女，具體說明及初判異常欄位系統自動會帶入。<br>
+			<font color="red">(2) 態樣類別「多位客戶同一裝置」 及「客戶使用多台裝置」，若資料日期及客戶ID相同，僅需填寫一筆檢  核說明則同時可複寫相同文字。</font>
+			<br/>
+			<font color="red">(3) 如照會有非本人承作KYC態樣，需確認客戶本人是否知悉，及提醒客戶為維護自身權益，建議重新進行風險屬性評估，並於業管系統留軌。</font>
 		</div>
 	</div>
 </div>

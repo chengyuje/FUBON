@@ -95,8 +95,8 @@ input.faChkSqr:after {
 						</td>											    											
 					</tr>
 					<tr>
-						<th>業務處：</th>
-						<td>
+						<th ng-if="!isUHRM">業務處：</th>
+						<td ng-if="!isUHRM">
 							<e-combobox id="region_center_id" name="region_center_id"
 							ng-datasource="REGION_LIST"
 							ng-model="inputVO.region_center_id"
@@ -110,8 +110,8 @@ input.faChkSqr:after {
 							width="155px"
 							style="line-height:20px;" />
 						</td>						
-						<th>營運區：</th>
-						<td>
+						<th ng-if="!isUHRM">營運區：</th>
+						<td ng-if="!isUHRM">
 							<e-combobox id="branch_area_id" name="branch_area_id"
 							ng-datasource="AREA_LIST"
 							ng-model="inputVO.branch_area_id"
@@ -121,17 +121,17 @@ input.faChkSqr:after {
 							ng-editable="false"
 							ng-format="F3"
 							ng-required="true"
-							ng-change="ChangeArea(region)"
+							ng-change="ChangeArea(region);checkIsUHRMArea();"
 							width="100px"
 							style="line-height:20px;" />
 						</td>
-						<th>分行別：</th>
-						<td>
+						<th ng-if="!isUHRM">分行別：</th>
+						<td ng-if="!isUHRM">
 							<e-combobox id="branch_nbr" name="branch_nbr"
 							ng-datasource="BRANCH_LIST"
 							ng-model="inputVO.branch_nbr"
 							ng-validate="false" 
-							ng-disabled="AVAIL_BRANCH.length == 1"
+							ng-disabled="AVAIL_BRANCH.length == 1 || isUHRMArea"
 							ng-readonly="AVAIL_BRANCH.length == 1"
 							ng-editable="false"
 							ng-format="F1"
@@ -154,7 +154,7 @@ input.faChkSqr:after {
 							style="line-height:20px;" />
 						</td>
 						<th>員編：</th>
-						<td>		
+						<td ng-if="!isUHRM && !isUHRMArea">		
 							<e-combobox id="emp_id" name="emp_id"
 										ng-datasource="EMP_LIST"
 										ng-model="inputVO.emp_id"
@@ -166,6 +166,18 @@ input.faChkSqr:after {
 										ng-required="false"
 										ng-change="ChangeEmp_id(region)"
 										style="line-height:20px;" />					 					 
+						</td>
+						<td ng-if="isUHRM || isUHRMArea">
+							<e-combobox id="emp_id" name="emp_id"
+										ng-datasource="mappingSet['UHRM_LIST']"
+										ng-model="inputVO.emp_id"
+										ng-validate="false" 
+										ng-disabled="mappingSet['UHRM_LIST'].length == 2 && pri_id != 'UHRM012'"
+										ng-readonly="mappingSet['UHRM_LIST'].length == 2 && pri_id != 'UHRM012'" 
+										ng-editable="false"
+										ng-format="F1"
+										style="line-height:20px;" />
+								</td>					 					 
 						</td>
 						
 						<th>客戶ID：</th>
@@ -267,7 +279,7 @@ input.faChkSqr:after {
 					<tr>
 						<td>說明：<br>
 						<span style="color:red;" text-align='left'>
-						(1) 「投資保險」、「個金RM」問卷中，<u>任一題</u>客戶回覆【不滿意/非常不滿意】，即需撰寫改善報告。<br>
+						(1) 「投資保險」、「RM/SRM」問卷中，<u>任一題</u>客戶回覆【不滿意/非常不滿意】，即需撰寫改善報告。<br>
 						(2) 「開戶」、簡訊問卷中，依客戶回覆<u>整體滿意度</u>【不滿意/非常不滿意】， 即需撰寫改善報告。<br>
 						(3) 「櫃檯」問卷中，依客戶回覆等候或整體滿意度【不滿意/非常不滿意】即需撰寫改善報告。
 						</span>

@@ -106,6 +106,8 @@ public class Branch {
 //	  		ws.setWsID(workStationID);
 //	  		setWorkStation(workStationID, ws);
 //		}
+    	
+    	WorkStation test = this.workStations.get(workStationID);
         return this.workStations.get(workStationID);
     }
 

@@ -210,6 +210,7 @@ eSoafApp.controller('PMS329Controller', function($rootScope, $scope, $controller
         		}
 				
 				$scope.paramList2 = tota[0].body.resultList;
+				console.log("paramList2", $scope.paramList2);
 				$scope.totalList = tota[0].body.totalList;
 				$scope.param = tota[0].body.DATA;
 				$scope.csvList = tota[0].body.csvList;

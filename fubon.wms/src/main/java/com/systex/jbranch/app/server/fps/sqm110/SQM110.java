@@ -465,7 +465,7 @@ public class SQM110 extends FubonWmsBizLogic {
 
 		List<Map<String, Object>> list = inputVO.getCheckList();
 		List<Map<String, Object>> list_01 = new ArrayList<Map<String, Object>>(); // 投資保險
-		List<Map<String, Object>> list_02 = new ArrayList<Map<String, Object>>(); // 個金RM
+		List<Map<String, Object>> list_02 = new ArrayList<Map<String, Object>>(); // RM/SRM
 		List<Map<String, Object>> list_03 = new ArrayList<Map<String, Object>>(); // 開戶	
 		List<Map<String, Object>> list_04 = new ArrayList<Map<String, Object>>(); // 櫃檯
 		List<Map<String, Object>> list_05 = new ArrayList<Map<String, Object>>(); // 簡訊	
@@ -475,7 +475,7 @@ public class SQM110 extends FubonWmsBizLogic {
 		for (Map<String, Object> data : list) {
 			//			if(StringUtils.isNotBlank(ObjectUtils.toString(data.get("DEDUCTION_FINAL")))){//調查結果已出來，才需要被匯出來。
 			switch (ObjectUtils.toString(data.get("QTN_TYPE"))) {
-				case "WMS01": // 個金RM
+				case "WMS01": // RM/SRM
 					list_01.add(data);
 					break;
 				case "WMS02": // 投資保險
@@ -524,7 +524,7 @@ public class SQM110 extends FubonWmsBizLogic {
 
 		if (!list_01.isEmpty()) {
 			//設定SHEET名稱
-			XSSFSheet sheet_01 = wb.createSheet("個金RM滿意度問卷");
+			XSSFSheet sheet_01 = wb.createSheet("RM_SRM滿意度問卷");
 			sheet_01.setDefaultColumnWidth(20);
 			sheet_01.setDefaultRowHeightInPoints(20);
 
@@ -532,7 +532,7 @@ public class SQM110 extends FubonWmsBizLogic {
 
 			List<String> heading = new ArrayList<String>();
 
-			heading.add("(一)個金RM滿意度問卷(非常滿意/滿意/普通/不滿意/非常不滿意)");
+			heading.add("(一)RM/SRM滿意度問卷(非常滿意/滿意/普通/不滿意/非常不滿意)");
 			heading.add("問題");
 
 			List<String> headerLineTop = new ArrayList<String>();
@@ -542,8 +542,8 @@ public class SQM110 extends FubonWmsBizLogic {
 			headerLineTop.add("私銀區");
 			headerLineTop.add("分行別");
 			headerLineTop.add("AO_CODE");
-			headerLineTop.add("個金RM姓名");
-			headerLineTop.add("個金RM員工編號");
+			headerLineTop.add("RM/SRM姓名");
+			headerLineTop.add("RM/SRM員工編號");
 			headerLineTop.add("客戶ID");
 			headerLineTop.add("交易日期");
 			headerLineTop.add("填寫日期");
@@ -724,8 +724,8 @@ public class SQM110 extends FubonWmsBizLogic {
 			headerLineTop.add("私銀區");
 			headerLineTop.add("分行別");
 			headerLineTop.add("AO_CODE");
-			headerLineTop.add("個金RM姓名");
-			headerLineTop.add("個金RM員工編號");
+			headerLineTop.add("RM/SRM姓名");
+			headerLineTop.add("RM/SRM員工編號");
 			headerLineTop.add("客戶ID");
 			headerLineTop.add("交易日期");
 			headerLineTop.add("填寫日期");

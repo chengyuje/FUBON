@@ -185,6 +185,12 @@ eSoafApp.controller('SOT610Controller',
 					sDate: undefined, 
 					eDate: undefined
         	};
+			
+			var min_mon2 = new Date();
+			min_mon2.setHours(0, 0, 0, 0);
+			$scope.inputVO.eDate = min_mon2;
+			$scope.inputVO.sDate = new Date(min_mon2.getFullYear(), min_mon2.getMonth(), min_mon2.getDate() - 7);
+				
 			$scope.mappingSet['SOT.TRADE_TYPE_COMBOBOX'] = [];
 			$scope.optionsInit();
 			$scope.limitDate();
@@ -216,21 +222,24 @@ eSoafApp.controller('SOT610Controller',
 							}
 				});
 			} else {
-				$scope.showErrorMsg("ehl_02_sot610_001");
+				$scope.showErrorMsg("除交易起迄日外，查詢條件須輸入/選擇其中一項");
 			}
 		}
 		
 		$scope.checkColumn = function() {
+			debugger
+			//交易起訖日一定要輸入
+			if( typeof($scope.inputVO.sDate) === 'undefined' && typeof($scope.inputVO.eDate) === 'undefined') {
+				$scope.showErrorMsg("請輸入交易起迄日");
+				return false;
+			}
 			if ($scope.inputVO.custID == "" && 
 				$scope.inputVO.prodType == "" && 
 				$scope.inputVO.tradeType == "" && 
 				$scope.inputVO.tradeStatus == "" && 
 				$scope.inputVO.isBaraginNeeded == "" && 
 				$scope.inputVO.bargainFeeFlag == "" && 
-				$scope.inputVO.prodID == "" && 
-				typeof($scope.inputVO.sDate) === 'undefined' &&
-				typeof($scope.inputVO.eDate) === 'undefined') {
-				
+				$scope.inputVO.prodID == "") {
 				return false;
 			} else {
 				return true;

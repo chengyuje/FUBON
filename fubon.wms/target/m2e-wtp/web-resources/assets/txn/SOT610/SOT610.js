@@ -8,7 +8,7 @@ eSoafApp.controller('SOT610Controller',
 		$controller('BaseController', {$scope: $scope});
 		$scope.controllerName = "SOT610Controller";
 		
-		getParameter.XML(["SOT.TRADE_TYPE", "SOT.BUY_SELL", "SOT.TRUST_TRADE_TYPE"], function(totas) {
+		getParameter.XML(["SOT.TRADE_TYPE", "SOT.BUY_SELL", "SOT.TRUST_TRADE_TYPE", "SOT.TRADE_TYPE_DYNA"], function(totas) {
 			   if (totas) {
 				//交易種類-基金
 			    $scope.mappingSet['SOT.TRADE_TYPE'] = totas.data[totas.key.indexOf('SOT.TRADE_TYPE')];
@@ -16,6 +16,8 @@ eSoafApp.controller('SOT610Controller',
 			    $scope.mappingSet['SOT.BUY_SELL'] = totas.data[totas.key.indexOf('SOT.BUY_SELL')];
 			    //信託交易類別
 			    $scope.mappingSet['SOT.TRUST_TRADE_TYPE'] = totas.data[totas.key.indexOf('SOT.TRUST_TRADE_TYPE')];
+			    //交易種類-動態鎖利
+			    $scope.mappingSet['SOT.TRADE_TYPE_DYNA'] = totas.data[totas.key.indexOf('SOT.TRADE_TYPE_DYNA')];
 			   }
 			  });
 		
@@ -93,7 +95,14 @@ eSoafApp.controller('SOT610Controller',
 				$scope.YN_Baragin = false;
 				//是否議價預設值為Y
 				$scope.inputVO.isBaraginNeeded = 'Y'
-			} else if($scope.inputVO.prodType == ""){
+			} else if ($scope.inputVO.prodType == "8") { //動態鎖利 
+				$scope.mappingSet['SOT.TRADE_TYPE_COMBOBOX'] = [];
+				$scope.mappingSet['SOT.TRADE_TYPE_COMBOBOX'] = $scope.mappingSet['SOT.TRADE_TYPE_DYNA'];
+				//只有基金與ETF有是否議價
+				$scope.YN_Baragin = false;
+				//是否議價預設值為Y
+				$scope.inputVO.isBaraginNeeded = 'Y'
+			}else if($scope.inputVO.prodType == ""){
 				$scope.YN_Baragin = true;
 				$scope.inputVO.isBaraginNeeded = '';
 				$scope.mappingSet['SOT.TRADE_TYPE_COMBOBOX'] = [];
@@ -126,22 +135,17 @@ eSoafApp.controller('SOT610Controller',
 		//===
         
 		// time picker
-		$scope.startDateOptions = {
-			maxDate: $scope.inputVO.eDate || $scope.maxDate,
-			minDate: $scope.minDate
-		};
-        $scope.startDateOptions2 = {
-			maxDate: $scope.inputVO.eDate || $scope.maxDate,
-			minDate: $scope.inputVO.sDate || $scope.minDate
-		};
-		$scope.endDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.inputVO.sDate || $scope.minDate
-		};
-		$scope.endDateOptions2 = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.inputVO.eDate || $scope.minDate
-		};
+		$scope.optionsInit = function() {
+			$scope.startDateOptions = {
+				maxDate: $scope.inputVO.eDate || $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.endDateOptions = {
+				maxDate: $scope.inputVO.eDate || $scope.maxDate,
+				minDate: $scope.inputVO.sDate || $scope.minDate
+			};
+		}
+
 		$scope.altInputFormats = ['M!/d!/yyyy'];
 		$scope.model = {};
 		$scope.open = function($event, elementOpened) {
@@ -150,15 +154,22 @@ eSoafApp.controller('SOT610Controller',
 			$scope.model[elementOpened] = !$scope.model[elementOpened];
 		};
 		$scope.limitDate = function() {
-			$scope.startDateOptions.maxDate = $scope.inputVO.eDate || $scope.inputVO.sDate2 || $scope.maxDate;
-			
-			$scope.startDateOptions2.minDate = $scope.inputVO.sDate || $scope.minDate;
-			$scope.startDateOptions2.maxDate = $scope.inputVO.eDate;
+			$scope.startDateOptions.maxDate = $scope.inputVO.eDate || $scope.maxDate;
+			if ($scope.inputVO.eDate) {
+				let y = $scope.inputVO.eDate.getFullYear();
+				let m = $scope.inputVO.eDate.getMonth() - 6;
+				let d = $scope.inputVO.eDate.getDate();
+				$scope.startDateOptions.minDate = new Date(y, m, d);
+			}
 			
 			$scope.endDateOptions.minDate = $scope.inputVO.sDate || $scope.minDate;
-			$scope.endDateOptions.maxDate = $scope.inputVO.eDate2;
-			
-			$scope.endDateOptions2.minDate = $scope.inputVO.eDate || $scope.minDate;
+			if ($scope.inputVO.sDate) {
+				let y = $scope.inputVO.sDate.getFullYear();
+				let m = $scope.inputVO.sDate.getMonth() + 6;
+				let d = $scope.inputVO.sDate.getDate();
+				$scope.endDateOptions.maxDate = new Date(y, m, d);
+			}
+
 		};
       	
         $scope.init = function(){
@@ -174,7 +185,14 @@ eSoafApp.controller('SOT610Controller',
 					sDate: undefined, 
 					eDate: undefined
         	};
+			
+			var min_mon2 = new Date();
+			min_mon2.setHours(0, 0, 0, 0);
+			$scope.inputVO.eDate = min_mon2;
+			$scope.inputVO.sDate = new Date(min_mon2.getFullYear(), min_mon2.getMonth(), min_mon2.getDate() - 7);
+				
 			$scope.mappingSet['SOT.TRADE_TYPE_COMBOBOX'] = [];
+			$scope.optionsInit();
 			$scope.limitDate();
 		};
 		$scope.init();
@@ -204,21 +222,24 @@ eSoafApp.controller('SOT610Controller',
 							}
 				});
 			} else {
-				$scope.showErrorMsg("ehl_02_sot610_001");
+				$scope.showErrorMsg("除交易起迄日外，查詢條件須輸入/選擇其中一項");
 			}
 		}
 		
 		$scope.checkColumn = function() {
+			debugger
+			//交易起訖日一定要輸入
+			if( typeof($scope.inputVO.sDate) === 'undefined' && typeof($scope.inputVO.eDate) === 'undefined') {
+				$scope.showErrorMsg("請輸入交易起迄日");
+				return false;
+			}
 			if ($scope.inputVO.custID == "" && 
 				$scope.inputVO.prodType == "" && 
 				$scope.inputVO.tradeType == "" && 
 				$scope.inputVO.tradeStatus == "" && 
 				$scope.inputVO.isBaraginNeeded == "" && 
 				$scope.inputVO.bargainFeeFlag == "" && 
-				$scope.inputVO.prodID == "" && 
-				typeof($scope.inputVO.sDate) === 'undefined' &&
-				typeof($scope.inputVO.eDate) === 'undefined') {
-				
+				$scope.inputVO.prodID == "") {
 				return false;
 			} else {
 				return true;

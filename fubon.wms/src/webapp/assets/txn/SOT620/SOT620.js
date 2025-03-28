@@ -64,21 +64,21 @@ eSoafApp.controller('SOT620Controller',
 //								$scope.curCRateData.PERCENTAGE_1 = rData.PERCENTAGE_1.toString() + "%"; //(移除)不保本境內外結構型商品
 								$scope.curCRateData.PERCENTAGE_2 = rData.PERCENTAGE_2.toString() + "%"; //低信評/無信評海外債券
 								$scope.curCRateData.PERCENTAGE_3 = rData.PERCENTAGE_3.toString() + "%"; //未具證投信基金性質境外基金
-								$scope.curCRateData.PERCENTAGE_4 = rData.PERCENTAGE_4.toString() + "%"; //高風險商品總計
+//								$scope.curCRateData.PERCENTAGE_4 = rData.PERCENTAGE_4.toString() + "%"; //高風險商品總計
 								$scope.curCRateData.LIMIT_PERC_2 = rData.LIMIT_PERC_2.toString() + "%"; //海外債券上限比例基準百分比
 								$scope.curCRateData.LIMIT_PERC_3 = rData.LIMIT_PERC_3.toString() + "%"; //未具證投信基金性質境外基金上限比例基準百分比
 //								$scope.curCRateData.remark1 = "上限" + rData.BASE_PERC_1.toString() + "%，" + ((rData.PERCENTAGE_1 > rData.BASE_PERC_1) ? "已超限" : "未超限");
-//								$scope.curCRateData.remark2 = "通知門檻比例" + rData.BASE_PERC_2.toString() + "%，上限比例" + rData.LIMIT_PERC_2.toString() + "%，" + ((rData.PERCENTAGE_2 > rData.BASE_PERC_2) ? "超過通知門檻比例" : ((rData.PERCENTAGE_2 > rData.LIMIT_PERC_2) ? "超過上限比例" : "未超限"));
-//								$scope.curCRateData.remark3 = "通知門檻比例" + rData.BASE_PERC_3.toString() + "%，上限比例" + rData.LIMIT_PERC_3.toString() + "%，" + ((rData.PERCENTAGE_3 > rData.BASE_PERC_3) ? "超過通知門檻比例" : ((rData.PERCENTAGE_3 > rData.LIMIT_PERC_3) ? "超過上限比例" : "未超限"));
+								$scope.curCRateData.remark2 = (rData.PERCENTAGE_2 > rData.BASE_PERC_2) ? "超過通知門檻比例" : "通知門檻比例" + rData.BASE_PERC_2.toString() + "%，未超限";
+								$scope.curCRateData.remark3 = (rData.PERCENTAGE_3 > rData.BASE_PERC_3) ? "超過通知門檻比例" : "通知門檻比例" + rData.BASE_PERC_3.toString() + "%，未超限";
 //								$scope.curCRateData.remark4 = "通知門檻比例" + rData.BASE_PERC_4.toString() + "%，" + ((rData.PERCENTAGE_4 > rData.BASE_PERC_4) ? "已超限" : "未超限");
-								$scope.curCRateData.remark2 = ((rData.PERCENTAGE_2 > rData.LIMIT_PERC_2) ? "超過上限比例" : ((rData.PERCENTAGE_2 > rData.BASE_PERC_2) ? "超過通知門檻比例" : "未超限"));
-								$scope.curCRateData.remark3 = ((rData.PERCENTAGE_3 > rData.LIMIT_PERC_3) ? "超過上限比例" : ((rData.PERCENTAGE_3 > rData.BASE_PERC_3) ? "超過通知門檻比例" : "未超限"));
-								$scope.curCRateData.remark4 = ((rData.PERCENTAGE_4 > rData.BASE_PERC_4) ? "超過通知門檻比例" : "未超限");
+//								$scope.curCRateData.remark2 = ((rData.PERCENTAGE_2 > rData.LIMIT_PERC_2) ? "超過上限比例" : ((rData.PERCENTAGE_2 > rData.BASE_PERC_2) ? "超過通知門檻比例" : "未超限"));
+//								$scope.curCRateData.remark3 = ((rData.PERCENTAGE_3 > rData.LIMIT_PERC_3) ? "超過上限比例" : ((rData.PERCENTAGE_3 > rData.BASE_PERC_3) ? "超過通知門檻比例" : "未超限"));
+//								$scope.curCRateData.remark4 = ((rData.PERCENTAGE_4 > rData.BASE_PERC_4) ? "超過通知門檻比例" : "未超限");
 								
 //								$scope.curCRateData.color1 = (rData.PERCENTAGE_1 > rData.BASE_PERC_1) ? "color:red" : "color:black";
 								$scope.curCRateData.color2 = (rData.PERCENTAGE_2 > rData.BASE_PERC_2) ? "color:red" : "color:black";
 								$scope.curCRateData.color3 = (rData.PERCENTAGE_3 > rData.BASE_PERC_3) ? "color:red" : "color:black";
-								$scope.curCRateData.color4 = (rData.PERCENTAGE_4 > rData.BASE_PERC_4) ? "color:red" : "color:black";
+//								$scope.curCRateData.color4 = (rData.PERCENTAGE_4 > rData.BASE_PERC_4) ? "color:red" : "color:black";
 							}
 							
 							//取得客戶已委託高風險商品庫存
@@ -164,21 +164,21 @@ eSoafApp.controller('SOT620Controller',
 //							$scope.trialCalData.PERCENTAGE_1 = rData.PERCENTAGE_1.toString() + "%";
 							$scope.trialCalData.PERCENTAGE_2 = rData.PERCENTAGE_2.toString() + "%";
 							$scope.trialCalData.PERCENTAGE_3 = rData.PERCENTAGE_3.toString() + "%";
-							$scope.trialCalData.PERCENTAGE_4 = rData.PERCENTAGE_4.toString() + "%";
+//							$scope.trialCalData.PERCENTAGE_4 = rData.PERCENTAGE_4.toString() + "%";
 							$scope.trialCalData.LIMIT_PERC_2 = rData.LIMIT_PERC_2.toString() + "%"; //海外債券上限比例基準百分比
 							$scope.trialCalData.LIMIT_PERC_3 = rData.LIMIT_PERC_3.toString() + "%"; //未具證投信基金性質境外基金上限比例基準百分比
 //							$scope.trialCalData.remark1 = "上限" + rData.BASE_PERC_1.toString() + "%，" + ((rData.PERCENTAGE_1 > rData.BASE_PERC_1) ? "已超限" : "未超限");
-//							$scope.trialCalData.remark2 = "通知門檻比例" + rData.BASE_PERC_2.toString() + "%，上限比例" + rData.LIMIT_PERC_2.toString() + "%，" + ((rData.PERCENTAGE_2 > rData.BASE_PERC_2) ? "超過通知門檻比例" : ((rData.PERCENTAGE_2 > rData.LIMIT_PERC_2) ? "超過上限比例" : "未超限"));
-//							$scope.trialCalData.remark3 = "通知門檻比例" + rData.BASE_PERC_3.toString() + "%，上限比例" + rData.LIMIT_PERC_3.toString() + "%，" + ((rData.PERCENTAGE_3 > rData.BASE_PERC_3) ? "超過通知門檻比例" : ((rData.PERCENTAGE_3 > rData.LIMIT_PERC_3) ? "超過上限比例" : "未超限"));
+							$scope.trialCalData.remark2 = (rData.PERCENTAGE_2 > rData.BASE_PERC_2) ? "超過通知門檻比例" : "通知門檻比例" + rData.BASE_PERC_2.toString() + "%，未超限";
+							$scope.trialCalData.remark3 = (rData.PERCENTAGE_3 > rData.BASE_PERC_3) ? "超過通知門檻比例" : "通知門檻比例" + rData.BASE_PERC_3.toString() + "%，未超限";
 //							$scope.trialCalData.remark4 = "通知門檻比例" + rData.BASE_PERC_4.toString() + "%，" + ((rData.PERCENTAGE_4 > rData.BASE_PERC_4) ? "已超限" : "未超限");
-							$scope.trialCalData.remark2 = ((rData.PERCENTAGE_2 > rData.LIMIT_PERC_2) ? "超過上限比例" : ((rData.PERCENTAGE_2 > rData.BASE_PERC_2) ? "超過通知門檻比例" : "未超限"));
-							$scope.trialCalData.remark3 = ((rData.PERCENTAGE_3 > rData.LIMIT_PERC_3) ? "超過上限比例" : ((rData.PERCENTAGE_3 > rData.BASE_PERC_3) ? "超過通知門檻比例" : "未超限"));
-							$scope.trialCalData.remark4 = ((rData.PERCENTAGE_4 > rData.BASE_PERC_4) ? "超過通知門檻比例" : "未超限");
+//							$scope.trialCalData.remark2 = ((rData.PERCENTAGE_2 > rData.LIMIT_PERC_2) ? "超過上限比例" : ((rData.PERCENTAGE_2 > rData.BASE_PERC_2) ? "超過通知門檻比例" : "未超限"));
+//							$scope.trialCalData.remark3 = ((rData.PERCENTAGE_3 > rData.LIMIT_PERC_3) ? "超過上限比例" : ((rData.PERCENTAGE_3 > rData.BASE_PERC_3) ? "超過通知門檻比例" : "未超限"));
+//							$scope.trialCalData.remark4 = ((rData.PERCENTAGE_4 > rData.BASE_PERC_4) ? "超過通知門檻比例" : "未超限");
 							
 //							$scope.trialCalData.color1 = (rData.PERCENTAGE_1 > rData.BASE_PERC_1) ? "color:red" : "color:black";
 							$scope.trialCalData.color2 = (rData.PERCENTAGE_2 > rData.BASE_PERC_2) ? "color:red" : "color:black";
 							$scope.trialCalData.color3 = (rData.PERCENTAGE_3 > rData.BASE_PERC_3) ? "color:red" : "color:black";
-							$scope.trialCalData.color4 = (rData.PERCENTAGE_4 > rData.BASE_PERC_4) ? "color:red" : "color:black";
+//							$scope.trialCalData.color4 = (rData.PERCENTAGE_4 > rData.BASE_PERC_4) ? "color:red" : "color:black";
 						}
 						
 						return;

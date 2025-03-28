@@ -284,8 +284,15 @@ public class PRD140 extends FubonWmsBizLogic {
 					throw new APException(fOutputVO.getErrorID());
 				}
 				
+				//客戶FATCA註記檢核
+				fOutputVO = prodFitness.validFundETFCustFATCA(inputVO.getCust_id());
+				if(fOutputVO.getIsError()) {
+					// 客戶資料適配檢核失敗，Exception整段跳出
+					throw new APException(fOutputVO.getErrorID());
+				}
+				
 				//針對新CRS/FATCA美國來源所得交易管控
-				fOutputVO = prodFitness.validUSACustAndProd(inputVO.getCust_id());//客戶FATCA註記檢核
+				fOutputVO = prodFitness.validUSACustAndProd(inputVO.getCust_id());
 				if(fOutputVO.getIsError()) {
 					// 客戶資料適配檢核失敗，Exception整段跳出
 					throw new APException(fOutputVO.getErrorID());

@@ -57,6 +57,7 @@ eSoafApp.controller('CRM821Controller',
 								$scope.redeemOutputVO = tota[0].body.redeemList;
 								
 								$scope.resultList = tota[0].body.resultList; //庫存資料
+								console.log("$scope.resultList", $scope.resultList);
 
 								angular.forEach($scope.resultList, function(row, index, objs) {
 									row.set = [];
@@ -131,7 +132,10 @@ eSoafApp.controller('CRM821Controller',
 									if (row.RewRateDigit == '-' && row.AccAllocateRewRate != 0) {
 										row.AccAllocateRewRate = row.AccAllocateRewRate * (-1);
 									}
-
+									if (row.RewRateDigitN == '-' && row.AccAllocateRewRateN != 0) {
+										row.AccAllocateRewRateN = row.AccAllocateRewRateN * (-1);
+									}
+									
 									//判斷交易型態
 									if (row.AssetType == "0001") {
 										row.TxType = "單筆";
@@ -335,6 +339,7 @@ eSoafApp.controller('CRM821Controller',
 			$scope.FundType_4 = 0 ;			//債券
 			$scope.FundType_5 = 0 ;			//平衡
 			$scope.SUMAccAllocateRew = 0;   //調整後累積現金配息
+			$scope.SUMAccAllocateRewN = 0; 	// 調整後累積現金配息(含轉換前息)
 
 			for(var i = 0; i < row.length; i++) {
 				
@@ -365,6 +370,7 @@ eSoafApp.controller('CRM821Controller',
 //				$scope.SUMCurBalNT += row[i].CurBalNT;
 				$scope.SUMCurAmt += (row[i].CurAmt * $scope.cod);
 				$scope.SUMAccAllocateRew += (row[i].AccAllocateRew * $scope.cod);
+				$scope.SUMAccAllocateRewN += (row[i].AccAllocateRewN * $scope.cod)
 				
 			}
 			
@@ -373,9 +379,20 @@ eSoafApp.controller('CRM821Controller',
 			$scope.SUMProfitAndLoss = _.round($scope.SUMCurBal-$scope.SUMCurAmt);
 			$scope.Return = Number(($scope.SUMProfitAndLoss * 100 / $scope.SUMCurAmt).toFixed(2));
 			
-			//參考總報酬率(含配息)
+			//參考總含息報酬率(不含轉換前配息)
 			$scope.SUMAccAllocateRew = _.round($scope.SUMAccAllocateRew);
 			$scope.Return_int = Number((($scope.SUMProfitAndLoss + $scope.SUMAccAllocateRew) * 100 / $scope.SUMCurAmt).toFixed(2));
+			
+			console.log("//參考總含息報酬率(不含轉換前配息)");
+			console.log("$scope.SUMProfitAndLoss", $scope.SUMProfitAndLoss);
+			console.log("$scope.SUMAccAllocateRew", $scope.SUMAccAllocateRew);
+			console.log("$scope.SUMCurAmt", $scope.SUMCurAmt);
+			
+			//參考總含息報酬率(含轉換前配息)
+			$scope.SUMAccAllocateRewN = _.round($scope.SUMAccAllocateRewN);
+			$scope.Return_int2 = Number((($scope.SUMProfitAndLoss + $scope.SUMAccAllocateRewN) * 100 / $scope.SUMCurAmt).toFixed(2));
+			console.log("//參考總含息報酬率(含轉換前配息)");
+			console.log("$scope.SUMAccAllocateRewN",  $scope.SUMAccAllocateRewN);
 		}
 		
 		$scope.reverse = '';

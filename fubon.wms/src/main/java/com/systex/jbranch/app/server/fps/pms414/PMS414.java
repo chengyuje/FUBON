@@ -1,13 +1,23 @@
 package com.systex.jbranch.app.server.fps.pms414;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +28,9 @@ import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
 import com.systex.jbranch.platform.common.dataaccess.query.ResultIF;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
-import com.systex.jbranch.platform.common.util.CSVUtil;
-import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
+import com.systex.jbranch.platform.server.info.SysInfo;
+import com.systex.jbranch.platform.server.info.SystemVariableConsts;
+import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
 /**
@@ -63,6 +74,7 @@ public class PMS414 extends FubonWmsBizLogic {
 		sql.append("         BRANCH_AREA_ID, ");
 		sql.append("         BRANCH_AREA_NAME, ");
 		sql.append("         DATA_DATE, ");
+		sql.append("         CASE WHEN TRUNC(CREATETIME) <= TRUNC(TO_DATE('20210326', 'YYYYMMDD')) THEN 'N' ELSE 'Y' END AS RECORD_YN, ");
 		sql.append("         CASE WHEN TRUNC(DATA_DATE) >= TO_DATE('20210326', 'YYYYMMDD') THEN 'Y' ELSE 'N' END AS CAN_UPD_FIRSTDATE_FLG, ");
 		sql.append("         BRANCH_NBR, ");
 		sql.append("         BRANCH_NAME, ");
@@ -81,6 +93,9 @@ public class PMS414 extends FubonWmsBizLogic {
 		sql.append("         NEARBY_CUST_FLAG, ");
 		sql.append("         EXPLANATION, ");
 		sql.append("         VIOLATION_FLAG, ");
+		sql.append("         NOTE, ");
+		sql.append("         NOTE_TYPE, ");
+		sql.append("         RECORD_SEQ, ");
 		sql.append("         MODIFIER, ");
 		sql.append("         JOB_TITLE, ");
 		sql.append("         LASTUPDATE, ");
@@ -94,6 +109,7 @@ public class PMS414 extends FubonWmsBizLogic {
 			sql.append("  AND CREATETIME >= TO_DATE(:SDATE, 'YYYY-MM-DD') ");
 			condition.setObject("SDATE", new java.text.SimpleDateFormat("yyyy/MM/dd").format(inputVO.getsCreDate()));
 		}
+		
 		if (inputVO.geteCreDate() != null) {
 			sql.append("  AND CREATETIME <= TO_DATE(:EDATE, 'YYYY-MM-DD HH24:MI:SS') ");
 			Date eDate = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(inputVO.geteCreDate().toString().concat(" 23:59:59"));
@@ -117,6 +133,16 @@ public class PMS414 extends FubonWmsBizLogic {
 			sql.append("  AND FIRSTUPDATE IS NULL ");
 		}
 
+		String bakFlag = (null == inputVO.getBakFlag() ? "NEW" : inputVO.getBakFlag());
+		switch (bakFlag) {
+			case "B":
+				sql.append("AND CREATETIME <= TO_DATE('2025-04-30 23:59:59', 'YYYY-MM-DD HH24:MI:SS')");
+				break;
+			default:
+				sql.append("AND CREATETIME >  TO_DATE('2025-04-30 23:59:59', 'YYYY-MM-DD HH24:MI:SS')");
+				break;
+		}
+		
 		//排序
 //		sql.append("  order by DATA_DATE ASC,REGION_CENTER_ID, BRANCH_AREA_ID, BRANCH_NBR, TRADE_DATE, CUST_ID ");
 		sql.append(") t ");
@@ -125,6 +151,7 @@ public class PMS414 extends FubonWmsBizLogic {
 		sql.append("  FROM TBPMS_DAILY_PUBCOM_REASON ");
 		sql.append("  WHERE (M_SEQNO, CREATETIME) IN (SELECT M_SEQNO, MAX(CREATETIME) FROM TBPMS_DAILY_PUBCOM_REASON GROUP BY M_SEQNO) ");
 		sql.append(") R ON T.SEQ = R.M_SEQNO ");
+		
 		sql.append("ORDER BY T.CDATE ASC, T.DATA_DATE ASC, T.REGION_CENTER_ID, T.BRANCH_AREA_ID, T.BRANCH_NBR, T.TRADE_DATE, T.CUST_ID ");
 		
 		condition.setQueryString(sql.toString());
@@ -188,6 +215,18 @@ public class PMS414 extends FubonWmsBizLogic {
 					String before_meetingMin = beforeMap.get("MEETING_MIN") == null ? "" : beforeMap.get("MEETING_MIN").toString();
 					String after_meetingMin = afterMap.get("MEETING_MIN") == null ? "" : afterMap.get("MEETING_MIN").toString();
 
+					// 查詢方式
+					String before_noteType = beforeMap.get("NOTE_TYPE") == null ? "" : beforeMap.get("NOTE_TYPE").toString();
+					String after_noteType = afterMap.get("NOTE_TYPE") == null ? "" : afterMap.get("NOTE_TYPE").toString();
+
+					// 查詢方式_其他_補充
+					String before_note = beforeMap.get("NOTE") == null ? "" : beforeMap.get("NOTE").toString();
+					String after_note = afterMap.get("NOTE") == null ? "" : afterMap.get("NOTE").toString();
+
+					// 電訪錄音序號
+					String before_recordSeq = beforeMap.get("RECORD_SEQ") == null ? "" : beforeMap.get("RECORD_SEQ").toString();
+					String after_recordSeq = afterMap.get("RECORD_SEQ") == null ? "" : afterMap.get("RECORD_SEQ").toString();
+
 					// 且任一選項修改 (待新建立VO後調整)
 					if (!before_staffFlag.equals(after_staffFlag) || 
 						!before_meeting.equals(after_meeting) || 
@@ -197,7 +236,10 @@ public class PMS414 extends FubonWmsBizLogic {
 						!before_violFlag.equals(after_violFlag) || 
 						!before_oboFlag.equals(after_oboFlag) || 
 						!before_meetingHour.equals(after_meetingHour) || 
-						!before_meetingMin.equals(after_meetingMin)) {
+						!before_meetingMin.equals(after_meetingMin) || 
+						!before_noteType.equals(after_noteType) || 
+						!before_note.equals(after_note) || 
+						!before_recordSeq.equals(after_recordSeq)) {
 
 						// 寫入檢核項目
 						condition = dam.getQueryCondition();
@@ -207,18 +249,23 @@ public class PMS414 extends FubonWmsBizLogic {
 						sql.append("SET STAFF_THERE_FLAG = :staffFlag, ");
 						
 						if (before_meeting != null) {
-							sql.append("MEETING = TRUNC(TO_DATE(:meeting, 'YYYY-MM-DD')), ");
+							sql.append("    MEETING = TRUNC(TO_DATE(:meeting, 'YYYY-MM-DD')), ");
 							condition.setObject("meeting", after_meeting);
 						}
 						
-						sql.append("MEETING_HOUR = :meetingHour, "); // 照會時間-小時
-						sql.append("MEETING_MIN = :meetingMin, "); // 照會時間-分鐘
-						sql.append("OBO_CUST_FLAG = :oboFlag, ");
-						sql.append("AVOID_FLAG = :avoidFlag, ");
-						sql.append("NEARBY_CUST_FLAG = :nearbyFlag, ");
-						sql.append("EXPLANATION = :explanation, ");
-						sql.append("VIOLATION_FLAG = :violFlag, ");
-						sql.append("MODIFIER = :loginUser, "); //改用原來登入者，避免用代理角色存取。
+						sql.append("    MEETING_HOUR = :meetingHour, "); // 照會時間-小時
+						sql.append("    MEETING_MIN = :meetingMin, "); // 照會時間-分鐘
+						sql.append("    OBO_CUST_FLAG = :oboFlag, ");
+						sql.append("    AVOID_FLAG = :avoidFlag, ");
+						sql.append("    NEARBY_CUST_FLAG = :nearbyFlag, ");
+						sql.append("    EXPLANATION = :explanation, ");
+						sql.append("    VIOLATION_FLAG = :violFlag, ");
+						
+						sql.append("    NOTE_TYPE = :noteType, ");
+						sql.append("    NOTE = :note, ");
+						sql.append("    RECORD_SEQ = :recordSEQ, ");
+						
+						sql.append("    MODIFIER = :loginUser, "); //改用原來登入者，避免用代理角色存取。
 						
 						if (beforeMap.get("FIRSTUPDATE") == null && StringUtils.equals("Y", beforeMap.get("CAN_UPD_FIRSTDATE_FLG").toString())) {
 							sql.append("FIRSTUPDATE = SYSDATE, ");
@@ -228,6 +275,13 @@ public class PMS414 extends FubonWmsBizLogic {
 
 						sql.append("WHERE SEQ = :seq ");
 
+						// KEY
+						condition.setObject("seq", afterMap.get("SEQ"));
+
+						// CONTENT
+						condition.setObject("noteType", after_noteType);
+						condition.setObject("note", after_note);
+						condition.setObject("recordSEQ", after_recordSeq);
 						condition.setObject("staffFlag", after_staffFlag);
 						condition.setObject("meetingHour", after_meetingHour);
 						condition.setObject("meetingMin", after_meetingMin);
@@ -237,7 +291,6 @@ public class PMS414 extends FubonWmsBizLogic {
 						condition.setObject("explanation", after_explanation);
 						condition.setObject("violFlag", after_violFlag);
 						condition.setObject("loginUser", DataManager.getWorkStation(uuid).getUser().getCurrentUserId());
-						condition.setObject("seq", afterMap.get("SEQ"));
 
 						condition.setQueryString(sql.toString());
 						
@@ -266,87 +319,196 @@ public class PMS414 extends FubonWmsBizLogic {
 	}
 
 	/* 產出 CSV */
-	public void export(Object body, IPrimitiveMap header) throws JBranchException {
+	public void export(Object body, IPrimitiveMap header) throws JBranchException, ParseException, FileNotFoundException, IOException {
 		
+		SimpleDateFormat sdfYYYYMMDDHHMMSS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat sdfYYYYMMDD_DASH = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdfYYYYMMDD = new SimpleDateFormat("yyyyMMdd");
+
+		XmlInfo xmlInfo = new XmlInfo();
+
 		PMS414OutputVO outputVO = (PMS414OutputVO) body;
 
 		List<Map<String, Object>> list = outputVO.getTotalList();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		
-		String[] csvHeader = { 	"序號", "資料日期",
-								"分行代碼", "分行名稱", "客戶ID", "客戶姓名", "AO Code",
+		String reportName = "公用電腦查核日報";
+		String fileName = reportName + "_" + sdfYYYYMMDD.format(new Date()) + ".xlsx";
+		String uuid = UUID.randomUUID().toString();
+		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
+
+		String filePath = Path + uuid;
+
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet(reportName);
+		sheet.setDefaultColumnWidth(20);
+		sheet.setDefaultRowHeightInPoints(20);
+		
+		// 表頭 CELL型式
+		XSSFCellStyle headingStyle = workbook.createCellStyle();
+		headingStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		headingStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		headingStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);// 填滿顏色
+		headingStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+		headingStyle.setBorderBottom((short) 1);
+		headingStyle.setBorderTop((short) 1);
+		headingStyle.setBorderLeft((short) 1);
+		headingStyle.setBorderRight((short) 1);
+		headingStyle.setWrapText(true);
+
+		// 資料 CELL型式
+		XSSFCellStyle mainStyle = workbook.createCellStyle();
+		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		mainStyle.setBorderBottom((short) 1);
+		mainStyle.setBorderTop((short) 1);
+		mainStyle.setBorderLeft((short) 1);
+		mainStyle.setBorderRight((short) 1);
+		
+		// 資料 CELL型式
+		XSSFCellStyle titleStyle = workbook.createCellStyle();
+		titleStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+		titleStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderBottom((short) 1);
+		titleStyle.setBorderTop((short) 1);
+		titleStyle.setBorderLeft((short) 1);
+		titleStyle.setBorderRight((short) 1);
+		
+		String[] headerLine = { "序號", 
+								"資料日期",
+								"分行代碼", 
+								"分行名稱", 
+								"客戶ID", 
+								"客戶姓名", 
+								"AO Code",
 								"特定客戶",
-								"交易時間", "交易項目",
+								"交易時間", 
+								"交易項目",
+								"查證方式", 
+								"電訪錄音編號", 
 								"本次交易是否\r\n有行員在場",
-								"1.若代「特定客戶」操作，照會是\r\n否為客戶本人意願(請註明照會時間)", "照會時間-小時", "照會時間-分鐘",
-								"2.是否為行員代登\r\n入網銀帳號密碼",
-								"3.客戶登入網銀帳號密碼\r\n時，行員是否迴避",
-								"4.行員協助操作時，客\r\n戶是否全程在旁",
+								"是否為行員代登\r\n入網銀帳號密碼",
+								"客戶登入網銀帳號密碼\r\n時，行員是否迴避",
+								"行員協助操作時，客\r\n戶是否全程在旁",
 								"其他說明\r\n(限100字內)",
 								"是否違規",
-								"首次建立時間", "最新異動人員", "最新異動日期", "最新異動原因"};
-		String[] csvMain   = {  "ROWNUM", "CDATE", 
-								"BRANCH_NBR", "BRANCH_NAME", "CUST_ID", "CUST_NAME", "AO_CODE",
+								"首次建立時間", 
+								"最新異動人員", 
+								"最新異動日期", 
+								"最新異動原因"};
+		
+		String[] mainLine   = { "ROWNUM", 
+								"CDATE", 
+								"BRANCH_NBR", 
+								"BRANCH_NAME", 
+								"CUST_ID", 
+								"CUST_NAME", 
+								"AO_CODE",
 								"SPECIFIC_FLAG",
-								"TRADE_DATE", "TRADE_ITEM",
+								"TRADE_DATE", 
+								"TRADE_ITEM",
+								"NOTE", 
+								"RECORD_SEQ",
 								"STAFF_THERE_FLAG",
-								"MEETING", "MEETING_HOUR", "MEETING_MIN",
 								"OBO_CUST_FLAG",
 								"AVOID_FLAG",
 								"NEARBY_CUST_FLAG",
 								"EXPLANATION",
 								"VIOLATION_FLAG",
-								"FIRSTUPDATE", "MODIFIER", "LASTUPDATE", "REASON"};
+								"FIRSTUPDATE", 
+								"MODIFIER", 
+								"LASTUPDATE", 
+								"REASON"};
 
-		
-		String fileName = "公用電腦查核日報_" + sdf.format(new Date()) + ".csv";
-		
-		List<Object[]> csvData = new ArrayList<Object[]>();
-		if (list.size() == 0) {
-			String[] records = new String[2];
-			records[0] = "查無資料";
-			csvData.add(records);
-		} else {
-			for (Map<String, Object> map : list) {
-				//20170929:問題單3791:本日無客戶使用公用電腦匯出不要出現
-				if ((map.get("CUST_ID") == null || StringUtils.isBlank(String.valueOf(map.get("CUST_ID")))) && (map.get("AO_CODE") == null || StringUtils.isBlank(String.valueOf(map.get("AO_CODE"))))) {
-					continue;
-				}
+		Integer index = 0;
 
-				String[] records = new String[csvHeader.length];
-				for (int i = 0; i < csvHeader.length; i++) {
-					switch (csvMain[i]) {
-						case "ROWNUM":
-							records[i] = ((int) Double.parseDouble(checkIsNull(map, csvMain[i]).toString())) + ""; // 首次建立時間
-							break;
-						case "CUST_ID":
-							records[i] = DataFormat.getCustIdMaskForHighRisk(checkIsNull(map, csvMain[i]));
-							break;
-						case "SPECIFIC_FLAG":
-						case "STAFF_THERE_FLAG":
-						case "OBO_CUST_FLAG":
-						case "AVOID_FLAG":
-						case "NEARBY_CUST_FLAG":
-						case "VIOLATION_FLAG":
-							records[i] = flagFormat(map, csvMain[i]);
-							break;
-						default:
-							records[i] = checkIsNull(map, csvMain[i]);
-							break;
-					}
-				}
-				
-				csvData.add(records);
-			}
+		XSSFRow row = sheet.createRow(index);
+		for (int i = 0; i < 1; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(titleStyle);
+			cell.setCellValue(reportName);
+		}
+		
+		index++;
+		
+		row = sheet.createRow(index);
+		row.setHeightInPoints(30);
+		for (int i = 0; i < headerLine.length; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(headingStyle);
+			cell.setCellValue(headerLine[i]);
 		}
 
-		CSVUtil csv = new CSVUtil();
-		csv.setHeader(csvHeader);
-		csv.addRecordList(csvData);
+		index++;
 		
-		String url = csv.generateCSV();
-		notifyClientToDownloadFile(url, fileName);
-		
+		for (Map<String, Object> map : list) {
+
+			//20170929:問題單3791:本日無客戶使用公用電腦匯出不要出現
+			if ((map.get("CUST_ID") == null || StringUtils.isBlank(String.valueOf(map.get("CUST_ID")))) && (map.get("AO_CODE") == null || StringUtils.isBlank(String.valueOf(map.get("AO_CODE"))))) {
+				continue;
+			}
+			
+			row = sheet.createRow(index);
+			
+			for (int i = 0; i < mainLine.length; i++) {
+				XSSFCell cell = row.createCell(i);
+				cell.setCellStyle(mainStyle);
+
+				switch (mainLine[i]) {
+					case "CDATE":
+						if (StringUtils.isNotEmpty(checkIsNull(map, mainLine[i]))) {
+							cell.setCellValue(sdfYYYYMMDD_DASH.format(sdfYYYYMMDD_DASH.parse((String) map.get(mainLine[i]))));
+						} else {
+							cell.setCellValue("");
+						}
+						break;
+					case "TRADE_DATE":
+					case "FIRSTUPDATE":
+					case "LASTUPDATE":
+						if (StringUtils.isNotEmpty(checkIsNull(map, mainLine[i]))) {
+							cell.setCellValue(sdfYYYYMMDDHHMMSS.format(sdfYYYYMMDDHHMMSS.parse((String) map.get(mainLine[i]))));
+						} else {
+							cell.setCellValue("");
+						}
+						break;
+					case "ROWNUM":
+						cell.setCellValue(((int) Double.parseDouble(checkIsNull(map, mainLine[i]).toString())) + ""); 
+						break;
+					case "CUST_ID":
+						cell.setCellValue(DataFormat.getCustIdMaskForHighRisk(checkIsNull(map, mainLine[i])));
+						break;
+					case "SPECIFIC_FLAG":
+					case "STAFF_THERE_FLAG":
+					case "OBO_CUST_FLAG":
+					case "AVOID_FLAG":
+					case "NEARBY_CUST_FLAG":
+					case "VIOLATION_FLAG":
+						cell.setCellValue(flagFormat(map, mainLine[i]));
+						break;
+					case "NOTE":
+						String note = (String) xmlInfo.getVariable("PMS.CHECK_TYPE", (String) map.get("NOTE_TYPE"), "F3");
+
+						if (null != map.get("NOTE_TYPE") && StringUtils.equals("O", (String) map.get("NOTE_TYPE"))) {
+							note = note + "：" + StringUtils.defaultString((String) map.get(mainLine[i]));
+						}
+						
+						cell.setCellValue((StringUtils.isNotEmpty(note) ? note : ""));
+						break;
+					case "RECORD_SEQ":
+						cell.setCellValue(checkIsNull(map, mainLine[i]) + "");
+						break;
+					default:
+						cell.setCellValue(checkIsNull(map, mainLine[i]));
+						break;
+				}
+			}
+
+			index++;
+		}
+
+		workbook.write(new FileOutputStream(filePath));
+
+		notifyClientToDownloadFile(DataManager.getSystem().getPath().get("temp").toString() + uuid, fileName);
+
 		this.sendRtnObject(null);
 	}
 

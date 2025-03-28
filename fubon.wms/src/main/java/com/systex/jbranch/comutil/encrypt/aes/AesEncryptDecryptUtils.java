@@ -15,15 +15,8 @@ public class AesEncryptDecryptUtils {
 	public static final String AES_ENCRYPT = "AES";
 	public static final String AES_ECB_PKCS7_PADDING = "AES/ECB/PKCS7Padding";
 	public static final String AES_CBC_PKCS5_PADDING = "AES/CBC/PKCS5Padding";
-	
-	
-	public static void main(String[] args) throws Exception {
-		String encrypt = AesEncryptDecryptUtils
-		.encryptAesEcbPkcs7Padding("6ed98832ff72eaf7", "03689902");
-		System.out.println(encrypt);
-//		AesEncryptDecryptUtils.decryptAesEcbPkcs7Padding();
-	}
-    
+	public static final String AES_ECB_PKCS5_PADDING = "AES/ECB/PKCS5Padding";
+	    
 	/** AES NO PADDING encrypt 128 **/
     public static String encryptAes128(String key ,String val) throws Exception {
     	return encryptAes(key , val , 128);
@@ -143,5 +136,36 @@ public class AesEncryptDecryptUtils {
         }
         
         return bkey;
+    }
+    
+    /** AES ECB_PKCS5_PADDING 加密 **/
+    public static String encryptAesEcbPkcs5Padding(String secretKey , String val) throws Exception {
+    	String encryptData = encryptAesEcbPkcs5Padding(secretKey.getBytes("UTF-8") , val);
+	    return encryptData.replace('/', '_').replace('+', '-');
+    }
+
+    /** AES ECB_PKCS5_PADDING 解密 **/
+    public static String decryptAesEcbPkcs5Padding(String secretKey , String val) throws Exception{
+    	val = val.replace('_', '/').replace('-', '+');
+	    return decryptAesEcbPkcs5Padding(secretKey.getBytes("UTF-8") , val);
+    }
+    
+    public static String encryptAesEcbPkcs5Padding(byte [] keyBytes , String val) throws Exception{
+	    Cipher cipher = doGetAesEcbPkcs5PaddingCipher(Cipher.ENCRYPT_MODE , keyBytes);
+	    return new String(Base64.encode(cipher.doFinal(val.getBytes("UTF-8"))));
+    }
+    
+    public static String decryptAesEcbPkcs5Padding(byte [] keyBytes , String val) throws Exception{
+	    Cipher cipher = doGetAesEcbPkcs5PaddingCipher(Cipher.DECRYPT_MODE , keyBytes);
+	    return new String(cipher.doFinal(Base64.decode(val)));
+    }
+    
+    public static Cipher doGetAesEcbPkcs5PaddingCipher(int model , byte[] keyBytes) throws Exception{
+    	Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    	SecretKeySpec key = new SecretKeySpec(keyBytes , AES_ENCRYPT);
+ 	    Cipher cipher = Cipher.getInstance(AES_ECB_PKCS5_PADDING);
+ 	    cipher = Cipher.getInstance(AES_ECB_PKCS5_PADDING);
+ 	    cipher.init(model , key);
+ 	    return cipher;
     }
 }

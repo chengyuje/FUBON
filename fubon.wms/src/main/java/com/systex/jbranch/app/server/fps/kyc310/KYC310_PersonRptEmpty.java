@@ -1044,31 +1044,43 @@ public class KYC310_PersonRptEmpty extends FubonWmsBizLogic {
             int page = writer.getPageNumber();
             
             try {
-            	tBarCode = new PdfPTable(4);
+            	tBarCode = new PdfPTable(5);
                 tBarCode.setTotalWidth(545);
                 PdfContentByte cb = writer.getDirectContent();
             	//#2252_調整KYC問卷條碼及版次
                 if(page == 1) {
-                	// barcode - page
-                    Barcode39 code39 = new Barcode39();
-                    code39.setCode("88-0402-99");
-                    code39.setBarHeight(17);
-                    code39.setSize(7);
-
-                    PdfPCell cell = new PdfPCell();
-                    cell.setFixedHeight(30);
-                    cell.setPadding(0);
-                    cell.setBorderWidth(0);
-                    cell.addElement(code39.createImageWithBarcode(cb, null, null));
-
-                    PdfPCell blank = new PdfPCell();
+                	PdfPCell blank = new PdfPCell();
                     blank.setBorderWidth(0);
                     blank.setFixedHeight(10);
+                    
+                    Barcode39 code39;
+                    PdfPCell cell;
+                    
+					// Barcode 99
+					code39 = new Barcode39();
+					code39.setCode("88-0402-99");
+					code39.setBarHeight(18);
+					code39.setSize(8);
+					cell = getPdfCell(code39, cb);
+					tBarCode.addCell(cell);
+                    tBarCode.addCell(blank);
 
-                    tBarCode.addCell(cell);
-					for (int i = 0; i < tBarCode.getNumberOfColumns(); i++) {
-						tBarCode.addCell(blank);
-					}
+					// Barcode CustID
+					code39 = new Barcode39();
+					code39.setCode(inputVO.getCUST_ID());
+					code39.setBarHeight(18);
+					code39.setSize(8);
+					cell = getPdfCell(code39, cb);
+					tBarCode.addCell(cell);
+					tBarCode.addCell(blank);
+
+					// Barcode Date
+					code39 = new Barcode39();
+					code39.setCode(twYear + month + day);
+					code39.setBarHeight(13.4f);
+					code39.setSize(6);
+					cell = getPdfCell(code39, cb);
+					tBarCode.addCell(cell);
                 }
                 
                 // page num
@@ -1121,6 +1133,17 @@ public class KYC310_PersonRptEmpty extends FubonWmsBizLogic {
             text.add(chunk);
             ColumnText.showTextAligned(total, Element.ALIGN_LEFT, text, 3, 2, 0);
         }
+        
+        
+        public PdfPCell getPdfCell(Barcode39 code39, PdfContentByte cb) {
+        	PdfPCell cell = new PdfPCell();
+            cell.setFixedHeight(30);
+            cell.setPadding(0);
+            cell.setBorderWidth(0);
+            cell.addElement(code39.createImageWithBarcode(cb, null, null));
+            return cell;
+        }
+        
     }
     
     public PdfPTable getQ3Ans() throws Exception {

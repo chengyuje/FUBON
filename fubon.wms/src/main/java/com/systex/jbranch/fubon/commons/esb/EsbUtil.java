@@ -8,6 +8,7 @@ import com.systex.jbranch.fubon.commons.esb.vo.TxHeadVO;
 import com.systex.jbranch.fubon.commons.esb.xml.parse.EsbXmlParseUtil;
 import com.systex.jbranch.fubon.commons.tx.tool.Journal;
 import com.systex.jbranch.fubon.commons.tx.tool.Navigation;
+import com.systex.jbranch.fubon.jlb.DataFormat;
 import com.systex.jbranch.fubon.jlb.FmpJRunTx;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
@@ -15,6 +16,7 @@ import com.systex.jbranch.platform.common.errHandle.DAOException;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.common.platformdao.table.TBSYSPARAMETERVO;
 import com.systex.jbranch.platform.common.util.PlatformContext;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ObjectUtils;
@@ -28,9 +30,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.xml.bind.JAXBContext;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -597,6 +599,11 @@ public class EsbUtil extends FubonWmsBizLogic {
 
 		if (StringUtils.isBlank(content))
 			throw new Exception(sendType + "電文內容為空");
+		DataFormat dfObj = new DataFormat();
+		
+		
+		// 遮罩CUST_ID
+		content = dfObj.maskXml(content, "CUST_?[IN][DO]");
 
 		String hstano = isSendTop ? fmpJRunTx.getInboundXML().getChild("TxHead").getChildText("HSTANO") : fmpJRunTx.getOutboundXML().getChild("TxHead").getChildText("HSTANO");
 

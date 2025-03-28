@@ -114,6 +114,13 @@ public class TBIOT_MAINVO
   private String OTH_FUND_PURPOSE_RMK_1;
   private String OTH_FUND_PURPOSE_RMK_2;
   
+  private String PAY_SERV_RETURN_CODE;
+  private String PAY_SERV_REMIT_NATNO;
+  private String REMIT_COUNTRY_FLAG;
+  private String FUND_VERIFY_PDF_YN;
+  private String FUND_VERIFY_PAPER_YN;
+  private String NO_PAPER_YN;
+  
   public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBIOT_MAIN";
 
   public String getTableuid()
@@ -1203,6 +1210,54 @@ public class TBIOT_MAINVO
 
 	public void setOTH_FUND_PURPOSE_RMK_2(String oTH_FUND_PURPOSE_RMK_2) {
 		OTH_FUND_PURPOSE_RMK_2 = oTH_FUND_PURPOSE_RMK_2;
+	}
+
+	public String getPAY_SERV_RETURN_CODE() {
+		return PAY_SERV_RETURN_CODE;
+	}
+
+	public void setPAY_SERV_RETURN_CODE(String pAY_SERV_RETURN_CODE) {
+		PAY_SERV_RETURN_CODE = pAY_SERV_RETURN_CODE;
+	}
+
+	public String getPAY_SERV_REMIT_NATNO() {
+		return PAY_SERV_REMIT_NATNO;
+	}
+
+	public void setPAY_SERV_REMIT_NATNO(String pAY_SERV_REMIT_NATNO) {
+		PAY_SERV_REMIT_NATNO = pAY_SERV_REMIT_NATNO;
+	}
+
+	public String getREMIT_COUNTRY_FLAG() {
+		return REMIT_COUNTRY_FLAG;
+	}
+
+	public void setREMIT_COUNTRY_FLAG(String rEMIT_COUNTRY_FLAG) {
+		REMIT_COUNTRY_FLAG = rEMIT_COUNTRY_FLAG;
+	}
+
+	public String getFUND_VERIFY_PDF_YN() {
+		return FUND_VERIFY_PDF_YN;
+	}
+
+	public void setFUND_VERIFY_PDF_YN(String fUND_VERIFY_PDF_YN) {
+		FUND_VERIFY_PDF_YN = fUND_VERIFY_PDF_YN;
+	}
+
+	public String getFUND_VERIFY_PAPER_YN() {
+		return FUND_VERIFY_PAPER_YN;
+	}
+
+	public void setFUND_VERIFY_PAPER_YN(String fUND_VERIFY_PAPER_YN) {
+		FUND_VERIFY_PAPER_YN = fUND_VERIFY_PAPER_YN;
+	}
+
+	public String getNO_PAPER_YN() {
+		return NO_PAPER_YN;
+	}
+
+	public void setNO_PAPER_YN(String nO_PAPER_YN) {
+		NO_PAPER_YN = nO_PAPER_YN;
 	}
 	
 }

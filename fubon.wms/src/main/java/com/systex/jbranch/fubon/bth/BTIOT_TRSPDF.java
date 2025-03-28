@@ -226,6 +226,92 @@ public class BTIOT_TRSPDF extends BizLogic {
 		}
 	}
 	
+	//無紙化案件上傳集中登打作業系統
+	public void noPaperDaily(Object body, IPrimitiveMap<?> header) throws Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		String yyyyMMdd = sdf.format(new Date());
+		// 根據以下SQL產生 XML資料 及 TIFF檔
+		dam = this.getDataAccessManager();
+		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT B.CUST_ID, TO_CHAR(B.APPLY_DATE, 'YYYYMMDD') as IOT_VALIDDATE, B.INS_ID, C.PDF_FILE ");
+		sb.append(" FROM TBIOT_MAIN B ");
+		sb.append(" INNER JOIN TBIOT_MAIN_PDF C ON B.INS_KEYNO = C.INS_KEYNO ");
+		sb.append(" WHERE TO_CHAR(B.AFT_SIGN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD') ");
+		qc.setQueryString(sb.toString());
+		List<Map<String, Object>> list = dam.exeQuery(qc);
+		
+		String tempPath = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH) + "reports" + File.separator;
+		int i = 0;
+		if (list.size() > 0) {
+			for (Map<String, Object> map : list) {
+				// 每個保險文件編號都要有一個『保險文件編號_要保書申請日.zip』ex.70423A001_20240523.zip，裡面放：保險文件編號.xml、保險文件編號.tiff
+				// 檔名為保險文件編號
+				String ins_id = map.get("INS_ID").toString().toUpperCase();
+				String fileName = ins_id + "_" + map.get("IOT_VALIDDATE").toString();
+				String xmlName = ins_id + ".xml";
+				String pdfName = ins_id + ".pdf";
+				
+				// 1. 建一個 INS_ID_IOT_VALIDDATE (保險文件編號_要保書申請日 ex.70423A001_20240523)資料夾
+				// 若此目錄不存在，則建立之 (裡面放：ins_id.xml、ins_id.tiff)
+				String filePath = tempPath + fileName;
+				File path = new File(filePath); 
+				if (!path.exists()) {
+					path.mkdir();
+				}
+				
+				File xmlFile = new File(filePath + File.separator + xmlName);
+				//若檔案已存在則刪除重新產生
+				if (xmlFile.exists()) xmlFile.delete();
+				xmlFile.createNewFile();
+				
+				// 2. 先將 XML 放至：保險文件編號_要保書申請日資料夾中 ex.70423A001_20240523
+				// 將名單寫到檔案
+				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(xmlFile, true), "UTF-8"));	// UTF-8編碼
+				
+				writer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+				writer.append("\r\n");
+				writer.append("<indexattribute>");
+				writer.append("\r\n");
+				writer.append("<id>" + map.get("CUST_ID") + "</id>");
+				writer.append("\r\n");
+				writer.append("<validdate>" + map.get("IOT_VALIDDATE") + "</validdate>");
+				writer.append("\r\n");
+				writer.append("<cBarcode>52-1015-99</cBarcode>");
+				writer.append("\r\n");
+				writer.append("<accno>" + map.get("INS_ID") + "</accno>");
+				writer.append("\r\n");
+				writer.append("</indexattribute>");
+				writer.close();
+				
+				// 下載PDF
+				if (null != map.get("PDF_FILE")) {
+					Blob blob = (Blob) map.get("PDF_FILE");
+					int blobLength = (int) blob.length();
+					byte[] blobAsBytes = blob.getBytes(1, blobLength);
+					
+					String pdfFilePath = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH) + "reports";
+					File targetFile = new File(pdfFilePath, pdfName);
+					FileOutputStream fos = new FileOutputStream(targetFile);
+					fos.write(blobAsBytes);
+					fos.close();
+					
+					// 3. 將 PDF 轉 TIFF 後放至：保險文件編號_要保書申請日 ex.70423A001_20240523
+					String pdfPath  = pdfFilePath + File.separator + pdfName;
+					// pdf 轉 tiff
+					// 參數：pdf目錄(含.pdf)、結果目錄
+					this.PdfToTiffConverter(pdfPath, filePath);
+					
+					// 4. 壓縮 70423A001_20240523 放至：D:\\INS_PDF
+					// xml、tiff 產生完畢打包成一個 [INS_ID]_[IOT_VALIDDATE].zip檔
+					// 參數：要壓縮的檔案路徑, 壓縮至何處, 壓縮檔名稱
+					this.zipFiles(filePath, "D:\\INS_PDF", fileName);
+				}
+				i++;
+			}
+		}
+	}
+	
 	public void PdfToTiffConverter(String pdfFilePath, String tiffFilePath) {
 		String dpi = "150";  // the resolution of the output image in DPI
 		

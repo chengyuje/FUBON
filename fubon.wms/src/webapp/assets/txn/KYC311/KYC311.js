@@ -197,15 +197,6 @@ eSoafApp.controller('KYC311Controller', function(
 		});
 	}
 	
-	//列印客戶風險屬性評估問卷差異說明
-	$scope.saveandPrintData_COMP = function(){
-		$scope.sendRecv("KYC311" , "print_COMP" , $scope.kyc311inputvo , $scope.inputVO , function(tota,isError){
-    		if (isError) {
-    			$scope.showErrorMsg(tota[0].body.msgData);
-    		}
-		});
-	}
-	
 	//刪除
 	$scope.deleteData = function(){
 		if(!$scope.checkBoss()){

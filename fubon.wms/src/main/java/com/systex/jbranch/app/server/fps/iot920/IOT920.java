@@ -1,6 +1,7 @@
 package com.systex.jbranch.app.server.fps.iot920;
 
 
+import com.systex.jbranch.app.common.fps.table.TBSYS_WEB_SERVICE_LOGVO;
 import com.systex.jbranch.app.server.fps.crm681.CRM681;
 import com.systex.jbranch.app.server.fps.crm681.CRM681InputVO;
 import com.systex.jbranch.app.server.fps.crm681.CRM681OutputVO;
@@ -38,9 +39,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.sql.Clob;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import javax.sql.rowset.serial.SerialClob;
+import javax.sql.rowset.serial.SerialException;
 
 /**
  * IOT920
@@ -333,13 +339,15 @@ public class IOT920 extends FubonWmsBizLogic{
 							
 							qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 							sb = new StringBuilder();
-							sb.append(" Select cust_name,birth_date,AO_CODE From TBCRM_CUST_MAST ");
+							sb.append(" Select CUST_NAME, BIRTH_DATE, AO_CODE From TBCRM_CUST_MAST ");
 							sb.append(" Where cust_id = :cust_id ");
 							qc.setObject("cust_id", inputVO.getCUST_ID().toUpperCase());
 							qc.setQueryString(sb.toString());
 							List<Map<String, Object>> tempList = dam_obj.exeQuery(qc);
 							// 2018/1/9 TBCRM_CUST_MAST change old BIRTH_DATE
-							if(CollectionUtils.isNotEmpty(tempList)) {
+							if(CollectionUtils.isNotEmpty(tempList) &&
+									StringUtils.isNotBlank(ObjectUtils.toString(tempList.get(0).get("CUST_NAME"))) && //客戶姓名或生日為空，則為非本行客戶
+									tempList.get(0).get("BIRTH_DATE") != null) {
 								for(Map<String, Object> map : tempList) {
 									if(map.get("BIRTH_DATE") != null) {
 										map.put("BIRTHDAY", map.get("BIRTH_DATE"));
@@ -367,7 +375,7 @@ public class IOT920 extends FubonWmsBizLogic{
 							} else {
 								tempList = new ArrayList<Map<String, Object>>();
 								Map<String, Object> map = new HashMap<String, Object>();
-								map.put("PROPOSER_CM_FLAG", "10");	//不在客戶主檔中，非本行客戶
+								map.put("PROPOSER_CM_FLAG", "10");	//不在客戶主檔中，非本行客戶 or 客戶姓名或生日為空，則為非本行客戶
 								map.put("UNDER_YN", UNDER_YN);
 								map.put("PRO_YN", PRO_YN);
 								map.put("CUST_REMARKS", CUST_REMARKS);
@@ -403,8 +411,10 @@ public class IOT920 extends FubonWmsBizLogic{
 							//取得保險庫存金額
 							CRM681 crm681 = (CRM681) PlatformContext.getBean("crm681");
 							outputVO.setINS_ASSET((crm681.inquire(inputVO.getCUST_ID())).getInsurance());
-							
-							outputVO.setINCOME3(getIncome3(inputVO.getCUST_ID().toUpperCase()));
+							//授信收入、最近授信收入維護日
+							Map<String, Object> creditMap = getCreditData(inputVO.getCUST_ID(), inputVO.getAPPLY_DATE());
+							outputVO.setINCOME3((BigDecimal) creditMap.get("income3"));
+							outputVO.setCREDIT_LASTUPDATE((Date) creditMap.get("creditLastUpdate"));
 							
 							//取得要保人高資產註記
 							CustHighNetWorthDataVO hnwcData = new CustHighNetWorthDataVO();
@@ -447,14 +457,16 @@ public class IOT920 extends FubonWmsBizLogic{
 							List<Map<String, Object>> insuredList = new ArrayList<Map<String,Object>>();
 							qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 							sb = new StringBuilder();
-							sb.append(" Select cust_name,birth_date,gender From TBCRM_CUST_MAST ");
+							sb.append(" Select CUST_NAME, BIRTH_DATE, gender From TBCRM_CUST_MAST ");
 							sb.append(" Where cust_id = :insured_id ");
 							qc.setObject("insured_id", inputVO.getINSURED_ID().toUpperCase());
 							qc.setQueryString(sb.toString());
 							insuredList = dam_obj.exeQuery(qc);
 							// 2018/1/9 TBCRM_CUST_MAST change old BIRTH_DATE
 
-							if(CollectionUtils.isNotEmpty(insuredList)) {
+							if(CollectionUtils.isNotEmpty(insuredList) &&
+									StringUtils.isNotBlank(ObjectUtils.toString(insuredList.get(0).get("CUST_NAME"))) && //客戶姓名或生日為空，則為非本行客戶
+									insuredList.get(0).get("BIRTH_DATE") != null) {
 								for(Map<String, Object> map : insuredList) {
 									if(map.get("BIRTH_DATE") != null) {
 										map.put("BIRTHDAY", map.get("BIRTH_DATE"));
@@ -478,7 +490,7 @@ public class IOT920 extends FubonWmsBizLogic{
 							} else {
 								insuredList = new ArrayList<Map<String, Object>>();
 								Map<String, Object> map = new HashMap<String, Object>();
-								map.put("INSURED_CM_FLAG", "10");	//不在客戶主檔中，非本行客戶
+								map.put("INSURED_CM_FLAG", "10");	//不在客戶主檔中，非本行客戶 or 客戶姓名或生日為空，則為非本行客戶
 								map.put("UNDER_YN", UNDER_YN);
 								map.put("PRO_YN", PRO_YN);
 								map.put("I_LOAN_CHK1_YN", I_LOAN_CHK1_YN);
@@ -497,8 +509,10 @@ public class IOT920 extends FubonWmsBizLogic{
 								insuredList.add(map);
 							}
 							outputVO.setINSURED_NAME(insuredList);
-
-							outputVO.setINCOME3(getIncome3(inputVO.getINSURED_ID().toUpperCase()));
+							//授信收入、最近授信收入維護日
+							Map<String, Object> creditMap = getCreditData(inputVO.getINSURED_ID(), inputVO.getAPPLY_DATE());
+							outputVO.setINCOME3((BigDecimal) creditMap.get("income3"));
+							outputVO.setCREDIT_LASTUPDATE((Date) creditMap.get("creditLastUpdate"));
 						}else{
 							errorMsg = "ehl_01_common_030";
 							throw new APException(errorMsg);
@@ -614,13 +628,15 @@ public class IOT920 extends FubonWmsBizLogic{
 							List<Map<String, Object>> payerList = new ArrayList<Map<String,Object>>();
 							qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 							sb = new StringBuilder();
-							sb.append(" Select cust_name,AO_CODE, birth_date From TBCRM_CUST_MAST ");
+							sb.append(" Select CUST_NAME, AO_CODE, BIRTH_DATE From TBCRM_CUST_MAST ");
 							sb.append(" Where cust_id = :payer_id ");
 							qc.setObject("payer_id", inputVO.getPAYER_ID().toUpperCase());
 							qc.setQueryString(sb.toString());
 							payerList = dam_obj.exeQuery(qc);
 
-							if(CollectionUtils.isNotEmpty(payerList)) {
+							if(CollectionUtils.isNotEmpty(payerList) &&
+									StringUtils.isNotBlank(ObjectUtils.toString(payerList.get(0).get("CUST_NAME"))) && //客戶姓名或生日為空，則為非本行客戶
+									payerList.get(0).get("BIRTH_DATE") != null) {
 								for(Map<String, Object> map : payerList) {
 									if(map.get("BIRTH_DATE") != null) {
 										map.put("BIRTHDAY", map.get("BIRTH_DATE"));
@@ -642,7 +658,7 @@ public class IOT920 extends FubonWmsBizLogic{
 							} else {
 								payerList = new ArrayList<Map<String, Object>>();
 								Map<String, Object> map = new HashMap<String, Object>();
-								map.put("PAYER_CM_FLAG", "10");	//不在客戶主檔中，非本行客戶
+								map.put("PAYER_CM_FLAG", "10");	//不在客戶主檔中，非本行客戶 or 客戶姓名或生日為空，則為非本行客戶
 								map.put("UNDER_YN", UNDER_YN);
 								map.put("PRO_YN", PRO_YN);
 								map.put("LOAN_CHK1_YN", LOAN_CHK1_YN);
@@ -1533,20 +1549,19 @@ public class IOT920 extends FubonWmsBizLogic{
 
 		return (CollectionUtils.isEmpty(dList) ? null : (Date)dList.get(0).get("CLS_DTE"));
 	}
-
+	
 	/***
-	 * 取得工作年收入(授信) -- 來源: 徵審系統
-	 * 個金與法金都要看，取異動日期最近的那一筆收入
+	 * 取得工作年收入(授信)、最近授信收入維護日 -- 來源: 徵審系統
+	 * 個金與法金都要看，取得要保書申請日-365日內，金額>0的那一筆資料
 	 * @param custID
 	 * @return
 	 * @throws JBranchException
 	 * @throws DAOException
 	 */
-	public BigDecimal getIncome3(String custID) throws DAOException, JBranchException {
+	public Map<String, Object> getCreditData(String custID, Date applyDate) throws DAOException, JBranchException {
+		Map<String, Object> map = new HashMap<String, Object>();
 		BigDecimal income3 = BigDecimal.ZERO;
-
-		if(StringUtils.isBlank(custID))
-			return income3;
+		Date creditLastUpdate = null;
 
 		dam_obj = getDataAccessManager();
 		QueryConditionIF qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -1555,7 +1570,8 @@ public class IOT920 extends FubonWmsBizLogic{
 		//20201027因法金徵審客戶ID檔會回傳多筆資訊，將子查詢語法的=改成in
 		sb.append("SELECT UPD_DATETIME AS SNAP_DATE, NVL(ANNUAL_INCOME, 0) AS INCOME, 'TWD' AS CURR_CODE ");
 		sb.append("  FROM TBCRM_TB_CASE_CRD_CUSTINFO ");	//個金徵審客戶資訊檔
-		sb.append("  WHERE CUST_ID = :custId AND UPD_DATETIME IS NOT NULL ");
+		sb.append("  WHERE CUST_ID = :custId AND UPD_DATETIME IS NOT NULL AND NVL(ANNUAL_INCOME, 0) > 0 ");
+		sb.append("  AND TRUNC(UPD_DATETIME) BETWEEN (TRUNC(:applyDate) - 365) AND TRUNC(:applyDate) ");
 		sb.append("UNION ");
 		sb.append("SELECT A.UPD_DT AS SNAP_DATE, (NVL(A.REAL_AMT, 0) * NVL(B.SEL_RATE, 1)) AS INCOME, A.REAL_CURR AS CURR_CODE ");
 		sb.append("  FROM TBCRM_TB_CCSM_CUSTB A ");			//法金徵審客戶資訊檔(公司戶)
@@ -1563,7 +1579,8 @@ public class IOT920 extends FubonWmsBizLogic{
 		sb.append("WHERE A.CUST_SYSID IN (SELECT CUST_SYSID  ");
 		sb.append("                       FROM TBCRM_TB_CCSM_ID_CUST ");	//法金徵審客戶ID檔
 		sb.append("                      WHERE JCIC_CD = :custId) ");
-		sb.append("      AND A.REAL_CURR IS NOT NULL AND A.UPD_DT IS NOT NULL ");
+		sb.append("      AND A.REAL_CURR IS NOT NULL AND A.UPD_DT IS NOT NULL AND NVL(A.REAL_AMT, 0) > 0 ");
+		sb.append("  	 AND TRUNC(A.UPD_DT) BETWEEN (TRUNC(:applyDate) - 365) AND TRUNC(:applyDate) ");
 		sb.append("UNION ");
 		sb.append("SELECT A.UPD_DT AS SNAP_DATE, (NVL(A.INCO_AMT, 0) * NVL(B.SEL_RATE, 1)) AS INCOME, A.INCO_CURR AS CURR_CODE ");
 		sb.append("  FROM TBCRM_TB_CCSM_CUSTP A ");			//法金徵審客戶資訊檔(個人戶)
@@ -1571,17 +1588,23 @@ public class IOT920 extends FubonWmsBizLogic{
 		sb.append("WHERE A.CUST_SYSID IN (SELECT CUST_SYSID  ");
 		sb.append("                       FROM TBCRM_TB_CCSM_ID_CUST ");	//法金徵審客戶ID檔
 		sb.append("                      WHERE JCIC_CD = :custId) ");
-		sb.append("      AND A.INCO_CURR IS NOT NULL AND A.UPD_DT IS NOT NULL ");
+		sb.append("      AND A.INCO_CURR IS NOT NULL AND A.UPD_DT IS NOT NULL AND NVL(A.INCO_AMT, 0) > 0 ");
+		sb.append("  	 AND TRUNC(A.UPD_DT) BETWEEN (TRUNC(:applyDate) - 365) AND TRUNC(:applyDate) ");
 		sb.append("ORDER BY SNAP_DATE DESC ");
 		qc.setObject("custId", custID);
+		qc.setObject("applyDate", new Timestamp(applyDate.getTime()));
 		qc.setQueryString(sb.toString());
 		chkList = dam_obj.exeQuery(qc);
 
 		if(CollectionUtils.isNotEmpty(chkList)) {
 			income3 = new BigDecimal(chkList.get(0).get("INCOME").toString());
+			creditLastUpdate = (Date)chkList.get(0).get("SNAP_DATE");
 		}
 
-		return income3;
+		map.put("income3", income3);
+		map.put("creditLastUpdate", creditLastUpdate);
+		
+		return map;
 	}
 
 	/***
@@ -1854,4 +1877,33 @@ public class IOT920 extends FubonWmsBizLogic{
 
 		return fuTotal;
 	}
+	
+	//寫入WebServiceLog資料檔
+	public void writeWebServiceLog(String txnID, String url, String header, String requestData, String responseData) throws JBranchException, SerialException, SQLException {
+		Clob requestClob = new SerialClob(requestData.toCharArray());
+		Clob responseClob = new SerialClob(responseData.toCharArray());
+		dam_obj = this.getDataAccessManager();
+		
+		TBSYS_WEB_SERVICE_LOGVO logVO = new TBSYS_WEB_SERVICE_LOGVO();
+		logVO.setSEQ(getWSLogSeqNo());
+		logVO.setTXN_ID(txnID);
+		logVO.setHEADER(header);
+		logVO.setWS_URL(url);
+		logVO.setREQUEST_MSG(requestClob);
+		logVO.setRESPONSE_MSG(responseClob);
+		dam_obj.create(logVO);
+	}
+	
+	//取得WebServiceLog資料檔主鍵
+	public BigDecimal getWSLogSeqNo() throws JBranchException {
+		dam_obj = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam_obj.getQueryCondition();
+		StringBuffer sql = new StringBuffer();
+		sql.append("SELECT TBSYS_WEB_SERVICE_LOG_SEQ.NEXTVAL AS SEQ FROM  DUAL ");
+		queryCondition.setQueryString(sql.toString());
+		List<Map<String, Object>> list = dam_obj.exeQuery(queryCondition);
+		BigDecimal seqNo = (BigDecimal) list.get(0).get("SEQ");
+		return seqNo;
+	}
+	
 }

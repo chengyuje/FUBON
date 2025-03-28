@@ -498,8 +498,10 @@ background-image: url("assets/images/magnifier.jpg");
     			<tr>
 					<td style="width: 10%;">AML風險等級:</td>
     				<td>{{inputVO.AML}}</td>
-    				<td style="width: 10%;">Pre-check結果:</td>
-    				<td colspan="5">{{inputVO.PRECHECK}}</td>
+    				<td style="width: 10%;">新增業務關係:</td>
+    				<td colspan="5">{{inputVO.BUSINESS_REL}}</td>
+<!--     				<td style="width: 10%;">Pre-check結果:</td> -->
+<!--     				<td colspan="5">{{inputVO.PRECHECK}}</td> -->
     			</tr>
     			<tr>
 					<td style="width: 10%;">*業報年收入(工作+其他):</td>
@@ -508,8 +510,9 @@ background-image: url("assets/images/magnifier.jpg");
     				<td><input type="text" id="cKycIncome" style="width: 150px; " ng-model="inputVO.C_KYC_INCOME" ng-disabled="true"></td>
     				<td style="width: 10%;">授信收入:</td>
     				<td>{{inputVO.PROPOSER_INCOME3 | number:0}}</td>
-    				<td style="width: 10%;">最近撥貸日:</td>
-    				<td>{{inputVO.C_LOAN_CHK2_DATE | date:'yyyy-MM-dd'}}</td>
+    				<td style="width: 10%;">最近授信收入維護日:</td>
+<!--     				<td>{{inputVO.C_LOAN_CHK2_DATE | date:'yyyy-MM-dd'}}</td> 最近撥貸日 -->
+    				<td>{{inputVO.C_CREDIT_LASTUPDATE | date:'yyyy-MM-dd'}}</td>
     			</tr>
     			<tr>
 					<td style="width: 10%;">保單借款檢核:<br>(透過本行送件)</td>
@@ -596,8 +599,9 @@ background-image: url("assets/images/magnifier.jpg");
     				<td><input type="text" id="iKycIncome" style="width: 150px; " ng-model="inputVO.I_KYC_INCOME" ng-disabled="true"></td>
     				<td style="width: 10%;">授信收入:</td>
     				<td>{{inputVO.INSURED_INCOME3 | number:0}}</td>
-    				<td style="width: 10%;">最近撥貸日:</td>
-    				<td>{{inputVO.I_LOAN_CHK2_DATE | date:'yyyy-MM-dd'}}</td>
+    				<td style="width: 10%;">最近授信收入維護日:</td>
+<!--     				<td>{{inputVO.I_LOAN_CHK2_DATE | date:'yyyy-MM-dd'}}</td> 最近撥貸日 -->
+    				<td>{{inputVO.I_CREDIT_LASTUPDATE | date:'yyyy-MM-dd'}}</td>
     			</tr>
     			<tr>
 					<td style="width: 10%;">保單借款檢核:<br>(透過本行送件)</td>
@@ -814,18 +818,18 @@ background-image: url("assets/images/magnifier.jpg");
 							ng-editable="false"
 							ng-format="F3"
 							ng-required="true"
-							ng-change=""
 							width="250px"
 							style="line-height:20px;"
+							ng-change="validateSeniorAuthOPT4();"
 							ng-disabled="!brhmgrAuthing"/>
 		    		</td>
     			</tr>
 				<tr>
     				<td style="width: 10%;">高齡客戶投保關懷說明</td>
     				<td colspan="5" width="82%"><textarea type="text" id="seniorAuthRemarks" style="width: 100%; " maxlength="100" 
-    					ng-model="inputVO.SENIOR_AUTH_REMARKS" ng-disabled="!brhmgrAuthing || inputVO.SENIOR_AUTH_OPT3 == '2' || inputVO.SENIOR_AUTH_OPT3 == '1'"></textarea></td>
+    					ng-model="inputVO.SENIOR_AUTH_REMARKS" ng-disabled="!brhmgrAuthing || ((inputVO.SENIOR_AUTH_OPT3 == '2' || inputVO.SENIOR_AUTH_OPT3 == '1') && inputVO.SENIOR_AUTH_OPT4 != '2')"></textarea></td>
     				<td style="width: 10%;">關懷主管員編</td>
-    				<td><input type="text" id="seniorAuthId" name="seniorAuthId" ng-model="inputVO.SENIOR_AUTH_ID" ng-disabled="!brhmgrAuthing || inputVO.SENIOR_AUTH_OPT3 == '2'" maxlength="10"></td>
+    				<td><input type="text" id="seniorAuthId" name="seniorAuthId" ng-model="inputVO.SENIOR_AUTH_ID" ng-disabled="!brhmgrAuthing || (inputVO.SENIOR_AUTH_OPT3 == '2' && inputVO.SENIOR_AUTH_OPT4 != '2')" maxlength="10"></td>
     			</tr>
     			
     			<tr>
@@ -944,8 +948,10 @@ background-image: url("assets/images/magnifier.jpg");
 			    <tr>
 					<td style="width: 18%;">AML風險等級:</td>
     				<td>{{inputVO.AML}}</td>
-    				<td style="width: 18%;">Pre-check結果:</td>
-    				<td>{{inputVO.PRECHECK}}</td>
+    				<td style="width: 18%;">新增業務關係:</td>
+    				<td>{{inputVO.BUSINESS_REL}}</td>
+<!--     				<td style="width: 18%;">Pre-check結果:</td> -->
+<!--     				<td>{{inputVO.PRECHECK}}</td> -->
     				<td style="width: 18%;">保險公司:</td>
     				<td>{{inputVO.INS_COM_NAME}}</td>
     			</tr>

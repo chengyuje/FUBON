@@ -643,32 +643,10 @@ public class KYC310 extends FubonWmsBizLogic{
 					outputVO.setCustEduHighSchool(sot701.getCustEduHighSchool(sot701vo));
 				}
 				
-//				//取得法代與年收入資料
-//				Map<String, String> legalRegMap = getData067050ByType(inputVO.getCUST_ID()); 
-//				//年收入
-//				BigDecimal yearIncome = BigDecimal.ZERO;
-//				if(StringUtils.isNotBlank(legalRegMap.get("INCOME_FROM_CBS"))) {
-//					try {
-//						yearIncome = new BigDecimal(legalRegMap.get("INCOME_FROM_CBS"));
-//					} catch(Exception e) {
-//						yearIncome = BigDecimal.ZERO;
-//					}
-//				}
-//				outputVO.setIncomeFromCBS(yearIncome); //端末系統留存的年收入
 				//未滿18歲自然人，取得法定代理人KYC
 				if(inputVO.getCUST_ID().length() >= 10 && age < 18) {
-					//取得法代與年收入資料
-					Map<String, String> legalRegMap = getData067050ByType(inputVO.getCUST_ID()); 
-					//年收入
-					BigDecimal yearIncome = BigDecimal.ZERO;
-					if(StringUtils.isNotBlank(legalRegMap.get("INCOME_FROM_CBS"))) {
-						try {
-							yearIncome = new BigDecimal(legalRegMap.get("INCOME_FROM_CBS"));
-						} catch(Exception e) {
-							yearIncome = BigDecimal.ZERO;
-						}
-					}
 					//取得法代資料
+					Map<String, String> legalRegMap = getData067050ByType(inputVO.getCUST_ID()); 
 					if(StringUtils.isNotBlank(legalRegMap.get("REP_RISK_1")) && StringUtils.isBlank(legalRegMap.get("REP_RISK_2"))) {
 						//法代1有風險屬性，法代2沒有；取法代1風險屬性
 						outputVO.setLegalRegKycLevel(legalRegMap.get("REP_RISK_1"));
@@ -683,7 +661,7 @@ public class KYC310 extends FubonWmsBizLogic{
 							outputVO.setLegalRegKycLevel(legalRegMap.get("REP_RISK_1"));
 						}
 					}
-				}else {outputVO.setIncomeFromCBS(BigDecimal.ZERO);}
+				}
 				
 				//依照類型取題目(法人、自然人)
 				List<Map<String, Object>> questList = queryQuestion(inputVO.getQUESTION_TYPE());//找題目
@@ -762,7 +740,6 @@ public class KYC310 extends FubonWmsBizLogic{
 						map.put("RISK_LIST", getDataAccessManager().exeQueryWithoutSort(qc));
 					}
 				}
-			
 				
 				//設定output題目答案
 				outputVO.setQuestionnaireList(questList);
@@ -1072,24 +1049,12 @@ public class KYC310 extends FubonWmsBizLogic{
 				
 				getPicture(inputVO);
 				String filePath = "";
-				KYC310InputVO test = new KYC310InputVO();
-				test.setEDUCATIONList(inputVO.getEDUCATIONList());
-				test.setCAREERList(inputVO.getCAREERList());
-				test.setMARRAGEList(inputVO.getMARRAGEList());
-				test.setCHILD_NOList(inputVO.getCHILD_NOList());
-				test.setSICK_TYPEList(inputVO.getSICK_TYPEList());
-				test.setQuest_list(inputVO.getQuest_list());
-				test.setCUST_ID("");
-				test.setEDUCATION("");
-				test.setCAREER("");
-				test.setMARRAGE("");
-				test.setCHILD_NO("");
-				test.setCUST_ADDR_1("");
+				
 				if(PRINT_QUESTIONNAIRE.equals(inputVO.getChk_type())){
 					//列印中文空白表單
 					if ("03".equals(inputVO.getQUESTION_TYPE())){	//法人中文
 						KYC310_CorpRptEmpty report = PlatformContext.getBean("kyc310CorpRptEmpty", KYC310_CorpRptEmpty.class);
-						report.setInputVO(test);
+						report.setInputVO(inputVO);
 						filePath = report.genBlankPDF();
 					} else {	//自然人中文
 						KYC310_PersonRptEmpty report = PlatformContext.getBean("kyc310PersonRptEmpty", KYC310_PersonRptEmpty.class);
@@ -1100,7 +1065,7 @@ public class KYC310 extends FubonWmsBizLogic{
 					//列印英文空白表單
 					if ("03".equals(inputVO.getQUESTION_TYPE())){	//法人英文
 						KYC310_CorpRptEmpty_ENG report = PlatformContext.getBean("kyc310CorpRptEmptyENG", KYC310_CorpRptEmpty_ENG.class);
-						report.setInputVO(test);
+						report.setInputVO(inputVO);
 						filePath = report.genBlankPDF();
 					} else {	//自然人英文
 						KYC310_PersonRptEmpty_ENG report = PlatformContext.getBean("kyc310PersonRptEmptyENG", KYC310_PersonRptEmpty_ENG.class);
@@ -1117,7 +1082,7 @@ public class KYC310 extends FubonWmsBizLogic{
 					PRDFitInputVO pdfInputVO = new PRDFitInputVO();
 					pdfInputVO.setCaseCode(2);
 					pdfInputVO.setCustId(inputVO.getCUST_ID());
-//					mergeUrl.addAll(new SotPdfContext(pdfInputVO, "sot813").getSotPdfULst());
+					mergeUrl.addAll(new SotPdfContext(pdfInputVO, "sot813").getSotPdfULst());
 				}
 				
 				String url = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), true, mergeUrl));
@@ -1466,30 +1431,7 @@ public class KYC310 extends FubonWmsBizLogic{
 				check.put("beforHEALTH", SICK_TYPE);
 				check.put("afterHEALTH", inputVO.getSICK_TYPE());
 				map2.put("HEALTH", check);
-			}				
-			//年收入比較
-			//第2題年收入勾選與端末系統留存年收入比較
-			boolean incomeChk = false;
-			String Q2AnsDesc = "";
-			if(CollectionUtils.isNotEmpty(questList)) {
-				List<Map<String, Object>> quest2 = (List<Map<String, Object>>) questList.get(1).get("ANSWER_LIST");
-				for(Map<String, Object> ans : quest2) {	//第2題答案
-					if(ans.get("select") != null && (boolean) ans.get("select")) {
-						String q2Ans = ans.get("ANSWER_SEQ").toString().trim().substring(0, 1);
-						Q2AnsDesc = ans.get("ANSWER_DESC").toString().trim();
-						incomeChk = getIncomeCBSChk(q2Ans, inputVO.getIncomeFromCBS());
-					}
-				}
 			}
-			Map<String, Object> incomeMap = new HashMap<String, Object>();
-			if(incomeChk) {
-				incomeMap.put("INCOMECBS_CHK", "Y");//檢核通過
-			} else {
-				incomeMap.put("INCOMECBS_CHK", "N");//KYC收入與端末收入不符
-				incomeMap.put("Q2ANS_DESC", Q2AnsDesc);
-				incomeMap.put("INCOME_CBS", ObjectUtils.toString((inputVO.getIncomeFromCBS().divide(new BigDecimal(10000))).intValue()));
-			}
-			map2.put("INCOME_CBS", incomeMap);
 			
 			for(Map<String, Object> map3:beforeData2){
 				Map<String, Object> check2 = new HashMap<String, Object>();
@@ -1528,7 +1470,7 @@ public class KYC310 extends FubonWmsBizLogic{
 			//若需填寫差異表，寫入差異表資料
 			if(StringUtils.equals("Y", inputVO.getNEED_COMPARISON_YN())) {
 				dam.create(inputVoToKycCompVo(inputVO , seq));//新增差異表資料
-				dam.update(genCompRpt(inputVO, seq));//產生差異表表單並存於blob
+//				dam.update(genCompRpt(inputVO, seq));//產生差異表表單並存於blob //與KYC表單MERGE一起
 //				printCompRpt(inputVO, seq); //測試時印出
 			}
 			//設定查詢參數
@@ -2155,9 +2097,26 @@ public class KYC310 extends FubonWmsBizLogic{
 			.getMethod("genBlankPDF" , new Class[]{KYC311InputVO.class , String.class})
 			.invoke(kyc310Pdf , new Object[]{kyc311InputVO , fileName});
 		
-		megerurl.add("/temp/reports/" + fileName);
-    	String url = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), megerurl));
+		megerurl.add("/temp/reports/" + fileName);		
     	
+		//若有差異表，寫入差異表資料
+		if(StringUtils.equals("Y", input310VO.getNEED_COMPARISON_YN())) {
+			String filePath = "";
+			input310VO.setKYC_SEQ(seq);
+			if ("03".equals(input310VO.getQUESTION_TYPE())){	//法人差異表單
+				KYC310_CorpRptComp report = PlatformContext.getBean("kyc310CorpRptComp", KYC310_CorpRptComp.class);
+				report.setInputVO(input310VO);
+				filePath = report.getPDFPath();
+			} else {	//自然人差異表單
+				KYC310_PersonRptComp report = PlatformContext.getBean("kyc310PersonRptComp", KYC310_PersonRptComp.class);
+				report.setInputVO(input310VO);
+				filePath = report.getPDFPath();
+			}			
+			megerurl.add(filePath);//產生差異表表單
+		}
+		//中文表單+差異表
+		String url = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), megerurl));    	
+		
     	//用Blob寫入資料庫
     	File file = new File(serverPath, url);
     	byte[] resultByte =  Files.readAllBytes(file.toPath());
@@ -2173,7 +2132,7 @@ public class KYC310 extends FubonWmsBizLogic{
 			.invoke(kyc310PdfEng , new Object[]{kyc311InputVO , fileNameEng});
 		
 		megerurlEng.add("/temp/reports/" + fileNameEng);
-		String urlEng = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), megerurlEng));
+		String urlEng = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), megerurlEng)); //英文表單
 
     	//用Blob寫入資料庫
     	File fileEng = new File(serverPath, urlEng);
@@ -2499,7 +2458,7 @@ public class KYC310 extends FubonWmsBizLogic{
 		}
 		
 		//年收入
-		rtnMap.put("INCOME_FROM_CBS", outputVO67101.getSigned01());
+//		rtnMap.put("INCOME_FROM_CBS", outputVO67101.getSigned01());
 		
 		return rtnMap;
 	}
@@ -2589,30 +2548,31 @@ public class KYC310 extends FubonWmsBizLogic{
 			//需顯示差異表
 			rtnMap.put("NEED_COMPARISON_YN", "Y"); //顯示差異表
 			
-			//檢查現在是否仍在冷靜期中
-			qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-			qc.setQueryString("SELECT SEQ, CUST_RISK_BEF, CUST_RISK_AFR FROM TBKYC_COOLING_PERIOD WHERE CUST_ID = :custId AND STATUS = 'C' ");
-			qc.setObject("custId", inputVO.getCUST_ID());
-			List<Map<String, Object>> mlist = dam.exeQuery(qc);
-
-			if (CollectionUtils.isNotEmpty(mlist)) { 
-				//現仍在冷靜期中，取進入冷靜期前的KYC填答內容
-				StringBuilder sb = new StringBuilder();
-				qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-				sb.append("SELECT A.SEQ, A.ANSWER_2 FROM TBKYC_INVESTOREXAM_D_HIS A ");
-				sb.append(" INNER JOIN (SELECT SEQ FROM TBKYC_INVESTOREXAM_M_HIS WHERE CUST_ID = :custId and STATUS = '03' AND SEQ <> :seq ");
-				sb.append(" 			 ORDER BY CREATE_DATE DESC FETCH FIRST 1 ROWS ONLY) B ON B.SEQ = A.SEQ ");
-				qc.setQueryString(sb.toString());
-				qc.setObject("custId", inputVO.getCUST_ID());
-				qc.setObject("seq", lastSeq);
-			} else { 
+//			//檢查現在是否仍在冷靜期中
+//			qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+//			qc.setQueryString("SELECT SEQ, CUST_RISK_BEF, CUST_RISK_AFR FROM TBKYC_COOLING_PERIOD WHERE CUST_ID = :custId AND STATUS = 'C' ");
+//			qc.setObject("custId", inputVO.getCUST_ID());
+//			List<Map<String, Object>> mlist = dam.exeQuery(qc);
+//
+//			if (CollectionUtils.isNotEmpty(mlist)) { 
+//				//現仍在冷靜期中，取進入冷靜期前的KYC填答內容
+//				StringBuilder sb = new StringBuilder();
+//				qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+//				sb.append("SELECT A.SEQ, A.ANSWER_2 FROM TBKYC_INVESTOREXAM_D_HIS A ");
+//				sb.append(" INNER JOIN (SELECT SEQ FROM TBKYC_INVESTOREXAM_M_HIS WHERE CUST_ID = :custId and STATUS = '03' AND SEQ <> :seq ");
+//				sb.append(" 			 ORDER BY CREATE_DATE DESC FETCH FIRST 1 ROWS ONLY) B ON B.SEQ = A.SEQ ");
+//				qc.setQueryString(sb.toString());
+//				qc.setObject("custId", inputVO.getCUST_ID());
+//				qc.setObject("seq", lastSeq);
+//			} else { 
 				//目前不在冷靜期中，取得前一次KYC評估結果填答內容
+				//不須檢核冷靜期，直接取得上一次KYC資料做比較
 				qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 				qc.setQueryString("SELECT SEQ, ANSWER_2 FROM TBKYC_INVESTOREXAM_D_HIS WHERE SEQ = :seq ");
 //				lastSeq = "KYC2024081340821"; //測試自然人
 //				lastSeq = "KYC2024080840718"; //測試法人
 				qc.setObject("seq", lastSeq);
-			}
+//			}
 			//上次KYC填答內容
 			List<Map<String, Object>> alist = dam.exeQuery(qc);
 			//冷靜期中，抓冷靜期前的問卷編號以及填答；不在冷靜期中，就是上一次的問卷
@@ -2778,45 +2738,6 @@ public class KYC310 extends FubonWmsBizLogic{
 	}
 	
 	/***
-	 * 產生KYC差異表單，存入DB
-	 * @param body
-	 * @param header
-	 * @throws Exception 
-	 */
-	private TBKYC_REPORTVO genCompRpt(KYC310InputVO inputVO, String seq) throws Exception{
-		inputVO.setKYC_SEQ(seq); //本次KYC填答主鍵
-		List<String> mergeUrl = new ArrayList();
-		
-		if ("03".equals(inputVO.getQUESTION_TYPE())){	//法人差異表單
-			KYC310_CorpRptComp report = PlatformContext.getBean("kyc310CorpRptComp", KYC310_CorpRptComp.class);
-			report.setInputVO(inputVO);
-			String filePath = report.getPDFPath();
-			mergeUrl.add(filePath);
-		} else {	//自然人差異表單
-			KYC310_PersonRptComp report = PlatformContext.getBean("kyc310PersonRptComp", KYC310_PersonRptComp.class);
-			report.setInputVO(inputVO);
-			String filePath = report.getPDFPath();
-			mergeUrl.add(filePath);
-		}
-		String url = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), true, mergeUrl));
-		//root path
-		String serverPath = (String) SysInfo.getInfoValue(SystemVariableConsts.SERVER_PATH);
-				
-    	//用Blob寫入資料庫
-    	File fileEng = new File(serverPath, url);
-    	byte[] resultByte =  Files.readAllBytes(fileEng.toPath());
-    	System.out.println(fileEng.delete());
-    	
-    	TBKYC_REPORTVO repVO = (TBKYC_REPORTVO) getDataAccessManager().findByPKey(TBKYC_REPORTVO.TABLE_UID, seq);
-    	if(repVO != null) {
-    		repVO.setREPORT_FILE_COMP(ObjectUtil.byteArrToBlob(resultByte));
-    	}
-    	
-    	return repVO;
-		
-	}
-	
-	/***
 	 * KYC差異表問卷表單 (測試用)
 	 * @param inputVO
 	 * @param seq
@@ -2849,22 +2770,22 @@ public class KYC310 extends FubonWmsBizLogic{
 	 * @return true: 客戶端末收入介於KYC收入區間 false:客戶端末收入"不"介於KYC收入區間
 	 * @throws JBranchException
 	 */
-	private boolean getIncomeCBSChk(String q2Ans, BigDecimal incomeCBS) throws JBranchException {
-		boolean rtnResult = false;
-		
-		//取得答案序號
-		int ansSeq = Integer.parseInt(q2Ans);
-		//KYC收入下限
-		BigDecimal lowerLimit = new BigDecimal(getParamName("IOT.API_KYC_Q2_ANS", String.valueOf(ansSeq-1)));
-		//KYC收入上限
-		BigDecimal upperLimit = new BigDecimal(getParamName("IOT.API_KYC_Q2_ANS", String.valueOf(ansSeq)));
-		//客戶端末收入介於KYC收入區間
-		if(incomeCBS.compareTo(lowerLimit) >= 0 && incomeCBS.compareTo(upperLimit) <= 0) {
-			rtnResult = true;
-		}
-		
-		return rtnResult;
-	}
+//	private boolean getIncomeCBSChk(String q2Ans, BigDecimal incomeCBS) throws JBranchException {
+//		boolean rtnResult = false;
+//		
+//		//取得答案序號
+//		int ansSeq = Integer.parseInt(q2Ans);
+//		//KYC收入下限
+//		BigDecimal lowerLimit = new BigDecimal(getParamName("IOT.API_KYC_Q2_ANS", String.valueOf(ansSeq-1)));
+//		//KYC收入上限
+//		BigDecimal upperLimit = new BigDecimal(getParamName("IOT.API_KYC_Q2_ANS", String.valueOf(ansSeq)));
+//		//客戶端末收入介於KYC收入區間
+//		if(incomeCBS.compareTo(lowerLimit) >= 0 && incomeCBS.compareTo(upperLimit) <= 0) {
+//			rtnResult = true;
+//		}
+//		
+//		return rtnResult;
+//	}
 	
 	private String getParamName(String paramType, String paramCode) throws DAOException, JBranchException {
 		String paramName = "0";		

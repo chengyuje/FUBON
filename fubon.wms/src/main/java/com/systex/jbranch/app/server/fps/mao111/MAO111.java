@@ -137,25 +137,36 @@ public class MAO111 extends FubonWmsBizLogic {
 		if (!StringUtil.isBlank(inputVO.getCust_name()))
 			sql.append("AND C.CUST_NAME like :cust_name ");
 		
+		//找客戶為主戶的所有從戶
 		sql.append("UNION ");
 		sql.append("SELECT C.CUST_NAME, R.CUST_ID_S AS CUST_ID, R.REL_TYPE, R.REL_TYPE_OTH, RC.BRA_NBR, RC.AO_CODE, BASE.EMP_NAME, R.CUST_ID_M, RC.CUST_NAME AS JOIN_SRV_CUST_NAME ");
 		sql.append("FROM TBCRM_CUST_MAST C  ");
 		sql.append("LEFT JOIN BASE ON BASE.AO_CODE = C.AO_CODE ");
-
 		sql.append("LEFT JOIN TBCRM_CUST_REL R ON C.CUST_ID = R.CUST_ID_S ");
 		sql.append("LEFT JOIN TBCRM_CUST_MAST RC ON R.CUST_ID_M = RC.CUST_ID ");
 		sql.append("WHERE BASE.AO_CODE = :aoCode ");
 		sql.append("AND R.CUST_ID_S IS NOT NULL ");
-//		sql.append("SELECT R.CUST_NAME, R.CUST_ID_S AS CUST_ID, R.REL_TYPE, R.REL_TYPE_OTH, RC.BRA_NBR, RC.AO_CODE, BASE.EMP_NAME, R.JOIN_SRV_CUST_ID, RC.CUST_NAME AS JOIN_SRV_CUST_NAME ");
-//		sql.append("FROM TBCRM_CUST_MAST C  ");
-//		sql.append("LEFT JOIN BASE ON BASE.AO_CODE = C.AO_CODE ");
-//
-//		sql.append("LEFT JOIN TBCRM_CUST_REL R ON C.CUST_ID = R.CUST_ID_S ");
-//		sql.append("LEFT JOIN TBCRM_CUST_MAST RC ON R.JOIN_SRV_CUST_ID = RC.CUST_ID ");
-//		sql.append("WHERE C.AO_CODE = :ao_code AND R.CUST_ID_M <> R.CUST_ID_S ");
+		sql.append("AND R.REL_MBR_YN = 'Y' "); 
+
 		
 		if (!StringUtil.isBlank(inputVO.getCust_id()))
 			sql.append("AND R.CUST_ID_M = :cust_id ");
+		if (!StringUtil.isBlank(inputVO.getCust_name()))
+			sql.append("AND C.CUST_NAME like :cust_name ");
+		
+		//找客戶為從戶的所有主戶
+		sql.append("UNION ");
+		sql.append("SELECT C.CUST_NAME, R.CUST_ID_M AS CUST_ID, R.REL_TYPE, R.REL_TYPE_OTH, RC.BRA_NBR, RC.AO_CODE, BASE.EMP_NAME, R.CUST_ID_S, RC.CUST_NAME AS JOIN_SRV_CUST_NAME ");
+		sql.append("FROM TBCRM_CUST_MAST C  ");
+		sql.append("LEFT JOIN BASE ON BASE.AO_CODE = C.AO_CODE ");
+		sql.append("LEFT JOIN TBCRM_CUST_REL R ON C.CUST_ID = R.CUST_ID_M ");
+		sql.append("LEFT JOIN TBCRM_CUST_MAST RC ON R.CUST_ID_S = RC.CUST_ID ");
+		sql.append("WHERE BASE.AO_CODE = :aoCode ");
+		sql.append("AND R.CUST_ID_M IS NOT NULL ");
+		sql.append("AND R.REL_MBR_YN = 'Y' "); 
+
+		if (!StringUtil.isBlank(inputVO.getCust_id()))
+			sql.append("AND R.CUST_ID_S = :cust_id ");
 		if (!StringUtil.isBlank(inputVO.getCust_name()))
 			sql.append("AND C.CUST_NAME like :cust_name ");
 		

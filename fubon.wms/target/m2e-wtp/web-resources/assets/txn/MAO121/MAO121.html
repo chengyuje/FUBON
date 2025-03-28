@@ -15,12 +15,11 @@
 			<div class="tfb_content_icon"></div>
 			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >申請查詢</div>
 		</div>
-		<!--Content of the panel-->
 		<div class="panel_content">
-			<div class="search_table search_box">
+			<div class="search_table search_box3">
 				<table>
-					<tr>
-						<th>區域中心：</th>
+					<tr ng-if="!priID.startsWith('UHRM')">
+						<th>業務處：</th>
 						<td>
 							<e-combobox id="region_center_id" name="region_center_id"
 										ng-datasource="REGION_LIST"
@@ -48,8 +47,6 @@
 										ng-change="ChangeArea(region)"
 										style="line-height:20px;" />
 						</td>
-					</tr>
-					<tr>
 						<th>分行別：</th>
 						<td>
 							<e-combobox id="branch_nbr" name="branch_nbr"
@@ -64,24 +61,66 @@
 										ng-change="ChangeBranch(region)"
 										style="line-height:20px;" />
 						</td>
-						<th>申請人：</th>
+					</tr>
+					<tr ng-if="priID.startsWith('UHRM')">
+						<th>業務處：</th>
 						<td>
-							<e-combobox id="emp_id" name="emp_id"
-								ng-datasource="EMP_LIST"
-								ng-model="inputVO.emp_id"
-								ng-validate="false" 
-								ng-disabled="EMP_LIST.length == 2"
-								ng-readonly="EMP_LIST.length == 2" 
-								ng-editable="false"
-								ng-format="F1"
-								ng-required="true"
-								ng-change="ChangeEmp_id(test)"
-								style="line-height:20px;" />
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="uhrmRCList"
+										ng-model="inputVO.region_center_id"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>		
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="uhrmOPList"
+										ng-model="inputVO.branch_area_id"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										style="line-height:20px;" />
 						</td>
+						<th></th>
+						<td></td>
 					</tr>
 					<tr>
+						<th>申請人：</th>
+						<td ng-if="!priID.startsWith('UHRM')">
+							<e-combobox id="emp_id" name="emp_id"
+										ng-datasource="EMP_LIST"
+										ng-model="inputVO.emp_id"
+										ng-validate="false" 
+										ng-disabled="EMP_LIST.length == 2"
+										ng-readonly="EMP_LIST.length == 2" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										ng-change="ChangeEmp_id(test)"
+										style="line-height:20px;" />
+						</td>
+						<td ng-if="priID.startsWith('UHRM')">
+							<e-combobox id="emp_id" name="emp_id"
+										ng-datasource="mappingSet['UHRM_LIST']"
+										ng-model="inputVO.emp_id"
+										ng-validate="false" 
+										ng-disabled="mappingSet['UHRM_LIST'].length == 2"
+										ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
 						<th>使用日期：</th>
-						<td>
+						<td colspan="2">
 							<div style="float: left" class="input-group datebox datewidth">
 								<input type="text" id="use_date_bgn" name="use_date_bgn"
 									   class="form-control"
@@ -131,7 +170,7 @@
 		<div class="panel_content">
 		<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
 		<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
-			<table class="e-table-freeze" e-height="500px" e-mode="1" e-top="true" e-list="data">
+			<table class="table e-table-freeze td_center" e-height="500px" e-mode="1" e-top="true" e-list="data">
 				<thead>
 					<tr>
 						<th>分行</th>
@@ -149,17 +188,17 @@
 				</thead>
 				<tbody>
 					<tr class="repeat-row" ng-repeat="row in data track by $index">
-						<td>{{row.BRANCH_NBR | mapping:mappingSet['branch_nbr_all']:'F3'}}</td>
-						<td>{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
-						<td>{{row.APL_EMP_ID}}</td>
-						<td>{{toJsDate(row.USE_DATE) | date: "yyyy-MM-dd"}}</td>
-						<td><div ng-repeat ="value in comma_split(row.VISIT_CUST_LIST) track by $index"><a onclick="return false" ng-click="custDTL(value)">{{value}}</a></div></td>
-						<td>{{row.START_TIME}}~{{row.END_TIME}}/{{row.DEV_NBR}}</td>
-						<td>{{row.DEV_STATUS | mapping:mappingSet['MAO.DEV_STATUS_AO']:'F3'}}</td>
-						<td>{{row.DEV_TAKE_EMP_ID}}</td>
-						<td>{{row.DEV_TAKE_DATETIME}}</td>
-						<td>{{row.DEV_RETURN_EMP_ID}}</td>
-      					<td>{{row.DEV_RETURN_DATETIME}}</td>
+						<td style="vertical-align:middle;">{{row.BRANCH_NBR | mapping:mappingSet['branch_nbr_all']:'F3'}}</td>
+						<td style="vertical-align:middle;">{{row.AO_CODE}}-{{row.EMP_NAME}}</td>
+						<td style="vertical-align:middle;">{{row.APL_EMP_ID}}</td>
+						<td style="vertical-align:middle;">{{toJsDate(row.USE_DATE) | date: "yyyy-MM-dd"}}</td>
+						<td style="vertical-align:middle;"><div ng-repeat ="value in comma_split(row.VISIT_CUST_LIST) track by $index"><a onclick="return false" ng-click="custDTL(value)">{{value}}</a></div></td>
+						<td style="vertical-align:middle;">{{row.START_TIME}}~{{row.END_TIME}}/{{row.DEV_NBR}}</td>
+						<td style="vertical-align:middle;">{{row.DEV_STATUS | mapping:mappingSet['MAO.DEV_STATUS_AO']:'F3'}}</td>
+						<td style="vertical-align:middle;">{{row.DEV_TAKE_EMP_ID}}</td>
+						<td style="vertical-align:middle;">{{row.DEV_TAKE_DATETIME}}</td>
+						<td style="vertical-align:middle;">{{row.DEV_RETURN_EMP_ID}}</td>
+      					<td style="vertical-align:middle;">{{row.DEV_RETURN_DATETIME}}</td>
 					</tr>
 				</tbody>
 			</table>

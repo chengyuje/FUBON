@@ -33,7 +33,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
     }
 
     //要保書類型/戶況檢核
-	getParameter.XML(['IOT.CM_FLAG','IOT.RLT_WITH_INSURED', 'IOT.RELATED_WITH_PROPOSER', 'IOT.PAY_TYPE', 'IOT.MOP2', 'IOT.MORTGAGE_LIFE_LOAN', 'IOT.PAYER_REL_PROPOSER','IOT.NO_CHK_LOAN_INSPRD', 'IOT.INV_PRD_LOAN_KYC'],function(totas){
+	getParameter.XML(['IOT.CM_FLAG','IOT.RLT_WITH_INSURED', 'IOT.RELATED_WITH_PROPOSER', 'IOT.PAY_TYPE', 'IOT.MOP2', 'IOT.MORTGAGE_LIFE_LOAN', 'IOT.PAYER_REL_PROPOSER','IOT.NO_CHK_LOAN_INSPRD', 'IOT.INV_PRD_LOAN_KYC', 'IOT.FPAY_KIND_MAPPING'],function(totas){
 		if(totas){
 			//戶況檢核
 			$scope.mappingSet['IOT.CM_FLAG'] = totas.data[totas.key.indexOf('IOT.CM_FLAG')];
@@ -45,6 +45,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 			$scope.mappingSet['IOT.PAYER_REL_PROPOSER'] = totas.data[totas.key.indexOf('IOT.PAYER_REL_PROPOSER')];
 			$scope.mappingSet['IOT.NO_CHK_LOAN_INSPRD'] = totas.data[totas.key.indexOf('IOT.NO_CHK_LOAN_INSPRD')];
 			$scope.mappingSet['IOT.INV_PRD_LOAN_KYC'] = totas.data[totas.key.indexOf('IOT.INV_PRD_LOAN_KYC')];
+			$scope.mappingSet['IOT.FPAY_KIND_MAPPING'] = totas.data[totas.key.indexOf('IOT.FPAY_KIND_MAPPING')];
 		}
 	});
 
@@ -59,6 +60,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 				$scope.KEYIN_DATE = dateTolong.toLocaleString();
 				$scope.branchID = $scope.INS_INFORMATION[0].BRANCH_NBR;
 				$scope.branchName = '';
+				$scope.fileResultList = tota[0].body.fileList;
 				$scope.inputVO = {
 						INS_KEYNO:$scope.INS_INFORMATION[0].INS_KEYNO,
 						NEED_MATCH:$scope.INS_INFORMATION[0].NEED_MATCH,
@@ -128,6 +130,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 						LOAN_SOURCE2_YN:$scope.INS_INFORMATION[0].LOAN_SOURCE2_YN,
 						AML:$scope.INS_INFORMATION[0].AML,
 						PRECHECK:$scope.INS_INFORMATION[0].PRECHECK,
+						BUSINESS_REL:$scope.INS_INFORMATION[0].BUSINESS_REL,
 						PROPOSER_INCOME1:$scope.INS_INFORMATION[0].PROPOSER_INCOME1,
 						C_KYC_INCOME:$scope.INS_INFORMATION[0].C_KYC_INCOME,
 						PROPOSER_INCOME3:$scope.INS_INFORMATION[0].PROPOSER_INCOME3,
@@ -173,7 +176,14 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 						COMPANY_NUM: $scope.INS_INFORMATION[0].COMPANY_NUM,
 						INS_COM_NAM: $scope.INS_INFORMATION[0].INS_COM_NAME, //保險公司名稱
 						FB_COM_YN: $scope.INS_INFORMATION[0].FB_COM_YN, //富壽:Y 非富壽:N
-						CANCEL_CONTRACT_YN: $scope.INS_INFORMATION[0].CANCEL_CONTRACT_YN //契撤案件
+						CANCEL_CONTRACT_YN: $scope.INS_INFORMATION[0].CANCEL_CONTRACT_YN, //契撤案件
+						PAY_SERV_RETURN_CODE: $scope.INS_INFORMATION[0].PAY_SERV_RETURN_CODE,
+						REMIT_COUNTRY_FLAG: $scope.INS_INFORMATION[0].REMIT_COUNTRY_FLAG,
+						FIRST_PAY_WAY: $scope.INS_INFORMATION[0].FIRST_PAY_WAY, //首期保費繳費方式：匯款件
+						FUND_VERIFY_PDF_YN: $scope.INS_INFORMATION[0].FUND_VERIFY_PDF_YN,
+						FUND_VERIFY_PAPER_YN: $scope.INS_INFORMATION[0].FUND_VERIFY_PAPER_YN,
+						MAPPVIDEO_YN: $scope.INS_INFORMATION[0].MAPPVIDEO_YN,
+						DIGITAL_AGREESIGN_YN: $scope.INS_INFORMATION[0].DIGITAL_AGREESIGN_YN
 					};
 
 				if(tota[0].body.PreMatchList.length>0){
@@ -327,6 +337,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 					KYC_DUE_DATE: undefined,
 					AML: '',
 					PRECHECK: '',
+					BUSINESS_REL: '',
 					GUILD_RPT_DATE: undefined,
 					LOAN_PRD_YN: '',
 					LOAN_SOURCE_YN: '',
@@ -377,7 +388,14 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 					QC_LOAN_CHK: '',
 					QC_SIGNATURE: '',
 					NEED_MATCH:'',
-					C_SENIOR_PVAL:''
+					C_SENIOR_PVAL:'',
+					isRCFlagDisalbed: true,
+					payServeRemit: false,
+					caseIdChanged: false,
+					regTypeChanged: false,
+					prematchSeqChanged: false,
+					FUND_VERIFY_PDF_YN: 'N',
+					FUND_VERIFY_PAPER_YN: 'N'
 				};
 		}
 	}
@@ -386,6 +404,11 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 	//判斷是否顯示使用紙本要保書原因
 	$scope.show_write_reason = function(){
 		if($scope.OPR_STATUS =='new'){
+			//清除留存文件暫存
+    		$scope.connector('set','IOT900inListtemp','');
+    		$scope.connector('set','IOT900outListtemp','');
+    		$scope.inputVO.regTypeChanged = true;
+    		
 			$scope.inputVO.in_column = '';
 			$scope.inputVO.INS_ID = undefined;
 			$scope.inputVO.CASE_ID = undefined;
@@ -446,6 +469,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 			$scope.inputVO.KYC_DUE_DATE = undefined;
 			$scope.inputVO.AML = '';
 			$scope.inputVO.PRECHECK = '';
+			$scope.inputVO.BUSINESS_REL = '';
 			$scope.inputVO.GUILD_RPT_DATE = undefined;
 			$scope.inputVO.LOAN_PRD_YN = '';
 			$scope.inputVO.LOAN_SOURCE_YN = '';
@@ -497,6 +521,8 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 			$scope.inputVO.QC_SIGNATURE = '';
 			$scope.inputVO.NEED_MATCH = '';
 			$scope.inputVO.C_SENIOR_PVAL = '';
+			$scope.inputVO.FUND_VERIFY_PDF_YN = 'N';
+			$scope.inputVO.FUND_VERIFY_PAPER_YN = 'N';
 		}
 		if($scope.inputVO.REG_TYPE == '2'){
 			$scope.yn_show_write = true;
@@ -576,9 +602,17 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 		debugger
 		if($scope.inputVO.REG_TYPE == '1'){
 			if($scope.inputVO.CASE_ID != undefined && $scope.inputVO.PREMATCH_SEQ != ""){
+				if($scope.OPR_STATUS =='new'){
+					//清除留存文件暫存
+		    		$scope.connector('set','IOT900inListtemp','');
+		    		$scope.connector('set','IOT900outListtemp','');
+		    		$scope.inputVO.caseIdChanged = true;
+				}
+				
 				$scope.webservice_clear();
 				debugger
 				$scope.inputVO.CASE_ID = $scope.inputVO.CASE_ID.toUpperCase();
+				$scope.inputVO.fromIOT120 = "Y";
 				$scope.sendRecv("IOT120","Get_InsInfo","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO",
     					$scope.inputVO,function(tota,isError){
 					if(!isError){
@@ -594,8 +628,26 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 								$scope.showErrorMsg(errorMsg);
 								$scope.init();
 							}else{
-								$scope.parseWebserviceData();
-								$scope.CASEPDF();
+								//富壽繳款單API回傳資料
+								$scope.wsPayServData = null;
+								if(tota[0].body.wsPayServData) {
+									$scope.wsPayServData = tota[0].body.wsPayServData;
+									$scope.inputVO.PAY_SERV_RETURN_CODE = $scope.wsPayServData.ReturnCode; //富壽繳款服務單API回傳狀態 100:成功
+									$scope.inputVO.PAY_SERV_REMIT_NATNO = $scope.wsPayServData.PAY_SERV_REMIT_NATIVENO; //匯款國別 001:中華民國 其他:境外
+									if($scope.inputVO.PAY_SERV_RETURN_CODE == "100") {
+										$scope.inputVO.REMIT_COUNTRY_FLAG = (($scope.inputVO.PAY_SERV_REMIT_NATNO == "" || $scope.inputVO.PAY_SERV_REMIT_NATNO == "001") ? "1" : "2");
+										$scope.inputVO.FIRST_PAY_WAY = "1"; //首期保費繳費方式：匯款件
+										$scope.inputVO.isRCFlagDisalbed = true; //匯款國家disabled
+										$scope.inputVO.payServeRemit = true; //線上繳款匯款件
+									} else {
+										$scope.inputVO.REMIT_COUNTRY_FLAG = "";
+										$scope.inputVO.isRCFlagDisalbed = false;
+										$scope.inputVO.payServeRemit = false; //線上繳款匯款件
+									}
+								}
+								//parsing電子要保書API回傳資料
+								$scope.parseWebserviceData(); 
+								$scope.CASEPDF(); //取得電子要保書PDF資料
 
 								//將購買檢核資料放入頁面中
 								$scope.sendRecv("IOT120","get_PreMatch","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO", $scope.inputVO,function(tota,isError){
@@ -642,7 +694,11 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 			$scope.inputVO.INS_RIDER_DTLList = $scope.webservice.Result.INS_RIDER_DTLList;
 			$scope.requiredINS_RIDER_DTLList = true;
 		}
-
+		//首期保費繳費方式
+		if($scope.inputVO.PAY_SERV_RETURN_CODE != "100") { //線上繳款匯款件由人壽線上繳款API取得，這裡就不用ASSIGN
+			var findFpay = $filter('filter')($scope.mappingSet['IOT.FPAY_KIND_MAPPING'], {DATA: $scope.webservice.Result.FPAY_KIND});
+			$scope.inputVO.FIRST_PAY_WAY = (findFpay != null && findFpay.length > 0) ? findFpay[0].LABEL : "";
+		}
 		//投資標的
 		//註解掉，由購買檢核資料帶入
 //		if($scope.webservice.Result.INVESTList.length > 0){
@@ -652,6 +708,13 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 
 	$scope.getPrematchData = function() {
 		debugger
+		if($scope.OPR_STATUS =='new'){
+			//清除留存文件暫存
+    		$scope.connector('set','IOT900inListtemp','');
+    		$scope.connector('set','IOT900outListtemp','');
+    		$scope.inputVO.prematchSeqChanged = true;
+		}
+		
 		if($scope.inputVO.REG_TYPE == "1") {
 			//電子要保書
 			$scope.CASEID();
@@ -711,9 +774,12 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 		$scope.inputVO.CUST_RISK = $scope.prematchList.CUST_RISK;
 		$scope.inputVO.AML = $scope.prematchList.AML;
 		$scope.inputVO.PRECHECK = $scope.prematchList.PRECHECK;
+		$scope.inputVO.BUSINESS_REL = $scope.prematchList.BUSINESS_REL;
 	//
 		//首期保費繳費方式
-		$scope.inputVO.FIRST_PAY_WAY = $scope.prematchList.FIRST_PAY_WAY;
+//		if($scope.inputVO.PAY_SERV_RETURN_CODE != "100") { //線上繳款匯款件由人壽線上繳款API取得
+//			$scope.inputVO.FIRST_PAY_WAY = $scope.prematchList.FIRST_PAY_WAY;
+//		}
 		//要保人生日
 		$scope.inputVO.PROPOSER_BIRTH = $scope.toJsDate($scope.prematchList.PROPOSER_BIRTH);
 		$scope.inputVO.INSPRD_ID = $scope.prematchList.INSPRD_ID;
@@ -781,6 +847,8 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 		
 		$scope.MATCH_DATE = $scope.toJsDate($scope.prematchList.MATCH_DATE);
 		$scope.inputVO.PRD_RISK = $scope.prematchList.CUST_RISK;
+		$scope.inputVO.MAPPVIDEO_YN = $scope.prematchList.MAPPVIDEO_YN;
+		$scope.inputVO.DIGITAL_AGREESIGN_YN = $scope.prematchList.DIGITAL_AGREESIGN_YN;
 	}
 
 	$scope.parseSoapWebserviceData = function(){
@@ -1123,10 +1191,13 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 				INS_KEYNO:$scope.inputVO.INS_KEYNO,
 				OPR_STATUS:$scope.OPR_STATUS,
 				in_REGTYPE:'1',
-				INSPRD_ID:$scope.inputVO.INSPRD_ID
+				INSPRD_ID:$scope.inputVO.INSPRD_ID,
+				REG_TYPE:$scope.inputVO.REG_TYPE,
+				CASE_ID:$scope.inputVO.CASE_ID
 		}
 		if($scope.OPR_STATUS != 'Read'){
-			if($scope.inputVO.BEFORE_INSPRD_ID != $scope.inputVO.INSPRD_ID){
+			if($scope.inputVO.BEFORE_INSPRD_ID != $scope.inputVO.INSPRD_ID || 
+					$scope.inputVO.caseIdChanged || $scope.inputVO.regTypeChanged || $scope.inputVO.prematchSeqChanged){
 				doc_qcList.OPR_STATUS='new';
 				$scope.inputVO.editINSPRD_ID = true;
 			}else{
@@ -1149,6 +1220,9 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 			if(data.value == 'out'){
 				$scope.checkout = true;
 			}
+			$scope.inputVO.caseIdChanged = false;
+			$scope.inputVO.regTypeChanged = false;
+			$scope.inputVO.prematchSeqChanged = false;
 		});
 	}
 
@@ -1209,10 +1283,15 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 				$scope.inputVO.QC_STAMP == '' || $scope.inputVO.QC_IMMI == '' ||
 				($scope.inputVO.REG_TYPE == '1' && regex.test($scope.inputVO.INS_ID) && $scope.inputVO.QC_APEC == '') ||
 				$scope.inputVO.QC_LOAN_CHK == '' || $scope.inputVO.QC_SIGNATURE == '' ||
-				($scope.underSevenYear && ($scope.inputVO.REPRESET_ID == undefined || $scope.inputVO.REPRESET_NAME==undefined || $scope.inputVO.RLT_BT_PROREP ==''))
+				($scope.underSevenYear && ($scope.inputVO.REPRESET_ID == undefined || $scope.inputVO.REPRESET_NAME==undefined || $scope.inputVO.RLT_BT_PROREP =='') ||
+				($scope.inputVO.FUND_VERIFY_PDF_YN == "N" && $scope.inputVO.FUND_VERIFY_PAPER_YN == "N"))
 			){
 //			$scope.inputVO.STATUS='10';
-			$scope.showMsg("ehl_01_common_022");
+			if($scope.inputVO.FUND_VERIFY_PDF_YN == "N" && $scope.inputVO.FUND_VERIFY_PAPER_YN == "N") {
+				$scope.showMsg("請至少勾選一項*保險資金證明檢附確認");
+			} else {
+				$scope.showMsg("ehl_01_common_022");
+			}
 		}else{
 			$scope.inputVO.INSURED_NAME.toUpperCase();
 			$scope.inputVO.PROPOSER_NAME.toUpperCase();
@@ -1311,7 +1390,30 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 		}else{
 			$scope.inputVO.MATCH_DATE = undefined;
 		}
-
+		debugger
+		//無紙化送件認定條件有三項
+		//1. 行動投保API DigitalAgreeSignFlag=Y或DistanceSignFlag=Y
+		//2. 保險資金整名檢附確認只選取"以PDF檔方式上傳"
+		//3. 保險送件文件檢核，文件重要性=2均無勾選
+		$scope.inputVO.NO_PAPER_YN = "N";
+		if(($scope.inputVO.MAPPVIDEO_YN == "Y" || $scope.inputVO.DIGITAL_AGREESIGN_YN == "Y") && //行動投保API DigitalAgreeSignFlag=Y或DistanceSignFlag=Y
+				$scope.inputVO.FUND_VERIFY_PDF_YN == "Y" && $scope.inputVO.FUND_VERIFY_PAPER_YN == "N") { //保險資金整名檢附確認只選取"以PDF檔方式上傳"
+			var outCount = 0;
+			angular.forEach($scope.inputVO.outList, function(row) {
+				if(row.DOC_LEVEL == "2" && row.DOC_CHK == "Y"){
+					outCount++;
+				}
+			});
+			if(outCount == 0) { //保險送件文件檢核，文件重要性=2均無勾選
+				$scope.inputVO.NO_PAPER_YN = "Y";
+			}
+		}
+		//是否有上傳保費資金證明檔案
+		$scope.inputVO.fundFileUploadYN = "N";
+		if($scope.fileResultList && $scope.fileResultList.length > 0) {
+			$scope.inputVO.fundFileUploadYN = "Y";
+		}		
+		
 		//$scope.inputVO.webservicePdfData = $scope.webservicePdfData;
 		$scope.sendRecv("IOT120","chkData","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO",
 				$scope.inputVO,function(tota,isError){
@@ -1329,6 +1431,12 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 	    	}
 			debugger
 	    	if (tota.length > 0) {
+				 debugger
+				//有錯誤訊息，則開popup
+				if(tota[0].body.errorMsg) {
+					var rmsg = tota[0].body.errorMsg;
+					$confirm({text: rmsg}, {size: 'sm'}).then(function(){});
+				}
 	    		//INS_ID重複跳錯誤訊息
 	    		//CASE_ID重複跳錯誤訊息
 	    		if($scope.OPR_STATUS == 'new' && tota[0].body.ErrorCASE_ID){
@@ -1471,6 +1579,21 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 
 	$scope.Submit = function(){
 		debugger
+		//非契撤，要保人/被保人/繳款人戶況檢核
+		if($scope.inputVO.CANCEL_CONTRACT_YN != "Y" &&
+				(RegExp('[4678]').test($scope.inputVO.PROPOSER_CM_FLAG) ||
+				 RegExp('[4678]').test($scope.inputVO.INSURED_CM_FLAG) ||
+				 RegExp('[4678]').test($scope.inputVO.PAYER_CM_FLAG))) {
+			$scope.showErrorMsgInDialog("要保人/被保人/繳款人不可為禁銷、拒銷、客訴戶");
+			return false;
+		}
+		//首期繳款方式為"匯款件"，"匯款國家"為必填欄位
+		if($scope.inputVO.FIRST_PAY_WAY == "1") { //首期保費繳費方式：匯款件)
+			if($scope.inputVO.REMIT_COUNTRY_FLAG == undefined || $scope.inputVO.REMIT_COUNTRY_FLAG == null || $scope.inputVO.REMIT_COUNTRY_FLAG == "") {
+				$scope.showErrorMsgInDialog("首期保費繳費方式為匯款件，請選擇匯款國家");
+				return false;
+			}
+		}
 		//投資型商品或非投資型但須適配商品，適配日(要保人保險購買檢核的鍵機日)須等於要保書申請日
 		if($scope.checkFieldData() && ($scope.inputVO.PRODUCT_TYPE != '1' || $scope.inputVO.NEED_MATCH == 'Y')) {
 			$scope.sendRecv("IOT120","getInvPreMatch","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO",
@@ -1494,7 +1617,9 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 		//檢核項目
 		$scope.chkItemsBeforeSave();
 
-		$scope.sendRecv("IOT120", "chkValid", "com.systex.jbranch.app.server.fps.iot120.IOT120InputVO", {"empId":$scope.inputVO.RECRUIT_ID, "APPLY_DATE":$scope.inputVO.APPLY_DATE},
+		$scope.sendRecv("IOT120", "chkValid", "com.systex.jbranch.app.server.fps.iot120.IOT120InputVO", {"RECRUIT_ID":$scope.inputVO.RECRUIT_ID, 
+																										 "INSPRD_ID":$scope.inputVO.INSPRD_ID, 
+																										 "APPLY_DATE":$scope.inputVO.APPLY_DATE},
 			function(tota, isError) {
 				let validVo = tota[0].body.REFList[0];
 				if (validVo.EXPIRED=='Y')	{
@@ -1511,6 +1636,10 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 				let tmsVO = tota[0].body.TMSList[0];
 				if (tmsVO.STUDY_COMPLETED == 'N')	{
 					$scope.showMsg("主約商品教育訓練尚未完成，無法通過檢核");
+					return;
+				}
+				if (tmsVO.OVERDUE == 'Y' && $scope.inputVO.CANCEL_CONTRACT_YN != "Y")	{
+					$scope.showMsg("要保書申請日不得小於商品訓練完訓日期");
 					return;
 				}
 
@@ -1586,10 +1715,53 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 		}
 	}
 
+	//回上一頁
 	$scope.back_page_btn = function(){
+		debugger
 		if($scope.OPR_STATUS == 'Read' || $scope.OPR_STATUS == 'UPDATE'){
-	    	$scope.connector('set','IOT140_updateSubmit',true);
-	    	$rootScope.menuItemInfo.url = "assets/txn/IOT140/IOT140.html";
+			if($scope.OPR_STATUS == 'UPDATE') { //修改模式進來
+				//若有(1)移除保費資金證明檔案(2)修改檢附文件資料，則沒有儲存就回上一頁，需做檢核，看狀態是否該為"理專進件"
+				//已PDF檔方式上傳="Y"&移除保費資金證明檔案 ==> "理專進件"
+				//檢附文件"必備"unchecked ==> "理專進件"
+				//是否有上傳保費資金證明檔案
+				var fileORdocChanged = "N";
+				if($scope.inputVO.FUND_VERIFY_PDF_YN == "Y" && (!$scope.fileResultList || $scope.fileResultList.length <= 0)) {
+					//已PDF檔方式上傳="Y"&移除保費資金證明檔案 ==> "理專進件"
+					fileORdocChanged= "Y";
+				}
+				//檢附文件"必備"unchecked ==> "理專進件"
+				var inList = $scope.connector('get','IOT900inList');
+				var outList = $scope.connector('get','IOT900outList');
+				angular.forEach(outList, function(row) {			
+					debugger
+					if(($scope.inputVO.REG_TYPE == '1' && row.DOC_LEVEL == "3" && row.DOC_CHK == "N") ||		//電子要保書
+							($scope.inputVO.REG_TYPE == '2' && row.DOC_LEVEL == "1" && row.DOC_CHK == "N")){	//紙本要保書
+						fileORdocChanged= "Y";
+					}
+				});
+				angular.forEach(inList, function(row) {	
+					debugger
+					if(row.DOC_LEVEL == "1" && row.DOC_CHK == "N") {
+						fileORdocChanged= "Y";
+					}
+				});
+				//若有修改，回上一頁將狀態改為"理專進件"
+				if(fileORdocChanged == "Y") {
+					$scope.sendRecv("IOT120","updateStatus10","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO", {'INS_KEYNO': $scope.inputVO.INS_KEYNO},
+							function(tota, isError) {
+								if (!isError) {
+									$scope.connector('set','IOT140_updateSubmit',true);
+							    	$rootScope.menuItemInfo.url = "assets/txn/IOT140/IOT140.html";
+								}
+						});
+				} else {
+					$scope.connector('set','IOT140_updateSubmit',true);
+			    	$rootScope.menuItemInfo.url = "assets/txn/IOT140/IOT140.html";
+				}
+			} else {
+				$scope.connector('set','IOT140_updateSubmit',true);
+		    	$rootScope.menuItemInfo.url = "assets/txn/IOT140/IOT140.html";
+			}
 		}
 	}
 
@@ -1629,4 +1801,58 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 		return redate;
 	}
 
+	//首期保費繳費方式
+	$scope.firstPayChanged = function() {
+		if($scope.inputVO.FIRST_PAY_WAY == "1") { //首期保費繳費方式：匯款件)
+			if(!$scope.inputVO.payServeRemit) { 
+				//線上繳款件，API已選擇匯款國家並disabled；非線上繳款件選匯款件enabled，需選擇國別
+				$scope.inputVO.isRCFlagDisalbed = false;
+			}
+		} else {
+			//非匯款件，不需選擇匯款國家
+			$scope.inputVO.REMIT_COUNTRY_FLAG = "";
+			$scope.inputVO.isRCFlagDisalbed = true;
+		}
+	}
+	
+	//上傳保險資金證明文件
+	$scope.uploadFile = function(name, rname) {
+		debugger
+		$scope.inputVO.fileName = name;
+		$scope.inputVO.fileRealName = rname;
+		
+		$scope.sendRecv("IOT120","uploadFile","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO", $scope.inputVO,
+			function(tota, isError) {
+				if (!isError) {
+					$scope.fileResultList = tota[0].body.fileList;
+					if($scope.OPR_STATUS == 'new') {
+						$scope.inputVO.INS_KEYNO = tota[0].body.INSKEY_NO;
+					}
+				}
+		});
+	}
+	
+	//刪除保險資金證明文件
+	$scope.deleteFile = function(row) {
+		$scope.sendRecv("IOT120","deleteFile","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO", {'INS_KEYNO': row.INS_KEYNO},
+			function(tota, isError) {
+				if (!isError) {
+					$scope.fileResultList = tota[0].body.fileList;
+					$scope.inputVO.fileName = "";
+					$scope.inputVO.fileRealName = "";
+	//				alert($scope.inputVO.SEQ);
+				}
+		});
+	}
+	
+	//檢視保險資金證明文件
+	$scope.viewFile = function(row) {
+		$scope.sendRecv("IOT120","viewFile","com.systex.jbranch.app.server.fps.iot120.IOT120InputVO", {'INS_KEYNO': row.INS_KEYNO},
+			function(totas, isError) {
+	    		if (!isError) {
+					return;
+				}
+		});
+    };
+    
 });

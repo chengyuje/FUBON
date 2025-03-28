@@ -29,8 +29,8 @@
 												ng-datasource="mappingSet['UHRM_LIST']"
 												ng-model="inputVO.pCode"
 												ng-validate="false" 
-												ng-disabled="mappingSet['UHRM_LIST'].length == 2"
-												ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
+												ng-disabled="mappingSet['UHRM_LIST'].length == 2 && priID != 'UHRM012'"
+												ng-readonly="mappingSet['UHRM_LIST'].length == 2 && priID != 'UHRM012'" 
 												ng-editable="false"
 												ng-format="F1"
 												style="line-height:20px;" />
@@ -42,7 +42,7 @@
 								<th>客戶ID：</th>
 								<td><input type="text" class="form-control" placeholder="請輸入..." id="id" name="id" style="text-transform: uppercase;" ng-model="inputVO.id" e-length-limit="25"></td>
 								<th>名單名稱：</th>
-								<td><input type="text" class="form-control" placeholder="請輸入..." id="name" name="name" ng-model="inputVO.name" e-length-limit="25"></td>
+								<td><input type="text" class="form-control" placeholder="請輸入..." id="name" name="name" ng-model="inputVO.name" e-length-limit="100"></td>
 							</tr>
 							<tr>
 								<th>*名單來源：</th>
@@ -55,7 +55,6 @@
 									ng-editable="false"
 									ng-format="F3"
 									ng-required="true"
-									width="150px"
 									style="line-height:20px;" />
 								</td>
 								<th>名單維護者：</th>
@@ -161,8 +160,8 @@
 					</form>
 	       		</div>
 	       		<div class="search_box_btn text-center">
-					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire(tabType)" function-type="query" ng-show="tabType==0">查詢(五年內)</button>
-					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire(tabType)" function-type="query" ng-show="tabType==1">查詢(五年前)</button>
+					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire(tabType,true)" function-type="query" ng-show="tabType==0">查詢(五年內)</button>
+					<button type="button" class="btn btn-info" ng-click="inquireInit();inquire(tabType,true)" function-type="query" ng-show="tabType==1">查詢(五年前)</button>
 					<button type="button" class="btn btn-info" ng-click="download()" function-type="export" ng-disabled="totalList.length == 0">下載</button>
 					<button type="button" class="btn btn-info" ng-click="init();inquireInit();">清除</button>
 				</div>

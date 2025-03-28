@@ -7,10 +7,12 @@ eSoafApp.controller('SQM320Controller', function($rootScope,$scope, $controller,
 	
 	$scope.controllerName = "SQM320Controller";
 	
-	getParameter.XML(["CRM.CON_DEGREE", "CRM.VIP_DEGREE"], function(totas) {
+	getParameter.XML(["CRM.CON_DEGREE", "CRM.VIP_DEGREE", "SQM.CUST_STATUS_LIST", "SQM.REVIEW_STATUS_LIST"], function(totas) {
 		if (totas) {
 			$scope.CON_DEGREE = totas.data[totas.key.indexOf('CRM.CON_DEGREE')];
 			$scope.VIP_DEGREE = totas.data[totas.key.indexOf('CRM.VIP_DEGREE')];
+			$scope.CUST_STATUS_LIST = totas.data[totas.key.indexOf('SQM.CUST_STATUS_LIST')];
+			$scope.REVIEW_STATUS_LIST = totas.data[totas.key.indexOf('SQM.REVIEW_STATUS_LIST')];
 		}
 	});
 	
@@ -53,19 +55,6 @@ eSoafApp.controller('SQM320Controller', function($rootScope,$scope, $controller,
     		}
     	});	
 	}
-
-	$scope.mappingSet['SQM.CUST_STATUS_LIST'] = [];
-	$scope.mappingSet['SQM.CUST_STATUS_LIST'].push(
-		{LABEL: '一般客戶', DATA: '01'},
-		{LABEL: '特殊客戶', DATA: '02'}
-	);
-
-	$scope.mappingSet['SQM.REVIEW_STATUS_LIST'] = [];
-	$scope.mappingSet['SQM.REVIEW_STATUS_LIST'].push(
-		{LABEL: '未訪查', DATA: '01'},
-		{LABEL: '已訪查', DATA: '02'},
-		{LABEL: '已覆核', DATA: '03'}
-	);
     
     $scope.init = function(){
     	var LastDate = new Date();
@@ -231,6 +220,8 @@ eSoafApp.controller('SQM320Controller', function($rootScope,$scope, $controller,
 		var memLoginFlag = $scope.inputVO.memLoginFlag;
 		var uhrmRC = $scope.inputVO.uhrmRC;
 		var uhrmOP = $scope.inputVO.uhrmOP;
+		console.log("uhrmRC:" + $scope.inputVO.uhrmRC);
+		console.log("uhrmOP:" + $scope.inputVO.uhrmOP)
 
 		var dialog = ngDialog.open({
 			template: 'assets/txn/' + $scope.inputVO.funcPage + '/' + $scope.inputVO.funcPage + '_visitTotal.html',
@@ -239,9 +230,9 @@ eSoafApp.controller('SQM320Controller', function($rootScope,$scope, $controller,
             controller: ['$scope', function($scope) {
             	$scope.yearQtr = yearQtr,
 				$scope.branch_nbr = branch_nbr,
-				$scope.memLoginFlag = memLoginFlag;
-            	$scope.uhrmRC = uhrmRC;
-            	$scope.uhrmOP = uhrmOP;
+				$scope.memLoginFlag = memLoginFlag,
+            	$scope.uhrmRC = uhrmRC,
+            	$scope.uhrmOP = uhrmOP
             }]
 		});
 		

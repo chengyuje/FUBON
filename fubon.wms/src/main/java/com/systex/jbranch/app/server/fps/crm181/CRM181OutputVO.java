@@ -20,7 +20,8 @@ public class CRM181OutputVO extends PagingOutputVO {
 	private String kyc320Count;
 	private String pms421Count;
 	private String pms429Msg;
-
+	private List ovsPriDivList;
+	
 	private Integer fetilrListCount;
 
 	public String getCrm8502Count() {
@@ -143,6 +144,14 @@ public class CRM181OutputVO extends PagingOutputVO {
 
 	public void setPms429Msg(String pms429Msg) {
 		this.pms429Msg = pms429Msg;
+	}
+
+	public List getOvsPriDivList() {
+		return ovsPriDivList;
+	}
+
+	public void setOvsPriDivList(List ovsPriDivList) {
+		this.ovsPriDivList = ovsPriDivList;
 	}
 
 	//	public String getCrm990Count() {

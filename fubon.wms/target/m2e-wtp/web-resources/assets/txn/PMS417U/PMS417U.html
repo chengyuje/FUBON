@@ -56,46 +56,44 @@
 				</tr>
 				<tr>								    												
 					<th>業務處：</th>
-						<td>
-							<e-combobox id="region_center_id" name="region_center_id"
-										ng-paramtype="PMS.UHRM_RC"
-										ng-model="inputVO.uhrmRC"
-										ng-validate="false" 
-										ng-disabled="true"
-										ng-readonly="true" 
-										ng-editable="false"
-										ng-format="F3"
-										ng-required="false"
-										ng-change="ChangeRegion()"
-										style="line-height:20px;" />
-						</td>	
-						<th>業務中心：</th>
-						<td>
-							<e-combobox id="branch_area_id" name="branch_area_id"
-										ng-paramtype="PMS.UHRM_OP"
-										ng-model="inputVO.uhrmOP"
-										ng-validate="false" 
-										ng-disabled="true"
-										ng-readonly="true" 
-										ng-editable="false"
-										ng-format="F3"
-										ng-required="false"
-										ng-change="ChangeArea()"
-										style="line-height:20px;" />
-						</td>
-						<th>理專：</th>
-						<td>
-							<e-combobox id="aoCode" name="aoCode"
-										ng-datasource="mappingSet['EmpName']"
-										ng-model="inputVO.aoCode"
-										ng-validate="false"
-										ng-disabled="false"
-										ng-readonly="false" 
-										ng-editable="false"
-										ng-format="F3"
-										ng-required="false"
-										style="line-height:20px;" />						 
-						</td>
+					<td>
+						<e-combobox id="region_center_id" name="region_center_id"
+									ng-datasource="uhrmRCList"
+									ng-model="inputVO.uhrmRC"
+									ng-validate="false" 
+									ng-disabled="true"
+									ng-readonly="true" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="true"
+									style="line-height:20px;" />
+					</td>		
+					<th>營運區：</th>
+					<td>
+						<e-combobox id="branch_area_id" name="branch_area_id"
+									ng-datasource="uhrmOPList"
+									ng-model="inputVO.uhrmOP"
+									ng-validate="false" 
+									ng-disabled="true"
+									ng-readonly="true" 
+									ng-editable="false"
+									ng-format="F1"
+									ng-required="true"
+									style="line-height:20px;" />
+					</td>
+					<th>員工姓名：</th>
+					<td>
+						<e-combobox id="aoCode" name="aoCode"
+									ng-datasource="mappingSet['EmpName']"
+									ng-model="inputVO.aoCode"
+									ng-validate="false"
+									ng-disabled="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									ng-required="false"
+									style="line-height:20px;" />						 
+					</td>
 				</tr>					
 			</table>
 		</div>
@@ -116,6 +114,7 @@
 			<table class="e-table-freeze" e-height="700px" e-mode="1" e-top="true" e-left="4" e-list="paramList">
 				<thead>
 					<tr>
+						<th>私銀註記</th>
 						<th>資料月份</th>
 						<th>業務處</th>
 						<th>區別</th>
@@ -149,6 +148,7 @@
 				</thead>
 				<tbody>
 					<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style="vertical-align:middle;">{{row.RM_FLAG}}</td>
 					 	<td style="vertical-align:middle;" align="center">{{row.YEARMON}}</td>
 					 	<td style="vertical-align:middle;" align="center">{{row.REGION_CENTER_NAME}}</td>
 						<td style="vertical-align:middle;" align="center">{{row.BRANCH_AREA_NAME}}</td>

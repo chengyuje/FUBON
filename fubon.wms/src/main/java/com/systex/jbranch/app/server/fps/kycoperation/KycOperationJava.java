@@ -541,20 +541,6 @@ public class KycOperationJava extends FubonWmsBizLogic {
 		}
 
 		tbkycLog.setPopup(resultMap.get("CDATA_UP").toString());
-
-		//是否需填寫差異表 & 前一次KYC答案選項
-		KYC310InputVO inputVO310 = new KYC310InputVO();
-		inputVO310.setCUST_ID(inputVO.getCustID());
-		inputVO310.setCUST_RISK_AFR(riskAfr);
-		inputVO310.setFromWebYN("Y");
-		Map<String, Object> compData = kyc310.getLastKYCComparisonData(inputVO310);
-		//回傳差異表資料
-		resultMap.put("NEED_COMPARISON_YN", ObjectUtils.toString(compData.get("NEED_COMPARISON_YN"))); //是否需填寫差異表
-		resultMap.put("LAST_ANSWER_2", ObjectUtils.toString(compData.get("LAST_ANSWER_2"))); //放入前次KYC填答答案
-		//寫Log訊息
-		tbkycLog.setNEED_COMPARISON_YN(ObjectUtils.toString(compData.get("NEED_COMPARISON_YN")));
-		tbkycLog.setLAST_ANSWER_2(ObjectUtils.toString(compData.get("LAST_ANSWER_2")));
-		tbkycLog.setLAST_SEQ(ObjectUtils.toString(compData.get("LAST_SEQ"))); //比較差異的(上次)客戶風險評估問卷主鍵
 		
 		return resultMap;
 	}
@@ -591,7 +577,7 @@ public class KycOperationJava extends FubonWmsBizLogic {
 		kyc311inputVO.setBRANCH("999");
 
 		//上送KYC基本資料至390(學歷,婚姻,子女人數,職業,重大傷病)
-		logger.info(fc032153datavo.getCustID() + "[" + seq + "]上送390CUST_DATA：" + (fc032153datavo.getCUST_DATA() == null ? "" : fc032153datavo.getCUST_DATA()));
+//		logger.info(fc032153datavo.getCustID() + "[" + seq + "]上送390CUST_DATA：" + (fc032153datavo.getCUST_DATA() == null ? "" : fc032153datavo.getCUST_DATA()));
 		// List<ESBUtilOutputVO> esbOut =
 		// getSot701().checkKycMiddleWare(fc032153datavo, null);
 		if (cbsservice.isNaturalPerson(cbsservice.getCBSIDCode(kyc311inputVO.getCUST_ID()))) {
@@ -609,7 +595,7 @@ public class KycOperationJava extends FubonWmsBizLogic {
 		sot701.kycUpdateCValue(kyc311inputVO);
 		// 更新主管已覆核
 		sot701.kycUpdateSupervisorCheck(kyc311inputVO);
-		logger.info(fc032153datavo.getCustID() + "[" + seq + "]上送390CUST_DATA：end");
+//		logger.info(fc032153datavo.getCustID() + "[" + seq + "]上送390CUST_DATA：end");
 	}
 
 	/**初始化上送390(風險屬性)的電文內容*/
@@ -1713,7 +1699,7 @@ public class KycOperationJava extends FubonWmsBizLogic {
 	}
 
 	public static void logInfo(String custId , Object msg){
-		logger.info("[" + custId + "]" + ObjectUtils.toString(msg));
+//		logger.info("[" + custId + "]" + ObjectUtils.toString(msg));
 	}
 
 	public static void logInfo(String firstTitle , String title , Object msg){

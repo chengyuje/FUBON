@@ -53,7 +53,22 @@ eSoafApp.controller('PMS361Controller', function($rootScope, $scope, $controller
 			if (!isError) {
 				$scope.chkMaintenance = tota[0].body.isMaintenancePRI == 'Y' ? true : false;
 
-				return;
+				$scope.uhrmRCList = [];
+				$scope.uhrmOPList = [];
+
+				if (null != tota[0].body.uhrmORGList) {
+					angular.forEach(tota[0].body.uhrmORGList, function(row) {
+						$scope.uhrmRCList.push({LABEL: row.REGION_CENTER_NAME, DATA: row.REGION_CENTER_ID});
+					});	
+					
+					$scope.inputVO.uhrmRC = tota[0].body.uhrmORGList[0].REGION_CENTER_ID;
+					
+					angular.forEach(tota[0].body.uhrmORGList, function(row) {
+						$scope.uhrmOPList.push({LABEL: row.BRANCH_AREA_NAME, DATA: row.BRANCH_AREA_ID});
+					});
+					
+					$scope.inputVO.uhrmOP = tota[0].body.uhrmORGList[0].BRANCH_AREA_ID;
+		        }
 			}						
 		});
 	};
@@ -91,6 +106,8 @@ eSoafApp.controller('PMS361Controller', function($rootScope, $scope, $controller
 						row.set.push({LABEL: "其它", DATA: "O"})
 					} else {
 						row.set = [];
+						row.set.push({LABEL: "親屬", DATA: "R"});
+						row.set.push({LABEL: "朋友", DATA: "F"});
 						row.set.push({LABEL: "其它", DATA: "O"})
 					}
 				});

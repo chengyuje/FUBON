@@ -16,6 +16,7 @@ import com.systex.jbranch.app.common.fps.table.TBCRM_TRS_PRJ_ROTATION_MPK;
 import com.systex.jbranch.app.common.fps.table.TBCRM_TRS_PRJ_ROTATION_MVO;
 import com.systex.jbranch.app.common.fps.table.TBPRD_FUNDVO;
 import com.systex.jbranch.app.common.fps.table.TBPRD_FUND_OVS_PRIVATEVO;
+import com.systex.jbranch.app.common.fps.table.TBPRD_FUND_OVS_PRI_DIVIDENDVO;
 import com.systex.jbranch.app.common.fps.table.TBSOT_NF_REDEEM_D_OVS_PRIPK;
 import com.systex.jbranch.app.common.fps.table.TBSOT_NF_REDEEM_D_OVS_PRIVO;
 import com.systex.jbranch.app.server.fps.sot703.SOT703;
@@ -151,6 +152,35 @@ public class PRD235  extends FubonWmsBizLogic {
 		this.sendRtnObject(return_VO);
 	}
 	
+	//取得配息期次資料
+	public void getDividendData(Object body, IPrimitiveMap header) throws JBranchException, Exception {
+		PRD235InputVO inputVO = (PRD235InputVO) body;
+		PRD235OutputVO return_VO = new PRD235OutputVO();
+		
+		dam = this.getDataAccessManager();		
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sql = new StringBuffer();
+		
+		sql.append("SELECT A.*, B.FUND_CNAME ");
+		sql.append(" FROM TBPRD_FUND_OVS_PRI_DIVIDEND A ");		
+		sql.append(" LEFT JOIN TBPRD_FUND B ON B.PRD_ID = A.PRD_ID ");
+		sql.append(" WHERE 1 = 1 ");
+		
+		if(StringUtils.isNotBlank(inputVO.getPRD_ID())) {
+			sql.append(" AND A.PRD_ID = :prdId ");
+			queryCondition.setObject("prdId", inputVO.getPRD_ID());
+		}
+		if(inputVO.getDIV_SEQ_NO() != null) {
+			sql.append(" AND A.DIV_SEQ_NO = :divSeqNo ");
+			queryCondition.setObject("divSeqNo", inputVO.getDIV_SEQ_NO());
+		}
+		
+		queryCondition.setQueryString(sql.toString());		
+		return_VO.setResultList(dam.exeQuery(queryCondition));
+		
+		this.sendRtnObject(return_VO);
+	}
+	
 	//商品資料儲存
 	public void save(Object body, IPrimitiveMap header) throws JBranchException, Exception {
 		PRD235InputVO inputVO = (PRD235InputVO) body;
@@ -249,6 +279,38 @@ public class PRD235  extends FubonWmsBizLogic {
 			queryCondition.setObject("loginId", getUserVariable(FubonSystemVariableConsts.LOGINID));
 			queryCondition.setObject("prdSeqNo", inputVO.getPRD_SEQ_NO());
 			dam.exeUpdate(queryCondition);
+		} else if(StringUtils.equals("6", inputVO.getSaveType())) { //配息期次設定//新增/修改
+			//同商品配息起訖日期間不得重疊
+			chkDivStartEndDate(inputVO);
+			
+			TBPRD_FUND_OVS_PRI_DIVIDENDVO dvo = new TBPRD_FUND_OVS_PRI_DIVIDENDVO();
+			if(inputVO.getDIV_SEQ_NO() == null) {
+				dvo.setDIV_SEQ_NO(getDivKeyNo());
+				dvo.setPRD_ID(inputVO.getPRD_ID());
+				dvo.setSTART_DATE(inputVO.getSTART_DATE());
+				dvo.setEND_DATE(inputVO.getEND_DATE());
+				dvo.setDIVIDEND_CATEGORY(inputVO.getDIVIDEND_CATEGORY());
+				dam.create(dvo);
+			} else {
+				dvo = (TBPRD_FUND_OVS_PRI_DIVIDENDVO) dam.findByPKey(TBPRD_FUND_OVS_PRI_DIVIDENDVO.TABLE_UID, inputVO.getDIV_SEQ_NO());			
+				if(dvo == null) {
+					throw new APException("查無此筆配息序號資料：" + inputVO.getDIV_SEQ_NO().toString());
+				}
+				
+				dvo.setPRD_ID(inputVO.getPRD_ID());
+				dvo.setSTART_DATE(inputVO.getSTART_DATE());
+				dvo.setEND_DATE(inputVO.getEND_DATE());
+				dvo.setDIVIDEND_CATEGORY(inputVO.getDIVIDEND_CATEGORY());
+				
+				dam.update(dvo);
+			}
+		} else if(StringUtils.equals("7", inputVO.getSaveType())) { //配息期次設定//刪除
+			TBPRD_FUND_OVS_PRI_DIVIDENDVO dvo = (TBPRD_FUND_OVS_PRI_DIVIDENDVO) dam.findByPKey(TBPRD_FUND_OVS_PRI_DIVIDENDVO.TABLE_UID, inputVO.getDIV_SEQ_NO());			
+			if(dvo == null) {
+				throw new APException("查無此筆配息序號資料：" + inputVO.getDIV_SEQ_NO().toString());
+			} else {
+				dam.delete(dvo);
+			}
 		}
 		
 		this.sendRtnObject(return_VO);
@@ -268,6 +330,20 @@ public class PRD235  extends FubonWmsBizLogic {
 		return keyNo;
 	}
 	
+	// 取得境外私募基金配息期次檔主鍵
+	private BigDecimal getDivKeyNo() throws JBranchException {
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition();
+		StringBuffer sql = new StringBuffer();
+		
+		sql.append("SELECT TBPRD_FUND_OVS_PR_DIVIDEND_SEQ.NEXTVAL FROM DUAL ");
+		queryCondition.setQueryString(sql.toString());
+		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+		BigDecimal keyNo = (BigDecimal) list.get(0).get("NEXTVAL");
+		
+		return keyNo;
+	}
+		
 	//檢核同商品開放起訖日期間不得重疊
 	private void chkStartEndDate(PRD235InputVO inputVO) throws DAOException, JBranchException {
 		dam = this.getDataAccessManager();
@@ -295,6 +371,33 @@ public class PRD235  extends FubonWmsBizLogic {
 		return;
 	}
 	
+	
+	//檢核同商品配息起訖日期間不得重疊
+	private void chkDivStartEndDate(PRD235InputVO inputVO) throws DAOException, JBranchException {
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sql = new StringBuffer();
+		
+		sql.append("SELECT 1 FROM TBPRD_FUND_OVS_PRI_DIVIDEND ");
+		sql.append(" WHERE PRD_ID = :prdId ");
+		sql.append(" AND (TRUNC(:startDate) BETWEEN TRUNC(START_DATE) AND TRUNC(END_DATE) OR TRUNC(:endDate) BETWEEN TRUNC(START_DATE) AND TRUNC(END_DATE)) ");
+		if(inputVO.getDIV_SEQ_NO() != null) {
+			sql.append(" AND DIV_SEQ_NO <> :seqNo ");
+			queryCondition.setObject("seqNo", inputVO.getDIV_SEQ_NO());
+		}
+		queryCondition.setObject("prdId", inputVO.getPRD_ID());
+		queryCondition.setObject("startDate", inputVO.getSTART_DATE());
+		queryCondition.setObject("endDate", inputVO.getEND_DATE());
+		queryCondition.setQueryString(sql.toString());
+		
+		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+		if(CollectionUtils.isNotEmpty(list)) {
+			throw new APException("同商品配息起訖日期間不得重疊");
+		}
+		
+		return;
+	}
+		
 	/**
      * 下載費用率與報酬率範例檔
      * @param body

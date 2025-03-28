@@ -27,6 +27,38 @@ eSoafApp.controller('ORG431Controller', function(sysInfoService, $scope, $contro
 		});
 	};
 	
+	$scope.chgORG = function (orgType) {
+		$scope.inputVO.orgType = orgType;
+		
+        $scope.sendRecv("PMS401U", "getORG", "com.systex.jbranch.app.server.fps.pms401u.PMS401UInputVO", $scope.inputVO, function(tota, isError) {
+			if (!isError) {
+				switch (orgType) {
+					case "getAR":
+						$scope.uhrmRCList = [];
+						$scope.uhrmOPList = [];
+						
+						if (null != tota[0].body.ARList) {
+							angular.forEach(tota[0].body.ARList, function(row) {
+								$scope.uhrmRCList.push({LABEL: row.REGION_CENTER_NAME, DATA: row.REGION_CENTER_ID});
+							});
+				        }
+						
+						break;
+					case "getOP":
+						$scope.uhrmOPList = [];
+						
+						if (null != tota[0].body.OPList) {
+							angular.forEach(tota[0].body.OPList, function(row) {
+								$scope.uhrmOPList.push({LABEL: row.BRANCH_AREA_NAME, DATA: row.BRANCH_AREA_ID});
+							});
+				        }
+
+						break;
+				}
+			}						
+		});
+	}
+	
 	$scope.init = function() {
 		$scope.aoCntLst = [];
 		$scope.reportLst = [];
@@ -40,7 +72,8 @@ eSoafApp.controller('ORG431Controller', function(sysInfoService, $scope, $contro
 			EXPORT_LST: []
     	};
 		
-		$scope.query();
+		$scope.chgORG('getAR');
+//		$scope.query();
 	};
 	$scope.init();
 	
@@ -48,21 +81,16 @@ eSoafApp.controller('ORG431Controller', function(sysInfoService, $scope, $contro
 		angular.copy($scope.reportLst, $scope.inputVO.EXPORT_LST);
 		$scope.inputVO.EXPORT_LST.push($scope.totals);
 		
-		console.log(JSON.stringify($scope.inputVO.EXPORT_LST));
-		
-		$scope.sendRecv("ORG431", "export", "com.systex.jbranch.app.server.fps.org431.ORG431InputVO", $scope.inputVO,
-				function(totas, isError) {
-                	if (isError) {
-                		$scope.showErrorMsg(totas[0].body.msgData);
-                	}
-                	if (totas.length > 0) {
-                		if(totas[0].body.aoCntLst && totas[0].body.aoCntLst.length == 0) {
-                			$scope.showMsg("ehl_01_common_009");
-                			return;
-                		}
-                	};
-				}
-		);
+		$scope.sendRecv("ORG431", "export", "com.systex.jbranch.app.server.fps.org431.ORG431InputVO", $scope.inputVO,function(totas, isError) {
+        	if (isError) {
+        		$scope.showErrorMsg(totas[0].body.msgData);
+        	}
+        	if (totas.length > 0) {
+        		if(totas[0].body.aoCntLst && totas[0].body.aoCntLst.length == 0) {
+        			$scope.showMsg("ehl_01_common_009");
+        			return;
+        		}
+        	};
+		});
 	};
-	
 });

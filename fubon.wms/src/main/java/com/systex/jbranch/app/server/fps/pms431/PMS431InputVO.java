@@ -9,6 +9,7 @@ import java.util.Map;
 public class PMS431InputVO extends PagingInputVO {
 
 	private String sCreDate;
+	private String eCreDate;
 	private String region_center_id;
 	private String branch_area_id;
 	private String branch_nbr;
@@ -33,6 +34,14 @@ public class PMS431InputVO extends PagingInputVO {
 	private String uhrmRC;
 	private String uhrmOP;
 	
+	public String geteCreDate() {
+		return eCreDate;
+	}
+
+	public void seteCreDate(String eCreDate) {
+		this.eCreDate = eCreDate;
+	}
+
 	public String getUhrmRC() {
 		return uhrmRC;
 	}

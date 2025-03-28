@@ -4,9 +4,11 @@
  */
 'use strict';
 eSoafApp.controller('CRM341Controller',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, $q, getParameter, $filter) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, $q, getParameter, $filter, crmService) {
 		$controller('BaseController', {$scope: $scope});
 		$scope.controllerName = "CRM341Controller";
+		
+		crmService.getForbiddenList();
 		
 		// combobox
 		$scope.pri_id = projInfoService.getPriID()[0];
@@ -109,6 +111,11 @@ eSoafApp.controller('CRM341Controller',
 		//查詢
 		$scope.inquire = function() {
 			$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase().trim();
+			
+			if(crmService.checkCustId($rootScope.forbiddenData,$scope.inputVO.cust_id)) {
+				$scope.showErrorMsg("ehl_01_CRM_002");
+    			return;
+			}
 			// 給同意書用
 			$scope.inputVO.oldVOList = {};
 			$scope.sendRecv("CRM341", "inquire", "com.systex.jbranch.app.server.fps.crm341.CRM341InputVO", $scope.inputVO,
@@ -231,13 +238,18 @@ eSoafApp.controller('CRM341Controller',
 	    
 	    //下載客戶同意書
     	$scope.download = function() {
+    		if($scope.inputVO.oldVOList && $scope.inputVO.oldVOList.CUST_ID != $scope.inputVO.cust_id) {
+    			$scope.showMsg('ehl_01_CRM341_001');
+				return;
+    		}
+    			
     		if(!$scope.inputVO.new_ao_code) {
     			$scope.showErrorMsg('請先選擇移入AO CODE');
 	    		return;
     		}
-    		// 下載前先檢核：他人主CODE客戶僅可移入轄下主CODE，不可移入副CODE
-    		if($scope.resultList.TYPE == '1' && $scope.resultList2.NEW_AO_TYPE != '1') {
-    			$scope.showErrorMsg('他人主CODE客戶僅可移入轄下主CODE，不可移入副CODE');
+    		// 下載前先檢核：主CODE客戶不可移轉至維護CODE
+    		if($scope.resultList.TYPE == '1' && $scope.resultList2.NEW_AO_TYPE == '3') {
+    			$scope.showErrorMsg('主CODE客戶不可移轉至維護CODE');
 	    		return;
         	} else {
 	    		$scope.sendRecv("CRM341", "download", "com.systex.jbranch.app.server.fps.crm341.CRM341InputVO", $scope.inputVO,
@@ -276,6 +288,11 @@ eSoafApp.controller('CRM341Controller',
         
         $scope.checkadd = function() {
         	$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase().trim();
+        	
+        	if($scope.inputVO.oldVOList && $scope.inputVO.oldVOList.CUST_ID != $scope.inputVO.cust_id) {
+    			$scope.showMsg('ehl_01_CRM341_001');
+				return;
+    		}
 
         	//2022換手名單：已換手經營客戶未滿6個月移轉回原個金RM，需簽署「客戶資產現況表申請書」及「客戶指定個金客戶經理自主聲明書」
         	if($scope.inputVO.is2022CMDTCust3) {
@@ -312,10 +329,10 @@ eSoafApp.controller('CRM341Controller',
     			$scope.showErrorMsg('需經客戶簽署「主要往來方行異動申請書」，上傳後才可申請移入');
 	    		return;
         	}
-        	debugger
-        	// 他人主CODE客戶僅可移入轄下主CODE，不可移入副CODE
-        	if($scope.resultList.TYPE == '1' && $scope.resultList2.NEW_AO_TYPE != '1') {
-    			$scope.showErrorMsg('他人主CODE客戶僅可移入轄下主CODE，不可移入副CODE');
+        	
+        	// 主CODE客戶不可移轉至維護CODE
+        	if($scope.resultList.TYPE == '1' && $scope.resultList2.NEW_AO_TYPE == '3') {
+    			$scope.showErrorMsg('主CODE客戶不可移轉至維護CODE');
 	    		return;
         	}
         	

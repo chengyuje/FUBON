@@ -17,8 +17,15 @@ eSoafApp.controller('PMS433Controller',
 			}
 		});
 		
-        
-        
+		$scope.role_id = projInfoService.getRoleID();
+		$scope.role_maintanence = projInfoService.getAuthorities().MODULEID[projInfoService.$currentModule].ITEMID['PMS433'].FUNCTIONID['maintenance'] === undefined ? false : projInfoService.getAuthorities().MODULEID[projInfoService.$currentModule].ITEMID['PMS433'].FUNCTIONID['maintenance'];
+		$scope.showUHRM = true;
+		if ($scope.role_id === 'B024' || $scope.role_id === 'B026' || $scope.role_id === 'A164' || $scope.role_id === 'B030') {
+			$scope.showUHRM = true;
+		} else {
+			$scope.showUHRM = false;
+		}
+
         //選取月份下拉選單 --> 重新設定可視範圍
         $scope.dateChange = function(){
         	//設定回傳時間
@@ -27,7 +34,8 @@ eSoafApp.controller('PMS433Controller',
         	} else {
         		//可視範圍  觸發 
         		$scope.inputVO.reportDate = $scope.inputVO.sCreDate;
-            	$scope.RegionController_getORG($scope.inputVO);
+        		$scope.getViewRegion($scope.inputVO);
+        		debugger;
         	}        	
         };
 
@@ -43,7 +51,10 @@ eSoafApp.controller('PMS433Controller',
 					call_result: '', //外撥結果
 					region_center_id: '',   //業務處
 					branch_area_id: '' ,   //營運區
-					branch_nbr: ''	     //歸屬行  			
+					branch_nbr: '',	     //歸屬行  	
+					uhrm_region_center_id: '',
+					uhrm_branch_area_id: '',
+					uhrmFlag		: String(sysInfoService.getMemLoginFlag()).toLowerCase().indexOf("uhrm") < 0 ? false : true
         	};
 			
 			$scope.sendRecv("PMS433", "init", "com.systex.jbranch.app.server.fps.pms433.PMS433InputVO", {}, function(tota, isError) {
@@ -51,7 +62,7 @@ eSoafApp.controller('PMS433Controller',
 					$scope.mappingSet['date'] = tota[0].body.dateList;
 					$scope.inputVO.reportDate = $scope.mappingSet['date'][0].DATA;
 					$scope.inputVO.sCreDate = $scope.mappingSet['date'][0].DATA;
-					$scope.RegionController_getORG($scope.inputVO);
+					$scope.getViewRegion($scope.inputVO);
 				} else {
 					$scope.showErrorMsg("參數初始化失敗，請重新登入此畫面或洽詢系統管理員。");
 				}
@@ -72,6 +83,7 @@ eSoafApp.controller('PMS433Controller',
 	    		$scope.showErrorMsg('欄位檢核錯誤:月份必要輸入欄位');
         		return;
         	}
+			$scope.inputVO.branch_list = $scope.BRANCH_LIST;
 			
 			$scope.sendRecv("PMS433", "query", "com.systex.jbranch.app.server.fps.pms433.PMS433InputVO", $scope.inputVO,
 					function(tota, isError) {
@@ -85,20 +97,17 @@ eSoafApp.controller('PMS433Controller',
 							$scope.originalList = angular.copy(tota[0].body.resultList);
 							$scope.resultList = tota[0].body.resultList;
 							angular.forEach($scope.resultList, function(row, index, objs){
-//								row.IDS=row.ID.substring(0, 4)+"****"+row.ID.substring(8, 10);
-//								
-//								//作業主管能做的資料 by 2017/11/29 willis 需求變更
-//								if($scope.role_id =='A150' || $scope.role_id == 'ABRF'){
-//									if(row.ROLE_FLAG == 'BR'){
-//										row.DISABLE_ROLE_FLAG = 'Y';
-//									}
-//								}
-//								//分行主管能做的資料 by 2017/11/29 willis 需求變更
-//								if($scope.role_id =='A161' || $scope.role_id == 'A149' || $scope.role_id =='ABRU' || $scope.role_id =='A308'){
-//									if(row.ROLE_FLAG == 'OP'){
-//										row.DISABLE_ROLE_FLAG = 'Y';
-//									}
-//								}
+								if(!row.CALL_RESULT) {
+									row.CALL_RESULT = '';
+								}
+
+							});	
+							
+							angular.forEach($scope.originalList, function(row, index, objs){
+								if(!row.CALL_RESULT) {
+									row.CALL_RESULT = '';
+								}
+
 							});	
 
 							$scope.outputVO = tota[0].body;	
@@ -117,7 +126,8 @@ eSoafApp.controller('PMS433Controller',
 		};		
 		
 		$scope.openDialog = function (row) {
-			var seq = row.SEQ;
+			var cust_id = row.CUST_ID;
+			var selected_date = row.SELECTED_DATE;
 
 			
 			var dialog = ngDialog.open({
@@ -125,22 +135,32 @@ eSoafApp.controller('PMS433Controller',
 				className: 'PMS433',
 				showClose: false,
 	            controller: ['$scope', function($scope) {
-	            	$scope.seq = seq;
+	            	$scope.cust_id = cust_id;
+	            	$scope.selected_date = selected_date;
 	            }]
 			});
 		};
 		
 		$scope.modifyResult = function (row) {
+			debugger;
 			row.MODIFY_FLAG = 'Y';
 		};
 		
 		$scope.save = function(){
 			$scope.modifyList = [];
-			angular.forEach($scope.resultList, function(row){
-				if (row.MODIFY_FLAG === 'Y') {
-					$scope.modifyList.push(row);
-				  }
-				});
+			angular.forEach($scope.originalList, function(row1){
+				angular.forEach($scope.resultList, function(row){
+					if (row.MODIFY_FLAG === 'Y' && row.SEQ === row1.SEQ) {
+						if(row.CALL_RESULT === row1.CALL_RESULT && row.REC_SEQ === row1.REC_SEQ && row.MEMO === row1.MEMO) {
+							
+						} else {
+							debugger;
+							$scope.modifyList.push(row);
+						}
+					  }
+					});				
+			});
+
 			if($scope.modifyList.length > 0) {
 				$scope.sendRecv("PMS433", "save", "com.systex.jbranch.app.server.fps.pms433.PMS433InputVO", {'modifyList':$scope.modifyList},
 						function(tota, isError) {						
@@ -157,4 +177,31 @@ eSoafApp.controller('PMS433Controller',
 			}
 		}
 		
+		$scope.getViewRegion = function(inputVO){
+			if(inputVO.uhrmFlag) {
+				$scope.sendRecv("PMS401U", "isMainten", "com.systex.jbranch.app.server.fps.pms401u.PMS401UInputVO", {'itemID': 'PMS433'},function(tota, isError) {
+					if (!isError) {						
+						$scope.REGION_LIST = [];
+						$scope.AREA_LIST = [];
+
+						if (null != tota[0].body.uhrmORGList) {
+							angular.forEach(tota[0].body.uhrmORGList, function(row) {
+								$scope.REGION_LIST.push({LABEL: row.REGION_CENTER_NAME, DATA: row.REGION_CENTER_ID});
+							});	
+							
+							$scope.inputVO.uhrm_region_center_id = tota[0].body.uhrmORGList[0].REGION_CENTER_ID;
+							
+							angular.forEach(tota[0].body.uhrmORGList, function(row) {
+								$scope.AREA_LIST.push({LABEL: row.BRANCH_AREA_NAME, DATA: row.BRANCH_AREA_ID});
+							});
+							
+							$scope.inputVO.uhrm_branch_area_id = tota[0].body.uhrmORGList[0].BRANCH_AREA_ID;
+							debugger;
+				        }
+					}
+				});
+			} else {
+				$scope.RegionController_getORG($scope.inputVO);
+			}
+		}
 });

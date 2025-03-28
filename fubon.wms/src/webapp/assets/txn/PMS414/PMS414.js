@@ -1,8 +1,18 @@
 'use strict';
-eSoafApp.controller('PMS414Controller', function($scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter, sysInfoService) {
+eSoafApp.controller('PMS414Controller', function($rootScope, $scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter, sysInfoService, getParameter) {
+	
 	$controller('BaseController', {$scope: $scope});
 	$controller('PMSRegionController', {$scope: $scope});
+	
 	$scope.controllerName = "PMS414Controller";
+	
+	// filter
+	getParameter.XML(["PMS.CHECK_TYPE"], function(totas) {
+		if (totas) {
+			$scope.mappingSet['PMS.CHECK_TYPE'] = totas.data[totas.key.indexOf('PMS.CHECK_TYPE')];
+		}
+	});
+    //
 	
 	/* 處理登入者雙重角色情況 */
 	var rcID = sysInfoService.getRegionID();  //登入者區域中心ID
@@ -164,17 +174,17 @@ eSoafApp.controller('PMS414Controller', function($scope, $controller, socketServ
 		$scope.reasonFlag = false;
 		
 		angular.forEach($scope.paramList, function(row, index, objs) {
-			if (row.MEETING_HOUR > 23) {
-				$scope.showErrorMsg("欄位檢查錯誤:[小時]欄位不可以超過23小時!");
-			 	$scope.dets = 1;
-				return;
-			}
-			
-			if (row.MEETING_MIN > 59) {
-				$scope.showErrorMsg("欄位檢查錯誤:[分鐘]欄位不可以超過59分鐘!");
-				$scope.dets = 1;
-				return;
-			}
+//			if (row.MEETING_HOUR > 23) {
+//				$scope.showErrorMsg("欄位檢查錯誤:[小時]欄位不可以超過23小時!");
+//			 	$scope.dets = 1;
+//				return;
+//			}
+//			
+//			if (row.MEETING_MIN > 59) {
+//				$scope.showErrorMsg("欄位檢查錯誤:[分鐘]欄位不可以超過59分鐘!");
+//				$scope.dets = 1;
+//				return;
+//			}
 			
 			//2017-10-11 willis 增加檢核邏輯 問題單0003818與0003826
 			if (!row.OBO_CUST_FLAG && !row.AVOID_FLAG && !row.NEARBY_CUST_FLAG) {
@@ -195,21 +205,18 @@ eSoafApp.controller('PMS414Controller', function($scope, $controller, socketServ
 					$scope.dets = 1;
 					return;
 				}
-				
-				// ADD MARK BY OCEAN : #1590_WMS-CR-20230807-01_擬優化各項內控報表相關功能
-//				if (row.SPECIFIC_FLAG == 'Y') {
-//					if (row.MEETING == null || row.MEETING_HOUR == null || row.MEETING_MIN == null ) {
-//						$scope.showErrorMsg("第" + (index+1) + " 筆，此為特定客戶，需必選問題一及照會時間。");
-//						$scope.dets = 1;
-//						return;
-//					}		
-//				}
-				
-//				if (row.MEETING != null) {
-//					row.MEETING = new Date(row.MEETING).getTime() + "";
-//				}
 			}
 
+			if (!row.NOTE_TYPE || // 查證方式需填寫
+				(row.NOTE_TYPE == 'O' && !row.NOTE) || // 查證方式若為其它，請補充查證方式
+				((row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A') && !row.RECORD_SEQ && row.RECORD_YN == 'Y') || // 查證方式若為電訪/系統查詢及電訪客戶，請輸入電訪錄音編號
+				((row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A') && row.RECORD_SEQ && row.RECORD_SEQ.length != 12 && row.RECORD_YN == 'Y') // 查證方式若為電訪/系統查詢及電訪客戶，電訪錄音編號需滿12碼
+			   ) {
+				$scope.showErrorMsg("查詢方式為必填；若為其它，請補充查詢方式；若為電訪客戶/系統查詢及電訪客戶，請輸入電訪錄音編號(12碼)。");
+				$scope.dets = 1;
+				return;
+			};
+			
 			angular.forEach($scope.originalList, function (originalRow, originalIndex, originalObjs) {
 				if (row.SEQ == originalRow.SEQ && row.VIOLATION_FLAG != originalRow.VIOLATION_FLAG && originalRow.FIRSTUPDATE != null) {
 					$scope.reasonFlag = true;
@@ -217,7 +224,7 @@ eSoafApp.controller('PMS414Controller', function($scope, $controller, socketServ
 			});
 		});
 		
-		if($scope.dets == 1) {
+		if ($scope.dets == 1) {
 			$scope.dets = 0;
 			return;
 		}
@@ -265,7 +272,6 @@ eSoafApp.controller('PMS414Controller', function($scope, $controller, socketServ
         	}
         	if (tota.length > 0) {
         		$scope.showMsg('儲存成功');
-//        		$scope.query();
         	};		
 		});
 	}
@@ -302,4 +308,18 @@ eSoafApp.controller('PMS414Controller', function($scope, $controller, socketServ
         	};
 		});
 	};
+	
+	$scope.setDefaultVal = function (row) {
+		if (row.NOTE_TYPE != 'O') {
+			row.NOTE = '';
+		}
+		
+		if (row.NOTE_TYPE != 'I' && row.NOTE_TYPE != 'A') {
+			row.RECORD_SEQ = '';
+		}
+	}
+	
+    $scope.oldRPT = function(page) {
+    	$rootScope.menuItemInfo.url = "assets/txn/PMS" + page + "/PMS" + page + ".html";
+    };
 });

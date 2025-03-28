@@ -663,9 +663,17 @@ public class SOT701 extends EsbUtil {
 
 		if (isNotBlank(outputVO.getIdno())) {
 			SimpleDateFormat ft = new SimpleDateFormat("ddMMyyyy");
+			SimpleDateFormat ft2 = new SimpleDateFormat("yyyyMMdd");
 			custKYCDataVO.setKycLevel(outputVO.getResult1());
 			custKYCDataVO.setKycDueDate(ft.parse(outputVO.getExpiryDate1()));
-
+			
+			Long sysdate = ft2.parse(ft2.format(new Date())).getTime();
+			Long dueDate = custKYCDataVO.getKycDueDate().getTime();
+			
+			if(((dueDate - sysdate) / (1000 * 60 * 60 * 24))  <= 30) {
+				custKYCDataVO.setKycDueDateLessOneMonth(true);
+			}
+			
 			XmlInfo xmlInfo = new XmlInfo();
 			String riskFit = (String) xmlInfo.getVariable("SOT.RISK_FIT_CONFIG", custKYCDataVO.getKycLevel(), "F3");
 			custKYCDataVO.setRISK_FIT(riskFit);

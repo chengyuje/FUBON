@@ -25,6 +25,25 @@ public class PMS361InputVO extends PagingInputVO {
 
 	private String uhrmRC;
 	private String uhrmOP;
+	
+	private String delType;
+	private String deviceID;
+	
+	public String getDeviceID() {
+		return deviceID;
+	}
+
+	public void setDeviceID(String deviceID) {
+		this.deviceID = deviceID;
+	}
+
+	public String getDelType() {
+		return delType;
+	}
+
+	public void setDelType(String delType) {
+		this.delType = delType;
+	}
 
 	public String getUhrmRC() {
 		return uhrmRC;

@@ -131,17 +131,11 @@ eSoafApp.controller('SOT111Controller',
 							$scope.inputVO.custRemarks = tota[0].body.mainList[0].CUST_REMARKS;	 			//客戶註記
 							$scope.inputVO.isOBU = tota[0].body.mainList[0].IS_OBU;	 						//是否為OBU客戶
 							$scope.inputVO.isAgreeProdAdv = tota[0].body.mainList[0].IS_AGREE_PROD_ADV;	 	//同意投資商品諮詢服務
-							console.log("$scope.inputVO.isAgreeProdAdv", $scope.inputVO.isAgreeProdAdv);
 							$scope.inputVO.piRemark = tota[0].body.mainList[0].PI_REMARK;	 	            //專業投資人註記
 							$scope.inputVO.bargainDueDate = $scope.toJsDate(tota[0].body.mainList[0].BARGAIN_DUE_DATE);		//期間議價效期
 							$scope.inputVO.bargainFeeFlag = tota[0].body.mainList[0].BARGAIN_FEE_FLAG;		//議價狀態
-							console.log("$scope.inputVO.bargainFeeFlag", $scope.inputVO.bargainFeeFlag);
 							$scope.inputVO.tradeStatus = tota[0].body.mainList[0].TRADE_STATUS;				//交易狀態
-							console.log("$scope.inputVO.tradeStatus ", $scope.inputVO.tradeStatus);
 							$scope.inputVO.isWeb = tota[0].body.mainList[0].IS_WEB;							//是否為網銀快速申購(Y/N)
-							console.log("$scope.inputVO.isWeb", $scope.inputVO.isWeb);
-//							
-							console.log("inputVO.goBankDisabled", $scope.inputVO.goBankDisabled);
 							$scope.inputVO.loanFlag = tota[0].body.mainList[0].FLAG_NUMBER;				    //90天貸款註記(Y/N)
 							
 							$scope.mainList = tota[0].body.mainList;
@@ -232,14 +226,13 @@ eSoafApp.controller('SOT111Controller',
 								$scope.recSeqFlagOrg = 'Y';
 							}							
 							$scope.recSeqFlag = $scope.recSeqFlagOrg;
-							console.log("$scope.recSeqFlag", $scope.recSeqFlag);
+							
 							return;
 						}
 			});
 		};
 		
 		$scope.enterPage = function () {
-			debugger;
 			$scope.noCallCustQuery().then(function(data) {
 				$scope.getSOTCustInfoCT();
 			});
@@ -461,6 +454,7 @@ eSoafApp.controller('SOT111Controller',
 					function(tota1, isError) {
 						if (!isError) {
 							$scope.isBackend = tota1[0].body.prodDTL[0].IS_BACKEND;
+							var overCentRateYN = $scope.carList[0].OVER_CENTRATE_YN; //境外私募基金只會有一筆
 							
 							var fitVO = {
 								caseCode : 		1, 							//case1 下單
@@ -469,7 +463,10 @@ eSoafApp.controller('SOT111Controller',
 								tradeSeq : 		$scope.inputVO.tradeSEQ, 	//交易序號
 								tradeType:		1,							//基金交易類別 : 單筆申購
 								isbBackend:		$scope.isBackend,			//是否為後收型基金(Y/N)
-								isPrintSOT819:	$scope.inputVO.loanFlag //是否列印貸款風險預告書
+								isPrintSOT819:	$scope.inputVO.loanFlag, //是否列印貸款風險預告書
+								overCentRateYN: overCentRateYN,	//超過集中度通知門檻
+								prdId :			$scope.carList[0].PROD_ID,
+								prdName :		$scope.carList[0].PROD_NAME
 							}
 							
 							$scope.sendRecv("SOT712", "fitToGetPDF", "com.systex.jbranch.app.server.fps.sot712.PRDFitInputVO", fitVO,

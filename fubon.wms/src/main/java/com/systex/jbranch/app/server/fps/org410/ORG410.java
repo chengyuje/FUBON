@@ -219,7 +219,7 @@ public class ORG410 extends FubonWmsBizLogic {
 		sb.append("SELECT R.ROLE_ID, R.ROLE_NAME, R.JOB_TITLE_NAME ");
 		sb.append("FROM TBSYSSECUROLPRIASS P ");
 		sb.append("LEFT JOIN TBORG_ROLE R ON P.ROLEID = R.ROLE_ID ");
-		sb.append("WHERE PRIVILEGEID IN ('002', '003') ");
+		sb.append("WHERE PRIVILEGEID IN ('002', '003', 'UHRM002') ");
 		sb.append("ORDER BY ROLE_NAME ");
 		
 		queryCondition.setQueryString(sb.toString());

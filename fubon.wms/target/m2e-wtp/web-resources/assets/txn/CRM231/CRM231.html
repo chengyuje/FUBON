@@ -18,52 +18,63 @@
     -moz-border-radius: 0px;
     border-radius: 0px;
 }
+.formatWidth{
+	width:150px !important;
+	float: left !important;
+}
 </style>
 <script type="text/javascript" src="assets/txn/CRM231/CRM231.js"></script>
 <script type="text/javascript" src="assets/txn/CRM230/CRM230.js"></script>
 <script type="text/javascript" src="assets/txn/CUS160/CUS160_ADD.js"></script>
 <script type="text/javascript" src="assets/txn/CRM230/CRM230_COMPANY.js"></script>
+<script src="assets/txn/CRM110/crmService.js" type="text/javascript" ></script>
 <div ng-controller="CRM231Controller" ng-cloak>
     <div>
         <div class="tfb_content">
             <div class="tfb_content_icon"></div>
             <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
         </div>
-        <!--Content of the panel-->
         <div class="panel_content">
-            <!-- include -->
             <div ng-include="'assets/txn/CRM230/CRM230_COMMON.html'"></div>
-            <!-- include -->
-            <div class="search_table">
+            <div class="search_table search_box3">
                 <hr>
                 <h4>所有商品</h4>
                 <table>
                     <tr>
                         <th width="10%">商品類別：</th>
                         <td width="40%">
-                            <e-combobox id="prod_type" ng-paramtype="CRM.AST_ALLPRD_TYPE" ng-model="inputVO.prod_type" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" height="30px" style="line-height:20px;" />
+                            <e-combobox id="prod_type" ng-paramtype="CRM.AST_ALLPRD_TYPE" ng-model="inputVO.prod_type" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" style="width: 200px;line-height:20px;" />
                         </td>
                         <th width="10%">報酬率(%)：</th>
                         <td width="40%">
-                            <input type="text" placeholder="請輸入..." id="rtn_rate_wd_bgn" name="rtn_rate_wd_bgn" ng-model="inputVO.rtn_rate_wd_bgn" e-input-limit="ND" e-length-limit="5">%&nbsp ~ &nbsp
-                            <input type="text" placeholder="請輸入..." id="rtn_rate_wd_end" name="rtn_rate_wd_end" ng-model="inputVO.rtn_rate_wd_end" e-input-limit="ND" e-length-limit="5">%
+	                        <div class="form-group">
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="rtn_rate_wd_bgn" name="rtn_rate_wd_bgn" ng-model="inputVO.rtn_rate_wd_bgn" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="rtn_rate_wd_end" name="rtn_rate_wd_end" ng-model="inputVO.rtn_rate_wd_end" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%</div>
+			     			</div>
                         </td>
+                        <th></th>
+                        <td></td>
                     </tr>
                     <tr>
                         <th>商品代碼：</th>
                         <td>
-                            <input type="text" placeholder="請輸入..." id="prod_id" name="prod_id" ng-model="inputVO.prod_id" e-length-limit="50" size="48" style="text-transform:uppercase;">
+                            <input type="text" class="form-control" placeholder="請輸入..." id="prod_id" name="prod_id" ng-model="inputVO.prod_id" e-length-limit="50" size="48" style="width: 200px;text-transform:uppercase;">
                         </td>
                         <th>台幣參考現值：</th>
                         <td>
-                            <input type="text" placeholder="請輸入..." id="now_amt_twd_bgn" name="now_amt_twd_bgn" ng-model="inputVO.now_amt_twd_bgn" e-input-limit="ND" e-length-limit="12">&nbsp ~ &nbsp
-                            <input type="text" placeholder="請輸入..." id="now_amt_twd_end" name="now_amt_twd_end" ng-model="inputVO.now_amt_twd_end" e-input-limit="ND" e-length-limit="12">
+                        	<div class="form-group">
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="now_amt_twd_bgn" name="now_amt_twd_bgn" ng-model="inputVO.now_amt_twd_bgn" e-input-limit="ND" e-length-limit="12"></div>
+			     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="now_amt_twd_end" name="now_amt_twd_end" ng-model="inputVO.now_amt_twd_end" e-input-limit="ND" e-length-limit="12"></div>
+			     			</div>
                         </td>
                     </tr>
                     <tr>
                         <th>商品名稱：</th>
                         <td>
-                            <input type="text" placeholder="請輸入..." id="prod_name" name="prod_name" ng-model="inputVO.prod_name" e-length-limit="50" size="48">
+                            <input type="text" class="form-control" placeholder="請輸入..." id="prod_name" name="prod_name" ng-model="inputVO.prod_name" e-length-limit="50" size="48" style="width: 200px;">
                         </td>
                         <th>投資幣別：</th>
                         <td>
@@ -73,13 +84,21 @@
                     <tr>
                         <th>客戶停利點(%)：</th>
                         <td>
-                            <input type="text" placeholder="請輸入..." id="take_prft_pt_bgn" name="take_prft_pt_bgn" ng-model="inputVO.take_prft_pt_bgn" e-input-limit="ND" e-length-limit="5">%&nbsp ~ &nbsp
-                            <input type="text" placeholder="請輸入..." id="take_prft_pt_end" name="take_prft_pt_end" ng-model="inputVO.take_prft_pt_end" e-input-limit="ND" e-length-limit="5">%
+                        	<div class="form-group">
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="take_prft_pt_bgn" name="take_prft_pt_bgn" ng-model="inputVO.take_prft_pt_bgn" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="take_prft_pt_end" name="take_prft_pt_end" ng-model="inputVO.take_prft_pt_end" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%</div>
+			     			</div>
                         </td>
                         <th>客戶停損點(%)：</th>
                         <td>
-                            <input type="text" placeholder="請輸入..." id="stop_loss_pt_bgn" name="stop_loss_pt_bgn" ng-model="inputVO.stop_loss_pt_bgn" e-input-limit="ND" e-length-limit="5">%&nbsp ~ &nbsp
-                            <input type="text" placeholder="請輸入..." id="stop_loss_pt_end" name="stop_loss_pt_end" ng-model="inputVO.stop_loss_pt_end" e-input-limit="ND" e-length-limit="5">%
+                        	<div class="form-group">
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="stop_loss_pt_bgn" name="stop_loss_pt_bgn" ng-model="inputVO.stop_loss_pt_bgn" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="stop_loss_pt_end" name="stop_loss_pt_end" ng-model="inputVO.stop_loss_pt_end" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%</div>
+			     			</div>
                         </td>
                     </tr>
                     <tr>

@@ -14,38 +14,42 @@ eSoafApp.controller('PMS427Controller', function($rootScope, $scope, $controller
 	});
 	// ===
 	
-	var NowDate = new Date();
-	var yr = NowDate.getFullYear();
-    var mm = NowDate.getMonth() + 1;
-    var strmm = '';
-    $scope.mappingSet['timeE'] = [];
-    for(var i = 0; i < 13; i++){
-    	mm = mm -1;
-    	if(mm == 0){
-    		mm = 12;
-    		yr = yr-1;
-    	}
-    	if(mm < 10)
-    		strmm = '0' + mm;
-    	else
-    		strmm = mm;        		
-    	$scope.mappingSet['timeE'].push({
-    		LABEL: yr + '/' + strmm,
-    		DATA: yr + '' + strmm
-    	});        
-    }
+	$scope.model = {};
+	$scope.open = function($event, elementOpened) {
+		$event.preventDefault();
+		$event.stopPropagation();
+		$scope.model[elementOpened] = !$scope.model[elementOpened];
+	};
+	
+    $scope.importStartDateOptions = {
+    	minMode: 'month', 
+		maxDate: $scope.inputVO.eCreDate || $scope.maxDate,
+		minDate: $scope.minDate
+	};
+    
+	$scope.importEndDateOptions = {
+		minMode: 'month',
+		maxDate: $scope.maxDate,
+		minDate: $scope.inputVO.sCreDate || $scope.minDate
+	};
+	
+	$scope.limitDate = function() {
+		$scope.importStartDateOptions.maxDate = $scope.inputVO.eCreDate || $scope.maxDate;
+		$scope.importEndDateOptions.minDate = $scope.inputVO.sCreDate || $scope.minDate;
+	};
 
-    //選取月份下拉選單 --> 重新設定可視範圍
-    $scope.dateChange = function() {
-	   if($scope.inputVO.sCreDate != ''){
-	   		$scope.inputVO.reportDate = $scope.inputVO.sCreDate;
-	   } else {   
-		   $scope.inputVO.sCreDate = '201701';
-		   $scope.inputVO.reportDate = $scope.inputVO.sCreDate;    
-		   $scope.inputVO.sCreDate = '';
-	   } 
-    	$scope.inputVO.dataMon = $scope.inputVO.sCreDate; 
-    }; 
+	//選取月份下拉選單 --> 重新設定可視範圍
+	$scope.dateChange = function(){
+		if ($scope.inputVO.sCreDate != '') {
+			$scope.inputVO.reportDate = $scope.inputVO.sCreDate;
+		} else {   
+			$scope.inputVO.sCreDate = '201701';
+			$scope.inputVO.reportDate = $scope.inputVO.sCreDate;
+			$scope.inputVO.sCreDate = '';
+		} 
+		
+		$scope.inputVO.dataMonth = $scope.inputVO.sCreDate; 
+	}; 
     
 	// 初始化
 	$scope.init = function() {
@@ -53,6 +57,7 @@ eSoafApp.controller('PMS427Controller', function($rootScope, $scope, $controller
 
 		$scope.inputVO = {
 			sCreDate			: '',
+			eCreDate            : '',
 			region_center_id	: '',   // 區域中心
 			branch_area_id		: '', 	// 營運區
 			branch_nbr			: '',	// 分行	

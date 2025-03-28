@@ -185,7 +185,7 @@ public class Ins145Report extends AbstractInsReport implements Ins145ReportInf{
 			//不是同一張保單的個別資訊
 			else 
 			{
-				System.out.println(lastKey + "\t:\t" + nowKey);
+//				System.out.println(lastKey + "\t:\t" + nowKey);
 				custPolicyMap = new HashMap<String, Object>();
 
 				//保險公司名稱 - 如果找不到名稱就直接塞保險公司代碼

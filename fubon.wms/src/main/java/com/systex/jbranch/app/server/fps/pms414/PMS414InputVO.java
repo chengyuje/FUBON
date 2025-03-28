@@ -21,6 +21,16 @@ public class PMS414InputVO extends PagingInputVO {
 
 	private String reason;
 	private String selectRoleID;
+	
+	private String bakFlag;
+
+	public String getBakFlag() {
+		return bakFlag;
+	}
+
+	public void setBakFlag(String bakFlag) {
+		this.bakFlag = bakFlag;
+	}
 
 	public String getSelectRoleID() {
 		return selectRoleID;

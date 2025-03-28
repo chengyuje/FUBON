@@ -24,9 +24,9 @@ public class NJBRVA1OutputVODetails {
     @XmlElement
 	private String ProdCurr;        //計價幣別
     @XmlElement
-	private String RefVal;      //參考報價
+	private String RefVal;          //參考報價
     @XmlElement
-	private String RefValDate;        //報價日期
+	private String RefValDate;      //報價日期
 
     public String getBondName() {
         return BondName;

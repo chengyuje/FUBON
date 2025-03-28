@@ -119,6 +119,8 @@ public class SOT310 extends EsbUtil {
 		//FOR CBS測試日期修改
 		outputVO.setKycDueDateUseful(outputVO_701.getCustKYCDataVO().isKycDueDateUseful());
 		outputVO.setPiDueDateUseful(outputVO_701.getFp032675DataVO().isPiDueDateUseful());
+		
+		outputVO.setKycDueDateLessOneMonth(outputVO_701.getCustKYCDataVO().isKycDueDateLessOneMonth());
 		// add by ocean 2016-10-26 因應適配
 		//		outputVO.setIsCustStackholder(sot701.isCustStakeholder(inputVO_701));
 		//		outputVO.setCustQValue(sot701.getCustQValue(inputVO_701));

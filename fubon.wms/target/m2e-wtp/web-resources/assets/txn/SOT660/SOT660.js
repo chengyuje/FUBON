@@ -30,6 +30,7 @@ eSoafApp.controller('SOT660Controller',
 			$scope.inputVO.wmshaiaData = null;
 			$scope.inputVO.dataDate = null;
 			$scope.inputVO.trialData = null;
+			$scope.inputVO.KYCExpiredYN = "";
 			
 			$scope.inputVO.currentRiskVal = 1; //客戶現在風險屬性值
         	$scope.inputVO.allowRiskVal = 4; //客戶可越級風險屬性值
@@ -91,6 +92,7 @@ eSoafApp.controller('SOT660Controller',
 							$scope.inputVO.wmshaiaData = tota[0].body.wmshaiaData; //投組風險檢核值資料
 							$scope.inputVO.dataDate = $filter('date')(new Date(),'yyyy-MM-dd HH:mm:ss');//取當日日期
 							$scope.inputVO.currentRiskVal = parseInt($scope.inputVO.custKYCData.kycLevel.substring(1)); //客戶現在風險屬性值
+							$scope.inputVO.KYCExpiredYN = tota[0].body.KYCExpiredYN; //KYC是否已過期 Y:已過期
 							
 							$scope.inputVO.AMT11 = $scope.inputVO.wmshaiaData.AMT_LEFT_1; //P1台幣最大可申購金額
 							$scope.inputVO.AMT21 = $scope.inputVO.wmshaiaData.AMT_LEFT_2; //P2台幣最大可申購金額
@@ -118,6 +120,20 @@ eSoafApp.controller('SOT660Controller',
 		
 		//進行投組適配試算
 		$scope.trialCalculate = function() {
+			if(!$scope.inputVO.hnwcData || $scope.inputVO.hnwcData.validHnwcYN != "Y" ||
+					$scope.inputVO.hnwcData.hnwcService != "Y") {
+				$scope.showErrorMsgInDialog("非高資產客戶無法執行試算");
+				return false;
+			}
+			if($scope.inputVO.hnwcData.spFlag == "Y") {
+				$scope.showErrorMsgInDialog("特定客戶不可越級適配，無法執行適算");
+				return false;
+			}
+			if($scope.inputVO.KYCExpiredYN == "Y") {
+				$scope.showErrorMsgInDialog("客戶風險屬性已逾期，無法執行試算");
+				return false;
+			}
+			
 			$scope.inputVO.trialData = null;
 			debugger
 			$scope.inputVO.custRemarks = $scope.inputVO.hnwcData.spFlag;

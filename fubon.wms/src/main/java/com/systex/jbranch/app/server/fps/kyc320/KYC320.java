@@ -211,19 +211,19 @@ public class KYC320 extends FubonWmsBizLogic {
 			}
 			
 			if(inputVO.getsTime() != null){
-				sb.append("AND TO_CHAR(T.CREATE_DATE,'YYYYMMDD') >= :CREATE_DATEE ");
+				sb.append("AND T.CREATE_DATE >= TRUNC(:CREATE_DATEE) ");
 				//日期轉換
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-				String dateString = sdf.format(inputVO.getsTime());
-				queryCondition.setObject("CREATE_DATEE", dateString);
+//				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+//				String dateString = sdf.format(inputVO.getsTime());
+				queryCondition.setObject("CREATE_DATEE", inputVO.getsTime());
 			}
 			
 			if(inputVO.geteTime() != null){
-				sb.append("AND TO_CHAR(T.CREATE_DATE,'YYYYMMDD') <= :CREATE_DATEE2 ");
+				sb.append("AND T.CREATE_DATE < TRUNC(:CREATE_DATEE2) + 1 ");
 				//日期轉換
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-				String dateString = sdf.format(inputVO.geteTime());
-				queryCondition.setObject("CREATE_DATEE2", dateString);
+//				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+//				String dateString = sdf.format(inputVO.geteTime());
+				queryCondition.setObject("CREATE_DATEE2", inputVO.geteTime());
 			}
 			
 			sb.append("ORDER BY T.CUST_ID, T.CREATE_DATE DESC ");

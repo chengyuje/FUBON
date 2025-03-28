@@ -4,11 +4,13 @@
  */
 'use strict';
 eSoafApp.controller('CRM211Controller',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService, crmService) {
 		$controller('BaseController', {$scope: $scope});
 
 		$controller('CRM210Controller', {$scope: $scope});
 		$scope.controllerName = "CRM211Controller";
+		
+		crmService.getForbiddenList();
 		
 		$scope.priID = String(sysInfoService.getPriID());
 		/*
@@ -108,7 +110,12 @@ eSoafApp.controller('CRM211Controller',
 		
 		$scope.inquire = function() {
 			if($scope.inputVO.cust_id != ''){
-				$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase();				
+				$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase();	
+				
+				if(crmService.checkCustId($rootScope.forbiddenData,$scope.inputVO.cust_id)) {
+					$scope.showErrorMsg("ehl_01_CRM_002");
+	    			return;
+				}
 			}
 			//手收貢獻度檢查
 			if($scope.inputVO.manage_05_Date != undefined){
@@ -125,12 +132,15 @@ eSoafApp.controller('CRM211Controller',
 			$scope.sendRecv("CRM211", "inquire", "com.systex.jbranch.app.server.fps.crm211.CRM211InputVO", $scope.inputVO,
 				function(tota, isError) {
 					if (!isError) {
+						debugger;
 						if(tota[0].body.resultList.length == 0) {
 							$scope.showMsg("ehl_01_common_009");
                 			return;
                 		}
 						$scope.obj.resultList = tota[0].body.resultList;
 						$scope.obj.outputVO = tota[0].body;
+						
+						$scope.obj.resultList = crmService.filterList($rootScope.forbiddenData,$scope.obj.resultList);
 					}
 			});
 	    };

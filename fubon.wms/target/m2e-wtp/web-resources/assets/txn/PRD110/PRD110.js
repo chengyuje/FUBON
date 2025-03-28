@@ -43,7 +43,6 @@ eSoafApp.controller('PRD110Controller',
 			var oritype = $scope.inputVO.type; 
 			$scope.inputVO = {};
 			$scope.inputVO.type = oritype;
-			console.log("prd110 $scope.inputVO.type", $scope.inputVO.type);
 			$scope.inputVO.prodType='1';  //1：基金
         	$scope.inputVO.tradeType=''; 
         	$scope.inputVO.seniorAuthType='A'; //高齡評估表授權種類(S:下單、A：適配)
@@ -56,6 +55,8 @@ eSoafApp.controller('PRD110Controller',
 				$scope.inputVO.main_prd = $scope.main_prd || '';
 				$scope.inputVO.sameSerialYN = $scope.sameSerialYN;
 				$scope.inputVO.sameSerialProdId = $scope.sameSerialProdId;
+				$scope.inputVO.dynamicProdCurrM = $scope.dynamicProdCurrM;
+				$scope.inputVO.dynamicType = $scope.dynamicType;
 				if($scope.isBackend != undefined)
 					$scope.inputVO.isBackend = $scope.isBackend;
 			} else if($scope.is910){
@@ -74,6 +75,9 @@ eSoafApp.controller('PRD110Controller',
 			} else {
 				$scope.inputVO.fromSOTProdYN = "N";
 			}
+			$scope.inputVO.fromPRD111YN = $scope.fromPRD111YN; //是否由動態鎖利適配過來
+			$scope.inputVO.sortType = "1"; //商品代碼排序 1:ASC 2:DESC
+			$scope.inputVO.column = "";
 		};
 		$scope.init();
 		
@@ -180,14 +184,14 @@ eSoafApp.controller('PRD110Controller',
 				$scope.inputVO.fund_id = $scope.inputVO.fund_id.toUpperCase();
 				$scope.getName().then(function(data) {
 					if($scope.inputVO.fromSOTProdYN == "Y") {
-						$scope.reallyInquire(); //下單只需要輸入客戶ID時檢核，商品搜尋時不需再次檢核
+						$scope.reallyInquire("N"); //下單只需要輸入客戶ID時檢核，商品搜尋時不需再次檢核
 					} else {
 						$scope.validSeniorCustEval(); //高齡評估量表檢核
 					}
 				});
 			} else {
 				if($scope.inputVO.fromSOTProdYN == "Y") {
-					$scope.reallyInquire(); //下單只需要輸入客戶ID時檢核，商品搜尋時不需再次檢核
+					$scope.reallyInquire("N"); //下單只需要輸入客戶ID時檢核，商品搜尋時不需再次檢核
 				} else {
 					$scope.validSeniorCustEval(); //高齡評估量表檢核
 				}
@@ -200,7 +204,10 @@ eSoafApp.controller('PRD110Controller',
 		};
 		
 		//PRD100高齡檢核後查詢
-		$scope.reallyInquire = function() {
+		$scope.reallyInquire = function(sortYN) {
+			debugger
+			$scope.inquireInit();
+			$scope.inputVO.column = "";
 			$scope.sendRecv("PRD110", "inquire", "com.systex.jbranch.app.server.fps.prd110.PRD110InputVO", $scope.inputVO,
 					function(tota, isError) {
 						if (!isError) {
@@ -209,6 +216,20 @@ eSoafApp.controller('PRD110Controller',
 	                			return;
 	                		}
 							$scope.totalList = tota[0].body.resultList;
+							if(sortYN == "Y") {
+								//以商品代碼排序
+								if($scope.inputVO.sortType == "1") { //ASC
+									$scope.totalList.sort(function (a, b) {
+										return (a.PRD_ID < b.PRD_ID) ? -1 : 1;
+									});
+									$scope.inputVO.sortType = "2"; //下一次 DESC
+								} else {
+									$scope.totalList.sort(function (a, b) {
+										return (a.PRD_ID > b.PRD_ID) ? -1 : 1;
+									});
+									$scope.inputVO.sortType = "1"; //下一次 ASC
+								}
+							}
 							$scope.outputVO = tota[0].body;
 							
 							return;
@@ -249,6 +270,74 @@ eSoafApp.controller('PRD110Controller',
 		};
 		
 		$scope.save = function(row) {
+			if($scope.inputVO.cust_id) {
+				$scope.sendRecv("SOT701", "getCustKycData", "com.systex.jbranch.app.server.fps.sot701.SOT701InputVO", {custID : $scope.inputVO.cust_id},
+						function(totas, isError) {
+					if (!isError) {
+						$scope.kycData = totas[0].body.custKYCDataVO;
+						debugger;
+						if(!$scope.kycData.isKycDueDateUseful && $scope.kycData.kycDueDateLessOneMonth) {
+							var kycDueDate = $scope.toJsDate($scope.kycData.kycDueDate);
+							var showYear = kycDueDate.getFullYear();  //西元年份 
+							var showMonth = kycDueDate.getMonth()+1;  //一年中的第幾月 
+							var showDate = kycDueDate.getDate();      //一月份中的第幾天
+							
+							$scope.showMsg('ehl_01_SOT_018',[showYear,showMonth,showDate]);
+						}
+					}
+				});
+			}
+			debugger
+			//適配資訊
+			var fitVO = {
+				caseCode  : 2, 					     //case2 適配
+				custId    : $scope.inputVO.cust_id,  //客戶ID
+				prdId     : row.PRD_ID,              //商品代碼
+				riskLevel : row.RISKCATE_ID,	     //商品P值
+				prdType	  : "1",                     //商品類別 : 1:基金
+				prdName	  : row.BOND_CNAME,			 //商品名稱
+				hnwcBuy	  : row.OVS_PRIVATE_YN,		 //境外私募基金註記
+				isPrintSOT819   	: $scope.isPrintSOT819  //印貸款風險預告書
+			}
+			
+			$scope.inputVO.hmshacrDataVO = null;
+			if(row.OVS_PRIVATE_YN == "Y") { //境外私募基金註記
+				//先檢核集中度
+				$scope.sendRecv("SOT712", "getCentRateData", "com.systex.jbranch.app.server.fps.sot712.PRDFitInputVO", fitVO,
+					function(totas, isError) {
+						if (!isError) {
+							debugger
+							if(totas[0].body.hmshacrDataVO) {
+								$scope.inputVO.hmshacrDataVO = totas[0].body.hmshacrDataVO;
+								
+								if(totas[0].body.hmshacrDataVO.VALIDATE_YN == "W") {
+									var dialog = ngDialog.open({
+										template: 'assets/txn/CONFIRM/CONFIRM.html',
+										className: 'CONFIRM',
+										showClose: false,
+										scope : $scope,
+										controller: ['$scope', function($scope) {
+											$scope.dialogLabel = "客戶高風險商品集中度已超過通知門檻比例，請取得客戶同意";
+							            }]
+									}).closePromise.then(function (data) {
+										if (data.value === 'successful') {
+											$scope.doSave(row);
+										}
+									});
+								} else { //totas[0].body.hmshacrDataVO.VALIDATE_YN == "Y"
+									$scope.doSave(row);
+								}
+							} else {
+								$scope.doSave(row);
+							}
+						}
+				});
+			} else { //商品沒有境外私募基金註記
+				$scope.doSave(row);
+			}
+		}
+		
+		$scope.doSave = function(row) {
 			$scope.isPrintSOT819 = 'Y';
 			if($scope.cust_id && $scope.cust_id.length >= 8 && $scope.cust_id.length < 10) {
 				$scope.isPrintSOT819 = 'N';
@@ -262,7 +351,9 @@ eSoafApp.controller('PRD110Controller',
 				prdType  	: 'MFD',   				   //商品類型 : MFD
 				prdName  	: row.FUND_CNAME,		   //商品名稱
 				currency   	: $scope.CURRENCY.filter((e)=>e.DATA == row.CURRENCY_STD_ID)[0].DATA,  //幣別
-				isPrintSOT819   	: $scope.isPrintSOT819  //印貸款風險預告書
+				isPrintSOT819   	: $scope.isPrintSOT819,  //印貸款風險預告書
+				hnwcBuy	  : row.OVS_PRIVATE_YN,		 //境外私募基金註記
+				hmshacrDataVO : $scope.inputVO.hmshacrDataVO, //集中度資訊
 			}
 			
 			$scope.getCustInfo(row.PRD_ID).then(function() {

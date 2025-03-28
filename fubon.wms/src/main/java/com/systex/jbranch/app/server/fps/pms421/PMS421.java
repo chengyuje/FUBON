@@ -1,5 +1,8 @@
 package com.systex.jbranch.app.server.fps.pms421;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,9 +12,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -441,56 +452,157 @@ public class PMS421 extends FubonWmsBizLogic {
 	}
 
 	//匯出
-	public void export(Object body, IPrimitiveMap header) throws Exception {
-
+	public void export(Object body, IPrimitiveMap header) throws JBranchException, ParseException, FileNotFoundException, IOException {
+		
+		SimpleDateFormat sdfYYYYMMDD_DASH = new SimpleDateFormat("yyyy/MM/dd");
+		SimpleDateFormat sdfYYYYMMDDHHMMSS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat sdfYYYYMM = new SimpleDateFormat("yyyyMM");
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		
 		PMS421InputVO inputVO = (PMS421InputVO) body;
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		String fileName = "對帳單函證回函(電子/簡訊)回覆異常報表_" + sdf.format(new Date()) + ".csv";
+		String reportName = "對帳單函證回函(電子／簡訊)回覆異常報表";
+		String fileName = reportName + "_" + sdfYYYYMM.format(new Date()) + ".xlsx";
+		String uuid = UUID.randomUUID().toString();
+		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
 
-		String[] csvHeader = { 	"私銀註記", "業務處", "區別", "分行名稱", "分行代碼", 
-								"客戶姓名", "身分證號", "服務理專", "AO CODE", "名單來源", "對帳單基準日", "函證/簡訊寄送日期", "客戶回覆日期", 
-								"聯繫內容", "電訪錄音編號", "異常通報", "名單來源", 
-								"首次建立時間", "訪查人", "最後異動時間", "最後異動人員" };
+		String filePath = Path + uuid;
 
-		String[] csvMain   = { 	"RM_FLAG", "REGION_CENTER_NAME", "BRANCH_AREA_NAME", "BRANCH_NAME", "BRANCH_NBR", 
-								"CUST_NAME", "CUST_ID", "EMP_NAME", "AO_CODE", "DATA_SOURCE", "DATA_DATE", "SEND_DATE", "RECV_DATE", 
-								"UPDATE_REMARK", "RECORD_SEQ", "EBILL_CONTENT_FLAG", "EBILL_COMFIRM_SOU", 
-								"FIRSTUPDATE_TIME", "FIRSTUPDATE_EMPID", "LASTUPDATE", "MODIFIER", };
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet(reportName);
+		sheet.setDefaultColumnWidth(20);
+		sheet.setDefaultRowHeightInPoints(20);
 
-		List<Object[]> csvData = new ArrayList<Object[]>();
+		// 表頭 CELL型式
+		XSSFCellStyle headingStyle = workbook.createCellStyle();
+		headingStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		headingStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		headingStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);// 填滿顏色
+		headingStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+		headingStyle.setBorderBottom((short) 1);
+		headingStyle.setBorderTop((short) 1);
+		headingStyle.setBorderLeft((short) 1);
+		headingStyle.setBorderRight((short) 1);
+		headingStyle.setWrapText(true);
 
-		for (Map<String, Object> map : inputVO.getList()) {
+		// 資料 CELL型式
+		XSSFCellStyle mainStyle = workbook.createCellStyle();
+		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		mainStyle.setBorderBottom((short) 1);
+		mainStyle.setBorderTop((short) 1);
+		mainStyle.setBorderLeft((short) 1);
+		mainStyle.setBorderRight((short) 1);
+		
+		// 資料 CELL型式
+		XSSFCellStyle titleStyle = workbook.createCellStyle();
+		titleStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+		titleStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderBottom((short) 1);
+		titleStyle.setBorderTop((short) 1);
+		titleStyle.setBorderLeft((short) 1);
+		titleStyle.setBorderRight((short) 1);
+		
+		String[] headerLine = { "私銀註記", 
+								"業務處", 
+								"區別", 
+								"分行名稱", 
+								"分行代碼", 
+								"客戶姓名", 
+								"身分證號", 
+								"服務理專", 
+								"AO CODE", 
+								"名單來源", 
+								"對帳單基準日", 
+								"函證/簡訊寄送日期", 
+								"客戶回覆日期", 
+								"聯繫內容", 
+								"電訪錄音編號", 
+								"異常通報", 
+								"名單來源", 
+								"首次建立時間", 
+								"訪查人", 
+								"最後異動時間", 
+								"最後異動人員" };
 
-			String[] records = new String[csvHeader.length];
+		String[] mainLine   = { "RM_FLAG", 
+								"REGION_CENTER_NAME", 
+								"BRANCH_AREA_NAME", 
+								"BRANCH_NAME", 
+								"BRANCH_NBR", 
+								"CUST_NAME", 
+								"CUST_ID", 
+								"EMP_NAME",
+								"AO_CODE", 
+								"DATA_SOURCE", 
+								"DATA_DATE", 
+								"SEND_DATE", 
+								"RECV_DATE", 
+								"UPDATE_REMARK", 
+								"RECORD_SEQ", 
+								"EBILL_CONTENT_FLAG", 
+								"EBILL_COMFIRM_SOU", 
+								"FIRSTUPDATE_TIME", 
+								"FIRSTUPDATE_EMPID", 
+								"LASTUPDATE", 
+								"MODIFIER" };
 
-			for (int i = 0; i < csvHeader.length; i++) {
-				switch (csvMain[i]) {
-				case "CUST_ID":
-					records[i] = DataFormat.getCustIdMaskForHighRisk(checkIsNull(map, csvMain[i]));
-					break;
-				case "AO_CODE":
-					records[i] = "=\"" + checkIsNull(map, csvMain[i]) + "\"";
-					break;
-				case "RECORD_SEQ":
-					records[i] = "=\"" + checkIsNull(map, csvMain[i]) + "\"";
-					break;
-				default:
-					records[i] = checkIsNull(map, csvMain[i]);
-					break;
-				}
-			}
+		Integer index = 0;
 
-			csvData.add(records);
+		XSSFRow row = sheet.createRow(index);
+		for (int i = 0; i < 1; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(titleStyle);
+			cell.setCellValue(reportName);
+		}
+		
+		index++;
+		
+		row = sheet.createRow(index);
+		for (int i = 0; i < headerLine.length; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(headingStyle);
+			cell.setCellValue(headerLine[i]);
 		}
 
-		CSVUtil csv = new CSVUtil();
-		csv.setHeader(csvHeader);
-		csv.addRecordList(csvData);
+		index++;
 
-		String url = csv.generateCSV();
+		for (Map<String, Object> map : inputVO.getList()) {
+			row = sheet.createRow(index);
+			
+			for (int i = 0; i < mainLine.length; i++) {
+				XSSFCell cell = row.createCell(i);
+				cell.setCellStyle(mainStyle);
 
-		notifyClientToDownloadFile(url, fileName);
+				switch (mainLine[i]) {
+					case "DATA_DATE":
+						if (StringUtils.isNotEmpty(checkIsNull(map, mainLine[i]))) {
+							cell.setCellValue(sdfYYYYMMDD_DASH.format(sdfYYYYMMDDHHMMSS.parse((String) map.get(mainLine[i]))));
+						} else {
+							cell.setCellValue("");
+						}
+						break;
+					case "CUST_ID":
+						cell.setCellValue(DataFormat.getCustIdMaskForHighRisk(checkIsNull(map, mainLine[i])));
+						break;
+					case "RECORD_SEQ":
+						cell.setCellValue(checkIsNull(map, mainLine[i]) + "");
+						break;
+					default:
+						cell.setCellValue(checkIsNull(map, mainLine[i]));
+						break;
+					}
+			}
+
+			index++;
+		}
+
+		workbook.write(new FileOutputStream(filePath));
+
+		notifyClientToDownloadFile(DataManager.getSystem().getPath().get("temp").toString() + uuid, fileName);
+
+		sendRtnObject(null);
 	}
 
 	private String checkIsNull(Map map, String key) {

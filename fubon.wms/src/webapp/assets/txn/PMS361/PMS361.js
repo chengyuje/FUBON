@@ -106,6 +106,8 @@ eSoafApp.controller('PMS361Controller', function($rootScope, $scope, $controller
 						row.set.push({LABEL: "其它", DATA: "O"})
 					} else {
 						row.set = [];
+						row.set.push({LABEL: "親屬", DATA: "R"});
+						row.set.push({LABEL: "朋友", DATA: "F"});
 						row.set.push({LABEL: "其它", DATA: "O"})
 					}
 				});

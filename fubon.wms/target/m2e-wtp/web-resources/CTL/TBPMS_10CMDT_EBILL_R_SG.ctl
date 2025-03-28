@@ -49,6 +49,7 @@ TRAILING NULLCOLS
   , VIEW_F01 "trim(:VIEW_F01)"
   , VIEW_G01 "trim(:VIEW_G01)"
   , VIEW_O01 "trim(:VIEW_O01)"
+  , VIEW_R01 "trim(:VIEW_R01)"
   , VIEW_Q01 "trim(:VIEW_Q01)"
   , VIEW_H "trim(:VIEW_H)"
   , VIEW_I "trim(:VIEW_I)"

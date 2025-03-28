@@ -89,10 +89,10 @@ public class CRM210 extends FubonWmsBizLogic {
 		sql.append("       V.AMT_16, "); 											// 全行黃金存摺
 		sql.append("       V.AMT_17, "); 											// 全行保險餘額
 		sql.append("       V.AMT_18, "); 											// 全行貸款餘額
-		sql.append("       V.AMT_18_1, "); 											// 房屋貸款
-		sql.append("       V.AMT_18_2, "); 											// 信用貸款
-		sql.append("       V.AMT_18_3, "); 											// 留學貸款
-		sql.append("       V.AMT_18_4, "); 											// 就學貸款
+//		sql.append("       V.AMT_18_1, "); 											// 房屋貸款
+//		sql.append("       V.AMT_18_2, "); 											// 信用貸款
+//		sql.append("       V.AMT_18_3, "); 											// 留學貸款
+//		sql.append("       V.AMT_18_4, "); 											// 就學貸款
 		sql.append("       V.AMT_19, "); 											// 前日大額100萬以上進出
 		sql.append("       V.AMT_11, "); 											// SN
 		
@@ -163,7 +163,8 @@ public class CRM210 extends FubonWmsBizLogic {
 		
 		sql.append("       V.W8BEN_YN AS CUST_W8BEN, "); 						    // W-8BEN(W-8BEN-E)
 		
-		sql.append("       V.VOC_FLAG "); 						      				// 是否有承租保管箱
+		sql.append("       V.VOC_FLAG, "); 						      				// 是否有承租保管箱
+		sql.append("       V.ROA "); 						      					// ROA(%)
 		
 		sql.append("FROM MVCRM_AST_AMT V ");
 		sql.append("LEFT JOIN TBCRM_CUST_MAST CM ON V.CUST_ID = CM.CUST_ID ");
@@ -442,7 +443,7 @@ public class CRM210 extends FubonWmsBizLogic {
 									sql.append("    AND NVL(ACCT_STATUS,'X') <> '2' ");
 									sql.append("    AND SUBSTR(ACCT_TYPE, 1, 2) <> 'LN' ");
 									sql.append("    AND A.BRA_NBR = :bra_nbr ");
-									sql.append("    AND A.AO_CODE IS NULL");
+//									sql.append("    AND A.AO_CODE IS NULL");
 									sql.append("  )");
 									sql.append(") "); //帳務行	    	    
 									
@@ -1168,6 +1169,16 @@ public class CRM210 extends FubonWmsBizLogic {
 			
 			queryCondition.setObject("txn_fee_s", getBigDecimal(inputVO.getManage_06_fee_s()));
 			queryCondition.setObject("txn_fee_e", getBigDecimal(inputVO.getManage_06_fee_e()));
+		}
+		
+		// WMS-CR-20250124-01_新增客戶ROA資訊相關功能
+		if (!StringUtils.isBlank(inputVO.getRoa_s())) {
+			sql.append("AND V.ROA >= :roa_s ");
+			queryCondition.setObject("roa_s", getBigDecimal(inputVO.getRoa_s()));
+		}
+		if (!StringUtils.isBlank(inputVO.getRoa_e())) {
+			sql.append("AND V.ROA <= :roa_e ");
+			queryCondition.setObject("roa_e", getBigDecimal(inputVO.getRoa_e()));
 		}
 		
 		// 活躍度 : WMS-CR-20211013-01_擬客戶活躍度週報供RM參考 add by ocean

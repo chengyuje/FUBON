@@ -29,6 +29,16 @@ public class PMS428InputVO extends PagingInputVO {
 	private String uhrmRC;
 	private String uhrmOP;
 	
+	private String dataSource;
+	
+	public String getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(String dataSource) {
+		this.dataSource = dataSource;
+	}
+
 	public String getUhrmRC() {
 		return uhrmRC;
 	}

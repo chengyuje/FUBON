@@ -115,7 +115,7 @@ public class CRM671 extends FubonWmsBizLogic {
 		}
 
 		//消金PS人員 & 個金AO
-		if ("004".equals(inputVO.getPri_id()) || "004AO".equals(inputVO.getPri_id())) {
+		if ("004".equals(inputVO.getPri_id()) || "004AO".equals(inputVO.getPri_id()) || "004PS".equals(inputVO.getPri_id())) {
 			sql.append(" AND RECORD.CREATOR = :emp_id ");
 			queryCondition.setObject("emp_id", ws.getUser().getUserID());
 		}

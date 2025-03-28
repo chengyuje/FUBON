@@ -71,12 +71,13 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
     }
 
     //要保書類型/戶況檢核
-	getParameter.XML(["IOT.CM_FLAG", "IOT.PAYER_REL_PROPOSER", "IOT.NO_CHK_LOAN_INSPRD"],function(totas){
+	getParameter.XML(["IOT.CM_FLAG", "IOT.PAYER_REL_PROPOSER", "IOT.NO_CHK_LOAN_INSPRD", "IOT.OTH_TYPE_SENIOR_CHK"],function(totas){
 		if(totas){
 			//戶況檢核
 			$scope.mappingSet['IOT.CM_FLAG'] = totas.data[totas.key.indexOf('IOT.CM_FLAG')];
 			$scope.mappingSet['IOT.PAYER_REL_PROPOSER'] = totas.data[totas.key.indexOf('IOT.PAYER_REL_PROPOSER')];
 			$scope.mappingSet['IOT.NO_CHK_LOAN_INSPRD'] = totas.data[totas.key.indexOf('IOT.NO_CHK_LOAN_INSPRD')];
+			$scope.mappingSet['IOT.OTH_TYPE_SENIOR_CHK'] = totas.data[totas.key.indexOf('IOT.OTH_TYPE_SENIOR_CHK')];
 		}
 	});
 
@@ -758,6 +759,16 @@ eSoafApp.controller('IOT130Controller', function($rootScope, $scope,$filter, $co
 			}
 		}
 
+		$scope.inputVO.C_SENIOR_DOCCHK_YN = "N"; //需檢核分行留存文件是否有勾選"銀行端高齡評估量表(維護)"
+		var keyinDate = new Date($scope.inputVO.DOC_KEYIN_DATE); //文件填寫申請日
+		var birthDate = new Date($scope.inputVO.PROPOSER_BIRDAY); //要保人生日
+        var chkDate65C = new Date(birthDate.getFullYear() + 64, birthDate.getMonth() + 6, birthDate.getDate()); //要保人64.5歲以上
+        var findOthType = $filter('filter')($scope.mappingSet['IOT.OTH_TYPE_SENIOR_CHK'], {DATA: $scope.inputVO.OTH_TYPE});//需檢核高齡的文件種類
+        if(keyinDate >= chkDate65C && (findOthType != null && findOthType.length > 0)) {
+        	//要保人>=64.5歲，且符合需檢核高齡文件種類
+        	$scope.inputVO.C_SENIOR_DOCCHK_YN = "Y";
+        }
+        
 		return true;
 	}
 

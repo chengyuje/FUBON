@@ -30,6 +30,8 @@ import com.systex.jbranch.fubon.commons.cbs.vo._067050_067115.CBS067115OutputVO;
 import com.systex.jbranch.fubon.commons.cbs.vo._067050_067115.CBS067501OutputVO;
 import com.systex.jbranch.fubon.commons.cbs.vo._067157_067157.CBS067157OutputVO;
 import com.systex.jbranch.fubon.commons.cbs.vo._067164_067165.CBS067165OutputVO;
+import com.systex.jbranch.fubon.commons.cbs.vo._067439_067442.CBS067439OutputVO;
+import com.systex.jbranch.fubon.commons.cbs.vo._067439_067442.CBS067442OutputVO;
 import com.systex.jbranch.fubon.commons.cbs.vo._085081_085105.CBS085105OutputVO;
 
 @XmlRootElement(name = "Tx")
@@ -125,6 +127,12 @@ public class CBSUtilOutputVO {
     
     @XmlElement(name = "CBS062171")
     private CBS062171OutputVO cbs062171OutputVO;
+    
+    @XmlElement(name = "CBS067439")
+    private CBS067439OutputVO cbs067439OutputVO;
+    
+    @XmlElement(name = "CBS067442")
+    private CBS067442OutputVO cbs067442OutputVO;
     
 	public String getHretrn() {
 		return hretrn;
@@ -349,6 +357,22 @@ public class CBSUtilOutputVO {
 
 	public void setCbs062171OutputVO(CBS062171OutputVO cbs062171OutputVO) {
 		this.cbs062171OutputVO = cbs062171OutputVO;
+	}
+
+	public CBS067439OutputVO getCbs067439OutputVO() {
+		return cbs067439OutputVO;
+	}
+
+	public void setCbs067439OutputVO(CBS067439OutputVO cbs067439OutputVO) {
+		this.cbs067439OutputVO = cbs067439OutputVO;
+	}
+
+	public CBS067442OutputVO getCbs067442OutputVO() {
+		return cbs067442OutputVO;
+	}
+
+	public void setCbs067442OutputVO(CBS067442OutputVO cbs067442OutputVO) {
+		this.cbs067442OutputVO = cbs067442OutputVO;
 	}
 	
 }

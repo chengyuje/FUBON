@@ -182,7 +182,7 @@ eSoafApp.controller('IOT400Controller',
 					$scope.inputVO.C_CALL_TYPE += "0";
 				}
 				
-				var iFlag2 = ($scope.inputVO.I_LOAN_CHK2_YN == 'Y' || $scope.inputVO.I_LOAN_CHK1_YN == 'Y' || $scope.inputVO.P_LOAN_APPLY_DATE != undefined) ? "1" : "0";
+				var iFlag2 = ($scope.inputVO.I_LOAN_CHK2_YN == 'Y' || $scope.inputVO.I_LOAN_CHK1_YN == 'Y' || $scope.inputVO.I_LOAN_APPLY_DATE != undefined) ? "1" : "0";
 				var pFlag2 = ($scope.inputVO.LOAN_CHK2_YN   == 'Y' || $scope.inputVO.LOAN_CHK1_YN   == 'Y' || $scope.inputVO.P_LOAN_APPLY_DATE != undefined) ? "1" : "0";
 				$scope.inputVO.I_CALL_TYPE += iFlag2;
 				$scope.inputVO.P_CALL_TYPE += pFlag2;

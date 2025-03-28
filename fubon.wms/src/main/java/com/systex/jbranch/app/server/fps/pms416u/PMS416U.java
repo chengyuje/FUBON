@@ -126,6 +126,7 @@ public class PMS416U extends FubonWmsBizLogic {
 		}
 		
 		if (StringUtils.isNotEmpty(inputVO.getUhrmOP())) {
+			System.out.println("inputVO.getUhrmOP():"+inputVO.getUhrmOP());
 			sb.append("AND EN.E_DEPT_ID = :eDeptID ");
 			condition.setObject("eDeptID", inputVO.getUhrmOP());
 		}

@@ -182,6 +182,7 @@
 							ng-validate="false" 
 							ng-readonly="false" 
 							ng-editable="false"
+							ng-change="getPurpose()"
 							ng-format="F3"
 							width="150px"
 							style="line-height:20px;" />
@@ -235,12 +236,28 @@
 							</div>
 						</td>
 					</tr>
+					<tr>
+						<th>名單目的：</th>
+						<td>
+							<e-combobox id="camp_purpose" name="camp_purpose" 
+							ng-datasource="PURPOSE"
+							ng-model="inputVO.camp_purpose"
+							ng-validate="false" 
+							ng-readonly="inputVO.type == undefined"
+							ng-editable="false"
+							ng-disabled="inputVO.type == undefined"
+							ng-format="F3"
+							width="150px"
+							style="line-height:20px;"/>
+						</td>
+					</tr>
 				</table>
 			</div>
 			<div class="search_box_btn text-center">
 				<button type="button" class="btn btn-info" ng-click="inquireInit();inquire()" function-type="query">查詢</button>
 				<button type="button" class="btn btn-info" ng-click="init();inquireInit();">清除</button>
 				<button type="button" class="btn btn-info" ng-click="btnAdd()" function-type="maintenance">新增手動名單匯入</button>
+				<button type="button" class="btn btn-info" ng-click="exportRPT()" ng-show="privilegeID == '049' || privilegeID == '050'">匯出報表</button>
 			</div>
 		</div>
 	</div>
@@ -262,6 +279,7 @@
 							<th>步驟代碼</th>
 							<th>活動負責人姓名</th>
 							<th><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="LEAD_TYPE" e-query="inquire()">名單類型</e-sorter></th>
+							<th><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="CAMP_PURPOSE" e-query="inquire()">名單目的</e-sorter></th>
 							<th><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="CREATETIME" e-query="inquire()">匯入日期</e-sorter></th>
 							<th><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="START_DATE" e-query="inquire()">活動起始日</e-sorter></th>
 							<th><e-sorter e-connect="GridTab1" e-input="inputVO" e-col="END_DATE" e-query="inquire()">活動截止日</e-sorter></th>
@@ -285,6 +303,7 @@
 							<td>{{row.STEP_ID}}</td>
 							<td>{{row.EMP_NAME}}</td>
 							<td>{{row.LEAD_TYPE | mapping:mappingSet['CAM.LEAD_TYPE']:'F3'}}</td>
+							<td>{{row.CAMP_PURPOSE | mapping:mappingSet['CAM.CAMP_PURPOSE']:'F3'}}</td>
 							<td>{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd"}}</td>
 							<td>{{toJsDate(row.START_DATE) | date:"yyyy-MM-dd"}}</td>
 							<td>{{toJsDate(row.END_DATE) | date:"yyyy-MM-dd"}}</td>

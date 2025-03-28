@@ -232,8 +232,18 @@ input.faChkSqr:after {
 										ng-disabled="row.RECORD_YN == 'N'" 
 										ng-blur="updateFlag(row)"/>
 							</td>
-							<td><input type="text" class="form-control" style="width: 300px;" ng-blur="updateFlag(row)" ng-model="row.NOTE2" placeholder="請輸入資金來源或帳戶關係..."></td>
-							<td><input type="text" class="form-control" style="width: 300px;" ng-blur="updateFlag(row)" ng-model="row.NOTE3" placeholder="請輸入具體原因或用途..."></td>
+							<td style="text-align:left;">
+		                   	 	<e-combobox id="custBase" name="custBase" 
+											ng-datasource="mappingSet['PMS.CUST_BASE_IP']"
+											ng-model="row.CUST_BASE"
+											ng-validate="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-change="updateFlag(row);setDefaultVal(row);"
+											style="line-height:20px;display:inline;" />
+								<input type="text" class="form-control"  style="width:300px;display:inline;" ng-blur="updateFlag(row)" ng-model="row.NOTE2" e-length-limit="600" placeholder="請輸入..." ng-if="row.CUST_BASE == 'O'">	                    
+		                    </td>							
+		                    <td><input type="text" class="form-control" style="width: 300px;" ng-blur="updateFlag(row)" ng-model="row.NOTE3" placeholder="請輸入具體原因或用途..."></td>
 							<td align="center">								
 								<label>是<input type="radio" value="Y" ng-change="updateFlag(row)" ng-model="row.WARNING_YN"></label>&emsp;								
 								<label>否<input type="radio" value="N" ng-change="updateFlag(row)" ng-model="row.WARNING_YN"></label>

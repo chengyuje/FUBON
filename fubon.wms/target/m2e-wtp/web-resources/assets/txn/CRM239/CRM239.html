@@ -18,58 +18,74 @@
     -moz-border-radius: 0px;
     border-radius: 0px;
 }
+.formatWidth{
+	width:150px !important;
+	float: left !important;
+}
+.datewidthByClass{
+	width:150px !important;
+	float: left !important;
+}
 </style>
 <script type="text/javascript" src="assets/txn/CRM239/CRM239.js"></script>
 <script type="text/javascript" src="assets/txn/CRM230/CRM230.js"></script>
 <script type="text/javascript" src="assets/txn/CUS160/CUS160_ADD.js"></script>
 <script type="text/javascript" src="assets/txn/CRM230/CRM230_COMPANY.js"></script>
+<script src="assets/txn/CRM110/crmService.js" type="text/javascript" ></script>
 <div class="CRM239" ng-controller="CRM239Controller" ng-cloak>
     <div>
         <div class="tfb_content">
             <div class="tfb_content_icon"></div>
             <div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif">查詢條件</div>
         </div>
-        <!--Content of the panel-->
         <div class="panel_content">
-            <!-- include -->
             <div ng-include="'assets/txn/CRM230/CRM230_COMMON.html'"></div>
-            <!-- include -->
-            <div class="search_table">
+            <div class="search_table search_box3">
                 <hr>
                 <h4>保險商品</h4>
                 <table>
                     <tr>
                         <th>保險代碼：</th>
                         <td >
-                            <input type="text" placeholder="請輸入..." id="prd_id" name="prd_id" ng-model="inputVO.prd_id" e-length-limit="50" style="text-transform:uppercase;">
+                            <input type="text" class="form-control" placeholder="請輸入..." id="prd_id" name="prd_id" ng-model="inputVO.prd_id" e-length-limit="50" style="width: 200px;text-transform:uppercase;">
                         </td>
                         <th>幣別：</th>
                         <td>
-                            <e-combobox id="crcy_type" name="crcy_type" ng-paramtype="FPS.CURRENCY" ng-model="inputVO.crcy_type" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="true" width="200px" style="line-height:20px;" />
+                            <e-combobox id="crcy_type" name="crcy_type" 
+                            			ng-paramtype="FPS.CURRENCY" 
+                            			ng-model="inputVO.crcy_type" 
+                            			ng-validate="false" 
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3" 
+                            			ng-required="true" 
+                            			width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
                         </td>
                         <th>保單進件來源：</th>
                         <td >
-                            <e-combobox id="ins_source" 
-                            	name="ins_source" 
-                            	ng-paramtype="CRM.INS_AST_SOURCE" 
-                            	ng-model="inputVO.ins_source"
-                            	ng-validate="false" 
-                            	ng-readonly="false" 
-                            	ng-editable="false" 
-                            	ng-format="F3" 
-                            	ng-required="true" 
-                            	width="200px" 
-                            	style="line-height:20px;" />
+                            <e-combobox id="ins_source" name="ins_source" 
+		                            	ng-paramtype="CRM.INS_AST_SOURCE" 
+		                            	ng-model="inputVO.ins_source"
+		                            	ng-validate="false" 
+		                            	ng-readonly="false" 
+		                            	ng-editable="false" 
+		                            	ng-format="F3" 
+		                            	ng-required="true" 
+		                            	width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
                         </td>
                     </tr>
                     <tr>
                         <th>保險名稱：</th>
                         <td>
-                            <input type="text" placeholder="請輸入..." id="prod_name" name="prod_name" ng-model="inputVO.prod_name" e-length-limit="50">
+                            <input type="text" class="form-control" placeholder="請輸入..." id="prod_name" name="prod_name" ng-model="inputVO.prod_name" e-length-limit="50" style="width: 200px;">
                         </td>
                         <th>檔期：</th>
                         <td>
-                            <input type="text" placeholder="請輸入..." id="term_cnt" name="term_cnt" ng-model="inputVO.term_cnt" e-length-limit="50">
+                            <input type="text" class="form-control" placeholder="請輸入..." id="term_cnt" name="term_cnt" ng-model="inputVO.term_cnt" e-length-limit="50" style="width: 200px;">
                         </td>
                         <th>保險公司名稱：</th>
                         <td>
@@ -80,30 +96,52 @@
 										ng-readonly="false" 
 										ng-editable="false"
 										ng-format="F3"
-										width="200px"
-										style="line-height:20px;"/>
+										width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;"/>
                         </td>
                     </tr>
                     <tr>
                         <th>投資型連結標的代碼：</th>
                         <td>
-                            <input type="text" style="text-transform:uppercase;" placeholder="請輸入..." id="inv_target_no" name="inv_target_no" ng-model="inputVO.inv_target_no" e-length-limit="50">
+                            <input type="text" class="form-control" style="width: 200px;text-transform:uppercase;" placeholder="請輸入..." id="inv_target_no" name="inv_target_no" ng-model="inputVO.inv_target_no" e-length-limit="50">
                         </td>
                         <th>生效日：</th>
                         <td colspan="3">
-                            <div>
-                                <input type="text" id="policy_active_date_s" name="policy_active_date_s" class="form-control-CRM239" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.policy_active_date_s" is-open="model.e" datepicker-options="policy_sDateOptions" ng-readonly="true" ng-change="limitDate1()" size="13" />
-                                <!-- 製作日曆button -->
-                                <button type="button" class="btn btn-default" ng-click="open($event,'e')">
-                                    <i class="glyphicon glyphicon-calendar"></i>
-                                </button>
-                                <label>&nbsp ~ &nbsp</label>
-                                <input type="text" id="policy_active_date_e" name="policy_active_date_e" class="form-control-CRM239" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.policy_active_date_e" is-open="model.f" datepicker-options="policy_eDateOptions" ng-readonly="true" ng-change="limitDate1()" size="13" />
-                                <!-- 製作日曆button -->
-                                <button type="button" class="btn btn-default" ng-click="open($event,'f')">
-                                    <i class="glyphicon glyphicon-calendar"></i>
-                                </button>
-                            </div>
+                        	<div class="form-group">
+			     				<div class="input-group datebox datewidthByClass">
+                                	<input 	type="text" id="policy_active_date_s" name="policy_active_date_s" 
+                                			class="form-control" 
+                                			uib-datepicker-popup="yyyy/MM/dd" 
+                                			ng-model="inputVO.policy_active_date_s" 
+                                			is-open="model.e" 
+                                			datepicker-options="policy_sDateOptions" 
+                                			ng-readonly="true" 
+                                			ng-change="limitDate1()" 
+                                			size="13" />
+                                	<span class="input-group-btn">
+                                    	<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+                                        	<i class="glyphicon glyphicon-calendar"></i>
+                                    	</button>
+                                	</span>
+			     				</div>
+			     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+			     				<div class="input-group datebox datewidthByClass">
+                                    <input 	type="text" id="policy_active_date_e" name="policy_active_date_e" 
+                                    		class="form-control" 
+                                    		uib-datepicker-popup="yyyy/MM/dd" 
+                                    		ng-model="inputVO.policy_active_date_e" 
+                                    		is-open="model.f" 
+                                    		datepicker-options="policy_eDateOptions" 
+                                    		ng-readonly="true" 
+                                    		ng-change="limitDate1()" 
+                                    		size="13" />
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" ng-click="open($event,'f')">
+                                            <i class="glyphicon glyphicon-calendar"></i></button>
+                                    </span>
+								</div>
+			     			</div>
                         </td>
                     </tr>
                     <tr>
@@ -116,8 +154,9 @@
 										ng-readonly="false" 
 										ng-editable="false"
 										ng-format="F3"
-										width="200px"
-										style="line-height:20px;"/>
+										width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;"/>
                         </td>
                     </tr>
                 </table>

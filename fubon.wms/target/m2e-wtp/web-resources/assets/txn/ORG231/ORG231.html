@@ -17,26 +17,35 @@
 			<table class="rstable">
 				<thead>
 					<tr>
-						<th>功能</th>
-						<th>RM1</br>員額數</th>
-						<th>RM2</br>員額數</th>
-						<th>SRM</br>員額數</th>
-						<th>最後修改人</th>
-						<th>最後修改時間</th>
+						<th rowspan="2">功能</th>
+						<th rowspan="2">業務處</th>
+						<th rowspan="2">私銀區</th>
+						<th colspan="6">員額數</th>
+						<th rowspan="2">最後修改人</th>
+						<th rowspan="2">最後修改時間</th>
+					</tr>
+					<tr>
+						<th>SRM1</th>
+						<th>SRM2</th>
+						<th>SRM3</th>
+						<th>私銀作業主管</th>
+						<th>私銀OP</th>
+						<th>私銀作業</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr class="repeat-row" >
-						<td class='text-center'>
-							<button type="button" class="btn btn-success" ng-click="save()">
-								<span class="glyphicon glyphicon-floppy-disk"></span>儲存
-							</button>
-						</td>
-						<td class='text-center'><input class="form-control" type="text" placeholder="請輸入..." id="RM1_CNT" name="RM1_CNT" e-input-limit="ND" ng-model="inputVO.RM1_CNT" e-length-limit="60"></td>
-						<td class='text-center'><input class="form-control" type="text" placeholder="請輸入..." id="RM2_CNT" name="RM2_CNT" e-input-limit="ND" ng-model="inputVO.RM2_CNT" e-length-limit="60"></td>
-						<td class='text-center'><input class="form-control" type="text" placeholder="請輸入..." id="SRM_CNT" name="SRM_CNT" e-input-limit="ND" ng-model="inputVO.SRM_CNT" e-length-limit="60"></td>
-						<td class='text-center'>{{inputVO.MODIFIER}}</td>
-						<td class='text-center'>{{toJsDate(inputVO.LASTUPDATE) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
+					<tr class="repeat-row" ng-repeat="row in resultList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td class='text-center'><button type="button" class="btn btn-success" ng-click="save(row)"><span class="glyphicon glyphicon-floppy-disk"></span>儲存</button></td>
+						<td class='text-center'>{{row.REGION_CENTER_NAME}}</td>
+						<td class='text-center'>{{row.DEPT_ID}}-{{row.BRANCH_AREA_NAME}}</td>
+						<td class='text-center'><input class="form-control" type="text" placeholder="請輸入..." id="SRM1_CNT" name="SRM1_CNT" e-input-limit="ND" ng-model="row.SRM1_CNT" e-length-limit="60"></td>
+						<td class='text-center'><input class="form-control" type="text" placeholder="請輸入..." id="SRM2_CNT" name="SRM2_CNT" e-input-limit="ND" ng-model="row.SRM2_CNT" e-length-limit="60"></td>
+						<td class='text-center'><input class="form-control" type="text" placeholder="請輸入..." id="SRM3_CNT" name="SRM3_CNT" e-input-limit="ND" ng-model="row.SRM3_CNT" e-length-limit="60"></td>
+						<td class='text-center'><input class="form-control" type="text" placeholder="請輸入..." id="OPH_CNT" name="OPH_CNT" e-input-limit="ND" ng-model="row.OPH_CNT" e-length-limit="60"></td>
+						<td class='text-center'><input class="form-control" type="text" placeholder="請輸入..." id="OP1_CNT" name="OP1_CNT" e-input-limit="ND" ng-model="row.OP1_CNT" e-length-limit="60"></td>
+						<td class='text-center'><input class="form-control" type="text" placeholder="請輸入..." id="OP2_CNT" name="OP2_CNT" e-input-limit="ND" ng-model="row.OP2_CNT" e-length-limit="60"></td>
+						<td class='text-center'>{{row.MODIFIER}}</td>
+						<td class='text-center'>{{toJsDate(row.LASTUPDATE) | date:"yyyy/MM/dd HH:mm:ss"}}</td>
 					</tr>
 				</tbody>
 			</table>

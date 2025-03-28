@@ -1,5 +1,7 @@
 package com.systex.jbranch.platform.server.mail;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +19,7 @@ import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -37,6 +40,56 @@ public class FubonSendJavaMail {
 	
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	public static String MAIL = "MAIL";
+	
+	public void sendMail_Jeff(FubonMail fubonMail,Map<String, Object> annexData) throws Exception {
+		Properties fromMail = new Properties();
+
+		fromMail.setProperty("mail.smtp.host", "smtp.gmail.com");
+		fromMail.setProperty("mail.smtp.port", "587");
+		fromMail.setProperty("mail.smtp.auth", "true");
+		fromMail.setProperty("mail.smtp.starttls.enable", "true");
+		fromMail.setProperty("mail.smtp.socketFactory.port" , "587");
+
+		final String fUserName = "jeff.cheng@frog-jump.com";
+		final String fPwd = "xnfncornysmilsnm";
+		
+		// 强制 JavaMail 使用指定网络接口（如 Wi-Fi）
+        try {
+            NetworkInterface wifiInterface = NetworkInterface.getByName("net9"); // Windows 通常是 "Wi-Fi"，macOS 可能是 "en0"
+            InetAddress wifiAddress = wifiInterface.getInetAddresses().nextElement();
+            fromMail.setProperty("mail.smtp.localaddress", wifiAddress.getHostAddress());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+		Session objSession = Session.getInstance(fromMail, new Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(fUserName, fPwd);
+			}
+		});
+
+		try {
+			MimeMessage mail = new MimeMessage(objSession);
+			mail.setFrom(new InternetAddress(fUserName));
+			mail.setRecipients(Message.RecipientType.TO, InternetAddress.parse("jyunda.huang@fubon.com"));
+			mail.setRecipients(Message.RecipientType.CC, InternetAddress.parse("english0922@gmail.com"));
+			mail.setSubject(fubonMail.getSubject());
+			mail.setText(fubonMail.getContent());
+//			Transport transport = objSession.getTransport("587");
+			Transport.send(mail);
+
+			System.out.println("郵件已成功發送至 jyunda.huang@fubon.com！");
+
+		} catch (AddressException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
 	
 	public void sendMail(FubonMail fubonMail,Map<String, Object> annexData) throws Exception {
 		// create some properties and get the default Session

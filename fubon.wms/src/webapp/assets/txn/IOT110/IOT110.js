@@ -106,6 +106,8 @@ eSoafApp.controller('IOT110Controller',
 								$scope.inputVO.C_CD_DUE_DATE = $scope.toJsDate($scope.inputVO.C_CD_DUE_DATE);
 								$scope.inputVO.I_CD_DUE_DATE = $scope.toJsDate($scope.inputVO.I_CD_DUE_DATE);
 								$scope.inputVO.P_CD_DUE_DATE = $scope.toJsDate($scope.inputVO.P_CD_DUE_DATE);
+								$scope.inputVO.C_CREDIT_LASTUPDATE = $scope.toJsDate($scope.inputVO.C_CREDIT_LASTUPDATE);
+								$scope.inputVO.I_CREDIT_LASTUPDATE = $scope.toJsDate($scope.inputVO.I_CREDIT_LASTUPDATE);
 
 								//要被繳有任一需要高齡/保費來源錄音序號
 								$scope.inputVO.NEED_PREMIUM_TRANSSEQ_YN = "N";
@@ -246,6 +248,7 @@ eSoafApp.controller('IOT110Controller',
 				$scope.inputVO.INSURED_BIRTH = $scope.inputVO.PROPOSER_BIRTH;
 				$scope.inputVO.INSURED_CM_FLAG = $scope.inputVO.PROPOSER_CM_FLAG;
 				$scope.inputVO.INSURED_INCOME3 = $scope.inputVO.PROPOSER_INCOME3;
+				$scope.inputVO.I_CREDIT_LASTUPDATE = $scope.inputVO.C_CREDIT_LASTUPDATE;
 				$scope.inputVO.I_LOAN_CHK1_YN = $scope.inputVO.C_LOAN_CHK1_YN;
 				$scope.inputVO.I_LOAN_CHK2_YN = $scope.inputVO.C_LOAN_CHK2_YN;
 				$scope.inputVO.I_LOAN_CHK2_DATE = $scope.inputVO.C_LOAN_CHK2_DATE;
@@ -264,6 +267,7 @@ eSoafApp.controller('IOT110Controller',
 				$scope.inputVO.INSURED_BIRTH = null;
 				$scope.inputVO.INSURED_CM_FLAG = '';
 				$scope.inputVO.INSURED_INCOME3 = undefined;
+				$scope.inputVO.I_CREDIT_LASTUPDATE = null;
 				$scope.inputVO.I_LOAN_CHK1_YN = '';
 				$scope.inputVO.I_LOAN_CHK2_YN = '';
 				$scope.inputVO.I_LOAN_CHK2_DATE = null;
@@ -596,10 +600,21 @@ eSoafApp.controller('IOT110Controller',
 									    						//invalidSeniorCustEvlBossC: Y:invalid 能力表現填答<>8.無上述情形
 									    						//invalidSeniorCustEvlBossD: Y:invalid 金融認知填答第一選項
 									    						//invalidSeniorCustEvlBossE: Y:invalid 金融認知填答第二或第三個選項
+									    						//invalidSeniorCustEvlBossCL: Y:invalid 前一次填答紀錄：能力表現填答<>8.無上述情形
+									    						//invalidSeniorCustEvlBossDL: Y:invalid 前一次填答紀錄：金融認知填答第一選項
+									    						//invalidSeniorCustEvlBossEL: Y:invalid 前一次填答紀錄：金融認知填答第二或第三個選項
 									    						if(tota[0].body.invalidSeniorCustEvlBossB != "Y" && tota[0].body.invalidSeniorCustEvlBossC != "Y") {
 									    							//金融認知結果=4沒有上述情形 且 能力表現填答=8.無上述情形
-									    							$scope.inputVO.SENIOR_AUTH_OPT3 = "2"; //2:沒有上述情形
-									    							$scope.inputVO.SENIOR_AUTH_REMARKS = "高齡客戶符合風險管理規範";
+									    							if(tota[0].body.invalidSeniorCustEvlBossCL != "Y" && 
+									    									tota[0].body.invalidSeniorCustEvlBossDL != "Y" && 
+									    									tota[0].body.invalidSeniorCustEvlBossEL != "Y") { 
+									    								//前一次填答紀錄：金融認知結果=4沒有上述情形 且 能力表現填答=8.無上述情形
+									    								$scope.inputVO.SENIOR_AUTH_OPT3 = "2"; //2:沒有上述情形
+									    								$scope.inputVO.SENIOR_AUTH_REMARKS = "高齡客戶符合風險管理規範";
+									    							} else {
+									    								//前一次填答紀錄：金融認知結果<>4沒有上述情形 或 能力表現填答<>8.無上述情形
+									    								$scope.inputVO.SENIOR_AUTH_OPT3 = "3"; //3:有上述情形-主管協同關懷確認可投保
+									    							}
 									    						} else if(tota[0].body.invalidSeniorCustEvlBossE == "Y") {
 									    							//金融認知填答第二或第三個選項
 									    							$scope.inputVO.SENIOR_AUTH_OPT3 = "1"; //1:有上述情形-主管協同關懷確認不可投保 
@@ -799,9 +814,18 @@ eSoafApp.controller('IOT110Controller',
 					}
 				}				
 				
-				if($scope.inputVO.SENIOR_AUTH_OPT4 == '2') {
-					$scope.showErrorMsgInDialog("客戶欠缺辨識有不利其投保權益情形請確認是否適合購買該保險商品");
-			    	return false;
+				if($scope.inputVO.SENIOR_AUTH_OPT4 == '1' || $scope.inputVO.SENIOR_AUTH_OPT4 == '2') {
+					//具有辨識不利其投保權益情形之能力且商品適合高齡客戶/欠缺辨識有不利其投保權益情形，都須輸入高齡說明&員編
+					if($scope.inputVO.SENIOR_AUTH_REMARKS == undefined || $scope.inputVO.SENIOR_AUTH_REMARKS == null || $scope.inputVO.SENIOR_AUTH_REMARKS == "" 
+						|| $scope.inputVO.SENIOR_AUTH_ID == undefined || $scope.inputVO.SENIOR_AUTH_ID == null || $scope.inputVO.SENIOR_AUTH_ID == "") {
+						$scope.showErrorMsgInDialog('請輸入高齡客戶投保關懷說明以及高齡關懷主管員編');
+						return false;
+					} else if($scope.inputVO.SENIOR_AUTH_REMARKS.length < 10) {
+						$scope.showErrorMsgInDialog('高齡客戶投保關懷說明至少要輸入10個字以上');
+						return false;
+					}
+//					$scope.showErrorMsgInDialog("客戶欠缺辨識有不利其投保權益情形請確認是否適合購買該保險商品");
+//			    	return false;
 				}
 			}
 
@@ -863,9 +887,9 @@ eSoafApp.controller('IOT110Controller',
 		    }
 
 		    //因應回覆金檢修改事項，要保人/被保人若要保書申請日一年內有貸款撥款，只需於畫面及報表上提示訊息，不須卡控業報書收入需等於徵審收入需一致
-		    if(($scope.inputVO.C_LOAN_CHK2_DATE != undefined && $scope.inputVO.C_LOAN_CHK2_DATE != null && $scope.inputVO.C_LOAN_CHK2_DATE != '') ||
-		       ($scope.inputVO.I_LOAN_CHK2_DATE != undefined && $scope.inputVO.I_LOAN_CHK2_DATE != null && $scope.inputVO.I_LOAN_CHK2_DATE != '')) {
-		    	$scope.showMsg("客戶近一年有貸款撥貸，請檢視授信收入與業報書收入(工作收入+其他收入)是否一致，不一致必須於業報書補充說明欄詳細說明原因。");
+		    if(($scope.inputVO.C_CREDIT_LASTUPDATE != undefined && $scope.inputVO.C_CREDIT_LASTUPDATE != null && $scope.inputVO.C_CREDIT_LASTUPDATE != '') ||
+		       ($scope.inputVO.I_CREDIT_LASTUPDATE != undefined && $scope.inputVO.I_CREDIT_LASTUPDATE != null && $scope.inputVO.I_CREDIT_LASTUPDATE != '')) {
+		    	$scope.showMsg("客戶近一年有授信紀錄，請檢視授信收入與業報書收入(工作收入+其他收入)是否一致，不一致必須於業報書補充說明欄詳細說明原因。");
 		    }
 
 			if(($scope.inputVO.LOAN_CHK3_YN == 'Y' || $scope.inputVO.C_LOAN_CHK3_YN == 'Y' || $scope.inputVO.I_LOAN_CHK3_YN == 'Y') && $scope.inputVO.CONTRACT_END_YN == '2') {
@@ -1131,6 +1155,14 @@ eSoafApp.controller('IOT110Controller',
     			if($scope.inputVO.PROPOSER_CM_FLAG == "8" || $scope.inputVO.INSURED_CM_FLAG == "8" || 
     					$scope.inputVO.PAYER_CM_FLAG == "8") {
     				$scope.showErrorMsgInDialog("客戶為客訴+拒銷+NS禁銷戶，不得送出覆核。");
+    				return false;
+    			}
+    		}
+    		
+    		//新契約電子要保書，若保險文件編號為空不得儲存
+    		if($scope.inputVO.REG_TYPE == "1" && $scope.inputVO.OTH_TYPE == "1") {
+    			if($scope.inputVO.INS_ID == undefined || $scope.inputVO.INS_ID == null || $scope.inputVO.INS_ID == "") {
+    				$scope.showErrorMsgInDialog("電子要保書，保險文件編號為空不得儲存");
     				return false;
     			}
     		}
@@ -1454,6 +1486,7 @@ eSoafApp.controller('IOT110Controller',
 				$scope.inputVO.INSURED_NAME = '';
 				$scope.inputVO.INSURED_CM_FLAG = '';
 				$scope.inputVO.INSURED_INCOME3 = undefined;
+				$scope.inputVO.I_CREDIT_LASTUPDATE = null
 
 				if($scope.inputVO.RLT_BT_PROPAY == "2") {	//繳款人= 被保人
 					$scope.inputVO.PAYER_ID = '';
@@ -1481,6 +1514,7 @@ eSoafApp.controller('IOT110Controller',
 				$scope.inputVO.PRECHECK = "";
 				$scope.inputVO.BUSINESS_REL = "";
 				$scope.inputVO.PROPOSER_INCOME3 = undefined;
+				$scope.inputVO.C_CREDIT_LASTUPDATE = null;
 				$scope.inputVO.hnwcData = undefined;
 //				$scope.inputVO.INVESTList = [];
 
@@ -1489,6 +1523,7 @@ eSoafApp.controller('IOT110Controller',
 					$scope.inputVO.INSURED_NAME = '';
 					$scope.inputVO.INSURED_BIRTH = null;
 					$scope.inputVO.INSURED_INCOME3 = undefined;
+					$scope.inputVO.I_CREDIT_LASTUPDATE = null;
 					$scope.inputVO.I_LOAN_CHK1_YN = '';
 					$scope.inputVO.I_LOAN_CHK2_YN = '';
 					$scope.inputVO.I_LOAN_CHK2_DATE = null;
@@ -1594,6 +1629,7 @@ eSoafApp.controller('IOT110Controller',
 								$scope.inputVO.PROPOSER_BIRTH = $scope.toJsDate(tota[0].body.CUST_NAME[0].BIRTHDAY);
 								$scope.inputVO.PROPOSER_CM_FLAG = tota[0].body.CUST_NAME[0].PROPOSER_CM_FLAG;
 								$scope.inputVO.PROPOSER_INCOME3 = tota[0].body.INCOME3;
+								$scope.inputVO.C_CREDIT_LASTUPDATE = $scope.toJsDate(tota[0].body.CREDIT_LASTUPDATE);
 								$scope.inputVO.C_LOAN_CHK1_YN = tota[0].body.CUST_NAME[0].C_LOAN_CHK1_YN;
 								$scope.inputVO.C_LOAN_CHK2_YN = tota[0].body.CUST_NAME[0].C_LOAN_CHK2_YN;
 								$scope.inputVO.C_LOAN_CHK2_DATE = $scope.toJsDate(tota[0].body.CUST_NAME[0].C_LOAN_CHK2_DATE);
@@ -1621,6 +1657,7 @@ eSoafApp.controller('IOT110Controller',
 									$scope.inputVO.INSURED_BIRTH = $scope.inputVO.PROPOSER_BIRTH;
 									$scope.inputVO.INSURED_CM_FLAG = $scope.inputVO.PROPOSER_CM_FLAG;
 									$scope.inputVO.INSURED_INCOME3 = $scope.inputVO.PROPOSER_INCOME3;
+									$scope.inputVO.I_CREDIT_LASTUPDATE = $scope.toJsDate($scope.inputVO.C_CREDIT_LASTUPDATE);
 									$scope.inputVO.I_LOAN_CHK1_YN = $scope.inputVO.C_LOAN_CHK1_YN;
 									$scope.inputVO.I_LOAN_CHK2_YN = $scope.inputVO.C_LOAN_CHK2_YN;
 									$scope.inputVO.I_LOAN_CHK2_DATE = $scope.inputVO.C_LOAN_CHK2_DATE;
@@ -1694,6 +1731,7 @@ eSoafApp.controller('IOT110Controller',
 								$scope.inputVO.INSURED_CM_FLAG = tota[0].body.INSURED_NAME[0].INSURED_CM_FLAG;
 								$scope.inputVO.INSURED_BIRTH = $scope.toJsDate(tota[0].body.INSURED_NAME[0].BIRTHDAY);
 								$scope.inputVO.INSURED_INCOME3 = tota[0].body.INCOME3;
+								$scope.inputVO.I_CREDIT_LASTUPDATE = $scope.toJsDate(tota[0].body.CREDIT_LASTUPDATE);
 								$scope.inputVO.I_LOAN_CHK1_YN = tota[0].body.INSURED_NAME[0].I_LOAN_CHK1_YN;
 								$scope.inputVO.I_LOAN_CHK2_YN = tota[0].body.INSURED_NAME[0].I_LOAN_CHK2_YN;
 								$scope.inputVO.I_LOAN_CHK2_DATE = $scope.toJsDate(tota[0].body.INSURED_NAME[0].I_LOAN_CHK2_DATE);
@@ -1789,16 +1827,16 @@ eSoafApp.controller('IOT110Controller',
 					}
 				}
 				debugger
-				//要保人有最近一年內撥貸日者，才需要顯示授信收入，若無最近撥貸日，就不用顯示授信收入
-				if($scope.inputVO.C_LOAN_CHK2_DATE == undefined || $scope.inputVO.C_LOAN_CHK2_DATE == null || $scope.inputVO.C_LOAN_CHK2_DATE == '') {
-					//不用顯示授信收入
-					$scope.inputVO.PROPOSER_INCOME3 = 0;
-				}
-				//被保人有最近一年內撥貸日者，才需要顯示授信收入，若無最近撥貸日，就不用顯示授信收入
-				if($scope.inputVO.I_LOAN_CHK2_DATE == undefined || $scope.inputVO.I_LOAN_CHK2_DATE == null || $scope.inputVO.I_LOAN_CHK2_DATE == '') {
-					//不用顯示授信收入
-					$scope.inputVO.INSURED_INCOME3 = 0;
-				}
+//				//要保人有最近一年內撥貸日者，才需要顯示授信收入，若無最近撥貸日，就不用顯示授信收入
+//				if($scope.inputVO.C_LOAN_CHK2_DATE == undefined || $scope.inputVO.C_LOAN_CHK2_DATE == null || $scope.inputVO.C_LOAN_CHK2_DATE == '') {
+//					//不用顯示授信收入
+//					$scope.inputVO.PROPOSER_INCOME3 = 0;
+//				}
+//				//被保人有最近一年內撥貸日者，才需要顯示授信收入，若無最近撥貸日，就不用顯示授信收入
+//				if($scope.inputVO.I_LOAN_CHK2_DATE == undefined || $scope.inputVO.I_LOAN_CHK2_DATE == null || $scope.inputVO.I_LOAN_CHK2_DATE == '') {
+//					//不用顯示授信收入
+//					$scope.inputVO.INSURED_INCOME3 = 0;
+//				}
 			});
 		}
 
@@ -1909,7 +1947,8 @@ eSoafApp.controller('IOT110Controller',
 			//實收保費
 			$scope.inputVO.REAL_PREMIUM = $scope.webservice.Result.MINS_PREMIUM;
 			//首期保費繳費方式
-			$scope.inputVO.FIRST_PAY_WAY = $scope.webservice.Result.FPAY_KIND;
+			var findFpay = $filter('filter')($scope.mappingSet['IOT.FPAY_KIND_MAPPING'], {DATA: $scope.webservice.Result.FPAY_KIND});
+			$scope.inputVO.FIRST_PAY_WAY = (findFpay != null && findFpay.length > 0) ? findFpay[0].LABEL : "";
 			//要保人生日民國年轉西元年再轉日期格式
 			$scope.inputVO.PROPOSER_BIRTH = $scope.webserviceDatechange($scope.webservice.Result.A_BIRTH);
 
@@ -2218,9 +2257,11 @@ eSoafApp.controller('IOT110Controller',
 				PROPOSER_INCOME1: undefined,
 //				PROPOSER_INCOME2: undefined,
 				PROPOSER_INCOME3: undefined,
+				C_CREDIT_LASTUPDATE: null,
 				INSURED_INCOME1: undefined,
 //				INSURED_INCOME2: undefined,
 				INSURED_INCOME3: undefined,
+				I_CREDIT_LASTUPDATE: null,
 				LOAN_CHK1_YN: '',
 				LOAN_CHK2_YN: '',
 				LOAN_CHK2_DATE: null, //繳款人行內貸款最近撥貸日
@@ -2309,7 +2350,7 @@ eSoafApp.controller('IOT110Controller',
 		};
 
 		//XML參數
-		getParameter.XML(["IOT.CM_FLAG", "IOT.NO_CHK_LOAN_INSPRD", "IOT.INV_PRD_LOAN_KYC", "IOT.PREMATCH_KEYIN_ROLE", "IOT.PREMATCH_AUTH_ROLE",
+		getParameter.XML(["IOT.CM_FLAG", "IOT.NO_CHK_LOAN_INSPRD", "IOT.INV_PRD_LOAN_KYC", "IOT.PREMATCH_KEYIN_ROLE", "IOT.PREMATCH_AUTH_ROLE", "IOT.FPAY_KIND_MAPPING",
 		                  "FUBONSYS.HEADMGR_ROLE","IOT.PREMATCH_AML_AUTH_ROLE", "IOT.MAPPVIDEO_CHK_STEP", "IOT.MAPPVIDEO_CHK_CODE", "IOT.NO_SENIOR_CERTIFICATE_EMP"],function(totas){
 			if(totas){
 				$scope.mappingSet['IOT.CM_FLAG'] = totas.data[totas.key.indexOf('IOT.CM_FLAG')];						//戶況檢核
@@ -2322,6 +2363,7 @@ eSoafApp.controller('IOT110Controller',
 				$scope.mappingSet['IOT.MAPPVIDEO_CHK_STEP'] = totas.data[totas.key.indexOf('IOT.MAPPVIDEO_CHK_STEP')];
 				$scope.mappingSet['IOT.MAPPVIDEO_CHK_CODE'] = totas.data[totas.key.indexOf('IOT.MAPPVIDEO_CHK_CODE')];
 				$scope.mappingSet['IOT.NO_SENIOR_CERTIFICATE_EMP'] = totas.data[totas.key.indexOf('IOT.NO_SENIOR_CERTIFICATE_EMP')];
+				$scope.mappingSet['IOT.FPAY_KIND_MAPPING'] = totas.data[totas.key.indexOf('IOT.FPAY_KIND_MAPPING')];
 
 				$scope.init();
 			}
@@ -2573,6 +2615,15 @@ eSoafApp.controller('IOT110Controller',
 			if($scope.inputVO.CANCEL_CONTRACT_YN != "Y" && $scope.inputVO.SENIOR_AUTH_OPT == "3") {
 				$scope.showErrorMsgInDialog("契約撤銷件，才可點選");
 				$scope.inputVO.SENIOR_AUTH_OPT = "";
+			}
+		}
+		
+		//高齡客戶投保評估量表，評估結果及適合投保評估理由勾選項目
+		$scope.validateSeniorAuthOPT4 = function() {
+			if($scope.inputVO.SENIOR_AUTH_OPT4 == "2") {
+				//欠缺辨識有不利其投保權益情形，清空「高齡客戶投保關懷說明」、「關懷主管員編」欄位後供填寫
+				$scope.inputVO.SENIOR_AUTH_REMARKS = "";
+				$scope.inputVO.SENIOR_AUTH_ID = "";
 			}
 		}
 		

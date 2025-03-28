@@ -22,10 +22,10 @@ TRAILING NULLCOLS
 ,CUST_NAME    
 ,BOND_CCT     
 ,NPP_CCT      
-,TOTAL_CCT    
+,TOTAL_CCT   constant"0" 
 ,BOND_STD     
 ,NPP_STD      
-,TOTAL_STD    
+,TOTAL_STD   constant"0"
 ,OVER_STD_TYPE  
 ,OVER_STD_MES
 ,VERSION   	constant"0"

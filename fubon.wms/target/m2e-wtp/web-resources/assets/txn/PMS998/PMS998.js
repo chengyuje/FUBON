@@ -1,5 +1,5 @@
 'use strict';
-eSoafApp.controller('PMS998Controller', function(sysInfoService, $scope, $controller, $confirm, $compile, socketService, ngDialog, projInfoService, getParameter) {
+eSoafApp.controller('PMS998Controller', function(sysInfoService, $scope, $controller, $confirm, $compile, socketService, ngDialog, projInfoService, getParameter, $q) {
 	$controller('BaseController', { $scope : $scope });
 	$scope.controllerName = "PMS998Controller";
 	
@@ -48,14 +48,14 @@ eSoafApp.controller('PMS998Controller', function(sysInfoService, $scope, $contro
 	/*
 	 * 取得UHRM人員清單(由員工檔+角色檔)
 	 */
-	$scope.sendRecv("ORG260", "get031EmpList", "com.systex.jbranch.app.server.fps.org260.ORG260InputVO", $scope.inputVO, function(tota, isError) {
-		if (isError) {
-			return;
-		}
-		if (tota.length > 0) {
-			$scope.mappingSet['UHRM_LIST'] = tota[0].body.uhrmList;
-			$scope.inputVO.uEmpID = sysInfoService.getUserID();
-		}
+	$scope.sendRecv("ORG260", "getUHRMList", "com.systex.jbranch.app.server.fps.org260.ORG260InputVO", $scope.inputVO, function(tota, isError) {
+		if (!isError) { 
+			if (null != tota[0].body.uhrmList) {
+				$scope.mappingSet['UHRM_LIST'] = tota[0].body.uhrmList;
+			} else {
+				$scope.mappingSet['UHRM_LIST'] = [];
+			}
+		} 
 	});
 	
 	$scope.init = function() {
@@ -65,7 +65,10 @@ eSoafApp.controller('PMS998Controller', function(sysInfoService, $scope, $contro
 			region_center_id : '',
 			branch_area_id   : '',
 			branch_nbr       : '',
-			EMP_ID           : ''
+			EMP_ID           : '', 
+			memLoginFlag     : $scope.memLoginFlag, 
+			uhrmRC           : '',
+			uhrmOP           : ''
 		};
 		
 		//組織連動
@@ -73,10 +76,38 @@ eSoafApp.controller('PMS998Controller', function(sysInfoService, $scope, $contro
         $scope.RegionController_setName($scope.region);
         
         $scope.hideFlag = "N";
-        if ((sysInfoService.getMemLoginFlag()).toLowerCase().startsWith("uhrm")) {
+        if (($scope.memLoginFlag).toLowerCase().startsWith("uhrm")) {
         	$scope.hideFlag = "Y";
-        	$scope.inputVO.branchNbr = "715";
         }
+        
+        var defer = $q.defer();
+        $scope.chkMaintenance = false;
+        $scope.sendRecv("PMS401U", "isMainten", "com.systex.jbranch.app.server.fps.pms401u.PMS401UInputVO", {'itemID': 'PMS998'}, function(tota, isError) {
+			if (!isError) {
+				$scope.chkMaintenance = tota[0].body.isMaintenancePRI == 'Y' ? true : false;
+
+				$scope.uhrmRCList = [];
+				$scope.uhrmOPList = [];
+
+				if (null != tota[0].body.uhrmORGList) {
+					angular.forEach(tota[0].body.uhrmORGList, function(row) {
+						$scope.uhrmRCList.push({LABEL: row.REGION_CENTER_NAME, DATA: row.REGION_CENTER_ID});
+					});	
+					
+					$scope.inputVO.uhrmRC = tota[0].body.uhrmORGList[0].REGION_CENTER_ID;
+					
+					angular.forEach(tota[0].body.uhrmORGList, function(row) {
+						$scope.uhrmOPList.push({LABEL: row.BRANCH_AREA_NAME, DATA: row.BRANCH_AREA_ID});
+					});
+					
+					$scope.inputVO.uhrmOP = tota[0].body.uhrmORGList[0].BRANCH_AREA_ID;
+		        }
+				
+				defer.resolve("success");
+			}						
+		});
+        
+        return defer.promise;
 	};
 	
 	$scope.query = function() {
@@ -124,8 +155,9 @@ eSoafApp.controller('PMS998Controller', function(sysInfoService, $scope, $contro
 		});
 		dialog.closePromise.then(function (data) {
 			if(data.value === 'successful'){
-				$scope.init();
-				$scope.query();
+				$scope.init().then(function(data) {
+					$scope.query();
+				});
 			}
 		});
 	};

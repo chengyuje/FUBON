@@ -27,7 +27,9 @@ eSoafApp.controller('PMS328Controller', function($rootScope, $scope, $controller
 				branch_area_id   : '',			//營運區
 				branch_nbr       : '',			//分行
 				ao_code          : '',			//理專
-				funcPage         : 'PMS328'
+				funcPage         : 'PMS328', 
+				importSDate      : '',
+				importEDate      : ''
     	};
 		
 		$scope.paramList = [];
@@ -186,19 +188,12 @@ eSoafApp.controller('PMS328Controller', function($rootScope, $scope, $controller
     		$scope.showErrorMsg('欄位檢核錯誤:必要輸入欄位(資料統計月份)起訖!!');
     		return;
     	}
-//    	if($scope.inputVO.eTime == $scope.inputVO.sTime && ($scope.inputVO.sTime == '' && $scope.inputVO.eTime == '')){
-//    		$scope.showErrorMsg('欄位檢核錯誤:必要輸入欄位(資料統計月份)起訖!!');
-//    		return;
-//    	}
-//    	alert($scope.inputVO.eTime);
-//    	alert($scope.inputVO.sTime);
-//    	alert(JSON.stringify($scope.mappingSet['time']));
-//    	alert($scope.mappingSet['time'][$scope.inputVO.sTime-1].LABEL);
+
     	$scope.s_time = $scope.mappingSet['time'][$scope.inputVO.sTime-1].LABEL;
     	$scope.e_time = $scope.mappingSet['time'][$scope.inputVO.eTime-1].LABEL;
     	
-    	if ($scope.s_time < '2024/06' && $scope.e_time >= '2024/06') {
-    		$scope.showErrorMsg('(2024/06起)因新制財管會員分級，故不可以新舊跨月查詢');
+    	if ($scope.s_time < '2024/08' && $scope.e_time >= '2024/08') {
+    		$scope.showErrorMsg('(2024/08起)因新制財管會員分級，故不可以新舊跨月查詢');
     		return;
     	}
     	
@@ -210,7 +205,7 @@ eSoafApp.controller('PMS328Controller', function($rootScope, $scope, $controller
     		$scope.inputVO.eTimes = '';
     	}
 		
-		$scope.sendRecv("PMS328", "queryData", "com.systex.jbranch.app.server.fps.pms329.PMS329InputVO", $scope.inputVO, function(tota, isError) {
+		$scope.sendRecv("PMS328", "queryData", "com.systex.jbranch.app.server.fps.pms328.PMS328InputVO", $scope.inputVO, function(tota, isError) {
 			if (!isError) {
 				
 				if(tota[0].body.resultList.length == 0) {

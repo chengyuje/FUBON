@@ -54,8 +54,29 @@ eSoafApp.controller('ORG220Controller', function(sysInfoService, $rootScope, $sc
 		}
 		
 		if ($scope.memLoginFlag.startsWith('UHRM') && $scope.memLoginFlag != 'UHRM') {
-			$scope.inputVO.region_center_id = '031';
-			$scope.inputVO.branch_area_id = '031A';
+			$scope.sendRecv("PMS401U", "isMainten", "com.systex.jbranch.app.server.fps.pms401u.PMS401UInputVO", {'itemID': 'ORG220'}, function(tota, isError) {
+				if (!isError) {
+					$scope.uhrmRCList = [];
+					$scope.uhrmOPList = [];
+
+					if (null != tota[0].body.uhrmORGList) {
+						angular.forEach(tota[0].body.uhrmORGList, function(row) {
+							$scope.uhrmRCList.push({LABEL: row.REGION_CENTER_NAME, DATA: row.REGION_CENTER_ID});
+						});	
+						
+						$scope.inputVO.uhrmRC = tota[0].body.uhrmORGList[0].REGION_CENTER_ID;
+						
+						angular.forEach(tota[0].body.uhrmORGList, function(row) {
+							$scope.uhrmOPList.push({LABEL: row.BRANCH_AREA_NAME, DATA: row.BRANCH_AREA_ID});
+						});
+						
+						$scope.inputVO.uhrmOP = tota[0].body.uhrmORGList[0].BRANCH_AREA_ID;
+			        }
+				}
+			});
+			
+			$scope.inputVO.region_center_id = $scope.inputVO.uhrmRC;
+			$scope.inputVO.branch_area_id = $scope.inputVO.uhrmOP;
 		} else {
 			//組織連動
 	        $scope.region = ['N', $scope.inputVO, "region_center_id", "REGION_LIST", "branch_area_id", "AREA_LIST", "branch_nbr", "BRANCH_LIST", "ao_code", "AO_LIST", "emp_id", "EMP_LIST"];

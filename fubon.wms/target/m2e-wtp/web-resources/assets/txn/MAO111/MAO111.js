@@ -5,6 +5,7 @@ eSoafApp.controller('MAO111Controller', function ($rootScope, $scope, $controlle
     });
     $scope.controllerName = "MAO111Controller";
 
+    $scope.priID = String(sysInfoService.getPriID());
     $scope.memLoginFlag = String(sysInfoService.getMemLoginFlag());
     
     //組織連動繼承
@@ -317,7 +318,8 @@ eSoafApp.controller('MAO111Controller', function ($rootScope, $scope, $controlle
         	
         } else if (!!valid.kycNearlyInvalid){
         	var d = $scope.toJsDate(valid.kycDueDate);
-            str.push('客戶KYC' + (valid.kycDueDate && d ? ('將於' + d.yyyy/MM/dd()) : '') + '失效，提醒客戶可於網銀或行銀執行KYC。(有效KYC及推介註記，才可進行理財規劃唷!)  ');
+        	var showyyyyMMdd = d.getFullYear()+ "/" + (d.getMonth()+1) + "/" + d.getDate();
+            str.push('客戶KYC' + (valid.kycDueDate && d ? ('將於' + showyyyyMMdd) : '') + '失效，提醒客戶可於網銀或行銀執行KYC。(有效KYC及推介註記，才可進行理財規劃唷!)  ');
         }
         
         if (valid.signAgmtInvalid){

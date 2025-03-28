@@ -311,8 +311,8 @@ public class INS450 extends FubonWmsBizLogic {
     vo.setUNIT(inputVO.getUnit());							// 單位
     vo.setPOLICY_FEE(inputVO.getPolicyFEE());				// 保費
     
-    System.out.println(new Gson().toJson(inputVO));
-    System.out.println(new Gson().toJson(vo));
+//    System.out.println(new Gson().toJson(inputVO));
+//    System.out.println(new Gson().toJson(vo));
 
     dam.create(vo);
     return vo.getSPP_ID();

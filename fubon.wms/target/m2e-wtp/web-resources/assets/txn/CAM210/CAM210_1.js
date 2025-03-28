@@ -20,7 +20,7 @@ eSoafApp.controller('CAM210_1Controller',
 		});
 		
 		$scope.inquire = function(){
-			$scope.sendRecv("CAM210", "queryAoData_1", "com.systex.jbranch.app.server.fps.cam210.CAM210InputVO", {'empId': $scope.row.EMP_ID},
+			$scope.sendRecv("CAM210", "queryAoData_1", "com.systex.jbranch.app.server.fps.cam210.CAM210InputVO", {'empId': $scope.row.EMP_ID,'branchID': $scope.row.BRANCH_NBR},
 	        		function(tota, isError) {
 	        			if (!isError) {
 	        				if(tota[0].body.resultList.length == 0) {

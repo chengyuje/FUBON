@@ -3,13 +3,14 @@ eSoafApp.controller('SOT630Controller', function($rootScope, $scope, $controller
 	$controller('BaseController', {$scope: $scope});
 	$scope.controllerName = "SOT630Controller";
 	
-	getParameter.XML(["SOT.AUTH_TYPE", "SOT.PROD_TYPE", "SOT.TRADE_TYPE", "SOT.BUY_SELL_B", "SOT.TRUST_TRADE_TYPE"], function(totas) {
+	getParameter.XML(["SOT.AUTH_TYPE", "SOT.PROD_TYPE", "SOT.TRADE_TYPE", "SOT.BUY_SELL_B", "SOT.TRUST_TRADE_TYPE", "SOT.TRADE_TYPE_DYNA"], function(totas) {
 		if (totas) {
 			$scope.mappingSet['SOT.AUTH_TYPE'] = totas.data[totas.key.indexOf('SOT.AUTH_TYPE')];
 			$scope.mappingSet['SOT.PROD_TYPE'] = totas.data[totas.key.indexOf('SOT.PROD_TYPE')];
 			$scope.mappingSet['SOT.TRADE_TYPE'] = totas.data[totas.key.indexOf('SOT.TRADE_TYPE')];
 			$scope.mappingSet['SOT.BUY_SELL_B'] = totas.data[totas.key.indexOf('SOT.BUY_SELL_B')];
 			$scope.mappingSet['SOT.TRUST_TRADE_TYPE'] = totas.data[totas.key.indexOf('SOT.TRUST_TRADE_TYPE')];
+			$scope.mappingSet['SOT.TRADE_TYPE_DYNA'] = totas.data[totas.key.indexOf('SOT.TRADE_TYPE_DYNA')];
 		}
 	});
 	

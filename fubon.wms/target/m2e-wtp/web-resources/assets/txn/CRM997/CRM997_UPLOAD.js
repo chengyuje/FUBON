@@ -2,6 +2,8 @@
 eSoafApp.controller('CRM997_UPLOADController',function($scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter) {
     $controller('BaseController', {$scope: $scope});
     $scope.controllerName = "CRM997_UPLOADController";
+    
+    $scope.inputVO.setting_type = '2';
 
 
     /**download sample files**/

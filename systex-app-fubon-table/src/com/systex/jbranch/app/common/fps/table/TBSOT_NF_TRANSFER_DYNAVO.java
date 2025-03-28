@@ -192,7 +192,17 @@ public class TBSOT_NF_TRANSFER_DYNAVO extends VOBase {
 	/** nullable persistent field */
 	private String NARRATOR_NAME;
 	
+	private String DEBIT_ACCT;
+	
 	public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBSOT_NF_TRANSFER_DYNA";
+
+	public String getDEBIT_ACCT() {
+		return DEBIT_ACCT;
+	}
+
+	public void setDEBIT_ACCT(String dEBIT_ACCT) {
+		DEBIT_ACCT = dEBIT_ACCT;
+	}
 
 	public String getTableuid() {
 		return TABLE_UID;

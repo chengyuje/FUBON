@@ -149,7 +149,11 @@ public class BTCRM512 extends BizLogic {
 			sb.append("AND DATE_FORMAT(CHG_DATE, '%Y%m%d') = DATE_FORMAT(DATE_SUB(SYSDATE(), INTERVAL 1 DAY), '%Y%m%d') ");
 		}
 
-		sb.append("AND (CHG_CUST_ID, CHG_DATE) IN (SELECT CHG_CUST_ID, MAX(CHG_DATE) AS MAX_CHG_DATE FROM TBCRM_EVALUATE_SENIOR_CUST_HIS GROUP BY CHG_CUST_ID) ");
+		sb.append("AND (CHG_CUST_ID, EXAM_VERSION, QUESTION_VERSION, CHG_DATE) IN ( ");
+		sb.append("  SELECT CHG_CUST_ID, EXAM_VERSION, QUESTION_VERSION, MAX(CHG_DATE) AS MAX_CHG_DATE ");
+		sb.append("  FROM TBCRM_EVALUATE_SENIOR_CUST_HIS ");
+		sb.append("  GROUP BY CHG_CUST_ID, EXAM_VERSION, QUESTION_VERSION ");
+		sb.append(") ");
 
 		PreparedStatement pstmt = conn.prepareStatement(sb.toString());
 		

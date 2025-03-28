@@ -90,7 +90,8 @@ eSoafApp.controller('KYC311Controller', function(
 			//add by SamTu
 			CUST_EMAIL_BEFORE : $scope.basic_information.CUST_EMAIL_BEFORE,
 		    SAMEEMAIL_REASON : $scope.basic_information.SAMEEMAIL_REASON,
-		    SAMEEMAIL_CHOOSE : $scope.basic_information.SAMEEMAIL_CHOOSE
+		    SAMEEMAIL_CHOOSE : $scope.basic_information.SAMEEMAIL_CHOOSE,
+		    NEED_COMPARISON_YN : $scope.basic_information.NEED_COMPARISON_YN
 		}
 		
 		if($scope.inputVO.GENDER == '1'){

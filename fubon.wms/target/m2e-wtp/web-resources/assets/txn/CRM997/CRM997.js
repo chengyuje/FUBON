@@ -29,6 +29,11 @@ eSoafApp.controller('CRM997Controller',
       $scope.experience_sDateOptions.maxDate = $scope.inputVO.experience_end_date|| $scope.maxDate;
       $scope.experience_eDateOptions.minDate = $scope.inputVO.experience_begin_date || $scope.minDate;
     };
+    
+    $scope.limitDate2 = function() {
+        $scope.potential_sDateOptions.maxDate = $scope.inputVO.potential_end_date|| $scope.maxDate;
+        $scope.potential_eDateOptions.minDate = $scope.inputVO.potential_begin_date || $scope.minDate;
+      };
 
 
     $scope.init = function(){
@@ -58,11 +63,21 @@ eSoafApp.controller('CRM997Controller',
       });
     };
 
-    /**資料整批匯入**/
-         $scope.upload = function (row) {
+         /**體驗匯入**/
+         $scope.uploadXP = function (row) {
           var dialog = ngDialog.open({
             template: 'assets/txn/CRM997/CRM997_UPLOAD.html',
             className: 'CRM997_UPLOAD',
+            controller: ['$scope', function($scope) {
+            }]
+          });
+         };
+         
+         /**潛力匯入**/
+         $scope.uploadPT = function (row) {
+          var dialog = ngDialog.open({
+            template: 'assets/txn/CRM997/CRM997_POTENTIAL_UPLOAD.html',
+            className: 'CRM997_POTENTIAL_UPLOAD',
             controller: ['$scope', function($scope) {
             }]
           });

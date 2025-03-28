@@ -619,7 +619,7 @@ public class CRM431 extends FubonWmsBizLogic {
 		TBCRM_BRG_APPLY_PERIODVO pvo = new TBCRM_BRG_APPLY_PERIODVO();
 		TBCRM_BRG_APPLY_SINGLEVO svo = new TBCRM_BRG_APPLY_SINGLEVO();
 
-		logger.info("Step1. " + empID + " review " + custID + (StringUtils.equals("1", applyCat) ? " PERIOD" : " SINGLE"));
+//		logger.info("Step1. " + empID + " review " + custID + (StringUtils.equals("1", applyCat) ? " PERIOD" : " SINGLE"));
 
 		Boolean actFlag = true; //判斷是否該繼續執行
 		dam = this.getDataAccessManager();
@@ -671,7 +671,7 @@ public class CRM431 extends FubonWmsBizLogic {
 
 				if (actFlag) {
 					if (StringUtils.equals("accept", actionType)) { //同意申請		
-						logger.info("Step2. " + empID + " accept " + custID + (StringUtils.equals("1", applyCat) ? " PERIOD" : " SINGLE"));
+//						logger.info("Step2. " + empID + " accept " + custID + (StringUtils.equals("1", applyCat) ? " PERIOD" : " SINGLE"));
 
 						Integer authStatus = Integer.parseInt(pvo.getAUTH_STATUS()) + 1;
 
@@ -778,7 +778,7 @@ public class CRM431 extends FubonWmsBizLogic {
 				}
 				if (actFlag) {
 					if (StringUtils.equals("accept", actionType)) { //同意申請		
-						logger.info("Step2. " + empID + " accept " + custID + (StringUtils.equals("1", applyCat) ? " PERIOD" : " SINGLE"));
+//						logger.info("Step2. " + empID + " accept " + custID + (StringUtils.equals("1", applyCat) ? " PERIOD" : " SINGLE"));
 						Integer authStatus = Integer.parseInt(svo.getAUTH_STATUS()) + 1;
 						if (authStatus > Integer.parseInt(svo.getHIGHEST_AUTH_LV())) { //當同層級有多個主管可以覆核，透過M+可能導致同時間一起覆核
 						//							throw new APException("ehl_02_CRM431_002"); //此議價已由其他主管覆核
@@ -789,7 +789,7 @@ public class CRM431 extends FubonWmsBizLogic {
 							setMgrEmp(dam, crm421, custID, comments, empID, prodType, null, svo, String.valueOf(authStatus), fromMPlus, seqNum);
 						}
 					} else if (StringUtils.equals("reject", actionType)) { //退回申請
-						logger.info("Step2. " + empID + " reject " + custID + (StringUtils.equals("1", applyCat) ? " PERIOD" : " SINGLE"));
+//						logger.info("Step2. " + empID + " reject " + custID + (StringUtils.equals("1", applyCat) ? " PERIOD" : " SINGLE"));
 						Integer authStatus = Integer.parseInt(svo.getAUTH_STATUS()) + 1;
 						if (authStatus > Integer.parseInt(svo.getHIGHEST_AUTH_LV())) { //當同層級有多個主管可以覆核，透過M+可能導致同時間一起覆核
 						//							throw new APException("ehl_02_CRM431_002"); //此議價已由其他主管覆核

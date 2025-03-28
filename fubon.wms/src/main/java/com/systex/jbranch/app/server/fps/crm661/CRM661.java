@@ -85,6 +85,7 @@ public class CRM661 extends FubonWmsBizLogic {
 
 	//關係戶查詢
 	public void inquire(Object body, IPrimitiveMap header) throws JBranchException {
+		
 		CRM661InputVO inputVO = (CRM661InputVO) body;
 		CRM661OutputVO return_VO = new CRM661OutputVO();
 
@@ -92,31 +93,9 @@ public class CRM661 extends FubonWmsBizLogic {
 		if (StringUtils.isNotBlank(cust_id)) {
 			dam = this.getDataAccessManager();
 
-			//			//先搜尋有無自己的資料，沒有資料自建一筆
-			//			QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-			//			StringBuffer sql = new StringBuffer();
-			//			sql.append("SELECT SEQ FROM TBCRM_CUST_REL WHERE CUST_ID_M = :cust_id AND CUST_ID_S = CUST_ID_M");
-			//			queryCondition.setQueryString(sql.toString());
-			//			queryCondition.setObject("cust_id", cust_id);
-			//			
-			//			List list = dam.exeQuery(queryCondition);
-			//			
-			//			if (list.size() == 0) {
-			//				TBCRM_CUST_RELVO vo = new TBCRM_CUST_RELVO();
-			//				vo.setSEQ(getSN());
-			//				vo.setCUST_ID_M(cust_id);
-			//				vo.setCUST_ID_S(cust_id);
-			//				vo.setREL_TYPE("00");  //本人
-			//				vo.setREL_MBR_YN("Y");			
-			//				//歸戶功能暫不使用
-			//				vo.setJOIN_SRV_YN("N");
-			//				dam.create(vo);
-			//			}
-
-			// 依系統角色決定下拉選單可視範圍
 			XmlInfo xmlInfo = new XmlInfo();
-			Map<String, String> FC_PRI = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2); //FC
-			Map<String, String> FCH_PRI = xmlInfo.doGetVariable("FUBONSYS.FCH_ROLE", FormatHelper.FORMAT_2); //FCH
+			boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(FubonSystemVariableConsts.LOGINROLE);
+			boolean isFCH = xmlInfo.doGetVariable("FUBONSYS.ARMGR_ROLE", FormatHelper.FORMAT_2).containsKey(FubonSystemVariableConsts.LOGINROLE);
 
 			//找出關係戶相關資訊
 			QueryConditionIF queryCondition2 = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
@@ -140,8 +119,7 @@ public class CRM661 extends FubonWmsBizLogic {
 			sql2.append("       C2.CON_DEGREE ");
 			
 			if (((getUserVariable(FubonSystemVariableConsts.LOGIN_AOCODE_LIST)).toString().replace("[", "").replace("]", "")).length() > 0 && 
-				(FC_PRI.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
-				 FCH_PRI.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE)))) {
+				(isFC || isFCH)) {
 				sql2.append(", (CASE WHEN C2.AO_CODE in (:curr_ao_code) THEN 'Y' ELSE 'N' END) AS IN_COVERAGE ");
 			} else {
 				sql2.append(", (CASE WHEN C2.BRA_NBR IN (:brNbrList) THEN 'Y' ELSE 'N' END) AS IN_COVERAGE ");
@@ -191,8 +169,7 @@ public class CRM661 extends FubonWmsBizLogic {
 			sql2.append("       C1.CON_DEGREE ");
 			
 			if (((getUserVariable(FubonSystemVariableConsts.LOGIN_AOCODE_LIST)).toString().replace("[", "").replace("]", "")).length() > 0 && 
-				(FC_PRI.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
-				 FCH_PRI.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE)))) {
+				(isFC || isFCH)) {
 				sql2.append(", (CASE WHEN C1.AO_CODE in (:curr_ao_code) THEN 'Y' ELSE 'N' END) AS IN_COVERAGE ");
 			} else {
 				sql2.append(", (CASE WHEN C1.BRA_NBR IN (:brNbrList) THEN 'Y' ELSE 'N' END) AS IN_COVERAGE ");
@@ -224,8 +201,7 @@ public class CRM661 extends FubonWmsBizLogic {
 			queryCondition2.setObject("cust_id", cust_id);
 			
 			if (((getUserVariable(FubonSystemVariableConsts.LOGIN_AOCODE_LIST)).toString().replace("[", "").replace("]", "")).length() > 0 && 
-				(FC_PRI.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE)) || 
-				 FCH_PRI.containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE)))) {
+				(isFC || isFCH)) {
 				queryCondition2.setObject("curr_ao_code", getUserVariable(FubonSystemVariableConsts.LOGIN_AOCODE_LIST));
 			} else {
 				queryCondition2.setObject("brNbrList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
@@ -522,8 +498,9 @@ public class CRM661 extends FubonWmsBizLogic {
 
 		// 依系統角色決定下拉選單可視範圍
 		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> uhrmmgrMap = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2); //UHRM科/處主管
-		Map<String, String> uhrmMap = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2); //UHRM
+		boolean isUHRM = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRMBMMGR = xmlInfo.doGetVariable("FUBONSYS.UHRMBMMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 
 		CRM661OutputVO return_VO = new CRM661OutputVO();
 		dam = this.getDataAccessManager();
@@ -538,17 +515,17 @@ public class CRM661 extends FubonWmsBizLogic {
 		sql.append("LEFT JOIN TBCRM_CUST_MAST C2 ON R.CUST_ID_S = C2.CUST_ID ");
 		sql.append("LEFT JOIN VWORG_AO_INFO E1 ON C1.AO_CODE = E1.AO_CODE ");
 		sql.append("LEFT JOIN VWORG_AO_INFO E2 ON C2.AO_CODE = E2.AO_CODE ");
-//		sql.append("LEFT JOIN TBORG_MEMBER M ON R.CREATOR = M.EMP_ID ");
 		sql.append("LEFT JOIN VWCRM_REL_TXFEE_DSCNT_RATE D ON C2.CUST_ID = D.CUST_ID ");
 		sql.append("WHERE 1 = 1 ");
 		sql.append("AND (R.REL_STATUS = 'RAN' OR R.REL_STATUS = 'RAD' OR R.REL_STATUS = 'RAJ' OR R.REL_STATUS = 'RAC')  ");
 
 		// add by ocean 0006001:WMS-CR-20181113-01_個人高端客群處「業管系統_第一階段需求調整申請」_P2
-		if (uhrmMap.containsKey(getCommonVariable(FubonSystemVariableConsts.LOGINROLE).toString())) {
+		if (isUHRM) {
 			sql.append("AND R.MODIFIER = :uhrmEmpID ");
 			queryCondition.setObject("uhrmEmpID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
-		} else if (uhrmmgrMap.containsKey(getCommonVariable(FubonSystemVariableConsts.LOGINROLE).toString())) {
-			sql.append("AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO T WHERE R.MODIFIER = T.EMP_ID) ");
+		} else if (isUHRMMGR) {
+			sql.append("AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO T WHERE R.MODIFIER = T.EMP_ID AND T.DEPT_ID = :loginArea) ");
+			queryCondition.setObject("loginArea", getUserVariable(FubonSystemVariableConsts.LOGIN_AREA));
 		} else {
 			sql.append("AND EXISTS (SELECT DISTINCT EMP_ID FROM VWORG_EMP_INFO INFO WHERE INFO.BRANCH_NBR IN (:brNbrList) AND R.MODIFIER = INFO.EMP_ID)");
 			queryCondition.setObject("brNbrList", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));

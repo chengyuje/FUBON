@@ -132,6 +132,7 @@ eSoafApp.controller('CRM211Controller',
 			$scope.sendRecv("CRM211", "inquire", "com.systex.jbranch.app.server.fps.crm211.CRM211InputVO", $scope.inputVO,
 				function(tota, isError) {
 					if (!isError) {
+						debugger;
 						if(tota[0].body.resultList.length == 0) {
 							$scope.showMsg("ehl_01_common_009");
                 			return;

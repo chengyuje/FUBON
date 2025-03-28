@@ -381,6 +381,40 @@ input:required:invalid{
 					</table>
 					<table>
 						<tr>
+		    				<td>新契約保費資金證明上傳：<br/>(銀行進件審核不送富壽，限上傳一份未加密之PDF檔)</td>
+		    				<td colspan="3">
+		    					<e-upload id='pdfUpload' success='uploadFile(name, rname)' model='inputVO.realfileName' width='350px' accept=".pdf" ng-disabled="read"></e-upload>
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td colspan="4">
+	    					<table>
+								<thead>
+									<tr>
+										<th>移除</th>
+										<th>檔案</th>
+										<th>上傳時間</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="repeat-row" ng-repeat="row in fileResultList" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+										<td align="center">
+											<a ng-if="!read" ng-click="deleteFile(row)" class="icon clickable">
+								            	<img src="assets/images/ic-delete.svg">
+								            </a>
+										</td>
+										<td>
+											<a ng-click="viewFile(row)" class="icon clickable">{{row.FILE_NAME}}</a>
+										</td>
+										<td>{{toJsDate(row.CREATETIME) | date:"yyyy/MM/dd"}}</td>							
+									</tr>
+								</tbody>
+							</table>
+	    					</td>
+		    			</tr>
+					</table>
+					<table>
+						<tr>
 							<th colspan="3" style="text-align: left;" class="table_title">七、檢核項目</th>
 						</tr>
 						<tr>
@@ -686,8 +720,15 @@ input:required:invalid{
 		    			</tr>
 		    			<tr>
 							<td colspan="6">*首期繳費方式為匯款，匯款國家：&nbsp;
-								<input type="checkbox" ng-model="inputVO.REMIT_COUNTRY_FLAG" ng-false-value="''" ng-true-value="'1'" ng-disabled="inputVO.isRCFlagDisalbed">&nbsp;中華民國&nbsp;&nbsp;&nbsp;&nbsp;
-								<input type="checkbox" ng-model="inputVO.REMIT_COUNTRY_FLAG" ng-false-value="''" ng-true-value="'2'" ng-disabled="inputVO.isRCFlagDisalbed">&nbsp;境外
+								<input type="checkbox" ng-model="inputVO.REMIT_COUNTRY_FLAG" ng-false-value="''" ng-true-value="'1'" ng-disabled="read || inputVO.isRCFlagDisalbed">&nbsp;中華民國&nbsp;&nbsp;&nbsp;&nbsp;
+								<input type="checkbox" ng-model="inputVO.REMIT_COUNTRY_FLAG" ng-false-value="''" ng-true-value="'2'" ng-disabled="read || inputVO.isRCFlagDisalbed">&nbsp;境外
+							</td>
+		    			</tr>
+		    			<tr>
+		    				<td>*保險資金證明檢附確認：<br/>(請至少勾選一項，可複選)</td>
+							<td colspan="5">
+								<input type="checkbox" ng-model="inputVO.FUND_VERIFY_PDF_YN" ng-false-value="'N'" ng-true-value="'Y'" ng-disabled="read">&nbsp;已PDF檔方式上傳&nbsp;&nbsp;&nbsp;&nbsp;
+								<input type="checkbox" ng-model="inputVO.FUND_VERIFY_PAPER_YN" ng-false-value="'N'" ng-true-value="'Y'" ng-disabled="read">&nbsp;已紙本方式
 							</td>
 		    			</tr>
 					</table>

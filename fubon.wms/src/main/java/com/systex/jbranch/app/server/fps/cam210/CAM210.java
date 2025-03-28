@@ -48,7 +48,7 @@ public class CAM210 extends FubonWmsBizLogic {
 	
 	// 2020-01-22 modify by ocean : #0000109 即期活動名單現況及已過期活動一覽頁面，活動名稱欄位輸入關係字後帶出相關名單，供使用者選擇後進行查詢，改善效能
 	public void getCampaignName(Object body, IPrimitiveMap header) throws JBranchException {
-		
+		long startTime = System.currentTimeMillis();
 		XmlInfo xmlInfo = new XmlInfo();
 		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		boolean isPSOP = xmlInfo.doGetVariable("FUBONSYS.PSOP_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
@@ -155,7 +155,10 @@ public class CAM210 extends FubonWmsBizLogic {
 		queryCondition.setQueryString(sb.toString());
 
 		outputVO.setCnameList(dam.exeQuery(queryCondition));
-		
+		long endTime = System.currentTimeMillis();
+		System.out.println("==========================");
+		System.out.println((endTime - startTime) / 1000);
+		System.out.println("========================");
 		sendRtnObject(outputVO);
 	}
 	

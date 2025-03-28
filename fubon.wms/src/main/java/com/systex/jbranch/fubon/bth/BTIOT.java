@@ -100,8 +100,9 @@ public class BTIOT extends BizLogic {
 		sb.append("LEFT OUTER JOIN TBORG_MEMBER C ON C.EMP_ID = A.AFT_SIGN_OPRID  ");
 		sb.append("LEFT OUTER JOIN TBORG_MEMBER D ON D.EMP_ID = A.RECRUIT_ID ");
 		sb.append("WHERE A.STATUS = '60' ");
-		sb.append("AND A.REG_TYPE IN ('1','2','3') ");
-		sb.append("AND A.COMPANY_NUM = 82 "); //只產生富壽件
+		sb.append(" AND A.REG_TYPE IN ('1','2','3') ");
+		sb.append(" AND A.COMPANY_NUM = 82 "); //只產生富壽件
+		sb.append(" AND NVL(A.NO_PAPER_YN, 'N') = 'N' "); //排除無紙化案件
 		 
 		dam = this.getDataAccessManager();
 		// 執行以上sql

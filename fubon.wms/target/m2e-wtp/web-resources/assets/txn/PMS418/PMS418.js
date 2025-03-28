@@ -55,8 +55,6 @@ eSoafApp.controller('PMS418Controller', function ($scope, $controller, socketSer
         $scope.sendRecv("PMS401U", "isMainten", "com.systex.jbranch.app.server.fps.pms401u.PMS401UInputVO", {'itemID': 'PMS418'}, function(tota, isError) {
 			if (!isError) {
 				$scope.chkMaintenance = tota[0].body.isMaintenancePRI == 'Y' ? true : false;
-
-				return;
 			}						
 		});
     };

@@ -7,6 +7,8 @@ eSoafApp.controller('SOT413Controller',
 	function($rootScope, $scope, $controller, $confirm, $filter, socketService, ngDialog, projInfoService, $q, validateService,getParameter, sotService, sysInfoService, $timeout) {
 		$controller('BaseController', {$scope: $scope});
 		$scope.controllerName = "SOT413Controller";
+		//繼承PRD100高齡檢核
+		$controller('PRD100Controller', {$scope: $scope});
 		
 		//xml參數初始化
 		getParameter.XML(["PRD.FCI_CURRENCY", "SOT.FCI_PM_PRIVILEGE_ID"], function(totas) {
@@ -89,7 +91,12 @@ eSoafApp.controller('SOT413Controller',
 					creditAcct: '',								//收益入帳帳號/贖回款入帳帳號
 					disableAuthId: false,						//disabled AUTH_ID
 					hnwcYN: '',									//是否為高資產客戶 Y/N 
-					hnwcServiceYN: ''							//可提供高資產商品或服務 Y/N 
+					hnwcServiceYN: '',							//可提供高資產商品或服務 Y/N 
+					seniorAuthType: 'S', 						//高齡評估表授權種類(S:下單、A：適配)
+			        trustTS: "S",								//高齡評估表主管確認表使用
+			        otherWithCustId: false,						//是否帶客戶ID進來(快查)
+			        prodType : '7',                             //7：FCI
+			        tradeType : '1'                             //1： 申購
 			};
 			
 			// if data
@@ -217,6 +224,32 @@ eSoafApp.controller('SOT413Controller',
 			$scope.inputVO.hnwcServiceYN = body.hnwcServiceYN;
 			//自然人不須輸入授權交易人員，法人才需要輸入
 			$scope.inputVO.disableAuthId = $scope.inputVO.custID.length >= 10 ? true : false;
+		};
+		
+
+		$scope.validateSeniorCust = function() {
+			if(!$scope.inputVO.custID) return;
+			
+			$scope.inputVO.type = "1";
+			$scope.inputVO.cust_id = $scope.inputVO.custID;
+			$scope.validSeniorCustEval(); //PRD100.validSeniorCustEval高齡檢核
+		}
+		
+		//PRD100.validSeniorCustEval高齡檢核不通過清空客戶ID
+		$scope.clearCustInfo = function() {
+			$scope.inputVO.custID = "";
+			$scope.connector('set','SOTCustID',null);
+			$scope.clearCust();
+		};
+		
+		//PRD100.validSeniorCustEval高齡檢核通過後查詢
+		$scope.reallyInquire = function() {
+			if($scope.inputVO.otherWithCustId) { //有帶客戶ID(快查)
+				$scope.queryChkSenior();
+			} else {
+				$scope.getSOTCustInfo(true);
+			}
+			$scope.connector('set','SOTCustID',null);
 		};
 		
 		// SOT701-客戶電文
@@ -609,6 +642,13 @@ eSoafApp.controller('SOT413Controller',
 					}
 			});
 		};
+		$scope.queryChkSenior = function() {
+			if($scope.inputVO.tradeSEQ) {
+				$scope.noCallCustQuery();
+			} else {
+				$scope.getTradeSEQ();//取得交易序號
+			}
+		};
 		
 		$scope.query = function() {
 			if($scope.inputVO.tradeSEQ) {
@@ -617,7 +657,16 @@ eSoafApp.controller('SOT413Controller',
 				$scope.getTradeSEQ();//取得交易序號
 			}
 		};
-		$scope.query();
+		if(!$scope.connector('get','SOTCustID')) {
+			//"不是"從快查或別的交易過來，帶CUSTID，維持原來
+			$scope.inputVO.otherWithCustId = false;
+			$scope.query();
+		} else {
+			//從快查或別的交易過來，帶CUSTID，先做高齡檢核
+			$scope.inputVO.otherWithCustId = true;
+			$scope.inputVO.custID = $scope.connector('get','SOTCustID');
+			$scope.validateSeniorCust();
+		}
 		
 		$scope.nextCheck = function() {
 			//讓扣款金額的e-combobox預設值是上次選的

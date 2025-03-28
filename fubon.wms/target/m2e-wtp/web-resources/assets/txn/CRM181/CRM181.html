@@ -1,5 +1,6 @@
 <script type="text/javascript" src="assets/txn/CRM181/CRM181.js"></script>
 <script type="text/javascript" src="assets/txn/CRM181/CRM181_FETILRW.js"></script>
+<script type="text/javascript" src="assets/txn/CRM181/CRM181_OP_DIVIDEND.js"></script>
 <div class="CRM181" ng-controller="CRM181Controller">
 	<div class="tfb_content">
 		<div class="tfb_content_icon"></div>
@@ -110,6 +111,30 @@
 				<tbody ng-if="fetilrListCount != 0">
 					<tr>
 						<td><a href="" ng-click="openFetilrW(fetilrListW)">近三日國外匯入款入帳清單</a></td>
+					</tr>
+				</tbody>
+			</table>
+			<br />
+			<table ng-if="(pri == '002' || pri == 'UHRM002') && ovsPriDividendCnt > 0">
+				<thead>
+					<tr>
+						<th colspan="5"><span style="color:red;">未具證基金配息通知</span></th>
+					</tr>
+					<tr>
+						<th>日期</th>
+						<th>客戶ID</th>
+						<th>客戶姓名</th>
+						<th>事件</th>
+						<th>已讀</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="repeat-row" ng-repeat="row in ovsPriDivList track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
+						<td style = " width:22%;" align="center">{{toJsDate(row.TXN_DATE) | date:"yyyy/MM/dd"}}</td>
+						<td style = " width:22%;">{{row.CUST_ID}}</td>
+						<td style = " width:22%;">{{row.CUST_NAME}}</td>
+						<td style = " width:22%;"><a href="" ng-click="openOvsPriDividend(row)">{{row.PRD_NAME_S}}配息通知</a></td>
+						<td style = " width:12%;"align="center"><input type='checkbox' ng-disabled="row.READ_YN=='Y'" ng-click='checkReadRow(row)' /></td>
 					</tr>
 				</tbody>
 			</table>

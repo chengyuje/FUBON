@@ -80,7 +80,9 @@ eSoafApp.controller('SOT320Controller',
 				$scope.inputVO.custId = '';
 				return;
 			}
-        	
+        	//報價日期
+        	var refPriceDate = null;
+        	debugger;
 			if ($scope.inputVO.trustTS == 'S') { 		// 特金贖回
 				$scope.sendRecv("SOT707", "getCustAssetBondData", "com.systex.jbranch.app.server.fps.sot707.SOT707InputVO", $scope.inputVO,
 						function(tota, isError) {
@@ -89,6 +91,7 @@ eSoafApp.controller('SOT320Controller',
 									$scope.custId = $scope.inputVO.custId;
 									$scope.custAssetBondList = tota[0].body.custAssetBondList;
 									$scope.outputVO = tota[0].body;
+									refPriceDate = tota[0].body.custAssetBondList[0].refPriceDate
 								} else {
 									$scope.outputVO = [];
 									$scope.showErrorMsg("ehl_01_common_009");
@@ -103,6 +106,7 @@ eSoafApp.controller('SOT320Controller',
 									$scope.custId = $scope.inputVO.custId;
 									$scope.custAssetBondList = tota[0].body.custAssetBondList;
 									$scope.outputVO = tota[0].body;
+									refPriceDate = tota[0].body.custAssetBondList[0].refPriceDate
 								} else {
 									$scope.outputVO = [];
 									$scope.showErrorMsg("ehl_01_common_009");
@@ -110,6 +114,7 @@ eSoafApp.controller('SOT320Controller',
 							}
 				});
 			}
+	
 			$scope.sendRecv("SOT320", "getSOTCustInfo", "com.systex.jbranch.app.server.fps.sot320.SOT320InputVO", {'custID': $scope.inputVO.custId, 'prodType': 3, 'tradeType': 2},
 					function(tota, isError) {
 						if (!isError) {

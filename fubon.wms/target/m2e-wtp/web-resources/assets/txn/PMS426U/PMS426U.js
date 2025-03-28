@@ -5,13 +5,4 @@ eSoafApp.controller('PMS426UController', function($rootScope, $scope, $controlle
 	
 	// 繼承
 	$controller('PMS426Controller', {$scope: $scope});
-	
-	$scope.initPMS426U = function() {
-		$scope.inputVO.uhrmRC = '031';
-		$scope.inputVO.uhrmOP = '031A';
-		
-	};
-	
-	$scope.initPMS426U();
-	
 });

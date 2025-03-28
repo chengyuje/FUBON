@@ -42,9 +42,6 @@ input.faChkSqr:after {
 .PMS424 .noticed {
     color: #FF0000;
 }
-
-
-
 </style>
 
 <script type="text/javascript" src="assets/txn/PMS424/PMS424.js"></script>
@@ -200,6 +197,7 @@ input.faChkSqr:after {
 						<tr>
 							<th>更新<br>資料</th>
 							<th>序號</th>
+							<th>私銀註記</th>
 							<th>資料日期</th>
 							<th>產出來源</th>
 							<th>交易日期</th>
@@ -226,6 +224,7 @@ input.faChkSqr:after {
 						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
 						 	<td align="center"><input type="checkbox" ng-disabled="" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"></td>
 							<td align="center">{{row.ROWNUM}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.RM_FLAG}}</td>
 						 	<td>{{row.CREATETIME_S}}</td>
 						 	<td>{{row.SOURCE_OF_DEMAND_N}}</td>
 						 	<td>{{row.TXN_DATE_S}}</td>
@@ -260,7 +259,19 @@ input.faChkSqr:after {
 										ng-disabled="!chkMaintenance || row.RECORD_YN == 'N'" 
 										ng-blur="updateFlag(row)"/>
 							</td>
-							<td><input type="text" class="form-control" style="width: 300px;display:inline;" ng-blur="updateFlag(row)" ng-disabled="!chkMaintenance" ng-model="row.NOTE2" placeholder="請輸入資金來源或帳戶關係..."></td>
+							<td style="text-align:left;">
+								<e-combobox id="custBase" name="custBase" 
+											ng-datasource="mappingSet['PMS.CUST_BASE_IP']"
+											ng-model="row.CUST_BASE"
+											ng-validate="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-change="updateFlag(row);setDefaultVal(row);"
+											ng-readonly="!chkMaintenance" 
+											ng-disabled="!chkMaintenance" 
+											style="line-height:20px;display:inline;" />
+								<input type="text" class="form-control"  style="width:300px;display:inline;" ng-blur="updateFlag(row)" ng-model="row.NOTE2" e-length-limit="600" placeholder="請輸入..." ng-disabled="!chkMaintenance" ng-if="row.CUST_BASE == 'O'">	                    
+		                    </td>
 							<td><input type="text" class="form-control" style="width: 300px;display:inline;" ng-blur="updateFlag(row)" ng-disabled="!chkMaintenance" ng-model="row.NOTE3" placeholder="請輸入具體原因或用途..."></td>
 							<td align="center">								
 								<label>是<input type="radio" value="Y" ng-change="updateFlag(row)" ng-disabled="!chkMaintenance" ng-model="row.WARNING_YN"></label>&emsp;								

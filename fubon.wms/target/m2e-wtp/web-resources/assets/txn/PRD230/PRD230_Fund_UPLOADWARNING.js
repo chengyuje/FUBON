@@ -32,9 +32,9 @@ eSoafApp.controller('PRD230_Fund_UPLOADWARNINGController',
 		            	}
 		            	if (tota.length > 0) {
 		            		if(tota[0].body.errorList && tota[0].body.errorList.length > 0)
-		            			$scope.showErrorMsg('ehl_01_prd210_001',[tota[0].body.errorList.toString()]);
+		            			$scope.showErrorMsg('第'+[tota[0].body.errorList.toString()]+'列有錯誤，中文警語訊息不可為空。');
 		            		if(tota[0].body.errorList2 && tota[0].body.errorList2.length > 0)
-		            			$scope.showErrorMsg('ehl_01_prd210_003',[tota[0].body.errorList2.toString()]);
+								$scope.showErrorMsg('第'+[tota[0].body.errorList2.toString()]+'列有錯誤，英文警語訊息不可為空。');
 		            		if(tota[0].body.errorList3 && tota[0].body.errorList3.length > 0)
 		            			$scope.showErrorMsg('ehl_01_prd210_004',[tota[0].body.errorList3.toString()]);
 		            		if(tota[0].body.errorList4 && tota[0].body.errorList4.length > 0)

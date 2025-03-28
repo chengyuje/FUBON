@@ -4,11 +4,13 @@
  */
 'use strict';
 eSoafApp.controller('CRM232Controller',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, getParameter, $timeout) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, getParameter, $timeout, crmService) {
 		$controller('BaseController', {$scope: $scope});
 		$controller('CRM230Controller', {$scope: $scope});
 		
 		$scope.controllerName = "CRM232Controller";
+		
+		crmService.getForbiddenList();
 		
 		// init
 		$scope.init = function(){
@@ -51,7 +53,7 @@ eSoafApp.controller('CRM232Controller',
 	                		}
 //							$scope.resultList = tota[0].body.resultList;
 //							$scope.outputVO = tota[0].body;
-							
+							debugger;
 							//去除沒有投資資訊的客戶
 							$scope.resultList = [];
 							angular.forEach(tota[0].body.resultList, function(row) {
@@ -59,8 +61,9 @@ eSoafApp.controller('CRM232Controller',
 									$scope.resultList.push(row);
 								}
 							});
+							$scope.resultList = crmService.filterList($rootScope.forbiddenData,$scope.resultList);
 							$scope.outputVO = {'data':$scope.resultList};
-							
+							debugger;
 							//客戶資訊(一個客戶只呈現一筆)
 							$scope.custList = [];
 							angular.forEach(tota[0].body.resultList, function(row) {
@@ -68,7 +71,9 @@ eSoafApp.controller('CRM232Controller',
 								if (!temp)
 		            				$scope.custList.push(row);
 							});
+							$scope.custList = crmService.filterList($rootScope.forbiddenData,$scope.custList);
 							$scope.custOutputVO = {'data':$scope.custList};
+							debugger;
 							return;
 						}
 			});

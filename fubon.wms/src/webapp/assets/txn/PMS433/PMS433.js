@@ -97,20 +97,17 @@ eSoafApp.controller('PMS433Controller',
 							$scope.originalList = angular.copy(tota[0].body.resultList);
 							$scope.resultList = tota[0].body.resultList;
 							angular.forEach($scope.resultList, function(row, index, objs){
-//								row.IDS=row.ID.substring(0, 4)+"****"+row.ID.substring(8, 10);
-//								
-//								//作業主管能做的資料 by 2017/11/29 willis 需求變更
-//								if($scope.role_id =='A150' || $scope.role_id == 'ABRF'){
-//									if(row.ROLE_FLAG == 'BR'){
-//										row.DISABLE_ROLE_FLAG = 'Y';
-//									}
-//								}
-//								//分行主管能做的資料 by 2017/11/29 willis 需求變更
-//								if($scope.role_id =='A161' || $scope.role_id == 'A149' || $scope.role_id =='ABRU' || $scope.role_id =='A308'){
-//									if(row.ROLE_FLAG == 'OP'){
-//										row.DISABLE_ROLE_FLAG = 'Y';
-//									}
-//								}
+								if(!row.CALL_RESULT) {
+									row.CALL_RESULT = '';
+								}
+
+							});	
+							
+							angular.forEach($scope.originalList, function(row, index, objs){
+								if(!row.CALL_RESULT) {
+									row.CALL_RESULT = '';
+								}
+
 							});	
 
 							$scope.outputVO = tota[0].body;	
@@ -145,16 +142,25 @@ eSoafApp.controller('PMS433Controller',
 		};
 		
 		$scope.modifyResult = function (row) {
+			debugger;
 			row.MODIFY_FLAG = 'Y';
 		};
 		
 		$scope.save = function(){
 			$scope.modifyList = [];
-			angular.forEach($scope.resultList, function(row){
-				if (row.MODIFY_FLAG === 'Y') {
-					$scope.modifyList.push(row);
-				  }
-				});
+			angular.forEach($scope.originalList, function(row1){
+				angular.forEach($scope.resultList, function(row){
+					if (row.MODIFY_FLAG === 'Y' && row.SEQ === row1.SEQ) {
+						if(row.CALL_RESULT === row1.CALL_RESULT && row.REC_SEQ === row1.REC_SEQ && row.MEMO === row1.MEMO) {
+							
+						} else {
+							debugger;
+							$scope.modifyList.push(row);
+						}
+					  }
+					});				
+			});
+
 			if($scope.modifyList.length > 0) {
 				$scope.sendRecv("PMS433", "save", "com.systex.jbranch.app.server.fps.pms433.PMS433InputVO", {'modifyList':$scope.modifyList},
 						function(tota, isError) {						

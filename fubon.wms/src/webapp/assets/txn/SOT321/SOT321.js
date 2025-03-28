@@ -199,7 +199,7 @@ eSoafApp.controller('SOT321Controller',
 					tradeDate: undefined,						//交易日期
 
 					certificateID: '',							//憑證編號
-					gtcYN: 'N',									//當日單N, 長效單Y
+					gtcYN: null,									//當日單N, 長效單Y
 					gtcEndDate: undefined,						//長效單迄日
 					gtcRefVal: undefined,						//長效單委託價格
 
@@ -516,8 +516,24 @@ eSoafApp.controller('SOT321Controller',
 				$scope.inputVO.entrustType = "2";
 				$scope.inputVO.gtcRefVal = undefined;
 				$scope.inputVO.gtcStartDate = undefined;
-				$scope.inputVO.gtcEndDate = undefined;	
+				$scope.inputVO.gtcEndDate = undefined;
 				
+				var today = new Date();
+				var year = today.getFullYear();
+				var month = today.getMonth();
+				var date = today.getDate();
+				//報價日期
+				var refPriceDate = new Date($scope.inputVO.refValDate);
+				var refValYear = refPriceDate.getFullYear();
+				var refValMonth = refPriceDate.getMonth();
+				var refValDate = refPriceDate.getDate();
+
+				//#2340
+				if (refValYear != year || refValMonth != month || refValDate != date) {
+					$scope.inputVO.gtcYN = null;
+					$scope.showErrorMsg("尚無當日參考報價");
+					return;
+				}
 			} else if ($scope.inputVO.gtcYN == "Y") {
 				// 長效單
 				$scope.inputVO.entrustType = "1";

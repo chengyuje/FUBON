@@ -52,6 +52,7 @@ public class SOT1640InputVO extends SOT110InputVO {
 	private String inProdC4YN;
 	private String inProdC5YN;
 	private String dynamicProdCurrM; //動態鎖利母基金計價幣別	
+	private String dynamicType;
 	
 	public String getProdIdC1() {
 		return prodIdC1;
@@ -298,6 +299,12 @@ public class SOT1640InputVO extends SOT110InputVO {
 	}
 	public void setDynamicProdCurrM(String dynamicProdCurrM) {
 		this.dynamicProdCurrM = dynamicProdCurrM;
+	}
+	public String getDynamicType() {
+		return dynamicType;
+	}
+	public void setDynamicType(String dynamicType) {
+		this.dynamicType = dynamicType;
 	}
 		
 }

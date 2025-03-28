@@ -5,6 +5,9 @@ import static org.apache.commons.lang.StringUtils.defaultString;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,9 +17,16 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -99,7 +109,7 @@ public class PMS418 extends FubonWmsBizLogic {
 		sb.append("       RPT.RECORD_SEQ, ");
 		sb.append("       RPT.AO_EMP_NAME, ");
 		sb.append("       RPT.TXN_TIME, ");
-		sb.append("       RPT.TASK_NM, ");
+		sb.append("       CASE WHEN RPT.TASK_NM = 'KYC-了解我的投資風險偏好' THEN 'KYC風險屬性評估(應由本人承作)' ELSE RPT.TASK_NM END AS TASK_NM, ");
 		sb.append("       RPT.IP_ADDR, ");
 		sb.append("       RPT.MODIFIER, ");
 		sb.append("       RPT.LASTUPDATE, ");
@@ -232,7 +242,7 @@ public class PMS418 extends FubonWmsBizLogic {
 			}
 			
 			sb.append("WHERE TO_CHAR(TXN_TIME, 'YYYYMMDD') = :txnDay ");
-			sb.append("AND TASK_NM = :taskNM ");
+			sb.append("AND CASE WHEN TASK_NM = 'KYC-了解我的投資風險偏好' THEN 'KYC風險屬性評估(應由本人承作)' ELSE TASK_NM END = :taskNM ");
 			sb.append("AND IP_ADDR = :ipAddr ");
 			sb.append("AND CUST_ID = :custID ");
 			
@@ -274,7 +284,7 @@ public class PMS418 extends FubonWmsBizLogic {
 		sb.append("WHERE 1 = 1 ");
 		
 		sb.append("AND TO_CHAR(TXN_TIME, 'YYYYMMDD') = :txnDay ");
-		sb.append("AND TASK_NM = :taskNM ");
+		sb.append("AND CASE WHEN TASK_NM = 'KYC風險屬性評估(應由本人承作)' THEN 'KYC-了解我的投資風險偏好' ELSE TASK_NM END = :taskNM ");
 		sb.append("AND IP_ADDR = :ipAddr ");
 		sb.append("AND CUST_ID = :custID ");
 		
@@ -293,99 +303,189 @@ public class PMS418 extends FubonWmsBizLogic {
 	}
 
 	// 匯出-理財戶同一IP交易警示報表
-	public void export(Object body, IPrimitiveMap header) throws JBranchException, ParseException {
+	public void export(Object body, IPrimitiveMap header) throws JBranchException, ParseException, FileNotFoundException, IOException {
 		
-		SimpleDateFormat dateSdf = new SimpleDateFormat("yyyyMMdd");
-		List<Map<String, Object>> list = this.queryData(body).getReportList();
-		
-		String[] csvHeader = { 	"私銀註記", "報表日期", "分行代碼", "分行名稱", 
-								"客戶ID", "客戶姓名", "高齡客戶", "客戶所屬理專", 
-								"交易時間", "交易項目", "IP", 
-								"查證方式", "電訪錄音編號", "客戶背景或關係", "具體說明", "初判異常轉法遵部調查", "首次建立時間", "最新異動人員", "最新異動日期" };
-		String[] csvMain   = { 	"RM_FLAG", "CREATETIME", "BRANCH_NBR", "BRANCH_NAME", 
-								"CUST_ID", "CUST_NAME", "CUST_AGE", "AO_EMP_NAME", 
-								"TXN_TIME", "TASK_NM", "IP_ADDR", 
-								"NOTE", "RECORD_SEQ", "NOTE2", "NOTE3", "EMP_DLG", "FIRSTUPDATE", "MODIFIER", "LASTUPDATE" };
+		SimpleDateFormat sdfYYYYMMDDHHMM = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat sdfYYYYMMDD = new SimpleDateFormat("yyyyMMdd");
 
 		XmlInfo xmlInfo = new XmlInfo();
+		
+		List<Map<String, Object>> list = this.queryData(body).getReportList();
+		
+		String reportName = "理財戶同一IP交易日報";
+		String fileName = reportName + "_" + sdfYYYYMMDD.format(new Date()) + ".xlsx";
+		String uuid = UUID.randomUUID().toString();
+		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
 
-		List<Object[]> csvData = new ArrayList<Object[]>();
-		if (CollectionUtils.isEmpty(list)) {
-			String[] records = new String[2];
-			records[0] = "查無資料";
-			csvData.add(records);
-		} else {
-			SimpleDateFormat timeSdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+		String filePath = Path + uuid;
 
-			for (Map<String, Object> map : list) {
-				String[] records = new String[csvHeader.length];
-				for (int i = 0; i < csvHeader.length; i++) {
-					switch (csvMain[i]) {
-						case "CREATETIME":
-						case "TXN_TIME":
-						case "FIRSTUPDATE":
-						case "LASTUPDATE":
-							records[i] = formatDate(map.get(csvMain[i]), timeSdf); // 首次建立時間
-							break;
-						case "CUST_ID":
-							records[i] = DataFormat.getCustIdMaskForHighRisk(StringUtils.defaultString((String) map.get(csvMain[i])));
-							break;
-						case "EMP_DLG":
-//							records[i] = formatFlag(StringUtils.defaultString((String) map.get(csvMain[i])));
-							switch (checkIsNull(map, csvMain[i]) ) {
-								case "N":
-									records[i] = "否-非行員代客戶操作";
-									break;
-								case "Y":
-									records[i] = "是-通報有異常";
-									break;
-							}
-							break;
-						case "MODIFIER":
-							records[i] = "=\"" + StringUtils.defaultString((String) map.get(csvMain[i])) + "\"";
-							break;
-						case "NOTE":
-							String note = (String) xmlInfo.getVariable("PMS.CHECK_TYPE", (String) map.get("NOTE_TYPE"), "F3");
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet(reportName);
+		sheet.setDefaultColumnWidth(20);
+		sheet.setDefaultRowHeightInPoints(20);
+		
+		// 表頭 CELL型式
+		XSSFCellStyle headingStyle = workbook.createCellStyle();
+		headingStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		headingStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		headingStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);// 填滿顏色
+		headingStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+		headingStyle.setBorderBottom((short) 1);
+		headingStyle.setBorderTop((short) 1);
+		headingStyle.setBorderLeft((short) 1);
+		headingStyle.setBorderRight((short) 1);
+		headingStyle.setWrapText(true);
 
-							if (null != map.get("NOTE_TYPE") && StringUtils.equals("O", (String) map.get("NOTE_TYPE"))) {
-								note = note + "：" + StringUtils.defaultString((String) map.get(csvMain[i]));
-							}
-							
-							records[i] = (StringUtils.isNotEmpty(note) ? note : "");
-							break;
-						case "CUST_AGE":
-							records[i] = StringUtils.equals("", checkIsNull(map, csvMain[i])) ? "" : (new BigDecimal(checkIsNull(map, csvMain[i])).compareTo(new BigDecimal("65")) >= 0 ? checkIsNull(map, csvMain[i]) : "");
-							break;
-						case "RECORD_SEQ":
-							records[i] = "=\"" + checkIsNull(map, csvMain[i]) + "\"";
-							break;
-						case "NOTE2":
-							String note2 = (String) xmlInfo.getVariable("PMS.CUST_BASE_IP", (String) map.get("CUST_BASE"), "F3");
+		// 資料 CELL型式
+		XSSFCellStyle mainStyle = workbook.createCellStyle();
+		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		mainStyle.setBorderBottom((short) 1);
+		mainStyle.setBorderTop((short) 1);
+		mainStyle.setBorderLeft((short) 1);
+		mainStyle.setBorderRight((short) 1);
+		
+		// 資料 CELL型式
+		XSSFCellStyle titleStyle = workbook.createCellStyle();
+		titleStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+		titleStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderBottom((short) 1);
+		titleStyle.setBorderTop((short) 1);
+		titleStyle.setBorderLeft((short) 1);
+		titleStyle.setBorderRight((short) 1);
+		
+		String[] headerLine = { "私銀註記", 
+								"報表日期", 
+								"分行代碼", 
+								"分行名稱", 
+								"客戶ID", 
+								"客戶姓名", 
+								"高齡客戶", 
+								"客戶所屬理專", 
+								"交易時間", 
+								"交易項目", 
+								"IP", 
+								"查證方式", 
+								"電訪錄音編號", 
+								"客戶背景或關係", 
+								"具體說明", 
+								"初判異常轉法遵部調查", 
+								"首次建立時間", 
+								"最新異動人員", 
+								"最新異動日期" };
+		
+		String[] mainLine   = { "RM_FLAG", 
+								"CREATETIME", 
+								"BRANCH_NBR", 
+								"BRANCH_NAME", 
+								"CUST_ID", 
+								"CUST_NAME", 
+								"CUST_AGE", 
+								"AO_EMP_NAME", 
+								"TXN_TIME", 
+								"TASK_NM", 
+								"IP_ADDR", 
+								"NOTE", 
+								"RECORD_SEQ", 
+								"NOTE2",
+								"NOTE3", 
+								"EMP_DLG", 
+								"FIRSTUPDATE", 
+								"MODIFIER", 
+								"LASTUPDATE" };
 
-							if (null != map.get("CUST_BASE") && StringUtils.equals("O", (String) map.get("CUST_BASE"))) {
-								note2 = note2 + "：" + StringUtils.defaultString((String) map.get(csvMain[i]));
-							}
-							
-							records[i] = note2;
-							break;
-						default :
-							if (null != map.get(csvMain[i])) {
-								records[i] = defaultString(map.get(csvMain[i]).toString());
-							} else {
-								records[i] = "";
-							}
-							break;
-					}
-				}
-				
-				csvData.add(records);
-			}
+		Integer index = 0;
+
+		XSSFRow row = sheet.createRow(index);
+		for (int i = 0; i < 1; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(titleStyle);
+			cell.setCellValue(reportName);
+		}
+		
+		index++;
+		
+		row = sheet.createRow(index);
+		row.setHeightInPoints(30);
+		for (int i = 0; i < headerLine.length; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(headingStyle);
+			cell.setCellValue(headerLine[i]);
 		}
 
-		CSVUtil csv = new CSVUtil();
-		csv.setHeader(csvHeader);
-		csv.addRecordList(csvData);
-		notifyClientToDownloadFile(csv.generateCSV(), "理財戶同一IP交易日報_" + dateSdf.format(new Date()) + ".csv");
+		index++;
+
+		for (Map<String, Object> map : list) {
+			row = sheet.createRow(index);
+			
+			for (int i = 0; i < mainLine.length; i++) {
+				XSSFCell cell = row.createCell(i);
+				cell.setCellStyle(mainStyle);
+				
+				switch (mainLine[i]) {
+					case "CREATETIME":
+						cell.setCellValue(formatDate(map.get(mainLine[i]), sdfYYYYMMDD)); // 首次建立時間
+						break;
+					case "TXN_TIME":
+					case "FIRSTUPDATE":
+					case "LASTUPDATE":
+						cell.setCellValue(formatDate(map.get(mainLine[i]), sdfYYYYMMDDHHMM)); // 首次建立時間
+						break;
+					case "CUST_ID":
+						cell.setCellValue(DataFormat.getCustIdMaskForHighRisk(StringUtils.defaultString((String) map.get(mainLine[i]))));
+						break;
+					case "EMP_DLG":
+						switch (checkIsNull(map, mainLine[i]) ) {
+							case "N":
+								cell.setCellValue("否-非行員代客戶操作");
+								break;
+							case "Y":
+								cell.setCellValue("是-通報有異常");
+								break;
+						}
+						break;
+					case "NOTE":
+						String note = (String) xmlInfo.getVariable("PMS.CHECK_TYPE", (String) map.get("NOTE_TYPE"), "F3");
+
+						if (null != map.get("NOTE_TYPE") && StringUtils.equals("O", (String) map.get("NOTE_TYPE"))) {
+							note = note + "：" + StringUtils.defaultString((String) map.get(mainLine[i]));
+						}
+						
+						cell.setCellValue((StringUtils.isNotEmpty(note) ? note : ""));
+						break;
+					case "CUST_AGE":
+						cell.setCellValue(StringUtils.equals("", checkIsNull(map, mainLine[i])) ? "" : (new BigDecimal(checkIsNull(map, mainLine[i])).compareTo(new BigDecimal("65")) >= 0 ? checkIsNull(map, mainLine[i]) : ""));
+						break;
+					case "NOTE2":
+						String note2 = (String) xmlInfo.getVariable("PMS.CUST_BASE_IP", (String) map.get("CUST_BASE"), "F3");
+
+						if (null != map.get("CUST_BASE") && StringUtils.equals("O", (String) map.get("CUST_BASE"))) {
+							note2 = note2 + "：" + StringUtils.defaultString((String) map.get(mainLine[i]));
+						}
+						
+						cell.setCellValue(note2);
+						break;
+					case "RECORD_SEQ":
+						cell.setCellValue(checkIsNull(map, mainLine[i]) + "");
+						break;
+					default :
+						if (null != map.get(mainLine[i])) {
+							cell.setCellValue(defaultString(map.get(mainLine[i]).toString()));
+						} else {
+							cell.setCellValue("");
+						}
+						break;
+				}
+			}
+			
+			index++;
+		}
+
+		workbook.write(new FileOutputStream(filePath));
+
+		notifyClientToDownloadFile(DataManager.getSystem().getPath().get("temp").toString() + uuid, fileName);
+
+		this.sendRtnObject(null);
 	}
 	
 	// 查詢-排除IP

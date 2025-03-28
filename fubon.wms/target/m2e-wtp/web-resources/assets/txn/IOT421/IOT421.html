@@ -38,6 +38,17 @@
 									ng-editable="false"
 									ng-format="F3" 
 									ng-required="false" 
+									ng-show="assign == 'N'"
+									style="line-height:20px;"/>
+						<e-combobox id="status" name="status"
+									ng-paramtype="ASSIGN_CALLOUT_STATUS"
+									ng-model="inputVO.status"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3" 
+									ng-required="false" 
+									ng-show="assign == 'Y'"
 									style="line-height:20px;"/>
 					</td>
 				</tr>
@@ -61,8 +72,8 @@
 							style="width:200px; text-transform: uppercase;">
 					</td>
 				</tr>
-				<!-- <tr>
-					<th class="col-md-1">檢視狀態：</th>
+				<tr>
+					<!-- <th class="col-md-1">檢視狀態：</th>
 					<td class="col-md-5">
 						<e-combobox id="review_status" name="review_status"
 									ng-paramtype="CALLOUT.REVIEW_STATUS"
@@ -73,7 +84,7 @@
 									ng-format="F3" 
 									ng-required="false" 
 									style="line-height:20px;" />
-					</td>				
+					</td> -->				
 					<th class="col-md-1">電訪員：</th>
 					<td class="col-md-5">
 						<input type="text" id="call_person" name="call_person" 
@@ -83,7 +94,16 @@
 							   class="form-control" 
 							   style="width:200px; text-transform: uppercase;">
 					</td>
-				</tr> -->
+					<th class="col-md-1">招攬人員員編：</th>
+					<td class="col-md-5">
+						<input type="text" id="recruit_id" name="recruit_id" 
+							   placeholder="請輸入..."
+							   ng-model="inputVO.recruit_id" 
+							   maxlength="15"
+							   class="form-control" 
+							   style="width:200px; text-transform: uppercase;">
+					</td>
+				</tr>
 				<tr>
 					<th class="col-md-1">要保書填寫申請日：</th>
 					<td class="col-md-5">
@@ -116,15 +136,6 @@
 									<i class="glyphicon glyphicon-calendar"></i></button>																		
 							</span>
 						</div>
-					</td>
-					<th class="col-md-1">招攬人員員編：</th>
-					<td class="col-md-5">
-						<input type="text" id="recruit_id" name="recruit_id" 
-							   placeholder="請輸入..."
-							   ng-model="inputVO.recruit_id" 
-							   maxlength="15"
-							   class="form-control" 
-							   style="width:200px; text-transform: uppercase;">
 					</td>
 				</tr>
 			</table>
@@ -256,7 +267,9 @@
 							<input type="checkbox" ng-model="row.C_TIME1" ng-true-value="'Y'" ng-false-value="'N'"> 09：00～12：00</br>
 	    					<input type="checkbox" ng-model="row.C_TIME2" ng-true-value="'Y'" ng-false-value="'N'"> 12：00～15：00</br>
 	    					<input type="checkbox" ng-model="row.C_TIME3" ng-true-value="'Y'" ng-false-value="'N'"> 15：00～18：00</br>
-	    					<input type="checkbox" ng-model="row.C_TIME4" ng-true-value="'Y'" ng-false-value="'N'"> 18：00～20：00
+	    					<!-- <input type="checkbox" ng-model="row.C_TIME4" ng-true-value="'Y'" ng-false-value="'N'"> 18：00～20：00 -->
+	    					<input type="checkbox" ng-model="row.C_TIME4" ng-true-value="'Y'" ng-false-value="'N'" ng-show="row.C_TIME4 == 'Y'">
+	    					<span ng-show="row.C_TIME4 == 'Y'"> 18：00～20：00</span>
 	    					<input type="text" id="c_time_memo" name="c_time_memo" 
 								   placeholder="限30個字"
 								   ng-model="row.C_TIME_MEMO" 
@@ -278,7 +291,9 @@
 							<input type="checkbox" ng-model="row.I_TIME1" ng-true-value="'Y'" ng-false-value="'N'"> 09：00～12：00</br>
 	    					<input type="checkbox" ng-model="row.I_TIME2" ng-true-value="'Y'" ng-false-value="'N'"> 12：00～15：00</br>
 	    					<input type="checkbox" ng-model="row.I_TIME3" ng-true-value="'Y'" ng-false-value="'N'"> 15：00～18：00</br>
-	    					<input type="checkbox" ng-model="row.I_TIME4" ng-true-value="'Y'" ng-false-value="'N'"> 18：00～20：00
+	    					<!-- <input type="checkbox" ng-model="row.I_TIME4" ng-true-value="'Y'" ng-false-value="'N'"> 18：00～20：00 -->
+	    					<input type="checkbox" ng-model="row.I_TIME4" ng-true-value="'Y'" ng-false-value="'N'" ng-show="row.I_TIME4 == 'Y'">
+	    					<span ng-show="row.I_TIME4 == 'Y'"> 18：00～20：00</span>
 	    					<input type="text" id="i_time_memo" name="i_time_memo" 
 								   placeholder="限30個字"
 								   ng-model="row.I_TIME_MEMO" 
@@ -300,7 +315,9 @@
 							<input type="checkbox" ng-model="row.P_TIME1" ng-true-value="'Y'" ng-false-value="'N'"> 09：00～12：00</br>
 	    					<input type="checkbox" ng-model="row.P_TIME2" ng-true-value="'Y'" ng-false-value="'N'"> 12：00～15：00</br>
 	    					<input type="checkbox" ng-model="row.P_TIME3" ng-true-value="'Y'" ng-false-value="'N'"> 15：00～18：00</br>
-	    					<input type="checkbox" ng-model="row.P_TIME4" ng-true-value="'Y'" ng-false-value="'N'"> 18：00～20：00
+	    					<!-- <input type="checkbox" ng-model="row.P_TIME4" ng-true-value="'Y'" ng-false-value="'N'"> 18：00～20：00 -->
+	    					<input type="checkbox" ng-model="row.P_TIME4" ng-true-value="'Y'" ng-false-value="'N'" ng-show="row.P_TIME4 == 'Y'">
+	    					<span ng-show="row.P_TIME4 == 'Y'"> 18：00～20：00</span>
 	    					<input type="text" id="p_time_memo" name="p_time_memo" 
 								   placeholder="限30個字"
 								   ng-model="row.P_TIME_MEMO" 

@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import com.systex.jbranch.app.common.fps.table.TBCRM_CUST_MASTVO;
 import com.systex.jbranch.app.common.fps.table.TBFPS_CUST_LISTVO;
 import com.systex.jbranch.app.server.fps.crm830.CRM830;
+import com.systex.jbranch.app.server.fps.crm870.CRM870;
 import com.systex.jbranch.app.server.fps.fps200.FPS200;
 import com.systex.jbranch.app.server.fps.sot701.FP032675DataVO;
 import com.systex.jbranch.app.server.fps.sot701.SOT701;
@@ -792,47 +793,52 @@ public class CRM681 extends EsbUtil {
 		
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
+		CRM870 crm870 = (CRM870) PlatformContext.getBean("crm870");
 		
-		sql.append("SELECT DISTINCT PRODUCT_CODE, ");
-		sql.append("       CUST_ID, ");
-		sql.append("       CURRENCY, ");
-		sql.append("       SUM(INVEST_AMT_FC) OVER (PARTITION BY CUST_ID, PRODUCT_CODE, CURRENCY) AS TOTAL_INVEST_AMT_FC, ");
-		sql.append("       SUM(AUM_FC) OVER (PARTITION BY CUST_ID, PRODUCT_CODE, CURRENCY) AS TOTAL_AUM_FC, ");
-		sql.append("       SUM(BENEFIT_AMT1) OVER (PARTITION BY CUST_ID, PRODUCT_CODE, CURRENCY) AS TOTAL_BENEFIT_AMT1, ");
-		sql.append("       SUM(BENEFIT_AMT2) OVER (PARTITION BY CUST_ID, PRODUCT_CODE, CURRENCY) AS TOTAL_BENEFIT_AMT2 ");
+		sql.append("SELECT DISTINCT M.PRODUCT_CODE, ");
+		sql.append("       M.CUST_ID, ");
+		sql.append("       M.CURRENCY, ");
+		sql.append("       SUM(M.INVEST_AMT_FC) OVER (PARTITION BY M.CUST_ID, M.PRODUCT_CODE, M.CURRENCY) AS TOTAL_INVEST_AMT_FC, ");
+		sql.append("       SUM(M.AUM_FC) OVER (PARTITION BY M.CUST_ID, M.PRODUCT_CODE, M.CURRENCY) AS TOTAL_AUM_FC, ");
+		sql.append("       SUM(M.BENEFIT_AMT1) OVER (PARTITION BY M.CUST_ID, M.PRODUCT_CODE, M.CURRENCY) AS TOTAL_BENEFIT_AMT1, ");
+		sql.append("       SUM(M.BENEFIT_AMT2) OVER (PARTITION BY M.CUST_ID, M.PRODUCT_CODE, M.CURRENCY) AS TOTAL_BENEFIT_AMT2 ");
 		sql.append("FROM ( ");
-		sql.append("  SELECT DATA_DATE, SNAP_DATE, BRANCH_NAME, CUST_ID, ACCT_NBR, PRODUCT_CODE, COUNTRY_CODE, EXCHANGE_CODE, UPPER_COMPANY_CODE, PROD_ID, CURRENCY, INVEST_AMT_FC, AUM_FC, BENEFIT_AMT1, BENEFIT_AMT2 ");
-		sql.append("  FROM TBCRM_AST_INV_SEC_STOCK ");
-		sql.append("  WHERE DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_STOCK) ");
+		sql.append("  SELECT M.DATA_DATE, M.SNAP_DATE, M.BRANCH_NAME, M.CUST_ID, M.ACCT_NBR, M.PRODUCT_CODE, M.COUNTRY_CODE, M.EXCHANGE_CODE, M.UPPER_COMPANY_CODE, M.PROD_ID, M.CURRENCY, M.INVEST_AMT_FC, M.AUM_FC, M.BENEFIT_AMT1, M.BENEFIT_AMT2 ");
+		sql.append("  FROM TBCRM_AST_INV_SEC_STOCK M ");
+		crm870.appendSecSql(sql);
+		sql.append("  WHERE M.DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_STOCK) ");
 		sql.append("  UNION ");
-		sql.append("  SELECT DATA_DATE, SNAP_DATE, BRANCH_NAME, CUST_ID, ACCT_NBR, PRODUCT_CODE, COUNTRY_CODE, EXCHANGE_CODE, UPPER_COMPANY_CODE, PROD_ID, CURRENCY, INVEST_AMT_FC, AUM_FC, BENEFIT_AMT1, BENEFIT_AMT2 ");
-		sql.append("  FROM TBCRM_AST_INV_SEC_BOND ");
-		sql.append("  WHERE DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_BOND) ");
+		sql.append("  SELECT M.DATA_DATE, M.SNAP_DATE, M.BRANCH_NAME, M.CUST_ID, M.ACCT_NBR, M.PRODUCT_CODE, M.COUNTRY_CODE, M.EXCHANGE_CODE, M.UPPER_COMPANY_CODE, M.PROD_ID, M.CURRENCY, M.INVEST_AMT_FC, M.AUM_FC, M.BENEFIT_AMT1, M.BENEFIT_AMT2 ");
+		sql.append("  FROM TBCRM_AST_INV_SEC_BOND M ");
+		crm870.appendSecSql(sql);
+		sql.append("  WHERE M.DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_BOND) ");
 		sql.append("  UNION ");
-		sql.append("  SELECT DATA_DATE, SNAP_DATE, BRANCH_NAME, CUST_ID, ACCT_NBR, PRODUCT_CODE, COUNTRY_CODE, EXCHANGE_CODE, UPPER_COMPANY_CODE, PROD_ID, CURRENCY, INVEST_AMT_FC, AUM_FC, BENEFIT_AMT1, BENEFIT_AMT2 ");
-		sql.append("  FROM TBCRM_AST_INV_SEC_SN ");
-		sql.append("  WHERE DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_SN) ");
+		sql.append("  SELECT M.DATA_DATE, M.SNAP_DATE, M.BRANCH_NAME, M.CUST_ID, M.ACCT_NBR, M.PRODUCT_CODE, M.COUNTRY_CODE, M.EXCHANGE_CODE, M.UPPER_COMPANY_CODE, M.PROD_ID, M.CURRENCY, M.INVEST_AMT_FC, M.AUM_FC, M.BENEFIT_AMT1, M.BENEFIT_AMT2 ");
+		sql.append("  FROM TBCRM_AST_INV_SEC_SN M ");
+		crm870.appendSecSql(sql);
+		sql.append("  WHERE M.DATA_DATE = (SELECT MAX(DATA_DATE) FROM TBCRM_AST_INV_SEC_SN) ");
 		sql.append("  UNION ");
 		
 		// #1345 : WMS-CR-20220930-01_業管系統新增證券之境內結構型商品資訊
-		sql.append("  SELECT INS_DATE AS DATA_DATE, ");  								//-- 資料日期
-		sql.append("         SNAP_DATE, ");  											//-- 庫存日期
+		sql.append("  SELECT M.INS_DATE AS DATA_DATE, ");  								//-- 資料日期
+		sql.append("         M.SNAP_DATE, ");  											//-- 庫存日期
 		sql.append("         NULL AS BRANCH_NAME, ");  									//-- 分公司名稱
-		sql.append("         CUSTOMER_ID AS CUST_ID, ");  								//-- 客戶ID(PER)(ID)
-		sql.append("         ACCT_NBR, ");  											//-- 客戶帳號(PER)(ACCT)
+		sql.append("         M.CUSTOMER_ID AS CUST_ID, ");  								//-- 客戶ID(PER)(ID)
+		sql.append("         M.ACCT_NBR, ");  											//-- 客戶帳號(PER)(ACCT)
 		sql.append("         'DSN' AS PRODUCT_CODE, ");  								//-- 產品類別代碼
 		sql.append("         NULL AS COUNTRY_CODE, ");  								//-- 國別代號
 		sql.append("         NULL AS EXCHANGE_CODE, ");  								//-- 交易所代號
 		sql.append("         NULL AS UPPER_COMPANY_CODE, ");  							//-- 上手券商代號
-		sql.append("         STOCK_CODE AS PROD_ID, ");  								//-- 商品代號
-		sql.append("         CURRENCY, ");  											//-- 幣別
-		sql.append("         INVEST_COST AS INVEST_AMT_FC, ");  						//-- 投資成本(原幣)
-		sql.append("         AUM_TW AS AUM_FC, ");  									//-- 庫存市值(原幣) / 帳面價值
-		sql.append("         (AUM_TW - INVEST_COST) AS BENEFIT_AMT1, ");  				//-- 損益金額(不含息)(原幣) = 帳面價值-投資成本
-		sql.append("         (AUM_TW - INVEST_COST + DIVIDEND_AMT) AS BENEFIT_AMT2 ");  //-- 損益金額(含息)(原幣) = 帳面價值-投資成本+累計配息金額
-		sql.append("  FROM TBCRM_AST_INV_SEC_DSN ");
-		sql.append("  WHERE INS_DATE = (SELECT MAX(INS_DATE) FROM TBCRM_AST_INV_SEC_DSN) ");
-		sql.append(") ");
+		sql.append("         M.STOCK_CODE AS PROD_ID, ");  								//-- 商品代號
+		sql.append("         M.CURRENCY, ");  											//-- 幣別
+		sql.append("         M.INVEST_COST AS INVEST_AMT_FC, ");  						//-- 投資成本(原幣)
+		sql.append("         M.AUM_TW AS AUM_FC, ");  									//-- 庫存市值(原幣) / 帳面價值
+		sql.append("         (M.AUM_TW - M.INVEST_COST) AS BENEFIT_AMT1, ");  				//-- 損益金額(不含息)(原幣) = 帳面價值-投資成本
+		sql.append("         (M.AUM_TW - M.INVEST_COST + M.DIVIDEND_AMT) AS BENEFIT_AMT2 ");  //-- 損益金額(含息)(原幣) = 帳面價值-投資成本+累計配息金額
+		sql.append("  FROM TBCRM_AST_INV_SEC_DSN M ");
+		crm870.appendSecDsnSql(sql);
+		sql.append("  WHERE M.INS_DATE = (SELECT MAX(INS_DATE) FROM TBCRM_AST_INV_SEC_DSN) ");
+		sql.append(") M ");
 		
 		sql.append("WHERE 1 = 1 ");
 		sql.append("AND CUST_ID = :cust_id ");
@@ -934,17 +940,26 @@ public class CRM681 extends EsbUtil {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
 		
-		sql.append("SELECT CUSTOMER_ID AS CUST_ID, ");
-		sql.append("       SNAP_DATE, ");
-		sql.append("       ACCT_NBR AS ACCT_NBR_DSN, ");
-		sql.append("       KYC_M_DATE, ");
-		sql.append("       SALES_BRANCH_NBR, ");
-		sql.append("       SALES_BRANCH_NAME, ");
-		sql.append("       ACCT_NBR AS LABEL, ");
-		sql.append("       ACCT_NBR AS DATA ");
-		sql.append("FROM TBCRM_S_TFB_SVIP_ACCT_DSN ");
-		sql.append("WHERE SNAP_DATE = (SELECT MAX(SNAP_DATE) FROM TBCRM_S_TFB_SVIP_ACCT_DSN) ");
-		sql.append("AND CUSTOMER_ID = :cust_id ");
+		sql.append("SELECT M.CUSTOMER_ID AS CUST_ID, ");
+		sql.append("       M.SNAP_DATE, ");
+		sql.append("       M.ACCT_NBR AS ACCT_NBR_DSN, ");
+		sql.append("       M.KYC_M_DATE, ");
+		sql.append("       M.SALES_BRANCH_NBR, ");
+		sql.append("       M.SALES_BRANCH_NAME, ");
+		sql.append("       M.ACCT_NBR AS LABEL, ");
+		sql.append("       M.ACCT_NBR AS DATA ");
+		sql.append("FROM TBCRM_S_TFB_SVIP_ACCT_DSN M ");
+		sql.append("INNER JOIN ( ");
+		sql.append("SELECT DISTINCT ");
+		sql.append("DSN.CUSTOMER_ID, DSN.SALES_BRANCH_NBR, ACCT.CROSS_SELLING_IND ");
+		sql.append("FROM TBCRM_S_TFB_SVIP_ACCT_DSN DSN ");
+		sql.append("     INNER JOIN TBCRM_S_TFB_SVIP_ACCT ACCT ");
+		sql.append("     ON DSN.CUSTOMER_ID = ACCT.CUST_ID AND DSN.SALES_BRANCH_NBR = ACCT.BRANCH_NBR");
+		sql.append("     AND ACCT.CROSS_SELLING_IND = 'Y' ");
+		sql.append(") S ");
+		sql.append("ON M.CUSTOMER_ID = S.CUSTOMER_ID AND M.SALES_BRANCH_NBR = S.SALES_BRANCH_NBR ");
+		sql.append("WHERE M.SNAP_DATE = (SELECT MAX(SNAP_DATE) FROM TBCRM_S_TFB_SVIP_ACCT_DSN) ");
+		sql.append("AND M.CUSTOMER_ID = :cust_id ");
 
 		queryCondition.setQueryString(sql.toString());
 		

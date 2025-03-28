@@ -127,8 +127,28 @@ eSoafApp.controller('PMS346Controller', function($rootScope, $scope, $controller
 	};
 	
 	$scope.limitDate = function() {
-		$scope.bgn_sDateOptions.maxDate = $scope.inputVO.eCreDate || $scope.maxDate;
-		$scope.bgn_eDateOptions.minDate = $scope.inputVO.sCreDate || $scope.minDate;
+//		$scope.bgn_sDateOptions.maxDate = $scope.inputVO.eCreDate || $scope.inputVO.sCreDate;
+//		$scope.bgn_eDateOptions.minDate = $scope.inputVO.sCreDate;
+		// 三個月
+		$scope.bgn_sDateOptions.maxDate = $scope.inputVO.eCreDate || $scope.inputVO.sCreDate;
+		if ($scope.inputVO.eCreDate) {
+			var min = new Date($scope.inputVO.eCreDate.getTime());
+			min.setMonth(min.getMonth() - 3);
+			
+			$scope.bgn_sDateOptions.minDate = min;
+		} else {
+			$scope.bgn_sDateOptions.minDate = $scope.minDate;
+		}
+		
+		$scope.bgn_eDateOptions.minDate = $scope.inputVO.sCreDate;
+		if ($scope.inputVO.sCreDate) {
+			var max = new Date($scope.inputVO.sCreDate.getTime());
+			max.setMonth(max.getMonth() + 3);
+
+			$scope.bgn_eDateOptions.maxDate = max;
+		} else {
+			$scope.bgn_eDateOptions.maxDate = $scope.nowDate;
+		}
 	};
 
 	$scope.limitDate2 = function() {
@@ -240,8 +260,9 @@ eSoafApp.controller('PMS346Controller', function($rootScope, $scope, $controller
      };
 		
      $scope.inquire = function() {
-    	 if ($scope.inputVO.sCreDate == undefined) {
-    		 $scope.showMsg("照會日期為必填欄位");
+    	 if ($scope.inputVO.sCreDate == undefined || 
+    		 ($scope.inputVO.branch_nbr == undefined || $scope.inputVO.branch_nbr == null || $scope.inputVO.branch_nbr == '')) {
+    		 $scope.showMsg("照會日期、分行為必填欄位");
     		 return;
     	 }
     	 

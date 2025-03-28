@@ -276,46 +276,58 @@ public class CAM998 extends BizLogic {
 			} 
 			// TODO : PS
 			else if (((String) leadsMap.get("CHANNEL")).indexOf("PS") > -1) { //消金PS
-				/*
-				 * 房信貸線上留資名單分派角色改由個金AO
-				 * 1.客戶有理專者，分派給所屬理專
-				 * 2.客戶無理專者，個金AO 有登入系統者，分派給個金AO
-				 *            個金AO 無登入系統者，提供給分行主管分派
-				 */	
-				switch ((String) leadsMap.get("LEAD_TYPE")) {
-					case "05":
-					case "06":
-					case "H1":
-					case "H2":
-					case "UX":
-						if (StringUtils.isNotBlank(custDtlMap.getAO_CODE())) {
-							logger.info("*****" + custDtlMap.getCUST_ID() + ": 客戶主檔中，有負責該客戶的AO_CODE，go setAoCode");
-							outputVO = setAoCode(dam, outputVO, leadsMap, custDtlMap, "cust", source);
+				switch ((String) leadsMap.get("CHANNEL")) {
+					case "004PS":
+						// 皆依客戶歸屬行分派。
+						// 同一分行有多位該種角色人員時(如OP)，隨機分派。
+						memDtlMap = setMem(dam, leadsMap, custDtlMap, source);
+						outputVO = setOutputVO(outputVO, leadsMap, memDtlMap, custDtlMap);
+						break;
+					default:
+						/*
+						 * 房信貸線上留資名單分派角色改由個金AO
+						 * 1.客戶有理專者，分派給所屬理專
+						 * 2.客戶無理專者，個金AO 有登入系統者，分派給個金AO
+						 *            個金AO 無登入系統者，提供給分行主管分派
+						 */	
+						switch ((String) leadsMap.get("LEAD_TYPE")) {
+							case "05":
+							case "06":
+							case "H1":
+							case "H2":
+							case "UX":
+								if (StringUtils.isNotBlank(custDtlMap.getAO_CODE())) {
+									logger.info("*****" + custDtlMap.getCUST_ID() + ": 客戶主檔中，有負責該客戶的AO_CODE，go setAoCode");
+									outputVO = setAoCode(dam, outputVO, leadsMap, custDtlMap, "cust", source);
+								}
+								
+								break;
+						}
+						
+						// 若『AO CODE有誤』或『無AO CODE』，依現行邏輯分派
+						if (null == outputVO.get("EMP_ID")) {
+							logger.info("*****" + custDtlMap.getCUST_ID() + ": 若『AO CODE有誤』或『無AO CODE』，依現行邏輯分派");
+							switch ((String) leadsMap.get("LEAD_TYPE")) {
+								case "05":
+								case "06":
+								case "H1":
+								case "H2":
+								case "UX":
+									if (("SYS".equals(source))) {
+										logger.info("*****" + custDtlMap.getCUST_ID() + ": 名單若為房信貸，則派予個金AO");
+										leadsMap.put("CHANNEL", "PAO");
+									}
+									
+									break;
+							}
+							
+							memDtlMap = setMem(dam, leadsMap, custDtlMap, source);
+							outputVO = setOutputVO(outputVO, leadsMap, memDtlMap, custDtlMap);
 						}
 						
 						break;
 				}
 				
-				// 若『AO CODE有誤』或『無AO CODE』，依現行邏輯分派
-				if (null == outputVO.get("EMP_ID")) {
-					logger.info("*****" + custDtlMap.getCUST_ID() + ": 若『AO CODE有誤』或『無AO CODE』，依現行邏輯分派");
-					switch ((String) leadsMap.get("LEAD_TYPE")) {
-						case "05":
-						case "06":
-						case "H1":
-						case "H2":
-						case "UX":
-							if (("SYS".equals(source))) {
-								logger.info("*****" + custDtlMap.getCUST_ID() + ": 名單若為房信貸，則派予個金AO");
-								leadsMap.put("CHANNEL", "PAO");
-							}
-							
-							break;
-					}
-					
-					memDtlMap = setMem(dam, leadsMap, custDtlMap, source);
-					outputVO = setOutputVO(outputVO, leadsMap, memDtlMap, custDtlMap);
-				}
 			}
 			// TODO : PAO
 			else if (((String) leadsMap.get("CHANNEL")).indexOf("PAO") > -1) {
@@ -459,19 +471,27 @@ public class CAM998 extends BizLogic {
 		sb.append("FROM ( ");
 		
 		switch ((String) leadsMap.get("CHANNEL")) {
+			case "004PS":
+				sb.append("  SELECT EMP.BRANCH_NBR AS BRANCH_ID, EMP.EMP_ID, NULL AS AO_CODE ");
+				sb.append("  FROM TBORG_NEWPS EMP ");
+				sb.append("  WHERE EMP.BRANCH_NBR = :branchID ");
+				
+				queryCondition.setObject("branchID", (StringUtils.isBlank((String) leadsMap.get("BRANCH_ID")) ? custDtlMap.getBRA_NBR() : (String) leadsMap.get("BRANCH_ID")));
+				
+				break;
 			case "PSAO":
-				sb.append("SELECT EMP.BRANCH_NBR AS BRANCH_ID, EMP.EMP_ID, NULL AS AO_CODE ");
-				sb.append("FROM TBORG_PSAO EMP ");
-				sb.append("WHERE EMP.SERVICE_NBR = :branchID ");
-				sb.append("AND EMP.ISONTHEJOB = 'Y' ");
+				sb.append("  SELECT EMP.BRANCH_NBR AS BRANCH_ID, EMP.EMP_ID, NULL AS AO_CODE ");
+				sb.append("  FROM TBORG_PSAO EMP ");
+				sb.append("  WHERE EMP.SERVICE_NBR = :branchID ");
+				sb.append("  AND EMP.ISONTHEJOB = 'Y' ");
 				
 				queryCondition.setObject("branchID", (StringUtils.isBlank((String) leadsMap.get("BRANCH_ID")) ? custDtlMap.getBRA_NBR() : (String) leadsMap.get("BRANCH_ID")));
 				
 				break;
 			case "PAO":
-				sb.append("SELECT EMP.BRANCH_NBR AS BRANCH_ID, EMP.EMP_ID, NULL AS AO_CODE ");
-				sb.append("FROM TBORG_PAO EMP ");
-				sb.append("WHERE EMP.BRANCH_NBR = :branchID ");
+				sb.append("  SELECT EMP.BRANCH_NBR AS BRANCH_ID, EMP.EMP_ID, NULL AS AO_CODE ");
+				sb.append("  FROM TBORG_PAO EMP ");
+				sb.append("  WHERE EMP.BRANCH_NBR = :branchID ");
 				switch ((String) leadsMap.get("LEAD_TYPE")) {
 					// 留資房信貸 分派給個金AO時，需當天有登入的個金AO
 					case "05":
@@ -480,7 +500,7 @@ public class CAM998 extends BizLogic {
 					case "H2":
 					case "UX":
 						if (StringUtils.equals("SYS", source)) {
-							sb.append("AND EXISTS (SELECT TELLERID FROM TBSYSWSONLINESTATUS LOGIN WHERE TRUNC(LOGIN.CREATETIME) = TRUNC(SYSDATE) AND EMP.EMP_ID = LOGIN.TELLERID) ");
+							sb.append("  AND EXISTS (SELECT TELLERID FROM TBSYSWSONLINESTATUS LOGIN WHERE TRUNC(LOGIN.CREATETIME) = TRUNC(SYSDATE) AND EMP.EMP_ID = LOGIN.TELLERID) ");
 						}
 					default:
 						if (StringUtils.isNotBlank((String) leadsMap.get("AO_CODE")) && ((String) leadsMap.get("AO_CODE")).length() > 3) {
@@ -499,10 +519,10 @@ public class CAM998 extends BizLogic {
 				break;
 			case "FA":
 			case "IA":
-				sb.append("SELECT EMP.SUPT_SALES_TEAM_ID, EMP.BRANCH_NBR AS BRANCH_ID, EMP.EMP_ID, NULL AS AO_CODE ");
-				sb.append("FROM TBORG_FAIA EMP ");
-				sb.append("WHERE EMP.SUPT_SALES_TEAM_ID = :channel ");
-				sb.append("AND EMP.BRANCH_NBR = :branchID ");
+				sb.append("  SELECT EMP.SUPT_SALES_TEAM_ID, EMP.BRANCH_NBR AS BRANCH_ID, EMP.EMP_ID, NULL AS AO_CODE ");
+				sb.append("  FROM TBORG_FAIA EMP ");
+				sb.append("  WHERE EMP.SUPT_SALES_TEAM_ID = :channel ");
+				sb.append("  AND EMP.BRANCH_NBR = :branchID ");
 				
 				queryCondition.setObject("channel", (String) leadsMap.get("CHANNEL"));
 				queryCondition.setObject("branchID", (StringUtils.isBlank((String) leadsMap.get("BRANCH_ID")) ? custDtlMap.getBRA_NBR() : (String) leadsMap.get("BRANCH_ID")));
@@ -520,45 +540,45 @@ public class CAM998 extends BizLogic {
 						break;
 				}
 				
-				sb.append("SELECT EMP.EMP_ID, EMP.AO_CODE, EMP.BRANCH_ID ");
-				sb.append("FROM ( ");
+				sb.append("  SELECT EMP.EMP_ID, EMP.AO_CODE, EMP.BRANCH_ID ");
+				sb.append("  FROM ( ");
 	
-				sb.append("  WITH DEPT AS ( ");
-				sb.append("    SELECT REGION_CENTER_ID, REGION_CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_NBR, BRANCH_NAME ");
-				sb.append("    FROM VWORG_DEFN_INFO ");
-				sb.append("    WHERE BRANCH_NBR = :branchID ");
-				sb.append("  ) ");
+				sb.append("    WITH DEPT AS ( ");
+				sb.append("      SELECT REGION_CENTER_ID, REGION_CENTER_NAME, BRANCH_AREA_ID, BRANCH_AREA_NAME, BRANCH_NBR, BRANCH_NAME ");
+				sb.append("      FROM VWORG_DEFN_INFO ");
+				sb.append("      WHERE BRANCH_NBR = :branchID ");
+				sb.append("    ) ");
 						
-				sb.append("  SELECT MEM.EMP_ID, NULL AS AO_CODE, (SELECT BRANCH_NBR FROM DEPT) AS BRANCH_ID ");
-				sb.append("  FROM TBORG_MEMBER MEM, TBORG_MEMBER_ROLE MR, TBORG_ROLE R ");
-				sb.append("  WHERE MEM.EMP_ID = MR.EMP_ID ");
-				sb.append("  AND MR.ROLE_ID = R.ROLE_ID ");
-				sb.append("  AND MR.IS_PRIMARY_ROLE = 'Y' ");
-				sb.append("  AND 1 = ( ");
-				sb.append("    CASE :roleID WHEN 'A146' THEN CASE MEM.DEPT_ID WHEN (SELECT BRANCH_AREA_ID FROM DEPT) THEN 1 ELSE 0 END ");
-				sb.append("                 WHEN 'A164' THEN CASE MEM.DEPT_ID WHEN (SELECT REGION_CENTER_ID FROM DEPT) THEN 1 ELSE 0 END ");
-				sb.append("    END ");
-				sb.append("  ) ");
+				sb.append("    SELECT MEM.EMP_ID, NULL AS AO_CODE, (SELECT BRANCH_NBR FROM DEPT) AS BRANCH_ID ");
+				sb.append("    FROM TBORG_MEMBER MEM, TBORG_MEMBER_ROLE MR, TBORG_ROLE R ");
+				sb.append("    WHERE MEM.EMP_ID = MR.EMP_ID ");
+				sb.append("    AND MR.ROLE_ID = R.ROLE_ID ");
+				sb.append("    AND MR.IS_PRIMARY_ROLE = 'Y' ");
+				sb.append("    AND 1 = ( ");
+				sb.append("      CASE :roleID WHEN 'A146' THEN CASE MEM.DEPT_ID WHEN (SELECT BRANCH_AREA_ID FROM DEPT) THEN 1 ELSE 0 END ");
+				sb.append("                   WHEN 'A164' THEN CASE MEM.DEPT_ID WHEN (SELECT REGION_CENTER_ID FROM DEPT) THEN 1 ELSE 0 END ");
+				sb.append("      END ");
+				sb.append("    ) ");
 				
-				sb.append("  UNION ");
+				sb.append("    UNION ");
 				
-				sb.append("  SELECT MEM.EMP_ID, NULL AS AO_CODE, (SELECT BRANCH_NBR FROM DEPT) AS BRANCH_ID ");
-				sb.append("  FROM TBORG_MEMBER_PLURALISM MEM, TBORG_MEMBER_ROLE MR, TBORG_ROLE R ");
-				sb.append("  WHERE MEM.EMP_ID = MR.EMP_ID ");
-				sb.append("  AND MR.ROLE_ID = R.ROLE_ID ");
-				sb.append("  AND MR.IS_PRIMARY_ROLE = 'N' ");
+				sb.append("    SELECT MEM.EMP_ID, NULL AS AO_CODE, (SELECT BRANCH_NBR FROM DEPT) AS BRANCH_ID ");
+				sb.append("    FROM TBORG_MEMBER_PLURALISM MEM, TBORG_MEMBER_ROLE MR, TBORG_ROLE R ");
+				sb.append("    WHERE MEM.EMP_ID = MR.EMP_ID ");
+				sb.append("    AND MR.ROLE_ID = R.ROLE_ID ");
+				sb.append("    AND MR.IS_PRIMARY_ROLE = 'N' ");
 				
 				// 20180913 add by ocean
-				sb.append("  AND (TRUNC(MEM.TERDTE) >= TRUNC(SYSDATE) OR MEM.TERDTE IS NULL) ");
-				sb.append("  AND MEM.ACTION <> 'D' ");
+				sb.append("    AND (TRUNC(MEM.TERDTE) >= TRUNC(SYSDATE) OR MEM.TERDTE IS NULL) ");
+				sb.append("    AND MEM.ACTION <> 'D' ");
 				
-				sb.append("  AND 1 = ( ");
-				sb.append("    CASE :roleID WHEN 'A146' THEN CASE MEM.DEPT_ID WHEN (SELECT BRANCH_AREA_ID FROM DEPT) THEN 1 ELSE 0 END ");
-				sb.append("                 WHEN 'A164' THEN CASE MEM.DEPT_ID WHEN (SELECT REGION_CENTER_ID FROM DEPT) THEN 1 ELSE 0 END ");
-				sb.append("    END ");
-				sb.append("  ) ");
-				sb.append(") EMP ");
-				sb.append("WHERE 1 = 1 ");
+				sb.append("    AND 1 = ( ");
+				sb.append("      CASE :roleID WHEN 'A146' THEN CASE MEM.DEPT_ID WHEN (SELECT BRANCH_AREA_ID FROM DEPT) THEN 1 ELSE 0 END ");
+				sb.append("                   WHEN 'A164' THEN CASE MEM.DEPT_ID WHEN (SELECT REGION_CENTER_ID FROM DEPT) THEN 1 ELSE 0 END ");
+				sb.append("      END ");
+				sb.append("    ) ");
+				sb.append("  ) EMP ");
+				sb.append("  WHERE 1 = 1 ");
 				
 				queryCondition.setObject("roleID", roleID);
 				queryCondition.setObject("branchID", (StringUtils.isBlank((String) leadsMap.get("BRANCH_ID")) ? custDtlMap.getBRA_NBR() : (String) leadsMap.get("BRANCH_ID")));
@@ -604,23 +624,23 @@ public class CAM998 extends BizLogic {
 		}
 
 		if (StringUtils.isNotBlank((String) leadsMap.get("EMP_ID"))) { //有指定
-			sb.append("AND EMP.EMP_ID = :empID");
+			sb.append("  AND EMP.EMP_ID = :empID ");
 			logger.info("###第一通路:" + (String) leadsMap.get("CHANNEL") + "-有指定 empID: " + (String) leadsMap.get("EMP_ID") + "###");
 
 			sb.append(") ");
 			queryCondition.setObject("empID", (String) leadsMap.get("EMP_ID"));
 		} else if (StringUtils.isNotBlank((String) leadsMap.get("AO_CODE")) && ((String) leadsMap.get("AO_CODE")).length() > 3) {
-			sb.append("AND EMP.EMP_ID = :empID");
+			sb.append("  AND EMP.EMP_ID = :empID ");
 			logger.info("###第一通路:" + (String) leadsMap.get("CHANNEL") + "-有指定 empID: " + (String) leadsMap.get("AO_CODE") + "###");
 
 			sb.append(") ");
 			queryCondition.setObject("empID", (String) leadsMap.get("AO_CODE"));
 		} else {
-			sb.append("ORDER BY DBMS_RANDOM.VALUE");
+			sb.append("  ORDER BY DBMS_RANDOM.VALUE ");
 			sb.append(") "); //隨機分派
 			sb.append("WHERE ROWNUM = 1 ");
 		}
-		
+
 		queryCondition.setQueryString(sb.toString());
 		logger.info("CAM998.setMem(final): 第一通路=" + (String) leadsMap.get("CHANNEL") + "/SQL=" + sb.toString());
 		

@@ -1,5 +1,7 @@
 package com.systex.jbranch.app.server.fps.iot150;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Blob;
@@ -11,8 +13,8 @@ import java.util.*;
 import com.systex.jbranch.fubon.commons.Manager;
 import com.systex.jbranch.fubon.commons.PdfConfigVO;
 import com.systex.jbranch.fubon.commons.PdfUtil;
-
 import com.systex.jbranch.platform.common.errHandle.DAOException;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -41,6 +43,7 @@ import com.systex.jbranch.platform.common.util.CSVUtil;
 import com.systex.jbranch.platform.common.util.StringUtil;
 import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
+import com.systex.jbranch.platform.server.info.SysInfo;
 import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
@@ -95,7 +98,8 @@ public class IOT150 extends FubonWmsBizLogic{
 			sb.append(" (CASE WHEN F.FB_COM_YN = 'Y' THEN D.INSPRD_TYPE ELSE (CASE WHEN TRIM(JPRD.PRODUCTTYPE1) <> '投資型' THEN '1' ELSE '2' END) END) AS INSPRD_TYPE, ");
 			sb.append(" PRE.CANCEL_CONTRACT_YN, a.BATCH_SETUP_EMPID, to_char(a.BATCH_SETUP_DATE, 'YYYY/MM/DD HH24:MI:SS') AS BATCH_SETUP_DATE, ");
 			sb.append(" CASE WHEN A.PREMIUM_TRANSSEQ IS NOT NULL OR A.I_PREMIUM_TRANSSEQ IS NOT NULL OR A.P_PREMIUM_TRANSSEQ IS NOT NULL THEN 'Y' ELSE 'N' END AS RECORD_YN, ");
-			sb.append(" PRE.SENIOR_AUTH_REMARKS, PRE.SENIOR_AUTH_ID ");
+			sb.append(" PRE.SENIOR_AUTH_REMARKS, PRE.SENIOR_AUTH_ID, A.CREATOR, NVL(A.NO_PAPER_YN, 'N') AS NO_PAPER_YN, ");
+			sb.append(" CASE WHEN MP.PDF_FILE IS NULL THEN 'N' ELSE 'Y' END AS FUND_UPLOAD_YN, A.INSPRD_KEYNO ");
 			sb.append(" FROM VWIOT_MAIN a " );
 			sb.append(" LEFT JOIN (select ins_keyno, listagg(trim(decode(doc_seq, '99', doc_name_oth,doc_name)), chr(10) ) within group (order by doc_seq) as doc_name ");
 			sb.append(" 	from TBIOT_DOC_CHK where doc_type = '1' And DOC_CHK = 'Y' group by ins_keyno) b ON a.ins_keyno = b.ins_keyno ");
@@ -106,6 +110,7 @@ public class IOT150 extends FubonWmsBizLogic{
 			sb.append(" LEFT JOIN TBIOT_MAIN F ON F.INS_KEYNO = A.INS_KEYNO " );
 			sb.append(" LEFT JOIN TBJSB_INS_PROD_COMPANY E ON E.SERIALNUM = F.COMPANY_NUM ");
 			sb.append(" LEFT JOIN TBIOT_PREMATCH PRE ON PRE.PREMATCH_SEQ = A.PREMATCH_SEQ ");
+			sb.append(" LEFT JOIN TBIOT_MAIN_PDF MP ON MP.INS_KEYNO = A.INS_KEYNO ");
 			sb.append(" where a.status in ('38', '40', '42','45','46','47', '50', '52', '60', '62', '70', '80', '85') ");
 
 			if(inputVO.getOP_BATCH_NO() != null){
@@ -276,6 +281,7 @@ public class IOT150 extends FubonWmsBizLogic{
 		TBIOT_MAINVO tmvo = new TBIOT_MAINVO();
 		List<Map<String, Object>> printList = new ArrayList<Map<String,Object>>();
 		List<Map<String, Object>> printListU = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> printListNP = new ArrayList<Map<String,Object>>(); //無紙化案件
 		int total = 0;
 		switch (inputVO.getREG_TYPE()) {
 		case "3":
@@ -359,6 +365,7 @@ public class IOT150 extends FubonWmsBizLogic{
 					tmvo = new TBIOT_MAINVO();
 
 					int totalU = 0;
+					int totalNP = 0;
 					//通過
 					for (Map<String, Object> pass : passList) {
 						tmvo = new TBIOT_MAINVO();
@@ -422,7 +429,12 @@ public class IOT150 extends FubonWmsBizLogic{
 								 * 送件點收，送件批號為"U"開頭之編碼，分開產生送件明細表(含補印)
 								 * **/ 
 								String op_batch_no = print.get("OP_BATCH_NO") != null ? print.get("OP_BATCH_NO").toString().substring(0, 1) : "";
-								if ("U".equals(op_batch_no)) {
+								if(StringUtils.equals("Y", ObjectUtils.toString(print.get("NO_PAPER_YN")))) { 
+									//無紙化分開產生送件明細表
+									totalNP++;
+									print.put("seq", totalNP);
+									printListNP.add(print);
+								} else if ("U".equals(op_batch_no)) {
 									totalU++;
 									print.put("seq", totalU);
 									printListU.add(print);
@@ -517,26 +529,30 @@ public class IOT150 extends FubonWmsBizLogic{
 						data.addRecordList("print", printList);
 						switch (inputVO.getREG_TYPE()) {
 							case "1":
-								title = "新契約簽署後送件明細表";
+								title = "新契約檢核後送件明細表";
 								data.addParameter("title", title);
+								data.addParameter("noPaper", "");
+								data.addParameter("LOGIN_ID", loginID);
 								report = generator.generateReport(txnCode, reportID, data);
 								pdfURL = report.getLocation();
-//								notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "新契約簽署後送件明細表.pdf");
+//								notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "新契約檢核後送件明細表.pdf");
 								urlList.add(pdfURL);
 								break;
 							case "2":
-								title = "其他文件簽署後送件明細表";
+								title = "其他文件檢核後送件明細表";
 								data.addParameter("title", title);
+								data.addParameter("noPaper", "");
+								data.addParameter("LOGIN_ID", loginID);
 								report = generator.generateReport(txnCode, reportID, data);
 								pdfURL = report.getLocation();
-//								notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "其他文件簽署後送件明細表.pdf");
+//								notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "其他文件檢核後送件明細表.pdf");
 								urlList.add(pdfURL);
 								break;
 							default:
 								break;
 						}
 					}
-					
+					//送件批號為"U"開頭之編碼，分開產生送件明細表(含補印)
 					if (printListU.size() > 0) {
 						String pdfURL = null;
 						String txnCode = "IOT150";
@@ -551,25 +567,68 @@ public class IOT150 extends FubonWmsBizLogic{
 						data.addRecordList("print", printListU);
 						switch (inputVO.getREG_TYPE()) {
 							case "1":
-								title = "新契約簽署後送件明細表";
+								title = "新契約檢核後送件明細表";
 								data.addParameter("title", title);
+								data.addParameter("noPaper", "");
+								data.addParameter("LOGIN_ID", loginID);
 								report = generator.generateReport(txnCode, reportID, data);
 								pdfURL = report.getLocation();
 								urlList.add(pdfURL);
-//								notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "新契約簽署後送件明細表.pdf");
+//								notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "新契約檢核後送件明細表.pdf");
 								break;
 							case "2":
-								title = "其他文件簽署後送件明細表";
+								title = "其他文件檢核後送件明細表";
 								data.addParameter("title", title);
+								data.addParameter("noPaper", "");
+								data.addParameter("LOGIN_ID", loginID);
 								report = generator.generateReport(txnCode, reportID, data);
 								pdfURL = report.getLocation();
 								urlList.add(pdfURL);
-//								notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "其他文件簽署後送件明細表.pdf");
+//								notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "其他文件檢核後送件明細表.pdf");
 								break;
 							default:
 								break;
 						}
 					}
+					//無紙化案件
+					if (printListNP.size() > 0) {
+						String pdfURL = null;
+						String txnCode = "IOT150";
+						String reportID = "R1";
+						ReportIF report = null;
+						
+						ReportFactory factory = new ReportFactory();
+						ReportDataIF data = new ReportData();
+						ReportGeneratorIF generator = factory.getGenerator();
+						data.addParameter("printdate", now_date);
+						data.addParameter("total", totalU);
+						data.addRecordList("print", printListNP);
+						switch (inputVO.getREG_TYPE()) {
+							case "1":
+								title = "新契約檢核後送件明細表";
+								data.addParameter("title", title);
+								data.addParameter("noPaper", "(無紙化案件)");
+								data.addParameter("LOGIN_ID", loginID);
+								report = generator.generateReport(txnCode, reportID, data);
+								pdfURL = report.getLocation();
+								urlList.add(pdfURL);
+//								notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "新契約檢核後送件明細表.pdf");
+								break;
+							case "2":
+								title = "其他文件檢核後送件明細表";
+								data.addParameter("title", title);
+								data.addParameter("noPaper", "");
+								data.addParameter("LOGIN_ID", loginID);
+								report = generator.generateReport(txnCode, reportID, data);
+								pdfURL = report.getLocation();
+								urlList.add(pdfURL);
+//								notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "其他文件檢核後送件明細表.pdf");
+								break;
+							default:
+								break;
+						}
+					}
+					
 					if (CollectionUtils.isNotEmpty(urlList)) {
 						String encryptUrl = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), true, urlList));
 						notifyClientToDownloadFile(encryptUrl, title + ".pdf");						
@@ -587,11 +646,14 @@ public class IOT150 extends FubonWmsBizLogic{
 
 	public void Report(Object body, IPrimitiveMap<Object> header) throws JBranchException{
 		IOT150InputVO inputVO = (IOT150InputVO) body;
+		String loginID = (String) getCommonVariable(SystemVariableConsts.LOGINID);
 		List<String> urlList = new ArrayList<String>();
 		int total = 0;
 		int totalU = 0;
+		int totalNP = 0;
 		List<Map<String, Object>> printList = new ArrayList<Map<String,Object>>();
 		List<Map<String, Object>> printListU = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> printListNP = new ArrayList<Map<String,Object>>();//無紙化
 		
 		for (Map<String, Object> print : inputVO.getIOT_MAINList()) {
 			String op_batch_no = print.get("OP_BATCH_NO") != null ? print.get("OP_BATCH_NO").toString().substring(0, 1) : "";
@@ -599,7 +661,22 @@ public class IOT150 extends FubonWmsBizLogic{
 			String status = status_change.toString();
 			
 			if ("60".equals(status)) {
-				if ("U".equals(op_batch_no)) {
+				if(StringUtils.equals("Y", ObjectUtils.toString(print.get("NO_PAPER_YN")))) { 
+					//無紙化案件
+					totalNP++;
+					String INSURED_NAME = "";
+					if (print.get("INSURED_NAME") != null) {
+						if (print.get("INSURED_NAME").toString().length() >= 2) {
+							INSURED_NAME = print.get("INSURED_NAME").toString().replace(print.get("INSURED_NAME").toString().substring(1, 2), "O");
+						} else {
+							INSURED_NAME = print.get("INSURED_NAME").toString();
+						}
+						
+					}
+					print.put("INSURED_NAME", INSURED_NAME);
+					print.put("seq", totalNP);
+					printListNP.add(print);
+				} else if ("U".equals(op_batch_no)) {
 					totalU++;
 					String INSURED_NAME = "";
 					if (print.get("INSURED_NAME") != null) {
@@ -651,20 +728,24 @@ public class IOT150 extends FubonWmsBizLogic{
 			data.addRecordList("print", printList);
 			switch (inputVO.getREG_TYPE()) {
 			case "1":
-				title = "新契約簽署後送件明細表";
+				title = "新契約檢核後送件明細表";
 				data.addParameter("title", title);
+				data.addParameter("noPaper", "");
+				data.addParameter("LOGIN_ID", loginID);
 				report = generator.generateReport(txnCode, reportID, data);
 				pdfURL = report.getLocation();
 				urlList.add(pdfURL);
-//				notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "新契約簽署後送件明細表.pdf");
+//				notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "新契約檢核後送件明細表.pdf");
 				break;
 			case "2":
-				title = "其他文件簽署後送件明細表";
+				title = "其他文件檢核後送件明細表";
 				data.addParameter("title", title);
+				data.addParameter("noPaper", "");
+				data.addParameter("LOGIN_ID", loginID);
 				report = generator.generateReport(txnCode, reportID, data);
 				pdfURL = report.getLocation();
 				urlList.add(pdfURL);
-//				notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "其他文件簽署後送件明細表.pdf");
+//				notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "其他文件檢核後送件明細表.pdf");
 				break;
 			default:
 				break;
@@ -685,20 +766,62 @@ public class IOT150 extends FubonWmsBizLogic{
 			data.addRecordList("print", printListU);
 			switch (inputVO.getREG_TYPE()) {
 			case "1":
-				title = "新契約簽署後送件明細表";
+				title = "新契約檢核後送件明細表";
 				data.addParameter("title", title);
+				data.addParameter("noPaper", "");
+				data.addParameter("LOGIN_ID", loginID);
 				report = generator.generateReport(txnCode, reportID, data);
 				pdfURL = report.getLocation();
 				urlList.add(pdfURL);
-//				notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "新契約簽署後送件明細表.pdf");
+//				notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "新契約檢核後送件明細表.pdf");
 				break;
 			case "2":
-				title = "其他文件簽署後送件明細表";
+				title = "其他文件檢核後送件明細表";
 				data.addParameter("title", title);
+				data.addParameter("noPaper", "");
+				data.addParameter("LOGIN_ID", loginID);
 				report = generator.generateReport(txnCode, reportID, data);
 				pdfURL = report.getLocation();
 				urlList.add(pdfURL);
-//				notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "其他文件簽署後送件明細表.pdf");
+//				notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "其他文件檢核後送件明細表.pdf");
+				break;
+			default:
+				break;
+			}
+		}
+		
+		if (printListNP.size() > 0) {
+			String pdfURL = null;
+			String txnCode = "IOT150";
+			String reportID = "R1";
+			ReportIF report = null;
+			
+			ReportFactory factory = new ReportFactory();
+			ReportDataIF data = new ReportData();
+			ReportGeneratorIF generator = factory.getGenerator();
+			data.addParameter("printdate", now_date);
+			data.addParameter("total", totalNP);
+			data.addRecordList("print", printListNP);
+			switch (inputVO.getREG_TYPE()) {
+			case "1":
+				title = "新契約檢核後送件明細表";
+				data.addParameter("title", title);
+				data.addParameter("noPaper", "(無紙化案件)");
+				data.addParameter("LOGIN_ID", loginID);
+				report = generator.generateReport(txnCode, reportID, data);
+				pdfURL = report.getLocation();
+				urlList.add(pdfURL);
+//				notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "新契約檢核後送件明細表.pdf");
+				break;
+			case "2":
+				title = "其他文件檢核後送件明細表";
+				data.addParameter("title", title);
+				data.addParameter("noPaper", "");
+				data.addParameter("LOGIN_ID", loginID);
+				report = generator.generateReport(txnCode, reportID, data);
+				pdfURL = report.getLocation();
+				urlList.add(pdfURL);
+//				notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL)), "其他文件檢核後送件明細表.pdf");
 				break;
 			default:
 				break;
@@ -725,7 +848,7 @@ public class IOT150 extends FubonWmsBizLogic{
 			int i = 0;
 			// 新契約進件/其他文件
 			if("1".equals(map.get("REG_TYPE").toString().substring(0, 1)) || "2".equals(map.get("REG_TYPE").toString().substring(0, 1))){
-				records = new String[36];
+				records = new String[37];
 				records[i]   = checkIsNull(map, "");  // 備註(傳給人壽)
 				records[++i] = xmlInfo.getVariable("IOT.MAIN_STATUS", checkIsNull(map, "STATUS_STR"), FormatHelper.FORMAT_3); // 狀態
 				records[++i] = checkIsNull(map, "REJ_REASON_SHOW"); // 退件原因
@@ -740,6 +863,7 @@ public class IOT150 extends FubonWmsBizLogic{
 				records[++i] = checkIsNull(map, "INSURED_NAME"); // 被保險人姓名
 				records[++i] = checkIsNull(map, "CUST_ID"); // 要保人ID
 				records[++i] = checkIsNull(map, "PROPOSER_NAME"); // 要保人姓名
+				records[++i] = checkIsNull(map, "CREATOR"); // 檢核人OP
 				records[++i] = checkIsNull(map, "INSPRD_ID"); // 主約險種
 
 				if("2".equals(map.get("REG_TYPE").toString().substring(0, 1)))
@@ -762,14 +886,14 @@ public class IOT150 extends FubonWmsBizLogic{
 				records[++i] = checkIsNull(map, "OP_BATCH_NO"); // 分行送件批號
 				records[++i] = checkIsNull(map, "BATCH_SETUP_EMPID"); // 行助員編(批次設定)
 				records[++i] = checkIsNull(map, "BATCH_SETUP_DATE"); // 行助簽收日(批次設定)
-				records[++i] = checkIsNull(map, "BEF_SIGN_OPRID"); // 行助員編(簽署前)
-				records[++i] = checkIsNull(map, "BEF_SIGN_DATE"); // 行助簽收日(簽署前)
+				records[++i] = checkIsNull(map, "BEF_SIGN_OPRID"); // 行助員編(檢核前)
+				records[++i] = checkIsNull(map, "BEF_SIGN_DATE"); // 行助簽收日(檢核前)
 				records[++i] = checkIsNull(map, "BEF_SIGN_NO"); // 總行送件批號
-				records[++i] = checkIsNull(map, "SIGN_OPRID"); // 簽署人員編
-				records[++i] = checkIsNull(map, "SIGN_DATE"); // 簽署日期
-				records[++i] = checkIsNull(map, "SIGN_NO"); // 簽署人批號
-				records[++i] = checkIsNull(map, "AFT_SIGN_OPRID"); // 行助員編(簽署後)
-				records[++i] = checkIsNull(map, "AFT_SIGN_DATE"); // 行助簽收日(簽署後)
+				records[++i] = checkIsNull(map, "SIGN_OPRID"); // 檢核人員編
+				records[++i] = checkIsNull(map, "SIGN_DATE"); // 檢核日期
+				records[++i] = checkIsNull(map, "SIGN_NO"); // 檢核人批號
+				records[++i] = checkIsNull(map, "AFT_SIGN_OPRID"); // 行助員編(檢核後)
+				records[++i] = checkIsNull(map, "AFT_SIGN_DATE"); // 行助簽收日(檢核後)
 				records[++i] = getInOutList(map, "inList"); // 分行留存文件
 				records[++i] = checkIsNull(map, "INS_SOURCE"); // 保單進件來源
 				records[++i] = checkIsNull(map, "INS_COM_NAME"); // 保險公司
@@ -796,7 +920,7 @@ public class IOT150 extends FubonWmsBizLogic{
 		//header
 		String [] csvHeader = null;
 		if("1".equals(list.get(0).get("REG_TYPE").toString().substring(0, 1)) || "2".equals(list.get(0).get("REG_TYPE").toString().substring(0, 1))){
-			csvHeader = new String[36];
+			csvHeader = new String[37];
 			int j = 0;
 			csvHeader[j] = "備註(傳給人壽)";
 			csvHeader[++j] = "狀態";
@@ -810,6 +934,7 @@ public class IOT150 extends FubonWmsBizLogic{
 			csvHeader[++j] = "被保險人姓名";
 			csvHeader[++j] = "要保人ID";
 			csvHeader[++j] = "要保人姓名";
+			csvHeader[++j] = "檢核人OP";
 			csvHeader[++j] = "主約險種";
 			if("2".equals(list.get(0).get("REG_TYPE").toString().substring(0, 1)))
 				csvHeader[++j] = "文件種類";
@@ -827,16 +952,16 @@ public class IOT150 extends FubonWmsBizLogic{
 			csvHeader[++j] = "人壽回饋說明";
 			csvHeader[++j] = "人壽簽收時間";
 			csvHeader[++j] = "分行送件批號";
-			csvHeader[++j] = "行助員編(批次設定)";
-			csvHeader[++j] = "行助簽收日(批次設定)";
-			csvHeader[++j] = "行助員編(簽署前)";
-			csvHeader[++j] = "行助簽收日(簽署前)";
+			csvHeader[++j] = "總行員編(批次設定)";
+			csvHeader[++j] = "總行簽收日(批次設定)";
+			csvHeader[++j] = "總行員編(檢核前)";
+			csvHeader[++j] = "總行簽收日(檢核前)";
 			csvHeader[++j] = "總行送件批號";
-			csvHeader[++j] = "簽署人員編";
-			csvHeader[++j] = "簽署日期";
-			csvHeader[++j] = "簽署人批號";
-			csvHeader[++j] = "行助員編(簽署後)";
-			csvHeader[++j] = "行助簽收日(簽署後)";
+			csvHeader[++j] = "檢核人員編";
+			csvHeader[++j] = "檢核日期";
+			csvHeader[++j] = "檢核人批號";
+			csvHeader[++j] = "總行員編(檢核後)";
+			csvHeader[++j] = "總行簽收日(檢核後)";
 			csvHeader[++j] = "分行留存文件";
 			csvHeader[++j] = "保單進件來源";
 			csvHeader[++j] = "保險公司";
@@ -918,13 +1043,11 @@ public class IOT150 extends FubonWmsBizLogic{
 		String filePath = "reports/" + UUID.randomUUID().toString();
 		String url = new PdfInputOutputUtils().doWritePdfFile(reportData , filePath);
 
-		notifyClientToDownloadFile(
-				PdfUtil.process(new PdfConfigVO(
-						this.getDataAccessManager(), url)), "電子投保.pdf");
+		notifyClientToDownloadFile(PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), url)), "電子投保.pdf");
 	}
 
 	/***
-	 * 人壽待簽署管理報表
+	 * 人壽待檢核管理報表
 	 * @param body
 	 * @param header
 	 * @throws Exception
@@ -952,7 +1075,7 @@ public class IOT150 extends FubonWmsBizLogic{
 		sb.append(" WHERE A.OP_BATCH_NO LIKE 'S%' ");
 
 		if(StringUtils.equals("Y", inputMap.getNotNullStr("UNSIGN"))) {
-			//未簽署
+			//未檢核
 			queryCondition.setQueryString(sb.toString() + " AND A.STATUS IN ('60', '70', '80') AND A.INS_SIGN_OPRID IS NULL AND A.INS_SIGN_DATE IS NULL AND A.INS_SIGN_YN IS NULL ");
 //			queryCondition.setQueryString(sb.toString());
 			List<Map<String, Object>> data_list = dam.exeQuery(queryCondition);
@@ -964,8 +1087,8 @@ public class IOT150 extends FubonWmsBizLogic{
 			data.addRecordList("print", data_list);
 			data.addParameter("total", data_list.size());
 			data.addParameter("printdate", now_date);
-			data.addParameter("RPT_TYPE", "未簽署");
-			data.addParameter("RPT_REMARK", "說明：請預審人員盡速至富壽簽署系統進行簽署作業");
+			data.addParameter("RPT_TYPE", "未檢核");
+			data.addParameter("RPT_REMARK", "說明：請預審人員盡速至富壽檢核系統進行檢核作業");
 
 			report = generator.generateReport(txnCode, reportID, data);
 			pdfURL = report.getLocation();
@@ -973,7 +1096,7 @@ public class IOT150 extends FubonWmsBizLogic{
 		}
 
 		if(StringUtils.equals("Y", inputMap.getNotNullStr("SIGNED"))) {
-			//已簽署
+			//已檢核
 			queryCondition.setQueryString(sb.toString() + " AND A.STATUS IN ('60', '70', '80') AND A.INS_SIGN_OPRID IS NOT NULL AND A.INS_SIGN_DATE IS NOT NULL AND A.INS_SIGN_YN IS NOT NULL AND A.STATUS <> '62' ");
 //			queryCondition.setQueryString(sb.toString());
 			List<Map<String, Object>> data_list = dam.exeQuery(queryCondition);
@@ -985,7 +1108,7 @@ public class IOT150 extends FubonWmsBizLogic{
 			data.addRecordList("print", data_list);
 			data.addParameter("total", data_list.size());
 			data.addParameter("printdate", now_date);
-			data.addParameter("RPT_TYPE", "已簽署");
+			data.addParameter("RPT_TYPE", "已檢核");
 			data.addParameter("RPT_REMARK", "  ");
 
 			report = generator.generateReport(txnCode, reportID, data);
@@ -994,7 +1117,7 @@ public class IOT150 extends FubonWmsBizLogic{
 		}
 
 		if(StringUtils.equals("Y", inputMap.getNotNullStr("REJECT"))) {
-			//需重新簽署
+			//需重新檢核
 			queryCondition.setQueryString(sb.toString() + " AND A.STATUS = '62' ");
 //			queryCondition.setQueryString(sb.toString());
 			List<Map<String, Object>> data_list = dam.exeQuery(queryCondition);
@@ -1006,7 +1129,7 @@ public class IOT150 extends FubonWmsBizLogic{
 			data.addRecordList("print", data_list);
 			data.addParameter("total", data_list.size());
 			data.addParameter("printdate", now_date);
-			data.addParameter("RPT_TYPE", "需重新簽署");
+			data.addParameter("RPT_TYPE", "需重新檢核");
 			data.addParameter("RPT_REMARK", "說明：該文件將由人壽退件回分行，重新送件");
 
 			report = generator.generateReport(txnCode, reportID, data);
@@ -1015,7 +1138,7 @@ public class IOT150 extends FubonWmsBizLogic{
 		}
 
 		String url = PdfUtil.mergePDF(urlList, false); //雙面列印為TRUE
-    	notifyClientToDownloadFile(url, "視訊簽單審核後送人壽待簽署報表.pdf");
+    	notifyClientToDownloadFile(url, "視訊簽單審核後送人壽待檢核報表.pdf");
 	}
 
 	/**
@@ -1041,7 +1164,7 @@ public class IOT150 extends FubonWmsBizLogic{
                     .append("from TBIOT_MAIN IOT ")
                     .append("left join TBJSB_INS_PROD_MAIN JPRD ON JPRD.PRODUCTSERIALNUM = IOT.INSPRD_KEYNO ")
                     .append("where IOT.COMPANY_NUM <> 82 ") // 非富壽案件
-                    .append("and IOT.STATUS = '60' ") // 狀態固定為「總行點收送件(簽署後)」
+                    .append("and IOT.STATUS = '60' ") // 狀態固定為「總行點收送件(檢核後)」
                     .append("and IOT.REG_TYPE " + (inputVO.isNewReg() ? "=" : "<>") + "'1'")
                     .condition(isNotBlank(inputVO.getAftSignOprId()), "and IOT.AFT_SIGN_OPRID = :aftSignOprId ", "aftSignOprId", inputVO.getAftSignOprId())
                     .condition(inputVO.getCompanyNum() != null, "and IOT.COMPANY_NUM = :companyNum ", "companyNum", inputVO.getCompanyNum());
@@ -1085,7 +1208,7 @@ public class IOT150 extends FubonWmsBizLogic{
 
         notifyClientToDownloadFile(
                 PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), pdfURL))
-                , String.format("其他文件簽署後送件明細表%s.pdf", inputVO.isRePrint() ? "（補印）" : "")); //目前新契約沒有非富壽案件
+                , String.format("其他文件檢核後送件明細表%s.pdf", inputVO.isRePrint() ? "（補印）" : "")); //目前新契約沒有非富壽案件
         this.sendRtnObject(new IOT150NotFbOutputVO());
 		}
 
@@ -1236,12 +1359,12 @@ public class IOT150 extends FubonWmsBizLogic{
 
 		sb.append(" SELECT A.INS_ID, A.CASE_ID, A.CUST_ID, A.INSURED_ID, A.INSPRD_ID, P.PARAM_NAME AS STATUS, ");
 		sb.append("		CASE WHEN A.PREMIUM_TRANSSEQ IS NOT NULL OR A.I_PREMIUM_TRANSSEQ IS NOT NULL OR A.P_PREMIUM_TRANSSEQ IS NOT NULL THEN 'Y' ELSE 'N' END AS RECORD_YN, ");
-		sb.append("		A.BEF_SIGN_OPRID, TO_CHAR(A.BEF_SIGN_DATE, 'YYYY/MM/DD') AS BEF_SIGN_DATE, ");
+		sb.append("		A.SIGN_OPRID, A.BEF_SIGN_OPRID, TO_CHAR(A.BEF_SIGN_DATE, 'YYYY/MM/DD') AS BEF_SIGN_DATE, ");
 		sb.append("		A.AFT_SIGN_OPRID, TO_CHAR(A.AFT_SIGN_DATE, 'YYYY/MM/DD') AS AFT_SIGN_DATE ");
 		sb.append(" FROM VWIOT_MAIN A ");
 		sb.append(" LEFT JOIN TBSYSPARAMETER P ON P.PARAM_TYPE = 'IOT.MAIN_STATUS' AND P.PARAM_CODE = A.STATUS ");
 		sb.append(" LEFT JOIN TBIOT_PREMATCH PRE ON PRE.PREMATCH_SEQ = A.PREMATCH_SEQ ");
-		sb.append(" WHERE A.STATUS IN ('60', '70') "); //總行行助點收送件(簽署後), 傳輸人壽批次產生 
+		sb.append(" WHERE A.STATUS IN ('60', '70') "); //總行行助點收送件(檢核後), 傳輸人壽批次產生 
 		sb.append(" AND NVL(PRE.CANCEL_CONTRACT_YN, 'N') = 'N' "); //非契撤案件
 		sb.append(" AND (A.PREMIUM_TRANSSEQ IS NOT NULL OR A.I_PREMIUM_TRANSSEQ IS NOT NULL OR A.P_PREMIUM_TRANSSEQ IS NOT NULL) "); //電訪註記欄位為Y
 		queryCondition.setQueryString(sb.toString());
@@ -1264,7 +1387,7 @@ public class IOT150 extends FubonWmsBizLogic{
 			records[++i] = checkIsNull(map, "STATUS");
 			records[++i] = checkIsNull(map, "RECORD_YN");
 			records[++i] = checkIsNull(map, "BEF_SIGN_OPRID");
-			records[++i] = checkIsNull(map, "BEF_SIGN_DATE");
+			records[++i] = checkIsNull(map, "SIGN_OPRID");
 			records[++i] = checkIsNull(map, "AFT_SIGN_OPRID");
 			records[++i] = checkIsNull(map, "AFT_SIGN_DATE");
 			listCSV.add(records);
@@ -1281,10 +1404,10 @@ public class IOT150 extends FubonWmsBizLogic{
 		csvHeader[++j] = "險種代碼";
 		csvHeader[++j] = "文件狀態";
 		csvHeader[++j] = "錄音註記";
-		csvHeader[++j] = "點收經辦員編(簽署前)";
-		csvHeader[++j] = "簽署人員員編";
-		csvHeader[++j] = "點收經辦員編(簽署後)";
-		csvHeader[++j] = "行助簽收日(簽署後)";
+		csvHeader[++j] = "點收經辦員編(檢核前)";
+		csvHeader[++j] = "檢核人員員編";
+		csvHeader[++j] = "點收經辦員編(檢核後)";
+		csvHeader[++j] = "總行簽收日(檢核後)";
 
 		CSVUtil csv = new CSVUtil();
 		csv.setHeader(csvHeader);
@@ -1293,5 +1416,145 @@ public class IOT150 extends FubonWmsBizLogic{
 		notifyClientToDownloadFile(url, fileName);
 		
 		this.sendRtnObject(null);
+	}
+    
+    //逾期查詢資料
+    public void exportOverdue(Object body, IPrimitiveMap header) throws JBranchException {
+    	IOT150InputVO inputVO = (IOT150InputVO) body;
+		DataAccessManager dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(" SELECT A.REMARK_BANK, A.INS_ID, A.INSURED_ID, A.INSURED_NAME, A.CUST_ID, A.PROPOSER_NAME, A.INSPRD_ID, to_char(A.SUBMIT_DATE,'YYYY/MM/DD HH24:MI:SS') as SUBMIT_DATE, ");
+		sb.append("		to_char(A.INS_SUBMIT_DATE,'YYYY/MM/DD HH24:MI:SS') as INS_SUBMIT_DATE, A.INS_RCV_OPRID, A.REMARK_INS, to_char(A.INS_RCV_DATE,'YYYY/MM/DD HH24:MI:SS') as INS_RCV_DATE, ");
+		sb.append("		A.BATCH_SETUP_EMPID, to_char(A.BATCH_SETUP_DATE,'YYYY/MM/DD HH24:MI:SS') as BATCH_SETUP_DATE, A.BEF_SIGN_OPRID, to_char(A.BEF_SIGN_DATE,'YYYY/MM/DD HH24:MI:SS') as BEF_SIGN_DATE, ");
+		sb.append("		A.BEF_SIGN_NO, A.OP_BATCH_NO, A.SIGN_OPRID, to_char(A.SIGN_DATE,'YYYY/MM/DD HH24:MI:SS') as SIGN_DATE, A.SIGN_NO, A.AFT_SIGN_OPRID, to_char(A.AFT_SIGN_DATE,'YYYY/MM/DD HH24:MI:SS') as AFT_SIGN_DATE, ");
+		sb.append("		(SELECT B.PARAM_NAME FROM TBSYSPARAMETER B WHERE B.PARAM_TYPE = 'IOT.MAIN_STATUS' AND A.STATUS = B.PARAM_CODE) AS STATUS, ");
+		sb.append("		(SELECT B.PARAM_NAME FROM TBSYSPARAMETER B WHERE B.PARAM_TYPE = 'IOT.REJ_REASON' AND A.REJ_REASON = B.PARAM_CODE) AS REJ_REASON_SHOW, ");
+		sb.append("		(SELECT B.PARAM_NAME FROM TBSYSPARAMETER B WHERE B.PARAM_TYPE = 'IOT.SUBMIT_WAY' AND A.SUBMIT_WAY = B.PARAM_CODE) AS SUBMIT_WAY, ");
+		sb.append("		(SELECT B.PARAM_NAME FROM TBSYSPARAMETER B WHERE B.PARAM_TYPE = 'IOT.BATCH_SEQ' AND A.BATCH_SEQ = B.PARAM_CODE) AS BATCH_SEQ ");
+		sb.append(" FROM VWIOT_MAIN A ");
+		sb.append(" WHERE A.BATCH_SETUP_DATE IS NOT NULL AND TRUNC(A.BATCH_SETUP_DATE) < TRUNC(SYSDATE - 1) "); //系統日-1天前之批次設定日
+		sb.append("  AND A.STATUS NOT IN ('80', '85') "); //狀態不為：人壽點收資料回饋, 人壽保單號碼回饋
+		if(StringUtils.isNotBlank(inputVO.getBATCH_SETUP_EMPID())) { //設定批次員編
+			sb.append("  AND A.BATCH_SETUP_EMPID = :batchSetupEmpId ");
+			queryCondition.setObject("batchSetupEmpId", inputVO.getBATCH_SETUP_EMPID());
+		}
+		queryCondition.setQueryString(sb.toString());
+		List<Map<String, Object>> list = dam.exeQuery(queryCondition);			
+			
+//		XmlInfo xmlInfo = new XmlInfo();
+//		List<Map<String, Object>> list = inputVO.getIOT_MAINList();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		String fileName = "逾期查詢_" + sdf.format(new Date()) + "_"+ (String) getUserVariable(FubonSystemVariableConsts.LOGINID) + ".csv";
+		List listCSV =  new ArrayList();
+		for(Map<String, Object> map : list){
+			String[] records = null;
+			int i = 0;
+			records = new String[27];
+			records[i]   = checkIsNull(map, "REMARK_BANK");
+			records[++i] = checkIsNull(map, "STATUS");
+			records[++i] = checkIsNull(map, "REJ_REASON_SHOW");
+			records[++i] = checkIsNull(map, "INS_ID");
+			records[++i] = checkIsNull(map, "INSURED_ID");
+			records[++i] = checkIsNull(map, "INSURED_NAME");
+			records[++i] = checkIsNull(map, "CUST_ID");
+			records[++i] = checkIsNull(map, "PROPOSER_NAME");
+			records[++i] = checkIsNull(map, "INSPRD_ID");
+			records[++i] = checkIsNull(map, "SUBMIT_WAY");
+			records[++i] = checkIsNull(map, "BATCH_SEQ");
+			records[++i] = checkIsNull(map, "SUBMIT_DATE");
+			records[++i] = checkIsNull(map, "INS_SUBMIT_DATE");
+			records[++i] = checkIsNull(map, "INS_RCV_OPRID");
+			records[++i] = checkIsNull(map, "REMARK_INS");
+			records[++i] = checkIsNull(map, "INS_RCV_DATE");
+			records[++i] = checkIsNull(map, "OP_BATCH_NO");
+			records[++i] = checkIsNull(map, "BATCH_SETUP_EMPID");
+			records[++i] = checkIsNull(map, "BATCH_SETUP_DATE");
+			records[++i] = checkIsNull(map, "BEF_SIGN_OPRID");
+			records[++i] = checkIsNull(map, "BEF_SIGN_DATE");
+			records[++i] = checkIsNull(map, "BEF_SIGN_NO");
+			records[++i] = checkIsNull(map, "SIGN_OPRID");
+			records[++i] = checkIsNull(map, "SIGN_DATE");
+			records[++i] = checkIsNull(map, "SIGN_NO");
+			records[++i] = checkIsNull(map, "AFT_SIGN_OPRID");
+			records[++i] = checkIsNull(map, "AFT_SIGN_DATE");
+			listCSV.add(records);
+		}
+		
+		//header
+		String [] csvHeader = null;
+		csvHeader = new String[27];
+		int j = 0;
+		csvHeader[j] = "備註(傳給人壽)";
+		csvHeader[++j] = "狀態";
+		csvHeader[++j] = "退件原因";
+		csvHeader[++j] = "保險文件編號";
+		csvHeader[++j] = "被保人ID";
+		csvHeader[++j] = "被保人姓名";
+		csvHeader[++j] = "要保人ID";
+		csvHeader[++j] = "要保人姓名";
+		csvHeader[++j] = "主約險種";
+		csvHeader[++j] = "送達方式";		
+		csvHeader[++j] = "批次";
+		csvHeader[++j] = "送達日";
+		csvHeader[++j] = "電子送件時間";
+		csvHeader[++j] = "人壽點收人";
+		csvHeader[++j] = "人壽回饋說明";
+		csvHeader[++j] = "人壽簽收時間";
+		csvHeader[++j] = "分行送件批號";
+		csvHeader[++j] = "總行員編(批次設定)";
+		csvHeader[++j] = "總行簽收日(批次設定)";
+		csvHeader[++j] = "總行員編(檢核前)";
+		csvHeader[++j] = "總行簽收日(檢核前)";
+		csvHeader[++j] = "總行送件批號";
+		csvHeader[++j] = "檢核人員編";
+		csvHeader[++j] = "檢核日期";
+		csvHeader[++j] = "檢核人批號";
+		csvHeader[++j] = "總行員編(檢核後)";
+		csvHeader[++j] = "總行簽收日(檢核後)";
+
+		CSVUtil csv = new CSVUtil();
+		csv.setHeader(csvHeader);
+		csv.addRecordList(listCSV);
+		String url = csv.generateCSV();
+		notifyClientToDownloadFile(url, fileName);
+		
+		this.sendRtnObject(null);
+	}
+    
+    //檢視保費資金證明上傳文件
+    public void getFundUploadPdfFile(Object body, IPrimitiveMap header) throws Exception{
+    	IOT150InputVO inputVO = (IOT150InputVO) body;
+		DataAccessManager dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+
+		StringBuffer sbr = new StringBuffer();
+		sbr.append(" SELECT PDF_FILE, FILE_NAME ");
+		sbr.append(" FROM TBIOT_MAIN_PDF ");
+		sbr.append(" WHERE INS_KEYNO = :insKeyno ");
+		List<Map<String , Object>> resultList = dam.exeQuery(queryCondition.setQueryString(sbr.toString()).setObject("insKeyno", inputVO.getINS_KEYNO()));
+
+		if(CollectionUtils.isEmpty(resultList)){
+			sendErrMsg("無此文件");
+			return;
+		}
+
+		String fileName = (String) resultList.get(0).get("FILE_NAME");
+		Blob blob = (Blob) resultList.get(0).get("PDF_FILE");
+		int blobLength = (int) blob.length();
+		byte[] blobAsBytes = blob.getBytes(1, blobLength);
+
+		String filePath = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
+		String uuid = UUID.randomUUID().toString();
+		File targetFile = new File(filePath, uuid);
+		FileOutputStream fos = new FileOutputStream(targetFile);
+		fos.write(blobAsBytes);
+		fos.close();
+		
+		List<String> urlList = new ArrayList<String>();
+		urlList.add("temp//" + uuid);
+		String encryptUrl = PdfUtil.process(new PdfConfigVO(this.getDataAccessManager(), true, urlList));
+		notifyClientToDownloadFile(encryptUrl, fileName);
 	}
 }

@@ -812,6 +812,8 @@ public class IOT110 extends FubonWmsBizLogic {
 		tpvo.setI_REVOLVING_LOAN_YN(inputVO.getI_REVOLVING_LOAN_YN());
 		tpvo.setP_REVOLVING_LOAN_YN(inputVO.getP_REVOLVING_LOAN_YN());
 		tpvo.setBUSINESS_REL(inputVO.getBUSINESS_REL());
+		tpvo.setC_CREDIT_LASTUPDATE(inputVO.getC_CREDIT_LASTUPDATE());
+		tpvo.setI_CREDIT_LASTUPDATE(inputVO.getI_CREDIT_LASTUPDATE());
 	}
 
 	//寫入基金適配標的清單
@@ -1450,8 +1452,8 @@ public class IOT110 extends FubonWmsBizLogic {
 //		if(StringUtils.equals("Y", ObjectUtils.toString(list.get(0).get("LOAN_CHK4_YN")))) loan4Name += (StringUtils.isBlank(loan4Name) ? "" : "、") + "繳款人";
 //		remarks.append(StringUtils.isBlank(loan4Name) ? "" : "**" + loan4Name + "有申請額度式房貸，請檢視客戶保費動用是否與該貸款相關。\n");
 		
-		if(list.get(0).get("C_LOAN_CHK2_DATE") != null || list.get(0).get("I_LOAN_CHK2_DATE") != null) {
-			remarks.append("**客戶近一年有貸款撥貸，請檢視授信收入與業報書收入(工作收入+其他收入)是否一致，不一致必須於業報書補充說明欄詳細說明原因。\n");
+		if(list.get(0).get("C_CREDIT_LASTUPDATE") != null || list.get(0).get("I_CREDIT_LASTUPDATE") != null) {
+			remarks.append("**客戶近一年有授信紀錄，請檢視授信收入與業報書收入(工作收入+其他收入)是否一致，不一致必須於業報書補充說明欄詳細說明原因。\n");
 		}
 
 		if(StringUtils.equals("Y", ObjectUtils.toString(list.get(0).get("AGE_UNDER20_YN")))) {
@@ -1827,6 +1829,16 @@ public class IOT110 extends FubonWmsBizLogic {
 			outputVO.setInvalidSeniorCustEvlBossC(outputVOBoss.getInvalidSeniorCustEvlBossC());
 			outputVO.setInvalidSeniorCustEvlBossD(outputVOBoss.getInvalidSeniorCustEvlBossD());
 			outputVO.setInvalidSeniorCustEvlBossE(outputVOBoss.getInvalidSeniorCustEvlBossE());
+			//能力表現第8項&金融認知第4項無上述情形，取得前一次填答紀錄
+			//invalidSeniorCustEvlBossCL: Y:invalid 能力表現填答<>8.無上述情形
+			//invalidSeniorCustEvlBossDL: Y:invalid 金融認知填答第一選項
+			//invalidSeniorCustEvlBossEL: Y:invalid 金融認知填答第二或第三個選項
+			if(StringUtils.equals("N", outputVOBoss.getInvalidSeniorCustEvlBossB()) && StringUtils.equals("N", outputVOBoss.getInvalidSeniorCustEvlBossC())) {
+				IOT110OutputVO outputVOBossLast = validSeniorCustEvlBossLast(inputVO);
+				outputVO.setInvalidSeniorCustEvlBossCL(outputVOBossLast.getInvalidSeniorCustEvlBossCL());
+				outputVO.setInvalidSeniorCustEvlBossDL(outputVOBossLast.getInvalidSeniorCustEvlBossDL());
+				outputVO.setInvalidSeniorCustEvlBossEL(outputVOBossLast.getInvalidSeniorCustEvlBossEL());
+			}
 		}
 		
 		this.sendRtnObject(outputVO);
@@ -1949,6 +1961,53 @@ public class IOT110 extends FubonWmsBizLogic {
 	}
 	
 	/***
+	 * 前一次填答紀錄：檢核客戶資訊觀察表高齡客戶能力表現問項為8.無上述情形且金融認知問項為4.無上述情形之選項
+	 * @param inputVO
+	 * @return
+	 * invalidSeniorCustEvlBossCL: Y:invalid 能力表現填答<>8.無上述情形
+	 * invalidSeniorCustEvlBossDL: Y:invalid 金融認知填答第一選項
+	 * invalidSeniorCustEvlBossEL: Y:invalid 金融認知填答第二或第三個選項
+	 * @throws Exception
+	 */
+	public IOT110OutputVO validSeniorCustEvlBossLast(IOT110InputVO inputVO) throws Exception {
+		IOT110OutputVO outputVO = new IOT110OutputVO();
+		String invalidCL = "N";
+		String invalidDL = "N";
+		String invalidEL = "N";
+		
+		if(StringUtils.equals("Y", inputVO.getC_SALE_SENIOR_YN())) { //要保人高齡
+			List<Map<String, String>> pList = invalidSeniorCustEvlBossLast(inputVO.getCUST_ID());
+			for(Map<String, String> map : pList) {
+				if(StringUtils.equals("CL", map.get("invalidCode"))) invalidCL = "Y";
+				if(StringUtils.equals("DL", map.get("invalidCode"))) invalidDL = "Y";
+				if(StringUtils.equals("EL", map.get("invalidCode"))) invalidEL = "Y";
+			}
+		}
+		if(!StringUtils.equals("10", inputVO.getINSURED_CM_FLAG()) && StringUtils.equals("Y", inputVO.getI_SALE_SENIOR_YN())) { //本行客戶、被保人高齡
+			List<Map<String, String>> pList = invalidSeniorCustEvlBossLast(inputVO.getINSURED_ID());
+			for(Map<String, String> map : pList) {
+				if(StringUtils.equals("CL", map.get("invalidCode"))) invalidCL = "Y";
+				if(StringUtils.equals("DL", map.get("invalidCode"))) invalidDL = "Y";
+				if(StringUtils.equals("EL", map.get("invalidCode"))) invalidEL = "Y";
+			}
+		}
+		if(!StringUtils.equals("10", inputVO.getPAYER_CM_FLAG()) && StringUtils.equals("Y", inputVO.getP_SALE_SENIOR_YN())) { //本行客戶、繳款人高齡
+			List<Map<String, String>> pList = invalidSeniorCustEvlBossLast(inputVO.getPAYER_ID());
+			for(Map<String, String> map : pList) {
+				if(StringUtils.equals("CL", map.get("invalidCode"))) invalidCL = "Y";
+				if(StringUtils.equals("DL", map.get("invalidCode"))) invalidDL = "Y";
+				if(StringUtils.equals("EL", map.get("invalidCode"))) invalidEL = "Y";
+			}
+		}
+		
+		outputVO.setInvalidSeniorCustEvlBossCL(invalidCL);
+		outputVO.setInvalidSeniorCustEvlBossDL(invalidDL);
+		outputVO.setInvalidSeniorCustEvlBossEL(invalidEL);
+		
+		return outputVO;
+	}
+	
+	/***
 	 * 要保人或被保人或繳款人，年齡>=64.5歲(保險年齡=65歲以上)
 	 * B：高齡客戶資訊觀察表金融認知結果是否填答<>4沒有上述情形
 	 * C：高齡客戶資訊觀察表取得能力表現是否填答<>8.無上述情形
@@ -1965,6 +2024,22 @@ public class IOT110 extends FubonWmsBizLogic {
 		return svalid.validSeniorCustEvalIOTBOSS(custId);
 	}
 	
+	/***
+	 * 前一次填答紀錄：要保人或被保人或繳款人，年齡>=64.5歲(保險年齡=65歲以上)
+	 * @param custId
+	 * @param applyDate
+	 * @return true:檢核不通過  false:檢核通過 
+	 * @throws Exception
+	 */
+	private List<Map<String, String>> invalidSeniorCustEvlBossLast(String custId) throws Exception {
+		SeniorValidation svalid = (SeniorValidation) PlatformContext.getBean("SeniorValidation");
+		SeniorValidationInputVO sInputVO = new SeniorValidationInputVO();
+		sInputVO.setCustID(custId);
+		
+		return svalid.validSeniorCustEvalIOTLast(custId);
+	}
+	
+	//高資產客戶投組風險權值檢核
 	private boolean validHnwcRiskValue(IOT110InputVO inputVO) throws Exception {
 		//買匯匯率
 		SOT110 sot110 = (SOT110) PlatformContext.getBean("sot110");

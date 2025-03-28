@@ -7,6 +7,8 @@ import com.systex.jbranch.platform.common.dataaccess.vo.PagingInputVO;
 
 public class PMS427InputVO extends PagingInputVO {
 
+	private String sCreDate;
+	private String eCreDate;
 	private String dataMon;
 	private String region_center_id;
 	private String branch_area_id;
@@ -30,6 +32,22 @@ public class PMS427InputVO extends PagingInputVO {
 	private String uhrmRC;
 	private String uhrmOP;
 	
+	public String getsCreDate() {
+		return sCreDate;
+	}
+
+	public void setsCreDate(String sCreDate) {
+		this.sCreDate = sCreDate;
+	}
+
+	public String geteCreDate() {
+		return eCreDate;
+	}
+
+	public void seteCreDate(String eCreDate) {
+		this.eCreDate = eCreDate;
+	}
+
 	public String getUhrmRC() {
 		return uhrmRC;
 	}

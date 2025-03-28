@@ -28,6 +28,7 @@ public class CRM662InputVO extends PagingInputVO {
 	private String vip_degree;
 	private List<Map<String, Object>> prv_sort_list;
 	private List<Map<String, Object>> add_list_prv;
+	private List<Map<String, Object>> familyAumList;
 
 	//
 	private String max_apl_ppl;
@@ -228,6 +229,14 @@ public class CRM662InputVO extends PagingInputVO {
 
 	public void setVA_type(String vA_type) {
 		VA_type = vA_type;
+	}
+
+	public List<Map<String, Object>> getFamilyAumList() {
+		return familyAumList;
+	}
+
+	public void setFamilyAumList(List<Map<String, Object>> familyAumList) {
+		this.familyAumList = familyAumList;
 	}
 
 }

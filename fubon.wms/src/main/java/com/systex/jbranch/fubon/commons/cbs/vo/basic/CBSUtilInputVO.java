@@ -35,6 +35,7 @@ import com.systex.jbranch.fubon.commons.cbs.vo._067157_067157.CBS067157OutputVO;
 import com.systex.jbranch.fubon.commons.cbs.vo._067157_067157.Spec067157_067157;
 import com.systex.jbranch.fubon.commons.cbs.vo._067164_067165.CBS067164InputVO;
 import com.systex.jbranch.fubon.commons.cbs.vo._067164_067165.Spec067164_067165;
+import com.systex.jbranch.fubon.commons.cbs.vo._067439_067442.CBS067439InputVO;
 import com.systex.jbranch.fubon.commons.cbs.vo._085081_085105.CBS085081InputVO;
 import com.systex.jbranch.fubon.commons.cbs.vo._085081_085105.Spec085081_085105;
 
@@ -128,6 +129,9 @@ public class CBSUtilInputVO {
     
     @XmlElement(name = "TxBody")
     private CBS062171InputVO cbs062171InputVO;
+    
+    @XmlElement(name = "TxBody")
+    private CBS067439InputVO cbs067439InputVO;
 
     public String getPickUpId() {
         return pickUpId;
@@ -385,6 +389,15 @@ public class CBSUtilInputVO {
 
 	public CBSUtilInputVO setCbs062171InputVO(CBS062171InputVO cbs062171InputVO) {
 		this.cbs062171InputVO = cbs062171InputVO;
+		return this;
+	}
+
+	public CBS067439InputVO getCbs067439InputVO() {
+		return cbs067439InputVO;
+	}
+
+	public CBSUtilInputVO setCbs067439InputVO(CBS067439InputVO cbs067439InputVO) {
+		this.cbs067439InputVO = cbs067439InputVO;
 		return this;
 	}
 }

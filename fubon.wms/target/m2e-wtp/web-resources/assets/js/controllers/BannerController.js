@@ -2,7 +2,6 @@ eSoafApp.controller("BannerController", ['$rootScope', '$scope', '$controller', 
 	function($rootScope, $scope, $controller, $http, $cookies, socketService, sysInfoService, projInfoService, $confirm, ngDialog , $window, getParameter){	
 			$controller('BaseController', {$scope: $scope});
 			
-			debugger
 			$scope.IsMobile = projInfoService.getLoginSourceToken() == 'mobile';
 			$scope.role = sysInfoService.getPriID()[0];
 			$scope.canQuick = true;
@@ -16,15 +15,23 @@ eSoafApp.controller("BannerController", ['$rootScope', '$scope', '$controller', 
 					}
 					
 					// 讀取參數檔
-					getParameter.XML(['SYS.AAS_SSO_ACC_PW'],function(tota){
-						debugger
+					getParameter.XML(['SYS.AAS_SSO_ACC_PW', 'SYS.FMA_SSO_ACC_PW'],function(tota){
 						if(tota){
 							var AAS_SSO_ACC_PW = tota.data[tota.key.indexOf('SYS.AAS_SSO_ACC_PW')];
 							$scope.AAS_SSO_ACC_PW_ENABLED = false;
 							angular.forEach(AAS_SSO_ACC_PW, function(row, index) {
 								if(row.DATA == 'ENABLED') 
 									$scope.AAS_SSO_ACC_PW_ENABLED = row.LABEL == 'Y' 
-							})
+							});
+							
+							//#2237 財管行銷助理SSO
+							$scope.FMA_SSO_ACC_PW = tota.data[tota.key.indexOf('SYS.FMA_SSO_ACC_PW')];
+							debugger;
+							$scope.FMA_SSO_ACC_PW_ENABLED = false;
+							angular.forEach($scope.FMA_SSO_ACC_PW, function(row, index) {
+								if(row.DATA == 'ENABLED') 
+									$scope.FMA_SSO_ACC_PW_ENABLED = row.LABEL == 'Y' 
+							});
 						}
 					});
 					
@@ -154,4 +161,42 @@ eSoafApp.controller("BannerController", ['$rootScope', '$scope', '$controller', 
 				}			
 				
 			}
+			
+			//透過FORM表單進行SSO傳輸
+			$scope.goMFA = function() {
+				$scope.sendRecv("SSO003" , "takeToken" , "java.util.HashMap" , {id : sysInfoService.getUserID()} ,
+		        		function(tota,isError){
+			        		if (!isError) {
+			        			if(tota[0].body.errMsg) {
+			        				$scope.showErrorMsg(tota[0].body.errCode + ":" + tota[0].body.errMsg);
+			        			} else {
+			        				
+			        				$scope.sendData = {
+			        						encryptedEmp : tota[0].body.encryptData
+			        				};
+
+			        	            
+			        	            var form = document.createElement("form");
+			        	            form.method = "POST";
+			        	            form.action = $scope.FMA_SSO_ACC_PW[0].LABEL;  //網址
+
+			        	            var input1 = document.createElement("input"); //夾帶參數
+			        	            input1.type = "hidden";
+			        	            input1.name = "encryptedEmp";
+			        	            input1.value = tota[0].body.encryptData;
+			        	            form.appendChild(input1);
+
+			        	           
+			        	            form.target = "_blank";  // 新頁籤
+
+			        	            document.body.appendChild(form);
+                                    debugger;
+			        	            form.submit();
+
+			        	            document.body.removeChild(form);
+			        			}
+			        			return;
+			        		}
+		        	});
+	        };
 }]);

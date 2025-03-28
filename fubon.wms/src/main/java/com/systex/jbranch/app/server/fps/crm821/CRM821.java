@@ -509,7 +509,9 @@ public class CRM821 extends EsbUtil {
 						retVO.setBenefitReturnRate3(decimalPoint(devo.getBenefitReturnRate3(), 2));
 						retVO.setTRANSFERAmt(decimalPoint(devo.getTRANSFERAmt(), 0));
 						retVO.setEviNumType(devo.getEviNumType());
-						
+						retVO.setAccAllocateRewN(decimalPoint(devo.getAccAllocateRewN(), 2));
+						retVO.setRewRateDigitN(devo.getRewRateDigitN());
+						retVO.setAccAllocateRewRateN(decimalPoint(devo.getAccAllocateRewRateN(), 2));
                         total.add(retVO);
                 	}
                 }
@@ -583,6 +585,9 @@ public class CRM821 extends EsbUtil {
 							retVO.setPayAcctId(StringUtils.trim(retVO.getPayAcctId()));
 						if (retVO.getPayAccountNo() != null)
 							retVO.setPayAccountNo(StringUtils.trim(retVO.getPayAccountNo()));
+						retVO.setAccAllocateRewN(decimalPoint(devo.getAccAllocateRewN(), 2));
+						retVO.setRewRateDigitN(devo.getRewRateDigitN());
+						retVO.setAccAllocateRewRateN(decimalPoint(devo.getAccAllocateRewRateN(), 2));
                         total.add(retVO);
                 	}
                 }
@@ -657,6 +662,9 @@ public class CRM821 extends EsbUtil {
 							retVO.setPayAcctId(StringUtils.trim(retVO.getPayAcctId()));
 						if (retVO.getPayAccountNo() != null)
 							retVO.setPayAccountNo(StringUtils.trim(retVO.getPayAccountNo()));
+						retVO.setAccAllocateRewN(decimalPoint(devo.getAccAllocateRewN(), 2));
+						retVO.setRewRateDigitN(devo.getRewRateDigitN());
+						retVO.setAccAllocateRewRateN(decimalPoint(devo.getAccAllocateRewRateN(), 2));
                         total.add(retVO);
                 	}                    
                 }
@@ -678,6 +686,7 @@ public class CRM821 extends EsbUtil {
                         retVO.setSPRefId(devo.getSPRefId());
                         retVO.setOccur(devo.getOccur());
                         retVO.setAcctId02(devo.getAcctId02());
+                        System.out.println("=========== " + devo.getEviNum());
                         retVO.setEviNum(devo.getEviNum());
                         retVO.setFundNO(devo.getFundNO());
                         retVO.setFundName(devo.getFundName());
@@ -730,6 +739,9 @@ public class CRM821 extends EsbUtil {
 							retVO.setPayAcctId(StringUtils.trim(retVO.getPayAcctId()));
 						if (retVO.getPayAccountNo() != null)
 							retVO.setPayAccountNo(StringUtils.trim(retVO.getPayAccountNo()));
+						retVO.setAccAllocateRewN(decimalPoint(devo.getAccAllocateRewN(), 2));
+						retVO.setRewRateDigitN(devo.getRewRateDigitN());
+						retVO.setAccAllocateRewRateN(decimalPoint(devo.getAccAllocateRewRateN(), 2));
                         total.add(retVO);
                 	}                    
                 }
@@ -805,6 +817,9 @@ public class CRM821 extends EsbUtil {
 							retVO.setPayAcctId(StringUtils.trim(retVO.getPayAcctId()));
 						if (retVO.getPayAccountNo() != null)
 							retVO.setPayAccountNo(StringUtils.trim(retVO.getPayAccountNo()));
+						retVO.setAccAllocateRewN(decimalPoint(devo.getAccAllocateRewN(), 2));
+						retVO.setRewRateDigitN(devo.getRewRateDigitN());
+						retVO.setAccAllocateRewRateN(decimalPoint(devo.getAccAllocateRewRateN(), 2));
                         total.add(retVO);
                 	}                    
                 }

@@ -4,11 +4,13 @@
  */
 'use strict';
 eSoafApp.controller('CRM234Controller',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService , getParameter) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService , getParameter, crmService) {
 		$controller('BaseController', {$scope: $scope});
 		$controller('CRM230Controller', {$scope: $scope});
 		
 		$scope.controllerName = "CRM234Controller";
+		
+		crmService.getForbiddenList();
 		
 		getParameter.XML(["CRM.CRM233_PRD_TYPE" , "FPS.CURRENCY"], function(totas) {
 			if (totas) {
@@ -90,6 +92,7 @@ eSoafApp.controller('CRM234Controller',
 									$scope.resultList.push(row);
 								}
 							});
+							$scope.resultList = crmService.filterList($rootScope.forbiddenData,$scope.resultList);
 							$scope.outputVO = {'data':$scope.resultList};
 							
 							//客戶資訊(一個客戶只呈現一筆)
@@ -99,6 +102,7 @@ eSoafApp.controller('CRM234Controller',
 								if (!temp)
 		            				$scope.custList.push(row);
 							});
+							$scope.custList = crmService.filterList($rootScope.forbiddenData,$scope.custList);
 							$scope.custOutputVO = {'data':$scope.custList};
 							return;
 						}

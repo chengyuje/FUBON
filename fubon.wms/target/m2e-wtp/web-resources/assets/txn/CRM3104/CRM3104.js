@@ -33,13 +33,14 @@ eSoafApp.controller('CRM3104Controller',
         };
         
 		// combobox
-    	getParameter.XML(["FUBONSYS.FC_ROLE", "FUBONSYS.BMMGR_ROLE", "FUBONSYS.ARMGR_ROLE", "CRM.TRS_PRJ_ROT_STEP_STATUS", "CRM.TRS_PRJ_ROT_STEP1_BMMGR"], function(totas) {
+    	getParameter.XML(["FUBONSYS.FC_ROLE", "FUBONSYS.BMMGR_ROLE", "FUBONSYS.ARMGR_ROLE", "CRM.TRS_PRJ_ROT_STEP_STATUS", "CRM.TRS_PRJ_ROT_STEP1_BMMGR", "CRM.TRS_TYPE"], function(totas) {
     		if (totas) {
     			$scope.mappingSet['FUBONSYS.BMMGR_ROLE'] = totas.data[totas.key.indexOf('FUBONSYS.BMMGR_ROLE')];
     			$scope.mappingSet['FUBONSYS.FC_ROLE'] = totas.data[totas.key.indexOf('FUBONSYS.FC_ROLE')];
     			$scope.mappingSet['FUBONSYS.ARMGR_ROLE'] = totas.data[totas.key.indexOf('FUBONSYS.ARMGR_ROLE')];
     			$scope.mappingSet['CRM.TRS_PRJ_ROT_STEP_STATUS'] = totas.data[totas.key.indexOf('CRM.TRS_PRJ_ROT_STEP_STATUS')];
     			$scope.mappingSet['CRM.TRS_PRJ_ROT_STEP1_BMMGR'] = totas.data[totas.key.indexOf('CRM.TRS_PRJ_ROT_STEP1_BMMGR')]; //第一階段可覆核主管角色
+    			$scope.mappingSet['CRM.TRS_TYPE'] = totas.data[totas.key.indexOf('CRM.TRS_TYPE')];
     			
     			debugger
     			//是否為理專角色

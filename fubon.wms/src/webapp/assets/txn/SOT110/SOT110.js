@@ -129,10 +129,8 @@ eSoafApp.controller('SOT110Controller',
 		}
 		
 		$scope.custClear = function() {
-//			console.log("custClear:");
 			$scope.inputVO.custName = '';
 			$scope.inputVO.kycLV = '';									//KYC等級
-			
 			$scope.inputVO.kycDueDate = undefined;						//KYC效期
 			$scope.inputVO.profInvestorYN = '';							//是否為專業投資人
 			$scope.inputVO.piDueDate = undefined;						//專業投資人效期
@@ -171,7 +169,6 @@ eSoafApp.controller('SOT110Controller',
 		$scope.inputVO.trustTS = 'S';  //M:金錢信託  S:特金交易--預設特金如果契約編號有值則為SOT112交易為金錢信託
 		
         $scope.prodClear = function(isClearProdId) {
-        	 //			console.log("prodClear:");
         	 if (isClearProdId) {
         		 $scope.inputVO.prodId = ''; //也要清空產品編號
         	 }
@@ -225,7 +222,6 @@ eSoafApp.controller('SOT110Controller',
 			 
 			if($scope.fromCRM421bargainApplySeq && $scope.fromCRM421bargainApplySeq!=null) { 
 				$scope.inputVO.bargainApplySEQ = $scope.fromCRM421bargainApplySeq;
-				//			console.log('fromCRM421bargain' + $scope.inputVO.bargainApplySEQ);
 				$scope.fromCRM421bargainApplySeq = undefined; 
 				$scope.connector('set', "SOTNF_bargainApplySeq", null);
 				
@@ -239,9 +235,7 @@ eSoafApp.controller('SOT110Controller',
 								$scope.custClear();
 								$scope.prodClear();
 								$scope.brgApplySingle = tota[0].body.brgApplySingle; //事先議價
-								//			console.log("brgApplySingle:" + JSON.stringify($scope.brgApplySingle));
 								if ($scope.brgApplySingle) {//事先議價
-									//			console.log('fromCRM421bargain 1 getSOTCustInfo');
 								    $scope.inputVO.custID = $scope.brgApplySingle.CUST_ID;
 								    $scope.getSOTCustInfo(false,false);
 								} 
@@ -430,8 +424,10 @@ eSoafApp.controller('SOT110Controller',
 			$scope.inputVO.prospTypeDisabled = false;
 			$scope.inputVO.hnwcYN = ''; //是否為高資產客戶 Y/N 
 			$scope.inputVO.hnwcServiceYN = ''; //可提供高資產商品或服務 Y/N 
-			$scope.inputVO.flagNumber = '' //90天內是否有貸款紀錄 Y/N
+			$scope.inputVO.flagNumber = ''; //90天內是否有貸款紀錄 Y/N
 			$scope.inputVO.otherWithCustId = false; //是否帶客戶ID進來(快查)
+			$scope.inputVO.kycDueDateLessOneMonth = false; //KYC校期小於等於1個月(30天)
+			$scope.fundType = "";
 		};
 		$scope.init();
 		
@@ -470,11 +466,9 @@ eSoafApp.controller('SOT110Controller',
 		
 		// SOT701-客戶電文
 		$scope.getSOTCustInfo = function(loadEdit,input) {
-			//			console.log("SOTCustInfo"+loadEdit);
 			var deferred = $q.defer();
 			$scope.inputVO.custID = $filter('uppercase')($scope.inputVO.custID);
 			var validCustID = validateService.checkCustID($scope.inputVO.custID); //自然人和法人檢查
-			//			console.log("custID:" + $scope.inputVO.custID + ", checkCustID: "+validCustID);
 			if(validCustID==false){ 
 				$scope.inputVO.custID='';
 			}
@@ -524,7 +518,6 @@ eSoafApp.controller('SOT110Controller',
 									}
 								    
 								    $scope.isGetSOTCustInfo = undefined;
-								    //			console.log("SOTCustInfo:"+JSON.stringify(tota[0].body));
 									$scope.inputVO.custName = tota[0].body.custName;
 									$scope.inputVO.kycLV = tota[0].body.kycLV;								//KYC等級
 									$scope.inputVO.kycDueDate = $scope.toJsDate(tota[0].body.kycDueDate);	//KYC效期
@@ -544,6 +537,7 @@ eSoafApp.controller('SOT110Controller',
 									$scope.inputVO.hnwcYN = tota[0].body.hnwcYN;
 									$scope.inputVO.hnwcServiceYN = tota[0].body.hnwcServiceYN;
 									$scope.inputVO.flagNumber = tota[0].body.flagNumber; 					//90天內是否有貸款紀錄 Y/N
+									$scope.inputVO.kycDueDateLessOneMonth = tota[0].body.kycDueDateLessOneMonth;
 									
 									// FOR 境外私募基金新增銷售客群
 									$scope.inputVO.proCorpInv = tota[0].body.proCorpInv;
@@ -558,12 +552,10 @@ eSoafApp.controller('SOT110Controller',
 									var car_purchaseAmt 	= $scope.inputVO.purchaseAmt;     	//申購金額 
 									
 									
-									//console.log("set SOT.DEBIT_ACCT_LIST 會呼叫 changeAcct()");
 									$scope.mappingSet['SOT.DEBIT_ACCT_LIST'] = tota[0].body.debitAcct;
 									$scope.mappingSet['SOT.TRUST_ACCT_LIST'] = tota[0].body.trustAcct;
 									$scope.mappingSet['SOT.CREDIT_ACCT_LIST'] = tota[0].body.creditAcct;
 									
-									//console.log("SOTCustInfo !$scope.inputVO.seqNo:"+(!$scope.inputVO.seqNo) + "!loadEdit:" + (!loadEdit));
 									if (!loadEdit || !$scope.inputVO.seqNo) {//沒有設loadEdit  從編輯按鈕(風控)過來不寫預設  因為信託帳號跟手續費有關 !$scope.inputVO.seqNo
 										$scope.inputVO.takeProfitPerc = tota[0].body.takeProfitPerc;			//停利點
 										$scope.inputVO.stopLossPerc = tota[0].body.stopLossPerc;				//停損點
@@ -573,9 +565,6 @@ eSoafApp.controller('SOT110Controller',
 										$scope.isGetSOTCustInfo = true;
 										$scope.checkTrustAcct();  //1.檢查信託帳號 設定扣款帳號  2.顯示debitAcct餘額 
 									} else if(loadEdit==true) {
-										//			console.log("car_debitAcct:"+car_debitAcct);
-										//			console.log("car_trustAcct:"+car_trustAcct);
-										//			console.log("car_creditAcct:"+car_creditAcct);
 										$scope.inputVO.debitAcct = car_debitAcct;     //扣款帳號
 										$scope.inputVO.trustAcct = car_trustAcct;     //信託帳號
 										$scope.inputVO.creditAcct = car_creditAcct;     //收益入帳帳號
@@ -588,7 +577,6 @@ eSoafApp.controller('SOT110Controller',
 										$scope.inputVO.feeType = car_feeType;  //手續費優惠方式
 										$scope.inputVO.bargainApplySEQ = car_bargainApplySEQ; //議價編號
 										$scope.inputVO.groupOfa = car_groupOfa; //優惠團體代碼  (從手續費優惠方式)
-										//			console.log("car_getFeeTypeListData");
 										$scope.getFeeTypeListData(true,$scope.inputVO.bargainApplySEQ,$scope.inputVO.feeType);
 									}
 									
@@ -602,7 +590,6 @@ eSoafApp.controller('SOT110Controller',
 									if ($scope.brgApplySingle) {//事先議價
 										$scope.inputVO.prodId = $scope.brgApplySingle.PROD_ID;
 										//再找產品
-										//			console.log('fromCRM421bargain 2 getProdDTL');
 										$scope.getProdDTL();
 									} 
 									deferred.resolve("success");
@@ -622,7 +609,6 @@ eSoafApp.controller('SOT110Controller',
 		//目前先輸入申購金額才查手續費列表和最優手續費
 		$scope.getFeeTypeListData = function (isLoadEdit,carBargainApplySEQ,carFeeType) { 
 			var deferred = $q.defer();
-			//			console.log("getFeeTypeListData()"+isLoadEdit+','+carBargainApplySEQ+','+carFeeType);
 			var canGetFeeType = false;
 			if($scope.inputVO.tradeSubType == '1'){
 				var purchaseAmt = $scope.moneyUnFormat($scope.inputVO.purchaseAmt);//千分位問題
@@ -631,7 +617,6 @@ eSoafApp.controller('SOT110Controller',
 				}
 			}
 			
-			//console.log("canGetFeeType---="+canGetFeeType);
 			if(canGetFeeType){
 				var getFeeTypeListInputVO = {"custID": $scope.inputVO.custID, 
 						            "trustAcct": $scope.inputVO.trustAcct, 
@@ -648,7 +633,6 @@ eSoafApp.controller('SOT110Controller',
 						            "isOBU" : $scope.inputVO.isOBU
 						            //,"isAutoCx": $scope.inputVO.isAutoCx
 						            };
-				//console.log("getFeeTypeListInputVO---="+JSON.stringify(getFeeTypeListInputVO));
 				$scope.sendRecv("SOT110", "getFeeTypeListData", "com.systex.jbranch.app.server.fps.sot110.SOT110InputVO", getFeeTypeListInputVO,
 					function(tota1, isError) {
 					    $scope.err = {};
@@ -669,7 +653,6 @@ eSoafApp.controller('SOT110Controller',
 									$scope.inputVO.defaultFeeRate = row.DefaultFeeRateL;
 								} 
 			    			});
-							//			console.log("FEE_RATE_TYPE :"+JSON.stringify($scope.mappingSet['FEE_RATE_TYPE']));
 							if (carBargainApplySEQ) {
 								$scope.inputVO.feeTypeIndex=tota1[0].body.feeTypeIndex;//保留上次選的手續費方式 
 							} else {
@@ -713,7 +696,6 @@ eSoafApp.controller('SOT110Controller',
 			$scope.inputVO.feeDiscount = $scope.moneyUnFormat($scope.inputVO.feeDiscount);
 			
 			if ($scope.inputVO.prodId && $scope.isGetSOTCustInfo && $scope.inputVO.trustCurrType!='' && $scope.inputVO.trustAcct!='') { //查詢完客戶後才能 查 基金表定、最優手續費
-				//			console.log("getDefaultFeeRate()");
 				$scope.sendRecv("SOT110", "getDefaultFeeData", "com.systex.jbranch.app.server.fps.sot110.SOT110InputVO", $scope.inputVO ,
 						function(tota1, isError) {
 							if (!isError) { 
@@ -878,12 +860,10 @@ eSoafApp.controller('SOT110Controller',
 		
 		//1.設定客戶帳號 ； 2.事先議價   CALL  $scope.checkTrustAcct()
 		$scope.getCustAcctData = function() {
-			//			console.log("getCustAcctData"); 
 			$scope.setCustAcctData();  //setCustAcctData CALL  $scope.checkTrustAcct()
 			//TODO 改變信託帳號  則要變換 手續費
 							
 			if ($scope.brgApplySingle) {//事先議價 
-				//			console.log('fromCRM421bargain 5 FeeTypeListData()');
 				$scope.getFeeTypeListData(true,$scope.brgApplySingle.bargainApplySEQ ,'D'); //查詢表定手續和其他事先議價
 				$scope.checkPurchaseAmtLimit();//因查BaseFee花時間不能馬上查到
 			} 
@@ -958,6 +938,14 @@ eSoafApp.controller('SOT110Controller',
 		
 		//加入購物車
 		$scope.doAddCar = function() {
+			if($scope.inputVO.kycDueDateLessOneMonth && $scope.inputVO.tradeDateType === '2') {
+				var showYear = $scope.inputVO.kycDueDate.getFullYear();  //西元年份 
+				var showMonth = $scope.inputVO.kycDueDate.getMonth()+1;  //一年中的第幾月 
+				var showDate = $scope.inputVO.kycDueDate.getDate();      //一月份中的第幾天
+				
+				$scope.showMsg('ehl_01_SOT_018',[showYear,showMonth,showDate]);
+			}	
+			
 			if(!$scope.inputVO.prodName){ //查無商品
 				$scope.showErrorMsg("ehl_01_common_009"); 
 				return;
@@ -977,7 +965,6 @@ eSoafApp.controller('SOT110Controller',
 			}
 			if($scope.parameterTypeEditForm.$invalid) {
 	    		$scope.showErrorMsg("ehl_01_common_022");
-	    		//			console.log('form=' + JSON.stringify($scope.parameterTypeEditForm));
 	    		return;
 	    	}
 			$scope.checkBestFee();//檢查手續費是否最優
@@ -1002,16 +989,9 @@ eSoafApp.controller('SOT110Controller',
 					function(tota, isError) {
 						if (!isError) {
 							debugger
-							if(tota[0].body.overCentRateResult == "N") {
-								//集中度超過上限
-								$scope.showErrorMsg("客戶高風險商品集中度比例已超過上限");
-								$scope.custClear();
-								$scope.prodClear(true);
-								$scope.refresh();
-								return;
-							} else if(tota[0].body.overCentRateResult == "W") {
+							if(tota[0].body.overCentRateResult == "W") {
 								//集中度超過通知門檻
-								$scope.showMsg("客戶高風險商品集中度已超過通知門檻比例，請取得客戶同意，若為弱勢客戶，須請處(副)主管核准");
+								$scope.showMsg("客戶高風險商品集中度已超過通知門檻比例，請取得客戶同意");
 							}
 							if (tota[0].body.errorMsg != null) {
 								$scope.showErrorMsg(tota[0].body.errorMsg);
@@ -1131,7 +1111,6 @@ eSoafApp.controller('SOT110Controller',
 		//將購物車該筆相同seqNo編號 顯示在編輯區
 		$scope.edit = function(row) {
 		  try{ 
-//			 			console.log('edit(row)'+JSON.stringify(row)); 
 			 $scope.inputVO.seqNo = row.SEQ_NO;
 			 $scope.inputVO.batchSeq = row.BATCH_SEQ;     //下單批號
 			 $scope.inputVO.batchNo = row.BATCH_NO;     //下單批號流水號
@@ -1175,9 +1154,6 @@ eSoafApp.controller('SOT110Controller',
 			 $scope.inputVO.plNotifWays = row.PL_NOTIFY_WAYS;     //停損停利通知方式
 			 $scope.inputVO.narratorID = row.NARRATOR_ID;     //解說專員員編
 			 $scope.inputVO.narratorName = row.NARRATOR_NAME;     //解說專員姓名
-			 //			console.log("set1 inputVO.debitAcct:"+$scope.inputVO.debitAcct);
-			 //			console.log("set1 inputVO.trustAcct:"+$scope.inputVO.trustAcct);
-			 //			console.log("set1 inputVO.creditAcct:"+$scope.inputVO.creditAcct);
 			 
 			 var acctCurrency = $scope.getAcctCurrency();
 			 $scope.inputVO.debitAcct = row.DEBIT_ACCT + '_'+ acctCurrency;     //扣款帳號
@@ -1192,7 +1168,6 @@ eSoafApp.controller('SOT110Controller',
 		     $scope.inputVO.groupOfa = row.GROUP_OFA;//優惠團體代碼  (從手續費優惠方式)
 			 
 		  }catch(e){ 
-		    	//			console.log("edit err:"+e);
 		  }
 		};
 		
@@ -1228,73 +1203,89 @@ eSoafApp.controller('SOT110Controller',
 			$scope.findNfMinBuyAmt();  //最低申購金額  
         }
 		
-		//信託類型tradeType,信託幣別currencyType
-		$scope.findNfMinBuyAmt = function(){
-			var PARAM_CODE='';
-			var MIN_BUY_AMT='';
-			if('N'==$scope.inputVO.trustCurrType){
-				PARAM_CODE='TWD_FOREIGN';
-			}else if ($scope.inputVO.prodFus20 == 'C'){
-				PARAM_CODE='TWD_DOMESTIC';
-			}else{
-				PARAM_CODE=$scope.inputVO.prodCurr; //產品計價幣別
+		//#2320:網行銀申購排除後收型/貨幣型/ETF基金 
+		function checkFundType ()  {
+			var check = false;
+			if ($scope.inputVO.isBackend != 'Y'
+				&& $scope.fundType != "04"
+				&& $scope.inputVO.prodId.substring(0, 2) != "05") {
+				check = true;
 			}
-			var tradeSubType = $scope.inputVO.tradeSubType; 
-			if(tradeSubType=='1'){
+			return check;
+		}
+		
+		//信託類型tradeType,信託幣別currencyType
+		$scope.findNfMinBuyAmt = function() {
+			var PARAM_CODE = '';
+			var MIN_BUY_AMT = '';
+			if ('N' == $scope.inputVO.trustCurrType) {
+				PARAM_CODE = 'TWD_FOREIGN';
+			} else if ($scope.inputVO.prodFus20 == 'C') {
+				PARAM_CODE = 'TWD_DOMESTIC';
+			} else {
+				PARAM_CODE = $scope.inputVO.prodCurr; //產品計價幣別
+			}
+			var tradeSubType = $scope.inputVO.tradeSubType;
+			if (tradeSubType == '1') {
 				//判斷是否為後收
-				if($scope.inputVO.isBackend == 'Y'){
+				if ($scope.inputVO.isBackend == 'Y') {
 					//用商品前兩碼判斷系列  
 					debugger;
 					if (($scope.inputVO.trustCurrType == 'C' || $scope.inputVO.trustCurrType == 'N')) {
-						PARAM_CODE = $scope.inputVO.prodId.substr(0,2) + "TWD";
+						PARAM_CODE = $scope.inputVO.prodId.substr(0, 2) + "TWD";
 					} else {
-						PARAM_CODE = $scope.inputVO.prodId.substr(0,2) + $scope.inputVO.prodCurr;
+						PARAM_CODE = $scope.inputVO.prodId.substr(0, 2) + $scope.inputVO.prodCurr;
 					}
-					
-					MIN_BUY_AMT='SOT.NF_MIN_BUY_AMT_4'; 
+
+					MIN_BUY_AMT = 'SOT.NF_MIN_BUY_AMT_4';
+				} else if ($scope.inputVO.isWeb == 'Y' && checkFundType()) {
+					MIN_BUY_AMT = 'SOT.NF_MIN_BUY_AMT_IS_WEB';
 				} else {
-					MIN_BUY_AMT='SOT.NF_MIN_BUY_AMT_1'; 
+					MIN_BUY_AMT = 'SOT.NF_MIN_BUY_AMT_1';
 				}
 			}
 
 			//信託型態
-	        var vo = {'param_type': MIN_BUY_AMT, 'desc': false};
-	        $scope.inputVO.prodMinBuyAmt = 0; 
-	        	$scope.requestComboBox(vo, function(totas) {
-	        		if (totas[totas.length - 1].body.result === 'success') {
-        				angular.forEach(totas[0].body.result, function(row){
-        	        		if(row.DATA == PARAM_CODE){
-        	        			debugger;
-        	        			$scope.inputVO.prodMinBuyAmt= row.LABEL;
-        	        			$scope.inputVO.BaseAmtOfSPurchaseCurr = MIN_BUY_AMT == 'SOT.NF_MIN_BUY_AMT_4' ? PARAM_CODE.substring(2, 5) : $scope.inputVO.BaseAmtOfSPurchaseCurr = row.DATA.split("_")[0];;
-        	        		}
-        	        	});
-	        		}
-	        		//境外私募基金最低申購金額依產品
-	    	        if($scope.inputVO.ovsPrivateYN == "Y") $scope.inputVO.prodMinBuyAmt= $scope.inputVO.ovsPriMinBuyAmt;
-	        });
+			var vo = { 'param_type': MIN_BUY_AMT, 'desc': false };
+			$scope.inputVO.prodMinBuyAmt = 0;
+			$scope.requestComboBox(vo, function(totas) {
+				if (totas[totas.length - 1].body.result === 'success') {
+					angular.forEach(totas[0].body.result, function(row) {
+						if (row.DATA == PARAM_CODE) {
+							debugger;
+							$scope.inputVO.prodMinBuyAmt = row.LABEL;
+							$scope.inputVO.BaseAmtOfSPurchaseCurr = MIN_BUY_AMT == 'SOT.NF_MIN_BUY_AMT_4' ? PARAM_CODE.substring(2, 5) : $scope.inputVO.BaseAmtOfSPurchaseCurr = row.DATA.split("_")[0];;
+						}
+					});
+				}
+				//境外私募基金最低申購金額依產品
+				if ($scope.inputVO.ovsPrivateYN == "Y") $scope.inputVO.prodMinBuyAmt = $scope.inputVO.ovsPriMinBuyAmt;
+			});
 		}
 		
 		//檢查 申購金額 要在 合理範圍內
 		$scope.checkPurchaseAmtLimit = function() {
-			try{
-				//			console.log("checkPurchaseAmtLimit:");
+			try {
 				var prodMinBuyAmt = Number($scope.inputVO.prodMinBuyAmt);
-//				var MaxAmtOfSPurchase = Number($scope.inputVO.MaxAmtOfSPurchase);
-				//			console.log("checkPurchaseAmtLimit:"+$scope.inputVO.tradeSubType  +" : " + prodMinBuyAmt + " : "+ Number($scope.inputVO.purchaseAmt));
+				//var MaxAmtOfSPurchase = Number($scope.inputVO.MaxAmtOfSPurchase);
 				if (($scope.inputVO.tradeSubType == '1')) {
-					var purchaseAmt = Number($scope.inputVO.purchaseAmt);
-					
-					if(purchaseAmt > 0 && purchaseAmt < prodMinBuyAmt) {
-						$scope.showErrorMsg("申購金額"+purchaseAmt+" 不可小於最低申購金額" + prodMinBuyAmt);
+					var purchaseAmt = Number($scope.moneyUnFormat($scope.inputVO.purchaseAmt));
+					if (purchaseAmt > 0 && purchaseAmt < prodMinBuyAmt) {
+						$scope.showErrorMsg("ehl_01_SOT_019", [purchaseAmt, prodMinBuyAmt]);
 						$scope.inputVO.purchaseAmt = undefined;
-						console.log("clear checkPurchaseAmtLimit");
 					}
-				} 
-				
-			}catch(e){
+					//#2320:網行銀以台幣購買須以千為單位外幣不用。
+					if ($scope.inputVO.isWeb == 'Y' 
+						&& $scope.inputVO.trustCurrType != "Y" && $scope.inputVO.trustCurrType != ""
+						&& !Number.isNaN(purchaseAmt) && purchaseAmt % 1000 != 0 && checkFundType()) {
+						$scope.showErrorMsg("ehl_01_SOT_027");
+						$scope.inputVO.purchaseAmt = undefined;
+					}
+				}
+
+			} catch (e) {
 				alert(e);
-			}	
+			}
 		}
 		
 		//選擇信託類型
@@ -1304,9 +1295,7 @@ eSoafApp.controller('SOT110Controller',
 			 */
 			// 參考 SOT.CHANGE_TRADE_SUB_TYPE
 			var type = $scope.inputVO.tradeSubType;
-			//			console.log("tradeSubType:"+type);
 			if(type == '1') {
-				//			console.log('1：單筆');
 			} 
 			$scope.findNfMinBuyAmt();
 		}
@@ -1319,7 +1308,6 @@ eSoafApp.controller('SOT110Controller',
 		
 		//選擇信託幣別
 		$scope.currencyType = function() {
-			//			console.log("currencyType()選擇信託幣別");
 			/*1.選擇台幣顯示台幣最低申購金額。
 			2.選擇外幣顯示外幣最低申購金額。
 			3. 當信託幣別改變時，表定手續費率、手續費優惠費率也將 改變。
@@ -1335,7 +1323,6 @@ eSoafApp.controller('SOT110Controller',
 			$scope.findNfMinBuyAmt();
 			
 			if ($scope.brgApplySingle) {//事先議價 
-				//			console.log('fromCRM421bargain 4 CustAcctData()');
 				$scope.getCustAcctData();    //1.設定客戶帳號  CALL  $scope.checkTrustAcct()； 2.事先議價 
 			}
 			//從FPS來的不清
@@ -1554,7 +1541,6 @@ eSoafApp.controller('SOT110Controller',
 		// 商品適配   給切換交易日期要檢查
 //		$scope.checkFitness = function () {
 //			var deferred = $q.defer();
-//			//			console.log('checkFitness()'+$scope.inputVO.prodId);
 //			$scope.inputVO.fee = $scope.cleanCurrency($scope.inputVO.fee);
 //			if($scope.inputVO.prodId) {
 //				$scope.sendRecv("SOT110", "checkFitness", "com.systex.jbranch.app.server.fps.sot110.SOT110InputVO", $scope.inputVO,
@@ -1577,7 +1563,6 @@ eSoafApp.controller('SOT110Controller',
 		
 		//查詢購物車
 		$scope.noCallCustQuery = function () {
-			//			console.log('noCallCustQuery');
 			var deferred = $q.defer();
 			$scope.sendRecv("SOT110", "query", "com.systex.jbranch.app.server.fps.sot110.SOT110InputVO", $scope.inputVO,
 					function(tota, isError) {
@@ -1618,16 +1603,12 @@ eSoafApp.controller('SOT110Controller',
 			var trustCurrType = $scope.inputVO.trustCurrType; //C國內 , N台幣 , Y外幣
 			
 			if($scope.isGetSOTCustInfo){ //查詢完客戶後才能changeAcct()
-				//			console.log('changeAcct()type:' + type +' , isGetSOTCustInfo:' + $scope.isGetSOTCustInfo);
 				if (type == 'debit') {
 						$scope.inputVO.creditAcct = $scope.inputVO.debitAcct.split("_")[0];			
 				}
 //				else {
 //					$scope.inputVO.debitAcct = $scope.inputVO.creditAcct +'_'+ $scope.getAcctCurrency();
 //				}
-				//			console.log("set2 inputVO.debitAcct:" + $scope.inputVO.debitAcct);
-				//			console.log("set2 inputVO.trustAcct:" + $scope.inputVO.trustAcct);
-				//			console.log("set2 inputVO.creditAcct:" + $scope.inputVO.creditAcct);
 				
 				//取得 相同商品別的 扣款帳後餘額
 				 
@@ -1639,7 +1620,6 @@ eSoafApp.controller('SOT110Controller',
 							//$scope.inputVO.debitAvbBalance = row.ACCT_BALACNE;
 							$scope.inputVO.debitAvbBalance = acctCcyRow.AVB_BALANCE;
 							$scope.avlCurrency = acctCcyRow.CURRENCY;
-							//			console.log('debitAcct acct:'+acctCcyRow.DATA+' currency:'+$scope.avlCurrency +', debitAvbBalance:'+$scope.inputVO.debitAvbBalance);
 					}
 				});
 				
@@ -1850,7 +1830,6 @@ eSoafApp.controller('SOT110Controller',
 					$scope.getSOTCustInfo(loadEdit,false);
 				});
 			} else if ($scope.fromFPS){
-				console.log($scope.FPSData);
 				$scope.getTradeSEQ();
 				$scope.inputVO.planID = $scope.FPSData.planID;
 				$scope.inputVO.custID = $scope.FPSData.custID;
@@ -1891,7 +1870,6 @@ eSoafApp.controller('SOT110Controller',
 		
 		//test 事先議價FromCRM421
 		$scope.testFromCRM421 = function () { 
-			//			console.log("testFromCRM421");
 			$scope.connector('set', "SOTNF_bargainApplySeq", "6"); // 6單筆  7 小額
 			$rootScope.menuItemInfo.url = "assets/txn/SOT120/SOT120.html";
 		};
@@ -1975,8 +1953,11 @@ eSoafApp.controller('SOT110Controller',
 		}
 		
 		$scope.onWebChange = function() {
-			if($scope.isWebValid() && $scope.inputVO.isWeb == 'Y') {
-				$scope.inputVO.feeTypeIndex=''; //手續費優惠方式下拉重設'請選擇'
+			//#2320:因臨櫃和網行銀基金購買價格不一樣，這邊多加判斷。
+			$scope.findNfMinBuyAmt();
+			if ($scope.isWebValid() && $scope.inputVO.isWeb == 'Y') {
+				$scope.checkPurchaseAmtLimit();
+				$scope.inputVO.feeTypeIndex = ''; //手續費優惠方式下拉重設'請選擇'
 				$scope.getFeeTypeListData();	//重新取得手續費
 			}
 		}

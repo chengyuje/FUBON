@@ -28,6 +28,7 @@ import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
 import com.systex.jbranch.fubon.commons.PdfUtil;
 import com.systex.jbranch.fubon.commons.cbs.CBSService;
 import com.systex.jbranch.fubon.commons.esb.vo.fp032151.FP032151OutputVO;
+import com.systex.jbranch.fubon.jlb.DataFormat;
 import com.systex.jbranch.fubon.webservice.rs.SeniorCitizenClientRS;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
@@ -167,7 +168,7 @@ public class CRM512 extends FubonWmsBizLogic {
 				inputGmap.put("CUST_ID", inputVO.getCustID());
 			}
 			
-			logger.info(apiName + " inputVO:" + gson.toJson(inputGmap.getParamMap()));
+			logger.info(apiName + " inputVO:" + new DataFormat().maskJson(gson.toJson(inputGmap.getParamMap()), "CUST_?[IN][DO]"));
 
 			List<Map<String, Object>> list = new SeniorCitizenClientRS().getList(url, inputGmap);
 			
@@ -176,7 +177,7 @@ public class CRM512 extends FubonWmsBizLogic {
 			logger.info("step 6 : get API LIST start " + new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss").format(new Date()));
 
 			for (Map<String, Object> map : list) {
-				logger.info(apiName + " return:" + map);
+				logger.info(apiName + " return:" + new DataFormat().maskJson(gson.toJson(map), "CUST_?[IN][DO]"));
 
 				// 取得分行名稱
 				sb = new StringBuffer();
@@ -382,7 +383,7 @@ public class CRM512 extends FubonWmsBizLogic {
 	}
 	
 	public void saveFunc(CRM512InputVO inputVO, String loginEmpID) throws JBranchException, Exception {
-
+		
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
@@ -429,32 +430,12 @@ public class CRM512 extends FubonWmsBizLogic {
 				ansAftMap.put("QUESTION_CLASS", map.get("QUESTION_CLASS"));
 				ansAftMap.put("QUESTION_NAME", map.get("QUESTION_NAME"));
 				ansAftMap.put("QUESTION_TYPE", map.get("QUESTION_TYPE"));
-				
+				ansAftMap.put("ansDisabled", (boolean) map.get("ansDisabled") ? (StringUtils.equals((String) map.get("QUESTION_CLASS"), "99") ? "Y" : "N") : "Y");
+
 				ansAftMap.put("ANSWER_SEQ", (maps.get("ANSWER_SEQ") + "").replace(".0", ""));
 				ansAftMap.put("ANSWER_DESC", maps.get("ANSWER_DESC"));
 				ansAftMap.put("ANSWER_NGCHECK", maps.get("ANSWER_NGCHECK"));
 				ansAftMap.put("ANSWER_REMARK", maps.get("ANSWER_REMARK"));
-				
-//				ansAftMap.put("REPORT_YN", map.get("REPORT_YN"));
-//				ansAftMap.put("CUST_ID", map.get("CUST_ID"));
-//				ansAftMap.put("CUST_NAME", map.get("CUST_NAME"));
-//				ansAftMap.put("QST_NO", (maps.get("QST_NO") + "").replace(".0", ""));
-//				ansAftMap.put("QUESTION_CLASS_NAME", map.get("QUESTION_CLASS_NAME"));
-//				ansAftMap.put("QUESTION_NAME_NAME", map.get("QUESTION_NAME_NAME"));
-//				ansAftMap.put("QUESTION_DESCR", map.get("QUESTION_DESCR"));
-//				ansAftMap.put("QUESTION_REMARK", map.get("QUESTION_REMARK"));
-//				ansAftMap.put("REQUIRED_YN", map.get("REQUIRED_YN"));
-//				ansAftMap.put("CAN_MODIFY_PRI_LIST", map.get("CAN_MODIFY_PRI_LIST"));
-//				ansAftMap.put("SYSTEM_CHK_YN", map.get("SYSTEM_CHK_YN"));
-//				ansAftMap.put("CHG_DEPT_NAME", map.get("CHG_DEPT_NAME"));
-//				ansAftMap.put("CHG_CREATOR_NAME", map.get("CHG_CREATOR_NAME"));
-//				ansAftMap.put("CHG_CREATOR_TIME", map.get("CHG_CREATOR_TIME"));
-				
-//				ansAftMap.put("ANSWER_FLAG", maps.get("ANSWER_FLAG"));
-//				ansAftMap.put("RESULT_YN", maps.get("RESULT_YN"));
-//				ansAftMap.put("FINACIAL_COGNITION_YN", maps.get("FINACIAL_COGNITION_YN"));
-//				ansAftMap.put("RESULT_FLAG", maps.get("RESULT_FLAG"));
-//				ansAftMap.put("RESULT_ANSWER_SEQ", maps.get("RESULT_ANSWER_SEQ"));
 				
 				inputAnswerList.add(ansAftMap.getParamMap());
 			}
@@ -462,11 +443,11 @@ public class CRM512 extends FubonWmsBizLogic {
 		
 		inputGmap.put("answer", inputAnswerList);
 		
-		logger.info(apiName + " inputVO:" + gson.toJson(inputGmap.getParamMap()));
+		logger.info(apiName + " inputVO:" + new DataFormat().maskJson(gson.toJson(inputGmap.getParamMap()), "CUST_?[IN][DO]"));
 		
 		Map<String, Object> map = new SeniorCitizenClientRS().getMap(url, inputGmap);
 				
-		logger.info(apiName + " return:" + map);
+		logger.info(apiName + " return:" + new DataFormat().maskJson(gson.toJson(map), "CUST_?[IN][DO]"));
 		
 		switch((String) map.get("EXEC_FLAG")) {
 			case "S":
@@ -498,12 +479,12 @@ public class CRM512 extends FubonWmsBizLogic {
 		inputGmap.put("EXAM_VERSION", inputVO.getExamVersion());
 		inputGmap.put("QUESTION_VERSION", inputVO.getQuestionVersion());
 		
-		logger.info(apiName + " inputVO:" + gson.toJson(inputGmap.getParamMap()));
+		logger.info(apiName + " inputVO:" + new DataFormat().maskJson(gson.toJson(inputGmap.getParamMap()), "CUST_?[IN][DO]"));
 
 		List<Map<String, Object>> list = new SeniorCitizenClientRS().getList(url, inputGmap);
 		
 		for (Map<String, Object> map : list) {
-			logger.info(apiName + " return:" + map);
+			logger.info(apiName + " return:" + new DataFormat().maskJson(gson.toJson(map), "CUST_?[IN][DO]"));
 			
 			// 取得分行名稱
 			sb = new StringBuffer();

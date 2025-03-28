@@ -100,31 +100,27 @@ input.faChkSqr:after {
 						<th>業務處：</th>
 						<td>
 							<e-combobox id="region_center_id" name="region_center_id"
-										ng-paramtype="PMS.UHRM_RC"
+										ng-datasource="uhrmRCList"
 										ng-model="inputVO.uhrmRC"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										ng-change="ChangeRegion()"
-										width="200px"
 										style="line-height:20px;" />
-						</td>						
-						<th>業務中心：</th>
+						</td>
+						<th>營運區：</th>
 						<td>
 							<e-combobox id="branch_area_id" name="branch_area_id"
-										ng-paramtype="PMS.UHRM_OP"
+										ng-datasource="uhrmOPList"
 										ng-model="inputVO.uhrmOP"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										ng-change="ChangeArea()"
-										width="200px"
 										style="line-height:20px;" />
 						</td>
 						<th></th>
@@ -133,7 +129,19 @@ input.faChkSqr:after {
 					<tr>
 	    				<th>轉出姓名：</th>
 	    				<td><input class="form-control" type="text" placeholder="請輸入..." id="accOutNameSearch" name="accOutNameSearch" ng-model="inputVO.accOutNameSearch" e-length-limit="60"></td>
-	    				<th>已回覆/未回覆：</th>
+	    				<th>資料來源：</th>
+						<td>
+							<e-combobox id="dataSource" name="dataSource" 
+										ng-paramtype="PMS.PMS428_DATA_SOURCE"
+										ng-model="inputVO.dataSource"
+										ng-validate="false" 
+										ng-readonly="false" 
+										ng-editable="false"
+										ng-format="F3"
+										width="200px"
+										style="line-height:20px;"/>
+						</td>
+						<th>已回覆/未回覆：</th>
 						<td>
 							<e-combobox id="noteStatus" name="noteStatus" 
 										ng-paramtype="PMS.NOTE_STATUS"
@@ -144,8 +152,6 @@ input.faChkSqr:after {
 										ng-format="F3"
 										style="line-height:20px;"/>
 						</td>
-						<th></th>
-						<td></td>
 	    			</tr>			
 				</table>
 			</div>
@@ -178,7 +184,7 @@ input.faChkSqr:after {
 					<thead>
 						<tr>
 							<th>更新<br>資料</th>
-							
+							<th>私銀註記</th>
 							<th>資料日期</th>
 							<th>資料來源</th>
 							<th>理專歸屬行</th>
@@ -205,8 +211,8 @@ input.faChkSqr:after {
 					<tbody>
 						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
 							<td align="center"><input type="checkbox" ng-disabled="" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"></td>                    
-						
-							<td style="vertical-align:middle;" align="center">{{toJsDate(row.DATA_DATE) | date:"yyyy-MM-dd"}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.RM_FLAG}}</td>
+							<td style="vertical-align:middle;" align="center">{{toJsDate(row.CREATETIME) | date:"yyyy-MM-dd"}}</td>
 							<td style="vertical-align:middle;" align="center">{{row.DATA_SOURCE}}</td>
 							<td style="vertical-align:middle;" align="center">{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
 							<td style="vertical-align:middle;" align="center">{{row.EMP_NAME}}</td>
@@ -252,7 +258,6 @@ input.faChkSqr:after {
 						</tr>
 					</tbody>
 				</table>
-				<text class="with-errors">提醒:若資料來源為「ATM_累積」,交易日期顯示當月底日期(例如:交易日期顯示2023-12-31,該筆交易及累積金額期間為2023/12/1~12/31)</text>
 			</div>
 			<br>
 			<div align="center" ng-show="paramList.length">
@@ -260,7 +265,11 @@ input.faChkSqr:after {
 	                <span class="glyphicon glyphicon-floppy-disk"></span>儲存
 	            </button>
 	        </div>
+	        <div>
+				提醒：<br>
+				<text class="with-errors">(1) 若資料來源為「ATM_累積」，交易日期顯示當月底日期(例如：交易日期顯示2023-12-31，該筆交易及累積金額期間為2023/12/1~12/31)</text><br>
+				(2) 請檢核資金往來或帳戶關係，非檢視洗錢疑慮。
+			</div>
 		</div>
 	</div>
-	<!-- 結果區 -->
 </div>

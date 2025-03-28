@@ -96,6 +96,12 @@ public class IOT120InputVO extends PagingInputVO{
 	private String PAY_SERV_REMIT_NATNO;
 	private String REMIT_COUNTRY_FLAG;
 	private String fromIOT120;
+	private String fileName;
+	private String fileRealName;
+	private String FUND_VERIFY_PDF_YN;
+	private String FUND_VERIFY_PAPER_YN;
+	private String NO_PAPER_YN;
+	private String fundFileUploadYN;
 
 	public String getAO_ID() {
 		return AO_ID;
@@ -620,6 +626,42 @@ public class IOT120InputVO extends PagingInputVO{
 	}
 	public void setFromIOT120(String fromIOT120) {
 		this.fromIOT120 = fromIOT120;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+	public String getFileRealName() {
+		return fileRealName;
+	}
+	public void setFileRealName(String fileRealName) {
+		this.fileRealName = fileRealName;
+	}
+	public String getFUND_VERIFY_PDF_YN() {
+		return FUND_VERIFY_PDF_YN;
+	}
+	public void setFUND_VERIFY_PDF_YN(String fUND_VERIFY_PDF_YN) {
+		FUND_VERIFY_PDF_YN = fUND_VERIFY_PDF_YN;
+	}
+	public String getFUND_VERIFY_PAPER_YN() {
+		return FUND_VERIFY_PAPER_YN;
+	}
+	public void setFUND_VERIFY_PAPER_YN(String fUND_VERIFY_PAPER_YN) {
+		FUND_VERIFY_PAPER_YN = fUND_VERIFY_PAPER_YN;
+	}
+	public String getNO_PAPER_YN() {
+		return NO_PAPER_YN;
+	}
+	public void setNO_PAPER_YN(String nO_PAPER_YN) {
+		NO_PAPER_YN = nO_PAPER_YN;
+	}
+	public String getFundFileUploadYN() {
+		return fundFileUploadYN;
+	}
+	public void setFundFileUploadYN(String fundFileUploadYN) {
+		this.fundFileUploadYN = fundFileUploadYN;
 	}
 
 }

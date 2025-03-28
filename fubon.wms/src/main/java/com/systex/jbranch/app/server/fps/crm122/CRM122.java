@@ -181,7 +181,7 @@ public class CRM122 extends FubonWmsBizLogic {
 			queryCondition.setQueryString(ObjectUtils.toString(sql));
 			queryCondition.setObject("date_o",new Timestamp(inputVO.getDate().getTime()));
 			List<Map<String,Object>> list = dam.exeQuery(queryCondition);
-			System.out.println(" ============== " + inputVO.getEMP_ID());
+//			System.out.println(" ============== " + inputVO.getEMP_ID());
 			System.out.println(" ============== " + new Timestamp(inputVO.getDate().getTime()));
 			return_vo.setMyTodoLst(list);
 			this.sendRtnObject(return_vo);		

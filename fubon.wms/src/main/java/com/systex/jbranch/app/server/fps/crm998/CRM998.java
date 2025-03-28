@@ -256,6 +256,13 @@ public class CRM998 extends FubonWmsBizLogic {
 	/** insert TBCRM_CUST_VIP_DEGREE_CHGLOG table */
 	private void insertChgLog(Map map) throws DAOException, JBranchException {
 		exeUpdateForMap(getInsertChgLogSql(), getInsertChgLogParamMap(map));
+		
+		// 同步更新TBCRM_CUST_MAST的VIP_EFF_DATE (#2298)
+		exeUpdateForMap(getUpdateMastSql(), getUpdateMastParamMap(map));
+		
+		// 把這筆CHGLOG的NEW_DEGREE更新到TBCRM_CUST_XP_DEGREE的CHGLOG_DEGREE (#2298)
+		exeUpdateForMap(getUpdateXpDegreeSql(), getUpdateXpDegreeParamMap(map));
+		
 	}
 
 	/** 取得插入TBCRM_CUST_VIP_DEGREE_CHGLOG 的param map */
@@ -332,5 +339,43 @@ public class CRM998 extends FubonWmsBizLogic {
 			.append("    LASTUPDATE = sysdate ")
 			.append("where SEQ = :SEQ ")
 			.toString();
+	}
+	
+	/** 取得更新 TBCRM_CUST_MAST.VIP_EFF_DATE 的SQL  */
+	private String getUpdateMastSql() {
+		return new StringBuffer()
+			.append("update TBCRM_CUST_MAST ")
+			.append("set VIP_EFF_DATE = TO_DATE(:VIP_EFF_DATE, 'YYYY-MM-DD HH24:MI:SS'), ")
+			.append("	 MODIFIER = 'CRM998', ")
+			.append("	 LASTUPDATE = SYSDATE ")
+			.append("where CUST_ID = :CUST_ID ")
+			.toString();
+	}
+	
+	/** 取得更新 TBCRM_CUST_MAST.VIP_EFF_DATE 的param map  */
+	private Map getUpdateMastParamMap(Map map) throws JBranchException {
+		HashMap param = new HashMap();
+		param.put("VIP_EFF_DATE", map.get("REVIEW_DATE"));
+		param.put("CUST_ID", map.get("CUST_ID"));
+		return param;
+	}
+	
+	/** 取得更新 TBCRM_CUST_XP_DEGREE.CHGLOG_DEGREE 的SQL  */
+	private String getUpdateXpDegreeSql() {
+		return new StringBuffer()
+			.append("update TBCRM_CUST_XP_DEGREE ")
+			.append("set CHGLOG_DEGREE = :CHGLOG_DEGREE, ")
+			.append("	 MODIFIER = 'CRM998', ")
+			.append("	 LASTUPDATE = SYSDATE ")
+			.append("where CUST_ID = :CUST_ID ")
+			.toString();
+	}
+	
+	/** 取得更新 TBCRM_CUST_MAST.VIP_EFF_DATE 的param map  */
+	private Map getUpdateXpDegreeParamMap(Map map) throws JBranchException {
+		HashMap param = new HashMap();
+		param.put("CHGLOG_DEGREE", map.get("NEW_DEGREE"));
+		param.put("CUST_ID", map.get("CUST_ID"));
+		return param;
 	}
 }

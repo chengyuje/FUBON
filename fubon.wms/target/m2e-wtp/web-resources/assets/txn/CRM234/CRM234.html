@@ -18,11 +18,20 @@
     -moz-border-radius: 0px;
     border-radius: 0px;
 }
+.formatWidth{
+	width:150px !important;
+	float: left !important;
+}
+.datewidthByClass{
+	width:150px !important;
+	float: left !important;
+}
 </style>
 <script type="text/javascript" src="assets/txn/CRM230/CRM230.js"></script>
 <script type="text/javascript" src="assets/txn/CRM234/CRM234.js"></script>
 <script type="text/javascript" src="assets/txn/CUS160/CUS160_ADD.js"></script>
 <script type="text/javascript" src="assets/txn/CRM230/CRM230_COMPANY.js"></script>
+<script src="assets/txn/CRM110/crmService.js" type="text/javascript" ></script>
 <div ng-controller="CRM234Controller" ng-cloak>
     <div>
         <div class="tfb_content">
@@ -31,141 +40,199 @@
         </div>
         <!--Content of the panel-->
         <div class="panel_content">
-            <!-- include -->
             <div ng-include="'assets/txn/CRM230/CRM230_COMMON.html'"></div>
-            <!-- include -->
-            <div class="search_table">
+            <div class="search_table search_box3">
                 <hr>
                 <h4>海外股票</h4>
                 <table>
                     <tr>
                         <th width="10%">成交日期：</th>
                         <td width="40%">
-                            <div>
-                                <input type="text" id="txn_date_bgn" name="txn_date_bgn" class="form-control-CRM234" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.txn_date_bgn" is-open="model.c" datepicker-options="txn_sDateOptions" ng-readonly="true" ng-change="limitDate1()" size="13" />
-                                <!-- 製作日曆button -->
-                                <button type="button" class="btn btn-default" ng-click="open($event,'c')">
-                                    <i class="glyphicon glyphicon-calendar"></i>
-                                </button>
-                                <label>&nbsp ~ &nbsp</label>
-                                <input type="text" id="txn_date_end" name="txn_date_end" class="form-control-CRM234" uib-datepicker-popup="yyyy/MM/dd" ng-model="inputVO.txn_date_end" is-open="model.d" datepicker-options="txn_eDateOptions" ng-readonly="true" ng-change="limitDate1()" size="13" />
-                                <!-- 製作日曆button -->
-                                <button type="button" class="btn btn-default" ng-click="open($event,'d')">
-                                    <i class="glyphicon glyphicon-calendar"></i>
-                                </button>
-                            </div>
+							<div class="form-inline">
+								<div class="input-group datebox datewidthByClass">
+                             		<input 	type="text" id="txn_date_bgn" name="txn_date_bgn" 
+                             				class="form-control" 
+                             				uib-datepicker-popup="yyyy/MM/dd" 
+                             				ng-model="inputVO.txn_date_bgn" 
+                             				is-open="model.c" 
+                             				datepicker-options="startDateOptions" 
+                             				alt-input-formats="altInputFormats" 
+                             				ng-readonly="true" 
+                             				ng-change="limitDate1()" />
+                             	<span class="input-group-btn">
+                                 	<button type="button" class="btn btn-default" ng-click="open($event,'c')">
+                                     	<i class="glyphicon glyphicon-calendar"></i>
+                                 	</button>
+                             	</span>
+								</div>
+								<div style="float: left !important;">&nbsp ~ &nbsp</div>
+								<div class="input-group datebox datewidthByClass">
+	                            	<input 	type="text" id="txn_date_end" name="txn_date_end" 
+	                            			class="form-control" 
+	                            			uib-datepicker-popup="yyyy/MM/dd" 
+	                            			ng-model="inputVO.txn_date_end" 
+	                            			is-open="model.d" 
+	                            			datepicker-options="txn_eDateOptions" 
+	                            			alt-input-formats="altInputFormats" 
+	                            			ng-readonly="true" 
+	                            			ng-change="limitDate1()" />
+	                           	 	<span class="input-group-btn">
+	                                	<button type="button" class="btn btn-default" ng-click="open($event,'d')">
+	                                    	<i class="glyphicon glyphicon-calendar"></i></button>
+	                            	</span>
+	                        	</div>
+			     			</div>
                         </td>
                         <th width="10%">商品名稱：</th>
                         <td width="40%">
-                            <input type="text" placeholder="請輸入..." id="prod_name" name="prod_name" ng-model="inputVO.prod_name" e-length-limit="300" size="48">
+                            <input type="text" class="form-control" placeholder="請輸入..." id="prod_name" name="prod_name" ng-model="inputVO.prod_name" e-length-limit="300" size="48" style="width: 200px;">
                         </td>
+                        <th></th>
+                        <td></td>
                     </tr>
                     <tr>
                         <th>交易所：</th>
                         <td>
-                            <e-combobox id="stock_code" ng-datasource="mappingSet['STOCK_CODE']" ng-model="inputVO.stock_code" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
+                            <e-combobox id="stock_code" 
+                            			ng-datasource="mappingSet['STOCK_CODE']" 
+                            			ng-model="inputVO.stock_code" 
+                            			ng-validate="false" 
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3" 
+                            			ng-required="false" 
+                            			width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
                         </td>
                         <th>商品代碼：</th>
                         <td>
-                            <input type="text" placeholder="請輸入..." id="prod_id" name="prod_id" ng-model="inputVO.prod_id" e-length-limit="50" size="48">
+                            <input type="text" class="form-control" placeholder="請輸入..." id="prod_id" name="prod_id" ng-model="inputVO.prod_id" e-length-limit="50" size="48" style="width: 200px;">
                         </td>
                     </tr>
                     <tr>
                         <th>投資標的類型：</th>
                         <td>
-                            <e-combobox id="prd_type" ng-datasource="mappingSet['CRM.CRM233_PRD_TYPE_RE']" ng-model="inputVO.prd_type" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
+                            <e-combobox id="prd_type" 
+                            			ng-datasource="mappingSet['CRM.CRM233_PRD_TYPE_RE']" 
+                            			ng-model="inputVO.prd_type" 
+                            			ng-validate="false" 
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3" 
+                            			ng-required="false" 
+                            			width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
                         </td>
                         <th>商品幣別：</th>
                         <td>
-                            <e-combobox id="currency_std_id" ng-datasource="mappingSet['FPS.CURRENCY_RE']" ng-model="inputVO.currency_std_id" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
+                            <e-combobox id="currency_std_id" 
+                            			ng-datasource="mappingSet['FPS.CURRENCY_RE']" 
+                            			ng-model="inputVO.currency_std_id" 
+                            			ng-validate="false" 
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3" 
+                            			ng-required="false" 
+                            			width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
                         </td>
                     </tr>
                     <tr>
                         <th>投資區域：</th>
                         <td>
-                            <e-combobox id="stock_area" ng-paramtype="CRM.CRM233_STOCK_AREA" ng-model="inputVO.stock_area" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
+                            <e-combobox id="stock_area" 
+                            			ng-paramtype="CRM.CRM233_STOCK_AREA" 
+                            			ng-model="inputVO.stock_area" 
+                            			ng-validate="false" 
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3" 
+                            			ng-required="false" 
+                            			width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
                         </td>
                         <th>商品風險等級：</th>
                         <td>
-                            <e-combobox id="riskcate_id" ng-paramtype="FPS.PROD_RISK_LEVEL" ng-model="inputVO.riskcate_id" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
+                            <e-combobox id="riskcate_id" 
+                            			ng-paramtype="FPS.PROD_RISK_LEVEL" 
+                            			ng-model="inputVO.riskcate_id" 
+                            			ng-validate="false" 
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3" 
+                            			ng-required="false" 
+                            			width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
                         </td>
                     </tr>
                     <tr>
-                        <tr>
-                            <th>專業投資人商品：</th>
-                            <td>
-                                <e-combobox id="pi_buy" ng-paramtype="CRM.CRM230_YN" ng-model="inputVO.pi_buy" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
-                            </td>
-                            <!-- 
-     					<th>商品類型：</th>
-     					<td>
-						    <e-combobox id="stock_attribute" 
-							ng-paramtype="CRM.CRM233_STOCK_ATTRIBUTE"
-							ng-model="inputVO.stock_attribute"
-   							ng-validate="false" 
-   							ng-readonly="false" 
-   							ng-editable="false"
-   							ng-format="F3"
-   							ng-required="false"
-   							width="360px"
-   							style="line-height:20px;" />
-     					</td>
-     					 -->
-                            <th>報酬率：</th>
-                            <td>
-                                <input type="text" placeholder="請輸入..." id="ref_abs_ret_rate_twd_bgn" name="ref_abs_ret_rate_twd_bgn" ng-model="inputVO.ref_abs_ret_rate_twd_bgn" e-input-limit="ND" e-length-limit="5">%&nbsp ~ &nbsp
-                                <input type="text" placeholder="請輸入..." id="ref_abs_ret_rate_twd_end" name="ref_abs_ret_rate_twd_end" ng-model="inputVO.ref_abs_ret_rate_twd_end" e-input-limit="ND" e-length-limit="5">%
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>信託類別：</th>
-                            <td>
-                                <e-combobox id="com27" ng-paramtype="CRM.CRM232_TRUST_TYPE" ng-model="inputVO.com27" ng-validate="false" ng-readonly="false" ng-editable="false" ng-format="F3" ng-required="false" width="360px" style="line-height:20px;" />
-                            </td>
-                            <!-- 
-     					<th>專業投資人商品：</th>
-     					<td>
-     						<e-combobox id="pi_buy" 
-							ng-paramtype="CRM.CRM230_YN"
-							ng-model="inputVO.pi_buy"
-   							ng-validate="false" 
-   							ng-readonly="false" 
-   							ng-editable="false"
-   							ng-format="F3"
-   							ng-required="false"
-   							width="360px"
-   							style="line-height:20px;" />
-     					</td>
-     					 -->
-                            <th>客戶停損點：</th>
-                            <td>
-                                <input type="text" placeholder="請輸入..." id="stop_loss_pt_bgn" name="stop_loss_pt_bgn" ng-model="inputVO.stop_loss_pt_bgn" e-input-limit="ND" e-length-limit="5">%&nbsp ~ &nbsp
-                                <input type="text" placeholder="請輸入..." id="stop_loss_pt_end" name="stop_loss_pt_end" ng-model="inputVO.stop_loss_pt_end" e-input-limit="ND" e-length-limit="5">%
-                            </td>
-                        </tr>
-                        <tr>
-                            <!-- 
-     					<th>信託類別：</th>
-     					<td>
-     						<e-combobox id="com27" 
-							ng-paramtype="CRM.CRM232_TRUST_TYPE"
-							ng-model="inputVO.com27"
-   							ng-validate="false" 
-   							ng-readonly="false" 
-   							ng-editable="false"
-   							ng-format="F3"
-   							ng-required="false"
-   							width="360px"
-   							style="line-height:20px;" />
-     					</td>
-     					 -->
-                            <td colspan="2"></td>
-                            <th>客戶停利點：</th>
-                            <td>
-                                <input type="text" placeholder="請輸入..." id="take_prft_pt_bgn" name="take_prft_pt_bgn" ng-model="inputVO.take_prft_pt_bgn" e-input-limit="ND" e-length-limit="5">%&nbsp ~ &nbsp
-                                <input type="text" placeholder="請輸入..." id="take_prft_pt_end" name="take_prft_pt_end" ng-model="inputVO.take_prft_pt_end" e-input-limit="ND" e-length-limit="5">%
-                            </td>
-                        </tr>
+                        <th>專業投資人商品：</th>
+                        <td>
+                            <e-combobox id="pi_buy" 
+                            			ng-paramtype="CRM.CRM230_YN" 
+                            			ng-model="inputVO.pi_buy" 
+                            			ng-validate="false" 
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3" 
+                            			ng-required="false" 
+                            			width="200px" 
+                        				height="30px" 
+                        				style="line-height:20px;" />
+                        </td>
+                        <th>報酬率：</th>
+	                     <td>
+	                     	<div class="form-group">
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="ref_abs_ret_rate_twd_bgn" name="ref_abs_ret_rate_twd_bgn" ng-model="inputVO.ref_abs_ret_rate_twd_bgn" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="ref_abs_ret_rate_twd_end" name="ref_abs_ret_rate_twd_end" ng-model="inputVO.ref_abs_ret_rate_twd_end" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%</div>
+			     			</div>
+						</td>
+                    </tr>
+                    <tr>
+                        <th>信託類別：</th>
+                        <td>
+                            <e-combobox id="com27" 
+                            			ng-paramtype="CRM.CRM232_TRUST_TYPE" 
+                            			ng-model="inputVO.com27" 
+                            			ng-validate="false" 
+                            			ng-readonly="false" 
+                            			ng-editable="false" 
+                            			ng-format="F3" 
+                            			ng-required="false" 
+                            			width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
+                        </td>
+                        <th>客戶停損點：</th>
+                        <td>
+                        	<div class="form-group">
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="stop_loss_pt_bgn" name="stop_loss_pt_bgn" ng-model="inputVO.stop_loss_pt_bgn" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="stop_loss_pt_end" name="stop_loss_pt_end" ng-model="inputVO.stop_loss_pt_end" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%</div>
+			     			</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td></td>
+                        <th>客戶停利點：</th>
+                        <td>
+                        	<div class="form-group">
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="take_prft_pt_bgn" name="take_prft_pt_bgn" ng-model="inputVO.take_prft_pt_bgn" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth"><input type="text" class="form-control" placeholder="請輸入..." id="take_prft_pt_end" name="take_prft_pt_end" ng-model="inputVO.take_prft_pt_end" e-input-limit="ND" e-length-limit="5"></div>
+			     				<div style="float: left !important;">%</div>
+			     			</div>
+                        </td>
+                    </tr>
                 </table>
             </div>
             <div class="search_box_btn text-center">

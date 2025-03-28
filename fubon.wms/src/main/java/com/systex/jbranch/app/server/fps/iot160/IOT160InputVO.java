@@ -1,10 +1,6 @@
 package com.systex.jbranch.app.server.fps.iot160;
 
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import com.systex.jbranch.platform.common.dataaccess.vo.PagingInputVO;
 
 public class IOT160InputVO extends PagingInputVO {
@@ -49,6 +45,7 @@ public class IOT160InputVO extends PagingInputVO {
 	private Timestamp date_8;
 	private Timestamp date_9;
 	private Timestamp date_10;
+	private String chkEmpId;
 	
 	public String getBatchNbr_1() {
 		return batchNbr_1;
@@ -290,4 +287,11 @@ public class IOT160InputVO extends PagingInputVO {
 	public void setDate_10(Timestamp date_10) {
 		this.date_10 = date_10;
 	}
+	public String getChkEmpId() {
+		return chkEmpId;
+	}
+	public void setChkEmpId(String chkEmpId) {
+		this.chkEmpId = chkEmpId;
+	}
+	
 }

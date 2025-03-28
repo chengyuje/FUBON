@@ -4,9 +4,17 @@
  */
 'use strict';
 eSoafApp.controller('CAM130Controller',
-	function($rootScope, $scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter) {
+	function($rootScope, $scope, $controller, ngDialog, sysInfoService, projInfoService, getParameter) {
 		$controller('BaseController', {$scope: $scope});
 		$scope.controllerName = "CAM130Controller";
+		
+		$scope.privilegeID = sysInfoService.getPriID();
+		
+		getParameter.XML(["CAM.CAMP_PURPOSE"], function(totas) {
+			if (totas) {
+				$scope.mappingSet['CAM.CAMP_PURPOSE'] = totas.data[totas.key.indexOf('CAM.CAMP_PURPOSE')];
+			}
+		});
 		
 		// filter
 		var vo = {'param_type': 'CAM.LEAD_TYPE', 'desc': false};
@@ -42,33 +50,35 @@ eSoafApp.controller('CAM130Controller',
         //
 		
      	// date picker
-        // 匯入日期
-        $scope.sCreDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
-		$scope.eCreDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
-		// 活動起始日
-        $scope.sStaDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
-		$scope.eStaDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
-		// 活動截止日
-        $scope.sEndDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
-		$scope.eEndDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.minDate
-		};
+		$scope.optionsInit = function() {
+			// 匯入日期
+			$scope.sCreDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.eCreDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			// 活動起始日
+			$scope.sStaDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.eStaDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			// 活動截止日
+			$scope.sEndDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.eEndDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.minDate
+			};
+		}
 		// config
 		$scope.model = {};
 		$scope.open = function($event, elementOpened) {
@@ -76,22 +86,88 @@ eSoafApp.controller('CAM130Controller',
 			$event.stopPropagation();
 			$scope.model[elementOpened] = !$scope.model[elementOpened];
 		};
+		
 		$scope.limitDate = function() {
 			$scope.sCreDateOptions.maxDate = $scope.inputVO.eCreDate || $scope.maxDate;
+			if ($scope.inputVO.eCreDate) {
+				let y = $scope.inputVO.eCreDate.getFullYear() - 1;
+				let m = $scope.inputVO.eCreDate.getMonth();
+				let d = $scope.inputVO.eCreDate.getDate();
+				$scope.sCreDateOptions.minDate = new Date(y, m, d);
+			}
 			$scope.eCreDateOptions.minDate = $scope.inputVO.sCreDate || $scope.minDate;
+			if ($scope.inputVO.sCreDate) {
+				let y = $scope.inputVO.sCreDate.getFullYear() + 1;
+				let m = $scope.inputVO.sCreDate.getMonth();
+				let d = $scope.inputVO.sCreDate.getDate();
+				$scope.eCreDateOptions.maxDate = new Date(y, m, d);
+			}
 		};
 		$scope.limitDate2 = function() {
 			$scope.sStaDateOptions.maxDate = $scope.inputVO.eStaDate || $scope.maxDate;
+			if ($scope.inputVO.eStaDate) {
+				let y = $scope.inputVO.eStaDate.getFullYear() - 1;
+				let m = $scope.inputVO.eStaDate.getMonth();
+				let d = $scope.inputVO.eStaDate.getDate();
+				$scope.sStaDateOptions.minDate = new Date(y, m, d);
+			}
 			$scope.eStaDateOptions.minDate = $scope.inputVO.sStaDate || $scope.minDate;
+			if ($scope.inputVO.sStaDate) {
+				let y = $scope.inputVO.sStaDate.getFullYear() + 1;
+				let m = $scope.inputVO.sStaDate.getMonth();
+				let d = $scope.inputVO.sStaDate.getDate();
+				$scope.eStaDateOptions.maxDate = new Date(y, m, d);
+			}
 		};
 		$scope.limitDate3 = function() {
 			$scope.sEndDateOptions.maxDate = $scope.inputVO.eEndDate || $scope.maxDate;
+			if ($scope.inputVO.eEndDate) {
+				let y = $scope.inputVO.eEndDate.getFullYear() - 1;
+				let m = $scope.inputVO.eEndDate.getMonth();
+				let d = $scope.inputVO.eEndDate.getDate();
+				$scope.sEndDateOptions.minDate = new Date(y, m, d);
+			}
 			$scope.eEndDateOptions.minDate = $scope.inputVO.sEndDate || $scope.minDate;
+			if ($scope.inputVO.sEndDate) {
+				let y = $scope.inputVO.sEndDate.getFullYear() + 1;
+				let m = $scope.inputVO.sEndDate.getMonth();
+				let d = $scope.inputVO.sEndDate.getDate();
+				$scope.eEndDateOptions.maxDate = new Date(y, m, d);
+			}
 		};
 		// date picker end
 		
+		// 取得參數：CAM.CAMP_PURPOSE
+		$scope.getCampPurpose = function(){
+			$scope.CAMP_PURPOSE = [];
+			$scope.sendRecv("CAM140", "getCampPurpose", "com.systex.jbranch.app.server.fps.cam140.CAM140InputVO", {},
+			function(tota, isError) {
+				if (!isError) {
+					$scope.CAMP_PURPOSE = tota[0].body.resultList;
+				}
+			});
+		}
+		$scope.getCampPurpose();
+		
+		// 依據所選『名單類型』變更『名單目的』下拉選項
+		$scope.getPurpose = function(){
+			$scope.inputVO.camp_purpose = undefined;
+			$scope.PURPOSE = [];
+			if ($scope.inputVO.type != undefined) {
+				angular.forEach($scope.CAMP_PURPOSE, function(row) {
+					if (row.PARAM_DESC.indexOf($scope.inputVO.type) >= 0) {
+						$scope.PURPOSE.push({LABEL:row.PARAM_NAME, DATA: row.PARAM_CODE});
+					}
+				});
+			}
+			if ($scope.PURPOSE.length == 0) {
+				$scope.PURPOSE = $scope.mappingSet['CAM.CAMP_PURPOSE'];
+			}
+		}
+		
 		$scope.init = function(){
 			$scope.inputVO = {};
+			$scope.optionsInit();
 			$scope.limitDate();
 			$scope.limitDate2();
 			$scope.limitDate3();
@@ -156,5 +232,14 @@ eSoafApp.controller('CAM130Controller',
 			);
 		};
 		
+		// 匯出報表
+		$scope.exportRPT = function () {
+			$scope.sendRecv("CAM130", "exportRPT", "com.systex.jbranch.app.server.fps.cam130.CAM130InputVO", $scope.inputVO,
+			function(totas, isError) {
+            	if (isError) {
+            		$scope.showErrorMsg(totas[0].body.msgData);
+            	}
+			});
+		}
 		
 });

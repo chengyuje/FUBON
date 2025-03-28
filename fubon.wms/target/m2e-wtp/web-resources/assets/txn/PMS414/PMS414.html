@@ -145,13 +145,12 @@
 							<th>特定客戶</th>
 							<th>交易時間</th>
 							<th>交易項目</th>
+							<th>查證方式</th>
+							<th>電訪錄音編號</th>
 							<th>*本次交易是否<br>有行員在場</th>
-							<th>1.若代「特定客戶」操作，照會是<br>否為客戶本人意願(請註明照會時間)</th>
-							<th>照會時間-小時</th>
-							<th>照會時間-分鐘</th>
-							<th>2.是否為行員代客登<br>入網銀帳號密碼</th>
-							<th>3.客戶登入網銀帳號密碼<br>時，行員是否迴避</th>
-							<th>4.行員協助操作時，客<br>戶是否全程在旁</th>
+							<th>是否為行員代客登<br>入網銀帳號密碼</th>
+							<th>客戶登入網銀帳號密碼<br>時，行員是否迴避</th>
+							<th>行員協助操作時，客<br>戶是否全程在旁</th>
 							<th>其他說明<br>(限100字內)</th>
 							<th>是否違規</th>
 							<th>首次建立時間</th>
@@ -162,18 +161,40 @@
 					</thead>
 					<tbody>
 						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
-							<td>{{row.ROWNUM}}</td>
-							<td>{{toJsDate(row.CDATE)  | date:'yyyy/MM/dd'}}</td>
-							<td>{{row.BRANCH_NBR}}</td>
-							<td>{{row.BRANCH_NAME}}</td>
-							<td>{{row.CUST_ID}}</td>
-							<td>{{row.CUST_NAME}}</td>
-							<td>{{row.AO_CODE}}</td>
-							<td>{{row.SPECIFIC_FLAG | mapping:mappingSet['flagYN']:'F3'}} </td>
+							<td style="vertical-align:middle;" align="center">{{row.ROWNUM}}</td>
+							<td style="vertical-align:middle;" align="center">{{toJsDate(row.CDATE)  | date:'yyyy-MM-dd'}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.BRANCH_NBR}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.BRANCH_NAME}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.CUST_ID}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.CUST_NAME}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.AO_CODE}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.SPECIFIC_FLAG | mapping:mappingSet['flagYN']:'F3'}} </td>
 							<td>{{row.TRADE_DATE}}</td>
 							<td>{{row.TRADE_ITEM}}</td>
+							<td style="text-align:left;">
+		                    	<e-combobox id="checkType" name="checkType"
+											ng-datasource="mappingSet['PMS.CHECK_TYPE']"
+											ng-model="row.NOTE_TYPE"
+											ng-validate="false"
+											ng-editable="false"
+											ng-format="F3"
+											ng-change="updateFlag(row);setDefaultVal(row);"
+											ng-readonly="!chkMaintenance"
+											ng-disabled="!chkMaintenance"
+											style="line-height:20px;display:inline;" />
+		                    	<input type="text" class="form-control" style="width: 300px;display:inline;" ng-blur="updateFlag(row)" ng-model="row.NOTE" e-length-limit="200" placeholder="請補充查證方式..." ng-disabled="!chkMaintenance" ng-if="row.NOTE_TYPE == 'O'"/>
+		                    </td>
+		                    <td>
+								<input 	type="text" class="form-control" style="width: 150px;display:inline;" 
+										e-length-limit="12" 
+										e-input-limit="ND"
+										ng-model="row.RECORD_SEQ" 
+										placeholder="請輸入電訪錄音編號..." 
+										ng-if="row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A'" 
+										ng-disabled="!chkMaintenance || row.RECORD_YN == 'N'" 
+										ng-blur="updateFlag(row)"/>
+							</td>
 							<td>
-								<!-- mantis 4801 DISABLE_FLAG => null -->
 								<e-combobox id="staff_YN" name="staff_YN"
 											ng-datasource="mappingSet['flagYN']"
 											ng-model="row.STAFF_THERE_FLAG"
@@ -188,18 +209,6 @@
 											style="line-height:20px;" />
 							</td>
 							<td>
-								<div class="input-group datebox datewidth">
-									<input type="text" id="meeting_time" name="meeting_time" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="row.MEETING" is-open="model[$index]" datepicker-options="" ng-readonly="true" />
-									<span class="input-group-btn" ng-hide="!chkMaintenance">
-										<button type="button" class="btn btn-default" ng-click="open($event,$index)">
-											<i class="glyphicon glyphicon-calendar"></i>
-										</button>
-									</span>
-								</div>
-							</td>
-							<td><input type="text" class="form-control" size="3" e-input-limit="ND" e-length-limit="2" ng-model="row.MEETING_HOUR" ng-disabled="!chkMaintenance" required /></td>
-							<td><input type="text" class="form-control" size="3" e-input-limit="ND" e-length-limit="2" ng-model="row.MEETING_MIN" ng-disabled="!chkMaintenance" required /></td>
-							<td>
 								<e-combobox id="obo_YN" name="obo_YN"
 											ng-datasource="mappingSet['flagYN']"
 											ng-model="row.OBO_CUST_FLAG" 
@@ -208,8 +217,8 @@
 											ng-change="oboChange(row)" 						
 											ng-format="F3"
 											width="100px" 
-											ng-readonly="!chkMaintenance"
-											ng-disabled="!chkMaintenance"
+											ng-readonly="!chkMaintenance || row.STAFF_THERE_FLAG == 'N'"
+											ng-disabled="!chkMaintenance || row.STAFF_THERE_FLAG == 'N'"
 											style="line-height:20px;" />
 							</td>
 							<td>
@@ -220,8 +229,8 @@
 											ng-change="oboChange(row)"  
 											ng-format="F3"
 											width="100px" 
-											ng-readonly="!chkMaintenance"
-											ng-disabled="!chkMaintenance"
+											ng-readonly="!chkMaintenance || row.STAFF_THERE_FLAG == 'N'"
+											ng-disabled="!chkMaintenance || row.STAFF_THERE_FLAG == 'N'"
 											style="line-height:20px;" />
 							</td>
 							<td>
@@ -232,19 +241,18 @@
 											ng-change="oboChange(row)" 
 											ng-format="F3"
 											width="100px" 
-											ng-readonly="!chkMaintenance"
-											ng-disabled="!chkMaintenance"
+											ng-readonly="!chkMaintenance || row.STAFF_THERE_FLAG == 'N'"
+											ng-disabled="!chkMaintenance || row.STAFF_THERE_FLAG == 'N'"
 											style="line-height:20px;" />
 							</td>
-							<td><input type="text" class="form-control" ng-model="row.EXPLANATION" ng-disabled="!chkMaintenance"></td>
+							<td><input type="text" class="form-control" style="width: 300px;display:inline;" ng-model="row.EXPLANATION" ng-disabled="!chkMaintenance"></td>
 							<td>
 								<label>是<input type="radio" value="Y" ng-model="row.VIOLATION_FLAG" ng-disabled="!chkMaintenance"/></label>&emsp;
 								<label>否<input type="radio" value="N" ng-model="row.VIOLATION_FLAG" ng-disabled="!chkMaintenance"/></label>
 							</td>
-							
-							<td>{{row.FIRSTUPDATE}}</td>
-							<td>{{row.MODIFIER}}</td>
-							<td>{{row.LASTUPDATE}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.FIRSTUPDATE}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.MODIFIER}}</td>
+							<td style="vertical-align:middle;" align="center">{{row.LASTUPDATE}}</td>
 							<td>{{row.REASON}}</td>
 						</tr>
 					</tbody>

@@ -1,14 +1,17 @@
 'use strict';
 eSoafApp.controller('CRM221Controller',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService, $filter, $timeout) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService, $filter, $timeout, crmService) {
 		$controller('BaseController', {$scope: $scope});
 		// include
 		$controller('CRM210Controller', {$scope: $scope});
 		$controller('RegionController', {$scope: $scope});
 		$scope.controllerName = "CRM221Controller";
 		
+		$scope.priID = String(sysInfoService.getPriID());
 		$scope.memLoginFlag = String(sysInfoService.getMemLoginFlag()).toUpperCase();
-
+		
+		crmService.getForbiddenList();
+		
 		$scope.empListShowEXT = function () {
 			$scope.empListShowFlag = "AO";
 			
@@ -28,19 +31,21 @@ eSoafApp.controller('CRM221Controller',
 		 * 取得UHRM人員清單(由員工檔+角色檔)
 		 */
 		$scope.getUHRMList = function() {
-			$scope.sendRecv("ORG260", "getUHRMListByType", "com.systex.jbranch.app.server.fps.org260.ORG260InputVO", $scope.inputVO, 
-					function(tota, isError) {
-						if (isError) {
-							return;
-						}
-						if (tota.length > 0) {
-							$scope.mappingSet['UHRM_LIST'] = tota[0].body.uhrmList;
-							if ($scope.mappingSet['UHRM_LIST'].length >= 1 && $scope.login == 'UHRM002') {
-								$scope.inputVO.uEmpID = $scope.mappingSet['UHRM_LIST'][0].DATA;
-							} else {
-								$scope.inputVO.uEmpID = '';
-							}
-						}
+			$scope.inputVO.regionCenterID = $scope.inputVO.ao_03;
+			$scope.inputVO.branchAreaID = $scope.inputVO.ao_04;
+			
+			$scope.sendRecv("ORG260", "getUHRMListByType", "com.systex.jbranch.app.server.fps.org260.ORG260InputVO", $scope.inputVO,  function(tota, isError) {
+				if (isError) {
+					return;
+				}
+				if (tota.length > 0) {
+					$scope.mappingSet['UHRM_LIST'] = tota[0].body.uhrmList;
+					if ($scope.mappingSet['UHRM_LIST'].length >= 1 && $scope.login == 'UHRM002') {
+						$scope.inputVO.uEmpID = $scope.mappingSet['UHRM_LIST'][0].DATA;
+					} else {
+						$scope.inputVO.uEmpID = '';
+					}
+				}
 			});
 		};
 		$scope.getUHRMList();
@@ -79,8 +84,14 @@ eSoafApp.controller('CRM221Controller',
 		$scope.init();
 						
 		$scope.inquire = function() {
+			debugger
 			if($scope.inputVO.cust_id != undefined && $scope.inputVO.cust_id.trim() != ""){
-				$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase();				
+				$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase();		
+				
+				if(crmService.checkCustId($rootScope.forbiddenData,$scope.inputVO.cust_id)) {
+					$scope.showErrorMsg("ehl_01_CRM_002");
+	    			return;
+				}
 			}
 			//手收貢獻度檢查
 			if($scope.inputVO.manage_05_Date != undefined){
@@ -93,6 +104,7 @@ eSoafApp.controller('CRM221Controller',
 					return;
 				}
 			}
+			
 			$scope.inputVO.aolist = $scope.AO_LIST;
 			$scope.inputVO.branch_list = [];
 			angular.forEach($scope.BRANCH_LIST, function(row, index, objs){
@@ -100,16 +112,30 @@ eSoafApp.controller('CRM221Controller',
 					$scope.inputVO.branch_list.push({LABEL: row.LABEL, DATA: row.DATA});					
 				}
 			});
+			//分行為必輸欄位
+			if($scope.empListShowFlag != "UHRM" && ($scope.inputVO.ao_05 == undefined || $scope.inputVO.ao_05 == null || $scope.inputVO.ao_05 == "")) {
+				if(($scope.inputVO.branch_list.length > 0 && $scope.inputVO.branch_list[0].DATA.length > 3) ||
+						$scope.inputVO.branch_list.length == 0) {
+					//若選到私銀區，或沒有分行下拉選單資料
+					//不檢核
+				} else {
+					$scope.showErrorMsg("請輸入分行查詢");
+					return;
+				}
+			}			
 			$scope.inputVO.role = $scope.role;
 			$scope.sendRecv("CRM221", "inquire", "com.systex.jbranch.app.server.fps.crm221.CRM221InputVO", $scope.inputVO,
 				function(tota, isError) {
 					if (!isError) {
+						debugger;
 						if(tota[0].body.resultList.length == 0) {
 							$scope.showMsg("ehl_01_common_009");
                 			return;
                 		}
 						$scope.obj.resultList = tota[0].body.resultList;
 						$scope.obj.outputVO = tota[0].body;
+						
+						$scope.obj.resultList = crmService.filterList($rootScope.forbiddenData,$scope.obj.resultList);
 					}
 				}
 			);

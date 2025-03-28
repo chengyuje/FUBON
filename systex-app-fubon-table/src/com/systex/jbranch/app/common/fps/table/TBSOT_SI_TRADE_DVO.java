@@ -87,6 +87,9 @@ public class TBSOT_SI_TRADE_DVO extends VOBase {
     /** nullable persistent field */
     private String OVER_CENTRATE_YN;
     
+    /** nullable persistent field */
+    private String Q4_BRANCH_NBR;
+    
 public static final String TABLE_UID = "com.systex.jbranch.app.common.fps.table.TBSOT_SI_TRADE_D";
 
 
@@ -324,6 +327,14 @@ public String getTableuid () {
 
 	public void setOVER_CENTRATE_YN(String oVER_CENTRATE_YN) {
 		OVER_CENTRATE_YN = oVER_CENTRATE_YN;
+	}
+
+	public String getQ4_BRANCH_NBR() {
+		return Q4_BRANCH_NBR;
+	}
+
+	public void setQ4_BRANCH_NBR(String q4_BRANCH_NBR) {
+		Q4_BRANCH_NBR = q4_BRANCH_NBR;
 	}
 
 	public void checkDefaultValue() {

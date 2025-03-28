@@ -112,8 +112,29 @@ eSoafApp.controller('IOT190Controller',
 			};
 				
 			if ($scope.memLoginFlag.startsWith('UHRM') && $scope.memLoginFlag != 'UHRM') {
-				$scope.inputVO.region_center_id = '031';
-				$scope.inputVO.branch_area_id = '031A';
+				$scope.sendRecv("PMS401U", "isMainten", "com.systex.jbranch.app.server.fps.pms401u.PMS401UInputVO", {'itemID': 'IOT190'}, function(tota, isError) {
+					if (!isError) {
+						$scope.uhrmRCList = [];
+						$scope.uhrmOPList = [];
+
+						if (null != tota[0].body.uhrmORGList) {
+							angular.forEach(tota[0].body.uhrmORGList, function(row) {
+								$scope.uhrmRCList.push({LABEL: row.REGION_CENTER_NAME, DATA: row.REGION_CENTER_ID});
+							});	
+							
+							$scope.inputVO.uhrmRC = tota[0].body.uhrmORGList[0].REGION_CENTER_ID;
+							
+							angular.forEach(tota[0].body.uhrmORGList, function(row) {
+								$scope.uhrmOPList.push({LABEL: row.BRANCH_AREA_NAME, DATA: row.BRANCH_AREA_ID});
+							});
+							
+							$scope.inputVO.uhrmOP = tota[0].body.uhrmORGList[0].BRANCH_AREA_ID;
+				        }
+					}
+				});
+				
+				$scope.inputVO.region_center_id = $scope.inputVO.uhrmRC;
+				$scope.inputVO.branch_area_id = $scope.inputVO.uhrmOP;
 			}
 		};
 		$scope.init();
@@ -238,11 +259,40 @@ eSoafApp.controller('IOT190Controller',
     				  if(tota[0].body.resultList.length == 0) {
     					  $scope.showMsg("ehl_01_common_009");
     					  return;
-    				  }							
+    				  }	
+    				  
+    				  //資金用途資料處理
+    				  angular.forEach(tota[0].body.resultList, function(row, index, objs) {
+    					  debugger
+    					  var purpose = "";
+    					  if(row.OTH_FUND_PURPOSE_1 == "Y") purpose = "保險費";
+    					  if(row.OTH_FUND_PURPOSE_2 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "存款";
+    					  if(row.OTH_FUND_PURPOSE_3 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "投資";
+    					  if(row.OTH_FUND_PURPOSE_4 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "房信貸還款";
+    					  if(row.OTH_FUND_PURPOSE_5 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "其他資金用途:" + row.OTH_FUND_PURPOSE_RMK_1;
+    					  row.OTH_FUND_PURPOSE_IN = purpose;
+    					  
+    					  if(row.OTH_FUND_PURPOSE_6 == "Y") var purpose1 = "非本行之其他資金用途：" + row.OTH_FUND_PURPOSE_RMK_2;
+    					  row.OTH_FUND_PURPOSE_OUT = purpose1;
+    				  });
+    				  angular.forEach(tota[0].body.list, function(row, index, objs) {
+    					  debugger
+    					  var purpose = "";
+    					  if(row.OTH_FUND_PURPOSE_1 == "Y") purpose = "保險費";
+    					  if(row.OTH_FUND_PURPOSE_2 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "存款";
+    					  if(row.OTH_FUND_PURPOSE_3 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "投資";
+    					  if(row.OTH_FUND_PURPOSE_4 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "房信貸還款";
+    					  if(row.OTH_FUND_PURPOSE_5 == "Y") purpose = (purpose == "" ? purpose : purpose + ",") + "其他資金用途:" + row.OTH_FUND_PURPOSE_RMK_1;
+    					  row.OTH_FUND_PURPOSE_IN = purpose;
+    					  
+    					  var purpose1 = "";
+    					  if(row.OTH_FUND_PURPOSE_6 == "Y") var purpose1 = "非本行之其他資金用途：" + row.OTH_FUND_PURPOSE_RMK_2;
+    					  row.OTH_FUND_PURPOSE_OUT = purpose1;
+    				  });
     				  $scope.paramList = tota[0].body.resultList;	
     				  $scope.printList = tota[0].body.list;
     				  $scope.outputVO = tota[0].body;			
-								
+    				  debugger	
     				  return;
     			  }					
     		  });

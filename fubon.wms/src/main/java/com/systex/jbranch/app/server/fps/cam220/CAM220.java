@@ -270,40 +270,44 @@ public class CAM220 extends FubonWmsBizLogic {
 
 		sb.append("SELECT EMP_ID, ROLE_ID, ROLE_NAME, EMP_NAME, AO_CODE, EMP_NAME AS LABEL, EMP_ID AS DATA ");
 		sb.append("FROM ( ");
-
-		if (StringUtils.equals(inputVO.getChannel(), "004AO")) {
-			sb.append("  SELECT PAO.EMP_ID, MR.ROLE_ID, R.ROLE_NAME, MEM.EMP_NAME, NULL AS AO_CODE ");
-			sb.append("  FROM TBORG_PAO PAO ");
-			sb.append("  LEFT JOIN VWORG_DEFN_INFO DEFN ON PAO.BRANCH_NBR = DEFN.BRANCH_NBR ");
-			sb.append("  LEFT JOIN TBORG_MEMBER MEM ON PAO.EMP_ID = MEM.EMP_ID ");
-			sb.append("  LEFT JOIN TBORG_MEMBER_ROLE MR ON PAO.EMP_ID = MR.EMP_ID ");
-			sb.append("  INNER JOIN TBORG_ROLE R ON MR.ROLE_ID = R.ROLE_ID AND R.JOB_TITLE_NAME IS NOT NULL ");
-			sb.append("  LEFT JOIN TBSYSSECUROLPRIASS PRI ON PRI.ROLEID = MR.ROLE_ID ");
-			sb.append("  WHERE 1 = 1 ");
-
-			if (StringUtils.isNotBlank(inputVO.getChannel())) {
-				sb.append("  AND PRI.PRIVILEGEID = :channel ");
-				queryCondition.setObject("channel", inputVO.getChannel());
-			}
-
-			sb.append("  AND PAO.BRANCH_NBR = :branchID ");
-		} else {
-			sb.append("  SELECT INFO.EMP_ID, INFO.ROLE_ID, INFO.ROLE_NAME, INFO.EMP_NAME, INFO.AO_CODE ");
-			sb.append("  FROM VWORG_EMP_INFO INFO ");
-			sb.append("  WHERE INFO.BRANCH_NBR = :branchID ");
-			
-			if (StringUtils.isNotBlank(inputVO.getChannel())) {
-				if (StringUtils.equals(inputVO.getChannel(), "002") || StringUtils.equals(inputVO.getChannel(), "003")) {
-					sb.append("  AND CODE_TYPE = '1' ");
+		switch (inputVO.getChannel()) {
+			case "004AO" :
+			case "004PS" :
+				sb.append("  SELECT BASE.EMP_ID, MR.ROLE_ID, R.ROLE_NAME, MEM.EMP_NAME, NULL AS AO_CODE ");
+				sb.append("  FROM ").append(StringUtils.equals(inputVO.getChannel(), "004AO") ? "TBORG_PAO" : "TBORG_NEWPS").append(" BASE ");
+				sb.append("  LEFT JOIN VWORG_DEFN_INFO DEFN ON BASE.BRANCH_NBR = DEFN.BRANCH_NBR ");
+				sb.append("  LEFT JOIN TBORG_MEMBER MEM ON BASE.EMP_ID = MEM.EMP_ID ");
+				sb.append("  LEFT JOIN TBORG_MEMBER_ROLE MR ON BASE.EMP_ID = MR.EMP_ID ");
+				sb.append("  INNER JOIN TBORG_ROLE R ON MR.ROLE_ID = R.ROLE_ID AND R.JOB_TITLE_NAME IS NOT NULL ");
+				sb.append("  LEFT JOIN TBSYSSECUROLPRIASS PRI ON PRI.ROLEID = MR.ROLE_ID ");
+				sb.append("  WHERE 1 = 1 ");
+	
+				if (StringUtils.isNotBlank(inputVO.getChannel())) {
+					sb.append("  AND PRI.PRIVILEGEID = :channel ");
+					queryCondition.setObject("channel", inputVO.getChannel());
 				}
+	
+				sb.append("  AND BASE.BRANCH_NBR = :branchID ");
+				
+				break;
+			default :
+				sb.append("  SELECT INFO.EMP_ID, INFO.ROLE_ID, INFO.ROLE_NAME, INFO.EMP_NAME, INFO.AO_CODE ");
+				sb.append("  FROM VWORG_EMP_INFO INFO ");
+				sb.append("  WHERE INFO.BRANCH_NBR = :branchID ");
+				
+				if (StringUtils.isNotBlank(inputVO.getChannel())) {
+					if (StringUtils.equals(inputVO.getChannel(), "002") || StringUtils.equals(inputVO.getChannel(), "003")) {
+						sb.append("  AND CODE_TYPE = '1' ");
+					}
 
-				sb.append("  AND INFO.PRIVILEGEID = :channel ");
+					sb.append("  AND INFO.PRIVILEGEID = :channel ");
 
-				queryCondition.setObject("channel", inputVO.getChannel());
-			}
-			sb.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE INFO.EMP_ID = UHRM.EMP_ID) ");
+					queryCondition.setObject("channel", inputVO.getChannel());
+				}
+				sb.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO UHRM WHERE INFO.EMP_ID = UHRM.EMP_ID) ");
+				break;
 		}
-
+		
 		sb.append(") ");
 		sb.append("ORDER BY ROLE_NAME, EMP_ID ");
 
@@ -313,9 +317,11 @@ public class CAM220 extends FubonWmsBizLogic {
 		List<Map<String, Object>> list = dam.exeQueryWithoutSort(queryCondition);
 		if (list.size() > 0) {
 			List<String> empList = new ArrayList<String>();
+			
 			for (Map<String, Object> map : list) {
 				empList.add(ObjectUtils.toString(map.get("EMP_ID")));
 			}
+			
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			sb = new StringBuffer();
 
@@ -574,32 +580,47 @@ public class CAM220 extends FubonWmsBizLogic {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
 
-		if (StringUtils.isNotBlank(inputVO.getChannel()) && StringUtils.equals("004AO", inputVO.getChannel())) {
-			sql.append("SELECT EMP.EMP_ID, EMP.ROLE_ID, EMP.ROLE_NAME, EMP.EMP_NAME, EMP.AO_CODE ");
-			sql.append("FROM VWORG_EMP_INFO EMP ");
-			sql.append("INNER JOIN TBORG_PAO PAO ON EMP.EMP_ID = PAO.EMP_ID ");
-			sql.append("WHERE EMP.PRIVILEGEID = :channel ");
-			sql.append("AND PAO.BRANCH_NBR = :branchID ");
-
-			queryCondition.setObject("channel", inputVO.getChannel());
-		} else {
-			sql.append("SELECT INFO.EMP_ID, INFO.ROLE_ID, INFO.ROLE_NAME, INFO.EMP_NAME, INFO.AO_CODE ");
-			sql.append("FROM VWORG_BRANCH_EMP_DETAIL_INFO INFO ");
-			sql.append("WHERE INFO.BRANCH_NBR = :branchID ");
-
-			if (StringUtils.isNotBlank(inputVO.getChannel()))
-				sql.append("AND INFO.ROLE_ID IN (SELECT ROLEID FROM TBSYSSECUROLPRIASS WHERE PRIVILEGEID = :channel) ");
-
-			sql.append("UNION ALL ");
-			sql.append("SELECT PT_INFO.EMP_ID, PT_INFO.ROLE_ID, PT_INFO.ROLE_NAME, PT_INFO.EMP_NAME, PT_INFO.AO_CODE ");
-			sql.append("FROM VWORG_EMP_PLURALISM_INFO PT_INFO ");
-			sql.append("WHERE PT_INFO.BRANCH_NBR = :branchID ");
-			if (StringUtils.isNotBlank(inputVO.getChannel())) {
-				sql.append("AND PT_INFO.ROLE_ID IN (SELECT ROLEID FROM TBSYSSECUROLPRIASS WHERE PRIVILEGEID = :channel) ");
+		switch (inputVO.getChannel()) {
+			case "004PS":
+				sql.append("SELECT EMP.EMP_ID, EMP.ROLE_ID, EMP.ROLE_NAME, EMP.EMP_NAME, EMP.AO_CODE ");
+				sql.append("FROM VWORG_EMP_INFO EMP ");
+				sql.append("INNER JOIN TBORG_NEWPS NPS ON EMP.EMP_ID = NPS.EMP_ID ");
+				sql.append("WHERE EMP.PRIVILEGEID = :channel ");
+				sql.append("AND NPS.BRANCH_NBR = :branchID ");
+	
 				queryCondition.setObject("channel", inputVO.getChannel());
-			}
-		}
+				
+				break;
+			case "004AO":
+				sql.append("SELECT EMP.EMP_ID, EMP.ROLE_ID, EMP.ROLE_NAME, EMP.EMP_NAME, EMP.AO_CODE ");
+				sql.append("FROM VWORG_EMP_INFO EMP ");
+				sql.append("INNER JOIN TBORG_PAO PAO ON EMP.EMP_ID = PAO.EMP_ID ");
+				sql.append("WHERE EMP.PRIVILEGEID = :channel ");
+				sql.append("AND PAO.BRANCH_NBR = :branchID ");
+	
+				queryCondition.setObject("channel", inputVO.getChannel());
+				
+				break;
+			default:
+				sql.append("SELECT INFO.EMP_ID, INFO.ROLE_ID, INFO.ROLE_NAME, INFO.EMP_NAME, INFO.AO_CODE ");
+				sql.append("FROM VWORG_BRANCH_EMP_DETAIL_INFO INFO ");
+				sql.append("WHERE INFO.BRANCH_NBR = :branchID ");
 
+				if (StringUtils.isNotBlank(inputVO.getChannel()))
+					sql.append("AND INFO.ROLE_ID IN (SELECT ROLEID FROM TBSYSSECUROLPRIASS WHERE PRIVILEGEID = :channel) ");
+
+				sql.append("UNION ALL ");
+				sql.append("SELECT PT_INFO.EMP_ID, PT_INFO.ROLE_ID, PT_INFO.ROLE_NAME, PT_INFO.EMP_NAME, PT_INFO.AO_CODE ");
+				sql.append("FROM VWORG_EMP_PLURALISM_INFO PT_INFO ");
+				sql.append("WHERE PT_INFO.BRANCH_NBR = :branchID ");
+				if (StringUtils.isNotBlank(inputVO.getChannel())) {
+					sql.append("AND PT_INFO.ROLE_ID IN (SELECT ROLEID FROM TBSYSSECUROLPRIASS WHERE PRIVILEGEID = :channel) ");
+					queryCondition.setObject("channel", inputVO.getChannel());
+				}
+				
+				break;
+		}
+		
 		queryCondition.setObject("branchID", inputVO.getBranchID());
 		queryCondition.setQueryString(sql.toString());
 		List<Map<String, Object>> channelEmpList = dam.exeQuery(queryCondition);

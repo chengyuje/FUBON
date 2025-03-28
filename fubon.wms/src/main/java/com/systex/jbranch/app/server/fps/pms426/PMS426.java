@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -55,7 +56,8 @@ public class PMS426 extends FubonWmsBizLogic {
 	public PMS426OutputVO query(Object body) throws Exception {
 
 		initUUID();
-		
+		SimpleDateFormat sdfYYYYMM = new SimpleDateFormat("yyyyMM");
+
 		PMS426InputVO inputVO = (PMS426InputVO) body;
 		PMS426OutputVO outputVO = new PMS426OutputVO();
 		dam = this.getDataAccessManager();
@@ -93,6 +95,7 @@ public class PMS426 extends FubonWmsBizLogic {
 
 		sb.append("       CD.NOTE_TYPE, ");
 		sb.append("       CD.NOTE, ");
+		sb.append("       CD.CUST_BASE, ");
 		sb.append("       CD.NOTE2, ");
 		sb.append("       CD.RECORD_SEQ, ");
 		sb.append("       CD.HR_ATTR, ");
@@ -112,11 +115,29 @@ public class PMS426 extends FubonWmsBizLogic {
 
 		sb.append("WHERE 1 = 1 ");
 		
-		//資料月份
-		if (StringUtils.isNotBlank(inputVO.getDataMon())) {
-			sb.append("AND CD.SNAP_YYYYMM = :dataMon ");
-			queryCondition.setObject("dataMon", inputVO.getDataMon());
-		}
+		// 由工作首頁 CRM181 過來，只須查詢主管尚未確認資料 & 報酬率為負值
+		if (StringUtils.equals("Y", inputVO.getFrom181())) {
+			if (StringUtils.isNotBlank(inputVO.getsCreDate())) {
+    			sb.append("  AND CD.SNAP_YYYYMM >= :yearMonS ");
+    			queryCondition.setObject("yearMonS", inputVO.getsCreDate());
+    		}
+			
+			if (StringUtils.isNotBlank(inputVO.geteCreDate())) {
+    			sb.append("  AND CD.SNAP_YYYYMM <= :yearMonE ");
+    			queryCondition.setObject("yearMonE", inputVO.geteCreDate());
+    		}
+        } else {
+    		//資料月份
+    		if (StringUtils.isNotBlank(inputVO.getsCreDate())) {
+    			sb.append("  AND CD.SNAP_YYYYMM >= :yearMonS ");
+    			queryCondition.setObject("yearMonS", sdfYYYYMM.format(new Date(Long.parseLong(inputVO.getsCreDate()))));
+    		}
+    		
+    		if (StringUtils.isNotBlank(inputVO.geteCreDate())) {
+    			sb.append("  AND CD.SNAP_YYYYMM <= :yearMonE ");
+    			queryCondition.setObject("yearMonE", sdfYYYYMM.format(new Date(Long.parseLong(inputVO.geteCreDate()))));
+    		}
+        }
 
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) { 		
 			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
@@ -201,6 +222,7 @@ public class PMS426 extends FubonWmsBizLogic {
 			sb.append("    NOTE_TYPE = :noteType, ");
 			sb.append("    HR_ATTR = :hrAttr, ");
 			sb.append("    NOTE = :note, ");
+			sb.append("    CUST_BASE = :custBase, ");
 			sb.append("    NOTE2 = :note2, ");
 			sb.append("    RECORD_SEQ = :recordSEQ, ");
 			sb.append("    MODIFIER = :modifier, ");
@@ -219,7 +241,8 @@ public class PMS426 extends FubonWmsBizLogic {
 			queryCondition.setObject("noteType", map.get("NOTE_TYPE"));
 			queryCondition.setObject("hrAttr", map.get("HR_ATTR"));
 			queryCondition.setObject("note", map.get("NOTE"));
-			queryCondition.setObject("note2", map.get("NOTE2"));
+			queryCondition.setObject("custBase", map.get("CUST_BASE"));
+			queryCondition.setObject("note2", StringUtils.equals((String) map.get("CUST_BASE"), "O") ? map.get("NOTE2") : "");
 			queryCondition.setObject("recordSEQ", map.get("RECORD_SEQ"));
 			queryCondition.setObject("modifier", DataManager.getWorkStation(uuid).getUser().getCurrentUserId());
 			
@@ -233,22 +256,28 @@ public class PMS426 extends FubonWmsBizLogic {
 
 	// 匯出
 	public void export(Object body, IPrimitiveMap header) throws JBranchException, ParseException, FileNotFoundException, IOException {
-
+		
+		SimpleDateFormat sdfYYYYMM = new SimpleDateFormat("yyyyMM");
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		
 		PMS426InputVO inputVO = (PMS426InputVO) body;
 
 		List<Map<String, Object>> list = inputVO.getExportList();
-
-		String fileName = "理財戶通訊關聯帳戶月報_" + inputVO.getDataMon() + ".xlsx";
+		
+		String reportName = "理財戶通訊關聯帳戶月報";
+		String fileName = reportName + "_" + sdfYYYYMM.format(new Date(Long.parseLong(inputVO.getsCreDate()))) + ".xlsx";
 		String uuid = UUID.randomUUID().toString();
 		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
 
 		String filePath = Path + uuid;
 
 		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet("理財戶通訊關聯帳戶月報");
+		XSSFSheet sheet = workbook.createSheet(reportName);
 		sheet.setDefaultColumnWidth(20);
 		sheet.setDefaultRowHeightInPoints(20);
 
+		// 表頭 CELL型式
 		XSSFCellStyle headingStyle = workbook.createCellStyle();
 		headingStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
 		headingStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
@@ -259,6 +288,24 @@ public class PMS426 extends FubonWmsBizLogic {
 		headingStyle.setBorderLeft((short) 1);
 		headingStyle.setBorderRight((short) 1);
 		headingStyle.setWrapText(true);
+
+		// 資料 CELL型式
+		XSSFCellStyle mainStyle = workbook.createCellStyle();
+		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		mainStyle.setBorderBottom((short) 1);
+		mainStyle.setBorderTop((short) 1);
+		mainStyle.setBorderLeft((short) 1);
+		mainStyle.setBorderRight((short) 1);
+		
+		// 資料 CELL型式
+		XSSFCellStyle titleStyle = workbook.createCellStyle();
+		titleStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+		titleStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderBottom((short) 1);
+		titleStyle.setBorderTop((short) 1);
+		titleStyle.setBorderLeft((short) 1);
+		titleStyle.setBorderRight((short) 1);
 
 		String[] headerLine = { "私銀註記", 
 								"資料日期",
@@ -279,6 +326,7 @@ public class PMS426 extends FubonWmsBizLogic {
 								"首次建立時間",
 								"最新異動人員",
 								"最新異動日期 "};
+		
 		String[] mainLine	= { "RM_FLAG", 
 								"SNAP_YYYYMM",
 								"CREATETIME",
@@ -302,6 +350,15 @@ public class PMS426 extends FubonWmsBizLogic {
 		Integer index = 0;
 
 		XSSFRow row = sheet.createRow(index);
+		for (int i = 0; i < 1; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(titleStyle);
+			cell.setCellValue(reportName);
+		}
+		
+		index++;
+		
+		row = sheet.createRow(index);
 		for (int i = 0; i < headerLine.length; i++) {
 			XSSFCell cell = row.createCell(i);
 			cell.setCellStyle(headingStyle);
@@ -309,15 +366,6 @@ public class PMS426 extends FubonWmsBizLogic {
 		}
 
 		index++;
-
-		// 資料 CELL型式
-		XSSFCellStyle mainStyle = workbook.createCellStyle();
-		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
-		mainStyle.setBorderBottom((short) 1);
-		mainStyle.setBorderTop((short) 1);
-		mainStyle.setBorderLeft((short) 1);
-		mainStyle.setBorderRight((short) 1);
 
 		for (Map<String, Object> map : list) {
 			row = sheet.createRow(index);
@@ -354,7 +402,6 @@ public class PMS426 extends FubonWmsBizLogic {
 						cell.setCellValue(currencyFormat(map, mainLine[i]) + "%");
 						break;
 					case "NOTE":
-						XmlInfo xmlInfo = new XmlInfo();
 						String note = (String) xmlInfo.getVariable("PMS.CHECK_TYPE", (String) map.get("NOTE_TYPE"), "F3");
 
 						if (null != map.get("NOTE_TYPE") && StringUtils.equals("O", (String) map.get("NOTE_TYPE"))) {
@@ -362,6 +409,15 @@ public class PMS426 extends FubonWmsBizLogic {
 						}
 						
 						cell.setCellValue((StringUtils.isNotEmpty(note) ? note : ""));
+						break;
+					case "NOTE2":
+						String note2 = (String) xmlInfo.getVariable("PMS.ACCOUNT_REL", (String) map.get("CUST_BASE"), "F3");
+
+						if (null != map.get("CUST_BASE") && StringUtils.equals("O", (String) map.get("CUST_BASE"))) {
+							note2 = note2 + "：" + StringUtils.defaultString((String) map.get(mainLine[i]));
+						}
+						
+						cell.setCellValue((StringUtils.isNotEmpty(note2) ? note2 : ""));
 						break;
 					case "RECORD_SEQ":
 						cell.setCellValue(checkIsNull(map, mainLine[i]) + "");

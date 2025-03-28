@@ -86,10 +86,24 @@ eSoafApp.controller('PMS496Controller', function($scope, $controller, socketServ
 			if (!isError) {
 				$scope.chkMaintenance = tota[0].body.isMaintenancePRI == 'Y' ? true : false;
 
-				return;
+				$scope.uhrmRCList = [];
+				$scope.uhrmOPList = [];
+
+				if (null != tota[0].body.uhrmORGList) {
+					angular.forEach(tota[0].body.uhrmORGList, function(row) {
+						$scope.uhrmRCList.push({LABEL: row.REGION_CENTER_NAME, DATA: row.REGION_CENTER_ID});
+					});	
+					
+					$scope.inputVO.uhrmRC = tota[0].body.uhrmORGList[0].REGION_CENTER_ID;
+					
+					angular.forEach(tota[0].body.uhrmORGList, function(row) {
+						$scope.uhrmOPList.push({LABEL: row.BRANCH_AREA_NAME, DATA: row.BRANCH_AREA_ID});
+					});
+					
+					$scope.inputVO.uhrmOP = tota[0].body.uhrmORGList[0].BRANCH_AREA_ID;
+		        }
 			}						
 		});
-        
 	};
 	
 	$scope.init();

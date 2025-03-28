@@ -47,12 +47,14 @@ eSoafApp.controller('CRM814Controller', function($rootScope, $scope, $controller
 	$scope.inquireInit();
 
 	// Joe-日曆初始設定-start
-	$scope.bgn_sDateOptions = {
-		maxDate: $scope.inputVO.eCreDate
-	};
-	$scope.bgn_eDateOptions = {
-		minDate: $scope.inputVO.sCreDate
-	};
+	$scope.optionsInit = function() {
+		$scope.bgn_sDateOptions = {
+			maxDate: $scope.inputVO.eCreDate
+		};
+		$scope.bgn_eDateOptions = {
+			minDate: $scope.inputVO.sCreDate
+		};
+	}
 	// config
 	$scope.model = {};
 	$scope.open = function($event, elementOpened) {
@@ -62,7 +64,19 @@ eSoafApp.controller('CRM814Controller', function($rootScope, $scope, $controller
 	};
 	$scope.limitDate = function() {
 		$scope.bgn_sDateOptions.maxDate = $scope.inputVO.eCreDate || $scope.maxDate;
+		if ($scope.inputVO.eCreDate) {
+			let y = $scope.inputVO.eCreDate.getFullYear() - 1;
+			let m = $scope.inputVO.eCreDate.getMonth();
+			let d = $scope.inputVO.eCreDate.getDate();
+			$scope.bgn_sDateOptions.minDate = new Date(y, m, d);
+		}
 		$scope.bgn_eDateOptions.minDate = $scope.inputVO.sCreDate || $scope.minDate;
+		if ($scope.inputVO.sCreDate) {
+			let y = $scope.inputVO.sCreDate.getFullYear() + 1;
+			let m = $scope.inputVO.sCreDate.getMonth();
+			let d = $scope.inputVO.sCreDate.getDate();
+			$scope.bgn_eDateOptions.maxDate = new Date(y, m, d);
+		}
 	};
 	// Joe-日曆初始設定-end
 
@@ -134,6 +148,7 @@ eSoafApp.controller('CRM814Controller', function($rootScope, $scope, $controller
 	$scope.cancel = function() {
 		$scope.inputVO.sCreDate = '';
 		$scope.inputVO.eCreDate = '';
+		$scope.optionsInit();
 		$scope.inputVO.time = '';
 		$scope.inputVO.account = '';
 	}

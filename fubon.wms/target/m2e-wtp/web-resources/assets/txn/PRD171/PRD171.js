@@ -9,7 +9,7 @@ eSoafApp.controller('PRD171Controller',
 		$controller('CommonUtil', {$scope: $scope}); // 載入 CommonUtil
 
 		//filter
-        getParameter.XML(["IOT.PRODUCT_TYPE","PRD.INS_CLASS","FPS.CURRENCY","PRD.DOC_TYPE","IOT.DOC_CHK_LEVEL","PRD.MAIN_RIDER","IOT.PAY_TYPE","PRD.CERT_TYPE","PRD.TRAINING_TYPE","PRD.INS_ANCDOC_Q_TYPE","PRD.FEE_STATE"],
+        getParameter.XML(["IOT.PRODUCT_TYPE","PRD.INS_CLASS","FPS.CURRENCY","PRD.DOC_TYPE","IOT.DOC_CHK_LEVEL","PRD.MAIN_RIDER","IOT.PAY_TYPE","PRD.CERT_TYPE","PRD.TRAINING_TYPE","PRD.INS_ANCDOC_Q_TYPE","PRD.FEE_STATE","COMMON.YES_NO"],
         	function(totas){
         		if(totas){
         			$scope.mappingSet['IOT.PRODUCT_TYPE'] = totas.data[totas.key.indexOf('IOT.PRODUCT_TYPE')];//IOT.PRODUCT_TYPE
@@ -23,6 +23,7 @@ eSoafApp.controller('PRD171Controller',
         			$scope.mappingSet['PRD.TRAINING_TYPE'] = totas.data[totas.key.indexOf('PRD.TRAINING_TYPE')];//TRAINING_TYPE
         			$scope.typelist = totas.data[totas.key.indexOf('PRD.INS_ANCDOC_Q_TYPE')];//題目類型
         			$scope.mappingSet['PRD.FEE_STATE'] = totas.data[totas.key.indexOf('PRD.FEE_STATE')];
+        			$scope.mappingSet['COMMON.YES_NO'] = totas.data[totas.key.indexOf('COMMON.YES_NO')];
         		}
         });
 

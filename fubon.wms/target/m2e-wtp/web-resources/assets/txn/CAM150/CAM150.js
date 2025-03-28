@@ -35,23 +35,26 @@ eSoafApp.controller('CAM150Controller',
 		} else {
         	$scope.mappingSet['CAM.CHECK_STATUS'] = projInfoService.mappingSet['CAM.CHECK_STATUS'];
         }
-		
-        $scope.startDateOptions = {
-			maxDate: $scope.inputVO.eDate,
-			minDate: $scope.minDate
-		};
-        $scope.startDateOptions2 = {
-			maxDate: $scope.inputVO.eDate,
-			minDate: $scope.inputVO.sDate
-		};
-		$scope.endDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.inputVO.sDate
-		};
-		$scope.endDateOptions2 = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.inputVO.eDate
-		};
+        
+		$scope.optionsInit = function() {
+			$scope.startDateOptions = {
+				maxDate: $scope.inputVO.eDate,
+				minDate: $scope.minDate
+			};
+			$scope.startDateOptions2 = {
+				maxDate: $scope.inputVO.eDate,
+				minDate: $scope.inputVO.sDate
+			};
+			$scope.endDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.inputVO.sDate
+			};
+			$scope.endDateOptions2 = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.inputVO.eDate
+			};
+		}
+        
 		$scope.altInputFormats = ['M!/d!/yyyy'];
 		$scope.model = {};
 		$scope.open = function($event, elementOpened) {
@@ -61,13 +64,36 @@ eSoafApp.controller('CAM150Controller',
 		};
 		
 		$scope.limitDate = function() {
-			$scope.startDateOptions.maxDate =  $scope.inputVO.eDate || $scope.inputVO.sDate2;
+			$scope.startDateOptions.maxDate = $scope.inputVO.sDate2;
+			if ($scope.inputVO.sDate2) {
+				let y = $scope.inputVO.sDate2.getFullYear() - 1;
+				let m = $scope.inputVO.sDate2.getMonth();
+				let d = $scope.inputVO.sDate2.getDate();
+				$scope.startDateOptions.minDate = new Date(y, m, d);
+			}
 			$scope.startDateOptions2.minDate = $scope.inputVO.sDate;
+			if ($scope.inputVO.sDate) {
+				let y = $scope.inputVO.sDate.getFullYear() + 1;
+				let m = $scope.inputVO.sDate.getMonth();
+				let d = $scope.inputVO.sDate.getDate();
+				$scope.startDateOptions2.maxDate = new Date(y, m, d);
+			}
 			
-			$scope.endDateOptions.minDate = $scope.inputVO.sDate;
 			$scope.endDateOptions.maxDate = $scope.inputVO.eDate2;
-			
+			if ($scope.inputVO.eDate2) {
+				let y = $scope.inputVO.eDate2.getFullYear() - 1;
+				let m = $scope.inputVO.eDate2.getMonth();
+				let d = $scope.inputVO.eDate2.getDate();
+				$scope.endDateOptions.minDate = new Date(y, m, d);
+			}
 			$scope.endDateOptions2.minDate = $scope.inputVO.eDate;
+			if ($scope.inputVO.eDate) {
+				let y = $scope.inputVO.eDate.getFullYear() + 1;
+				let m = $scope.inputVO.eDate.getMonth();
+				let d = $scope.inputVO.eDate.getDate();
+				$scope.endDateOptions2.maxDate = new Date(y, m, d);
+			}
+
 		};
 		
         $scope.init = function(){
@@ -83,7 +109,7 @@ eSoafApp.controller('CAM150Controller',
 					eDate: undefined, 
 					eDate2: undefined
         	};
-			
+			$scope.optionsInit();
 			$scope.limitDate();
 		};
         $scope.init();

@@ -270,6 +270,12 @@ public class IOT130 extends FubonWmsBizLogic{
 								throw new APException(errorMsg);
 							}
 						}
+						if(StringUtils.equals("Y", inputVO.getC_SENIOR_DOCCHK_YN()) && (Double)INitem.get("DOC_SEQ") == 2) {
+							if(!"Y".equals(INitem.get("DOC_CHK"))) {
+								errorMsg = "高齡客戶請確認是否有執行銀行內之高齡評估維護，並需於分行留存文件勾選「銀行端高齡評估量表(維護)」";
+								throw new APException(errorMsg);
+							}
+						}
 					}
 				}
 
@@ -499,6 +505,12 @@ public class IOT130 extends FubonWmsBizLogic{
 					if(StringUtils.equals("Y", inputVO.getBUSINESS_REL()) && (Double)INitem.get("DOC_SEQ") == 1) {
 						if(!"Y".equals(INitem.get("DOC_CHK"))) {
 							errorMsg = "分行留存文件應檢附「洗錢防制姓名檢核結果」";
+							throw new APException(errorMsg);
+						}
+					}
+					if(StringUtils.equals("Y", inputVO.getC_SENIOR_DOCCHK_YN()) && (Double)INitem.get("DOC_SEQ") == 2) {
+						if(!"Y".equals(INitem.get("DOC_CHK"))) {
+							errorMsg = "高齡客戶請確認是否有執行銀行內之高齡評估維護，並需於分行留存文件勾選「銀行端高齡評估量表(維護)」";
 							throw new APException(errorMsg);
 						}
 					}

@@ -1,8 +1,9 @@
 'use strict';
-eSoafApp.controller('IOT111Controller', function($rootScope, $scope, $controller, getParameter, ngDialog) {
+eSoafApp.controller('IOT111Controller', function($rootScope, $scope, $controller, socketService, ngDialog, projInfoService, $q, $confirm, $filter, sysInfoService ,getParameter) {
 	$controller('BaseController', {$scope: $scope});
+	$controller('RegionController', {$scope: $scope});
 	$scope.controllerName = "IOT111Controller";
-  	
+	
 	//XML參數
 	getParameter.XML(["IOT.TRADE_TYPE", "IOT.PREMATCH_STATUS", "CALLOUT_STATUS"],function(totas){
 		if(totas){
@@ -39,6 +40,7 @@ eSoafApp.controller('IOT111Controller', function($rootScope, $scope, $controller
 	$scope.inquireInit = function() {
 		$scope.data = [];
 		$scope.prematchList = [];
+		$scope.exportList = [];
 		$scope.outputVO = [];
 		$scope.showExport = false;
 	};
@@ -46,8 +48,27 @@ eSoafApp.controller('IOT111Controller', function($rootScope, $scope, $controller
 	
 	$scope.query = function() {
 		$scope.prematchList = [];
+		$scope.exportList = [];
 		$scope.outputVO = [];
 		$scope.showExport = false;
+		
+//		$scope.inputVO.branch_list = [];
+//		angular.forEach($scope.BRANCH_LIST, function(row, index, objs){
+//			if(row.DATA != "" && row.DATA != "0"){
+//				$scope.inputVO.branch_list.push({LABEL: row.LABEL, DATA: row.DATA});					
+//			}
+//		});
+//		//非總行、非UHRM，分行為必輸欄位
+//		if(!$scope.isHeadMgr && !$scope.isUHRM && ($scope.inputVO.branch_id == undefined || $scope.inputVO.branch_id == null || $scope.inputVO.branch_id == "")) {
+//			if(($scope.inputVO.branch_list.length > 0 && $scope.inputVO.branch_list[0].DATA.length > 3) ||
+//					$scope.inputVO.branch_list.length == 0) {
+//				//若選到私銀區，或沒有分行下拉選單資料
+//				//不檢核
+//			} else {
+//				$scope.showErrorMsg("請輸入分行查詢");
+//				return;
+//			}
+//		}			
 		
 		if(($scope.inputVO.REG_TYPE == null || $scope.inputVO.REG_TYPE == undefined || $scope.inputVO.REG_TYPE == "") && 
 				($scope.inputVO.CUST_ID == null || $scope.inputVO.CUST_ID == undefined || $scope.inputVO.CUST_ID == "") && 
@@ -65,6 +86,7 @@ eSoafApp.controller('IOT111Controller', function($rootScope, $scope, $controller
 	            			return;
 	            		}
 						$scope.prematchList = tota[0].body.prematchList;
+						$scope.exportList = [].concat($scope.prematchList); //clone array
 						$scope.outputVO = tota[0].body;
 						if ($scope.inputVO.REG_TYPE == '1') {
 							$scope.showExport = true;
@@ -76,7 +98,7 @@ eSoafApp.controller('IOT111Controller', function($rootScope, $scope, $controller
 	}
 	
 	$scope.export = function() {
-		$scope.sendRecv("IOT111", "export", "com.systex.jbranch.app.server.fps.iot111.IOT111InputVO", {'prematchList': $scope.prematchList},
+		$scope.sendRecv("IOT111", "export", "com.systex.jbranch.app.server.fps.iot111.IOT111InputVO", {'prematchList': $scope.exportList},
 		function(tota, isError) {
 			
 		});
@@ -129,7 +151,27 @@ eSoafApp.controller('IOT111Controller', function($rootScope, $scope, $controller
 			APPLY_DATE_F: today.addDays(-1),
 			APPLY_DATE_E: new Date()
     	};	
+
+		$scope.priID = String(sysInfoService.getPriID());
+		$scope.memLoginFlag = String(sysInfoService.getMemLoginFlag()).toUpperCase();
+		//是否為總行人員角色
+		var findHeadMgr = $filter('filter')($scope.mappingSet['FUBONSYS.HEADMGR_ROLE'], {DATA: $scope.RoleID});
+		$scope.isHeadMgr = (findHeadMgr != null && findHeadMgr != undefined && findHeadMgr.length > 0) ? true : false;
+		//是否為私銀角色
+		$scope.isUHRM = $scope.memLoginFlag.startsWith('UHRM') ? true : false;
 		
+		// ["塞空ao_code用Y/N", $scope.inputVO, "區域NAME", "區域LISTNAME", "營運區NAME", "營運區LISTNAME", "分行別NAME", "分行別LISTNAME", "ao_codeNAME", "ao_codeLISTNAME", "emp_idNAME", "emp_idLISTNAME"]
+		$scope.orgList = ['N', $scope.inputVO, "region_id", "REGION_LIST", "area_id", "AREA_LIST", "branch_id", "BRANCH_LIST", "ao_code", "AO_LIST", "emp_id", "EMP_LIST"];
+		
+        $scope.RegionController_setName($scope.orgList).then(function(data) {
+//        	var temp = ['023', '024'];//IA
+//        	if(temp.indexOf($scope.priID) > -1) {
+//        		if($scope.AVAIL_REGION.length > 2) $scope.inputVO.region_id = "";
+//        		if($scope.AREA_LIST.length > 2) $scope.inputVO.area_id = "";
+//        		if($scope.BRANCH_LIST.length > 2) $scope.inputVO.branch_id = "";
+//        	}
+        });
+        
 		if($scope.update_return){
         	$scope.connector('set','IOT111_updateSubmit','');
         	$scope.inputVO = $scope.connector('get','IOT111_querytemp');

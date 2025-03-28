@@ -50,7 +50,7 @@ public class CRM451 extends FubonWmsBizLogic {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-		logger.info("M+ Log : " + sdf.format(new Date()) + " 發送  " + custID + " 之議價申請資訊給主管：" + empId);
+//		logger.info("M+ Log : " + sdf.format(new Date()) + " 發送  " + custID + " 之議價申請資訊給主管：" + empId);
 
 		dam = this.getDataAccessManager();
 		if(StringUtils.isBlank(seqNum)) {
@@ -162,7 +162,7 @@ public class CRM451 extends FubonWmsBizLogic {
 
 		for(String empstr : tempArray) {
 
-			logger.info("M+ Log : " + sdf.format(new Date()) + " 發送  " + custID + " 之議價申請資訊給主管：" + empstr);
+//			logger.info("M+ Log : " + sdf.format(new Date()) + " 發送  " + custID + " 之議價申請資訊給主管：" + empstr);
 			MPlusInputVO inputVO = new MPlusInputVO();
 
 			// FIXME: 以empId重DB中查出empPhones(目前table來源尚未確定)

@@ -11,6 +11,7 @@ eSoafApp.controller('CRM82B_DETAILController',
 		$scope.txnType = [];
 		$scope.txnType.push({LABEL : '買斷',DATA : '1'},{LABEL : '配息',DATA : '2'},{LABEL : '到期',DATA : '3'},{LABEL : '贖回',DATA : '4'});
 		$scope.inputVO.prod_id = $scope.row.PROD_ID;
+		$scope.inputVO.cert_id = $scope.row.CERT_ID;
 		$scope.inputVO.cust_id = $scope.cust_id;
 		
 		//查SQL

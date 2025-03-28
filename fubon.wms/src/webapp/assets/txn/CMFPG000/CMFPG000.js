@@ -435,6 +435,7 @@ eSoafApp.controller('CMFPG000Controller', ["$rootScope", "$scope", "$location", 
 				var deferred = $q.defer();
 				$scope.sendRecv("CMMGR020", "getMENUTree", "com.systex.jbranch.app.server.fps.cmmgr020.CMMGR020DataVO", {},
 					function(totas, isError) {
+						debugger;
 						if (isError) {
 							$scope.showErrorMsg(totas[0].body.msgData);
 							deferred.reject();

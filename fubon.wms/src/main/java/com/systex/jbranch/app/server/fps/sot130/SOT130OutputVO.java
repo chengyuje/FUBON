@@ -29,6 +29,9 @@ public class SOT130OutputVO extends PagingOutputVO {
 	private String Short_2; 
 	private String Short_3; 
 	
+	//#2304_商品適配及申購新增KYC快到期提醒
+    private boolean kycDueDateLessOneMonth; //KYC校期小於等於1個月(30天)
+	
 	public boolean getRecNeeded() {
 		return recNeeded;
 	}
@@ -132,4 +135,11 @@ public class SOT130OutputVO extends PagingOutputVO {
 	public void setIsBanker(String isBanker) {
 		this.isBanker = isBanker;
 	}
+	public boolean isKycDueDateLessOneMonth() {
+		return kycDueDateLessOneMonth;
+	}
+	public void setKycDueDateLessOneMonth(boolean kycDueDateLessOneMonth) {
+		this.kycDueDateLessOneMonth = kycDueDateLessOneMonth;
+	}
+	
 }

@@ -76,9 +76,9 @@ public class PMS328 extends FubonWmsBizLogic {
 				sb.append("       'ALL_TOTAL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS REGION_CENTER_ID" : "").append(", ");
 				sb.append("       '全行 合計' ").append(StringUtils.equals("SELECT", sqlType) ? "AS REGION_CENTER_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_ID" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
+				sb.append("       'ALL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NBR" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
+				sb.append("       'ALL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
 				
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
 				
@@ -87,7 +87,7 @@ public class PMS328 extends FubonWmsBizLogic {
 				}
 				
 				sb.append("       'ZZZZZ' ").append(StringUtils.equals("SELECT", sqlType) ? "AS DEPT_ID" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
+				sb.append("       'ZZZZZ' ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_CODE" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS AO_TYPE" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_ID" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS EMP_NAME" : "").append(", "); 
@@ -99,9 +99,9 @@ public class PMS328 extends FubonWmsBizLogic {
 				sb.append("       REGION_CENTER_ID || '_TOTAL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS REGION_CENTER_ID" : "").append(", ");
 				sb.append("       REGION_CENTER_NAME ").append(StringUtils.equals("SELECT", sqlType) ? "AS REGION_CENTER_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_ID" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
+				sb.append("       'REGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NBR" : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
+				sb.append("       'REGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME" : "").append(", "); 
 				
 				sb.append("       'ZZZZZREGION' ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
 				
@@ -125,7 +125,7 @@ public class PMS328 extends FubonWmsBizLogic {
 				sb.append("       BRANCH_AREA_ID || '_TOTAL' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_ID" : "").append(", ");
 				sb.append("       BRANCH_AREA_NAME ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_AREA_NAME" : "").append(", "); 
 				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NBR " : "").append(", "); 
-				sb.append("       NULL ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME " : "").append(", "); 
+				sb.append("       'AREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS BRANCH_NAME " : "").append(", "); 
 				
 				sb.append("       'ZZZZZAREA' ").append(StringUtils.equals("SELECT", sqlType) ? "AS YEARMON" : "").append(", "); 
 				
@@ -659,9 +659,9 @@ public class PMS328 extends FubonWmsBizLogic {
 		}
 		
 		//=== MAIN SQL END ===
-
+		
 		queryCondition.setQueryString(sb.toString());
-		System.out.println(sb.toString());
+
 		ResultIF list = dam.executePaging(queryCondition, inputVO.getCurrentPageIndex() + 1, inputVO.getPageCount());
 		List<Map<String, Object>> csvList = dam.exeQuery(queryCondition);
 

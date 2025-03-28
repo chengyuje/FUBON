@@ -714,7 +714,7 @@ public class SOT703Dyna extends SOT703 {
 		txBodyVO.setBRANCH_NBR(branchNbr);
 		
 		txBodyVO.setPAY_TYPE("3");
-//		txBodyVO.setFEE_DEBIT_ACCT(FEE_DEBIT_ACCT);
+		txBodyVO.setFEE_DEBIT_ACCT(ObjectUtils.toString(dynaData.get("DEBIT_ACCT")));
 		txBodyVO.setNARRATOR_ID(ObjectUtils.toString(dynaData.get("NARRATOR_ID")));
 		txBodyVO.setEMP_ID(ObjectUtils.toString(dynaData.get("MODIFIER")));
 		txBodyVO.setCONFIRM(sot703InputVO.getConfirm());

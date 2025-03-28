@@ -20,6 +20,9 @@ import com.systex.jbranch.app.common.fps.table.TBSOT_TRADE_MAINVO;
 import com.systex.jbranch.app.server.fps.crm421.CRM421;
 import com.systex.jbranch.app.server.fps.crm421.CRM421InputVO;
 import com.systex.jbranch.app.server.fps.crm421.CRM421OutputVO;
+import com.systex.jbranch.app.server.fps.prd110.PRD110;
+import com.systex.jbranch.app.server.fps.prd110.PRD110InputVO;
+import com.systex.jbranch.app.server.fps.prd110.PRD110OutputVO;
 import com.systex.jbranch.app.server.fps.sot110.SOT110;
 import com.systex.jbranch.app.server.fps.sot701.CustHighNetWorthDataVO;
 import com.systex.jbranch.app.server.fps.sot703.SOT703Dyna;
@@ -117,6 +120,7 @@ public class SOT1620 extends FubonWmsBizLogic {
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 
+		//取得商品資訊
 		queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT f.*, i.FUS20, i.FUS40 ");
@@ -125,9 +129,37 @@ public class SOT1620 extends FubonWmsBizLogic {
 		sb.append("WHERE f.PRD_ID = :prodID ");
 		queryCondition.setObject("prodID", inputVO.getProdId());
 		queryCondition.setQueryString(sb.toString());
-
 		outputVO.setProdDTL(dam.exeQuery(queryCondition));
 
+		//母基金加碼，母基金需做適配
+		boolean isFitness = StringUtils.equals("N", (String) new XmlInfo().getVariable("SOT.FITNESS_YN", "NF", "F3")) ? false : true;
+		outputVO.setWarningMsg("");
+		outputVO.setErrorMsg("");
+
+		if (isFitness && StringUtils.equals("M", inputVO.getDynamicType())) {
+			// 1.適配，由商品查詢取得，邏輯需一致
+			PRD110OutputVO prdOutputVO = new PRD110OutputVO();
+			PRD110InputVO prdInputVO = new PRD110InputVO();
+			prdInputVO.setCust_id(inputVO.getCustID().toUpperCase());
+			prdInputVO.setType("4");
+			prdInputVO.setFund_id(inputVO.getProdId());
+			prdInputVO.setTrustTS(inputVO.getTrustTS());
+			//動態鎖利
+			prdInputVO.setFromSOTProdYN("Y");
+			prdInputVO.setDynamicType(inputVO.getDynamicType());
+			PRD110 prd110 = (PRD110) PlatformContext.getBean("prd110");
+			prdOutputVO = prd110.inquire(prdInputVO);
+
+			if (CollectionUtils.isNotEmpty(prdOutputVO.getResultList())) {
+				String warningMsg = (String) ((Map<String, Object>) prdOutputVO.getResultList().get(0)).get("warningMsg");
+				String errId = (String) ((Map<String, Object>) prdOutputVO.getResultList().get(0)).get("errorID");
+				outputVO.setWarningMsg(warningMsg);
+				outputVO.setErrorMsg(errId);
+			}
+		} else {
+			logger.debug("SOT.FITNESS_YN 不進行適配 ");
+		}
+		
 		this.sendRtnObject(outputVO);
 	}
 		

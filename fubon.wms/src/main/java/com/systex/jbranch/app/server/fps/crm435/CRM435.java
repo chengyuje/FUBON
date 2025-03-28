@@ -22,6 +22,7 @@ import com.systex.jbranch.fubon.commons.cbs.dao._067157_067157DAO;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
+import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
 /**
@@ -56,25 +57,7 @@ public class CRM435 extends FubonWmsBizLogic {
 	private List<String> printRptIdList = new ArrayList<String>();
 
 	public void inquire(Object body, IPrimitiveMap<?> header) throws Exception {
-
-//		dam = this.getDataAccessManager();
-//		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-//		StringBuffer sb = new StringBuffer();
-//		sb.append("SELECT 1 ");
-//		sb.append("FROM TBCRM_CUST_MAST ");
-//		sb.append("WHERE CUST_ID = :custID ");
-//		sb.append("AND ROUND(MONTHS_BETWEEN(SYSDATE, BIRTH_DATE) / 12, 2) >= 64.5 ");
-//		
-//		queryCondition.setQueryString(sb.toString());
-//		queryCondition.setObject("custID", "T220494883");
-//		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
-//		this.print(body, header);
-		try {
-			this.test(null);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-//			e.printStackTrace();
-		}
+		String loginID = (String) getCommonVariable(SystemVariableConsts.LOGINID);
 
 		this.sendRtnObject(null);
 	}

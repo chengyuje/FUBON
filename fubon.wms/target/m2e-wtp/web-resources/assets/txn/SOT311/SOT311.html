@@ -91,7 +91,11 @@
 							<tr>
 								<th>委託方式：</th>
 								<td colspan="6" ng-show="inputVO.gtcYN == 'N'">當日單</td>
-								<td colspan="6" ng-show="inputVO.gtcYN == 'Y'">長效單&nbsp;&nbsp;&nbsp;&nbsp;委託迄日：{{inputVO.gtcEndDate | date:"yyyy-MM-dd"}}</td>
+								<td colspan="6" ng-show="inputVO.gtcYN == 'Y'">
+									長效單&nbsp;&nbsp;&nbsp;&nbsp;
+									委託起日：{{inputVO.gtcStartDate | date:"yyyy-MM-dd"}}、委託迄日：{{inputVO.gtcEndDate | date:"yyyy-MM-dd"}}								
+								</td>
+								<td colspan="6" ng-show="inputVO.gtcYN == 'P'">預約單&nbsp;&nbsp;&nbsp;&nbsp;委託日：{{inputVO.gtcStartDate | date:"yyyy-MM-dd"}}</td>
 							</tr>
 							<tr>
 								<th>委託價格：</th>
@@ -100,7 +104,10 @@
 										<span ng-hide="row.DATA != inputVO.entrustType">{{row.LABEL}}</input>
 									</div>
 								</td>
-								<td>{{inputVO.entrustAmt | currency:''}}&nbsp;%</td>
+								<td>
+									<span ng-show="inputVO.gtcYN == 'N'">{{inputVO.entrustAmt | currency:''}}&nbsp;%</span>
+									<span ng-show="inputVO.gtcYN != 'N' && inputVO.entrustType == '1'">{{inputVO.entrustAmt | currency:''}}&nbsp;%</span>
+								</td>
 								<td></td>
 								<td></td>
 								<td></td>
@@ -108,21 +115,33 @@
 							</tr>
 							<tr>
 								<th>信託本金：</th>
-								<td colspan="6"><span ng-show="inputVO.gtcYN == 'Y'">預估 </span>{{inputVO.trustAmt | currency:''}}<span ng-show="inputVO.gtcYN == 'Y'">，實際信託本金仍依成交當時價格為準</span></td>
+								<td colspan="6">
+									<span ng-show="inputVO.gtcYN == 'N'">{{inputVO.trustAmt | currency:''}}</span>
+									<span ng-show="inputVO.gtcYN != 'N'">
+										<span ng-show="inputVO.entrustType == '1'">預估 {{inputVO.trustAmt | currency:''}}，實際信託本金仍依成交當時價格為準</span>
+										<span ng-show="inputVO.entrustType == '2'">實際信託本金仍依成交當時價格為準</span>
+									</span>
+								</td>
 							</tr>
 							<tr>
 								<th>手續費：</th>
-								<td colspan="6"><span ng-show="inputVO.gtcYN == 'Y'">預估 </span>{{inputVO.fee | currency:''}}<span ng-show="inputVO.gtcYN == 'Y'">，實際手續費仍依實際信託本金乘上手續費率為準</span></td>
+								<td colspan="6">
+									<span ng-show="inputVO.gtcYN == 'N'">{{inputVO.fee | currency:''}}</span>
+									<span ng-show="inputVO.gtcYN != 'N'">
+										<span ng-show="inputVO.entrustType == '1'">預估 {{inputVO.fee | currency:''}}，實際信託本金仍依成交當時價格為準</span>
+										<span ng-show="inputVO.entrustType == '2'">實際信託本金仍依成交當時價格為準</span>
+									</span>
+								</td>
 							</tr>
 							<tr>
 								<th>應付前手息：</th>
 								<td colspan="6" ng-show="inputVO.gtcYN == 'N'">{{inputVO.payableFee | currency:''}}</td>
-								<td colspan="6" ng-show="inputVO.gtcYN == 'Y'">實際前手息仍依實際成交日當日前手息為準</td>
+								<td colspan="6" ng-show="inputVO.gtcYN != 'N'">實際前手息仍依實際成交日當日前手息為準</td>
 							</tr>
 							<tr>
 								<th>總扣款金額：</th>
 								<td colspan="6" ng-show="inputVO.gtcYN == 'N'">{{inputVO.totAmt | currency:''}}</td>
-								<td colspan="6" ng-show="inputVO.gtcYN == 'Y'">實際扣款金額為實際信託本金加上實際手續費再加上實際前手息</td>
+								<td colspan="6" ng-show="inputVO.gtcYN != 'N'">實際扣款金額為實際信託本金加上實際手續費再加上實際前手息</td>
 							</tr>
 							<tr>
 								<th>信託帳號：</th>
@@ -221,7 +240,7 @@
 			<button type="button" class="btn btn-info" ng-click="delTrade()" function-type="maintenance" ng-disabled="inputVO.isBargainNeeded == 'Y' || inputVO.tradeStatus == '3' || inputVO.tradeStatus == '4'">取消</button>
 			<button type="button" class="btn btn-info" ng-click="goPage()" function-type="maintenance" ng-disabled="inputVO.isBargainNeeded == 'Y' || inputVO.tradeStatus == '3' || inputVO.tradeStatus == '4'">修改</button>
 			<button type="button" class="btn btn-info" ng-click="goOP()" function-type="maintenance" ng-disabled="inputVO.goOPDisabled || inputVO.bargainFeeFlag == '1' || inputVO.tradeStatus == '3' || inputVO.tradeStatus == '4' || recSeqFlag == 'Y' || inputVO.isWeb == 'Y'">傳送OP交易及列印表單</button>
-			<button type="button" class="btn btn-info" ng-click="goBANK()" function-type="maintenance"  ng-disabled="inputVO.goBankDisabled || inputVO.bargainFeeFlag == '1' || inputVO.tradeStatus == '3' || inputVO.tradeStatus == '4' || recSeqFlag == 'Y' || inputVO.isAgreeProdAdv != 'Y' || inputVO.isWeb == 'N'">網銀行銀快速申購</button>
+			<button type="button" class="btn btn-info" ng-click="goBANK()" function-type="maintenance"  ng-disabled="inputVO.goBankDisabled || inputVO.bargainFeeFlag == '1' || inputVO.tradeStatus == '3' || inputVO.tradeStatus == '4' || recSeqFlag == 'Y' || (inputVO.profInvestorYN != 'Y' && inputVO.isAgreeProdAdv != 'Y') || inputVO.isWeb == 'N'">網銀行銀快速申購</button>
 			<button type="button" class="btn btn-info" ng-click="newTrade()" function-type="maintenance" ng-disabled="inputVO.tradeStatus != '3' && inputVO.tradeStatus != '4'">繼續交易</button>
 		</div>
 	</div>

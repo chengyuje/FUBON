@@ -9,12 +9,12 @@ eSoafApp.controller('PRD230_FundController',
 		$scope.controllerName = "PRD230_FundController";
 		
 		// combobox
-		getParameter.XML(["PRD.FUND_VIGILANT","COMMON.YES_NO", "FPS.STOCK_BOND_TYPE", "PRD.FUND_ALERT", "PRD.FUND_SUBJECT", "PRD.FUND_PROJECT", "PRD.FUND_CUSTOMER_LEVEL"], function(totas) {
+		getParameter.XML(["PRD.FUND_VIGILANT","COMMON.YES_NO", "FPS.STOCK_BOND_TYPE", "PRD.FUND_C_ALERT", "PRD.FUND_SUBJECT", "PRD.FUND_PROJECT", "PRD.FUND_CUSTOMER_LEVEL"], function(totas) {
 			if (totas) {
 				$scope.mappingSet['PRD.FUND_VIGILANT'] = totas.data[totas.key.indexOf('PRD.FUND_VIGILANT')];
 				$scope.mappingSet['COMMON.YES_NO'] = totas.data[totas.key.indexOf('COMMON.YES_NO')];
 				$scope.mappingSet['FPS.STOCK_BOND_TYPE'] = totas.data[totas.key.indexOf('FPS.STOCK_BOND_TYPE')];
-				$scope.mappingSet['PRD.FUND_ALERT'] = totas.data[totas.key.indexOf('PRD.FUND_ALERT')];
+				$scope.mappingSet['PRD.FUND_C_ALERT'] = totas.data[totas.key.indexOf('PRD.FUND_C_ALERT')];
 				$scope.mappingSet['PRD.FUND_SUBJECT'] = totas.data[totas.key.indexOf('PRD.FUND_SUBJECT')];
 				$scope.mappingSet['PRD.FUND_PROJECT'] = totas.data[totas.key.indexOf('PRD.FUND_PROJECT')];
 				$scope.mappingSet['PRD.FUND_CUSTOMER_LEVEL'] = totas.data[totas.key.indexOf('PRD.FUND_CUSTOMER_LEVEL')];

@@ -380,7 +380,7 @@ public class SOT814 extends SotPdf {
 								
 								if (StringUtils.isNotBlank(getString(map2.get("WARNING")))) {
 									XmlInfo xmlInfo = new XmlInfo();
-									Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_ALERT", FormatHelper.FORMAT_3);
+									Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_C_ALERT", FormatHelper.FORMAT_3);
 									String WARNING = map.get(getString(map2.get("WARNING")));
 									addMap.put("WARNING", WARNING);
 								} else {
@@ -460,7 +460,7 @@ public class SOT814 extends SotPdf {
 								
 								if (StringUtils.isNotBlank(getString(record.get("WARNING")))) {
 									XmlInfo xmlInfo = new XmlInfo();
-									Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_ALERT", FormatHelper.FORMAT_3);
+									Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_C_ALERT", FormatHelper.FORMAT_3);
 									String WARNING = map.get(getString(record.get("WARNING")));
 									record.put("WARNING", WARNING);
 								}
@@ -705,7 +705,7 @@ public class SOT814 extends SotPdf {
 				}
 				if (StringUtils.isNotBlank(getString(fitList.get(0).get("WARNING")))) {
 					XmlInfo xmlInfo = new XmlInfo();
-					Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_ALERT", FormatHelper.FORMAT_3);
+					Map<String, String> map = xmlInfo.doGetVariable("PRD.FUND_C_ALERT", FormatHelper.FORMAT_3);
 					String WARNING = map.get(getString(fitList.get(0).get("WARNING")));
 					addMap.put("WARNING", WARNING);
 				} else {

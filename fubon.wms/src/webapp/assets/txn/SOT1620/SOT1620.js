@@ -1293,7 +1293,7 @@ eSoafApp.controller('SOT1620Controller',
 			var prodId = $filter('uppercase')(obj);
 		    
 			if(prodId) {
-				$scope.sendRecv("SOT1620", "getProdDTL", "com.systex.jbranch.app.server.fps.sot1620.SOT1620InputVO", {"prodId": prodId},
+				$scope.sendRecv("SOT1620", "getProdDTL", "com.systex.jbranch.app.server.fps.sot1620.SOT1620InputVO", {"prodId": prodId, "dynamicType": type, "custID": $scope.inputVO.custID},
 					function(tota, isError) {
 						if (!isError) {
 							if (tota[0].body.errorMsg != null && tota[0].body.errorMsg != "") {

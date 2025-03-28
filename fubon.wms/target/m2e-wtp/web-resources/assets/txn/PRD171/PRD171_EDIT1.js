@@ -105,7 +105,8 @@ eSoafApp.controller('PRD171_EDIT1Controller',
 						EXPIRY_DATE     :$scope.toJsDate($scope.row_data.EXPIRY_DATE)   ,
 						APPROVER        :$scope.row_data.APPROVER      ,
 						APP_DATE        :$scope.toJsDate($scope.row_data.APP_DATE)      ,
-						COMPANY_NUM		:$scope.row_data.COMPANY_NUM
+						COMPANY_NUM		:$scope.row_data.COMPANY_NUM,
+						DIVIDEND_YN		:$scope.row_data.DIVIDEND_YN
 				}
 			}
 		}

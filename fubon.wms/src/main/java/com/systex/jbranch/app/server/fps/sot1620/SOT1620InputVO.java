@@ -1,12 +1,8 @@
 package com.systex.jbranch.app.server.fps.sot1620;
 
 import com.systex.jbranch.app.server.fps.sot110.SOT110InputVO;
-import com.systex.jbranch.platform.common.dataaccess.vo.PagingInputVO;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 //基金動態鎖利單筆申購
 public class SOT1620InputVO extends SOT110InputVO {
@@ -39,6 +35,7 @@ public class SOT1620InputVO extends SOT110InputVO {
 	private BigDecimal engagedROI3; // 約定報酬率3
 	private String certificateID; //憑證編號
 	private String confirm; //確認碼	1.檢核 , 空白：確認
+	private String dynamicType;
 	
 	public String getProdIdC1() {
 		return prodIdC1;
@@ -207,6 +204,12 @@ public class SOT1620InputVO extends SOT110InputVO {
 	}
 	public void setCertificateID(String certificateID) {
 		this.certificateID = certificateID;
+	}
+	public String getDynamicType() {
+		return dynamicType;
+	}
+	public void setDynamicType(String dynamicType) {
+		this.dynamicType = dynamicType;
 	}
 		
 }

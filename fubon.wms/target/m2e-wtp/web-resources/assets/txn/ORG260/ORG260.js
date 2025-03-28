@@ -17,7 +17,7 @@ eSoafApp.controller('ORG260Controller', function($scope, $controller, $confirm, 
 						return;
 					}
 					if (tota.length > 0) {
-						$scope.mappingSet['UHRM_LIST'] = tota[0].body.uhrmList;
+						$scope.mappingSet['UHRM_LIST'] = RCRtota[0].body.uhrmList;
 						$scope.inputVO.uEmpID = tota[0].body.uEmpID;
 					}
 		});

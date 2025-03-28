@@ -5,6 +5,7 @@
 </style>
 <script type="text/javascript" src="assets/txn/CRM997/CRM997.js"></script>
 <script type="text/javascript" src="assets/txn/CRM997/CRM997_UPLOAD.js"></script>
+<script type="text/javascript" src="assets/txn/CRM997/CRM997_POTENTIAL_UPLOAD.js"></script>
 <div class="CRM997" ng-controller="CRM997Controller" ng-cloak>
   <div>
     <div class="tfb_content">
@@ -20,18 +21,10 @@
             <td>
               <input type="text" class="form-control" placeholder="請輸入..." ng-model="inputVO.custId" e-length-limit="20" style="width:250px">
             </td>
-            <th>潛力等級：</th>
-            <td>
-              <e-combobox id="potential_level" name="potential_level"
-              ng-datasource="mappingSet['POTENTIAL_LEVEL']"
-              ng-model="inputVO.potential_level"
-              ng-validate="false"
-              ng-readonly="false"
-              ng-editable="false"
-              ng-format="F3"
-              width="155px"
-              style="line-height:20px;" />
-            </td>
+            <th></th><td></td>
+             <th></th><td></td>
+          </tr>
+          <tr>
             <th>體驗等級：</th>
             <td>
               <e-combobox id="experience_level" name="experience_level"
@@ -44,8 +37,6 @@
               width="155px"
               style="line-height:20px;" />
             </td>
-          </tr>
-          <tr>
             <th width = "10%">體驗開始日期：</th>
               <td width = "40%">
                 <div class="input-group datebox datewidth">
@@ -85,13 +76,66 @@
               </div>
               </td>
           </tr>
+          <tr>
+            <th>潛力等級：</th>
+            <td>
+              <e-combobox id="potential_level" name="potential_level"
+              ng-datasource="mappingSet['POTENTIAL_LEVEL']"
+              ng-model="inputVO.potential_level"
+              ng-validate="false"
+              ng-readonly="false"
+              ng-editable="false"
+              ng-format="F3"
+              width="155px"
+              style="line-height:20px;" />
+            </td>
+            <th width = "10%">潛力開始日期：</th>
+              <td width = "40%">
+                <div class="input-group datebox datewidth">
+                  <input type="text" class="form-control"
+                uib-datepicker-popup="yyyy/MM/dd"
+                ng-model="inputVO.potential_begin_date"
+                is-open="model.c"
+                datepicker-options="potential_sDateOptions"
+                ng-readonly="true"
+                ng-change="limitDate2()"
+                size = "13"/>
+                <!-- 製作日曆button -->
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-default" ng-click="open($event,'c')">
+                  <i class="glyphicon glyphicon-calendar"></i>
+                  </button>
+                </span>
+              </div>
+            </td>
+            <th width = "10%">潛力結束日期：</th>
+              <td width = "40%">
+                <div class="input-group datebox datewidth">
+                  <input type="text" class="form-control"
+                uib-datepicker-popup="yyyy/MM/dd"
+                ng-model="inputVO.potential_end_date"
+                is-open="model.d"
+                datepicker-options="potential_eDateOptions"
+                ng-readonly="true"
+                ng-change="limitDate2()"
+                size = "13"/>
+                <!-- 製作日曆button -->
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-default" ng-click="open($event,'d')">
+                  <i class="glyphicon glyphicon-calendar"></i>
+                  </button>
+                </span>
+              </div>
+              </td>
+          </tr>
         </table>
       </div>
       <div class="search_box_btn">
          <div style="text-align: center;">
           <button type="button" class="btn btn-info" ng-click="inquireInit();inquire()">查詢</button>
           <button type="button" class="btn btn-info" ng-click="init();">清除</button>
-          <button type="button" class="btn btn-info" ng-click="upload()">整批匯入</button>
+          <button type="button" class="btn btn-info" ng-click="uploadXP()">體驗匯入</button>
+          <button type="button" class="btn btn-info" ng-click="uploadPT()">潛力匯入</button>
          </div>
       </div>
     </div>
@@ -111,22 +155,30 @@
             <tr>
               <th>客戶ID</th>
               <th>潛力等級</th>
+              <th>潛力起日</th>
+              <th>潛力迄日</th>
+              <th>潛力更新人員</th>
+              <th>潛力更新日期</th>
               <th>體驗等級</th>
-              <th>體驗開始日</th>
-              <th>體驗結束日</th>
-              <th>建立人員及日期</th>
-              <th>修改人員及日期</th>
+              <th>體驗起日</th>
+              <th>體驗迄日</th>
+              <th>體驗更新人員</th>
+              <th>體驗更新日期</th>
             </tr>
           </thead>
           <tbody>
             <tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
               <td>{{row.CUST_ID}}</td>
               <td>{{row.POTENTIAL_LEVEL | mapping:mappingSet['POTENTIAL_LEVEL']:'F3'}}</td>
+              <td>{{toJsDate(row.POTENTIAL_BEGIN_DATE) | date:"yyyy-MM-dd"}}</td>
+              <td>{{toJsDate(row.POTENTIAL_END_DATE) | date:"yyyy-MM-dd"}}</td>
+              <td>{{row.PT_MODIFIER}}</td>
+              <td>{{row.PT_LASTUPDATE}}</td>
               <td>{{row.EXPERIENCE_LEVEL | mapping:mappingSet['EXPERIENCE_LEVEL']:'F3'}}</td>
               <td>{{toJsDate(row.EXPERIENCE_BEGIN_DATE) | date:"yyyy-MM-dd"}}</td>
               <td>{{toJsDate(row.EXPERIENCE_END_DATE) | date:"yyyy-MM-dd"}}</td>
-              <td>{{row.CREATOR}} / {{row.CREATETIME}}</td>
-              <td>{{row.MODIFIER}} / {{row.LASTUPDATE}}</td>
+              <td>{{row.XP_MODIFIER}}</td>
+              <td>{{row.XP_LASTUPDATE}}</td>
             </tr>
           </tbody>
         </table>

@@ -78,7 +78,7 @@
 									ng-editable="false"
 									ng-format="F3"
 									ng-required="false"
-									ng-change="ChangeRegion(region)"
+									ng-change="ChangeRegion(region);getUHRMList()"
 									style="line-height:20px;" />
 				   	</td>
 					<th>*營運區：</th>
@@ -92,7 +92,7 @@
 									ng-editable="false"
 									ng-format="F3"
 									ng-required="false"
-									ng-change="ChangeArea(region)"
+									ng-change="ChangeArea(region);getUHRMList()"
 									style="line-height:20px;" />
 				   	</td>
 					<th>分行：</th>
@@ -141,6 +141,20 @@
 			    	</td>
 			    	<th>客戶ID:</th>
 					<td><input type="text" class="form-control" placeholder="請輸入..." id="custId" name="custId" style="text-transform: uppercase;" ng-model="inputVO.custId" e-length-limit="16"></td>
+				</tr>
+				<tr ng-show="priID == '013' || memLoginFlag == 'ALL'">
+					<th>私銀員工姓名：</th>
+					<td>
+						<e-combobox id="uEmpId" name="uEmpId"
+									ng-datasource="mappingSet['UHRM_LIST']"
+									ng-model="inputVO.uEmpId"
+									ng-validate="false" 
+									ng-disabled="false"
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F1"
+									style="line-height:20px;" />
+			    	</td>
 				</tr>
 				<tr ng-show="tabSheet == '3' || tabSheet == '4' || tabSheet == '5'">
 					<th>*活動名稱:</th>
@@ -247,8 +261,17 @@
 									ng-format="F3"
 									style="line-height:20px;"/>
 					</td>
-					<th></th>
-					<td></td>
+					<th>名單分類：</th>
+	              	<td>
+	              		<e-combobox id="leadType" name="leadType" 
+									ng-paramtype="CAM.CAMP_TYPE"
+									ng-model="inputVO.campType"
+									ng-validate="false" 
+									ng-readonly="false" 
+									ng-editable="false"
+									ng-format="F3"
+									style="line-height:20px;" />
+	              	</td>
 				</tr>
 				<tr ng-show="(tabSheet == '0' || tabSheet == '1' || tabSheet == '2') && (!inputVO.op && !inputVO.custId)">
 					<th></th>

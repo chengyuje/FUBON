@@ -61,6 +61,7 @@ public class BTIOT005 extends BizLogic {
 		sb.append(" select INS_ID ");
 		sb.append(" from VWIOT_MAIN ");
 		sb.append(" where TRUNC(INS_SUBMIT_DATE) = TRUNC(SYSDATE) ");
+		sb.append(" AND NVL(NO_PAPER_YN, 'N') = 'N' ");
 		
 		//執行SQL
 		qc.setQueryString(sb.toString());

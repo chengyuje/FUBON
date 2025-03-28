@@ -67,6 +67,8 @@ public class CRM210InputVO extends PagingInputVO {
 	private String manage_05_Date;
 	private String manage_06_fee_s;
 	private String manage_06_fee_e;
+	private String roa_s;
+	private String roa_e;
 	private String campaign_ao_code;
 	private Date campaign_date;
 	
@@ -74,6 +76,7 @@ public class CRM210InputVO extends PagingInputVO {
 	private String IS_ACTUAL;		// 是否實動戶
 	private String cust_w8ben;      // W-8BEN(W-8BEN-E)
 	private String IS_VOC;			// 是否有承租保管箱
+	private String hnwc_flag;		// 高資產客戶註記
 
 	public String getIS_VOC() {
 		return IS_VOC;
@@ -595,6 +598,22 @@ public class CRM210InputVO extends PagingInputVO {
 		this.manage_06_fee_e = manage_06_fee_e;
 	}
 	
+	public String getRoa_s() {
+		return roa_s;
+	}
+
+	public void setRoa_s(String roa_s) {
+		this.roa_s = roa_s;
+	}
+
+	public String getRoa_e() {
+		return roa_e;
+	}
+
+	public void setRoa_e(String roa_e) {
+		this.roa_e = roa_e;
+	}
+
 	public String getCampaign_ao_code() {
 		return campaign_ao_code;
 	}
@@ -609,6 +628,14 @@ public class CRM210InputVO extends PagingInputVO {
 
 	public void setCampaign_date(Date campaign_date) {
 		this.campaign_date = campaign_date;
+	}
+
+	public String getHnwc_flag() {
+		return hnwc_flag;
+	}
+
+	public void setHnwc_flag(String hnwc_flag) {
+		this.hnwc_flag = hnwc_flag;
 	}
 
 }

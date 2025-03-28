@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -157,9 +158,14 @@ public class PMS428 extends FubonWmsBizLogic {
 			sb.append("AND CD.RM_FLAG = 'U' ");
 		}
 		
+		if (StringUtils.isNotEmpty(inputVO.getDataSource())) {
+			sb.append("AND CD.DATA_SOURCE LIKE :dataSource ");
+ 			queryCondition.setObject("dataSource", "%" + inputVO.getDataSource() + "%");
+		}
+		
 		//由工作首頁 CRM181 過來，只須查詢主管尚未確認資料
-        if(StringUtils.equals("Y", inputVO.getFrom181())){
-        	sb.append("AND FIRSTUPDATE IS NULL ");
+        if (StringUtils.equals("Y", inputVO.getFrom181())) {
+        	sb.append("AND CD.FIRSTUPDATE IS NULL ");
         }
         
         // #0001258_WMS-CR-20220829-01_因應高齡客戶交易加強關懷擬優化內控報表欄位 : 新增「行員員編ID」，以利查詢行員區間內產出相關資訊。
@@ -251,17 +257,19 @@ public class PMS428 extends FubonWmsBizLogic {
 
 		List<Map<String, Object>> list = inputVO.getExportList();
 
-		String fileName = "理財戶大額轉出日報_" + sdfYYYYMMDD.format(inputVO.getsDate()) + "-" + sdfYYYYMMDD.format(inputVO.geteDate()) + ".xlsx";
+		String reportName = "理財戶大額轉出日報";
+		String fileName = reportName + "_" + sdfYYYYMMDD.format(inputVO.getsDate()) + "-" + sdfYYYYMMDD.format(inputVO.geteDate()) + ".xlsx";
 		String uuid = UUID.randomUUID().toString();
 		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
 
 		String filePath = Path + uuid;
 
 		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet("理財戶大額轉出日報");
+		XSSFSheet sheet = workbook.createSheet(reportName);
 		sheet.setDefaultColumnWidth(20);
 		sheet.setDefaultRowHeightInPoints(20);
 
+		// 表頭 CELL型式
 		XSSFCellStyle headingStyle = workbook.createCellStyle();
 		headingStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
 		headingStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
@@ -272,6 +280,24 @@ public class PMS428 extends FubonWmsBizLogic {
 		headingStyle.setBorderLeft((short) 1);
 		headingStyle.setBorderRight((short) 1);
 		headingStyle.setWrapText(true);
+
+		// 資料 CELL型式
+		XSSFCellStyle mainStyle = workbook.createCellStyle();
+		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		mainStyle.setBorderBottom((short) 1);
+		mainStyle.setBorderTop((short) 1);
+		mainStyle.setBorderLeft((short) 1);
+		mainStyle.setBorderRight((short) 1);
+		
+		// 資料 CELL型式
+		XSSFCellStyle titleStyle = workbook.createCellStyle();
+		titleStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+		titleStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderBottom((short) 1);
+		titleStyle.setBorderTop((short) 1);
+		titleStyle.setBorderLeft((short) 1);
+		titleStyle.setBorderRight((short) 1);
 
 		String[] headerLine = { "私銀註記", 
 								"資料日期",
@@ -294,6 +320,7 @@ public class PMS428 extends FubonWmsBizLogic {
 								"首次建立時間",
 								"最新異動人員",
 								"最新異動日期 "};
+		
 		String[] mainLine	= { "RM_FLAG", 
 								"CREATETIME",
 								"DATA_SOURCE",
@@ -319,6 +346,15 @@ public class PMS428 extends FubonWmsBizLogic {
 		Integer index = 0;
 
 		XSSFRow row = sheet.createRow(index);
+		for (int i = 0; i < 1; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(titleStyle);
+			cell.setCellValue(reportName);
+		}
+		
+		index++;
+		
+		row = sheet.createRow(index);
 		for (int i = 0; i < headerLine.length; i++) {
 			XSSFCell cell = row.createCell(i);
 			cell.setCellStyle(headingStyle);
@@ -326,15 +362,6 @@ public class PMS428 extends FubonWmsBizLogic {
 		}
 
 		index++;
-
-		// 資料 CELL型式
-		XSSFCellStyle mainStyle = workbook.createCellStyle();
-		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
-		mainStyle.setBorderBottom((short) 1);
-		mainStyle.setBorderTop((short) 1);
-		mainStyle.setBorderLeft((short) 1);
-		mainStyle.setBorderRight((short) 1);
 
 		for (Map<String, Object> map : list) {
 			row = sheet.createRow(index);

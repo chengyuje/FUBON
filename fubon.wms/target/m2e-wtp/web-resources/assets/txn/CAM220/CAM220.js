@@ -25,14 +25,17 @@ eSoafApp.controller('CAM220Controller',
 			$scope.tabType = 'tab1';
 		}
 		
-		$scope.startDateOptions = {
-			maxDate: $scope.inputVO.eDate || $scope.maxDate,
-			minDate: $scope.minDate
-		};
-		$scope.endDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.inputVO.sDate || $scope.minDate
-		};
+		$scope.optionsInit = function() {
+			$scope.startDateOptions = {
+				maxDate: $scope.inputVO.eDate || $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.endDateOptions = {
+				maxDate: $scope.maxDate,
+				minDate: $scope.inputVO.sDate || $scope.minDate
+			};
+		}
+		
 		$scope.altInputFormats = ['M!/d!/yyyy'];
 		$scope.model = {};
 		$scope.open = function($event, elementOpened) {
@@ -42,7 +45,19 @@ eSoafApp.controller('CAM220Controller',
 		};
 		$scope.limitDate = function() {
 			$scope.startDateOptions.maxDate = $scope.inputVO.eDate || $scope.maxDate;
+			if ($scope.inputVO.eDate) {
+				let y = $scope.inputVO.eDate.getFullYear();
+				let m = $scope.inputVO.eDate.getMonth() - 6;
+				let d = $scope.inputVO.eDate.getDate();
+				$scope.startDateOptions.minDate = new Date(y, m, d);
+			}
 			$scope.endDateOptions.minDate = $scope.inputVO.sDate || $scope.minDate;
+			if ($scope.inputVO.sDate) {
+				let y = $scope.inputVO.sDate.getFullYear();
+				let m = $scope.inputVO.sDate.getMonth() + 6;
+				let d = $scope.inputVO.sDate.getDate();
+				$scope.endDateOptions.maxDate = new Date(y, m, d);
+			}
 		};
 		
         $scope.init = function(){
@@ -67,7 +82,7 @@ eSoafApp.controller('CAM220Controller',
 					sDate: $scope.inputVO.sDate,
 					eDate: $scope.inputVO.eDate
         	};
-
+        	$scope.optionsInit();
 			$scope.limitDate();
 			// 2017/9/6
 			$scope.checkVO = {};
@@ -126,6 +141,7 @@ eSoafApp.controller('CAM220Controller',
 					sDate: undefined,
 					eDate: undefined,
         	};
+			$scope.optionsInit();
         	$scope.limitDate();
         	$scope.logList = [];
         	$scope.logListOutputVO = {};
@@ -452,10 +468,13 @@ eSoafApp.controller('CAM220Controller',
 	    $scope.logList = [];
 	    $scope.getLogList = function() {
 	    	// 2017/8/3 russle add 必填
-        	if(!$scope.inputVO.branchID) {
-        		$scope.showErrorMsg('請選擇分行');
-        		return;
-        	}
+			if (!$scope.inputVO.branchID) {
+				$scope.showErrorMsg('請選擇分行');
+				return;
+			} else if (!$scope.inputVO.sDate || !$scope.inputVO.eDate) {
+				$scope.showErrorMsg('請選分派日期區間');
+				return;
+			}
 			$scope.sendRecv("CAM220", "getLogList", "com.systex.jbranch.app.server.fps.cam220.CAM220InputVO", $scope.inputVO,
         			function(tota, isError) {
         				if (!isError) {

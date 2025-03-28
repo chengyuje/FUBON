@@ -22,6 +22,7 @@
 <script type="text/javascript" src="assets/txn/IOT150/IOT150_notFbGenPrint.js"></script>
 <script type="text/javascript" src="assets/txn/IOT150/IOT150_notFbSigReview.js"></script>
 <script type="text/javascript" src="assets/txn/IOT150/IOT150_notFbReviewForm.js"></script>
+<script type="text/javascript" src="assets/txn/IOT150/IOT150_OVERDUE.js"></script>
 
 <div ng-controller="IOT150Controller" ng-cloak>
     <div class="tfb_content">
@@ -143,11 +144,11 @@
                     </th>
                 </tr>
                 <tr>
-                    <th>點收經辦員編(簽署前)</th>
+                    <th>點收經辦員編(檢核前)</th>
                     <td>
                         <input id="bef_sign_oprid" name="bef_sign_oprid" type="text" placeholder="請輸入..." ng-model="inputVO.BEF_SIGN_OPRID">
                     </td>
-                    <th>*點收日期(簽署前)</th>
+                    <th>*點收日期(檢核前)</th>
                     <td colspan="2" class="form-inline">
                         <div class="form-group">
                             <div class="input-group datebox datewidth">
@@ -163,11 +164,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>簽署人員編</th>
+                    <th>檢核人員編</th>
                     <td>
                         <input id="sign_oprid" name="sign_oprid" type="text" placeholder="請輸入..." ng-model="inputVO.SIGN_OPRID">
                     </td>
-                    <th>簽署日期</th>
+                    <th>檢核日期</th>
                     <td colspan="2" class="form-inline">
                         <div class="form-group">
                             <div class="input-group datebox datewidth">
@@ -183,11 +184,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>點收經辦員編(簽署後)</th>
+                    <th>點收經辦員編(檢核後)</th>
                     <td>
                         <input id="aft_sign_oprid" name="aft_sign_oprid" type="text" placeholder="請輸入..." ng-model="inputVO.AFT_SIGN_OPRID">
                     </td>
-                    <th>點收日期(簽署後)</th>
+                    <th>點收日期(檢核後)</th>
                     <td colspan="2" class="form-inline">
                         <div class="form-group">
                             <div class="input-group datebox datewidth">
@@ -239,10 +240,11 @@
             <button ng-click="queryData()" class="btn btn-info">查詢</button>
             <button ng-click="btnClear()" class="btn btn-info">清除</button>
             <button ng-click="export()" class="btn btn-info">匯出</button>
-            <button ng-click="insSigRpt()" class="btn btn-info">人壽待簽署管理報表</button>
+            <button ng-click="insSigRpt()" class="btn btn-info">人壽待檢核管理報表</button>
             <button function-type="query" ng-click="notFbGenPrint()" class="btn btn-info">非富壽_送件明細表產生暨補印</button>
             <button function-type="query" ng-click="notFbSigReview()" class="btn btn-info">非富壽_送件明細表保險公司簽收回覆</button>
             <button ng-click="exportRecordYN()" class="btn btn-info">保險資金電訪報表</button>
+            <button ng-click="exportOverdue()" class="btn btn-info">逾期查詢</button>
         </div>
         <div class="text-right">
             <e-jumping-once ng-show="inputVO" output="outputVO" totallist="IOT_MAINList" list="data" rowcountlimit="300">
@@ -252,7 +254,7 @@
             <table ng-show="othertable==false?true:false" style="width: 420%;" class="e-table-freeze" e-height="500px" e-mode="3" e-top="true" e-left="4" e-list="data">
                 <thead>
                     <tr>
-						<th ng-show="signViewFileShow">簽署/檢視文件 </th>
+						<th ng-show="signViewFileShow">檢核/檢視文件 </th>
                         <th>
                             <input class="uniform_on bLarger" type='checkbox' id="selectPass_all" name="selectPass_all" ng-model="inputVO.selectPass_all" ng-true-value="'Y'" ng-false-value="'N'" ng-change="selectall()"" ng-disabled="inputVO.selectNoPass_all == 'Y'?true:false" />通過
                         </th>
@@ -276,6 +278,7 @@
                         <th>備註(傳給人壽)</th>
                         <th>要保人ID</th>
                         <th>要保人姓名</th>
+                        <th>檢核人OP</th>
                         <th ng-show="otherDataShow">保單號碼</th>
                         <th>送達方式</th>
                         <th>批次</th>
@@ -285,20 +288,20 @@
                         <th>人壽回饋說明</th>
                         <th>人壽簽收時間</th>
                         <th>分行送件批號</th>
-                        <th>行助員編(批次設定)</th>
-                        <th>行助簽收日(批次設定)</th>
-                        <th>行助員編(簽署前)</th>
-                        <th>行助簽收日(簽署前)</th>
+                        <th>總行員編(批次設定)</th>
+                        <th>總行簽收日(批次設定)</th>
+                        <th>總行員編(檢核前)</th>
+                        <th>總行簽收日(檢核前)</th>
                         <th>總行送件批號</th>
-                        <th>簽署人員編</th>
-                        <th>簽署日期</th>
-                        <th>簽署人批號</th>
-                        <th>行助員編(簽署後)</th>
-                        <th>行助簽收日(簽署後)</th>
+                        <th>檢核人員編</th>
+                        <th>檢核日期</th>
+                        <th>檢核人批號</th>
+                        <th>總行員編(檢核後)</th>
+                        <th>總行簽收日(檢核後)</th>
                         <th>分行留存文件</th>
-                        <th>人壽系統簽署人員編</th>
-                        <th>人壽系統簽署日期</th>
-                        <th>人壽系統簽署結果</th>
+                        <th>人壽系統檢核人員編</th>
+                        <th>人壽系統檢核日期</th>
+                        <th>人壽系統檢核結果</th>
                         <th>保單進件來源</th>
                         <th>保險公司</th>
                         <th>契撤案件</th>
@@ -309,10 +312,10 @@
                     <tr ng-repeat="row in data" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
                         <td ng-show="signViewFileShow">
                         	<button ng-show="row.isOpBatchNonewEtopShow && (row.STATUS == 40 || row.STATUS == 62)" ng-click="signView('sign')" class="btn btn-info">
-                        		簽署
+                        		檢核
                         	</button>
                         	<button ng-show="row.isOpBatchS && (row.STATUS == 60 || row.STATUS == 70 || row.STATUS == 80)" ng-click="signINSView()" class="btn btn-info">
-                        		簽署(人壽)
+                        		檢核(人壽)
                         	</button>
                         	<button ng-show="((row.isOpBatchNonewEtopShow && (row.STATUS != 40 && row.STATUS != 62)) || row.isOpBatchS)" ng-click="pdfFile(row.INS_ID)" class="btn btn-info">
                         		檢視文件
@@ -322,6 +325,9 @@
                         	</button>
                         	<button ng-show="row.MAPPVIDEO_YN == 'Y'" ng-click="openMAPPVideoDialog(row)" class="btn btn-info">
                         		影像品質檢核項目
+                        	</button>
+                        	<button ng-show="row.FUND_UPLOAD_YN == 'Y'" ng-click="openFundUploadFile(row.INS_KEYNO)" class="btn btn-info">
+                        		上傳檔案檢視
                         	</button>
                         </td>
                         <td>
@@ -357,6 +363,7 @@
                         </td>
                         <td>{{row.CUST_ID}}</td>
                         <td>{{row.PROPOSER_NAME}}</td>
+                        <td>{{row.CREATOR}}</td>
                         <td ng-show="otherDataShow">
                             <div style="width: 200px;">{{row.POLICY_NO}}</div>
                         </td>

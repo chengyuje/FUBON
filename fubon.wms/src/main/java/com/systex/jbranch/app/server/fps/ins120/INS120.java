@@ -142,7 +142,7 @@ public class INS120 extends FubonWmsBizLogic {
 		if (StringUtils.isNotBlank(inputVO.getCustId())) {
 			sb.append(" AND HIS.CUST_ID = :custId ");
 			queryCondition.setObject("custId", inputVO.getCustId());
-			logger.info("custId:" + inputVO.getCustId());
+//			logger.info("custId:" + inputVO.getCustId());
 		}
 		if (null !=inputVO.getAgreeSdate() && null !=inputVO.getAgreeEdate()) {
 			sb.append(" AND TRUNC(REPORT.CREATETIME) BETWEEN TRUNC(:agreeSdate) AND TRUNC(:agreeEdate) ");

@@ -230,7 +230,7 @@ eSoafApp.controller('KYC310Controller', function(
     $scope.queryData = function(){
     	$scope.inipersional();
     	$scope.inquireInit();
-    	debugger;
+    	
     	if($scope.inputVO.CUST_ID ==''){
     		//無客戶ID但必須輸入解說人員
     		if($scope.inputVO.COMMENTARY_STAFF == ''){
@@ -321,7 +321,9 @@ eSoafApp.controller('KYC310Controller', function(
 						
 						//未滿18歲法代風險屬性
 						$scope.inputVO.legalRegKycLevel = tota[0].body.legalRegKycLevel;
-							
+//						//端末年收入
+//						$scope.inputVO.incomeFromCBS = tota[0].body.incomeFromCBS;
+						
 						if($scope.quest_list != null && $scope.inputVO.CUST_ID.length>=10){
     						$scope.temp_QNineAns = angular.copy($scope.quest_list[8].ANSWER_LIST);
 						}
@@ -1648,37 +1650,74 @@ eSoafApp.controller('KYC310Controller', function(
     		//add by Brian
     		$scope.basic_information = angular.copy($scope.inputVO)
     		$scope.inputVO.basic_information = $scope.basic_information;
-			$scope.sendRecv("KYC310" , "submit" , $scope.kyc310inputvo , $scope.inputVO , function(tota,isError){
-            	if (isError) {
-            		$scope.showErrorMsg(tota[0].body.msgData);
+    		//檢核是否需要填寫差異說明表
+    		$scope.sendRecv("KYC310" , "getLastKYCComparisonData" , $scope.kyc310inputvo , $scope.inputVO , function(tota,isError) {
+    			debugger
+    			if (!isError) {
+    				$scope.inputVO.NEED_COMPARISON_YN = "N";
+            		if(tota[0].body.lastKYCComparisonData && tota[0].body.lastKYCComparisonData.NEED_COMPARISON_YN == "Y") { //需填寫差異表
+    					$scope.inputVO.NEED_COMPARISON_YN = tota[0].body.lastKYCComparisonData.NEED_COMPARISON_YN; //是否需填寫差異表問卷
+    					$scope.inputVO.COMP_QUES = tota[0].body.lastKYCComparisonData.COMP_QUES; //差異表問卷內容
+    					$scope.inputVO.LAST_SEQ = tota[0].body.lastKYCComparisonData.LAST_SEQ; //比較差異的(前次)客戶風險評估問卷主鍵
+    					$scope.inputVO.LAST_ANSWER_2 = tota[0].body.lastKYCComparisonData.LAST_ANSWER_2; //比較差異的(前次)問卷答案選項
+    					
+            			var inputVO = $scope.inputVO;
+            			var dialog = ngDialog.open({
+            				template: 'assets/txn/KYC310/KYC310_COMPARISON.html',
+            				className: 'KYC310_COMPARISON',
+            				controller:['$scope',function($scope){
+            					$scope.inputVO = inputVO;
+            				}]
+            			});
+            			dialog.closePromise.then(function(data){
+            				debugger
+            				if(data.value != undefined && data.value != 'cancel') {
+            					//差異表填答答案內容
+            					$scope.inputVO.ANSWER_COMP = data.value;
+            					//存檔
+            					$scope.doSubmit(); 
+            				}
+            			});
+            		} else {
+            			//不需填寫差異表，直接存檔
+            			$scope.doSubmit(); 
+            		}
             	}
-            	
-            	if (tota.length > 0) {
-            		if($scope.inputVO.gender_M==true){
-            			$scope.inputVO.GENDER ='男';
-					}
-            		if($scope.inputVO.gender_W==true){
-						$scope.inputVO.GENDER ='女'
-					}
-            		$scope.inputVO.EXPIRY_DATE = tota[0].body.EXPIRY_DATE;
-            		$scope.inputVO.seq = tota[0].body.seq;
-            		$scope.showSuccessMsg('ehl_01_common_001');
-            		$scope.connector('set','KYC310Question',$scope.quest_list);
-            		$scope.connector('set','KYC310', $scope.inputVO);
-            		$rootScope.menuItemInfo.url = "assets/txn/KYC311/KYC311.html";
-            	};
-			});
-    	}
-    	else{
+    		});
+    	} else {
     		$scope.showErrorMsg('行動必須09開頭');
     	}
     }
    
+    $scope.doSubmit = function() {
+    	$scope.sendRecv("KYC310" , "submit" , $scope.kyc310inputvo , $scope.inputVO , function(tota,isError){
+        	if (isError) {
+        		$scope.showErrorMsg(tota[0].body.msgData);
+        	}
+        	
+        	if (tota.length > 0) {
+        		if($scope.inputVO.gender_M==true){
+        			$scope.inputVO.GENDER ='男';
+				}
+        		if($scope.inputVO.gender_W==true){
+					$scope.inputVO.GENDER ='女'
+				}
+        		$scope.inputVO.EXPIRY_DATE = tota[0].body.EXPIRY_DATE;
+        		$scope.inputVO.seq = tota[0].body.seq;
+        		$scope.showSuccessMsg('ehl_01_common_001');
+        		$scope.connector('set','KYC310Question',$scope.quest_list);
+        		$scope.connector('set','KYC310', $scope.inputVO);
+        		$rootScope.menuItemInfo.url = "assets/txn/KYC311/KYC311.html";
+        	};
+		});
+    }
+    
     $scope.dobouledo = function(){
     	$scope.inputVO.seq = $scope.persional[0].SEQ;
     	$scope.inputVO.CUST_RISK_AFR = $scope.persional[0].CUST_RISK_AFR;
     	$scope.inputVO.EXAM_VERSION = $scope.persional[0].EXAM_VERSION;
     	$scope.inputVO.EXPIRY_DATE = $scope.persional[0].EXPIRY_DATE;
+    	$scope.inputVO.NEED_COMPARISON_YN = $scope.persional[0].NEED_COMPARISON_YN;
 		$scope.connector('set','KYC310Question',$scope.quest_list);
 		$scope.connector('set','KYC310', $scope.inputVO);
 		$rootScope.menuItemInfo.url = "assets/txn/KYC311/KYC311.html";

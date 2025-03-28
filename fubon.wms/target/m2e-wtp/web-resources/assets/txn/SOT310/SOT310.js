@@ -9,9 +9,12 @@ eSoafApp.controller('SOT310Controller',
 		$scope.controllerName = "SOT310Controller";
 		//繼承PRD100高齡檢核
 		$controller('PRD100Controller', {$scope: $scope});
+		var pageID = $scope.connector('get','SOT310PAGE'); // 從哪前來SOT315
+		$scope.connector('set','SOT310PAGE', null);
+//		alert(pageID);
 
 		// filter
-		getParameter.XML(["SOT.CUST_TYPE", "SOT.MARKET_TYPE","SOT.SPEC_CUSTOMER","SOT.BN_CUR_LIMIT","SOT.BN_CUR_LIMIT_GTC", "SOT.BN_GTC_LIMITPRICE_RANGE", "OTH001", "SOT.BOND_WEB_TIMESTAMP"], function(totas) {
+		getParameter.XML(["SOT.CUST_TYPE", "SOT.MARKET_TYPE","SOT.SPEC_CUSTOMER","SOT.BN_CUR_LIMIT","SOT.BN_CUR_LIMIT_GTC", "SOT.BN_GTC_LIMITPRICE_RANGE", "OTH001", "SOT.BOND_WEB_TIMESTAMP","SOT.BOND_WEB_AMT_LIMIT"], function(totas) {
 			if (totas) {
 				$scope.mappingSet['SOT.CUST_TYPE'] = totas.data[totas.key.indexOf('SOT.CUST_TYPE')];
 				$scope.mappingSet['SOT.MARKET_TYPE'] = totas.data[totas.key.indexOf('SOT.MARKET_TYPE')];
@@ -22,6 +25,7 @@ eSoafApp.controller('SOT310Controller',
 				$scope.mappingSet['SOT.BN_GTC_LIMITPRICE_RANGE'] = totas.data[totas.key.indexOf('SOT.BN_GTC_LIMITPRICE_RANGE')]
 				$scope.mappingSet['CBS.ORDERDATE'] = totas.data[totas.key.indexOf('OTH001')].filter(e => e.DATA === 'ORDER_DATE');
 				$scope.mappingSet['SOT.BOND_WEB_TIMESTAMP'] = totas.data[totas.key.indexOf('SOT.BOND_WEB_TIMESTAMP')];//當日14:50(以參數設定)之後不可使用網銀快速申購
+				$scope.mappingSet['SOT.BOND_WEB_AMT_LIMIT'] = totas.data[totas.key.indexOf('SOT.BOND_WEB_AMT_LIMIT')];//快速申購金額上限
 				debugger;
 			}
 		});
@@ -45,12 +49,15 @@ eSoafApp.controller('SOT310Controller',
 				}
 			});
 		};
-		$scope.getMaxGtcEndDate();
-
+		
+		if (pageID != 'SOT315') {
+			$scope.getMaxGtcEndDate();
+		}
+		
 		// date picker
 //		$scope.apply_gtcEndDateOptions = {
-//				maxDate: $scope.maxDate,
-//				minDate: $scope.minDate
+//			maxDate: $scope.maxDate,
+//			minDate: $scope.minDate
 //		};
 
 		$scope.model = {};
@@ -65,17 +72,17 @@ eSoafApp.controller('SOT310Controller',
 			var minEndDate   = $scope.inputVO.MIN_GTC_END_DATE;
 			var maxEndDate   = $scope.inputVO.MAX_GTC_END_DATE;
 			
-			var endDate = undefined;
-			if ($scope.inputVO.gtcYN != 'P' && $scope.inputVO.gtcEndDate != undefined) {
-				endDate = angular.copy($scope.inputVO.gtcEndDate);
-				endDate = endDate.setDate(endDate.getDate()-1);					
-				endDate = new Date(endDate);
-				if (endDate > maxEndDate) {
-					endDate = maxEndDate;
-				}
-			}
+//			var endDate = undefined;
+//			if ($scope.inputVO.gtcYN != 'P' && $scope.inputVO.gtcEndDate != undefined) {
+//				endDate = angular.copy($scope.inputVO.gtcEndDate);
+//				endDate = endDate.setDate(endDate.getDate()-1);					
+//				endDate = new Date(endDate);
+//				if (endDate > maxEndDate) {
+//					endDate = maxEndDate;
+//				}
+//			}
 			$scope.apply_gtcStartDateOptions.minDate = minStartDate;
-			$scope.apply_gtcStartDateOptions.maxDate = endDate || maxStartDate;
+			$scope.apply_gtcStartDateOptions.maxDate = maxStartDate;
 			
 			// 長效單起迄日邏輯：最短2日最長5日,要連續的日期區間
 			if ($scope.inputVO.gtcYN == 'Y') {
@@ -100,6 +107,13 @@ eSoafApp.controller('SOT310Controller',
 			} else {
 				$scope.apply_gtcEndDateOptions.minDate = minEndDate;
 				$scope.apply_gtcEndDateOptions.maxDate = maxEndDate;
+			}
+			
+			if ($scope.inputVO.gtcStartDate != undefined && $scope.inputVO.gtcEndDate != undefined) {
+				if ($scope.inputVO.gtcStartDate > $scope.inputVO.gtcEndDate) {
+					// 若起日大於迄日，則清空迄日
+					$scope.inputVO.gtcEndDate = undefined;
+				}
 			}
 		};
 
@@ -231,7 +245,8 @@ eSoafApp.controller('SOT310Controller',
 					hnwcYN: '',									//是否為高資產客戶 Y/N 
 					hnwcServiceYN: '',							//可提供高資產商品或服務 Y/N 
 					flagNumber: '',								//90天內是否有貸款紀錄 Y/N
-					otherWithCustId: false						//是否帶客戶ID進來(快查)
+					otherWithCustId: false,					//是否帶客戶ID進來(快查)
+					kycDueDateLessOneMonth : false              //KYC校期小於等於1個月(30天)
 			};
 			var custID = $scope.connector('get','ORG110_custID');
 
@@ -319,7 +334,7 @@ eSoafApp.controller('SOT310Controller',
 			$scope.inputVO.tradeDate = undefined;						//交易日期
 			$scope.inputVO.limitedPrice = undefined;
 			$scope.inputVO.bestFeeRate = undefined;						//最優手續費率
-			$scope.inputVO.gtcYN = 'N';									//當日單N, 長效單Y
+			$scope.inputVO.gtcYN = null;									//當日單N, 長效單Y
 			$scope.inputVO.gtcEndDate = undefined;						//長效單迄日
 			$scope.nvlAMT = undefined;
 			$scope.sumITEM = undefined;
@@ -587,6 +602,8 @@ eSoafApp.controller('SOT310Controller',
 			$scope.inputVO.hnwcYN = row.hnwcYN;
 			$scope.inputVO.hnwcServiceYN = row.hnwcServiceYN;
 			$scope.inputVO.flagNumber = row.flagNumber;							//90天內是否有貸款紀錄 Y/N
+			debugger;
+			$scope.inputVO.kycDueDateLessOneMonth = row.kycDueDateLessOneMonth;
 			
 			$scope.mappingSet['SOT.DEBIT_ACCT_LIST'] = row.debitAcct;
 			$scope.mappingSet['SOT.TRUST_ACCT_LIST'] = row.trustAcct;
@@ -822,6 +839,7 @@ eSoafApp.controller('SOT310Controller',
 									// 金錢信託
 									$scope.inputVO.contractID = tota[0].body.carList[0].CONTRACT_ID;					//契約編號
 									$scope.inputVO.trustPeopNum = tota[0].body.carList[0].TRUST_PEOP_NUM;				//是否為多委託人契約 Y=是/N=否
+									
 								});
 							});
 
@@ -858,7 +876,8 @@ eSoafApp.controller('SOT310Controller',
 																															'purchaseAmt': $scope.inputVO.purchaseAmt,
 																															'txFeeType': '1',
 																															'trustAcct': $scope.inputVO.trustAcct,
-																															'debitAcct': debitAccount},
+																															'debitAcct': debitAccount,
+																															'isOBU':$scope.inputVO.isOBU},
 				function(tota1, isError) {
 					if (!isError) {
 						$scope.inputVO.payableFeeRate = tota1[0].body.payableFeeRate;
@@ -937,8 +956,7 @@ eSoafApp.controller('SOT310Controller',
 			if($scope.inputVO.purchaseAmt != undefined){
 				$scope.inputVO.purchaseAmt = $scope.moneyUnFormat($scope.inputVO.purchaseAmt);
 			}
-			if (($scope.inputVO.purchaseAmt >= $scope.inputVO.prodMinBuyAmt) &&
-				($scope.inputVO.purchaseAmt % $scope.inputVO.prodMinGrdAmt == 0)) {
+			if (true) {
 				
 				if (flag) {
 					$scope.entrustAmtDisabled = false;
@@ -975,17 +993,23 @@ eSoafApp.controller('SOT310Controller',
 							$scope.entrustDisabled = false;
 						}
 						
-						//不可議價
-						$scope.changeFee = undefined;
-						$scope.changeFeeDisabled = true;
+						$scope.changeFeeDisabled = false;
 						$scope.getDefaultFeeRateData().then(function(data) {
 							$scope.getFee('rate');
 						});
+//						//不可議價
+//						$scope.changeFee = undefined;
+//						$scope.changeFeeDisabled = true;
+//						$scope.getDefaultFeeRateData().then(function(data) {
+//							$scope.getFee('rate');
+//						});
 					} else { //當日單
+					debugger;
 						$scope.changeFeeDisabled = false;
 
 						angular.forEach($scope.mappingSet['SOT.BN_CUR_LIMIT'], function(row){
 							if ($scope.inputVO.prodCurr == row.DATA && $scope.inputVO.purchaseAmt < Number(row.LABEL)) {
+								debugger;
 								$scope.sendRecv("SOT310", "limitPrice", "com.systex.jbranch.app.server.fps.sot310.SOT310InputVO",
 								{'custID':$scope.inputVO.custID, 'prodID':$scope.inputVO.prodID} ,
 								function(tota, isError) {
@@ -1045,15 +1069,21 @@ eSoafApp.controller('SOT310Controller',
 							}
 						});
 					}
-				} else if(!flag && $scope.inputVO.gtcYN == "Y") { //長效單，修改限價價格
-					//參數取得"限價超過參考報價的正負N"
-					var rangelist = $filter('filter')($scope.mappingSet["SOT.BN_GTC_LIMITPRICE_RANGE"], "1");
+				} else if(!flag && $scope.inputVO.gtcYN != "N") { 
+					// 長效單/預約單，修改限價價格
+					if ($scope.inputVO.entrustAmt == 0) {
+						$scope.inputVO.entrustAmt = undefined;
+						$scope.showErrorMsg("限價價格不可為0");
+						return;
+					}
+					
+					var rangelist = $filter('filter')($scope.mappingSet["SOT.BN_GTC_LIMITPRICE_RANGE"], "1");	//參數取得"限價超過參考報價的正負N"
 					var range = 3;
 					//若無參數預設為3
 					if(range != undefined && range != null) range = rangelist[0].LABEL;
 
 					if(Math.abs($scope.inputVO.entrustAmt - $scope.inputVO.refVal) > range ) {
-						var txtMsg = $filter('i18n')('ehl_02_SOT_013');	//限價超過參考報價的正負3，請確認是否繼續下單。
+						var txtMsg = $filter('i18n')('ehl_02_SOT_013');		//限價超過參考報價的正負3，請確認是否繼續下單。
 						$scope.showWarningMsg(txtMsg, range);
 					}
 				}
@@ -1068,6 +1098,7 @@ eSoafApp.controller('SOT310Controller',
 					}
 
 				} else if ($scope.inputVO.entrustType == "2"){
+					debugger;
 					//長效單市價可修改委託價格
 					if($scope.inputVO.gtcYN != "Y") {
 						$scope.inputVO.entrustAmt = $scope.inputVO.refVal;
@@ -1214,7 +1245,6 @@ eSoafApp.controller('SOT310Controller',
 											$scope.inputVO.contractID = '';
 										}
 									}
-
 									deferred.resolve("success");
 									return deferred.promise;
 								} else {
@@ -1503,6 +1533,15 @@ eSoafApp.controller('SOT310Controller',
 						if($scope.inputVO.purchaseAmt != undefined){
 						    $scope.inputVO.purchaseAmt=$scope.moneyUnFormat($scope.inputVO.purchaseAmt);
 						}
+						
+						debugger;
+						if($scope.inputVO.kycDueDateLessOneMonth && ($scope.inputVO.gtcYN === 'Y' || $scope.inputVO.gtcYN === 'P') ) {
+							var showYear = $scope.inputVO.kycDueDate.getFullYear();  //西元年份 
+							var showMonth = $scope.inputVO.kycDueDate.getMonth()+1;  //一年中的第幾月 
+							var showDate = $scope.inputVO.kycDueDate.getDate();      //一月份中的第幾天
+							
+							$scope.showMsg('ehl_01_SOT_018',[showYear,showMonth,showDate]);
+						}
 
 						$scope.sendRecv("SOT310", "next", "com.systex.jbranch.app.server.fps.sot310.SOT310InputVO", $scope.inputVO,
 						function(tota, isError) {
@@ -1638,7 +1677,7 @@ eSoafApp.controller('SOT310Controller',
 
 		//是否為長效單
 		$scope.gtcYN_Changed = function() {
-			if($scope.inputVO.isWeb == "Y" && $scope.inputVO.gtcYN == "Y") {
+			if($scope.inputVO.isWeb == "Y" && $scope.inputVO.gtcYN != "N") {
 				$scope.inputVO.gtcYN = "N";
 				$scope.inputVO.gtcEndDate = undefined;
 				$scope.showErrorMsg("長效單及限價交易未開放快速申購。");
@@ -1648,8 +1687,23 @@ eSoafApp.controller('SOT310Controller',
 			if ($scope.inputVO.gtcYN == "N") {
 				// 當日單
 				$scope.inputVO.gtcStartDate = undefined;
-				$scope.inputVO.gtcEndDate = undefined;	
-				
+				$scope.inputVO.gtcEndDate = undefined;
+
+				var today = new Date();
+				var year = today.getFullYear();
+				var month = today.getMonth();
+				var date = today.getDate();
+				//報價日期
+				var refValYear = $scope.inputVO.refValDate.getFullYear();
+				var refValMonth = $scope.inputVO.refValDate.getMonth();
+				var refValDate = $scope.inputVO.refValDate.getDate();
+
+				//#2340
+				if (refValYear != year || refValMonth != month || refValDate != date) {
+					$scope.inputVO.gtcYN = null;
+					$scope.showErrorMsg("尚無當日參考報價");
+					return;
+				}
 			} else if ($scope.inputVO.gtcYN == "Y") {
 				// 長效單
 				$scope.inputVO.gtcEndDate = undefined;
@@ -1657,6 +1711,9 @@ eSoafApp.controller('SOT310Controller',
 			} else if ($scope.inputVO.gtcYN == "P") {
 				// 預約單
 				$scope.inputVO.gtcEndDate = $scope.inputVO.gtcStartDate;
+				
+				// 預約單：『委託價格』enable 及default為"市價"，價格可約定指定交易日當日市價或買進限價
+				$scope.inputVO.entrustType = "2";	// 市價
 			}
 			$scope.limitDate();
 
@@ -1702,8 +1759,10 @@ eSoafApp.controller('SOT310Controller',
 				return false;
 			}
 
-			if($scope.inputVO.totAmt && ($scope.inputVO.totAmt * $scope.inputVO.buyRate) > 10000000) {
-				$scope.showErrorMsg("交易金額檢核超過上限，不可使用快速申購。");//交易金額上限折台1,000萬
+			var findParam = $filter('filter')($scope.mappingSet['SOT.BOND_WEB_AMT_LIMIT'], {DATA: "1"});
+			var webAmtLimit = Number((findParam != null && findParam.length > 0) ? findParam[0].LABEL : "50000000");
+			if($scope.inputVO.totAmt && ($scope.inputVO.totAmt * $scope.inputVO.buyRate) > webAmtLimit) {
+				$scope.showErrorMsg("交易金額檢核超過上限，不可使用快速申購。");//交易金額上限折台5,000萬
 				return false;
 			}
 

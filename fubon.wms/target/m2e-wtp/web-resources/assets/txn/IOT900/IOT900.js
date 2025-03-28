@@ -18,6 +18,8 @@ eSoafApp.controller('IOT900Controller',
 					SIGN_INC:'',
 					in_REGTYPE:$scope.doc_qcList.in_REGTYPE,
 					in_othtype:$scope.doc_qcList.oth_type,
+					REG_TYPE:$scope.doc_qcList.REG_TYPE,
+					CASE_ID:$scope.doc_qcList.CASE_ID,
 					inList:undefined,
 					outList:undefined
 			}

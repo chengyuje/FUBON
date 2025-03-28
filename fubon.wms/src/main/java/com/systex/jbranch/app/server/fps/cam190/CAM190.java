@@ -469,7 +469,7 @@ public class CAM190 extends FubonWmsBizLogic {
 	
 	// 自訂查詢_前後端入口
 	public void getList (Object body, IPrimitiveMap header) throws JBranchException {
-		
+		long startTime = System.currentTimeMillis();
 		WorkStation ws = DataManager.getWorkStation(uuid);
 		CAM190InputVO inputVO = (CAM190InputVO) body;
 		CAM190OutputVO outputVO = new CAM190OutputVO();
@@ -492,8 +492,8 @@ public class CAM190 extends FubonWmsBizLogic {
 		logger.info("regionID:" + inputVO.getRegionID());
 		logger.info("opID:" + inputVO.getOpID());
 		logger.info("branchID:" + inputVO.getBranchID());
-		logger.info("custID:" + "%" + inputVO.getCustID() + "%");
-		logger.info("custName:" + "%" + inputVO.getCustName() + "%");
+//		logger.info("custID:" + "%" + inputVO.getCustID() + "%");
+//		logger.info("custName:" + "%" + inputVO.getCustName() + "%");
 		logger.info("aoCode:" + inputVO.getAoCode());
 		logger.info("empID:" + ws.getUser().getUserID());
 		logger.info("campName:" + "%" + inputVO.getCampName() + "%");
@@ -543,7 +543,10 @@ public class CAM190 extends FubonWmsBizLogic {
 		outputVO.setCurrentPageIndex(inputVO.getCurrentPageIndex());// 當前頁次
 		outputVO.setTotalPage(totalPage_i);// 總頁次
 		outputVO.setTotalRecord(totalRecord_i);// 總筆數
-		
+		long endTime = System.currentTimeMillis();
+		System.out.println("==========================");
+		System.out.println((endTime - startTime) / 1000);
+		System.out.println("========================");
 		this.sendRtnObject(outputVO);
 	}
 	

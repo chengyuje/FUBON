@@ -88,37 +88,33 @@ input.faChkSqr:after {
 						<th>業務處：</th>
 						<td>
 							<e-combobox id="region_center_id" name="region_center_id"
-										ng-paramtype="PMS.UHRM_RC"
+										ng-datasource="uhrmRCList"
 										ng-model="inputVO.uhrmRC"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										ng-change="ChangeRegion()"
-										width="200px"
-										style="line-height:20px;"></e-combobox>
-						</td>						
-						<th>業務中心：</th>
+										style="line-height:20px;" />
+						</td>		
+						<th>營運區：</th>
 						<td>
 							<e-combobox id="branch_area_id" name="branch_area_id"
-										ng-paramtype="PMS.UHRM_OP"
+										ng-datasource="uhrmOPList"
 										ng-model="inputVO.uhrmOP"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										ng-change="ChangeArea()"
-										width="200px"
-										style="line-height:20px;"></e-combobox>
+										style="line-height:20px;" />
 						</td>
 						<th>員編：</th>
 						<td>
 							<e-combobox id="emp_id" name="emp_id"
-										ng-datasource="mappingSet['EmpName']""
+										ng-datasource="mappingSet['EmpName']"
 										ng-model="inputVO.emp_id"
 										ng-validate="false"
 										ng-readonly="disableEmpCombo" 
@@ -134,7 +130,7 @@ input.faChkSqr:after {
 						<th>訪查狀態 : </th>
 						<td>
 							<e-combobox id="review_status" name="review_status"
-										ng-datasource="mappingSet['SQM.REVIEW_STATUS_LIST']"
+										ng-datasource="REVIEW_STATUS_LIST"
 										ng-model="inputVO.review_status"
 									    ng-validate="false"
 										ng-readonly="false"
@@ -147,7 +143,7 @@ input.faChkSqr:after {
 						<th>身分別 : </th>
 						<td>
 							<e-combobox id="cust_status" name="cust_status"
-										ng-datasource="mappingSet['SQM.CUST_STATUS_LIST']"
+										ng-datasource="CUST_STATUS_LIST"
 										ng-model="inputVO.cust_status"
 										ng-validate="false"
 										ng-readonly="false"
@@ -237,6 +233,10 @@ input.faChkSqr:after {
 								<button type="button" class="btn btn-danger btn-circle" ng-click="del(row)" ng-show ="row.REVIEW_DATE == null && isSupervisor == false && row.AUDITED == 'Y'">
 									<i class="glyphicon glyphicon-trash" title="刪除"></i>
 								</button>	
+								
+								<button type="button" class="btn btn-info" ng-click="del(row, 'R')" ng-show ="row.REVIEW_YN == 'Y'">
+				                    <i class="glyphicon glyphicon-refresh" title="清除"></i>
+				                </button>
 							</td>
 							<td>
 								<font style="font-weight:bold;color:red;" ng-show="row.HIGH_YEAR_YN == 'Y'">{{row.BRANCH_NBR}} - {{row.BRANCH_NAME}}</font>

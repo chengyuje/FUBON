@@ -146,6 +146,21 @@ eSoafApp.controller('CRM181Controller',
 						}
 				});				
 			}
+			
+			// 未具證基金配息通知
+			$scope.ovsPriDividendCnt = 0;
+			if ($scope.pri == '002' || $scope.pri == 'UHRM002') {
+				$scope.sendRecv("CRM181", "getOvsPriDividend", "com.systex.jbranch.app.server.fps.crm181.CRM181InputVO", $scope.inputVO,
+						function(tota, isError) {
+							if (!isError) {
+								debugger
+								if(tota[0].body.ovsPriDivList && tota[0].body.ovsPriDivList.length > 0) {
+									$scope.ovsPriDividendCnt = tota[0].body.ovsPriDivList.length;
+									$scope.ovsPriDivList = tota[0].body.ovsPriDivList;
+								}
+							}
+				});
+			}
 		};
 		
 		$scope.initial();
@@ -258,5 +273,27 @@ eSoafApp.controller('CRM181Controller',
 		    
 		    $rootScope.menuItemInfo.url = 'assets/txn/'+row.RPT_PROG_URL+'/'+row.RPT_PROG_URL+'.html';	
 		};
+		
+		//未具證配息通知點選"已讀"
+		$scope.checkReadRow = function(row) {
+			$scope.sendRecv("CRM181", "setOvsPriDividendRead", "com.systex.jbranch.app.server.fps.crm181.CRM181InputVO", {"PRD_ID":row.PRD_ID,"CERT_NBR":row.CERT_NBR, "TXN_DATE":$scope.toJsDate(row.TXN_DATE)},
+					function(tota, isError) {
+						if (!isError) {
+							row.READ_YN = "Y";
+						}
+			});
+		}
+		
+		//開啟未具證配息通知詳細資料視窗
+		$scope.openOvsPriDividend = function(row) {
+			var dialog = ngDialog.open({
+				template: 'assets/txn/CRM181/CRM181_OP_DIVIDEND.html',
+				className: 'CRM181',
+				showClose: false,
+                controller: ['$scope', function($scope) {
+                	$scope.row = row;
+                }]
+			});
+		}
 		
 });

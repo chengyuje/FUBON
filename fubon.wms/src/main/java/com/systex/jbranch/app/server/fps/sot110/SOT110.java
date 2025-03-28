@@ -157,6 +157,8 @@ public class SOT110 extends FubonWmsBizLogic {
 
 		// FOR CBS測試日期修改
 		outputVO.setKycDueDateUseful(outputVO_701.getCustKYCDataVO().isKycDueDateUseful());
+		
+		outputVO.setKycDueDateLessOneMonth(outputVO_701.getCustKYCDataVO().isKycDueDateLessOneMonth());
 
 		//扣款帳號
 		List<AcctVO> debitAcct = outputVO_701.getCustAcctDataVO().getDebitAcctList();
@@ -171,7 +173,26 @@ public class SOT110 extends FubonWmsBizLogic {
 			debitAcctList.add(map);
 		}
 		outputVO.setDebitAcct(debitAcctList);
-
+		
+		//for動態鎖利轉換扣款帳號
+		List<Map<String, Object>> feeDebitAcctList = new ArrayList<Map<String, Object>>();
+		for (AcctVO vo : debitAcct) {
+			// 判斷是否有重複
+			boolean noRepeat = true;
+			for(Map temp : feeDebitAcctList){
+				if (StringUtils.equals(vo.getAcctNo(), temp.get("LABEL").toString())) {
+					noRepeat = false;
+				}
+			}
+			if (noRepeat){
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("LABEL", cbsservice.checkAcctLength(vo.getAcctNo()));
+				map.put("DATA", cbsservice.checkAcctLength(vo.getAcctNo()));
+				feeDebitAcctList.add(map);
+			}
+		}
+		outputVO.setFeeDebitAcct(feeDebitAcctList);
+		
 		//信託帳號
 		List<AcctVO> trustAcct = outputVO_701.getCustAcctDataVO().getTrustAcctList();
 		List<Map<String, Object>> trustAcctList = new ArrayList<Map<String, Object>>();
@@ -429,10 +450,6 @@ public class SOT110 extends FubonWmsBizLogic {
 		if(StringUtils.equals("Y", inputVO.getHnwcYN()) && StringUtils.equals("Y", inputVO.getOvsPrivateYN())) {
 			overCentRateResult = getOverCentRateYN(inputVO); //Y:可交易 W:超過通知門檻 N:不可交易
 			inputVO.setOverCentRateYN(overCentRateResult);
-			
-			if(StringUtils.equals("N", overCentRateResult)) {
-				throw new APException("客戶高風險商品集中度比例已超過上限");
-			}
 		}
 		outputVO.setOverCentRateResult(overCentRateResult);
 				

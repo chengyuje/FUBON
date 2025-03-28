@@ -432,7 +432,7 @@ public class KYC310_CorpRpt extends FubonWmsBizLogic{
 		document.add(tbText9);
 		document.add(genUserSignatureColumn());//簽名印鑑
 		document.add(tbText9);
-		document.add(tbText9);
+//		document.add(tbText9);
 		document.add(genBankNoteColumn(kyc311));//銀行註記欄
     }
     
@@ -595,7 +595,6 @@ public class KYC310_CorpRpt extends FubonWmsBizLogic{
     		try {
 	    		int riskBef = Integer.parseInt(kyc311.getCUST_RISK_BEF().substring(1));
 	    		int riskAfr = Integer.parseInt(kyc311.getCUST_RISK_AFR().substring(1));
-	    		
 	    		if(riskAfr > riskBef) {
 	    			if(kyc311.isCOOLING()){
 	    				sb.append("\n3. 貴公司本次的風險屬性評估結果為" + kyc311.getCUST_RISK_AFR() + "等級(" + kyc311.getRISK_TYPE() + ")，較上次評估結果")
@@ -659,7 +658,7 @@ public class KYC310_CorpRpt extends FubonWmsBizLogic{
 		}
     	//有內容時增加標題
     	if(sb.length()>0){
-    		sb.insert(0, "\n\n另確認以下項目：");
+    		sb.insert(0, "\n另確認以下項目：");
     	}
     	table.addCell(buildCell(sb.toString(), bFont, Paragraph.ALIGN_LEFT, -1, 0));
     	return table;

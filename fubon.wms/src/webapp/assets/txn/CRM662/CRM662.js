@@ -79,9 +79,7 @@ eSoafApp.controller('CRM662Controller',
 		// 權限
 		$scope.pri = sysInfoService.getPriID()[0];
         $scope.ao = sysInfoService.getAoCode()[0] ? sysInfoService.getAoCode()[0] : '';
-        console.log("sysInfoService.getAoCode()", sysInfoService.getAoCode());
-        console.log("sysInfoService.getAoCode()[0]", sysInfoService.getAoCode()[0]);
-        debugger;
+        
         if ($scope.ao != '' && $scope.ao != undefined) {
         	$scope.check_ao = true;
         } else {
@@ -189,12 +187,12 @@ eSoafApp.controller('CRM662Controller',
 											 $scope.resultList_prv[0].VIP_DEGREE == 'T' ? '智富理財會員' : (
 											 $scope.resultList_prv[0].VIP_DEGREE == 'K' ? '穩富理財會員' : ''));
 						
-						var vip_degree = $scope.resultList_prv[0].VIP_DEGREE == 'H' ? '恆富理財會員' : (
-										 $scope.resultList_prv[0].VIP_DEGREE == 'T' ? '智富理財會員' : (
-										 $scope.resultList_prv[0].VIP_DEGREE == 'K' ? '穩富理財會員' : ''));
-						
 						for(var i = 0; i < list.value.length; i++){
 							if(list.value[i].CUST_ID != undefined && list.value[i].CUST_ID != ''){	
+								
+								var vip_degree = list.value[i].VIP_DEGREE == 'H' ? '恆富理財會員' : (
+												 list.value[i].VIP_DEGREE == 'T' ? '智富理財會員' : (
+												 list.value[i].VIP_DEGREE == 'K' ? '穩富理財會員' : ''));
 								
 								if (($scope.resultList_prv[0].VIP_DEGREE == 'T' && list.value[i].VIP_DEGREE == 'H') ||
 									($scope.resultList_prv[0].VIP_DEGREE == 'K' && list.value[i].VIP_DEGREE == 'H') ||	
@@ -362,8 +360,7 @@ eSoafApp.controller('CRM662Controller',
 					rowData.type = true;
 				}
 				return;
-		}		
-		
+		}
 		
 		/** ----變更排序----* */
 		$scope.prv_sort = function() {			
@@ -435,28 +432,25 @@ eSoafApp.controller('CRM662Controller',
 			rowData.type = true;
 			$scope.add_first_row();
 		}
+		
 		/** ----新增家庭戶----* */
-		$scope.prv_add = function(rowCustID) {
-			console.log("inputVO.cust_id", $scope.inputVO.cust_id);
-			console.log("rowCustID", rowCustID);
-//			// 必須選擇一位關係戶成員才可以加入家庭戶
-//			if(!$scope.addList_prv[0].prv_cust_id){
-//				$scope.showErrorMsgInDialog('請選取成員客戶ID');
-//				return;				
-//			}
-//
-//			for(var i = 0; i < $scope.addList_prv.length; i++){
-//				if(($scope.addList_prv[i].rel_type == undefined || $scope.addList_prv[i].rel_type == "") 
-//						&& ($scope.addList_prv[i].prv_cust_id != undefined) ){
-//					var id = $scope.addList_prv[i].prv_cust_id;
-//					var name = $scope.addList_prv[i].prv_cust_name;
-//					$scope.showErrorMsgInDialog('請選取成員 ' + id + ' ' + name + '與主戶的關係');
-//					return;	
-//				}
-//			}
-//
-//		// =====================================================================================//
-//		
+		$scope.prv_add = function() {
+			// 必須選擇一位關係戶成員才可以加入家庭戶
+			if(!$scope.addList_prv[0].prv_cust_id){
+				$scope.showErrorMsgInDialog('請選取成員客戶ID');
+				return;				
+			}
+
+			for(var i = 0; i < $scope.addList_prv.length; i++){
+				if(($scope.addList_prv[i].rel_type == undefined || $scope.addList_prv[i].rel_type == "") 
+						&& ($scope.addList_prv[i].prv_cust_id != undefined) ){
+					var id = $scope.addList_prv[i].prv_cust_id;
+					var name = $scope.addList_prv[i].prv_cust_name;
+					$scope.showErrorMsgInDialog('請選取成員 ' + id + ' ' + name + '與主戶的關係');
+					return;	
+				}
+			}
+			
 //			// 抓出FAMILY_DEGREE相對應的整戶門檻金額
 //			var listDegreeAUM = $scope.mappingSet['CRM.FAMILY_DEGREE_AUM'];
 //			
@@ -473,45 +467,67 @@ eSoafApp.controller('CRM662Controller',
 //			var Aum = Number(mapDegreeAUM[degree]) * 10000;
 //			// 錯誤類型 : 整戶金額門檻未達3000/1000萬
 //			if($scope.inputVO.aum_total < Aum){
-//				$scope.inputVO.reject_reason = '整戶金額門檻未達6000萬/2000萬/600萬';
+//				// WMS-CR-20241119-02_調整家庭會員資格檢核邏輯
+//				$scope.inputVO.reject_reason = '家庭往來資產總額未達6,000萬/2,000萬/600萬';
+////				$scope.inputVO.reject_reason = '整戶金額門檻未達6000萬/2000萬/600萬';
 ////				$scope.inputVO.reject_reason = '整戶金額門檻未達3000/1000萬';
 //				$scope.showErrorMsgInDialog($scope.inputVO.reject_reason);
 //				return;
 //			}
-//		
-//		// =====================================================================================//
-//						
-//			$scope.inputVO.add_list_prv = $scope.addList_prv;
-//			$scope.inputVO.prv_list = $scope.resultList_prv;
-//			// $scope.inputVO.prv_list_length = $scope.resultList_prv.length;
-//			$confirm({text: $filter('i18n')('確定新增家庭成員?')}, {size: 'sm'}).then(function() {
-//				$scope.sendRecv("CRM662", "prv_add", "com.systex.jbranch.app.server.fps.crm662.CRM662InputVO", $scope.inputVO,
-//						function(tota, isError) {
-//							if (isError) {
-//								$scope.showErrorMsgInDialog(tota.body.msgData);
-//								return;
-//							}
-//							if (tota.length > 0) {								
-//								// 錯誤類型C:申請人只能歸屬一位主戶成為家庭會員
-//								if (tota[0].body.prv_add_err_type == 'C') {
-//									$scope.inputVO.reject_reason = '每一位客戶僅能歸屬一位主戶成為其家庭會員';
-//									$scope.showErrorMsgInDialog($scope.inputVO.reject_reason);
-//								}
-//								// 錯誤類型N:無錯誤，通過檢核
-//								else if (tota[0].body.prv_add_err_type == 'N') {
-//									$scope.showMsg('新增申請成功，待主管覆核');
-//									$scope.inputVO.reject_reason = '';
-//									$scope.init();
-//					                $scope.inquireInit();
-//					                $scope.inquire();
-//					                $scope.add_first_row();
-//								}
-//			                };
-//				});
-//			});
+			
+			/**
+			 * WMS-CR-20241119-02_調整家庭會員資格檢核邏輯
+			 * 檢視整戶家庭會員最近12週，
+			 * 所有成員『每週加總餘額』是否皆達對應家庭會員門檻(600萬/2,000萬/6,000萬)」ex.家庭戶每週AuM週餘額加總皆達600萬門檻，因此符合穩富家庭會員資格。
+			 * **/
+			$scope.sendRecv("CRM662", "checkFamilyAum", "com.systex.jbranch.app.server.fps.crm662.CRM662InputVO", 
+			{'add_list_prv': $scope.addList_prv, 'cust_id': $scope.inputVO.cust_id, 'vip_degree': $scope.resultList_prv[0].VIP_DEGREE} ,
+			function(tota, isError) {
+				if (isError) {
+					$scope.showErrorMsgInDialog(tota.body.msgData);
+					return;
+				}
+                if (tota.length > 0) {
+					if (tota[0].body.family_flag == 'N') {
+						$scope.inputVO.reject_reason = '家庭往來資產總額未達6,000萬/2,000萬/600萬';
+						$scope.showErrorMsgInDialog($scope.inputVO.reject_reason);
+						return;
 						
+					} else {
+						$scope.inputVO.vip_degree = $scope.resultList_prv[0].VIP_DEGREE;
+						$scope.inputVO.familyAumList = tota[0].body.familyAumList;
+						$scope.inputVO.add_list_prv = $scope.addList_prv;
+						$scope.inputVO.prv_list = $scope.resultList_prv;
+						// $scope.inputVO.prv_list_length = $scope.resultList_prv.length;
+						$confirm({text: $filter('i18n')('確定新增家庭成員?')}, {size: 'sm'}).then(function() {
+							$scope.sendRecv("CRM662", "prv_add", "com.systex.jbranch.app.server.fps.crm662.CRM662InputVO", $scope.inputVO,
+							function(tota, isError) {
+								if (isError) {
+									$scope.showErrorMsgInDialog(tota.body.msgData);
+									return;
+								}
+								if (tota.length > 0) {								
+									// 錯誤類型C:申請人只能歸屬一位主戶成為家庭會員
+									if (tota[0].body.prv_add_err_type == 'C') {
+										$scope.inputVO.reject_reason = '每一位客戶僅能歸屬一位主戶成為其家庭會員';
+										$scope.showErrorMsgInDialog($scope.inputVO.reject_reason);
+									}
+									// 錯誤類型N:無錯誤，通過檢核
+									else if (tota[0].body.prv_add_err_type == 'N') {
+										$scope.showMsg('新增申請成功，待主管覆核');
+										$scope.inputVO.reject_reason = '';
+										$scope.init();
+						                $scope.inquireInit();
+						                $scope.inquire();
+						                $scope.add_first_row();
+									}
+				                };
+							});
+						});
+					}
+                }
+			});			
 		}
-		
 		
 		/** ----刪除家庭戶----* */
 		$scope.prv_delete = function(row) {

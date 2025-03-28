@@ -137,6 +137,7 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 						
 						$scope.mappingSet['CAM.REF_USER_ROLE'].push({LABEL: '新金PS', DATA: '3'});
 						$scope.mappingSet['CAM.REF_USER_ROLE'].push({LABEL: '商金RM', DATA: '4'});
+						$scope.mappingSet['CAM.REF_USER_ROLE'].push({LABEL: '新興PS', DATA: '7'});
 					}
 					
 					if ((tota[0].body.custID).substr(0, 1) == "0") {
@@ -273,6 +274,7 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 				break;
 			case "2":	// 2:理專
 			case "9":	// 9:JRM 
+			case "10":	// 10:新興PS
 				// 轉介時，不自動帶出客戶個金RM
 				$scope.inputVO.refEmpID = $scope.tempRefEmpID;
 				
@@ -293,7 +295,6 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 					
 					break;
 			}
-			
 			$scope.tempRefEmpID = $scope.inputVO.refEmpID; 
 		}
 	}
@@ -477,8 +478,7 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 			
 			$scope.clearRefEmp();
 		}
-		
-		if (($scope.inputVO.refEmpID != "" && $scope.inputVO.refEmpID != undefined) && $scope.tempRefEmpID != $scope.inputVO.refEmpID) {
+		if (($scope.inputVO.refEmpID != "" && $scope.inputVO.refEmpID != undefined)) {
 			$scope.sendRecv("REF110", "queryUserProfile", "com.systex.jbranch.app.server.fps.ref110.REF110InputVO", $scope.inputVO, function(tota, isError) {
 				if (!isError) {
 					if (null != tota[0].body.refEmpName) {
@@ -606,8 +606,7 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 							
 							$scope.mappingSet['CAM.REF_USER_ROLE'] = [];
 							$scope.mappingSet['CAM.REF_USER_ROLE'].push({LABEL: '個金AO', DATA: '5'});
-						}
-						else if (null != $scope.inputVO.refEmpRoleName && $scope.inputVO.refEmpRoleName == "6") {
+						} else if (null != $scope.inputVO.refEmpRoleName && $scope.inputVO.refEmpRoleName == "6") {
 							if ($scope.inputVO.empRoleName == "9") { //JRM不可轉介給JRM
 								$scope.setRefEmpDtl("ehl_01_ref110_010");
 								
@@ -635,6 +634,19 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 							$scope.inputVO.refProd = "5";
 							$scope.mappingSet['CAM.REF_USER_ROLE'] = [];
 							$scope.mappingSet['CAM.REF_USER_ROLE'].push({LABEL: 'JRM', DATA: '6'});
+						} else if (null != $scope.inputVO.refEmpRoleName && $scope.inputVO.refEmpRoleName == "7") {
+							if ($scope.inputVO.empRoleName == "10") { //新興PS不可轉介給新興PS
+								$scope.setRefEmpDtl("受轉介人員不得為新興PS");
+								
+								deferred.resolve("");									
+								return deferred.promise;
+							}
+							
+							$scope.mappingSet['REF_RPOD'].push({LABEL: '企業貸款', DATA: '4'});
+							$scope.inputVO.refProd = "4";
+							
+							$scope.mappingSet['CAM.REF_USER_ROLE'] = [];
+							$scope.mappingSet['CAM.REF_USER_ROLE'].push({LABEL: '新興PS', DATA: '7'});
 						}
 						// 2018/3/1 old code clear
 						else {

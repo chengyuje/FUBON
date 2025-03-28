@@ -7,8 +7,8 @@ eSoafApp.controller('PMS496UController', function($scope, $controller, socketSer
 	$controller('PMS496Controller', {$scope: $scope});
 	
 	//選取月份下拉選單 --> 重新設定可視範圍
+	$scope.mappingSet['EmpName'] = [];
     $scope.dateChangeU = function(){
-
     	if ($scope.inputVO.importSDate != '') {
     		$scope.inputVO.reportDate = $scope.inputVO.importSDate;
     		$scope.inputVO.dataMonth = $scope.inputVO.importSDate; 
@@ -30,14 +30,11 @@ eSoafApp.controller('PMS496UController', function($scope, $controller, socketSer
     	} else {
     		$scope.mappingSet['EmpName'] = [];
     	}
-
     }; 
     
-	$scope.initPMS496U = function() {
-		$scope.inputVO.uhrmRC = '031';
-		$scope.inputVO.uhrmOP = '031A';
-		
-	};
-	
-	$scope.initPMS496U();
+    $scope.sendRecv("PMS401U", "isMainten", "com.systex.jbranch.app.server.fps.pms401u.PMS401UInputVO", {'itemID': 'PMS496U'}, function(tota, isError) {
+		if (!isError) {
+			$scope.chkMaintenanceU = tota[0].body.isMaintenancePRI == 'Y' ? true : false;
+		}						
+	});
 });

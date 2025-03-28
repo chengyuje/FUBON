@@ -27,9 +27,9 @@ eSoafApp.controller('CRM671_detailController',
 			$scope.inputVO.cust_id = $scope.custVO.CUST_ID;
 			$scope.pri_id = String(sysInfoService.getPriID());
 			$scope.pri = '';		
-			if($scope.pri_id == '009' || $scope.pri_id == '010' || $scope.pri_id == '011' || $scope.pri_id == '012' || $scope.pri_id == '013'){
+			if ($scope.pri_id == '009' || $scope.pri_id == '010' || $scope.pri_id == '011' || $scope.pri_id == '012' || $scope.pri_id == '013') {
 				$scope.pri = 'A1'
-			} else if ($scope.pri_id == 'UHRM002' || $scope.pri_id == 'UHRM012' || $scope.pri_id == 'UHRM013'){
+			} else if ($scope.pri_id == 'UHRM012' || $scope.pri_id == 'UHRM013') {
 				$scope.pri = 'U1'
 			} else {
 				$scope.pri = String(sysInfoService.getPriID());

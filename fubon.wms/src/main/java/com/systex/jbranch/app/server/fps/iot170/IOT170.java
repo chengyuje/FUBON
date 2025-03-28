@@ -1142,7 +1142,7 @@ public class IOT170 extends FubonWmsBizLogic{
 		for(Map<String, Object> map : list){
 			//鍵機資訊
 			if("1".equals(rptType)){
-				records = new String[48];
+				records = new String[49];
 				int i = 0;
 				records[i]   = checkIsNull(map, "KEYIN_DATE");
 				records[++i] = checkIsNull(map, "APPLY_DATE");
@@ -1219,6 +1219,7 @@ public class IOT170 extends FubonWmsBizLogic{
 				records[++i] = checkIsNull(map, "INS_RCV_DATE");					//人壽簽收時間
 				records[++i] = checkIsNull(map, "INS_RCV_OPRID");					//人壽簽收人
 				records[++i] = checkIsNull(map, "REMARK_BANK");					    //備註
+				records[++i] = checkIsNull(map, "NO_PAPER_YN");
 				records[++i] = checkIsNull(map, "DELETE_DATE");
 				records[++i] = checkIsNull(map, "DELETE_OPRID");
 				records[++i] = checkIsNull(map, "TARGET_ID");
@@ -1405,7 +1406,7 @@ public class IOT170 extends FubonWmsBizLogic{
 		String [] csvHeader = null;
 		//鍵機資訊
 		if("1".equals(rptType)){
-			csvHeader = new String[44+col];
+			csvHeader = new String[45+col];
 			int j = 0;
 			csvHeader[j]   = "鍵機日";
 			csvHeader[++j] = "要保書填寫申請日";
@@ -1449,6 +1450,7 @@ public class IOT170 extends FubonWmsBizLogic{
 			csvHeader[++j] = "人壽簽收時間";
 			csvHeader[++j] = "人壽簽收人";
 			csvHeader[++j] = "備註";
+			csvHeader[++j] = "無紙化案件";
 			csvHeader[++j] = "刪除時間";
 			csvHeader[++j] = "刪除人";
 			if(flag){
@@ -2013,7 +2015,7 @@ public class IOT170 extends FubonWmsBizLogic{
 		sql.append(" 		IOT.WRITE_REASON, IOT.WRITE_REASON_OTH, ");
 		sql.append(" 		IOT.QC_ANC_DOC, IOT.INS_RCV_DATE, IOT.INS_RCV_OPRID, IOT.REMARK_BANK, ");
 		sql.append(" 		IOT.DELETE_DATE, IOT.DELETE_OPRID ,IOT.FIRST_PAY_WAY, IOT.CREATETIME, ");
-		sql.append("		IOT.COMPANY_NUM, E.CNAME AS INS_COM_NAME, CASE WHEN IOT.COMPANY_NUM = 82 THEN '富壽' ELSE '非富壽' END AS INS_SOURCE ");
+		sql.append("		IOT.COMPANY_NUM, E.CNAME AS INS_COM_NAME, CASE WHEN IOT.COMPANY_NUM = 82 THEN '富壽' ELSE '非富壽' END AS INS_SOURCE, IOT.NO_PAPER_YN ");
 		sql.append(" FROM VWIOT_MAIN IOT ");
 		sql.append(" LEFT JOIN TBORG_MEMBER MEM ON MEM.EMP_ID = IOT.RECRUIT_ID ");
 		sql.append(" LEFT JOIN TBCAM_LOAN_SALEREC SAL ON SAL.REF_CON_ID = IOT.REF_CON_ID ");
@@ -2043,7 +2045,7 @@ public class IOT170 extends FubonWmsBizLogic{
 		sql.append(" 		IOT.DELETE_DATE, IOT.DELETE_OPRID ,IOT.FIRST_PAY_WAY, IOT.CREATETIME, ");
 		sql.append("		IOT.COMPANY_NUM, E.CNAME AS INS_COM_NAME, CASE WHEN IOT.COMPANY_NUM = 82 THEN '富壽' ELSE '非富壽' END AS INS_SOURCE ");
 		sql.append("		,FND.INS_KEYNO AS F_INS_KEYNO, FND.PRD_KEYNO, FND.TARGET_ID, "); 	//EXCEL帶出明細欄位
-		sql.append("		FND.LINKED_NAME, FND.PRD_RISK, FND.LINK_PCT  ");	//EXCEL帶出明細欄位
+		sql.append("		FND.LINKED_NAME, FND.PRD_RISK, FND.LINK_PCT, IOT.NO_PAPER_YN  ");	//EXCEL帶出明細欄位
 		sql.append(" FROM VWIOT_MAIN IOT ");
 		sql.append(" LEFT JOIN TBORG_MEMBER MEM ON MEM.EMP_ID = IOT.RECRUIT_ID ");
 		sql.append(" LEFT JOIN TBCAM_LOAN_SALEREC SAL ON SAL.REF_CON_ID = IOT.REF_CON_ID ");

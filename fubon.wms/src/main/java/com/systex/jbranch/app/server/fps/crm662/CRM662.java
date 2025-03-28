@@ -5,8 +5,10 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -26,8 +28,10 @@ import com.systex.jbranch.platform.common.dataaccess.serialnumber.SerialNumberUt
 import com.systex.jbranch.platform.common.errHandle.DAOException;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.common.util.PlatformContext;
+import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
 import com.systex.jbranch.platform.server.info.SysInfo;
+import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
 /**
@@ -320,6 +324,64 @@ public class CRM662 extends FubonWmsBizLogic {
 			}
 		}
 	}
+	
+	/**
+	 * WMS-CR-20241119-02_調整家庭會員資格檢核邏輯
+	 * 檢視整戶家庭會員最近12週，
+	 * 所有成員『每週加總餘額』是否皆達對應家庭會員門檻(600萬/2,000萬/6,000萬)」ex.家庭戶每週AuM週餘額加總皆達600萬門檻，因此符合穩富家庭會員資格。
+	 * **/
+	public void checkFamilyAum(Object body, IPrimitiveMap header) throws JBranchException {
+		CRM662InputVO inputVO = (CRM662InputVO) body;
+		CRM662OutputVO outputVO = new CRM662OutputVO();
+		String family_flag = "Y";
+		
+		dam = this.getDataAccessManager();
+		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sb = new StringBuffer();
+		
+		List<Map<String, Object>> add_list_prv = inputVO.getAdd_list_prv();
+		Set<String> idList = new HashSet<>();
+		for(Map<String, Object> map : add_list_prv) {
+			if (map.get("prv_cust_id") != null) {
+				idList.add(map.get("prv_cust_id").toString());				
+			}
+		}
+		
+		sb.append(" SELECT DATA_DAY, SUM(AVG_AUM_AMT) AS SUM_AUM ");
+		sb.append(" FROM TBCRM_CUST_AUM_WK_CAL_DEGREE ");
+		sb.append(" WHERE (CUST_ID IN ( ");
+		sb.append("   SELECT CUST_ID_S ");
+		sb.append("   FROM TBCRM_CUST_PRV ");
+		sb.append("   WHERE CUST_ID_M = :cust_id) OR CUST_ID = :cust_id ");
+		
+		if (idList != null && idList.size() > 0) {
+			sb.append(" OR CUST_ID IN (:cust_id_list) ");	
+			qc.setObject("cust_id_list", idList);
+		}
+		
+		sb.append(" ) AND TO_DATE(DATA_DAY, 'YYYYMMDD') > SYSDATE - (12*7) ");
+		sb.append(" GROUP BY DATA_DAY ");
+		
+		qc.setObject("cust_id", inputVO.getCust_id());
+		
+		qc.setQueryString(sb.toString());
+		List<Map<String, Object>> aumList = dam.exeQuery(qc);
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		Map<String, String> aumMap = xmlInfo.doGetVariable("CRM.FAMILY_DEGREE_AUM", FormatHelper.FORMAT_3);
+		int aum = aumMap.get(inputVO.getVip_degree()) != null ? Integer.parseInt(aumMap.get(inputVO.getVip_degree())) * 10000 : 0;
+		
+		for (Map<String, Object> map : aumList) {
+			int sum_aum = map.get("SUM_AUM") != null ? Integer.parseInt(map.get("SUM_AUM").toString()) : 0;
+			if (sum_aum < aum) {
+				family_flag = "N";
+				break;
+			}
+		}
+		outputVO.setFamily_flag(family_flag);
+		outputVO.setFamilyAumList(aumList);
+		sendRtnObject(outputVO);
+	}
 
 	/** 家庭戶新增查詢-轄下客戶 SQL **/
 	public StringBuffer getCustomerSQL (StringBuffer sql, CRM662InputVO inputVO) {
@@ -500,7 +562,6 @@ public class CRM662 extends FubonWmsBizLogic {
 
 	/** 新增家庭戶 **/
 	public void prv_add(Object body, IPrimitiveMap header) throws JBranchException {
-		
 		CRM662InputVO inputVO = (CRM662InputVO) body;
 		CRM662OutputVO outputVO = new CRM662OutputVO();
 		dam = this.getDataAccessManager();
@@ -511,8 +572,24 @@ public class CRM662 extends FubonWmsBizLogic {
 		sql.append("SELECT SEQ FROM TBCRM_CUST_PRV WHERE CUST_ID_M = :cust_id AND CUST_ID_S = CUST_ID_M");
 		queryCondition.setQueryString(sql.toString());
 		queryCondition.setObject("cust_id", inputVO.getCust_id());
-
 		List list = dam.exeQuery(queryCondition);
+		
+		// GET_FAMILY_DEGREE
+		String family_degree = "";	// AUM未滿12週，則無家庭會員等級
+		List<Map<String, Object>> familyAumList = inputVO.getFamilyAumList();
+		if (familyAumList.size() == 12) {
+			String vip_degree = inputVO.getVip_degree();
+			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			sql = new StringBuffer();
+			sql.append(" SELECT GET_FAMILY_DEGREE( :vip_degree, :w1, :w2, :w3, :w4, :w5, :w6, :w7, :w8, :w9, :w10, :w11, :w12 ) AS FAMILY_DEGREE FROM DUAL ");
+			queryCondition.setObject("vip_degree", vip_degree);
+			for (int i = 0; i < 12; i++) {
+				queryCondition.setObject("w" + (i + 1), familyAumList.get(i).get("SUM_AUM"));
+			}
+			queryCondition.setQueryString(sql.toString());
+			List<Map<String, Object>>  family_degree_list = dam.exeQuery(queryCondition);
+			family_degree = family_degree_list.get(0).get("FAMILY_DEGREE") != null ? family_degree_list.get(0).get("FAMILY_DEGREE").toString() : "";
+		}
 
 		if (list.size() == 0) {
 			String seq = getSN("CRM662");
@@ -531,32 +608,39 @@ public class CRM662 extends FubonWmsBizLogic {
 			dam.create(vo);
 
 			//=====================================加入FAMILY_DEGREE欄位======================================//
-			dam = this.getDataAccessManager();
+//			dam = this.getDataAccessManager();
+//			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+//			sql = new StringBuffer();
+//
+//			sql.append("SELECT * FROM TBCRM_CUST_MAST WHERE CUST_ID = :cust_id ");
+//			queryCondition.setObject("cust_id", inputVO.getCust_id());
+//			queryCondition.setQueryString(sql.toString());
+//
+//			List<Map<String, Object>> listCustMast = dam.exeQuery(queryCondition);
+//			if (CollectionUtils.isNotEmpty(listCustMast) && listCustMast.size() > 0) {
+//				dam = this.getDataAccessManager();
+//				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+//				StringBuffer sqlInsert = new StringBuffer();
+//
+//				String family_degree = StringUtils.isNotEmpty(listCustMast.get(0).get("VIP_DEGREE").toString()) ? listCustMast.get(0).get("VIP_DEGREE").toString() : "";
+//				sqlInsert.append("UPDATE TBCRM_CUST_PRV SET FAMILY_DEGREE = :family_degree WHERE SEQ = :seq");
+//				queryCondition.setObject("family_degree", family_degree);
+//				queryCondition.setObject("seq", seq);
+//				queryCondition.setQueryString(sqlInsert.toString());
+//				dam.exeUpdate(queryCondition);
+//			}
+			
 			queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-			sql = new StringBuffer();
+			StringBuffer sqlInsert = new StringBuffer();
 
-			sql.append("SELECT * FROM TBCRM_CUST_MAST WHERE CUST_ID = :cust_id ");
-			queryCondition.setObject("cust_id", inputVO.getCust_id());
-			queryCondition.setQueryString(sql.toString());
-
-			List<Map<String, Object>> listCustMast = dam.exeQuery(queryCondition);
-			if (CollectionUtils.isNotEmpty(listCustMast) && listCustMast.size() > 0) {
-				dam = this.getDataAccessManager();
-				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-				StringBuffer sqlInsert = new StringBuffer();
-
-				String family_degree = StringUtils.isNotEmpty(listCustMast.get(0).get("VIP_DEGREE").toString()) ? listCustMast.get(0).get("VIP_DEGREE").toString() : "";
-
-				sqlInsert.append("UPDATE TBCRM_CUST_PRV SET FAMILY_DEGREE = :family_degree WHERE SEQ = :seq");
-				queryCondition.setObject("family_degree", family_degree);
-				queryCondition.setObject("seq", seq);
-				queryCondition.setQueryString(sqlInsert.toString());
-				dam.exeUpdate(queryCondition);
-			}
+			sqlInsert.append("UPDATE TBCRM_CUST_PRV SET FAMILY_DEGREE = :family_degree WHERE SEQ = :seq");
+			queryCondition.setObject("family_degree", family_degree);
+			queryCondition.setObject("seq", seq);
+			queryCondition.setQueryString(sqlInsert.toString());
+			dam.exeUpdate(queryCondition);
 			//===========================================================================================//
 		}
 
-		dam = this.getDataAccessManager();
 		queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		sql = new StringBuffer();
 		//算現有家庭成員數目，之後與新加成員，總數>=8 需要雙主管覆核
@@ -610,27 +694,36 @@ public class CRM662 extends FubonWmsBizLogic {
 				dam.create(vo);
 
 				//=====================================加入FAMILY_DEGREE欄位======================================//
-				dam = this.getDataAccessManager();
+//				dam = this.getDataAccessManager();
+//				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+//				sql = new StringBuffer();
+//
+//				sql.append("SELECT * FROM TBCRM_CUST_MAST WHERE CUST_ID = :cust_id ");
+//				queryCondition.setObject("cust_id", inputVO.getCust_id());
+//				queryCondition.setQueryString(sql.toString());
+//
+//				List<Map<String, Object>> listCustMast = dam.exeQuery(queryCondition);
+//				if (CollectionUtils.isNotEmpty(listCustMast) && listCustMast.size() > 0) {
+//					dam = this.getDataAccessManager();
+//					queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+//					sql = new StringBuffer();
+//
+//					String family_degree = StringUtils.isNotEmpty(listCustMast.get(0).get("VIP_DEGREE").toString()) ? listCustMast.get(0).get("VIP_DEGREE").toString() : "";
+//					sql.append("UPDATE TBCRM_CUST_PRV SET FAMILY_DEGREE = (:family_degree) WHERE SEQ = :seq");
+//					queryCondition.setObject("family_degree", family_degree);
+//					queryCondition.setObject("seq", seq);
+//					queryCondition.setQueryString(sql.toString());
+//					dam.exeUpdate(queryCondition);
+//				}
+				
 				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-				sql = new StringBuffer();
+				StringBuffer sqlInsert = new StringBuffer();
 
-				sql.append("SELECT * FROM TBCRM_CUST_MAST WHERE CUST_ID = :cust_id ");
-				queryCondition.setObject("cust_id", inputVO.getCust_id());
-				queryCondition.setQueryString(sql.toString());
-
-				List<Map<String, Object>> listCustMast = dam.exeQuery(queryCondition);
-				if (CollectionUtils.isNotEmpty(listCustMast) && listCustMast.size() > 0) {
-					dam = this.getDataAccessManager();
-					queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-					sql = new StringBuffer();
-
-					String family_degree = StringUtils.isNotEmpty(listCustMast.get(0).get("VIP_DEGREE").toString()) ? listCustMast.get(0).get("VIP_DEGREE").toString() : "";
-					sql.append("UPDATE TBCRM_CUST_PRV SET FAMILY_DEGREE = (:family_degree) WHERE SEQ = :seq");
-					queryCondition.setObject("family_degree", family_degree);
-					queryCondition.setObject("seq", seq);
-					queryCondition.setQueryString(sql.toString());
-					dam.exeUpdate(queryCondition);
-				}
+				sqlInsert.append("UPDATE TBCRM_CUST_PRV SET FAMILY_DEGREE = :family_degree WHERE SEQ = :seq");
+				queryCondition.setObject("family_degree", family_degree);
+				queryCondition.setObject("seq", seq);
+				queryCondition.setQueryString(sqlInsert.toString());
+				dam.exeUpdate(queryCondition);
 				//===========================================================================================//
 			}
 		}
@@ -1206,7 +1299,7 @@ public class CRM662 extends FubonWmsBizLogic {
 			}
 		}
 		
-		System.out.println( getPrvFamilyCount(inputVO.getCust_id_m_dc()));
+		//System.out.println( getPrvFamilyCount(inputVO.getCust_id_m_dc()));
 		
 		// 重新取得客戶資料
 		queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);

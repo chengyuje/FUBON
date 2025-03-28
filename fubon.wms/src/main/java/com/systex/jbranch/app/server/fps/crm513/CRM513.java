@@ -43,7 +43,7 @@ import com.systex.jbranch.platform.util.IPrimitiveMap;
 @Scope("request")
 public class CRM513 extends FubonWmsBizLogic {
 
-	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 	public DataAccessManager dam = null;
 	
 	private String apiParam = "SYS.SENIOR_CITIZEN_URL";

@@ -16,6 +16,21 @@ eSoafApp.controller('IOT421Controller', function($scope, $controller, getParamet
 		}
 	});
 	
+	// 檢核登入者是否為『派件員』
+	$scope.assign = 'N';
+	$scope.mappingSet['ASSIGN_CALLOUT_STATUS'] = [];
+	$scope.sendRecv("IOT420", "showAssign", "com.systex.jbranch.app.server.fps.iot420.IOT420InputVO", {},
+	function(tota, isError) {
+		if (!isError) {				
+			if (tota[0].body.showAssign != undefined) {
+				if (tota[0].body.showAssign) {
+					$scope.assign = 'Y';
+				}
+			}
+		}
+//		alert($scope.assign);
+	});
+	
 	// 日期起迄
 	$scope.s_apply_dateOptions = {
     		maxDate: $scope.maxDate,
@@ -76,6 +91,7 @@ eSoafApp.controller('IOT421Controller', function($scope, $controller, getParamet
 		if ($scope.inputVO.case_id != undefined) {
 			$scope.inputVO.case_id = $scope.inputVO.case_id.toUpperCase();			
 		}
+		$scope.inputVO.assign = $scope.assign;
 		$scope.sendRecv("IOT420", "inquire", "com.systex.jbranch.app.server.fps.iot420.IOT420InputVO", $scope.inputVO,
 		function(tota, isError) {
 			if (!isError) {

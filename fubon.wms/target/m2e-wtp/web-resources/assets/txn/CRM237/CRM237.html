@@ -1,28 +1,30 @@
 <style>
-
 .bigspace{
 	margin-left: 50px !important;
 }
-
+.formatWidth{
+	width:150px !important;
+	float: left !important;
+}
+.datewidthByClass{
+	width:120px !important;
+	float: left !important;
+}
 </style>
 <script type="text/javascript" src="assets/txn/CRM237/CRM237.js"></script>
 <script type="text/javascript" src="assets/txn/CRM230/CRM230.js"></script>
 <script type="text/javascript" src="assets/txn/CUS160/CUS160_ADD.js"></script>
 <script type="text/javascript" src="assets/txn/CRM230/CRM230_COMPANY.js"></script>
-
+<script src="assets/txn/CRM110/crmService.js" type="text/javascript" ></script>
 <div class="CRM237" ng-controller="CRM237Controller" ng-cloak>
 	<div>
 		<div class="tfb_content">
 			<div class="tfb_content_icon"></div>
 			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
 		</div>
-		<!--Content of the panel-->
 		<div class="panel_content">
-			<!-- include -->
 			<div ng-include="'assets/txn/CRM230/CRM230_COMMON.html'"></div>
-			<!-- include -->
-
-			<div class="search_table">
+			<div class="search_table search_box3">
 				<hr>
 				<h4>境外結構型商品</h4>
 				<table>
@@ -30,47 +32,50 @@
      					<th width = "10%">商品幣別：</th>
      					<td width = "40%" >
     						<e-combobox id="inv_crcy_type" 
-							ng-paramtype="FPS.CURRENCY"
-							ng-model="inputVO.inv_crcy_type"
-   							ng-validate="false" 
-   							ng-readonly="false" 
-   							ng-editable="false"
-   							ng-format="F3"
-   							ng-required="false"
-   							width="360px"
-   							style="line-height:20px;" />
+										ng-paramtype="FPS.CURRENCY"
+										ng-model="inputVO.inv_crcy_type"
+			   							ng-validate="false" 
+			   							ng-readonly="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
      					</td>
      					<th width = "10%">保本率：</th>
      					<td width = "40%">
      						<e-combobox id="rate_guaranteepay" 
-							ng-paramtype="CRM.CRM236_RATE_GUARANTEEPAY"
-							ng-model="inputVO.rate_guaranteepay"
-   							ng-validate="false" 
-   							ng-readonly="false" 
-   							ng-editable="false"
-   							ng-format="F3"
-   							ng-required="false"
-   							width="360px"
-   							style="line-height:20px;" />
+										ng-paramtype="CRM.CRM236_RATE_GUARANTEEPAY"
+										ng-model="inputVO.rate_guaranteepay"
+			   							ng-validate="false" 
+			   							ng-readonly="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
      					</td>
+     					<th></th>
+     					<td></td>
   			  		</tr>
      	
      				<tr>
      					<th>商品代號：</th>
      					<td>
-     						<input type="text" placeholder="請輸入..." id="bond_nbr" name="bond_nbr" ng-model="inputVO.bond_nbr" e-length-limit="50" size="48">
+     						<input type="text" class="form-control" placeholder="請輸入..." id="bond_nbr" name="bond_nbr" ng-model="inputVO.bond_nbr" e-length-limit="50" size="48" style="width: 200px;">
      					</td>
      					<th>到期年度：</th>
      					<td>
-     						<div class="input-group datebox datewidth">
-								<input type="text" id="year_of_maturity" name="year_of_maturity"
-									class="form-control"
-									uib-datepicker-popup="yyyy"
-									ng-model="inputVO.year_of_maturity"
-									is-open="model.zz"
-									datepicker-options="yomDateOptions"
-									ng-readonly="true"/>
-								<!-- 製作日曆button -->
+     						<div class="input-group datebox datewidthByClass">
+								<input 	type="text" id="year_of_maturity" name="year_of_maturity"
+										class="form-control"
+										uib-datepicker-popup="yyyy"
+										ng-model="inputVO.year_of_maturity"
+										is-open="model.zz"
+										datepicker-options="yomDateOptions"
+										ng-readonly="true"/>
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" ng-click="open($event,'zz')">
 									<i class="glyphicon glyphicon-calendar"></i></button>
@@ -82,83 +87,45 @@
      				<tr>
      					<th>商品名稱：</th>
      					<td>
-     						<input type="text" placeholder="請輸入..." id="prod_name" name="prod_name" ng-model="inputVO.prod_name" e-length-limit="300" size="48">
+     						<input type="text" class="form-control" placeholder="請輸入..." id="prod_name" name="prod_name" ng-model="inputVO.prod_name" e-length-limit="300" size="48" style="width: 200px;">
      					</td>   
      					<th>商品風險等級：</th>
      					<td>
      						<e-combobox id="riskcate_id" 
-							ng-paramtype="FPS.PROD_RISK_LEVEL"
-							ng-model="inputVO.riskcate_id"
- 	  						ng-validate="false" 
-   							ng-readonly="false" 
-   							ng-editable="false"
-   							ng-format="F3"
-   							ng-required="false"
-   							width="360px"
-   							style="line-height:20px;" />
+										ng-paramtype="FPS.PROD_RISK_LEVEL"
+										ng-model="inputVO.riskcate_id"
+			 	  						ng-validate="false" 
+			   							ng-readonly="false" 
+			   							ng-editable="false"
+			   							ng-format="F3"
+			   							ng-required="false"
+			   							width="200px" 
+                            			height="30px" 
+                            			style="line-height:20px;" />
      					</td>
      				</tr>	
-     					
-<!--  			    	<tr> -->
-<!--  			    		<th>連結標的類型：</th> -->
-<!--     			 		<td> -->
-<!--      						<input type="text" placeholder="請輸入..."  -->
-<!--      							id="investment_targets" name="investment_targets"  -->
-<!--      							ng-model="inputVO.investment_targets"  -->
-<!--      							e-length-limit="300" size="48"> -->
-<!--      					</td>  -->
-<!--      					<th>報價範圍：</th> -->
-<!--      					<td> -->
-<!--      						<input type="number" placeholder="請輸入..."  -->
-<!--      							id="sell_price_bgn" name="sell_price_bgn"  -->
-<!--      							ng-model="inputVO.sell_price_bgn"  -->
-<!--      							min="0" e-number-range>&nbsp ~ &nbsp -->
-<!-- 							<input type="number" placeholder="請輸入..."  -->
-<!-- 								id="sell_price_end" name="sell_price_end"  -->
-<!-- 								ng-model="inputVO.sell_price_end"  -->
-<!-- 								min="0" e-number-range> -->
-<!--      					</td> -->
-<!--      				</tr> -->
-     				
-<!--     				<tr> -->
-<!--      					<th>幣轉：</th> -->
-<!--      					<td> -->
-<!-- 						    <e-combobox id="currency_exchange"  -->
-<!-- 							ng-paramtype="CRM.CRM230_YN" -->
-<!-- 							ng-model="inputVO.currency_exchange" -->
-<!--    							ng-validate="false"  -->
-<!--    							ng-readonly="false"  -->
-<!--    							ng-editable="false" -->
-<!--    							ng-format="F3" -->
-<!--    							ng-required="false" -->
-<!--    							width="360px" -->
-<!--    							style="line-height:20px;" /> -->
-<!--      					</td> -->
-<!--      					<th>含息報價範圍：</th> -->
-<!--      					<td> -->
-<!--      						<input type="number" placeholder="請輸入..." id="sdamt3_wd_bgn" name="sdamt3_wd_bgn" ng-model="inputVO.sdamt3_wd_bgn" min="0" e-number-range>&nbsp ~ &nbsp -->
-<!-- 							<input type="number" placeholder="請輸入..." id="sdamt3_wd_end" name="sdamt3_wd_end" ng-model="inputVO.sdamt3_wd_end" min="0" e-number-range> -->
-<!--      					</td> -->
-<!--      				</tr>     				 -->
-
      				<tr>
      					<th>發行機構：</th>
      					<td>
-     						<input type="text" placeholder="請輸入..." 
-     							id="instition_of_flotation" name="instition_of_flotation" 
-     							ng-model="inputVO.instition_of_flotation" 
-     							e-length-limit="300" size="48">
+     						<input type="text" class="form-control" placeholder="請輸入..." id="instition_of_flotation" name="instition_of_flotation" ng-model="inputVO.instition_of_flotation" e-length-limit="300" size="48"  style="width: 200px;">
      					</td> 
      					<th>報價範圍：</th>
      					<td>
-     						<input type="number" placeholder="請輸入..." 
-     							id="sell_price_bgn" name="sell_price_bgn" 
-     							ng-model="inputVO.sell_price_bgn" 
-     							min="0" e-number-range>&nbsp ~ &nbsp
-							<input type="number" placeholder="請輸入..." 
-								id="sell_price_end" name="sell_price_end" 
-								ng-model="inputVO.sell_price_end" 
-								min="0" e-number-range>
+     						<div class="form-group">
+			     				<div class="formatWidth">
+			     					<input 	type="number" class="form-control" placeholder="請輸入..." 
+			     							id="sell_price_bgn" name="sell_price_bgn" 
+			     							ng-model="inputVO.sell_price_bgn" 
+			     							min="0" e-number-range>
+			     				</div>
+			     				<div style="float: left !important;">&nbsp ~ &nbsp</div>
+			     				<div class="formatWidth">
+			     					<input 	type="number" class="form-control" placeholder="請輸入..." 
+			     							id="sell_price_bgn" name="sell_price_bgn" 
+			     							ng-model="inputVO.sell_price_bgn" 
+			     							min="0" e-number-range>
+     							</div>
+			     			</div>
      					</td>
      				</tr>
 				</table>

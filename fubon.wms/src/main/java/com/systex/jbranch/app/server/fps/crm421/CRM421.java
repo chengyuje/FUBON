@@ -2220,7 +2220,7 @@ public class CRM421 extends FubonWmsBizLogic {
 				//================================================================
 
 				//於下單程式加入log。作為往後追查問題的資訊來源(#4169)
-				logger.info("發送" + vo.getCUST_ID() + "之單次議價申請：" + vo.getPROD_NAME() + " 手續費率：" + vo.getFEE_RATE() + " 手續費折數：" + vo.getFEE_DISCOUNT() + " 最高授權層級：" + vo.getHIGHEST_AUTH_LV());
+//				logger.info("發送" + vo.getCUST_ID() + "之單次議價申請：" + vo.getPROD_NAME() + " 手續費率：" + vo.getFEE_RATE() + " 手續費折數：" + vo.getFEE_DISCOUNT() + " 最高授權層級：" + vo.getHIGHEST_AUTH_LV());
 
 				custID = vo.getCUST_ID();
 				creator = vo.getCreator();

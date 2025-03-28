@@ -37,6 +37,7 @@ eSoafApp.controller('PMS366UController', function($scope, $controller, socketSer
     }; 
     
 	$scope.initPMS366U = function() {
+		$scope.inputVO.NOT_EXIST_UHRM = 'U';
 		$scope.sendRecv("PMS401U", "isMainten", "com.systex.jbranch.app.server.fps.pms401u.PMS401UInputVO", {'itemID': 'PMS366U'}, function(tota, isError) {
 			if (!isError) {
 				$scope.uhrmRCList = [];

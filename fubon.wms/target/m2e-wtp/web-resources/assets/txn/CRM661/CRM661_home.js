@@ -37,7 +37,8 @@ eSoafApp.controller('CRM661_HOMEController',
 					
 					//判斷家庭戶是否有資料，有可能V做從戶
 					$scope.sendRecv("CRM661", "query_PRV", "com.systex.jbranch.app.server.fps.crm661.CRM661InputVO", {'cust_id':$scope.custVO.CUST_ID},
-						function(tota, isError) {						
+						function(tota, isError) {			
+							debugger;			
 							if(tota[0].body.resultList.length > 0) {
 								if(tota[0].body.resultList[0].CUST_ID_M == $scope.custVO.CUST_ID){		//主戶
 									$scope.VATYPE = '2';
@@ -47,10 +48,10 @@ eSoafApp.controller('CRM661_HOMEController',
 								
 								$scope.custVO.CRM661_VATYPE = $scope.VATYPE;
 							}else{
-								//家庭戶沒資料才判斷是否為V/A
+								//家庭戶沒資料才判斷是否為V/A => H/T/K
 								if($scope.resultList2 && $scope.resultList2.length > 0) {
 									debugger
-									if($scope.resultList2[0].VIP_DEGREE == 'V' || $scope.resultList2[0].VIP_DEGREE == 'A'){
+									if($scope.resultList2[0].VIP_DEGREE == 'H' || $scope.resultList2[0].VIP_DEGREE == 'T' || $scope.resultList2[0].VIP_DEGREE == 'K'){
 										//判斷ID長度是否小於10位
 										//自然人ID長度10位,若小於10位則為非自然人,不可加入家庭戶
 										if($scope.custVO.CUST_ID.length >= 10){

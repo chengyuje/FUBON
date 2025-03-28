@@ -22,6 +22,17 @@ eSoafApp.controller('IOT160Controller', function($scope, $rootScope,$controller,
 		return "3"; //16:01~23:59 第三批
 	}
 	
+	$scope.getChkEmpList = function() {
+		$scope.chkEmpList = [];
+		$scope.sendRecv("IOT160", "getChkEmpList", "com.systex.jbranch.app.server.fps.iot160.IOT160InputVO", {},
+				function(tota, isError) {
+					if (!isError) {
+						$scope.chkEmpList = tota[0].body.list;
+					}
+			});
+	}
+	$scope.getChkEmpList();
+	
 	 // init
 	$scope.init = function() {
 		var now = new Date();
@@ -38,9 +49,11 @@ eSoafApp.controller('IOT160Controller', function($scope, $rootScope,$controller,
 			batchNbr_9 : '',
 			batchNbr_10 : '',
 			shipMethod_1 : '1',
+			prevShipMethod_1 : '1', //上一次的送達方式
 			batchSeq_1 : $scope.getBatchSeq(),
 			date_1 : now,
-			empId : sysInfoService.getUserID()
+			empId : sysInfoService.getUserID(),
+			chkEmpId : ''
 		};
 	};
 	$scope.init();
@@ -69,191 +82,155 @@ eSoafApp.controller('IOT160Controller', function($scope, $rootScope,$controller,
 		maxDate : $scope.timesys
 	};
 		
+	//儲存前檢核
 	$scope.checkData = function() {
+		debugger
+		var rtnValue = true;
 		if($scope.inputVO.shipMethod_1 == '' || $scope.inputVO.batchSeq_1 == '' || $scope.inputVO.date_1 == '') {
-			return false;
-		} else {
-			return true;
+			//送達方式、批次、送達日，為必填欄位
+			rtnValue = false;
 		}
-	}
-	
-	$scope.checkData_1 = function() {
-		if($scope.inputVO.batchNbr_1 != ''){
-			var temp=$scope.inputVO.batchNbr_1.toUpperCase();
-			$scope.inputVO.batchNbr_1 = temp;
+		var count = 0;
+		for(var i = 1; i <=10; i++) {
+			debugger
+			var thisElement = document.getElementById("batchNbr_" + i);
+			if(!thisElement || (thisElement.value.length > 0 && thisElement.value.length < 11)) {
+				//分行批號須為11碼
+				rtnValue = false;
+			} else {
+				count++;
+			}
 		}
+		if(count == 0) rtnValue = false;  //沒有填入任何分行批號
 		
-		if ($scope.inputVO.batchNbr_1 != '' && $scope.checkData()) {
-			$scope.check.pass = 'true'
-		}else {
-			$scope.check.pass = 'false'
-		}
-	}
-	
-	$scope.checkData_2 = function() {
-		if($scope.inputVO.batchNbr_2 != ''){
-			var temp=$scope.inputVO.batchNbr_2.toUpperCase();
-			$scope.inputVO.batchNbr_2 = temp;
-		}
-
-		if ($scope.inputVO.batchNbr_2 != '' && $scope.checkData()) {
-			$scope.check.pass = 'true'
-		}else {
-			$scope.check.pass = 'false'
-		}
-	}
-	
-	$scope.checkData_3 = function() {
-		if($scope.inputVO.batchNbr_3 != ''){
-			var temp=$scope.inputVO.batchNbr_3.toUpperCase();
-			$scope.inputVO.batchNbr_3 = temp;
-		}
-
-		if ($scope.inputVO.batchNbr_3 != '' && $scope.checkData()) {
-			$scope.check.pass = 'true'
-		}else {
-			$scope.check.pass = 'false'
-		}
-	}
-	
-	$scope.checkData_4 = function() {
-		if($scope.inputVO.batchNbr_4 != ''){
-			var temp=$scope.inputVO.batchNbr_4.toUpperCase();
-			$scope.inputVO.batchNbr_4 = temp;
-		}
-
-		if ($scope.inputVO.batchNbr_4 != '' && $scope.checkData()) {
-			$scope.check.pass = 'true'
-		}else {
-			$scope.check.pass = 'false'
-		}
-	}
-	
-	$scope.checkData_5 = function() {
-		if($scope.inputVO.batchNbr_5 != ''){
-			var temp=$scope.inputVO.batchNbr_5.toUpperCase();
-			$scope.inputVO.batchNbr_5 = temp;
-		}
-
-		if ($scope.inputVO.batchNbr_5 != '' && $scope.checkData()) {
-			$scope.check.pass = 'true'
-		}else {
-			$scope.check.pass = 'false'
-		}
-	}
-	
-	$scope.checkData_6 = function() {
-		if($scope.inputVO.batchNbr_6 != ''){
-			var temp=$scope.inputVO.batchNbr_6.toUpperCase();
-			$scope.inputVO.batchNbr_6 = temp;
-		}
-
-		if ($scope.inputVO.batchNbr_6 != '' && $scope.checkData()) {
-			$scope.check.pass = 'true'
-		}else {
-			$scope.check.pass = 'false'
-		}
-	}
-	
-	$scope.checkData_7 = function() {
-		if($scope.inputVO.batchNbr_7 != ''){
-			var temp=$scope.inputVO.batchNbr_7.toUpperCase();
-			$scope.inputVO.batchNbr_7 = temp;
-		}
-
-		if ($scope.inputVO.batchNbr_7 != '' && $scope.checkData()) {
-			$scope.check.pass = 'true'
-		}else {
-			$scope.check.pass = 'false'
-		}
-	}
-	
-	$scope.checkData_8 = function() {
-		if($scope.inputVO.batchNbr_8 != ''){
-			var temp=$scope.inputVO.batchNbr_8.toUpperCase();
-			$scope.inputVO.batchNbr_8 = temp;
-		}
-
-		if ($scope.inputVO.batchNbr_8 != '' && $scope.checkData()) {
-			$scope.check.pass = 'true'
-		}else {
-			$scope.check.pass = 'false'
-		}
-	}
-	
-	$scope.checkData_9 = function() {
-		if($scope.inputVO.batchNbr_9 != ''){
-			var temp=$scope.inputVO.batchNbr_9.toUpperCase();
-			$scope.inputVO.batchNbr_9 = temp;
-		}
-
-		if ($scope.inputVO.batchNbr_9 != '' && $scope.checkData()) {
-			$scope.check.pass = 'true'
-		}else {
-			$scope.check.pass = 'false'
-		}
-	}
-	
-	$scope.checkData_10 = function() {
-		if($scope.inputVO.batchNbr_10 != ''){
-			var temp=$scope.inputVO.batchNbr_10.toUpperCase();
-			$scope.inputVO.batchNbr_10 = temp;
-		}
-
-		if ($scope.inputVO.batchNbr_10 != '' && $scope.checkData()) {
-			$scope.check.pass = 'true'
-		}else {
-			$scope.check.pass = 'false'
-		}
-	}
+		return rtnValue;
+	}	
 	
 	$scope.saveData = function() {
+		debugger
+		var rtnValue = true;
+		if($scope.inputVO.shipMethod_1 == '' || $scope.inputVO.batchSeq_1 == '' || $scope.inputVO.date_1 == '') {
+			//送達方式、批次、送達日，為必填欄位
+			$scope.showErrorMsg("送達方式、批次、送達日，為必填欄位");
+			return;
+		}
+		var count = 0;
+		for(var i = 1; i <=10; i++) {
+			debugger
+			var thisElement = document.getElementById("batchNbr_" + i);
+			if(!thisElement || (thisElement.value.length > 0 && thisElement.value.length < 11)) {
+				//分行批號須為11碼
+				$scope.showErrorMsg("分行批號須為11碼");
+				return;
+			}
+			if(thisElement.value.length == 0) {
+				count++;
+			}
+		}
+		if(count == 10) {
+			//沒有填入任何分行批號
+			$scope.showErrorMsg("請填入批號");
+			return;
+		}
+		
 		$scope.sendRecv("IOT160", "saveData", "com.systex.jbranch.app.server.fps.iot160.IOT160InputVO", $scope.inputVO,
 				function(tota, isError) {
 					if (!isError) {
 						$scope.showMsg(tota[0].body.message);
 						$scope.closeThisDialog('successful');
 					}
-			})
+			});
 	}
 	
 	//批號滿12碼，自動跳到下一個tabindex
 	$scope.toNextIndex = function(thisIdx, nextIdx) {
+		debugger
 		var batchNo = eval("$scope.inputVO.batchNbr_" + thisIdx);
 		if(batchNo && batchNo.length >= 11) {
-			var element = document.getElementById("batchNbr_" + nextIdx);
-			if(element) element.focus();
-			
-			switch (thisIdx) {
-			case "1":
-				checkData_1();
-				break;
-			case "2":
-				checkData_2();
-				break;
-			case "3":
-				checkData_3();
-				break;
-			case "4":
-				checkData_4();
-				break;
-			case "5":
-				checkData_5();
-				break;
-			case "6":
-				checkData_6();
-				break;
-			case "7":
-				checkData_7();
-				break;
-			case "8":
-				checkData_8();
-				break;
-			case "9":
-				checkData_9();
-				break;
-			}
+			//批次為大寫
+			var thisElement = document.getElementById("batchNbr_" + thisIdx);
+			thisElement.value = batchNo.toUpperCase();
+			//下一個批號onFocus
+			var nextElement = document.getElementById("batchNbr_" + nextIdx);
+			if(nextElement) nextElement.focus();
 		}
+	}
+	
+	$scope.setBatchNo = function(idx, value) {
+		if(idx == 1) {
+			$scope.inputVO.batchNbr_1 = value;
+		} else if(idx == 2) {
+			$scope.inputVO.batchNbr_2 = value;
+		} else if(idx == 3) {
+			$scope.inputVO.batchNbr_3 = value;
+		} else if(idx == 4) {
+			$scope.inputVO.batchNbr_4 = value;
+		} else if(idx == 5) {
+			$scope.inputVO.batchNbr_5 = value;
+		} else if(idx == 6) {
+			$scope.inputVO.batchNbr_6 = value;
+		} else if(idx == 7) {
+			$scope.inputVO.batchNbr_7 = value;
+		} else if(idx == 8) {
+			$scope.inputVO.batchNbr_8 = value;
+		} else if(idx == 9) {
+			$scope.inputVO.batchNbr_9 = value;
+		} else if(idx == 10) {
+			$scope.inputVO.batchNbr_10 = value;
+		}
+	}
+	
+	//將批號都清掉
+	$scope.clearOPBatchNo = function() {
+		$scope.inputVO.batchNbr_1 = "";
+		$scope.inputVO.batchNbr_2 = "";
+		$scope.inputVO.batchNbr_3 = "";
+		$scope.inputVO.batchNbr_4 = "";
+		$scope.inputVO.batchNbr_5 = "";
+		$scope.inputVO.batchNbr_6 = "";
+		$scope.inputVO.batchNbr_7 = "";
+		$scope.inputVO.batchNbr_8 = "";
+		$scope.inputVO.batchNbr_9 = "";
+		$scope.inputVO.batchNbr_10 = "";
+	}
+	
+	//無紙化查詢
+	$scope.inquireNoPaper = function() {
+		//取得
+		$scope.sendRecv("IOT160", "inquireNoPaper", "com.systex.jbranch.app.server.fps.iot160.IOT160InputVO", {"chkEmpId":$scope.inputVO.chkEmpId},
+				function(tota, isError) {
+					if (!isError) {
+						$scope.clearOPBatchNo(); //將批號都先清掉
+						if(tota[0].body.list && tota[0].body.list.length > 0) {
+							var count = 1;
+							angular.forEach(tota[0].body.list, function(row) {
+								if(count <= 10 && row.OP_BATCH_NO) { //只有10個欄位，多的就不放了
+									debugger
+									$scope.setBatchNo(count, row.OP_BATCH_NO);
+									$scope.toNextIndex(count, count+1)
+								}
+								count++;
+							});
+							//送達方式
+							$scope.inputVO.prevShipMethod_1 = "5"; //避免再觸發$scope.checkData_1();，上面已經清過批號
+							$scope.inputVO.shipMethod_1 = "5"; //無紙化
+						} else {
+							$scope.showErrorMsg("查無無紙化案件");
+						}
+					}
+			});
+	}
+	
+	$scope.checkData_1 = function() {
+		debugger
+		//送達方式由"無紙化"改為其它，或由其他改為"無紙化"，則需清空前一次批號
+		if($scope.inputVO.shipMethod_1 == "5" && $scope.inputVO.prevShipMethod_1 != "5") {
+			$scope.clearOPBatchNo(); //將批號先清掉
+		} else if($scope.inputVO.shipMethod_1 != "5" && $scope.inputVO.prevShipMethod_1 == "5") {
+			$scope.clearOPBatchNo(); //將批號先清掉
+		}
+		//
+		$scope.inputVO.prevShipMethod_1 = $scope.inputVO.shipMethod_1;
 	}
 	
 });

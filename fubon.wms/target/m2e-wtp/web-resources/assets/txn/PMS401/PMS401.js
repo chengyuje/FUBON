@@ -5,7 +5,6 @@ eSoafApp.controller('PMS401Controller', function($rootScope, $scope, $controller
 
 	$controller('PMSRegionController', {$scope: $scope});
 
-    /*** 可視範圍  JACKY共用版  START ***/
     //選取月份下拉選單 --> 重新設定可視範圍
     $scope.dateChange = function(){
     	//設定回傳時間
@@ -21,14 +20,6 @@ eSoafApp.controller('PMS401Controller', function($rootScope, $scope, $controller
 		}
 	});
     //
-
-	var rp = "RC";
-	if(sysInfoService.getRoleName().substring(0, 2) == 'FC')
-		rp = "AO";
-	if(sysInfoService.getRoleID() == 'A161')
-		rp = "BR";
-	
-	/*** 可視範圍  JACKY共用版  END***/
     
 	// date picker start
 	$scope.open = function($event, index) {
@@ -121,48 +112,19 @@ eSoafApp.controller('PMS401Controller', function($rootScope, $scope, $controller
 	$scope.inquireInit();	
 	
 	
-	var CRM181toPMS401 = "NO";
-	
 	//資料查詢
 	$scope.query = function() {			
-//		if (CRM181toPMS401 != "Yes") {				
-//			if ($scope.REGION_LIST.length == 0) {				
-//				$scope.inputVO.ao_code = sysInfoService.getUserID();				
-//			}
-//		}
-		CRM181toPMS401 = "NO";
-		$scope.rptDate = $filter('date')($scope.inputVO.sCreDate, 'yyyy/MM/dd')+ '~' +$filter('date')($scope.inputVO.eCreDate, 'yyyy/MM/dd'); 			
+		$scope.rptDate = $filter('date')($scope.inputVO.sCreDate, 'yyyy/MM/dd')+ '~' +$filter('date')($scope.inputVO.eCreDate, 'yyyy/MM/dd'); 		
+		
 		$scope.sendRecv("PMS401", "queryData", "com.systex.jbranch.app.server.fps.pms401.PMS401InputVO", $scope.inputVO, function(tota, isError) {
 			if (!isError) {
 				if (tota[0].body.resultList.length == 0) {
-					$scope.paramList = [];
 					$scope.totalData = [];
 					$scope.outputVO = {};
 					$scope.showMsg("ehl_01_common_009");
         			return;
         		}
 				
-				$scope.paramList = tota[0].body.totalList;
-						
-				angular.forEach($scope.paramList, function (row, index, objs) {
-					row.UPDATE_FLAG = 'N';
-					row.ROWNUM = index + 1;
-					//資料最後修改日小於20170825，則不能修改"主管確認"以及"主管備註欄"
-					if (row.LASTUPDATE != null) { 
-						row.DISABLE_FLAG = 'N';
-					} else {
-						row.DISABLE_FLAG = 'N';
-					}
-					
-					if ($scope.role_id =='A150' || $scope.role_id == 'ABRF' || $scope.role_id == 'A157' ||
-						$scope.role_id =='A161' || $scope.role_id == 'A149' || $scope.role_id =='ABRU' ||
-						$scope.role_id =='A308' || $scope.role_id =='A147') {
-						// 不能修改自己的資料
-						if (row.EMP_ID == projInfoService.getUserID()) {
-							row.DISABLE_ROLE_FLAG = 'Y';
-						}
-					}
-				});	
 				$scope.totalData = tota[0].body.totalList;
 				$scope.outputVO = tota[0].body;		
 				return;
@@ -178,6 +140,7 @@ eSoafApp.controller('PMS401Controller', function($rootScope, $scope, $controller
 		$scope.updateList = [];
 		var checkData = true;
 		var rowIndex;
+		
 		angular.forEach($scope.paramList, function (row, index, objs) {
 			if (row.UPDATE_FLAG == 'Y') {
 				if (!row.HR_ATTR || 	//初判異常轉法遵部調查
@@ -210,7 +173,7 @@ eSoafApp.controller('PMS401Controller', function($rootScope, $scope, $controller
 			
         	if (tota.length > 0) {
         		$scope.showMsg('儲存成功');
-        		$scope.inputVO.currentPageIndex=$scope.outputVO.currentPageIndex || 0;
+        		$scope.inputVO.currentPageIndex = $scope.outputVO.currentPageIndex || 0;
         		$scope.query();
         	};		
 		});
@@ -233,7 +196,6 @@ eSoafApp.controller('PMS401Controller', function($rootScope, $scope, $controller
 	$scope.passParams = $scope.connector('get','passParams');
 	
 	$scope.fromCRM181 = function() {
-		CRM181toPMS401 = "Yes";
 		if($scope.passParams != null){
 			$scope.query();
 		}

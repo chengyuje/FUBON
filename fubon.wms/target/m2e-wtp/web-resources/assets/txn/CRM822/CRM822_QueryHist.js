@@ -24,6 +24,17 @@ eSoafApp.controller('CRM822_QueryHistController',
 		$scope.limitDate = function() {
 			$scope.bgn_sDateOptions.maxDate = $scope.inputVO.EndDt;
 			$scope.bgn_eDateOptions.minDate = $scope.inputVO.StartDt;
+			
+			if($scope.inputVO.EndDt) {
+				var tempDate = new Date($scope.inputVO.EndDt.getFullYear(), $scope.inputVO.EndDt.getMonth(), $scope.inputVO.EndDt.getDate() - 365);				
+				$scope.bgn_sDateOptions.minDate = tempDate;
+
+			}
+			
+			if($scope.inputVO.StartDt) {
+				var tempDate = new Date($scope.inputVO.StartDt.getFullYear(), $scope.inputVO.StartDt.getMonth(), $scope.inputVO.StartDt.getDate() + 365)
+				$scope.bgn_eDateOptions.maxDate = tempDate;		
+			}
 		};
 		
 		//初始化
@@ -111,6 +122,8 @@ eSoafApp.controller('CRM822_QueryHistController',
 			$scope.inputVO.StartDt = '';
 			$scope.inputVO.EndDt = '';
 			$scope.bgn_sDateOptions.maxDate = '';
+			$scope.bgn_sDateOptions.minDate = '';
+			$scope.bgn_eDateOptions.maxDate = '';
 			$scope.bgn_eDateOptions.minDate = '';
 			$scope.inputVO.time = '';
 			$scope.inputVO.account = '';

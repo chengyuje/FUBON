@@ -32,19 +32,45 @@
 				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
 					<table>
 						<tr>
-							<th>*統計月份：</th>
-							<td>						 						 
-								<e-combobox id="dataMonth" name="dataMonth" 
-											ng-datasource="mappingSet['timeE']"
-											ng-model="inputVO.sCreDate"
-											ng-validate="false" 
-											ng-readonly="false" 
-											ng-editable="false"
-											ng-required="true"
-											ng-change="dateChange()"
-											ng-format="F3"
-											width="150px"
-											style="line-height:20px;" />														
+							<th><font color=red>＊</font>統計月份：</th>
+							<td class="form-inline" colspan="5">
+			                	<div class="form-group">
+									<div class="input-group datebox datewidth">
+										<input 	type="text" id="sCreDate" name="sCreDate"
+											   	class="form-control"
+												uib-datepicker-popup="yyyyMM"
+												ng-model="inputVO.sCreDate"
+												is-open="model.e"
+												datepicker-options="importStartDateOptions"
+										   		datepicker-mode="'month'"
+												ng-readonly="true"
+												ng-change="limitDate();dateChange()"/>
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+									<div style="float: left !important;">～</div>
+									<div class="input-group datebox datewidth">
+										<input 	type="text" id="eCreDate" name="eCreDate"
+											   	class="form-control"
+												uib-datepicker-popup="yyyyMM"
+												ng-model="inputVO.eCreDate"
+												is-open="model.f"
+												datepicker-options="importEndDateOptions"
+										   		datepicker-mode="'month'"
+												ng-readonly="true"
+												ng-change="limitDate()" 
+												ng-disabled="inputVO.sCreDate == undefined || inputVO.sCreDate == null || inputVO.sCreDate == ''" />
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" 
+													ng-click="open($event,'f')" 
+													ng-disabled="inputVO.sCreDate == undefined || inputVO.sCreDate == null || inputVO.sCreDate == ''" 
+													ng-readonly="inputVO.sCreDate == undefined || inputVO.sCreDate == null || inputVO.sCreDate == ''">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+								</div>
 							</td>
 						</tr>
 						<tr>

@@ -18,6 +18,7 @@ eSoafApp.controller('CRM435Controller',
 				apply_seq: '',  //議價編號
 				auth_emp_id: '' //簽核者員工編號
 			};
+			$scope.text = "";
 			
 			
 		}
@@ -47,17 +48,19 @@ eSoafApp.controller('CRM435Controller',
 			$scope.sendRecv("CRM435", "inquire", "com.systex.jbranch.app.server.fps.crm435.CRM435InputVO", $scope.inputVO,
 				function(tota, isError) {
 					if (!isError) {
-						var errMsg = tota[0].body.errMsg;
-						if (errMsg) {
-							$scope.showErrorMsg(errMsg);
-							return;
-						}
-						if (tota[0].body.resultList.length) {
-							$scope.resultList = tota[0].body.resultList;
-							$scope.outputVO = tota[0].body;
-						} else {
-							$scope.showMsg("ehl_01_common_009");
-						}
+						console.log("tota", tota);
+						console.log("tota.length > 0", tota.length>0);
+//						var errMsg = tota[0].body.errMsg;
+//						if (errMsg) {
+//							$scope.showErrorMsg(errMsg);
+//							return;
+//						}
+//						if (tota[0].body.resultList.length) {
+//							$scope.resultList = tota[0].body.resultList;
+//							$scope.outputVO = tota[0].body;
+//						} else {
+//							$scope.showMsg("ehl_01_common_009");
+//						}
 					}
 				});
 			console.log("filter", $filter);
@@ -80,5 +83,39 @@ eSoafApp.controller('CRM435Controller',
 				});
 		}
 
-
+		$scope.test = function() {
+			debugger;
+//			const age = "18";
+//			var test = new Map();
+//			const result = `AGE => ${age}`;
+//			
+//			$scope.showMsg();
+//			
+//			var filter = $filter("i18n");
+//			console.log("filter", filter);
+			
+			console.log("$scope.text", $scope.text);
+			
+		}
+		
+		
+		//標點符號半形轉全形
+		$scope.ChangeToFullWidth = function() {
+			debugger;
+			console.log($scope.text);
+			var temp = "";
+			for (var i = 0; i < text.length; i++) {
+				var charCode = text.charCodeAt(i);
+				if (
+					(charCode >= 33 && charCode <= 47) ||  // ! " # $ % & ' ( ) * + , - . /
+					(charCode >= 58 && charCode <= 64) ||  // : ; < = > ? @
+					(charCode >= 91 && charCode <= 96) ||  // [ \ ] ^ _ `
+					(charCode >= 123 && charCode <= 126)   // { | } ~
+				) {
+					charCode += 65248; // 轉換為全形標點
+				}
+				temp += String.fromCharCode(charCode);
+			}
+			$scope.text = temp;
+		}
 	});

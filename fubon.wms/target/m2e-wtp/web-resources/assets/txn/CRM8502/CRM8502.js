@@ -125,12 +125,13 @@ eSoafApp.controller('CRM8502Controller',
 								}								
 								row.APPLY_NO = row.CUST_ID + "-" + applyDate + seq;
 //								row.CUST_NAME = tota[0].body.custName;
-
+								
 								var today = new Date();
 								today = ""+(today.getYear()+1900)
 										+((today.getMonth()+1)<10?"0"+(today.getMonth()+1):""+(today.getMonth()+1))
 										+((today.getDate())<10?"0"+(today.getDate()):(today.getDate()));
 								row.applyStage = (applyDate == today);
+								console.log("row.applyStage", row.applyStage);
 							});
 							
 							$scope.custAssetDocList2=[];

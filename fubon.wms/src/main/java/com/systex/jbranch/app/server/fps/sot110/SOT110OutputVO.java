@@ -65,6 +65,11 @@ public class SOT110OutputVO extends PagingOutputVO {
 	private String proCorpInv;		//專業機構投資人
     private String highYieldCorp;	//高淨值法人
     private String overCentRateResult; //集中度檢核結果
+    
+    //#2304_商品適配及申購新增KYC快到期提醒
+    private boolean kycDueDateLessOneMonth; //KYC校期小於等於1個月(30天)
+    //for動態鎖利轉換扣款帳號
+    private List<Map<String, Object>> feeDebitAcct;
 	
 	public boolean isKycDueDateUseful() {
 		return isKycDueDateUseful;
@@ -392,6 +397,22 @@ public class SOT110OutputVO extends PagingOutputVO {
 
 	public void setOverCentRateResult(String overCentRateResult) {
 		this.overCentRateResult = overCentRateResult;
+	}
+
+	public boolean isKycDueDateLessOneMonth() {
+		return kycDueDateLessOneMonth;
+	}
+
+	public void setKycDueDateLessOneMonth(boolean kycDueDateLessOneMonth) {
+		this.kycDueDateLessOneMonth = kycDueDateLessOneMonth;
+	}
+
+	public List<Map<String, Object>> getFeeDebitAcct() {
+		return feeDebitAcct;
+	}
+
+	public void setFeeDebitAcct(List<Map<String, Object>> feeDebitAcct) {
+		this.feeDebitAcct = feeDebitAcct;
 	}
 	
 }

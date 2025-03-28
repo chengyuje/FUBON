@@ -26,6 +26,25 @@ public class PMS426InputVO extends PagingInputVO {
 	private String uhrmRC;
 	private String uhrmOP;
 	
+	private String sCreDate;
+	private String eCreDate;
+	
+	public String getsCreDate() {
+		return sCreDate;
+	}
+
+	public void setsCreDate(String sCreDate) {
+		this.sCreDate = sCreDate;
+	}
+
+	public String geteCreDate() {
+		return eCreDate;
+	}
+
+	public void seteCreDate(String eCreDate) {
+		this.eCreDate = eCreDate;
+	}
+
 	public String getUhrmRC() {
 		return uhrmRC;
 	}

@@ -9,6 +9,7 @@ public class CRM860InputVO extends PagingInputVO {
 	private String prdType;
 	private Date startDate;
 	private Date endDate;
+	private String isOBU;
 	
 	
 	public String getCustID() {
@@ -34,5 +35,11 @@ public class CRM860InputVO extends PagingInputVO {
 	}
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+	public String getIsOBU() {
+		return isOBU;
+	}
+	public void setIsOBU(String isOBU) {
+		this.isOBU = isOBU;
 	}
 }

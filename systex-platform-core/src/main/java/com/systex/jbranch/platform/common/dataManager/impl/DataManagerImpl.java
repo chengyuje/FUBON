@@ -93,6 +93,7 @@ public class DataManagerImpl implements DataManagerIF {
      * @return branch
      */
     public Branch getBranch(String branchID) {
+    	System.out.println();
         return branch.get(branchID);
     }
 

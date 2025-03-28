@@ -14,8 +14,10 @@ eSoafApp.controller('REF900Controller',
 		});
 		
 		// date picker
-		$scope.startDateOptions = {};
-		$scope.endDateOptions = {};
+		$scope.optionsInit = function() {
+			$scope.startDateOptions = {};
+			$scope.endDateOptions = {};
+		}
 		// config
 		$scope.model = {};
 		$scope.open = function($event, elementOpened) {
@@ -25,7 +27,19 @@ eSoafApp.controller('REF900Controller',
 		};
 		$scope.limitDate = function() {
 			$scope.startDateOptions.maxDate = $scope.inputVO.endDate;
+			if ($scope.inputVO.endDate) {
+				let y = $scope.inputVO.endDate.getFullYear();
+				let m = $scope.inputVO.endDate.getMonth() - 3;
+				let d = $scope.inputVO.endDate.getDate();
+				$scope.startDateOptions.minDate = new Date(y, m, d);
+			}
 			$scope.endDateOptions.minDate = $scope.inputVO.startDate;
+			if ($scope.inputVO.startDate) {
+				let y = $scope.inputVO.startDate.getFullYear();
+				let m = $scope.inputVO.startDate.getMonth() + 3;
+				let d = $scope.inputVO.startDate.getDate();
+				$scope.endDateOptions.maxDate = new Date(y, m, d);
+			}
 		};
 		// date picker end
 		
@@ -40,6 +54,7 @@ eSoafApp.controller('REF900Controller',
 			var min_mon2 = new Date();
 			min_mon2.setHours(0, 0, 0, 0);
 			$scope.inputVO.endDate = min_mon2;
+			$scope.optionsInit();
 			$scope.limitDate();
 			// 連動
 			$scope.regionOBJ = ['N', $scope.inputVO, "region_center_id", "REGION_LIST", "branch_area_id", "AREA_LIST", "branch_nbr", "BRANCH_LIST", "ao_code", "AO_LIST", "emp_id", "EMP_LIST"];
@@ -79,8 +94,8 @@ eSoafApp.controller('REF900Controller',
 							}
 							// 若非受轉人，但權限群組是011/012/013/046 且是待仲裁案件， 用主管的下拉選單
 							else if(row.STATUS == 'A' && row.SALES_BOSS == $scope.pri_id && boss_temp.indexOf(projInfoService.getUserID()) > -1) {
-								row.set.push({LABEL: "發回轉介", DATA: "Y"});
-								row.set.push({LABEL: "刪除", DATA: "C"});
+								row.set.push({LABEL: "轉介成立", DATA: "Y"});
+								row.set.push({LABEL: "轉介不成立", DATA: "C"});
 							}
 							else
 								row.enableCombo = false;

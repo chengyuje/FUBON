@@ -270,6 +270,23 @@ eSoafApp.controller('PRD110Controller',
 		};
 		
 		$scope.save = function(row) {
+			if($scope.inputVO.cust_id) {
+				$scope.sendRecv("SOT701", "getCustKycData", "com.systex.jbranch.app.server.fps.sot701.SOT701InputVO", {custID : $scope.inputVO.cust_id},
+						function(totas, isError) {
+					if (!isError) {
+						$scope.kycData = totas[0].body.custKYCDataVO;
+						debugger;
+						if(!$scope.kycData.isKycDueDateUseful && $scope.kycData.kycDueDateLessOneMonth) {
+							var kycDueDate = $scope.toJsDate($scope.kycData.kycDueDate);
+							var showYear = kycDueDate.getFullYear();  //西元年份 
+							var showMonth = kycDueDate.getMonth()+1;  //一年中的第幾月 
+							var showDate = kycDueDate.getDate();      //一月份中的第幾天
+							
+							$scope.showMsg('ehl_01_SOT_018',[showYear,showMonth,showDate]);
+						}
+					}
+				});
+			}
 			debugger
 			//適配資訊
 			var fitVO = {
@@ -293,17 +310,14 @@ eSoafApp.controller('PRD110Controller',
 							if(totas[0].body.hmshacrDataVO) {
 								$scope.inputVO.hmshacrDataVO = totas[0].body.hmshacrDataVO;
 								
-								if(totas[0].body.hmshacrDataVO.VALIDATE_YN == "N") {
-									$scope.showErrorMsg("客戶高風險商品集中度比例已超過上限");
-									return;
-								} else if(totas[0].body.hmshacrDataVO.VALIDATE_YN == "W") {
+								if(totas[0].body.hmshacrDataVO.VALIDATE_YN == "W") {
 									var dialog = ngDialog.open({
 										template: 'assets/txn/CONFIRM/CONFIRM.html',
 										className: 'CONFIRM',
 										showClose: false,
 										scope : $scope,
 										controller: ['$scope', function($scope) {
-											$scope.dialogLabel = "客戶高風險商品集中度已超過通知門檻比例，請取得客戶同意，若為弱勢客戶，須請處(副)主管核准\n\n是否繼續";
+											$scope.dialogLabel = "客戶高風險商品集中度已超過通知門檻比例，請取得客戶同意";
 							            }]
 									}).closePromise.then(function (data) {
 										if (data.value === 'successful') {

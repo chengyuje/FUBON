@@ -15,21 +15,15 @@ eSoafApp.controller('SOT312Controller',
 		});
         		
 		// time picker
-		$scope.startDateOptions = {
-			maxDate: $scope.inputVO.eDate || $scope.maxDate,
-			minDate: $scope.minDate
-		};
-        $scope.startDateOptions2 = {
-			maxDate: $scope.inputVO.eDate || $scope.maxDate,
-			minDate: $scope.inputVO.sDate || $scope.minDate
-		};
-		$scope.endDateOptions = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.inputVO.sDate || $scope.minDate
-		};
-		$scope.endDateOptions2 = {
-			maxDate: $scope.maxDate,
-			minDate: $scope.inputVO.eDate || $scope.minDate
+		$scope.optionsInit = function() {
+			$scope.startDateOptions = {
+				maxDate: $scope.inputVO.eDate || $scope.maxDate,
+				minDate: $scope.minDate
+			};
+			$scope.endDateOptions = {
+				maxDate: $scope.inputVO.eDate || $scope.maxDate,
+				minDate: $scope.inputVO.sDate || $scope.minDate
+			}
 		};
 		$scope.altInputFormats = ['M!/d!/yyyy'];
 		$scope.model = {};
@@ -39,15 +33,21 @@ eSoafApp.controller('SOT312Controller',
 			$scope.model[elementOpened] = !$scope.model[elementOpened];
 		};
 		$scope.limitDate = function() {
-			$scope.startDateOptions.maxDate = $scope.inputVO.eDate || $scope.inputVO.sDate2 || $scope.maxDate;
-			
-			$scope.startDateOptions2.minDate = $scope.inputVO.sDate || $scope.minDate;
-			$scope.startDateOptions2.maxDate = $scope.inputVO.eDate;
+			$scope.startDateOptions.maxDate = $scope.inputVO.eDate || $scope.maxDate;
+			if ($scope.inputVO.eDate) {
+				let y = $scope.inputVO.eDate.getFullYear();
+				let m = $scope.inputVO.eDate.getMonth() - 6;
+				let d = $scope.inputVO.eDate.getDate();
+				$scope.startDateOptions.minDate = new Date(y, m, d);
+			}
 			
 			$scope.endDateOptions.minDate = $scope.inputVO.sDate || $scope.minDate;
-			$scope.endDateOptions.maxDate = $scope.inputVO.eDate2;
-			
-			$scope.endDateOptions2.minDate = $scope.inputVO.eDate || $scope.minDate;
+			if ($scope.inputVO.sDate) {
+				let y = $scope.inputVO.sDate.getFullYear();
+				let m = $scope.inputVO.sDate.getMonth() + 6;
+				let d = $scope.inputVO.sDate.getDate();
+				$scope.endDateOptions.maxDate = new Date(y, m, d);
+			}
 		};
       	
         $scope.init = function(){
@@ -59,6 +59,7 @@ eSoafApp.controller('SOT312Controller',
 					sDate: undefined, 
 					eDate: undefined
         	};
+        	$scope.optionsInit();
 			$scope.limitDate();
 		};
 		$scope.init();

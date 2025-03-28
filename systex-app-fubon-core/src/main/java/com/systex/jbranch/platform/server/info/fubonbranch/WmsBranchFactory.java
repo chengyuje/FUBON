@@ -234,11 +234,11 @@ public class WmsBranchFactory implements BranchFactoryIF {
 		}
 
 		sb.append(" order by BRANCH_NBR");
-
-		cond.setObject("loginSysRole", sysRole);
-		cond.setObject("loginID", loginInfoMap.get("userId"));
+		
+		cond.setObject("loginSysRole", sysRole);// HEADMGR
+		cond.setObject("loginID", loginInfoMap.get("userId")); //299014
 		cond.setObject("loginDeptID", loginInfoMap.get("deptID"));
-		cond.setObject("memLoginFlag", loginInfoMap.get("memLoginFlag"));
+		cond.setObject("memLoginFlag", loginInfoMap.get("memLoginFlag")); //uhrmHeadMGR
 
 		cond.setQueryString(sb.toString());
 		

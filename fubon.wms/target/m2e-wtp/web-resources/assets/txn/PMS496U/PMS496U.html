@@ -1,7 +1,8 @@
 <style>
 
 .datewidth{
-	width:180px !important;
+	width:120px !important;
+	float: left !important;
 }
 
 </style>
@@ -29,7 +30,7 @@
 											datepicker-options="importStartDateOptions"
 									   		datepicker-mode="'month'"
 											ng-readonly="true"
-											ng-change="limitDate();dateChange()"/>
+											ng-change="limitDate();dateChangeU()"/>
 									<span class="input-group-btn">
 										<button type="button" class="btn btn-default" ng-click="open($event,'e')">
 										<i class="glyphicon glyphicon-calendar"></i></button>
@@ -81,31 +82,27 @@
 						<th>業務處：</th>
 						<td>
 							<e-combobox id="region_center_id" name="region_center_id"
-										ng-paramtype="PMS.UHRM_RC"
+										ng-datasource="uhrmRCList"
 										ng-model="inputVO.uhrmRC"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										ng-change="ChangeRegion()"
-										width="150px"
 										style="line-height:20px;" />
-						</td>						
-						<th>業務中心：</th>
+						</td>		
+						<th>營運區：</th>
 						<td>
 							<e-combobox id="branch_area_id" name="branch_area_id"
-										ng-paramtype="PMS.UHRM_OP"
+										ng-datasource="uhrmOPList"
 										ng-model="inputVO.uhrmOP"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										ng-change="ChangeArea()"
-										width="150px"
 										style="line-height:20px;" />
 						</td>
 						<th>員工姓名：</th>
@@ -149,8 +146,9 @@
 				<table class="rstable e-table-freeze" e-height="700px" e-mode="1" e-top="true" e-left="6" e-list="paramList">
 					<thead>
 						<tr>
-							<th ng-show="chkMaintenance">更新<br>資料</th>
+							<th ng-show="chkMaintenanceU">更新<br>資料</th>
 							<th>序號</th>
+							<th>私銀註記</th>
 							<th>資料月份</th>
 							<th>分行<br>代號</th>
 							<th>分行名稱</th>
@@ -186,8 +184,9 @@
 					</thead>
 					<tbody>
 						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
-							<td align="center" ng-show="chkMaintenance"><input type="checkbox" ng-hide="row.PROFIT_RATE >= 0"　ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"　></td>                    
+							<td align="center" ng-show="chkMaintenanceU"><input type="checkbox" ng-hide="row.PROFIT_RATE >= 0"　ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenanceU" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"　></td>                    
 						 	<td align="center">{{row.ROWNUM}}</td>
+						 	<td style="vertical-align:middle;">{{row.RM_FLAG}}</td>
 						 	<td align="center">{{row.YEARMON}}</td>
 							<td align="center">{{row.BRANCH_NBR}}</td>
 							<td align="center">{{row.BRANCH_NAME}}</td>
@@ -215,8 +214,8 @@
 							<td align="center">{{row.AO_CODE}}</td>
 							
 							<td align="center">
-								<label ng-hide="row.PROFIT_RATE >= 0">是<input type="radio" value="Y" ng-change="updateFlag(row)" ng-model="row.HR_ATTR" ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance"/></label>&emsp;
-								<label ng-hide="row.PROFIT_RATE >= 0">否<input type="radio" value="N" ng-change="updateFlag(row)" ng-model="row.HR_ATTR" ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance"/></label>
+								<label ng-hide="row.PROFIT_RATE >= 0">是<input type="radio" value="Y" ng-change="updateFlag(row)" ng-model="row.HR_ATTR" ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenanceU"/></label>&emsp;
+								<label ng-hide="row.PROFIT_RATE >= 0">否<input type="radio" value="N" ng-change="updateFlag(row)" ng-model="row.HR_ATTR" ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenanceU"/></label>
 							</td>
 							<td>
 								<e-combobox id="checkType" name="checkType" 
@@ -226,23 +225,23 @@
 											ng-editable="false"
 											ng-format="F3"
 											ng-hide="row.PROFIT_RATE >= 0"
-											ng-readonly="row.PROFIT_RATE >= 0 || !chkMaintenance"
-											ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance"
+											ng-readonly="row.PROFIT_RATE >= 0 || !chkMaintenanceU"
+											ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenanceU"
 											style="line-height:20px;display:inline;" />
-		                    	<input type="text" class="form-control" style="width: 300px;display:inline;" e-length-limit="200" ng-model="row.NOTE" ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance" ng-hide="row.PROFIT_RATE >= 0" placeholder="請補充查證方式..." ng-if="row.NOTE_TYPE == 'O'" ng-blur="updateFlag(row)"/>
+		                    	<input type="text" class="form-control" style="width: 300px;display:inline;" e-length-limit="200" ng-model="row.NOTE" ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenanceU" ng-hide="row.PROFIT_RATE >= 0" placeholder="請補充查證方式..." ng-if="row.NOTE_TYPE == 'O'" ng-blur="updateFlag(row)"/>
 							</td>
 							<td>
 								<input 	type="text" class="form-control" style="width: 300px;display:inline;" 
 										e-length-limit="12" 
 										e-input-limit="ND"
 										ng-model="row.RECORD_SEQ" 
-										ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance || row.RECORD_YN == 'N'" 
+										ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenanceU || row.RECORD_YN == 'N'" 
 										ng-hide="row.PROFIT_RATE >= 0" 
 										placeholder="請輸入電訪錄音編號..." 
 										ng-if="row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A'" 
 										ng-blur="updateFlag(row)"/>
 							</td>
-							<td><input type="text" class="form-control" style="width: 300px" ng-blur="updateFlag(row)" ng-model="row.NOTE2" placeholder="請輸入具體原因..." ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenance" ng-hide="row.PROFIT_RATE >= 0"></td>
+							<td><input type="text" class="form-control" style="width: 300px" ng-blur="updateFlag(row)" ng-model="row.NOTE2" placeholder="請輸入具體原因..." ng-disabled="row.PROFIT_RATE >= 0 || !chkMaintenanceU" ng-hide="row.PROFIT_RATE >= 0"></td>
 							<td ng-bind="row.FIRSTUPDATE"></td>
 							<td>{{row.MODIFIER}}</td>
 							<td>{{row.LASTUPDATE}}</td>		
@@ -251,7 +250,7 @@
 				</table>
 			</div>
 			<br>
-			<div align="center" ng-show="paramList.length && chkMaintenance">
+			<div align="center" ng-show="paramList.length && chkMaintenanceU">
 	       		<button type="button" class="btn btn-success" ng-click="save()"><span class="glyphicon glyphicon-floppy-disk"></span>儲存</button>
 	       	</div>
 			<div>說明：</div>

@@ -157,7 +157,7 @@ eSoafApp.controller('PRD151Controller',
 					function(tota, isError) {
 						if (!isError) {
 	                		debugger
-	                		if(tota[0].body.C_RM_PROFEE) {
+	                		if(tota[0].body.C_RM_PROFEE != null && tota[0].body.C_RM_PROFEE != undefined && tota[0].body.MINUF_MON != null && tota[0].body.MINUF_MON != undefined) {
 	                			$scope.inputVO.RM_PROFEE = tota[0].body.C_RM_PROFEE;
 	                			$scope.inputVO.MINUF_MON = tota[0].body.MINUF_MON;
 	                			if(!$scope.inputVO.isFCIPMRole && $scope.inputVO.RM_PROFEE < $scope.inputVO.MINUF_MON) {
@@ -165,6 +165,10 @@ eSoafApp.controller('PRD151Controller',
 	                				$scope.inputVO.allowPurchaseYN = "N";
 	                				return;
 	                			}
+	                		} else {
+	                			$scope.showErrorMsg("產品條件超出權限，請洽PM");
+                				$scope.inputVO.allowPurchaseYN = "N";
+                				return;
 	                		}
 						}
 			});

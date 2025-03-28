@@ -35,7 +35,7 @@ import com.systex.jbranch.platform.util.IPrimitiveMap;
  * @spec null
  */
 @Component("pms433")
-@Scope("request")
+@Scope("prototype")
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class PMS433 extends FubonWmsBizLogic {
 	private DataAccessManager dam = null;
@@ -61,7 +61,7 @@ public class PMS433 extends FubonWmsBizLogic {
 		// 主查詢
 		sql.append("SELECT * FROM ( ");
 		sql.append(" SELECT ");
-		sql.append(" row_number() over (partition by H.CUST_ID, H.SELECTED_DATE ORDER BY H.YYYYMM) RN,  ");
+		sql.append(" row_number() over (partition by H.CUST_ID, H.SELECTED_DATE, H.BRA_NBR ORDER BY H.YYYYMM) RN,  ");
 		sql.append(" H.SEQ,  ");
 		sql.append(" H.CUST_ID,  ");
 		sql.append(" C.CUST_NAME,  ");
@@ -143,6 +143,68 @@ public class PMS433 extends FubonWmsBizLogic {
 		}
 	}
 	
+	/** 供必辦工作事項所用的查詢 
+	 * @throws ParseException 
+	 * @throws JAXBException **/
+	public PMS433OutputVO queryForCRM181(PMS433InputVO inputVO) throws JBranchException, ParseException, JAXBException {
+		PMS433OutputVO outputVO = new PMS433OutputVO();
+		DataAccessManager dam = this.getDataAccessManager();
+				
+		String roleID = inputVO.getSysRole();
+			
+		QueryConditionIF condition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sql = new StringBuffer();
+		// 主查詢
+		sql.append(" SELECT ");
+		sql.append(" H.CUST_ID,  ");
+		sql.append(" H.BRA_NBR,  ");
+		sql.append(" H.SELECTED_DATE ");
+		sql.append(" FROM TBPMS_HIGH_SOT_M H  ");
+		sql.append(" LEFT JOIN TBCRM_CUST_MAST C ON H.CUST_ID = C.CUST_ID ");
+		sql.append(" LEFT JOIN VWORG_EMP_UHRM_INFO VW ON C.AO_CODE = VW.UHRM_CODE ");
+		sql.append(" LEFT JOIN ( SELECT AO.EMP_ID, AO.AO_CODE, M.DEPT_ID FROM TBORG_SALES_AOCODE AO  ");
+		sql.append(" INNER JOIN TBORG_MEMBER M ON M.EMP_ID = AO.EMP_ID) AO_INFO ON C.AO_CODE = AO_INFO.AO_CODE ");
+		sql.append(" LEFT JOIN TBPMS_EMPLOYEE_REC_N MEM ON VW.EMP_ID = MEM.EMP_ID AND TO_DATE(H.YYYYMM,'yyyyMM') BETWEEN MEM.START_TIME AND MEM.END_TIME ");
+		sql.append(" LEFT JOIN VWORG_DEFN_INFO VWORG ON H.BRA_NBR = VWORG.BRANCH_NBR ");
+		sql.append(" WHERE 1 = 1  ");
+		//限制條件
+		if(roleID.matches("A150|ABRF|A157|A147|A257|")) { //作業主管or有權人員or業務主管
+			sql.append(" AND VW.UHRM_CODE IS NULL ");
+		} else if (roleID.matches("R012|R006")) { //UHRM科主管or私銀作業主管
+			sql.append(" AND VW.UHRM_CODE IS NOT NULL ");
+		} /*其他身分都可檢視'B024','B026','A164','B030'
+		    財管內控管理科經辦、財管績效科管理科經辦、業務處主管、個金行銷部經辦
+		  */
+		//固定最大的SELECTED_DATE
+		sql.append(" AND H.SELECTED_DATE = :YYYYMM ");
+		condition.setObject("YYYYMM", inputVO.getsCreDate());
+
+		if(inputVO.isUhrmFlag()) {
+			if (StringUtils.isNotBlank(inputVO.getUhrm_branch_area_id())) {
+				sql.append(" AND (AO_INFO.DEPT_ID = :BRA_AREA OR MEM.E_DEPT_ID = :BRA_AREA)  ");
+				condition.setObject("BRA_AREA", inputVO.getUhrm_branch_area_id());
+			}	
+		} else {
+			if(StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
+				sql.append(" AND H.BRA_NBR = :BRA_NBR ");
+				condition.setObject("BRA_NBR", inputVO.getBranch_nbr());
+			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {
+				sql.append(" AND VWORG.BRANCH_AREA_ID = :BRANCH_AREA_ID ");
+				condition.setObject("BRANCH_AREA_ID", inputVO.getBranch_area_id());
+			} else if (StringUtils.isNotBlank(inputVO.getRegion_center_id())) {
+				sql.append(" AND VWORG.REGION_CENTER_ID = :REGION_CENTER_ID ");
+				condition.setObject("REGION_CENTER_ID", inputVO.getRegion_center_id());
+			}
+		}
+		
+		condition.setQueryString(sql.toString());
+		List<Map<String, Object>> resultList = dam.exeQuery(condition);
+		
+		
+		outputVO.setResultList(resultList); // 主查詢資訊
+		return outputVO;
+	}
+	
 	private Object getFilterBranchLise(List<Map<String, Object>>  branch_list) {
 		if (branch_list.size() == 0) {
 			return null;
@@ -199,7 +261,7 @@ public class PMS433 extends FubonWmsBizLogic {
 		} else {
 			for (Map<String, Object> map : list) {
 				String[] records = null;
-				if(roleID.matches("A150|ABRF|A157|R012")) {
+				if(roleID.matches("A150|ABRF|A157|A147|A257|R012|R006")) {
 					records = new String[12];
 					int i = 0;
 					records[i] = checkIsNull(map, "SEQ"); 
@@ -241,7 +303,7 @@ public class PMS433 extends FubonWmsBizLogic {
 	private String[] getCsvHeader(String roleID) {
 		int j = 0;
 		String[] csvHeader = null;
-		if(roleID.matches("A150|ABRF|A157|R012")) {
+		if(roleID.matches("A150|ABRF|A157|A147|A257|R012|R006")) {
 			csvHeader = new String[12];
 			csvHeader[j] = "序號";
 			csvHeader[++j] = "客戶ID";
@@ -459,6 +521,7 @@ public class PMS433 extends FubonWmsBizLogic {
 		sb.append(" WHERE ");
 		sb.append(" 1 = 1 ");
 		sb.append(" AND CUST_ID = :CUST_ID ");
+		sb.append(" AND SELECTED_DATE = :SELECTED_DATE ");
 		sb.append(" AND SELECTED_DATE = :SELECTED_DATE ");
 
 		return sb.toString();

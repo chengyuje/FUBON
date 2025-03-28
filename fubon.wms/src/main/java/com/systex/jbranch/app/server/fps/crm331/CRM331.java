@@ -447,7 +447,7 @@ public class CRM331 extends FubonWmsBizLogic {
 					vo.setPROCESS_STATUS("L1");
 				
 				// mantis 0004267: 主管覆核客戶移轉 先埋log
-				logger.info("處理客戶為:" + ObjectUtils.toString(list.get("CUST_ID")));
+//				logger.info("處理客戶為:" + ObjectUtils.toString(list.get("CUST_ID")));
 				logger.info("處理流程為:" + vo.getPROCESS_STATUS());
 				vo.setTRS_TYPE("6");
 				vo.setTRS_TXN_SOURCE("1");

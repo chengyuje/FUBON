@@ -194,30 +194,26 @@ public class PMS366 extends FubonWmsBizLogic {
 				sb.append("FROM BASE ");
 				sb.append("WHERE 1 = 1 ");
 
-				if (StringUtils.equals("Y", NOT_EXIST_BS)) {
-					sb.append("AND NOT EXISTS ( ");
-					sb.append("  SELECT 1 ");
-					sb.append("  FROM TBPMS_EMPLOYEE_REC_N UCN ");
-					sb.append("  WHERE 1 = 1 ");
-					sb.append("  AND LAST_DAY(TO_DATE(:YYYYMM || '01', 'YYYYMMDD')) BETWEEN UCN.START_TIME AND UCN.END_TIME ");
-					sb.append("  AND IS_PRIMARY_ROLE = 'N' ");
-					sb.append("  AND AO_JOB_RANK IS NOT NULL ");
-					sb.append("  AND NOT EXISTS (SELECT 1 FROM TBPMS_EMPLOYEE_REC_N UCN_T WHERE UCN_T.DEPT_ID IN ('031', '1001') AND UCN.EMP_ID = UCN_T.EMP_ID) ");
-					sb.append("  AND BASE.EMP_ID = UCN.EMP_ID ");
-					sb.append(") ");
-				}
-				
-				if (StringUtils.equals("Y", NOT_EXIST_UHRM)) {
-					sb.append("AND NOT EXISTS ( ");
-					sb.append("  SELECT 1 ");
-					sb.append("  FROM TBPMS_EMPLOYEE_REC_N UCN ");
-					sb.append("  WHERE 1 = 1 ");
-					sb.append("  AND LAST_DAY(TO_DATE(:YYYYMM || '01', 'YYYYMMDD')) BETWEEN UCN.START_TIME AND UCN.END_TIME ");
-					sb.append("  AND IS_PRIMARY_ROLE = 'N' ");
-					sb.append("  AND AO_JOB_RANK IS NOT NULL ");
-					sb.append("  AND EXISTS (SELECT 1 FROM TBPMS_EMPLOYEE_REC_N UCN_T WHERE UCN_T.DEPT_ID IN ('031', '1001') AND UCN.EMP_ID = UCN_T.EMP_ID) ");
-					sb.append("  AND BASE.EMP_ID = UCN.EMP_ID ");
-					sb.append(") ");
+				switch (NOT_EXIST_UHRM) {
+					case "Y":
+						sb.append("AND NOT EXISTS ( ");
+						sb.append("  SELECT 1 ");
+						sb.append("  FROM TBPMS_EMPLOYEE_REC_N UCN ");
+						sb.append("  WHERE 1 = 1 ");
+						sb.append("  AND LAST_DAY(TO_DATE(:YYYYMM || '01', 'YYYYMMDD')) BETWEEN UCN.START_TIME AND UCN.END_TIME ");
+						sb.append("  AND UCN.DEPT_ID <> UCN.E_DEPT_ID "); // 私銀理專
+						sb.append("  AND BASE.EMP_ID = UCN.EMP_ID ");
+						sb.append(") ");
+						break;
+					case "U":
+						sb.append("AND EXISTS ( ");
+						sb.append("  SELECT 1 ");
+						sb.append("  FROM TBPMS_EMPLOYEE_REC_N UCN ");
+						sb.append("  WHERE 1 = 1 ");
+						sb.append("  AND LAST_DAY(TO_DATE(:YYYYMM || '01', 'YYYYMMDD')) BETWEEN UCN.START_TIME AND UCN.END_TIME ");
+						sb.append("  AND UCN.DEPT_ID <> UCN.E_DEPT_ID "); // 私銀理專
+						sb.append("  AND BASE.EMP_ID = UCN.EMP_ID ");
+						sb.append(") ");
 				}
 				
 				break;
@@ -331,36 +327,38 @@ public class PMS366 extends FubonWmsBizLogic {
 		//=== MAIN SQL START ===
 		queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		sb = new StringBuffer();
+		
+		String NOT_EXIST_UHRM = null != inputVO.getNOT_EXIST_UHRM() ? inputVO.getNOT_EXIST_UHRM() : "N";
 		sb.append("WITH BASE AS ( ");
 		sb.append("  SELECT * ");
-		sb.append("  FROM ( ").append(genSQL("BASE", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM(), (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")).append("  ) "); 
+		sb.append("  FROM ( ").append(genSQL("BASE", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), NOT_EXIST_UHRM, (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")).append("  ) "); 
 		sb.append(") ");
 		
 		sb.append("SELECT * ");
 		sb.append("FROM ( "); 
 		
 		// 人員
-		sb.append(genSQL("EMP", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM(), (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")); 
+		sb.append(genSQL("EMP", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), NOT_EXIST_UHRM, (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")); 
 		
 		sb.append("UNION "); 
 		
 		// 分行合計
-		sb.append(genSQL("BRANCH", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM(), (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")); 
+		sb.append(genSQL("BRANCH", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), NOT_EXIST_UHRM, (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")); 
 		
 		sb.append("UNION "); 
 		
 		// 營運區合計
-		sb.append(genSQL("AREA", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM(), (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")); 
+		sb.append(genSQL("AREA", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), NOT_EXIST_UHRM, (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")); 
 		
 		sb.append("UNION "); 
 		
 		// 業務處合計
-		sb.append(genSQL("REGION", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM(), (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")); 
+		sb.append(genSQL("REGION", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), NOT_EXIST_UHRM, (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")); 
 
 		sb.append("UNION "); 
 		
 		// 全行合行
-		sb.append(genSQL("ALL", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), inputVO.getNOT_EXIST_UHRM(), (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")); 
+		sb.append(genSQL("ALL", inputVO, isFC, isHeadMGR, inputVO.getNOT_EXIST_BS(), NOT_EXIST_UHRM, (String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).toString().replaceAll("\\s+", " ")); 
 
 		sb.append(") "); 
 		

@@ -23,6 +23,7 @@ public class CRM611OutputVO extends PagingOutputVO{
 	
 	private boolean lostFlag;
 	
+	private String billNote;
 	
 	
 	public FP032151OutputVO getFp032151OutputVO() {
@@ -97,6 +98,10 @@ public class CRM611OutputVO extends PagingOutputVO{
 	public void setLostFlag(boolean lostFlag) {
 		this.lostFlag = lostFlag;
 	}
-    
-	
+	public String getBillNote() {
+		return billNote;
+	}
+	public void setBillNote(String billNote) {
+		this.billNote = billNote;
+	}
 }

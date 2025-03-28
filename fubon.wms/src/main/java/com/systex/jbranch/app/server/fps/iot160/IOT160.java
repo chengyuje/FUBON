@@ -86,9 +86,19 @@ public class IOT160 extends FubonWmsBizLogic {
 				tbi.setBATCH_SEQ(inputVO.getBatchSeq_1());
 				dam.update(tbi);
 
+				qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+				sb = new StringBuilder();
+				sb.append(" select 1 from TBIOT_MAIN where BATCH_INFO_KEYNO = :batch_info_keyno1 AND NVL(NO_PAPER_YN, 'N') = :noPaperYN ");
+				qc.setObject("batch_info_keyno1", tbi.getBATCH_INFO_KEYNO());
+				qc.setObject("noPaperYN", StringUtils.equals("5", inputVO.getShipMethod_1()) ? "N" : "Y"); //5:無紙化 存在非無紙化案件出錯 其它: 存在無紙化案件出錯
+				qc.setQueryString(sb.toString());
+				List<Map<String, Object>> noPaperList = dam.exeQuery(qc);
+				if(CollectionUtils.isNotEmpty(noPaperList)) {
+					throw new APException("該批號"+opBatchNo+(StringUtils.equals("5", inputVO.getShipMethod_1()) ? "非無紙化案件" : "為無紙化案件"));
+				}
+				
 				tbi = new TBIOT_BATCH_INFOVO();
 				tbi = (TBIOT_BATCH_INFOVO) dam.findByPKey(TBIOT_BATCH_INFOVO.TABLE_UID, new BigDecimal(batchInfoList.get(0).get("BATCH_INFO_KEYNO").toString()));
-				
 				qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 				sb = new StringBuilder();
 				sb.append(" select INS_KEYNO from TBIOT_MAIN where BATCH_INFO_KEYNO = :batch_info_keyno1 ");
@@ -147,4 +157,42 @@ public class IOT160 extends FubonWmsBizLogic {
         String data  =  new java.text.SimpleDateFormat("yyyy/MM/dd").format(Date);
 		return data;
 	}
+	
+	//取得點收轄區員編資料
+	public void getChkEmpList(Object body, IPrimitiveMap header) throws JBranchException {
+		IOT160OutputVO outputVO = new IOT160OutputVO();
+		dam = getDataAccessManager();
+		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_SQL);
+		StringBuilder sql = new StringBuilder();
+		
+		sql.append("SELECT DISTINCT A.EMP_ID AS DATA, B.EMP_NAME AS LABEL ");
+		sql.append(" FROM TBIOT_CHK_ACCEPT_EMP A ");
+		sql.append(" LEFT JOIN TBORG_MEMBER B ON B.EMP_ID = A.EMP_ID ");
+		qc.setQueryString(sql.toString());
+		outputVO.setList(dam.exeQuery(qc));
+		
+		sendRtnObject(outputVO);
+	}
+	
+	//取得無紙化查詢資料
+	public void inquireNoPaper(Object body, IPrimitiveMap header) throws JBranchException {
+		IOT160InputVO inputVO = (IOT160InputVO)body;
+		IOT160OutputVO outputVO = new IOT160OutputVO();
+		dam = getDataAccessManager();
+		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuilder sql = new StringBuilder();
+		
+		sql.append("SELECT DISTINCT C.OP_BATCH_NO ");
+		sql.append(" FROM TBIOT_MAIN A ");
+		sql.append(" INNER JOIN TBIOT_CHK_ACCEPT_EMP B ON B.BRANCH_NBR = A.BRANCH_NBR ");
+		sql.append(" INNER JOIN TBIOT_BATCH_INFO C ON C.BATCH_INFO_KEYNO = A.BATCH_INFO_KEYNO ");
+		sql.append(" WHERE A.REG_TYPE IN ('1', '2') AND A.STATUS = '30' "); //新契約進件且狀態為"OP打包送件"
+		sql.append(" AND NVL(A.NO_PAPER_YN, 'N') = 'Y' AND B.EMP_ID = :empId "); //無紙化認定，且依點收轄區員編對應分行取得批號
+		qc.setObject("empId", inputVO.getChkEmpId());
+		qc.setQueryString(sql.toString());
+		outputVO.setList(dam.exeQuery(qc));
+		
+		sendRtnObject(outputVO);
+	}
+	
 }

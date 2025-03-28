@@ -166,6 +166,19 @@ eSoafApp.controller('CRM800Controller',
 			return defer.promise;
 		}
 		
+		//金市SN債
+		$scope.getGoldSnAsset= function() {
+            var defer = $q.defer();
+            $scope.sendRecv("CRM82B", "getGoldSnAsset", "com.systex.jbranch.app.server.fps.crm82B.CRM82BInputVO", {"cust_id": $scope.custVO.CUST_ID}, 
+            	function (tota, isError) {
+                if (!isError) {
+                    $scope.crm82B = tota[0].body.SUMTrustVal;
+                }
+                defer.resolve("success");
+            });
+            return defer.promise;
+        }
+		
 		//1913 查詢存款庫存資料查詢
 		$scope.inquire_C = function() {
 			var deferred = $q.defer();
@@ -196,6 +209,7 @@ eSoafApp.controller('CRM800Controller',
 								$scope.crm827 +
 								$scope.crm829 +
 								$scope.crm82A +
+								$scope.crm82B +
 								$scope.other;
 
 			//畫圖參數設定
@@ -471,6 +485,7 @@ eSoafApp.controller('CRM800Controller',
 				$scope.custInvestmentVO.crm828 = $scope.crm828.SUMP_VALUE;
 				$scope.custInvestmentVO.crm829 = $scope.crm829;
 				$scope.custInvestmentVO.crm82A = $scope.crm82A;
+				$scope.custInvestmentVO.crm82B = $scope.crm82B;
 				$scope.custInvestmentVO.other  = $scope.other;
 				$scope.$emit("CRM610VO", {action:"set", type:"CRM681_Investment", data: $scope.custInvestmentVO});
 				$scope.connector("set","CRM681_Investment",$scope.custInvestmentVO);
@@ -587,6 +602,7 @@ eSoafApp.controller('CRM800Controller',
 				crm828: undefined,
 				crm829: undefined,
 				crm82A: undefined,
+				crm82B: undefined,
 				other: undefined,
 				total: undefined
 			}
@@ -612,19 +628,21 @@ eSoafApp.controller('CRM800Controller',
 					console.log("CRM800 getCustAssetInvestData2 finished" + new Date());
 					$scope.inquireGoldBond().then(function(data) {
 						console.log("CRM800 inquireGoldBond finished" + new Date());
-						getGold().then(function(data) {
-							console.log("CRM800 getGold finished" + new Date());
-							$scope.inquire_A().then(function(data) {
-								console.log("CRM800 inquire_A finished" + new Date());
-								$scope.inquire_B().then(function(data) {
-									console.log("CRM800 inquire_B finished" + new Date());
-									$scope.getCustAssetInvestData($scope.inputVO.isOBU).then(function(data) {
-										$scope.getFundDeposit($scope.inputVO.isOBU).then(function(data) {
-											$scope.getETFStockDeposit().then(function(data) {
-												$scope.getBondSnDeposit($scope.inputVO.isOBU).then(function(data) {
-													$scope.getSIDeposit().then(function(data) {
-														$scope.inquire_C().then(function(data) {
-															console.log("CRM800 inquire_C finished" + new Date());
+						$scope.getGoldSnAsset().then(function(data) {
+							console.log("CRM800 getGoldSnAsset finished" + new Date());
+							getGold().then(function(data) {
+								console.log("CRM800 getGold finished" + new Date());
+								$scope.inquire_A().then(function(data) {
+									console.log("CRM800 inquire_A finished" + new Date());
+									$scope.inquire_B().then(function(data) {
+										console.log("CRM800 inquire_B finished" + new Date());
+											$scope.getCustAssetInvestData($scope.inputVO.isOBU).then(function(data) {
+												$scope.getFundDeposit($scope.inputVO.isOBU).then(function(data) {
+													$scope.getETFStockDeposit().then(function(data) {
+														$scope.getBondSnDeposit($scope.inputVO.isOBU).then(function(data) {
+															$scope.getSIDeposit().then(function(data) {
+																$scope.inquire_C().then(function(data) {
+																	console.log("CRM800 inquire_C finished" + new Date());
 														});
 													});
 												});
@@ -638,6 +656,7 @@ eSoafApp.controller('CRM800Controller',
 				});
 			});
 		});
+	});
 		};
 		$scope.init();
 		

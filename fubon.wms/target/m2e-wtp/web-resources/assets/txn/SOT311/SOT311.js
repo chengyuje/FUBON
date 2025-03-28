@@ -171,8 +171,9 @@ eSoafApp.controller('SOT311Controller',
 							$scope.inputVO.trustAcct = tota[0].body.carList[0].TRUST_ACCT;						//信託帳號
 							$scope.inputVO.creditAcct = tota[0].body.carList[0].CREDIT_ACCT;					//收益入帳帳號
 							
-							$scope.inputVO.gtcYN = tota[0].body.carList[0].GTC_YN;								//當日單N, 長效單Y
-							$scope.inputVO.gtcEndDate = $scope.toJsDate(tota[0].body.carList[0].GTC_END_DATE);	//長效單迄日
+							$scope.inputVO.gtcYN = tota[0].body.carList[0].GTC_YN;									//當日單N, 長效單Y, 預約單P
+							$scope.inputVO.gtcStartDate = $scope.toJsDate(tota[0].body.carList[0].GTC_START_DATE);	//長效單起日
+							$scope.inputVO.gtcEndDate = $scope.toJsDate(tota[0].body.carList[0].GTC_END_DATE);		//長效單迄日
 							
 							$scope.inputVO.batchSeq = tota[0].body.carList[0].BATCH_SEQ; 						//批號
 							
@@ -328,7 +329,7 @@ eSoafApp.controller('SOT311Controller',
 			$scope.sendRecv("SOT712", "updateBatchSeq", "com.systex.jbranch.app.server.fps.sot712.SOT712InputVO", {'prodType': 'BN', 'tradeSeq': $scope.inputVO.tradeSEQ},
 				function(tota, isError) {
 					if (!isError) {
-						  $scope.sendRecv("SOT310", "goBANK", "com.systex.jbranch.app.server.fps.sot310.SOT310InputVO", {'tradeSEQ': $scope.inputVO.tradeSEQ},
+						  $scope.sendRecv("SOT310", "goBANK", "com.systex.jbranch.app.server.fps.sot310.SOT310InputVO", $scope.inputVO,
 						  function(tota, isError) {
 							 if (!isError) {
 								if (tota[0].body.errorMsg != '' && tota[0].body.errorMsg != null) {
@@ -417,8 +418,10 @@ eSoafApp.controller('SOT311Controller',
 				tradeSeq : 		$scope.inputVO.tradeSEQ, 		//交易序號
 				tradeSubType:	1,								//交易類型 : 申購
 				tradeTS  :      $scope.inputVO.trustTS,			//S=特金,M=金錢信託
-				overCentRateYN: $scope.inputVO.overCentRateYN,	//超過集中度上限
-				isPrintSOT819:		$scope.inputVO.loanFlag //是否列印貸款風險預告書
+				overCentRateYN: $scope.inputVO.overCentRateYN,	//超過集中度通知門檻
+				isPrintSOT819:		$scope.inputVO.loanFlag, //是否列印貸款風險預告書
+				prdId :			$scope.inputVO.prodID,
+				prdName :		$scope.inputVO.prodName
 			}
 				
 			$scope.sendRecv("SOT712", "fitToGetPDF", "com.systex.jbranch.app.server.fps.sot712.PRDFitInputVO", fitVO,

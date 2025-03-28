@@ -87,6 +87,7 @@ eSoafApp.controller('SOT130Controller',
 			$scope.inputVO.prospectusType    ='';    //公開說明書
 			$scope.inputVO.ovsPrivateYN		 ='N';
 			$scope.inputVO.ovsPrivateSeq	 = undefined;
+			$scope.inputVO.kycDueDateLessOneMonth = false; //KYC校期小於等於1個月(30天)
 			$scope.isEndCertificate_required = false;
 		    $("#tradeDateType1").attr("disabled", false);
 		};
@@ -324,6 +325,8 @@ eSoafApp.controller('SOT130Controller',
 								$scope.inputVO.takeProfitPerc = custPLData.takeProfitPerc;
 								$scope.inputVO.stopLossPerc   = custPLData.stopLossPerc;
 								$scope.inputVO.plNotifWays    = custPLData.plMsg;
+								debugger;
+								$scope.inputVO.kycDueDateLessOneMonth    = custKYCData.kycDueDateLessOneMonth;
 
 								$scope.getFeeTypeData();
 								deferred.resolve("success");
@@ -472,7 +475,7 @@ eSoafApp.controller('SOT130Controller',
 			});
 		}
 		 $scope.getTradeDate();
-		 $scope.getReserveTradeDate = function() {
+		 $scope.getReserveTradeDate = function() {		 
 			 if($scope.inputVO.tradeDateType == '2'){
 				$scope.inputVO.tradeDate = $scope.tradeDate;
 			 }else if($scope.inputVO.tradeDateType == '1'){
@@ -542,6 +545,16 @@ eSoafApp.controller('SOT130Controller',
 //			debugger;
 			console.log($scope.parameterTypeEditForm);
 			$scope.cartListSave=[];
+			
+			if($scope.inputVO.kycDueDateLessOneMonth && $scope.inputVO.tradeDateType === '2' && $scope.inputVO.isRePurchase === "Y") {
+				var kycDueDate = $scope.toJsDate($scope.inputVO.kycDueDate);
+				var showYear = kycDueDate.getFullYear();  //西元年份 
+				var showMonth = kycDueDate.getMonth()+1;  //一年中的第幾月 
+				var showDate = kycDueDate.getDate();      //一月份中的第幾天
+				
+				$scope.showMsg('ehl_01_SOT_018',[showYear,showMonth,showDate]);
+			}
+			
 			if($scope.parameterTypeEditForm.$invalid) {
 	    		$scope.showErrorMsg('欄位檢核錯誤:必要輸入欄位');
         		return;

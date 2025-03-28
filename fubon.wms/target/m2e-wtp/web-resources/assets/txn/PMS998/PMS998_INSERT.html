@@ -23,7 +23,7 @@
 				</div>
 	 			<div class="modal-body">
 			  		<table width="100%">
-			  			<tr ng-hide="hideFlag == 'Y'">
+			  			<tr ng-if="!priID.startsWith('UHRM')">
 							<td class="col-xs-2"></td>
 							<th class="col-md-2 tdpadding">業務處：</th>
 							<td class="col-md-4 tdpadding">
@@ -41,7 +41,7 @@
 							</td>
 							<td class="col-xs-2"></td>
 						</tr>
-						<tr ng-hide="hideFlag == 'Y'">
+						<tr ng-if="!priID.startsWith('UHRM')">
 							<td class="col-xs-2"></td>
 							<th class="col-md-2 tdpadding">營運區：</th>
 							<td class="col-md-4 tdpadding">
@@ -59,7 +59,7 @@
 							</td>
 							<td class="col-xs-2"></td>
 						</tr>
-						<tr ng-hide="hideFlag == 'Y'">
+						<tr ng-if="!priID.startsWith('UHRM')">
 							<td class="col-xs-2"></td>
 							<th class="col-md-2 tdpadding"><font color="red">*</font>&nbsp;分行：</th>
 							<td class="col-md-4 tdpadding">
@@ -77,10 +77,10 @@
 							</td>
 							<td class="col-xs-2"></td>
 						</tr>
-						<tr>
+						<tr ng-if="!priID.startsWith('UHRM')">
 							<td class="col-xs-2"></td>
-							<th class="col-md-2 tdpadding" ng-if="hideFlag != 'Y'"><font color="red">*</font>&nbsp;行員員編：</th>
-							<td class="col-md-4 tdpadding" ng-if="hideFlag != 'Y'">
+							<th class="col-md-2 tdpadding"><font color="red">*</font>&nbsp;行員員編：</th>
+							<td class="col-md-4 tdpadding">
 								<e-combobox id="empID" name="empID"
 											ng-datasource="EMP_LIST"
 											ng-model="inputVO.empID"
@@ -92,20 +92,30 @@
 											ng-required="true"
 											style="line-height:20px;" />
 							</td>
-					    	<th class="col-md-2 tdpadding" ng-if="hideFlag == 'Y'">員工姓名：</th>
-							<td class="col-md-2 tdpadding" ng-if="hideFlag == 'Y'">
+							<td class="col-xs-2"></td>
+						<tr ng-if="priID.startsWith('UHRM')">
+							<td class="col-xs-2"></td>
+					    	<th class="col-md-2 tdpadding">分行：</th>
+							<td class="col-md-2 tdpadding">
+			    				{{inputVO.branchNbr}}-{{inputVO.branchName}}
+							</td>
+							
+							<td class="col-xs-2"></td>
+						</tr>
+						<tr ng-if="priID.startsWith('UHRM')">
+							<td class="col-xs-2"></td>
+					    	<th class="col-md-2 tdpadding">員工姓名：</th>
+							<td class="col-md-2 tdpadding">
 			    				<e-combobox id="uEmpID" name="uEmpID"
 											ng-datasource="mappingSet['UHRM_LIST']"
 											ng-model="inputVO.empID"
 											ng-validate="false" 
-											ng-disabled="mappingSet['UHRM_LIST'].length == 2"
-											ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
 											ng-editable="false"
 											ng-format="F1"
 											ng-required="true"
+											ng-change="uhrmDept()"
 											style="line-height:20px;" />				 
 							</td>
-							
 							<td class="col-xs-2"></td>
 						</tr>
 						<tr>

@@ -16,6 +16,7 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.eclipse.birt.report.model.api.util.StringUtil;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -433,46 +434,30 @@ public class PMS496 extends FubonWmsBizLogic {
 	
 	// 匯出
 	public void export(Object body, IPrimitiveMap header) throws Exception {
+		
+		SimpleDateFormat sdfYYYYMM = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat timeSdf = new SimpleDateFormat("yyyy/MM/dd");
 
 		XmlInfo xmlInfo = new XmlInfo();
 		
 		PMS496InputVO inputVO = (PMS496InputVO) body;
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		String fileName = "基金與海外債短線交易進出報表_" + sdf.format(new Date()) + ".xlsx";
+		List<Map<String, String>> reportList = inputVO.getExportList();
+
+		String reportName = "基金與海外債短線交易進出報表";
+		String fileName = reportName + "_" + sdfYYYYMM.format(new Date(Long.parseLong(inputVO.getImportSDate()))) + ".xlsx";
 		String uuid = UUID.randomUUID().toString();
 		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
 
 		String filePath = Path + uuid;
 
-		List<Map<String, String>> reportList = inputVO.getExportList();
-
-		String[] headerLine = { "序號", "私銀註記", "資料月份", 
-				  				"分行代號", "分行名稱", 
-				  				"交易類別",
-				                "申購日期", "贖回日期", "憑證號碼", "產品代號", "商品名稱", 
-				                "計價幣別", "參考贖回金額", "相關配息", "投資金額", 
-				                "相關手續費(e.g 申購手續費、信管費、短線費)", 
-				                "通路服務費", "報酬率", "客戶ID", "客戶姓名", "高齡客戶",
-				                "員工編號", "員工姓名", "AO CODE", 
-	                            "專員是否勸誘客戶短線進出", "查證方式", "電訪錄音編號", "具體原因", "首次建立時間", "最新異動人員", "最新異動日期"};
-		String[] mainLine   = { "ROWNUM", "RM_FLAG", "YEARMON", 
-								"BRANCH_NBR", "BRANCH_NAME", 
-								"PROD_TYPE",
-				                "RPT_INV_DATE", "RPT_REF_DATE", "CERT_NBR", "PRD_ID", "PRD_NAME", 
-				                "CUR_COD", "REF_AMT", "DIV_AMT", "INV_AMT", 
-				                "INV_FEE", 
-				                "CHANNEL_FEE", "PROFIT_RATE", "CUST_ID", "CUST_NAME", "CUST_AGE",
-				                "EMP_ID", "EMP_NAME", "AO_CODE", 
-	                            "HR_ATTR", "NOTE", "RECORD_SEQ", "NOTE2", "FIRSTUPDATE", "MODIFIER", "LASTUPDATE"};
-
-		XSSFWorkbook wb = new XSSFWorkbook();
-		XSSFSheet sheet = wb.createSheet("基金與海外債短線交易進出報表_" + sdf.format(new Date()));
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet(reportName + "_" + sdf.format(new Date()));
 		sheet.setDefaultColumnWidth(20);
 		sheet.setDefaultRowHeightInPoints(20);
 
 		// 表頭 CELL型式
-		XSSFCellStyle headingStyle = wb.createCellStyle();
+		XSSFCellStyle headingStyle = workbook.createCellStyle();
 		headingStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
 		headingStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
 		headingStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);// 填滿顏色
@@ -483,11 +468,56 @@ public class PMS496 extends FubonWmsBizLogic {
 		headingStyle.setBorderRight((short) 1);
 		headingStyle.setWrapText(true);
 
+		// 資料 CELL型式
+		XSSFCellStyle mainStyle = workbook.createCellStyle();
+		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		mainStyle.setBorderBottom((short) 1);
+		mainStyle.setBorderTop((short) 1);
+		mainStyle.setBorderLeft((short) 1);
+		mainStyle.setBorderRight((short) 1);
+		mainStyle.setWrapText(true);
+
+		// 資料 CELL型式
+		XSSFCellStyle titleStyle = workbook.createCellStyle();
+		titleStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+		titleStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderBottom((short) 1);
+		titleStyle.setBorderTop((short) 1);
+		titleStyle.setBorderLeft((short) 1);
+		titleStyle.setBorderRight((short) 1);
+
+		String[] headerLine = { "序號", "私銀註記", "資料月份", 
+				  				"分行代號", "分行名稱", 
+				  				"交易類別",
+				                "申購日期", "贖回日期", "憑證號碼", "產品代號", "商品名稱", 
+				                "計價幣別", "參考贖回金額", "相關配息", "投資金額", 
+				                "相關手續費(e.g 申購手續費、信管費、短線費)", 
+				                "通路服務費", "報酬率", "客戶ID", "客戶姓名", "高齡客戶",
+				                "員工編號", "員工姓名", "AO CODE", 
+	                            "專員是否勸誘客戶短線進出", "查證方式", "電訪錄音編號", "具體原因", "首次建立時間", "最新異動人員", "最新異動日期"};
+		
+		String[] mainLine   = { "ROWNUM", "RM_FLAG", "YEARMON", 
+								"BRANCH_NBR", "BRANCH_NAME", 
+								"PROD_TYPE",
+				                "RPT_INV_DATE", "RPT_REF_DATE", "CERT_NBR", "PRD_ID", "PRD_NAME", 
+				                "CUR_COD", "REF_AMT", "DIV_AMT", "INV_AMT", 
+				                "INV_FEE", 
+				                "CHANNEL_FEE", "PROFIT_RATE", "CUST_ID", "CUST_NAME", "CUST_AGE",
+				                "EMP_ID", "EMP_NAME", "AO_CODE", 
+	                            "HR_ATTR", "NOTE", "RECORD_SEQ", "NOTE2", "FIRSTUPDATE", "MODIFIER", "LASTUPDATE"};
+
 		Integer index = 0; // first row
 
-		// Heading
 		XSSFRow row = sheet.createRow(index);
-
+		for (int i = 0; i < 1; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(titleStyle);
+			cell.setCellValue(reportName);
+		}
+		
+		index++;
+		
 		row = sheet.createRow(index);
 		row.setHeightInPoints(30);
 		for (int i = 0; i < headerLine.length; i++) {
@@ -498,20 +528,10 @@ public class PMS496 extends FubonWmsBizLogic {
 
 		index++;
 
-		// 資料 CELL型式
-		XSSFCellStyle mainStyle = wb.createCellStyle();
-		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
-		mainStyle.setBorderBottom((short) 1);
-		mainStyle.setBorderTop((short) 1);
-		mainStyle.setBorderLeft((short) 1);
-		mainStyle.setBorderRight((short) 1);
-		mainStyle.setWrapText(true);
-
+		DecimalFormat df = new DecimalFormat("#,##0.##");
 		for (Map<String, String> map : reportList) {
 			row = sheet.createRow(index);
 
-			SimpleDateFormat timeSdf = new SimpleDateFormat("yyyy/MM/dd");
 			for (int j = 0; j < mainLine.length; j++) {
 				XSSFCell cell = row.createCell(j);
 				cell.setCellStyle(mainStyle);
@@ -540,30 +560,34 @@ public class PMS496 extends FubonWmsBizLogic {
 						cell.setCellValue((String) xmlInfo.getVariable("PMS.SHORT_PRD_TYPE", (String) map.get(mainLine[j]), "F3"));
 						break;
 					case "INV_FEE":
-						DecimalFormat df = new DecimalFormat("#,##0.00");
-						BigDecimal fee = new BigDecimal(checkIsNull(map, "INV_FEE") + 0).add(new BigDecimal(checkIsNull(map, "MANAGE_FEE") + 0));
+						BigDecimal fee = new BigDecimal(StringUtil.isEmpty(checkIsNull(map, mainLine[j])) ? "0" : checkIsNull(map, mainLine[j])).add(new BigDecimal(StringUtil.isEmpty(checkIsNull(map, "MANAGE_FEE")) ? "0" : checkIsNull(map, "MANAGE_FEE")));
 						cell.setCellValue(df.format(fee));
 						break;
 					case "REF_AMT":
-					case "DIV_AMT":
 					case "INV_AMT":
 					case "CHANNEL_FEE":
-						cell.setCellValue(currencyFormat(map, mainLine[j]));
+						cell.setCellValue(df.format(new BigDecimal(StringUtil.isEmpty(checkIsNull(map, mainLine[j])) ? "0" : checkIsNull(map, mainLine[j]))));
+						break;
+					case "DIV_AMT":
+						cell.setCellValue(StringUtil.isEmpty(checkIsNull(map, mainLine[j])) ? "" : df.format(new BigDecimal(checkIsNull(map, mainLine[j]))));
 						break;
 					case "PROFIT_RATE":
 						cell.setCellValue(currencyFormat(map, mainLine[j]) + "%");
+						break;
+					case "RECORD_SEQ":
+						cell.setCellValue(checkIsNull(map, mainLine[j]) + "");
 						break;
 					default :
 						cell.setCellValue(checkIsNull(map, mainLine[j]));
 						break;
 				}
-				
 			}
 
 			index++;
 		}
 
-		wb.write(new FileOutputStream(filePath));
+		workbook.write(new FileOutputStream(filePath));
+		
 		notifyClientToDownloadFile(DataManager.getSystem().getPath().get("temp").toString() + uuid, fileName);
 
 		sendRtnObject(null);

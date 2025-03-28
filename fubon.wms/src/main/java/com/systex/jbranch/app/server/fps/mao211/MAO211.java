@@ -158,9 +158,9 @@ public class MAO211 extends FubonWmsBizLogic {
 
 		if (!StringUtil.isBlank(inputVO.getCust_name()))
 			sql.append("AND C.CUST_NAME like :cust_name ");
-
+		
+		//找客戶為主戶的所有從戶
 		sql.append("UNION ");
-
 		sql.append("SELECT C.CUST_NAME, ");
 		sql.append("       R.CUST_ID_S AS CUST_ID, ");
 		sql.append("       R.REL_TYPE, ");
@@ -179,13 +179,42 @@ public class MAO211 extends FubonWmsBizLogic {
 		sql.append("LEFT JOIN TBCRM_CUST_MAST RC ON R.CUST_ID_M = RC.CUST_ID ");
 		sql.append("WHERE AO.EMP_ID = :uEmpID ");
 		sql.append("AND R.CUST_ID_S IS NOT NULL ");
+		sql.append("AND R.REL_MBR_YN = 'Y' "); 
 
 		if (!StringUtil.isBlank(inputVO.getCust_id()))
 			sql.append("AND R.CUST_ID_M = :cust_id ");
 
 		if (!StringUtil.isBlank(inputVO.getCust_name()))
 			sql.append("AND C.CUST_NAME like :cust_name ");
+		
+		//找客戶為從戶的所有主戶
+		sql.append("UNION ");
+		sql.append("SELECT C.CUST_NAME, ");
+		sql.append("       R.CUST_ID_M AS CUST_ID, ");
+		sql.append("       R.REL_TYPE, ");
+		sql.append("       R.REL_TYPE_OTH, ");
+		sql.append("       RC.BRA_NBR, ");
+		sql.append("       RC.AO_CODE, ");
+		sql.append("       AO.EMP_NAME, ");
+		sql.append("       UEMP.EMP_ID AS UEMP_ID, ");
+		sql.append("       UEMP.EMP_NAME AS UEMP_NAME, ");
+		sql.append("       R.CUST_ID_S, ");
+		sql.append("       RC.CUST_NAME AS JOIN_SRV_CUST_NAME ");
+		sql.append("FROM TBCRM_CUST_MAST C ");
+		sql.append("LEFT JOIN VWORG_EMP_INFO AO ON C.AO_CODE = AO.AO_CODE ");
+		sql.append("LEFT JOIN VWORG_EMP_UHRM_INFO UEMP ON C.UEMP_ID = UEMP.EMP_ID ");
+		sql.append("LEFT JOIN TBCRM_CUST_REL R ON C.CUST_ID = R.CUST_ID_M ");
+		sql.append("LEFT JOIN TBCRM_CUST_MAST RC ON R.CUST_ID_S = RC.CUST_ID ");
+		sql.append("WHERE AO.EMP_ID = :uEmpID ");
+		sql.append("AND R.CUST_ID_M IS NOT NULL ");
+		sql.append("AND R.REL_MBR_YN = 'Y' "); 
 
+		if (!StringUtil.isBlank(inputVO.getCust_id()))
+			sql.append("AND R.CUST_ID_S = :cust_id ");
+
+		if (!StringUtil.isBlank(inputVO.getCust_name()))
+			sql.append("AND C.CUST_NAME like :cust_name ");
+		
 		sql.append("ORDER BY REL_TYPE ");
 
 		queryCondition.setQueryString(sql.toString());

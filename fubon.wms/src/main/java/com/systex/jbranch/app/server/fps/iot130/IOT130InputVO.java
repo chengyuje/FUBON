@@ -73,6 +73,7 @@ public class IOT130InputVO extends PagingInputVO{
 	private String OTH_FUND_PURPOSE_RMK_1;
 	private String OTH_FUND_PURPOSE_RMK_2;
 	private String BUSINESS_REL;
+	private String C_SENIOR_DOCCHK_YN;
 	
 	public boolean isEditOTH_TYPE() {
 		return editOTH_TYPE;
@@ -511,6 +512,14 @@ public class IOT130InputVO extends PagingInputVO{
 
 	public void setBUSINESS_REL(String bUSINESS_REL) {
 		BUSINESS_REL = bUSINESS_REL;
+	}
+
+	public String getC_SENIOR_DOCCHK_YN() {
+		return C_SENIOR_DOCCHK_YN;
+	}
+
+	public void setC_SENIOR_DOCCHK_YN(String c_SENIOR_DOCCHK_YN) {
+		C_SENIOR_DOCCHK_YN = c_SENIOR_DOCCHK_YN;
 	}
 	
 }

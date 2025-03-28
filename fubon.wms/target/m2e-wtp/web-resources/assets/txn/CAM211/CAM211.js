@@ -7,31 +7,12 @@ eSoafApp.controller('CAM211Controller', function($scope, $rootScope, $controller
 	$controller('BaseController', {$scope: $scope});
 	
 	$scope.controllerName = "CAM211Controller";
-	
-	$scope.UHRM_REGION_CENTER_LIST = [{'LABEL':'個人高端客群處', 'DATA': 'TEMP_RC'}];
-	$scope.UHRM_BRANCH_AREA_LIST = [{'LABEL':'台灣業務中心', 'DATA': 'TEMP_BA'}];
 
-	/*
-	 * 取得UHRM人員清單(由員工檔+角色檔)
-	 */
-	$scope.getUHRMList = function() {
-		$scope.sendRecv("ORG260", "getUHRMList", "com.systex.jbranch.app.server.fps.org260.ORG260InputVO", $scope.inputVO, 
-				function(tota, isError) {
-					if (isError) {
-						return;
-					}
-					if (tota.length > 0) {
-						$scope.mappingSet['UHRM_LIST'] = tota[0].body.uhrmList;
-						$scope.inputVO.pCode = tota[0].body.uEmpID;
-					}
-		});
-	};
-	
 	// 繼承
 	$controller('CAM210Controller', {$scope: $scope});
 	
 	$scope.initCAM211 = function() {
-		$scope.inputVO = {};
+//		$scope.inputVO = {};
 		var min_mon = new Date();
 		min_mon.setMonth(min_mon.getMonth() - 2, 1);
 		min_mon.setHours(0, 0, 0, 0);
@@ -39,8 +20,6 @@ eSoafApp.controller('CAM211Controller', function($scope, $rootScope, $controller
 		$scope.limitDate();
 		
 		$scope.getUHRMList();
-		$scope.inputVO.uhrmRegion = 'TEMP_RC';
-		$scope.inputVO.uhrmOp = 'TEMP_BA';
 		
         //登入者權限
 		$scope.loginRole = function (){
@@ -60,14 +39,36 @@ eSoafApp.controller('CAM211Controller', function($scope, $rootScope, $controller
 		$scope.loginRole();
 		
 		$scope.fromOTHER();
+		
+        $scope.sendRecv("PMS401U", "isMainten", "com.systex.jbranch.app.server.fps.pms401u.PMS401UInputVO", {'itemID': 'CAM211'}, function(tota, isError) {
+			if (!isError) {
+				$scope.chkMaintenance = tota[0].body.isMaintenancePRI == 'Y' ? true : false;
+
+				$scope.uhrmRCList = [];
+				$scope.uhrmOPList = [];
+
+				if (null != tota[0].body.uhrmORGList) {
+					angular.forEach(tota[0].body.uhrmORGList, function(row) {
+						$scope.uhrmRCList.push({LABEL: row.REGION_CENTER_NAME, DATA: row.REGION_CENTER_ID});
+					});	
+					
+					$scope.inputVO.uhrmRC = tota[0].body.uhrmORGList[0].REGION_CENTER_ID;
+					
+					angular.forEach(tota[0].body.uhrmORGList, function(row) {
+						$scope.uhrmOPList.push({LABEL: row.BRANCH_AREA_NAME, DATA: row.BRANCH_AREA_ID});
+					});
+					
+					$scope.inputVO.uhrmOP = tota[0].body.uhrmORGList[0].BRANCH_AREA_ID;
+		        }
+			}						
+		});
 	};
 	$scope.initCAM211();
 	
 	// 20170524 ADD BY OCEAN
 	$scope.downloadCAM211 = function() {
-		console.log($scope.tabSheet);
-		if($scope.tabSheet == '3' || $scope.tabSheet == '4') {
-			if(!$scope.inputVO.campaignName) {
+		if ($scope.tabSheet == '3' || $scope.tabSheet == '4') {
+			if (!$scope.inputVO.campaignName) {
 	    		$scope.showErrorMsg('欄位檢核錯誤:必要輸入欄位');
         		return;
         	}
@@ -83,4 +84,5 @@ eSoafApp.controller('CAM211Controller', function($scope, $rootScope, $controller
             }]
 		});
 	};
+	
 });

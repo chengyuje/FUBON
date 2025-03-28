@@ -29,6 +29,8 @@ public class PRD235InputVO extends PagingInputVO{
 	private String STATUS;
 	private BigDecimal NEW_RDM_TOTAL_UNITS;
 	private List<Map<String, Object>> adjList;
+	private BigDecimal DIV_SEQ_NO;
+	private String DIVIDEND_CATEGORY;
 	
 	public BigDecimal getSEQ_NO() {
 		return SEQ_NO;
@@ -149,6 +151,18 @@ public class PRD235InputVO extends PagingInputVO{
 	}
 	public void setAdjList(List<Map<String, Object>> adjList) {
 		this.adjList = adjList;
+	}
+	public BigDecimal getDIV_SEQ_NO() {
+		return DIV_SEQ_NO;
+	}
+	public void setDIV_SEQ_NO(BigDecimal dIV_SEQ_NO) {
+		DIV_SEQ_NO = dIV_SEQ_NO;
+	}
+	public String getDIVIDEND_CATEGORY() {
+		return DIVIDEND_CATEGORY;
+	}
+	public void setDIVIDEND_CATEGORY(String dIVIDEND_CATEGORY) {
+		DIVIDEND_CATEGORY = dIVIDEND_CATEGORY;
 	}
 	
 }

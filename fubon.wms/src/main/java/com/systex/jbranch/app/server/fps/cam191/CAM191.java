@@ -143,8 +143,8 @@ public class CAM191 extends FubonWmsBizLogic {
 		logger.info("regionID:" + inputVO.getRegionID());
 		logger.info("opID:" + inputVO.getOpID());
 		logger.info("branchID:" + inputVO.getBranchID());
-		logger.info("custID:" + "%" + inputVO.getCustID() + "%");
-		logger.info("custName:" + "%" + inputVO.getCustName() + "%");
+//		logger.info("custID:" + "%" + inputVO.getCustID() + "%");
+//		logger.info("custName:" + "%" + inputVO.getCustName() + "%");
 		logger.info("aoCode:" + inputVO.getAoCode());
 		logger.info("empID:" + ws.getUser().getUserID());
 		logger.info("campName:" + "%" + inputVO.getCampName() + "%");

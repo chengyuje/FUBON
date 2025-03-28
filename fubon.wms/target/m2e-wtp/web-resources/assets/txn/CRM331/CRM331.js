@@ -4,7 +4,7 @@
  */
 'use strict';
 eSoafApp.controller('CRM331Controller',
-	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, $filter, getParameter,sysInfoService) {
+	function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, $filter, getParameter,sysInfoService, crmService) {
 		$controller('BaseController', {$scope: $scope});
 		// include
 		$controller('CRM210Controller', {$scope: $scope});
@@ -12,9 +12,11 @@ eSoafApp.controller('CRM331Controller',
 		//
 		$scope.controllerName = "CRM331Controller";
 		
+		crmService.getForbiddenList();
+		
 		// combobox
 		$scope.pri_id = String(sysInfoService.getPriID());
-		getParameter.XML(["CRM.CON_DEGREE", "CRM.VIP_DEGREE", "CRM.CUST_GENDER", "CRM.TRS_APL_REASON", "COMMON.YES_NO", "TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN", "CRM.CRM331_CHG_FRQ"], function(totas) {
+		getParameter.XML(["CRM.CON_DEGREE", "CRM.VIP_DEGREE", "CRM.CUST_GENDER", "CRM.TRS_APL_REASON", "COMMON.YES_NO", "TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN", "CRM.CRM331_CHG_FRQ", "CRM.331_MAX_QUERY_COUNT"], function(totas) {
 			if (totas) {
 				$scope.CON_DEGREE = totas.data[totas.key.indexOf('CRM.CON_DEGREE')];
 				$scope.VIP_DEGREE = totas.data[totas.key.indexOf('CRM.VIP_DEGREE')];
@@ -31,6 +33,7 @@ eSoafApp.controller('CRM331Controller',
 				$scope.COMYN = totas.data[totas.key.indexOf('COMMON.YES_NO')];
 				$scope.TCMYN = totas.data[totas.key.indexOf('TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN')];
 				$scope.CRM331_CHG_FRQ = totas.data[totas.key.indexOf('CRM.CRM331_CHG_FRQ')];
+				$scope.MAX_QUERY_COUNT = totas.data[totas.key.indexOf('CRM.331_MAX_QUERY_COUNT')];
 			}
 		}); 
 		//get處理方式
@@ -214,11 +217,24 @@ eSoafApp.controller('CRM331Controller',
 				}
 			});
 			// toUpperCase
-			if($scope.inputVO.cust_id)
+			if($scope.inputVO.cust_id) {
 				$scope.inputVO.cust_id = $scope.inputVO.cust_id.toUpperCase();
+				
+			if(crmService.checkCustId($rootScope.forbiddenData,$scope.inputVO.cust_id)) {
+					$scope.showErrorMsg("ehl_01_CRM_002");
+	    			return;
+			}
+			}
+		
 			if($scope.inputVO.re_ao_code)
 				$scope.inputVO.re_ao_code = $scope.inputVO.re_ao_code.toUpperCase();
 
+			//分行必輸
+			if($scope.inputVO.ao_05 == undefined || $scope.inputVO.ao_05 == null || $scope.inputVO.ao_05 == "") {
+				$scope.showErrorMsg('請輸入分行後再做查詢');
+        		return;
+			}
+			
 			$scope.sendRecv("CRM331", "inquire", "com.systex.jbranch.app.server.fps.crm331.CRM331InputVO", $scope.inputVO,
 			function(tota, isError) {
 				if (!isError) {
@@ -226,8 +242,16 @@ eSoafApp.controller('CRM331Controller',
 						$scope.showMsg("ehl_01_common_009");
             			return;
             		}
+					debugger
+					var maxcntAry = $filter('filter')($scope.MAX_QUERY_COUNT, {DATA: "1"});
+					var maxCount = (maxcntAry != null && maxcntAry.length > 0) ? maxcntAry[0].LABEL : 1000; //找不到參數，預設查詢筆數上限為1000
+					if(tota[0].body.resultList.length > maxCount) {
+						$scope.showWarningMsg("查詢結果超過筆數上限，只顯示前" + maxCount + "筆資料");
+					}
 					$scope.resultList = tota[0].body.resultList;
 					$scope.outputVO = tota[0].body;
+					
+					$scope.resultList = crmService.filterList($rootScope.forbiddenData,$scope.resultList);
 					return;
 				}
 			});
@@ -329,8 +353,8 @@ eSoafApp.controller('CRM331Controller',
 								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", 公司戶與公司負責人掛Code需一致");
 							} else if (tota[0].body.resultList2 == 'ERR7') {
 								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", 該客戶屬十保監控客戶未滿六個月需客戶同意書才可移回原理專");
-							} else if (tota[0].body.resultList2 == 'ERR8') {
-								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", 主CODE客戶僅可移入主CODE");
+							} else if (tota[0].body.resultList2 == 'ERR8') { //#2225:主CODE客戶不可移轉至維護CODE
+								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", 主CODE客戶不可移轉至維護CODE");
 							} else if (tota[0].body.resultList2 == 'ERR9') {
 								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + "為NS戶，無法申請客戶移入，請洽分行內控品管科。");
 							} else if (tota[0].body.resultList2 == 'ERR10') {
@@ -344,7 +368,9 @@ eSoafApp.controller('CRM331Controller',
 							} else if (tota[0].body.resultList2 == 'ERR14') {
 								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + "輪調RM名單上傳後，執行前名單中RM/客戶不可做移入申請");
 							} else if (tota[0].body.resultList2 == 'ERR15') {
-								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + "RM輪調後，帶走30%核心客戶，一年內不得再帶走該RM轄下原分行70%客戶");
+								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", RM輪調後，帶走核心客戶，一年內不得再帶走該RM轄下原分行客戶");
+							} else if (tota[0].body.resultList2 == 'ERR16') {
+								$scope.showErrorMsg("客戶:" + tota[0].body.resultList + ", 不可將分行客戶移入私銀CODE");
 							} else {
 								$scope.sendRecv("CRM331", "confirm", "com.systex.jbranch.app.server.fps.crm331.CRM331InputVO", $scope.inputVO2,
 										function(tota, isError) {

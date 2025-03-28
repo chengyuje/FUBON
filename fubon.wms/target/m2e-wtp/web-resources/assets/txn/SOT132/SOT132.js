@@ -33,6 +33,17 @@ eSoafApp.controller('SOT132Controller', function($scope, $controller, socketServ
 	};
 
 	$scope.query = function() {
+		if($scope.dynamicYN && $scope.dynamicYN == "Y") {
+			//動態鎖利庫存
+			$scope.queryDyna();
+		} else {
+			//一般基金庫存
+			$scope.queryNormal();
+		}
+	}
+	
+	//非動態鎖利
+	$scope.queryNormal = function() {
 		$scope.sendRecv("SOT703", "getCustAssetNFData", "com.systex.jbranch.app.server.fps.sot703.SOT703InputVO", {
 			"custId" : $scope.custID,
 			"trustTS" : $scope.trustTS,
@@ -97,6 +108,49 @@ eSoafApp.controller('SOT132Controller', function($scope, $controller, socketServ
 			}
 		});
 	};
+	
+	//動態鎖利
+	$scope.queryDyna = function() {
+		$scope.sendRecv("SOT703", "getCustAssetNFData", "com.systex.jbranch.app.server.fps.sot703.SOT703InputVO", {
+			"custId" : $scope.custID,
+			"trustTS" : $scope.trustTS,
+			"debitAcct" : $scope.debitAcct,
+			"returnNumZeroYN" : "Y" //母基金庫存為0仍要顯示
+		}, function(tota, isError) {
+			if (!isError) {
+				if (tota[0].body.custAssetFundList) {
+					$scope.tempList = tota[0].body.custAssetFundList;
+					$scope.astList = [];
+					$scope.outputVO = tota[0].body;
+
+					for (var i = 0; i < $scope.tempList.length; i++) {
+						//只取得動態鎖利的庫存
+						if ($scope.tempList[i].AssetType && $scope.tempList[i].AssetType == "0001" && 
+								($scope.tempList[i].Dynamic == '1' || $scope.tempList[i].Dynamic == '2')) {
+							$scope.tempList[i].assetTradeSubType = '1';
+							$scope.tempList[i].assetTradeSubTypeD = '1';
+							if($scope.tempList[i].Dynamic == '1') {
+								$scope.tempList[i].FundName = $scope.tempList[i].FundName + "(動態鎖利_母)";
+							} else if($scope.tempList[i].Dynamic == '2') {
+								$scope.tempList[i].FundName = $scope.tempList[i].FundName + "(動態鎖利_子)";
+							}
+							$scope.astList.push($scope.tempList[i]);
+						}
+					}
+					//排序：憑證編號、母/子基金(母基金在前)
+					$scope.astList.sort(function (a, b) {
+						if(a.EviNum == b.EviNum) {
+							return (a.Dynamic < b.Dynamic) ? -1 : 1;
+						} else {
+							return (a.EviNum < b.EviNum) ? -1 : 1;
+						}
+					});
+				}
+				return;
+			}
+		});
+	};
+	
 
 	// #0687 金錢信託_基金贖回_後收型基金新判斷
 	$scope.checkEviNumAndCloseDialog = function(row) {
@@ -170,6 +224,29 @@ eSoafApp.controller('SOT132Controller', function($scope, $controller, socketServ
 		});
 	};
 
+	//動態鎖利：回傳該憑證編號的母子基金資料
+	$scope.getDynaData = function(row) {
+		var rtnData = [];
+		var cIndex = 1;
+		
+		for (var i = 0; i < $scope.astList.length; i++) {
+			//相同憑證編號
+			if($scope.astList[i].EviNum == row.EviNum) {
+				if($scope.astList[i].Dynamic == "1") rtnData.prodM = $scope.astList[i]; //母基金
+				if($scope.astList[i].Dynamic == "2") { //子基金(舊憑證最多5筆，新憑證最多3筆)
+					if(cIndex == 1) rtnData.prodC1 = $scope.astList[i];
+					if(cIndex == 2) rtnData.prodC2 = $scope.astList[i];
+					if(cIndex == 3) rtnData.prodC3 = $scope.astList[i];
+					if(cIndex == 4) rtnData.prodC4 = $scope.astList[i];
+					if(cIndex == 5) rtnData.prodC5 = $scope.astList[i];
+					cIndex++;
+				}
+			}
+		}
+		//回傳該憑證編號的母子基金資料
+		$scope.closeThisDialog(rtnData); 
+	}
+	
 	$scope.init();
 	$scope.query();
 

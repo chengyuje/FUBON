@@ -657,7 +657,13 @@ public class JSB130 extends FubonWmsBizLogic {
 				sb.append(" WHERE COM_ID = :ins_com_id AND CONTRACT_STATUS IN ('01', '04', '05', '10', '16') ");
 				sb.append(" AND NOT EXISTS ( ");
 				sb.append(" SELECT 'Y' FROM TBJSB_INS_BILL_SG01 B WHERE A.COM_ID = B.INS_COM_ID ");
-				sb.append(" AND DATA_MONTH = :data_month AND A.POLICY_NBR = B.POLICY_NBR)) ");
+				sb.append(" AND DATA_MONTH = :data_month AND A.POLICY_NBR = B.POLICY_NBR) ");
+				
+				// 排除日盛(對帳單)不檢核清單
+				sb.append(" AND NOT EXISTS ( ");
+				sb.append(" SELECT 'Y' FROM TBJSB_INS_BILL_EXCLUDE E WHERE A.COM_ID = E.COM_ID AND A.POLICY_NBR = E.POLICY_NBR AND A.ACCEPTID = E.ACCEPTID) ");
+				
+				sb.append(" ) ");
 				sb.append(" SELECT TBJSB_INS_IMP_LOG_SEQ.nextval, ");
 				sb.append(" :data_date, :ins_com_id, 'BILL', :data_month, 'JSB_AST_03', ");
 				sb.append(" 'E06', SR.ACCEPTID, SR.POLICY_NBR, SR.POLICY_FULL_NAME, ");

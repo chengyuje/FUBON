@@ -31,7 +31,7 @@ public class CRM231 extends FubonWmsBizLogic {
 	private Logger logger = LoggerFactory.getLogger(CRM231.class);
 	
 	public void inquire(Object body, IPrimitiveMap header) throws JBranchException {
-		
+		long startTime = System.currentTimeMillis();
 		WorkStation ws = DataManager.getWorkStation(uuid);
 		CRM231InputVO inputVO = (CRM231InputVO) body;
 		
@@ -48,7 +48,10 @@ public class CRM231 extends FubonWmsBizLogic {
 		CRM230OutputVO outputVO_crm230 = new CRM230OutputVO();
 		
 		outputVO_crm230 = crm230.inquire_common(inputVO_all, "CRM231");
-
+		long  endTime = System.currentTimeMillis();
+		System.out.println("=========================");
+		System.out.println((endTime-startTime)/1000);
+		System.out.println("========================");
 		this.sendRtnObject(outputVO_crm230);
 	}
 	

@@ -589,7 +589,10 @@ public class SOT413 extends FubonWmsBizLogic {
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
-		sb.append("SELECT 1 FROM TBSOT_TRADE_MAIN WHERE PROD_TYPE = '7' AND TRADE_SEQ <> :tradeSeq AND REC_SEQ = :recSeq ");
+		sb.append("SELECT 1 FROM TBSOT_TRADE_MAIN A ");
+		sb.append(" INNER JOIN TBSOT_FCI_TRADE_D B ON B.TRADE_SEQ = A.TRADE_SEQ ");
+		sb.append(" WHERE A.PROD_TYPE = '7' AND A.TRADE_SEQ <> :tradeSeq AND A.REC_SEQ = :recSeq ");
+		sb.append(" AND NVL(B.BATCH_SEQ, '@@') NOT IN (SELECT BATCH_SEQ FROM TBSOT_FCI_INV_DETAIL WHERE STATUS = '1') ");
 		queryCondition.setObject("tradeSeq", inputVO.getTradeSEQ());
 		queryCondition.setObject("recSeq", inputVO.getRecSEQ());
 		queryCondition.setQueryString(sb.toString());

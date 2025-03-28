@@ -13,24 +13,69 @@
 		<div class="panel_content">
 			<div class="search_table search_box3">
 				<table>
-					<th>*交易類型：</th>
-					<td>
-						<e-combobox id="regType" ng-paramtype="IOT.TRADE_TYPE"
-							ng-model="inputVO.REG_TYPE" ng-validate="false" ng-format="F3"
-							ng-required="true" width="180px" />
-					</td>
-					<th>*要保人ID：</th>
-					<td>
-						<input type="text" id="custId" name="custId"
-						ng-blur="getInfo('CUST')" ng-model="inputVO.CUST_ID"
-						ng-required="true" style="text-transform: uppercase;"">
-					</td>
-					<th>*狀態：</th>
-					<td>
-						<e-combobox id="status" ng-paramtype="IOT.PREMATCH_STATUS"
-							ng-model="inputVO.STATUS" ng-validate="false" ng-format="F3"
-							ng-required="true" width="180px" />
-					</td>
+					<tr>
+	     				<th ng-if="!isUHRM">業務處：</th>
+	     				<td ng-if="!isUHRM">
+	     					<e-combobox id="region_id" name="region_id"
+										ng-datasource="REGION_LIST"
+										ng-model="inputVO.region_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_REGION.length == 1"
+										ng-readonly="AVAIL_REGION.length == 1"
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeRegion(orgList);"
+				   						style="line-height:20px;" />
+	     				</td>
+	     				<th ng-if="!isUHRM">營運區：</th>
+	   					<td ng-if="!isUHRM">
+	   						<e-combobox id="area_id" name="area_id"
+										ng-datasource="AREA_LIST"
+										ng-model="inputVO.area_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_AREA.length == 1"
+										ng-readonly="AVAIL_AREA.length == 1" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="false"
+										ng-change="ChangeArea(orgList);"
+										style="line-height:20px;" />
+	   					</td>
+	     				<th ng-if="!isUHRM">分行：</th>
+	     				<td ng-if="!isUHRM">
+	     					<e-combobox id="branch_id" name="branch_id"
+				     					ng-datasource="BRANCH_LIST"
+										ng-model="inputVO.branch_id"
+										ng-validate="false" 
+										ng-disabled="AVAIL_BRANCH.length == 1"
+										ng-readonly="AVAIL_BRANCH.length == 1"
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="false"
+										ng-change="ChangeBranch(orgList)"
+				   						style="line-height:20px;" />
+	     				</td>
+	     			</tr>
+					<tr>
+						<th>*交易類型：</th>
+						<td>
+							<e-combobox id="regType" ng-paramtype="IOT.TRADE_TYPE"
+								ng-model="inputVO.REG_TYPE" ng-validate="false" ng-format="F3"
+								ng-required="true" width="180px" />
+						</td>
+						<th>*要保人ID：</th>
+						<td>
+							<input type="text" id="custId" name="custId"
+							ng-blur="getInfo('CUST')" ng-model="inputVO.CUST_ID"
+							ng-required="true" style="text-transform: uppercase;"">
+						</td>
+						<th>*狀態：</th>
+						<td>
+							<e-combobox id="status" ng-paramtype="IOT.PREMATCH_STATUS"
+								ng-model="inputVO.STATUS" ng-validate="false" ng-format="F3"
+								ng-required="true" width="180px" />
+						</td>
 					</tr>
 					<tr>
 						<th>*適合度檢核編碼：</th>

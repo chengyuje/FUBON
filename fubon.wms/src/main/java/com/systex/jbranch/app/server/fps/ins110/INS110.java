@@ -341,7 +341,7 @@ public class INS110 extends FubonWmsBizLogic{
 		
 		resultMap.put("insyearfee_y", sumInsYearFee);
 		resultMap.put("policy", toList);
-		System.out.println(new Gson().toJson(resultMap));
+//		System.out.println(new Gson().toJson(resultMap));
 		this.sendRtnObject(resultMap);
 	}
 	

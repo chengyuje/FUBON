@@ -8,10 +8,11 @@ eSoafApp.controller('PMS424Controller', function($rootScope, $scope, $controller
 	$controller('PMSRegionController', {$scope: $scope});
 	
 	// filter
-	getParameter.XML(["PMS.PMS424_SOURCE_OF_DEMAND", "PMS.CHECK_TYPE"], function(totas) {
+	getParameter.XML(["PMS.PMS424_SOURCE_OF_DEMAND", "PMS.CHECK_TYPE", "PMS.CUST_BASE_IP"], function(totas) {
 		if (totas) {
 			$scope.mappingSet['PMS.PMS424_SOURCE_OF_DEMAND'] = totas.data[totas.key.indexOf('PMS.PMS424_SOURCE_OF_DEMAND')];
 			$scope.mappingSet['PMS.CHECK_TYPE'] = totas.data[totas.key.indexOf('PMS.CHECK_TYPE')];
+			$scope.mappingSet['PMS.CUST_BASE_IP'] = totas.data[totas.key.indexOf('PMS.CUST_BASE_IP')];
 		}
 	});
 	// ===
@@ -125,7 +126,9 @@ eSoafApp.controller('PMS424Controller', function($rootScope, $scope, $controller
 		var rowIndex;
 		angular.forEach($scope.paramList, function(row, index, objs){
 			if (row.UPDATE_FLAG == 'Y') {
-				if (!row.NOTE2 || 
+				if ((!row.CUST_BASE || // 客戶背景或關係需填寫
+						 (row.CUST_BASE == 'O' && !row.NOTE2) // 客戶背景或關係若為其它，請補充查證方式
+				    ) || 
 					!row.NOTE3 || 
 					!row.WARNING_YN || 
 					(!row.NOTE_TYPE || // 查證方式需填寫
@@ -175,4 +178,20 @@ eSoafApp.controller('PMS424Controller', function($rootScope, $scope, $controller
 			}
 		});
 	};
+	
+    $scope.setDefaultVal = function (row) {
+		switch(row.CUST_BASE) {
+			case "M":
+			case "PC":
+			case "BS":
+			case "G":
+			case "B":
+				row.WARNING_YN = 'N';
+				break;
+			case "O":
+				break;
+			default:
+				break;
+		}
+	}
 });

@@ -74,7 +74,19 @@ public class ORG140 extends FubonWmsBizLogic {
 		sb.append("WITH CERT_GROUP_LIST AS ( ");
 		sb.append("  SELECT PARAM_TYPE AS CERT_GROUP, PARAM_CODE AS PRIVILEGEID ");
 		sb.append("  FROM TBSYSPARAMETER ");
-		sb.append("  WHERE PARAM_TYPE IN ('ORG.CERT_MGR', 'ORG.CERT_FC', 'ORG.CERT_PS', 'ORG.CERT_OP_1', 'ORG.CERT_OP_2', 'ORG.CERT_NEWAO', 'ORG.CERT_PAO', 'ORG.CERT_UHRM', 'ORG.CERT_JRM') ");
+		sb.append("  WHERE PARAM_TYPE IN ( ");
+		sb.append("    'ORG.CERT_MGR',  ");
+		sb.append("    'ORG.CERT_FC', ");
+		sb.append("    'ORG.CERT_PS', ");
+		sb.append("    'ORG.CERT_OP_1', ");
+		sb.append("    'ORG.CERT_OP_2', ");
+		sb.append("    'ORG.CERT_NEWAO', ");
+		sb.append("    'ORG.CERT_PAO', ");
+		sb.append("    'ORG.CERT_UHRM', ");
+		sb.append("    'ORG.CERT_JRM', ");
+		sb.append("    'ORG.CERT_UHRMMGR', ");
+		sb.append("    'ORG.CERT_UHRMOP_1' ");
+		sb.append("  ) ");
 		sb.append(") ");
 		sb.append(", CERT_MAIN_LIST AS ( ");
 		sb.append("  SELECT REPLACE(PARAM_TYPE, '_LIST', '') AS CERT_GROUP, PARAM_CODE AS CERT_ID, PARAM_NAME AS CERT_NAME, PARAM_DESC AS CERT_GET_TYPE, PARAM_ORDER AS CERT_ORDER ");
@@ -383,7 +395,19 @@ public class ORG140 extends FubonWmsBizLogic {
 		sb.append("    WHERE INFO.PRIVILEGEID IN ( ");
 		sb.append("      SELECT PARAM_CODE ");
 		sb.append("      FROM TBSYSPARAMETER ");
-		sb.append("      WHERE PARAM_TYPE IN ('ORG.CERT_MGR', 'ORG.CERT_FC', 'ORG.CERT_PS', 'ORG.CERT_OP_1', 'ORG.CERT_OP_2', 'ORG.CERT_NEWAO', 'ORG.CERT_PAO', 'ORG.CERT_UHRM', 'ORG.CERT_JRM') ");
+		sb.append("      WHERE PARAM_TYPE IN ( ");
+		sb.append("        'ORG.CERT_MGR',  ");
+		sb.append("        'ORG.CERT_FC', ");
+		sb.append("        'ORG.CERT_PS', ");
+		sb.append("        'ORG.CERT_OP_1', ");
+		sb.append("        'ORG.CERT_OP_2', ");
+		sb.append("        'ORG.CERT_NEWAO', ");
+		sb.append("        'ORG.CERT_PAO', ");
+		sb.append("        'ORG.CERT_UHRM', ");
+		sb.append("        'ORG.CERT_JRM', ");
+		sb.append("        'ORG.CERT_UHRMMGR', ");
+		sb.append("        'ORG.CERT_UHRMOP_1' ");
+		sb.append("      ) ");
 		sb.append("    ) ");
 		sb.append("  ) MEM_LIST ON 1 = 1 ");
 		sb.append("  LEFT JOIN TBORG_MEMBER_CERT MC ON MEM_LIST.EMP_ID = MC.EMP_ID AND CERT_ALL.CERT_ID = MC.CERTIFICATE_CODE ");
@@ -395,8 +419,8 @@ public class ORG140 extends FubonWmsBizLogic {
 
 		if (isUHRMMGR || isUHRMBMMGR) {
 			sb.append("AND ( ");
-			sb.append("      A.EMP_ID IS NOT NULL ");
-			sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE A.EMP_DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID AND MT.DEPT_ID = :loginArea) ");
+			sb.append("      MEM_LIST.EMP_ID IS NOT NULL ");
+			sb.append("  AND EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MEM_LIST.EMP_DEPT_ID = MT.DEPT_ID AND MT.EMP_ID = :loginID AND MT.DEPT_ID = :loginArea) ");
 			sb.append(") ");
 			
 			queryCondition.setObject("loginID", (String) SysInfo.getInfoValue(SystemVariableConsts.LOGINID));
@@ -404,7 +428,7 @@ public class ORG140 extends FubonWmsBizLogic {
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getBranch_nbr()) && Integer.valueOf(inputVO.getBranch_nbr()) > 0) {
 				if (isHANDMGR || isARMGR || isOPMGR) {
-					sb.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE A.EMP_ID = MT.EMP_ID) ");
+					sb.append("  AND NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO MT WHERE MEM_LIST.EMP_ID = MT.EMP_ID) ");
 				}
 				
 				sb.append("AND MEM_LIST.BRANCH_NBR like :branNbr "); //分行代碼

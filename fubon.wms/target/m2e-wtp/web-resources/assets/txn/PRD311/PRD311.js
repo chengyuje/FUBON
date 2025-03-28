@@ -21,6 +21,11 @@ eSoafApp.controller('PRD311Controller', ($rootScope, $scope, $controller, $confi
             (tota, isError) => {
                 if (!isError) {
                     $scope.data = tota[0].body.result;
+                    angular.forEach($scope.data, function(row){
+                    	if (row.COMPLETE_DATE != undefined) {
+                    		row.COMPLETE_DATE = $scope.toJsDate(row.COMPLETE_DATE);
+                    	}
+                    });
                     $scope.outputVO = tota[0].body;
 
                     if (!$scope.data.length)
@@ -105,14 +110,42 @@ eSoafApp.controller('PRD311Controller', ($rootScope, $scope, $controller, $confi
                 }
             });
     }
+    
+    $scope.modify = function (row) {
+    	if (row.FUNCTION == 'D') {
+    		// 刪除
+    		$confirm({text: "您確定刪除此筆紀錄?"}, {size: 'sm'}).then(function() {
+    			$scope.delete(row);
+    		});
+    	} if (row.FUNCTION == 'M') {
+    		var completeDate = angular.copy(row.COMPLETE_DATE);
+    		
+    		// 修改
+    		var dialog = ngDialog.open({
+				template: 'assets/txn/PRD311/PRD311_MODIFY.html',
+				className: 'PRD311',
+				showClose: false,
+				 controller: ['$scope', function($scope) {
+					 	$scope.row = row;
+					 	$scope.inputVO = {completeDate: completeDate};
+	             }]
+			});
+			dialog.closePromise.then(function (data) {
+				if (data.value === 'successful') {
+					$scope.query();
+				}
+			});
+    	}
+    }
 
     /** 配置參數 **/
     $scope.configureParameters = () => {
         $scope.mappingSet = {
-            STATUS: [{LABEL: '未通過', DATA: '0'}, {LABEL: '通過', DATA: '1'}]
+            STATUS: [{LABEL: '未通過', DATA: '0'}, {LABEL: '通過', DATA: '1'}],
+            FUNCTION: [{LABEL: '修改', DATA: 'M'},{LABEL: '刪除', DATA: 'D'}]
         }
     }
-
+    
     /** 匯出資料成 Excel **/
     $scope.exportExcel = () => $scope.sendRecv("PRD311", "export", $scope.modelName, $scope.inputVO, () => {});
 

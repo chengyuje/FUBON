@@ -98,6 +98,36 @@
 									style="line-height:20px;" />
 			   		</td>
 				</tr>
+				<tr ng-hide="hideFlag != 'Y'">
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="uhrmRCList"
+										ng-model="inputVO.uhrmRC"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="uhrmOPList"
+										ng-model="inputVO.uhrmOP"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F1"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
+					<th width="16.6%"></th>
+					<td width="16.6%"></td>
+				</tr>
 				<tr>
 					<th ng-if="hideFlag == 'N'">行員員編：</th>
 					<td ng-if="hideFlag == 'N'">
@@ -160,9 +190,9 @@
 				<tbody>
 					<tr class="repeat-row  text-center" ng-repeat="row in data track by $index | limitTo:displayLimit" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
 						<td align="center">
-							<button type="button" class="btn btn-success" ng-click="actionGO('RT', row.SEQ)" function-type="confirm"    ng-if="row.CONFIRM_YN == 'Y'"><span class="glyphicon glyphicon-ok"></span>核可</button>
-							<button type="button" class="btn btn-warning" ng-click="actionGO('RF', row.SEQ)" function-type="confirm"    ng-if="row.CONFIRM_YN == 'Y'"><span class="glyphicon glyphicon-remove"></span>退回</button>
-							<button type="button" class="btn btn-danger"  ng-click="actionGO('D',  row.SEQ)" function-type="maintenance" ng-if="row.MAINTENANCE_YN == 'Y'"><span class="glyphicon glyphicon-minus"></span>刪除</button>
+							<button type="button" class="btn btn-success" ng-click="actionGO('RT', row.SEQ)" function-type="confirm"     ng-if="row.CONFIRM_YN == 'Y'"><span class="glyphicon glyphicon-ok"></span>核可</button>
+							<button type="button" class="btn btn-warning" ng-click="actionGO('RF', row.SEQ)" function-type="confirm"     ng-if="row.CONFIRM_YN == 'Y'"><span class="glyphicon glyphicon-remove"></span>退回</button>
+							<button type="button" class="btn btn-danger"  ng-click="actionGO('D',  row.SEQ)" function-type="maintenance" ><span class="glyphicon glyphicon-minus"></span>刪除</button>
 						</td>
 						<td align="center">{{row.STATUS | mapping:mappingSet['PMS.PMS998_STATUS']:'F3'}}</td>
 						<td align="center">{{row.BRANCH_NBR}}</td>

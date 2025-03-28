@@ -28,6 +28,7 @@ public class IOT120OutputVO extends PagingOutputVO{
 	private Map<String, Object> webservicePdfData;
 	private String errorMsg;
 	private Map<String, Object> wsPayServData; //富壽繳款服務單API回傳資料
+	private List<Map<String, Object>> fileList;
 	
 	//
 	private List<Map<String, Object>> TMSList;
@@ -206,5 +207,13 @@ public class IOT120OutputVO extends PagingOutputVO{
 
 	public void setWsPayServData(Map<String, Object> wsPayServData) {
 		this.wsPayServData = wsPayServData;
+	}
+
+	public List<Map<String, Object>> getFileList() {
+		return fileList;
+	}
+
+	public void setFileList(List<Map<String, Object>> fileList) {
+		this.fileList = fileList;
 	}
 }

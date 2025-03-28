@@ -27,6 +27,10 @@ public class PMS433InputVO {
 	//更新
 	private List modifyList;
 	
+	//必辦工作事項用
+	private String fromCRM181;
+	private String sysRole;
+	
 	public String getsCreDate() {
 		return sCreDate;
 	}
@@ -122,6 +126,18 @@ public class PMS433InputVO {
 	}
 	public void setUhrm_branch_area_id(String uhrm_branch_area_id) {
 		this.uhrm_branch_area_id = uhrm_branch_area_id;
+	}
+	public String getFromCRM181() {
+		return fromCRM181;
+	}
+	public void setFromCRM181(String fromCRM181) {
+		this.fromCRM181 = fromCRM181;
+	}
+	public String getSysRole() {
+		return sysRole;
+	}
+	public void setSysRole(String sysRole) {
+		this.sysRole = sysRole;
 	}
 
 

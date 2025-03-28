@@ -1797,6 +1797,11 @@ eSoafApp.controller('SOT1610Controller',
 				if(!$scope.notEmptyValue($scope.inputVO.prodIdC3) && $scope.notEmptyValue($scope.inputVO.purchaseAmtC3)) {
 					$scope.inputVO.purchaseAmtC3 = null;
 				}
+				//約定報酬率檢核
+				if($scope.inputVO.engagedROI < 5) {
+					$scope.showErrorMsg("約定報酬率須達5%以上(含)");
+		    		return;
+				}
 				
 				if($scope.overTradeTime){
 					$scope.initOverTradeTime(); //判斷完再回到初始狀態

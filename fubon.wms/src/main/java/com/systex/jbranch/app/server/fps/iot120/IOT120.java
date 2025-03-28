@@ -9,7 +9,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.InetAddress;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -23,6 +26,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialClob;
 import javax.sql.rowset.serial.SerialException;
 
 import com.systex.jbranch.fubon.commons.PdfConfigVO;
@@ -40,8 +44,12 @@ import org.springframework.stereotype.Component;
 import com.systex.jbranch.app.common.fps.table.TBIOT_DOC_CHKPK;
 import com.systex.jbranch.app.common.fps.table.TBIOT_DOC_CHKVO;
 import com.systex.jbranch.app.common.fps.table.TBIOT_MAINVO;
+import com.systex.jbranch.app.common.fps.table.TBIOT_MAIN_PDFVO;
 import com.systex.jbranch.app.common.fps.table.TBIOT_MAPP_PDFVO;
 import com.systex.jbranch.app.common.fps.table.TBIOT_RIDER_DTLVO;
+import com.systex.jbranch.app.common.fps.table.TBSYS_WEB_SERVICE_LOGVO;
+import com.systex.jbranch.app.server.fps.iot400.IOT400InputVO;
+import com.systex.jbranch.app.server.fps.iot400.IOT400OutputVO;
 import com.systex.jbranch.app.server.fps.iot920.FirstBuyDataVO;
 import com.systex.jbranch.app.server.fps.iot920.FirstBuyInputVO;
 import com.systex.jbranch.app.server.fps.iot920.INSIDDataVO;
@@ -61,15 +69,18 @@ import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
 import com.systex.jbranch.platform.common.errHandle.APException;
 import com.systex.jbranch.platform.common.errHandle.DAOException;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
+import com.systex.jbranch.platform.common.errHandle.NotFoundException;
 import com.systex.jbranch.platform.common.json.parser.JSONParser;
 import com.systex.jbranch.platform.common.report.ReportIF;
 import com.systex.jbranch.platform.common.report.factory.ReportFactory;
 import com.systex.jbranch.platform.common.report.generator.ReportGeneratorIF;
 import com.systex.jbranch.platform.common.report.reportdata.ReportData;
 import com.systex.jbranch.platform.common.report.reportdata.ReportDataIF;
+import com.systex.jbranch.platform.common.util.ObjectUtil;
 import com.systex.jbranch.platform.common.util.PlatformContext;
 import com.systex.jbranch.platform.common.util.StringUtil;
 import com.systex.jbranch.platform.server.info.FormatHelper;
+import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
 import com.systex.jbranch.platform.server.info.SysInfo;
 import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.server.info.XmlInfo;
@@ -114,7 +125,8 @@ public class IOT120 extends FubonWmsBizLogic {
 		sb.append(" CASE WHEN D.C_PREMIUM_TRANSSEQ IS NOT NULL THEN D.C_PREMIUM_TRANSSEQ ELSE C.PREMIUM_TRANSSEQ END AS PREMIUM_TRANSSEQ, ");
 		sb.append(" CASE WHEN D.I_PREMIUM_TRANSSEQ IS NOT NULL THEN D.I_PREMIUM_TRANSSEQ ELSE C.I_PREMIUM_TRANSSEQ END AS I_PREMIUM_TRANSSEQ, ");
 		sb.append(" CASE WHEN D.P_PREMIUM_TRANSSEQ IS NOT NULL THEN D.P_PREMIUM_TRANSSEQ ELSE C.P_PREMIUM_TRANSSEQ END AS P_PREMIUM_TRANSSEQ, ");
-		sb.append(" P.BUSINESS_REL, A.PAY_SERV_RETURN_CODE, A.PAY_SERV_REMIT_NATNO, A.REMIT_COUNTRY_FLAG ");
+		sb.append(" P.BUSINESS_REL, A.PAY_SERV_RETURN_CODE, A.PAY_SERV_REMIT_NATNO, A.REMIT_COUNTRY_FLAG, P.MAPPVIDEO_YN, P.DIGITAL_AGREESIGN_YN, ");
+		sb.append(" NVL(A.FUND_VERIFY_PDF_YN, 'N') AS FUND_VERIFY_PDF_YN, NVL(A.FUND_VERIFY_PAPER_YN, 'N') AS FUND_VERIFY_PAPER_YN, NVL(A.NO_PAPER_YN, 'N') AS NO_PAPER_YN ");
 		sb.append(" From TBIOT_MAIN A ");
 		sb.append(" LEFT OUTER JOIN TBIOT_PREMATCH P ON P.PREMATCH_SEQ = A.PREMATCH_SEQ ");
 		sb.append(" LEFT OUTER JOIN TBPRD_INS_MAIN PRD ON PRD.INSPRD_KEYNO = P.INSPRD_KEYNO ");
@@ -176,11 +188,17 @@ public class IOT120 extends FubonWmsBizLogic {
 		sb.append(" where a.INSPRD_KEYNO = b.INSPRD_KEYNO ");
 		sb.append(" and a.INS_KEYNO = :in_INSKEYNO ");
 		sb.append(" order by a.RIDER_DTL_KEYNO ");
-
 		qc.setObject("in_INSKEYNO", inputVO.getINS_KEYNO());
-
 		qc.setQueryString(sb.toString());
 		outputVO.setINS_RIDER_DTLList(dam_obj.exeQuery(qc));
+		
+		//保險資金證明文件
+		dam_obj = this.getDataAccessManager();
+		qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		qc.setQueryString("SELECT * FROM TBIOT_MAIN_PDF WHERE INS_KEYNO = :inskeyno ");
+		qc.setObject("inskeyno", inputVO.getINS_KEYNO());
+		outputVO.setFileList(dam_obj.exeQuery(qc));
+		
 		sendRtnObject(outputVO);
 	}
 
@@ -333,7 +351,7 @@ public class IOT120 extends FubonWmsBizLogic {
 				if (payServData.get("ReturnCode") != null
 						&& payServData.get("ReturnCode").toString().equals("100")
 						&& StringUtils.isNotBlank(payServData.get("Result").toString())) {
-					payServResult = (Map<String, Object>) webServiceData.get("Result");
+					payServResult = (Map<String, Object>) payServData.get("Result");
 				}
 				//ReturnCode=100:成功，不須檢富繳款服務單  200:無繳款服務單資訊  300:尚未審核通過
 				payServResult.put("ReturnCode", payServData.get("ReturnCode").toString());
@@ -458,7 +476,7 @@ public class IOT120 extends FubonWmsBizLogic {
 		sb.append("     ,CASE WHEN D.C_PREMIUM_TRANSSEQ IS NOT NULL THEN D.C_PREMIUM_TRANSSEQ ELSE C.PREMIUM_TRANSSEQ END AS PREMIUM_TRANSSEQ ");
 		sb.append("     ,CASE WHEN D.I_PREMIUM_TRANSSEQ IS NOT NULL THEN D.I_PREMIUM_TRANSSEQ ELSE C.I_PREMIUM_TRANSSEQ END AS I_PREMIUM_TRANSSEQ ");
 		sb.append("     ,CASE WHEN D.P_PREMIUM_TRANSSEQ IS NOT NULL THEN D.P_PREMIUM_TRANSSEQ ELSE C.P_PREMIUM_TRANSSEQ END AS P_PREMIUM_TRANSSEQ ");
-		sb.append("     ,BUSINESS_REL ");
+		sb.append("     ,A.BUSINESS_REL, A.MAPPVIDEO_YN, A.DIGITAL_AGREESIGN_YN ");
 		sb.append(" From TBIOT_PREMATCH A ");
 		sb.append(" LEFT JOIN TBPRD_INS_MAIN P on P.INSPRD_KEYNO = A.INSPRD_KEYNO ");
 		sb.append(" LEFT JOIN TBJSB_INS_PROD_COMPANY B ON B.SERIALNUM = A.COMPANY_NUM ");
@@ -712,17 +730,18 @@ public class IOT120 extends FubonWmsBizLogic {
 		iot920_inputVO.setREG_TYPE(inputVO.getREG_TYPE());
 		if ("new".equals(inputVO.getOPR_STATUS())) {
 			try {
-				List<Map<String, Object>> INS_KEYNOList = new ArrayList<Map<String, Object>>();
 				dam_obj = this.getDataAccessManager();
 				QueryConditionIF qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 				StringBuilder sb = new StringBuilder();
-
-				sb.append(" select TBIOT_MAIN_SEQ.NEXTVAL from dual ");
-				qc.setQueryString(sb.toString());
-
-				INS_KEYNOList = dam_obj.exeQuery(qc);
-
-				String INS_KEYNO = INS_KEYNOList.get(0).get("NEXTVAL").toString();
+				
+				//取得INS_KEYNO
+				String INS_KEYNO;
+				if(StringUtils.isBlank(inputVO.getINS_KEYNO())) {
+					//若有上傳檔案需先產生INS_KEYNO寫入TBIOT_MAIN_PDF，這裡就不需再次產生
+					INS_KEYNO = getINS_KEYNO();
+				} else {
+					INS_KEYNO = inputVO.getINS_KEYNO();
+				}
 				BigDecimal keyno_change = new BigDecimal(INS_KEYNO);
 
 				// 文件檢核
@@ -849,6 +868,20 @@ public class IOT120 extends FubonWmsBizLogic {
 //						}
 					}
 				}
+				//保費資金上傳檔案檢核
+				if(StringUtils.equals("Y", inputVO.getFUND_VERIFY_PDF_YN())) {
+					//若"以PDF檔方式上傳"有勾選，但沒有上傳檔案，狀態為"10 理專進件"
+					if(!StringUtils.equals("Y", inputVO.getFundFileUploadYN())) {
+						inputVO.setSTATUS("10");	//理專進件
+						outputVO.setErrorMsg("資金證明上傳與資金檢附確認不一致，請確認！");
+					}
+				} else {
+					//若"以PDF檔方式上傳"無勾選，但有上傳檔案，狀態為"10 理專進件"
+					if(StringUtils.equals("Y", inputVO.getFundFileUploadYN())) {
+						inputVO.setSTATUS("10");	//理專進件
+						outputVO.setErrorMsg("資金證明上傳與資金檢附確認不一致，請確認！");
+					}
+				}
 
 				dam_obj = this.getDataAccessManager();
 				TBIOT_MAINVO tmvo = new TBIOT_MAINVO();
@@ -945,6 +978,8 @@ public class IOT120 extends FubonWmsBizLogic {
 					if(!StringUtils.equals("Y", inputVO.getCANCEL_CONTRACT_YN()) && !validCallReportPrematch(inputVO.getCASE_ID(), inputVO.getPREMATCH_SEQ())) {
 						throw new APException("該案件已申請電訪購買檢核編碼輸入錯誤，請與理專確認");
 					}
+					//更新保費資金上傳檔的CASE_ID
+					updateCASE_ID4File(keyno_change, inputVO.getCASE_ID());
 				}
 
 				//適合度檢核編號
@@ -967,7 +1002,10 @@ public class IOT120 extends FubonWmsBizLogic {
 				tmvo.setPAY_SERV_RETURN_CODE(inputVO.getPAY_SERV_RETURN_CODE());
 				tmvo.setPAY_SERV_REMIT_NATNO(inputVO.getPAY_SERV_REMIT_NATNO());
 				tmvo.setREMIT_COUNTRY_FLAG(inputVO.getREMIT_COUNTRY_FLAG());
-
+				tmvo.setFUND_VERIFY_PDF_YN(inputVO.getFUND_VERIFY_PDF_YN());
+				tmvo.setFUND_VERIFY_PAPER_YN(inputVO.getFUND_VERIFY_PAPER_YN());
+				tmvo.setNO_PAPER_YN(inputVO.getNO_PAPER_YN());
+				
 				dam_obj.create(tmvo);
 
 				// 避免要保人生日存入時分秒
@@ -987,18 +1025,15 @@ public class IOT120 extends FubonWmsBizLogic {
 					for (Map<String, Object> INS_RIDER_DTL : inputVO.getINS_RIDER_DTLList()) {
 						List<Map<String, Object>> RIDER_DTL_KEYNOList = new ArrayList<Map<String, Object>>();
 						dam_obj = this.getDataAccessManager();
-						qc =
-							dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+						qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 						sb = new StringBuilder();
 
 						sb.append(" select TBIOT_MAIN_SEQ.NEXTVAL from dual ");
 						qc.setQueryString(sb.toString());
 
 						RIDER_DTL_KEYNOList = dam_obj.exeQuery(qc);
-						String RIDER_DTL_KEYNO =
-								RIDER_DTL_KEYNOList.get(0).get("NEXTVAL").toString();
-						BigDecimal rider_dtl_keyno_change =
-								new BigDecimal(RIDER_DTL_KEYNO);
+						String RIDER_DTL_KEYNO = RIDER_DTL_KEYNOList.get(0).get("NEXTVAL").toString();
+						BigDecimal rider_dtl_keyno_change = new BigDecimal(RIDER_DTL_KEYNO);
 
 						dam_obj = this.getDataAccessManager();
 						trd = new TBIOT_RIDER_DTLVO();
@@ -1008,8 +1043,7 @@ public class IOT120 extends FubonWmsBizLogic {
 
 						if (INS_RIDER_DTL.get("INSPRD_KEYNO") != null
 								&& StringUtils.isNotBlank(String.valueOf(INS_RIDER_DTL.get("INSPRD_KEYNO")))) {
-							BigDecimal INSPRD_KEYNO =
-									new BigDecimal(INS_RIDER_DTL.get("INSPRD_KEYNO").toString());
+							BigDecimal INSPRD_KEYNO = new BigDecimal(INS_RIDER_DTL.get("INSPRD_KEYNO").toString());
 							trd.setINSPRD_KEYNO(INSPRD_KEYNO);
 						} else {
 							throw new APException("ehl_02_common_002");
@@ -1031,8 +1065,7 @@ public class IOT120 extends FubonWmsBizLogic {
 
 						if (INS_RIDER_DTL.get("PREMIUM") != null
 								&& StringUtils.isNotBlank(String.valueOf(INS_RIDER_DTL.get("PREMIUM")))) {
-							BigDecimal PREMIUM =
-									new BigDecimal(INS_RIDER_DTL.get("PREMIUM").toString().replaceAll(",", ""));
+							BigDecimal PREMIUM = new BigDecimal(INS_RIDER_DTL.get("PREMIUM").toString().replaceAll(",", ""));
 							trd.setPREMIUM(PREMIUM);
 						} else {
 							throw new APException("ehl_02_common_002");
@@ -1063,8 +1096,7 @@ public class IOT120 extends FubonWmsBizLogic {
 
 			}
 		} else if ("UPDATE".equals(inputVO.getOPR_STATUS())) {
-			QueryConditionIF qc = dam_obj
-					.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			QueryConditionIF qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			StringBuilder sb = new StringBuilder();
 			BigDecimal ins_keyno_change = new BigDecimal(inputVO.getINS_KEYNO());
 
@@ -1075,8 +1107,7 @@ public class IOT120 extends FubonWmsBizLogic {
 			// 險種代碼更改時，留存文件清除
 			if (inputVO.isEditINSPRD_ID()) {
 				dam_obj = getDataAccessManager();
-				qc = dam_obj
-						.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+				qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 				sb = new StringBuilder();
 				sb.append(" DELETE TBIOT_DOC_CHK where INS_KEYNO = :ins_keyno ");
 				qc.setObject("ins_keyno", ins_keyno_change);
@@ -1149,8 +1180,7 @@ public class IOT120 extends FubonWmsBizLogic {
 			int check_QC = 0;
 			if ("Y".equals(inputVO.getQC_ERASER())
 					|| ("N".equals(inputVO.getQC_STAMP())
-							&& inputVO.getPROPOSER_TRANSSEQ() == null && inputVO
-							.getINSURED_TRANSSEQ() == null)) {
+							&& inputVO.getPROPOSER_TRANSSEQ() == null && inputVO.getINSURED_TRANSSEQ() == null)) {
 				inputVO.setSTATUS("10");
 				check_QC++;
 			}
@@ -1224,6 +1254,23 @@ public class IOT120 extends FubonWmsBizLogic {
 				//非契撤件，若案件編號已存在電訪作業檔，輸入的購買檢核編號與電訪作業購買檢核編號不符，則顯示錯誤訊息
 				if(!StringUtils.equals("Y", inputVO.getCANCEL_CONTRACT_YN()) && !validCallReportPrematch(inputVO.getCASE_ID(), inputVO.getPREMATCH_SEQ())) {
 					throw new APException("該案件已申請電訪購買檢核編碼輸入錯誤，請與理專確認");
+				}
+				//更新保費資金上傳檔的CASE_ID
+				updateCASE_ID4File(ins_keyno_change, inputVO.getCASE_ID());
+			}
+			
+			//保費資金上傳檔案檢核
+			if(StringUtils.equals("Y", inputVO.getFUND_VERIFY_PDF_YN())) {
+				//若"以PDF檔方式上傳"有勾選，但沒有上傳檔案，狀態為"10 理專進件"
+				if(!StringUtils.equals("Y", inputVO.getFundFileUploadYN())) {
+					inputVO.setSTATUS("10");	//理專進件
+					outputVO.setErrorMsg("資金證明上傳與資金檢附確認不一致，請確認！");
+				}
+			} else {
+				//若"以PDF檔方式上傳"無勾選，但有上傳檔案，狀態為"10 理專進件"
+				if(StringUtils.equals("Y", inputVO.getFundFileUploadYN())) {
+					inputVO.setSTATUS("10");	//理專進件
+					outputVO.setErrorMsg("資金證明上傳與資金檢附確認不一致，請確認！");
 				}
 			}
 			
@@ -1336,6 +1383,9 @@ public class IOT120 extends FubonWmsBizLogic {
 			tmvo.setPAY_SERV_RETURN_CODE(inputVO.getPAY_SERV_RETURN_CODE());
 			tmvo.setPAY_SERV_REMIT_NATNO(inputVO.getPAY_SERV_REMIT_NATNO());
 			tmvo.setREMIT_COUNTRY_FLAG(inputVO.getREMIT_COUNTRY_FLAG());
+			tmvo.setFUND_VERIFY_PDF_YN(inputVO.getFUND_VERIFY_PDF_YN());
+			tmvo.setFUND_VERIFY_PAPER_YN(inputVO.getFUND_VERIFY_PAPER_YN());
+			tmvo.setNO_PAPER_YN(inputVO.getNO_PAPER_YN());
 
 			dam_obj.update(tmvo);
 
@@ -1651,8 +1701,7 @@ public class IOT120 extends FubonWmsBizLogic {
 		try {
 			List<Map<String, Object>> case_idList = new ArrayList<Map<String, Object>>();
 			dam_obj = this.getDataAccessManager();
-			QueryConditionIF qc =
-					dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			QueryConditionIF qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 			StringBuilder sb = new StringBuilder();
 			sb.append(" select count(*) as count from TBIOT_MAIN where CASE_ID = :case_id and status <> '99' ");
 			qc.setObject("case_id", CASE_ID);
@@ -1660,8 +1709,7 @@ public class IOT120 extends FubonWmsBizLogic {
 
 			case_idList = dam_obj.exeQuery(qc);
 
-			BigDecimal count_change =
-					new BigDecimal(case_idList.get(0).get("COUNT").toString());
+			BigDecimal count_change = new BigDecimal(case_idList.get(0).get("COUNT").toString());
 			int count = count_change.intValue();
 			if (count > 0) {
 				throw new APException("案件編號重複");
@@ -1817,25 +1865,33 @@ public class IOT120 extends FubonWmsBizLogic {
 		// 接收回傳資料
 		String webSerivceReturn = new String();
 		Map<String, Object> webserviceData = new HashMap<String, Object>();
-
+		
 		logger.info("IOT120 getWebServiceInfo begins:");
 		logger.info("IOT120 getWebServiceInfo begins: URL: " + url);
 		logger.info("IOT120 getWebServiceInfo begins: jsonRequestData: " + jsonRequestData);
 		logger.info("IOT120 getWebServiceInfo begins: header: " + header);
-
-		GenericMap result = HttpClientJsonUtils.sendJsonRequest(url,
-				jsonRequestData, 900000000, header, new DefHeaderCallBack());
-
+		
+		//Send Request
+		GenericMap result = HttpClientJsonUtils.sendJsonRequest(url, jsonRequestData, 900000000, header, new DefHeaderCallBack());
+		//get Response Data
 		webSerivceReturn = (String) result.getParamMap().get("body");
+		
 		if(type == 1) {
-			logger.info("IOT120 getWebServiceInfo returns: result: " + webSerivceReturn.substring(0, 100));
+			logger.info("IOT120 getWebServiceInfo returns: 電子要保書PDF檔案 result: " + webSerivceReturn.substring(0, 100));
 		} else if(type == 2) {
-			logger.info("IOT120 getWebServiceInfo returns: result: " + webSerivceReturn);
+			logger.info("IOT120 getWebServiceInfo returns: 電子要保書內容 result: " + webSerivceReturn);
+		} else if(type == 3) {
+			logger.info("IOT120 getWebServiceInfo returns: 繳款服務單內容 result: " + webSerivceReturn);
 		}
-
+		
 		webserviceData = JsonUtil.genDefaultGson().fromJson(webSerivceReturn,HashMap.class);
-
+		
 		logger.info("IOT120 getWebServiceInfo ends:");
+		
+		//將WebService寫入Log資料表
+		IOT920 iot920 = (IOT920) PlatformContext.getBean("iot920");
+		String txnId = this.getClass().getSimpleName() + "." + new Object() {}.getClass().getEnclosingMethod().getName();
+		iot920.writeWebServiceLog(txnId, url, header.toString(), jsonRequestData, (type == 1 ? webSerivceReturn.substring(0, 100) : webSerivceReturn));
 
 		return webserviceData;
 	}
@@ -2260,5 +2316,128 @@ public class IOT120 extends FubonWmsBizLogic {
 
 		return list;
 	}
+	
+	//上傳保險資金證明文件
+	public void uploadFile(Object body, IPrimitiveMap header) throws Exception {
+		IOT120InputVO inputVO = (IOT120InputVO) body;
+		IOT120OutputVO outputVO = new IOT120OutputVO();
+		dam_obj = this.getDataAccessManager();
+						
+		if (StringUtils.isNotBlank(inputVO.getFileName())) {
+			//取得INS_KEYNO
+			String INS_KEYNO;
+			if(StringUtils.isBlank(inputVO.getINS_KEYNO())) {
+				INS_KEYNO = getINS_KEYNO();
+			} else {
+				INS_KEYNO = inputVO.getINS_KEYNO();
+			}
+			BigDecimal insKeyno = new BigDecimal(INS_KEYNO);
+			
+			byte[] data = Files.readAllBytes(Paths.get(new File((String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH), inputVO.getFileName()).toString()));
+			TBIOT_MAIN_PDFVO tmpdfvo = (TBIOT_MAIN_PDFVO) dam_obj.findByPKey(TBIOT_MAIN_PDFVO.TABLE_UID, insKeyno);
+			if(tmpdfvo == null) { //新增
+				tmpdfvo = new TBIOT_MAIN_PDFVO();
+				tmpdfvo.setINS_KEYNO(insKeyno);
+				tmpdfvo.setCASE_ID(inputVO.getCASE_ID());
+				tmpdfvo.setFILE_NAME(inputVO.getFileRealName());
+				tmpdfvo.setPDF_FILE(ObjectUtil.byteArrToBlob(data));
+				dam_obj.create(tmpdfvo);
+			} else { //修改
+				tmpdfvo.setCASE_ID(inputVO.getCASE_ID());
+				tmpdfvo.setFILE_NAME(inputVO.getFileRealName());
+				tmpdfvo.setPDF_FILE(ObjectUtil.byteArrToBlob(data));
+				dam_obj.update(tmpdfvo);
+			}
+			
+			//
+			dam_obj = this.getDataAccessManager();
+			QueryConditionIF qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+			qc.setQueryString("SELECT * FROM TBIOT_MAIN_PDF WHERE INS_KEYNO = :inskeyno ");
+			qc.setObject("inskeyno", insKeyno);
+			
+			outputVO.setFileList(dam_obj.exeQuery(qc));
+			outputVO.setINSKEY_NO(INS_KEYNO);
+			
+			this.sendRtnObject(outputVO);
+		}
+	}
+	
+	//刪除保險資金證明文件
+	public void deleteFile(Object body, IPrimitiveMap header) throws JBranchException {
+		IOT120InputVO inputVO = (IOT120InputVO) body;
+		IOT120OutputVO outputVO = new IOT120OutputVO();
+		dam_obj = this.getDataAccessManager();
+		TBIOT_MAIN_PDFVO tmpdfvo = (TBIOT_MAIN_PDFVO) dam_obj.findByPKey(TBIOT_MAIN_PDFVO.TABLE_UID, new BigDecimal(inputVO.getINS_KEYNO()));
+		if(tmpdfvo != null) {
+			dam_obj.delete(tmpdfvo);
+		}
+		
+		outputVO.setFileList(new ArrayList());
+		this.sendRtnObject(outputVO);
+	}
+	
+	//檢視保險資金證明文件
+	public void viewFile(Object body, IPrimitiveMap header) throws Exception {
+		IOT120InputVO inputVO = (IOT120InputVO) body;
+		IOT120OutputVO outputVO = new IOT120OutputVO();
+		dam_obj = this.getDataAccessManager();
+		QueryConditionIF qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		String filePath = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
+		String uuid = UUID.randomUUID().toString();
+		
+		qc.setObject("insKeyno", inputVO.getINS_KEYNO());
+		qc.setQueryString(" SELECT * FROM TBIOT_MAIN_PDF WHERE INS_KEYNO = :insKeyno ");
+		List<Map<String, Object>> list = dam_obj.exeQuery(qc);
+		
+		String fileName = (String) list.get(0).get("FILE_NAME");
+		Blob blob = (Blob) list.get(0).get("PDF_FILE");
+		int blobLength = (int) blob.length();
+		byte[] blobAsBytes = blob.getBytes(1, blobLength);
 
+		File targetFile = new File(filePath, uuid);
+		FileOutputStream fos = new FileOutputStream(targetFile);
+		fos.write(blobAsBytes);
+		fos.close();
+		notifyClientToDownloadFile("temp//" + uuid, fileName);
+	}
+	
+	//更新保險資金證明文件檔中的CASE_ID欄位
+	private void updateCASE_ID4File(BigDecimal insKeyno, String caseId) throws NotFoundException, DAOException {
+		dam_obj = this.getDataAccessManager();
+		TBIOT_MAIN_PDFVO tmpdfvo = (TBIOT_MAIN_PDFVO) dam_obj.findByPKey(TBIOT_MAIN_PDFVO.TABLE_UID, insKeyno);
+		if(tmpdfvo != null) {
+			tmpdfvo.setCASE_ID(caseId);
+			dam_obj.update(tmpdfvo);
+		}
+	}
+		
+	//取得TBIOT_MAIN.INS_KEYNO
+	private String getINS_KEYNO() throws DAOException, JBranchException {
+		List<Map<String, Object>> INS_KEYNOList = new ArrayList<Map<String, Object>>();
+		dam_obj = this.getDataAccessManager();
+		QueryConditionIF qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(" select TBIOT_MAIN_SEQ.NEXTVAL from dual ");
+		qc.setQueryString(sb.toString());
+
+		INS_KEYNOList = dam_obj.exeQuery(qc);
+
+		return INS_KEYNOList.get(0).get("NEXTVAL").toString();
+	}
+		
+	//若有(1)移除保費資金證明檔案(2)修改檢附文件資料，則沒有儲存就回上一頁，需做檢核，看狀態是否該為"理專進件"
+	public void updateStatus10(Object body, IPrimitiveMap header) throws Exception {
+		IOT120InputVO inputVO = (IOT120InputVO) body;
+		IOT120OutputVO outputVO = new IOT120OutputVO();
+		
+		dam_obj = this.getDataAccessManager();
+		TBIOT_MAINVO tmvo = new TBIOT_MAINVO();
+		tmvo = (TBIOT_MAINVO) dam_obj.findByPKey(TBIOT_MAINVO.TABLE_UID, new BigDecimal(inputVO.getINS_KEYNO()));
+		if(tmvo != null) {
+			tmvo.setSTATUS(new BigDecimal("10")); //理專進件
+			dam_obj.update(tmvo);
+		}
+		this.sendRtnObject(outputVO);
+	}
 }

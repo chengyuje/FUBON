@@ -147,15 +147,14 @@ public class PMS364 extends FubonWmsBizLogic {
 		sb.append(returnAppend(genType, "SELECT"));
 		sb.append("       SUM(SUM_PROF_INVESTOR_Y) AS SUM_PROF_INVESTOR_Y, ");
 		sb.append("       SUM(SUM_PROF_INVESTOR_N) AS SUM_PROF_INVESTOR_N, ");
-		sb.append("       SUM(SUM_PROF_INVESTOR_A_Y) AS SUM_PROF_INVESTOR_A_Y, ");
-		sb.append("       SUM(SUM_PROF_INVESTOR_A_N) AS SUM_PROF_INVESTOR_A_N, ");
-		sb.append("       SUM(SUM_PROF_INVESTOR_C_Y) AS SUM_PROF_INVESTOR_C_Y, ");
-		sb.append("       SUM(SUM_PROF_INVESTOR_C_N) AS SUM_PROF_INVESTOR_C_N, ");
 		sb.append("       SUM(SUM_TX_FLAG_Y) AS SUM_TX_FLAG_Y, ");
 		sb.append("       SUM(SUM_IS_EFFETIVE_Y) AS SUM_IS_EFFETIVE_Y, ");
 		sb.append("       SUM(SUM_COMPLAIN_Y) AS SUM_COMPLAIN_Y, ");
 		sb.append("       SUM(SUM_COMM_RS_Y) AS SUM_COMM_RS_Y, ");
-		sb.append("       SUM(SUM_COMM_NS_Y) AS SUM_COMM_NS_Y ");
+		sb.append("       SUM(SUM_COMM_NS_Y) AS SUM_COMM_NS_Y, ");
+		sb.append("       SUM(SUM_HNWC_1) AS SUM_HNWC_1, ");
+		sb.append("       SUM(SUM_HNWC_2) AS SUM_HNWC_2, ");
+		sb.append("       SUM(SUM_HNWC_3) AS SUM_HNWC_3 ");
 		sb.append("FROM TBPMS_MONTHLY_CUST_NOTE MCN ");
 		sb.append("LEFT JOIN (SELECT DISTINCT EMP_ID, EMP_DEPT_ID AS DEPT_ID FROM VWORG_EMP_INFO) EMP ON MCN.AO_EMP_ID = EMP.EMP_ID ");
 		sb.append("WHERE 1 = 1 ");
@@ -430,7 +429,12 @@ public class PMS364 extends FubonWmsBizLogic {
 		sb.append("       IS_EFFETIVE, "); 
 		sb.append("       COMPLAIN_YN, "); 
 		sb.append("       COMM_RS_YN, "); 
-		sb.append("       COMM_NS_YN "); 
+		sb.append("       COMM_NS_YN, "); 
+		sb.append("       HNWC_FLAG, ");
+		sb.append("       CASE WHEN HNWC_FLAG = '1' THEN '有效' "); 
+		sb.append("            WHEN HNWC_FLAG = '2' THEN '暫停服務' "); 
+		sb.append("            WHEN HNWC_FLAG = '3' THEN '無效' "); 
+		sb.append("       ELSE '' END AS HNWC_NAME "); 
 		sb.append("FROM TBPMS_CUST_NOTE_REC_N "); 
 		sb.append("WHERE 1 = 1 "); 
 		sb.append("AND YYYYMM = :yyyymm "); 
@@ -444,6 +448,15 @@ public class PMS364 extends FubonWmsBizLogic {
 			case "PROF_INVESTOR_N":
 				sb.append("AND PROF_INVESTOR_YN = 'N' "); 
 				break;
+			case "HNWC_1":
+				sb.append("AND HNWC_FLAG = '1' "); 
+				break;
+			case "HNWC_2":
+				sb.append("AND HNWC_FLAG = '2' "); 
+				break;
+			case "HNWC_3":
+				sb.append("AND HNWC_FLAG = '3' "); 
+				break;
 			default:
 				sb.append("AND ").append(inputVO.getType()).append(" = 'Y' "); 
 				
@@ -455,7 +468,7 @@ public class PMS364 extends FubonWmsBizLogic {
 		queryCondition.setObject("custAO", inputVO.getCustAO());
 
 		queryCondition.setQueryString(sb.toString().toString().replaceAll("\\s+", " "));
-		
+
 		outputVO.setDtlList(dam.exeQuery(queryCondition));
 		
 		this.sendRtnObject(outputVO);
@@ -490,6 +503,8 @@ public class PMS364 extends FubonWmsBizLogic {
 				break;
 			case "COMM_NS_YN":
 				typeName = "禁銷戶";
+			case "HNWC_NAME":
+				typeName = "高資產客戶"; 
 				break;
 		}
 		
@@ -515,8 +530,28 @@ public class PMS364 extends FubonWmsBizLogic {
 		headingStyle.setBorderRight((short) 1);
 		headingStyle.setWrapText(true);
 		
-		String[] headerLine = {"分行別", "理專", "客戶ID", "客戶姓名", "專業投資人效期", "信託同意", "衍商同意", "客訴戶", "拒銷戶", "禁銷戶"};
-		String[] mainLine   = {"BRANCH_NBR", "CUST_AO", "CUST_ID", "CUST_NAME", "PROF_INVESTOR_DATE", "TX_FLAG", "IS_EFFETIVE", "COMPLAIN_YN", "COMM_RS_YN", "COMM_NS_YN"};
+		String[] headerLine = {	"分行別", 
+								"理專", 
+								"客戶ID", 
+								"客戶姓名",
+								"專業投資人效期",
+								"信託同意",
+								"衍商同意",
+								"客訴戶",
+								"拒銷戶", 
+								"禁銷戶", 
+								"高資產客戶"};
+		String[] mainLine   = {	"BRANCH_NBR", 
+								"CUST_AO", 
+								"CUST_ID",
+								"CUST_NAME",
+								"PROF_INVESTOR_DATE", 
+								"TX_FLAG",
+								"IS_EFFETIVE",
+								"COMPLAIN_YN", 
+								"COMM_RS_YN",
+								"COMM_NS_YN",
+								"HNWC_NAME"};
 
 		Integer index = 0;
 		
@@ -568,7 +603,6 @@ public class PMS364 extends FubonWmsBizLogic {
 	}
 	
 	// 匯出統計
-	// 20240711_#2072_俊達_特定註記客戶統計表調整  by Sam Tu
 	public void export (Object body, IPrimitiveMap header) throws JBranchException, ParseException, FileNotFoundException, IOException {
 		
 		PMS364InputVO inputVO = (PMS364InputVO) body;
@@ -597,9 +631,48 @@ public class PMS364 extends FubonWmsBizLogic {
 		headingStyle.setBorderRight((short) 1);
 		headingStyle.setWrapText(true);
 		
-		String[] headerLine = {"業務處", "區別", "分行", "AO Code", "專業投資人(有效)", "", "專業投資人(無效)", "", "信託同意", "衍商同意", "客訴戶", "拒銷戶", "禁銷戶"};
-		String[] headerLine2 = {"", "", "", "", "A板塊", "C板塊", "A板塊", "C板塊", "", "", "", "", ""};
-		String[] mainLine   = {"REGION_CENTER_NAME", "BRANCH_AREA_NAME", "BRANCH_NAME", "CUST_AO", "SUM_PROF_INVESTOR_A_Y", "SUM_PROF_INVESTOR_C_Y", "SUM_PROF_INVESTOR_A_N", "SUM_PROF_INVESTOR_C_N", "SUM_TX_FLAG_Y", "SUM_IS_EFFETIVE_Y", "SUM_COMPLAIN_Y", "SUM_COMM_RS_Y", "SUM_COMM_NS_Y"};
+		String[] headerLine = {	"業務處", 
+								"區別", 
+								"分行", 
+								"AO Code", 
+								"專業投資人(有效)", 
+								"專業投資人(無效)",  
+								"信託同意", 
+								"衍商同意", 
+								"客訴戶", 
+								"拒銷戶", 
+								"禁銷戶", 
+								"高資產客戶", 
+								"高資產客戶", 
+								"高資產客戶"};
+		String[] headerLine2 = {"", 
+								"", 
+								"", 
+								"", 
+								"",
+								"",
+								"", 
+								"", 
+								"", 
+								"", 
+								"", 
+								"有效", 
+								"暫停服務", 
+								"無效"};
+		String[] mainLine   = {	"REGION_CENTER_NAME", 
+								"BRANCH_AREA_NAME", 
+								"BRANCH_NAME", 
+								"CUST_AO", 
+								"SUM_PROF_INVESTOR_Y",  
+								"SUM_PROF_INVESTOR_N", 
+								"SUM_TX_FLAG_Y", 
+								"SUM_IS_EFFETIVE_Y", 
+								"SUM_COMPLAIN_Y", 
+								"SUM_COMM_RS_Y", 
+								"SUM_COMM_NS_Y", 
+								"SUM_HNWC_1", 
+								"SUM_HNWC_2", 
+								"SUM_HNWC_3"};
 
 		Integer index = 0;
 		
@@ -618,21 +691,19 @@ public class PMS364 extends FubonWmsBizLogic {
 			cell.setCellValue(headerLine2[i]);
 		}
 		index++;
-		
+
 		//標頭合併欄位
 		sheet.addMergedRegion(new CellRangeAddress(0,1,0,0));
 		sheet.addMergedRegion(new CellRangeAddress(0,1,1,1));
 		sheet.addMergedRegion(new CellRangeAddress(0,1,2,2));
 		sheet.addMergedRegion(new CellRangeAddress(0,1,3,3));
-		sheet.addMergedRegion(new CellRangeAddress(0,0,4,5));
-		sheet.addMergedRegion(new CellRangeAddress(0,0,6,7));
+		sheet.addMergedRegion(new CellRangeAddress(0,1,4,4));
+		sheet.addMergedRegion(new CellRangeAddress(0,1,5,5));
+		sheet.addMergedRegion(new CellRangeAddress(0,1,6,6));
+		sheet.addMergedRegion(new CellRangeAddress(0,1,7,7));
 		sheet.addMergedRegion(new CellRangeAddress(0,1,8,8));
 		sheet.addMergedRegion(new CellRangeAddress(0,1,9,9));
 		sheet.addMergedRegion(new CellRangeAddress(0,1,10,10));
-		sheet.addMergedRegion(new CellRangeAddress(0,1,11,11));
-		sheet.addMergedRegion(new CellRangeAddress(0,1,12,12));
-		
-
 		
 		// 資料 CELL型式
 		XSSFCellStyle mainStyle = workbook.createCellStyle();

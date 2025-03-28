@@ -162,6 +162,74 @@ eSoafApp.controller('PRD130Controller',
 		};
 
 		$scope.save = function(row) {
+			if($scope.inputVO.cust_id) {
+				$scope.sendRecv("SOT701", "getCustKycData", "com.systex.jbranch.app.server.fps.sot701.SOT701InputVO", {custID : $scope.inputVO.cust_id},
+						function(totas, isError) {
+					if (!isError) {
+						$scope.kycData = totas[0].body.custKYCDataVO;
+						debugger;
+						if(!$scope.kycData.isKycDueDateUseful && $scope.kycData.kycDueDateLessOneMonth) {
+							var kycDueDate = $scope.toJsDate($scope.kycData.kycDueDate);
+							var showYear = kycDueDate.getFullYear();  //西元年份 
+							var showMonth = kycDueDate.getMonth()+1;  //一年中的第幾月 
+							var showDate = kycDueDate.getDate();      //一月份中的第幾天
+							
+							$scope.showMsg('ehl_01_SOT_018',[showYear,showMonth,showDate]);
+						}
+					}
+				});
+			}
+			debugger
+			//適配資訊
+			var fitVO = {
+				caseCode  : 2, 					     //case2 適配
+				custId    : $scope.inputVO.cust_id,  //客戶ID
+				prdId     : row.PRD_ID,              //商品代碼
+				riskLevel : row.RISKCATE_ID,	     //商品P值
+				prdType	  : "3",                     //商品類別 : 3:海外債 
+				prdName	  : row.BOND_CNAME,			 //商品名稱
+				hnwcBuy	  : row.HNWC_BUY,			 //限高資產申購註記
+				isPrintSOT819   	: $scope.isPrintSOT819  //印貸款風險預告書
+			}
+			
+			$scope.inputVO.hmshacrDataVO = null;
+			if(row.HNWC_BUY == "Y") { //限高資產申購註記
+				//先檢核集中度
+				$scope.sendRecv("SOT712", "getCentRateData", "com.systex.jbranch.app.server.fps.sot712.PRDFitInputVO", fitVO,
+					function(totas, isError) {
+						if (!isError) {
+							debugger
+							if(totas[0].body.hmshacrDataVO) {
+								$scope.inputVO.hmshacrDataVO = totas[0].body.hmshacrDataVO;
+								
+								if(totas[0].body.hmshacrDataVO.VALIDATE_YN == "W") {
+									var dialog = ngDialog.open({
+										template: 'assets/txn/CONFIRM/CONFIRM.html',
+										className: 'CONFIRM',
+										showClose: false,
+										scope : $scope,
+										controller: ['$scope', function($scope) {
+											$scope.dialogLabel = "客戶高風險商品集中度已超過通知門檻比例，請取得客戶同意\n\n是否繼續";
+							            }]
+									}).closePromise.then(function (data) {
+										if (data.value === 'successful') {
+											$scope.doSave(row);
+										}
+									});
+								} else { //totas[0].body.hmshacrDataVO.VALIDATE_YN == "Y"
+									$scope.doSave(row);
+								}
+							} else {
+								$scope.doSave(row);
+							}
+						}
+				});
+			} else { //商品沒有限高資產申購註記
+				$scope.doSave(row);
+			}
+		}
+		
+		$scope.doSave = function(row) {
 			$scope.isPrintSOT819 = 'Y';
 			if($scope.cust_id && $scope.cust_id.length >= 8 && $scope.cust_id.length < 10) {
 				$scope.isPrintSOT819 = 'N';
@@ -175,7 +243,8 @@ eSoafApp.controller('PRD130Controller',
 				prdType	  : "BND",                   //商品類別 : BND
 				prdName	  : row.BOND_CNAME,			 //商品名稱
 				hnwcBuy	  : row.HNWC_BUY,			 //限高資產申購註記
-				isPrintSOT819   	: $scope.isPrintSOT819  //印貸款風險預告書
+				isPrintSOT819   	: $scope.isPrintSOT819,  //印貸款風險預告書
+				hmshacrDataVO : $scope.inputVO.hmshacrDataVO //集中度資訊
 			}
 
 			if(row.warningMsg != null && row.warningMsg != undefined && row.warningMsg != "") {

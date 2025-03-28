@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,6 +87,7 @@ public class JSB110 extends FubonWmsBizLogic {
 		JSB110OutputVO outputVO = new JSB110OutputVO();
 		List<Map<String, Object>> outputList = new ArrayList<>();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		String today = sdf.format(new Date());
 		File dataFile = null;
 		String loginID = (String) getUserVariable(FubonSystemVariableConsts.LOGINID);
 		
@@ -273,7 +275,7 @@ public class JSB110 extends FubonWmsBizLogic {
 				Map<String, Object> acceptidMap = this.getMastMap(inputVO.getIns_com_id(), "A");
 				Map<String, Object> policyNbrMap = this.getMastMap(inputVO.getIns_com_id(), "P");
 				this.loadMastData(inputVO.getIns_com_id()); //載入保險公司data
-				
+				Calendar cal = Calendar.getInstance();
 				for (int i = 1; i < resultList.size(); i++) {
 					String policy_nbr = resultList.get(i).get(policy_nbr_s);		// 保單號碼
 					String acceptid = resultList.get(i).get(acceptid_s);			// 受理編號
@@ -382,6 +384,29 @@ public class JSB110 extends FubonWmsBizLogic {
 						continue;
 					}
 					
+					/**
+					 * WMS-CR-20250319-01_修改非富壽保險公司每月保單檔上傳
+					 * 1. 當 CONTRACT_DATE 與上傳日期比較在5年以前，且 CONTRACT_STATUS = 13、15、26 時，將不匯入系統，且將這些保單移至錯誤保單中。
+					 * 2. 錯誤保單數訊息新增項目：無效保單逾五年
+					 * **/
+					Date contractDate = new Date();
+					if (mastMap != null && mastMap.size() > 0 && mastMap.get("CONTRACT_DATE") != null && mastMap.get("CONTRACT_STATUS") != null) {
+						String contractStatus = mastMap.get("CONTRACT_STATUS").toString();
+						
+						contractDate = (Date) mastMap.get("CONTRACT_DATE");	
+						cal.setTime(contractDate);
+						cal.add(Calendar.YEAR, 5);	// 加5年
+						
+						Date d = cal.getTime();
+						String cd = sdf.format(d);
+						if (cd.compareTo(today) < 0 && (contractStatus.equals("13") || contractStatus.equals("15") || contractStatus.equals("26"))) {
+							// E09：無效保單逾五年
+							this.updateLog(inputVO, "E09", acceptid, policy_nbr, policy_name, soucr_status, mastMap, different);
+							fail_row_count++;
+							continue;
+						}
+					}
+					
 					// W01的判斷要在E01~E08之後
 					if (different) {
 						// W01: 判斷該筆資料保單狀態是否與『TBJSB_INS_INS_MAST』契約狀態欄位不相同
@@ -447,7 +472,7 @@ public class JSB110 extends FubonWmsBizLogic {
 						} else if (colNbr == 12) {
 							// 判斷匯入資料使用S05轉換後是否與S06保單狀態中文(CONTRACT_TEXT)是否相同, 
 							// 若相同則填上S06保單狀態異動日(CONTRACT_DATE), 維持原來的資料日期),不同則填上系統日期(最新日期)
-							Date contractDate = new Date();
+							contractDate = new Date();
 							if (!different) {
 								if (mastMap.get("CONTRACT_DATE") != null) {
 									contractDate = (Date) mastMap.get("CONTRACT_DATE");									

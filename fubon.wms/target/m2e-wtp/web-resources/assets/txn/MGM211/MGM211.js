@@ -254,8 +254,7 @@ eSoafApp.controller('MGM211Controller',
     			$scope.inputVO.deadline == undefined || 
     			$scope.inputVO.exc_deadline == undefined || 
     			($scope.inputVO.mgm_form_name == undefined && $scope.mgm_form_name == undefined) ||
-    			($scope.inputVO.be_mgm_form_name == undefined && $scope.be_mgm_form_name == undefined) ||
-    			$scope.inputVO.giftList.length == 0){
+    			($scope.inputVO.be_mgm_form_name == undefined && $scope.be_mgm_form_name == undefined)){
 			    		$scope.showErrorMsg("ehl_01_common_022");		//欄位檢核錯誤：*為必要輸入欄位,請輸入後重試
 			    		return;
 	    	} else {

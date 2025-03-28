@@ -16,6 +16,8 @@ public class CRM662OutputVO extends PagingOutputVO {
 	private List resultList_prv_sort;
 	private List resultList_prv_rpy;
 	private String prv_delete;
+	private String family_flag;
+	private List familyAumList;
 
 	//
 	private List resultList_prv_rpy_dc;
@@ -106,6 +108,22 @@ public class CRM662OutputVO extends PagingOutputVO {
 
 	public void setPrv_delete(String prv_delete) {
 		this.prv_delete = prv_delete;
+	}
+
+	public String getFamily_flag() {
+		return family_flag;
+	}
+
+	public void setFamily_flag(String family_flag) {
+		this.family_flag = family_flag;
+	}
+
+	public List getFamilyAumList() {
+		return familyAumList;
+	}
+
+	public void setFamilyAumList(List familyAumList) {
+		this.familyAumList = familyAumList;
 	}
 
 }

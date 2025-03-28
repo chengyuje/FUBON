@@ -4,9 +4,11 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 	$controller('BaseController', { $scope: $scope });
 	$scope.controllerName = "PMS432Controller";
 	
+	debugger;
+	
 	// 修改頁籤寬度
 	$("#eJumping select").css({
-		"width":      "85px",
+		"width":      "95px",
 		"text-align": "center",
 		"height":     "30px",
 		"display":    "inline",
@@ -31,6 +33,8 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 			compareResult: "",		//比對結果
 			custID: "",				//客戶ID
 			empCustID: "",          //理專ID
+			compareType: "",
+			checkedResult: "",
 			list: [],
 			uploadMark: false	    //上傳
 		};
@@ -38,6 +42,7 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 		$scope.outputVO = {};
 		$scope.sourceTypeList = [];
 		$scope.exportList = [];
+		$scope.tmpList = [];
 	};
 	$scope.init();
 
@@ -46,6 +51,9 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 		$scope.outputVO = {};
 		$scope.sourceTypeList = [];
 		$scope.inputVO.list = [];
+		$scope.exportList = [];
+		$scope.tmpList = [];
+		$scope.inputVO.compareType = "";
 	};
 	$scope.inquireInit();
 
@@ -55,24 +63,81 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 		$scope.sendRecv("PMS432", "initCheckInterval", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", $scope.inputVO,
 			function(tota, isError) {
 				if (!isError) {
-					angular.forEach(tota[0].body.resultList, function(data, idx) {
-						$scope.checkIntervalList.push(
-							{
-								LABEL: data.YYYYMM, DATA: data.YYYYMM,
-								orgLabel: data.YYYYMM, label: data.YYYYMM, value: data.YYYYMM
-							}
-						);
-					});
+					$scope.checkIntervalList = tota[0].body.resultList;
 				}
 			});
 	};
 	$scope.initCheckInterval();
+	
+	function getNewList(resultList) {
+		var list = [];
+		angular.forEach(resultList, function(data, idx) {
+			debugger;
+			var disabled = false;
+			var chkResult = "";
+			var insurNo = "";
+			var othRel = "";
+			var rel = "";
+			var selected = false;
+			if (data.CHECKED_RESULT != null) {
+				//已維護過的資料(儲存後)，直接設值
+				chkResult = data.CHECKED_RESULT;
+				insurNo = data.INSURANCE_NO;
+				othRel = data.OTHER_REL;
+				rel = data.RELATION;
+				disabled = true;
+			} else if ($scope.tmpList.length > 0) {
+				//把在其他分頁需要維護的資料(儲存前)
+				//再把值重新塞回去
+				angular.forEach($scope.tmpList, function(tmpData, tmpIdx) {
+					if (data.SEQ === tmpData.SEQ) {
+						chkResult = tmpData.CHECKED_RESULT;
+						insurNo = tmpData.INSURANCE_NO;
+						othRel = tmpData.OTHER_REL;
+						rel = tmpData.RELATION;
+						if (tmpData.SELECTED) {
+							selected = true;
+						}
+					}
+				});
 
+			}
+			data = {
+				...data, CHECKED_RESULT: chkResult,
+				INSURANCE_NO: insurNo, OTHER_REL: othRel,
+				RELATION: rel, SELECTED: selected,
+				chkBoxDisabled: disabled
+			}
+			list.push(data);
+		});
+		return list;
+	};
+	
+	//tmpList obj 不存在 => push，已存在 => 取代
+	function dealTmpList() {
+		angular.forEach($scope.paramList, function(data, idx) {
+			if ($scope.tmpList.length == 0) {
+				$scope.tmpList.push(data);
+			} else {
+				var needPush = true;
+				for(var tmpIdx = 0; tmpIdx < $scope.tmpList.length; tmpIdx++) {
+					var tmpData = $scope.tmpList[tmpIdx];
+					if (data.SEQ === tmpData.SEQ) {
+						//取代
+						$scope.tmpList.splice(tmpIdx, 1, data);
+						needPush = false;
+						break;
+					}
+				}
+				if (needPush) {
+					$scope.tmpList.push(data);
+				}
+			}
+		});
+	};
+	
 	//查詢
-	$scope.query = function(str) {
-		if (str == "save") {
-			$scope.inputVO.list = [];
-		}
+	$scope.query = function() {
 		if ($scope.inputVO.checkInterval == "") {
 			$scope.showMsg("請選擇查核區間!");
 			return;
@@ -99,23 +164,8 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 							$scope.showMsg("ehl_01_common_009");
 							return;
 						}
-						var newList = [];
-						angular.forEach(resultList, function(data, idx) {
-							var disabled = false;
-							if (data.CHECKED_RESULT == "Y" && data.INSURANCE_NO != null) {
-								if (data.RELATION == "9" && data.OTHER_REL != null
-									|| data.RELATION != null) {
-									disabled = true;
-								}
-							}
-							data = {
-								...data, SELECTED: false,
-								chkBoxDisbaled: disabled
-							};
-							newList.push(data);
-						});
-
-						$scope.paramList = newList;
+						$scope.paramList = getNewList(resultList);
+						dealTmpList();
 						$scope.totalData = tota[0].body.totalList;
 						$scope.outputVO = tota[0].body;
 						$scope.exportList = angular.copy(tota[0].body.totalList);
@@ -131,10 +181,10 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 						}
 
 					}
-
 				});
 		}
 	};
+	
 	
 	$scope.conditionReset = function() {
 		if ($scope.inputVO.checkInterval == "" 
@@ -143,29 +193,9 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 			  || $scope.inputVO.compareResult == "") {
 			$scope.inputVO.custID = "";
 			$scope.inputVO.empCustID = "";
+			$scope.inputVO.checkedResult = "";
 		}
 	};
-
-	// 查核結果選無關係 => 重製關係說明 其他關係 證明文件說明 欄位
-	$scope.checkReset = function(row) {
-		if (row.CHECKED_RESULT == 'N') {
-			row.RELATION = "";
-			row.OTHER_REL = "";
-			row.INSURANCE_NO = "";
-		}
-	};
-
-	//重新比對
-//	$scope.reCompare = function(str) {
-//		$scope.sendRecv("PMS432", "reCompare", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", $scope.inputVO,
-//			function(tota, isError) {
-//				if (!isError) {
-//					if(str != "upload"){
-//						$scope.query("reCompare");
-//					}
-//				}
-//			});
-//	};
 
 	$scope.checkRelation = function(row) {
 		if (row.RELATION != "9" && row.OTHER_REL != "") {
@@ -183,44 +213,42 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 	};
 
 	//儲存
-	$scope.save = function() {
+	$scope.save = function(type) {
 		var updateList = [];
-		for (var i = 0; i < $scope.paramList.length; i++) {
-			var data = $scope.paramList[i];
+		$scope.inputVO.compareType = type;
+		for (var i = 0; i < $scope.tmpList.length; i++) {
+			var data = $scope.tmpList[i];
 			if (data.SELECTED) {
-				if (data.CHECKED_RESULT == "Y") {
+				if (data.CHECKED_RESULT == "Y" || data.CHECKED_RESULT == "N") {
 					if (data.RELATION == "" || data.INSURANCE_NO == "") {
 						$scope.showMsg("請選擇關係說明以及填寫保險文件編號");
 						return;
 					} else {
-						if (data.RELATION == "9" && data.OTHER_REL == "") {
+						if (data.RELATION == "9" && (data.OTHER_REL == "" || data.OTHER_REL == null)) {
 							$scope.showMsg("請填寫其他關係欄位!");
 							return;
 						}
 					}
-					data.SELECTED = false;
-					data.MATCH_YN = "Y";
-					updateList.push(data);
-				} else {
-					if (data.CHECKED_RESULT == "N") {
+					if (data.CHECKED_RESULT == "Y") {
+						data.MATCH_YN = "Y";
+					} else {
 						data.MATCH_YN = "N";
-						data.SELECTED = false;
-						updateList.push(data);
-					} else if (data.SELECTED) {
-						$scope.showMsg("勾選的資料列，請選擇查核結果、關係說明以及填寫保險文件編號!");
-						return;
 					}
+					updateList.push(data);
+				} else if (data.SELECTED) {
+					$scope.showMsg("勾選的資料列，請選擇查核結果、關係說明以及填寫保險文件編號!");
+					return;
 				}
 			}
 		}
-		
 		if (updateList.length > 0) {
 			$scope.inputVO.list = updateList;
 			$scope.sendRecv("PMS432", "checkUpdateInsert", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", $scope.inputVO,
 				function(tota, isError) {
 					if (!isError) {
 						$scope.showSuccessMsg('ehl_01_common_025');
-						$scope.query("save");
+						$scope.inquireInit();
+						$scope.query();
 					}
 				});
 		} else {
@@ -228,7 +256,6 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 		}
 
 	};
-
 
 	//匯出
 	$scope.export = function() {
@@ -253,22 +280,20 @@ eSoafApp.controller('PMS432Controller', function($scope, $controller, socketServ
 			className: 'PMS432',
 			showClose: false,
 			controller: ['$scope', function($scope) {
-
+				
 			}]
 		});
 		dialog.closePromise.then(function(data) {
-			if (data.value != "cancel" && data.value.length > 0) {
-				var list = [];
-				angular.forEach(data.value, function(row, idx) {
-					row = {...row, CHECKED_RESULT: "Y"};
-					list.push(row);
-				});
-				$scope.inputVO.list = list;
+			if (data.value != "cancel" && data.value.resultList.length > 0) {
+				const {resultList, compareType} = data.value;
+				$scope.inputVO.compareType = compareType;
+				$scope.inputVO.list = resultList;
 				$scope.sendRecv("PMS432", "checkUpdateInsert", "com.systex.jbranch.app.server.fps.pms432.PMS432InputVO", $scope.inputVO,
 					function(tota, isError) {
 						if (!isError) {
 							$scope.showSuccessMsg("資料上傳成功!");
 							$scope.inputVO.uploadMark = false;
+							$scope.inquireInit();
 						}
 					});
 			} else if (data.value == "cancel") {

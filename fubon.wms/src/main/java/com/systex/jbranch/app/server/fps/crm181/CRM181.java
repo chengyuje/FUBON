@@ -20,6 +20,7 @@ import com.systex.jbranch.platform.common.dataManager.DataManager;
 import com.systex.jbranch.platform.common.dataManager.WorkStation;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
+import com.systex.jbranch.platform.common.errHandle.DAOException;
 import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
@@ -113,7 +114,22 @@ public class CRM181 extends FubonWmsBizLogic {
 		
 		queryCondition.setQueryString(sql.toString());
 		
-		return_VO.setResultList(dam.exeQuery(queryCondition));
+		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+		
+		//#2291 網行銀高齡交易季報 PCK是每月 但顯示每季
+		if(null != list && list.size() > 0) {
+			for(Map map : list) {
+				if("網行銀高齡交易季報".equals(map.get("RPT_NAME"))) {
+					map.put("FRQ_TYPE", "S");
+					break;
+				}
+			}
+		}
+		
+		return_VO.setResultList(list);
+		
+
+		
 		// 報表設定改至改至JAVA 批次 BTCRM181 : #0001930_WMS-CR-20240226-03_為提升系統效能擬優化業管系統相關功能_必辦工作清單
 				
 		// 其他通知，改至ORACLE PABTH_BTCRM181 === start : #0001930_WMS-CR-20240226-03_為提升系統效能擬優化業管系統相關功能_必辦工作清單
@@ -337,5 +353,49 @@ public class CRM181 extends FubonWmsBizLogic {
 		
 		this.sendRtnObject(outputVO);
 	}
+	
+	//取得未具證配息通知資料(境外私募基金)
+	public void getOvsPriDividend(Object body, IPrimitiveMap header) throws JBranchException {
+		CRM181OutputVO outputVO = new CRM181OutputVO();
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("SELECT A.*, B.FUND_CNAME_A AS PRD_NAME, B.FUND_CNAME_S AS PRD_NAME_S, C.CUST_NAME ");
+		sb.append(" FROM TBCRM_FUND_OVS_PRI_DIV_NOTI A ");
+		sb.append(" INNER JOIN TBPRD_FUND B ON B.PRD_ID = A.PRD_ID ");
+		sb.append(" LEFT JOIN TBCRM_CUST_MAST C ON C.CUST_ID = A.CUST_ID ");
+		sb.append(" WHERE TRUNC(A.TXN_DATE) BETWEEN TRUNC(SYSDATE - 30) AND TRUNC(SYSDATE) "); //最近30日內資料
+		sb.append(" AND NVL(A.READ_YN, 'N') = 'N' "); //理專未讀
+		sb.append(" AND A.EMP_ID = :empId "); //登入理專轄下客戶
+		
+		queryCondition.setObject("empId", getUserVariable(FubonSystemVariableConsts.LOGINID));
+		queryCondition.setQueryString(sb.toString());
+		List<Map<String, Object>> list = dam.exeQuery(queryCondition);		
+		outputVO.setOvsPriDivList(list);
+		
+		this.sendRtnObject(outputVO);
+	}
 
+	//將未具證配息通知設為已讀
+	public void setOvsPriDividendRead(Object body, IPrimitiveMap header) throws DAOException, JBranchException {
+		CRM181OutputVO outputVO = new CRM181OutputVO();
+		CRM181InputVO inputVO = (CRM181InputVO) body;
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("UPDATE TBCRM_FUND_OVS_PRI_DIV_NOTI ");
+		sb.append("SET READ_YN = 'Y', LASTUPDATE = SYSDATE, MODIFIER = :loginId ");
+		sb.append("WHERE CERT_NBR = :certNbr AND PRD_ID = :prdId AND TRUNC(TXN_DATE) = TRUNC(:txnDate) ");
+		
+		queryCondition.setObject("certNbr", inputVO.getCERT_NBR());
+		queryCondition.setObject("prdId", inputVO.getPRD_ID());
+		queryCondition.setObject("txnDate", new Timestamp(inputVO.getTXN_DATE().getTime()));
+		queryCondition.setObject("loginId", getUserVariable(FubonSystemVariableConsts.LOGINID));
+		queryCondition.setQueryString(sb.toString());
+		dam.exeUpdate(queryCondition);
+		
+		this.sendRtnObject(outputVO);
+	}
 }

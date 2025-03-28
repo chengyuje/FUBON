@@ -206,7 +206,7 @@
 						<tr ng-repeat-start="(a, dataA) in paramList2 | groupBy: 'REGION_CENTER_NAME' as resultA">
 							<td rowspan="{{(dataA.length + numGroups(resultB)) * 2 + 1}}" ng-show="cp != tp && !(a.indexOf('合計') > -1)">{{a}}</td>
 							<td rowspan="{{dataA.length + numGroups(resultB) * 2 + 2 + (numGroupsA(paramList2) > 1 ? 1 : 0 ) + (numGroupsA(paramList2) < 1 ? -1 : 0 )}} " ng-show="cp == tp && !(a.indexOf('合計') > -1)">{{a}}</td>
-							<td rowspan="{{dataA.length + numGroups(resultB) * 2 + 2 + (numGroupsA(paramList2) > 1 ? 1 : 0 ) + (numGroupsA(paramList2) < 1 ? -1 : 0 )}} " align="center" colspan="5" ng-show="(a.indexOf('合計') > -1)">{{a}}</td>
+							<!-- <td rowspan="{{dataA.length + numGroups(resultB) * 2 + 2 + (numGroupsA(paramList2) > 1 ? 1 : 0 ) + (numGroupsA(paramList2) < 1 ? -1 : 0 )}} " align="center" colspan="5" ng-show="(a.indexOf('合計') > -1)">{{a}}</td> -->
 						</tr>
 						<tr ng-repeat-start="(b, dataB) in dataA | groupBy: 'BRANCH_AREA_NAME' as resultB">
 							<td rowspan="{{dataB.length + numGroups(resultC) * 2 + 1}}" ng-show="b != 'REGION' && b != 'ALL' && cp != tp">{{b}}</td>
@@ -216,6 +216,7 @@
 							<td rowspan="{{dataC.length + 1}}" ng-hide="c == 'REGION' || c == 'AREA' || c == 'ALL'">{{c}}</td>
 						</tr>
 						<tr ng-repeat="c1 in dataC">
+							<td colspan="5" align="center" ng-show="c1.AO_CODE == 'ZZZZZ'">{{c1.REGION_CENTER_NAME}}</td>
 							<td colspan="4" align="center" ng-show="c1.AO_CODE == 'ZZZZZREGION'">{{c1.REGION_CENTER_NAME}} 合計</td>
 							<td colspan="3" align="center" ng-show="c1.AO_CODE == 'ZZZZZAREA'">{{c1.BRANCH_AREA_NAME}} 合計</td>
 							<td colspan="2" align="center" ng-show="c1.AO_CODE == 'ZZZZZBRANCH'">{{c1.BRANCH_NAME}} 合計</td>

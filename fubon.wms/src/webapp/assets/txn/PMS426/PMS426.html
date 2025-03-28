@@ -1,6 +1,6 @@
 <style>
 .datewidth{
-	width:180px !important;
+	width:120px !important;
 	float: left !important;
 }
 .rstable thead tr th {
@@ -59,19 +59,45 @@ input.faChkSqr:after {
 				<form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
 					<table>
 						<tr>
-							<th>*資料月份：</th>
-							<td colspan="7">
-								<e-combobox id="dataMonth" name="dataMonth" 
-											ng-datasource="mappingSet['timeE']"
-											ng-model="inputVO.sCreDate"
-											ng-validate="false" 
-											ng-readonly="false" 
-											ng-editable="false"
-											ng-required="true"
-											ng-change="dateChange()"
-											ng-format="F3"
-											width="200px"
-											style="line-height:20px;" />	
+							<th><font color=red>＊</font>資料月份：</th>
+							<td class="form-inline" colspan="5">
+			                	<div class="form-group">
+									<div class="input-group datebox datewidth">
+										<input 	type="text" id="sCreDate" name="sCreDate"
+											   	class="form-control"
+												uib-datepicker-popup="yyyyMM"
+												ng-model="inputVO.sCreDate"
+												is-open="model.e"
+												datepicker-options="importStartDateOptions"
+										   		datepicker-mode="'month'"
+												ng-readonly="true"
+												ng-change="limitDate();dateChange()"/>
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+									<div style="float: left !important;">～</div>
+									<div class="input-group datebox datewidth">
+										<input 	type="text" id="eCreDate" name="eCreDate"
+											   	class="form-control"
+												uib-datepicker-popup="yyyyMM"
+												ng-model="inputVO.eCreDate"
+												is-open="model.f"
+												datepicker-options="importEndDateOptions"
+										   		datepicker-mode="'month'"
+												ng-readonly="true"
+												ng-change="limitDate()" 
+												ng-disabled="inputVO.sCreDate == undefined || inputVO.sCreDate == null || inputVO.sCreDate == ''" />
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-default" 
+													ng-click="open($event,'f')" 
+													ng-disabled="inputVO.sCreDate == undefined || inputVO.sCreDate == null || inputVO.sCreDate == ''" 
+													ng-readonly="inputVO.sCreDate == undefined || inputVO.sCreDate == null || inputVO.sCreDate == ''">
+											<i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</div>
+								</div>
 							</td>
 						</tr>
 						<tr>
@@ -143,7 +169,7 @@ input.faChkSqr:after {
 				</form>
 			</div>
 			<div class="search_box_btn text-center">
-				<button type="button" class="btn btn-primary" ng-click="queryInit();query();" function-type="query"><span class="glyphicon glyphicon-search"></span>查詢</button>
+				<button type="button" class="btn btn-primary" ng-click="query();" function-type="query"><span class="glyphicon glyphicon-search"></span>查詢</button>
 				<button type="button" class="btn btn-info" ng-click="init();limitDate();dateChange()"><span class="glyphicon glyphicon-erase"></span>清除</button>
 				<button type="button" class="btn btn-success" ng-click="exportRPT()" ng-disabled="resultList.length < 1" function-type="export"><span class="glyphicon glyphicon-save"></span>匯出</button>
 			</div>
@@ -231,7 +257,19 @@ input.faChkSqr:after {
 										ng-disabled="!chkMaintenance || row.RECORD_YN == 'N'" 
 										ng-blur="updateFlag(row)"/>
 							</td>
-							<td><input type="text" class="form-control" style="width: 300px" ng-blur="updateFlag(row)" ng-disabled="!chkMaintenance" ng-model="row.NOTE2" placeholder="請輸入帳戶關係。如客戶彼此不認識請了解客戶留存原因是否合理..."></td>
+							<td style="text-align:left;">
+		                   	 	<e-combobox id="custBase" name="custBase" 
+											ng-datasource="mappingSet['PMS.ACCOUNT_REL']"
+											ng-model="row.CUST_BASE"
+											ng-validate="false" 
+											ng-editable="false"
+											ng-format="F3"
+											ng-change="updateFlag(row);setDefaultVal(row);"
+											ng-readonly="!chkMaintenance" 
+											ng-disabled="!chkMaintenance" 
+											style="line-height:20px;display:inline;" />
+								<input type="text" class="form-control"  style="width:300px;display:inline;" ng-blur="updateFlag(row)" ng-model="row.NOTE2" e-length-limit="600" placeholder="請輸入..." ng-disabled="!chkMaintenance" ng-if="row.CUST_BASE == 'O'">	                    
+		                    </td>
 							<td align="center">
 								<label>是<input type="radio" value="Y" ng-change="updateFlag(row)" ng-disabled="!chkMaintenance" ng-model="row.HR_ATTR"/></label>&emsp;
 								<label>否<input type="radio" value="N" ng-change="updateFlag(row)" ng-disabled="!chkMaintenance" ng-model="row.HR_ATTR"/></label>

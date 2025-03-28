@@ -5,6 +5,9 @@ import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.defaultString;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,8 +15,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +38,8 @@ import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.common.util.CSVUtil;
 import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
+import com.systex.jbranch.platform.server.info.SysInfo;
+import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
@@ -74,6 +88,7 @@ public class PMS431 extends FubonWmsBizLogic {
 	public PMS431OutputVO queryData(Object body) throws JBranchException {
 
 		initUUID();
+		SimpleDateFormat sdfYYYYMM = new SimpleDateFormat("yyyyMM");
 
 		PMS431InputVO inputVO = (PMS431InputVO) body;
 		PMS431OutputVO outputVO = new PMS431OutputVO();
@@ -133,29 +148,48 @@ public class PMS431 extends FubonWmsBizLogic {
 
 		sb.append("  WHERE 1 = 1 ");
 		
-		// 統計月份
-		if (StringUtils.isNotEmpty(inputVO.getsCreDate())) {
-			sb.append("  AND RPT.YYYYMM = :sDate ");
-			queryCondition.setObject("sDate", inputVO.getsCreDate());
-		}
+		if (StringUtils.equals("Y", inputVO.getNeedConfirmYN())) {
+			if (StringUtils.isNotBlank(inputVO.getsCreDate())) {
+    			sb.append("  AND RPT.YYYYMM >= :yearMonS ");
+    			queryCondition.setObject("yearMonS", inputVO.getsCreDate());
+    		}
+			
+			if (StringUtils.isNotBlank(inputVO.geteCreDate())) {
+    			sb.append("  AND RPT.YYYYMM <= :yearMonE ");
+    			queryCondition.setObject("yearMonE", inputVO.geteCreDate());
+    		}
+        } else {
+        	//資料月份
+    		if (StringUtils.isNotBlank(inputVO.getsCreDate())) {
+    			sb.append("  AND RPT.YYYYMM >= :yearMonS ");
+    			queryCondition.setObject("yearMonS", sdfYYYYMM.format(new Date(Long.parseLong(inputVO.getsCreDate()))));
+    		}
+    		
+    		if (StringUtils.isNotBlank(inputVO.geteCreDate())) {
+    			sb.append("  AND RPT.YYYYMM <= :yearMonE ");
+    			queryCondition.setObject("yearMonE", sdfYYYYMM.format(new Date(Long.parseLong(inputVO.geteCreDate()))));
+    		}
+        }
+		
 
 		if (StringUtils.lowerCase(inputVO.getMemLoginFlag()).indexOf("uhrm") < 0) { 		
 			if (StringUtils.isNotBlank(inputVO.getBranch_nbr())) {
 				sb.append("  AND RPT.AO_BRANCH_NBR = :branch ");
 				sb.append("  AND CASE WHEN ( ");
-				sb.append("           SELECT COUNT(1) ");
-				sb.append("           FROM TBPMS_HIGH_RISK_INV_D_REP D ");
-				sb.append("           WHERE RPT.SNAP_YYYYMM = D.SNAP_YYYYMM ");
-				sb.append("           AND RPT.AO_BRANCH_NBR = D.AO_BRANCH_NBR ");
-				sb.append("           AND RPT.AO_EMP_CID = D.AO_EMP_ID ");
-				sb.append("           AND RPT.KIND_TYPE = D.KIND_TYPE ");
-				sb.append("           AND D.RM_FLAG = 'U' ");
-				sb.append("         ) > 0 THEN 'Y' ELSE 'N' END = 'N' ");
+				sb.append("    SELECT COUNT(1) ");
+				sb.append("    FROM TBPMS_HIGH_RISK_INV_D_REP D ");
+				sb.append("    WHERE RPT.SNAP_YYYYMM = D.SNAP_YYYYMM ");
+				sb.append("    AND RPT.AO_BRANCH_NBR = D.AO_BRANCH_NBR ");
+				sb.append("    AND RPT.AO_EMP_CID = D.AO_EMP_ID ");
+				sb.append("    AND RPT.KIND_TYPE = D.KIND_TYPE ");
+				sb.append("    AND D.RM_FLAG = 'U' ");
+				sb.append("  ) > 0 THEN 'Y' ELSE 'N' END = 'N' ");
 				
 				queryCondition.setObject("branch", inputVO.getBranch_nbr());
 			} else if (StringUtils.isNotBlank(inputVO.getBranch_area_id())) {	
 				sb.append("  AND ( ");
-				sb.append("      (CASE WHEN ( ");
+				sb.append("    (");
+				sb.append("     CASE WHEN ( ");
 				sb.append("         SELECT COUNT(1) ");
 				sb.append("         FROM TBPMS_HIGH_RISK_INV_D_REP D ");
 				sb.append("         WHERE RPT.SNAP_YYYYMM = D.SNAP_YYYYMM ");
@@ -163,21 +197,22 @@ public class PMS431 extends FubonWmsBizLogic {
 				sb.append("         AND RPT.AO_EMP_CID = D.AO_EMP_ID ");
 				sb.append("         AND RPT.KIND_TYPE = D.KIND_TYPE ");
 				sb.append("         AND D.RM_FLAG = 'B' ");
-				sb.append("      ) > 0 THEN 'Y' ELSE 'N' END = 'Y' ");
-				sb.append("      AND DEFN.BRANCH_AREA_ID = :BRANCH_AREA_IDD) ");
+				sb.append("     ) > 0 THEN 'Y' ELSE 'N' END = 'Y' ");
+				sb.append("     AND DEFN.BRANCH_AREA_ID = :BRANCH_AREA_IDD ");
+				sb.append("    ) ");
 				
 				if (isHANDMGR || isARMGR) {
 					sb.append("  OR ( ");
-					sb.append("      (CASE WHEN ( ");
-					sb.append("         SELECT COUNT(1) ");
-					sb.append("         FROM TBPMS_HIGH_RISK_INV_D_REP D ");
-					sb.append("         WHERE RPT.SNAP_YYYYMM = D.SNAP_YYYYMM ");
-					sb.append("         AND RPT.AO_BRANCH_NBR = D.AO_BRANCH_NBR ");
-					sb.append("         AND RPT.AO_EMP_CID = D.AO_EMP_ID ");
-					sb.append("         AND RPT.KIND_TYPE = D.KIND_TYPE ");
-					sb.append("         AND D.RM_FLAG = 'U' ");
-					sb.append("      ) > 0 THEN 'Y' ELSE 'N' END = 'Y' ");
-					sb.append("      AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.AO_EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD) ");
+					sb.append("    CASE WHEN ( ");
+					sb.append("      SELECT COUNT(1) ");
+					sb.append("      FROM TBPMS_HIGH_RISK_INV_D_REP D ");
+					sb.append("      WHERE RPT.SNAP_YYYYMM = D.SNAP_YYYYMM ");
+					sb.append("      AND RPT.AO_BRANCH_NBR = D.AO_BRANCH_NBR ");
+					sb.append("      AND RPT.AO_EMP_CID = D.AO_EMP_ID ");
+					sb.append("      AND RPT.KIND_TYPE = D.KIND_TYPE ");
+					sb.append("      AND D.RM_FLAG = 'U' ");
+					sb.append("    ) > 0 THEN 'Y' ELSE 'N' END = 'Y' ");
+					sb.append("    AND EXISTS ( SELECT 1 FROM TBORG_MEMBER MT WHERE RPT.AO_EMP_ID = MT.EMP_ID AND MT.DEPT_ID = :BRANCH_AREA_IDD) ");
 					sb.append("  ) ");
 				}
 			
@@ -199,7 +234,7 @@ public class PMS431 extends FubonWmsBizLogic {
 				sb.append("    AND RPT.KIND_TYPE = D.KIND_TYPE ");
 				sb.append("    AND D.RM_FLAG = 'B' ");
 				sb.append("  ) > 0 THEN 'Y' ELSE 'N' END = 'Y' ");
-			}
+			} 
 		} else {
 			if (StringUtils.isNotBlank(inputVO.getUhrmOP())) {
 				sb.append("  AND (");
@@ -254,7 +289,7 @@ public class PMS431 extends FubonWmsBizLogic {
 		}
 
 		sb.append("ORDER BY BASE.CREATETIME DESC, BASE.BRANCH_NBR, BASE.AO_EMP_ID, BASE.KIND_TYPE ");
-System.out.println(sb.toString());
+
 		queryCondition.setQueryString(sb.toString());
 
 		ResultIF list = dam.executePaging(queryCondition, inputVO.getCurrentPageIndex() + 1, inputVO.getPageCount());
@@ -372,7 +407,7 @@ System.out.println(sb.toString());
 	}
 
 	// 匯出CSV
-	public void export(Object body, IPrimitiveMap header) throws JBranchException {
+	public void export(Object body, IPrimitiveMap header) throws JBranchException, ParseException, FileNotFoundException, IOException {
 
 		PMS431InputVO inputVO = (PMS431InputVO) body;
 		dam = this.getDataAccessManager();
@@ -508,95 +543,191 @@ System.out.println(sb.toString());
 
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 
-		String[] csvHeader = { 	"私銀註記", "交易統計年月", "行員歸屬行", "行員姓名", "行員ID", "類別", "累積異動金額", 
-//								"當月底活期存款餘額合計", 
-								"已回覆筆數", "未回覆筆數",
-								"資料日期(系統日期)",
-								"交易日期", "行員歸屬行", "行員姓名", "行員ID", "行員員編", "帳號", "轉入/轉出",
-								"類別", 
-//								"券商代號", 
-								"幣別", "交易金額", "交易序號", 
-								"備註", 
-								"初判異常轉法遵部調查", "備註(如有異常必填入說明)", "首次建立時間", "最新異動人員", "最新異動日期"};
+		// === start ===
+		SimpleDateFormat sdfYYYYMMDDHHMM = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+		SimpleDateFormat sdfYYYYMM = new SimpleDateFormat("yyyyMM");
+
+		String reportName = "客戶經理高風險月報";
+		String fileName = reportName + "_" + sdfYYYYMM.format(new Date(Long.parseLong(inputVO.getsCreDate()))) + ".xlsx";
+		String uuid = UUID.randomUUID().toString();
+		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
+
+		String filePath = Path + uuid;
+
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet(reportName);
+		sheet.setDefaultColumnWidth(20);
+		sheet.setDefaultRowHeightInPoints(20);
+
+		// 表頭 CELL型式
+		XSSFCellStyle headingStyle = workbook.createCellStyle();
+		headingStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		headingStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		headingStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);// 填滿顏色
+		headingStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+		headingStyle.setBorderBottom((short) 1);
+		headingStyle.setBorderTop((short) 1);
+		headingStyle.setBorderLeft((short) 1);
+		headingStyle.setBorderRight((short) 1);
+		headingStyle.setWrapText(true);
+
+		// 資料 CELL型式
+		XSSFCellStyle mainStyle = workbook.createCellStyle();
+		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		mainStyle.setBorderBottom((short) 1);
+		mainStyle.setBorderTop((short) 1);
+		mainStyle.setBorderLeft((short) 1);
+		mainStyle.setBorderRight((short) 1);
 		
-		String[] csvMain   = { 	"RM_FLAG", "M_SNAP_YYYYMM", "M_BRANCH_NBR", "AO_EMP_NAME", "M_AO_EMP_CID", "M_KIND_NAME", "M_TX_AMT_TWD", 
-//								"BAL_TWD_ME",
-								"RESPONDING", "NOT_RESPONDING",
+		// 資料 CELL型式
+		XSSFCellStyle titleStyle = workbook.createCellStyle();
+		titleStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+		titleStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderBottom((short) 1);
+		titleStyle.setBorderTop((short) 1);
+		titleStyle.setBorderLeft((short) 1);
+		titleStyle.setBorderRight((short) 1);
+		
+		String[] headerLine = { "私銀註記", 
+								"交易統計年月", 
+								"行員歸屬行", 
+								"行員姓名", 
+								"行員ID", 
+								"類別", 
+								"累積異動金額", 
+								"已回覆筆數", 
+								"未回覆筆數",
+								"資料日期(系統日期)",
+								"交易日期", 
+								"行員歸屬行", 
+								"行員姓名", 
+								"行員ID", 
+								"行員員編", 
+								"帳號",
+								"轉入/轉出",
+								"類別", 
+								"幣別", 
+								"交易金額", 
+								"交易序號", 
+								"備註", 
+								"初判異常轉法遵部調查", 
+								"備註(如有異常必填入說明)", 
+								"首次建立時間",
+								"最新異動人員",
+								"最新異動日期"};
+		
+		String[] mainLine   = { "RM_FLAG", 
+								"M_SNAP_YYYYMM", 
+								"M_BRANCH_NBR", 
+								"AO_EMP_NAME", 
+								"M_AO_EMP_CID", 
+								"M_KIND_NAME", 
+								"M_TX_AMT_TWD", 
+								"RESPONDING", 
+								"NOT_RESPONDING",
 								"D_SNAP_YYYYMM",
-								"TX_DATE", "D_BRANCH_NBR", "AO_NAME", "D_AO_EMP_CID", "AO_EMP_ID", "ACCT_NBR_ORI", "DRCR_NAME",
+								"TX_DATE", 
+								"D_BRANCH_NBR", 
+								"AO_NAME", 
+								"D_AO_EMP_CID", 
+								"AO_EMP_ID",
+								"ACCT_NBR_ORI", 
+								"DRCR_NAME",
 								"D_KIND_NAME", 
-//								"STCK_CSTDY_CD", 
-								"CUR", "D_TX_AMT_TWD", "JRNL_NO", 
+								"CUR", 
+								"D_TX_AMT_TWD", 
+								"JRNL_NO", 
 								"REMK",
-								"HR_ATTR", "NOTE", "FIRSTUPDATE", "MODIFIER", "LASTUPDATE"};
+								"HR_ATTR", 
+								"NOTE", 
+								"FIRSTUPDATE", 
+								"MODIFIER", 
+								"LASTUPDATE"};
 
-		List listCSV = new ArrayList();
-		if (isEmpty(list))
-			listCSV.add(new String[] { "查無資料" });
-		else {
-			SimpleDateFormat timeSdf = new SimpleDateFormat("yyyy/MM/dd hh:mm");
-			for (Map<String, Object> map : list) {
-				String[] records = new String[csvHeader.length];
+		Integer index = 0;
 
-				for (int i = 0; i < csvHeader.length; i++) {
-					switch (csvMain[i]) {
-						case "FIRSTUPDATE":	
-						case "LASTUPDATE":
-							records[i] = formatDate(map.get(csvMain[i]), timeSdf);
-							break;
-						case "D_BRANCH_NBR":
-						case "M_BRANCH_NBR":
-							records[i] = format("%s-%s", defaultString((String) map.get(csvMain[i])), defaultString((String) map.get("M_BRANCH_NAME")));
-							break;
-						case "M_AO_EMP_CID":	// 身分證號（高風險隱蔽資料）
-						case "D_AO_EMP_CID":
-							records[i] = getCustIdMaskForHighRisk(defaultString((String) map.get(csvMain[i])));
-							break;
-						case "M_TX_AMT_TWD":
-						case "BAL_TWD_ME":
-						case "D_TX_AMT_TWD":
-							if (null != map.get(csvMain[i])) {
-								records[i] = new DecimalFormat("#,##0.00").format(map.get(csvMain[i]));
-							} else {
-								records[i] = "0.00";
-							}
-
-							break;
-						case "RESPONDING":
-						case "NOT_RESPONDING":
-							if (null != map.get(csvMain[i])) {
-								records[i] = new DecimalFormat("#,##0").format(map.get(csvMain[i]));
-							} else {
-								records[i] = "0";
-							}
-
-							break;
-						case "HR_ATTR":		// 初判異常轉法遵部調查 Y: 是、N: 否
-							records[i] = formatFlag(defaultString((String) map.get(csvMain[i]))); // 初判異常轉法遵部調查 Y: 是、N: 否
-							break;
-						default:
-							if (null != map.get(csvMain[i])) {
-								records[i] = defaultString(map.get(csvMain[i]).toString());
-							} else {
-								records[i] = "";
-							}
-							break;
-					}
-				}
-
-				for (int index = 0; index < records.length; index++)
-					records[index] = format("=\"%s\"", records[index]);
-
-				listCSV.add(records);
-			}
+		XSSFRow row = sheet.createRow(index);
+		for (int i = 0; i < 1; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(titleStyle);
+			cell.setCellValue(reportName);
+		}
+		
+		index++;
+		
+		row = sheet.createRow(index);
+		for (int i = 0; i < headerLine.length; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(headingStyle);
+			cell.setCellValue(headerLine[i]);
 		}
 
-		CSVUtil csv = new CSVUtil();
-		csv.setHeader(csvHeader);
-		csv.addRecordList(listCSV);
+		index++;
+		
+		for (Map<String, Object> map : list) {
+			row = sheet.createRow(index);
 
-		SimpleDateFormat dateSdf = new SimpleDateFormat("yyyyMMdd");
-		notifyClientToDownloadFile(csv.generateCSV(), format("客戶經理高風險月報_%s.csv", dateSdf.format(new Date())));
+			for (int i = 0; i < mainLine.length; i++) {
+				XSSFCell cell = row.createCell(i);
+				cell.setCellStyle(mainStyle);
+
+				switch (mainLine[i]) {
+					case "FIRSTUPDATE":	
+					case "LASTUPDATE":
+						cell.setCellValue(formatDate(map.get(mainLine[i]), sdfYYYYMMDDHHMM));
+						break;
+					case "D_BRANCH_NBR":
+					case "M_BRANCH_NBR":
+						cell.setCellValue(format("%s-%s", defaultString((String) map.get(mainLine[i])), defaultString((String) map.get("M_BRANCH_NAME"))));
+						break;
+					case "M_AO_EMP_CID":	// 身分證號（高風險隱蔽資料）
+					case "D_AO_EMP_CID":
+						cell.setCellValue(getCustIdMaskForHighRisk(defaultString((String) map.get(mainLine[i]))));
+						break;
+					case "M_TX_AMT_TWD":
+					case "BAL_TWD_ME":
+					case "D_TX_AMT_TWD":
+						if (null != map.get(mainLine[i])) {
+							cell.setCellValue(new DecimalFormat("#,##0.##").format(map.get(mainLine[i])));
+						} else {
+							cell.setCellValue("0");
+						}
+
+						break;
+					case "RESPONDING":
+					case "NOT_RESPONDING":
+						if (null != map.get(mainLine[i])) {
+							cell.setCellValue(new DecimalFormat("#,##0").format(map.get(mainLine[i])));
+						} else {
+							cell.setCellValue("0");
+						}
+
+						break;
+					case "HR_ATTR":		// 初判異常轉法遵部調查 Y: 是、N: 否
+						cell.setCellValue(formatFlag(defaultString((String) map.get(mainLine[i])))); // 初判異常轉法遵部調查 Y: 是、N: 否
+						break;
+					case "RECORD_SEQ":
+						cell.setCellValue(checkIsNull(map, mainLine[i]) + "");
+						break;
+					default:
+						if (null != map.get(mainLine[i])) {
+							cell.setCellValue(defaultString(map.get(mainLine[i]).toString()));
+						} else {
+							cell.setCellValue("");
+						}
+						break;
+				}
+			}
+			
+			index++;
+		}
+
+		workbook.write(new FileOutputStream(filePath));
+
+		notifyClientToDownloadFile(DataManager.getSystem().getPath().get("temp").toString() + uuid, fileName);
+
+		sendRtnObject(null);
 	}
 
 	// 格式時間
@@ -612,5 +743,14 @@ System.out.println(sb.toString());
 	private String formatFlag(String flag) {
 
 		return "Y".equals(flag) ? "是" : "N".equals(flag) ? "否" : "";
+	}
+	
+	private String checkIsNull(Map map, String key) {
+
+		if (StringUtils.isNotBlank(ObjectUtils.toString(map.get(key)))) {
+			return String.valueOf(map.get(key));
+		} else {
+			return "";
+		}
 	}
 }

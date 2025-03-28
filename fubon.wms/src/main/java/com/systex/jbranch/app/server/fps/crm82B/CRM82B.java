@@ -41,15 +41,21 @@ public class CRM82B extends FubonWmsBizLogic {
 		QueryConditionIF qc = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuilder sb = new StringBuilder();
 		
+		sb.append(" WITH DATA AS ( ");
 		sb.append(" SELECT A.ISIN_Code, A.PROD_ID, A.PROD_NAME, A.CCY, A.M_TP_NOMINAL, ");
 		sb.append(" A.M_TP_DTETRN, A.M_TP_DTEPMT, A.LAST_INTEREST_DATE, ");
 		sb.append(" A.LAST_INTEREST_RATE, A.TOT_INTEREST_RATE, A.REF_NAV, A.DIV_RTN, ");
-		sb.append(" SUM(NVL(A.BAL_AMT_TWD, 0)) AS SUMTRUSTVAL, A.CUST_ID ");
+		sb.append(" NVL(A.BAL_AMT_TWD, 0) AS BAL_AMT_TWD, A.CUST_ID, A.CERT_ID ");
 		sb.append(" FROM TBCRM_AST_INV_VPSN A ");
 		sb.append(" WHERE A.CUST_ID = :cust_id ");
-		sb.append(" GROUP BY A.ISIN_Code, A.PROD_ID, A.PROD_NAME, A.CCY, A.M_TP_NOMINAL, ");
-		sb.append("  A.M_TP_DTETRN, A.M_TP_DTEPMT, A.LAST_INTEREST_DATE, ");
-		sb.append("  A.LAST_INTEREST_RATE, A.TOT_INTEREST_RATE, A.REF_NAV, A.DIV_RTN,A.CUST_ID ");
+		sb.append(" ),totalAMT AS ( ");
+		sb.append(" SELECT CUST_ID, SUM(BAL_AMT_TWD) AS SUMTrustVal ");
+		sb.append(" FROM DATA ");
+		sb.append(" GROUP BY CUST_ID ");
+		sb.append(" ) ");
+		sb.append(" SELECT A.*, B.SUMTrustVal ");
+		sb.append(" FROM DATA A ");
+		sb.append(" LEFT JOIN totalAMT B ON A.CUST_ID = B.CUST_ID ");
 		
 		qc.setObject("cust_id", inputVO.getCust_id());
 		qc.setQueryString(sb.toString());
@@ -82,9 +88,11 @@ public class CRM82B extends FubonWmsBizLogic {
 		sb.append(" SELECT A.INTEREST_DATE, A.TXN_TYPE, A.TXN_CCY, A.TXN_AMT ");
 		sb.append(" FROM TBCRM_AST_INV_VPSN_TXN A ");
 		sb.append(" WHERE A.PROD_ID =:prd_id AND A.CUST_ID = :cust_id ");
+		sb.append(" AND A.CERT_ID = :cert_id ");
 
 		qc.setObject("prd_id", inputVO.getPrd_id());
 		qc.setObject("cust_id", inputVO.getCust_id());
+		qc.setObject("cert_id", inputVO.getCert_id());
 		qc.setQueryString(sb.toString());
 		resultList = dam.exeQuery(qc);
 		

@@ -1,5 +1,8 @@
 package com.systex.jbranch.app.server.fps.pms401;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -8,8 +11,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +33,8 @@ import com.systex.jbranch.platform.common.errHandle.JBranchException;
 import com.systex.jbranch.platform.common.util.CSVUtil;
 import com.systex.jbranch.platform.server.info.FormatHelper;
 import com.systex.jbranch.platform.server.info.FubonSystemVariableConsts;
+import com.systex.jbranch.platform.server.info.SysInfo;
+import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import com.systex.jbranch.platform.server.info.XmlInfo;
 import com.systex.jbranch.platform.util.IPrimitiveMap;
 
@@ -310,11 +323,57 @@ public class PMS401 extends FubonWmsBizLogic {
 	}
 
 	/* 產出CSV */
-	public void export(Object body, IPrimitiveMap header) throws JBranchException {
+	public void export(Object body, IPrimitiveMap header) throws JBranchException, ParseException, FileNotFoundException, IOException {
 
+		SimpleDateFormat sdfYYYYMMDD = new SimpleDateFormat("yyyyMMdd");
+
+		XmlInfo xmlInfo = new XmlInfo();
+		
 		PMS401OutputVO outputVO = (PMS401OutputVO) body;
 
-		String[] csvHeader = { 	"私銀註記", 
+		String reportName = "分行人員存款異動日報";
+		String fileName = reportName + "_" + sdfYYYYMMDD.format(new Date()) + ".xlsx";
+		String uuid = UUID.randomUUID().toString();
+		String Path = (String) SysInfo.getInfoValue(SystemVariableConsts.TEMP_PATH);
+
+		String filePath = Path + uuid;
+
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet(reportName);
+		sheet.setDefaultColumnWidth(20);
+		sheet.setDefaultRowHeightInPoints(20);
+		
+		// 表頭 CELL型式
+		XSSFCellStyle headingStyle = workbook.createCellStyle();
+		headingStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		headingStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		headingStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);// 填滿顏色
+		headingStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+		headingStyle.setBorderBottom((short) 1);
+		headingStyle.setBorderTop((short) 1);
+		headingStyle.setBorderLeft((short) 1);
+		headingStyle.setBorderRight((short) 1);
+		headingStyle.setWrapText(true);
+
+		// 資料 CELL型式
+		XSSFCellStyle mainStyle = workbook.createCellStyle();
+		mainStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		mainStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		mainStyle.setBorderBottom((short) 1);
+		mainStyle.setBorderTop((short) 1);
+		mainStyle.setBorderLeft((short) 1);
+		mainStyle.setBorderRight((short) 1);
+		
+		// 資料 CELL型式
+		XSSFCellStyle titleStyle = workbook.createCellStyle();
+		titleStyle.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+		titleStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderBottom((short) 1);
+		titleStyle.setBorderTop((short) 1);
+		titleStyle.setBorderLeft((short) 1);
+		titleStyle.setBorderRight((short) 1);
+		
+		String[] headerLine = { "私銀註記", 
 								"資料日期",
 								"交易日期",
 								"所屬分行",
@@ -330,7 +389,7 @@ public class PMS401 extends FubonWmsBizLogic {
 								"最新異動人員",
 								"最新異動日期" };
 
-		String[] csvMain = { 	"RM_FLAG", 
+		String[] mainLine 	= { "RM_FLAG", 
 								"CREATETIME",
 								"TX_DATE",
 								"BRANCH_NBR",
@@ -345,60 +404,76 @@ public class PMS401 extends FubonWmsBizLogic {
 								"FIRSTUPDATE",
 								"MODIFIER",
 								"LASTUPDATE" };
-		XmlInfo xmlInfo = new XmlInfo();
+		
+		Integer index = 0;
 
-		List<Object[]> csvData = new ArrayList<Object[]>();
-
-		if ((outputVO.getTotalList()).size() == 0) {
-			String[] records = new String[csvHeader.length];
-			records[0] = "查無資料";
-			csvData.add(records);
-		} else {
-			for (Map<String, Object> map : outputVO.getTotalList()) {
-				String[] records = new String[csvHeader.length];
-				for (int i = 0; i < csvHeader.length; i++) {
-					switch (csvMain[i]) {
-						case "ROWNUM":
-							records[i] = ((int) Double.parseDouble(checkIsNull(map, csvMain[i]).toString())) + ""; // 序號 - 去小數點
-							break;
-						case "MODIFIER":
-						case "RECORD_SEQ":
-							records[i] = "=\"" + StringUtils.defaultString((String) map.get(csvMain[i])) + "\"";
-							break;
-						case "BRANCH_NBR":
-							records[i] = StringUtils.defaultString((String) map.get(csvMain[i])) + "-" + StringUtils.defaultString((String) map.get("BRANCH_NAME"));
-							break;
-						case "NOTE":
-							String note = (String) xmlInfo.getVariable("PMS.CHECK_TYPE", (String) map.get("NOTE_TYPE"), "F3");
-	
-							if (null != map.get("NOTE_TYPE") && StringUtils.equals("O", (String) map.get("NOTE_TYPE"))) {
-								note = note + "：" + StringUtils.defaultString((String) map.get(csvMain[i]));
-							}
-							
-							records[i] = (StringUtils.isNotEmpty(note) ? note : "");
-							break;
-						case "TX_AMT":
-							if (null != map.get(csvMain[i])) {
-								records[i] = new DecimalFormat("#,##0.00").format(map.get(csvMain[i]));
-							} else {
-								records[i] = "0.00";
-							}
-
-							break;
-						default:
-							records[i] = checkIsNull(map, csvMain[i]);
-							break;
-					}
-				}
-				csvData.add(records);
-			}
+		XSSFRow row = sheet.createRow(index);
+		for (int i = 0; i < 1; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(titleStyle);
+			cell.setCellValue(reportName);
+		}
+		
+		index++;
+		
+		row = sheet.createRow(index);
+		row.setHeightInPoints(30);
+		for (int i = 0; i < headerLine.length; i++) {
+			XSSFCell cell = row.createCell(i);
+			cell.setCellStyle(headingStyle);
+			cell.setCellValue(headerLine[i]);
 		}
 
-		CSVUtil csv = new CSVUtil();
-		csv.setHeader(csvHeader);
-		csv.addRecordList(csvData);
+		index++;
+		
+		for (Map<String, Object> map : outputVO.getTotalList()) {
+			row = sheet.createRow(index);
+			
+			for (int i = 0; i < mainLine.length; i++) {
+				XSSFCell cell = row.createCell(i);
+				cell.setCellStyle(mainStyle);
+				
+				switch (mainLine[i]) {
+					case "ROWNUM":
+						cell.setCellValue(((int) Double.parseDouble(checkIsNull(map, mainLine[i]).toString())) + ""); // 序號 - 去小數點
+						break;
+					case "BRANCH_NBR":
+						cell.setCellValue(StringUtils.defaultString((String) map.get(mainLine[i])) + "-" + StringUtils.defaultString((String) map.get("BRANCH_NAME")));
+						break;
+					case "NOTE":
+						String note = (String) xmlInfo.getVariable("PMS.CHECK_TYPE", (String) map.get("NOTE_TYPE"), "F3");
 
-		notifyClientToDownloadFile(csv.generateCSV(), "分行人員存款異動日報_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "-" + getUserVariable(FubonSystemVariableConsts.LOGINID) + ".csv");
+						if (null != map.get("NOTE_TYPE") && StringUtils.equals("O", (String) map.get("NOTE_TYPE"))) {
+							note = note + "：" + StringUtils.defaultString((String) map.get(mainLine[i]));
+						}
+						
+						cell.setCellValue((StringUtils.isNotEmpty(note) ? note : ""));
+						break;
+					case "TX_AMT":
+						if (null != map.get(mainLine[i])) {
+							cell.setCellValue(new DecimalFormat("#,##0.##").format(map.get(mainLine[i])));
+						} else {
+							cell.setCellValue("0");
+						}
+
+						break;
+					case "RECORD_SEQ":
+						cell.setCellValue(checkIsNull(map, mainLine[i]) + "");
+						break;
+					default:
+						cell.setCellValue(checkIsNull(map, mainLine[i]));
+						break;
+				}
+			}
+
+			index++;
+		}
+
+		workbook.write(new FileOutputStream(filePath));
+
+		notifyClientToDownloadFile(DataManager.getSystem().getPath().get("temp").toString() + uuid, fileName);
+
+		this.sendRtnObject(null);
 	}
 
 	/* 產出CSV */

@@ -280,13 +280,14 @@ public class WmsInsDSHRDao extends BizLogic implements WmsInsDSHRDaoInf{
 		BigDecimal custWIncome = new BigDecimal(paramMap.getNotNullStr("custWIncome"));
 		//要保人其他收入(元)
 		BigDecimal custOIncome = new BigDecimal(paramMap.getNotNullStr("custOIncome"));
-		//行內貸款最近撥貸日
-		Date custDate = (Date)iot920.inHouseLoanChk(custId, applyDate).get("inHouseLoanDate");
+		//最近授信收入維護日
+		Map<String, Object> creditData = iot920.getCreditData(custId, applyDate);
+		Date creditLastupdate = (Date)creditData.get("creditLastUpdate");
 		//取得工作年收入(授信徵審)
-		BigDecimal bankIncome = iot920.getIncome3(custId);
+		BigDecimal bankIncome = (BigDecimal)creditData.get("income3");
 		
-		//要保人有最近一年內撥貸日者，才需要檢核授信收入
-		if(custDate != null) {
+		//要保人有最近一年內最近授信收入維護日者，才需要檢核授信收入
+		if(creditLastupdate != null) {
 			BigDecimal insIncome = custWIncome.add(custOIncome);
 			if(insIncome.compareTo(bankIncome) > 0)
 				return "N1"; //人壽收入 > 銀行收入
@@ -319,13 +320,14 @@ public class WmsInsDSHRDao extends BizLogic implements WmsInsDSHRDaoInf{
 		BigDecimal insuredWIncome = new BigDecimal(paramMap.getNotNullStr("insuredWIncome"));
 		//被保人其他收入(元)
 		BigDecimal insuredOIncome = new BigDecimal(paramMap.getNotNullStr("insuredOIncome"));
-		//行內貸款最近撥貸日
-		Date insuredDate = (Date)iot920.inHouseLoanChk(insuredId, applyDate).get("inHouseLoanDate");
+		//最近授信收入維護日
+		Map<String, Object> creditData = iot920.getCreditData(insuredId, applyDate);
+		Date creditLastupdate = (Date)creditData.get("creditLastUpdate");
 		//取得工作年收入(授信徵審)
-		BigDecimal bankIncome = iot920.getIncome3(insuredId);
+		BigDecimal bankIncome = (BigDecimal)creditData.get("income3");
 		
-		//被保人有最近一年內撥貸日者，才需要檢核授信收入
-		if(insuredDate != null) {
+		//被保人有最近一年內最近授信收入維護日者，才需要檢核授信收入
+		if(creditLastupdate != null) {
 			BigDecimal insIncome = insuredWIncome.add(insuredOIncome);
 			if(insIncome.compareTo(bankIncome) > 0)
 				return "N1"; //人壽收入 > 銀行收入

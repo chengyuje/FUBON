@@ -35,16 +35,19 @@ public class CRM110 extends FubonWmsBizLogic {
 	//可視範圍 : 轄下掛Code客戶、歸屬行或帳戶行空Code客戶
 	public void inquire(Object body, IPrimitiveMap header) throws JBranchException {
 		
-		XmlInfo xmlInfo = new XmlInfo();
-		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2);
-		
 		CRM110InputVO inputVO = (CRM110InputVO) body;
 		CRM110OutputVO return_VO = new CRM110OutputVO();
 		dam = this.getDataAccessManager();
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		Map<String, String> fcMap = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2); // 理專
-		String roleID = getUserVariable(FubonSystemVariableConsts.LOGINROLE).toString();
+		
+		XmlInfo xmlInfo = new XmlInfo();
+		boolean isHANDMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE).toString());
+		boolean isFAIA = xmlInfo.doGetVariable("FUBONSYS.FAIA_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE).toString());
+		boolean isPAO = xmlInfo.doGetVariable("FUBONSYS.PAO_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isNEWPS = xmlInfo.doGetVariable("FUBONSYS.NEWPS_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		
 		String brNbr = getUserVariable(FubonSystemVariableConsts.LOGINBRH).toString();
 
 		sql.append("SELECT CUST_ID, CUST_NAME, BRA_NBR, AO_CODE ");
@@ -53,20 +56,21 @@ public class CRM110 extends FubonWmsBizLogic {
 
 		// UHRM
 		if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") >= 0) {
-			sql.append("and EXISTS (SELECT T.CUST_ID FROM VWORG_EMP_UHRM_INFO T WHERE T.UHRM_CODE = CM.AO_CODE) ");
+			sql.append("AND EXISTS (SELECT T.CUST_ID FROM VWORG_EMP_UHRM_INFO T WHERE T.UHRM_CODE = CM.AO_CODE) ");
 		// 非總行人員
-		} else if (!headmgrMap.containsKey(getCommonVariable(FubonSystemVariableConsts.LOGINROLE).toString())) {
+		} else if (!isHANDMGR) {
 			if (StringUtils.equals("JRM", getCommonVariable(FubonSystemVariableConsts.LOGINROLE).toString())) {
 				// 開放全行查詢
 			} else {
-				sql.append("and BRA_NBR in (:branchlist) ");
-				 //理專不可查私銀客戶
-				if (fcMap.containsKey(roleID)) {
+				sql.append("AND BRA_NBR in (:branchlist) ");
+				
+				//理專不可查私銀客戶
+				if (isFC) {
 					sql.append("and NOT EXISTS (SELECT 1 FROM VWORG_EMP_UHRM_INFO T WHERE T.UHRM_CODE = CM.AO_CODE) ");
 				}
 
-				// 輔銷人員 FAIA、無歸屬行（分行000）、PAO 使用轄下可視分行作條件查詢
-				if (StringUtils.defaultString(inputVO.getRole()).matches("faia|pao") || StringUtil.isEqual(brNbr, "000")) {
+				// 輔銷人員 FAIA、無歸屬行（分行000）、PAO/新興PS 使用轄下可視分行作條件查詢
+				if (isFAIA || isPAO || isNEWPS || StringUtil.isEqual(brNbr, "000")) {
 					queryCondition.setObject("branchlist", getUserVariable(FubonSystemVariableConsts.AVAILBRANCHLIST));
 				} else {
 					queryCondition.setObject("branchlist", brNbr);
@@ -101,7 +105,9 @@ public class CRM110 extends FubonWmsBizLogic {
 			for (Object key : qry_max_limit_xml.keySet()) {
 				qry_max_limit = key.toString();
 			}
+			
 			sql.append("AND ROWNUM <= :qry_max_limit ");
+			
 			queryCondition.setObject("qry_max_limit", qry_max_limit);
 		} else {
 			queryCondition.setMaxResults((Integer) SysInfo.getInfoValue(FubonSystemVariableConsts.QRY_MAX_RESULTS));
@@ -113,7 +119,7 @@ public class CRM110 extends FubonWmsBizLogic {
 		
 		sendRtnObject(return_VO);
 	}
-
+	
 	//查詢
 	public void inquireCust(Object body, IPrimitiveMap header) throws JBranchException {
 

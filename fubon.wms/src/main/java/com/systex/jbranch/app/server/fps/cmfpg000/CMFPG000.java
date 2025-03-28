@@ -124,6 +124,9 @@ public class CMFPG000 extends FubonWmsBizLogic {
 
 	private final String sysRoleBSMGR = "BSMGR";
 	private final String xmlBSMGR = "FUBONSYS.BSMGR_ROLE";
+	
+	private final String sysRoleNewPS = "NEWPS";
+	private final String xmlNewPS = "FUBONSYS.NEWPS_ROLE";
 
 	//===== ABOUT OTHER =====//
 	private final String LDAP_CONFIG = "FUBONSYS.LOGIN_LDAP";
@@ -418,7 +421,7 @@ public class CMFPG000 extends FubonWmsBizLogic {
 
 			WmsBranch branch = branchFactory.getWmsBranch(loginInfoMap);
 			loginInfoMap.put("branchNo", branch.getBrchID());
-
+			
 			// ***** 如branch不存在則重設 [2016/03/26] Modified by William
 			// (kgi登入時以0000為預設分行，故在此取得實際分行後新增判斷是否已存在DataManager中)
 			if (DataManager.getBranch(branch.getBrchID()) == null) {
@@ -625,10 +628,10 @@ public class CMFPG000 extends FubonWmsBizLogic {
 
 		List<Map<String, Object>> loginBreach = dam.exeQuery(queryCondition);
 
-		//                 0          1          2           3            4             5              6             7            8               9               10           11             	     12            13           14
-		String[] cases = { xmlFC,     xmlFCH,    xmlPAO,     xmlPSOP,     xmlBMMGR,     xmlMBRMGR,     xmlARMGR,     xmlFAIA,     xmlHEADMGR,     xmlUHRMMGR,     xmlUHRM,     "UHRMHEADMGR",        xmlBSMGR,     "BS",        xmlUHRMBMMGR };
-		String[] flags = { "brhMem",  "brhMem",  "brhMem",   "brhMem",    "brhMem",     "brhMemMGR",   "brhMemMGR",  "ALL",       "ALL",          "uhrmMGR",      "UHRM",      "uhrmHeadMGR",        "bsMGR",      "BS",        "uhrmBMMGR" };
-		String[] sysRo = { sysRoleFC, sysRoleFC, sysRolePAO, sysRolePSOP, sysRoleBMMGR, sysRoleMBRMGR, sysRoleARMGR, sysRoleFAIA, sysRoleHEADMGR, sysRoleUHRMMGR, sysRoleUHRM, "sysRoleUHRMHEADMGR", sysRoleBSMGR, "sysRoleBS", sysRoleUHRMBMMGR };
+		//                 0          1          2           3            4             5              6             7            8               9               10           11             	     12            13           14                15
+		String[] cases = { xmlFC,     xmlFCH,    xmlPAO,     xmlPSOP,     xmlBMMGR,     xmlMBRMGR,     xmlARMGR,     xmlFAIA,     xmlHEADMGR,     xmlUHRMMGR,     xmlUHRM,     "UHRMHEADMGR",        xmlBSMGR,     "BS",        xmlUHRMBMMGR,     xmlNewPS};
+		String[] flags = { "brhMem",  "brhMem",  "brhMem",   "brhMem",    "brhMem",     "brhMemMGR",   "brhMemMGR",  "ALL",       "ALL",          "uhrmMGR",      "UHRM",      "uhrmHeadMGR",        "bsMGR",      "BS",        "uhrmBMMGR",      "NEWPS" };
+		String[] sysRo = { sysRoleFC, sysRoleFC, sysRolePAO, sysRolePSOP, sysRoleBMMGR, sysRoleMBRMGR, sysRoleARMGR, sysRoleFAIA, sysRoleHEADMGR, sysRoleUHRMMGR, sysRoleUHRM, "sysRoleUHRMHEADMGR", sysRoleBSMGR, "sysRoleBS", sysRoleUHRMBMMGR, sysRoleNewPS };
 
 		String sysRole = sysRoleFC; // 預設FC
 		String memLoginFlag = flags[0]; // 預設brhMem
@@ -678,6 +681,7 @@ public class CMFPG000 extends FubonWmsBizLogic {
 			case 10: // FUBONSYS.UHRM_ROLE
 			case 12: // FUBONSYS.BSMGR_ROLE
 			case 14: // FUBONSYS.UHRMBMMGR_ROLE
+			case 15: // FUBONSYS.NEWPS_ROLE
 				sysRole = sysRo[i];
 				memLoginFlag = flags[i];
 				break;

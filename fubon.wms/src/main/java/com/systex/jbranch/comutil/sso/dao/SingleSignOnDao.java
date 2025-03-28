@@ -60,4 +60,10 @@ public class SingleSignOnDao extends CommonDao implements SingleSignOnDaoInf{
 	public GenericMap queryInsSigSsoConfig() throws JBranchException {
 		return queryConfig("SYS.INSSIG_SSO_ACC_PW");
 	}
+
+	/** 財管數位行銷助理 相關設定  **/
+	public GenericMap queryMfaSigSsoConfig() throws JBranchException {
+		return queryConfig("SYS.FMA_SSO_ACC_PW");
+	}
+	
 }

@@ -1187,7 +1187,7 @@ eSoafApp.controller('SOT150Controller',
 				
 				//動態鎖利不可變更
 				if (data.value.Dynamic && (data.value.Dynamic == '1' || data.value.Dynamic == '2')) {
-					$scope.showErrorMsg("動態鎖利母/子基金不可進行事件變更");
+					$scope.showErrorMsg("請至動態鎖利專區進行交易");
 					return;
 				}
 				

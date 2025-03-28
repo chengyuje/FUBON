@@ -276,13 +276,13 @@ public class CMMGR013 extends BizLogic {
 		ArrayList<String> sql_list = new ArrayList<String>();
 		StringBuffer sql_sb = new StringBuffer();
 		
-		sql_sb.append("select distinct U.DEPT_ID, U.EMP_ID, U.EMP_NAME, U.ROLEID, U.ROLENAME,"
+		sql_sb.append("select distinct U.DEPT_ID, U.EMP_ID, U.EMP_NAME, U.ROLEID, U.ROLENAME, U.APPLY,"
 				+ " U.PRIVILEGEID, U.PRINAME, U.ITEMID, U.EXTEND3, U.TXNNAME"
 				+ " from (select m.DEPT_ID, m.EMP_ID, m.EMP_NAME,"
 				+ " sr.ROLEID, sr.NAME as ROLENAME, sr.EXTEND3,"
 				+ " sp.PRIVILEGEID, sp.NAME as PRINAME,"
 				+ " spf.ITEMID, spf.FUNCTIONID,"
-				+ " t.TXNNAME"
+				+ " t.TXNNAME, tt.APPLY"
 				+ " from TBORG_MEMBER m"
 				+ " left outer join TBORG_MEMBER_ROLE mr on mr.EMP_ID = m.EMP_ID"
 				+ " left outer join TBSYSSECUROLE sr on sr.ROLEID = mr.ROLE_ID"
@@ -290,6 +290,7 @@ public class CMMGR013 extends BizLogic {
 				+ " left outer join TBSYSSECUPRI sp on sp.PRIVILEGEID = srp.PRIVILEGEID"
 				+ " left outer join TBSYSSECUPRIFUNMAP spf on spf.PRIVILEGEID =  srp.PRIVILEGEID"
 				+ " left outer join TBSYSTXN t on t.TXNCODE = spf.ITEMID"
+				+ " left outer join TBSYSSECUMODUITEM tt on tt.ITEMID = spf.ITEMID"
 				+ " where mr.ROLE_ID IS NOT NULL ");
 		
 		if (queryMode == 1 && empID != null && !empID.equals("")) {
@@ -305,7 +306,8 @@ public class CMMGR013 extends BizLogic {
 			sql_list.add("%" + cmbBRCHID + "%");
 		}
 		
-		sql_sb.append(") U order by U.DEPT_ID, U.EMP_ID, U.ROLEID, U.PRIVILEGEID, U.ITEMID");
+		sql_sb.append(") U where U.APPLY = 'Y' or U.APPLY IS NULL"
+				+ " order by U.DEPT_ID, U.EMP_ID, U.ROLEID, U.PRIVILEGEID, U.ITEMID");
 		queryCondition.setQueryString(sql_sb.toString());
 		for (int sql_i = 0; sql_i < sql_list.size(); sql_i ++) {
 			queryCondition.setString(sql_i + 1, sql_list.get(sql_i));

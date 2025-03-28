@@ -329,7 +329,7 @@ eSoafApp.controller('SOT311Controller',
 			$scope.sendRecv("SOT712", "updateBatchSeq", "com.systex.jbranch.app.server.fps.sot712.SOT712InputVO", {'prodType': 'BN', 'tradeSeq': $scope.inputVO.tradeSEQ},
 				function(tota, isError) {
 					if (!isError) {
-						  $scope.sendRecv("SOT310", "goBANK", "com.systex.jbranch.app.server.fps.sot310.SOT310InputVO", {'tradeSEQ': $scope.inputVO.tradeSEQ},
+						  $scope.sendRecv("SOT310", "goBANK", "com.systex.jbranch.app.server.fps.sot310.SOT310InputVO", $scope.inputVO,
 						  function(tota, isError) {
 							 if (!isError) {
 								if (tota[0].body.errorMsg != '' && tota[0].body.errorMsg != null) {

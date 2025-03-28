@@ -56,55 +56,83 @@ input.faChkSqr:after {
 			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >查詢條件</div>
 		</div>
 		<div class="panel_content">
-			<div class="search_table search_box">
+			<div class="search_table search_box3 scroll_y">
 				<table>
 					<tr>
-						<th>*資料月份：</th>
-						<td colspan="7">
-							<e-combobox id="dataMonth" name="dataMonth" 
-										ng-datasource="mappingSet['timeE']"
-										ng-model="inputVO.sCreDate"
-										ng-validate="false" 
-										ng-readonly="false" 
-										ng-editable="false"
-										ng-required="true"
-										ng-change="dateChange()"
-										ng-format="F3"
-										width="200px"
-										style="line-height:20px;" />	
+						<th><font color=red>＊</font>資料月份：</th>
+						<td class="form-inline" colspan="5">
+		                	<div class="form-group">
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="sCreDate" name="sCreDate"
+										   	class="form-control"
+											uib-datepicker-popup="yyyyMM"
+											ng-model="inputVO.sCreDate"
+											is-open="model.e"
+											datepicker-options="importStartDateOptions"
+									   		datepicker-mode="'month'"
+											ng-readonly="true"
+											ng-change="limitDate();dateChange()"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="open($event,'e')">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+								<div style="float: left !important;">～</div>
+								<div class="input-group datebox datewidth">
+									<input 	type="text" id="eCreDate" name="eCreDate"
+										   	class="form-control"
+											uib-datepicker-popup="yyyyMM"
+											ng-model="inputVO.eCreDate"
+											is-open="model.f"
+											datepicker-options="importEndDateOptions"
+									   		datepicker-mode="'month'"
+											ng-readonly="true"
+											ng-change="limitDate()" 
+											ng-disabled="inputVO.sCreDate == undefined || inputVO.sCreDate == null || inputVO.sCreDate == ''" />
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" 
+												ng-click="open($event,'f')" 
+												ng-disabled="inputVO.sCreDate == undefined || inputVO.sCreDate == null || inputVO.sCreDate == ''" 
+												ng-readonly="inputVO.sCreDate == undefined || inputVO.sCreDate == null || inputVO.sCreDate == ''">
+										<i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</div>
+							</div>
 						</td>
+						<th></th>
+						<td></td>
+						<th></th>
+						<td></td>
 					</tr>
 					<tr>
-						<th>*業務處：</th>
+						<th>業務處：</th>
 						<td>
 							<e-combobox id="region_center_id" name="region_center_id"
-										ng-paramtype="PMS.UHRM_RC"
+										ng-datasource="uhrmRCList"
 										ng-model="inputVO.uhrmRC"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										ng-change="ChangeRegion()"
-										width="200px"
 										style="line-height:20px;" />
-						</td>						
+						</td>
 						<th>營運區：</th>
 						<td>
 							<e-combobox id="branch_area_id" name="branch_area_id"
-										ng-paramtype="PMS.UHRM_OP"
+										ng-datasource="uhrmOPList"
 										ng-model="inputVO.uhrmOP"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										ng-change="ChangeArea()"
-										width="200px"
 										style="line-height:20px;" />
 						</td>
+						<th></th>
+						<td></td>
 					</tr>					
 				</table>
 			</div>
@@ -137,7 +165,7 @@ input.faChkSqr:after {
 					<thead>
 						<tr>
 							<th>更新<br>資料</th>
-							
+							<th>私銀註記</th>
 							<th>資料日期</th>
 							<th>理專歸屬行</th>
 							<th>理專姓名</th>
@@ -159,6 +187,7 @@ input.faChkSqr:after {
 					<tbody>
 						<tr class="repeat-row" ng-repeat="row in paramList track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
 							<td align="center" ><input type="checkbox" ng-disabled="" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"></td>
+							<td style="vertical-align:middle;">{{row.RM_FLAG}}</td>
 							<td style="vertical-align:middle;">{{toJsDate(row.DATA_DATE) | date:"yyyy-MM-dd"}}</td>
 							<td style="vertical-align:middle;">{{row.BRANCH_NBR}}-{{row.BRANCH_NAME}}</td>
 							<td style="vertical-align:middle;">{{row.EMP_NAME}}</td>
@@ -175,10 +204,8 @@ input.faChkSqr:after {
 											ng-validate="false" 
 											ng-editable="false"
 											ng-format="F3"
-											ng-readonly="!chkMaintenance"
-											ng-disabled="!chkMaintenance"
 											style="line-height:20px;display:inline;" />
-		                    	<input type="text" class="form-control" style="width: 300px;display:inline;" e-length-limit="200" ng-model="row.NOTE" placeholder="請補充查證方式..." ng-if="row.NOTE_TYPE == 'O'" ng-disabled="!chkMaintenance" ng-blur="updateFlag(row)"/>
+		                    	<input type="text" class="form-control" style="width: 300px;display:inline;" e-length-limit="200" ng-model="row.NOTE" placeholder="請補充查證方式..." ng-if="row.NOTE_TYPE == 'O'" ng-blur="updateFlag(row)"/>
 							</td>
 							<td>
 								<input 	type="text" class="form-control" style="width: 150px;display:inline;" 
@@ -187,7 +214,7 @@ input.faChkSqr:after {
 										ng-model="row.RECORD_SEQ" 
 										placeholder="請輸入電訪錄音編號..." 
 										ng-if="row.NOTE_TYPE == 'I' || row.NOTE_TYPE == 'A'" 
-										ng-disabled="!chkMaintenance || row.RECORD_YN == 'N'" 
+										ng-disabled="row.NOTE_TYPE == 'I' || row.RECORD_YN == 'N'" 
 										ng-blur="updateFlag(row)"/>
 							</td>
 							<td><input type="text" class="form-control" style="width: 300px" ng-blur="updateFlag(row)" ng-model="row.NOTE2" placeholder="請輸入聯繫客戶情形及敘明原因..."></td>
@@ -203,7 +230,7 @@ input.faChkSqr:after {
 				</table>
 			</div>
 			<br>
-			<div align="center" ng-show="paramList.length && (priID == '007' || priID == '006' || priID == '011' || priID == '012')"> 
+			<div align="center" ng-show="paramList.length && (priID == 'UHRM012')"> 
 	            <button type="button" class="btn btn-success" ng-click="save()" >
 	                <span class="glyphicon glyphicon-floppy-disk"></span>儲存
 	            </button>

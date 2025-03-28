@@ -12,8 +12,9 @@ public class CustKYCDataVO {
     
   //FOR CBS測試日期修改
     private boolean isKycDueDateUseful;  //如果Y 代表過期 如果N代表沒過期;
-
     
+    //#2304_商品適配及申購新增KYC快到期提醒
+    private boolean kycDueDateLessOneMonth; //KYC校期小於1個月    
     
     public boolean isKycDueDateUseful() {
 		return isKycDueDateUseful;
@@ -46,8 +47,17 @@ public class CustKYCDataVO {
     public void setKycDueDate(Date kycDueDate) {
         this.kycDueDate = kycDueDate;
     }
+    
 
-    @Override
+    public boolean isKycDueDateLessOneMonth() {
+		return kycDueDateLessOneMonth;
+	}
+
+	public void setKycDueDateLessOneMonth(boolean kycDueDateLessOneMonth) {
+		this.kycDueDateLessOneMonth = kycDueDateLessOneMonth;
+	}
+
+	@Override
     public String toString() {
         return "CustKYCDataVO{" +
                 "kycLevel='" + kycLevel + '\'' +

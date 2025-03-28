@@ -36,6 +36,7 @@ public class IOT150InputVO extends PagingInputVO{
 	private String caseId;
 	private String BATCH_SETUP_EMPID;
 	private Date BATCH_SETUP_DATE;
+	private String INS_KEYNO;
 	
 	public List<Map<String, Object>> getIOT_MAINList() {
 		return IOT_MAINList;
@@ -211,4 +212,11 @@ public class IOT150InputVO extends PagingInputVO{
 	public void setBATCH_SETUP_DATE(Date bATCH_SETUP_DATE) {
 		BATCH_SETUP_DATE = bATCH_SETUP_DATE;
 	}
+	public String getINS_KEYNO() {
+		return INS_KEYNO;
+	}
+	public void setINS_KEYNO(String iNS_KEYNO) {
+		INS_KEYNO = iNS_KEYNO;
+	}
+	
 }

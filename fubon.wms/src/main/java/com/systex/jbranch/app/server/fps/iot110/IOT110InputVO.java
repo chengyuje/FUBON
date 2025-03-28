@@ -160,6 +160,8 @@ public class IOT110InputVO extends PagingInputVO {
 	private String I_REVOLVING_LOAN_YN;
 	private String P_REVOLVING_LOAN_YN;
 	private String BUSINESS_REL;
+	private Timestamp C_CREDIT_LASTUPDATE;
+	private Timestamp I_CREDIT_LASTUPDATE;
 
 	public String getPREMATCH_SEQ() {
 		return PREMATCH_SEQ;
@@ -1036,6 +1038,18 @@ public class IOT110InputVO extends PagingInputVO {
 	}
 	public void setBUSINESS_REL(String bUSINESS_REL) {
 		BUSINESS_REL = bUSINESS_REL;
+	}
+	public Timestamp getC_CREDIT_LASTUPDATE() {
+		return C_CREDIT_LASTUPDATE;
+	}
+	public void setC_CREDIT_LASTUPDATE(Timestamp c_CREDIT_LASTUPDATE) {
+		C_CREDIT_LASTUPDATE = c_CREDIT_LASTUPDATE;
+	}
+	public Timestamp getI_CREDIT_LASTUPDATE() {
+		return I_CREDIT_LASTUPDATE;
+	}
+	public void setI_CREDIT_LASTUPDATE(Timestamp i_CREDIT_LASTUPDATE) {
+		I_CREDIT_LASTUPDATE = i_CREDIT_LASTUPDATE;
 	}
 
 }

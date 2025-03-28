@@ -122,6 +122,9 @@ public class SOT801 extends SotPdf{
 				}else{//特金交易
 					if(StringUtils.equals(data_list.get(0).get("OVS_PRIVATE_YN").toString(), "Y")) {
 						reportID = "R3"; //境外私募基金
+						if(StringUtils.equals(data_list.get(0).get("OVER_CENTRATE_YN").toString(), "W")) {
+							data.addParameter("CENTRATE_REMARK", "本筆交易觸及集中度限制，需徵提高資產客戶投資產品集中度聲明書。");
+						}
 					} else {
 						reportID = "R1";
 					}

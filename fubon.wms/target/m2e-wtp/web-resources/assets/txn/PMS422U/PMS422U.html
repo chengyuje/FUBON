@@ -75,55 +75,51 @@
 						<th>業務處：</th>
 						<td>
 							<e-combobox id="region_center_id" name="region_center_id"
-										ng-paramtype="PMS.UHRM_RC"
-										ng-model="uhrmRC"
+										ng-datasource="uhrmRCList"
+										ng-model="inputVO.uhrmRC"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										width="200px"
 										style="line-height:20px;" />
-						</td>						
-						<th>業務中心：</th>
+						</td>
+						<th>營運區：</th>
 						<td>
 							<e-combobox id="branch_area_id" name="branch_area_id"
-										ng-paramtype="PMS.UHRM_OP"
-										ng-model="uhrmOP"
+										ng-datasource="uhrmOPList"
+										ng-model="inputVO.uhrmOP"
 										ng-validate="false" 
 										ng-disabled="true"
 										ng-readonly="true" 
 										ng-editable="false"
-										ng-format="F3"
+										ng-format="F1"
 										ng-required="true"
-										width="200px"
 										style="line-height:20px;" />
 						</td>
 						<th></th>
 						<td></td>
 					</tr>
 					<tr>
-	                	<th ng-show="tabNumber=='0'">行員ID：</th>
-						<td ng-show="tabNumber=='0'"><input class="form-control" type="text" placeholder="請輸入..." id="empID" name="empID" ng-model="inputVO.empID" e-length-limit="60"></td>
+	                	<th ng-show="tabNumber=='0'">行員身分證號：</th>
+						<td ng-show="tabNumber=='0'"><input class="form-control" type="text" placeholder="請輸入..." id="custID" name="custID" ng-model="inputVO.custID" e-length-limit="60"></td>
+						<th ng-show="tabNumber=='1'">轉出ID：</th>
+						<td ng-show="tabNumber=='1'"><input class="form-control" type="text" placeholder="請輸入..." id="outCustID" name="outCustID" ng-model="inputVO.outCustID" style="width:100%;display:inline;text-transform: uppercase;"></td>
+						<th>員工編號：</th>
+						<td><input class="form-control" type="text" placeholder="請輸入..." id="empID" name="empID" ng-model="inputVO.empID" style="width:100%;display:inline;text-transform: uppercase;"></td>
 						<th>已回覆/未回覆：</th>
 						<td>
-							<e-combobox id="noteStatus" name="noteStatus" 
+							<e-combobox id="noteStatus" name="noteStatus"
 										ng-paramtype="PMS.NOTE_STATUS"
 										ng-model="inputVO.noteStatus"
-										ng-validate="false" 
-										ng-readonly="false" 
+										ng-validate="false"
+										ng-readonly="false"
 										ng-editable="false"
 										ng-format="F3"
 										width="200px"
 										style="line-height:20px;"/>
 						</td>
-						<th ng-show="tabNumber=='1'">轉出ID：</th>
-						<td ng-show="tabNumber=='1'"><input class="form-control" type="text" placeholder="請輸入..." id="outCustID" name="outCustID" ng-model="inputVO.outCustID" style="width:100%;display:inline;text-transform: uppercase;"></td>
-						<th></th>
-						<td></td>
-						<th></th>
-						<td></td>
 					</tr>
 	            </table>
     		</div>
@@ -147,6 +143,7 @@
 				                <tr>
 				                    <th>更新<br>資料</th>
 				                    <th>序號</th>
+				                    <th>私銀註記</th>
 				                    <th>資料日期</th>
 				                    <th>資料來源</th>
 				                    <th>理專歸屬行</th>
@@ -174,6 +171,7 @@
 				                <tr class="repeat-row" ng-repeat="row in data track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
 									<td align="center"><input type="checkbox" ng-disabled="" ng-model="row.UPDATE_FLAG" ng-true-value="'Y'" ng-false-value="'N'"></td>   
 				                    <td ng-bind="outputVO.currentPageIndex * 10 + $index + 1"></td>
+				                    <td ng-bind="row.RM_FLAG"></td>
 				                    <td ng-bind="row.CREATETIME"></td>
 				                    <td ng-bind="row.SOURCE_OF_DEMAND_N"></td>
 				                    <td ng-bind="row.BRANCH_NBR + '-' + row.BRANCH_NAME"></td>
@@ -243,11 +241,12 @@
 				                <thead>
 				                <tr>
 				                	<th>查核</th>
+				                	<th>私銀註記</th>
 				                    <th>資料統計日期</th>
 				                    <th>帳務起日</th>
 				                    <th>帳務迄日</th>
 				                    <th>理專歸屬行</th>
-				                    <th>AO CODE</th>
+				                    <th>員工編號</th>
 				                    <th>轉出ID</th>
 				                    <th>轉出姓名</th>
 				                    <th>轉入ID</th>
@@ -267,11 +266,12 @@
 											<i class="glyphicon glyphicon-search" title="檢視"></i>
 										</button>
 									</td>
+									<td>{{row.RM_FLAG}}</td>
 				                    <td>{{row.CREATETIME}}</td>
 				                    <td>{{row.ACT_START_DATE}}</td>
 				                    <td>{{row.ACT_END_DATE}}</td>
 				                    <td>{{row.BRANCH_NBR + '-' + row.BRANCH_NAME}}</td>
-				                    <td>{{row.AO_CODE}}</td>
+				                    <td>{{row.EMP_ID}}</td>
 				                    <td>{{row.OUT_CUST_ID1}}</td>
 				                    <td>{{row.OUT_CUST_NAME1}}</td>
 				                    <td>{{row.IN_CUST_ID1}}</td>

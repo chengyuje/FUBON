@@ -7,11 +7,10 @@
 			<div class="tfb_content_icon"></div>
 			<div class="tfb_content_tit"><img src="assets/images/icon/tfb_icon_a15.gif" >設備管理查詢</div>
 		</div>
-		<!--Content of the panel-->
 		<div class="panel_content">
-			<div class="search_table search_box2">
+			<div class="search_table search_box3">
 				<table>
-					<tr>
+					<tr ng-if="!priID.startsWith('UHRM')">
 						<th>業務處：</th>
 						<td>
 							<e-combobox id="regionCenterId" name="regionCenterId"
@@ -40,9 +39,7 @@
 										ng-change="ChangeArea(region)"
 										style="line-height:20px;" />
 					   	</td>
-					</tr>
-					<tr>
-						<th>分行：</th>
+					   	<th>分行：</th>
 						<td>
 							<e-combobox id="branchNbr" name="branchNbr"
 										ng-datasource="BRANCH_LIST"
@@ -56,12 +53,42 @@
 										ng-change="ChangeBranch(region)"
 										style="line-height:20px;" />
 				   		</td>
+					</tr>
+					<tr ng-if="priID.startsWith('UHRM')">
+						<th>業務處：</th>
+						<td>
+							<e-combobox id="region_center_id" name="region_center_id"
+										ng-datasource="uhrmRCList"
+										ng-model="inputVO.regionCenterId"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>		
+						<th>營運區：</th>
+						<td>
+							<e-combobox id="branch_area_id" name="branch_area_id"
+										ng-datasource="uhrmOPList"
+										ng-model="inputVO.bra_areaID"
+										ng-validate="false" 
+										ng-disabled="true"
+										ng-readonly="true" 
+										ng-editable="false"
+										ng-format="F3"
+										ng-required="true"
+										style="line-height:20px;" />
+						</td>
+						<th></th>
+						<td></td>
+					</tr>
+					<tr>
 						<th>設備編號：</th>
 						<td>
 							<input type="text" class="form-control" id="dev_nbr" name="dev_nbr" ng-model="inputVO.dev_nbr" e-length-limit="15">
 						</td>
-					</tr>
-					<tr>
 						<th>狀態：</th>
 						<td>
 							<e-combobox id="dev_status"
@@ -87,6 +114,9 @@
 			   							style="line-height:20px;" />
 						</td>
 					</tr>
+					<tr>
+						
+					</tr>
 				</table>
 			</div>
 			<div class="search_box_btn text-center">
@@ -97,7 +127,6 @@
 			</div>
 		</div>
 	</div>
-	<!-- 結果區 -->
 	<div>
 		<div class="tfb_content">
 			<div class="tfb_content_icon"></div>
@@ -123,7 +152,7 @@
 			<e-jumping-once output="outputVO" list="data" totallist="resultList"></e-jumping-once>
 			<div class="gv_tab_sc scroll_y" style="white-space: nowrap;">
 				<div id="exportable">
-					<table>
+					<table class="table e-table-freeze td_center" e-height="500px" e-mode="1" e-top="true" e-list="data">
 						<thead>
 							<tr>
 								<th>勾選</th>
@@ -143,30 +172,33 @@
 						</thead>
 						<tbody>
 							<tr class="repeat-row" ng-repeat="row in data | limitTo:displayLimit track by $index" ng-class-odd="'rowOdd'" ng-class-even="'rowEven'">
-								<td><input type='checkbox' ng-model='row.SELECTED' ></td>
-								<td>{{row.DC_NBR | mapping:REGION_LIST:'F3'}}</td>
-								<td>{{row.OP_NBR | mapping:AREA_LIST:'F3'}}</td>
-								<td>{{row.BRA_NBR | mapping:BRANCH_LIST:'F1'}}</td>
-								<td>{{row.AO_CODE}}{{row.AO_CODE == undefined ? '' : '-'}}{{row.EMP_NAME}}</td>
-								<td>{{row.EMP_ID}}</td>
-								<td>{{row.CREATOR}}</td>
-								<td>{{row.DEV_NBR}}</td>
-								<td><input type="text" class="form-control" id="dev_take_emp" name="dev_take_emp" ng-model="row.DEV_TAKE_EMP" ng-blur="showName(row)" e-length-limit="6" style="display: inline; width: 100px">{{row.KEEPER_NAME}}</td>
-								<td ng-if="!auth">{{row.DEV_SITE_TYPE | mapping:mappingSet['MAO.DEV_SITE_TYPE']:'F3'}}</td>
-								<td ng-if="auth">
-									<e-combobox id="dev_site_type"
-										ng-datasource="mappingSet['MAO.DEV_SITE_TYPE']" 
-										ng-model="row.DEV_SITE_TYPE"
-			   							ng-validate="false" 
-			   							ng-readonly="false" 
-			   							ng-editable="false"
-			   							ng-format="F3"
-			   							ng-required="false"
-			   							style="line-height:20px;" />
+								<td style="vertical-align:middle;"><input type='checkbox' ng-model='row.SELECTED' ></td>
+								<td style="vertical-align:middle;">{{row.REGION_CENTER_NAME}}</td>
+								<td style="vertical-align:middle;">{{row.BRANCH_AREA_NAME}}</td>
+								<td style="vertical-align:middle;">{{row.BRANCH_NAME}}</td>
+								<td style="vertical-align:middle;">{{row.AO_CODE}}{{row.AO_CODE == undefined ? '' : '-'}}{{row.EMP_NAME}}</td>
+								<td style="vertical-align:middle;">{{row.EMP_ID}}</td>
+								<td style="vertical-align:middle;">{{row.CREATOR}}</td>
+								<td style="vertical-align:middle;">{{row.DEV_NBR}}</td>
+								<td style="vertical-align:middle;text-align: left">
+									<input type="text" class="form-control" id="dev_take_emp" name="dev_take_emp" ng-model="row.DEV_TAKE_EMP" ng-blur="showName(row)" e-length-limit="6" style="display: inline; width: 100px">
+									{{row.KEEPER_NAME}}
 								</td>
-								<td><a ng-if="row.POS_LONG && row.POS_LATI" onclick="return false" ng-click="map(row)">經度: {{row.POS_LONG}}, 緯度: {{row.POS_LATI}} </a></td>
-								<td>{{row.LASTUPDATE}}</td>
-								<td>{{row.DEV_STATUS | mapping:mappingSet['MAO.DEV_STATUS']:'F3'}}</td>
+								<td style="vertical-align:middle;" ng-if="!auth">{{row.DEV_SITE_TYPE | mapping:mappingSet['MAO.DEV_SITE_TYPE']:'F3'}}</td>
+								<td style="vertical-align:middle;" ng-if="auth">
+									<e-combobox id="dev_site_type"
+												ng-datasource="mappingSet['MAO.DEV_SITE_TYPE']" 
+												ng-model="row.DEV_SITE_TYPE"
+					   							ng-validate="false" 
+					   							ng-readonly="false" 
+					   							ng-editable="false"
+					   							ng-format="F3"
+					   							ng-required="false"
+					   							style="line-height:20px;" />
+								</td>
+								<td style="vertical-align:middle;"><a ng-if="row.POS_LONG && row.POS_LATI" onclick="return false" ng-click="map(row)">經度: {{row.POS_LONG}}, 緯度: {{row.POS_LATI}} </a></td>
+								<td style="vertical-align:middle;">{{row.LASTUPDATE}}</td>
+								<td style="vertical-align:middle;">{{row.DEV_STATUS | mapping:mappingSet['MAO.DEV_STATUS']:'F3'}}</td>
 							</tr>
 						</tbody>
 					</table>

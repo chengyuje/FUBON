@@ -177,4 +177,18 @@ eSoafApp.controller('PRD235Controller',
         $scope.tradeTypeChanged = function() {
         	$scope.inquireInit();
         }
+        
+        $scope.dividendSetup = function() {
+        	var dialog = ngDialog.open({
+				template: 'assets/txn/PRD235/PRD235_DIVIDEND.html',
+				className: 'PRD235_DIVIDEND',
+				showClose: false,
+				controller: ['$scope', function($scope) {
+					$scope.row = {};
+				}]
+			});
+			dialog.closePromise.then(function(data) {
+//				$scope.inquire();
+			});
+        }
 });

@@ -7,8 +7,8 @@
 	<h4>客戶基本資料查詢</h4>
 	<table>
      	<tr>
-     		<th>歸屬行：</th>
-     		<td>
+     		<th ng-show="!pri.startsWith('UHRM')">歸屬行：</th>
+     		<td ng-show="!pri.startsWith('UHRM')">
      			<e-combobox id="belong_bra_nbr"
 							ng-datasource="mappingSet['branchsDesc']"
 							ng-model="inputVO.belong_bra_nbr"
@@ -21,6 +21,39 @@
 			   				width="200px"
 			   				style="line-height:20px;" />
      		</td>
+     		<th ng-show="!pri.startsWith('UHRM')">AO Code：</th>
+     		<td ng-show="!pri.startsWith('UHRM')">
+     			<!-- #0662: WMS-CR-20210624-01_配合DiamondTeam專案調整系統模組功能_組織+客管 -->
+     			<e-combobox id="ao_code" 
+							ng-datasource="mappingSet['AO_CODE']"
+							ng-model="inputVO.ao_code"
+			   				ng-validate="false" 
+			   				ng-readonly="ao_code.length == 1" 
+			   				ng-disabled="ao_code.length == 1"
+			   				ng-editable="false"
+			   				ng-format="F1"
+			   				ng-required="false"
+			   				width="200px"
+			   				style="line-height:20px;" />
+			</td>
+     		<th ng-show="pri.startsWith('UHRM') || pri == '013' || memLoginFlag == 'ALL'">私銀：</th>
+			<td ng-show="pri.startsWith('UHRM') || pri == '013' || memLoginFlag == 'ALL'">
+   				<e-combobox id="uEmpID" name="uEmpID"
+							ng-datasource="mappingSet['UHRM_LIST']"
+							ng-model="inputVO.uEmpID"
+							ng-validate="false" 
+							ng-disabled="mappingSet['UHRM_LIST'].length == 2"
+							ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
+							ng-editable="false"
+							ng-format="F3"
+							ng-required="true"
+							width="200px"
+							style="line-height:20px;" />
+     		</td>
+     	</tr>
+     	<tr>
+     		<th></th>
+     		<td></td>
      		<th>國籍：</th>
      		<td>
      			<e-combobox id="country_nbr"
@@ -156,34 +189,8 @@
 			   				width="200px"
 			   				style="line-height:20px;" />
      		</td>
-     		<th>{{pri.startsWith('UHRM') ? 'UHRM：' : 'AO Code：'}}</th>
-     		<td>
-     			<!-- #0662: WMS-CR-20210624-01_配合DiamondTeam專案調整系統模組功能_組織+客管 -->
-     			<e-combobox id="ao_code" 
-							ng-datasource="mappingSet['AO_CODE']"
-							ng-model="inputVO.ao_code"
-			   				ng-validate="false" 
-			   				ng-readonly="ao_code.length == 1" 
-			   				ng-disabled="ao_code.length == 1"
-			   				ng-hide="pri.startsWith('UHRM')"
-			   				ng-editable="false"
-			   				ng-format="F1"
-			   				ng-required="false"
-			   				width="200px"
-			   				style="line-height:20px;" />
-   				<e-combobox id="uEmpID" name="uEmpID"
-							ng-datasource="mappingSet['UHRM_LIST']"
-							ng-model="inputVO.uEmpID"
-							ng-validate="false" 
-							ng-disabled="mappingSet['UHRM_LIST'].length == 2"
-							ng-readonly="mappingSet['UHRM_LIST'].length == 2" 
-							ng-show="pri.startsWith('UHRM')"
-							ng-editable="false"
-							ng-format="F3"
-							ng-required="true"
-							width="200px"
-							style="line-height:20px;" />
-     		</td>
+     		<th></th>
+     		<td></td>
      		<th>客戶風險屬性：</th>
      		<td>
      			<e-combobox id="cust_risk_atr" 

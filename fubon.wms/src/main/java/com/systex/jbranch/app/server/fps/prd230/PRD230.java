@@ -890,7 +890,7 @@ public class PRD230 extends FubonWmsBizLogic {
 			// gen csv
 			Map<String, String> comm_yn = xmlInfo.doGetVariable("COMMON.YES_NO", FormatHelper.FORMAT_3);
 			Map<String, String> vigi_hs = xmlInfo.doGetVariable("PRD.FUND_VIGILANT", FormatHelper.FORMAT_3);
-			Map<String, String> warning = xmlInfo.doGetVariable("PRD.FUND_ALERT", FormatHelper.FORMAT_3);
+			Map<String, String> warning = xmlInfo.doGetVariable("PRD.FUND_C_ALERT", FormatHelper.FORMAT_3);
 			Map<String, String> subject = xmlInfo.doGetVariable("PRD.FUND_SUBJECT", FormatHelper.FORMAT_3);
 			Map<String, String> project = xmlInfo.doGetVariable("PRD.FUND_PROJECT", FormatHelper.FORMAT_3);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -1551,8 +1551,10 @@ public class PRD230 extends FubonWmsBizLogic {
 		// 先清空
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		sql.append("delete TBSYSPARAMETER where PARAM_TYPE = :PARAM_TYPE ");
-		queryCondition.setObject("PARAM_TYPE", "PRD.FUND_ALERT");
+		// 2354
+		sql.append("delete TBSYSPARAMETER where PARAM_TYPE = :PARAM_TYPE_C OR PARAM_TYPE = :PARAM_TYPE_E ");
+		queryCondition.setObject("PARAM_TYPE_C", "PRD.FUND_C_ALERT");
+		queryCondition.setObject("PARAM_TYPE_E", "PRD.FUND_E_ALERT");
 		queryCondition.setQueryString(sql.toString());
 		dam.exeUpdate(queryCondition);
 		List<String> error = new ArrayList<String>();
@@ -1572,8 +1574,11 @@ public class PRD230 extends FubonWmsBizLogic {
 					try {
 						if (!"警語代碼".equals(str[0].trim()))
 							throw new Exception(str[0]);
-						else if (!"警語訊息".equals(str[1].trim()))
+							//2354
+						else if (!"中文警語訊息".equals(str[1].trim()))
 							throw new Exception(str[1]);
+						else if (!"英文警語訊息".equals(str[2].trim()))
+							throw new Exception(str[2]);
 					} catch (Exception ex) {
 						throw new APException(ex.getMessage() + ":上傳格式錯誤，請下載範例檔案");
 					}
@@ -1588,30 +1593,17 @@ public class PRD230 extends FubonWmsBizLogic {
 					continue;
 				}
 
-				TBSYSPARAMETERPK parameterPK = new TBSYSPARAMETERPK();
-				parameterPK.setPARAM_TYPE("PRD.FUND_ALERT");
-				parameterPK.setPARAM_CODE(str[0].trim());
-				TBSYSPARAMETERVO parameterVO = new TBSYSPARAMETERVO();
-				parameterVO.setcomp_id(parameterPK);
-				parameterVO.setPARAM_NAME(str[1].trim());
-				parameterVO.setPARAM_NAME_EDIT(str[1].trim());
-
-				sql = new StringBuffer();
-				sql.append("select max(PARAM_ORDER) as COUNT from TBSYSPARAMETER where PARAM_TYPE = :PARAM_TYPE");
-				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-				queryCondition.setObject("PARAM_TYPE", "PRD.FUND_ALERT");
-				queryCondition.setQueryString(sql.toString());
-				List<Map<String, Object>> list2 = dam.exeQuery(queryCondition);
-				if (null == list2.get(0).get("COUNT")) {
-					parameterVO.setPARAM_ORDER(0);
-				} else {
-					parameterVO.setPARAM_ORDER(Integer.parseInt(list2.get(0).get("COUNT").toString()) + 1);
+				// 2354
+				if (StringUtils.isBlank(str[1])){
+					error.add(Integer.toString(i+1));
+					continue;
+				} else if (StringUtils.isBlank(str[2])){
+					error2.add(Integer.toString(i+1));
+					continue;
 				}
 
-				parameterVO.setVersion(new Long(0));
-				parameterVO.setPARAM_STATUS("0");
-
-				dam.create(parameterVO);
+				dataUpdate("PRD.FUND_C_ALERT", str[0].trim(), str[1].trim());
+				dataUpdate("PRD.FUND_E_ALERT", str[0].trim(), str[2].trim());
 			}
 		}
 		return_VO.setErrorList(error);
@@ -1620,6 +1612,33 @@ public class PRD230 extends FubonWmsBizLogic {
 		return_VO.setErrorList4(error4);
 		return_VO.setErrorList5(error5);
 		this.sendRtnObject(return_VO);
+	}
+
+	// 2354
+	private void dataUpdate(String param_type, String param_code, String param_name) throws Exception {
+		TBSYSPARAMETERPK parameterPK = new TBSYSPARAMETERPK();
+		parameterPK.setPARAM_TYPE(param_type);
+		parameterPK.setPARAM_CODE(param_code);
+		TBSYSPARAMETERVO parameterVO = new TBSYSPARAMETERVO();
+		parameterVO.setcomp_id(parameterPK);
+		parameterVO.setPARAM_NAME(param_name);
+		parameterVO.setPARAM_NAME_EDIT(param_name);
+		StringBuffer sql = new StringBuffer();
+		sql.append("select max(PARAM_ORDER) as COUNT from TBSYSPARAMETER where PARAM_TYPE = :PARAM_TYPE");
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		queryCondition.setObject("PARAM_TYPE", param_type);
+		queryCondition.setQueryString(sql.toString());
+		List<Map<String, Object>> list2 = dam.exeQuery(queryCondition);
+		if (null == list2.get(0).get("COUNT")) {
+			parameterVO.setPARAM_ORDER(0);
+		} else {
+			parameterVO.setPARAM_ORDER(Integer.parseInt(list2.get(0).get("COUNT").toString()) + 1);
+		}
+
+		parameterVO.setVersion(new Long(0));
+		parameterVO.setPARAM_STATUS("0");
+
+		dam.create(parameterVO);
 	}
 
 	/*
@@ -1916,8 +1935,12 @@ public class PRD230 extends FubonWmsBizLogic {
 		// getRoleList
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();
-		sql.append("select PARAM_CODE, PARAM_NAME from tbsysparameter where PARAM_TYPE = :PARAM_TYPE order by param_order ");
-		queryCondition.setObject("PARAM_TYPE", "PRD.FUND_ALERT");
+		// sql.append("select a.PARAM_CODE, a.PARAM_NAME, NVL((select PARAM_NAME from tbsysparameter where PARAM_TYPE = :PARAM_TYPE_E and PARAM_CODE = a.PARAM_CODE),'123') as PARAM_NAME_2 from tbsysparameter a where a.PARAM_TYPE = :PARAM_TYPE_C order by a.param_order");
+		sql.append("SELECT * FROM (SELECT param_order,PARAM_CODE, PARAM_NAME, ROW_NUMBER() OVER (PARTITION BY PARAM_CODE ORDER BY PARAM_NAME desc) AS row_num "+
+		"FROM tbsysparameter where PARAM_TYPE = :PARAM_TYPE_C or PARAM_TYPE = :PARAM_TYPE_E) "+
+		"PIVOT (MAX(PARAM_NAME) FOR row_num IN (1 AS PARAM_NAME, 2 AS PARAM_NAME_2)) ORDER BY param_order");
+		queryCondition.setObject("PARAM_TYPE_C", "PRD.FUND_C_ALERT");
+		queryCondition.setObject("PARAM_TYPE_E", "PRD.FUND_E_ALERT");
 		queryCondition.setQueryString(sql.toString());
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
 		if (list.size() > 0) {
@@ -1926,19 +1949,22 @@ public class PRD230 extends FubonWmsBizLogic {
 			List listCSV = new ArrayList();
 			for (Map<String, Object> map : list) {
 				// 24 column
-				String[] records = new String[2];
+				String[] records = new String[3];
 				int i = 0;
 
 				records[i] = checkIsNull(map, "PARAM_CODE");
 				records[++i] = checkIsNull(map, "PARAM_NAME");
+				records[++i] = checkIsNull(map, "PARAM_NAME_2");
 
 				listCSV.add(records);
 			}
 			// header
-			String[] csvHeader = new String[2];
+			String[] csvHeader = new String[3];
 			int j = 0;
 			csvHeader[j] = "警語代碼";
-			csvHeader[++j] = "警語訊息";
+			//2354
+			csvHeader[++j] = "中文警語訊息";
+			csvHeader[++j] = "英文警語訊息";
 
 			CSVUtil csv = new CSVUtil();
 			csv.setHeader(csvHeader);

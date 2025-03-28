@@ -225,7 +225,21 @@ eSoafApp.controller('PMS399Controller', function($rootScope, $scope, $controller
 	};
 	
 	$scope.passParams = $scope.connector('get','passParams');
-
+	
+	$scope.bn = function(url) {
+    	var sdate = $scope.inputVO.sCreDate;
+    	var edate = $scope.inputVO.eCreDate;
+    	var dialog = ngDialog.open({
+    	    template:'assets/txn/PMS399/PMS399_detail.html',
+    	    className:'PMS399',     
+    	    controller:['$scope',function($scope) {
+    	    	$scope.sCreDate = sdate;
+    	    	$scope.eCreDate = edate;
+    	    	$scope.cust_id = url;
+    	    }]        	 
+    	});
+    };
+    
 	$scope.newRPT = function() {
 		$rootScope.menuItemInfo.url = "assets/txn/PMS401/PMS401.html";
     };
