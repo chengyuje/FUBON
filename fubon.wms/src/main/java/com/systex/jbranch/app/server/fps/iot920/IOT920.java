@@ -1563,6 +1563,9 @@ public class IOT920 extends FubonWmsBizLogic{
 		BigDecimal income3 = BigDecimal.ZERO;
 		Date creditLastUpdate = null;
 
+		if(applyDate == null || StringUtils.isBlank(custID))
+			return map;
+		
 		dam_obj = getDataAccessManager();
 		QueryConditionIF qc = dam_obj.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuilder sb = new StringBuilder();

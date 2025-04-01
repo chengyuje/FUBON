@@ -872,7 +872,8 @@ public class ProdFitness extends FubonWmsBizLogic {
 	private Boolean validPIBuyBondSNETF() throws Exception {
 		FP032675DataVO fp032675 = this.getCustVO().getFp032675DataVO();
 		
-		if (StringUtils.equals("Y", this.getPiBuy()) 
+		if (!StringUtils.equals("Y", this.getCustVO().getHNWCDataVO().getValidHnwcYN()) //高資產客戶可免兩週控管
+				&& StringUtils.equals("Y", this.getPiBuy()) 
 				&& StringUtils.equals("Y", fp032675.getCustProFlag()) 
 				&& StringUtils.equals("Y", fp032675.getInvestType()) 
 				&& !StringUtils.equals("Y", fp032675.getInvestDue())) {

@@ -58,7 +58,7 @@ eSoafApp.controller('CRM820Controller',
 			if(!isNaN($scope.investment.total)) $scope.total  = $scope.investment.total;
 		};
 		$scope.init();
-		
+
 		
 	
 		//畫圖參數設定
@@ -156,6 +156,7 @@ eSoafApp.controller('CRM820Controller',
 		
 		// 2017/11/2
 		$scope.goCRM860 = function() {
+			$scope.custVO.isOBU = $scope.inputVO.isOBU;
 			var temp_vo = $scope.custVO;
 			var dialog = ngDialog.open({
 				template: 'assets/txn/CRM860/CRM860.html',

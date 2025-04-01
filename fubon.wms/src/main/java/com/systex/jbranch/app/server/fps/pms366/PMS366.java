@@ -312,6 +312,7 @@ public class PMS366 extends FubonWmsBizLogic {
 		XmlInfo xmlInfo = new XmlInfo();
 		boolean isHeadMGR = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2).containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 		boolean isFC = xmlInfo.doGetVariable("FUBONSYS.FC_ROLE", FormatHelper.FORMAT_2).containsKey((String) getUserVariable(FubonSystemVariableConsts.LOGINROLE));
+		boolean isUHRM = xmlInfo.doGetVariable("FUBONSYS.UHRM_ROLE", FormatHelper.FORMAT_2).containsKey(getUserVariable(FubonSystemVariableConsts.LOGINROLE));
 
 //		//=== 取得查詢資料可視範圍 START ===
 //		PMS000 pms000 = (PMS000) PlatformContext.getBean("pms000");
@@ -372,7 +373,7 @@ public class PMS366 extends FubonWmsBizLogic {
 		}
 		
 		// EMP 
-		if (isFC) {
+		if (isFC || isUHRM) {
 			queryCondition.setObject("empID", (String) getUserVariable(FubonSystemVariableConsts.LOGINID));
 		} else if (StringUtils.isNotBlank(inputVO.getAo_code())) {
 			queryCondition.setObject("aoCode", inputVO.getAo_code());

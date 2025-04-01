@@ -696,8 +696,7 @@ eSoafApp.controller('IOT120Controller', function($rootScope, $confirm, $scope, $
 		}
 		//首期保費繳費方式
 		if($scope.inputVO.PAY_SERV_RETURN_CODE != "100") { //線上繳款匯款件由人壽線上繳款API取得，這裡就不用ASSIGN
-			var findFpay = $filter('filter')($scope.mappingSet['IOT.FPAY_KIND_MAPPING'], {DATA: $scope.webservice.Result.FPAY_KIND});
-			$scope.inputVO.FIRST_PAY_WAY = (findFpay != null && findFpay.length > 0) ? findFpay[0].LABEL : "";
+			$scope.inputVO.FIRST_PAY_WAY = $scope.webservice.Result.FPAY_KIND;
 		}
 		//投資標的
 		//註解掉，由購買檢核資料帶入
