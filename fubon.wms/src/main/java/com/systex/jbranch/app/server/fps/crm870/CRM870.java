@@ -764,14 +764,14 @@ public class CRM870 extends FubonWmsBizLogic {
 	public void appendSecDsnSql(StringBuffer sb) {
 		sb.append("INNER JOIN ( ");
 		sb.append("SELECT ");
-		sb.append("DSN.CUSTOMER_ID, DSN.SALES_BRANCH_NBR, ACCT.CROSS_SELLING_IND ");
+		sb.append("DSN.CUSTOMER_ID, DSN.SALES_BRANCH_NBR, ACCT.CROSS_SELLING_IND, DSN.ACCT_NBR ");
 		sb.append("FROM TBCRM_S_TFB_SVIP_ACCT_DSN DSN ");
 		sb.append("     INNER JOIN TBCRM_S_TFB_SVIP_ACCT ACCT ");
 		sb.append("     ON DSN.CUSTOMER_ID = ACCT.CUST_ID AND DSN.SALES_BRANCH_NBR = ACCT.BRANCH_NBR ");
 		sb.append("     AND ACCT.CROSS_SELLING_IND = 'Y' ");
 		sb.append("WHERE ACCT.SNAP_DATE = (SELECT MAX(SNAP_DATE) FROM TBCRM_S_TFB_SVIP_ACCT) ");
 		sb.append(") S ");
-		sb.append("ON M.CUSTOMER_ID = S.CUSTOMER_ID AND M.ACCT_NBR = S.SALES_BRANCH_NBR ");
+		sb.append("ON M.CUSTOMER_ID = S.CUSTOMER_ID AND M.ACCT_NBR = S.ACCT_NBR ");
 	}
 	
 	/*
@@ -796,14 +796,14 @@ public class CRM870 extends FubonWmsBizLogic {
 	public void appendSecDsnSql(StringBuilder sb) {
 		sb.append("INNER JOIN ( ");
 		sb.append("SELECT ");
-		sb.append("DSN.CUSTOMER_ID, DSN.SALES_BRANCH_NBR, ACCT.CROSS_SELLING_IND ");
+		sb.append("DSN.CUSTOMER_ID, DSN.SALES_BRANCH_NBR, ACCT.CROSS_SELLING_IND, DSN.ACCT_NBR ");
 		sb.append("FROM TBCRM_S_TFB_SVIP_ACCT_DSN DSN ");
 		sb.append("     INNER JOIN TBCRM_S_TFB_SVIP_ACCT ACCT ");
 		sb.append("     ON DSN.CUSTOMER_ID = ACCT.CUST_ID AND DSN.SALES_BRANCH_NBR = ACCT.BRANCH_NBR ");
 		sb.append("     AND ACCT.CROSS_SELLING_IND = 'Y' ");
 		sb.append("WHERE ACCT.SNAP_DATE = (SELECT MAX(SNAP_DATE) FROM TBCRM_S_TFB_SVIP_ACCT) ");
 		sb.append(") S ");
-		sb.append("ON M.CUSTOMER_ID = S.CUSTOMER_ID AND M.ACCT_NBR = S.SALES_BRANCH_NBR ");
+		sb.append("ON M.CUSTOMER_ID = S.CUSTOMER_ID AND M.ACCT_NBR = S.ACCT_NBR ");
 	}
 	
 }

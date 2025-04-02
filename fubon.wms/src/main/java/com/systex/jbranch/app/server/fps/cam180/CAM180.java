@@ -85,8 +85,24 @@ public class CAM180 extends FubonWmsBizLogic {
 //		queryCondition.setFetchSize(3000); //沒有用，不會真的限制3000筆資料
 		queryCondition.setMaxResults((Integer) SysInfo.getInfoValue(FubonSystemVariableConsts.QRY_MAX_RESULTS));
 		queryCondition.setQueryString(genSql(queryCondition, inputVO).toString());
-
+        Long startTime = System.currentTimeMillis();
 		return_VO.setResultList(dam.exeQuery(queryCondition));
+		Long EndTime = System.currentTimeMillis();
+		Long executeTime = (EndTime - startTime) / 1000;
+		if(executeTime > 60) {
+			System.out.println("CAM180 inquire超時60秒案例:" +  executeTime   + "秒");
+			System.out.println(queryCondition.getQueryString());
+			System.out.println("bCode:" + inputVO.getbCode());
+			System.out.println("branch_area_id:" + inputVO.getBranch_area_id());
+			System.out.println("pCode:" + inputVO.getpCode());
+			System.out.println("force:" + inputVO.getForce());
+			System.out.println("from:" + inputVO.getFrom());
+			System.out.println("tabType:" + inputVO.getTabType());
+			System.out.println("sDate:" + inputVO.getsDate());
+			System.out.println("eDate:" + inputVO.geteDate());
+			System.out.println("sEDate:" + inputVO.getsEDate());
+			System.out.println("eEDate:" + inputVO.geteEDate());	
+		}
 		this.sendRtnObject(return_VO);
 	}
 
@@ -464,7 +480,24 @@ public class CAM180 extends FubonWmsBizLogic {
 		String downloadCount = (String) xmlInfo.getVariable("CAM.180_MAX_DOWNLOAD_COUNT", "1", "F3");
 		queryCondition.setMaxResults(Integer.parseInt(downloadCount)); //10000筆
 		queryCondition.setQueryString(genSql(queryCondition, inputVO).toString());
+		Long startTime = System.currentTimeMillis();
 		List<Map<String, Object>> list = dam.exeQuery(queryCondition);
+		Long EndTime = System.currentTimeMillis();
+		Long executeTime = (EndTime - startTime) / 1000;
+		if(executeTime > 60) {
+			System.out.println("CAM180 inquire超時60秒案例:" +  executeTime   + "秒");
+			System.out.println(queryCondition.getQueryString());
+			System.out.println("bCode:" + inputVO.getbCode());
+			System.out.println("branch_area_id:" + inputVO.getBranch_area_id());
+			System.out.println("pCode:" + inputVO.getpCode());
+			System.out.println("force:" + inputVO.getForce());
+			System.out.println("from:" + inputVO.getFrom());
+			System.out.println("tabType:" + inputVO.getTabType());
+			System.out.println("sDate:" + inputVO.getsDate());
+			System.out.println("eDate:" + inputVO.geteDate());
+			System.out.println("sEDate:" + inputVO.getsEDate());
+			System.out.println("eEDate:" + inputVO.geteEDate());	
+		}
 		if (list.size() > 0) {
 			Map<String, String> visitCmuType = xmlInfo.doGetVariable("CAM.VST_REC_CMU_TYPE", FormatHelper.FORMAT_3);
 			Map<String, String> source_id = xmlInfo.doGetVariable("CAM.CAM_CATEGORY", FormatHelper.FORMAT_3);
