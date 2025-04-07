@@ -129,7 +129,7 @@ public class PRD130 extends FubonWmsBizLogic {
 		sql.append(" ROUND((a.DATE_OF_MATURITY - SYSDATE) / 365, 2) as DATE_OF_MATURITY, ");
 		sql.append(" b.BOND_CREDIT_RATING_SP,a.YTM,CASE WHEN a.PI_BUY = 'Y' THEN 'Y' ELSE 'N' END AS PI_BUY,a.BOND_CATE_ID, a.DATE_OF_MATURITY as MATURITY_DATE, ");
 		sql.append(" a.OBU_BUY as OBU_BUY_2, NVL(a.IS_WEB_SALE, 'N') as IS_WEB_SALE, a.PROJECT, a.CUSTOMER_LEVEL, ");
-		sql.append(" NVL(a.FACE_VALUE, 0) AS FACE_VALUE, b.BASE_AMT_OF_PURCHASE, a.UNIT_OF_PURCHASE, b.COUPON_TYPE, b.FREQUENCY_OF_INTEST_PAY, d.YTM_YTC, ");	// for 海外債試算
+		sql.append(" NVL(a.FACE_VALUE, 0) / 100 AS FACE_VALUE, b.BASE_AMT_OF_PURCHASE, a.UNIT_OF_PURCHASE, b.COUPON_TYPE, b.FREQUENCY_OF_INTEST_PAY, d.YTM_YTC, ");	// for 海外債試算
 		sql.append(" TO_CHAR(A.DATE_OF_MATURITY, 'YYYYMMDD') AS END_DATE, TO_CHAR(b.NEXT_INTEREST_PAY_DATE, 'YYYYMMDD') AS NEXT_INTEREST_PAY_DATE, ");			// for 海外債試算
 		sql.append(" a.HNWC_BUY "); //限制高資產客戶申購 (Y/ )
 		sql.append(" from TBPRD_BOND a ");

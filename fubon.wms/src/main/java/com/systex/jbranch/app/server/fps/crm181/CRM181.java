@@ -361,7 +361,7 @@ public class CRM181 extends FubonWmsBizLogic {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sb = new StringBuffer();
 		
-		sb.append("SELECT A.*, B.FUND_CNAME_A AS PRD_NAME, B.FUND_CNAME_S AS PRD_NAME_S, C.CUST_NAME ");
+		sb.append("SELECT A.*, B.FUND_CNAME_A AS PRD_NAME, B.FUND_CNAME_S AS PRD_NAME_S, C.CUST_NAME, B.FUND_CNAME AS PRD_CNAME ");
 		sb.append(" FROM TBCRM_FUND_OVS_PRI_DIV_NOTI A ");
 		sb.append(" INNER JOIN TBPRD_FUND B ON B.PRD_ID = A.PRD_ID ");
 		sb.append(" LEFT JOIN TBCRM_CUST_MAST C ON C.CUST_ID = A.CUST_ID ");

@@ -31,8 +31,8 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 			$scope.sendRecv("REF110", "queryCustProfile", "com.systex.jbranch.app.server.fps.ref110.REF110InputVO", $scope.inputVO, function(tota, isError) {
 				if (!isError) {
 					// 高端_P3
-					if (tota[0].body.uhrmYN == 'Y') { //此為高端客戶，請洽詢個人高端RM
-						$scope.showErrorMsg("此為高端客戶，請洽詢個人高端RM");
+					if (tota[0].body.uhrmYN == 'Y') { //私銀客戶不可進行轉介
+						$scope.showErrorMsg("私銀客戶不可進行轉介");
 						$scope.inputVO.custID = '';
 						
 						return;
@@ -341,8 +341,8 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 			$scope.sendRecv("REF110", "queryCustProfile", "com.systex.jbranch.app.server.fps.ref110.REF110InputVO", $scope.inputVO, function(tota, isError) {
 					if (!isError) {
 						// 高端_P3
-						if (tota[0].body.uhrmYN == 'Y') { //此為高端客戶，請洽詢個人高端RM
-							$scope.showErrorMsg("此為高端客戶，請洽詢個人高端RM");
+						if (tota[0].body.uhrmYN == 'Y') { //私銀客戶不可進行轉介
+							$scope.showErrorMsg("私銀客戶不可進行轉介");
 							$scope.inputVO.custID = '';
 							
 							return;
@@ -515,24 +515,25 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 
 							// #1070: WMS-CR-20220420-01_主副Code專案-轉介功能調整 modify by ocean : 主CODE客戶/主CODE客戶其關係戶，不可轉介投保商品。
 							if ($scope.inputVO.custAoType == 'N') {
-								$scope.showErrorMsg("主CODE客戶，不可轉介投保商品。");///主CODE客戶其關係戶
+								$scope.showErrorMsg("主副CODE有投保客戶，不可轉介投保商品。");///主CODE客戶其關係戶
 								$scope.clearRefEmp();
 								
 								deferred.resolve("");									
 								return deferred.promise;
 							}
 							
-							if ($scope.inputVO.empRoleName == "9") { // JRM->RM，僅可轉介維護CODE與MASS戶
-								if ($scope.inputVO.maintainCust == 'Y' || $scope.inputVO.massCust == 'Y') {
-								} else {
-									$scope.showErrorMsg("JRM僅可轉介維護CODE/MASS戶。");
-									$scope.clearRefEmp();
-									
-									deferred.resolve("");									
-									return deferred.promise;
-								}
-							}
-							
+							// 2025/04/02 add mark by Ocean : WMS-CR-20250401-01_新增轉介規則調整_實動戶檢核
+//							if ($scope.inputVO.empRoleName == "9") { // JRM->RM，僅可轉介維護CODE與MASS戶
+//								if ($scope.inputVO.maintainCust == 'Y' || $scope.inputVO.massCust == 'Y') {
+//								} else {
+//									$scope.showErrorMsg("JRM僅可轉介維護CODE/MASS戶。");
+//									$scope.clearRefEmp();
+//									
+//									deferred.resolve("");									
+//									return deferred.promise;
+//								}
+//							}
+//							
 							// #1070: WMS-CR-20220420-01_主副Code專案-轉介功能調整 modify by ocean : 轉介人轉介投保時，客戶若有所屬理專，系統帶出理專員編；若非與轉介人同一分行，僅可轉介給同一分行理專。
 //							if (($scope.inputVO.branchID).length == 3 && ($scope.inputVO.branchID >= 200 && $scope.inputVO.branchID <= 900)) {
 //								if (!($scope.inputVO.custBraNbr == null || $scope.inputVO.custBraNbr == undefined || $scope.inputVO.custBraNbr == '') && 
@@ -615,20 +616,21 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 							}
 							
 							if ($scope.inputVO.custAoType == 'N') {
-								$scope.showErrorMsg("主CODE客戶，不可轉介投保商品。");///主CODE客戶其關係戶
+								$scope.showErrorMsg("主副CODE有投保客戶，不可轉介投保商品。");///主CODE客戶其關係戶
 								$scope.clearRefEmp();
 								
 								deferred.resolve("");									
 								return deferred.promise;
 							}
 							
-							if ($scope.inputVO.viceCust == 'Y') {
-								$scope.showErrorMsg("副CODE客戶僅可轉介給RM。");
-								$scope.clearRefEmp();
-								
-								deferred.resolve("");									
-								return deferred.promise;
-							}
+							// 2025/04/02 add mark by Ocean : WMS-CR-20250401-01_新增轉介規則調整_實動戶檢核
+//							if ($scope.inputVO.viceCust == 'Y') {
+//								$scope.showErrorMsg("副CODE客戶僅可轉介給RM。");
+//								$scope.clearRefEmp();
+//								
+//								deferred.resolve("");									
+//								return deferred.promise;
+//							}
 							
 							$scope.mappingSet['REF_RPOD'].push({LABEL: '投保商品', DATA: '5'}); 
 							$scope.inputVO.refProd = "5";
@@ -665,7 +667,7 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 						deferred.resolve("success");									
 						return deferred.promise;
 					} else if (null == tota[0].body.refEmpName && "UHRM" == tota[0].body.refEmpRoleName) {
-						$scope.setRefEmpDtl("此為高端客戶，請洽詢個人高端RM");
+						$scope.setRefEmpDtl("私銀客戶不可進行轉介");
 					} else {
 						$scope.setRefEmpDtl("ehl_01_ref110_006");
 					}
@@ -682,8 +684,8 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 		$scope.sendRecv("REF110", "queryCustProfile", "com.systex.jbranch.app.server.fps.ref110.REF110InputVO", $scope.inputVO, function(tota, isError) {
 			if (!isError) {
 				// 高端_P3
-				if (tota[0].body.uhrmYN == 'Y') { //此為高端客戶，請洽詢個人高端RM
-					$scope.showErrorMsg("此為高端客戶，請洽詢個人高端RM");
+				if (tota[0].body.uhrmYN == 'Y') { //私銀客戶不可進行轉介
+					$scope.showErrorMsg("私銀客戶不可進行轉介");
 					$scope.inputVO.custID = '';
 					
 					return;
@@ -754,12 +756,18 @@ eSoafApp.controller('REF110Controller', function(sysInfoService, $rootScope, $sc
 				}
 				
 				if ($scope.data == "update") {
-					if ($scope.inputVO.salerecCounts != null && $scope.inputVO.salerecCounts == 'Y') { //客戶30天內只可轉介同類商品一次(已移除同分行)
-						$scope.showErrorMsg("同客戶、同商品，T+3個月底內只能轉介一次。");		
-						
-						return;
-					} 
-					
+					switch ($scope.inputVO.empRoleName) {
+						case "9":
+							break;
+						default:
+							if ($scope.inputVO.salerecCounts != null && $scope.inputVO.salerecCounts == 'Y') { //客戶30天內只可轉介同類商品一次(已移除同分行)
+								$scope.showErrorMsg("同客戶、同商品，T+3個月底內只能轉介一次。");		
+								
+								return;
+							} 
+							break;
+					}
+
 					$scope.sendRecv("REF110", "updRef", "com.systex.jbranch.app.server.fps.ref110.REF110InputVO", $scope.inputVO,
 	    					function(tota, isError) {
 								if (isError) {

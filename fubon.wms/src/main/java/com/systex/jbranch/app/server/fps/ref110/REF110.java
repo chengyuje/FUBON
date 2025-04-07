@@ -270,8 +270,8 @@ public class REF110 extends FubonWmsBizLogic {
 		sb.append("       CASE WHEN MEM.TYPE = '2' THEN 'Y' ELSE 'N' END AS VICE_CUST, ");		// 副CODE客戶
 		sb.append("       CASE WHEN MEM.TYPE = '3' THEN 'Y' ELSE 'N' END AS MAINTAIN_CUST, ");	// 維護CODE客戶
 		sb.append("       CASE WHEN CUST.AO_CODE IS NULL THEN 'Y' ELSE 'N' END AS MASS_CUST, ");// 空CODE客戶
-		sb.append("       CASE WHEN MEM.TYPE IN ('1', '2') AND PLIST_T.TODAY_FLAG = 'Y' THEN 'Y'"); 	// 轉介客戶為主CODE客戶/副CODE客戶 + 當日登CODE = 可轉介
-		sb.append("            WHEN MEM.TYPE IN ('1', '2') AND PLIST_T.TODAY_FLAG = 'N' AND (CASE WHEN AN.CUST_ID IS NULL THEN 'N' ELSE 'Y' END) = 'Y' THEN 'N'"); 	// 轉介客戶為主CODE客戶 + 非當日登CODE + 有投保實動 = 不可轉介
+		sb.append("       CASE WHEN PLIST_T.ORG_AO_TYPE NOT IN ('1', '2') AND MEM.TYPE IN ('1', '2') AND PLIST_T.TODAY_FLAG = 'Y' THEN 'Y' "); 	// 轉介客戶前次非主CODE/副CODE + 本次為主CODE客戶/副CODE客戶 + 當日登CODE = 可轉介
+		sb.append("            WHEN MEM.TYPE IN ('1', '2') AND PLIST_T.TODAY_FLAG = 'N' AND (CASE WHEN AN.CUST_ID IS NULL THEN 'N' ELSE 'Y' END) = 'Y' THEN 'N'"); 	// 轉介客戶為主CODE客戶/副CODE客戶 + 非當日登CODE + 有投保實動 = 不可轉介
 		sb.append("       ELSE 'Y' END AS AO_TYPE ");
 		
 		if (StringUtils.isNotBlank(inputVO.getRefProd())) {
@@ -301,9 +301,10 @@ public class REF110 extends FubonWmsBizLogic {
 		sb.append("LEFT JOIN TBORG_SALES_AOCODE MEM ON CUST.AO_CODE = MEM.AO_CODE ");
 		sb.append("LEFT JOIN TBPMS_CUST_ACTUAL AN ON AN.YYYYMM = (SELECT MAX(YYYYMM) FROM TBPMS_CUST_ACTUAL) AND AN.CUST_ID = CUST.CUST_ID ");
 		sb.append("LEFT JOIN ( ");
-		sb.append("  SELECT CUST_ID, NEW_AO_CODE, TRUNC(LETGO_DATETIME) AS ACT_DATE, CASE WHEN TRUNC(LETGO_DATETIME) = TRUNC(SYSDATE) THEN 'Y' ELSE 'N' END AS TODAY_FLAG ");
-		sb.append("  FROM TBCRM_CUST_AOCODE_CHGLOG ");
-		sb.append("  WHERE (CUST_ID, TRUNC(LETGO_DATETIME)) IN ( ");
+		sb.append("  SELECT CHG.CUST_ID, CHG.ORG_AO_CODE, AO.TYPE AS ORG_AO_TYPE, CHG.NEW_AO_CODE, TRUNC(CHG.LETGO_DATETIME) AS ACT_DATE, CASE WHEN TRUNC(CHG.LETGO_DATETIME) = TRUNC(SYSDATE) THEN 'Y' ELSE 'N' END AS TODAY_FLAG ");
+		sb.append("  FROM TBCRM_CUST_AOCODE_CHGLOG CHG ");
+		sb.append("  LEFT JOIN TBORG_SALES_AOCODE AO ON CHG.ORG_AO_CODE = AO.AO_CODE ");
+		sb.append("  WHERE (CHG.CUST_ID, TRUNC(CHG.LETGO_DATETIME)) IN ( ");
 		sb.append("    SELECT CUST_ID, MAX(TRUNC(LETGO_DATETIME)) ");
 		sb.append("    FROM TBCRM_CUST_AOCODE_CHGLOG ");
 		sb.append("    GROUP BY CUST_ID ");
