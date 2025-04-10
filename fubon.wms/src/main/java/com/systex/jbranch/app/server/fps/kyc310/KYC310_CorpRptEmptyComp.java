@@ -365,9 +365,12 @@ public class KYC310_CorpRptEmptyComp extends FubonWmsBizLogic {
     	PdfPTable table = buildTable(new int[]{20});
         List<Map> ansList = (List) map.get("ANSWER_LIST_COMP");
         for (Map ansMap : ansList) {
-        	PdfPCell cell = buildCellWithBorder(String.format("□%s", ansMap.get("ANSWER_DESC")), nFont, Paragraph.ALIGN_LEFT, -1, 0);
-            cell.setVerticalAlignment(Paragraph.ALIGN_TOP);
-        	table.addCell(cell);
+        	if(ansMap.get("sameAnsSelect") != null && !((boolean)ansMap.get("sameAnsSelect"))) {
+        		//本次填答與前次相同，不用顯示差異表問卷答案選項
+	        	PdfPCell cell = buildCellWithBorder(String.format("□%s", ansMap.get("ANSWER_DESC")), nFont, Paragraph.ALIGN_LEFT, -1, 0);
+	            cell.setVerticalAlignment(Paragraph.ALIGN_TOP);
+	        	table.addCell(cell);
+        	}
         }
         
         return table;
@@ -431,9 +434,12 @@ public class KYC310_CorpRptEmptyComp extends FubonWmsBizLogic {
        for (Map ansMap : ansList) {
     	 //本次填答比上次上升兩級以上，第一個答案選項不用顯示
     	   if(!(pTypeMap.get("Q3Over2Degree") != null && (boolean)pTypeMap.get("Q3Over2Degree") && ((Double)ansMap.get("ANSWER_SEQ")).equals(new Double(1)))) {
-	    	   PdfPCell cell = buildCellWithBorder(String.format("□%s", ansMap.get("ANSWER_DESC")), nFont, Paragraph.ALIGN_LEFT, -1, 0);
-	           cell.setVerticalAlignment(Paragraph.ALIGN_TOP);
-	           table.addCell(cell);
+    		   if(pTypeMap.get("sameAnsSelect") != null && !((boolean)pTypeMap.get("sameAnsSelect"))) {
+    			   //本次填答與前次相同，不用顯示差異表問卷答案選項
+		    	   PdfPCell cell = buildCellWithBorder(String.format("□%s", ansMap.get("ANSWER_DESC")), nFont, Paragraph.ALIGN_LEFT, -1, 0);
+		           cell.setVerticalAlignment(Paragraph.ALIGN_TOP);
+		           table.addCell(cell);
+    		   }
     	   }
        }
        

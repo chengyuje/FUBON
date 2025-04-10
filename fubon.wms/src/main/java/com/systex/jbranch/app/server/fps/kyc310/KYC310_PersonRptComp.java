@@ -5,19 +5,12 @@ import com.lowagie.text.Image;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
-import com.systex.jbranch.app.server.fps.kyc311.KYC311InputVO;
-import com.systex.jbranch.common.xmlInfo.XMLInfo;
 import com.systex.jbranch.fubon.commons.FubonWmsBizLogic;
 import com.systex.jbranch.platform.common.dataManager.DataManager;
 import com.systex.jbranch.platform.common.dataaccess.delegate.DataAccessManager;
 import com.systex.jbranch.platform.common.dataaccess.query.QueryConditionIF;
-import com.systex.jbranch.platform.common.errHandle.JBranchException;
-import com.systex.jbranch.platform.server.info.XmlInfo;
-
+import com.systex.jbranch.platform.server.info.SystemVariableConsts;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -30,8 +23,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.file.Paths;
-import java.sql.Blob;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -191,8 +182,10 @@ public class KYC310_PersonRptComp extends FubonWmsBizLogic {
         doc.add(buildPart2Table());
         doc.add(buildRemindTable());
         doc.add(buildRemindTable2());
-        doc.add(buildSignTable());
-        doc.add(buildNoteTable());
+        if(StringUtils.equals("1", footerType)) { //銀行留存聯才需要
+	        doc.add(buildSignTable());
+	        doc.add(buildNoteTable());
+        }
     }
     
 	/**
@@ -613,20 +606,43 @@ public class KYC310_PersonRptComp extends FubonWmsBizLogic {
     /** 註記區 **/
     private PdfPTable buildNoteTable() throws Exception {
     	PdfPTable table = buildTable(new int[]{84}, 100);
-        PdfPTable inner = buildTable(new int[]{30, 20, 17, 17});
+    	PdfPTable inner = buildTable(new int[]{22, 28, 14, 14, 14});
 
         inner.addCell(buildCell("銀行註記欄：", nFont, Paragraph.ALIGN_LEFT, -1, 0));
         inner.addCell(buildBlankCell(18, 0));
         inner.addCell(buildBlankCell(18, 0));
         inner.addCell(buildBlankCell(18, 0));
-        inner.addCell(buildCell("營業單位：", nFont, Paragraph.ALIGN_LEFT, -1, 0));
+        inner.addCell(buildBlankCell(18, 0));
+        
+        Map param = null;
+		String loginID = (String) getCommonVariable(SystemVariableConsts.LOGINID);
+        StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT  ");
+		sb.append("   DECODE(DEPT_ID , '999', '網銀', DEPT_NAME) DEPT_NAME ");
+		sb.append(" FROM( ");
+		sb.append("   SELECT  ");
+		sb.append("     DEPT_ID, ");
+		sb.append("     (SELECT DEPT_NAME FROM TBORG_DEFN WHERE DEPT_ID = a.DEPT_ID) DEPT_NAME ");
+		sb.append("   FROM TBORG_MEMBER a WHERE emp_id = :empId ");
+		sb.append(" ) ");
+		param = new Hashtable();
+		param.put("empId", loginID);
+		List<Map<String, Object>> list = exeQueryForMap(sb.toString() , param);
+		
+		if (list.size()>0){
+	        inner.addCell(buildCell("營業單位： "+ list.get(0).get("DEPT_NAME") , nFont, Paragraph.ALIGN_LEFT, -1, 0));
+		}else{
+			inner.addCell(buildCell("營業單位： " , nFont, Paragraph.ALIGN_LEFT, -1, 0));
+		}
+        inner.addCell(buildBlankCell(18, 0));
         inner.addCell(buildBlankCell(18, 0));
         inner.addCell(buildBlankCell(18, 0));
         inner.addCell(buildBlankCell(18, 0));
 
-        inner.addCell(buildCell("對保人(核對本人親簽無誤)：_________", nFont, Paragraph.ALIGN_LEFT, -1, 0));
-        inner.addCell(buildCell("鍵機/解說人員：_________", nFont, Paragraph.ALIGN_LEFT, -1, 0));
-        inner.addCell(buildCell("驗印：_________", nFont, Paragraph.ALIGN_LEFT, -1, 0));
+        inner.addCell(buildCell("解說： "+ inputVO.getBasicInforRptComp().get("COMMENTATOR"), nFont, Paragraph.ALIGN_LEFT, -1, 0));
+        inner.addCell(buildCell("對保（核對本人親簽無誤）：", nFont, Paragraph.ALIGN_LEFT, -1, 0));
+        inner.addCell(buildCell("驗印：", nFont, Paragraph.ALIGN_LEFT, -1, 0));
+        inner.addCell(buildCell("鍵機： " + inputVO.getBasicInforRptComp().get("KEYIN").toString(), nFont, Paragraph.ALIGN_LEFT, -1, 0));
         inner.addCell(buildCell("覆核主管：_________", nFont, Paragraph.ALIGN_LEFT, -1, 0));
 
         table.addCell(inner);

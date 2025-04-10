@@ -102,6 +102,7 @@ public class KYC310InputVO extends PagingInputVO {
 	private List ANSWER_COMP;
 	private BigDecimal incomeFromCBS;
 	private String fromWebYN; //從網行銀來
+	private Map<String, Object> basicInforRptComp;
 	
 	public List<Map<String, Object>> getMARRAGEList() {
 		return MARRAGEList;
@@ -632,6 +633,12 @@ public class KYC310InputVO extends PagingInputVO {
 	}
 	public void setFromWebYN(String fromWebYN) {
 		this.fromWebYN = fromWebYN;
+	}
+	public Map<String, Object> getBasicInforRptComp() {
+		return basicInforRptComp;
+	}
+	public void setBasicInforRptComp(Map<String, Object> basicInforRptComp) {
+		this.basicInforRptComp = basicInforRptComp;
 	}
 	
 }

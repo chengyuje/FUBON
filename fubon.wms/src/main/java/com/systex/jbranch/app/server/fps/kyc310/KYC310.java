@@ -2103,6 +2103,7 @@ public class KYC310 extends FubonWmsBizLogic{
 		if(StringUtils.equals("Y", input310VO.getNEED_COMPARISON_YN())) {
 			String filePath = "";
 			input310VO.setKYC_SEQ(seq);
+			input310VO.setBasicInforRptComp(basicInformation);
 			if ("03".equals(input310VO.getQUESTION_TYPE())){	//法人差異表單
 				KYC310_CorpRptComp report = PlatformContext.getBean("kyc310CorpRptComp", KYC310_CorpRptComp.class);
 				report.setInputVO(input310VO);
