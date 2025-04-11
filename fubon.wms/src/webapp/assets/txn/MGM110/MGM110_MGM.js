@@ -168,7 +168,6 @@ eSoafApp.controller('MGM110_MGMController',
 		
 		// 檢核被推薦人
 		$scope.checkBeMGMCust = function(){
-			
 			if($scope.inputVO.be_mgm_cust_id.trim() != ''){
 				$scope.inputVO.be_mgm_cust_id = $scope.inputVO.be_mgm_cust_id.toUpperCase();
 				
@@ -211,14 +210,15 @@ eSoafApp.controller('MGM110_MGMController',
 															//TBCRM_CUST_MAST.VIP_DEGREE為NULL、空白、M 都是非理財會員
 															if(tota[0].body.resultList[0].VIP_DEGREE != null && 
 															   tota[0].body.resultList[0].VIP_DEGREE.trim() != '' &&
-															   tota[0].body.resultList[0].VIP_DEGREE.trim() != 'M'){
+															   tota[0].body.resultList[0].VIP_DEGREE.trim() != 'M' &&
+															   tota[0].body.resultList[0].VIP_DEGREE.trim() != 'C'){
 																$scope.showErrorMsg('此客戶為本行理財會員，故不符合活動參與資格。');
 																$scope.initBeMGM();
 																return;
 															}
 															
 															//活動年度之前一年度12月31日AUM餘額加總小於等值新台幣10萬元
-															if(tota[0].body.resultList[0].LDAY_AUM_AMT > $scope.aum_amt){
+															if(Number(tota[0].body.resultList[0].LDAY_AUM_AMT) > Number($scope.aum_amt)){
 																$scope.showErrorMsg('此客戶AUM餘額加總大於等值新台幣' + $scope.aum_amt + '元，故不符合活動參與資格。');
 																$scope.initBeMGM();
 																return;

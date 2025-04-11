@@ -1,7 +1,3 @@
-/*
-  交易畫面邏輯定義
-  請修改 Controller 名稱，以符合交易畫面的定義
- */
 'use strict';
 eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller, $confirm, socketService, ngDialog, projInfoService, sysInfoService, getParameter) {
 	$controller('BaseController', {$scope: $scope});
@@ -15,17 +11,16 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
 
 	/** 抓出所有分行 **/
 	$scope.mappingSet['branchsDesc_all'] = [];		
-	$scope.sendRecv("CRM210", "getAllBranch", "com.systex.jbranch.app.server.fps.crm210.CRM210InputVO", {}, 
-			function(totas, isError) {
-    			if (isError) {
-    				$scope.showErrorMsgInDialog(totas.body.msgData);
-    				return;
-                }
-                if (totas.length > 0) {
-                	angular.forEach(totas[0].body.resultList, function(row, index, objs){
-            			$scope.mappingSet['branchsDesc_all'].push({LABEL: row.BRANCH_NBR + '-' + row.BRANCH_NAME, DATA: row.BRANCH_NBR});
-            		});
-                };
+	$scope.sendRecv("CRM210", "getAllBranch", "com.systex.jbranch.app.server.fps.crm210.CRM210InputVO", {}, function(totas, isError) {
+		if (isError) {
+			$scope.showErrorMsgInDialog(totas.body.msgData);
+			return;
+        }
+        if (totas.length > 0) {
+        	angular.forEach(totas[0].body.resultList, function(row, index, objs){
+    			$scope.mappingSet['branchsDesc_all'].push({LABEL: row.BRANCH_NBR + '-' + row.BRANCH_NAME, DATA: row.BRANCH_NBR});
+    		});
+        };
     });
 	
 	// filter
@@ -42,60 +37,14 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
 	});
     //
 	
-	/** 貢獻度等級 **/
-	var vo = {'param_type': 'CRM.CON_DEGREE', 'desc': false};
-    if(!projInfoService.mappingSet['CRM.CON_DEGREE']) {
-    	$scope.requestComboBox(vo, function(totas) {      	
-    		if (totas[totas.length - 1].body.result === 'success') {        		
-    			projInfoService.mappingSet['CRM.CON_DEGREE'] = totas[0].body.result;
-    			$scope.mappingSet['CRM.CON_DEGREE'] = projInfoService.mappingSet['CRM.CON_DEGREE'];        		
-    		}
-    	});
-    } else
-    	$scope.mappingSet['CRM.CON_DEGREE'] = projInfoService.mappingSet['CRM.CON_DEGREE'];
-	
-	/** 理財會員等級 **/
-	var vo = {'param_type': 'CRM.VIP_DEGREE', 'desc': false};
-    if(!projInfoService.mappingSet['CRM.VIP_DEGREE']) {
-    	$scope.requestComboBox(vo, function(totas) {      	
-    		if (totas[totas.length - 1].body.result === 'success') {        		
-    			projInfoService.mappingSet['CRM.VIP_DEGREE'] = totas[0].body.result;
-    			$scope.mappingSet['CRM.VIP_DEGREE'] = projInfoService.mappingSet['CRM.VIP_DEGREE'];        		
-    		}
-    	});
-    } else
-    	$scope.mappingSet['CRM.VIP_DEGREE'] = projInfoService.mappingSet['CRM.VIP_DEGREE'];
-    
-    /** 家庭會員等級 **/
-	var vo = {'param_type': 'CRM.FAMILY_DEGREE', 'desc': false};
-    if(!projInfoService.mappingSet['CRM.FAMILY_DEGREE']) {
-    	$scope.requestComboBox(vo, function(totas) {      	
-    		if (totas[totas.length - 1].body.result === 'success') {        		
-    			projInfoService.mappingSet['CRM.FAMILY_DEGREE'] = totas[0].body.result;
-    			$scope.mappingSet['CRM.FAMILY_DEGREE'] = projInfoService.mappingSet['CRM.FAMILY_DEGREE'];        		
-    		}
-    	});
-    } else
-    	$scope.mappingSet['CRM.FAMILY_DEGREE'] = projInfoService.mappingSet['CRM.FAMILY_DEGREE'];
-    
-	/** 經營頻次符合度 **/
-	var vo = {'param_type': 'TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN', 'desc': false};
-    if(!projInfoService.mappingSet['TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN']) {
-    	$scope.requestComboBox(vo, function(totas) {      	
-    		if (totas[totas.length - 1].body.result === 'success') {        		
-    			projInfoService.mappingSet['TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN'] = totas[0].body.result;
-    			$scope.mappingSet['TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN'] = projInfoService.mappingSet['TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN'];        		
-    		}
-    	});
-    } else
-    	$scope.mappingSet['TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN'] = projInfoService.mappingSet['TBCRM_CUST_NOTE.TAKE_CARE_MATCH_YN'];
-        
 	// gender
 	$scope.mappingSet['GENDER'] = [];
 	$scope.mappingSet['GENDER'].push({LABEL : '男',DATA : '1'},{LABEL : '女',DATA : '2'});
+	
 	// yn
 	$scope.mappingSet['YN'] = [];
 	$scope.mappingSet['YN'].push({LABEL : '是',DATA : 'Y'},{LABEL : '否',DATA : 'N'});
+	
 	// OP_FREQ
 	$scope.mappingSet['OP_FREQ'] = [];
 	$scope.mappingSet['OP_FREQ'].push({LABEL : '符合',DATA : 'Y'},{LABEL : '未符合',DATA : 'N'});
@@ -177,19 +126,17 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
     		$scope.inputVO.group_name = $scope.groupData.GROUP_NAME;
     	} else {
     		$scope.inputVO.ao_code = String(sysInfoService.getAoCode());
-    		$scope.sendRecv("CRM230", "getGroupList", "com.systex.jbranch.app.server.fps.crm230.CRM230InputVO", $scope.inputVO,
-				function(totas, isError) {
-                	if (isError) {
-                		$scope.showErrorMsg(totas[0].body.msgData);
-                	}
-                	if (totas.length > 0) {
-                		$scope.mappingSet['GroupList'] = [];
-                		angular.forEach(totas[0].body.resultList, function(row, index, objs){
-            				$scope.mappingSet['GroupList'].push({LABEL: row.GROUP_NAME, DATA: row.GROUP_ID});
-            			});
-                	};
-				}
-        	);	
+    		$scope.sendRecv("CRM230", "getGroupList", "com.systex.jbranch.app.server.fps.crm230.CRM230InputVO", $scope.inputVO, function(totas, isError) {
+            	if (isError) {
+            		$scope.showErrorMsg(totas[0].body.msgData);
+            	}
+            	if (totas.length > 0) {
+            		$scope.mappingSet['GroupList'] = [];
+            		angular.forEach(totas[0].body.resultList, function(row, index, objs){
+        				$scope.mappingSet['GroupList'].push({LABEL: row.GROUP_NAME, DATA: row.GROUP_ID});
+        			});
+            	};
+			});	
     	}
     }
     $scope.getGroup();
@@ -210,47 +157,40 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
 		$scope.ao_code = sysInfoService.getAoCode();
 		
 		//AO CODE
-	    $scope.sendRecv("CRM211", "getAOCode", "com.systex.jbranch.app.server.fps.crm211.CRM211InputVO", $scope.inputVO,
-			function(tota, isError) {
-				if (!isError) {
-					if(tota[0].body.msgData != undefined){
-						$scope.showErrorMsg(tota[0].body.msgData);
-					}
-					
+	    $scope.sendRecv("CRM211", "getAOCode", "com.systex.jbranch.app.server.fps.crm211.CRM211InputVO", $scope.inputVO, function(tota, isError) {
+			if (!isError) {
+				if(tota[0].body.msgData != undefined){
+					$scope.showErrorMsg(tota[0].body.msgData);
 				}
-				if (tota.length > 0) {
-					$scope.aolist = _.sortBy(tota[0].body.resultList, ['AO_CODE']);
-					$scope.mappingSet['new_ao_list'] = [];
-					
-					if ($scope.ao_code != '' && $scope.ao_code != undefined) {		//有AO_CODE
-            			if($scope.ao_code.length > 1){		//有兩個以上AO_CODE的理專
-            				angular.forEach($scope.aolist, function(row, index, objs){
-            					angular.forEach($scope.ao_code, function(row2, index2, objs2){
-            						if(row.AO_CODE == row2){
-            							$scope.mappingSet['new_ao_list'].push({LABEL: row.AO_CODE + '_' + row.EMP_NAME, DATA: row.AO_CODE});
-            						}
-            					});
-                			});
-            			}else if($scope.ao_code.length == 1){		//只有一個AO_CODE的理專
-                    		angular.forEach($scope.aolist, function(row, index, objs){
-                				$scope.mappingSet['new_ao_list'].push({LABEL: row.AO_CODE + '_' + row.EMP_NAME, DATA: row.AO_CODE});
-                			});
-            				$scope.inputVO.campaign_ao_code = String(sysInfoService.getAoCode());		//指派至新理專
-            			}
-        			}else{		//無AO_CODE
+			}
+			
+			if (tota.length > 0) {
+				$scope.aolist = _.sortBy(tota[0].body.resultList, ['AO_CODE']);
+				$scope.mappingSet['new_ao_list'] = [];
+				
+				if ($scope.ao_code != '' && $scope.ao_code != undefined) {		//有AO_CODE
+        			if($scope.ao_code.length > 1){		//有兩個以上AO_CODE的理專
         				angular.forEach($scope.aolist, function(row, index, objs){
-        					$scope.mappingSet['new_ao_list'].push({LABEL: row.AO_CODE + '_' + row.EMP_NAME, DATA: row.AO_CODE});
-        				});
-        			}   		
-            	};
+        					angular.forEach($scope.ao_code, function(row2, index2, objs2){
+        						if(row.AO_CODE == row2){
+        							$scope.mappingSet['new_ao_list'].push({LABEL: row.AO_CODE + '_' + row.EMP_NAME, DATA: row.AO_CODE});
+        						}
+        					});
+            			});
+        			} else if ($scope.ao_code.length == 1) {		//只有一個AO_CODE的理專
+                		angular.forEach($scope.aolist, function(row, index, objs) {
+            				$scope.mappingSet['new_ao_list'].push({LABEL: row.AO_CODE + '_' + row.EMP_NAME, DATA: row.AO_CODE});
+            			});
+        				$scope.inputVO.campaign_ao_code = String(sysInfoService.getAoCode());		//指派至新理專
+        			}
+    			} else {		//無AO_CODE
+    				angular.forEach($scope.aolist, function(row, index, objs) {
+    					$scope.mappingSet['new_ao_list'].push({LABEL: row.AO_CODE + '_' + row.EMP_NAME, DATA: row.AO_CODE});
+    				});
+    			}   		
+        	};
 		});	
-	    
-//	    debugger
-//		if(projInfoService.getAvailBranch().length == 1) {
-//			$scope.inputVO.cust_02 = projInfoService.getBranchID();
-//		}
 	};
-	
 	$scope.init_common();
 	
 	$scope.inquireInit_common = function(){
@@ -264,8 +204,7 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
 	$scope.show_advance = function() {
 		if ($scope.advanced == false) {
 			$scope.advanced = true;
-		}
-		else {
+		} else {
 			$scope.advanced = false;
 		}
 	};
@@ -281,6 +220,7 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
 			});
     	}
     };
+    
     $scope.checkrow2 = function() {
     	if ($scope.obj.clickAll2) {
     		angular.forEach($scope.obj.resultList, function(row) {
@@ -303,35 +243,34 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
     	}
 
     	$scope.inputVO.grouplist = ans;
-    	$scope.sendRecv("CRM230", "group_check", "com.systex.jbranch.app.server.fps.crm230.CRM230InputVO", $scope.inputVO, 
-	    		function(totas, isError) {
-
-	    			if (isError) {
-	    				$scope.showErrorMsgInDialog(totas.body.msgData);
-	    				return;
-	    			}
-	    			if (totas[0].body.resultList.length == 0) {
-	    				$scope.showErrorMsg('勾選客戶中有非歸屬理專自建的群組名單');
-	    				return;
-	    			}else{
-	    				$scope.sendRecv("CRM230", "group_join", "com.systex.jbranch.app.server.fps.crm230.CRM230InputVO", $scope.inputVO, 
-	    		    			function(totas, isError) {
-	    		        			if (isError) {
-	    		        				$scope.showErrorMsgInDialog(totas.body.msgData);
-	    		        				return;
-	    			                }
-	    			                if (totas.length > 0) {
-	    			                	$scope.showMsg('加入成功');
-	    			                	
-	    			                	if ($scope.groupData) {
-	    			                		// 原路徑
-	    			                    	var path = $rootScope.menuItemInfo.txnPath;
-	    			                    	path.pop();
-	    			                    	$rootScope.GeneratePage({'txnName':"CRM251",'txnId':"CRM251",'txnPath':path});
-	    			                	}	
-	    			                };
-	    			    });
-	    			}
+    	$scope.sendRecv("CRM230", "group_check", "com.systex.jbranch.app.server.fps.crm230.CRM230InputVO", $scope.inputVO,  function(totas, isError) {
+			if (isError) {
+				$scope.showErrorMsgInDialog(totas.body.msgData);
+				return;
+			}
+			
+			if (totas[0].body.resultList.length == 0) {
+				$scope.showErrorMsg('勾選客戶中有非歸屬理專自建的群組名單');
+				return;
+			} else {
+				$scope.sendRecv("CRM230", "group_join", "com.systex.jbranch.app.server.fps.crm230.CRM230InputVO", $scope.inputVO,  function(totas, isError) {
+        			if (isError) {
+        				$scope.showErrorMsgInDialog(totas.body.msgData);
+        				return;
+	                }
+        			
+	                if (totas.length > 0) {
+	                	$scope.showMsg('加入成功');
+	                	
+	                	if ($scope.groupData) {
+	                		// 原路徑
+	                    	var path = $rootScope.menuItemInfo.txnPath;
+	                    	path.pop();
+	                    	$rootScope.GeneratePage({'txnName':"CRM251",'txnId':"CRM251",'txnPath':path});
+	                	}	
+	                };
+			    });
+			}
     	});
 	};
 	
@@ -359,17 +298,15 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
     	}
     	$scope.inputVO.campaign_custlist = ans;
     	$scope.inputVO.source = 'crm210';
-    	$scope.sendRecv("CRM230", "add_campaign", "com.systex.jbranch.app.server.fps.crm230.CRM230InputVO", $scope.inputVO, 
-    			function(totas, isError) {
-        			if (isError) {
-        				$scope.showErrorMsgInDialog(totas.body.msgData);
-        				return;
-	                }
-	                if (totas.length > 0) {
-	                	$scope.showMsg('加入成功');
-	                };
-	           }
-    	);
+    	$scope.sendRecv("CRM230", "add_campaign", "com.systex.jbranch.app.server.fps.crm230.CRM230InputVO", $scope.inputVO, function(totas, isError) {
+			if (isError) {
+				$scope.showErrorMsgInDialog(totas.body.msgData);
+				return;
+            }
+            if (totas.length > 0) {
+            	$scope.showMsg('加入成功');
+            };
+    	});
     };
 	
     $scope.goCRM610 = function(row){ 	
@@ -402,4 +339,22 @@ eSoafApp.controller('CRM210Controller', function($rootScope, $scope, $controller
 		});
     };	    
 		
+    $scope.toggleRadio = function toggleRadio() {
+    	$scope.inputVO.branchID = $scope.inputVO.ao_05;
+
+    	$scope.mappingSet['campEmpList'] = [];
+    	
+    	$scope.sendRecv("CAM220", "getEmpList", "com.systex.jbranch.app.server.fps.cam220.CAM220InputVO", $scope.inputVO, function(tota, isError) {
+			if (!isError) {
+				$scope.empList = tota[0].body.resultList;
+				
+				$scope.mappingSet['campEmpList'] = [];
+				
+				angular.forEach($scope.empList, function(row, index, objs){
+					var label = row.EMP_ID + "-" + row.EMP_NAME + "(" + row.TOTAL_CONTACT_CUST + ")";
+					$scope.mappingSet['campEmpList'].push({LABEL: label, DATA: row.EMP_ID});
+				});
+			}
+		});
+    }
 });

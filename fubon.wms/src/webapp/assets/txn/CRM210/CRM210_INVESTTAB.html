@@ -2,11 +2,38 @@
 <form name="parameterTypeEditForm" class="form-horizontal" data-toggle="validator" role="form" autocomplete="off" enter-as-tab>
 	<table>
 		<tr>
-     		<th>名單/待辦工作名稱：</th>
+     		<th><font color=red>＊</font>名單/待辦工作名稱：</th>
      		<td>
      			<input type="text" class="form-control" placeholder="請輸入..." id="campaign_name" name="campaign_name" ng-model="inputVO.campaign_name" e-length-limit="25" required>
      		</td>
-     		<th ng-hide="ao_code.length != 0">指派至新理專：</th>
+     		<th><font color=red>＊</font>指派人員類別：</th>
+			<td>
+				<e-combobox id="channel" name="channel" 
+							ng-paramtype="CAM.DISPATCH_CHANNEL"
+							ng-model="inputVO.channel"
+							ng-validate="false" 
+							ng-disabled="inputVO.ao_05 == null || inputVO.ao_05 == undefined || inputVO.ao_05 == ''"
+			   				ng-readonly="inputVO.ao_05 == null || inputVO.ao_05 == undefined || inputVO.ao_05 == ''"
+			   				ng-change="toggleRadio()"
+			   				ng-format="F3"
+							width="150px"
+							style="line-height:20px;"
+							required />
+			</td>
+			<th><font color=red>＊</font>指派人員：</th>
+			<td>
+     			<e-combobox id="campEmpID" name="campEmpID" 
+							ng-datasource="mappingSet['campEmpList']"
+							ng-model="inputVO.campEmpID"
+   							ng-validate="false" 
+   							ng-disabled="inputVO.channel == null || inputVO.channel == undefined || inputVO.channel == ''"
+			   				ng-readonly="inputVO.channel == null || inputVO.channel == undefined || inputVO.channel == ''"
+			   				ng-format="F3"
+			   				width="150px"
+			   				style="line-height:20px;" 
+			   				required/>
+     		</td> 
+     		<!-- <th ng-hide="ao_code.length != 0">指派至新理專：</th>
      		<td ng-hide="ao_code.length != 0">
      			<e-combobox id="campaign_ao_code" 
 							ng-datasource="mappingSet['new_ao_list']"
@@ -18,7 +45,7 @@
 			   				width="150px"
 			   				style="line-height:20px;" 
 			   				required/>
-     		</td>
+     		</td>  -->
      		<!-- <th>到期日：</th>
 			<td>
 				<div class="input-group datebox datewidth">
@@ -45,20 +72,20 @@
      			<textarea class="form-control" id="campaign_desc" name="campaign_desc" ng-model="inputVO.campaign_desc" style="width: 100%; height: 100px" e-length-limit="1000" required></textarea>
      		</td>
 			<!-- 理專新增名單 -->
-     		<td ng-show="ao_code.length != 0">
-     			<button type="button" class="btn btn-info" ng-click="add_campaign()" ng-disabled="(inputVO.campaign_name == undefined || inputVO.campaign_name == null) &&
-     																							  inputVO.campaign_date == undefined &&
-     																							  (inputVO.campaign_desc == undefined || inputVO.campaign_desc == null)">
-     			新增名單</button>
-     			</br>
-     			<span style="color: red">名單將在每天中午及凌晨各更新一次，若您有新增名單，將在此二個時間過後才會更新，請留意！</span>
-     		</td>
-     		<!-- 非理專新增名單 -->
-     		<td ng-show="ao_code.length == 0">
-     			<button type="button" class="btn btn-info" ng-click="add_campaign()" ng-disabled="parameterTypeEditForm.$invalid">新增名單</button>
-     			<br />
-	     		<span style="color: red">名單將在每天中午及凌晨各更新一次，若您有新增名單，將在此二個時間過後才會更新，請留意！</span>
-     		</td>
+<!--      		<td ng-show="ao_code.length != 0"> -->
+<!--      			<button type="button" class="btn btn-info" ng-click="add_campaign()" ng-disabled="(inputVO.campaign_name == undefined || inputVO.campaign_name == null) && -->
+<!--      																							  inputVO.campaign_date == undefined && -->
+<!--      																							  (inputVO.campaign_desc == undefined || inputVO.campaign_desc == null)"> -->
+<!--      			新增名單</button> -->
+<!--      			</br> -->
+<!--      			<span style="color: red">名單將在每天中午及凌晨各更新一次，若您有新增名單，將在此二個時間過後才會更新，請留意！</span> -->
+<!--      		</td> -->
+<!--      		非理專新增名單 -->
+<!--      		<td ng-show="ao_code.length == 0"> -->
+<!--      			<button type="button" class="btn btn-info" ng-click="add_campaign()" ng-disabled="parameterTypeEditForm.$invalid">新增名單</button> -->
+<!--      			<br /> -->
+<!-- 	     		<span style="color: red">名單將在每天中午及凌晨各更新一次，若您有新增名單，將在此二個時間過後才會更新，請留意！</span> -->
+<!--      		</td> -->
      	</tr>
 	</table>
 </form>
@@ -67,17 +94,17 @@
 <div class="search_box_btn" ng-if="!inputVO.disableGroupCombobox">
 	客戶群組：
 	<e-combobox id="group" 
-		ng-datasource="mappingSet['GroupList']"
-		ng-model="inputVO.group"
-		ng-validate="false" 
-		ng-disabled="group_source !='' && group_source !=  undefined"
-		ng-readonly="group_source !='' && group_source !=  undefined" 
-		ng-editable="false"
-		ng-format="F3"
-		ng-required="false"
-		ng-change="getGroupName()"
-		width="250px"
-		style="line-height:20px;" />
+				ng-datasource="mappingSet['GroupList']"
+				ng-model="inputVO.group"
+				ng-validate="false" 
+				ng-disabled="group_source !='' && group_source !=  undefined"
+				ng-readonly="group_source !='' && group_source !=  undefined" 
+				ng-editable="false"
+				ng-format="F3"
+				ng-required="false"
+				ng-change="getGroupName()"
+				width="250px"
+				style="line-height:20px;" />
 	<span class="bigspace"></span>
 	<button type="button" class="btn btn-info" ng-click="checkAdd()" ng-disabled = "inputVO.group ==''|| inputVO.group == undefined">勾選客戶加入群組</button>
 	

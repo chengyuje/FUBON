@@ -180,6 +180,7 @@ public class PRD235  extends FubonWmsBizLogic {
 		
 		this.sendRtnObject(return_VO);
 	}
+
 	
 	//商品資料儲存
 	public void save(Object body, IPrimitiveMap header) throws JBranchException, Exception {
@@ -343,7 +344,7 @@ public class PRD235  extends FubonWmsBizLogic {
 		
 		return keyNo;
 	}
-		
+
 	//檢核同商品開放起訖日期間不得重疊
 	private void chkStartEndDate(PRD235InputVO inputVO) throws DAOException, JBranchException {
 		dam = this.getDataAccessManager();
@@ -371,7 +372,6 @@ public class PRD235  extends FubonWmsBizLogic {
 		return;
 	}
 	
-	
 	//檢核同商品配息起訖日期間不得重疊
 	private void chkDivStartEndDate(PRD235InputVO inputVO) throws DAOException, JBranchException {
 		dam = this.getDataAccessManager();
@@ -397,7 +397,7 @@ public class PRD235  extends FubonWmsBizLogic {
 		
 		return;
 	}
-		
+
 	/**
      * 下載費用率與報酬率範例檔
      * @param body
@@ -548,12 +548,9 @@ public class PRD235  extends FubonWmsBizLogic {
 		
 		//取得該商品贖回資料明細
 		sql.append("SELECT A.*, B.PRD_YEAR, B.PRD_CATEGORY, TO_CHAR(B.DEADLINE_DATE, 'YYYY/MM/DD') AS DEADLINE_DATE, ");
-		sql.append(" TO_CHAR(A.UNIT_NUM, '999G999G990D9999') AS UNIT_NUM_STR, TO_CHAR(A.RDM_TRADE_DATE, 'YYYY/MM/DD') AS RDM_TRADE_DATE_STR, ");
-		sql.append(" C.PRD_YEAR AS BUY_PRD_YEAR, C.PRD_CATEGORY AS BUY_PRD_CATEGORY, D.FUND_ENAME ");
+		sql.append(" TO_CHAR(A.UNIT_NUM, '999G999G990D9999') AS UNIT_NUM_STR, TO_CHAR(A.RDM_TRADE_DATE, 'YYYY/MM/DD') AS RDM_TRADE_DATE_STR ");
 		sql.append(" FROM TBSOT_NF_REDEEM_D_OVS_PRI A ");
-		sql.append(" LEFT JOIN TBPRD_FUND_OVS_PRIVATE B ON B.SEQ_NO = A.PRD_SEQ_NO ");
-		sql.append(" LEFT JOIN TBPRD_FUND_OVS_PRIVATE C ON C.PRD_ID = A.PRD_ID AND C.TRADE_TYPE = '1' AND TRUNC(C.TRADE_DATE) = TRUNC(A.RDM_TRADE_DATE) "); //以申購交易日資料串回申購年份及次別
-		sql.append(" LEFT JOIN TBPRD_FUND D ON D.PRD_ID = A.PRD_ID ");
+		sql.append(" LEFT JOIN TBPRD_FUND_OVS_PRIVATE B ON B.SEQ_NO = A.PRD_SEQ_NO ");	
 		sql.append(" WHERE PRD_SEQ_NO = :seqNo ");
 		queryCondition.setObject("seqNo", inputVO.getSEQ_NO());
 		queryCondition.setQueryString(sql.toString());		
@@ -596,12 +593,10 @@ public class PRD235  extends FubonWmsBizLogic {
 		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
 		StringBuffer sql = new StringBuffer();	
 		sql.append("SELECT * FROM ( ");
-		sql.append(" SELECT B.PRD_YEAR, B.PRD_CATEGORY, TO_CHAR(SUM(A.UNIT_NUM), '999G999G999G999G990D9999') AS TOTAL_UNIT_STR_1, SUM(A.UNIT_NUM) AS TOTAL_UNIT_1 ");
-		sql.append(" FROM TBSOT_NF_REDEEM_D_OVS_PRI A ");
-		sql.append(" LEFT JOIN TBPRD_FUND_OVS_PRIVATE B ON B.PRD_ID = A.PRD_ID AND B.TRADE_TYPE = '1' AND TRUNC(B.TRADE_DATE) = TRUNC(A.RDM_TRADE_DATE) "); //以申購交易日資料串回申購年份及次別
-		sql.append(" WHERE A.PRD_SEQ_NO = :seqNo ");
-		sql.append(" GROUP BY B.PRD_YEAR, B.PRD_CATEGORY ");
-		sql.append(" ) ORDER BY PRD_YEAR, PRD_CATEGORY ");
+		sql.append(" SELECT TO_CHAR(RDM_TRADE_DATE, 'YYYY/MM/DD') AS RDM_TRADE_DATE_1, TO_CHAR(SUM(UNIT_NUM), '999G999G999G999G990D9999') AS TOTAL_UNIT_STR_1, SUM(UNIT_NUM) AS TOTAL_UNIT_1 ");
+		sql.append(" FROM TBSOT_NF_REDEEM_D_OVS_PRI WHERE PRD_SEQ_NO = :seqNo ");
+		sql.append(" GROUP BY TO_CHAR(RDM_TRADE_DATE, 'YYYY/MM/DD') ");
+		sql.append(" ) ORDER BY RDM_TRADE_DATE_1 ");
 		queryCondition.setObject("seqNo", inputVO.getSEQ_NO());
 		queryCondition.setQueryString(sql.toString());		
 		List<Map<String, Object>> totalList = dam.exeQuery(queryCondition);
@@ -630,15 +625,15 @@ public class PRD235  extends FubonWmsBizLogic {
 		String totalUnit = CollectionUtils.isEmpty(totalList) ? "" : ObjectUtils.toString(totalList.get(0).get("TOTAL_UNIT_STR"));
 		//以認購日期加總贖回單位數
 		List<Map<String, Object>> tradeDateList = getRdmTotalByTradeDateList(inputVO);
-//		List<Map<String, Object>> totalTradeDateList = new ArrayList<Map<String, Object>>();
-//		if(CollectionUtils.isNotEmpty(tradeDateList)) {
-//			totalTradeDateList.addAll(tradeDateList);
-//			Map<String, Object> maptotal = new HashMap<String, Object>();
-//			maptotal.put("RDM_TRADE_DATE_1", "Total");
-//			maptotal.put("TOTAL_UNIT_STR_1", totalUnit);
-//			maptotal.put("TOTAL_UNIT_1", CollectionUtils.isEmpty(totalList) ? null : (BigDecimal)totalList.get(0).get("TOTAL_UNIT"));
-//			totalTradeDateList.add(maptotal);
-//		}
+		List<Map<String, Object>> totalTradeDateList = new ArrayList<Map<String, Object>>();
+		if(CollectionUtils.isNotEmpty(tradeDateList)) {
+			totalTradeDateList.addAll(tradeDateList);
+			Map<String, Object> maptotal = new HashMap<String, Object>();
+			maptotal.put("RDM_TRADE_DATE_1", "Total");
+			maptotal.put("TOTAL_UNIT_STR_1", totalUnit);
+			maptotal.put("TOTAL_UNIT_1", CollectionUtils.isEmpty(totalList) ? null : (BigDecimal)totalList.get(0).get("TOTAL_UNIT"));
+			totalTradeDateList.add(maptotal);
+		}
 		
 		String txnCode = "PRD235";
 		String reportID = "R1";
@@ -649,13 +644,12 @@ public class PRD235  extends FubonWmsBizLogic {
 		
 		data.addRecordList("DATALIST", list);
 		data.addParameter("PRD_NAME", list.get(0).get("PRD_NAME"));
-		data.addParameter("FUND_ENAME", list.get(0).get("FUND_ENAME"));
 		data.addParameter("PRD_YEAR", list.get(0).get("PRD_YEAR"));
 		data.addParameter("PRD_CATEGORY", list.get(0).get("PRD_CATEGORY"));
 		data.addParameter("DEADLINE_DATE", list.get(0).get("DEADLINE_DATE"));
 		data.addParameter("TOTAL_UNIT_NUM", totalUnit.trim());
 		//以認購日期加總贖回單位數
-		data.addRecordList("TOTAL_TRADEDATE", tradeDateList);
+		data.addRecordList("TOTAL_TRADEDATE", totalTradeDateList);
 		
 		report = gen.generateReport(txnCode, reportID, data);
 		String url = report.getLocation();

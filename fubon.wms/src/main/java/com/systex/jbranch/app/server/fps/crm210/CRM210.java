@@ -166,17 +166,19 @@ public class CRM210 extends FubonWmsBizLogic {
 		sql.append("       V.VOC_FLAG, "); 						      				// 是否有承租保管箱
 		sql.append("       V.ROA, "); 						      					// ROA(%)
 		sql.append("       V.HNWC_FLAG "); 						      				// 高資產客戶註記
-
 		
 		sql.append("FROM MVCRM_AST_AMT V ");
-		sql.append("LEFT JOIN TBCRM_CUST_MAST CM ON V.CUST_ID = CM.CUST_ID ");
-		sql.append("LEFT JOIN TBORG_SALES_AOCODE SAO ON SAO.AO_CODE = CM.AO_CODE ");
+
+		sql.append("LEFT JOIN TBORG_SALES_AOCODE SAO ON SAO.AO_CODE = V.AO_CODE ");
 		sql.append("LEFT JOIN TBORG_MEMBER MEM ON SAO.EMP_ID = MEM.EMP_ID ");
 		
-		sql.append("WHERE 1 = 1 ");
+		
 				
 		switch (type) {
 			case "CRM211": // 我的客戶查詢
+				
+				sql.append("WHERE 1 = 1 ");
+				
 				CRM211InputVO inputVO_CRM211 = inputVO_all.getCrm211inputVO();
 				String aoCode = inputVO_CRM211.getAo_code();
 
@@ -352,6 +354,8 @@ public class CRM210 extends FubonWmsBizLogic {
 				//歸屬行主管可查詢轄下分行的所有客戶，包含有掛Code的客戶和空code客戶，帳戶行主管及理專僅能查詢於本分行開戶的空code單一客戶。
 				//查詢與理專所屬分行相同之"歸屬行"或"帳務行"空code客戶
 				
+				sql.append("WHERE 1 = 1 ");
+				
 				CRM221InputVO inputVO_CRM221 = inputVO_all.getCrm221inputVO();
 	
 				if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).indexOf("uhrm") >= 0 &&
@@ -461,25 +465,25 @@ public class CRM210 extends FubonWmsBizLogic {
 								sql.append("AND ( ");
 								sql.append("  EXISTS ( ");
 								sql.append("    SELECT 'X' ");
-								sql.append("    FROM TBCRM_CUST_MAST A ");
-								sql.append("    WHERE V.CUST_ID = A.CUST_ID ");
-								sql.append("    AND A.BRA_NBR IN (:branch_list) ");
+								sql.append("    FROM VWORG_DEFN_INFO A ");
+								sql.append("    WHERE A.BRANCH_NBR = V.BRA_NBR ");
+								sql.append("    AND A.REGION_CENTER_ID = :region_center_id ");
 								
 								if ("0".equals(inputVO_CRM221.getAo_code())) {
-									sql.append("    AND A.AO_CODE IS NULL "); //本行客戶空code
+									sql.append("    AND V.AO_CODE IS NULL "); //本行客戶空code
 								}
 								
 								sql.append("  ) ");
 								sql.append("  OR ");
 								sql.append("  EXISTS ( ");
 								sql.append("    SELECT 'X' ");
-								sql.append("    FROM TBCRM_ACCT_MAST B, TBCRM_CUST_MAST A ");
-								sql.append("    WHERE A.CUST_ID = B.CUST_ID ");
+								sql.append("    FROM TBCRM_ACCT_MAST B, VWORG_DEFN_INFO A ");
+								sql.append("    WHERE B.BRA_NBR = A.BRANCH_NBR ");
 								sql.append("    AND B.CUST_ID = V.CUST_ID ");
 								sql.append("    AND NVL(ACCT_STATUS,'X') <> '2' ");
 								sql.append("    AND SUBSTR(ACCT_TYPE, 1, 2) <> 'LN' ");
-								sql.append("    AND A.BRA_NBR IN (:branch_list) ");
-								sql.append("    AND A.AO_CODE IS NULL ");
+								sql.append("    AND A.REGION_CENTER_ID  = :region_center_id ");
+								sql.append("    AND V.AO_CODE IS NULL ");
 								sql.append("  )");
 								
 								sql.append("  OR ");
@@ -489,12 +493,13 @@ public class CRM210 extends FubonWmsBizLogic {
 
 								sql.append(") "); //帳務行
 	
-								List<String> branch_list = new ArrayList<String>();
-								for (int i = 0; i < inputVO_CRM221.getBranch_list().size(); i++) {
-									branch_list.add(inputVO_CRM221.getBranch_list().get(i).get("DATA"));
-								}
-
-								queryCondition.setObject("branch_list", branch_list);
+//								List<String> branch_list = new ArrayList<String>();
+//								for (int i = 0; i < inputVO_CRM221.getBranch_list().size(); i++) {
+//									branch_list.add(inputVO_CRM221.getBranch_list().get(i).get("DATA"));
+//								}
+								
+								queryCondition.setObject("region_center_id", inputVO_CRM221.getAo_03());
+//								queryCondition.setObject("branch_list", branch_list);
 								queryCondition.setObject("branchAreaID", inputVO_CRM221.getAo_04());
 							} else {
 								// 區域、營運區、分行 皆未選取(總行人員才可)       			
@@ -535,6 +540,10 @@ public class CRM210 extends FubonWmsBizLogic {
 
 				break;
 			case "CRM331":
+				
+				sql.append("LEFT JOIN TBCRM_CUST_MAST CM ON V.CUST_ID = CM.CUST_ID ");
+				sql.append("WHERE 1 = 1 ");
+				
 				CRM331InputVO inputVO_CRM331 = inputVO_all.getCrm331inputVO();
 	
 				if ((StringUtils.isNotBlank(inputVO_CRM331.getAo_code()) || StringUtils.isNotBlank(inputVO_CRM331.getRe_ao_code())) && !"0".equals(inputVO_CRM331.getAo_code())) {
@@ -1230,7 +1239,7 @@ public class CRM210 extends FubonWmsBizLogic {
 			sql.append("AND V.HNWC_FLAG = :hnwcFlag ");
 			queryCondition.setObject("hnwcFlag", inputVO.getHnwc_flag());
 		}
-
+		
 		// 燈號----1:黃燈 2:紅燈
 //		if (!StringUtils.isBlank(inputVO.getManage_07())) {
 //			sql.append("and V.CONTACT_LIGHT = :manage_07 ");

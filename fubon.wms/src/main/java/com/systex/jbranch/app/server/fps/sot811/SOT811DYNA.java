@@ -99,16 +99,20 @@ public class SOT811DYNA extends SotPdf {
 					totalList.add(addMap);
 					totalProdLine++;
 				} else if(StringUtils.equals("2", ObjectUtils.toString(rMap.get("TRANSFER_TYPE")))) { //子基金轉回母基金
+					boolean isTransfer = false;
 					for(int rIdx = 1; rIdx <= 5; rIdx++) {
 						String rType = "_C" + Integer.toString(rIdx);
-						if(StringUtils.equals("Y", ObjectUtils.toString(rMap.get("IN_PROD" + rType + "_YN")))) { //有轉入子基金
-							HashMap<String, Object> addMap = new HashMap<String, Object>();
-							addMap.put("PROD_ID", ObjectUtils.toString(rMap.get("PROD_ID" + rType)));
-							addMap.put("PROD_NAME",  ObjectUtils.toString(rMap.get("PROD_NAME" + rType)));
-							addMap.put("CUST_ID", ObjectUtils.toString(rMap.get("CUST_ID")));
-							totalList.add(addMap);
-							totalProdLine++;
+						if(StringUtils.equals("Y", ObjectUtils.toString(rMap.get("IN_PROD" + rType + "_YN")))) { //有轉出子基金
+							isTransfer = true;
 						}
+					}
+					if(isTransfer) { //有子基金轉回母基金，放轉入母基金資料
+						HashMap<String, Object> addMap = new HashMap<String, Object>();
+						addMap.put("PROD_ID", ObjectUtils.toString(rMap.get("PROD_ID")));
+						addMap.put("PROD_NAME",  ObjectUtils.toString(rMap.get("PROD_NAME")));
+						addMap.put("CUST_ID", ObjectUtils.toString(rMap.get("CUST_ID")));
+						totalList.add(addMap);
+						totalProdLine++;
 					}
 				}
 			} else if(inputVO.getTradeType() == 4) { 

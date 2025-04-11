@@ -294,127 +294,109 @@ public class CRM230 extends FubonWmsBizLogic {
 
 	//新增名單
 	public void add_campaign(Object body, IPrimitiveMap header) throws JBranchException {
+
+		SimpleDateFormat sdfYYYYMMDD = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat sdfHHMMSS = new SimpleDateFormat("HHmmss");
+		
 		CRM230InputVO inputVO = (CRM230InputVO) body;
 		dam = this.getDataAccessManager();
-		//		CAM996 cam996 = (CAM996) PlatformContext.getBean("cam996");
-		CAM996 cam996 = new CAM996();
-		Date date = new Date();
-		String campaign_ao_code = null;
-
-		if (StringUtils.isBlank(inputVO.getCampaign_ao_code())) {
-			QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-			String emp_id = (String) getUserVariable(FubonSystemVariableConsts.LOGINID);
-
-			StringBuilder sb = new StringBuilder();
-			sb.append("SELECT AO_CODE FROM TBORG_SALES_AOCODE WHERE EMP_ID = :emp_id AND TYPE = '1' ");
-
-			queryCondition.setObject("emp_id", emp_id);
-			queryCondition.setQueryString(sb.toString());
-
-			List<Map<String, Object>> aoCode = dam.exeQueryWithoutSort(queryCondition);
-
-			campaign_ao_code = aoCode.get(0).get("AO_CODE").toString();
-		} else {
-			campaign_ao_code = inputVO.getCampaign_ao_code();
-		}
-
-		//===查詢新指派理專為FC(002)還是FCH(003)
-		//		dam = this.getDataAccessManager();
-		QueryConditionIF query = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-
-		StringBuilder sb1 = new StringBuilder();
-		sb1.append("SELECT AO.AO_CODE ,PRI.PRIVILEGEID FROM TBORG_SALES_AOCODE AO ");
-		sb1.append("LEFT JOIN TBORG_MEMBER_ROLE ROLE ON AO.EMP_ID = ROLE.EMP_ID ");
-		sb1.append("LEFT JOIN TBSYSSECUROLPRIASS PRI ON ROLE.ROLE_ID = PRI.ROLEID ");
-		sb1.append("WHERE AO.AO_CODE = :campaign_ao_code ");
-
-		query.setQueryString(sb1.toString());
-		//		query.setObject("campaign_ao_code", inputVO.getCampaign_ao_code());
-		query.setObject("campaign_ao_code", campaign_ao_code);
-
-		List<Map<String, Object>> temp = dam.exeQueryWithoutSort(query);
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		StringBuilder sb = new StringBuilder();
 		
-		String privilegeid = "";
-		if (null != temp && temp.size() > 0 && null != temp.get(0).get("PRIVILEGEID")) {
-			privilegeid = temp.get(0).get("PRIVILEGEID").toString();			
+		String campPrivilegeID = inputVO.getChannel();
+		String campAoCode = null;
+		
+		switch (inputVO.getChannel()) {
+			case "002" :
+				queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+				sb = new StringBuilder();
+				
+				sb.append("SELECT AO_CODE FROM TBORG_SALES_AOCODE WHERE EMP_ID = :emp_id AND TYPE = '1' ");
+				
+				queryCondition.setObject("emp_id", inputVO.getCampEmpID());
+				
+				queryCondition.setQueryString(sb.toString());
+
+				List<Map<String, Object>> aoCode = dam.exeQueryWithoutSort(queryCondition);
+
+				campAoCode = (String) aoCode.get(0).get("AO_CODE");
+				
+				break;
+			default :
+				campAoCode = inputVO.getCampEmpID();
+				
+				break;
 		}
-
-		//===查詢新指派理專為FC(002)還是FCH(003)--END
-
+		
+		CAM996 cam996 = new CAM996();
 		BigDecimal campaign_Seq = cam996.getCampaignSEQ(dam);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		//		String campaignID = sdf.format(date) + "TODO" + inputVO.getCampaign_ao_code();
-		String campaignID = sdf.format(date) + "TODO" + campaign_ao_code;
+		String campaignID = sdfYYYYMMDD.format(new Date()) + "TODO" + campAoCode;
 		String campaignName = inputVO.getCampaign_name();
 		String campaignDesc = inputVO.getCampaign_desc();
-		sdf = new SimpleDateFormat("HHmmss");
-		String stepID = sdf.format(date);
+		String stepID = sdfHHMMSS.format(new Date());
 		String leadSourceId = "04";
-		Date startDate = new Timestamp(Calendar.getInstance().getTime().getTime());
-
-		/*
-		 * WMS-CR-20240524-02_RM名單管理機制調整：
-		 * 1. 名單類別調整為「參考資訊」(04)。
-		 * 2. 名單到期日為T(建立日) + 60日
-		 * **/
-		Date today = new Date();
-//	    System.out.println("Today：" + today);
-	    Calendar c = Calendar.getInstance();
-	    c.setTime(today);
-	    c.add(Calendar.DATE, 60);
-	    Date endDate = c.getTime();
-//		Date endDate = new Timestamp(inputVO.getCampaign_date().getTime());
 		String leadType = "04";
-//		String leadType = "03";
-		
 		String leadPara1 = "N";
 		String leadPara2 = "N";
 		String examID = null;
 		String salesPitch = null;
-		String firstChannel = "FCALL";
-		if ("003".equals(privilegeid)) {
-			firstChannel = "FCH";
-		}
 		String secondChannel = null;
 		String impStatus = "IN";
 		String checkStatus = "00";
 		String giftCampaignID = null;
 		BigDecimal leTotalCnt = new BigDecimal(inputVO.getCampaign_custlist().size());
 
-		cam996.saveCampaign(dam, campaign_Seq, campaignID, campaignName, campaignDesc, stepID, leadSourceId, startDate, endDate, leadType, leadPara1, leadPara2, 
-							examID, salesPitch, firstChannel, secondChannel, impStatus, checkStatus, giftCampaignID, leTotalCnt, null, null);
+		// === firstChannel start ===
+		queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		sb = new StringBuilder();
+		
+		sb.append("SELECT PARAM_NAME FROM TBSYSPARAMETER WHERE PARAM_TYPE = 'CAM.CHANNEL_MAPPING' AND PARAM_CODE = :paramCode ");
+		
+		queryCondition.setObject("paramCode", inputVO.getChannel());
+		
+		queryCondition.setQueryString(sb.toString());
+
+		List<Map<String, Object>> channelMapping = dam.exeQueryWithoutSort(queryCondition);
+		
+		String firstChannel = (String) channelMapping.get(0).get("PARAM_NAME");
+		// === firstChannel end ===
+		
+		Date startDate = new Timestamp(Calendar.getInstance().getTime().getTime());
+
+		/* WMS-CR-20240524-02_RM名單管理機制調整： 1. 名單類別調整為「參考資訊」(04)。 2. 名單到期日為T(建立日) + 60日 */
+	    Calendar c = Calendar.getInstance();
+	    c.setTime(new Date());
+	    c.add(Calendar.DATE, 60);
+	    Date endDate = c.getTime();
+
+		cam996.saveCampaign(dam, 
+							campaign_Seq, 
+							campaignID, 
+							campaignName, 
+							campaignDesc, 
+							stepID, 
+							leadSourceId, 
+							startDate, 
+							endDate, 
+							leadType, 
+							leadPara1, 
+							leadPara2, 
+							examID, 
+							salesPitch, 
+							firstChannel, 
+							secondChannel, 
+							impStatus, 
+							checkStatus, 
+							giftCampaignID, 
+							leTotalCnt, 
+							null, 
+							null);
 
 		for (Map<String, String> data : inputVO.getCampaign_custlist()) {
 			BigDecimal seqNo = campaign_Seq;
 			String custID = data.get("CUST_ID");
 			String custName = data.get("CUST_NAME");
-			String branchID = null;
-			if (StringUtil.isEqual(inputVO.getSource(), "crm210")) {
-				if (data.get("CUST_02") != null) {
-					branchID = data.get("CUST_02");
-				} else { //如果客戶沒有歸屬行則定義branchID為指派新理專的歸屬行
-					QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
-
-					StringBuilder sb = new StringBuilder();
-					sb.append("SELECT INFO.BRANCH_NBR FROM TBORG_SALES_AOCODE SALE ");
-					sb.append("LEFT JOIN VWORG_BRANCH_EMP_DETAIL_INFO INFO ON SALE.EMP_ID = INFO.EMP_ID ");
-					sb.append("WHERE INFO.BRANCH_NBR IS NOT NULL AND SALE.AO_CODE = :ao_code ");
-
-					queryCondition.setQueryString(sb.toString());
-
-					if (StringUtils.isBlank(inputVO.getCampaign_ao_code())) {
-						queryCondition.setObject("ao_code", data.get("AO_CODE"));
-					} else {
-						queryCondition.setObject("ao_code", inputVO.getCampaign_ao_code());
-					}
-
-					List<Map<String, Object>> tempList = dam.exeQueryWithoutSort(queryCondition);
-					branchID = tempList.get(0).get("BRANCH_NBR").toString();
-				}
-			} else {
-				branchID = data.get("BRA_NBR");
-			}
-//			String aoCode = data.get("AO_CODE");
+			String branchID = inputVO.getBranchID();
 			String aoCode = inputVO.getCampaign_ao_code() != null && inputVO.getCampaign_ao_code().equals("OWN") ? null : inputVO.getCampaign_ao_code();
 			Date lead_startDate = new Timestamp(Calendar.getInstance().getTime().getTime());
 			Date lead_endDate = endDate;
@@ -422,6 +404,7 @@ public class CRM230 extends FubonWmsBizLogic {
 
 			cam996.saveLeads(dam, seqNo, custID, custName, branchID, aoCode, lead_startDate, lead_endDate, lead_leadType);
 		}
+		
 		this.sendRtnObject(null);
 	}
 

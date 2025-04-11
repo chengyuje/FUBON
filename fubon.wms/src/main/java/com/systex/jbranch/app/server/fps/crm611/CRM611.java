@@ -17,12 +17,7 @@ import com.systex.jbranch.app.server.fps.sot701.SOT701InputVO;
 import com.systex.jbranch.comutil.collection.GenericMap;
 import com.systex.jbranch.comutil.parse.JsonUtil;
 import com.systex.jbranch.fubon.commons.cbs.CBSService;
-import com.systex.jbranch.fubon.commons.cbs.dao._067050_067439DAO;
-import com.systex.jbranch.fubon.commons.cbs.dao._067439_067442DAO;
 import com.systex.jbranch.fubon.commons.cbs.service.FP032151Service;
-import com.systex.jbranch.fubon.commons.cbs.vo._067439_067442.CBS067439OutputVO;
-import com.systex.jbranch.fubon.commons.cbs.vo._067439_067442.CBS067442OutputVO;
-import com.systex.jbranch.fubon.commons.cbs.vo.basic.CBSUtilOutputVO;
 import com.systex.jbranch.fubon.commons.esb.EsbUtil;
 import com.systex.jbranch.fubon.commons.esb.vo.fp032151.FP032151OutputVO;
 import com.systex.jbranch.fubon.commons.esb.vo.wms032154.WMS032154OutputDetailsVO;
@@ -54,13 +49,6 @@ public class CRM611 extends EsbUtil {
 	private FP032151Service fp032151Service;
 	
 	private DataAccessManager dam = null;
-	
-	@Autowired
-	_067050_067439DAO _067050_067439dao;			
-	
-	@Autowired
-	_067439_067442DAO _067439_067442dao;
-	
 
 	private String apiParam = "SYS.SENIOR_CITIZEN_URL";
 	
@@ -274,13 +262,17 @@ public class CRM611 extends EsbUtil {
 		sql.append("       MAST.FAMILY_DEGREE, ");
 		sql.append("       XPE.EXPERIENCE_LEVEL, ");
 		sql.append("       PT.POTENTIAL_LEVEL, ");
-		sql.append("       CASE WHEN AN.CUST_ID IS NULL THEN 'N' ELSE 'Y' END AS IS_ACTUAL "); // add by ocean : WMS-CR-20220517-01_新增實動戶上傳註記
+		sql.append("       CASE WHEN AN.CUST_ID IS NULL THEN 'N' ELSE 'Y' END AS IS_ACTUAL,"); // add by ocean : WMS-CR-20220517-01_新增實動戶上傳註記
+		sql.append("       TCP.PRIVATE, "); // 2380 私銀註記欄位新增
+		sql.append("       TCP.EFFECTIVE_DATE "); // 2380 私銀註記欄位新增
 		sql.append("FROM TBCRM_CUST_MAST MAST ");
 		sql.append("LEFT JOIN TBCRM_CUST_NOTE NOTE ON MAST.CUST_ID = NOTE.CUST_ID  ");
 		sql.append("LEFT JOIN TBCRM_CUST_AGR_MKT_NOTE MKT ON MKT.CUST_ID = MAST.CUST_ID ");
 		sql.append("LEFT JOIN TBCRM_CUST_XP_DEGREE XPE ON XPE.CUST_ID = MAST.CUST_ID AND TRUNC(SYSDATE) BETWEEN TRUNC(XPE.EXPERIENCE_BEGIN_DATE) AND TRUNC(XPE.EXPERIENCE_END_DATE) ");
 		sql.append("LEFT JOIN TBCRM_CUST_PT_DEGREE PT ON PT.CUST_ID = MAST.CUST_ID AND TRUNC(SYSDATE) BETWEEN TRUNC(PT.POTENTIAL_BEGIN_DATE) AND TRUNC(PT.POTENTIAL_END_DATE)");
 		sql.append("LEFT JOIN TBPMS_CUST_ACTUAL AN ON AN.YYYYMM = (SELECT MAX(YYYYMM) FROM TBPMS_CUST_ACTUAL) AND AN.CUST_ID = MAST.CUST_ID "); // 實動戶註記
+		// 2380 私銀註記欄位新增
+		sql.append("LEFT JOIN TBCRM_CUST_PRIVATE TCP ON MAST.CUST_ID = TCP.CUST_ID  ");
 		
 		sql.append("WHERE MAST.CUST_ID = :custID");
 		
@@ -425,33 +417,5 @@ public class CRM611 extends EsbUtil {
 			return false;
 		}
 	}
-	
-	/*
-	 * #2325
-	 * 取得對帳單寄送註記
-	 */
-	public void getBillNote(Object body, IPrimitiveMap header) throws Exception {
-		CRM611InputVO inputVO = (CRM611InputVO) body;
-		CRM611OutputVO outputVO = new CRM611OutputVO();
-		
-		String custID = inputVO.getCust_id();
-		String idType = cbsservice.getCBSIDCode(custID);
-		
-//		@Autowired
-//		_067050_067439DAO _067050_067439dao;			
-//		
-//		@Autowired
-//		_067439_067442DAO _067439_067442dao;
-		List<CBSUtilOutputVO> list = _067050_067439dao.search(custID, idType);
-		
-		CBS067439OutputVO outputVO067439 = list.get(0).getCbs067439OutputVO();
-		
-		List<CBSUtilOutputVO> list2 = _067439_067442dao.search(outputVO067439);
-		
-		CBS067442OutputVO outputVO067442 = list2.get(0).getCbs067442OutputVO();
-					
-		this.sendRtnObject(outputVO);
-	}
-	
 
 }

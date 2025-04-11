@@ -4,6 +4,8 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
 	$controller('RegionController', {$scope: $scope});
 	$scope.controllerName = "CAM180Controller";
 	
+	$scope.priID = projInfoService.getPriID()[0];
+	
 	$scope.tabType = 0;
 	// combobox
 	getParameter.XML(["CAM.CHANNEL_CODE", "FUBONSYS.HEADMGR_ROLE", "CAM.VST_REC_CMU_TYPE"], function(totas) {
@@ -84,6 +86,17 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
 		});
 	};
 	
+	function getAllBranch() {
+		$scope.sendRecv("CAM180", "getAllBranch", "com.systex.jbranch.app.server.fps.cam180.CAM180InputVO", {}, function(tota, isError) {
+			if (!isError) {
+				if(tota[0].body.resultList.length > 0) {
+					$scope.BRANCH_LIST = tota[0].body.resultList;
+					console.log("$scope.region", $scope.region);
+        		}
+			}
+		});
+	}
+	
 	$scope.init = function() {
 		$scope.inputVO = {};
 		$scope.limitDate();
@@ -106,6 +119,10 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
         	if($scope.inputVO.isRegionMgr) {
         		$scope.getUHRMList();
         	}
+        	
+        	if($scope.priID == "JRM") {
+				getAllBranch();
+			}
         });
 	};
 	
@@ -155,7 +172,9 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
 				$scope.showErrorMsg("ehl_01_common_022");
 				return;
 			}
-		} else if(!isUHRM && !$scope.IS_HEADMGR_ROLE && !$scope.inputVO.bCode) {
+		} else if(!isUHRM && !$scope.IS_HEADMGR_ROLE 
+						  && !$scope.inputVO.bCode
+						  && $scope.priID != "JRM") {
 			//非私銀非總行一定要選分行
 			$scope.showErrorMsg("ehl_01_common_022");
         	return;
@@ -178,6 +197,13 @@ eSoafApp.controller('CAM180Controller', function($scope, $controller, socketServ
 	
 	$scope.setTabType = function (tabType) {
 		$scope.tabType = tabType;
+	}
+	
+	//排除JRM角色
+	$scope.changeBranchChk = function(region) {
+		if($scope.priID != "JRM") {
+			$scope.ChangeBranch(region);
+		}
 	}
     		
 	$scope.download = function() {

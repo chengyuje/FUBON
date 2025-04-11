@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
+
+
 
 
 
@@ -138,9 +141,36 @@ public class BTIOT extends BizLogic {
 			}
 		}		
 		
+		//更新無紙化案件傳送人壽日期
+		exeUpdateForMap(getUpdateInsSubmitDateSql(), new HashMap());
+		//更新無紙化案件人壽回饋簽收日期
+		exeUpdateForMap(getUpdateInsRcvDateSql(), new HashMap());
+		
 //		ftpUpload(ftpCode);
 
 	}
+	
+	//更新無紙化案件傳送人壽日期
+	//因不用傳送人壽就都押上今天日期
+	private String getUpdateInsSubmitDateSql() {
+		return new StringBuffer()
+			.append("UPDATE TBIOT_MAIN ")
+			.append(" SET INS_SUBMIT_DATE = SYSDATE, MODIFIER = 'BTIOT001', LASTUPDATE = SYSDATE ")
+			.append(" WHERE STATUS = '60' AND REG_TYPE IN ('1','2','3') AND COMPANY_NUM = 82 AND NVL(NO_PAPER_YN, 'N') = 'Y' AND INS_SUBMIT_DATE IS NULL ")
+			.toString();
+	}
+	
+	//更新無紙化案件人壽回饋簽收日期
+	//因人壽不會會饋，都押上今天日期
+	private String getUpdateInsRcvDateSql() {
+		return new StringBuffer()
+			.append("UPDATE TBIOT_BATCH_INFO ")
+			.append(" SET INS_RCV_DATE = SYSDATE, INS_RCV_OPRID = 'VP1', LASTUPDATE = SYSDATE, MODIFIER = 'BTIOT001' ")
+			.append(" WHERE INS_RCV_DATE IS NULL AND BATCH_INFO_KEYNO IN (SELECT BATCH_INFO_KEYNO FROM TBIOT_MAIN ")
+			.append(" 			WHERE STATUS = '60' AND REG_TYPE IN ('1','2','3') AND COMPANY_NUM = 82 AND NVL(NO_PAPER_YN, 'N') = 'Y') ")
+			.toString();
+	}
+	
 	//產出CSVO
 	private String OutputCsv(String path,String fileName, String[] csvHeader, String[] csvHeader_zh,
 			List<Map<String, Object>> datalist) throws JBranchException {

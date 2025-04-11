@@ -89,7 +89,7 @@ public class PMS433 extends FubonWmsBizLogic {
 		sql.append(" LEFT JOIN TBPMS_EMPLOYEE_REC_N MEM ON VW.EMP_ID = MEM.EMP_ID AND TO_DATE(H.YYYYMM,'yyyyMM') BETWEEN MEM.START_TIME AND MEM.END_TIME ");
 		sql.append(" WHERE 1 = 1  ");
 		//限制條件
-		if(roleID.matches("A150|ABRF|A157|A147|A257|")) { //作業主管or有權人員or業務主管
+		if(roleID.matches("A150|ABRF|A157|A147|A257|A161|A149")) { //作業主管or有權人員or業務主管or分行主管
 			sql.append(" AND VW.UHRM_CODE IS NULL ");
 		} else if (roleID.matches("R012|R006")) { //UHRM科主管or私銀作業主管
 			sql.append(" AND VW.UHRM_CODE IS NOT NULL ");
@@ -168,7 +168,7 @@ public class PMS433 extends FubonWmsBizLogic {
 		sql.append(" LEFT JOIN VWORG_DEFN_INFO VWORG ON H.BRA_NBR = VWORG.BRANCH_NBR ");
 		sql.append(" WHERE 1 = 1  ");
 		//限制條件
-		if(roleID.matches("A150|ABRF|A157|A147|A257|")) { //作業主管or有權人員or業務主管
+		if(roleID.matches("A150|ABRF|A157|A147|A257|A149|A161")) { //作業主管or有權人員or業務主管or分行個金主管
 			sql.append(" AND VW.UHRM_CODE IS NULL ");
 		} else if (roleID.matches("R012|R006")) { //UHRM科主管or私銀作業主管
 			sql.append(" AND VW.UHRM_CODE IS NOT NULL ");

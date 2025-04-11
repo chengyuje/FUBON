@@ -411,7 +411,7 @@ public class KYC310_PersonRptEmptyComp extends FubonWmsBizLogic {
     	PdfPTable table = buildTable(new int[]{20});
         List<Map> ansList = (List) map.get("ANSWER_LIST_COMP");
         for (Map ansMap : ansList) {
-        	if(ansMap.get("sameAnsSelect") != null && !((boolean)ansMap.get("sameAnsSelect"))) {
+        	if(ansMap.get("sameAnsSelect") == null || (ansMap.get("sameAnsSelect") != null && !((boolean)ansMap.get("sameAnsSelect")))) {
         		//本次填答與前次相同，不用顯示差異表問卷答案選項
 	        	PdfPCell cell = buildCellWithBorder(String.format("□%s", ansMap.get("ANSWER_DESC")), nFont, Paragraph.ALIGN_LEFT, -1, 0);
 	            cell.setVerticalAlignment(Paragraph.ALIGN_TOP);
@@ -480,7 +480,7 @@ public class KYC310_PersonRptEmptyComp extends FubonWmsBizLogic {
         for (Map ansMap : ansList) {
      	 //本次填答比上次上升兩級以上，第一個答案選項不用顯示
      	   if(!(pTypeMap.get("Q3Over2Degree") != null && (boolean)pTypeMap.get("Q3Over2Degree") && ((Double)ansMap.get("ANSWER_SEQ")).equals(new Double(1)))) {
-     		  if(pTypeMap.get("sameAnsSelect") != null && !((boolean)pTypeMap.get("sameAnsSelect"))) {
+     		  if(pTypeMap.get("sameAnsSelect") == null || (pTypeMap.get("sameAnsSelect") != null && !((boolean)pTypeMap.get("sameAnsSelect")))) {
      			  //本次填答與前次相同，不用顯示差異表問卷答案選項
 	 	    	  PdfPCell cell = buildCellWithBorder(String.format("□%s", ansMap.get("ANSWER_DESC")), nFont, Paragraph.ALIGN_LEFT, -1, 0);
 	 	          cell.setVerticalAlignment(Paragraph.ALIGN_TOP);

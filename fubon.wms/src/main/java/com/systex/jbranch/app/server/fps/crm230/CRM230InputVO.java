@@ -63,6 +63,35 @@ public class CRM230InputVO extends PagingInputVO {
 	// add by Carley 2019/08/05
 	private String cust_type; //客戶別（02：自然人、03：法人）
 	private String sal_acc_yn; //薪轉戶
+	
+	// add by Ocean 2025/03/31 WMS-CR-20250307-01_為利分行各類業務推展擬優化分行名單指派功能\
+	private String channel;
+	private String campEmpID;
+	private String branchID;
+	
+	public String getBranchID() {
+		return branchID;
+	}
+
+	public void setBranchID(String branchID) {
+		this.branchID = branchID;
+	}
+
+	public String getChannel() {
+		return channel;
+	}
+
+	public void setChannel(String channel) {
+		this.channel = channel;
+	}
+
+	public String getCampEmpID() {
+		return campEmpID;
+	}
+
+	public void setCampEmpID(String campEmpID) {
+		this.campEmpID = campEmpID;
+	}
 
 	public String getCust_w8ben() {
 		return cust_w8ben;

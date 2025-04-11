@@ -149,6 +149,13 @@ eSoafApp.controller('ORG110Controller', function(sysInfoService, $rootScope, $sc
 		$rootScope.menuItemInfo.url = "assets/txn/ORG120/ORG120.html";
 	}
 	
+	$scope.openORG121 = function(row) {
+		$scope.connector('set','ORG110_queryCondition', $scope.inputVO);
+		
+		$scope.connector('set','ORG110_tnsfData', row);
+		$rootScope.menuItemInfo.url = "assets/txn/ORG121/ORG121.html";
+	}
+	
 	$scope.openORG210 = function(row) {
 		$scope.connector('set','ORG110_queryCondition', $scope.inputVO);
 		

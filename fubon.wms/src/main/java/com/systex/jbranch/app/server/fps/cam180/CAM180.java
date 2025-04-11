@@ -160,7 +160,10 @@ public class CAM180 extends FubonWmsBizLogic {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-
+		
+		Map<String, String> bmmgrMap = xmlInfo.doGetVariable("FUBONSYS.BMMGR_ROLE", FormatHelper.FORMAT_2);
+		String loginRole = (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
+		
 		StringBuffer sql = new StringBuffer();
 		// TBCRM_CUST_VISIT_RECORD is A
 		sql.append("select r.RESPONSE_NAME, ");
@@ -210,6 +213,9 @@ public class CAM180 extends FubonWmsBizLogic {
 		sql.append("left join TBORG_MEMBER g2 on a.CREATOR = g2.EMP_ID ");
 		sql.append("left join TBORG_MEMBER g3 on a.MODIFIER = g3.EMP_ID ");
 		sql.append("left join TBORG_DEFN h on d.BRA_NBR = h.DEPT_ID ");
+		if (bmmgrMap.containsKey(loginRole)) {
+			sql.append("left join TBORG_MEMBER_ROLE g4 on g3.EMP_ID = g4.EMP_ID ");
+		}
 		sql.append("where 1 = 1 ");
 
 		// 20200602 ADD BY OCEAN : 0000166: WMS-CR-20200226-01_高端業管功能改採兼任分行角色調整相關功能_登入底層+行銷模組
@@ -227,10 +233,18 @@ public class CAM180 extends FubonWmsBizLogic {
 			//非總行一定要選分行，不用IN
 			//總行不需要限制分行
 			if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("1", inputVO.getbCodeType())) {
-				sql.append("and b.BRANCH_ID = :bcode ");
+				if (bmmgrMap.containsKey(loginRole)) {
+					sql.append("and (b.BRANCH_ID = :bcode or g4.ROLE_ID = 'JRM') ");
+				} else {
+					sql.append("and b.BRANCH_ID = :bcode ");
+				}
 				queryCondition.setObject("bcode", inputVO.getbCode());
 			} else if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("2", inputVO.getbCodeType())) {
-				sql.append("and d.BRA_NBR = :bcode ");
+				if (bmmgrMap.containsKey(loginRole)) {
+					sql.append("and (d.BRA_NBR = :bcode or g4.ROLE_ID = 'JRM') ");
+				} else {
+					sql.append("and d.BRA_NBR = :bcode ");
+				}
 				queryCondition.setObject("bcode", inputVO.getbCode());
 			}
 			
@@ -301,7 +315,10 @@ public class CAM180 extends FubonWmsBizLogic {
 
 		XmlInfo xmlInfo = new XmlInfo();
 		Map<String, String> headmgrMap = xmlInfo.doGetVariable("FUBONSYS.HEADMGR_ROLE", FormatHelper.FORMAT_2); //總行人員
-
+		
+		Map<String, String> bmmgrMap = xmlInfo.doGetVariable("FUBONSYS.BMMGR_ROLE", FormatHelper.FORMAT_2);
+		String loginRole = (String) getUserVariable(FubonSystemVariableConsts.LOGINROLE);
+		
 		StringBuffer sql = new StringBuffer();
 		// TBCRM_CUST_VISIT_RECORD is F
 		sql.append("select r.RESPONSE_NAME, ");
@@ -345,13 +362,18 @@ public class CAM180 extends FubonWmsBizLogic {
 		case "1":
 			sql.append("  SELECT * FROM TBCRM_CUST_VISIT_RECORD WHERE TRUNC(LASTUPDATE) < TRUNC(ADD_MONTHS(SYSDATE, -60)) ");
 			break;
-	}
+	    }
 	    sql.append(") f  on b.CUST_MEMO_SEQ = f.VISIT_SEQ ");
 		sql.append("left join TBORG_MEMBER g on b.EMP_ID = g.EMP_ID ");
 		sql.append("left join TBORG_MEMBER g2 on b.CREATOR = g2.EMP_ID ");
 		sql.append("left join TBORG_MEMBER g3 on b.MODIFIER = g3.EMP_ID ");
 		sql.append("left join TBORG_DEFN h on c.BRA_NBR = h.DEPT_ID ");
 		sql.append("left join TBORG_DEFN h2 on b.branch_ID = h2.DEPT_ID ");
+		
+		if (bmmgrMap.containsKey(loginRole)) {
+			sql.append("left join TBORG_MEMBER_ROLE g4 on g3.EMP_ID = g4.EMP_ID ");
+		}
+		
 		sql.append("where 1=1 ");
 
 		// 20200602 ADD BY OCEAN : 0000166: WMS-CR-20200226-01_高端業管功能改採兼任分行角色調整相關功能_登入底層+行銷模組
@@ -376,10 +398,18 @@ public class CAM180 extends FubonWmsBizLogic {
 			//非總行一定要選分行，不用IN
 			//總行不需要限制分行
 			if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("1", inputVO.getbCodeType())) {
-				sql.append(" and c.BRA_NBR = :bcode ");
+				if (bmmgrMap.containsKey(loginRole)) {
+					sql.append(" and (c.BRA_NBR = :bcode or g4.ROLE_ID = 'JRM') ");
+				} else {
+					sql.append(" and c.BRA_NBR = :bcode ");
+				}
 				queryCondition.setObject("bcode", inputVO.getbCode());
 			} else if (StringUtils.isNotBlank(inputVO.getbCode()) && StringUtils.equals("2", inputVO.getbCodeType())) {
-				sql.append(" and b.BRANCH_ID = :bcode ");
+				if (bmmgrMap.containsKey(loginRole)) {
+					sql.append(" and (b.BRANCH_ID = :bcode or g4.ROLE_ID = 'JRM') ");
+				} else {
+					sql.append(" and b.BRANCH_ID = :bcode ");
+				}
 				queryCondition.setObject("bcode", inputVO.getbCode());
 			}
 		} else if (StringUtils.lowerCase((String) getCommonVariable(FubonSystemVariableConsts.MEM_LOGIN_FLAG)).equals("uhrm")) {
@@ -458,6 +488,26 @@ public class CAM180 extends FubonWmsBizLogic {
 //		sql.append("order by LEAD_NAME,DEPT_NAME,EMP_ID,CUST_ID ");
 
 		return sql;
+	}
+	
+	/*
+	 * #2375
+	 * JRM角色，取得所有分行。
+	 */
+	public void getAllBranch(Object body, IPrimitiveMap header) throws Exception {
+		CAM180OutputVO outputVO = new CAM180OutputVO();
+		dam = this.getDataAccessManager();
+		QueryConditionIF queryCondition = dam.getQueryCondition(DataAccessManager.QUERY_LANGUAGE_TYPE_VAR_SQL);
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT ");
+		sb.append("  BRANCH_NAME AS LABEL, ");
+		sb.append("  BRANCH_NBR AS DATA ");
+		sb.append("FROM ");
+		sb.append("  VWORG_DEFN_INFO ");
+		queryCondition.setQueryString(sb.toString());
+		outputVO.setResultList(dam.exeQuery(queryCondition));
+		this.sendRtnObject(outputVO);
 	}
 	
 	public void download(Object body, IPrimitiveMap header) throws Exception {

@@ -643,7 +643,7 @@ public class KYC310_PersonRptComp extends FubonWmsBizLogic {
         inner.addCell(buildCell("對保（核對本人親簽無誤）：", nFont, Paragraph.ALIGN_LEFT, -1, 0));
         inner.addCell(buildCell("驗印：", nFont, Paragraph.ALIGN_LEFT, -1, 0));
         inner.addCell(buildCell("鍵機： " + inputVO.getBasicInforRptComp().get("KEYIN").toString(), nFont, Paragraph.ALIGN_LEFT, -1, 0));
-        inner.addCell(buildCell("覆核主管：_________", nFont, Paragraph.ALIGN_LEFT, -1, 0));
+        inner.addCell(buildCell("覆核主管：", nFont, Paragraph.ALIGN_LEFT, -1, 0));
 
         table.addCell(inner);
         return table;
